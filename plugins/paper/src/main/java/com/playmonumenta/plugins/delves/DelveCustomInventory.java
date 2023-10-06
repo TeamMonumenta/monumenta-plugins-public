@@ -186,7 +186,7 @@ public class DelveCustomInventory extends CustomInventory {
 					if (stack != null) {
 						int slot = (DELVE_MOD_ITEM_SLOTS[i] - (9 * (j + 1)));
 						mInventory.setItem(slot, stack);
-						if (level > DelvesUtils.MODIFIER_RANK_CAPS.get(mod)) {
+						if (level > DelvesUtils.MODIFIER_RANK_CAPS.getOrDefault(mod, 0)) {
 							break;
 						}
 					}

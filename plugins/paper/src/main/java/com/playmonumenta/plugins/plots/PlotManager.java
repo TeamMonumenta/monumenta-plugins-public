@@ -32,7 +32,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -83,7 +82,7 @@ public class PlotManager {
 								sender.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
 								ex.printStackTrace();
 							} else {
-								sender.sendMessage(ChatColor.GOLD + "Displaying info for player " + ChatColor.AQUA + name);
+								sender.sendMessage(Component.text("Displaying info for player ", NamedTextColor.GOLD).append(Component.text(name, NamedTextColor.AQUA)));
 								plotAccessInfo(sender, info);
 							}
 						});
@@ -281,20 +280,20 @@ public class PlotManager {
 	}
 
 	private static void plotAccessHelp(CommandSender sender) {
-		sender.sendMessage(ChatColor.GREEN + "");
-		sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "/plot access help");
-		sender.sendMessage(ChatColor.GREEN + "This command is used to give other people access to your plot");
-		sender.sendMessage(ChatColor.GREEN + "/plot access " + ChatColor.AQUA + "list");
-		sender.sendMessage(ChatColor.GREEN + "  Lists access to your plot and other plots you can access");
-		sender.sendMessage(ChatColor.GREEN + "/plot access " + ChatColor.AQUA + "add playerName optionalDuration");
-		sender.sendMessage(ChatColor.GREEN + "  Lets " + ChatColor.AQUA + "playerName" + ChatColor.GREEN + " access your plot");
-		sender.sendMessage(ChatColor.GREEN + "  Player does not need to be online");
-		sender.sendMessage(ChatColor.GREEN + "  Use " + ChatColor.AQUA + "optionalDuration" + ChatColor.GREEN + " to indicate when access expires");
-		sender.sendMessage(ChatColor.GREEN + "  For example 5d3h for 5 days 3 hours; max 365 days");
-		sender.sendMessage(ChatColor.GREEN + "/plot access " + ChatColor.AQUA + "remove playerName");
-		sender.sendMessage(ChatColor.GREEN + "  Removes " + ChatColor.AQUA + "playerName" + ChatColor.GREEN + " from access your plot");
-		sender.sendMessage(ChatColor.GREEN + "  Will *not* teleport them out if they are already there!");
-		sender.sendMessage(ChatColor.GREEN + "  (or if they logged out there)");
+		sender.sendMessage(Component.empty());
+		sender.sendMessage(Component.text("/plot access help", NamedTextColor.GREEN, TextDecoration.BOLD));
+		sender.sendMessage(Component.text("This command is used to give other people access to your plot", NamedTextColor.GREEN));
+		sender.sendMessage(Component.text("/plot access ", NamedTextColor.GREEN).append(Component.text("list", NamedTextColor.AQUA)));
+		sender.sendMessage(Component.text("  Lists access to your plot and other plots you can access", NamedTextColor.GREEN));
+		sender.sendMessage(Component.text("/plot access ", NamedTextColor.GREEN).append(Component.text("add playerName optionalDuration", NamedTextColor.AQUA)));
+		sender.sendMessage(Component.text("  Lets ", NamedTextColor.GREEN).append(Component.text("playerName", NamedTextColor.AQUA)).append(Component.text(" access your plot", NamedTextColor.GREEN)));
+		sender.sendMessage(Component.text("  Player does not need to be online", NamedTextColor.GREEN));
+		sender.sendMessage(Component.text("  Use ", NamedTextColor.GREEN).append(Component.text("optionalDuration", NamedTextColor.AQUA)).append(Component.text(" to indicate when access expires", NamedTextColor.GREEN)));
+		sender.sendMessage(Component.text("  For example 5d3h for 5 days 3 hours; max 365 days", NamedTextColor.GREEN));
+		sender.sendMessage(Component.text("/plot access ", NamedTextColor.GREEN).append(Component.text("remove playerName", NamedTextColor.AQUA)));
+		sender.sendMessage(Component.text("  Removes ", NamedTextColor.GREEN).append(Component.text("playerName", NamedTextColor.AQUA)).append(Component.text(" from access your plot", NamedTextColor.GREEN)));
+		sender.sendMessage(Component.text("  Will *not* teleport them out if they are already there!", NamedTextColor.GREEN));
+		sender.sendMessage(Component.text("  (or if they logged out there)", NamedTextColor.GREEN));
 	}
 
 	private static boolean plotAccessIsExpired(long time) {
@@ -302,18 +301,21 @@ public class PlotManager {
 	}
 
 	private static void plotAccessInfo(CommandSender sender, PlotInfo info) {
-		sender.sendMessage(ChatColor.GREEN + "Your plot number is: " + ChatColor.GOLD + "#" + info.mOwnedPlotId);
-		sender.sendMessage(ChatColor.GREEN + "Your currently selected plot is: " + ChatColor.GOLD + "#" + info.mCurrentPlotId);
+		sender.sendMessage(Component.text("Your plot number is: ", NamedTextColor.GREEN).append(Component.text("#" + info.mOwnedPlotId, NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("Your currently selected plot is: ", NamedTextColor.GREEN).append(Component.text("#" + info.mCurrentPlotId, NamedTextColor.GOLD)));
 		if (info.mOtherAccessToOwnerPlot.size() == 0) {
 			sender.sendMessage(Component.text("There are no players with access to your plot", NamedTextColor.GREEN));
 		} else {
 			sender.sendMessage(Component.text("These players have access to your plot:", NamedTextColor.GREEN));
 
 			info.mOtherAccessToOwnerPlot.forEach((key, expiration) -> {
-				if (expiration <= 0) {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key));
-				} else {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key) + ChatColor.GREEN + " Expires: " + ChatColor.AQUA + MessagingUtils.getTimeDifferencePretty(expiration));
+				String name = MonumentaRedisSyncIntegration.cachedUuidToName(key);
+				if (name != null) {
+					Component msg = Component.text("  " + name, NamedTextColor.AQUA);
+					if (expiration <= 0) {
+						msg = msg.append(Component.text(" Expires: ", NamedTextColor.GREEN)).append(Component.text(MessagingUtils.getTimeDifferencePretty(expiration), NamedTextColor.AQUA));
+					}
+					sender.sendMessage(msg);
 				}
 			});
 		}
@@ -324,10 +326,13 @@ public class PlotManager {
 			sender.sendMessage(Component.text("You have access to these other plots:", NamedTextColor.GREEN));
 
 			info.mOwnerAccessToOtherPlots.forEach((key, other) -> {
-				if (other.mExpiration <= 0) {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key) + ChatColor.GOLD + " (#" + other.mPlotId + ")");
-				} else {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key) + ChatColor.GOLD + " (#" + other.mPlotId + ")" + ChatColor.GREEN + " Expires: " + ChatColor.AQUA + MessagingUtils.getTimeDifferencePretty(other.mExpiration));
+				String name = MonumentaRedisSyncIntegration.cachedUuidToName(key);
+				if (name != null) {
+					Component msg = Component.text("  " + name, NamedTextColor.AQUA).append(Component.text(" (#" + other.mPlotId + ")", NamedTextColor.GOLD));
+					if (other.mExpiration <= 0) {
+						msg = msg.append(Component.text(" Expires: ", NamedTextColor.GREEN)).append(Component.text(MessagingUtils.getTimeDifferencePretty(other.mExpiration), NamedTextColor.AQUA));
+					}
+					sender.sendMessage(msg);
 				}
 			});
 		}
@@ -397,20 +402,24 @@ public class PlotManager {
 				String otherName = MonumentaRedisSyncIntegration.cachedUuidToName(otherUUID);
 				String plotName = sender instanceof Player player && player.getUniqueId().equals(ownerUUID) ? "your plot" : "the plot of " + ownerName;
 
+				if (otherName == null) {
+					return;
+				}
+
 				if (successOwn) {
-					sender.sendMessage(ChatColor.GREEN + "Successfully granted " + ChatColor.AQUA + otherName + ChatColor.GREEN + " access to " + plotName);
+					sender.sendMessage(Component.text("Successfully granted ", NamedTextColor.GREEN).append(Component.text(otherName, NamedTextColor.AQUA)).append(Component.text(" access to " + plotName, NamedTextColor.GREEN)));
 				} else {
-					sender.sendMessage(ChatColor.GREEN + "Successfully updated the duration of access of " + ChatColor.AQUA + otherName + ChatColor.GREEN + " to " + plotName);
+					sender.sendMessage(Component.text("Successfully updated the duration of access of ", NamedTextColor.GREEN).append(Component.text(otherName, NamedTextColor.AQUA)).append(Component.text(" to " + plotName, NamedTextColor.GREEN)));
 				}
 
 				Player ownerPlayer = Bukkit.getPlayer(ownerUUID);
 				if (ownerPlayer != null && ownerPlayer != sender) {
-					ownerPlayer.sendMessage(ChatColor.AQUA + otherName + ChatColor.GREEN + " has been granted access to your plot by a moderator.");
+					ownerPlayer.sendMessage(Component.text(otherName, NamedTextColor.AQUA).append(Component.text(" has been granted access to your plot by a moderator.", NamedTextColor.GREEN)));
 				}
-				if (successOther) {
+				if (successOther && ownerName != null) {
 					Player addedPlayer = Bukkit.getPlayer(otherUUID);
 					if (addedPlayer != null) {
-						addedPlayer.sendMessage(ChatColor.GREEN + "You now have access to " + ChatColor.AQUA + ownerName + ChatColor.GREEN + "'s plot");
+						addedPlayer.sendMessage(Component.text("You now have access to ", NamedTextColor.GREEN).append(Component.text(ownerName, NamedTextColor.AQUA)).append(Component.text("'s plot", NamedTextColor.GREEN)));
 					}
 				}
 			});

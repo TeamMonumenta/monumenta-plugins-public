@@ -18,7 +18,6 @@ public class WorldlyProtection implements Enchantment {
 	private static final double DAMAGE_MULTIPLIER_R1 = 0.05; // 5% reduction for region 1
 	private static final double DAMAGE_MULTIPLIER_R2 = 0.0725; // 7.25% reduction for region 2
 	private static final double DAMAGE_MULTIPLIER_R3 = 0.1; // 10% reduction for region 3
-	private static final double ATTACK_REDUCTION = 0.25;
 
 	@Override
 	public String getName() {

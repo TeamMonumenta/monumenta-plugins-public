@@ -110,70 +110,72 @@ public class CosmeticsGUI extends CustomInventory {
 		// Cosmetic skill page layers
 		if (mDisplayPage == CosmeticType.COSMETIC_SKILL) {
 			// Choose class
-			if (mCurrentClass == null && mCurrentAbility == null) {
-				// Choose class or shop
-				if (slot == CosmeticSkillGUIConfig.SHOP_LOC) {
-					close();
-					new CosmeticSkillShopGUI(mPlugin, player).openInventory(player, mPlugin);
-					return;
-				}
-				final MonumentaClasses mClasses = new MonumentaClasses();
-				for (int i = 0; i < CosmeticSkillGUIConfig.CLASS_LOCS.length; i++) {
-					if (slot == CosmeticSkillGUIConfig.CLASS_LOCS[i]) {
-						mCurrentClass = mClasses.mClasses.get(i);
+			if (mCurrentAbility == null) {
+				if (mCurrentClass == null) {
+					// Choose class or shop
+					if (slot == CosmeticSkillGUIConfig.SHOP_LOC) {
+						close();
+						new CosmeticSkillShopGUI(mPlugin, player).openInventory(player, mPlugin);
+						return;
+					}
+					final MonumentaClasses mClasses = new MonumentaClasses();
+					for (int i = 0; i < CosmeticSkillGUIConfig.CLASS_LOCS.length; i++) {
+						if (slot == CosmeticSkillGUIConfig.CLASS_LOCS[i]) {
+							mCurrentClass = mClasses.mClasses.get(i);
+							playBookSound(player);
+							setUpClassPage();
+							return;
+						}
+					}
+				} else if (mCurrentSpec == null) {
+					// Choose skill
+					for (int i = 0; i < CosmeticSkillGUIConfig.SKILL_LOCS.length; i++) {
+						if (slot == CosmeticSkillGUIConfig.SKILL_LOCS[i]) {
+							mCurrentAbility = mCurrentClass.mAbilities.get(i);
+							playBookSound(player);
+							setUpCosmetics(player);
+							return;
+						}
+					}
+
+					// Choose spec
+					if (slot == CosmeticSkillGUIConfig.SPEC_ONE_LOC) {
+						mCurrentSpec = mCurrentClass.mSpecOne;
+						playBookSound(player);
+						setUpSpecPage();
+						return;
+					} else if (slot == CosmeticSkillGUIConfig.SPEC_TWO_LOC) {
+						mCurrentSpec = mCurrentClass.mSpecTwo;
+						playBookSound(player);
+						setUpSpecPage();
+						return;
+					}
+
+					// Return to class selection
+					if (slot == BACK_LOC) {
+						mCurrentClass = null;
+						playBookSound(player);
+						setUpClassSelectionPage();
+						return;
+					}
+				} else {
+					// Choose spec skills
+					for (int i = 0; i < CosmeticSkillGUIConfig.SPEC_SKILL_LOCS.length; i++) {
+						if (slot == CosmeticSkillGUIConfig.SPEC_SKILL_LOCS[i]) {
+							mCurrentAbility = mCurrentSpec.mAbilities.get(i);
+							playBookSound(player);
+							setUpCosmetics(player);
+							return;
+						}
+					}
+
+					// Return to class page
+					if (slot == BACK_LOC) {
+						mCurrentSpec = null;
 						playBookSound(player);
 						setUpClassPage();
 						return;
 					}
-				}
-			} else if (mCurrentSpec == null && mCurrentAbility == null) {
-				// Choose skill
-				for (int i = 0; i < CosmeticSkillGUIConfig.SKILL_LOCS.length; i++) {
-					if (slot == CosmeticSkillGUIConfig.SKILL_LOCS[i]) {
-						mCurrentAbility = mCurrentClass.mAbilities.get(i);
-						playBookSound(player);
-						setUpCosmetics(player);
-						return;
-					}
-				}
-
-				// Choose spec
-				if (slot == CosmeticSkillGUIConfig.SPEC_ONE_LOC) {
-					mCurrentSpec = mCurrentClass.mSpecOne;
-					playBookSound(player);
-					setUpSpecPage();
-					return;
-				} else if (slot == CosmeticSkillGUIConfig.SPEC_TWO_LOC) {
-					mCurrentSpec = mCurrentClass.mSpecTwo;
-					playBookSound(player);
-					setUpSpecPage();
-					return;
-				}
-
-				// Return to class selection
-				if (slot == BACK_LOC) {
-					mCurrentClass = null;
-					playBookSound(player);
-					setUpClassSelectionPage();
-					return;
-				}
-			} else if (mCurrentAbility == null) {
-				// Choose spec skills
-				for (int i = 0; i < CosmeticSkillGUIConfig.SPEC_SKILL_LOCS.length; i++) {
-					if (slot == CosmeticSkillGUIConfig.SPEC_SKILL_LOCS[i]) {
-						mCurrentAbility = mCurrentSpec.mAbilities.get(i);
-						playBookSound(player);
-						setUpCosmetics(player);
-						return;
-					}
-				}
-
-				// Return to class page
-				if (slot == BACK_LOC) {
-					mCurrentSpec = null;
-					playBookSound(player);
-					setUpClassPage();
-					return;
 				}
 			} else {
 				// Chosen ability, override back to go to previous page

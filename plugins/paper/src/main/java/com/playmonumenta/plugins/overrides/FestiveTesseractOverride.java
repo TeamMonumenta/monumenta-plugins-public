@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,8 +44,8 @@ public class FestiveTesseractOverride extends BaseOverride implements Listener {
 	private static final Particle.DustOptions FESTIVE_GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
 	private static final int COOLDOWN = 60 * 20 * 5;
 	private static final HashMap<UUID, Integer> PLAYERS_ON_COOLDOWN = new HashMap<>();
-	private static final List<String> STANDARD_SUMMONS = new ArrayList<String>(Arrays.asList("TurretSnowman", "SpeedySnowman", "HeavySnowman", "HoppingSnowman"));
-	private static final List<String> UPGRADE_SUMMONS = new ArrayList<String>(Arrays.asList("SentrySnowman", "SneakySnowman", "TankSnowman", "AgileSnowman"));
+	private static final List<String> STANDARD_SUMMONS = new ArrayList<>(Arrays.asList("TurretSnowman", "SpeedySnowman", "HeavySnowman", "HoppingSnowman"));
+	private static final List<String> UPGRADE_SUMMONS = new ArrayList<>(Arrays.asList("SentrySnowman", "SneakySnowman", "TankSnowman", "AgileSnowman"));
 
 	public FestiveTesseractOverride() {
 		Bukkit.getPluginManager().registerEvents(this, Plugin.getInstance());
@@ -92,21 +92,21 @@ public class FestiveTesseractOverride extends BaseOverride implements Listener {
 			// On cooldown
 			int secondsLeft = (cooldownEnds - Bukkit.getServer().getCurrentTick()) / 20;
 
-			String timespec;
+			int time;
+			String unit;
 			if (secondsLeft < 60) {
-				timespec = ChatColor.RED + "" + ChatColor.BOLD + secondsLeft + ChatColor.RESET + ChatColor.AQUA + " second";
-				if (secondsLeft > 1) {
-					timespec += "s";
-				}
+				time = secondsLeft;
+				unit = "second";
 			} else {
-				int minutes = secondsLeft / 60;
-				timespec = ChatColor.RED + "" + ChatColor.BOLD + minutes + ChatColor.RESET + ChatColor.AQUA + " minute";
-				if (minutes > 1) {
-					timespec += "s";
-				}
+				time = secondsLeft / 60;
+				unit = "minute";
 			}
+			if (time > 1) {
+				unit += "s";
+			}
+			Component timespec = Component.empty().append(Component.text(Integer.toString(time), NamedTextColor.RED, TextDecoration.BOLD)).append(Component.text(" " + unit, NamedTextColor.AQUA));
 
-			player.sendMessage(ChatColor.AQUA + "Your tesseract is on cooldown! You can use it in " + timespec + ".");
+			player.sendMessage(Component.text("Your tesseract is on cooldown! You can use it in ", NamedTextColor.AQUA).append(timespec).append(Component.text(".", NamedTextColor.AQUA)));
 
 			return false;
 		}
@@ -131,8 +131,8 @@ public class FestiveTesseractOverride extends BaseOverride implements Listener {
 			if (summon != null) {
 				summon.getScoreboardTags().remove("boss_targetplayer");
 				summon.getScoreboardTags().remove("boss_winter_snowman");
-				if (summon instanceof Lootable) {
-					((Lootable) summon).clearLootTable();
+				if (summon instanceof Lootable lootable) {
+					lootable.clearLootTable();
 				}
 				if (checkTesseractName(item) == 1) {
 					BossManager.getInstance().unload(summon, false);

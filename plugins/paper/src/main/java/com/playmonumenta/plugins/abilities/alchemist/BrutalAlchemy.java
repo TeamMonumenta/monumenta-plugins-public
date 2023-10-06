@@ -13,7 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BrutalAlchemy extends Ability implements PotionAbility {
 	private static final int BRUTAL_ALCHEMY_DURATION = 8 * 20;
@@ -56,7 +56,7 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 			.displayItem(Material.REDSTONE);
 
 	private final int mPeriod;
-	private @MonotonicNonNull AlchemistPotions mAlchemistPotions;
+	private @Nullable AlchemistPotions mAlchemistPotions;
 
 	public BrutalAlchemy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
