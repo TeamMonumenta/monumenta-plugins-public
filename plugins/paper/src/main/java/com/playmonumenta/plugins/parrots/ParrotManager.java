@@ -47,7 +47,8 @@ public class ParrotManager implements Listener {
 		PATREON("Patreon Parakeet", 6, Parrot.Variant.RED, Material.ORANGE_WOOL) {
 			@Override
 			public boolean hasUnlocked(Player player) {
-				return ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) > Constants.PATREON_TIER_1;
+				return ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS)
+					.orElse(0) >= Constants.PATREON_TIER_1;
 			}
 		},
 		PULSATING_GOLD("Golden Conure", 7, Parrot.Variant.CYAN, Material.YELLOW_CONCRETE),
