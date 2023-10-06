@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -42,7 +42,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	private final LingeringRingAesthetics mLingeringRingAesthetics;
 	private final LingeringCenterAesthetics mLingeringCenterAesthetics;
 
-	private final String mSummonName;
+	private final LoSPool mSummonPool;
 	private final float mGrenadeVelocity;
 
 	public SpellBaseGrenadeLauncher(
@@ -74,7 +74,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, "", 0.7f);
+			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f);
 	}
 
 	/*
@@ -117,7 +117,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	 * @param ringAesthetics      aesthetics for the ring lingering
 	 * @param centerAesthetics    aesthetics for the center of the ring lingering
 	 * @param lingeringHitAction  action called for each LivingEntity that explosionTargets returns if inside lingeringRadius
-	 * @param spawnedmob          the mob to be spawned when the grenade explodes
+	 * @param mobPool             the mob pool to be spawned when the grenade explodes
 	 */
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -146,7 +146,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		LingeringCenterAesthetics centerAesthetics,
 		HitAction lingeringHitAction,
 
-		String spawnedmob,
+		LoSPool mobPool,
 		float yVelocity
 	) {
 		mPlugin = plugin;
@@ -172,7 +172,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		mLingeringRingAesthetics = ringAesthetics;
 		mLingeringHit = lingeringHitAction;
 
-		mSummonName = spawnedmob;
+		mSummonPool = mobPool;
 		mGrenadeVelocity = yVelocity;
 
 	}
@@ -274,7 +274,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 								for (LivingEntity target : targets) {
 									mHitAction.launch(mBoss, target, blockLocation);
 								}
-								Entity spawn = LibraryOfSoulsIntegration.summon(blockLocation, mSummonName);
+								Entity spawn = mSummonPool.spawn(blockLocation);
 								if (spawn != null) {
 									summonPlugins(spawn);
 								}
@@ -297,7 +297,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 							for (LivingEntity target : targets) {
 								mHitAction.launch(mBoss, target, blockLocation);
 							}
-							Entity spawn = LibraryOfSoulsIntegration.summon(blockLocation, mSummonName);
+							Entity spawn = mSummonPool.spawn(blockLocation);
 							if (spawn != null) {
 								summonPlugins(spawn);
 							}
@@ -315,7 +315,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 						for (LivingEntity target : targets) {
 							mHitAction.launch(mBoss, target, blockLocation);
 						}
-						Entity entity = LibraryOfSoulsIntegration.summon(blockLocation, mSummonName);
+						Entity entity = mSummonPool.spawn(blockLocation);
 						if (entity != null) {
 							summonPlugins(entity);
 						}

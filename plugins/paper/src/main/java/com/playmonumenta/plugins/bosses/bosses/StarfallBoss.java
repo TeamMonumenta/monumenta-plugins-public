@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -65,7 +65,7 @@ public class StarfallBoss extends BossAbilityGroup {
 		public SoundsList SOUND_METEOR = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,3,1)]");
 		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,3,1)]");
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
-		public String SPAWNEDMOB = "";
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 
 	}
 
@@ -131,7 +131,7 @@ public class StarfallBoss extends BossAbilityGroup {
 							if (mCurrentHeight <= 0) {
 								p.PARTICLE_EXPLOSION.spawn(boss, meteorCenter, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, 0.1);
 								p.SOUND_EXPLOSION.play(meteorCenter);
-								Entity spawn = LibraryOfSoulsIntegration.summon(meteorCenter, p.SPAWNEDMOB);
+								Entity spawn = p.SPAWNED_MOB_POOL.spawn(meteorCenter);
 								if (spawn != null) {
 									summonPlugins(spawn);
 								}

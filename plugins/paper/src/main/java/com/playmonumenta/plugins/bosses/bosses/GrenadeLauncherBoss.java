@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -96,7 +97,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		public SoundsList SOUND_LINGERING = SoundsList.fromString("[(ENTITY_BLAZE_BURN,4,1.5)]");
 
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
-		public String SPAWNEDMOB = "";
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 
 		public float Y_VELOCITY = 0.7f;
 
@@ -178,7 +179,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 
 				p.LINGERING_EFFECTS.apply(target, boss);
 			},
-			p.SPAWNEDMOB, p.Y_VELOCITY
+			p.SPAWNED_MOB_POOL, p.Y_VELOCITY
 		);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 
