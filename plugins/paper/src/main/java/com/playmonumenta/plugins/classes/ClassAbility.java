@@ -69,6 +69,7 @@ public enum ClassAbility {
 	DIVINE_JUSTICE(DivineJustice.NAME),
 	HAND_OF_LIGHT("Hand of Light"),
 	SANCTIFIED_ARMOR("Sanctified Armor"),
+	ILLUMINATE("Illuminate"),
 
 	// Hierophant
 	ENCHANTED_PRAYER("Enchanted Prayer"),

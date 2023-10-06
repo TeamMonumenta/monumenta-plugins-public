@@ -25,9 +25,9 @@ import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
+import com.playmonumenta.plugins.abilities.cleric.Illuminate;
 import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
-import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
@@ -359,9 +359,18 @@ public class CharmManager {
 			HandOfLight.CHARM_DAMAGE,
 			HandOfLight.CHARM_HEALING,
 			HandOfLight.CHARM_RANGE,
-			SanctifiedArmor.CHARM_DAMAGE,
-			SanctifiedArmor.CHARM_DURATION,
-			SanctifiedArmor.CHARM_SLOW,
+			Illuminate.CHARM_COOLDOWN,
+			Illuminate.CHARM_RANGE,
+			Illuminate.CHARM_VELOCITY,
+			Illuminate.CHARM_TRAIL_WIDTH,
+			Illuminate.CHARM_TRAIL_DURATION,
+			Illuminate.CHARM_SPEED_BUFF,
+			Illuminate.CHARM_STRENGTH_BUFF,
+			Illuminate.CHARM_DAMAGE,
+			Illuminate.CHARM_RADIUS,
+			Illuminate.CHARM_KNOCKBACK,
+			Illuminate.CHARM_ENHANCE_DAMAGE,
+			Illuminate.CHARM_ENHANCE_RADIUS,
 			HolyJavelin.CHARM_COOLDOWN,
 			HolyJavelin.CHARM_DAMAGE,
 			HolyJavelin.CHARM_RANGE,
@@ -899,6 +908,7 @@ public class CharmManager {
 			HolyJavelin.CHARM_COOLDOWN,
 			ChoirBells.CHARM_COOLDOWN,
 			LuminousInfusion.CHARM_COOLDOWN,
+			Illuminate.CHARM_COOLDOWN,
 			EnchantedPrayer.CHARM_COOLDOWN,
 			ThuribleProcession.CHARM_COOLDOWN,
 			HallowedBeam.CHARM_COOLDOWN,

@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
-import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
+import com.playmonumenta.plugins.abilities.cleric.Illuminate;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
@@ -32,7 +32,7 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(HandOfLight.INFO);
 		mAbilities.add(HeavenlyBoon.INFO);
 		mAbilities.add(Crusade.INFO);
-		mAbilities.add(SacredProvisions.INFO);
+		mAbilities.add(Illuminate.INFO);
 		mAbilities.add(SanctifiedArmor.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Cleric";
@@ -71,7 +71,8 @@ public class Cleric extends PlayerClass {
 			CelestialBlessing.INFO,
 			CleansingRain.INFO,
 			DivineJustice.INFO,
-			HandOfLight.INFO // after cleansing rain and luminous infusion
+			HandOfLight.INFO, // after cleansing rain and luminous infusion
+			Illuminate.INFO
 		);
 	}
 }
