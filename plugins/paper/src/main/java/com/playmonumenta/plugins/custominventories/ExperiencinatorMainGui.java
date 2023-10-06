@@ -80,7 +80,7 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 		}
 
 		// fill empty slots with filler
-		GUIUtils.fillWithFiller(mInventory, Material.GRAY_STAINED_GLASS_PANE);
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	public static void show(Player player, Plugin plugin, ExperiencinatorConfig.Experiencinator experiencinator, ItemStack experiencinatorItem) {

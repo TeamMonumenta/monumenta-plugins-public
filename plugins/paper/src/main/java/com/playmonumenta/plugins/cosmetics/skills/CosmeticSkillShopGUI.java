@@ -78,7 +78,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final ImmutableList<GalleryCS> GALLERY_CS = CosmeticSkills.getGallerySkins();
 
 	//GUI constants
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final Material LOCKED = Material.BARRIER;
 	private static final int LINE = 5;
 	private static final int INTRO_LOC = 4;
@@ -443,8 +443,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		mCurrentPage = page;
 		player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 		// Set filler to start
-		mInventory.clear();
-		GUIUtils.fillWithFiller(mInventory, FILLER);
+		GUIUtils.fillWithFiller(mInventory, true);
 
 		switch (mCurrentPage) {
 			case Depth:

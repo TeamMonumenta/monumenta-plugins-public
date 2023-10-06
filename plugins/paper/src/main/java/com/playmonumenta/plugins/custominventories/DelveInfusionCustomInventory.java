@@ -66,7 +66,6 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	}
 
 	private static final int MAX_LORE_LENGTH = 30;
-	private static final Material JUNK_ITEM = Material.GRAY_STAINED_GLASS_PANE;
 
 	private static final Map<DelveInfusionSelection, List<ItemStack>> mDelveInfusionPanelsMap = new HashMap<>();
 	private static final HashMap<DelveInfusionSelection, ItemStack> mDelvePanelList = new HashMap<>();
@@ -376,16 +375,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	}
 
 	private void fillWithJunk() {
-		ItemStack junk = new ItemStack(JUNK_ITEM, 1);
-		ItemMeta meta = junk.getItemMeta();
-		meta.displayName(Component.text(""));
-		junk.setItemMeta(meta);
-
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, junk);
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private static void addItems(DelveInfusionSelection infusion, BiFunction<Integer, String, String> function) {

@@ -60,7 +60,6 @@ public class LoadoutManagerGui extends Gui {
 		super(sender, 6 * 9, Component.text(LoadoutManager.LOADOUT_MANAGER_NAME, NamedTextColor.WHITE, TextDecoration.BOLD));
 		mTarget = target;
 		mLoadoutData = Plugin.getInstance().mLoadoutManager.getData(target);
-		setFiller(Material.GRAY_STAINED_GLASS_PANE);
 	}
 
 	@Override

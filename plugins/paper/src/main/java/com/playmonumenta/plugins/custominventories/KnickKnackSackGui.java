@@ -38,9 +38,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class KnickKnackSackGui extends Gui {
-
 	private static final int INV_SIZE = 36;
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Component BASE_TITLE = Component.text("Knick-Knack Sack");
 
 	private enum Page {
@@ -65,7 +63,6 @@ public class KnickKnackSackGui extends Gui {
 	public KnickKnackSackGui(Player player) {
 		super(player, INV_SIZE, BASE_TITLE);
 		mPage = Page.TRINKETS1;
-		setFiller(FILLER);
 	}
 
 	@Override

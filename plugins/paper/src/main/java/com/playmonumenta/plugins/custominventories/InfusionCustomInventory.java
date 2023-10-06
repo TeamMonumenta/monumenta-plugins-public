@@ -186,16 +186,7 @@ public class InfusionCustomInventory extends CustomInventory {
 
 
 	private void fillWithJunk() {
-		ItemStack junk = new ItemStack(JUNK_ITEM, 1);
-		ItemMeta meta = junk.getItemMeta();
-		meta.displayName(Component.text(""));
-		junk.setItemMeta(meta);
-
-		for (int i = 0; i < (ROW * COLUMNS); i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, junk);
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private static void addItems(InfusionSelection infusion, BiFunction<Integer, String, String> function) {

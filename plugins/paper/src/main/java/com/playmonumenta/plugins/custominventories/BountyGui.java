@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class BountyGui extends Gui {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final int RANGE = 10;
 
 	private static final List<Integer> BOUNTY_L1_LOCATIONS = new ArrayList<>(Arrays.asList(19, 22, 25));
@@ -87,7 +86,6 @@ public class BountyGui extends Gui {
 		mRegion = region;
 
 		mBounties = parseData(region);
-		setFiller(FILLER);
 	}
 
 	@Override

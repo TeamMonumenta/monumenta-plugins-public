@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class DepthsDebugGUI extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 
 	public static class DebugGUIItem {
 		int mSlot;
@@ -48,9 +48,7 @@ public class DepthsDebugGUI extends CustomInventory {
 		GUI_ITEMS.add(new DebugGUIItem(13, Material.PINK_DYE, "List Party Abilities", "Opens the depths summary GUI as if you are the player.", "abilityinfo"));
 		GUI_ITEMS.add(new DebugGUIItem(16, Material.MAGMA_BLOCK, "List Party Delve Info", "Opens the delve GUI as if you are the player.", "delveinfo"));
 
-		for (int i = 0; i < 27; i++) {
-			mInventory.setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory, true);
 
 		for (DebugGUIItem item : GUI_ITEMS) {
 			createCustomItem(item);

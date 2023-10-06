@@ -25,7 +25,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(47, 48, 50, 51, 46, 52, 45, 53));
 	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<>(Arrays.asList(2, 3, 5, 6));
 	private static final int START_OF_PASSIVES = 27;
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final int REWARD_LOCATION = 49;
 	private Boolean mDebugVersion = false;
 	private @Nullable DepthsParty mDepthsParty;
@@ -65,9 +65,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 		TRIGGER_STRINGS.add(new TriggerData(16, DepthsTrigger.SWAP, "No Swap ability!"));
 		TRIGGER_STRINGS.add(new TriggerData(17, DepthsTrigger.LIFELINE, "No Lifeline ability!"));
 
-		for (int i = 0; i < 54; i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory, true);
 		DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
 
 		if (playerInstance != null) {
@@ -117,7 +115,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 			return false;
 		}
 
-		GUIUtils.fillWithFiller(mInventory, Material.GRAY_STAINED_GLASS_PANE, true);
+		GUIUtils.fillWithFiller(mInventory, true);
 
 		//First- check if the player has any rewards to open
 		ItemStack rewardItem;

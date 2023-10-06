@@ -538,7 +538,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				                                         : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
 		}
 
-		GUIUtils.fillWithFiller(mInventory, Material.BLACK_STAINED_GLASS_PANE);
+		GUIUtils.fillWithFiller(mInventory);
 
 	}
 }

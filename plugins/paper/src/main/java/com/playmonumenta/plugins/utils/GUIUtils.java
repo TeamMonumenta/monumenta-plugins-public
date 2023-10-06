@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,25 @@ import org.jetbrains.annotations.Nullable;
 public class GUIUtils {
 	public static final String GUI_KEY = "GUI";
 	public static final String PLACEHOLDER_KEY = "Placeholder";
+	public static final String FILLER_KEY = "Filler";
+	public static final Material FILLER_MATERIAL = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
+	public static final ItemStack FILLER = createFiller();
+
+	private static ItemStack createFiller() {
+		ItemStack filler = new ItemStack(FILLER_MATERIAL, 1);
+		createFiller(filler);
+		return filler;
+	}
+
+	public static void createFiller(ItemStack filler) {
+		NBT.modify(filler, nbt -> {
+			nbt.modifyMeta((nbtr, meta) -> {
+				meta.displayName(Component.empty());
+			});
+			setPlaceholder(nbt);
+			setFiller(nbt);
+		});
+	}
 
 	public static void splitLoreLine(ItemStack item, String lore, TextColor color, int maxLength, boolean clean) {
 		ItemMeta meta = item.getItemMeta();
@@ -191,7 +211,7 @@ public class GUIUtils {
 		if (setPlainTag) {
 			ItemUtils.setPlainTag(item);
 		}
-		GUIUtils.setPlaceholder(item);
+		setPlaceholder(item);
 		return item;
 	}
 
@@ -201,19 +221,28 @@ public class GUIUtils {
 			       .decoration(TextDecoration.BOLD, nameBold);
 	}
 
-	public static void fillWithFiller(Inventory inventory, Material fillerMaterial) {
-		fillWithFiller(inventory, fillerMaterial, false);
+	public static void fillWithFiller(Inventory inventory) {
+		fillWithFiller(inventory, false);
 	}
 
-	public static void fillWithFiller(Inventory inventory, Material fillerMaterial, boolean clearInv) {
-		ItemStack filler = new ItemStack(fillerMaterial, 1);
-		ItemMeta meta = filler.getItemMeta();
-		meta.displayName(Component.empty());
-		filler.setItemMeta(meta);
-		setPlaceholder(filler);
+	public static void fillWithFiller(Inventory inventory, boolean clearInv) {
+		fillWithFiller(inventory, FILLER, false);
+	}
+
+	public static void fillWithFiller(Inventory inventory, Material material) {
+		fillWithFiller(inventory, material, false);
+	}
+
+	public static void fillWithFiller(Inventory inventory, Material material, boolean clearInv) {
+		ItemStack filler = new ItemStack(material, 1);
+		createFiller(filler);
+		fillWithFiller(inventory, filler, false);
+	}
+
+	public static void fillWithFiller(Inventory inventory, ItemStack filler, boolean clearInv) {
 		for (int i = 0; i < inventory.getSize(); i++) {
 			if (inventory.getItem(i) == null || clearInv) {
-				inventory.setItem(i, filler.clone());
+				inventory.setItem(i, filler);
 			}
 		}
 	}
@@ -232,11 +261,11 @@ public class GUIUtils {
 	}
 
 	public static boolean isPlaceholder(final @Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
+		if (ItemUtils.isNullOrAir(item)) {
 			return false;
 		}
 		return NBT.get(item, nbt -> {
-			ReadableNBT monumenta = nbt.getCompound("GUI");
+			ReadableNBT monumenta = nbt.getCompound(GUI_KEY);
 			if (monumenta == null) {
 				return false;
 			}
@@ -246,12 +275,21 @@ public class GUIUtils {
 	}
 
 	public static void setPlaceholder(final @Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
+		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			nbt.getOrCreateCompound(GUI_KEY).setBoolean(PLACEHOLDER_KEY, true);
+			setPlaceholder(nbt);
 		});
+	}
+
+	public static void setPlaceholder(ReadWriteNBT nbt) {
+		nbt.getOrCreateCompound(GUI_KEY).setBoolean(PLACEHOLDER_KEY, true);
+	}
+
+	public static void setFiller(ReadWriteNBT nbt) {
+		nbt.getOrCreateCompound(GUI_KEY).setBoolean(FILLER_KEY, true);
+		nbt.getOrCreateCompound("plain").getOrCreateCompound("display").setString("Name", "gui_blank");
 	}
 
 	public static void refreshOffhand(InventoryClickEvent event) {

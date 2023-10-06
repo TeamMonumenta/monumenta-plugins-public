@@ -29,7 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class ClassSelectionCustomInventory extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final String UNLOCK_SPECS = "Quest103";
 	private static final int UNLOCK_SPECS_MIN = 6;
 	private static final int COMMON_BACK_LOC = 0;
@@ -708,6 +708,6 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				ItemUtils.setPlainTag(item);
 			}
 		}
-		GUIUtils.fillWithFiller(mInventory, FILLER);
+		GUIUtils.fillWithFiller(mInventory);
 	}
 }

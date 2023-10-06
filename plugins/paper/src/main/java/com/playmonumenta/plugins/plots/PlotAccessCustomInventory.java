@@ -21,7 +21,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class PlotAccessCustomInventory extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final ArrayList<Integer> LOCATIONS = new ArrayList<>(Arrays.asList(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
 	private final int mNumPages;
 	private final ArrayList<PlotEntry> mAccessList = new ArrayList<>();
@@ -153,10 +153,6 @@ public class PlotAccessCustomInventory extends CustomInventory {
 	}
 
 	private void fillJunk() {
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, new ItemStack(FILLER, 1));
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 }

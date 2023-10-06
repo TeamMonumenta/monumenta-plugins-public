@@ -8,8 +8,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class ExampleCustomInventory extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
-
 	//Beyond creating this file, you also need a command, set up within
 	//CustomInventoriesCommands.java in this folder.
 
@@ -19,9 +17,7 @@ public class ExampleCustomInventory extends CustomInventory {
 		super(player, 27, "Example GUI");
 
 		//Main setup thread, create the first page of the GUI that loads in here.
-		for (int i = 0; i < 27; i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory);
 
 		ItemStack exampleItem = new ItemStack(Material.BAKED_POTATO, 1);
 		mInventory.setItem(13, exampleItem);
@@ -36,7 +32,7 @@ public class ExampleCustomInventory extends CustomInventory {
 		//did not click the filler item
 		if (event.getClickedInventory() != mInventory
 			    || event.getCurrentItem() == null
-			    || event.getCurrentItem().getType() == FILLER
+			    || event.getCurrentItem().getType() == GUIUtils.FILLER_MATERIAL
 			    || event.isShiftClick()) {
 			return;
 		}

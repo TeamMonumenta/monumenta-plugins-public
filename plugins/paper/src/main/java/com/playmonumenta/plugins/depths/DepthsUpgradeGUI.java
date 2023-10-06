@@ -6,19 +6,16 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class DepthsUpgradeGUI extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 
 	public DepthsUpgradeGUI(Player player) {
 		super(player, 27, "Select an Upgrade");
 
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getAbilityUpgradeOptions(player);
 
-		for (int i = 0; i < 27; i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory, true);
 		if (items != null) {
 			if (items.size() >= 1) {
 				mInventory.setItem(10, items.get(0).mItem);

@@ -49,7 +49,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class PassGui extends Gui {
 	protected static final int MAX_X = 8;
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 
 	private static final Set<PassGui> mOpenGuis = new HashSet<>();
 
@@ -88,7 +87,6 @@ public class PassGui extends Gui {
 			mView = new PassesView(this);
 		}
 
-		setFiller(FILLER);
 		mOpenGuis.add(this);
 	}
 

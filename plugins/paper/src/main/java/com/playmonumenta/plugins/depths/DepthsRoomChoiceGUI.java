@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class DepthsRoomChoiceGUI extends CustomInventory {
 	private static final Material NO_CHOICE = Material.BLACK_STAINED_GLASS_PANE;
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final ArrayList<RoomChoice> ROOM_LOCATIONS = new ArrayList<>();
 
 	public static final int LEVELSIX = 0x703663;
@@ -114,10 +114,6 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 	}
 
 	public void fillEmpty() {
-		for (int i = 0; i < 27; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, new ItemStack(FILLER, 1));
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 }

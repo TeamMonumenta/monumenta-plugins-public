@@ -32,7 +32,6 @@ class VanityBuyScreen extends Gui {
 		super(player, 4 * 9, Component.text("Unlock Vanity Item?", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		mItem = item;
 		mVanityGUI = vanityGUI;
-		setFiller(CosmeticsGUI.FILLER);
 	}
 
 	@Override

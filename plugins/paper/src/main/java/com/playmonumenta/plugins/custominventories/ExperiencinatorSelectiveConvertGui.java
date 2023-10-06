@@ -151,7 +151,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 
 
 		// fill empty slots with filler
-		GUIUtils.fillWithFiller(mInventory, Material.GRAY_STAINED_GLASS_PANE);
+		GUIUtils.fillWithFiller(mInventory);
 
 	}
 

@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,7 +19,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -40,7 +38,7 @@ public abstract class Gui {
 
 	private final List<GuiItem> mItems;
 
-	private @Nullable ItemStack mFiller = null;
+	private final ItemStack mFiller = GUIUtils.FILLER;
 
 	public Gui(Player player, int size, Component title) {
 		mPlugin = Plugin.getInstance();
@@ -105,30 +103,6 @@ public abstract class Gui {
 	 */
 	public void close() {
 		mCustomInventory.close();
-	}
-
-	/**
-	 * Sets a filler item to fill empty slots with. The name of the filler item will be set to the empty string.
-	 * <p>
-	 * Can be called at any time from within {@link #setup()} or in the constructor. If called from anywhere else, needs an {@link #update()} call to become effective.
-	 */
-	public void setFiller(@Nullable Material fillerMaterial) {
-		if (fillerMaterial == null) {
-			mFiller = null;
-			return;
-		}
-		ItemStack filler = new ItemStack(fillerMaterial, 1);
-		ItemMeta meta = filler.getItemMeta();
-		meta.displayName(Component.text(""));
-		filler.setItemMeta(meta);
-		mFiller = filler;
-	}
-
-	/**
-	 * Sets a filler item to fill empty slots with.
-	 */
-	public void setFiller(@Nullable ItemStack filler) {
-		mFiller = filler;
 	}
 
 	/**

@@ -48,7 +48,6 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final int MAX_MASTERWORK_LEVEL = 3;
 
 	private static final int MAX_LORE_LENGTH = 30;
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Material ORANGE_FILLER = Material.ORANGE_STAINED_GLASS_PANE;
 	private static final Material PURPLE_FILLER = Material.PURPLE_STAINED_GLASS_PANE;
 	private static final Material A_FILLER = Material.RED_STAINED_GLASS_PANE;
@@ -590,16 +589,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	}
 
 	private void fillWithJunk() {
-		ItemStack junk = new ItemStack(FILLER, 1);
-		ItemMeta meta = junk.getItemMeta();
-		meta.displayName(Component.text(""));
-		junk.setItemMeta(meta);
-
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, junk);
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private void fillWithColoredJunk(int slot, Material filler) {

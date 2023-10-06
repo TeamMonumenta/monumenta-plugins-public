@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class DepthsRemoveAbilityGUI extends CustomInventory {
 	private static final int START_OF_PASSIVES = 36;
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final Material CONFIRM_MAT = Material.GREEN_STAINED_GLASS_PANE;
 	private static final Material CANCEL_MAT = Material.ORANGE_STAINED_GLASS_PANE;
 	private static final int CONFIRM_ABILITY_LOC = 13;
@@ -56,9 +56,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		TRIGGER_STRINGS.add(new TriggerData(25, DepthsTrigger.SWAP, "No Swap ability!"));
 		TRIGGER_STRINGS.add(new TriggerData(26, DepthsTrigger.LIFELINE, "No Lifeline ability!"));
 
-		for (int i = 0; i < 54; i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory, true);
 
 		setAbilities(targetPlayer);
 	}
@@ -109,9 +107,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 	}
 
 	public void setConfirmation(ItemStack item) {
-		for (int i = 0; i < mInventory.getSize(); i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory, true);
 		mAbilityName = ItemUtils.getPlainName(item);
 
 		mInventory.setItem(CONFIRM_ABILITY_LOC, item);
@@ -128,9 +124,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 			return false;
 		}
 
-		for (int i = 0; i < mInventory.getSize(); i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory, true);
 
 		ItemStack createItem = createCustomItem(Material.PURPLE_STAINED_GLASS_PANE,
 		                                        "Click the ability to remove",

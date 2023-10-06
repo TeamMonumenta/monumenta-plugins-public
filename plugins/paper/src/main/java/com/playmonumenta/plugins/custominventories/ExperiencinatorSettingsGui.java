@@ -148,7 +148,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		}
 
 		// fill empty slots with filler
-		GUIUtils.fillWithFiller(mInventory, Material.GRAY_STAINED_GLASS_PANE);
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private void setupRegionOptions(Region region, Set<Tier> availableTiers) {

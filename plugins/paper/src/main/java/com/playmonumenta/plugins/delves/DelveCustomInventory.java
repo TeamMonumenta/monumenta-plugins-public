@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class DelveCustomInventory extends CustomInventory {
 
-	private static final ItemStack WHITE_ITEM = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
 	private static final ItemStack SELECT_ALL_MOD_ITEM = getSelectAllModifiers();
 	private static final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
 	private static final ItemStack BOUNTY_SELECTION_ITEM = getBountySelection();
@@ -44,11 +43,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
 	static {
-		ItemMeta meta = WHITE_ITEM.getItemMeta();
-		meta.displayName(Component.empty());
-		WHITE_ITEM.setItemMeta(meta);
-
-		meta = STARTING_ITEM.getItemMeta();
+		ItemMeta meta = STARTING_ITEM.getItemMeta();
 		meta.displayName(Component.text("Start delve!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		STARTING_ITEM.setItemMeta(meta);
 
@@ -218,11 +213,7 @@ public class DelveCustomInventory extends CustomInventory {
 			mInventory.setItem(PAGE_RIGHT_SLOT, SELECT_ALL_MOD_ITEM);
 		}
 
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, WHITE_ITEM);
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private List<DelvesModifier> getAvailableModifiers() {

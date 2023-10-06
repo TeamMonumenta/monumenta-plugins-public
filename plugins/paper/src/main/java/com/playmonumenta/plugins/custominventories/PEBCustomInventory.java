@@ -34,7 +34,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public class PEBCustomInventory extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 
 	private enum PebPage {
 		COMMON,
@@ -146,7 +146,7 @@ public class PEBCustomInventory extends CustomInventory {
 
 		// main menu
 		definePage(PebPage.MAIN,
-			new PebItem(0, "", "", NamedTextColor.LIGHT_PURPLE, FILLER, false),
+			new PebItem(0, "", "", NamedTextColor.LIGHT_PURPLE, FILLER, false), // TODO: why is this needed? we manually override it in setLayout
 			new PebItem(4, "Main Menu",
 				"A list of commonly used options, along with menu buttons to reach the full lists.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false),
@@ -944,18 +944,9 @@ public class PEBCustomInventory extends CustomInventory {
 			}
 		}
 
-		ItemStack fillerItem = new ItemStack(FILLER, 1);
-		ItemMeta meta = fillerItem.getItemMeta();
-		meta.displayName(Component.empty());
-		fillerItem.setItemMeta(meta);
-
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, fillerItem);
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 		if (page.equals(PebPage.MAIN)) {
-			mInventory.setItem(0, fillerItem);
+			mInventory.setItem(0, GUIUtils.FILLER);
 		}
 	}
 }

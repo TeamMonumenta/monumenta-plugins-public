@@ -311,8 +311,7 @@ public class CustomTradeGui extends Gui {
 		organizeTradesIfApplicable();
 			// theme:
 		if (mPebTradeGUITheme == 1) {
-			mBackgroundPane = GUIUtils.createBasicItem(Material.GRAY_STAINED_GLASS_PANE, "", NamedTextColor.GRAY, false,
-				"", NamedTextColor.GRAY, 0);
+			mBackgroundPane = GUIUtils.FILLER;
 		}
 	}
 

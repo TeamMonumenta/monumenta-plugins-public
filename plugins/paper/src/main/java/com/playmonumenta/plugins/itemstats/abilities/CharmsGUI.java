@@ -25,7 +25,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CharmsGUI extends Gui {
 	private static final int START_OF_CHARMS = 45;
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Material RED_FILLER = Material.RED_STAINED_GLASS_PANE;
 	private static final Material YELLOW_FILLER = Material.YELLOW_STAINED_GLASS_PANE;
 
@@ -44,7 +43,6 @@ public class CharmsGUI extends Gui {
 		super(requestingPlayer, 54, Component.text(targetPlayer.getName() + "'s Charms"));
 		mTargetPlayer = targetPlayer;
 		mMayEdit = mayEdit;
-		setFiller(FILLER);
 	}
 
 	@Override

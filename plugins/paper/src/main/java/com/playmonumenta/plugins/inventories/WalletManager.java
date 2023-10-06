@@ -433,7 +433,6 @@ public class WalletManager implements Listener {
 			mWallet = wallet;
 			mSettings = settings;
 			mPlainName = MessagingUtils.plainText(displayName);
-			setFiller(Material.BLACK_STAINED_GLASS_PANE);
 		}
 
 		@Override

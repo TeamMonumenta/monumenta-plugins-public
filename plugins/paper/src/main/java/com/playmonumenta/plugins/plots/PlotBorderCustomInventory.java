@@ -25,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class PlotBorderCustomInventory extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final Map<UUID, Long> COOLDOWNS = new HashMap<>();
 
 	/*
@@ -250,11 +250,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			}
 		}
 
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, new ItemStack(FILLER, 1));
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	public static String[] getCosmeticNames() {

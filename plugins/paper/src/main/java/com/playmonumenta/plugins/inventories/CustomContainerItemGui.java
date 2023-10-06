@@ -39,7 +39,6 @@ public class CustomContainerItemGui extends Gui {
 		super(player, (config.mTypesLimit <= 0 ? 6 : Math.min((config.mTypesLimit + 8) / 9, 5) + 1) * 9, container.getItemMeta().displayName());
 		this.mContainer = container;
 		this.mConfig = config;
-		setFiller(Material.BLACK_STAINED_GLASS_PANE);
 	}
 
 	public ItemStack getContainer() {

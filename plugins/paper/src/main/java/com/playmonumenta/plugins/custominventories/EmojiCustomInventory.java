@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class EmojiCustomInventory extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final Map<UUID, Long> COOLDOWNS = new HashMap<>();
 	public static final String EMOJI_CHOICE_BOARD = "DefaultEmoji";
 	private static final String PATREON_BOARD = Constants.Objectives.PATREON_DOLLARS;
@@ -173,10 +173,6 @@ public class EmojiCustomInventory extends CustomInventory {
 			mInventory.setItem(EMOJI_LOCS[locationIndex++], createCustomItem(player, item));
 		}
 
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, new ItemStack(FILLER, 1));
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory);
 	}
 }

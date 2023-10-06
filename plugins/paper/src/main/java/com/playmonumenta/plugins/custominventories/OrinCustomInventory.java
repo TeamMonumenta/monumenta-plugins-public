@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class OrinCustomInventory extends CustomInventory {
-	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final int[] INSTANCE_UPTO3_LOCS = {20, 22, 24};
 	private static final int[] INSTANCE_UPTO9_LOCS = {20, 22, 24, 29, 31, 33, 38, 40, 42};
 	private static final int[] INSTANCE_UPTO20_LOCS = {20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42, 47, 48, 49, 50, 51};
@@ -370,7 +370,7 @@ public class OrinCustomInventory extends CustomInventory {
 			}
 		}
 
-		GUIUtils.fillWithFiller(mInventory, FILLER);
+		GUIUtils.fillWithFiller(mInventory);
 
 		if (mCurrentPage == 11) {
 			showInstances(player, "valley");
