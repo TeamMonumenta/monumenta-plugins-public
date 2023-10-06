@@ -195,8 +195,11 @@ public class StasisListener implements Listener {
 		if (event.getAction() == Action.PHYSICAL) {
 			return;
 		}
-		if (isInRespawnStasis(event.getPlayer())) {
+		if (isInRespawnStasis(event.getPlayer()) && event.getAction().isRightClick()) {
 			event.setCancelled(true);
+			Player player = event.getPlayer();
+			player.setBedSpawnLocation(player.getWorld().getSpawnLocation());
+			player.teleport(player.getWorld().getSpawnLocation());
 			// Allow "respawning" after 1 second (to prevent accidental instant respawns)
 			endRespawnStasis(event.getPlayer(), false);
 		}
