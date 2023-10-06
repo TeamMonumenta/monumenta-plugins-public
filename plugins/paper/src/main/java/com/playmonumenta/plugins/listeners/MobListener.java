@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -59,6 +61,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -321,6 +324,18 @@ public class MobListener implements Listener {
 								}
 							}
 						}
+					}
+				} else {
+					// Attempt to update fangs damage using EvokerFangDamage nbt tag if it exists.
+					try {
+						if (fangs.getPersistentDataContainer().has(new NamespacedKey(mPlugin, "evoker-fang-damage"))) {
+							double damage = Objects.requireNonNull(fangs.getPersistentDataContainer().get(new NamespacedKey(mPlugin, "evoker-fang-damage"), PersistentDataType.DOUBLE));
+							event.setDamage(damage);
+						}
+					} catch (Exception e) {
+							MMLog.warning("[MobListener] Error while replacing EvokerFangs damage with custom EvokerFangDamage. Reason: " + e.getMessage());
+							e.printStackTrace();
+							return;
 					}
 				}
 			}
