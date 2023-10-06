@@ -28,7 +28,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class Quake implements Enchantment {
 
 	private static final float RADIUS = 3.0f;
-	private static final float DAMAGE_MODIFIER_PER_LEVEL = 0.1f;
+	private static final float DAMAGE_MODIFIER_PER_LEVEL = 0.05f;
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
@@ -84,7 +84,7 @@ public class Quake implements Enchantment {
 
 			double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.OTHER, finalDamage, ClassAbility.QUAKE, false, true);
+				DamageUtils.damage(player, mob, DamageType.TRUE, finalDamage, ClassAbility.QUAKE, false, true);
 			}
 
 			if (fire + ice + thunder + decay + bleed + wind == 0) {
