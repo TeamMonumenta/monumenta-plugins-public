@@ -122,7 +122,7 @@ public class RespawnStasis extends Stasis {
 		} else if (getDuration() >= DURATION / 2) {
 			// After 10 seconds, tell the player that they can click to respawn (or after the minimal duration if not showing the shatter message)
 			if (getDuration() <= DURATION - MINIMUM_DURATION) {
-				player.sendActionBar(Component.text("Left click any time to respawn, right click to respawn back at the world spawn.", NamedTextColor.WHITE));
+				player.sendActionBar(Component.text("(click any time to respawn)", NamedTextColor.WHITE));
 				mRemoveActionbar = true;
 			}
 		} else {
