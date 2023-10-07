@@ -25,9 +25,8 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
-import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
+import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
@@ -239,7 +238,6 @@ public class AbilityManager {
 			CluckingPotions.INFO,
 
 			// ALL PLAYERS (but technically for Cleric)
-			NonClericProvisionsPassive.INFO,
 
 			// ALL Attriba
 			AttribaAttackDamage.INFO,
@@ -310,7 +308,7 @@ public class AbilityManager {
 			HeavenlyBoon.INFO,
 			Crusade.INFO,
 			Illuminate.INFO,
-			SacredProvisions.INFO,
+			SanctifiedArmor.INFO,
 
 			//********** WARLOCK **********//
 			AmplifyingHex.INFO,

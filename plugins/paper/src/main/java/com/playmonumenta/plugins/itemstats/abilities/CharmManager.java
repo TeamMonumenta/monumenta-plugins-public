@@ -27,7 +27,6 @@ import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
 import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
-import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
@@ -349,8 +348,6 @@ public class CharmManager {
 			HeavenlyBoon.CHARM_STRENGTH_AMPLIFIER,
 			HeavenlyBoon.CHARM_RESIST_AMPLIFIER,
 			HeavenlyBoon.CHARM_ABSORPTION_AMPLIFIER,
-			SacredProvisions.CHARM_CHANCE,
-			SacredProvisions.CHARM_RANGE,
 			CleansingRain.CHARM_COOLDOWN,
 			CleansingRain.CHARM_RANGE,
 			CleansingRain.CHARM_REDUCTION,

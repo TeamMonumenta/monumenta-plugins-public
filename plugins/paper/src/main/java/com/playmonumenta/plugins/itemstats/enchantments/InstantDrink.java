@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -51,11 +50,7 @@ public class InstantDrink implements Enchantment {
 				if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY)) {
 					event.setUseItemInHand(Result.DENY);
 				} else if (player.getGameMode() != GameMode.CREATIVE) {
-					if (NonClericProvisionsPassive.testRandomChance(player)) {
-						NonClericProvisionsPassive.sacredProvisionsSound(player);
-					} else {
-						item.setAmount(item.getAmount() - 1);
-					}
+					item.setAmount(item.getAmount() - 1);
 				}
 				// fix for ghost potions on hotbar - bug #14893
 				// is hard to reproduce even with high ping so this may not be necessary

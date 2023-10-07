@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ZombieVillager;
@@ -29,13 +28,8 @@ public class GoldenAppleOverride extends BaseOverride {
 
 		event.setCancelled(true);
 
-		if (NonClericProvisionsPassive.testRandomChance(player)) {
-			NonClericProvisionsPassive.sacredProvisionsSound(player);
-			// really stupid fix for when sacred provisions ignores it
-			event.setReplacement(mainhand);
-		} else {
-			player.getInventory().setItemInMainHand(mainhand.subtract(1));
-		}
+		player.getInventory().setItemInMainHand(mainhand.subtract(1));
+
 		player.setFoodLevel(Math.min(player.getFoodLevel() + 4, 20));
 		player.setSaturation(Math.min(player.getSaturation() + 9.6f, player.getFoodLevel()));
 

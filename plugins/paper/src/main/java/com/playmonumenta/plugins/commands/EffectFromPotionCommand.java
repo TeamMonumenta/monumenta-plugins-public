@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -143,20 +142,13 @@ public class EffectFromPotionCommand {
 			Starvation.apply(player, starvation);
 		}
 
-		// Check for Cleric Sacred Provisions
-		if (NonClericProvisionsPassive.testRandomChance(player)) {
-			// Cleric Sacred Provisions triggers, make nice sounds.
-			NonClericProvisionsPassive.sacredProvisionsSound(player);
+		// If there is more than one potion, decrement potion by one
+		if (potion.getAmount() > 1) {
+			potion.setAmount(potion.getAmount() - 1);
 			updatedPotion = potion;
 		} else {
-			// If there is more than one potion, decrement potion by one
-			if (potion.getAmount() > 1) {
-				potion.setAmount(potion.getAmount() - 1);
-				updatedPotion = potion;
-			} else {
-				// Set potion to air.
-				updatedPotion = new ItemStack(Material.AIR);
-			}
+			// Set potion to air.
+			updatedPotion = new ItemStack(Material.AIR);
 		}
 
 		return updatedPotion;

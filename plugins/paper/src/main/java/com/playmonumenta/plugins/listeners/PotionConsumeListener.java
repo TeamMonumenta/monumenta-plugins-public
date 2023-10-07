@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.listeners;
 
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
@@ -191,10 +190,6 @@ public class PotionConsumeListener implements Listener {
 			//Apply Starvation if applicable
 			Starvation.apply(player, starvation);
 
-			if (reduceStack && NonClericProvisionsPassive.testRandomChance(player)) {
-				NonClericProvisionsPassive.sacredProvisionsSound(player);
-				reduceStack = false;
-			}
 		} else {
 			//Gives 80% slowness to emulate the slow walking of drinking, extra 5 ticks to match delay of drinking
 			mPlugin.mEffectManager.addEffect(player, INVENTORY_DRINK_SLOW_EFFECT_NAME, new PercentSpeed(DRINK_DURATION + 5, -0.8, INVENTORY_DRINK_SLOW_EFFECT_NAME).displays(false));
@@ -214,16 +209,8 @@ public class PotionConsumeListener implements Listener {
 
 						Starvation.apply(player, starvation);
 
-						//If Sacred Provisions check passes, do not consume, but do not enable cancel quick drink function
-						//Do not run addition on infinity potions
-						if (potion != null && ItemStatUtils.getEnchantmentLevel(potion, EnchantmentType.INFINITY) == 0 &&
-							    NonClericProvisionsPassive.testRandomChance(player)) {
-							NonClericProvisionsPassive.sacredProvisionsSound(player);
-							postPotionDrink(player, clickedInventory, potion, false);
-						} else {
-							//Remove glass bottle from inventory once drinked
-							postPotionDrink(player, clickedInventory, null, false);
-						}
+						//Remove glass bottle from inventory once drinked
+						postPotionDrink(player, clickedInventory, null, false);
 
 						this.cancel();
 						mRunnables.remove(uuid);
@@ -294,12 +281,6 @@ public class PotionConsumeListener implements Listener {
 		if (potion.getItem().getType() == Material.SPLASH_POTION) {
 			PotionUtils.mimicSplashPotionEffect(player, potion);
 			PotionUtils.splashPotionParticlesAndSound(player, potion.getPotionMeta().getColor());
-		}
-
-		//If Sacred Provisions check passes, do not consume
-		if (NonClericProvisionsPassive.testRandomChance(player)) {
-			NonClericProvisionsPassive.sacredProvisionsSound(player);
-			return;
 		}
 
 		//Remove item
