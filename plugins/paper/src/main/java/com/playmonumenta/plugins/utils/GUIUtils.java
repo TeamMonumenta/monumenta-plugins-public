@@ -226,7 +226,7 @@ public class GUIUtils {
 	}
 
 	public static void fillWithFiller(Inventory inventory, boolean clearInv) {
-		fillWithFiller(inventory, FILLER, false);
+		fillWithFiller(inventory, FILLER, clearInv);
 	}
 
 	public static void fillWithFiller(Inventory inventory, Material material) {
