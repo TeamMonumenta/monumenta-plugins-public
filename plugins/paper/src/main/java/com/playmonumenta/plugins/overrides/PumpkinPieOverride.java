@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -33,6 +35,11 @@ public class PumpkinPieOverride extends BaseOverride {
 		}
 
 		if (!player.hasPermission("monumenta.command.summontrickycreeper")) {
+			return true;
+		}
+
+		if (player.getScoreboardTags().contains("SQRacer")) {
+			player.sendMessage(Component.text("You can't stop to feed the creepers during a race!", NamedTextColor.RED));
 			return true;
 		}
 
