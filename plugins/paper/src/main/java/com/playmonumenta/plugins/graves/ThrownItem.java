@@ -112,9 +112,10 @@ public class ThrownItem {
 	private void remove() {
 		if (mEntity != null) {
 			mManager.removeItem(mEntity);
-			if (mEntity.isValid()) {
-				mEntity.remove();
-			}
+			// Note that as of 1.19, mEntity.isValid() is false at this point.
+			// We need to remove it anyway - it's still in the chunk that is unloading.
+			Plugin.getInstance().getLogger().fine(() -> "Removing thrown item due to chunk unload at " + mEntity.getLocation() + " " + mEntity.getItemStack().getType());
+			mEntity.remove();
 			mEntity = null;
 			stopTracking();
 		}
