@@ -579,7 +579,8 @@ public class LoadoutManagerGui extends Gui {
 	}
 
 	private static final ImmutableSet<String> ALLOWED_PLAYER_MODIFIED_KEYS = ImmutableSet.of(
-		ItemStatUtils.CUSTOM_SKIN_KEY, ItemStatUtils.PLAYER_CUSTOM_NAME_KEY, ItemStatUtils.VANITY_ITEMS_KEY);
+		ItemStatUtils.CUSTOM_SKIN_KEY, ItemStatUtils.PLAYER_CUSTOM_NAME_KEY, ItemStatUtils.VANITY_ITEMS_KEY,
+		ParrotManager.SCOREBOARD_PARROT_LEFT, ParrotManager.SCOREBOARD_PARROT_RIGHT);
 
 	private static boolean isUnmodifiedShulker(ItemStack item) {
 		// Must be empty
