@@ -30,14 +30,11 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class TotemAbility extends Ability implements AbilityWithDuration {
 
-	private static final double VELOCITY = 1.25;
-	private static final double TIME_TO_DROP = 75;
-	private static final double XZ_DISTANCE_TO_DROP = 14;
+	private static final double VELOCITY = 0.65;
 	private static final int TOTEM_DELAY = 20;
 
 	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
@@ -90,13 +87,6 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				if (mT > cd) {
 					proj.remove();
 					this.cancel();
-				}
-
-				Location projLoc = proj.getLocation();
-				projLoc.setY(mPlayer.getLocation().getY());
-				if (mT >= TIME_TO_DROP
-					|| projLoc.distance(mPlayer.getLocation()) >= XZ_DISTANCE_TO_DROP) {
-					proj.setVelocity(new Vector(0, -2, 0));
 				}
 
 				if (proj.isDead()) {
