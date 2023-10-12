@@ -471,7 +471,7 @@ public class ShopManager implements Listener {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.withArguments(new IntegerArgument("radius"))
 			.executes((sender, args) -> {
-				unlockMarketBarrels((Player) args[1], (Player) args[2], (int) args[3]);
+				unlockMarketBarrels((Player) args[0], (Player) args[1], (int) args[2]);
 			})
 			.register();
 
