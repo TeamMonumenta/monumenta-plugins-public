@@ -870,8 +870,12 @@ public class ItemUtils {
 			return "";
 		}
 		return NBT.get(itemStack, nbt -> {
-			return nbt.resolveOrDefault(plainNamePath, "");
+			return getPlainNameIfExists(nbt);
 		});
+	}
+
+	public static String getPlainNameIfExists(ReadableNBT nbt) {
+		return nbt.resolveOrDefault(plainNamePath, "");
 	}
 
 	public static String getPlainNameOrDefault(@Nullable ItemStack itemStack) {

@@ -178,15 +178,16 @@ public class ItemUpdateHelper {
 			}
 
 			// Checks for PI + Totem of Transposing
-			String plainName = ItemUtils.getPlainNameIfExists(item);
+			String plainName = ItemUtils.getPlainNameIfExists(nbt);
 			if (plainName.equals("Potion Injector") && ItemUtils.isShulkerBox(item.getType())) {
 				List<String> plainLore = ItemUtils.getPlainLore(item);
 				Component potionName = Objects.requireNonNull(item.lore()).get(1);
 				lore.add(Component.text(plainLore.get(0), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				lore.add(potionName);
 			} else if (plainName.equals("Totem of Transposing")) {
-				List<String> plainLore = ItemUtils.getPlainLore(item);
-				lore.add(Component.text(plainLore.get(0), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				int transposingId = nbt.getOrDefault("TransposingID", -1);
+				String transposingChannel = transposingId == -1 ? "MISSING CHANNEL" : transposingId + "";
+				lore.add(Component.text("Transposing Channel: " + transposingChannel, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 			}
 
 			List<Component> tagsLater = new ArrayList<>();
