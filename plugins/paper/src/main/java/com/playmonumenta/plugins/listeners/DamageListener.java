@@ -213,16 +213,6 @@ public class DamageListener implements Listener {
 			GalleryManager.onEntityDamageEvent(event);
 		}
 
-		// Reverb custom enchant needs to calculate final damage after effects are applied.
-		if (source instanceof Player player) {
-			PlayerItemStats eventPlayerItemStats = event.getPlayerItemStats();
-			if (eventPlayerItemStats != null) {
-				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, eventPlayerItemStats, event, damagee);
-			} else {
-				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, event, damagee);
-			}
-		}
-
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
 		if (source instanceof Player player
 			    && ((damager instanceof Projectile proj && !proj.hasMetadata(RapidFire.META_DATA_TAG)) || ElementalArrows.isElementalArrowDamage(event))
@@ -248,6 +238,16 @@ public class DamageListener implements Listener {
 			} else {
 				DamageUtils.damage(player, damagee, DamageEvent.DamageType.TRUE, damage, event.getAbility(), true, false);
 				mPlugin.mEffectManager.addEffect(damagee, ProjectileIframe.SOURCE, new ProjectileIframe(ProjectileIframe.IFRAME_DURATION, damage));
+			}
+		}
+
+		// Reverb custom enchant needs to calculate final damage after effects are applied.
+		if (source instanceof Player player) {
+			PlayerItemStats eventPlayerItemStats = event.getPlayerItemStats();
+			if (eventPlayerItemStats != null) {
+				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, eventPlayerItemStats, event, damagee);
+			} else {
+				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, event, damagee);
 			}
 		}
 	}

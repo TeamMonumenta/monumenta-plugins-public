@@ -47,7 +47,9 @@ public class Reverb implements Enchantment {
 	// Event occurs before the actual damages are applied to the mob, on the same tick.
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && EntityUtils.isHostileMob(enemy)) {
+		if (EntityUtils.isHostileMob(enemy) &&
+			(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
+			event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE)) {
 			mEnemyHealth = enemy.getHealth();
 			mEntity = enemy;
 			mDamageThisTick = 0;
