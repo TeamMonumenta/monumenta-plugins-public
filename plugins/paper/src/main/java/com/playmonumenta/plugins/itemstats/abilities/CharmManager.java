@@ -159,6 +159,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
@@ -1221,18 +1222,18 @@ public class CharmManager {
 	public String getSummaryOfCharmNames(Player p) {
 		List<ItemStack> charms = mPlayerCharms.get(p.getUniqueId());
 		if (charms != null) {
-			String summary = "";
+			StringBuilder summary = new StringBuilder();
 			int powerBudget = 0;
 			for (ItemStack item : charms) {
 				if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-					summary += item.getItemMeta().getDisplayName() + "\n";
+					summary.append(item.displayName()).append("\n");
 					powerBudget += ItemStatUtils.getCharmPower(item);
 				}
 			}
-			summary += ChatColor.YELLOW + "Charm Power: " + powerBudget;
-			return summary;
+			summary.append(NamedTextColor.YELLOW).append("Charm Power: ").append(powerBudget);
+			return summary.toString();
 		}
-		return ChatColor.GRAY + "no charms";
+		return NamedTextColor.GRAY + "no charms";
 	}
 
 	public int getCharmPower(Player p) {

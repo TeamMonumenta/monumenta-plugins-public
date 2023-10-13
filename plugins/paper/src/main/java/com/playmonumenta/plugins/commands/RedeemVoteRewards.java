@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.RemoteDataAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -35,7 +36,7 @@ public class RedeemVoteRewards extends GenericCommand {
 	}
 
 	private static void run(Plugin plugin, Player player, String scoreboardName, FunctionWrapper[] functions) {
-		MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, MonumentaRedisSyncAPI.remoteDataGet(player.getUniqueId(), VOTES_UNCLAIMED), (data, ex) -> {
+		MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, RemoteDataAPI.get(player.getUniqueId(), VOTES_UNCLAIMED), (data, ex) -> {
 			if (ex != null) {
 				MessagingUtils.sendError(player, "Failed to get unclaimed vote rewards: " + ex.getMessage());
 			} else {
@@ -67,7 +68,7 @@ public class RedeemVoteRewards extends GenericCommand {
 				final int amountRedeemed = amountAvailable;
 
 				// Now try to atomically remove that many unclaimed rewards from that value
-				MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, MonumentaRedisSyncAPI.remoteDataIncrement(player.getUniqueId(), VOTES_UNCLAIMED, -1 * amountRedeemed), (resultRemaining, resultEx) -> {
+				MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, RemoteDataAPI.increment(player.getUniqueId(), VOTES_UNCLAIMED, -1 * amountRedeemed), (resultRemaining, resultEx) -> {
 					if (resultEx != null) {
 						MessagingUtils.sendError(player, "Failed to decrement unclaimed vote rewards: " + resultEx.getMessage());
 					} else {
@@ -82,7 +83,7 @@ public class RedeemVoteRewards extends GenericCommand {
 								MessagingUtils.sendError(player, "Got negative remaining vote rewards after redeeming - be patient and only try once at a time");
 							}
 							// Put the amount redeemed back to redis
-							MonumentaRedisSyncAPI.remoteDataIncrement(player.getUniqueId(), VOTES_UNCLAIMED, amountRedeemed);
+							RemoteDataAPI.increment(player.getUniqueId(), VOTES_UNCLAIMED, amountRedeemed);
 						} else {
 							// Hooray, successfully claimed rewards
 							ScoreboardUtils.setScoreboardValue(player, scoreboardName, amountRedeemed);

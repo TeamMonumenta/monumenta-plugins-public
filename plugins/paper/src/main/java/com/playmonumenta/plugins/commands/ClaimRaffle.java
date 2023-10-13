@@ -40,7 +40,7 @@ public class ClaimRaffle {
 	}
 
 	private static void run(Plugin plugin, Player player) {
-		MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, MonumentaRedisSyncAPI.remoteDataGet(player.getUniqueId(), RAFFLE_WINS_UNCLAIMED), (data, ex) -> {
+		MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, RemoteDataAPI.get(player.getUniqueId(), RAFFLE_WINS_UNCLAIMED), (data, ex) -> {
 			if (ex != null) {
 				MessagingUtils.sendError(player, "Failed to get unclaimed raffle rewards: " + ex.getMessage());
 			} else {

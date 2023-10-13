@@ -134,7 +134,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			}
 
 			if (mTridentName == null) {
-				mTridentName = mTrident.getItemMeta().getDisplayName();
+				mTridentName = mTrident.displayName().toString();
 			}
 
 			Damageable dm = (Damageable) mTrident.getItemMeta();
@@ -421,9 +421,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	private boolean equalsTrident(ItemStack item) {
 		if (item != null) {
 			ItemMeta im = item.getItemMeta();
-			if (im != null && im.getDisplayName().equals(mTridentName)) {
-				return true;
-			}
+            return item.displayName().toString().equals(mTridentName);
 		}
 		return false;
 	}

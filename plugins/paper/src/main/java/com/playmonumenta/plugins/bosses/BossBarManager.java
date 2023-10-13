@@ -42,9 +42,9 @@ public class BossBarManager {
 		}
 
 		if (bossFog) {
-			mBar = Bukkit.getServer().createBossBar(boss.getCustomName(), color, style, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
+			mBar = Bukkit.getServer().createBossBar(boss.getName(), color, style, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
 		} else {
-			mBar = Bukkit.getServer().createBossBar(boss.getCustomName(), color, style, BarFlag.PLAY_BOSS_MUSIC);
+			mBar = Bukkit.getServer().createBossBar(boss.getName(), color, style, BarFlag.PLAY_BOSS_MUSIC);
 		}
 		mBar.setVisible(true);
 
@@ -85,7 +85,7 @@ public class BossBarManager {
 		}
 
 		if (!Double.isFinite(progress) || progress > 1.0f || progress < 0f) {
-			mPlugin.getLogger().severe("Boss '" + mBoss.getCustomName() + "' has invalid health " +
+			mPlugin.getLogger().severe("Boss '" + mBoss.getName() + "' has invalid health " +
 				mBoss.getHealth() + " out of max " +
 				EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0));
 		} else {

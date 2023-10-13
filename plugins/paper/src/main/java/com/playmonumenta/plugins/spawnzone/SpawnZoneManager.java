@@ -29,7 +29,7 @@ public class SpawnZoneManager {
 				for (SpawnEffect effect : zone.getSpawnEffects()) {
 					if (entity.getType() == effect.getEntityType()) {
 						LivingEntity creature = (LivingEntity)entity;
-						String name = creature.getCustomName();
+						String name = creature.name().toString();
 						String goalName = effect.getName();
 
 						if (name == null ? "DEFAULT".equals(goalName) : name.contains(goalName)) {

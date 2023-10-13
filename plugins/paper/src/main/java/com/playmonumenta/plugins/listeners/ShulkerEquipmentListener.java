@@ -340,7 +340,7 @@ public class ShulkerEquipmentListener implements Listener {
 			ItemStack newVanity = vanityItems.hasTag(slotKey) ? vanityItems.getItemStack(slotKey) : null;
 			if (newVanity != null && (newVanity.getType() == Material.AIR || !VanityManager.isValidVanityItem(player, newVanity, slot))) {
 				newVanity = null;
-			} else if (newVanity != null && ItemStatUtils.isDirty(newVanity)) {
+			} else if (ItemStatUtils.isDirty(newVanity)) {
 				ItemUtils.setPlainTag(newVanity);
 				ItemUpdateHelper.generateItemStats(newVanity);
 				ItemStatUtils.removeDirty(newVanity);
