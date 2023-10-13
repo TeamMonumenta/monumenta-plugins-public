@@ -339,7 +339,7 @@ public class PotionBarrelListener implements Listener {
 					CoreProtectIntegration.logContainerTransaction(player, clickedBlock);
 					takeAll(barrelInventory, player.getInventory());
 				}
-			} else if (MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "potionbarreldeposit", 50)) {
+			} else if (!isShopLocation(clickedBlock.getLocation()) && MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "potionbarreldeposit", 50)) {
 				depositPotionsAndRefillInjectorsAllBarrels(barrel.getLocation(), player, playerInventory);
 			}
 		}
@@ -625,7 +625,7 @@ public class PotionBarrelListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void plockPlaceEvent(BlockPlaceEvent event) {
 		if (isPotionBarrel(event.getBlock())
-				&& !isValidLocation(event.getBlock().getLocation())) {
+				&& !isValidShard()) {
 			event.setCancelled(true);
 		}
 	}
@@ -659,10 +659,15 @@ public class PotionBarrelListener implements Listener {
 				&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
 	}
 
-	private static boolean isValidLocation(Location location) {
+	private static boolean isValidShard() {
 		return ServerProperties.getShardName().equals("playerplots")
 				|| ServerProperties.getShardName().startsWith("dev")
-				|| (ServerProperties.getShardName().equals("plots") && !ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE));
+				|| ServerProperties.getShardName().equals("plots");
+	}
+
+	private static boolean isShopLocation(Location location) {
+		return ServerProperties.getShardName().equals("plots")
+			    && ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE);
 	}
 
 }
