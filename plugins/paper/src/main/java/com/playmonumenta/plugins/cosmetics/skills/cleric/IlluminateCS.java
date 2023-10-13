@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.cleric;
 
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -11,6 +12,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static org.bukkit.Material.AIR;
+import static org.bukkit.Material.LIGHT;
 
 public class IlluminateCS implements CosmeticSkill {
 
@@ -80,6 +84,12 @@ public class IlluminateCS implements CosmeticSkill {
 			sparkfloor.count((int) (radius * radius * 3)).location(loc.clone().subtract(0, 0.35, 0)).spawnAsPlayerActive(player);
 		}
 
+		// create light blocks? lol? only replace air though
+		if (ticks == 0 && location.getBlock().getType().equals(AIR)) {
+			TemporaryBlockChangeManager.INSTANCE.changeBlock(location.getBlock(), LIGHT, maxTicks);
+		} else if (ticks == maxTicks - 1) {
+			TemporaryBlockChangeManager.INSTANCE.revertChangedBlock(location.getBlock(), LIGHT);
+		}
 	}
 
 	public void projectileExplosionEffects(Player player, Location location) {
