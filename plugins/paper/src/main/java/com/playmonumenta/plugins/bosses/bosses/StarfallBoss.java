@@ -66,6 +66,8 @@ public class StarfallBoss extends BossAbilityGroup {
 		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,3,1)]");
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
 		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
+		@BossParam(help = "how often particles/sounds spawn during the starfall's falling sequence (BASED ON HEIGHT)")
+		public int FALL_AESTHETIC_INTERVAL = 1;
 
 	}
 
@@ -115,6 +117,7 @@ public class StarfallBoss extends BossAbilityGroup {
 				}
 				if (mTicks >= p.LOCKING_DURATION) {
 					new BukkitRunnable() {
+						int mTicks = 0;
 						final double mStep = p.METEOR_SPEED;
 						double mCurrentHeight = p.HEIGHT;
 
@@ -126,6 +129,7 @@ public class StarfallBoss extends BossAbilityGroup {
 							}
 
 							mCurrentHeight -= mStep;
+							mTicks++;
 							Location meteorCenter = mLocation.clone().add(0, mCurrentHeight, 0);
 
 							if (mCurrentHeight <= 0) {
@@ -150,10 +154,10 @@ public class StarfallBoss extends BossAbilityGroup {
 
 								cancel();
 							}
-
-							p.SOUND_METEOR.play(meteorCenter, 3.0f, (float) (mCurrentHeight / p.HEIGHT) * 1.5f);
-							p.PARTICLE_METEOR.spawn(boss, meteorCenter);
-
+							if (mTicks % p.FALL_AESTHETIC_INTERVAL == 0) {
+								p.SOUND_METEOR.play(meteorCenter, 3.0f, (float) (mCurrentHeight / p.HEIGHT) * 1.5f);
+								p.PARTICLE_METEOR.spawn(boss, meteorCenter);
+							}
 						}
 					}.runTaskTimer(mPlugin, 0, 1);
 
