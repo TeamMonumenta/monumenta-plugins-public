@@ -136,6 +136,8 @@ public class CustomTradeGui extends Gui {
 				TradeStatusWrapper wrapper = mSavedBaseRequirements.get(mRequirements);
 				mHasRequirements = wrapper.status();
 				mLore = wrapper.lore();
+				// Check for locked trades:
+				mHasRequirements = mHasRequirements && handleMaxUses(trade, multiplier, mLore);
 				return;
 			}
 			// Copy of player's inventory and wallet (if enabled):
@@ -164,10 +166,13 @@ public class CustomTradeGui extends Gui {
 				// Update total requirement status:
 				mHasRequirements = mHasRequirements && meetsRequirement;
 			}
-			// Finally, save the base requirement to our map:
-			if (multiplier == 1) {
+			// Save the base requirement to our map:
+			boolean tradeAvailable = handleMaxUses(trade, multiplier, mLore);
+			if (multiplier == 1 && tradeAvailable) {
 				mSavedBaseRequirements.put(mRequirements, new TradeStatusWrapper(mHasRequirements, mLore));
 			}
+			// Check for locked trades:
+			mHasRequirements = mHasRequirements && tradeAvailable;
 		}
 
 		public List<Component> lore() {
@@ -255,6 +260,17 @@ public class CustomTradeGui extends Gui {
 			return result;
 		}
 
+		private static boolean handleMaxUses(TradeWindowOpenEvent.Trade trade, int multiplier, List<Component> mLore) {
+			// Returns if trade is available or not:
+			if (trade.getRecipe().getMaxUses() < multiplier) {
+				mLore.add(0, Component.text("Out of Stock", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+				for (int i = 1; i < mLore.size(); i++) {
+					mLore.set(i, mLore.get(i).color(NamedTextColor.GRAY).decoration(TextDecoration.STRIKETHROUGH, true));
+				}
+				return false;
+			}
+			return true;
+		}
 	}
 
 	private static class TradeStatusWrapper {
