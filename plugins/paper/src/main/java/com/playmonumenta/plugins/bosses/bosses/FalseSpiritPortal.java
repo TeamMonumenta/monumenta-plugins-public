@@ -43,7 +43,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -134,7 +133,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			}
 
 			if (mTridentName == null) {
-				mTridentName = mTrident.displayName().toString();
+				mTridentName = MessagingUtils.plainText(mTrident.displayName());
 			}
 
 			Damageable dm = (Damageable) mTrident.getItemMeta();
@@ -418,10 +417,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	}
 
 	//Checks if the given ItemStack equals the mTrident variable by name
-	private boolean equalsTrident(ItemStack item) {
+	private boolean equalsTrident(@Nullable ItemStack item) {
 		if (item != null) {
-			ItemMeta im = item.getItemMeta();
-            return item.displayName().toString().equals(mTridentName);
+			return MessagingUtils.plainText(item.displayName()).equals(mTridentName);
 		}
 		return false;
 	}
