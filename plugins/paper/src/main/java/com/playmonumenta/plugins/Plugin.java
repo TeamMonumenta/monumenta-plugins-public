@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.explosions.ExplosionManager;
 import com.playmonumenta.plugins.fishing.FishingCombatManager;
 import com.playmonumenta.plugins.fishing.FishingManager;
 import com.playmonumenta.plugins.gallery.GalleryCommands;
@@ -425,6 +426,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this), this);
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(mShulkerEquipmentListener, this);
+		manager.registerEvents(new ExplosionManager(), this);
 		manager.registerEvents(new LootboxManager(this), this);
 		manager.registerEvents(new PortableEnderListener(), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);

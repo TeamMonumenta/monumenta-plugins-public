@@ -1,16 +1,15 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.itemstats.enums.PickupFilterResult;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -28,14 +27,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 
-
 public final class JunkItemListener implements Listener {
 	public static final String COMMAND = "pickup";
 	public static final String ALIAS = "pu";
+	public static final Set<Tier> IGNORED_TIERS = Set.of(Tier.NONE, Tier.ZERO);
 
-	private static final String TIERED_TAG = "OnlyTieredItemsPickup";
-	private static final String LORE_TAG = "OnlyLoredItemsPickup";
-	private static final String INTERESTING_TAG = "NoJunkItemsPickup";
+	private static final String TIERED_TAG = Objects.requireNonNull(PickupFilterResult.TIERED.mTag);
+	private static final String LORE_TAG = Objects.requireNonNull(PickupFilterResult.LORE.mTag);
+	private static final String INTERESTING_TAG = Objects.requireNonNull(PickupFilterResult.INTERESTING.mTag);
 
 	private static final String PICKUP_MIN_OBJ_NAME = "PickupMin";
 	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
@@ -217,23 +216,18 @@ public final class JunkItemListener implements Listener {
 		}
 
 		// If the stack size is at least the specified size, bypass restrictions
-		if (item.getAmount() >= minStack) {
+		if (PickupFilterResult.getPickupCount(item) >= minStack) {
 			return false;
 		}
 
+		PickupFilterResult filterResult = PickupFilterResult.getFilterResult(item);
+
 		if (mTieredPlayers.contains(uuid)) {
-			Tier tier = ItemStatUtils.getTier(item);
-			if ((tier == Tier.NONE || tier == Tier.ZERO) && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
-				return true;
-			}
+			return !PickupFilterResult.TIERED.equals(filterResult);
 		} else if (mLorePlayers.contains(uuid)) {
-			if (!ItemUtils.hasLore(item)) {
-				return true;
-			}
+			return filterResult.compareTo(PickupFilterResult.LORE) > 0;
 		} else if (mInterestingPlayers.contains(uuid)) {
-			if (!ItemUtils.isInteresting(item)) {
-				return true;
-			}
+			return filterResult.compareTo(PickupFilterResult.INTERESTING) > 0;
 		}
 		return false;
 	}
