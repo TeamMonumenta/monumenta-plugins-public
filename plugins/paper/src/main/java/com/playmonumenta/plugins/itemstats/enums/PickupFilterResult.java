@@ -135,7 +135,7 @@ public enum PickupFilterResult {
 		int count = NBT.get(item, nbt -> {
 			ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
 			if (playerModified == null) {
-				return null;
+				return -1;
 			}
 
 			ReadableNBT pickupTag = playerModified.getCompound(PICKUP_TAG);
