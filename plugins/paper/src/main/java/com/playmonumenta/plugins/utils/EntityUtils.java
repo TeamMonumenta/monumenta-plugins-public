@@ -750,8 +750,7 @@ public class EntityUtils {
 		return 1;
 	}
 
-	public static @Nullable LivingEntity getNearestHostile(Player player, double range) {
-		Location loc = player.getLocation();
+	public static @Nullable LivingEntity getNearestHostile(Location loc, double range) {
 		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
 			       .stream()
 			       .filter(e -> e.isValid() && isHostileMob(e))
