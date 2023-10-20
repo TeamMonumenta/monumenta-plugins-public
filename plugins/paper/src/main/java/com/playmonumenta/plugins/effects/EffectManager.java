@@ -81,7 +81,7 @@ public final class EffectManager implements Listener {
 			if (effect.mUsed) {
 				// Each entity must have their own instance of an effect, they cannot be shared
 				MMLog.severe("Attempted to add an effect multiple times or to multiple entities! source="
-						+ source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
+					             + source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
 				return;
 			}
 			effect.mUsed = true;
@@ -234,7 +234,7 @@ public final class EffectManager implements Listener {
 		/**
 		 * Gets all effects as a json object
 		 */
-		public JsonObject getAsJsonObject(boolean isLogout) {
+		public JsonObject getAsJsonObject() {
 			JsonObject ret = new JsonObject();
 			for (Map.Entry<EffectPriority, Map<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
 				JsonObject mid = new JsonObject();
@@ -242,12 +242,10 @@ public final class EffectManager implements Listener {
 				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
 					JsonArray inner = new JsonArray();
 					for (Effect effect : effects.getValue()) {
-						if (isLogout && effect.shouldDeleteOnLogout()) {
-							continue;
-						}
 						JsonObject serializedEffect = effect.serialize();
 						serializedEffect.addProperty("displaysTime", effect.doesDisplayTime());
 						serializedEffect.addProperty("displays", effect.doesDisplay());
+						serializedEffect.addProperty("deleteOnLogout", effect.shouldDeleteOnLogout());
 						serializedEffect.addProperty("heavenlyBoonExtensions", effect.mHeavenlyBoonExtensions);
 						if (serializedEffect.has("effectID")) {
 							inner.add(serializedEffect);
@@ -685,10 +683,10 @@ public final class EffectManager implements Listener {
 	 *
 	 * @param entity the entity to get effects for
 	 */
-	public JsonObject getAsJsonObject(Entity entity, boolean isLogout) {
+	public JsonObject getAsJsonObject(Entity entity) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
-			return effects.getAsJsonObject(isLogout);
+			return effects.getAsJsonObject();
 		}
 		return new JsonObject();
 	}
@@ -712,6 +710,10 @@ public final class EffectManager implements Listener {
 		}
 		if (deserializedEffect != null && object.has("displays")) {
 			deserializedEffect.displays(object.get("displays").getAsBoolean());
+		}
+		if (deserializedEffect != null && object.has("deleteOnLogout")) {
+			deserializedEffect.deleteOnLogout(object.get("deleteOnLogout").getAsBoolean());
+			Bukkit.getScheduler().runTaskLater(plugin, deserializedEffect::clearEffect, 5);
 		}
 		if (deserializedEffect != null && object.has("heavenlyBoonExtensions")) {
 			deserializedEffect.mHeavenlyBoonExtensions = object.get("heavenlyBoonExtensions").getAsInt();

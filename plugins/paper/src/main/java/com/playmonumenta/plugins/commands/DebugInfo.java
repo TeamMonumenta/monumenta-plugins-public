@@ -25,7 +25,7 @@ public class DebugInfo extends GenericCommand {
 			debugInfo.add("Ability Manager", plugin.mAbilityManager.getAsJson(player));
 		}
 		if (plugin.mEffectManager != null) {
-			debugInfo.add("Effect Manager", plugin.mEffectManager.getAsJsonObject(player, false));
+			debugInfo.add("Effect Manager", plugin.mEffectManager.getAsJsonObject(player));
 		}
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();

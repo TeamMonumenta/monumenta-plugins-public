@@ -19,19 +19,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class RewriteHistory extends Spell {
 	private static final String ABILITY_NAME = "Rewrite History";
 	public static final String PERCENT_HEALTH_EFFECT = "TealSpiritPercentHealthEffect";
+
 	private final int mHealthCastTime;
 	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	private int mStack = 1;
 	private final int mRange;
 	private final Location mSpawnLoc;
 	private final ChargeUpManager mChargeHealth;
 
-	public RewriteHistory(Plugin mPlugin, LivingEntity mBoss, int mHealthCastTime, int mRange, Location mSpawnLoc) {
-		this.mHealthCastTime = mHealthCastTime;
-		this.mPlugin = mPlugin;
-		this.mRange = mRange;
-		this.mSpawnLoc = mSpawnLoc;
-		this.mChargeHealth = new ChargeUpManager(mBoss, mHealthCastTime, Component.text("Casting ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)),
+	public RewriteHistory(Plugin plugin, LivingEntity boss, int healthCastTime, int range, Location spawnLoc) {
+		mHealthCastTime = healthCastTime;
+		mPlugin = plugin;
+		mBoss = boss;
+		mRange = range;
+		mSpawnLoc = spawnLoc;
+		mChargeHealth = new ChargeUpManager(mBoss, mHealthCastTime, Component.text("Casting ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)),
 			BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, mRange);
 	}
 
@@ -42,6 +45,11 @@ public class RewriteHistory extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
+				if (mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+					return;
+				}
+
 				if (mChargeHealth.getTime() % 2 == 0) {
 					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
 						p.playSound(p.getLocation(), Sound.ENTITY_CAT_HISS, SoundCategory.HOSTILE, 2f, 0.5f + (mChargeHealth.getTime() / 80f) * 1.5f);

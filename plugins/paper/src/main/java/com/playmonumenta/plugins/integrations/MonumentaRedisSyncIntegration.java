@@ -125,7 +125,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 		JsonObject pluginData = new JsonObject();
 		pluginData.add("potions", mPlugin.mPotionManager.getAsJsonObject(player, false));
-		pluginData.add("effects", mPlugin.mEffectManager.getAsJsonObject(player, true));
+		pluginData.add("effects", mPlugin.mEffectManager.getAsJsonObject(player));
 		pluginData.add("season_pass_progress", SeasonalEventManager.getPlayerProgressJson(player));
 		pluginData.add("health", new JsonPrimitive(player.getHealth()));
 		event.setPluginData(IDENTIFIER, pluginData);
