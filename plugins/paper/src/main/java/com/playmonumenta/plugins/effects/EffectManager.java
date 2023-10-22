@@ -712,8 +712,11 @@ public final class EffectManager implements Listener {
 			deserializedEffect.displays(object.get("displays").getAsBoolean());
 		}
 		if (deserializedEffect != null && object.has("deleteOnLogout")) {
-			deserializedEffect.deleteOnLogout(object.get("deleteOnLogout").getAsBoolean());
-			Bukkit.getScheduler().runTaskLater(plugin, deserializedEffect::clearEffect, 5);
+			boolean delete = object.get("deleteOnLogout").getAsBoolean();
+			deserializedEffect.deleteOnLogout(delete);
+			if (delete) {
+				Bukkit.getScheduler().runTaskLater(plugin, deserializedEffect::clearEffect, 5);
+			}
 		}
 		if (deserializedEffect != null && object.has("heavenlyBoonExtensions")) {
 			deserializedEffect.mHeavenlyBoonExtensions = object.get("heavenlyBoonExtensions").getAsInt();
