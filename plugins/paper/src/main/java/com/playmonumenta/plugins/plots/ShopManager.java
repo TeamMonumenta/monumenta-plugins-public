@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.plots;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -11,7 +12,11 @@ import com.playmonumenta.scriptedquests.quests.QuestNpc;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.*;
+import dev.jorel.commandapi.arguments.BooleanArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +25,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -57,6 +61,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootTables;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
@@ -80,8 +85,9 @@ public class ShopManager implements Listener {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 
+		Component customName = damagee.customName();
 		if (damager instanceof Player player && damagee instanceof Shulker
-				&& damagee.getCustomName() != null && damagee.getCustomName().endsWith("Shop")
+				&& customName != null && MessagingUtils.plainText(customName).endsWith("Shop")
 				&& ZoneUtils.hasZoneProperty(damager, ZoneProperty.SHOPS_POSSIBLE)) {
 
 			final Shop shop;
@@ -132,14 +138,18 @@ public class ShopManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
-		if (event.getAction().equals(EntityPotionEffectEvent.Action.ADDED) && !event.getNewEffect().getType().equals(PotionEffectType.HEAL)) {
+		PotionEffect potionEffect = event.getNewEffect();
+		if (event.getAction().equals(EntityPotionEffectEvent.Action.ADDED)
+			&& potionEffect != null
+			&& !potionEffect.getType().equals(PotionEffectType.HEAL)) {
 			cancelIfNpc(event.getEntity(), event);
 		}
 	}
 
 	private void cancelIfNpc(Entity damagee, Cancellable event) {
+		Component customName = damagee.customName();
 		if (damagee instanceof Shulker
-			&& damagee.getCustomName() != null && damagee.getCustomName().endsWith("Shop")
+			&& customName != null && MessagingUtils.plainText(customName).endsWith("Shop")
 			&& ZoneUtils.hasZoneProperty(damagee, ZoneProperty.SHOPS_POSSIBLE)) {
 			event.setCancelled(true);
 		}
@@ -148,22 +158,21 @@ public class ShopManager implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
 		/* Prevent players from placing bricks */
-		if (event.getBlockPlaced() != null
-			&& event.getBlockPlaced().getType().equals(Material.BRICKS)
+		if (event.getBlockPlaced().getType().equals(Material.BRICKS)
 			&& !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)
 			&& ZoneUtils.hasZoneProperty(event.getBlockPlaced().getLocation(), ZoneProperty.SHOPS_POSSIBLE)) {
 			event.setCancelled(true);
 			return;
 		}
 
-		if (!isAllowed(event.getPlayer(), event.getBlockPlaced())) {
+		if (isDisallowed(event.getPlayer(), event.getBlockPlaced())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (!isAllowed(event.getPlayer(), event.getBlock())) {
+		if (isDisallowed(event.getPlayer(), event.getBlock())) {
 			event.setCancelled(true);
 		}
 	}
@@ -178,24 +187,22 @@ public class ShopManager implements Listener {
 	private boolean isAllowed(Location loc, Block block) {
 		if (loc != null && block != null && ZoneUtils.hasZoneProperty(loc, ZoneProperty.SHOPS_POSSIBLE)) {
 			loc.setY(10);
-			if (!loc.getBlock().getType().equals(Material.SPONGE)) {
-				return false;
-			}
+			return loc.getBlock().getType().equals(Material.SPONGE);
 		}
 		return true;
 	}
 
-	private boolean isAllowed(Player player, Block block) {
+	private boolean isDisallowed(Player player, Block block) {
 		if (player != null && block != null && !player.getGameMode().equals(GameMode.CREATIVE) && ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
 			Location loc = block.getLocation();
 			int y = loc.getBlockY();
 			loc.setY(10);
 			Material mat = loc.getBlock().getType();
 			// Sponge or (wet sponge below y = 53) allows building non-container inventories
-			return mat.equals(Material.SPONGE) || (mat.equals(Material.WET_SPONGE) && y < 53 && !(block.getState() instanceof Lockable));
+			return !mat.equals(Material.SPONGE) && (!mat.equals(Material.WET_SPONGE) || y >= 53 || block.getState() instanceof Lockable);
 		}
 		// Allow otherwise - not in the zone, not a block, in creative, etc.
-		return true;
+		return false;
 	}
 
 	private static class Shop {
@@ -333,8 +340,8 @@ public class ShopManager implements Listener {
 			return Math.abs(mMax.getBlockX() - mMin.getBlockX()) >= GUILD_SHOP_WIDTH;
 		}
 
-		private boolean isLockingEnabled() {
-			return mLockingEnabled;
+		private boolean isLockingDisabled() {
+			return !mLockingEnabled;
 		}
 
 		private void setLockingEnabled(boolean enabled) {
@@ -356,7 +363,7 @@ public class ShopManager implements Listener {
 	}
 
 	public static void registerCommands() {
-		/********************* NEW *********************/
+		/* ******************** NEW ******************** */
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("new"))
@@ -366,7 +373,7 @@ public class ShopManager implements Listener {
 			})
 			.register();
 
-		/********************* LOCK *********************/
+		/* ******************** LOCK ******************** */
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("lock"))
@@ -385,7 +392,7 @@ public class ShopManager implements Listener {
 			})
 			.register();
 
-		/********************* SEMI-LOCK (adventure mode, but unlocked containers) *********************/
+		/* ******************** SEMI-LOCK (adventure mode, but unlocked containers) ******************** */
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("semilock"))
@@ -404,7 +411,7 @@ public class ShopManager implements Listener {
 			})
 			.register();
 
-		/********************* UNLOCK *********************/
+		/* ******************** UNLOCK ******************** */
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("unlock"))
@@ -423,7 +430,7 @@ public class ShopManager implements Listener {
 			})
 			.register();
 
-		/********************* LOCKDISABLE *********************/
+		/* ******************** LOCK DISABLE ******************** */
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("setlockable"))
@@ -444,7 +451,7 @@ public class ShopManager implements Listener {
 			})
 			.register();
 
-		/********************* RESET *********************/
+		/* ******************** RESET ******************** */
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("reset"))
@@ -463,7 +470,7 @@ public class ShopManager implements Listener {
 			})
 			.register();
 
-		/******************** UTILITIES ****************************/
+		/* ******************* UTILITIES *************************** */
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("utilities"))
@@ -507,14 +514,14 @@ public class ShopManager implements Listener {
 		}
 
 		/* Find the dimensions of the platform */
-		int tmpminX = -1;
-		int tmpminZ = -1;
-		int tmpmaxX = -1;
-		int tmpmaxZ = -1;
+		int tmpMinX = -1;
+		int tmpMinZ = -1;
+		int tmpMaxX = -1;
+		int tmpMaxZ = -1;
 		Location testLoc = startLoc.clone();
 		for (int i = 0; i < MAX_SHOP_WIDTH; i++) {
 			if (testLoc.getBlock().getType().equals(SHOP_EMPTY_MAT)) {
-				tmpminX = testLoc.getBlockX();
+				tmpMinX = testLoc.getBlockX();
 			} else {
 				break;
 			}
@@ -523,7 +530,7 @@ public class ShopManager implements Listener {
 		testLoc = startLoc.clone();
 		for (int i = 0; i < MAX_SHOP_WIDTH; i++) {
 			if (testLoc.getBlock().getType().equals(SHOP_EMPTY_MAT)) {
-				tmpmaxX = testLoc.getBlockX();
+				tmpMaxX = testLoc.getBlockX();
 			} else {
 				break;
 			}
@@ -532,7 +539,7 @@ public class ShopManager implements Listener {
 		testLoc = startLoc.clone();
 		for (int i = 0; i < MAX_SHOP_WIDTH; i++) {
 			if (testLoc.getBlock().getType().equals(SHOP_EMPTY_MAT)) {
-				tmpminZ = testLoc.getBlockZ();
+				tmpMinZ = testLoc.getBlockZ();
 			} else {
 				break;
 			}
@@ -541,16 +548,16 @@ public class ShopManager implements Listener {
 		testLoc = startLoc.clone();
 		for (int i = 0; i < MAX_SHOP_WIDTH; i++) {
 			if (testLoc.getBlock().getType().equals(SHOP_EMPTY_MAT)) {
-				tmpmaxZ = testLoc.getBlockZ();
+				tmpMaxZ = testLoc.getBlockZ();
 			} else {
 				break;
 			}
 			testLoc.add(0, 0, 1);
 		}
-		final int minX = tmpminX;
-		final int minZ = tmpminZ;
-		final int maxX = tmpmaxX;
-		final int maxZ = tmpmaxZ;
+		final int minX = tmpMinX;
+		final int minZ = tmpMinZ;
+		final int maxX = tmpMaxX;
+		final int maxZ = tmpMaxZ;
 		final int platY = startLoc.getBlockY();
 
 		boolean isGuildShop = Math.abs(maxX - minX) >= GUILD_SHOP_WIDTH;
@@ -573,16 +580,16 @@ public class ShopManager implements Listener {
 		Location entityLoc = startLoc.clone();
 		if (minXD <= minZD && minXD <= maxXD && minXD <= maxZD) {
 			entityLoc.setX(minX - 1);
-			entityLoc.setZ((maxZ + minZ) / 2);
+			entityLoc.setZ((maxZ + minZ) >> 1);
 		} else if (minZD <= minXD && minZD <= maxXD && minZD <= maxZD) {
 			entityLoc.setZ(minZ - 1);
-			entityLoc.setX((maxX + minX) / 2);
+			entityLoc.setX((maxX + minX) >> 1);
 		} else if (maxXD <= minXD && maxXD <= minZD && maxXD <= maxZD) {
 			entityLoc.setX(maxX + 1);
-			entityLoc.setZ((maxZ + minZ) / 2);
+			entityLoc.setZ((maxZ + minZ) >> 1);
 		} else {
 			entityLoc.setZ(maxZ + 1);
-			entityLoc.setX((maxX + minX) / 2);
+			entityLoc.setX((maxX + minX) >> 1);
 		}
 		entityLoc.add(0.5, 0, 0.5);
 
@@ -597,20 +604,20 @@ public class ShopManager implements Listener {
 			preloadEntity.setPersistent(true);
 
 			if (isGuildShop) {
-				preloadEntity.setCustomName(ChatColor.GREEN + guildName + "'s Guild Shop");
+				preloadEntity.customName(Component.text(guildName + "'s Guild Shop", NamedTextColor.GREEN));
 			} else {
-				preloadEntity.setCustomName(ChatColor.AQUA + player.getName() + "'s Shop");
+				preloadEntity.customName(Component.text(player.getName() + "'s Shop", NamedTextColor.AQUA));
 			}
 			Set<String> tags = preloadEntity.getScoreboardTags();
-			tags.add("shop_x1=" + Integer.toString(minX));
-			tags.add("shop_y1=" + Integer.toString(platY));
-			tags.add("shop_z1=" + Integer.toString(minZ));
-			tags.add("shop_x2=" + Integer.toString(maxX));
-			tags.add("shop_y2=" + Integer.toString(platY));
-			tags.add("shop_z2=" + Integer.toString(maxZ));
+			tags.add("shop_x1=" + minX);
+			tags.add("shop_y1=" + platY);
+			tags.add("shop_z1=" + minZ);
+			tags.add("shop_x2=" + maxX);
+			tags.add("shop_y2=" + platY);
+			tags.add("shop_z2=" + maxZ);
 			tags.add("shop_ownerName=" + player.getName());
 			tags.add("shop_ownerUUID=" + player.getUniqueId());
-			tags.add("shop_origMat=" + originalEntityMat.toString());
+			tags.add("shop_origMat=" + originalEntityMat);
 			tags.add("shop_shulker");
 			if (isGuildShop) {
 				tags.add("guild_shop");
@@ -637,7 +644,7 @@ public class ShopManager implements Listener {
 		});
 
 		shop.iterExpandedArea((Location plat) -> {
-			/* Add a celler floor */
+			/* Add a cellar floor */
 			plat.subtract(0, SHOP_DEPTH + 1, 0);
 			plat.getBlock().setType(Material.BEDROCK);
 		});
@@ -673,7 +680,7 @@ public class ShopManager implements Listener {
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
 
-		if (!shop.isLockingEnabled()) {
+		if (shop.isLockingDisabled()) {
 			if (player != null) {
 				player.sendMessage(Component.text("Locking and unlocking this shop is disabled, change that setting first before trying to lock.", NamedTextColor.WHITE));
 			}
@@ -698,8 +705,8 @@ public class ShopManager implements Listener {
 				plat.subtract(0, SHOP_DEPTH, 0);
 				for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
 					BlockState state = plat.getBlock().getState();
-					if (state instanceof Lockable && (((Lockable) state).getLock() == null || ((Lockable) state).getLock().isEmpty())) {
-						((Lockable) state).setLock(LOCK_PREFIX + shop.mOwnerName + LOCK_SUFFIX);
+					if (state instanceof Lockable lockable && lockable.getLock().isEmpty()) {
+						lockable.setLock(LOCK_PREFIX + shop.mOwnerName + LOCK_SUFFIX);
 						state.update();
 					}
 					plat.add(0, 1, 0);
@@ -728,7 +735,7 @@ public class ShopManager implements Listener {
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
 
-		if (!shop.isLockingEnabled()) {
+		if (shop.isLockingDisabled()) {
 			if (player != null) {
 				player.sendMessage(Component.text("Locking and unlocking this shop is disabled, change that setting first before trying to unlock.", NamedTextColor.WHITE));
 			}
@@ -748,9 +755,10 @@ public class ShopManager implements Listener {
 			plat.subtract(0, SHOP_DEPTH, 0);
 			for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
 				BlockState state = plat.getBlock().getState();
-				if (state instanceof Lockable) {
-					if (((Lockable)state).getLock() != null && ((Lockable)state).getLock().startsWith(LOCK_PREFIX)) {
-						((Lockable)state).setLock(null);
+				if (state instanceof Lockable lockable) {
+					((Lockable) state).getLock();
+					if (lockable.getLock().startsWith(LOCK_PREFIX)) {
+						lockable.setLock(null);
 						state.update();
 					}
 				}
@@ -833,13 +841,13 @@ public class ShopManager implements Listener {
 			String guildName = LuckPermsIntegration.getGuildName(LuckPermsIntegration.getGuild(player));
 			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName) || ScoreboardUtils.getScoreboardValue(player, "Founder").orElse(0) != 1) {
 				String msg = "You must be a *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
-				player.sendMessage(ChatColor.RED + msg);
+				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
 		} else if (!player.getUniqueId().equals(shop.mOwnerUUID)) {
 			/* Not a guild shop, and also not the owning player */
 			String msg = "You must be the owner of this shop to change its settings";
-			player.sendMessage(ChatColor.RED + msg);
+			player.sendMessage(Component.text(msg, NamedTextColor.RED));
 			throw CommandAPI.failWithString(msg);
 		}
 	}
@@ -858,9 +866,10 @@ public class ShopManager implements Listener {
 			for (double y = start.getY() - radius; y <= start.getY() + radius; y++) {
 				for (double z = start.getZ() - radius; z <= start.getZ() + radius; z++) {
 					BlockState state = new Location(sender.getWorld(), x, y, z).getBlock().getState();
-					if (state instanceof Lockable) {
-						if (((Lockable)state).getLock() != null && ((Lockable)state).getLock().equalsIgnoreCase(LOCK_PREFIX + target.getName() + LOCK_SUFFIX)) {
-							((Lockable)state).setLock(null);
+					if (state instanceof Lockable lockable) {
+						lockable.getLock();
+						if (lockable.getLock().equalsIgnoreCase(LOCK_PREFIX + target.getName() + LOCK_SUFFIX)) {
+							lockable.setLock(null);
 							state.update();
 						}
 					}
