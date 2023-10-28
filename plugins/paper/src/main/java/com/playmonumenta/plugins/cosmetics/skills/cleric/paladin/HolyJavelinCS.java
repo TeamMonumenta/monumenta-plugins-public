@@ -14,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class HolyJavelinCS implements CosmeticSkill {
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
 
 	@Override
 	public ClassAbility getAbility() {
@@ -33,10 +32,11 @@ public class HolyJavelinCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_SHULKER_BULLET_HURT, SoundCategory.PLAYERS, 2.0f, 0.1f);
 	}
 
-	public void javelinParticle(Player player, Location startLoc, Location endLoc) {
+	public void javelinParticle(Player player, Location startLoc, Location endLoc, double size) {
+		Particle.DustOptions color = new Particle.DustOptions(Color.fromRGB(255, 255, 50), (float) size);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, startLoc.clone().add(startLoc.getDirection()), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(player);
 		new PPLine(Particle.EXPLOSION_NORMAL, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0).extra(0.025).spawnAsPlayerActive(player);
-		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(22).delta(0.25).data(COLOR).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(22).delta(0.25 * size).data(color).spawnAsPlayerActive(player);
 	}
 
 	public void javelinSound(World world, Location loc) {

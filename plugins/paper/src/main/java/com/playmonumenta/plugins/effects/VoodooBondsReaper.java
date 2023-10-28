@@ -77,15 +77,16 @@ public class VoodooBondsReaper extends Effect {
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
+		double receivedDamageModifier = 1 + CharmManager.getLevelPercentDecimal(mPlayer, VoodooBonds.CHARM_RECEIVED_DAMAGE);
 		if (mPlayer != null && !mDone && mPlayer.isValid() && !mPlayer.isDead() && mPlayer.getHealth() > 0) {
 			double absorbHealth = AbsorptionUtils.getAbsorption(mPlayer);
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 			if (!mPlayerDied && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
 				if (absorbHealth <= 0) {
-					mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - maxHealth * mDamagePercent, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
+					mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - maxHealth * (mDamagePercent * receivedDamageModifier), mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
 				} else {
-					if (maxHealth * mDamagePercent >= absorbHealth) {
-						double leftoverHealth = mPlayer.getHealth() + absorbHealth - maxHealth * mDamagePercent;
+					if (maxHealth * (mDamagePercent * receivedDamageModifier) >= absorbHealth) {
+						double leftoverHealth = mPlayer.getHealth() + absorbHealth - maxHealth * (mDamagePercent * receivedDamageModifier);
 						AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
 						mPlayer.setHealth(Math.max(leftoverHealth, 1));
 					} else {

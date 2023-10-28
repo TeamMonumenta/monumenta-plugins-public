@@ -61,6 +61,7 @@ public class Challenge extends Ability {
 	public static final String CHARM_CDR_PER = "Challenge Cooldown Reduction Per Mob";
 	public static final String CHARM_RANGE = "Challenge Range";
 	public static final String CHARM_COOLDOWN = "Challenge Cooldown";
+	public static final String CHARM_MAX_MOBS = "Challenge Max Mobs";
 
 	public static final AbilityInfo<Challenge> INFO =
 		new AbilityInfo<>(Challenge.class, "Challenge", Challenge::new)
@@ -69,7 +70,7 @@ public class Challenge extends Ability {
 			.shorthandName("Ch")
 			.descriptions(
 				("Left-clicking while sneaking makes all enemies within %s blocks target you. " +
-					 "You gain %s Absorption per affected mob (up to %s Absorption) for %s seconds and +%s%% melee damage for %s seconds. Cooldown: %ss.")
+					"You gain %s Absorption per affected mob (up to %s Absorption) for %s seconds and +%s%% melee damage for %s seconds. Cooldown: %ss.")
 					.formatted(CHALLENGE_RANGE, ABSORPTION_PER_MOB_1, MAX_ABSORPTION_1, StringUtils.ticksToSeconds(DURATION),
 						StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_1),
 						StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
@@ -135,7 +136,7 @@ public class Challenge extends Ability {
 
 	public void incrementKills() {
 		mKillCount++;
-		if (mKillCount >= KILLED_MOBS_CAP || mKillCount >= mAffectedEntities.size()) {
+		if (mKillCount >= KILLED_MOBS_CAP + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_MOBS) || mKillCount >= mAffectedEntities.size()) {
 			double speed = mKillCount * (SPEED_PER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED_PER));
 			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, speed, SPEED_EFFECT_NAME));
 

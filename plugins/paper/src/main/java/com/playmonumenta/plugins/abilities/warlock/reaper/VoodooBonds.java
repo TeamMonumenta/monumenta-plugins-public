@@ -42,6 +42,7 @@ public class VoodooBonds extends Ability {
 	public static final String CHARM_COOLDOWN = "Voodoo Bonds Cooldown";
 	public static final String CHARM_TRANSFER_DAMAGE = "Voodoo Bonds Transfer Damage";
 	public static final String CHARM_TRANSFER_TIME = "Voodoo Bonds Transfer Time Limit";
+	public static final String CHARM_RECEIVED_DAMAGE = "Voodoo Bonds Received Damage";
 	public static final String CHARM_DAMAGE = "Voodoo Bonds Damage";
 	public static final String CHARM_RADIUS = "Voodoo Bonds Radius";
 
@@ -52,12 +53,12 @@ public class VoodooBonds extends Ability {
 			.shorthandName("VB")
 			.descriptions(
 				("Melee strikes to a mob apply %s%% of the damage to all mobs of the same type within %s blocks. " +
-					 "Additionally, right-click while sneaking and looking down to cast a protective spell on all players within an %s block radius. " +
-					 "The next hit every player (including the Reaper) takes has all damage ignored (or 50%% if attack is from a Boss), " +
-					 "but that damage will transfer to the Reaper in %ss unless it is passed on again. " +
-					 "Passing that damage requires a melee strike, in which %s%% of the initial damage blocked is added to the damage of the strike (Bosses are immune to this bonus). " +
-					 "The damage directed to the Reaper is calculated by the percentage of health the initial hit would have taken from that player, " +
-					 "and can never kill you, only leave you at 1 HP. Cooldown: %ss.")
+					"Additionally, right-click while sneaking and looking down to cast a protective spell on all players within an %s block radius. " +
+					"The next hit every player (including the Reaper) takes has all damage ignored (or 50%% if attack is from a Boss), " +
+					"but that damage will transfer to the Reaper in %ss unless it is passed on again. " +
+					"Passing that damage requires a melee strike, in which %s%% of the initial damage blocked is added to the damage of the strike (Bosses are immune to this bonus). " +
+					"The damage directed to the Reaper is calculated by the percentage of health the initial hit would have taken from that player, " +
+					"and can never kill you, only leave you at 1 HP. Cooldown: %ss.")
 					.formatted(
 						StringUtils.multiplierToPercentage(CLEAVE_DAMAGE), PASSIVE_RADIUS, ACTIVE_RADIUS,
 						StringUtils.ticksToSeconds(DURATION_1), StringUtils.multiplierToPercentage(VoodooBondsReaper.PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN_1)
@@ -91,7 +92,7 @@ public class VoodooBonds extends Ability {
 			//better effects
 			mCosmetic.bondsApplyEffect(mPlayer, p);
 			mPlugin.mEffectManager.addEffect(p, EFFECT_NAME,
-					new VoodooBondsOtherPlayer(getModifiedCooldown(), mTransferDuration, mPlayer, mPlugin));
+				new VoodooBondsOtherPlayer(getModifiedCooldown(), mTransferDuration, mPlayer, mPlugin));
 		}
 	}
 

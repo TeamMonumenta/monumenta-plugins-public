@@ -37,9 +37,9 @@ public class PrismaticShield extends Ability {
 	private static final int COOLDOWN = 90 * 20;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int STUN_DURATION = 20;
-	private static final int HEAL_DURATION = 5 * 20;
-	private static final int HEAL_PERCENT = 5;
-	private static final float DAMAGE_BUFF_PERCENT = 30;
+	private static final int ENHANCEMENT_DURATION = 5 * 20;
+	private static final double HEAL_PERCENT = 0.05;
+	private static final double DAMAGE_BUFF_PERCENT = 0.3;
 	private static final int ENHANCEMENT_COOLDOWN_REDUCTION_TICKS = 5 * 20;
 	private static final String DAMAGE_BUFF_NAME = "PrismaticShieldDamageBuff";
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
@@ -51,6 +51,9 @@ public class PrismaticShield extends Ability {
 	public static final String CHARM_DURATION = "Prismatic Shield Absorption Duration";
 	public static final String CHARM_TRIGGER = "Prismatic Shield Trigger Health";
 	public static final String CHARM_RADIUS = "Prismatic Shield Radius";
+	public static final String CHARM_ENHANCE_DURATION = "Prismatic Shield Enhancement Duration";
+	public static final String CHARM_ENHANCE_DAMAGE = "Prismatic Shield Enhancement Damage";
+	public static final String CHARM_ENHANCE_HEALING = "Prismatic Shield Enhancement Healing";
 
 	public static final AbilityInfo<PrismaticShield> INFO =
 		new AbilityInfo<>(PrismaticShield.class, "Prismatic Shield", PrismaticShield::new)
@@ -59,8 +62,8 @@ public class PrismaticShield extends Ability {
 			.shorthandName("PS")
 			.descriptions(
 				String.format("When your health drops below %s hearts you receive %s absorption health which lasts up to %ss." +
-					              " If damage taken would kill you but could have been prevented by up to %s times this skill's absorption, it will save you from death." +
-					              " In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
+						" If damage taken would kill you but could have been prevented by up to %s times this skill's absorption, it will save you from death." +
+						" In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
 					TRIGGER_HEALTH / 2,
 					ABSORPTION_HEALTH_1,
 					DURATION / 20,
@@ -73,10 +76,10 @@ public class PrismaticShield extends Ability {
 					(int) RADIUS,
 					STUN_DURATION / 20),
 				String.format("After Prismatic Shield is activated, in the next %ss, you deal %s%% more damage and every spell that deals damage to at least one enemy will heal you for %s%% of your max health." +
-									" Additionally, %ss will be reduced from your abilities' cooldowns.",
-					HEAL_DURATION / 20,
-					DAMAGE_BUFF_PERCENT,
-					HEAL_PERCENT,
+						" Additionally, %ss will be reduced from your abilities' cooldowns.",
+					ENHANCEMENT_DURATION / 20,
+					(int) (DAMAGE_BUFF_PERCENT * 100),
+					(int) (HEAL_PERCENT * 100),
 					ENHANCEMENT_COOLDOWN_REDUCTION_TICKS / 20
 				)
 			)
@@ -87,6 +90,8 @@ public class PrismaticShield extends Ability {
 
 	private final double mAbsorptionHealth;
 	private final double mRadius;
+	private final int mEnhancementDuration;
+
 
 	private int mLastActivation = -1;
 	private final Set<ClassAbility> mHealedFromAbilitiesThisTick = new HashSet<>();
@@ -98,6 +103,7 @@ public class PrismaticShield extends Ability {
 		super(plugin, player, INFO);
 		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
+		mEnhancementDuration = CharmManager.getDuration(player, CHARM_ENHANCE_DURATION, ENHANCEMENT_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PrismaticShieldCS());
 	}
 
@@ -170,11 +176,11 @@ public class PrismaticShield extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (isEnhanced()
-			    && Bukkit.getServer().getCurrentTick() <= mLastActivation + HEAL_DURATION
-			    && event.getAbility() != null
-			    && !event.getAbility().isFake()
-			    && event.getAbility() != ClassAbility.SPELLSHOCK
-			    && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
+			&& Bukkit.getServer().getCurrentTick() <= mLastActivation + mEnhancementDuration
+			&& event.getAbility() != null
+			&& !event.getAbility().isFake()
+			&& event.getAbility() != ClassAbility.SPELLSHOCK
+			&& event.getAbility() != ClassAbility.ASTRAL_OMEN) {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, HEALED_THIS_TICK_METAKEY)) {
 				// new tick, clear abilities encountered this tick
 				mHealedFromAbilitiesThisTick.clear();
@@ -191,8 +197,8 @@ public class PrismaticShield extends Ability {
 				}
 				mHealedFromBlizzard = true;
 			}
-			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(HEAL_DURATION, DAMAGE_BUFF_PERCENT / 100));
-			PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT / 100.0 * EntityUtils.getMaxHealth(mPlayer));
+			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(mEnhancementDuration, DAMAGE_BUFF_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)));
+			PlayerUtils.healPlayer(mPlugin, mPlayer, (HEAL_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_HEALING)) * EntityUtils.getMaxHealth(mPlayer));
 			mCosmetic.prismaOnHeal(mPlayer);
 		}
 		return false; // there may be multiple spells cast in the same tick, need to check them all. No recursion possible as this doesn't deal damage.

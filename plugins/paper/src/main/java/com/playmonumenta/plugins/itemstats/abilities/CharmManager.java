@@ -34,6 +34,7 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
 import com.playmonumenta.plugins.abilities.mage.MagmaShield;
@@ -75,7 +76,14 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.abilities.shaman.*;
+import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
+import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
+import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
+import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
+import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
+import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
@@ -162,7 +170,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -271,6 +278,9 @@ public class CharmManager {
 			PrismaticShield.CHARM_TRIGGER,
 			PrismaticShield.CHARM_COOLDOWN,
 			PrismaticShield.CHARM_RADIUS,
+			PrismaticShield.CHARM_ENHANCE_DAMAGE,
+			PrismaticShield.CHARM_ENHANCE_DURATION,
+			PrismaticShield.CHARM_ENHANCE_HEALING,
 			FrostNova.CHARM_DAMAGE,
 			FrostNova.CHARM_DURATION,
 			FrostNova.CHARM_RANGE,
@@ -330,6 +340,7 @@ public class CharmManager {
 			ElementalSpiritFire.CHARM_COOLDOWN,
 			ElementalSpiritFire.CHARM_DAMAGE,
 			ElementalSpiritFire.CHARM_SIZE,
+			Channeling.CHARM_DAMAGE,
 
 			//Cleric
 			CelestialBlessing.CHARM_COOLDOWN,
@@ -340,6 +351,8 @@ public class CharmManager {
 			DivineJustice.CHARM_DAMAGE,
 			DivineJustice.CHARM_ALLY,
 			DivineJustice.CHARM_SELF,
+			DivineJustice.CHARM_ENHANCE_DAMAGE,
+			DivineJustice.CHARM_ENHANCE_DURATION,
 			HeavenlyBoon.CHARM_CHANCE,
 			HeavenlyBoon.CHARM_DURATION,
 			HeavenlyBoon.CHARM_RADIUS,
@@ -372,6 +385,7 @@ public class CharmManager {
 			HolyJavelin.CHARM_COOLDOWN,
 			HolyJavelin.CHARM_DAMAGE,
 			HolyJavelin.CHARM_RANGE,
+			HolyJavelin.CHARM_SIZE,
 			ChoirBells.CHARM_COOLDOWN,
 			ChoirBells.CHARM_RANGE,
 			ChoirBells.CHARM_SLOW,
@@ -409,6 +423,7 @@ public class CharmManager {
 			AdvancingShadows.CHARM_DAMAGE,
 			AdvancingShadows.CHARM_KNOCKBACK,
 			AdvancingShadows.CHARM_RANGE,
+			AdvancingShadows.CHARM_ENHANCE_TIMER,
 			ByMyBlade.CHARM_COOLDOWN,
 			ByMyBlade.CHARM_DAMAGE,
 			ByMyBlade.CHARM_HASTE_DURATION,
@@ -543,6 +558,7 @@ public class CharmManager {
 			Challenge.CHARM_SPEED_PER,
 			Challenge.CHARM_CDR_PER,
 			Challenge.CHARM_DURATION,
+			Challenge.CHARM_MAX_MOBS,
 			Challenge.CHARM_RANGE,
 			ShieldWall.CHARM_DAMAGE,
 			ShieldWall.CHARM_COOLDOWN,
@@ -683,6 +699,8 @@ public class CharmManager {
 			GraspingClaws.CHARM_PULL,
 			GraspingClaws.CHARM_CAGE_RADIUS,
 			MelancholicLament.CHARM_COOLDOWN,
+			MelancholicLament.CHARM_ENHANCE_DAMAGE,
+			MelancholicLament.CHARM_ENHANCE_DURATION,
 			MelancholicLament.CHARM_RADIUS,
 			MelancholicLament.CHARM_RECOVERY,
 			MelancholicLament.CHARM_WEAKNESS,
@@ -732,6 +750,7 @@ public class CharmManager {
 			VoodooBonds.CHARM_COOLDOWN,
 			VoodooBonds.CHARM_DAMAGE,
 			VoodooBonds.CHARM_RADIUS,
+			VoodooBonds.CHARM_RECEIVED_DAMAGE,
 			VoodooBonds.CHARM_TRANSFER_DAMAGE,
 			VoodooBonds.CHARM_TRANSFER_TIME,
 
@@ -957,6 +976,7 @@ public class CharmManager {
 			DarkPact.CHARM_COOLDOWN,
 			JudgementChain.CHARM_COOLDOWN,
 			VoodooBonds.CHARM_COOLDOWN,
+			VoodooBonds.CHARM_RECEIVED_DAMAGE,
 			EagleEye.CHARM_COOLDOWN,
 			HuntingCompanion.CHARM_COOLDOWN,
 			Volley.CHARM_COOLDOWN,

@@ -48,6 +48,8 @@ public class MelancholicLament extends Ability {
 	public static final String CHARM_COOLDOWN = "Melancholic Lament Cooldown";
 	public static final String CHARM_WEAKNESS = "Melancholic Lament Weakness Amplifier";
 	public static final String CHARM_RECOVERY = "Melancholic Lament Negative Effect Recovery";
+	public static final String CHARM_ENHANCE_DAMAGE = "Melancholic Lament Enhancement Damage Modifier";
+	public static final String CHARM_ENHANCE_DURATION = "Melancholic Lament Enhancement Duration";
 
 	public static final AbilityInfo<MelancholicLament> INFO =
 		new AbilityInfo<>(MelancholicLament.class, "Melancholic Lament", MelancholicLament::new)
@@ -57,7 +59,7 @@ public class MelancholicLament extends Ability {
 			.actionBarColor(TextColor.color(235, 235, 224))
 			.descriptions(
 				("Press the swap key while sneaking and holding a scythe to recite a haunting song, " +
-					 "causing all mobs within %s blocks to target the user and afflicting them with %s%% Weaken for %s seconds. Cooldown: %ss.")
+					"causing all mobs within %s blocks to target the user and afflicting them with %s%% Weaken for %s seconds. Cooldown: %ss.")
 					.formatted(RADIUS, StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1), StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
 				"Increase the Weaken to %s%% and decrease the duration of all negative potion effects on players in the radius by %ss."
 					.formatted(StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2), StringUtils.ticksToSeconds(CLEANSE_REDUCTION)),
@@ -98,6 +100,7 @@ public class MelancholicLament extends Ability {
 		}
 
 		if (isEnhanced()) {
+
 			cancelOnDeath(new BukkitRunnable() {
 				int mTicks = 0;
 
@@ -111,12 +114,12 @@ public class MelancholicLament extends Ability {
 
 					Hitbox enhanceHitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
 					int numTargeting = (int) enhanceHitbox
-						                         .getHitMobs().stream()
-						                         .filter(entity -> entity instanceof Mob mob && mob.getTarget() != null && mob.getTarget().equals(mPlayer))
-						                         .limit(ENHANCE_MAX_MOBS)
-						                         .count();
+						.getHitMobs().stream()
+						.filter(entity -> entity instanceof Mob mob && mob.getTarget() != null && mob.getTarget().equals(mPlayer))
+						.limit(ENHANCE_MAX_MOBS)
+						.count();
 					for (Player player : enhanceHitbox.getHitPlayers(true)) {
-						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, ENHANCE_DAMAGE * numTargeting, AFFECTED_DAMAGE_TYPES));
+						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, (ENHANCE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)) * numTargeting, AFFECTED_DAMAGE_TYPES));
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
 								(entity, fourHertz, twoHertz, oneHertz) -> {
 									mCosmetic.enhancementTick(player, mPlayer);
@@ -126,7 +129,7 @@ public class MelancholicLament extends Ability {
 					}
 
 					mTicks += 1;
-					if (mTicks > DURATION) {
+					if (mTicks > CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DURATION, DURATION)) {
 						this.cancel();
 					}
 				}

@@ -50,6 +50,7 @@ public class AdvancingShadows extends Ability {
 	public static final String CHARM_COOLDOWN = "Advancing Shadows Cooldown";
 	public static final String CHARM_RANGE = "Advancing Shadows Range";
 	public static final String CHARM_KNOCKBACK = "Advancing Shadows Knockback";
+	public static final String CHARM_ENHANCE_TIMER = "Advancing Shadows Recast Timer";
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeTypes();
@@ -81,6 +82,7 @@ public class AdvancingShadows extends Ability {
 
 	private final double mPercentDamageDealt;
 	private final double mActivationRange;
+	private final int mRecastTimer;
 	private final Team mColorTeam;
 
 	private int mEnhancementKillTick = -999;
@@ -93,6 +95,7 @@ public class AdvancingShadows extends Ability {
 		super(plugin, player, INFO);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2);
 		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));
+		mRecastTimer = CharmManager.getDuration(player, CHARM_ENHANCE_TIMER, ENHANCEMENT_KILL_REQUIREMENT_TIME);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS());
 		mColorTeam = ScoreboardUtils.getExistingTeamOrCreate("advancingShadowsColor", NamedTextColor.BLACK);
@@ -200,13 +203,13 @@ public class AdvancingShadows extends Ability {
 				if (Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(entity.getUniqueId().toString()) == null) {
 					mColorTeam.addEntry(entity.getUniqueId().toString());
 				}
-				entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, ENHANCEMENT_KILL_REQUIREMENT_TIME, 0));
+				entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, mRecastTimer, 0));
 				cancelOnDeath(new BukkitRunnable() {
 					int mT = 0;
 
 					@Override
 					public void run() {
-						if (mT > ENHANCEMENT_KILL_REQUIREMENT_TIME) {
+						if (mT > mRecastTimer) {
 							mEnhancementChain = 0;
 							// Revert glowing color to normal white
 							if (mColorTeam.hasEntry(entity.getUniqueId().toString())) {

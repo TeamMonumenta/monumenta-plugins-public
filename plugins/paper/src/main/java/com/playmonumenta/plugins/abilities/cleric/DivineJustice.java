@@ -65,6 +65,8 @@ public class DivineJustice extends Ability {
 	public static final String CHARM_DAMAGE = "Divine Justice Damage";
 	public static final String CHARM_SELF = "Divine Justice Self Heal";
 	public static final String CHARM_ALLY = "Divine Justice Ally Heal";
+	public static final String CHARM_ENHANCE_DAMAGE = "Divine Justice Enhancement Damage Modifier";
+	public static final String CHARM_ENHANCE_DURATION = "Divine Justice Enhancement Duration";
 
 	public static final AbilityInfo<DivineJustice> INFO =
 		new AbilityInfo<>(DivineJustice.class, NAME, DivineJustice::new)
@@ -104,6 +106,8 @@ public class DivineJustice extends Ability {
 			.displayItem(Material.IRON_SWORD);
 
 	private final boolean mDoHealingAndMultiplier;
+	private final double mEnhanceDamage;
+	private final int mEnhanceDuration;
 
 	// Passive damage to share with Holy Javelin
 	public double mLastPassiveDamage = 0;
@@ -120,6 +124,8 @@ public class DivineJustice extends Ability {
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDoHealingAndMultiplier = isLevelTwo();
+		mEnhanceDamage = ENHANCEMENT_ASH_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_DAMAGE);
+		mEnhanceDuration = CharmManager.getDuration(player, CHARM_ENHANCE_DURATION, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS());
 
@@ -199,8 +205,8 @@ public class DivineJustice extends Ability {
 		}
 
 		if (isEnhanced()
-			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
-			    && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
+			&& Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
+			&& FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
 		}
 	}
@@ -212,9 +218,9 @@ public class DivineJustice extends Ability {
 		Effect existingEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 		if (existingEffect != null && existingEffect.getMagnitude() > 0) {
 			mPriorAmount = existingEffect.getMagnitude();
-		} else if (existingEffect == null && mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE > 0) {
-			addEnhancementEffect(mPlayer, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION, mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE);
-			mPriorAmount -= ENHANCEMENT_ASH_BONUS_DAMAGE;
+		} else if (existingEffect == null && mPriorAmount - mEnhanceDamage > 0) {
+			addEnhancementEffect(mPlayer, mEnhanceDuration, mPriorAmount - mEnhanceDamage);
+			mPriorAmount -= mEnhanceDamage;
 		}
 	}
 
@@ -272,7 +278,7 @@ public class DivineJustice extends Ability {
 
 	public static boolean isAsh(Item item) {
 		return item.getItemStack().getType() == ASH_MATERIAL
-			       && ASH_NAME.equals(ItemUtils.getPlainNameIfExists(item.getItemStack()));
+			&& ASH_NAME.equals(ItemUtils.getPlainNameIfExists(item.getItemStack()));
 	}
 
 	public static boolean canPickUpAsh(Player player) {
@@ -290,8 +296,8 @@ public class DivineJustice extends Ability {
 			existingEffectAmount = existingEffect.getMagnitude();
 		}
 
-		int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
-		double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + ENHANCEMENT_ASH_BONUS_DAMAGE, ENHANCEMENT_BONUS_DAMAGE_MAX);
+		int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, mEnhanceDuration);
+		double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + mEnhanceDamage, ENHANCEMENT_BONUS_DAMAGE_MAX);
 
 		addEnhancementEffect(player, duration, bonusDamage);
 	}

@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class HolyJavelin extends Ability {
 	private static final int RANGE = 12;
+	private static final double SIZE = 0.95;
 	private static final int UNDEAD_DAMAGE_1 = 22;
 	private static final int UNDEAD_DAMAGE_2 = 36;
 	private static final int DAMAGE_1 = 11;
@@ -42,6 +43,7 @@ public class HolyJavelin extends Ability {
 	public static final String CHARM_DAMAGE = "Holy Javelin Damage";
 	public static final String CHARM_COOLDOWN = "Holy Javelin Cooldown";
 	public static final String CHARM_RANGE = "Holy Javelin Range";
+	public static final String CHARM_SIZE = "Holy Javelin Size";
 
 	public static final AbilityInfo<HolyJavelin> INFO =
 		new AbilityInfo<>(HolyJavelin.class, "Holy Javelin", HolyJavelin::new)
@@ -88,7 +90,7 @@ public class HolyJavelin extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
-			    && mCustomTriggers.get(0).check(mPlayer, AbilityTrigger.Key.LEFT_CLICK)) {
+			&& mCustomTriggers.get(0).check(mPlayer, AbilityTrigger.Key.LEFT_CLICK)) {
 			double sharedPassiveDamage = 0;
 			if (mLuminousInfusion != null) {
 				sharedPassiveDamage += mLuminousInfusion.mLastPassiveMeleeDamage;
@@ -111,6 +113,7 @@ public class HolyJavelin extends Ability {
 		}
 		putOnCooldown();
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		double size = CharmManager.getRadius(mPlayer, CHARM_SIZE, SIZE);
 
 		World world = mPlayer.getWorld();
 		mCosmetic.javelinSound(world, mPlayer.getLocation());
@@ -118,9 +121,9 @@ public class HolyJavelin extends Ability {
 
 		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, range, loc -> mCosmetic.javelinHitBlock(mPlayer, loc, world));
 
-		mCosmetic.javelinParticle(mPlayer, startLoc, endLoc);
+		mCosmetic.javelinParticle(mPlayer, startLoc, endLoc, size);
 
-		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, 0.95, true).accuracy(0.5).getHitMobs()) {
+		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, size, true).accuracy(0.5).getHitMobs()) {
 			double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;
 			if (enemy != triggeringEnemy) {
 				// Triggering enemy would've already received the melee damage from Luminous Infusion
