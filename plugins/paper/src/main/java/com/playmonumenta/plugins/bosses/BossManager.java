@@ -16,6 +16,8 @@ import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTurretBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.DropShardBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.LavaCannonBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.Samwell;
+import com.playmonumenta.plugins.bosses.bosses.exalted.ExaltedCAxtal;
+import com.playmonumenta.plugins.bosses.bosses.exalted.FlamingHavocBoss;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
@@ -349,6 +351,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(OmenBoss.identityTag, OmenBoss::new, new OmenBoss.Parameters());
 		registerStatelessBoss(FlareBoss.identityTag, FlareBoss::new, new FlareBoss.Parameters());
 		registerStatelessBoss(DevourBoss.identityTag, DevourBoss::new, new DevourBoss.Parameters());
+		registerStatelessBoss(FlamingHavocBoss.identityTag, FlamingHavocBoss::new);
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
@@ -387,7 +390,7 @@ public class BossManager implements Listener {
 		registerStatefulBoss(Samwell.identityTag, Samwell::new);
 		registerStatefulBoss(TealSpirit.identityTag, TealSpirit::new);
 		registerStatefulBoss(Xenotopsis.identityTag, Xenotopsis::new);
-
+		registerStatefulBoss(ExaltedCAxtal.identityTag, ExaltedCAxtal::new);
 	}
 
 	private static void registerStatelessBoss(String identityTag, StatelessBossConstructor constructor) {

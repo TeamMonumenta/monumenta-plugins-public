@@ -58,7 +58,7 @@ public class CAxtal extends SerializedLocationBossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellAxtalWitherAoe(plugin, mBoss, 13, 0, 30),
-			new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12),
+			new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12, "Soul", false),
 			new SpellTpBehindPlayer(plugin, mBoss, 160, 80, 50, 10, true),
 			new SpellAxtalTntThrow(plugin, mBoss, 5, 15),
 			new SpellBaseLaser(plugin, boss, 60, 140, false, true, 160,

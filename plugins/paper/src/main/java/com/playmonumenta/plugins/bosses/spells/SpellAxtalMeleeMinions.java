@@ -23,9 +23,11 @@ public class SpellAxtalMeleeMinions extends Spell {
 	private int mRepeats;
 	private int mNearbyRadius;
 	private int mMaxNearby;
+	private String mSummonedMobs;
+	private boolean mPool;
 
 	public SpellAxtalMeleeMinions(Plugin plugin, Entity launcher, int count, int scope,
-	                              int repeats, int nearbyRadius, int maxNearby) {
+	                              int repeats, int nearbyRadius, int maxNearby, String summonedMobs, boolean isPool) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mCount = count;
@@ -33,6 +35,8 @@ public class SpellAxtalMeleeMinions extends Spell {
 		mRepeats = repeats;
 		mNearbyRadius = nearbyRadius;
 		mMaxNearby = maxNearby;
+		mSummonedMobs = summonedMobs;
+		mPool = isPool;
 	}
 
 	@Override
@@ -61,13 +65,18 @@ public class SpellAxtalMeleeMinions extends Spell {
 			public void run() {
 				int numberToSpawn = mCount + (FastUtils.RANDOM.nextInt(2 * mScope) - mScope);
 				for (int j = 0; j < numberToSpawn && !mLauncher.isDead(); j++) {
-					LibraryOfSoulsIntegration.summon(loc, "Soul");
+					String soul = mSummonedMobs;
+					if (mPool) {
+						List<String> souls = LibraryOfSoulsIntegration.getPool(mSummonedMobs).keySet().stream().map((x) -> x.getLabel()).toList();
+						soul = souls.get(FastUtils.RANDOM.nextInt(souls.size()));
+					}
+					LibraryOfSoulsIntegration.summon(loc, soul);
 				}
-				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
-					if (skelly.getType() == EntityType.SKELETON) {
+				for (Entity e : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
+					if (e != mLauncher) {
 						double x = 0.5f * FastUtils.cos((double) FastUtils.RANDOM.nextInt(628) / 100);
 						double z = 0.5f * FastUtils.sin((double) FastUtils.RANDOM.nextInt(628) / 100);
-						skelly.setVelocity(new Vector(x, 0.5, z));
+						e.setVelocity(new Vector(x, 0.5, z));
 					}
 				}
 
