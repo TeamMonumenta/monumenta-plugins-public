@@ -35,7 +35,7 @@ public class DesecratingShot extends Ability {
 
 	public static final String CHARM_COOLDOWN = "Desecrating Shot Cooldown";
 	public static final String CHARM_DAMAGE = "Desecrating Shot Damage";
-	public static final String CHARM_WEAKNESS = "Desecrating Shot Weakness";
+	public static final String CHARM_WEAKNESS = "Desecrating Shot Weakness Amplifier";
 	public static final String CHARM_DURATION = "Desecrating Shot Duration";
 	public static final String CHARM_RADIUS = "Desecrating Shot Radius";
 

@@ -166,7 +166,7 @@ public enum ClassAbility {
 	INTERCONNECTED_HAVOC("Interconnected Havoc"),
 	CHAIN_LIGHTNING("Chain Lightning"),
 	LIGHTNING_TOTEM("Lightning Totem"),
-	ADHESIVE_TOTEMS("Adhesive Totems"),
+	CRYSTALLINE_COMBOS("Crystalline Combos"),
 	TOTEMIC_PROJECTION("Totemic Projection"),
 
 	// Soothsayer

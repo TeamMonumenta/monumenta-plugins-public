@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.guis.AbilityTriggersGui;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
@@ -280,7 +279,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	}
 
 	public void makeSkillSelectPage(PlayerClass userClass, Player player) {
-		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE && userClass.mClass != Shaman.CLASS_ID) {
+		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE) {
 			makeRegionThreeSkillPage(userClass, player);
 		} else {
 			makeRegionOneSkillPage(userClass, player);
@@ -404,7 +403,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	public void applyAbilityChosen(int chosenSlot, Player player, int level) {
 		ArrayList<Integer> currentLocations;
-		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE && ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != Shaman.CLASS_ID) {
+		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE) {
 			currentLocations = P3_ABILITY_LOCS;
 		} else {
 			currentLocations = P2_ABILITY_LOCS;

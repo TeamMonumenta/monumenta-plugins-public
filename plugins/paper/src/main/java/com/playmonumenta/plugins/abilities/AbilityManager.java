@@ -89,7 +89,7 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.abilities.shaman.AdhesiveTotems;
+import com.playmonumenta.plugins.abilities.shaman.CrystallineCombos;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
 import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
@@ -339,7 +339,7 @@ public class AbilityManager {
 			InterconnectedHavoc.INFO,
 			EarthenTremor.INFO,
 			LightningTotem.INFO,
-			AdhesiveTotems.INFO,
+			CrystallineCombos.INFO,
 			TotemicEmpowerment.INFO,
 			TotemicProjection.INFO
 		);

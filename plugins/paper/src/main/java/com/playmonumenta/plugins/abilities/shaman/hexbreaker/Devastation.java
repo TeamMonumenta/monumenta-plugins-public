@@ -43,7 +43,7 @@ public class Devastation extends Ability {
 			.scoreboardId("Devastation")
 			.shorthandName("DV")
 			.descriptions(
-				String.format("Press Swap while sneaking and holding a projectile weapon to destroy the nearest totem, dealing %s magic damage within a %s block radius of the totem. The totem's cooldown is reduced by %ss. Cooldown: %ss",
+				String.format("Punch while holding a projectile weapon to destroy the nearest totem, dealing %s magic damage within a %s block radius of the totem. The totem's cooldown is reduced by %ss. Cooldown: %ss",
 					DAMAGE_1,
 					RADIUS_1,
 					StringUtils.ticksToSeconds(CDR_ON_KILL),
@@ -53,9 +53,9 @@ public class Devastation extends Ability {
 					DAMAGE_2,
 					RADIUS_2)
 			)
-			.simpleDescription("Press swap to destroy your nearest totem, dealing massive damage within a medium radius.")
+			.simpleDescription("Punch with a bow to destroy your nearest totem, dealing massive damage within a medium radius.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Devastation::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Devastation::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false)
 				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.COAL_BLOCK);
 

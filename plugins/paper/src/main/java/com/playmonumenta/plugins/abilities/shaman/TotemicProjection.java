@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -15,9 +17,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class TotemicProjection extends Ability {
@@ -37,15 +38,21 @@ public class TotemicProjection extends Ability {
 	private static final double SLOWNESS_PERCENT = 0.2;
 	private static final int SLOWNESS_DURATION = 3 * 20;
 	private static final int RADIUS = 6;
-	private static final double VELOCITY = 0.65;
+	private static final double VELOCITY = 1.25;
+	private static final double TIME_TO_DROP = 75;
+	private static final double XZ_DISTANCE_TO_DROP = 14;
 	private static final int DISTRIBUTION_RADIUS = 3;
+	private static final double ENHANCE_DAMAGE_PERCENT_PER = 0.1;
+	private static final int ENHANCE_DAMAGE_PERCENT_DURATION = 6 * 20;
 
-	public static final String CHARM_SLOWNESS_PERCENT = "Totemic Projection Slowness";
+	public static final String CHARM_SLOWNESS_PERCENT = "Totemic Projection Slowness Amplifier";
 	public static final String CHARM_SLOWNESS_DURATION = "Totemic Projection Slowness Duration";
 
 	public static final String CHARM_COOLDOWN = "Totemic Projection Cooldown";
 	public static final String CHARM_DAMAGE_RADIUS = "Totemic Projection Damage Radius";
-	public static final String CHARM_DISTANCE = "Totemic Projection Distance";
+	public static final String CHARM_DISTANCE = "Totemic Projection Spread";
+	public static final String CHARM_ENHANCE_DAMAGE_PERCENT_PER = "Totemic Projection Enhancement Damage";
+	public static final String CHARM_ENHANCE_DAMAGE_DURATION = "Totemic Projection Enhancement Damage Duration";
 
 	public static final AbilityInfo<TotemicProjection> INFO =
 		new AbilityInfo<>(TotemicProjection.class, "Totemic Projection", TotemicProjection::new)
@@ -61,7 +68,11 @@ public class TotemicProjection extends Ability {
 					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
 					StringUtils.ticksToSeconds(SLOWNESS_DURATION),
 					RADIUS,
-					StringUtils.ticksToSeconds(COOLDOWN_2))
+					StringUtils.ticksToSeconds(COOLDOWN_2)),
+				String.format("For every totem affected by this ability, " +
+					"the Shaman gets +%s%% Attack/Projectile damage for %ss.",
+					StringUtils.multiplierToPercentage(ENHANCE_DAMAGE_PERCENT_PER),
+					StringUtils.ticksToSeconds(ENHANCE_DAMAGE_PERCENT_DURATION))
 			)
 			.simpleDescription("Fires a projectile that summons all of your active totems around the landing location.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
@@ -72,6 +83,8 @@ public class TotemicProjection extends Ability {
 	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	private final double mSlownessPercent;
 	private final int mSlownessDuration;
+	private final double mEnhanceDamagePercent;
+	private final int mEnhanceDamageDuration;
 
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -80,6 +93,8 @@ public class TotemicProjection extends Ability {
 		}
 		mSlownessPercent = isLevelTwo() ? SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT) : 0;
 		mSlownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, SLOWNESS_DURATION);
+		mEnhanceDamageDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DAMAGE_DURATION, ENHANCE_DAMAGE_PERCENT_DURATION);
+		mEnhanceDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE_PERCENT_PER, ENHANCE_DAMAGE_PERCENT_PER);
 	}
 
 	public void cast() {
@@ -99,6 +114,29 @@ public class TotemicProjection extends Ability {
 
 		// Clear out list just in case
 		mProjectiles.keySet().removeIf(p -> p.isDead() || !p.isValid());
+		new BukkitRunnable() {
+			int mT = 0;
+			final Location mPlayerLocation = mPlayer.getLocation();
+			@Override
+			public void run() {
+				if (mProjectiles.get(proj) != playerItemStats) {
+					this.cancel();
+				}
+
+				Location projLoc = proj.getLocation();
+				projLoc.setY(mPlayer.getLocation().getY());
+				if (mT >= TIME_TO_DROP
+					|| projLoc.distance(mPlayerLocation) >= XZ_DISTANCE_TO_DROP) {
+					proj.setVelocity(new Vector(0, -2, 0));
+				}
+
+				if (proj.isDead()) {
+					mProjectiles.remove(proj);
+					this.cancel();
+				}
+				mT++;
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	@Override
@@ -113,14 +151,6 @@ public class TotemicProjection extends Ability {
 			mPlayer.playSound(dropCenter, Sound.BLOCK_VINE_BREAK, 2.0f, 1.0f);
 			new PartialParticle(Particle.REVERSE_PORTAL, dropCenter, 20).spawnAsPlayerActive(mPlayer);
 			mPlayer.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.7f);
-
-			for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
-				if (abil instanceof TotemAbility totemAbility) {
-					totemAbility.mAttachedMob = null;
-					totemAbility.mMobStuckWithEffect = null;
-				}
-			}
-
 
 			List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
 			if (totems.size() == 1) {
@@ -154,6 +184,12 @@ public class TotemicProjection extends Ability {
 					}
 					currentDeg += degIncrement;
 				}
+			}
+			if (isEnhanced()) {
+				mPlugin.mEffectManager.addEffect(mPlayer, "ShamanProjectionEnhancement",
+					new PercentDamageDealt(mEnhanceDamageDuration,
+						mEnhanceDamagePercent * totems.size(),
+						EnumSet.of(DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.MELEE)));
 			}
 
 			if (isLevelTwo()) {

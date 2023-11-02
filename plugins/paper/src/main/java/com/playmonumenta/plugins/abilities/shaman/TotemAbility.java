@@ -30,21 +30,24 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class TotemAbility extends Ability implements AbilityWithDuration {
 
-	private static final double VELOCITY = 0.65;
-	private static final int TOTEM_DELAY = 20;
+	protected static final int PULSE_DELAY = 20;
+	private static final double VELOCITY = 1.25;
+	private static final double TIME_TO_DROP = 75;
+	private static final double XZ_DISTANCE_TO_DROP = 14;
 
 	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	private final String mProjectileName;
 	private final String mTotemName;
 	public final String mDisplayName;
-	public @Nullable LivingEntity mAttachedMob = null;
-	public @Nullable LivingEntity mMobStuckWithEffect = null;
 	public double mWhirlwindBuffPercent = 0;
 	public boolean mDecayedBuffed = false;
+	public int mChargeUpTicks = PULSE_DELAY;
+	public boolean mIsCharging = true;
 
 	private @Nullable BukkitRunnable mTotemTickingRunnable;
 
@@ -62,6 +65,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		if (mTotemTickingRunnable != null) {
 			mTotemTickingRunnable.cancel();
 		}
+		mIsCharging = mChargeUpTicks > 0;
 
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
@@ -72,17 +76,27 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 		mProjectiles.put(proj, playerItemStats);
 		putOnCooldown();
+		onTotemCast();
 
 		int cd = getModifiedCooldown();
 		// Clear out list just in case
 		mProjectiles.keySet().removeIf(p -> p.isDead() || !p.isValid() || p.getTicksLived() >= 100);
 		new BukkitRunnable() {
 			int mT = 0;
+			final Location mPlayerLocation = mPlayer.getLocation();
 			@Override
 			public void run() {
 				if (mProjectiles.get(proj) != playerItemStats) {
 					this.cancel();
 				}
+
+				Location projLoc = proj.getLocation();
+				projLoc.setY(mPlayer.getLocation().getY());
+				if (mT >= TIME_TO_DROP
+					|| projLoc.distance(mPlayerLocation) >= XZ_DISTANCE_TO_DROP) {
+					proj.setVelocity(new Vector(0, -2, 0));
+				}
+
 
 				if (mT > cd) {
 					proj.remove();
@@ -109,21 +123,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 			}
 			if (stats != null) {
 				Entity hitMob = event.getHitEntity();
-				Ability stickyTotems = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AdhesiveTotems.class);
-				if (stickyTotems != null) {
-					if (hitMob instanceof LivingEntity mob &&
-							!EntityUtils.isBoss(hitMob) &&
-							!(hitMob instanceof Player || hitMob instanceof ArmorStand || hitMob instanceof Villager)) {
-						mAttachedMob = mob;
-						mAttachedMob.getWorld().playSound(mAttachedMob, Sound.BLOCK_HONEY_BLOCK_PLACE, 2.0f, 0.7f);
-
-						if (stickyTotems.isLevelTwo()) {
-							mMobStuckWithEffect = mob;
-							onAdhereToMob(mMobStuckWithEffect);
-						}
-					}
-				}
-
+				onTotemHitEntity(hitMob);
 				placeTotem(proj.getLocation(), stats);
 			}
 		}
@@ -139,7 +139,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 			return;
 		}
 		stand.setMarker(false);
-		stand.setGravity(mAttachedMob == null);
+		stand.setGravity(true);
 		stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 		stand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 
@@ -166,22 +166,20 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 					return;
 				}
 
-				if (mT - TOTEM_DELAY >= 0) {
-					onTotemTick(mT - TOTEM_DELAY, stand, world, standLocation, stats);
+				if (mT - mChargeUpTicks >= 0 && mIsCharging) {
+					mIsCharging = false;
+					mT = 0;
+				}
+				if (!mIsCharging) {
+					onTotemTick(mT, stand, world, standLocation, stats);
 				}
 
-				if (mAttachedMob != null) {
-					if (mAttachedMob.isDead() || !mAttachedMob.isValid()) {
-						stand.setGravity(true);
-						mAttachedMob = null;
-					} else {
-						stand.teleport(mAttachedMob.getEyeLocation().clone().add(0, 0.5, 0));
-					}
-				} else {
-					stand.setGravity(true);
-				}
 				if (durationStand != null) {
-					AbilityUtils.produceDurationString(stand, durationStand, duration, mT, mWhirlwindBuffPercent, mDecayedBuffed);
+					if (mIsCharging) {
+						AbilityUtils.produceChargeUpString(stand, durationStand, mChargeUpTicks, duration);
+					} else {
+						AbilityUtils.produceDurationString(stand, durationStand, duration, mT, mWhirlwindBuffPercent, mDecayedBuffed);
+					}
 				}
 
 				if (((mWhirlwindBuffPercent != 0 && mT >= duration * mWhirlwindBuffPercent) || (mWhirlwindBuffPercent == 0 && mT >= duration))
@@ -201,11 +199,11 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 			@Override
 			public synchronized void cancel() {
-				mAttachedMob = null;
-				mMobStuckWithEffect = null;
 				if (durationStand != null) {
 					durationStand.remove();
 				}
+				mDecayedBuffed = false;
+				mWhirlwindBuffPercent = 0;
 				TotemicEmpowerment.removeTotem(mPlayer, stand);
 				mCurrDuration = -1;
 				ClientModHandler.updateAbility(mPlayer, TotemAbility.this);
@@ -227,7 +225,15 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 	public abstract void onTotemExpire(World world, Location standLocation);
 
-	public void onAdhereToMob(LivingEntity hitMob) {
+	public void onTotemHitEntity(Entity entity) {
+
+	}
+
+	public void onTotemCast() {
+
+	}
+
+	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
 
 	}
 

@@ -31,7 +31,7 @@ public class Shaman extends PlayerClass {
 		mAbilities.add(LightningTotem.INFO);
 		mAbilities.add(ChainLightning.INFO);
 		mAbilities.add(EarthenTremor.INFO);
-		mAbilities.add(AdhesiveTotems.INFO);
+		mAbilities.add(CrystallineCombos.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Shaman";
 		mPermissionString = PERMISSION_STRING;
@@ -67,7 +67,7 @@ public class Shaman extends PlayerClass {
 
 		mTriggerOrder = ImmutableList.of(
 			InterconnectedHavoc.INFO,
-			AdhesiveTotems.INFO,
+			CrystallineCombos.INFO,
 			CleansingTotem.INFO,
 			TotemicProjection.INFO,
 

@@ -10,9 +10,7 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
@@ -26,13 +24,21 @@ public class InterconnectedHavoc extends Ability {
 	private static final int DAMAGE_2 = 7;
 	private static final int RANGE_1 = 10;
 	private static final int RANGE_2 = 16;
+	public static final float KNOCKBACK = 0.2f;
+	public static final int STUN_TIME = 10;
 
 	public static final String CHARM_DAMAGE = "Interconnected Havoc Damage";
 	public static final String CHARM_RANGE = "Interconnected Havoc Range";
+	public static final String CHARM_ENHANCEMENT_KNOCKBACK = "Interconnected Havoc Knockback";
+	public static final String CHARM_ENHANCEMENT_STUN = "Interconnected Havoc Stun Duration";
 
 	private final double mRange;
 	private double mDamage;
+	private float mKnockback;
+	private int mStunTime;
+	private int mClearTimer;
 	private final List<LivingEntity> mHitMobs = new ArrayList<>();
+	private final List<LivingEntity> mBlockedMobs = new ArrayList<>();
 
 	public static final AbilityInfo<InterconnectedHavoc> INFO =
 		new AbilityInfo<>(InterconnectedHavoc.class, "Interconnected Havoc", InterconnectedHavoc::new)
@@ -46,7 +52,10 @@ public class InterconnectedHavoc extends Ability {
 				),
 				String.format("Magic damage is increased to %s, and the maximum distance is now %s.",
 					DAMAGE_2,
-					RANGE_2)
+					RANGE_2),
+				String.format("Mobs are now knocked back from the player when coming in contact " +
+					"with the line for the first time and are stunned for %ss.",
+					StringUtils.ticksToSeconds(STUN_TIME))
 			)
 			.simpleDescription("Forms lines between your active totems, dealing damage to mobs crossing those lines.")
 			.displayItem(Material.CHAIN);
@@ -60,6 +69,8 @@ public class InterconnectedHavoc extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mDamage *= SupportExpertise.damageBuff(mPlayer);
+		mKnockback = (float) CharmManager.getExtraPercent(mPlayer, CHARM_ENHANCEMENT_KNOCKBACK, KNOCKBACK);
+		mStunTime = CharmManager.getDuration(mPlayer, CHARM_ENHANCEMENT_STUN, STUN_TIME);
 	}
 
 	@Override
@@ -76,20 +87,34 @@ public class InterconnectedHavoc extends Ability {
 					continue;
 				}
 				List<LivingEntity> targetMobs = EntityUtils.getMobsInLine(startPoint, endPoint, 0.5);
-				targetMobs.removeIf(mHitMobs::contains);
-				for (LivingEntity mob : targetMobs) {
+				List<LivingEntity> mobsForDamage = new ArrayList<>(List.copyOf(targetMobs));
+				mobsForDamage.removeIf(mHitMobs::contains);
+				for (LivingEntity mob : mobsForDamage) {
 					mHitMobs.add(mob);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, ClassAbility.INTERCONNECTED_HAVOC, false, false);
 				}
-				if (targetMobs.isEmpty()) {
+				if (mobsForDamage.isEmpty()) {
 					new PPLine(Particle.ENCHANTMENT_TABLE, startPoint, endPoint).countPerMeter(10).spawnAsPlayerActive(mPlayer);
 				} else {
 					new PPLine(Particle.DAMAGE_INDICATOR, startPoint, endPoint).countPerMeter(4).spawnAsPlayerActive(mPlayer);
 				}
+				if (isEnhanced()) {
+					targetMobs.removeIf(mBlockedMobs::contains);
+					for (LivingEntity mob : targetMobs) {
+						mBlockedMobs.add(mob);
+						MovementUtils.knockAway(mPlayer.getLocation(), mob, mKnockback, 0.6f, true);
+						EntityUtils.applyStun(mPlugin, mStunTime, mob);
+					}
+				}
 			}
 		}
 		if (oneSecond) {
+			mClearTimer++;
 			mHitMobs.clear();
+			if (mClearTimer >= 30) {
+				mBlockedMobs.clear();
+				mClearTimer = 0;
+			}
 		}
 	}
 }

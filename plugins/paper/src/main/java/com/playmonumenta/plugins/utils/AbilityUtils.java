@@ -642,6 +642,16 @@ public class AbilityUtils {
 		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
 	}
 
+	public static void produceChargeUpString(LivingEntity totem, ArmorStand target, int chargeDuration, int currentDuration) {
+		Component indicatorName = Component.empty();
+		indicatorName = indicatorName.append(Component.text("[", NamedTextColor.WHITE));
+		indicatorName = indicatorName.append(Component.text("   Charging Up...   ", NamedTextColor.RED));
+		indicatorName = indicatorName.append(Component.text("]", NamedTextColor.WHITE));
+
+		target.customName(indicatorName);
+		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
+	}
+
 	public static Snowball spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
 		Location loc = player.getEyeLocation();
 		Snowball proj = world.spawn(loc, Snowball.class);

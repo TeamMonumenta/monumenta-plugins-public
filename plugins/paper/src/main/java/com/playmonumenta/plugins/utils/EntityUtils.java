@@ -1083,13 +1083,17 @@ public class EntityUtils {
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats) {
+		applyFire(plugin, fireTicks, target, player, playerItemStats, 1.0);
+	}
+
+	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats, double infernoScale) {
 		if (target instanceof ArmorStand || target.isInvulnerable()) {
 			return;
 		}
 
 		int inferno = plugin.mItemStatManager.getEnchantmentLevel(playerItemStats, EnchantmentType.INFERNO);
 		if (inferno > 0) {
-			Inferno.apply(plugin, player, playerItemStats, inferno, target, fireTicks);
+			Inferno.apply(plugin, player, playerItemStats, (int) Math.floor(inferno * infernoScale), target, fireTicks);
 		}
 
 		setFireTicksIfLower(fireTicks, target);
