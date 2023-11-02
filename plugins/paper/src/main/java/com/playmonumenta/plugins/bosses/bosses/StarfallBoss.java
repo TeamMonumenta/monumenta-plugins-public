@@ -56,6 +56,9 @@ public class StarfallBoss extends BossAbilityGroup {
 		@BossParam(help = "The number of starfalls to spawn when set to spawn randomly (i.e. DOES_TARGETING = FALSE). Does nothing otherwise")
 		public int COUNT = 3;
 
+		@BossParam(help = "the height above the target location to put particlecircle tracking particles")
+		public double LOCKING_CIRCLE_HEIGHT = 0.3;
+
 		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(FLAME,1,0,0,0,0.1)]");
 
 		public ParticlesList PARTICLE_METEOR = ParticlesList.fromString("[(FLAME,30,0.1,0.1,0.1,0.1),(SMOKE_LARGE,3)]");
@@ -171,7 +174,7 @@ public class StarfallBoss extends BossAbilityGroup {
 					double size = (p.LOCKING_DURATION - mTicks) / 20.0 * p.SPHERE_RADIUS;
 					for (int degree = 0; degree <= 360; degree += 5) {
 						double radiant = Math.toRadians(degree);
-						Location l = mLocation.clone().add(FastUtils.cos(radiant) * size, 0.3, FastUtils.sin(radiant) * size);
+						Location l = mLocation.clone().add(FastUtils.cos(radiant) * size, p.LOCKING_CIRCLE_HEIGHT, FastUtils.sin(radiant) * size);
 						p.PARTICLE_CIRCLE.spawn(boss, l);
 					}
 				}

@@ -179,7 +179,9 @@ public class ProjectileBoss extends BossAbilityGroup {
 				},
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY);
+					if (p.SPELL_DELAY > 0) {
+						PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY);
+					}
 					p.SOUND_START.play(loc);
 				},
 				// Launch Aesthetic

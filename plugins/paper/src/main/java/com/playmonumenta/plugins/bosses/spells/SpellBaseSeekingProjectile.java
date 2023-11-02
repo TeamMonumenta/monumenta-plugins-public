@@ -498,7 +498,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 
 					for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2, true)) {
-						if (mHitbox.overlaps(player.getBoundingBox()) && (player.equals(mTarget) || !mCollidesWithOthers)) {
+						if (mHitbox.overlaps(player.getBoundingBox()) && (player.equals(mTarget) || mCollidesWithOthers)) {
 							mHitAction.run(mWorld, player, mLocation, prevLoc);
 							this.cancel();
 							if (!mLingers) {

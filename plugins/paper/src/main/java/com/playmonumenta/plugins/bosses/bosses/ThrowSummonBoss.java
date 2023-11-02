@@ -60,7 +60,7 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		public int MOB_CAP = 15;
 
 		@BossParam(help = "Particles played when the boss throws a mob")
-		public ParticlesList THROW_PARTICLE = ParticlesList.fromString("[(FIRE,10,0.2,0.2,0.2,0.1)]");
+		public ParticlesList THROW_PARTICLE = ParticlesList.fromString("[(FLAME,10,0.2,0.2,0.2,0.1)]");
 
 		@BossParam(help = "Sound played when the boss throws a mob")
 		public SoundsList THROW_SOUND = SoundsList.fromString("[(ENTITY_SHULKER_SHOOT,1,1)]");

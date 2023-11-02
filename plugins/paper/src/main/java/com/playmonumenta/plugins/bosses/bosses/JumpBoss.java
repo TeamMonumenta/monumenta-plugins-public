@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -57,6 +58,7 @@ public class JumpBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_LAND_GROUND = ParticlesList.fromString("[(CLOUD,1,0.1,0.1,0.1,0.1)]");
 		public boolean PREFER_TARGET = true;
 		public boolean IGNORE_WALLS = false;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 	}
 
 	public JumpBoss(Plugin plugin, LivingEntity boss) {
@@ -83,6 +85,7 @@ public class JumpBoss extends BossAbilityGroup {
 
 			p.SOUND_LANDING.play(loc);
 			p.PARTICLE_LAND.spawn(boss, loc);
+			p.SPAWNED_MOB_POOL.spawn(loc);
 		}, p.PREFER_TARGET, p.IGNORE_WALLS);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

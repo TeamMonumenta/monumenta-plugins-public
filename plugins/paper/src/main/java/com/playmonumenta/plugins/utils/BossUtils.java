@@ -96,7 +96,7 @@ public class BossUtils {
 			return false;
 		} else {
 			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null, null, cause), damage, bypassIFrames, causeKnockback, false);
-			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager) && damage > 0) {
+			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager) && damage > 0 && stunTicks > 0) {
 				Shielding.disable(player);
 			}
 			return true;

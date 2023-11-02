@@ -37,12 +37,16 @@ public class ShockwaveBoss extends BossAbilityGroup {
 		public int DURATION = 40;
 		@BossParam(help = "duration of the wave")
 		public int WAVE_DURATION = 40;
-		@BossParam(help = "speed of the wave (may ever so slightly affect duration)")
-		public int WAVE_SPEED = 2;
+		@BossParam(help = "rate of wave expansion")
+		public double SPEED = 0.45;
+		@BossParam(help = "how often the wave will expand, in ticks")
+		public int FREQUENCY = 2;
 		@BossParam(help = "whether the mob can move while charging up or not")
 		public boolean CAN_MOVE = false;
 		@BossParam(help = "damage on contact")
 		public double DAMAGE = 3;
+		@BossParam(help = "number of points around the circle that will be generated")
+		public int POINT_COUNT = 48;
 		@BossParam(help = "whether the shockwave ignores i-frames")
 		public boolean IGNORE_IFRAMES = false;
 		@BossParam(help = "damage type")
@@ -56,7 +60,7 @@ public class ShockwaveBoss extends BossAbilityGroup {
 		@BossParam(help = "particles around the boss while it telegraphs")
 		public ParticlesList PARTICLE_BOSS_CHARGE = ParticlesList.fromString("[(ELECTRIC_SPARK,8,1,0.1,1,0.01)]");
 		@BossParam(help = "particle of the shockwave")
-		public ParticlesList PARTICLE_RELEASE = ParticlesList.fromString("[(END_ROD,1,0.2,0.2,0.2,0.0),(REDSTONE,8,1,0.1,1,0.01,#f0e02e,1.0)]");
+		public ParticlesList PARTICLE_RELEASE = ParticlesList.fromString("[(CRIT,1,0.0,0.0,0.0,0)]");
 		@BossParam(help = "sound played while the boss charges up")
 		public SoundsList SOUND_CHARGE = SoundsList.fromString("[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.7)]");
 		@BossParam(help = "sound played when the shockwave is released")
@@ -93,11 +97,11 @@ public class ShockwaveBoss extends BossAbilityGroup {
 							this.cancel();
 							p.SOUND_RELEASE.play(mBoss.getLocation());
 							Location loc = mBoss.getLocation().add(0, 0.25, 0);
-							for (int i = 0; i < 48; i++) {
+							for (int i = 0; i < p.POINT_COUNT; i++) {
 								int j = i;
 								new BukkitRunnable() {
 									final BoundingBox mBox = BoundingBox.of(loc, 0.75, 0.4, 0.75);
-									final double mRadian1 = Math.toRadians((7.5 * j));
+									final double mRadian1 = Math.toRadians((360.0 / p.POINT_COUNT * j));
 									final Location mPoint = loc.clone().add(FastUtils.cos(mRadian1) * 0.5, 0, FastUtils.sin(mRadian1) * 0.5);
 									final Vector mDir = LocationUtils.getDirectionTo(mPoint, loc);
 									int mTicks = 0;
@@ -105,7 +109,7 @@ public class ShockwaveBoss extends BossAbilityGroup {
 									@Override
 									public void run() {
 										mTicks++;
-										mBox.shift(mDir.clone().multiply(0.45));
+										mBox.shift(mDir.clone().multiply(p.SPEED));
 										Location bLoc = mBox.getCenter().toLocation(world);
 										p.PARTICLE_RELEASE.spawn(mBoss, bLoc);
 										for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), p.DETECTION, true)) {
@@ -126,7 +130,7 @@ public class ShockwaveBoss extends BossAbilityGroup {
 										mActiveRunnables.remove(this);
 										super.cancel();
 									}
-								}.runTaskTimer(mPlugin, 0, p.WAVE_SPEED);
+								}.runTaskTimer(mPlugin, 0, p.FREQUENCY);
 							}
 						}
 					}

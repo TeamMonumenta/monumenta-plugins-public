@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +90,7 @@ public class SpellBaseSummon extends Spell {
 		LivingEntity boss,
 		int cooldown,
 		int summoningDuration,
-		int summonRange,
+		double summonRange,
 		float deepness,
 		boolean canBeStopped,
 		boolean canMove,
@@ -116,18 +117,15 @@ public class SpellBaseSummon extends Spell {
 		mSummonAnimation = summonAnimation;
 
 		// Calculate a reference list of offsets to randomly try when spawning mobs
-		mLocationOffsets = new ArrayList<Vector>();
-		for (int y = -summonRange / 3; y <= summonRange / 3; y++) {
-			for (int x = -summonRange; x <= summonRange; x++) {
-				for (int z = -6; z <= 6; z++) {
-					// Don't spawn very close - no fun
-					if (x > -4 && x < 4 && z > -4 && z < 4) {
-						continue;
-					}
+		mLocationOffsets = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			double r = FastUtils.randomDoubleInRange(summonRange * 0.5, summonRange);
+			double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 
-					mLocationOffsets.add(new Vector(x + 0.5, y, z + 0.5));
-				}
-			}
+			double x = r * Math.cos(theta);
+			double z = r * Math.sin(theta);
+
+			mLocationOffsets.add(new Vector(x, 0, z));
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -22,34 +23,45 @@ public class DodgeBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 
+		@BossParam(help = "distance the mob will teleport to the side when dodging")
 		public double TELEPORT_RANGE = 3;
-
+		@BossParam(help = "number of dodges the mob will do")
+		public int DODGE_COUNT = 1;
+		@BossParam(help = "damage reduced on dodged attacks. if >= 1, attack is canceled")
+		public double DAMAGE_REDUCTION = 1.0;
+		@BossParam(help = "cooldown before refreshing all charges of dodge")
 		public long COOLDOWN = 20 * 3;
 	}
 
 	private final Parameters mParams;
-	private boolean mDodge = true;
+	private int mDodgeCount;
 
 	public DodgeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParams = Parameters.getParameters(boss, identityTag, new Parameters());
+		mDodgeCount = mParams.DODGE_COUNT;
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), -1, null);
 	}
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mDodge && !EntityUtils.isStunned(mBoss)) {
+		if (mDodgeCount > 0 && !EntityUtils.isStunned(mBoss) && !EntityUtils.isSilenced(mBoss)) {
 			dodge(event);
-			mDodge = false;
+			mDodgeCount--;
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mDodge = true;
+				mDodgeCount = mParams.DODGE_COUNT;
 			}, mParams.COOLDOWN);
 		}
 	}
 
 
 	private void dodge(DamageEvent event) {
-		event.setCancelled(true);
+		if (mParams.DAMAGE_REDUCTION >= 1) {
+			event.setCancelled(true);
+		} else {
+			event.setDamage(event.getDamage() * (1 - mParams.DAMAGE_REDUCTION));
+		}
+
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation().add(0, 1, 0);
 		Entity damager = event.getDamager();

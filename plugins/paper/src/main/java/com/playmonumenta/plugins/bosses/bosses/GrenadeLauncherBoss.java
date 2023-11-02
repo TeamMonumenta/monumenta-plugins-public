@@ -101,6 +101,8 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 
 		public float Y_VELOCITY = 0.7f;
 
+		public double LOB_VARIANCE = 0.0;
+
 	}
 
 	public GrenadeLauncherBoss(Plugin plugin, LivingEntity boss) {
@@ -179,7 +181,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 
 				p.LINGERING_EFFECTS.apply(target, boss);
 			},
-			p.SPAWNED_MOB_POOL, p.Y_VELOCITY
+			p.SPAWNED_MOB_POOL, p.Y_VELOCITY, p.LOB_VARIANCE
 		);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 

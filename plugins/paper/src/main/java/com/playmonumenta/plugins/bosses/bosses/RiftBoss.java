@@ -102,7 +102,10 @@ public class RiftBoss extends BossAbilityGroup {
 				List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
 				List<Location> locs = new ArrayList<>();
 				for (LivingEntity target : targets) {
-					locs.add(target.getLocation());
+					// treat everything as on the same y-plane for targeting
+					Location flatLocation = target.getLocation();
+					flatLocation.setY(mBoss.getLocation().getY());
+					locs.add(flatLocation);
 				}
 
 				if (p.LINES > 1) {

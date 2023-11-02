@@ -43,7 +43,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	private final LingeringCenterAesthetics mLingeringCenterAesthetics;
 
 	private final LoSPool mSummonPool;
-	private final float mGrenadeVelocity;
+	private final float mGrenadeYVelocity;
+	private final double mThrowVariance;
 
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -74,7 +75,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f);
+			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0);
 	}
 
 	/*
@@ -118,6 +119,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	 * @param centerAesthetics    aesthetics for the center of the ring lingering
 	 * @param lingeringHitAction  action called for each LivingEntity that explosionTargets returns if inside lingeringRadius
 	 * @param mobPool             the mob pool to be spawned when the grenade explodes
+	 * @param throwVariance       variance of where the grenade will be thrown
 	 */
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -147,7 +149,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		HitAction lingeringHitAction,
 
 		LoSPool mobPool,
-		float yVelocity
+		float yVelocity,
+		double throwVariance
 	) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -173,8 +176,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		mLingeringHit = lingeringHitAction;
 
 		mSummonPool = mobPool;
-		mGrenadeVelocity = yVelocity;
-
+		mGrenadeYVelocity = yVelocity;
+		mThrowVariance = throwVariance;
 	}
 
 
@@ -218,10 +221,19 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
 
+			// apply throw variance
+			if (mThrowVariance != 0) {
+				double r = FastUtils.randomDoubleInRange(0, mThrowVariance);
+				double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
+				double x = r * Math.cos(theta);
+				double z = r * Math.sin(theta);
+				pLoc.add(x, 0, z);
+			}
+
 			// approximate formula for the max height of a falling block's trajectory given its initial y-velocity
-			double maxHeight = -0.453758*mGrenadeVelocity + 12.6052*Math.pow(mGrenadeVelocity, 2) +
-							   -3.75027*Math.pow(mGrenadeVelocity, 3) + 0.906156*Math.pow(mGrenadeVelocity, 4) +
-							   -0.114669*Math.pow(mGrenadeVelocity, 5);
+			double maxHeight = -0.453758* mGrenadeYVelocity + 12.6052*Math.pow(mGrenadeYVelocity, 2) +
+				-3.75027*Math.pow(mGrenadeYVelocity, 3) + 0.906156*Math.pow(mGrenadeYVelocity, 4) +
+				-0.114669*Math.pow(mGrenadeYVelocity, 5);
 
 			// h = 0.5 * g * t^2
 			// t^2 = 0.5 * g / h
@@ -234,11 +246,11 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			double velocity = distance * timeOfFlight;
 
 			// lessen velocity if the y-velocity is very low as to avoid overshooting, and vice versa
-			velocity *= 1 + (mGrenadeVelocity - 0.7);
+			velocity *= 1 + (mGrenadeYVelocity - 0.7);
 
 			// Divide the actual velocity by 32 (speed at which things fall in minecraft; don't ask me why, but it works)
 			Vector vel = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ()).normalize().multiply(velocity / 32);
-			vel.setY(mGrenadeVelocity);
+			vel.setY(mGrenadeYVelocity);
 
 			if (!Double.isFinite(vel.getX())) {
 				vel = new Vector(0, 1, 0);

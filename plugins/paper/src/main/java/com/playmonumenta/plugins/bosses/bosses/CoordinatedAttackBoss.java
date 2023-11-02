@@ -1,23 +1,24 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -25,79 +26,109 @@ import org.bukkit.util.Vector;
 public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_coordinatedattack";
-	public static final int detectionRange = 24;
 
-	private static final int TARGET_RADIUS = 20;
-	private static final int DELAY = 10;
-	private static final int COOLDOWN = 20 * 3;
-	private static final int AFFECTED_MOB_CAP = 4;
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "detection range of the ability")
+		public int DETECTION = 40;
+		@BossParam(help = "initial delay in ticks before this ability becomes active")
+		public int DELAY = 30;
+		@BossParam(help = "cooldown in ticks")
+		public int COOLDOWN = 12 * 20;
+		@BossParam(help = "if false, selects mobs around the target. if true, selects mobs around itself.")
+		public boolean NEAR_SELF = false;
+		@BossParam(help = "radius in which mobs can be selected from")
+		public int TARGET_RADIUS = 20;
+		@BossParam(help = "color the selected mobs will glow before jumping")
+		public String COLOR = "red";
+		@BossParam(help = "delay before the selected mobs jump")
+		public int WINDUP = 20;
+		@BossParam(help = "scalar affecting the distance the jumping mobs will go")
+		public double DISTANCE_SCALAR = 1;
+		@BossParam(help = "scalar affecting the height the jumping mobs will reach")
+		public double HEIGHT_SCALAR = 1;
+		@BossParam(help = "maximum number of mobs that can be launched")
+		public int AFFECTED_MOB_CAP = 4;
 
-	private int mLastTriggered = 0;
+	}
 
 	public CoordinatedAttackBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
-	}
+		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
+		Spell spell = new Spell() {
+			@Override
+			public void run() {
+				LivingEntity target = ((Mob) boss).getTarget();
 
-	@Override
-	public void bossChangedTarget(EntityTargetEvent event) {
-		Entity target = event.getTarget();
-
-		if (target instanceof Player) {
-			if (mBoss.getTicksLived() - mLastTriggered < COOLDOWN) {
-				return;
-			}
-
-			mLastTriggered = mBoss.getTicksLived();
-
-			World world = mBoss.getWorld();
-			Location loc = target.getLocation();
-			world.playSound(loc, Sound.EVENT_RAID_HORN, SoundCategory.HOSTILE, 50f, 1.5f);
-			new PartialParticle(Particle.VILLAGER_ANGRY, loc, 30, 2, 0, 2, 0).spawnAsEntityActive(mBoss);
-			new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 0.5, 0), 30, 2, 0.5, 2, 0).spawnAsEntityActive(mBoss);
-
-			new BukkitRunnable() {
-				final Player mTarget = (Player) target;
-
-				@Override
-				public void run() {
+				if (target instanceof Player mTarget) {
 					if (mTarget.isDead() || !mTarget.isValid() || !mTarget.isOnline()) {
 						return;
 					}
 
-					Location locTarget = mTarget.getLocation();
+					World world = mBoss.getWorld();
+					Location targetLoc = target.getLocation();
 
-					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(locTarget, TARGET_RADIUS);
+					new PartialParticle(Particle.VILLAGER_ANGRY, mBoss.getEyeLocation(), 8, 0.3, 0.3, 0.3, 0).spawnAsEntityActive(mBoss);
+
+					world.playSound(targetLoc, Sound.EVENT_RAID_HORN, SoundCategory.HOSTILE, 50f, 1.5f);
+					new PartialParticle(Particle.VILLAGER_ANGRY, targetLoc, 20, 1, 0, 1, 0).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_WITCH, targetLoc, 20, 1, 0.5, 1, 0).spawnAsEntityActive(mBoss);
+
+					List<LivingEntity> mobs;
+					if (p.NEAR_SELF) {
+						mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), p.TARGET_RADIUS);
+					} else {
+						mobs = EntityUtils.getNearbyMobs(targetLoc, p.TARGET_RADIUS);
+					}
 					Collections.shuffle(mobs);
 
 					int i = 0;
-					for (LivingEntity le : EntityUtils.getNearbyMobs(locTarget, TARGET_RADIUS)) {
-						if (le instanceof Mob mob && mob.hasLineOfSight(mTarget)) {
-							if (!AbilityUtils.isStealthed(mTarget)) {
-								Set<String> tags = mob.getScoreboardTags();
-								// Don't set target of mobs with this ability, or else infinite loop
-								if (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG) && !EntityUtils.isBoss(mob)) {
-									mob.setTarget(mTarget);
-									Location loc = mob.getLocation();
-									double distance = loc.distance(locTarget);
-									Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19);
-									velocity.setY(velocity.getY() * 0.5 + distance * 0.08);
-									mob.setVelocity(velocity);
+					for (LivingEntity le : mobs) {
+						if (le instanceof Mob mob && mob.hasLineOfSight(mTarget) && !AbilityUtils.isStealthed(mTarget)) {
+							Set<String> tags = mob.getScoreboardTags();
+							if (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG) && !EntityUtils.isBoss(mob)) {
+								PotionUtils.applyColoredGlowing(identityTag, mob, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.WINDUP);
+								new BukkitRunnable() {
+									@Override
+									public void run() {
+										Location locTarget = mTarget.getLocation();
 
-									new PartialParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
-									new PartialParticle(Particle.VILLAGER_ANGRY, mob.getEyeLocation(), 8, 0.3, 0.3, 0.3, 0).spawnAsEntityActive(mBoss);
+										mob.setTarget(mTarget);
+										Location loc = mob.getLocation();
+										double distance = loc.distance(locTarget);
+										Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19 * p.DISTANCE_SCALAR);
+										velocity.setY(velocity.getY() * 0.5 + distance * 0.08 * p.HEIGHT_SCALAR);
+										mob.setVelocity(velocity);
 
-									i++;
-									if (i >= AFFECTED_MOB_CAP) {
-										break;
+										new PartialParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.VILLAGER_ANGRY, mob.getEyeLocation(), 8, 0.3, 0.3, 0.3, 0).spawnAsEntityActive(mBoss);
 									}
+								}.runTaskLater(mPlugin, p.WINDUP);
+
+								i++;
+								if (i >= p.AFFECTED_MOB_CAP) {
+									break;
 								}
 							}
 						}
 					}
 				}
-			}.runTaskLater(mPlugin, DELAY);
+			}
 
-		}
+			@Override
+			public int cooldownTicks() {
+				return p.COOLDOWN;
+			}
+
+			@Override
+			public boolean canRun() {
+				LivingEntity target = ((Mob) mBoss).getTarget();
+				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), p.TARGET_RADIUS);
+
+				return target != null && target.hasLineOfSight(mBoss) && !mobs.isEmpty();
+			}
+
+		};
+
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }
