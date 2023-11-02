@@ -165,6 +165,10 @@ public class DelveLootTableGroup {
 		// willows
 		new DelveLootTableGroup("r3/exalteds/willows/delves/delve_chest", "r3/exalteds/willows/delves/dmat_chest", "r3/exalteds/willows/delves/cmat_chest", "r3/exalteds/willows/chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/exalteds/willows/delves/lootroom_delve_chest", "r3/exalteds/willows/delves/lootroom_dmat_chest", "r3/exalteds/willows/delves/lootroom_cmat_chest", "r3/exalteds/willows/lootroom_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		// reverie
+		new DelveLootTableGroup("r3/exalteds/reverie/delves/delve_generic", "r3/exalteds/reverie/delves/dmat_generic", "r3/exalteds/reverie/delves/cmat_generic", "r3/exalteds/reverie/chest_academy", "r3/exalteds/reverie/chest_apartments", "r3/exalteds/reverie/chest_castle", "r3/exalteds/reverie/chest_city", "r3/exalteds/reverie/chest_oldlabs").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/exalteds/reverie/delves/chest_special_delve", "r3/exalteds/reverie/delves/dmat_generic", "r3/exalteds/reverie/delves/cmat_generic", "r3/exalteds/reverie/chest_special").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 	}
 
 
