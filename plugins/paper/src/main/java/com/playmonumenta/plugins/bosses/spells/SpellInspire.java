@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
@@ -31,8 +32,15 @@ public class SpellInspire extends Spell {
 
 	@Override
 	public void run() {
-		Location loc = mBoss.getLocation();
-		new PartialParticle(Particle.FIREWORKS_SPARK, loc, mRange * mRange / 8, mRange / 1.5, 0, mRange / 1.5, 0.05).spawnAsEntityActive(mBoss);
+		Location loc = mBoss.getLocation().clone().add(0, 0.25, 0);
+		new PPCircle(Particle.FIREWORKS_SPARK, loc, mRange)
+			.ringMode(true)
+			.count(30)
+			.extra(0.01)
+			.spawnAsEntityActive(mBoss);
+
+		new PartialParticle(Particle.SPELL_INSTANT, mBoss.getEyeLocation(), mRange * mRange / 8, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
+
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRange)) {
 			mPlugin.mEffectManager.addEffect(mob, PERCENT_SPEED_EFFECT_NAME,

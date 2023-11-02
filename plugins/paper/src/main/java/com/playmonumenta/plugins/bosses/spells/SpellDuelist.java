@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 
 public class SpellDuelist extends Spell {
 
-	private static final Particle.DustOptions SWORD_COLOR = new Particle.DustOptions(Color.fromRGB(200, 200, 200), 1.0f);
+	private static final Particle.DustOptions SWORD_COLOR = new Particle.DustOptions(Color.fromRGB(225, 225, 225), 1.5f);
 
 	private static final int RANGE = 5;
 
@@ -66,15 +66,24 @@ public class SpellDuelist extends Spell {
 
 		((Mob) mBoss).setTarget(target);
 
+		mWorld.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 1f, 1.5f);
+		mWorld.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.HOSTILE, 1f, 1.7f);
+		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, SoundCategory.HOSTILE, 1f, 1.3f);
+		mWorld.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.HOSTILE, 1f, 1.4f);
+		int random = FastUtils.randomIntInRange(0, 2);
+		if (mBoss.getLocation().getY() > target.getLocation().getY()) {
+			random = FastUtils.randomIntInRange(0, 1);
+		} else if (mBoss.getLocation().getY() < target.getLocation().getY()) {
+			random = FastUtils.randomIntInRange(1, 2);
+		}
 
-		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
-		int random = FastUtils.RANDOM.nextInt(3);
-
+		//high sweep
 		if (random == 0) {
 			Vector direction = mBoss.getLocation().getDirection().setY(0).normalize();
 			Vector sideways = new Vector(direction.getZ() / 2, 0, -direction.getX() / 2);
 			Location locParticle = mBoss.getLocation().add(0, 1.75, 0).subtract(sideways.clone().multiply(10));
 			for (int i = 0; i <= 20; i++) {
+				new PartialParticle(Particle.WAX_OFF, locParticle, 5, 0.2, 0.2, 0.2, 0).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR).spawnAsEntityActive(mBoss);
 				locParticle.add(sideways);
 			}
@@ -122,12 +131,14 @@ public class SpellDuelist extends Spell {
 				}
 			};
 
-			attack.runTaskTimer(mPlugin, 10, 1);
+			attack.runTaskTimer(mPlugin, 15, 1);
 			mActiveRunnables.add(attack);
+			//vertical
 		} else if (random == 1) {
 			Vector direction = target.getLocation().subtract(mBoss.getLocation()).toVector().setY(0).normalize();
 			Location locParticle = mBoss.getEyeLocation();
 			for (int i = 0; i < 10; i++) {
+				new PartialParticle(Particle.WAX_OFF, locParticle, 5, 0.2, 0.2, 0.2, 0).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR).spawnAsEntityActive(mBoss);
 				locParticle.add(0, 0.5, 0);
 			}
@@ -166,13 +177,15 @@ public class SpellDuelist extends Spell {
 				}
 			};
 
-			attack.runTaskTimer(mPlugin, 10, 1);
+			attack.runTaskTimer(mPlugin, 15, 1);
 			mActiveRunnables.add(attack);
+			//lower
 		} else {
 			Vector direction = mBoss.getLocation().getDirection().setY(0).normalize();
 			Vector sideways = new Vector(direction.getZ() / 2, 0, -direction.getX() / 2);
 			Location locParticle = mBoss.getLocation().subtract(sideways.clone().multiply(10));
 			for (int i = 0; i <= 20; i++) {
+				new PartialParticle(Particle.WAX_OFF, locParticle, 5, 0.2, 0.2, 0.2, 0).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR).spawnAsEntityActive(mBoss);
 				locParticle.add(sideways);
 			}
@@ -220,7 +233,7 @@ public class SpellDuelist extends Spell {
 				}
 			};
 
-			attack.runTaskTimer(mPlugin, 10, 1);
+			attack.runTaskTimer(mPlugin, 15, 1);
 			mActiveRunnables.add(attack);
 		}
 	}

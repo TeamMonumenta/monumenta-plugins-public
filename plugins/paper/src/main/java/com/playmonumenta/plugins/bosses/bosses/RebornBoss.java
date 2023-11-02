@@ -2,14 +2,12 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -27,6 +25,18 @@ public class RebornBoss extends BossAbilityGroup {
 
 		@BossParam(help = "% of the MaxHealth that the mob will have when reborn")
 		public double REBORN_PERCENT_HEALTH = 0.5;
+
+		@BossParam(help = "Whether the mob becomes invulnerable when reborn")
+		public boolean IS_INVULNERABLE = false;
+
+		@BossParam(help = "how long the reborn invulnerability lasts for, if applicable")
+		public int INVULN_DURATION = 60;
+
+		@BossParam(help = "sound played on reborn")
+		public SoundsList SOUND_REBORN = SoundsList.fromString("[(ITEM_TOTEM_USE, 1.0, 1.0)]");
+
+		@BossParam(help = "particles displayed on reborn")
+		public ParticlesList PARTICLE_REBORN = ParticlesList.fromString("[(TOTEM, 4, 0, 0, 0, 0.35)]");
 	}
 
 	private final Parameters mParams;
@@ -43,10 +53,12 @@ public class RebornBoss extends BossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (mParams.REBORN_TIMES > mTimesReborn && mBoss.getHealth() - event.getFinalDamage(true) <= 0) {
 			mTimesReborn++;
-			World world = mBoss.getWorld();
 			event.setCancelled(true);
+			if (mParams.IS_INVULNERABLE) {
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "REBORN_INVULN", new PercentDamageReceived(mParams.INVULN_DURATION, -4));
+			}
 			event.setDamage(0);
-			world.playSound(mBoss.getLocation(), Sound.ITEM_TOTEM_USE, SoundCategory.HOSTILE, 1, 1);
+			mParams.SOUND_REBORN.play(mBoss.getLocation());
 			mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * mParams.REBORN_PERCENT_HEALTH);
 			mBoss.setFireTicks(-1);
 
@@ -71,7 +83,7 @@ public class RebornBoss extends BossAbilityGroup {
 				@Override
 				public void run() {
 					mT++;
-					new PartialParticle(Particle.TOTEM, mBoss.getEyeLocation(), 4, 0, 0, 0, 0.35).spawnAsEntityActive(mBoss);
+					mParams.PARTICLE_REBORN.spawn(mBoss, mBoss.getEyeLocation());
 					if (mT > 20 * 2) {
 						this.cancel();
 					}

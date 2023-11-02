@@ -54,12 +54,17 @@ public class WrathBoss extends BossAbilityGroup {
 			// Initiate Aesthetic
 			(World world, Location loc) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ENTITY_VINDICATOR_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.8f, 0.8f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 2f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.HOSTILE, 2f, 1.7f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, SoundCategory.HOSTILE, 2f, 1.3f);
+				world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.HOSTILE, 2f, 1.4f);
 			},
 			// Leap Aesthetic
 			(World world, Location loc) -> {
 				new PartialParticle(Particle.CLOUD, loc, 20, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 1f);
+				world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1, 1f);
 			},
 			// Leaping Aesthetic
 			(World world, Location loc) -> {
@@ -123,7 +128,7 @@ public class WrathBoss extends BossAbilityGroup {
 							this.cancel();
 						}
 					}
-				}.runTaskTimer(mPlugin, 0, 1);
+				}.runTaskTimer(mPlugin, 5, 1);
 			}, null, null), new SpellDuelist(plugin, boss, mParams.COOLDOWN, mParams.DAMAGE)));
 
 		Bukkit.getScheduler().runTaskLater(plugin, () -> EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1), 1);

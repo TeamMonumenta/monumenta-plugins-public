@@ -45,22 +45,22 @@ public class Transcendent {
 
 		List<String> seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=8,distance=32,speed=0.5,delay=10,cooldown=30,turnradius=0.04,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=8,distance=32,speed=0.5,delay=10,cooldown=100,turnradius=0.02,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R1.add(seekingProjectileBoss);
 		ABILITY_POOL_R1.add(seekingProjectileBoss);
 		seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=16,distance=32,speed=0.7,delay=10,cooldown=30,turnradius=0.06,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=16,distance=32,speed=0.7,delay=10,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R2.add(seekingProjectileBoss);
 		ABILITY_POOL_R2.add(seekingProjectileBoss);
 		seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=24,distance=32,speed=0.7,delay=10,cooldown=30,turnradius=0.06,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=24,distance=32,speed=0.7,delay=10,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R3.add(seekingProjectileBoss);
 		ABILITY_POOL_R3.add(seekingProjectileBoss);
@@ -78,16 +78,19 @@ public class Transcendent {
 		wrathBoss.add(WrathBoss.identityTag);
 		wrathBoss.add(WrathBoss.identityTag + "[damage=9,spellname=\"" + WRATH_SPELL_NAME + "\"]");
 		wrathBoss.add(DodgeBoss.identityTag);
+		wrathBoss.add(DodgeBoss.identityTag + "[cooldown=120]");
 		ABILITY_POOL_MELEE_R1.add(wrathBoss);
 		wrathBoss = new ArrayList<>();
 		wrathBoss.add(WrathBoss.identityTag);
 		wrathBoss.add(WrathBoss.identityTag + "[damage=18,spellname=\"" + WRATH_SPELL_NAME + "\"]");
 		wrathBoss.add(DodgeBoss.identityTag);
+		wrathBoss.add(DodgeBoss.identityTag + "[cooldown=100]");
 		ABILITY_POOL_MELEE_R2.add(wrathBoss);
 		wrathBoss = new ArrayList<>();
 		wrathBoss.add(WrathBoss.identityTag);
 		wrathBoss.add(WrathBoss.identityTag + "[damage=27,spellname=\"" + WRATH_SPELL_NAME + "\"]");
 		wrathBoss.add(DodgeBoss.identityTag);
+		wrathBoss.add(DodgeBoss.identityTag + "[cooldown=80]");
 		ABILITY_POOL_MELEE_R3.add(wrathBoss);
 
 	}
@@ -95,9 +98,9 @@ public class Transcendent {
 	public static final String DESCRIPTION = "Elites become greatly empowered.";
 
 	public static String[] rankDescription(int level) {
-			return new String[]{
-				"Elites have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to be Transcendent."
-			};
+		return new String[]{
+			"Elites have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to be Transcendent."
+		};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
