@@ -160,11 +160,13 @@ public class CleansingTotem extends TotemAbility {
 
 	@Override
 	public void onTotemCast() {
-		cleanseTargets(List.of(mPlayer));
-		PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer,
-			CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlayer);
-		new PPCircle(Particle.HEART, mPlayer.getLocation(), 1).ringMode(true)
-			.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
+		if (isEnhanced()) {
+			cleanseTargets(List.of(mPlayer));
+			PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer,
+				CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlayer);
+			new PPCircle(Particle.HEART, mPlayer.getLocation(), 1).ringMode(true)
+				.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
+		}
 	}
 
 	@Override
