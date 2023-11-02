@@ -27,6 +27,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -407,4 +408,93 @@ public class DisplayEntityUtils {
 		ItemUtils.setPlainTag(stack);
 		return stack;
 	}
+
+	public static void rotateAroundDisplayLocation(Display display, double radius, int ticksPerRotation) {
+		rotateAroundLocation(display, radius, ticksPerRotation, new Vector3f(0, 1, 0), new Vector3f(1, 0, 0), ticksPerRotation);
+	}
+
+	public static void rotateAroundLocation(Display display, double radius, int ticksPerRotation, Vector3f leftAxis, Vector3f rightAxis, int duration) {
+		display.setInterpolationDuration(2);
+
+		new BukkitRunnable() {
+			int mTicks = 0;
+			float mAngle = 0;
+			final float mIncriment = (float) ((Math.PI * 2) / ticksPerRotation);
+
+			@Override
+			public void run() {
+				rotateAround(display, radius, mAngle, leftAxis, rightAxis);
+				if (mTicks >= duration) {
+					this.cancel();
+				}
+				mAngle += mIncriment;
+				mTicks++;
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+	}
+
+	public static void rotateAroundEntityLocation(Entity entity, Display display, double radius, int ticksPerRotation) {
+		rotateAroundEntityLocation(entity, display, radius, ticksPerRotation, new Vector3f(0, 1, 0), new Vector3f(1, 0, 0), ticksPerRotation);
+	}
+
+	public static void rotateAroundEntityLocation(Entity entity, Display display, double radius, int ticksPerRotation, Vector3f leftAxis, Vector3f rightAxis, int duration) {
+		display.setInterpolationDuration(2);
+
+		new BukkitRunnable() {
+			int mTicks = 0;
+			float mAngle = 0;
+			final float mIncriment = (float) ((Math.PI * 2) / ticksPerRotation);
+
+			@Override
+			public void run() {
+				display.teleport(entity.getLocation().setDirection(new Vector(1, 0, 0)));
+				rotateAround(display, radius, mAngle, leftAxis, rightAxis);
+				if (mTicks >= duration) {
+					this.cancel();
+				}
+				mAngle += mIncriment;
+				mTicks++;
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+	}
+
+	private static void rotateAround(Display display, double radius, float angle, Vector3f leftAxis, Vector3f rightAxis) {
+		display.setTransformation(new Transformation(
+			new Vector3f((float) (radius * Math.cos(angle)), 0, (float) (radius * Math.sin(angle))),
+			new AxisAngle4f(angle, leftAxis.x, leftAxis.y, leftAxis.z),
+			display.getTransformation().getScale(),
+			new AxisAngle4f(angle, rightAxis.x, rightAxis.y, rightAxis.z)));
+		display.setInterpolationDelay(-1);
+	}
+
+	/**
+	 * Only works for cubes and will make item displays vertical and point towards it. By default, rotates it for weapons
+	 *
+	 * @param display  display to be rotated
+	 * @param vec      vector direction the display should be rotated.
+	 *                 For looking at a loc get the vector between the two locs
+	 * @param duration duration of the interpolation
+	 */
+	public static void rotateToPointAtLoc(Display display, Vector vec, int duration) {
+		rotateToPointAtLoc(display, vec, duration, -Math.PI / 4.0f);
+	}
+
+	/**
+	 * Only works for cubes and will make item displays vertical and point towards it.
+	 *
+	 * @param display     display to be rotated
+	 * @param vec         vector direction the display should be rotated.
+	 *                    For looking at a loc get the vector between the two locs
+	 * @param duration    duration of the interpolation
+	 * @param angleOffset the angle in radians to rotate it in additions. Cross bows would be +π/4, armor would be 0,
+	 *                    and weapons would be -π/4
+	 */
+	public static void rotateToPointAtLoc(Display display, Vector vec, int duration, double angleOffset) {
+		vec.normalize();
+		display.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f((float) -Math.atan2(vec.getZ(), vec.getX()), 0, 1, 0), new Vector3f(2f), new AxisAngle4f((float) (Math.asin(vec.getY()) + angleOffset), 0, 0, 1)));
+		display.setInterpolationDuration(duration);
+		display.setInterpolationDelay(-1);
+	}
+
+
 }
