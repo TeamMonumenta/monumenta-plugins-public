@@ -130,6 +130,26 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r3/world/poi/waterfall_village/delves/base_chest", "r3/world/poi/waterfall_village/delves/dmat_chest", "r3/world/poi/waterfall_village/delves/cmat_chest", "r3/world/poi/waterfall_village/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/world/poi/waterfall_village/delves/base_final", "r3/world/poi/waterfall_village/delves/dmat_final", "r3/world/poi/waterfall_village/delves/cmat_final", "r3/world/poi/waterfall_village/endchest", "r3/world/poi/waterfall_village/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
+		// Star Point POIs
+		// constellation tower
+		new DelveLootTableGroup("r3/world/poi/constellation_tower/delves/base_chest", "r3/world/poi/constellation_tower/delves/dmat_chest", "r3/world/poi/constellation_tower/delves/cmat_chest", "r3/world/poi/constellation_tower/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/constellation_tower/delves/base_final", "r3/world/poi/constellation_tower/delves/dmat_final", "r3/world/poi/constellation_tower/delves/cmat_final", "r3/world/poi/constellation_tower/endchest", "r3/world/poi/constellation_tower/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// the tolumaeus
+		new DelveLootTableGroup("r3/world/poi/the_tolumaeus/delves/base_chest", "r3/world/poi/the_tolumaeus/delves/dmat_chest", "r3/world/poi/the_tolumaeus/delves/cmat_chest", "r3/world/poi/the_tolumaeus/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/the_tolumaeus/delves/base_final", "r3/world/poi/the_tolumaeus/delves/dmat_final", "r3/world/poi/the_tolumaeus/delves/cmat_final", "r3/world/poi/the_tolumaeus/endchest", "r3/world/poi/the_tolumaeus/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// chittering gutters
+		new DelveLootTableGroup("r3/world/poi/chittering_gutters/delves/base_chest", "r3/world/poi/chittering_gutters/delves/dmat_chest", "r3/world/poi/chittering_gutters/delves/cmat_chest", "r3/world/poi/chittering_gutters/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/chittering_gutters/delves/base_final", "r3/world/poi/chittering_gutters/delves/dmat_final", "r3/world/poi/chittering_gutters/delves/cmat_final", "r3/world/poi/chittering_gutters/endchest", "r3/world/poi/chittering_gutters/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// celestial rampart
+		new DelveLootTableGroup("r3/world/poi/celestial_rampart/delves/base_chest", "r3/world/poi/celestial_rampart/delves/dmat_chest", "r3/world/poi/celestial_rampart/delves/cmat_chest", "r3/world/poi/celestial_rampart/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/celestial_rampart/delves/base_final", "r3/world/poi/celestial_rampart/delves/dmat_final", "r3/world/poi/celestial_rampart/delves/cmat_final", "r3/world/poi/celestial_rampart/endchest", "r3/world/poi/celestial_rampart/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// starbound sanctuary
+		new DelveLootTableGroup("r3/world/poi/starbound_sanctuary/delves/base_chest", "r3/world/poi/starbound_sanctuary/delves/dmat_chest", "r3/world/poi/starbound_sanctuary/delves/cmat_chest", "r3/world/poi/starbound_sanctuary/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/starbound_sanctuary/delves/base_final", "r3/world/poi/starbound_sanctuary/delves/dmat_final", "r3/world/poi/starbound_sanctuary/delves/cmat_final", "r3/world/poi/starbound_sanctuary/endchest", "r3/world/poi/starbound_sanctuary/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// the nadir
+		new DelveLootTableGroup("r3/world/poi/the_nadir/delves/base_chest", "r3/world/poi/the_nadir/delves/dmat_chest", "r3/world/poi/the_nadir/delves/cmat_chest", "r3/world/poi/the_nadir/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/the_nadir/delves/base_final", "r3/world/poi/the_nadir/delves/dmat_final", "r3/world/poi/the_nadir/delves/cmat_final", "r3/world/poi/the_nadir/endchest", "r3/world/poi/the_nadir/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
 		// R3 STRIKES (patches astral not spawning)
 
 		// portal
