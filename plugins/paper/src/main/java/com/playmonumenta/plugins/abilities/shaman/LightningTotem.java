@@ -209,7 +209,8 @@ public class LightningTotem extends TotemAbility {
 
 	@Override
 	public void onTotemHitEntity(Entity entity) {
-		if (entity instanceof LivingEntity target) {
+		if (entity instanceof LivingEntity target
+			&& EntityUtils.isHostileMob(target)) {
 			mTarget = target;
 		}
 	}
