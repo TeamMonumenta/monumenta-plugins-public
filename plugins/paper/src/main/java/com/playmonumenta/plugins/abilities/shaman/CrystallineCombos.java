@@ -104,7 +104,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 				.spawnAsOtherPlayerActive()));
 	private static final Collection<Map.Entry<Double, ParticleUtils.SpawnParticleAction>> PARTICLES_BREAK =
 		List.of(new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.4,
-			(Location loc) -> new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.1)
+			(Location loc) -> new PartialParticle(Particle.CRIT_MAGIC, loc, 1)
 				.spawnAsOtherPlayerActive()));
 
 	public CrystallineCombos(Plugin plugin, Player player) {
