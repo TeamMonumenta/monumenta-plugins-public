@@ -149,6 +149,7 @@ public class CustomTradeGui extends Gui {
 				int[] result = calculateDebt(requirement, itemStacks, inventoryWallet, mPebTradeGUIWallet);
 				int inventoryDebt = result[0];
 				int walletDebt = result[1];
+				int numInWallet = result[3];
 				boolean meetsRequirement = (result[2] == 1);
 				// Remove from inventory and wallet:
 				if (meetsRequirement && inventoryDebt > 0) {
@@ -162,7 +163,7 @@ public class CustomTradeGui extends Gui {
 				mLore.add(
 					Component.text(requirement.getAmount() + " " + plainName + " ", NamedTextColor.WHITE).append(
 						Component.text(meetsRequirement ? "\u2713" : "\u2717", (meetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).append(
-						Component.text(walletDebt > 0 ? " (" + walletDebt + " from wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
+						Component.text(walletDebt > 0 ? " (" + numInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 				// Update total requirement status:
 				mHasRequirements = mHasRequirements && meetsRequirement;
 			}
@@ -262,7 +263,7 @@ public class CustomTradeGui extends Gui {
 
 		private static boolean handleMaxUses(TradeWindowOpenEvent.Trade trade, int multiplier, List<Component> mLore) {
 			// Returns if trade is available or not:
-			if (trade.getRecipe().getMaxUses() < multiplier) {
+			if (trade.getRecipe().getMaxUses() < (trade.getRecipe().getUses() + multiplier)) {
 				mLore.add(0, Component.text("Out of Stock", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 				for (int i = 1; i < mLore.size(); i++) {
 					mLore.set(i, mLore.get(i).color(NamedTextColor.GRAY).decoration(TextDecoration.STRIKETHROUGH, true));
