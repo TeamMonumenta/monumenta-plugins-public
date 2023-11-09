@@ -67,7 +67,10 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		Material.BEDROCK,
 		Material.BARRIER,
 		Material.SPAWNER,
-		Material.END_PORTAL
+		Material.END_PORTAL,
+		Material.CHEST,
+		Material.SPAWNER,
+		Material.TRAPPED_CHEST
 	);
 
 	private double mCoefficient = 1.0;
