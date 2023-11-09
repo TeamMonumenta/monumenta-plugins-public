@@ -55,6 +55,12 @@ public class ShockwaveBoss extends BossAbilityGroup {
 		public float KB_X = 0.6f;
 		@BossParam(help = "vertical knockback velocity")
 		public float KB_Y = 0.8f;
+		@BossParam(help = "vertical knockback velocity")
+		public double XZ_HITBOX = 0.75;
+		@BossParam(help = "vertical knockback velocity")
+		public double Y_HITBOX = 0.4;
+		@BossParam(help = "vertical knockback velocity")
+		public double Y_OFFSET = 0.25;
 		@BossParam(help = "effects applied on hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 		@BossParam(help = "particles around the boss while it telegraphs")
@@ -85,6 +91,7 @@ public class ShockwaveBoss extends BossAbilityGroup {
 				}
 				new BukkitRunnable() {
 					double mT = 0;
+
 					@Override
 					public void run() {
 						if (mT <= p.DURATION) {
@@ -96,11 +103,11 @@ public class ShockwaveBoss extends BossAbilityGroup {
 						} else {
 							this.cancel();
 							p.SOUND_RELEASE.play(mBoss.getLocation());
-							Location loc = mBoss.getLocation().add(0, 0.25, 0);
+							Location loc = mBoss.getLocation().add(0, p.Y_OFFSET, 0);
 							for (int i = 0; i < p.POINT_COUNT; i++) {
 								int j = i;
 								new BukkitRunnable() {
-									final BoundingBox mBox = BoundingBox.of(loc, 0.75, 0.4, 0.75);
+									final BoundingBox mBox = BoundingBox.of(loc, p.XZ_HITBOX, p.Y_HITBOX, p.XZ_HITBOX);
 									final double mRadian1 = Math.toRadians((360.0 / p.POINT_COUNT * j));
 									final Location mPoint = loc.clone().add(FastUtils.cos(mRadian1) * 0.5, 0, FastUtils.sin(mRadian1) * 0.5);
 									final Vector mDir = LocationUtils.getDirectionTo(mPoint, loc);

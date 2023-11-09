@@ -16,13 +16,14 @@ import org.bukkit.entity.LivingEntity;
 public class Chivalrous {
 
 	private static final double SPAWN_CHANCE_PER_LEVEL = 0.10;
+	public static final String AVOID_CHIVALROUS = "boss_chivalrousimmune";
 
 	// 50% bee - 25% slime - 25% magmacube
 	private static final String[] MOUNTS = {
-			"ChivalrousBeeMount",
-			"ChivalrousBeeMount",
-			"SlimeMount",
-			"MagmaCubeMount"
+		"ChivalrousBeeMount",
+		"ChivalrousBeeMount",
+		"SlimeMount",
+		"MagmaCubeMount"
 	};
 
 	private static final String[] LAVA_MOUNTS = {
@@ -38,37 +39,37 @@ public class Chivalrous {
 	};
 
 	public static final String[] MOUNT_NAMES = {
-			"Chivalrous Bee Mount",
-			"Slime Mount",
-			"Magma Cube Mount",
-			"Chivalrous Strider Mount",
-			"Chivalrous Dolphin Mount",
-			"Chivalrous Pufferfish Mount"
+		"Chivalrous Bee Mount",
+		"Slime Mount",
+		"Magma Cube Mount",
+		"Chivalrous Strider Mount",
+		"Chivalrous Dolphin Mount",
+		"Chivalrous Pufferfish Mount"
 	};
 
 	public static final String DESCRIPTION = "Enemies become Knights of slime, bees, dolphins, fish, and striders.";
 
 	public static String[] rankDescription(int level) {
-			return new String[]{
-				"Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to be Chivalrous."
-			};
+		return new String[]{
+			"Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to be Chivalrous."
+		};
 	}
 
 
 	private static final EnumSet<EntityType> CHIVALROUS_IMMUNE = EnumSet.of(
-			EntityType.GHAST,
-			EntityType.PHANTOM,
-			EntityType.VEX,
-			EntityType.BEE,
-			EntityType.BLAZE
+		EntityType.GHAST,
+		EntityType.PHANTOM,
+		EntityType.VEX,
+		EntityType.BEE,
+		EntityType.BLAZE
 	);
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!mob.isInsideVehicle() && !CHIVALROUS_IMMUNE.contains(mob.getType()) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
-				&& FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
+			&& FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level && !mob.getScoreboardTags().contains(AVOID_CHIVALROUS)) {
 			boolean isInWater = LocationUtils.isLocationInWater(mob.getLocation());
 			boolean isInLava = mob.getLocation().getBlock().getType() == Material.LAVA;
-			String [] possibleMounts = MOUNTS;
+			String[] possibleMounts = MOUNTS;
 			if (isInWater) {
 				possibleMounts = WATER_MOUNTS;
 			} else if (isInLava) {

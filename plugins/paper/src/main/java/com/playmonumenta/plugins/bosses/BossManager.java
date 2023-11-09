@@ -352,6 +352,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(FlareBoss.identityTag, FlareBoss::new, new FlareBoss.Parameters());
 		registerStatelessBoss(DevourBoss.identityTag, DevourBoss::new, new DevourBoss.Parameters());
 		registerStatelessBoss(FlamingHavocBoss.identityTag, FlamingHavocBoss::new);
+		registerStatelessBoss(FacingBoss.identityTag, FacingBoss::new, new FacingBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
@@ -771,9 +772,9 @@ public class BossManager implements Listener {
 			Entity snowman = Bukkit.getEntity(UUID.fromString(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
 			Component snowmanName = snowman != null ? snowman.customName() : null;
 			Component deathMessage = Component.text("")
-				                         .append(Component.selector(player.getName()))
-				                         .append(Component.text(" was snowballed by "))
-				                         .append(snowmanName != null ? snowmanName : Component.text("a snowman"));
+				.append(Component.selector(player.getName()))
+				.append(Component.text(" was snowballed by "))
+				.append(snowmanName != null ? snowmanName : Component.text("a snowman"));
 			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
@@ -927,8 +928,8 @@ public class BossManager implements Listener {
 			if (mStatefulBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-						                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-						                   "' but it requires positional arguments");
+						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						"' but it requires positional arguments");
 					sender.sendMessage(Component.text("Try again with some ending location coordinates", NamedTextColor.GOLD));
 				}
 			} else {
@@ -961,8 +962,8 @@ public class BossManager implements Listener {
 			if (mStatelessBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-						                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-						                   "' but it does not take positional arguments");
+						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						"' but it does not take positional arguments");
 					sender.sendMessage(Component.text("Try again without the coordinates", NamedTextColor.GOLD));
 				}
 			} else {

@@ -75,6 +75,8 @@ public class OmenBoss extends BossAbilityGroup {
 		@BossParam(help = "sound of getting hit")
 		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2.0)]");
 		@BossParam(help = "sound that plays throughout the telegraph's duration")
+		public SoundsList SOUND_WAVE = SoundsList.fromString("[]");
+		@BossParam(help = "(VERY OPTIONAL) sound that plays constantly for the duration of the omen's actual travel time")
 		public SoundsList SOUND_TEL = SoundsList.fromString("[(UI_TOAST_IN, 1.5, 1.9)]");
 		@BossParam(help = "sound that plays at the start of the spell cast")
 		public SoundsList SOUND_WARN = SoundsList.fromString("[(ENTITY_WITHER_AMBIENT, 1.0, 1.0)]");
@@ -117,9 +119,7 @@ public class OmenBoss extends BossAbilityGroup {
 			}
 
 			public void launchOmen(double[] targetYawPitch) {
-
-
-				BukkitRunnable runA = new BukkitRunnable() {
+				new BukkitRunnable() {
 					double mT = 0.0;
 					final List<Vector> mBasevec = new ArrayList<>();
 
@@ -147,19 +147,17 @@ public class OmenBoss extends BossAbilityGroup {
 
 						//blade function
 						if (mT >= p.TEL_DURATION) {
-							//clear all entries before launching blade
+							this.cancel();
 							p.SOUND_LAUNCH.play(mBoss.getLocation());
 							launchBlade(mBasevec, false, targetYawPitch);
-							this.cancel();
+
 						}
 						if (!p.CAN_MOVE) {
 							EntityUtils.selfRoot(mBoss, p.TEL_DURATION);
 						}
 					}
 
-				};
-				runA.runTaskTimer(mPlugin, 0, 1);
-				mActiveRunnables.add(runA);
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
 
 			public void launchBlade(List<Vector> basevec, boolean warning, double[] targetYawPitch) {
@@ -179,7 +177,7 @@ public class OmenBoss extends BossAbilityGroup {
 
 					Location startLoc = mBoss.getLocation().add(0, p.HEIGHT_OFFSET, 0).add(dir);
 					//launch blade tip
-					BukkitRunnable runB = new BukkitRunnable() {
+					new BukkitRunnable() {
 						int mT = 0;
 
 						@Override
@@ -192,14 +190,17 @@ public class OmenBoss extends BossAbilityGroup {
 								if (anchor.distance(startLoc) > p.MAX_RANGE) {
 									this.cancel();
 								}
+								//play sounds
+								if (mT % 4 == 0) {
+									p.SOUND_WAVE.play(anchor);
+								}
 								//construct blade
 								createBlade(anchor, startLoc, vec, warning);
 							}
 						}
 
-					};
-					runB.runTaskTimer(mPlugin, 0, 1);
-					mActiveRunnables.add(runB);
+					}.runTaskTimer(mPlugin, 0, 1);
+
 				}
 			}
 
