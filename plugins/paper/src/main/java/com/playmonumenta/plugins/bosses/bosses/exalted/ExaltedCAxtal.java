@@ -217,9 +217,9 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 					Component.text("a", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
 					Component.text("st, the keys a", NamedTextColor.DARK_RED)).append(
 					Component.text("re", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
-					Component.text("... Co", NamedTextColor.DARK_RED)).append(
-					Component.text("llect", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
-					Component.text("or... is h", NamedTextColor.DARK_RED)).append(
+					Component.text("... Th", NamedTextColor.DARK_RED)).append(
+					Component.text("e Nigh", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
+					Component.text("tmare... is h", NamedTextColor.DARK_RED)).append(
 					Component.text("e", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
 					Component.text("re... I can ", NamedTextColor.DARK_RED)).append(
 					Component.text("be ", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
@@ -243,29 +243,29 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		});
 		events.put(15, (mBoss) -> {
 			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-				.sendMessage(Component.text("Y", TextColor.fromCSSHexString("#39b14e")).append(
-					Component.text("ES", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text("... THE S", mJade)).append(
-					Component.text("OUR", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text("CE O", mJade)).append(
+				.sendMessage(Component.text("H", TextColor.fromCSSHexString("#39b14e")).append(
+					Component.text("OW RESPLEN", mJade, TextDecoration.OBFUSCATED)).append(
+					Component.text("DENT... THE O", mJade)).append(
+					Component.text("RIG", mJade, TextDecoration.OBFUSCATED)).append(
+					Component.text("IN O", mJade)).append(
 					Component.text("F T", mJade, TextDecoration.OBFUSCATED)).append(
 					Component.text("H", mJade)).append(
 					Component.text("E ", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text("D", mJade)).append(
-					Component.text("RE", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text("AMS IS ", mJade)).append(
-					Component.text("HERE", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text(". AH", mJade)).append(
+					Component.text("T", mJade)).append(
+					Component.text("APE", mJade, TextDecoration.OBFUSCATED)).append(
+					Component.text("STRY HAS EN", mJade)).append(
+					Component.text("DOWED US WITH THEIR COUN", mJade, TextDecoration.OBFUSCATED)).append(
+					Component.text("TENANCE. AH", mJade)).append(
 					Component.text("HHH... ", mJade, TextDecoration.OBFUSCATED)).append(
 					Component.text("THI", mJade)).append(
 					Component.text("S D", mJade, TextDecoration.OBFUSCATED)).append(
 					Component.text("AN", mJade)).append(
 					Component.text("CE ", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text("IS PE", mJade)).append(
-					Component.text("R", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text("F", mJade)).append(
-					Component.text("EC", mJade, TextDecoration.OBFUSCATED)).append(
-					Component.text("T.", mJade)));
+					Component.text("SHALL BE", mJade)).append(
+					Component.text("EXE", mJade, TextDecoration.OBFUSCATED)).append(
+					Component.text("MPL", mJade)).append(
+					Component.text("AR", mJade, TextDecoration.OBFUSCATED)).append(
+					Component.text("Y.", mJade)));
 			phaseTransition(24, 1.5, mIgnoredMats, phaseChangeActive, activeSpells3, passiveSpells);
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
