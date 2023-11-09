@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -35,11 +36,11 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 		@BossParam(help = "cooldown in ticks")
 		public int COOLDOWN = 12 * 20;
 		@BossParam(help = "if false, selects mobs around the target. if true, selects mobs around itself.")
-		public boolean NEAR_SELF = false;
+		public boolean NEAR_SELF = true;
 		@BossParam(help = "radius in which mobs can be selected from")
 		public int TARGET_RADIUS = 20;
 		@BossParam(help = "color the selected mobs will glow before jumping")
-		public String COLOR = "red";
+		public String COLOR = "gold";
 		@BossParam(help = "delay before the selected mobs jump")
 		public int WINDUP = 20;
 		@BossParam(help = "scalar affecting the distance the jumping mobs will go")
@@ -48,8 +49,9 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 		public double HEIGHT_SCALAR = 1;
 		@BossParam(help = "maximum number of mobs that can be launched")
 		public int AFFECTED_MOB_CAP = 4;
-
 	}
+
+	public final String IGNORE_TAG = "boss_coordinatedattack_ignore";
 
 	public CoordinatedAttackBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -79,6 +81,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 					} else {
 						mobs = EntityUtils.getNearbyMobs(targetLoc, p.TARGET_RADIUS);
 					}
+					mobs.removeIf(mob -> mob.getScoreboardTags().contains(IGNORE_TAG));
 					Collections.shuffle(mobs);
 
 					int i = 0;
@@ -87,6 +90,11 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 							Set<String> tags = mob.getScoreboardTags();
 							if (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG) && !EntityUtils.isBoss(mob)) {
 								PotionUtils.applyColoredGlowing(identityTag, mob, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.WINDUP);
+
+								// make mob immune to other coordinated attacks for a short time
+								mob.addScoreboardTag(IGNORE_TAG);
+								Bukkit.getScheduler().runTaskLater(mPlugin, () -> mob.removeScoreboardTag(IGNORE_TAG), 30);
+
 								new BukkitRunnable() {
 									@Override
 									public void run() {
@@ -123,6 +131,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 			public boolean canRun() {
 				LivingEntity target = ((Mob) mBoss).getTarget();
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), p.TARGET_RADIUS);
+				mobs.removeIf(mob -> mob.getScoreboardTags().contains(IGNORE_TAG));
 
 				return target != null && target.hasLineOfSight(mBoss) && !mobs.isEmpty();
 			}
