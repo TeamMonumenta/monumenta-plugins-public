@@ -42,7 +42,7 @@ public class TotemicProjection extends Ability {
 	private static final double TIME_TO_DROP = 75;
 	private static final double XZ_DISTANCE_TO_DROP = 14;
 	private static final int DISTRIBUTION_RADIUS = 3;
-	private static final double ENHANCE_DAMAGE_PERCENT_PER = 0.1;
+	private static final double ENHANCE_DAMAGE_PERCENT_PER = 0.15;
 	private static final int ENHANCE_DAMAGE_PERCENT_DURATION = 6 * 20;
 
 	public static final String CHARM_SLOWNESS_PERCENT = "Totemic Projection Slowness Amplifier";
@@ -85,6 +85,8 @@ public class TotemicProjection extends Ability {
 	private final int mSlownessDuration;
 	private final double mEnhanceDamagePercent;
 	private final int mEnhanceDamageDuration;
+	private final double mDistributionRadius;
+	private final double mRadius;
 
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -95,6 +97,8 @@ public class TotemicProjection extends Ability {
 		mSlownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, SLOWNESS_DURATION);
 		mEnhanceDamageDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DAMAGE_DURATION, ENHANCE_DAMAGE_PERCENT_DURATION);
 		mEnhanceDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE_PERCENT_PER, ENHANCE_DAMAGE_PERCENT_PER);
+		mDistributionRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE, DISTRIBUTION_RADIUS);
+		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE_RADIUS, RADIUS);
 	}
 
 	public void cast() {
@@ -162,8 +166,7 @@ public class TotemicProjection extends Ability {
 					totem.teleport(dropCenter);
 				}
 			} else if (totems.size() > 1) {
-				double dist = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, DISTRIBUTION_RADIUS);
-				Vector forward = dropCenter.getDirection().setY(0).normalize().multiply(dist);
+				Vector forward = dropCenter.getDirection().setY(0).normalize().multiply(mDistributionRadius);
 				int currentDeg;
 				switch (totems.size()) {
 					case 2 -> currentDeg = -90;
@@ -193,9 +196,9 @@ public class TotemicProjection extends Ability {
 			}
 
 			if (isLevelTwo()) {
-				double radius = CharmManager.getRadius(mPlayer, CHARM_DAMAGE_RADIUS, RADIUS);
-				List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(dropCenter, radius, null);
-				new PPCircle(Particle.REVERSE_PORTAL, dropCenter, radius).ringMode(false).countPerMeter(4).spawnAsPlayerActive(mPlayer);
+
+				List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(dropCenter, mRadius, null);
+				new PPCircle(Particle.REVERSE_PORTAL, dropCenter, mRadius).ringMode(false).countPerMeter(4).spawnAsPlayerActive(mPlayer);
 
 				for (LivingEntity mob : affectedMobs) {
 					EntityUtils.applySlow(mPlugin, mSlownessDuration, mSlownessPercent, mob);

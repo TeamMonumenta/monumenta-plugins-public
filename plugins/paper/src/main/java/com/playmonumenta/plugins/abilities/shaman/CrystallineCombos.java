@@ -22,14 +22,13 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 public class CrystallineCombos extends Ability implements AbilityWithChargesOrStacks {
-	public static int CRYSTAL_STACK_THRESHOLD_1 = 15;
-	public static int CRYSTAL_STACK_THRESHOLD_2 = 12;
+	public static int CRYSTAL_STACK_THRESHOLD = 12;
 	public static int CRYSTAL_DAMAGE_1 = 7;
 	public static int CRYSTAL_DAMAGE_2 = 10;
 	public static int CRYSTAL_RANGE = 12;
 	public static int SHOT_COUNT_1 = 16;
 	public static int SHOT_COUNT_2 = 20;
-	public static double SPEED_PER_STACK = 0.025;
+	public static double SPEED_PER_STACK = 0.04;
 	public static double MAX_SPEED = .9;
 	public static int SPEED_DURATION = 6 * 20;
 	public static int COOLDOWN = 4 * 20;
@@ -59,15 +58,12 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 					"the crystals lash out at any mobs within %s blocks of you at a rate of 1 shot per %ss, " +
 					"dealing %s damage to each for a total " +
 					"of %s shots. Stacks decay at a rate of 1 stack per %ss.",
-					CRYSTAL_STACK_THRESHOLD_1, CRYSTAL_RANGE,
+					CRYSTAL_STACK_THRESHOLD, CRYSTAL_RANGE,
 					StringUtils.ticksToSeconds(SHOT_DELAY), CRYSTAL_DAMAGE_1,
 					SHOT_COUNT_1, STACK_DECAY_TIME_1),
 				String.format("Damage is increased to %s, number of shots increased to %s, " +
-					"stack decay rate is reduced " +
-					"to 1 stack per %ss, and stack threshold is reduced to %s.",
-					CRYSTAL_DAMAGE_2, SHOT_COUNT_2, STACK_DECAY_TIME_2,
-					CRYSTAL_STACK_THRESHOLD_2
-					),
+					"stack decay rate is reduced to 1 stack per %ss.",
+					CRYSTAL_DAMAGE_2, SHOT_COUNT_2, STACK_DECAY_TIME_2),
 				String.format("Pressing swap while sneaking and holding a projectile weapon " +
 					"will use all existing crystal stacks to provide %s%% speed per stack (max %s%%) to the Shaman " +
 					"for %ss. Decay rate reduced to 1 stack per %ss. Can now target outside of line of sight. Cooldown %ss.",
@@ -115,7 +111,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		mCrystalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_CRYSTAL_DAMAGE,
 			isLevelTwo() ? CRYSTAL_DAMAGE_2 : CRYSTAL_DAMAGE_1);
 		mCrystalRange = CharmManager.getRadius(player, CHARM_CRYSTAL_RANGE, CRYSTAL_RANGE);
-		mCrystalStackThreshold = (int) ((isLevelTwo() ? CRYSTAL_STACK_THRESHOLD_2 : CRYSTAL_STACK_THRESHOLD_1)
+		mCrystalStackThreshold = (int) (CRYSTAL_STACK_THRESHOLD
 			+ CharmManager.getLevel(player, CHARM_CRYSTAL_STACK_THRESHOLD));
 		mSpeedPerStack = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED_PER_STACK, SPEED_PER_STACK);
 		mMaxSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_MAX_SPEED, MAX_SPEED);
@@ -276,7 +272,8 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		for (LivingEntity target : targets) {
 			if (!DamageUtils.isImmuneToDamage(target, DamageEvent.DamageType.MAGIC)) {
 				hitSomething = true;
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_HIT, 1.2f, 1.0f);
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 2f, 1.4f);
 				DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, mCrystalDamage,
 					ClassAbility.CRYSTALLINE_COMBOS, true, false);
 				new PPLine(Particle.REDSTONE,

@@ -40,8 +40,8 @@ public class ChainLightning extends MultipleChargeAbility {
 	public static final int DAMAGE_1 = 5;
 	public static final int DAMAGE_2 = 7;
 	public static final float KNOCKBACK = 0.2f;
-	public static final double ENHANCE_POSITIVE_EFFICIENCY = 0.25;
-	public static final double ENHANCE_NEGATIVE_EFFICIENCY = 0.6;
+	public static final double ENHANCE_POSITIVE_EFFICIENCY = 0.3;
+	public static final double ENHANCE_NEGATIVE_EFFICIENCY = 0.5;
 
 	public static final String CHARM_COOLDOWN = "Chain Lightning Cooldown";
 	public static final String CHARM_DAMAGE = "Chain Lightning Damage";

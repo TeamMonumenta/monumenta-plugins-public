@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.itemstats.enchantments.Decay;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -43,7 +42,7 @@ public class DecayedTotem extends TotemAbility {
 	private static final int DURATION_1 = 8 * 20;
 	private static final int DURATION_2 = 12 * 20;
 	private static final int DAMAGE = 4;
-	private static final double SLOWNESS_PERCENT = 0.4;
+	private static final double SLOWNESS_PERCENT = 0.3;
 	private static final int TARGETS = 3;
 	private static final int FLAME_TOTEM_DAMAGE_BUFF = 1;
 	private static final int LIGHTNING_TOTEM_DAMAGE_BUFF = 5;

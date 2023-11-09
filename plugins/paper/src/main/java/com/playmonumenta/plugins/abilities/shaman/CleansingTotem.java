@@ -25,7 +25,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -106,6 +105,16 @@ public class CleansingTotem extends TotemAbility {
 		if (ticks == 0) {
 			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 2.0f, 1.3f);
 			world.playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8f, 2.0f);
+			if (isEnhanced()) {
+				List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, 3, true);
+				cleanseTargets(players);
+				for (Player player : players) {
+					PlayerUtils.healPlayer(mPlugin, player, CharmManager.calculateFlatAndPercentValue(mPlayer,
+						CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(player)), mPlayer);
+					new PPCircle(Particle.HEART, player.getLocation(), 1).ringMode(true)
+						.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
+				}
+			}
 		}
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
@@ -165,17 +174,6 @@ public class CleansingTotem extends TotemAbility {
 			PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer,
 				CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlayer);
 			new PPCircle(Particle.HEART, mPlayer.getLocation(), 1).ringMode(true)
-				.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
-		}
-	}
-
-	@Override
-	public void onTotemHitEntity(Entity entity) {
-		if (isEnhanced() && entity instanceof Player player) {
-			cleanseTargets(List.of(player));
-			PlayerUtils.healPlayer(mPlugin, player, CharmManager.calculateFlatAndPercentValue(mPlayer,
-				CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(player)), mPlayer);
-			new PPCircle(Particle.HEART, player.getLocation(), 1).ringMode(true)
 				.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
 		}
 	}

@@ -26,10 +26,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.util.Transformation;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 public class LightningTotem extends TotemAbility {
 
@@ -39,18 +36,17 @@ public class LightningTotem extends TotemAbility {
 	private static final int AOE_RANGE = 7;
 	private static final int DAMAGE_1 = 14;
 	private static final int DAMAGE_2 = 21;
-	private static final double ROD_CHANCE = 0.75;
-	private static final double ROD_DAMAGE_PERCENT = 0.35;
-	private static final int ROD_DAMAGE_RADIUS = 2;
+	private static final double STORM_DAMAGE_PERCENT = 0.35;
+	private static final int STORM_DAMAGE_RADIUS = 2;
 	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
+	public static final Particle.DustOptions DUST_GRAY_LARGE = new Particle.DustOptions(Color.fromRGB(51, 51, 51), 2);
 
 	public static final String CHARM_DURATION = "Lightning Totem Duration";
 	public static final String CHARM_RADIUS = "Lightning Totem Radius";
 	public static final String CHARM_COOLDOWN = "Lightning Totem Cooldown";
 	public static final String CHARM_DAMAGE = "Lightning Totem Damage";
-	public static final String CHARM_ROD_CHANCE = "Lightning Totem Lightning Rod Chance";
-	public static final String CHARM_ROD_DAMAGE = "Lightning Totem Lightning Rod Damage";
-	public static final String CHARM_ROD_RADIUS = "Lightning Totem Lightning Rod Radius";
+	public static final String CHARM_STORM_DAMAGE = "Lightning Totem Lightning Storm Damage";
+	public static final String CHARM_STORM_RADIUS = "Lightning Totem Lightning Storm Radius";
 	public static final String CHARM_PULSE_DELAY = "Lightning Totem Pulse Delay";
 
 	public static final AbilityInfo<LightningTotem> INFO =
@@ -70,12 +66,11 @@ public class LightningTotem extends TotemAbility {
 				),
 				String.format("The totem deals %s magic damage per hit.",
 					DAMAGE_2),
-				String.format("If the totem kills a mob, there is a %s%% chance of it spawning a lightning rod " +
-					"at the mob's location. The lightning rod will deal %s%% of the main magic damage " +
-					"to all mobs within %s blocks of the rod every %s seconds.",
-					StringUtils.multiplierToPercentage(ROD_CHANCE),
-					StringUtils.multiplierToPercentage(ROD_DAMAGE_PERCENT),
-					ROD_DAMAGE_RADIUS,
+				String.format("If the totem kills a mob outside of an existing storm, it spawns a lightning storm " +
+					"at the mob's location. The lightning storm will deal %s%% of the main magic damage " +
+					"to all mobs within %s blocks of the center every %s seconds.",
+					StringUtils.multiplierToPercentage(STORM_DAMAGE_PERCENT),
+					STORM_DAMAGE_RADIUS,
 					StringUtils.ticksToSeconds(INTERVAL)
 				)
 			)
@@ -91,10 +86,9 @@ public class LightningTotem extends TotemAbility {
 	private final double mRadius;
 	private @Nullable LivingEntity mTarget = null;
 	public double mDecayedTotemBuff = 0;
-	private final double mRodChance;
-	private final double mRodDamagePercent;
-	private final double mRodRadius;
-	private final List<BlockDisplay> mAllDisplays = new ArrayList<>();
+	private final double mStormDamagePercent;
+	private final double mStormRadius;
+	private final List<Location> mAllLocs = new ArrayList<>();
 	private final int mInterval;
 
 	public LightningTotem(Plugin plugin, Player player) {
@@ -107,9 +101,8 @@ public class LightningTotem extends TotemAbility {
 		mDamage *= SupportExpertise.damageBuff(mPlayer);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TOTEM_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
-		mRodChance = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ROD_CHANCE, ROD_CHANCE);
-		mRodDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ROD_DAMAGE, ROD_DAMAGE_PERCENT);
-		mRodRadius = CharmManager.getRadius(mPlayer, CHARM_ROD_RADIUS, ROD_DAMAGE_RADIUS);
+		mStormDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_STORM_DAMAGE, STORM_DAMAGE_PERCENT);
+		mStormRadius = CharmManager.getRadius(mPlayer, CHARM_STORM_RADIUS, STORM_DAMAGE_RADIUS);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
 	}
 
@@ -121,6 +114,18 @@ public class LightningTotem extends TotemAbility {
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		new PPCircle(Particle.CRIT, standLocation.clone().add(0, 0.3, 0), mRadius).countPerMeter(0.4).spawnAsPlayerActive(mPlayer);
+		for (Location loc : mAllLocs) {
+			new PartialParticle(
+				Particle.REDSTONE,
+				loc.clone().add(0, 4, 0),
+				15,
+				1.5,
+				0.25,
+				1.5,
+				0,
+				DUST_GRAY_LARGE
+			).spawnAsPlayerActive(mPlayer);
+		}
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
 		}
@@ -158,17 +163,16 @@ public class LightningTotem extends TotemAbility {
 			lightning.spawnAsPlayerActive(mPlayer);
 		}
 		if (isEnhanced()) {
-			for (BlockDisplay display : mAllDisplays) {
-				Location targetSpot = display.getLocation().clone().add(0.5, 0, 0.5);
-				PPLightning lightning = new PPLightning(Particle.END_ROD, targetSpot)
-					.count(8).duration(3);
-				mPlayer.getWorld().playSound(display.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
+			for (Location loc : mAllLocs) {
+				PPLightning lightning = new PPLightning(Particle.END_ROD, loc)
+					.count(8).duration(3).height(4);
+				mPlayer.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
 				lightning.init(3, 2.5, 0.3, 0.3);
 				lightning.spawnAsPlayerActive(mPlayer);
-				for (LivingEntity entity : EntityUtils.getNearbyMobsInSphere(targetSpot, mRodRadius, mTarget)) {
+				for (LivingEntity entity : EntityUtils.getNearbyMobsInSphere(loc, mStormRadius, mTarget)) {
 					DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(
 						DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats),
-						damageApplied * mRodDamagePercent, true, false, false);
+						damageApplied * mStormDamagePercent, true, false, false);
 				}
 			}
 		}
@@ -177,17 +181,15 @@ public class LightningTotem extends TotemAbility {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		Location targetLoc = mTarget != null ? mTarget.getLocation() : null;
 		if (isEnhanced()
-			&& mTarget != null
-			&& event.getEntity().equals(mTarget)
-			&& Math.random() < mRodChance) {
-			BlockDisplay blockDisplay = mTarget.getWorld().spawn(mTarget.getLocation().clone().add(-0.5, -0.3, -0.5), BlockDisplay.class);
-			blockDisplay.addScoreboardTag("REMOVE_ON_UNLOAD");
-			blockDisplay.setBlock(Material.LIGHTNING_ROD.createBlockData());
-			blockDisplay.setBrightness(new Display.Brightness(8, 8));
-			blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
-			blockDisplay.setInterpolationDuration(2);
-			mAllDisplays.add(blockDisplay);
+			&& targetLoc != null
+			&& event.getEntity().equals(mTarget)) {
+			List<Location> locsWithinKill = new ArrayList<>(mAllLocs);
+			locsWithinKill.removeIf(loc -> loc.distance(targetLoc) > mStormRadius);
+			if (locsWithinKill.isEmpty()) {
+				mAllLocs.add(targetLoc);
+			}
 		}
 	}
 
@@ -197,14 +199,8 @@ public class LightningTotem extends TotemAbility {
 		world.playSound(standLocation, Sound.ENTITY_BLAZE_DEATH, 0.7f, 0.5f);
 		mTarget = null;
 		mDecayedTotemBuff = 0;
-		for (BlockDisplay display : mAllDisplays) {
-			display.remove();
-		}
-		mAllDisplays.removeIf(display -> !display.isValid());
-		if (mAllDisplays.size() > 0) {
-			MMLog.warning("Failed to remove all lightning rod displays for player "
-				+ mPlayer.getName() + " on totem expire, remaining: " + mAllDisplays.size());
-		}
+		mWhirlwindBuffPercent = 0;
+		mAllLocs.clear();
 	}
 
 	@Override

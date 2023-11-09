@@ -39,7 +39,8 @@ public class FlameTotem extends TotemAbility {
 	private static final int FIRE_DURATION = 2 * 20;
 	private static final int DAMAGE_1 = 4;
 	private static final int DAMAGE_2 = 5;
-	private static final double ENHANCE_RADIUS = 2.5;
+	private static final int ENHANCE_BONUS_DAMAGE = 2;
+	private static final double ENHANCE_RADIUS = 3;
 	private static final double ENHANCE_INFERNO_SCALE = 0.5;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
@@ -84,9 +85,9 @@ public class FlameTotem extends TotemAbility {
 					AOE_RANGE_2,
 					StringUtils.ticksToSeconds(DURATION_2)),
 				String.format("The totem now throws explosive fireballs at a target " +
-					"every second that deal %s magic damage in a %s block radius and set mobs on fire for %s seconds " +
+					"every second that deal %s extra magic damage in a %s block radius and set mobs on fire for %s seconds " +
 					"instead of the base skill's approach. Applies inferno at %s%% efficiency.",
-					DAMAGE_2,
+					ENHANCE_BONUS_DAMAGE,
 					ENHANCE_RADIUS,
 					StringUtils.ticksToSeconds(FIRE_DURATION),
 					StringUtils.multiplierToPercentage(ENHANCE_INFERNO_SCALE))
@@ -103,7 +104,8 @@ public class FlameTotem extends TotemAbility {
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
+			(isLevelOne() ? DAMAGE_1 : DAMAGE_2) + (isEnhanced() ? ENHANCE_BONUS_DAMAGE : 0));
 		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mDamage *= SupportExpertise.damageBuff(mPlayer);
 

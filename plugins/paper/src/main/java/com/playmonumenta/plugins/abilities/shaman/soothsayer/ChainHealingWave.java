@@ -37,8 +37,8 @@ public class ChainHealingWave extends Ability {
 	public static final int TARGETS_2 = 6;
 	public static final int BOUNCE_RANGE_1 = 10;
 	public static final int BOUNCE_RANGE_2 = 15;
-	public static final double HEAL_PERCENT_1 = 0.2;
-	public static final double HEAL_PERCENT_2 = 0.25;
+	public static final double HEAL_PERCENT_1 = 0.25;
+	public static final double HEAL_PERCENT_2 = 0.35;
 	public static final int CDR_ON_KILL = 30;
 
 	public static final String CHARM_COOLDOWN = "Chain Healing Wave Cooldown";
