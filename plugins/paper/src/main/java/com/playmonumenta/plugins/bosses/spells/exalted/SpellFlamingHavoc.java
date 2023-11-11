@@ -50,12 +50,13 @@ public class SpellFlamingHavoc extends Spell {
 			BukkitRunnable drawLine = new BukkitRunnable() {
 				final double mMaxActionLimit = 500.0;
 				final double mStepCount = mMaxActionLimit / mobList.size();
+				int mTotalAction = 0;
 				final BoundingBox mBox = BoundingBox.of(startLoc, 0.4, 0.4, 0.4);
 				@Override public void run() {
 					for (int action = 0; action < mStepCount; action++) {
+						mTotalAction++;
 						mBox.shift(dir.clone());
 						Location bLoc = mBox.getCenter().toLocation(world);
-						world.playSound(bLoc, Sound.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.HOSTILE, 0.25f, 1f);
 						new PartialParticle(Particle.FLAME, bLoc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true)) {
 							if (player.getBoundingBox().overlaps(mBox) && player.getNoDamageTicks() <= 0) {
@@ -67,11 +68,12 @@ public class SpellFlamingHavoc extends Spell {
 						}
 
 						double distance = mBoss.getLocation().distance(target.getLocation());
-						if (action / 4.0 >= distance) {
+						if (mTotalAction / 4.0 >= distance) {
 							this.cancel();
 							break;
 						}
 					}
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.HOSTILE, 3f, 1f);
 				}
 			};
 			mActiveRunnables.add(drawLine);
