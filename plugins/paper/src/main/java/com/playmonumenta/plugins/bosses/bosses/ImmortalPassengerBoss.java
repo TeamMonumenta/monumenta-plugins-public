@@ -44,7 +44,7 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
-				if (boss.getVehicle() == null) {
+				if (boss.getVehicle() == null || boss.getVehicle().getScoreboardTags().contains("boss_immortalmount")) {
 					boss.setHealth(0);
 					boss.remove();
 				}

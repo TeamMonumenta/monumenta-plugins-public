@@ -47,6 +47,8 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				List<Entity> passengers = boss.getPassengers();
+				passengers.removeIf(e -> e.getScoreboardTags().contains("boss_immortalpassenger")
+					                         || e.getType() == EntityType.ARMOR_STAND);
 
 				// exception for snowball passengers
 				if (!passengers.isEmpty() && passengers.get(0) instanceof Snowball snowball && snowball.getPassengers().isEmpty()) {
