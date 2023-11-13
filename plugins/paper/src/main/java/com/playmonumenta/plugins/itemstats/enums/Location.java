@@ -108,7 +108,7 @@ public enum Location {
 	DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
 	INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
 	MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
-	STARPOINT("starpoint", "new expansion :pog:", TextColor.fromHexString("#342768")),
+	STARPOINT("starpoint", "Star Point", TextColor.fromHexString("#342768")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
