@@ -11,7 +11,7 @@ import org.bukkit.plugin.Plugin;
 
 public class FlamingHavocBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flaminghavoc";
-	public static final int detectionRange = 100;
+	public static final int detectionRange = 64;
 
 
 	public FlamingHavocBoss(Plugin plugin, LivingEntity boss) {

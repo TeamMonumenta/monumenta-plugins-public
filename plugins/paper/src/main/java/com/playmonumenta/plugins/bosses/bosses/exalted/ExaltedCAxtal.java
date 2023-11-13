@@ -84,7 +84,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		SpellManager activeSpells1 = new SpellManager(Arrays.asList(
 			new SpellAxtalGroundSurge(mPlugin, mBoss, 1, detectionRange),
 			new SpellAxtalMeleeMinions(plugin, mBoss, 6, 3, 3, 20, 12, "~ExAxtalSummons", true),
-			new SpellAxtalTotem(plugin, mBoss, detectionRange),
+			new SpellAxtalTotem(plugin, mBoss, 30),
 			new SpellBaseLaser(plugin, boss, 60, 140, false, true, 8 * 20,
 				// Tick action per player
 				(LivingEntity target, int ticks, boolean blocked) -> {
@@ -123,7 +123,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		SpellManager activeSpells2 = new SpellManager(Arrays.asList(
 			new SpellAxtalGroundSurge(mPlugin, mBoss, 2, detectionRange),
 			new SpellAxtalMeleeMinions(plugin, mBoss, 8, 3, 3, 20, 12, "~ExAxtalSummons", true),
-			new SpellAxtalTotem(plugin, mBoss, detectionRange),
+			new SpellAxtalTotem(plugin, mBoss, 35),
 			new SpellBaseLaser(plugin, boss, 60, 140, false, true, 160,
 				// Tick action per player
 				(LivingEntity target, int ticks, boolean blocked) -> {
@@ -162,7 +162,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		SpellManager activeSpells3 = new SpellManager(Arrays.asList(
 			new SpellAxtalGroundSurge(mPlugin, mBoss, 3, detectionRange),
 			new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12, "~ExAxtalSummons", true),
-			new SpellAxtalTotem(plugin, mBoss, detectionRange),
+			new SpellAxtalTotem(plugin, mBoss, 40),
 			new SpellBaseLaser(plugin, boss, 60, 140, false, true, 160,
 				// Tick action per player
 				(LivingEntity target, int ticks, boolean blocked) -> {
