@@ -38,7 +38,7 @@ public class EmpoweringOdor extends Ability implements PotionAbility {
 			.scoreboardId("EmpoweringOdor")
 			.shorthandName("EO")
 			.descriptions(
-				"Other players hit by your Alchemist's Potions are given %s%% speed and %s%% damage from all sources for %ss."
+				"Other players hit by your Alchemist's Potions are given %s%% speed and %s%% damage for %ss."
 					.formatted(
 							StringUtils.multiplierToPercentage(EMPOWERING_ODOR_SPEED_AMPLIFIER),
 							StringUtils.multiplierToPercentage(EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER),
