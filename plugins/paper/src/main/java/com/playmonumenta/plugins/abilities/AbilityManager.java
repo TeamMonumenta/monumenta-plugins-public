@@ -565,6 +565,10 @@ public class AbilityManager {
 		return getPlayerAbilities(player).getAsJson();
 	}
 
+	public JsonElement getDebugState(Player player) {
+		return getPlayerAbilities(player).getDebugState();
+	}
+
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 

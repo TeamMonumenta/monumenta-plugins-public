@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -251,5 +252,29 @@ public final class MeteorSlam extends Ability {
 		if (event.getType() == DamageType.FALL && !new Hitbox.SphereHitbox(mPlayer.getLocation(), mLevelSize).getHitMobs().isEmpty()) {
 			event.setCancelled(true);
 		}
+	}
+
+	@Override
+	public JsonObject getDebugState() {
+		JsonObject result = super.getDebugState();
+
+		result.addProperty("mLevelDamage", mLevelDamage);
+		result.addProperty("mLevelDamageCap", mLevelDamageCap);
+		result.addProperty("mLevelSize", mLevelSize);
+		result.addProperty("mLevelJumpAmplifier", mLevelJumpAmplifier);
+		result.addProperty("mReducedThreshold", mReducedThreshold);
+		if (mSlamAttackRunner == null) {
+			result.add("mSlamAttackRunner", null);
+		} else {
+			result.addProperty("mSlamAttackRunner", "Is cancelled: " + mSlamAttackRunner.isCancelled());
+		}
+		result.addProperty("mFallFromY", mFallFromY);
+		if (mCosmetic == null) {
+			result.add("mCosmetic", null);
+		} else {
+			result.addProperty("mCosmetic", "Cosmetic named " + mCosmetic.getName());
+		}
+
+		return result;
 	}
 }

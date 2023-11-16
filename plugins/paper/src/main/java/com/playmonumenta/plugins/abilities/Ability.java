@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
@@ -405,5 +407,37 @@ public abstract class Ability {
 			return mInfo.getDisplayName();
 		}
 		return ca.getName();
+	}
+
+	public JsonObject getDebugState() {
+		JsonObject result = new JsonObject();
+
+		if (mInfo == null) {
+			result.add("mInfo", null);
+		} else {
+			result.add("mInfo", mInfo.toJson());
+		}
+
+		if (mPlayer == null) {
+			result.add("mPlayer", null);
+		} else {
+			result.addProperty("mPlayer", mPlayer.getName());
+		}
+
+		if (mScore == null) {
+			result.add("mScore", null);
+		} else {
+			result.addProperty("mScore", mScore);
+		}
+
+		JsonArray customTriggersJson = new JsonArray();
+		for (AbilityTriggerInfo<?> triggerInfo : mCustomTriggers) {
+			customTriggersJson.add(triggerInfo.toJson());
+		}
+		result.add("mCustomTriggers", customTriggersJson);
+
+		result.addProperty("mCancelOnDeath", "List<" + mCancelOnDeath.size() + ">");
+
+		return result;
 	}
 }

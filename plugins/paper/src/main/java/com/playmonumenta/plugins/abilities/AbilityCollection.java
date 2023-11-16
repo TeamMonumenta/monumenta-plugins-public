@@ -99,6 +99,16 @@ public class AbilityCollection {
 		return playerAbilities;
 	}
 
+	public JsonElement getDebugState() {
+		JsonArray playerAbilitiesDebug = new JsonArray();
+
+		for (Ability ability : mAbilities.values()) {
+			playerAbilitiesDebug.add(ability.getDebugState());
+		}
+
+		return playerAbilitiesDebug;
+	}
+
 	void setSilenced(boolean silenced) {
 		mIsSilenced = silenced;
 	}

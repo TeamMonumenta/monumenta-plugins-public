@@ -205,7 +205,7 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	/**
-	 * Effect to be executed when the player loses this ability, e.g. cleaning up andy added attributes.
+	 * Effect to be executed when the player loses this ability, e.g. cleaning up any added attributes.
 	 */
 	public AbilityInfo<T> remove(Consumer<Player> remove) {
 		mRemove = remove;
