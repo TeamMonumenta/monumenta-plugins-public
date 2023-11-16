@@ -43,7 +43,7 @@ public class SeasonalEventManager {
 	public static @Nullable SeasonalPass mActivePass = null;
 	private static final Map<UUID, PlayerProgress> mPlayerProgress = new HashMap<>();
 
-	public SeasonalEventManager() {
+	public static void enable() {
 		reloadPasses(Bukkit.getConsoleSender());
 	}
 

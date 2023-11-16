@@ -41,12 +41,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class PlotManager {
-	public PlotManager() {
-		registerCommands();
-	}
-
 	@SuppressWarnings("unchecked")
-	private static void registerCommands() {
+	public static void registerCommands() {
 		new CommandAPICommand("plot")
 			.withPermission(CommandPermission.NONE)
 			/* ACCESS */

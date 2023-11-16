@@ -15,19 +15,19 @@ import org.jetbrains.annotations.Nullable;
 public class CoreProtectIntegration {
 	private static @Nullable CoreProtectAPI API = null;
 
-	public CoreProtectIntegration(Logger logger) {
+	public static void enable(Logger logger) {
 		logger.info("Enabling CoreProtect integration");
 
 		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("CoreProtect");
 
 		// Check that CoreProtect is loaded
-		if (plugin == null || !(plugin instanceof CoreProtect)) {
+		if (!(plugin instanceof CoreProtect)) {
 			return;
 		}
 
 		// Check that the API is enabled
 		CoreProtectAPI coreProtect = ((CoreProtect) plugin).getAPI();
-		if (coreProtect.isEnabled() == false) {
+		if (!coreProtect.isEnabled()) {
 			return;
 		}
 

@@ -25,7 +25,7 @@ public class LuckPermsIntegration {
 	protected static @MonotonicNonNull UserManager UM = null;
 	protected static @MonotonicNonNull GroupManager GM = null;
 
-	public LuckPermsIntegration(Plugin plugin) {
+	public static void enable(Plugin plugin) {
 		plugin.getLogger().info("Enabling LuckPerms integration");
 		LP = LuckPermsProvider.get();
 		UM = LP.getUserManager();

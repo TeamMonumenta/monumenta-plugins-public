@@ -10,18 +10,18 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class PremiumVanishIntegration {
-	private static @Nullable PremiumVanishIntegration INSTANCE = null;
+	private static boolean DISABLED = true;
 
-	public PremiumVanishIntegration(Logger logger) {
+	public static void enable(Logger logger) {
 		logger.info("Enabling PremiumVanish integration");
-		INSTANCE = this;
+		DISABLED = false;
 	}
 
 	/**
 	 * A list of the UUIDs of all online vanished players
 	 */
 	public static List<UUID> getInvisiblePlayers() {
-		if (INSTANCE == null) {
+		if (DISABLED) {
 			return new ArrayList<>();
 		}
 		return VanishAPI.getInvisiblePlayers();
@@ -37,7 +37,7 @@ public class PremiumVanishIntegration {
 		if (p.getGameMode() == GameMode.SPECTATOR) {
 			return true;
 		}
-		if (INSTANCE == null) {
+		if (DISABLED) {
 			return false;
 		}
 		return VanishAPI.isInvisible(p);
@@ -49,7 +49,7 @@ public class PremiumVanishIntegration {
 	 * @param p - the player.
 	 */
 	public static void hidePlayer(Player p) {
-		if (INSTANCE == null) {
+		if (DISABLED) {
 			return;
 		}
 		VanishAPI.hidePlayer(p);
@@ -61,7 +61,7 @@ public class PremiumVanishIntegration {
 	 * @param p - the player.
 	 */
 	public static void showPlayer(Player p) {
-		if (INSTANCE == null) {
+		if (DISABLED) {
 			return;
 		}
 		VanishAPI.showPlayer(p);
@@ -75,7 +75,7 @@ public class PremiumVanishIntegration {
 	 * @return TRUE if viewed is not vanished or viewer has the permission to see viewed
 	 */
 	public static boolean canSee(Player viewer, Player viewed) {
-		if (INSTANCE == null) {
+		if (DISABLED) {
 			return true;
 		}
 		return VanishAPI.canSee(viewer, viewed);

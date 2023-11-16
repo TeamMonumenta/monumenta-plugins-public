@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.playmonumenta.plugins.Plugin;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
@@ -17,8 +18,13 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataHolder;
+import org.bukkit.persistence.PersistentDataType;
 
 public class MessagingUtils {
 	public static final Gson GSON = new Gson();
@@ -26,6 +32,7 @@ public class MessagingUtils {
 	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
 	public static final GsonComponentSerializer GSON_SERIALIZER = GsonComponentSerializer.gson();
 	public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
+	public static final String PLAIN_NAME_DATA_KEY = "plain_name";
 
 	public static String translatePlayerName(Player player, String message) {
 		return message.replaceAll("@S", player.getName());
@@ -166,6 +173,27 @@ public class MessagingUtils {
 			return TextColor.fromHexString(value);
 		} else {
 			return NamedTextColor.NAMES.value(value);
+		}
+	}
+
+	public static void updatePlainName(Entity entity) {
+		if (entity instanceof Player) {
+			return;
+		}
+		updatePlainName(entity, entity.customName());
+	}
+
+	public static void updatePlainName(PersistentDataHolder dataHolder, @Nullable Component name) {
+		if (dataHolder instanceof Player) {
+			return;
+		}
+		NamespacedKey plainKey = new NamespacedKey(Plugin.getInstance(), PLAIN_NAME_DATA_KEY);
+		PersistentDataContainer dataContainer = dataHolder.getPersistentDataContainer();
+		if (name == null) {
+			dataContainer.remove(plainKey);
+		} else {
+			String plainName = plainText(name);
+			dataContainer.set(plainKey, PersistentDataType.STRING, plainName);
 		}
 	}
 

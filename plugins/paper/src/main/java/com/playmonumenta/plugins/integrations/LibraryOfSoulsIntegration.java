@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class LibraryOfSoulsIntegration {
 	private static boolean ENABLED = false;
 
-	public LibraryOfSoulsIntegration(Logger logger) {
+	public static void enable(Logger logger) {
 		logger.info("Enabling LibraryOfSouls integration");
 		ENABLED = true;
 	}

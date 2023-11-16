@@ -90,6 +90,8 @@ public class WorldListener implements Listener {
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
 		Entity entity = event.getEntity();
 
+		MessagingUtils.updatePlainName(entity);
+
 		Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mTrackingManager.addEntity(entity));
 	}
 
@@ -125,12 +127,18 @@ public class WorldListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntitiesLoadEvent(EntitiesLoadEvent event) {
-		if (!Plugin.IS_PLAY_SERVER || ServerProperties.getEntityScoresDisabled(event.getWorld())) {
-			return;
+		if (Plugin.IS_PLAY_SERVER && !ServerProperties.getEntityScoresDisabled(event.getWorld())) {
+			loadEntityScores(event.getEntities());
 		}
 
-		Gson gson = new Gson();
 		for (Entity entity : event.getEntities()) {
+			MessagingUtils.updatePlainName(entity);
+		}
+	}
+
+	public void loadEntityScores(Collection<Entity> entities) {
+		Gson gson = new Gson();
+		for (Entity entity : entities) {
 			if (entity instanceof Player) {
 				continue;
 			}

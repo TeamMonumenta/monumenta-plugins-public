@@ -163,7 +163,6 @@ public class Plugin extends JavaPlugin {
 	public CharmManager mCharmManager;
 	public ItemOverrides mItemOverrides;
 	public CosmeticsManager mCosmeticsManager;
-	public SeasonalEventManager mSeasonalEventManager;
 	public VanityManager mVanityManager;
 	public LoadoutManager mLoadoutManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
@@ -196,102 +195,103 @@ public class Plugin extends JavaPlugin {
 		 *
 		 * These need to register immediately on load to prevent function loading errors
 		 */
-		ChangeLogLevel.register();
-		GiveSoulbound.register();
-		ClaimRaffle.register(this);
-		DateVersionCommand.register();
-		DebugInfo.register(this);
-		BossDebug.register();
-		RefreshClass.register(this);
-		ResetClass.register(this);
-		Effect.register(this);
-		RemoveTags.register();
-		DeathMsg.register();
-		MonumentaReload.register(this);
-		MonumentaDebug.register(this);
-		RestartEmptyCommand.register(this);
-		RedeemVoteRewards.register(this);
-		BossFight.register();
-		SpellDetectionCircle.registerCommand(this);
-		SkillDescription.register(this);
-		SkillSummary.register(this);
-		TeleportAsync.register();
-		TeleportByScore.register();
-		UpdateHeldItem.register();
-		UpTimeCommand.register();
-		Portal1.register();
-		Portal2.register();
-		ClearPortals.register();
-		Launch.register();
-		UnsignBook.register();
-		GetScoreCommand.register();
-		GraveCommand.register();
-		StatTrackItem.register();
-		ToggleSwap.register();
-		CustomInventoryCommands.register(this);
-		DelvesCommands.register(this);
+		AbsorptionCommand.register();
 		AdminNotify.register();
-		ViewActivity.register();
+		AttributeModifierCommand.register();
+		AuditLogCommand.register();
+		BlueStrikeDaggerCraftingBoss.register();
+		BoatUtilsCommand.register();
+		BossDebug.register();
+		BossFight.register();
+		ChangeLogLevel.register();
+		ChargeUpBarCommand.register(this);
+		CharmsCommand.register(this);
+		ClaimRaffle.register(this);
+		ClearPortals.register();
+		CoreProtectLogCommand.register();
+		CosmeticsCommand.register(this);
+		CustomEffect.register();
+		CustomInventoryCommands.register(this);
+		DateVersionCommand.register();
+		DeathMsg.register();
+		DebugInfo.register(this);
+		DelvesCommands.register(this);
+		DungeonAccessCommand.register();
+		EffectFromPotionCommand.register(this);
+		Effect.register(this);
+		Eggify.register();
+		EventCommand.register();
+		ExperiencinatorCommand.register();
+		ForceCastSpell.register();
+		GenerateCharms.register();
+		GenerateItems.register();
+		GetScoreCommand.register();
+		GiveSoulbound.register();
+		GlowingCommand.register();
+		GraveCommand.register();
+		ItemStatCommands.registerAttrCommand();
+		ItemStatCommands.registerCharmCommand();
+		ItemStatCommands.registerColorCommand();
+		ItemStatCommands.registerConsumeCommand();
+		ItemStatCommands.registerEnchCommand();
+		ItemStatCommands.registerFishCommand();
 		ItemStatCommands.registerInfoCommand();
 		ItemStatCommands.registerLoreCommand();
 		ItemStatCommands.registerNameCommand();
-		ItemStatCommands.registerEnchCommand();
-		ItemStatCommands.registerAttrCommand();
-		ItemStatCommands.registerCharmCommand();
-		ItemStatCommands.registerFishCommand();
-		ItemStatCommands.registerConsumeCommand();
 		ItemStatCommands.registerRemoveCommand();
-		ItemStatCommands.registerColorCommand();
-		UpdateChestItems.register();
-		PlayerItemStatsGUICommand.register(this);
-		AuditLogCommand.register();
-		PickLevelAfterAnvils.register();
-		GenerateItems.register();
-		GenerateCharms.register();
 		JingleBells.register();
-		Spawn.register();
-		Stuck.register();
-		GlowingCommand.register();
-		VirtualFirmament.register();
-		RocketJump.register();
-		ExperiencinatorCommand.register();
-		EventCommand.register();
-		Eggify.register();
-		SeasonalEventCommand.register();
-		CosmeticsCommand.register(this);
-		POICommands.register();
-		NameMCVerify.register(this);
-		TellMiniMessage.register();
-		RunWithPlaceholdersCommand.register();
-		ParticlesCommand.register();
-		PartialParticleCommand.register();
-		CustomEffect.register();
-		EffectFromPotionCommand.register(this);
-		CharmsCommand.register(this);
-		WorldNameCommand.register();
-		ToggleTrail.register();
+		Launch.register();
+		LoadoutManagerCommand.register();
+		MMQuest.register(this);
+		MonumentaDebug.register(this);
+		MonumentaReload.register(this);
 		MonumentaTrigger.register();
-		BlueStrikeDaggerCraftingBoss.register();
+		NameMCVerify.register(this);
+		POICommands.register();
+		PartialParticleCommand.register();
+		ParticleUtilsCommand.register();
+		ParticlesCommand.register();
+		PersistentDataCommand.register();
+		PickLevelAfterAnvils.register();
+		PlayerItemStatsGUICommand.register(this);
+		Portal1.register();
+		Portal2.register();
+		RedeemVoteRewards.register(this);
+		RefreshClass.register(this);
+		RegisterTorch.register();
+		RemoveTags.register();
+		RenameItemCommand.register();
+		ResetClass.register(this);
+		RestartEmptyCommand.register(this);
+		RocketJump.register();
+		RunWithPlaceholdersCommand.register();
 		ScanChests.register();
-		AbsorptionCommand.register();
+		SeasonalEventCommand.register();
 		SetActivity.register(this);
 		SetMasterwork.register();
-		WalletManager.registerCommand();
-		CoreProtectLogCommand.register();
-		UpdateStrikeChests.register();
-		RenameItemCommand.register();
-		ForceCastSpell.register();
-		DungeonAccessCommand.register();
+		SkillDescription.register(this);
+		SkillSummary.register(this);
 		SpawnerCountCommand.register();
-		PersistentDataCommand.register();
-		MMQuest.register(this);
-		LoadoutManagerCommand.register();
+		Spawn.register();
+		SpellDetectionCircle.registerCommand(this);
+		StatTrackItem.register();
+		Stuck.register();
+		TeleportAsync.register();
+		TeleportByScore.register();
+		TellMiniMessage.register();
 		TimeWarpCommand.register();
-		ParticleUtilsCommand.register();
-		ChargeUpBarCommand.register(this);
-		BoatUtilsCommand.register();
-		AttributeModifierCommand.register();
-		RegisterTorch.register();
+		ToggleSwap.register();
+		ToggleTrail.register();
+		UnsignBook.register();
+		UpTimeCommand.register();
+		UpdateChestItems.register();
+		UpdateHeldItem.register();
+		UpdatePlainName.register();
+		UpdateStrikeChests.register();
+		ViewActivity.register();
+		VirtualFirmament.register();
+		WalletManager.registerCommand();
+		WorldNameCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -311,7 +311,7 @@ public class Plugin extends JavaPlugin {
 		}
 
 		/* Plot commands are valid on all shards */
-		new PlotManager();
+		PlotManager.registerCommands();
 
 		mJunkItemsListener = new JunkItemListener();
 		mItemDropListener = new ItemDropListener();
@@ -365,7 +365,7 @@ public class Plugin extends JavaPlugin {
 		mSignUtils = new SignUtils(this);
 		mTowerManager = new TowerManager(this);
 		mCosmeticsManager = CosmeticsManager.getInstance();
-		mSeasonalEventManager = new SeasonalEventManager();
+		SeasonalEventManager.enable();
 		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
 		mLoadoutManager = new LoadoutManager();
@@ -573,7 +573,7 @@ public class Plugin extends JavaPlugin {
 		// Hook into Library of Souls for mob management if available
 		if (Bukkit.getPluginManager().isPluginEnabled("LibraryOfSouls")) {
 			BossTagCommand.register();
-			new LibraryOfSoulsIntegration(this.getLogger());
+			LibraryOfSoulsIntegration.enable(this.getLogger());
 		}
 
 		// Provide placeholder API replacements if it is present
@@ -583,17 +583,17 @@ public class Plugin extends JavaPlugin {
 
 		// Log things in CoreProtect if it is present
 		if (Bukkit.getPluginManager().isPluginEnabled("CoreProtect")) {
-			new CoreProtectIntegration(this.getLogger());
+			CoreProtectIntegration.enable(this.getLogger());
 		}
 
 		// Register luckperms commands if LuckPerms is present
 		if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
-			new LuckPermsIntegration(this);
+			LuckPermsIntegration.enable(this);
 		}
 
 		// Hook into PremiumVanish if present
 		if (Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
-			new PremiumVanishIntegration(this.getLogger());
+			PremiumVanishIntegration.enable(this.getLogger());
 		}
 
 		// Hook into ProtocolLib if present
