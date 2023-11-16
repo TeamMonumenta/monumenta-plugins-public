@@ -69,8 +69,8 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		Material.SPAWNER,
 		Material.END_PORTAL,
 		Material.CHEST,
-		Material.SPAWNER,
-		Material.TRAPPED_CHEST
+		Material.TRAPPED_CHEST,
+		Material.LAVA
 	);
 
 	private double mCoefficient = 1.0;
@@ -228,7 +228,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		events.put(67, (mBoss) -> {
 			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
 				.sendMessage(Component.text("She can see us so clearly. So many eyes watching... We are nothing but a show for them...", NamedTextColor.DARK_RED));
-			phaseTransition(16, 1, mIgnoredMats, phaseChangeActive, activeSpells2, passiveSpells);
+			phaseTransition(12, 1, mIgnoredMats, phaseChangeActive, activeSpells2, passiveSpells);
 		});
 		events.put(33, (mBoss) -> {
 			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
@@ -239,7 +239,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 					Component.text("h to do t", NamedTextColor.DARK_RED)).append(
 					Component.text("h", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
 					Component.text("is?", NamedTextColor.DARK_RED)));
-			phaseTransition(20, 1, mIgnoredMats, phaseChangeActive, activeSpells3, passiveSpells);
+			phaseTransition(16, 1, mIgnoredMats, phaseChangeActive, activeSpells3, passiveSpells);
 		});
 		events.put(15, (mBoss) -> {
 			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
@@ -266,7 +266,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 					Component.text("MPL", mJade)).append(
 					Component.text("AR", mJade, TextDecoration.OBFUSCATED)).append(
 					Component.text("Y.", mJade)));
-			phaseTransition(24, 1.5, mIgnoredMats, phaseChangeActive, activeSpells3, passiveSpells);
+			phaseTransition(20, 1.5, mIgnoredMats, phaseChangeActive, activeSpells3, passiveSpells);
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -341,7 +341,12 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 				double inc = Math.min(360.0 / (Math.max(mRadius, 1) * 8.0), 360);
 				//get valid blocks in circle
 				for (double degrees = 0; degrees <= 360; degrees += inc) {
-					//block under boss
+					// ignore 33% of blocks
+					double rng = FastUtils.randomDoubleInRange(0, 1);
+					if (rng <= 0.33) {
+						continue;
+					}
+					// block under boss
 					if (mRadius < 1) {
 						Block block = getBlock(bossLoc.clone());
 						if (block.isSolid()) {
