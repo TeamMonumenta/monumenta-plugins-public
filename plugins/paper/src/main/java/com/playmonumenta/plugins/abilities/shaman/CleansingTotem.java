@@ -43,6 +43,7 @@ public class CleansingTotem extends TotemAbility {
 	private static final int DURATION_2 = 12 * 20;
 	private static final int CLEANSES = 2;
 	private static final double ENHANCE_HEALING_PERCENT = 0.2;
+	private static final int ENHANCE_RADIUS = 3;
 
 	public static String CHARM_DURATION = "Cleansing Totem Duration";
 	public static String CHARM_RADIUS = "Cleansing Totem Radius";
@@ -73,8 +74,9 @@ public class CleansingTotem extends TotemAbility {
 					StringUtils.ticksToSeconds(DURATION_2),
 					CLEANSES),
 				String.format("Throwing the totem cleanses the shaman and heals %s%% max health instantly. " +
-					"Directly hitting another player with the projectile applies the same effects on impact.",
-					StringUtils.multiplierToPercentage(ENHANCE_HEALING_PERCENT)
+					"Players within %s blocks of the landing location receive the same effects on impact.",
+					StringUtils.multiplierToPercentage(ENHANCE_HEALING_PERCENT),
+					ENHANCE_RADIUS
 				)
 			)
 			.simpleDescription("Summon a totem that heals and cleanses players over its duration.")
@@ -106,8 +108,9 @@ public class CleansingTotem extends TotemAbility {
 			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 2.0f, 1.3f);
 			world.playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8f, 2.0f);
 			if (isEnhanced()) {
-				List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, 3, true);
+				List<Player> players = PlayerUtils.playersInRange(standLocation, ENHANCE_RADIUS, true);
 				cleanseTargets(players);
+				players.removeIf(player -> player == mPlayer);
 				for (Player player : players) {
 					PlayerUtils.healPlayer(mPlugin, player, CharmManager.calculateFlatAndPercentValue(mPlayer,
 						CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(player)), mPlayer);

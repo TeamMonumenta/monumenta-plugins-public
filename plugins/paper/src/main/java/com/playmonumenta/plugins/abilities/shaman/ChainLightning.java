@@ -117,16 +117,16 @@ public class ChainLightning extends MultipleChargeAbility {
 
 		List<LivingEntity> nearbyMobs = hitbox.getHitMobs();
 		nearbyMobs.sort((a, b) -> (int) (a.getLocation().distance(mPlayer.getLocation()) - b.getLocation().distance(mPlayer.getLocation())));
-		if (nearbyMobs.isEmpty()) {
-			List<LivingEntity> nearbyTotems = new ArrayList<>(TotemicEmpowerment.getTotemList(mPlayer));
-			nearbyTotems.removeIf(totem -> !hitbox.intersects(totem.getBoundingBox()));
+		List<LivingEntity> nearbyTotems = new ArrayList<>(TotemicEmpowerment.getTotemList(mPlayer));
+		nearbyTotems.removeIf(totem -> !hitbox.intersects(totem.getBoundingBox()));
+		if (!nearbyMobs.isEmpty()) {
+			mHitTargets.add(nearbyMobs.get(0));
 			if (!nearbyTotems.isEmpty()) {
 				LivingEntity totem = FastUtils.getRandomElement(nearbyTotems);
 				mHitTargets.add(totem);
 				startChain(totem, false);
+				return;
 			}
-		} else {
-			mHitTargets.add(nearbyMobs.get(0));
 			startChain(nearbyMobs.get(0), true);
 		}
 	}
