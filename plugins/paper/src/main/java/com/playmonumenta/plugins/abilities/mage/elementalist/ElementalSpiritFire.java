@@ -37,6 +37,8 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 	public static final String CHARM_DAMAGE = "Elemental Spirits Damage";
 	public static final String CHARM_COOLDOWN = "Elemental Spirits Cooldown";
 	public static final String CHARM_SIZE = "Elemental Spirits Size";
+	public static final String CHARM_DAMAGE2 = "Fire Elemental Spirit Damage";
+	public static final String CHARM_COOLDOWN2 = "Fire Elemental Spirit Cooldown";
 
 	public static final AbilityInfo<ElementalSpiritFire> INFO =
 		new AbilityInfo<>(ElementalSpiritFire.class, NAME, ElementalSpiritFire::new)
@@ -77,7 +79,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 				)
 			)
 			.simpleDescription("Deal extra damage in a radius upon dealing fire or ice damage.")
-			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
+			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN, CHARM_COOLDOWN2)
 			.displayItem(Material.SUNFLOWER);
 
 	public ElementalSpiritFire(Plugin plugin, Player player) {
@@ -109,6 +111,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 		Location playerLocation = mPlayer.getLocation();
 
 		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, HITBOX);
+		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritFire.CHARM_DAMAGE2, spellDamage);
 		BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), size, size, size);
 		double maxDistanceSquared = startLocation.distanceSquared(endLocation);
 		double maxDistance = Math.sqrt(maxDistanceSquared);
@@ -127,7 +130,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 			while (iterator.hasNext()) {
 				LivingEntity potentialTarget = iterator.next();
 				if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
-					damage(potentialTarget, spellDamage, playerItemStats, isElementalArrows);
+					damage(potentialTarget, damage, playerItemStats, isElementalArrows);
 					iterator.remove();
 				}
 			}

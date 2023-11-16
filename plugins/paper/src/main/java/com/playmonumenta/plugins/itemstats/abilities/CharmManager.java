@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
@@ -47,6 +48,7 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
+import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
@@ -93,6 +95,7 @@ import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.abilities.warlock.Culling;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
@@ -341,6 +344,10 @@ public class CharmManager {
 			ElementalSpiritFire.CHARM_COOLDOWN,
 			ElementalSpiritFire.CHARM_DAMAGE,
 			ElementalSpiritFire.CHARM_SIZE,
+			ElementalSpiritFire.CHARM_DAMAGE2,
+			ElementalSpiritFire.CHARM_COOLDOWN2,
+			ElementalSpiritIce.CHARM_DAMAGE2,
+			ElementalSpiritIce.CHARM_COOLDOWN2,
 			Channeling.CHARM_DAMAGE,
 
 			//Cleric
@@ -363,6 +370,7 @@ public class CharmManager {
 			HeavenlyBoon.CHARM_STRENGTH_AMPLIFIER,
 			HeavenlyBoon.CHARM_RESIST_AMPLIFIER,
 			HeavenlyBoon.CHARM_ABSORPTION_AMPLIFIER,
+			Crusade.CHARM_DAMAGE,
 			CleansingRain.CHARM_COOLDOWN,
 			CleansingRain.CHARM_RANGE,
 			CleansingRain.CHARM_REDUCTION,
@@ -453,6 +461,7 @@ public class CharmManager {
 			ViciousCombos.CHARM_VULN,
 			ViciousCombos.CHARM_WEAKEN,
 			ViciousCombos.CHARM_DURATION,
+			ViciousCombos.CHARM_DAMAGE_AMPLIFIER,
 			BladeDance.CHARM_COOLDOWN,
 			BladeDance.CHARM_DAMAGE,
 			BladeDance.CHARM_RADIUS,
@@ -754,6 +763,8 @@ public class CharmManager {
 			VoodooBonds.CHARM_RECEIVED_DAMAGE,
 			VoodooBonds.CHARM_TRANSFER_DAMAGE,
 			VoodooBonds.CHARM_TRANSFER_TIME,
+			Culling.CHARM_DURATION,
+			Culling.CHARM_RESISTANCE,
 
 			//Scout
 			Agility.CHARM_HASTE,
@@ -1029,7 +1040,9 @@ public class CharmManager {
 			Devastation.CHARM_COOLDOWN,
 			ChainHealingWave.CHARM_COOLDOWN,
 			WhirlwindTotem.CHARM_COOLDOWN,
-			WhirlwindTotem.CHARM_PULSE_DELAY
+			WhirlwindTotem.CHARM_PULSE_DELAY,
+			ElementalSpiritIce.CHARM_COOLDOWN2,
+			ElementalSpiritFire.CHARM_COOLDOWN2
 		);
 	}
 

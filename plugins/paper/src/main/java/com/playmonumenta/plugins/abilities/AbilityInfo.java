@@ -63,6 +63,7 @@ public class AbilityInfo<T extends Ability> {
 	//This is in ticks; order: [level 1, level 2, level 1 enhanced, level 2 enhanced]; for depths this is one entry per rarity (so 6 in total)
 	public @Nullable List<Integer> mCooldowns;
 	public @Nullable String mCharmCooldown;
+	public @Nullable String mCharmCooldown2;
 
 	private Predicate<Player> mCanUse = player -> mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mScoreboardId).orElse(0) > 0;
 
@@ -119,6 +120,13 @@ public class AbilityInfo<T extends Ability> {
 	public AbilityInfo<T> cooldown(int cooldown, String charmCooldown) {
 		mCooldowns = List.of(cooldown, cooldown, cooldown, cooldown);
 		mCharmCooldown = charmCooldown;
+		return this;
+	}
+
+	public AbilityInfo<T> cooldown(int cooldown, String charmCooldown, String charmCooldown2) {
+		mCooldowns = List.of(cooldown, cooldown, cooldown, cooldown);
+		mCharmCooldown = charmCooldown;
+		mCharmCooldown2 = charmCooldown2;
 		return this;
 	}
 
@@ -226,6 +234,9 @@ public class AbilityInfo<T extends Ability> {
 
 	public int getModifiedCooldown(Player player, int score) {
 		int baseCooldown = getBaseCooldown(player, score);
+		if (mCharmCooldown2 != null && mCharmCooldown != null) {
+			return CharmManager.getCooldown(player, mCharmCooldown2, CharmManager.getCooldown(player, mCharmCooldown, baseCooldown));
+		}
 		if (mCharmCooldown != null) {
 			return CharmManager.getCooldown(player, mCharmCooldown, baseCooldown);
 		}

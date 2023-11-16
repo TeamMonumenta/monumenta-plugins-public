@@ -40,6 +40,7 @@ public class ViciousCombos extends Ability {
 	public static final String CHARM_VULN = "Vicious Combos Vulnerability Amplifier";
 	public static final String CHARM_WEAKEN = "Vicious Combos Weakness Amplifier";
 	public static final String CHARM_DURATION = "Vicious Combos Duration";
+	public static final String CHARM_DAMAGE_AMPLIFIER = "Vicious Combos Enhancement Damage Amplifier";
 
 	public static final AbilityInfo<ViciousCombos> INFO =
 		new AbilityInfo<>(ViciousCombos.class, "Vicious Combos", ViciousCombos::new)
@@ -119,7 +120,8 @@ public class ViciousCombos extends Ability {
 			    && mLastAbility != null
 			    && Bukkit.getServer().getCurrentTick() < mAbilityCastTime + ENHANCEMENT_CHARGE_LIFETIME) {
 
-			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_INCREASE));
+			double enhancementDamageMulti = ENHANCEMENT_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
+			event.setDamage(event.getDamage() * (1 + enhancementDamageMulti));
 			mPlugin.mTimers.updateCooldown(mPlayer, mLastAbility, ENHANCEMENT_COOLDOWN_REDUCTION);
 
 			// mPlayer.sendMessage(mLastAbility.getName() + " has been reduced!");

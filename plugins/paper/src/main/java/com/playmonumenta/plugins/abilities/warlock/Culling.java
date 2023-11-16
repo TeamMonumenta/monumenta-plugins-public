@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -18,6 +19,8 @@ public class Culling extends Ability {
 	private static final int PASSIVE_DURATION = 6 * 20;
 	private static final String WARLOCK_PASSIVE_EFFECT_NAME = "CullingPercentDamageResistEffect";
 	private static final double WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT = -0.1;
+	public static final String CHARM_RESISTANCE = "Culling Resistance Amplifier";
+	public static final String CHARM_DURATION = "Culling Duration";
 
 	public static final AbilityInfo<Culling> INFO =
 		new AbilityInfo<>(Culling.class, null, Culling::new)
@@ -31,7 +34,9 @@ public class Culling extends Ability {
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		if (EntityUtils.isHostileMob(event.getEntity())
 			    && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
-			mPlugin.mEffectManager.addEffect(mPlayer, WARLOCK_PASSIVE_EFFECT_NAME, new PercentDamageReceived(PASSIVE_DURATION, WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT));
+			double resistance = WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, PASSIVE_DURATION);
+			mPlugin.mEffectManager.addEffect(mPlayer, WARLOCK_PASSIVE_EFFECT_NAME, new PercentDamageReceived(duration, resistance));
 		}
 	}
 }

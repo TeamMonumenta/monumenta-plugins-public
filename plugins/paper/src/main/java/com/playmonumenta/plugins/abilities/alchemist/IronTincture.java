@@ -55,7 +55,7 @@ public class IronTincture extends Ability {
 	public static final String CHARM_ABSORPTION = "Iron Tincture Absorption Health";
 	public static final String CHARM_DURATION = "Iron Tincture Duration";
 	public static final String CHARM_VELOCITY = "Iron Tincture Velocity";
-	public static final String CHARM_RESISTANCE = "Iron Tincture Resistance";
+	public static final String CHARM_RESISTANCE = "Iron Tincture Enhancement Resistance Amplifier";
 
 	public static final AbilityInfo<IronTincture> INFO =
 		new AbilityInfo<>(IronTincture.class, "Iron Tincture", IronTincture::new)

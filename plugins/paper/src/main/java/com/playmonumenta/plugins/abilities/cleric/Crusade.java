@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.effects.CrusadeTag;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import org.bukkit.Material;
@@ -20,6 +21,7 @@ public class Crusade extends Ability {
 	public static final double ENHANCEMENT_RADIUS = 8;
 	public static final int ENHANCEMENT_MAX_MOBS = 6;
 	public static final double ENHANCEMENT_BONUS_DAMAGE = 0.05;
+	public static final String CHARM_DAMAGE = "Crusade Enhancement Damage Amplifier";
 
 	public static final AbilityInfo<Crusade> INFO =
 		new AbilityInfo<>(Crusade.class, NAME, Crusade::new)
@@ -47,7 +49,8 @@ public class Crusade extends Ability {
 		if (isEnhanced()) {
 			long numMobs = new Hitbox.SphereHitbox(mPlayer.getLocation(), ENHANCEMENT_RADIUS)
 				.getHitMobs().stream().filter(e -> enemyTriggersAbilities(e, this)).limit(ENHANCEMENT_MAX_MOBS).count();
-			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_BONUS_DAMAGE * numMobs));
+			double damagePerMob = ENHANCEMENT_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+			event.setDamage(event.getDamage() * (1 + damagePerMob * numMobs));
 		}
 
 		addCrusadeTag(enemy);

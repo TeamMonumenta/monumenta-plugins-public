@@ -30,12 +30,15 @@ public class ElementalSpiritIce extends BaseElementalSpirit {
 	public static final int COOLDOWN_TICKS = ElementalSpiritFire.COOLDOWN_TICKS;
 	public static final EnumSet<ClassAbility> ICE_ABILITIES = EnumSet.of(ClassAbility.ELEMENTAL_ARROWS_ICE, ClassAbility.BLIZZARD, ClassAbility.FROST_NOVA);
 
+	public static final String CHARM_DAMAGE2 = "Ice Elemental Spirit Damage";
+	public static final String CHARM_COOLDOWN2 = "Ice Elemental Spirit Cooldown";
+
 	// Note that name and description are empty. This ability is ignored by Tesseract of Elements
 	public static final AbilityInfo<ElementalSpiritIce> INFO =
 		new AbilityInfo<>(ElementalSpiritIce.class, null, ElementalSpiritIce::new)
 			.linkedSpell(ClassAbility.ELEMENTAL_SPIRIT_ICE)
 			.scoreboardId("ElementalSpirit")
-			.cooldown(COOLDOWN_TICKS, ElementalSpiritFire.CHARM_COOLDOWN);
+			.cooldown(COOLDOWN_TICKS, ElementalSpiritFire.CHARM_COOLDOWN, CHARM_COOLDOWN2);
 
 
 	private @Nullable BukkitTask mSpiritPulser;
@@ -66,6 +69,7 @@ public class ElementalSpiritIce extends BaseElementalSpirit {
 	protected void activate(LivingEntity target, World world, double spellDamage, ItemStatManager.PlayerItemStats playerItemStats, boolean isElementalArrows) {
 		Location centre = LocationUtils.getHalfHeightLocation(target);
 		double size = CharmManager.getRadius(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE);
+		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritIce.CHARM_DAMAGE2, spellDamage);
 		mSpiritPulser = new BukkitRunnable() {
 			int mPulses = 1; // The current pulse for this run
 
@@ -73,7 +77,7 @@ public class ElementalSpiritIce extends BaseElementalSpirit {
 			public void run() {
 				// Damage actions
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, size)) {
-					damage(mob, spellDamage, playerItemStats, isElementalArrows);
+					damage(mob, damage, playerItemStats, isElementalArrows);
 					mob.setVelocity(new Vector()); // Wipe velocity, extreme local climate
 				}
 

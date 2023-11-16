@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Alchemist;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
@@ -555,6 +556,9 @@ public class ItemStatUtils {
 			// The real ability name is "Alchemist Potions", but charms don't use the "s"
 			if (line.contains("Alchemist Potion")) {
 				return new Alchemist();
+			}
+			if (line.contains("Fire Elemental Spirit") || line.contains("Ice Elemental Spirit")) {
+				return new Mage();
 			}
 		}
 		return null;
