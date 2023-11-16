@@ -179,7 +179,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(FloatBoss.identityTag, FloatBoss::new);
 		registerStatelessBoss(FrostNovaBoss.identityTag, FrostNovaBoss::new, new FrostNovaBoss.Parameters());
 		registerStatelessBoss(DebuffHitBoss.identityTag, DebuffHitBoss::new);
-		registerStatelessBoss(IceAspectBoss.identityTag, IceAspectBoss::new, new IceAspectBoss.Parameters());
 		registerStatelessBoss(TsunamiChargerBoss.identityTag, TsunamiChargerBoss::new);
 		registerStatelessBoss(BombTossBoss.identityTag, BombTossBoss::new);
 		registerStatelessBoss(BombTossNoBlockBreakBoss.identityTag, BombTossNoBlockBreakBoss::new);
@@ -198,7 +197,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(PrimordialElementalKaulBoss.identityTag, PrimordialElementalKaulBoss::new);
 		registerStatelessBoss(ImmortalElementalKaulBoss.identityTag, ImmortalElementalKaulBoss::new);
 		registerStatelessBoss(CyanSummonBoss.identityTag, CyanSummonBoss::new);
-		registerStatelessBoss(WitherHitBoss.identityTag, WitherHitBoss::new);
 		registerStatelessBoss(VolatileBoss.identityTag, VolatileBoss::new);
 		registerStatelessBoss(SwapOnDismountBoss.identityTag, SwapOnDismountBoss::new);
 		registerStatelessBoss(PlayerDamageOnlyBoss.identityTag, PlayerDamageOnlyBoss::new);
