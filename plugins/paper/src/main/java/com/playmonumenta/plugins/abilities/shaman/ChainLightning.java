@@ -124,10 +124,14 @@ public class ChainLightning extends MultipleChargeAbility {
 			if (!nearbyTotems.isEmpty()) {
 				LivingEntity totem = FastUtils.getRandomElement(nearbyTotems);
 				mHitTargets.add(totem);
-				startChain(totem, false);
-				return;
 			}
 			startChain(nearbyMobs.get(0), true);
+		} else {
+			if (!nearbyTotems.isEmpty()) {
+				LivingEntity totem = FastUtils.getRandomElement(nearbyTotems);
+				mHitTargets.add(totem);
+				startChain(totem, false);
+			}
 		}
 	}
 
