@@ -294,13 +294,13 @@ public class CustomInventoryCommands {
 		ArrayList<EmojiCustomInventory.Emoji> list = new ArrayList<>(EmojiCustomInventory.EMOJI_LIST);
 		list.removeIf(item -> item.mDefaultID != defaultEmote);
 		if (list.isEmpty()) {
-			player.sendMessage("Select an emote in the emoji selection GUI as a default first!");
+			player.sendMessage(Component.text("Select an emote in the emoji selection GUI as a default first!"));
 			return;
 		}
 		if (list.get(0).mPatreon && !(ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_2)) {
-			player.sendMessage("You must be a T2+ Patron to use this emote!");
+			player.sendMessage(Component.text("You must be a T2+ Patron to use this emote!"));
 			return;
 		}
-		EmojiCustomInventory.completeCommand(player, list.get(0).mLeftClick);
+		EmojiCustomInventory.trySpawnEmoji(player, list.get(0).mEmojiName);
 	}
 }

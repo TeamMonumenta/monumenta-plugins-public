@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PPImage;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.time.Instant;
@@ -15,12 +17,17 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 
 public class EmojiCustomInventory extends CustomInventory {
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
@@ -29,21 +36,23 @@ public class EmojiCustomInventory extends CustomInventory {
 	private static final String PATREON_BOARD = Constants.Objectives.PATREON_DOLLARS;
 	private static final int PATREON_MINIMUM = Constants.PATREON_TIER_2;
 	private static final int[] EMOJI_LOCS = {19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52};
+	private static final int PATREON_COOLDOWN = 1;
+	private static final int NORMAL_COOLDOWN = 15;
 
 	public static class Emoji {
 		String mName;
 		String mLore;
 		Boolean mPatreon;
 		Material mType;
-		String mLeftClick;
+		String mEmojiName;
 		int mDefaultID;
 
-		public Emoji(String name, String lore, Material type, Boolean patreon, String leftClick, int defaultId) {
+		public Emoji(String name, String lore, Material type, Boolean patreon, String emojiName, int defaultId) {
 			mName = name;
 			mLore = lore;
 			mType = type;
 			mPatreon = patreon;
-			mLeftClick = leftClick;
+			mEmojiName = emojiName;
 			mDefaultID = defaultId;
 		}
 	}
@@ -99,7 +108,7 @@ public class EmojiCustomInventory extends CustomInventory {
 			for (Emoji item : EMOJI_LIST) {
 				if (chosenName.contains(item.mName) && !chosenName.contains("(Locked)")) {
 					if (event.isLeftClick()) {
-						completeCommand(player, item.mLeftClick);
+						trySpawnEmoji(player, item.mEmojiName);
 					} else {
 						ScoreboardUtils.setScoreboardValue(player, EMOJI_CHOICE_BOARD, item.mDefaultID);
 						setLayout(player);
@@ -109,27 +118,31 @@ public class EmojiCustomInventory extends CustomInventory {
 		}
 	}
 
-	public static void completeCommand(Player player, String cmd) {
-		if (cmd.isEmpty()) {
+	public static void trySpawnEmoji(Player player, String emojiName) {
+		if (emojiName.isEmpty()) {
 			return;
 		}
 		long timeLeft = COOLDOWNS.getOrDefault(player.getUniqueId(), 0L) - Instant.now().getEpochSecond();
+		boolean isPatreon = ScoreboardUtils.getScoreboardValue(player, PATREON_BOARD) >= PATREON_MINIMUM;
 
 		if (timeLeft > 0) {
-			if (ScoreboardUtils.getScoreboardValue(player, PATREON_BOARD) >= PATREON_MINIMUM) {
-				player.sendMessage("Too fast! You can only emote once every 15s (" + timeLeft + "s remaining)");
-			} else {
-				player.sendMessage("Too fast! You can only emote once every 60s (" + timeLeft + "s remaining)");
+			if (!isPatreon) {
+				player.sendMessage(Component.text("Too fast! You can only emote once every 15s (" + timeLeft + "s remaining)"));
 			}
-		} else {
-			if (ScoreboardUtils.getScoreboardValue(player, PATREON_BOARD) >= PATREON_MINIMUM) {
-				COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + 15);
-			} else {
-				COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + 60);
-			}
-			String command = "execute as @S at @S run function monumenta:mechanisms/emojis/" + cmd + "_run";
-			NmsUtils.getVersionAdapter().runConsoleCommandSilently(command.replace("@S", player.getName()));
+			player.closeInventory();
+			return;
 		}
+
+		COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + (isPatreon ? PATREON_COOLDOWN : NORMAL_COOLDOWN));
+
+		Location eyeLoc = player.getEyeLocation();
+		Vector eyeDir = eyeLoc.getDirection();
+		Location emojiLoc = player.getEyeLocation().add(VectorUtils.rotationToVector(eyeLoc.getYaw(), eyeLoc.getPitch() - 90).multiply(2.5));
+		PPImage emoji = new PPImage(emojiLoc, "/emoji/" + emojiName + ".png").centered(true).dimensions(24, 24).normal(eyeDir);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, SoundCategory.PLAYERS, 1, 0.5f);
+		emoji.spawnAsPlayerEmoji(player);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> emoji.spawnAsPlayerEmoji(player), 5);
+
 		player.closeInventory();
 	}
 

@@ -255,6 +255,10 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_BUFF, ParticleCategory.OTHER_BUFF);
 	}
 
+	public SelfT spawnAsPlayerEmoji(Player sourcePlayer) {
+		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_EMOJI, ParticleCategory.OTHER_EMOJI);
+	}
+
 	/*
 	 * Spawns particles for each nearby player,
 	 * based on individual particle multiplier settings.

@@ -644,6 +644,8 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(4, "Particle Settings",
 				"Choose how many particles are shown for abilities of various categories. These settings can also be changed using the /particles command.", NamedTextColor.GRAY,
 				Material.NETHER_STAR, false),
+			makePartialParticlePebItem(11, "Particle multiplier for your own emojis", Material.GLOW_INK_SAC, ParticleCategory.OWN_EMOJI),
+			makePartialParticlePebItem(15, "Particle multiplier for other players' emojis", Material.GLOW_INK_SAC, ParticleCategory.OTHER_EMOJI),
 			makePartialParticlePebItem(19, "Particle multiplier for your own active abilities", Material.PLAYER_HEAD, ParticleCategory.OWN_ACTIVE),
 			makePartialParticlePebItem(20, "Particle multiplier for your own passive abilities", Material.FIREWORK_STAR, ParticleCategory.OWN_PASSIVE),
 			makePartialParticlePebItem(21, "Particle multiplier for active effects on you, e.g. the Defensive Line buff", Material.ENDER_PEARL, ParticleCategory.OWN_BUFF),
@@ -829,15 +831,31 @@ public class PEBCustomInventory extends CustomInventory {
 
 	}
 
+	private static boolean isEmojiCategory(ParticleCategory category) {
+		return category == ParticleCategory.OWN_EMOJI || category == ParticleCategory.OTHER_EMOJI;
+	}
+
 	private static PebItem makePartialParticlePebItem(int slot, String description, Material material, ParticleCategory category) {
 		String objectiveName = Objects.requireNonNull(category.mObjectiveName);
 		return new PebItem(slot, gui -> category.mDisplayName + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
-			gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", NamedTextColor.GRAY,
+			gui -> description + ". Left click to increase, right click to decrease." + (isEmojiCategory(category) ? "" : " Hold shift to increase/decrease in smaller steps."), NamedTextColor.GRAY,
 			material, false).switchToPage(PebPage.PARTIAL_PARTICLES)
 			       .action((gui, event) -> {
 				       int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
-				       value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
-				       value = Math.max(0, Math.min(value, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
+					   if (isEmojiCategory(category)) {
+						   // Only 4 options: 100%, 50%, 25%, 0% (1x, 0.5x, 0.25x, 0x resolution)
+						   value = (int) (value * (event.isLeftClick() ? 2.0 : 0.5));
+						   // Handle 0
+						   if (value == 0 && event.isLeftClick()) {
+							   value = 25;
+						   } else if (value < 25) {
+							   value = 0;
+						   }
+						   value = Math.min(100, value);
+					   } else {
+						   value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
+						   value = Math.max(0, Math.min(value, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
+					   }
 				       ScoreboardUtils.setScoreboardValue(gui.mPlayer, objectiveName, value);
 				       gui.setLayout(gui.mCurrentPage); // refresh GUI
 			       });

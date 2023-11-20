@@ -4,6 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import io.papermc.paper.datapack.Datapack;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.imageio.ImageIO;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 
@@ -214,5 +219,61 @@ public class FileUtils {
 		MMLog.fine("Identified " + results.size() + " datapack files matching subfolder '" + subfolder + "' and extension '" + extension + "'");
 
 		return results;
+	}
+
+	public static class SimpleImage {
+
+		private BufferedImage mImage;
+		private int mWidth;
+		private int mHeight;
+
+		public SimpleImage(Path imagePath) throws IllegalArgumentException, IOException {
+			mImage = ImageIO.read(new File(imagePath.toUri()));
+			mWidth = mImage.getWidth();
+			mHeight = mImage.getHeight();
+		}
+
+		public void resize(int width, int height) {
+			BufferedImage scaled = new BufferedImage(width, height, mImage.getType());
+			AffineTransform at = new AffineTransform();
+			at.scale((double) width / (double) mWidth, (double) height / (double) mHeight);
+			AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+			mImage = scaleOp.filter(mImage, scaled);
+			mWidth = mImage.getWidth();
+			mHeight = mImage.getHeight();
+		}
+
+		public int[][] getARGBMatrix() {
+			byte[] pixels = ((DataBufferByte) mImage.getRaster().getDataBuffer()).getData();
+			boolean mHasAlphaChannel = mImage.getAlphaRaster() != null;
+			int mPixelLength = mHasAlphaChannel ? 4 : 3;
+			int[][] argbMatrix = new int[mWidth][mHeight];
+
+			for (int x = 0; x < mWidth; x++) {
+				for (int y = 0; y < mHeight; y++) {
+					int pos = (y * mPixelLength * mWidth) + (x * mPixelLength);
+
+					int argb = -16777216; // 255 alpha
+					if (mHasAlphaChannel) {
+						argb = (((int) pixels[pos++] & 0xff) << 24); // alpha
+					}
+
+					argb += ((int) pixels[pos++] & 0xff); // blue
+					argb += (((int) pixels[pos++] & 0xff) << 8); // green
+					argb += (((int) pixels[pos++] & 0xff) << 16); // red
+					argbMatrix[x][y] = argb;
+				}
+			}
+
+			return argbMatrix;
+		}
+
+		public int getWidth() {
+			return mWidth;
+		}
+
+		public int getHeight() {
+			return mHeight;
+		}
 	}
 }
