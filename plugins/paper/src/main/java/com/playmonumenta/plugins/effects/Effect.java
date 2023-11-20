@@ -119,7 +119,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	}
 
-	public void onKill(EntityDeathEvent event) {
+	public void onKill(EntityDeathEvent event, Player player) {
 
 	}
 

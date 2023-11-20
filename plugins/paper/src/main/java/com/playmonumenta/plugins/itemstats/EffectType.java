@@ -1,34 +1,7 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
-import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
-import com.playmonumenta.plugins.effects.AbsorptionSickness;
-import com.playmonumenta.plugins.effects.ArrowSaving;
-import com.playmonumenta.plugins.effects.Bleed;
-import com.playmonumenta.plugins.effects.BonusSoulThreads;
-import com.playmonumenta.plugins.effects.BoonOfKnightlyPrayer;
-import com.playmonumenta.plugins.effects.BoonOfThePit;
-import com.playmonumenta.plugins.effects.CrystalineBlessing;
-import com.playmonumenta.plugins.effects.DeepGodsEndowment;
-import com.playmonumenta.plugins.effects.DurabilitySaving;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.FishQualityIncrease;
-import com.playmonumenta.plugins.effects.HealingSickness;
-import com.playmonumenta.plugins.effects.NegateDamage;
-import com.playmonumenta.plugins.effects.PercentAttackSpeed;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentExperience;
-import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.effects.PercentHealthBoost;
-import com.playmonumenta.plugins.effects.PercentKnockbackResist;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.effects.SilverPrayer;
-import com.playmonumenta.plugins.effects.StarCommunion;
-import com.playmonumenta.plugins.effects.Stasis;
-import com.playmonumenta.plugins.effects.TemporalFlux;
-import com.playmonumenta.plugins.effects.TuathanBlessing;
+import com.playmonumenta.plugins.effects.*;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
@@ -172,7 +145,11 @@ public enum EffectType {
 	HARRAKFARS_BLESSING("HarrakfarsBlessing", "Harrakfar's Blessing", true, false, true),
 	SILVER_PRAYER("SilverPrayer", "Silver Prayer", true, false, true),
 	STAR_COMMUNION("StarCommunion", "Star Communion", true, false, true),
-	TUATHAN_BLESSING("TuathanBlessing", "Tuathan Blessing", true, false, true);
+	TUATHAN_BLESSING("TuathanBlessing", "Tuathan Blessing", true, false, true),
+	GIFT_OF_THE_STARS("GiftOfTheStars", "Gift of the Stars", true, false, true),
+	BOON_OF_THE_FRACTURED_TREE("BoonOfTheFracturedTree", "Boon of the Fractured Tree", true, false, true),
+	SKY_SEEKERS_GRACE("SkySeekersGrace", "Sky Seeker's Grace", true, false, true);
+
 
 	public static final String KEY = "Effects";
 
@@ -440,6 +417,9 @@ public enum EffectType {
 			case SILVER_PRAYER -> new SilverPrayer(duration);
 			case STAR_COMMUNION -> new StarCommunion(duration);
 			case TUATHAN_BLESSING -> new TuathanBlessing(duration);
+			case GIFT_OF_THE_STARS -> new GiftOfTheStars(duration);
+			case BOON_OF_THE_FRACTURED_TREE -> new BoonOfTheFracturedTree(duration);
+			case SKY_SEEKERS_GRACE -> new SkySeekersGrace(duration);
 
 			default -> null;
 		};

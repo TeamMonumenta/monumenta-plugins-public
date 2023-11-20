@@ -85,6 +85,7 @@ public enum EnchantmentType {
 	WIND_ASPECT(new WindAspect(), true, false, false, true),
 	EARTH_ASPECT(new EarthAspect(), true, false, false, true),
 	FIRST_STRIKE(new FirstStrike(), true, false, false, true),
+	FRACTAL(new Fractal(), true, false, false, true),
 	GILLS(new Gills(), false, false, false, false),
 	HEX_EATER(new HexEater(), true, false, false, true),
 	INFERNO(new Inferno(), true, false, false, true),
@@ -117,10 +118,12 @@ public enum EnchantmentType {
 	STARVATION(new Starvation(), false, true, false, false),
 	SUSTENANCE(new Sustenance(), true, false, false, true),
 	WEIGHTLESS(new Weightless(), false, false, false, false),
+	TECHNIQUE(new Technique(), true, false, false, true),
 	TEMPORAL_BENDER(new TemporalBender(), false, false, false, false),
 	THROWING_KNIFE(new ThrowingKnife(), false, false, false, false),
 	TRIAGE(new Triage(), true, false, false, true),
 	TRIVIUM(new Trivium(), true, false, false, true),
+	VERSATILITY(new Versatility(), true, false, false, true),
 
 	// Curses
 	CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false, false),

@@ -354,6 +354,12 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
 		mEffectDeserializer.put(ColoredGlowingEffect.effectID, ColoredGlowingEffect::deserialize);
 		mEffectDeserializer.put(FishQualityIncrease.effectID, FishQualityIncrease::deserialize);
+		mEffectDeserializer.put(GiftOfTheStars.effectID, GiftOfTheStars::deserialize);
+		mEffectDeserializer.put(BoonOfTheFracturedTree.effectID, BoonOfTheFracturedTree::deserialize);
+		mEffectDeserializer.put(SkySeekersTag.effectID, SkySeekersTag::deserialize);
+		mEffectDeserializer.put(SkySeekersGrace.effectID, SkySeekersGrace::deserialize);
+		mEffectDeserializer.put(FractalVuln.effectID, FractalVuln::deserialize);
+		mEffectDeserializer.put(FractalCooldown.effectID, FractalCooldown::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -814,7 +820,7 @@ public final class EffectManager implements Listener {
 			if (killerEffects != null) {
 				for (Map<String, NavigableSet<Effect>> priorityEffects : killerEffects.mPriorityMap.values()) {
 					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-						effectGroup.last().onKill(event);
+						effectGroup.last().onKill(event, killer);
 					}
 				}
 			}

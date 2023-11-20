@@ -29,6 +29,7 @@ public enum InfusionType {
 	ARDOR(new Ardor(), "", true, false, false, false, true, true),
 	AURA(new Aura(), "", true, false, false, false, true, true),
 	CARAPACE(new Carapace(), "", true, false, false, false, true, true),
+	CELESTIAL(new Celestial(), "", true, false, false, false, true, true),
 	CHOLER(new Choler(), "", true, false, false, false, true, true),
 	DECAPITATION(new Decapitation(), "", true, false, false, false, true, true),
 	EMPOWERED(new Empowered(), "", true, false, false, false, true, true),

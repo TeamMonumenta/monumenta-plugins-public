@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -321,6 +322,25 @@ public class PotionUtils {
 		}
 		// This method removes vanilla effects regardless of source - may need to re-apply effects from non-potion sources afterwards
 		plugin.mPotionManager.refreshEffects(player);
+	}
+
+	public static void reduceNegatives(Plugin plugin, Player player, double reduction) {
+		plugin.mPotionManager.modifyPotionDuration(player, potionInfo -> {
+			if (NEGATIVE_EFFECTS.contains(potionInfo.mType)) {
+				return (int) (potionInfo.mDuration * reduction);
+			} else {
+				return potionInfo.mDuration;
+			}
+		});
+		List<Effect> effects = EffectManager.getInstance().getAllEffects(player);
+		if (effects == null) {
+			return;
+		}
+		for (Effect effect : effects) {
+			if (effect.isDebuff()) {
+				effect.setDuration((int) (effect.getDuration() * reduction));
+			}
+		}
 	}
 
 	public static void clearNegatives(LivingEntity entity) {

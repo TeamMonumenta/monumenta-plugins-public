@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +19,7 @@ public class BonusSoulThreads extends SingleArgumentEffect {
 	}
 
 	@Override
-	public void onKill(EntityDeathEvent event) {
+	public void onKill(EntityDeathEvent event, Player player) {
 		for (ItemStack drop : event.getDrops()) {
 			String name = ItemUtils.getPlainName(drop);
 			if (name != null && name.equals("Soul Thread")) {

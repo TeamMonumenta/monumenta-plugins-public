@@ -59,6 +59,7 @@ public class DelveInfusionUtils {
 		GRACE("grace", InfusionType.GRACE, Location.KEEP, Material.CRACKED_STONE_BRICKS, "Iridium Catalysts", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
 		GALVANIC("galvanic", InfusionType.GALVANIC, Location.SCIENCE, Material.IRON_BLOCK, "Corrupted Circuits", NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
 		DECAPITATION("decapitation", InfusionType.DECAPITATION, Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
+		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
 
 		REFUND("refund", null, null, Material.GRINDSTONE, null, null, (String[]) null);
 

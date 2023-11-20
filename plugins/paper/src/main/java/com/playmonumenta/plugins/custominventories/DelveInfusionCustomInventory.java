@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.infusions.Ardor;
 import com.playmonumenta.plugins.itemstats.infusions.Aura;
 import com.playmonumenta.plugins.itemstats.infusions.Carapace;
+import com.playmonumenta.plugins.itemstats.infusions.Celestial;
 import com.playmonumenta.plugins.itemstats.infusions.Choler;
 import com.playmonumenta.plugins.itemstats.infusions.Decapitation;
 import com.playmonumenta.plugins.itemstats.infusions.Empowered;
@@ -117,6 +118,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.GRACE, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Grace.ATKS_BONUS * i) + "% attack speed" + perLevel + ".");
 		addItems(DelveInfusionSelection.GALVANIC, (i, perLevel) -> "Gain a " + StringUtils.multiplierToPercentage(Galvanic.STUN_CHANCE_PER_LVL * i) + "% chance" + perLevel + " to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.");
 		addItems(DelveInfusionSelection.DECAPITATION, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Decapitation.DAMAGE_MLT_PER_LVL * i) + "% additional damage" + perLevel + " on a critical melee strike.");
+		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
 
 		//INVALIDS ITEM.
 		//placeholder when an item can't be infused.
@@ -245,6 +247,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		itemPlacements.put(DelveInfusionSelection.QUENCH, 36);
 		itemPlacements.put(DelveInfusionSelection.GRACE, 37);
+		// UPDATE THIS CODE WHEN STAR POINT RELEASES, UNCOMMENT THE FOLLOWING 3 LINES AND DELETE THE 2 BELOW THEM.
+		//itemPlacements.put(DelveInfusionSelection.CELESTIAL, 38);
+		//itemPlacements.put(DelveInfusionSelection.GALVANIC, 39);
+		//itemPlacements.put(DelveInfusionSelection.DECAPITATION, 40);
 		itemPlacements.put(DelveInfusionSelection.GALVANIC, 38);
 		itemPlacements.put(DelveInfusionSelection.DECAPITATION, 39);
 

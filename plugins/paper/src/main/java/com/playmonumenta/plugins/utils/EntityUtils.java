@@ -1656,4 +1656,10 @@ public class EntityUtils {
 		display.setBrightness(new Display.Brightness(15, 15));
 	}
 
+	public static boolean isInFieldOfView(LivingEntity entity, LivingEntity entityInSight) {
+		Vector lineOfSight = new Vector(0, 0, 1);
+		lineOfSight.rotateAroundY(Math.toRadians(-entity.getLocation().getYaw()));
+		Vector mobToPlayer = entityInSight.getLocation().toVector().subtract(entity.getLocation().toVector());
+		return !(lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0));
+	}
 }
