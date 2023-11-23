@@ -142,7 +142,7 @@ public class SpellThrowSummon extends Spell {
 
 	@Override
 	public boolean canRun() {
-		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap) {
+		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap || mTargets.getTargetsList(mBoss).isEmpty()) {
 			return false;
 		}
 		return true;

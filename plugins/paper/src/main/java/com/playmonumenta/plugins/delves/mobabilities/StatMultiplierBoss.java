@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.abilities.Arcanic;
-import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.delves.abilities.Transcendent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -43,7 +42,7 @@ public class StatMultiplierBoss extends BossAbilityGroup {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		String spellName = event.getBossSpellName();
-		if (!(spellName != null && (Arcanic.SPELL_NAMES.contains(spellName) || Infernal.SPELL_NAMES.contains(spellName) || Transcendent.SPELL_NAMES.contains(spellName)))) {
+		if (!(spellName != null && (Arcanic.SPELL_NAMES.contains(spellName) || Transcendent.SPELL_NAMES.contains(spellName)))) {
 			// Abilities from delve modifiers only scale based on points, and not from stat compensation or region scaling (they have their own region scaling)
 			if (DelvesUtils.isDelveMob(mBoss)) {
 				// Delve mobs get point and region scaling
