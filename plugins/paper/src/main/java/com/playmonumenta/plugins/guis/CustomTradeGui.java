@@ -115,8 +115,11 @@ public class CustomTradeGui extends Gui {
 		private final List<ItemStack> mRequirements = new ArrayList<>();
 		private final int mNumRequirements;
 		private boolean mHasRequirements = true;
+		private TradeWindowOpenEvent.Trade mTrade;
 
 		public TradeReq(Player player, TradeWindowOpenEvent.Trade trade, int multiplier, boolean useCache) {
+			// Store trade:
+			mTrade = trade;
 			// Obtain the requirements for this trade:
 			for (ItemStack requirement : trade.getRecipe().getIngredients()) {
 				// Check for air or null:
@@ -190,6 +193,10 @@ public class CustomTradeGui extends Gui {
 
 		public boolean status() {
 			return mHasRequirements;
+		}
+
+		public TradeWindowOpenEvent.Trade getTrade() {
+			return mTrade;
 		}
 
 		public void removeRequirements() {
@@ -384,9 +391,12 @@ public class CustomTradeGui extends Gui {
 		if (mCurrentTab == null) {
 			mCurrentTab = mDisplayTradeTypes.get(0);
 		}
+		// Load trades for the current tab:
+		int numTrades = showTrades(mCurrentTab);
+		int pageCount = getMaxPages(numTrades);
 		// Display header and icons for all tabs:
 		setItem(0, 4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
-			"Tab: " + mCurrentTab.toString() + "\nPage: " + mCurrentPage + "/" + getMaxPages(), NamedTextColor.GRAY, 20));
+			"Tab: " + mCurrentTab.toString() + "\nPage: " + mCurrentPage + "/" + pageCount, NamedTextColor.GRAY, 20));
 		int guiCol = 1;
 		for (TradeType tradeType : mDisplayTradeTypes) {
 			setItem(5, guiCol, GUIUtils.createBasicItem((mCurrentTab == tradeType ? Material.BLUE_STAINED_GLASS_PANE : Material.CYAN_STAINED_GLASS_PANE), tradeType.toString() + (mCurrentTab == tradeType ? " (Selected)" : ""), NamedTextColor.YELLOW, false,
@@ -401,17 +411,16 @@ public class CustomTradeGui extends Gui {
 			});
 			guiCol++;
 		}
-		// Display page icons if needed:
-		int pageCount = getMaxPages();
+		// Display page icons:
 		if (mCurrentPage > pageCount) {
 			// Failsafe for a glitch or something:
 			mCurrentPage = pageCount;
 		}
 		if (mCurrentPage < pageCount) {
 			// EX - we are on page 1 out of 2:
-			setItem(5, 7, GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, "Next Page (" + (mCurrentPage + 1) + ")", NamedTextColor.YELLOW, false,
+			setItem(5, 7, GUIUtils.createBasicItem(Material.ARROW, "Next Page (" + (mCurrentPage + 1) + ")", NamedTextColor.YELLOW, false,
 				"", NamedTextColor.GRAY, 0)).onLeftClick(() -> {
-					// Page Flip:
+				// Page Flip:
 				mCurrentPage++;
 				playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
 				update();
@@ -419,9 +428,9 @@ public class CustomTradeGui extends Gui {
 		}
 		if (mCurrentPage > 1) {
 			// EX - we are on page 2:
-			setItem(5, 6, GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, "Previous Page (" + (mCurrentPage - 1) + ")", NamedTextColor.YELLOW, false,
+			setItem(5, 6, GUIUtils.createBasicItem(Material.ARROW, "Previous Page (" + (mCurrentPage - 1) + ")", NamedTextColor.YELLOW, false,
 				"", NamedTextColor.GRAY, 0)).onLeftClick(() -> {
-					// Page Flip:
+				// Page Flip:
 				mCurrentPage--;
 				playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
 				update();
@@ -432,11 +441,10 @@ public class CustomTradeGui extends Gui {
 			"Click to toggle. ", NamedTextColor.GRAY, 20)).onLeftClick(() -> {
 			// Page Flip:
 			mShowAllTrades = !mShowAllTrades;
+			mCurrentPage = 1;
 			playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
 			update();
 		});
-		// Load trades for the current tab:
-		showTrades(mCurrentTab);
 	}
 
 	private void openConfirmTradeView() {
@@ -492,9 +500,12 @@ public class CustomTradeGui extends Gui {
 				update();
 			});
 		// Back Button:
-		setItem(4, 3, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
-			"Return to the previous page.", NamedTextColor.GRAY, 40))
-			.onLeftClick(this::navReturnToPreview);
+		ItemStack backButton =
+			tradeReq.status() ?
+				GUIUtils.createCancel(List.of(Component.text("Return to the previous page.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))) :
+				GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
+					"Return to the previous page.", NamedTextColor.GRAY, 40);
+		setItem(4, 3, backButton).onLeftClick(this::navReturnToPreview);
 		// Confirm/Deny Button:
 		if (tradeReq.status()) {
 			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq)).onLeftClick(() -> {
@@ -505,9 +516,17 @@ public class CustomTradeGui extends Gui {
 		}
 	}
 
-	private void showTrades(TradeType type) {
+	private int showTrades(TradeType type) {
+		// Handle the displaying of trades, return the number of trades displayed.
+
 		// Find the right trades list:
-		List<TradeWindowOpenEvent.Trade> trades = tradeTypeToMemberList(type);
+		List<TradeWindowOpenEvent.Trade> tradeList = tradeTypeToMemberList(type);
+		// Create a list of filtered trade (requirement objects):
+		List<TradeReq> trades =
+			tradeList.stream()
+				.map(trade -> new TradeReq(mPlayer, trade, 1, true))
+				.filter(tradeReq -> mShowAllTrades || tradeReq.status())
+				.toList();
 		// Loop through and display trades from (1, 1) to (7, 4):
 		int numTrades = trades.size();
 		// Trade preview spacing:
@@ -542,19 +561,15 @@ public class CustomTradeGui extends Gui {
 					mPlayer.sendMessage("Something went wrong - if this keeps happening, please report it!");
 					MMLog.warning("Custom Trade GUI: overflow trades: " + mVillager.getName() + ", " + trades.get(i));
 					close();
-					return;
+					return 0;
 				} else {
 					guiRow++;
 					guiCol = 1;
 				}
 			}
 			// Trade preview logic:
-			TradeWindowOpenEvent.Trade trade = trades.get(i);
-			TradeReq tradeReq = new TradeReq(mPlayer, trade, 1, true);
-			// New trade toggle:
-			if (!mShowAllTrades && !tradeReq.status()) {
-				continue;
-			}
+			TradeReq tradeReq = trades.get(i);
+			TradeWindowOpenEvent.Trade trade = tradeReq.getTrade();
 			setItem(guiRow, guiCol, createTradePreviewGuiItem(trade.getRecipe(), tradeReq, true, 1)).onLeftClick(() -> {
 				if (mPebTradeGUIConfirm == 0) {
 					// Open confirm menu:
@@ -572,6 +587,7 @@ public class CustomTradeGui extends Gui {
 			});
 			guiCol += spacer;
 		}
+		return numTrades;
 	}
 
 	private void navGoToConfirm(TradeWindowOpenEvent.Trade trade) {
@@ -801,10 +817,9 @@ public class CustomTradeGui extends Gui {
 		}
 	}
 
-	private int getMaxPages() {
-		List<TradeWindowOpenEvent.Trade> trades = tradeTypeToMemberList(mCurrentTab);
+	private int getMaxPages(int tradeCount) {
 		int maxTradesPerPage = (mPebTradeGUISpacing == 1 ? 16 : 28); // 0 and 2 are auto & 28, 1 is 16.
-		return (int) Math.ceil((double) trades.size() / maxTradesPerPage);
+		return (int) Math.ceil((double) tradeCount / maxTradesPerPage);
 	}
 
 	private int getMaxTradeMultiplier(TradeWindowOpenEvent.Trade trade) {
@@ -903,18 +918,7 @@ public class CustomTradeGui extends Gui {
 	}
 
 	private ItemStack createConfirmButton(TradeWindowOpenEvent.Trade trade, MerchantRecipe recipe, TradeReq tradeReq) {
-		// Decide to confirm or deny:
-		ItemStack itemStack = new ItemStack(Material.LIME_DYE);
-		if (!tradeReq.status()) {
-			itemStack = new ItemStack(Material.BARRIER);
-		}
-		// Set item and name:
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		itemMeta.displayName(Component.text("Confirm Purchase", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-		if (!tradeReq.status()) {
-			itemMeta.displayName(Component.text("Missing material(s)", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-		}
-		// Set lore:
+		// Create lore:
 		ItemStack result = recipe.getResult();
 		ItemStack originalResult = trade.getOriginalResult();
 		if (originalResult != null) {
@@ -930,10 +934,18 @@ public class CustomTradeGui extends Gui {
 		List<Component> confirmLore = new ArrayList<>();
 		confirmLore.add(comp);
 		confirmLore.addAll(tradeReq.lore());
-		itemMeta.lore(confirmLore);
-		// Finalize:
-		itemStack.setItemMeta(itemMeta);
-		return itemStack;
+		// Set item material and name:
+		ItemStack item;
+		if (tradeReq.status()) {
+			item = GUIUtils.createConfirm(confirmLore);
+		} else {
+			item = new ItemStack(Material.BARRIER);
+			ItemMeta meta = item.getItemMeta();
+			meta.displayName(Component.text("Missing material(s)", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			meta.lore(confirmLore);
+			item.setItemMeta(meta);
+		}
+		return item;
 	}
 
 	private ItemStack createTradePreviewGuiItem(MerchantRecipe recipe, TradeReq tradeReq, boolean includePriceInLore, int multiplier) {

@@ -47,6 +47,45 @@ public class GUIUtils {
 		});
 	}
 
+	public static ItemStack createConfirm(@Nullable List<Component> lore) {
+		ItemStack confirm = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+		ItemMeta meta = confirm.getItemMeta();
+		meta.displayName(Component.text("Confirm", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		if (lore != null) { meta.lore(lore); }
+		confirm.setItemMeta(meta);
+		ItemUtils.setPlainTag(confirm);
+		NBT.modify(confirm, nbt -> {
+			nbt.getOrCreateCompound("plain").getOrCreateCompound("display").setString("Name", "gui_checkmark");
+		});
+		return confirm;
+	}
+
+	public static ItemStack createCancel(@Nullable List<Component> lore) {
+		ItemStack cancel = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
+		ItemMeta meta = cancel.getItemMeta();
+		meta.displayName(Component.text("Cancel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		if (lore != null) { meta.lore(lore); }
+		cancel.setItemMeta(meta);
+		ItemUtils.setPlainTag(cancel);
+		NBT.modify(cancel, nbt -> {
+			nbt.getOrCreateCompound("plain").getOrCreateCompound("display").setString("Name", "gui_cancel");
+		});
+		return cancel;
+	}
+
+	public static ItemStack createExclamation(@Nullable List<Component> lore) {
+		ItemStack exclamation = new ItemStack(Material.GOLD_INGOT);
+		ItemMeta meta = exclamation.getItemMeta();
+		meta.displayName(Component.text("!", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		if (lore != null) { meta.lore(lore); }
+		exclamation.setItemMeta(meta);
+		ItemUtils.setPlainTag(exclamation);
+		NBT.modify(exclamation, nbt -> {
+			nbt.getOrCreateCompound("plain").getOrCreateCompound("display").setString("Name", "gui_exclamation_mark");
+		});
+		return exclamation;
+	}
+
 	public static void splitLoreLine(ItemStack item, String lore, TextColor color, int maxLength, boolean clean) {
 		ItemMeta meta = item.getItemMeta();
 		splitLoreLine(meta, lore, color, maxLength, clean);
