@@ -925,16 +925,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		event.setDamage(event.getDamage() / mDefenseScaling);
 		mGotHit = true;
 
-		// ridiculous burst prevention, 1% above the next health action
-		double damage = event.getDamage();
-		if (mPhase == 1 && mBoss.getHealth() - damage <= MAX_HEALTH * 0.51) {
-			event.setDamage(mBoss.getHealth() - MAX_HEALTH * 0.51);
-		} else if (mPhase == 2 && mBoss.getHealth() - damage <= MAX_HEALTH * 0.34) {
-			event.setDamage(mBoss.getHealth() - MAX_HEALTH * 0.34);
-		} else if (mPhase == 3 && mBoss.getHealth() - damage <= MAX_HEALTH * 0.31) {
-			event.setDamage(mBoss.getHealth() - MAX_HEALTH * 0.31);
-		}
-
 		// death check
 		if (mBoss.getHealth() - event.getDamage() <= 0) {
 			event.setCancelled(true);

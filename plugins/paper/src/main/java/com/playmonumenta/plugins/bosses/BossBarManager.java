@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Map;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -25,18 +24,24 @@ public class BossBarManager {
 	private final @Nullable Map<Integer, BossHealthAction> mEvents;
 	private final BossBar mBar;
 	private int mEventCursor;
+	private final boolean mCapDamage;
 
 	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events) {
 		this(plugin, boss, range, color, style, events, true);
 	}
 
 	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog) {
+		this(plugin, boss, range, color, style, events, bossFog, true);
+	}
+
+	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mEvents = events;
 		mEventCursor = 100;
-		double progress = mBoss.getHealth() / EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0);
+		mCapDamage = capDamage;
+		double progress = mBoss.getHealth() / EntityUtils.getMaxHealth(mBoss);
 		while (mEvents != null && mEventCursor > (progress * 100)) {
 			mEventCursor--;
 		}
@@ -68,26 +73,42 @@ public class BossBarManager {
 			}
 		}
 
-		double progress = mBoss.getHealth() / EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0);
-		if (mEvents != null && (progress * 100) > 99 && mEventCursor >= 99) {
-			BossHealthAction event = mEvents.get(mEventCursor);
-			if (event != null) {
-				event.run(mBoss);
+		double maxHealth = EntityUtils.getMaxHealth(mBoss);
+		double progress = mBoss.getHealth() / maxHealth;
+		if (mEvents != null) {
+			if (progress * 100 > 99 && mEventCursor >= 99) {
+				BossHealthAction event = mEvents.get(mEventCursor);
+				if (event != null) {
+					event.run(mBoss);
+					if (mCapDamage) {
+						double cap = mEventCursor / 100.0;
+						mBoss.setHealth(maxHealth * cap);
+						mBar.setProgress(cap);
+					}
+				}
+				mEventCursor--;
 			}
-			mEventCursor--;
-		}
-		while (mEvents != null && mEventCursor > (progress * 100)) {
-			BossHealthAction event = mEvents.get(mEventCursor);
-			if (event != null) {
-				event.run(mBoss);
+			while (true) {
+				progress = mBoss.getHealth() / maxHealth;
+				if (mEventCursor <= progress * 100) {
+					break;
+				}
+				BossHealthAction event = mEvents.get(mEventCursor);
+				if (event != null) {
+					event.run(mBoss);
+					if (mCapDamage) {
+						double cap = mEventCursor / 100.0;
+						mBoss.setHealth(maxHealth * cap);
+						mBar.setProgress(cap);
+					}
+				}
+				mEventCursor--;
 			}
-			mEventCursor--;
 		}
 
 		if (!Double.isFinite(progress) || progress > 1.0f || progress < 0f) {
 			mPlugin.getLogger().severe("Boss '" + mBoss.getName() + "' has invalid health " +
-				mBoss.getHealth() + " out of max " +
-				EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0));
+				mBoss.getHealth() + " out of max " + maxHealth);
 		} else {
 			mBar.setProgress(progress);
 		}
