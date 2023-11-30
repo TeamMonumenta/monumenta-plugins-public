@@ -67,8 +67,7 @@ public class ChainHealingWave extends Ability {
 			)
 			.simpleDescription("Cast a heal that will bounce between teammates and your totems.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChainHealingWave::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChainHealingWave::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.WHITE_CANDLE);
 
 	public final double mBounceRange;
