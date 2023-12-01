@@ -5,27 +5,43 @@ import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.effects.DisplayableEffect;
+import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	private static final Pattern SHARD_NUMBER_PATTERN = Pattern.compile("(?:-|^dev)(\\d+)$");
+
+	private static final List<Pair<String, String>> mShrineNames = new ArrayList<>(
+		Arrays.asList(
+			Pair.of("Speed", "D1Finished"),
+			Pair.of("Resistance", "D3Finished"),
+			Pair.of("Strength", "D4Finished"),
+			Pair.of("Intuitive", "D5Finished"),
+			Pair.of("Thrift", "D6Finished"),
+			Pair.of("Harvester", "D7Finished")
+		)
+	);
+
+	private List<Pair<String, String>> mActiveShrines = new ArrayList<>();
+
+	protected @Nullable BukkitTask mSystemTask = null;
 
 	private final Plugin mPlugin;
 
@@ -33,6 +49,19 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		super();
 		plugin.getLogger().info("Enabling PlaceholderAPI integration");
 		mPlugin = plugin;
+		mSystemTask = new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				List<Pair<String, String>> activeShrines = new ArrayList<>();
+				for (Pair<String, String> shrine : mShrineNames) {
+					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", shrine.getRight()).orElse(0) > 1) {
+						activeShrines.add(shrine);
+					}
+				}
+				mActiveShrines = activeShrines;
+			}
+		}.runTaskTimer(mPlugin, 0, 15);
 	}
 
 	@Override
@@ -84,69 +113,68 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			return "1";
 		}
 
+		if (identifier.startsWith("shrine_active_count")) {
+			return Integer.toString(mActiveShrines.size());
+		}
+
 		if (identifier.startsWith("shrineicon")) {
-			String shrineType = identifier.substring("shrineicon_".length());
-			if ((shrineType.equalsIgnoreCase("Speed") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D1Finished").orElse(0) > 1) ||
-				    (shrineType.equalsIgnoreCase("Resistance") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D3Finished").orElse(0) > 1) ||
-				    (shrineType.equalsIgnoreCase("Strength") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D4Finished").orElse(0) > 1) ||
-				    (shrineType.equalsIgnoreCase("Intuitive") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D5Finished").orElse(0) > 1) ||
-				    (shrineType.equalsIgnoreCase("Thrift") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D6Finished").orElse(0) > 1) ||
-				    (shrineType.equalsIgnoreCase("Harvester") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D7Finished").orElse(0) > 1)) {
-				return "active";
+			if (identifier.contains("simplified")) {
+				int index = identifier.substring("shrineicon_simplified_".length()).isEmpty() ? 0 :
+					Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
+				if (index <= mActiveShrines.size()) {
+					Pair<String, String> currentShrine = mActiveShrines.get(index);
+					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0) > 1) {
+						return "active/" + currentShrine.getLeft();
+					} else {
+						return "inactive/" + currentShrine.getLeft();
+					}
+				}
+			} else {
+				String shrineType = identifier.substring("shrineicon_".length());
+				for (Pair<String, String> shrineName : mShrineNames) {
+					if (shrineName.getLeft().equalsIgnoreCase(shrineType)) {
+						if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", shrineName.getRight()).orElse(0) > 1) {
+							return "active";
+						} else {
+							return "inactive";
+						}
+					}
+				}
+				return "inactive";
 			}
-			return "inactive";
 		}
 
 		if (identifier.startsWith("shrine")) {
-			String shrineType = identifier.substring("shrine_".length());
 			int remainingTime;
-			if (shrineType.equalsIgnoreCase("Speed")) {
-				remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D1Finished").orElse(0);
-				if (remainingTime > 1) {
-					remainingTime = (int) Math.floor(remainingTime / 60.0);
-					return ChatColor.AQUA + "Speed: " + ChatColor.WHITE + remainingTime + "m";
+			if (identifier.contains("simplified")) {
+				int index = identifier.substring("shrine_simplified_".length()).isEmpty() ? 0 :
+					Integer.parseInt(identifier.substring("shrine_simplified_".length()));
+				if (index <= mActiveShrines.size()) {
+					Pair<String, String> currentShrine = mActiveShrines.get(index);
+					remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0);
+					if (remainingTime >= 1) {
+						remainingTime = (int) Math.floor(remainingTime / 60.0);
+						return ChatColor.AQUA + currentShrine.getLeft() + ": " + ChatColor.WHITE + remainingTime + "m";
+					} else {
+						mActiveShrines.remove(index);
+						return "";
+					}
 				} else {
-					return ChatColor.AQUA + "Speed" + ChatColor.WHITE + " is not active.";
+					return "";
 				}
-			} else if (shrineType.equalsIgnoreCase("Resistance")) {
-				remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D3Finished").orElse(0);
-				if (remainingTime > 1) {
-					remainingTime = (int) Math.floor(remainingTime / 60.0);
-					return ChatColor.GRAY + "Resistance: " + ChatColor.WHITE + remainingTime + "m";
-				} else {
-					return ChatColor.GRAY + "Resistance" + ChatColor.WHITE + " is not active.";
-				}
-			} else if (shrineType.equalsIgnoreCase("Strength")) {
-				remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D4Finished").orElse(0);
-				if (remainingTime > 1) {
-					remainingTime = (int) Math.floor(remainingTime / 60.0);
-					return ChatColor.DARK_RED + "Strength: " + ChatColor.WHITE + remainingTime + "m";
-				} else {
-					return ChatColor.DARK_RED + "Strength" + ChatColor.WHITE + " is not active.";
-				}
-			} else if (shrineType.equalsIgnoreCase("Intuitive")) {
-				remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D5Finished").orElse(0);
-				if (remainingTime > 1) {
-					remainingTime = (int) Math.floor(remainingTime / 60.0);
-					return ChatColor.GOLD + "Intuitive: " + ChatColor.WHITE + remainingTime + "m";
-				} else {
-					return ChatColor.GOLD + "Intuitive" + ChatColor.WHITE + " is not active.";
-				}
-			} else if (shrineType.equalsIgnoreCase("Thrift")) {
-				remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D6Finished").orElse(0);
-				if (remainingTime > 1) {
-					remainingTime = (int) Math.floor(remainingTime / 60.0);
-					return ChatColor.LIGHT_PURPLE + "Thrift: " + ChatColor.WHITE + remainingTime + "m";
-				} else {
-					return ChatColor.LIGHT_PURPLE + "Thrift" + ChatColor.WHITE + " is not active.";
-				}
-			} else if (shrineType.equalsIgnoreCase("Harvester")) {
-				remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D7Finished").orElse(0);
-				if (remainingTime > 1) {
-					remainingTime = (int) Math.floor(remainingTime / 60.0);
-					return ChatColor.DARK_GREEN + "Harvester: " + ChatColor.WHITE + remainingTime + "m";
-				} else {
-					return ChatColor.DARK_GREEN + "Harvester" + ChatColor.WHITE + " is not active.";
+
+			} else {
+				String shrineType = identifier.substring("shrine_".length());
+				for (Pair<String, String> shrineName : mShrineNames) {
+					if (shrineName.getLeft().equalsIgnoreCase(shrineType)) {
+						remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", shrineName.getRight()).orElse(0);
+						if (remainingTime >= 1) {
+							remainingTime = (int) Math.floor(remainingTime / 60.0);
+							return ChatColor.AQUA + shrineName.getLeft() + ": " + ChatColor.WHITE + remainingTime + "m";
+						} else {
+							return ChatColor.AQUA + shrineName.getLeft() + ChatColor.WHITE + " is not active.";
+						}
+					}
 				}
 			}
 		}

@@ -135,6 +135,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	}
 
+	public void entityUpdateEffect(Entity entity) {
+
+	}
+
 	// Serialize effects into JSON for debug and saving purposes.
 	// Override this if we need to save the effect, for effects that we can care less about
 	// though, just leave this be for String output purposes.
@@ -184,9 +188,17 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	@Override
 	public @Nullable String getDisplay() {
 		if (mDisplay) {
+			return getDisplayWithoutTime() + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
+		}
+		return null;
+	}
+
+	@Override
+	public @Nullable String getDisplayWithoutTime() {
+		if (mDisplay) {
 			String specificDisplay = getSpecificDisplay();
 			if (specificDisplay != null) {
-				return ChatColor.GREEN + specificDisplay + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
+				return ChatColor.GREEN + specificDisplay;
 			}
 		}
 		return null;

@@ -33,6 +33,11 @@ public class BrownPolarityDisplay {
 		public String getDisplay() {
 			return mDisplay;
 		}
+
+		@Override
+		public String getDisplayWithoutTime() {
+			return mDisplay;
+		}
 	}
 
 	private static boolean IS_INITIALIZED = false;

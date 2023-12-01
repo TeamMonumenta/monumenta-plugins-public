@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.guis.CustomTradeGui;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -288,7 +289,20 @@ public class PEBCustomInventory extends CustomInventory {
 				}),
 			new PebItem(32, "Trading GUI Options",
 				"Click to choose your NPC trading preferences.", NamedTextColor.LIGHT_PURPLE,
-				Material.DEEPSLATE_EMERALD_ORE, false).switchToPage(PebPage.TRADE_GUI)
+				Material.DEEPSLATE_EMERALD_ORE, false).switchToPage(PebPage.TRADE_GUI),
+			new PebItem(33, "Simplified Tab List",
+				"Click to enable or disable the simplified tab list, removing custom effects from the tab list."
+				+ " Recommended if using an up-to-date version of the Unofficial Monumenta Mod (1.9.8+).", NamedTextColor.LIGHT_PURPLE,
+				Material.FLOWER_BANNER_PATTERN, false)
+				.action((peb, event) -> {
+					if (peb.mPlayer.hasPermission("monumenta.tablist.simplified")) {
+						LuckPermsIntegration.setPermission(peb.mPlayer, "monumenta.tablist.simplified", false);
+						peb.mPlayer.sendMessage(Component.text("Simplified Tab List has been disabled!", NamedTextColor.GOLD));
+					} else {
+						LuckPermsIntegration.setPermission(peb.mPlayer, "monumenta.tablist.simplified", true);
+						peb.mPlayer.sendMessage(Component.text("Simplified Tab List has been enabled!", NamedTextColor.GOLD));
+					}
+				})
 		);
 
 		// Trade GUI Options

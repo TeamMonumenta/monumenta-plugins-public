@@ -16,6 +16,8 @@ public interface DisplayableEffect {
 
 	@Nullable String getDisplay();
 
+	@Nullable String getDisplayWithoutTime();
+
 	static List<DisplayableEffect> getEffects(Plugin plugin, LivingEntity entity) {
 		List<DisplayableEffect> effects = new ArrayList<>(plugin.mEffectManager.getPriorityEffects(entity).values());
 		effects.addAll(AbsorptionUtils.getAbsorptionDisplayables(entity));

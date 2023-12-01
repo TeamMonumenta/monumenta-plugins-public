@@ -187,7 +187,12 @@ public class AbsorptionUtils {
 
 		@Override
 		public String getDisplay() {
-			return ChatColor.YELLOW + "" + StringUtils.to2DP(mAmount) + " Absorption " + ChatColor.GRAY + "" + StringUtils.intToMinuteAndSeconds(mDuration / 20);
+			return getDisplayWithoutTime() + ChatColor.GRAY + "" + StringUtils.intToMinuteAndSeconds(mDuration / 20);
+		}
+
+		@Override
+		public String getDisplayWithoutTime() {
+			return ChatColor.YELLOW + "" + StringUtils.to2DP(mAmount) + " Absorption ";
 		}
 
 

@@ -40,6 +40,11 @@ public class GalleryPhoenixEffect extends GalleryEffect {
 
 	@Override
 	public String getDisplay() {
+		return getDisplayWithoutTime();
+	}
+
+	@Override
+	public String getDisplayWithoutTime() {
 		return ChatColor.GOLD + mType.getRealName();
 	}
 

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ToggleSwap;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
@@ -48,13 +49,9 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import de.tr7zw.nbtapi.NBTEntity;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -227,6 +224,12 @@ public class PlayerListener implements Listener {
 		//TODO: Remove this when custom effects logout handling is better dealt with
 		EntityUtils.applyRecoilDisable(mPlugin, 9999, 99, player);
 
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			if (ClientModHandler.playerHasClientMod(player)) {
+				ClientModHandler.updateEffects(player);
+			}
+		}, 20);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

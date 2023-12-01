@@ -10,18 +10,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MMLog;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.TreeSet;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.bukkit.Bukkit;
@@ -424,23 +416,25 @@ public final class EffectManager implements Listener {
 						}
 
 						for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
-							Iterator<NavigableSet<Effect>> priorityEffectsIter = priorityEffects.values().iterator();
+							Iterator<Map.Entry<String, NavigableSet<Effect>>> priorityEffectsIter = priorityEffects.entrySet().iterator();
 							while (priorityEffectsIter.hasNext()) {
-								NavigableSet<Effect> effectGroup = priorityEffectsIter.next();
-								if (effectGroup.isEmpty()) {
+								Map.Entry<String, NavigableSet<Effect>> effectGroup = priorityEffectsIter.next();
+								if (effectGroup.getValue().isEmpty()) {
 									priorityEffectsIter.remove();
+									ClientModHandler.updateEffects(entity);
 									continue;
 								}
 
 								boolean currentEffectRemoved = false;
-								Effect currentEffect = effectGroup.last();
-								Iterator<Effect> effectGroupIter = effectGroup.descendingIterator();
+								Effect currentEffect = effectGroup.getValue().last();
+								Iterator<Effect> effectGroupIter = effectGroup.getValue().descendingIterator();
 								while (effectGroupIter.hasNext()) {
 									Effect effect = effectGroupIter.next();
 
 									if (currentEffectRemoved) {
 										try {
 											effect.entityGainEffect(entity);
+											ClientModHandler.updateEffect(entity, effect, effectGroup.getKey(), false);
 										} catch (Exception ex) {
 											MMLog.severe("Error in effect manager entityGainEffect: " + ex.getMessage());
 											ex.printStackTrace();
@@ -462,6 +456,7 @@ public final class EffectManager implements Listener {
 										if (effect == currentEffect) {
 											try {
 												effect.entityLoseEffect(entity);
+												ClientModHandler.updateEffect(entity, effect, effectGroup.getKey(), true);
 											} catch (Exception ex) {
 												MMLog.severe("Error in effect manager entityLoseEffect: " + ex.getMessage());
 												ex.printStackTrace();
@@ -471,8 +466,8 @@ public final class EffectManager implements Listener {
 
 										effectGroupIter.remove();
 
-										if (!effectGroup.isEmpty()) {
-											currentEffect = effectGroup.last();
+										if (!effectGroup.getValue().isEmpty()) {
+											currentEffect = effectGroup.getValue().last();
 										} else {
 											priorityEffectsIter.remove();
 										}
@@ -516,6 +511,7 @@ public final class EffectManager implements Listener {
 
 			Effects effects = mEntities.computeIfAbsent(entity, Effects::new);
 			effects.addEffect(source, effect);
+			ClientModHandler.updateEffect(entity, effect, source, false);
 		}
 	}
 
@@ -660,7 +656,14 @@ public final class EffectManager implements Listener {
 	public @Nullable NavigableSet<Effect> clearEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
-			return effects.clearEffects(source);
+			NavigableSet<Effect> removedEffects = effects.clearEffects(source);
+			if (entity instanceof Player player
+				&& removedEffects != null) {
+				for (Effect effect : removedEffects) {
+					ClientModHandler.updateEffect(player, effect, source, true);
+				}
+			}
+			return removedEffects;
 		}
 
 		return null;
@@ -675,6 +678,9 @@ public final class EffectManager implements Listener {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			effects.clearEffects();
+			if (entity instanceof Player player) {
+				ClientModHandler.updateEffects(player);
+			}
 			mEntities.remove(entity);
 		}
 	}
@@ -848,9 +854,11 @@ public final class EffectManager implements Listener {
 						// Effect is Buff, set duration based on Phylactery value.
 						effect.setDuration((int) (effect.getDuration() * phylactery * Phylactery.DURATION_KEPT));
 						effect.entityLoseEffect(player);
+						effect.entityUpdateEffect(player);
 					} else {
 						// Effect is Debuff (or not stated), set duration to 0.
 						effect.setDuration(0);
+						effect.entityUpdateEffect(player);
 					}
 				}
 			}
@@ -999,6 +1007,7 @@ public final class EffectManager implements Listener {
 					String source = getSource(player, effect);
 					// Recall Effect Gain Function to regain buffs one tick later.
 					effect.entityLoseEffect(player);
+					ClientModHandler.updateEffect(player, effect, source, true);
 					if (source != null) {
 						Bukkit.getScheduler().runTaskLater(plugin, () -> {
 							NavigableSet<Effect> effectsInSource = getEffects(player, source);
@@ -1009,6 +1018,7 @@ public final class EffectManager implements Listener {
 							// Really, it's more insurance to ensure we don't have another bug in our hands due to all the delay stuff.
 							if (effectsInSource != null && effectsInSource.last() == effect && effectsInSource.last().getDuration() == effect.getDuration() && effect.getDuration() > 0) {
 								effect.entityGainEffect(player);
+								ClientModHandler.updateEffect(player, effect, source, false);
 							}
 						}, 1);
 					}

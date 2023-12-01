@@ -18,8 +18,12 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
+import java.util.UUID;
 import java.util.function.Predicate;
+
+import com.playmonumenta.plugins.effects.Effect;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
@@ -120,6 +124,52 @@ public class ClientModHandler {
 		INSTANCE.sendPacket(player, packet);
 	}
 
+	public static void updateEffects(Entity entity) {
+		if (INSTANCE == null
+			|| !(entity instanceof Player player)
+			|| !playerHasClientMod(player)) {
+			return;
+		}
+		EffectInfo[] effectsList = INSTANCE.mPlugin.mEffectManager.getPriorityEffects(player).entrySet().stream()
+			.filter(effect -> effect != null && effect.getValue().doesDisplay() && effect.getValue().getDisplayWithoutTime() != null)
+			.map(effect -> {
+				EffectInfo info = new EffectInfo();
+				mapEffectToEffectInfo(effect.getValue(), info, effect.getKey(), false);
+				return info;
+			})
+			.sorted((effect1, effect2) -> effect2.displayPriority - effect1.displayPriority)
+			.toArray(EffectInfo[]::new);
+
+		MassEffectUpdatePacket packet = new MassEffectUpdatePacket();
+		packet.effects = effectsList;
+		INSTANCE.sendPacket(player, packet);
+	}
+
+	public static void updateEffect(Entity entity, Effect effect, String source, boolean remove) {
+		if (INSTANCE == null
+			|| !(entity instanceof Player player)
+			|| !playerHasClientMod(player)
+			|| effect == null
+			|| !effect.doesDisplay()
+			|| effect.getDisplayWithoutTime() == null) {
+			return;
+		}
+		EffectInfo info = new EffectInfo();
+		mapEffectToEffectInfo(effect, info, source, remove);
+		EffectUpdatePacket packet = new EffectUpdatePacket();
+		packet.effect = info;
+		INSTANCE.sendPacket(player, packet);
+	}
+
+	public static void mapEffectToEffectInfo(Effect effect, EffectInfo info, String source, boolean remove) {
+		info.UUID = UUID.nameUUIDFromBytes(source.getBytes(StandardCharsets.UTF_8)).toString();
+		info.duration = remove ? 0 : effect.getDuration();
+		info.name = effect.getDisplayWithoutTime() != null ? effect.getDisplayWithoutTime() : "";
+		info.percentage = effect.getDisplay() != null && effect.getDisplay().contains("%");
+		info.power = (int) effect.getMagnitude();
+		info.displayPriority = effect.getDisplayPriority();
+	}
+
 	public static void silenced(Player player, int duration) {
 		if (INSTANCE == null) {
 			return;
@@ -184,7 +234,7 @@ public class ClientModHandler {
 		return null;
 	}
 
-	private static boolean playerHasClientMod(Player player) {
+	public static boolean playerHasClientMod(Player player) {
 		return player.getListeningPluginChannels().contains(CHANNEL_ID);
 	}
 
@@ -271,6 +321,34 @@ public class ClientModHandler {
 
 		@Nullable Integer count;
 
+	}
+
+	@SuppressWarnings("unused")
+	public static class MassEffectUpdatePacket implements Packet {
+		String _type = "MassEffectUpdatePacket";
+
+		//when received, will clear stored effects.
+		public @Nullable EffectInfo[] effects;
+	}
+
+	@SuppressWarnings("unused")
+	public static class EffectUpdatePacket implements Packet {
+		String _type = "EffectUpdatePacket";
+
+		public @Nullable EffectInfo effect;
+	}
+
+	@SuppressWarnings("NullAway")
+	public static class EffectInfo {
+		public String UUID;
+		public int displayPriority;
+
+		public String name;
+		public Integer duration;
+		public double power;
+
+		public boolean positive;
+		public boolean percentage;
 	}
 
 }

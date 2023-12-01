@@ -10,6 +10,7 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.query.QueryOptions;
@@ -38,6 +39,13 @@ public class LuckPermsIntegration {
 		TestGuild.register();
 		TeleportGuild.register();
 		SetGuildTeleport.register(plugin);
+	}
+
+	public static void setPermission(Player player, String permission, boolean value) {
+		UM.modifyUser(player.getUniqueId(), user -> {
+			// Add the permission
+			user.data().add(Node.builder(permission).value(value).build());
+		});
 	}
 
 	public static @Nullable Group getGuild(Player player) {
