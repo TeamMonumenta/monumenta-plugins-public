@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -138,10 +139,16 @@ public class StarfallBoss extends BossAbilityGroup {
 							if (mCurrentHeight <= 0) {
 								p.PARTICLE_EXPLOSION.spawn(boss, meteorCenter, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, 0.1);
 								p.SOUND_EXPLOSION.play(meteorCenter);
-								Entity spawn = p.SPAWNED_MOB_POOL.spawn(meteorCenter);
-								if (spawn != null) {
-									summonPlugins(spawn);
+
+								// don't spawn in safe zones!
+								if (!ZoneUtils.hasZoneProperty(meteorCenter, ZoneUtils.ZoneProperty.RESIST_5) || ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
+									Entity spawn = p.SPAWNED_MOB_POOL.spawn(meteorCenter);
+									if (spawn != null) {
+										summonPlugins(spawn);
+									}
 								}
+
+
 								for (LivingEntity target : p.TARGETS_EXPLOSION.getTargetsListByLocation(mBoss, meteorCenter)) {
 
 									if (p.DAMAGE > 0) {

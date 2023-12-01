@@ -132,6 +132,7 @@ public class EntityListener implements Listener {
 	private static final NamespacedKey INVISIBLE_ITEM_FRAME_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/invisible_item_frame");
 
 	private static final String FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY = "MonumentaFallingBlockAdventureMode";
+	private static final String FALLING_BLOCK_NO_PLACE_ADVENTURE_MODE_TAG = "DisableBlockPlacementAdventureMode";
 
 	private static final String AREA_EFFECT_CLOUD_POTION_METAKEY = "MonumentaAreaEffectCloudPotion";
 
@@ -943,7 +944,8 @@ public class EntityListener implements Listener {
 		// Note that this event is also called when the block starts to fall, thus a missing metadata on the block is assumed to be that start event and thus allowed
 		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)
 			    && event.getEntity() instanceof FallingBlock fallingBlock
-			    && !MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)) {
+			    && (!MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)
+				    || fallingBlock.getScoreboardTags().contains(FALLING_BLOCK_NO_PLACE_ADVENTURE_MODE_TAG))) {
 			if (fallingBlock.getDropItem()) {
 				Material material = fallingBlock.getBlockData().getMaterial();
 				if (!material.isAir() && material != Material.FROSTED_ICE) { // this can apparently happen, and frosted ice somehow gets turned into air too?
