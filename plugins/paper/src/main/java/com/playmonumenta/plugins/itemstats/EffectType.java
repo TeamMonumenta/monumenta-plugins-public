@@ -4,21 +4,32 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.*;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -148,7 +159,10 @@ public enum EffectType {
 	TUATHAN_BLESSING("TuathanBlessing", "Tuathan Blessing", true, false, true),
 	GIFT_OF_THE_STARS("GiftOfTheStars", "Gift of the Stars", true, false, true),
 	BOON_OF_THE_FRACTURED_TREE("BoonOfTheFracturedTree", "Boon of the Fractured Tree", true, false, true),
-	SKY_SEEKERS_GRACE("SkySeekersGrace", "Sky Seeker's Grace", true, false, true);
+	SKY_SEEKERS_GRACE("SkySeekersGrace", "Sky Seeker's Grace", true, false, true),
+
+	CLUCKING("Clucking", "Clucking", false, true, true),
+	;
 
 
 	public static final String KEY = "Effects";
@@ -263,6 +277,9 @@ public enum EffectType {
 			includeTime = false;
 		} else if (effectType.isConstant()) {
 			text = effectType.mName;
+			if (effectType == CLUCKING) {
+				includeTime = false;
+			}
 		} else if (effectType.getPotionEffectType() != null) {
 			text = effectType.mName + " " + StringUtils.toRoman((int) strength);
 		} else if (effectType.getType().contains("Instant")) {
@@ -329,6 +346,19 @@ public enum EffectType {
 			}
 			DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
 			return;
+		} else if (effectType == CLUCKING) {
+			if (entity instanceof Player player) {
+				List<ItemStack> cluckingCandidates = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
+				cluckingCandidates.add(player.getInventory().getItemInOffHand());
+				cluckingCandidates.removeIf(item -> item == null || item.getType() == Material.AIR || ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CLUCKING) > 0);
+				if (!cluckingCandidates.isEmpty()) {
+					ItemStack item = cluckingCandidates.get(FastUtils.RANDOM.nextInt(cluckingCandidates.size()));
+					ItemStatUtils.addEnchantment(item, EnchantmentType.CLUCKING, 1);
+					ItemUpdateHelper.generateItemStats(item);
+					plugin.mItemStatManager.updateStats(player);
+					new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(player);
+				}
+			}
 		}
 
 		String sourceString = source != null ? source : effectType.mType;

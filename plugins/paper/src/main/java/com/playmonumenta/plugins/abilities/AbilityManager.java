@@ -54,7 +54,6 @@ import com.playmonumenta.plugins.abilities.other.AttribaAttackSpeed;
 import com.playmonumenta.plugins.abilities.other.AttribaKnockbackResistance;
 import com.playmonumenta.plugins.abilities.other.AttribaMaxHealth;
 import com.playmonumenta.plugins.abilities.other.AttribaMovementSpeed;
-import com.playmonumenta.plugins.abilities.other.CluckingPotions;
 import com.playmonumenta.plugins.abilities.other.PatronGreen;
 import com.playmonumenta.plugins.abilities.other.PatronPurple;
 import com.playmonumenta.plugins.abilities.other.PatronRed;
@@ -234,11 +233,6 @@ public class AbilityManager {
 		mDisabledSpecAbilities = new ArrayList<>();
 
 		mReferenceAbilities.addAll(Arrays.asList(
-			// ALL (CLUCKING POTIONS)
-			CluckingPotions.INFO,
-
-			// ALL PLAYERS (but technically for Cleric)
-
 			// ALL Attriba
 			AttribaAttackDamage.INFO,
 			AttribaAttackSpeed.INFO,
