@@ -45,4 +45,7 @@ public enum DepthsTree {
 		return GUIUtils.createBasicItem(mMaterial, 1, getNameComponent(), mDescription, NamedTextColor.GRAY, 30, true);
 	}
 
+	public ItemStack createItemWithDescription(String description) {
+		return GUIUtils.createBasicItem(mMaterial, 1, getNameComponent(), description, NamedTextColor.GRAY, 30, true);
+	}
 }

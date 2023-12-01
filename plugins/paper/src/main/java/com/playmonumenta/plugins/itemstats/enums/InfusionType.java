@@ -52,6 +52,15 @@ public enum InfusionType {
 	UNYIELDING(new Unyielding(), "", true, false, false, false, true, true),
 	USURPER(new Usurper(), "", true, false, false, false, true, true),
 	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true),
+	// Ichor Imbuements
+	ICHOR_DAWNBRINGER(new IchorDawnbringer(), "Imbued", false, false, false, false, false, false),
+	ICHOR_EARTHBOUND(new IchorEarthbound(), "Imbued", false, false, false, false, false, false),
+	ICHOR_FLAMECALLER(new IchorFlamecaller(), "Imbued", false, false, false, false, false, false),
+	ICHOR_FROSTBORN(new IchorFrostborn(), "Imbued", false, false, false, false, false, false),
+	ICHOR_PRISMATIC(new IchorPrismatic(), "Imbued", false, false, false, false, false, false),
+	ICHOR_SHADOWDANCER(new IchorShadowdancer(), "Imbued", false, false, false, false, false, false),
+	ICHOR_STEELSAGE(new IchorSteelsage(), "Imbued", false, false, false, false, false, false),
+	ICHOR_WINDWALKER(new IchorWindwalker(), "Imbued", false, false, false, false, false, false),
 	// Other Added Tags
 	LOCKED(new Locked(), "", false, false, false, false, false, false),
 	BARKING(new Barking(), "", true, false, true, false, false, false),
@@ -87,6 +96,7 @@ public enum InfusionType {
 	STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false, false),
 	STAT_TRACK_HEALING_DONE(new StatTrackHealingDone(), "", true, false, false, true, false, false),
 	STAT_TRACK_FISH_CAUGHT(new StatTrackFishCaught(), "", true, false, false, true, false, false);
+
 	public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
 		.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 

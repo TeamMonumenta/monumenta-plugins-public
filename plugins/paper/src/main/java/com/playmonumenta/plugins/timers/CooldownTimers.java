@@ -147,6 +147,50 @@ public class CooldownTimers {
 		}
 	}
 
+	/**
+	 * Reduces the players ticks on all of their cooldowns.
+	 *
+	 * @param player The player whose cooldown ticks will be updated
+	 * @param modifier  The cooldown reduction % to apply, e.g. 0.05 will be a 5% reduction.
+	 *
+	 * @return Number of abilities that had their cooldowns reduced.
+	 */
+	public int updateCooldownsPercent(Player player, double modifier) {
+		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
+		AbilityCollection abilityCollection = mPlugin.mAbilityManager.getPlayerAbilities(player);
+		if (cds == null) {
+			return 0;
+		}
+
+		int abilitiesReduced = cds.size();
+
+		Iterator<Entry<ClassAbility, Integer>> it = cds.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<ClassAbility, Integer> entry = it.next();
+			ClassAbility spell = entry.getKey();
+			Ability ability = abilityCollection.getAbility(spell);
+			if (ability == null) {
+				continue;
+			}
+
+			int cd = entry.getValue();
+			cd = (int) (cd - ability.getModifiedCooldown() * modifier);
+			if (cd <= 0) {
+				showOffCooldownMessage(player, spell);
+				it.remove();
+			} else {
+				cds.put(spell, cd);
+			}
+			ClientModHandler.updateAbility(player, spell);
+		}
+
+		if (cds.isEmpty()) {
+			mTimers.remove(player.getUniqueId());
+		}
+
+		return abilitiesReduced;
+	}
+
 	public void updateCooldown(Player player, ClassAbility spell, int ticks) {
 		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
 

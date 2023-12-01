@@ -827,7 +827,7 @@ public class ItemStatUtils {
 		return newItem;
 	}
 
-public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
+	public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
 			return null;

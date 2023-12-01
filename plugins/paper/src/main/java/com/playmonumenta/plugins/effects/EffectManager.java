@@ -360,6 +360,9 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(SkySeekersGrace.effectID, SkySeekersGrace::deserialize);
 		mEffectDeserializer.put(FractalVuln.effectID, FractalVuln::deserialize);
 		mEffectDeserializer.put(FractalCooldown.effectID, FractalCooldown::deserialize);
+		mEffectDeserializer.put(IchorCooldown.effectID, IchorCooldown::deserialize);
+		mEffectDeserializer.put(IchorEarthEffect.effectID, IchorEarthEffect::deserialize);
+		mEffectDeserializer.put(IchorSteelEffect.effectID, IchorSteelEffect::deserialize);
 	}
 
 	private static final int PERIOD = 5;

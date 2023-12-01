@@ -475,6 +475,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PotionBarrelListener(), this);
 		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
 		manager.registerEvents(new TorchListener(), this);
+		manager.registerEvents(new IchorListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);

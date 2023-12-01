@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.guis.FishingDifficultyGui;
+import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
+import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -17,6 +19,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class CustomInventoryCommands {
@@ -184,6 +187,26 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new FishingDifficultyGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("openichorinfusiongui")
+			.withPermission("monumenta.command.openichorinfusiongui")
+			.executesPlayer((player, args) -> {
+				ItemStack mainhand = player.getInventory().getItemInMainHand();
+				if (IchorListener.isIchor(mainhand)) {
+					new IchorSelectionGUI(player).open();
+				}
+			})
+			.register();
+		new CommandAPICommand("openichorinfusiongui")
+			.withPermission("monumenta.command.openichorinfusiongui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				ItemStack mainhand = player.getInventory().getItemInMainHand();
+				if (IchorListener.isIchor(mainhand)) {
+					new IchorSelectionGUI(player).open();
+				}
 			})
 			.register();
 		new CommandAPICommand("openclassgui")
