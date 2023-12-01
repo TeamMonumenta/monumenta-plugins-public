@@ -51,6 +51,7 @@ import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
+import com.playmonumenta.plugins.minigames.pzero.PzeroManager;
 import com.playmonumenta.plugins.mmquest.commands.MMQuest;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
@@ -165,6 +166,7 @@ public class Plugin extends JavaPlugin {
 	public CosmeticsManager mCosmeticsManager;
 	public VanityManager mVanityManager;
 	public LoadoutManager mLoadoutManager;
+	public PzeroManager mPzeroManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
@@ -256,6 +258,7 @@ public class Plugin extends JavaPlugin {
 		PlayerItemStatsGUICommand.register(this);
 		Portal1.register();
 		Portal2.register();
+		PZeroCommand.register();
 		RedeemVoteRewards.register(this);
 		RefreshClass.register(this);
 		RegisterTorch.register();
@@ -370,6 +373,7 @@ public class Plugin extends JavaPlugin {
 		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
 		mLoadoutManager = new LoadoutManager();
+		mPzeroManager = new PzeroManager();
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
 
 		new ClientModHandler(this);
@@ -476,6 +480,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PotionBarrelListener(), this);
 		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
 		manager.registerEvents(new TorchListener(), this);
+		manager.registerEvents(mPzeroManager, this);
 		manager.registerEvents(new IchorListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
@@ -549,6 +554,13 @@ public class Plugin extends JavaPlugin {
 				// Show marker entities
 				try {
 					ShowMarkerTimer.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				// Update everything related to the PZero Minigame
+				try {
+					mPzeroManager.update(oneHertz, twoHertz, fourHertz);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

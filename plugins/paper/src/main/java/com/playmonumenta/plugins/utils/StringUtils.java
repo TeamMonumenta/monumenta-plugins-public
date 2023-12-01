@@ -223,4 +223,22 @@ public class StringUtils {
 		}
 		return String.valueOf(chars);
 	}
+
+	public static String intToOrdinal(int i) {
+		int rightDigit = i % 10;
+		switch (rightDigit) {
+			case 1 -> {
+				return i + "st";
+			}
+			case 2 -> {
+				return i + "nd";
+			}
+			case 3 -> {
+				return i + "rd";
+			}
+			default -> {
+				return i + "th";
+			}
+		}
+	}
 }

@@ -1656,6 +1656,19 @@ public class EntityUtils {
 		display.setBrightness(new Display.Brightness(15, 15));
 	}
 
+	public static @Nullable Item createUnpickableItem(Material material, Location location) {
+		Entity itemEntity = location.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);
+		if (itemEntity instanceof Item item) {
+			item.setItemStack(new ItemStack(material));
+			item.setCanMobPickup(false);
+			item.setCanPlayerPickup(false);
+			makeItemInvulnereable(item);
+
+			return item;
+		}
+		return null;
+	}
+
 	public static boolean isInFieldOfView(LivingEntity entity, LivingEntity entityInSight) {
 		Vector lineOfSight = new Vector(0, 0, 1);
 		lineOfSight.rotateAroundY(Math.toRadians(-entity.getLocation().getYaw()));

@@ -3,10 +3,12 @@ package com.playmonumenta.plugins.utils;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Team;
@@ -47,6 +49,22 @@ public class ScoreboardUtils {
 			setScoreboardValue(entity.getName(), objectiveName, value);
 		} else {
 			setScoreboardValue(entity.getUniqueId().toString(), objectiveName, value);
+		}
+	}
+
+	public static void resetScoreboardValue(String entryName, String objectiveName) {
+		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
+		if (objective != null) {
+			Score score = objective.getScore(entryName);
+			score.resetScore();
+		}
+	}
+
+	public static void resetScoreboardValue(Entity entity, String objectiveName) {
+		if (entity instanceof Player) {
+			resetScoreboardValue(entity.getName(), objectiveName);
+		} else {
+			resetScoreboardValue(entity.getUniqueId().toString(), objectiveName);
 		}
 	}
 
@@ -141,5 +159,20 @@ public class ScoreboardUtils {
 		}
 		setScoreboardValue(entity, objectiveName, scoreboardValue.getAsInt() + add);
 		return true;
+	}
+
+	public static Objective createObjective(String name, Component displayName) {
+		return Bukkit.getScoreboardManager().getMainScoreboard().registerNewObjective(name, Criteria.DUMMY, displayName);
+	}
+
+	public static Objective createObjectiveOnTempScoreboard(String name, Component displayName) {
+		return Bukkit.getScoreboardManager().getNewScoreboard().registerNewObjective(name, Criteria.DUMMY, displayName);
+	}
+
+	public static void removeScoreboard(String name) {
+		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(name);
+		if (objective != null) {
+			objective.unregister();
+		}
 	}
 }
