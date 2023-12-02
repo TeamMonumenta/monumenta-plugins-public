@@ -247,12 +247,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		itemPlacements.put(DelveInfusionSelection.QUENCH, 36);
 		itemPlacements.put(DelveInfusionSelection.GRACE, 37);
-		// UPDATE THIS CODE WHEN STAR POINT RELEASES, UNCOMMENT THE FOLLOWING 3 LINES AND DELETE THE 2 BELOW THEM.
-		//itemPlacements.put(DelveInfusionSelection.CELESTIAL, 38);
-		//itemPlacements.put(DelveInfusionSelection.GALVANIC, 39);
-		//itemPlacements.put(DelveInfusionSelection.DECAPITATION, 40);
-		itemPlacements.put(DelveInfusionSelection.GALVANIC, 38);
-		itemPlacements.put(DelveInfusionSelection.DECAPITATION, 39);
+		itemPlacements.put(DelveInfusionSelection.CELESTIAL, 38);
+		itemPlacements.put(DelveInfusionSelection.GALVANIC, 39);
+		itemPlacements.put(DelveInfusionSelection.DECAPITATION, 40);
 
 		itemPlacements.forEach((infusion, place) -> {
 			if (infusion.isUnlocked(player)) {

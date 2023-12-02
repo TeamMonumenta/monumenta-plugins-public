@@ -46,6 +46,9 @@ public class MasterworkUtils {
 	private static final String KEEP_FRAG = "epic:r3/fragments/keep_fragment";
 	private static final String KEEP_MAT = "epic:r3/items/currency/iridium_catalyst";
 
+	private static final String STAR_FRAG = "epic:r3/fragments/star_point_fragment";
+	private static final String STAR_MAT = "epic:r3/items/currency/dust_of_the_herald";
+
 	private static final String SKT_FRAG = "epic:r3/fragments/silver_fragment";
 	private static final String SKT_MAT = "epic:r3/items/currency/silver_remnant";
 
@@ -65,6 +68,8 @@ public class MasterworkUtils {
 	private static final String GALLERY2_MAT = "epic:r3/gallery/map2/deathly_piece_of_eight";
 
 	private static final String GODSPORE_MAT = "epic:r3/godspore/items/fungal_remnants";
+
+	private static final String SIRIUS_FRAG = "epic:r3/fragments/starblight_fragment";
 
 	private static final String FISH_MAT = "epic:r3/items/fishing/sand_dollar";
 
@@ -167,7 +172,7 @@ public class MasterworkUtils {
 			put(Masterwork.I, PULSATING_SHARD, 6, HYPER_ARCHOS_RING, 1);
 			put(Masterwork.II, PULSATING_SHARD, 6, HYPER_ARCHOS_RING, 3);
 			put(Masterwork.III, PULSATING_SHARD, 6, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, PULSATING_SHARD, 12, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, PULSATING_SHARD, 12, HYPER_ARCHOS_RING, 5);
 			put(Masterwork.V, PULSATING_SHARD, 18, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, PULSATING_DIAMOND, 8, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, PULSATING_SHARD, 32, FORTITUDE_AUGMENT, 16);
@@ -182,7 +187,7 @@ public class MasterworkUtils {
 			put(Masterwork.I, frag, 1, HYPER_ARCHOS_RING, 1);
 			put(Masterwork.II, frag, 1, HYPER_ARCHOS_RING, 3);
 			put(Masterwork.III, frag, 1, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, PULSATING_DIAMOND, 2, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, PULSATING_DIAMOND, 1, HYPER_ARCHOS_RING, 5);
 			put(Masterwork.V, PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, mat, 16, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, mat, 32, FORTITUDE_AUGMENT, 16);
@@ -195,7 +200,7 @@ public class MasterworkUtils {
 		private Gallery(String mat) {
 			super(Masterwork.III);
 			put(Masterwork.III, mat, 10, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, mat, 16, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, mat, 12, HYPER_ARCHOS_RING, 5);
 			put(Masterwork.V, PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, mat, 24, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, mat, 48, FORTITUDE_AUGMENT, 16);
@@ -208,12 +213,19 @@ public class MasterworkUtils {
 		private Boss(String mat) {
 			super(Masterwork.III);
 			put(Masterwork.III, mat, 6, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, mat, 12, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, mat, 10, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.V, PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, mat, 18, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, mat, 32, FORTITUDE_AUGMENT, 16);
 			put(Masterwork.VIIB, mat, 32, POTENCY_AUGMENT, 16);
 			put(Masterwork.VIIC, mat, 32, ALACRITY_AUGMENT, 16);
+		}
+	}
+
+	private static class WorldBoss extends MasterworkCost {
+		private WorldBoss(String frag) {
+			super(Masterwork.IV);
+			put(Masterwork.IV, frag, 2, HYPER_ARCHOS_RING, 4);
 		}
 	}
 
@@ -236,7 +248,7 @@ public class MasterworkUtils {
 			super(minLevel);
 			put(Masterwork.II, mat, 3, HYPER_ARCHOS_RING, 3);
 			put(Masterwork.III, mat, 6, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, PULSATING_DIAMOND, 2, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, PULSATING_DIAMOND, 1, HYPER_ARCHOS_RING, 5);
 			put(Masterwork.V, PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, mat, 16, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, mat, 32, FORTITUDE_AUGMENT, 16);
@@ -251,6 +263,7 @@ public class MasterworkUtils {
 			put(Masterwork.I, "epic:r3/items/currency/godtree_carving", 4, HYPER_ARCHOS_RING, 1);
 			put(Masterwork.II, PULSATING_DIAMOND, 2, HYPER_ARCHOS_RING, 3);
 			put(Masterwork.III, "epic:r3/shrine/curse_of_the_dark_soul", 1, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, "epic:r3/shrine/gift_of_the_stars", 1, HYPER_ARCHOS_RING, 6);
 		}
 	}
 
@@ -260,6 +273,7 @@ public class MasterworkUtils {
 	static {
 		MASTERWORK_COSTS.put(Location.FOREST, new Generic(FOREST_FRAG, FOREST_MAT, Masterwork.I));
 		MASTERWORK_COSTS.put(Location.KEEP, new Generic(KEEP_FRAG, KEEP_MAT, Masterwork.I));
+		MASTERWORK_COSTS.put(Location.STARPOINT, new Generic(STAR_FRAG, STAR_MAT, Masterwork.II));
 
 		MASTERWORK_COSTS.put(Location.SILVER, new Generic(SKT_FRAG, SKT_MAT, Masterwork.II));
 		MASTERWORK_COSTS.put(Location.BLUE, new Generic(BLUE_FRAG, BLUE_MAT, Masterwork.II));
@@ -272,6 +286,8 @@ public class MasterworkUtils {
 		MASTERWORK_COSTS.put(Location.MARINANOIR, new Gallery(GALLERY2_MAT));
 
 		MASTERWORK_COSTS.put(Location.GODSPORE, new Boss(GODSPORE_MAT));
+
+		MASTERWORK_COSTS.put(Location.SIRIUS, new WorldBoss(SIRIUS_FRAG));
 
 		MASTERWORK_COSTS.put(Location.FISHING, new Fish());
 

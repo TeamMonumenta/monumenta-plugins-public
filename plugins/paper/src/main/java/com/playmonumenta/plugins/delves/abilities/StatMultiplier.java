@@ -34,7 +34,7 @@ public class StatMultiplier {
 
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.4;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
-	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.6;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.7;
 
 	static {
 		//r1 shards
@@ -60,10 +60,10 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("depths", 1.0);
 
 		//r3 shards
-		STAT_COMPENSATION_MAPPINGS.put("blue", 1.2);
-		STAT_COMPENSATION_MAPPINGS.put("brown", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("ruin", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("portal", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("blue", 1.25);
+		STAT_COMPENSATION_MAPPINGS.put("brown", 1.05);
+		STAT_COMPENSATION_MAPPINGS.put("ruin", 1.05);
+		STAT_COMPENSATION_MAPPINGS.put("portal", 1.05);
 		STAT_COMPENSATION_MAPPINGS.put("skt", 1.0);
 
 		//dev shards
@@ -72,7 +72,7 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
 
 		// Wolfswood
-		final double FOREST = 1.2;
+		final double FOREST = 1.3;
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Coven Fortress", FOREST);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Locum Vernantia", FOREST);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Shadowcast Bastille", FOREST);
@@ -82,7 +82,7 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Vibrant Hollow", FOREST);
 
 		// Pelias' Keep
-		final double KEEP = 1.2;
+		final double KEEP = 1.3;
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Quelled Convent", KEEP);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Silvic Quarry", KEEP);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Doomed Encampment", KEEP);
@@ -100,10 +100,10 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("The Nadir", STAR_POINT);
 
 		// Exalted
-		STAT_COMPENSATION_MAPPINGS.put("whiteexalted", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("orangeexalted", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("magentaexalted", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("lightblueexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("whiteexalted", 1.05);
+		STAT_COMPENSATION_MAPPINGS.put("orangeexalted", 1.05);
+		STAT_COMPENSATION_MAPPINGS.put("magentaexalted", 1.05);
+		STAT_COMPENSATION_MAPPINGS.put("lightblueexalted", 1.05);
 		STAT_COMPENSATION_MAPPINGS.put("yellowexalted", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("willowsexalted", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("reverieexalted", 1.0);
