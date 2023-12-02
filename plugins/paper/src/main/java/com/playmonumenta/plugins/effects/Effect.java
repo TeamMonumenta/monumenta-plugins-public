@@ -188,7 +188,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	@Override
 	public @Nullable String getDisplay() {
 		if (mDisplay) {
-			return getDisplayWithoutTime() + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
+			String displayWithoutTime = getDisplayWithoutTime();
+			if (displayWithoutTime != null) {
+				return displayWithoutTime + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
+			}
 		}
 		return null;
 	}
