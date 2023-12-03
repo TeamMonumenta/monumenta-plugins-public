@@ -1,30 +1,26 @@
 package com.playmonumenta.plugins.minigames.pzero;
 
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public enum PzeroMap {
 	MAP_NULL("NULL", new Vector(), new Vector(), new Vector(), "", "", "", 1, Collections.emptyList()),
 	MAP_0("Test", new Vector(-1985, 212, -1175), new Vector(-2009, 206, -1172), new Vector(-1976, 229, -1210), "monumenta:events/pzero/arena0start", "monumenta:events/pzero/arena0reset", "monumenta:events/pzero/arena0win", 1, getMap0Checkpoints()),
 	MAP_1("Wintery Shroomland", new Vector(-1045, 101, -2982), new Vector(-989, 100, -2971), new Vector(-1094, 140, -3049), "monumenta:events/pzero/race1start", "monumenta:events/pzero/race1reset", "monumenta:events/pzero/race1win", 5, getMap1Checkpoints())
 	;
-
-	public static final TextComponent FANCY_SCOREBOARD_NAME = Component.text("▂▄▆ Race Standings ▆▄▂", NamedTextColor.GOLD, TextDecoration.BOLD);
 
 	public final String mName;
 	public final Vector mReturnPosition;
@@ -41,7 +37,7 @@ public enum PzeroMap {
 
 	public PzeroMapState mState;
 	private int mPlayerCountAtStart;
-	private @Nullable Objective mCurrentObjective = null;
+	private HashMap<UUID, Integer> mCurrentPlacements;
 
 	PzeroMap(String name, Vector returnPosition, Vector spawnPosition, Vector spectatePosition, String startFunctionName, String resetFunctionName, String winFunctionName, int lapCount, List<PzeroCheckpoint> checkpoints) {
 		mName = name;
@@ -55,6 +51,7 @@ public enum PzeroMap {
 		mCheckpoints = checkpoints;
 		mState = PzeroMapState.WAITING;
 		mPlayerCountAtStart = 0;
+		mCurrentPlacements = new HashMap<>();
 	}
 
 	public String getName() {
@@ -128,29 +125,16 @@ public enum PzeroMap {
 		mPlayerCountAtStart = count;
 	}
 
-	public void recreateObjective() {
-		if (mCurrentObjective != null) {
-			mCurrentObjective.unregister();
-		}
-
-		mCurrentObjective = ScoreboardUtils.createObjectiveOnTempScoreboard(getScoreboardName(), FANCY_SCOREBOARD_NAME);
-		mCurrentObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+	public int getCurrentPlayerPlacement(Player player) {
+		return Optional.ofNullable(mCurrentPlacements.get(player.getUniqueId())).orElse(0);
 	}
 
-	public @Nullable Objective getObjective() {
-		return mCurrentObjective;
+	public void setCurrentPlayerPlacement(Player player, int value) {
+		mCurrentPlacements.put(player.getUniqueId(), value);
 	}
 
-	public void setScore(Player player, int value) {
-		if (mCurrentObjective == null) {
-			return;
-		}
-
-		mCurrentObjective.getScore(player.getName()).setScore(value);
-	}
-
-	public String getScoreboardName() {
-		return mName + "_standings";
+	public void clearCurrentPlayerPlacements() {
+		mCurrentPlacements.clear();
 	}
 
 	public void displayStandingsToNearbyPlayers(World world, double radius) {
