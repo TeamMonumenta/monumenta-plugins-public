@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,7 +33,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.event.entity.EntityDismountEvent;
@@ -55,9 +55,14 @@ public class PzeroManager implements Listener {
 		// Send the action bar message regarding energy, and other info.
 		if (twoHertz) {
 			mTrackedPlayers.values().stream().filter(pzPlayer -> getMap(pzPlayer.getMapName()).isRunning())
-				.forEach(pzPlayer -> pzPlayer.getPlayer().sendActionBar(
-						MessagingUtils.fromMiniMessage("<bold>【[<gold>Lap " + (pzPlayer.getCurrentLap() + 1) + "/" + pzPlayer.getLapCount() + "<white>] <gradient:#CF1533:#F94B18:#FAA426:#FFF03E:#63CB5F:#1B82AA:#0339C4> " + "|".repeat(pzPlayer.getCurrentEnergy()) + ".".repeat(PzeroPlayer.MAX_ENERGY - pzPlayer.getCurrentEnergy()) + " <white>[" + (pzPlayer.isBoosting() ? "<gold>" : "<dark_gray>") + "⚡<white>]】")
-					)
+				.forEach(pzPlayer -> {
+						int position = getMap(pzPlayer.getMapName()).getCurrentPlayerPlacement(pzPlayer.getPlayer());
+						String placementColor = PzeroPlayer.getPlacementColor(position).asHexString();
+						String placementString = "<" + placementColor + ">" + (position == 0 ? "..." : StringUtils.intToOrdinal(position)) + "</" + placementColor + ">";
+						pzPlayer.getPlayer().sendActionBar(
+							MessagingUtils.fromMiniMessage("<bold>【[<gold>Lap " + (pzPlayer.getCurrentLap() + 1) + "/" + pzPlayer.getLapCount() + "<white>] [" + placementString + "]<gradient:#CF1533:#F94B18:#FAA426:#FFF03E:#63CB5F:#1B82AA:#0339C4> " + "|".repeat(pzPlayer.getCurrentEnergy()) + ".".repeat(PzeroPlayer.MAX_ENERGY - pzPlayer.getCurrentEnergy()) + " <white>[" + (pzPlayer.isBoosting() ? "<gold>" : "<dark_gray>") + "⚡<white>]】")
+						);
+					}
 				);
 		}
 
@@ -128,10 +133,10 @@ public class PzeroManager implements Listener {
 
 			// Display the placements on the scoreboard. The placement number is handled as a relative number,
 			// thanks to the sort above, so that if players leave the game, their positions should remain/be updated.
-			int scoreboardCurrentPlace = -1;
+			int scoreboardCurrentPlace = 1;
 			for (PzeroPlayerPlacement placement : merged) {
-				map.setScore(placement.mPlayer, scoreboardCurrentPlace);
-				scoreboardCurrentPlace--;
+				map.setCurrentPlayerPlacement(placement.mPlayer, scoreboardCurrentPlace);
+				scoreboardCurrentPlace++;
 			}
 		});
 	}
@@ -283,13 +288,7 @@ public class PzeroManager implements Listener {
 				NmsUtils.getVersionAdapter().runConsoleCommandSilently("function " + map.mResetFunctionName)
 			);
 			doMapCountdown(map, mapName);
-			map.recreateObjective();
-		}
-		// Give the player the map's objective in the sidebar
-		Objective objective = map.getObjective();
-		if (objective != null && objective.getScoreboard() != null) {
-			objective.getScore(player.getName()).setScore(0);
-			player.setScoreboard(objective.getScoreboard());
+			map.clearCurrentPlayerPlacements();
 		}
 
 		return null;
@@ -301,7 +300,6 @@ public class PzeroManager implements Listener {
 			return;
 		}
 
-		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		pzPlayer.removeBoostRod();
 		if (countPlayersInMap(pzPlayer.getMapName()) == 0) {
 			resetMap(getMap(pzPlayer.getMapName()), pzPlayer.getPlayer().getWorld());
