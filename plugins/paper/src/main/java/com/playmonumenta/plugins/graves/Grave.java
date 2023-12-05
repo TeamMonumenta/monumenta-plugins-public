@@ -11,12 +11,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.*;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import java.time.Instant;
@@ -137,6 +132,13 @@ public final class Grave {
 		mLocation = mPlayer.getLocation().clone();
 		if (mLocation.getY() < 1) {
 			mLocation.setY(1);
+			for (int i = 0; i < 100; i++) {
+				if (ZoneUtils.hasZoneProperty(mLocation, ZoneUtils.ZoneProperty.RAISE_GRAVE_ABOVE_ZONE)) {
+					mLocation.add(0, 1, 0);
+				} else {
+					break;
+				}
+			}
 		}
 		mEquipment = new HashMap<>();
 		mEquipment.put(KEY_EQUIPMENT_HEAD, equipment.get(EquipmentSlot.HEAD));

@@ -56,7 +56,8 @@ public class ZoneUtils {
 		NO_PLACING_BOATS("No Placing Boats"),
 		ABYSSAL_FORCED("Abyssal Forced"),
 		ANTI_SPEED("Anti Speed"),
-		LOOTING_LIMITER_DISABLED("Looting Limiter Disabled");
+		LOOTING_LIMITER_DISABLED("Looting Limiter Disabled"),
+		RAISE_GRAVE_ABOVE_ZONE("Raise Grave Above Zone");
 
 		private final String mPropertyName;
 
