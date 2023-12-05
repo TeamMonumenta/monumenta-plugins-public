@@ -302,6 +302,17 @@ public class PEBCustomInventory extends CustomInventory {
 						LuckPermsIntegration.setPermission(peb.mPlayer, "monumenta.tablist.simplified", true);
 						peb.mPlayer.sendMessage(Component.text("Simplified Tab List has been enabled!", NamedTextColor.GOLD));
 					}
+				}),
+			new PebItem(40, "Show Overworld POI Titles", "Click to enable or disable seeing " +
+				"titles appear upon entering certain " +
+				"Overworld Points of Interest.", NamedTextColor.LIGHT_PURPLE,
+				Material.BIRCH_SIGN, false)
+				.action((peb, event) -> {
+					if (ScoreboardUtils.toggleBinaryScoreboard(peb.mPlayer, "POITitles")) {
+						peb.mPlayer.sendMessage(Component.text("Overworld POI Titles have been disabled!", NamedTextColor.GOLD));
+					} else {
+						peb.mPlayer.sendMessage(Component.text("Overworld POI Titles have been enabled!", NamedTextColor.GOLD));
+					}
 				})
 		);
 
@@ -774,18 +785,31 @@ public class PEBCustomInventory extends CustomInventory {
 				"No music will be played in the wilderness of the Celsian Isles", NamedTextColor.LIGHT_PURPLE,
 				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldIsles 2").playerMessage("No music will be played in the wilderness of Celsian Isles."),
 
-			new PebItem(13, "Architect's Ring Music",
-				"Choose what sounds to play in the Architect's Ring", NamedTextColor.LIGHT_PURPLE,
+			new PebItem(13, "Silvaria Music",
+				"Choose what sounds to play in Silvaria", NamedTextColor.LIGHT_PURPLE,
 				Material.RED_MUSHROOM_BLOCK, false),
 			new PebItem(22, "Official Theme",
-				"The official theme of the Architect’s Ring will play when in the wilderness of that region.", NamedTextColor.LIGHT_PURPLE,
-				Material.DIAMOND, false).serverCommand("scoreboard players set @S MusicOverworldRing 0").playerMessage("The official theme of the Architect's Ring will play in wilderness."),
+				"The official theme of Silvaria will play when in the wilderness of that region.", NamedTextColor.LIGHT_PURPLE,
+				Material.DIAMOND, false).serverCommand("scoreboard players set @S MusicOverworldRing 0").playerMessage("The official theme of Silvaria will play in wilderness."),
 			new PebItem(31, "Custom Theme",
-				"The \"customoverworldring.ogg\" file in your custom music resource pack will be played in the wilderness of the Architect’s Ring.", NamedTextColor.LIGHT_PURPLE,
-				Material.NETHER_STAR, false).serverCommand("scoreboard players set @S MusicOverworldRing 1").playerMessage("The custom music file you set will now play in the Architect's Ring wilderness."),
+				"The \"customoverworldring.ogg\" file in your custom music resource pack will be played in the wilderness of Silvaria.", NamedTextColor.LIGHT_PURPLE,
+				Material.NETHER_STAR, false).serverCommand("scoreboard players set @S MusicOverworldRing 1").playerMessage("The custom music file you set will now play in Silvaria wilderness."),
 			new PebItem(40, "No Theme",
-				"No music will be played in the wilderness of the Architect’s Ring.", NamedTextColor.LIGHT_PURPLE,
-				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldRing 2").playerMessage("No music will be played in the wilderness of Architect's Ring."),
+				"No music will be played in the wilderness of Silvaria.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldRing 2").playerMessage("No music will be played in the wilderness of Silvaria."),
+
+			new PebItem(14, "Star Point Music",
+				"Choose what sounds to play in Star Point", NamedTextColor.LIGHT_PURPLE,
+				Material.AMETHYST_BLOCK, false),
+			new PebItem(23, "Official Theme",
+				"The official theme of the Star Point will play when in the wilderness of that region.", NamedTextColor.LIGHT_PURPLE,
+				Material.ENDER_EYE, false).serverCommand("scoreboard players set @S MusicOverworldStarpoint 0").playerMessage("The official theme of the Star Point will play in wilderness."),
+			new PebItem(32, "Custom Theme",
+				"The \"customoverworldstarpoint.ogg\" file in your custom music resource pack will be played in the wilderness of the Star Point.", NamedTextColor.LIGHT_PURPLE,
+				Material.ENDER_PEARL, false).serverCommand("scoreboard players set @S MusicOverworldStarpoint 1").playerMessage("The custom music file you set will now play in the Star Point wilderness."),
+			new PebItem(41, "No Theme",
+				"No music will be played in the wilderness of the Star Point.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldStarpoint 2").playerMessage("No music will be played in the wilderness of Star Point."),
 
 			new PebItem(15, "Plots and Playerplots Music",
 				"Enable or disable strike music.", NamedTextColor.LIGHT_PURPLE,

@@ -68,6 +68,16 @@ public class ScoreboardUtils {
 		}
 	}
 
+	public static boolean toggleBinaryScoreboard(Player player, String scoreboard) {
+		boolean trueBefore = getScoreboardValue(player, scoreboard).orElse(0) == 1;
+		if (trueBefore) {
+			setScoreboardValue(player, scoreboard, 0);
+		} else {
+			setScoreboardValue(player, scoreboard, 1);
+		}
+		return !trueBefore;
+	}
+
 	public static boolean checkTag(
 		Entity entity,
 		String tag
