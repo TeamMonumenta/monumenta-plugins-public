@@ -5,10 +5,13 @@ import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.effects.DisplayableEffect;
-import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.*;
-
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +21,8 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -29,14 +33,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	private static final Pattern SHARD_NUMBER_PATTERN = Pattern.compile("(?:-|^dev)(\\d+)$");
 
 	private static final List<Pair<String, String>> mShrineNames = new ArrayList<>(
-		Arrays.asList(
-			Pair.of("Speed", "D1Finished"),
-			Pair.of("Resistance", "D3Finished"),
-			Pair.of("Strength", "D4Finished"),
-			Pair.of("Intuitive", "D5Finished"),
-			Pair.of("Thrift", "D6Finished"),
-			Pair.of("Harvester", "D7Finished")
-		)
+			Arrays.asList(
+					Pair.of("Speed", "D1Finished"),
+					Pair.of("Resistance", "D3Finished"),
+					Pair.of("Strength", "D4Finished"),
+					Pair.of("Intuitive", "D5Finished"),
+					Pair.of("Thrift", "D6Finished"),
+					Pair.of("Harvester", "D7Finished")
+			)
 	);
 
 	private List<Pair<String, String>> mActiveShrines = new ArrayList<>();
@@ -120,8 +124,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		if (identifier.startsWith("shrineicon")) {
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrineicon_simplified_".length()).isEmpty() ? 0 :
-					Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
-				if (index <= mActiveShrines.size()) {
+						Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
+				if (index < mActiveShrines.size()) {
 					Pair<String, String> currentShrine = mActiveShrines.get(index);
 					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0) > 1) {
 						return "active/" + currentShrine.getLeft();
@@ -148,8 +152,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			int remainingTime;
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrine_simplified_".length()).isEmpty() ? 0 :
-					Integer.parseInt(identifier.substring("shrine_simplified_".length()));
-				if (index <= mActiveShrines.size()) {
+						Integer.parseInt(identifier.substring("shrine_simplified_".length()));
+				if (index < mActiveShrines.size()) {
 					Pair<String, String> currentShrine = mActiveShrines.get(index);
 					remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0);
 					if (remainingTime >= 1) {
@@ -202,9 +206,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
 			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
 			return Integer.toString(AbilityUtils.getEffectiveTotalSkillPoints(player) +
-				                        AbilityUtils.getEffectiveTotalSpecPoints(player) +
-				                        ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
-				                        charmPower);
+					AbilityUtils.getEffectiveTotalSpecPoints(player) +
+					ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
+					charmPower);
 		}
 
 		//Player equipped title
