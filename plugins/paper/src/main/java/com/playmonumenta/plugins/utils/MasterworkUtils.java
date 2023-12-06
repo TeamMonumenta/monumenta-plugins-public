@@ -82,7 +82,7 @@ public class MasterworkUtils {
 	private static final String WILLOWS_MAT = "epic:r1/delves/willows/auxiliary/echoes_of_the_veil";
 	private static final String REVERIE_MAT = "epic:r1/delves/reverie/auxiliary/delve_material";
 
-	public record MasterworkCostLevel(String item1, int amount1, String item2, int amount2) {
+	public record MasterworkCostLevel(String item1, int amount1, String item2, int amount2, @Nullable String item3, int amount3) {
 		public List<String> getCostStringList(Player p) {
 			String itemName;
 			String strA = amount1 + " ";
@@ -92,7 +92,12 @@ public class MasterworkUtils {
 			if (amount1 > 1) {
 				strA += itemNameSuffix(p, itemName);
 			}
-			strA += " and";
+
+			if (item3 == null) {
+				strA += " and";
+			} else {
+				strA += ",";
+			}
 
 			String strB = amount2 + " ";
 			itemName = ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
@@ -101,7 +106,21 @@ public class MasterworkUtils {
 			if (amount2 > 1) {
 				strB += itemNameSuffix(p, itemName);
 			}
-			return List.of(strA, strB);
+
+			if (item3 == null) {
+				return List.of(strA, strB);
+			} else {
+				strB += " and";
+			}
+
+			String strC = amount3 + " ";
+			itemName = ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
+				NamespacedKeyUtils.fromString(item3)));
+			strC += itemName;
+			if (amount3 > 1) {
+				strC += itemNameSuffix(p, itemName);
+			}
+			return List.of(strA, strB, strC);
 		}
 
 		public boolean canPayCost(Player p, boolean isRefund) {
@@ -112,7 +131,8 @@ public class MasterworkUtils {
 			PlayerInventory inventory = p.getInventory();
 			ItemStack itemA = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(item1));
 			ItemStack itemB = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(item2));
-			return inventory.containsAtLeast(itemA, amount1) && inventory.containsAtLeast(itemB, amount2);
+			ItemStack itemC = item3 == null ? null : InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(item3));
+			return inventory.containsAtLeast(itemA, amount1) && inventory.containsAtLeast(itemB, amount2) && (itemC == null || inventory.containsAtLeast(itemC, amount3));
 		}
 
 		public void payCost(Player p, ItemStack item, boolean isRefund, Masterwork masterwork) {
@@ -125,27 +145,45 @@ public class MasterworkUtils {
 			PlayerInventory inventory = p.getInventory();
 			ItemStack itemA = InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(item1));
 			ItemStack itemB = InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(item2));
+			ItemStack itemC = item3 == null ? null : InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(item3));
 
 			itemA.setAmount(amount1);
 			itemB.setAmount(amount2);
+			if (itemC != null) {
+				itemC.setAmount(amount3);
+			}
 
 			if (isRefund) {
-				AuditListener.logPlayer("[Masterwork] Refund - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' from level=" + masterwork.getName() + " stack size=" + item.getAmount()
-					                        + " material refund=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount());
+				String auditString = "[Masterwork] Refund - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' from level=" + masterwork.getName() + " stack size=" + item.getAmount()
+					+ " material refund=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount();
+				if (itemC != null) {
+					auditString += "," + ItemUtils.getPlainName(itemC) + ":" + itemC.getAmount();
+				}
+				AuditListener.logPlayer(auditString);
 
 				InventoryUtils.giveItem(p, itemA);
 				InventoryUtils.giveItem(p, itemB);
+				if (itemC != null) {
+					InventoryUtils.giveItem(p, itemC);
+				}
 			} else {
-				AuditListener.logPlayer("[Masterwork] Upgrade - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' to level=" + masterwork.getName() + " stack size=" + item.getAmount()
-					                        + " material cost=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount());
+				String auditString = "[Masterwork] Purchase - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' to level=" + masterwork.getName() + " stack size=" + item.getAmount()
+					+ " material refund=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount();
+				if (itemC != null) {
+					auditString += "," + ItemUtils.getPlainName(itemC) + ":" + itemC.getAmount();
+				}
+				AuditListener.logPlayer(auditString);
 
 				inventory.removeItem(itemA);
 				inventory.removeItem(itemB);
+				if (itemC != null) {
+					inventory.removeItem(itemC);
+				}
 			}
 		}
 	}
 
-	private static final MasterworkCostLevel DEFAULT = new MasterworkCostLevel(INVALID_ITEM, 1, INVALID_ITEM, 1);
+	private static final MasterworkCostLevel DEFAULT = new MasterworkCostLevel(INVALID_ITEM, 1, INVALID_ITEM, 1, INVALID_ITEM, 1);
 
 	public static class MasterworkCost {
 		private final Map<Masterwork, MasterworkCostLevel> mLevelMap = new HashMap<>();
@@ -156,8 +194,12 @@ public class MasterworkUtils {
 		}
 
 		protected void put(Masterwork masterwork, String item1, int amount1, String item2, int amount2) {
+			put(masterwork, item1, amount1, item2, amount2, null, 0);
+		}
+
+		protected void put(Masterwork masterwork, String item1, int amount1, String item2, int amount2, @Nullable String item3, int amount3) {
 			if (mMinLevel.lessThanOrEqualTo(masterwork)) {
-				mLevelMap.put(masterwork, new MasterworkCostLevel(item1, amount1, item2, amount2));
+				mLevelMap.put(masterwork, new MasterworkCostLevel(item1, amount1, item2, amount2, item3, amount3));
 			}
 		}
 
@@ -187,7 +229,7 @@ public class MasterworkUtils {
 			put(Masterwork.I, frag, 1, HYPER_ARCHOS_RING, 1);
 			put(Masterwork.II, frag, 1, HYPER_ARCHOS_RING, 3);
 			put(Masterwork.III, frag, 1, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, PULSATING_DIAMOND, 1, HYPER_ARCHOS_RING, 5);
+			put(Masterwork.IV, frag, 1, PULSATING_DIAMOND, 1, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.V, PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, mat, 16, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, mat, 32, FORTITUDE_AUGMENT, 16);
@@ -234,7 +276,7 @@ public class MasterworkUtils {
 			super(Masterwork.II);
 			put(Masterwork.II, FISH_MAT, 4, HYPER_ARCHOS_RING, 3);
 			put(Masterwork.III, FISH_MAT, 4, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, FISH_MAT, 8, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, FISH_MAT, 6, HYPER_ARCHOS_RING, 5);
 			put(Masterwork.V, PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, FISH_MAT, 12, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, FISH_MAT, 20, FORTITUDE_AUGMENT, 16);
@@ -248,7 +290,7 @@ public class MasterworkUtils {
 			super(minLevel);
 			put(Masterwork.II, mat, 3, HYPER_ARCHOS_RING, 3);
 			put(Masterwork.III, mat, 6, HYPER_ARCHOS_RING, 4);
-			put(Masterwork.IV, PULSATING_DIAMOND, 1, HYPER_ARCHOS_RING, 5);
+			put(Masterwork.IV, mat, 6, PULSATING_DIAMOND, 1, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.V, PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VI, mat, 16, HYPER_ARCHOS_RING, 4);
 			put(Masterwork.VIIA, mat, 32, FORTITUDE_AUGMENT, 16);
