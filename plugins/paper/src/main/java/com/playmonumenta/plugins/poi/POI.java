@@ -10,7 +10,10 @@ public enum POI {
 	AMANITA_COLONY("amanita_colony", "Amanita Colony", "epic:r3/world/poi/amanita_colony/endweekly", "#4C8F4D"),
 	ARX_SPIRENSIS("arx_spirensis", "Arx Spirensis", "epic:r3/world/poi/arx_spirensis/endweekly", "#C4BBA5"),
 	BEWITCHED_DOMINION("bewitched_dominion", "Bewitched Dominion", "epic:r3/world/poi/farm/endweekly", "#4C8F4D"),
+	CELESTIAL_RAMPART("celestial_rampart", "Celestial Rampart", "epic:r3/world/poi/celestial_rampart/endweekly", "#342768"),
 	CHANTERELLE_VILLAGE("chanterelle_village", "Chanterelle Village", "epic:r3/world/poi/chanterelle_village/endweekly", "#4C8F4D"),
+	CHITTERING_GUTTERS("chittering_gutters", "Chittering Gutters", "epic:r3/world/poi/chittering_gutters/endweekly", "#342768"),
+	CONSTELLATION_TOWER("constellation_tower", "Constellation Tower", "epic:r3/world/poi/constellation_tower/endweekly", "#342768"),
 	COVEN_FORTRESS("coven_fortress", "Coven Fortress", "epic:r3/world/poi/coven_fortress/endweekly", "#4C8F4D"),
 	DOOMED_ENCAMPMENT("doomed_encampment", "Doomed Encampment", "epic:r3/world/poi/doomed_encampment/endweekly", "#C4BBA5"),
 	FORSAKEN_MANOR("forsaken_manor", "Forsaken Manor", "epic:r3/world/poi/forsaken_manor/endweekly", "#C4BBA5"),
@@ -18,7 +21,10 @@ public enum POI {
 	QUELLED_CONVENT("quelled_convent", "Quelled Convent", "epic:r3/world/poi/cathedral/endweekly", "#C4BBA5"),
 	SHADOWCAST_BASTILLE("shadowcast_bastille", "Shadowcast Bastille", "epic:r3/world/poi/silverstrike_bastille/endweekly", "#4C8F4D"),
 	SILVIC_QUARRY("silvic_quarry", "Silvic Quarry", "epic:r3/world/poi/terracotta_mine/endweekly", "#C4BBA5"),
+	STARBOUND_SANCTUARY("starbound_sanctuary", "Starbound Sanctuary", "epic:r3/world/poi/starbound_sanctuary/endweekly", "#342768"),
 	SUBMERGED_CITADEL("submerged_citadel", "Submerged Citadel", "epic:r3/world/poi/waterfall_village/endweekly", "#C4BBA5"),
+	THE_NADIR("the_nadir", "The Nadir", "epic:r3/world/poi/the_nadir/endweekly", "#342768"),
+	THE_TOLUMAEUS("the_tolumaeus", "The Tolumaeus", "epic:r3/world/poi/the_tolumaeus/endweekly", "#342768"),
 	VIBRANT_HOLLOW("vibrant_hollow", "Vibrant Hollow", "epic:r3/world/poi/vibrant_hollow/endweekly", "#4C8F4D"),
 	NONE("none", "None", "temp_path", "");
 
