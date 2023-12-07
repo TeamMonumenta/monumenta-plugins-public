@@ -116,6 +116,22 @@ public class MovementUtils {
 		}
 	}
 
+	// Normalized Pull Velocity (Shouldn't increase based on distance)
+	public static void pullTowardsNormalized(Location location, LivingEntity target, float speed) {
+		if (EntityUtils.isBoss(target)) {
+			return;
+		}
+		BossManager.getInstance().entityKnockedAway(target, speed);
+		Vector dir = target.getLocation().subtract(location.toVector()).toVector().normalize().multiply(-speed);
+
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
+		if (mult > 0) {
+			dir.multiply(mult);
+
+			target.setVelocity(dir);
+		}
+	}
+
 	public static void pullTowardsByUnit(Entity towardsEntity, LivingEntity target, float speed) {
 		if (EntityUtils.isBoss(target) || !target.getLocation().getWorld().equals(towardsEntity.getLocation().getWorld()) || target.getLocation().distance(towardsEntity.getLocation()) < 0.01) {
 			// Don't pull if target is a boss, in a different world, or if they're already on top of each other

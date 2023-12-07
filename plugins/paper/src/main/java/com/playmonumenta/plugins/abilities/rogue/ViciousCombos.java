@@ -139,7 +139,7 @@ public class ViciousCombos extends Ability {
 				@Override
 				public void run() {
 					// Get the index of the ability in mAbilities, add to the order.
-					mLastAbility = event.getAbility();
+					mLastAbility = event.getSpell();
 					mAbilityCastTime = Bukkit.getServer().getCurrentTick();
 					// mPlayer.sendMessage(mLastAbility.getName() + " is Selected");
 				}

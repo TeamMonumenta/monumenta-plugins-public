@@ -3,19 +3,21 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.WeakHashMap;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,24 +42,31 @@ public class RapidFire extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Rapid Fire";
 	public static final int[] ARROWS = {4, 5, 6, 7, 8, 10};
-	public static final int DAMAGE = 12;
+	public static final int DAMAGE = 10;
 	public static final int COOLDOWN = 18 * 20;
 	public static final String META_DATA_TAG = "RapidFireArrow";
+
+	public static final String CHARM_COOLDOWN = "Rapid Fire Cooldown";
 
 	public static final DepthsAbilityInfo<RapidFire> INFO =
 		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.RAPIDFIRE)
-			.cooldown(COOLDOWN)
+			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.REPEATER)
 			.descriptions(RapidFire::getDescription)
 			.priorityAmount(950); // Needs to trigger before a few things like Focused Combos since it cancels damage
 
+	private final int mArrows;
+	private final double mDamage;
+
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public RapidFire(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mArrows = ARROWS[mRarity - 1] + (int) CharmManager.getLevel(mPlayer, CharmEffects.RAPID_FIRE_ARROWS.mEffectName);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.RAPID_FIRE_DAMAGE.mEffectName, DAMAGE);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
@@ -73,7 +82,7 @@ public class RapidFire extends DepthsAbility {
 			@Override
 			public void run() {
 
-				if (mCount >= ARROWS[mRarity - 1]) {
+				if (mCount >= mArrows) {
 					this.cancel();
 					return;
 				}
@@ -112,7 +121,7 @@ public class RapidFire extends DepthsAbility {
 		if (event.getDamager() instanceof Projectile proj) {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
 			if (playerItemStats != null) {
-				DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), DAMAGE, true, true, false);
+				DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, true, false);
 				event.setCancelled(true);
 				proj.remove();
 			}
@@ -120,10 +129,14 @@ public class RapidFire extends DepthsAbility {
 		return false; // prevents multiple calls itself
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Left clicking with a projectile weapon shoots a flurry of ")
-			.append(Component.text(ARROWS[rarity - 1], color))
-			.append(Component.text(" projectiles in the direction that you are looking that deal " + DAMAGE + " projectile damage, bypassing iframes. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<RapidFire> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<RapidFire>(color)
+			.add("Left clicking with a projectile weapon shoots a flurry of ")
+			.add(a -> a.mArrows, ARROWS[rarity - 1], false, null, true)
+			.add(" projectiles in the direction that you are looking that deal ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE, false)
+			.add(" projectile damage.")
+			.addCooldown(COOLDOWN);
 	}
 }
 

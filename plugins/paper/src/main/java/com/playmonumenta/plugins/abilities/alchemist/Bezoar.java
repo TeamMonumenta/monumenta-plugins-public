@@ -22,7 +22,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -132,11 +131,7 @@ public class Bezoar extends Ability {
 
 	private void spawnBezoar(Location loc) {
 		World world = loc.getWorld();
-		ItemStack itemBezoar = mCosmetic.bezoarItem(false);
-		Item item = world.dropItemNaturally(loc, itemBezoar);
-		item.setGlowing(true);
-		item.setPickupDelay(Integer.MAX_VALUE);
-		EntityUtils.makeItemInvulnereable(item);
+		Item item = spawnItem(world, loc, false);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -203,11 +198,7 @@ public class Bezoar extends Ability {
 
 	private void spawnPhilosopherStone(Location loc) {
 		World world = loc.getWorld();
-		ItemStack itemStone = mCosmetic.bezoarItem(true);
-		Item item = world.dropItemNaturally(loc, itemStone);
-		item.setGlowing(true);
-		item.setPickupDelay(Integer.MAX_VALUE);
-		EntityUtils.makeItemInvulnereable(item);
+		Item item = spawnItem(world, loc, true);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -247,6 +238,10 @@ public class Bezoar extends Ability {
 
 	private void applyPhilosopherEffects(Player player) {
 		applyEffects(player, true);
+	}
+
+	private Item spawnItem(World world, Location loc, boolean philosophersStone) {
+		return AbilityUtils.spawnAbilityItem(world, loc, mCosmetic.bezoarMat(philosophersStone), mCosmetic.bezoarName(philosophersStone), true, 0, true, true);
 	}
 
 	public boolean shouldDrop() {

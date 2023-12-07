@@ -30,6 +30,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -128,33 +129,37 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static int removeSpecialItems(final Player player, final boolean ephemeralOnly, final boolean includeSubInventories) {
+	public static int removeSpecialItems(Player player, boolean ephemeralOnly, boolean includeSubInventories) {
+		return removeSpecialItems(player, ephemeralOnly, includeSubInventories, true);
+	}
+
+	public static int removeSpecialItems(final Player player, final boolean ephemeralOnly, final boolean includeSubInventories, boolean dropItems) {
 		int dropped = 0;
 
 		final Location loc = player.getLocation();
 
 		// Inventory
-		dropped += removeSpecialItemsFromInventory(player.getInventory(), loc, ephemeralOnly, includeSubInventories);
+		dropped += removeSpecialItemsFromInventory(player.getInventory(), loc, ephemeralOnly, includeSubInventories, dropItems);
 
 		if (includeSubInventories) {
 			// Ender Chest
-			dropped += removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeralOnly, true);
+			dropped += removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeralOnly, true, dropItems);
 		}
 
 		// Armor slots
 		@Nullable ItemStack[] items = player.getInventory().getArmorContents();
-		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, false);
+		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, false, dropItems);
 		player.getInventory().setArmorContents(items);
 
 		// Extra slots (offhand, ???)
 		items = player.getInventory().getExtraContents();
-		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, includeSubInventories);
+		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, includeSubInventories, dropItems);
 		player.getInventory().setExtraContents(items);
 
 		return dropped;
 	}
 
-	private static int removeSpecialItemsFromInventory(final @Nullable ItemStack @Nullable [] items, final Location loc, final boolean ephemeralOnly, final boolean includeSubInventories) {
+	private static int removeSpecialItemsFromInventory(final @Nullable ItemStack @Nullable [] items, final Location loc, final boolean ephemeralOnly, final boolean includeSubInventories, boolean dropItems) {
 		if (items == null) {
 			return 0;
 		}
@@ -165,7 +170,9 @@ public class InventoryUtils {
 			ItemStack item = items[i];
 			if (item != null) {
 				if (!ephemeralOnly && containsSpecialLore(item)) {
-					loc.getWorld().dropItem(loc, item);
+					if (dropItems) {
+						loc.getWorld().dropItem(loc, item);
+					}
 					items[i] = null;
 					dropped += 1;
 				} else if (CurseOfEphemerality.isEphemeral(item)) {
@@ -174,7 +181,7 @@ public class InventoryUtils {
 					try {
 						if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta meta) {
 							if (meta.getBlockState() instanceof ShulkerBox shulker) {
-								dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly, true);
+								dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly, true, dropItems);
 
 								meta.setBlockState(shulker);
 								item.setItemMeta(meta);
@@ -194,9 +201,9 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static int removeSpecialItemsFromInventory(final Inventory inventory, final Location loc, final boolean ephemeralOnly, final boolean includeSubInventories) {
+	private static int removeSpecialItemsFromInventory(final Inventory inventory, final Location loc, final boolean ephemeralOnly, final boolean includeSubInventories, boolean dropItems) {
 		final @Nullable ItemStack[] items = inventory.getContents();
-		final int dropped = removeSpecialItemsFromInventory(items, loc, ephemeralOnly, includeSubInventories);
+		final int dropped = removeSpecialItemsFromInventory(items, loc, ephemeralOnly, includeSubInventories, dropItems);
 		inventory.setContents(items);
 		return dropped;
 	}
@@ -213,11 +220,12 @@ public class InventoryUtils {
 
 		for (int i = 0; i < items.length; i++) {
 			ItemStack item = items[i];
-			if (item != null) {
-				if (item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(name)) {
+			if (item != null && item.hasItemMeta()) {
+				ItemMeta itemMeta = item.getItemMeta();
+				if (itemMeta.hasDisplayName() && MessagingUtils.plainText(itemMeta.displayName()).equals(name)) {
 					items[i] = null;
 				} else {
-					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
+					if (itemMeta instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
 						@Nullable ItemStack[] shulkerItems = shulker.getInventory().getContents();
 						for (int j = 0; j < shulkerItems.length; j++) {
 							if (shulkerItems[j] != null && shulkerItems[j].hasItemMeta() && shulkerItems[j].getItemMeta().hasDisplayName() && MessagingUtils.plainText(shulkerItems[j].getItemMeta().displayName()).equals(name)) {

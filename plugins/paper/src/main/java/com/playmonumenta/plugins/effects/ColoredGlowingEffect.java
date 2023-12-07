@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -52,9 +53,11 @@ public class ColoredGlowingEffect extends Effect {
 		if (entity.isGlowing()) {
 			Team entityTeam = ScoreboardUtils.getEntityTeam(entity);
 
-			PotionEffect oldGlowing = ((LivingEntity) entity).getPotionEffect(PotionEffectType.GLOWING);
-			if (oldGlowing != null) {
-				mOldEffectSpoilTicks = oldGlowing.getDuration();
+			if (!(entity instanceof Item)) {
+				PotionEffect oldGlowing = ((LivingEntity) entity).getPotionEffect(PotionEffectType.GLOWING);
+				if (oldGlowing != null) {
+					mOldEffectSpoilTicks = oldGlowing.getDuration();
+				}
 			}
 
 			if (entityTeam != null) {
@@ -62,7 +65,11 @@ public class ColoredGlowingEffect extends Effect {
 			}
 		}
 
-		PotionUtils.applyPotion(null, (LivingEntity) entity, new PotionEffect(PotionEffectType.GLOWING, getDuration(), 0));
+		if (entity instanceof Item) {
+			entity.setGlowing(true);
+		} else {
+			PotionUtils.applyPotion(null, (LivingEntity) entity, new PotionEffect(PotionEffectType.GLOWING, getDuration(), 0));
+		}
 		if (mTeam != null) {
 			mTeam.addToTeam(entity);
 		}

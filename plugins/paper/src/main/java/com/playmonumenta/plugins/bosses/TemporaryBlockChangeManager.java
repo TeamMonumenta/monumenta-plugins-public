@@ -64,13 +64,25 @@ public class TemporaryBlockChangeManager implements Listener {
 	}
 
 	public boolean changeBlock(Block block, BlockData temporaryData, int duration) {
+		return changeBlock(block, temporaryData, duration, false);
+	}
+
+	public boolean changeBlock(Block block, Material temporaryType, int duration, boolean forceReplace) {
+		return changeBlock(block, temporaryType.createBlockData(), duration, forceReplace);
+	}
+
+	public boolean changeBlock(Block block, BlockData temporaryData, int duration, boolean forceReplace) {
 		if (duration <= 0) {
 			return false;
 		}
 		Material existingType = block.getType();
-		if (temporaryData.getMaterial() == existingType || (BlockUtils.isMechanicalBlock(existingType) && existingType != Material.AIR) || BlockUtils.isValuableBlock(existingType)) {
+		if (temporaryData.getMaterial() == existingType) {
 			return false;
 		}
+		if (!forceReplace && ((BlockUtils.isMechanicalBlock(existingType) && existingType != Material.AIR) || BlockUtils.isValuableBlock(existingType))) {
+			return false;
+		}
+
 		int expiration = Bukkit.getCurrentTick() + duration;
 		Map<Block, ChangedBlock> worldMap = mChangedBlocks.computeIfAbsent(block.getWorld(), key -> new HashMap<>());
 		ChangedBlock existingChangedBlock = worldMap.get(block);

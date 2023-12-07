@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Region;
@@ -278,7 +279,7 @@ public class LoadoutManager implements Listener {
 				if (full && loadout.mIncludeCharms) {
 					List<ItemUtils.ItemIdentifier> itemsNotFound = new ArrayList<>();
 					List<ItemUtils.ItemIdentifier> failedItems = new ArrayList<>();
-					List<ItemStack> activeCharms = Plugin.getInstance().mCharmManager.getCharms(player);
+					List<ItemStack> activeCharms = Plugin.getInstance().mCharmManager.getCharms(player, CharmManager.CharmType.NORMAL);
 					Set<ItemStack> oldCharmsSet = new HashSet<>(activeCharms);
 					List<ItemStack> oldCharms = new ArrayList<>(activeCharms);
 					activeCharms.clear();
@@ -290,7 +291,7 @@ public class LoadoutManager implements Listener {
 						// First, check if equipped charms match and re-equip them if so
 						for (Iterator<ItemStack> iterator = oldCharms.iterator(); iterator.hasNext(); ) {
 							ItemStack oldCharm = iterator.next();
-							if (charmIdentifier.isIdentifierFor(oldCharm, false) && Plugin.getInstance().mCharmManager.validateCharm(player, oldCharm)) {
+							if (charmIdentifier.isIdentifierFor(oldCharm, false) && Plugin.getInstance().mCharmManager.validateCharm(player, oldCharm, CharmManager.CharmType.NORMAL)) {
 								activeCharms.add(oldCharm);
 								iterator.remove();
 								continue charmLoop;
@@ -304,7 +305,7 @@ public class LoadoutManager implements Listener {
 									ItemStatUtils.cleanIfNecessary(newItem);
 									ItemStack newItemClone = ItemUtils.clone(newItem);
 									newItemClone.setAmount(1);
-									if (!Plugin.getInstance().mCharmManager.validateCharm(player, newItemClone)) {
+									if (!Plugin.getInstance().mCharmManager.validateCharm(player, newItemClone, CharmManager.CharmType.NORMAL)) {
 										failedItems.add(charmIdentifier);
 										continue charmLoop;
 									}
@@ -349,7 +350,7 @@ public class LoadoutManager implements Listener {
 					swappedCharms = !oldCharmsSet.equals(new HashSet<>(activeCharms));
 
 					if (swappedCharms) {
-						Plugin.getInstance().mCharmManager.updateCharms(player, activeCharms);
+						Plugin.getInstance().mCharmManager.updateCharms(player, CharmManager.CharmType.NORMAL, activeCharms);
 					}
 					if (!itemsNotFound.isEmpty()) {
 						player.sendMessage(Component.text("Could not find all charms for this loadout! Hover this message to see missing charms.", NamedTextColor.RED)
@@ -508,7 +509,7 @@ public class LoadoutManager implements Listener {
 			}
 		}
 		if (loadout.mIncludeCharms) {
-			List<ItemStack> charms = Plugin.getInstance().mCharmManager.getCharms(player);
+			List<ItemStack> charms = Plugin.getInstance().mCharmManager.getCharms(player, CharmManager.CharmType.NORMAL);
 			for (ItemUtils.ItemIdentifier charm : loadout.mCharms) {
 				if (charms.stream().noneMatch(item -> charm.isIdentifierFor(item, false))) {
 					return false;
@@ -673,7 +674,7 @@ public class LoadoutManager implements Listener {
 		}
 
 		public void setCharmsFromPlayer(Player player) {
-			List<ItemStack> charms = Plugin.getInstance().mCharmManager.mPlayerCharms.get(player.getUniqueId());
+			List<ItemStack> charms = CharmManager.CharmType.NORMAL.mPlayerCharms.get(player.getUniqueId());
 			mCharms.clear();
 			if (charms != null) {
 				for (ItemStack charm : charms) {

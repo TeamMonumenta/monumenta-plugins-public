@@ -1,6 +1,10 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.commands.GenericCommand;
+import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
+import com.playmonumenta.plugins.depths.guis.DepthsDebugGUI;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import de.tr7zw.nbtapi.NBTItem;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -12,9 +16,12 @@ import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class DepthsCommand extends GenericCommand {
@@ -31,14 +38,14 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
 
-			DepthsManager.getInstance().init(player);
-		})
-		.register();
+				DepthsManager.getInstance().init(player);
+			})
+			.register();
 
 		//ABILITY COMMAND - debug to set a player's level in an ability directly
 
@@ -49,13 +56,13 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new IntegerArgument("Rarity"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
 
-			DepthsManager.getInstance().setPlayerLevelInAbility((String) args[1], player, (int) args[2]);
-		}).register();
+				DepthsManager.getInstance().setPlayerLevelInAbility((String) args[1], player, (int) args[2]);
+			}).register();
 
 		//DELETE COMMAND - removes a player from the depths system and clears their data
 
@@ -64,13 +71,13 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
-			DepthsManager.getInstance().deletePlayer(player);
-			player.sendMessage("Removed you from depths system");
-		}).register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				DepthsManager.getInstance().deletePlayer(player);
+				player.sendMessage("Removed you from depths system");
+			}).register();
 
 		//PARTY COMMAND - prints a summary string of party information to the player
 
@@ -79,13 +86,13 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
 
-			player.sendMessage(DepthsManager.getInstance().getPartySummary(player));
-		}).register();
+				player.sendMessage(DepthsManager.getInstance().getPartySummary(player));
+			}).register();
 
 		//SPAWN COMMAND - ran at the end of each room to load the next one dynamically
 
@@ -95,12 +102,12 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new LocationArgument("loc", LocationType.BLOCK_POSITION));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
-			DepthsManager.getInstance().gotRoomEndpoint(player, (Location) args[1]);
-		}).register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				DepthsManager.getInstance().gotRoomEndpoint(player, (Location) args[1]);
+			}).register();
 
 		//WEAPON COMMAND - run once by each player to select their weapon aspect
 
@@ -109,12 +116,12 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui weaponaspect " + player.getName());
-		}).register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui weaponaspect " + player.getName());
+			}).register();
 
 		//TREASURE COMMAND - run to increase the party's treasure score by given amount (used in select rooms)
 
@@ -124,14 +131,14 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new IntegerArgument("amount"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
 
-			DepthsManager.getInstance().incrementTreasure(null, player, (int) args[1]);
+				DepthsManager.getInstance().incrementTreasure(null, player, (int) args[1]);
 
-		}).register();
+			}).register();
 
 		//CHAOS COMMAND - run in select utility room to replace one player's ability with two others
 
@@ -140,14 +147,31 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
 
-			DepthsManager.getInstance().chaos(player);
+				DepthsManager.getInstance().chaos(player);
 
-		}).register();
+			}).register();
+
+		//WHEEL COMMAND - run in select utility room to trigger a curious effect depending on the result
+
+		arguments.clear();
+		arguments.add(new LiteralArgument("wheel"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+		arguments.add(new IntegerArgument("result"));
+
+		new CommandAPICommand("depths")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+
+				DepthsManager.getInstance().wheel(player, (int) args[1]);
+
+			}).register();
 
 		//FLOOR COMMAND - debug command to manually send a party to the next floor
 
@@ -156,14 +180,14 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
 
-			DepthsManager.getInstance().goToNextFloor(player);
+				DepthsManager.getInstance().goToNextFloor(player);
 
-		}).register();
+			}).register();
 
 		//BOSSFIGHT COMMAND - run by boss rooms to spawn the boss and initiate combat
 
@@ -173,12 +197,12 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new LocationArgument("loc", LocationType.BLOCK_POSITION));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
-			DepthsManager.getInstance().startBossFight(player, (Location) args[1]);
-		}).register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				DepthsManager.getInstance().startBossFight(player, (Location) args[1]);
+			}).register();
 
 		//ROOM COMMAND - debug command to manually set the party's room number to specified value
 		arguments.clear();
@@ -187,14 +211,14 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new IntegerArgument("amount"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
 
-			DepthsManager.getInstance().setRoomDebug(player, (int) args[1]);
+				DepthsManager.getInstance().setRoomDebug(player, (int) args[1]);
 
-		}).register();
+			}).register();
 
 		//ROOM COMMAND - debug command to manually set the party's room number to specified value
 		arguments.clear();
@@ -203,15 +227,57 @@ public class DepthsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("target player"));
 
 		new CommandAPICommand("depths")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player requestingPlayer = (Player) args[0];
-			Player targetPlayer = (Player) args[1];
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player requestingPlayer = (Player) args[0];
+				Player targetPlayer = (Player) args[1];
 
-			new DepthsDebugGUI(requestingPlayer, targetPlayer, plugin).openInventory(requestingPlayer, plugin);
+				new DepthsDebugGUI(requestingPlayer, targetPlayer, plugin).openInventory(requestingPlayer, plugin);
 
-		}).register();
+			}).register();
+
+		//CHARMGEN COMMAND - debug command to gen charmfactory charm
+		arguments.clear();
+		arguments.add(new LiteralArgument("charmfactory"));
+		arguments.add(new LiteralArgument("create"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+		arguments.add(new IntegerArgument("rarity"));
+
+		new CommandAPICommand("depths")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				Location loc = player.getLocation();
+				int power = new Random().nextInt(5) + 1;
+				ItemStack charm = CharmFactory.generateCharm((int) args[1], power, 0, null, null, null, null, null);
+				player.sendMessage("DEBUG SEED " + Objects.requireNonNull(ItemStatUtils.getPlayerModified(new NBTItem(charm))).getLong(CharmFactory.CHARM_UUID_KEY));
+				loc.getWorld().dropItem(loc, charm);
+			}).register();
+
+		//CHARMGEN COMMAND - debug command to update charmfactory charm
+		arguments.clear();
+		arguments.add(new LiteralArgument("charmfactory"));
+		arguments.add(new LiteralArgument("update"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+
+		new CommandAPICommand("depths")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				ItemStack item = player.getInventory().getItemInMainHand();
+
+				ItemStack newCharm = CharmFactory.updateCharm(item);
+				if (newCharm != null) {
+					player.getInventory().setItemInMainHand(newCharm);
+					item.setAmount(0);
+					player.updateInventory();
+					player.sendMessage("DEBUG SEED " + Objects.requireNonNull(ItemStatUtils.getPlayerModified(new NBTItem(newCharm))).getLong(CharmFactory.CHARM_UUID_KEY));
+				}
+
+			}).register();
 
 		//CHECK ENDLESS COMMAND - mech command that returns 1 if endless, else 0
 		arguments.clear();

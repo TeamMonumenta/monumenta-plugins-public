@@ -27,12 +27,14 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Whether or not damage taken by this mount is redirected to its passenger")
 		public boolean TRANSFER_DAMAGE = true;
-
+		@BossParam(help = "Whether or not the mount should be killed when it has no passengers")
+		public boolean KILL_MOUNT_ON_NO_PASSENGER = true;
 		@BossParam(help = "detection range of this ability")
 		public int DETECTION = 40;
 	}
 
 	private final boolean mTransferDamage;
+	private final boolean mKillMountOnNoPassenger;
 
 	private @MonotonicNonNull LivingEntity mPassenger;
 	private double mMountDamageThisTick = 0;
@@ -43,6 +45,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		mTransferDamage = p.TRANSFER_DAMAGE;
+		mKillMountOnNoPassenger = p.KILL_MOUNT_ON_NO_PASSENGER;
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
@@ -56,7 +59,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 					boss.remove();
 				}
 
-				if (passengers.size() == 0) {
+				if (mKillMountOnNoPassenger && passengers.size() == 0) {
 					boss.setHealth(0);
 					boss.remove();
 				} else {

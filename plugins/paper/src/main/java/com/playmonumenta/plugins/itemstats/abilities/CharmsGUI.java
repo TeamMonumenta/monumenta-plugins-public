@@ -2,11 +2,9 @@ package com.playmonumenta.plugins.itemstats.abilities;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,29 +28,43 @@ public class CharmsGUI extends Gui {
 
 	private final Player mTargetPlayer;
 	private final boolean mMayEdit;
+	private final CharmManager.CharmType mCharmType;
 
 	public CharmsGUI(Player player) {
 		this(player, player, true); // a player can always edit their own charms
 	}
 
+	public CharmsGUI(Player player, CharmManager.CharmType charmType) {
+		this(player, player, true, charmType);
+	}
+
 	public CharmsGUI(Player requestingPlayer, Player targetPlayer) {
-		this(requestingPlayer, targetPlayer, requestingPlayer.equals(targetPlayer)); // a player can always edit their own charms
+		this(requestingPlayer, targetPlayer, requestingPlayer.equals(targetPlayer));
+	}
+
+	public CharmsGUI(Player requestingPlayer, Player targetPlayer, CharmManager.CharmType charmType) {
+		this(requestingPlayer, targetPlayer, requestingPlayer.equals(targetPlayer), charmType);
 	}
 
 	public CharmsGUI(Player requestingPlayer, Player targetPlayer, boolean mayEdit) {
+		this(requestingPlayer, targetPlayer, mayEdit, CharmManager.getInstance().mEnabledCharmType);
+	}
+
+	public CharmsGUI(Player requestingPlayer, Player targetPlayer, boolean mayEdit, CharmManager.CharmType charmType) {
 		super(requestingPlayer, 54, Component.text(targetPlayer.getName() + "'s Charms"));
 		mTargetPlayer = targetPlayer;
 		mMayEdit = mayEdit;
+		mCharmType = charmType;
 	}
 
 	@Override
 	protected void setup() {
 		// getOrDefault could hypothetically return a null, but present value. It won't, but it makes IntelliJ feel better I guess.
-		List<ItemStack> charms = CharmManager.getInstance().mPlayerCharms.get(mTargetPlayer.getUniqueId());
+		List<ItemStack> charms = mCharmType.mPlayerCharms.get(mTargetPlayer.getUniqueId());
 		if (charms == null) {
 			charms = new ArrayList<>();
 		}
-		int totalBudget = ScoreboardUtils.getScoreboardValue(mTargetPlayer, AbilityUtils.CHARM_POWER).orElse(0);
+		int totalBudget = mCharmType.getTotalCharmPower(mTargetPlayer);
 		if (totalBudget <= 0) {
 			if (mTargetPlayer.equals(mPlayer)) {
 				mTargetPlayer.sendMessage(Component.text("You have no Charm Power!", NamedTextColor.RED));
@@ -81,7 +93,7 @@ public class CharmsGUI extends Gui {
 		}
 
 		Consumer<ItemStack> onCharmClick = charm -> {
-			if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm)) {
+			if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm, mCharmType)) {
 				InventoryUtils.giveItem(mPlayer, charm);
 				mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
 				update();
@@ -120,7 +132,7 @@ public class CharmsGUI extends Gui {
 				.onLeftClick(() -> onCharmClick.accept(charm));
 		}
 
-		int charmPower = CharmManager.getInstance().getCharmPower(mTargetPlayer);
+		int charmPower = CharmManager.getInstance().getUsedCharmPower(mTargetPlayer, mCharmType);
 
 		{ // Charm power indicator
 			ItemStack item = new ItemStack(Material.GLOWSTONE_DUST, Math.max(1, charmPower));
@@ -147,7 +159,7 @@ public class CharmsGUI extends Gui {
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
 
-			List<Component> lore = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(mTargetPlayer);
+			List<Component> lore = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(mTargetPlayer, mCharmType);
 			meta.lore(lore);
 
 			item.setItemMeta(meta);
@@ -169,7 +181,7 @@ public class CharmsGUI extends Gui {
 
 		if (charmPower > totalBudget && mMayEdit && mPlayer.equals(mTargetPlayer)) {
 			for (ItemStack charm : new ArrayList<>(charms)) {
-				if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm)) {
+				if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm, mCharmType)) {
 					InventoryUtils.giveItem(mTargetPlayer, charm);
 				}
 			}
@@ -188,18 +200,12 @@ public class CharmsGUI extends Gui {
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
 		// Attempt to load charm if clicked in inventory
 		ItemStack item = event.getCurrentItem();
-		if (item != null && item.getType() != Material.AIR) {
-			if (CharmManager.getInstance().validateCharm(mTargetPlayer, item)) {
-				if (CharmManager.getInstance().addCharm(mTargetPlayer, item)) {
-					item.subtract();
-					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
-					update();
-				} else {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
-				}
-			} else {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
-			}
+		if (!ItemUtils.isNullOrAir(item) && CharmManager.getInstance().addCharm(mTargetPlayer, item, mCharmType)) {
+			item.subtract();
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
+			update();
+		} else {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
 		}
 	}
 

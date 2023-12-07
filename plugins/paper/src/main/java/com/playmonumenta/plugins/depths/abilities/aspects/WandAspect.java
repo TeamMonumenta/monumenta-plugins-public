@@ -21,7 +21,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 	public static final DepthsAbilityInfo<WandAspect> INFO =
 		new DepthsAbilityInfo<>(WandAspect.class, ABILITY_NAME, WandAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
 			.displayItem(Material.STICK)
-			.description("You deal " + DAMAGE + " extra melee damage while holding a wand, and all ability damage is increased by " + (int) (SPELL_MOD * 100) + "% of the wand's spell power.");
+			.description("You deal " + DAMAGE + " extra melee damage while holding a wand, and all ability damage is increased by " + (int) (SPELL_MOD * 100) + "% of the wand's spell power. The next three abilities you find are guaranteed to be in active trigger slots.");
 
 	public WandAspect(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

@@ -24,7 +24,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	protected boolean consumeCharge() {
 		if (mCharges > 0) {
 			mCharges--;
-			PlayerUtils.callAbilityCastEvent(mPlayer, mLinkedSpell);
+			PlayerUtils.callAbilityCastEvent(mPlayer, this, mLinkedSpell);
 			if (mMaxCharges > 1) {
 				showChargesMessage();
 			}

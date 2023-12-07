@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -107,7 +106,6 @@ public class FrostNova extends Ability {
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS);
-		int frozenDuration = CharmManager.getDuration(mPlayer, CHARM_FROZEN, ENHANCED_FROZEN_DURATION);
 		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE);
 		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), size);
 		for (LivingEntity mob : hitbox.getHitMobs()) {
@@ -116,19 +114,9 @@ public class FrostNova extends Ability {
 			} else {
 				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier, mob);
 				if (isEnhanced()) {
-					if (mob.hasAI()) {
-						mob.setAI(false);
-						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-							mob.setAI(true);
-						}, frozenDuration);
-					}
-
-					if (mob.hasGravity()) {
-						mob.setGravity(false);
-						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-							mob.setGravity(true);
-						}, frozenDuration);
-					}
+					int frozenDuration = CharmManager.getDuration(mPlayer, CHARM_FROZEN, ENHANCED_FROZEN_DURATION);
+					EntityUtils.disableAI(mPlugin, mob, frozenDuration);
+					EntityUtils.disableGravity(mPlugin, mob, frozenDuration);
 				}
 			}
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);

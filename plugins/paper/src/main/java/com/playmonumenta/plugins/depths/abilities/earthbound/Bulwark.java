@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -9,8 +11,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,12 +28,15 @@ public class Bulwark extends DepthsAbility {
 	public static final String ABILITY_NAME = "Bulwark";
 	public static final int[] COOLDOWN = {18 * 20, 16 * 20, 14 * 20, 12 * 20, 10 * 20, 7 * 20};
 
+	public static final String CHARM_COOLDOWN = "Bulwark Cooldown";
+
 	public static final DepthsAbilityInfo<Bulwark> INFO =
 		new DepthsAbilityInfo<>(Bulwark.class, ABILITY_NAME, Bulwark::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.BULWARK)
-			.cooldown(COOLDOWN)
+			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.displayItem(Material.NETHERITE_HELMET)
-			.descriptions(Bulwark::getDescription);
+			.descriptions(Bulwark::getDescription)
+			.singleCharm(false);
 
 	public Bulwark(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -58,9 +61,9 @@ public class Bulwark extends DepthsAbility {
 		}
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("You block the next melee attack that would have hit you, nullifying the damage. Cooldown: ")
-			.append(Component.text(COOLDOWN[rarity - 1] / 20 + "s", color))
-			.append(Component.text("."));
+	private static Description<Bulwark> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Bulwark>(color)
+			.add("You block the next melee attack that would have hit you, nullifying the damage.")
+			.addCooldown(COOLDOWN[rarity - 1], true);
 	}
 }

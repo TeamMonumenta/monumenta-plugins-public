@@ -3,19 +3,14 @@ package com.playmonumenta.plugins.cosmetics.skills.alchemist;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,17 +36,13 @@ public class ArcaneBezoarCS extends BezoarCS {
 	}
 
 	@Override
-	public ItemStack bezoarItem(boolean philosophersStone) {
-		if (philosophersStone) {
-			return super.bezoarItem(true);
-		}
-		ItemStack item = new ItemStack(Material.GILDED_BLACKSTONE);
-		ItemUtils.modifyMeta(item, meta -> {
-			meta.displayName(Component.text("Arcane Bezoar", NamedTextColor.WHITE)
-				                 .decoration(TextDecoration.ITALIC, false));
-		});
-		ItemUtils.setPlainName(item, "Arcane Bezoar");
-		return item;
+	public Material bezoarMat(boolean philosophersStone) {
+		return philosophersStone ? Material.RED_CONCRETE : Material.GILDED_BLACKSTONE;
+	}
+
+	@Override
+	public String bezoarName(boolean philosophersStone) {
+		return philosophersStone ? "Philosopher's Stone" : "Arcane Bezoar";
 	}
 
 	@Override

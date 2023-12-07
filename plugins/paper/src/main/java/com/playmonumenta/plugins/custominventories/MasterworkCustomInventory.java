@@ -44,7 +44,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	}
 
 	//TODO: Replace with next max level
-	private static final int MAX_MASTERWORK_LEVEL = 3;
+	private static final int MAX_MASTERWORK_LEVEL = 4;
 
 	private static final int MAX_LORE_LENGTH = 30;
 	private static final Material ORANGE_FILLER = Material.ORANGE_STAINED_GLASS_PANE;

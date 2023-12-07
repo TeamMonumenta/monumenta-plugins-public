@@ -4,7 +4,11 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
-import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.depths.loot.DepthsLoot;
+import com.playmonumenta.plugins.depths.loot.ZenithLoot;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoom;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
@@ -22,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -53,6 +58,11 @@ public class DepthsParty {
 	public static final int MAX_LOOT_ROOMS_EXPANDED = 6;
 	public static final String ENDLESS_LEADERBOARD = "DepthsEndless";
 	public static final String EXPANDED_LEADERBOARD = "DepthsEndless6";
+	public static final String ASCENSION_LEADERBOARD = "ZenithAscension";
+	public static final String SIX_ASCENSION_LEADERBOARD = "ZenithAscension6";
+	public static final double ZENITH_HEALTH_INCREASE_PER_ASCENSION = 0.03;
+	public static final double ZENITH_DAMAGE_INCREASE_PER_ASCENSION = 0.03;
+
 
 	// The difference between where the player spawns in a loot room, and where the loot needs to be dropped
 	// Transient - don't try to save a circular reference to players (will crash data save)
@@ -107,6 +117,10 @@ public class DepthsParty {
 	public int mRoomStartX;
 	//Whether the party has exceeded four players
 	public boolean mIsSixPlayerMode;
+	//The Depths content this party is in
+	public DepthsContent mContent;
+	public @Nullable Vector mDeathWaitingRoomPoint;
+	public int mAscension;
 
 	/**
 	 * Creates a new depths party with the given players
@@ -133,8 +147,19 @@ public class DepthsParty {
 				p.removeScoreboardTag(DepthsManager.RIGGED_STRING);
 			}
 
+			int currentAscension = ScoreboardUtils.getScoreboardValue(p, "CurrentAscension").orElse(0);
+			if (currentAscension > 0) {
+				mAscension = currentAscension;
+				ScoreboardUtils.setScoreboardValue(p, "CurrentAscension", 0);
+			}
+			mContent = DepthsUtils.getDepthsContent();
+
 			if (mPartyNum <= 0) {
-				mPartyNum = ScoreboardUtils.getScoreboardValue(p, "DDAccess").orElse(0);
+				if (getContent() == DepthsContent.DARKEST_DEPTHS) {
+					mPartyNum = ScoreboardUtils.getScoreboardValue(p, DepthsManager.DEPTHS_ACCESS).orElse(0);
+				} else if (getContent() == DepthsContent.CELESTIAL_ZENITH) {
+					mPartyNum = ScoreboardUtils.getScoreboardValue(p, DepthsManager.ZENITH_ACCESS).orElse(0);
+				}
 				if (mPartyNum <= 0) {
 					mPartyNum = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 				}
@@ -152,7 +177,7 @@ public class DepthsParty {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
 					//Get random ability to start
 					int[] chances = {80, 15, 5, 0, 0};
-					DepthsManager.getInstance().getRandomAbility(Objects.requireNonNull(p), dp, chances);
+					DepthsManager.getInstance().getRandomAbility(Objects.requireNonNull(p), dp, chances, false, false);
 				}
 			}
 
@@ -166,6 +191,7 @@ public class DepthsParty {
 		mDelveModifiers = new HashMap<>();
 		mSpawnedReward = false;
 		mRoomStartX = loc.getBlockX();
+		mContent = DepthsUtils.getDepthsContent();
 
 		//Attempt to set locations for the next floor lobby to load
 		Collection<ArmorStand> nearbyStands = loc.getNearbyEntitiesByType(ArmorStand.class, 100.0);
@@ -181,6 +207,11 @@ public class DepthsParty {
 
 			if (stand.getName().contains(DepthsManager.LOOT_ROOM_STAND_NAME)) {
 				mLootRoomLocations.add(stand.getLocation().toVector());
+				stand.remove();
+			}
+
+			if (stand.getName().contains(DepthsManager.DEATH_WAITING_ROOM_STAND_NAME)) {
+				mDeathWaitingRoomPoint = stand.getLocation().toVector();
 				stand.remove();
 			}
 		}
@@ -218,25 +249,15 @@ public class DepthsParty {
 			return;
 		}
 
-		boolean spawnSlime = false;
-		//Check if the room is complete, and we didn't already reward them
+		//Check if the room is complete and we didnt already reward them
 		if (mSpawnersToBreak == 0 && !mSpawnedReward && mCurrentRoom.mSpawnerCount > 0) {
 
-			for (DepthsPlayer dp : mPlayersInParty) {
-				if (dp != null) {
-					DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(mCurrentRoomType);
-					if (rewardType != null) {
-						dp.mEarnedRewards.add(rewardType);
-						spawnSlime = true;
-					}
-					Player partyMember = Bukkit.getPlayer(dp.mPlayerId);
-					if (partyMember != null) {
-						partyMember.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-							"This room's " + DepthsUtils.rewardString(mCurrentRoomType)
-								+ " reward has been found!")));
-					}
-				}
+			DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(mCurrentRoomType);
+			if (rewardType != null) {
+				mPlayersInParty.forEach(dp -> dp.mEarnedRewards.add(rewardType));
 			}
+			sendMessage("This room's " + DepthsUtils.rewardString(mCurrentRoomType) + " reward has been found!");
+
 			if (mCurrentRoomType == DepthsRoomType.TREASURE || mCurrentRoomType == DepthsRoomType.TREASURE_ELITE) {
 				mCanGetTreasureReward = true;
 			}
@@ -249,7 +270,7 @@ public class DepthsParty {
 			l.getWorld().playSound(l, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.8f, 1.0f);
 			l.getWorld().playSound(l, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			EntityUtils.fireworkAnimation(l);
-			spawnRoomReward(l, spawnSlime);
+			spawnRoomReward(l, rewardType != null);
 		}
 	}
 
@@ -299,6 +320,7 @@ public class DepthsParty {
 
 	/**
 	 * Gets some summary information about the party
+	 *
 	 * @return info about the party as a string to print
 	 */
 	public Component getSummaryComponent() {
@@ -340,11 +362,18 @@ public class DepthsParty {
 			.append(Component.text("Treasure score: "))
 			.append(Component.text(mTreasureScore, NamedTextColor.WHITE));
 
-		if (mEndlessMode || endlessModeUnlocked) {
+		if ((mEndlessMode || endlessModeUnlocked) && mContent == DepthsContent.DARKEST_DEPTHS) {
 			result = result
 				.append(Component.newline())
 				.append(Component.text("Endless mode: "))
 				.append(Component.text(mEndlessMode, NamedTextColor.WHITE));
+		}
+
+		if (mContent == DepthsContent.CELESTIAL_ZENITH) {
+			result = result
+				.append(Component.newline())
+				.append(Component.text("Ascension level: "))
+				.append(Component.text(mAscension, NamedTextColor.WHITE));
 		}
 
 		return result;
@@ -352,6 +381,7 @@ public class DepthsParty {
 
 	/**
 	 * Called when a new room is spawned. Sets spawner count and resets reward availability for players.
+	 *
 	 * @param room the room that was just spawned for the party
 	 */
 	public void setNewRoom(DepthsRoom room) {
@@ -365,11 +395,13 @@ public class DepthsParty {
 		//Logic for entering a new floor
 		if (mRoomNumber % 10 == 1) {
 			for (DepthsPlayer p : mPlayersInParty) {
-				//Reset chaos eligibility
+				//Reset chaos and wheel eligibility
 				p.mUsedChaosThisFloor = false;
+				p.mUsedWheelThisFloor = false;
 				//Reset ability removal eligibility
 				p.mUsedAbilityDeletion = false;
 				p.mUsedAbilityMutation = false;
+				p.mUsedGenerosity = false;
 			}
 			mTwistedThisFloor = false;
 		}
@@ -381,6 +413,39 @@ public class DepthsParty {
 		//Add to room history so party can't get it again
 		mOldRooms.add(room);
 
+		//Give extra rewards to all players if it's the starter room in depths 2
+
+		if (mRoomNumber == 1 && mContent == DepthsContent.CELESTIAL_ZENITH) {
+			try {
+				DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(room.mRoomType);
+				if (rewardType != null) {
+					for (DepthsPlayer dp : mPlayersInParty) {
+						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
+						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+					}
+				}
+				// Add delve points for ascension
+				if (mAscension > 0) {
+					int totalPoints = 0;
+					for (int x : DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS) {
+						if (x <= mAscension) {
+							totalPoints += DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS_AMOUNT;
+						}
+					}
+					if (mAscension >= 13) {
+						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints, mDelveModifiers, true);
+					} else {
+						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints, mDelveModifiers, false);
+					}
+				}
+			} catch (Exception e) {
+				MMLog.warning("Null depths party member");
+				e.printStackTrace();
+			}
+		}
+
 		//Make all players eligible for rewards again if spawner count is 0
 		if (room.mSpawnerCount == 0) {
 			try {
@@ -391,17 +456,12 @@ public class DepthsParty {
 					}
 				}
 			} catch (Exception e) {
-				Plugin.getInstance().getLogger().info("Null depths party member");
+				MMLog.warning("Null depths party member");
+				e.printStackTrace();
 			}
 		}
 
-		for (DepthsPlayer dp : mPlayersInParty) {
-			Player p = Bukkit.getPlayer(dp.mPlayerId);
-			if (p != null) {
-				p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-					"Spawned new " + room.mRoomType.getRoomString() + " room!")));
-			}
-		}
+		sendMessage("Spawned new " + room.mRoomType.getRoomString() + " room!");
 
 		mBeatBoss = false;
 	}
@@ -470,33 +530,24 @@ public class DepthsParty {
 	//Sends player to, and fills, the next open loot room
 	public void populateLootRoom(Player p, boolean victory) {
 		int maxLootRooms = mIsSixPlayerMode ? MAX_LOOT_ROOMS_EXPANDED : MAX_LOOT_ROOMS;
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(p);
+		if (dp == null) {
+			// This should be very impossible
+			MMLog.warning(p.getName() + " respawned in Depths while being in a party but not in the depths system");
+			return;
+		}
 		if (mLootRoomLocations.size() > mLootRoomsUsed && maxLootRooms > mLootRoomsUsed) {
 			Location lootRoomLoc = new Location(p.getWorld(), mLootRoomLocations.get(mLootRoomsUsed).getX(), mLootRoomLocations.get(mLootRoomsUsed).getY(), mLootRoomLocations.get(mLootRoomsUsed).getZ());
 			p.teleport(lootRoomLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 			p.setBedSpawnLocation(lootRoomLoc, true);
 			p.addScoreboardTag(Constants.Tags.NO_TRANSPOSING);
 			mLootRoomsUsed++;
-			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-				"Sending you to loot room " + mLootRoomsUsed)));
+			dp.sendMessage("Sending you to loot room " + mLootRoomsUsed);
 
 			//Remove delve score if applicable
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					DelvesUtils.clearDelvePlayerByShard(null, p, ServerProperties.getShardName());
-				}
-
-			}.runTaskLater(Plugin.getInstance(), 80);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> DelvesUtils.clearDelvePlayerByShard(null, p, ServerProperties.getShardName()), 80);
 
 			p.removeScoreboardTag(DepthsManager.ENDLESS_MODE_STRING);
-
-			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
-			if (dp == null) {
-				// This should be very impossible
-				MMLog.warning(p.getName() + " respawned in Depths while being in a party but not in the depths system");
-				return;
-			}
 
 			int treasureScore = dp.mFinalTreasureScore;
 			if (treasureScore == -1) {
@@ -509,59 +560,115 @@ public class DepthsParty {
 			DepthsManager.getInstance().deletePlayer(p);
 			mPlayersInParty.remove(dp);
 			int lootRoomTreasure = mIsSixPlayerMode ? (int) Math.ceil(treasureScore * 0.75) : treasureScore;
-			DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, (roomReached > 120) && !mIsSixPlayerMode);
+			if (getContent() == DepthsContent.DARKEST_DEPTHS) {
+				DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, (roomReached > 120) && !mIsSixPlayerMode);
+			} else {
+				ZenithLoot.generateLoot(lootRoomLoc.clone().add(ZenithLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, getAscension() >= 15 && !mIsSixPlayerMode && victory, getAscension());
+			}
 
 			//Set their highest room score and do announcements
 			int highestRoom;
+			int maxAscension;
 			if (!mIsSixPlayerMode) {
-				highestRoom = ScoreboardUtils.getScoreboardValue(p, ENDLESS_LEADERBOARD).orElse(0);
-				if (roomReached > highestRoom) {
-					ScoreboardUtils.setScoreboardValue(p, ENDLESS_LEADERBOARD, roomReached);
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getName() + " " + ENDLESS_LEADERBOARD);
-				}
-				if (roomReached > 30) {
+				if (getContent() == DepthsContent.DARKEST_DEPTHS) {
+					highestRoom = ScoreboardUtils.getScoreboardValue(p, ENDLESS_LEADERBOARD).orElse(0);
 					if (roomReached > highestRoom) {
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
-					} else {
+						ScoreboardUtils.setScoreboardValue(p, ENDLESS_LEADERBOARD, roomReached);
+						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getName() + " " + ENDLESS_LEADERBOARD);
+					}
+					if (roomReached > 30) {
+						if (roomReached > highestRoom) {
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						} else {
+							Bukkit.getServer().sendMessage(Component.empty()
+								.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+								.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
+									                       + roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+						}
+					}
+				} else if (getContent() == DepthsContent.CELESTIAL_ZENITH) {
+					maxAscension = ScoreboardUtils.getScoreboardValue(p, ASCENSION_LEADERBOARD).orElse(0);
+					if (victory && getAscension() > maxAscension) {
+						ScoreboardUtils.setScoreboardValue(p, ASCENSION_LEADERBOARD, getAscension());
+						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getName() + " " + ASCENSION_LEADERBOARD);
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith with a new personal best! (Ascension Level: " + getAscension() + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+					} else if (victory && getAscension() > 0) {
 						Bukkit.getServer().sendMessage(Component.empty()
 							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
-							.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
-								+ roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+							.append(Component.text(" defeated the Celestial Zenith! (Ascension Level: "
+								                       + getAscension() + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 					}
 				}
-			} else {
-				highestRoom = ScoreboardUtils.getScoreboardValue(p, EXPANDED_LEADERBOARD).orElse(0);
-				if (roomReached > highestRoom) {
-					ScoreboardUtils.setScoreboardValue(p, EXPANDED_LEADERBOARD, roomReached);
-					NmsUtils.getVersionAdapter().runConsoleCommandSilently("leaderboard update " + p.getName() + " " + EXPANDED_LEADERBOARD);
-				}
-				if (roomReached > 30) {
-					if (roomReached > highestRoom) {
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best in six player mode! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
-					} else {
-						Bukkit.getServer().sendMessage(Component.empty()
-							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
-							.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
-								+ roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
-					}
-				}
-			}
-			SeasonalEventListener.playerCompletedDepths(p, roomReached);
 
-			if (victory) {
-				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "depths"));
+			} else {
+				// 6 player mode handler
+				if (getContent() == DepthsContent.DARKEST_DEPTHS) {
+					highestRoom = ScoreboardUtils.getScoreboardValue(p, EXPANDED_LEADERBOARD).orElse(0);
+					if (roomReached > highestRoom) {
+						ScoreboardUtils.setScoreboardValue(p, EXPANDED_LEADERBOARD, roomReached);
+						NmsUtils.getVersionAdapter().runConsoleCommandSilently("leaderboard update " + p.getName() + " " + EXPANDED_LEADERBOARD);
+					}
+					if (roomReached > 30) {
+						if (roomReached > highestRoom) {
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best in six player mode! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						} else {
+							Bukkit.getServer().sendMessage(Component.empty()
+								.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+								.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
+									                       + roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+						}
+					}
+				} else if (getContent() == DepthsContent.CELESTIAL_ZENITH) {
+					maxAscension = ScoreboardUtils.getScoreboardValue(p, SIX_ASCENSION_LEADERBOARD).orElse(0);
+					if (victory && getAscension() > maxAscension) {
+						ScoreboardUtils.setScoreboardValue(p, SIX_ASCENSION_LEADERBOARD, getAscension());
+						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getName() + " " + SIX_ASCENSION_LEADERBOARD);
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith with a new personal best in six player mode! (Ascension Level: " + getAscension() + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+					} else if (victory) {
+						Bukkit.getServer().sendMessage(Component.empty()
+							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+							.append(Component.text(" defeated the Celestial Zenith! (Ascension Level: "
+								                       + getAscension() + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+					}
+				}
+
 			}
+			if (getContent() == DepthsContent.DARKEST_DEPTHS) {
+				SeasonalEventListener.playerCompletedDepths(p, roomReached);
+			} else {
+				SeasonalEventListener.playerCompletedZenith(p, roomReached);
+			}
+
+			if (victory && getContent() == DepthsContent.DARKEST_DEPTHS) {
+				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "depths"));
+			} else if (victory && getContent() == DepthsContent.CELESTIAL_ZENITH) {
+				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "zenith"));
+			}
+
 
 		} else {
-			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-				"Max loot rooms reached! This should never happen - please contact a moderator.")));
-			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
-			if (dp != null) {
-				//Remove player from their party anyway
-				DepthsManager.getInstance().deletePlayer(p);
-				mPlayersInParty.remove(dp);
+			dp.sendMessage("Max loot rooms reached! This should never happen- please contact a moderator.");
+			//Remove player from their party anyway
+			DepthsManager.getInstance().deletePlayer(p);
+			mPlayersInParty.remove(dp);
+		}
+	}
+
+	public int getAscension() {
+		if (mContent == DepthsContent.CELESTIAL_ZENITH) {
+			return mAscension;
+		}
+		return 0;
+	}
+
+	// For ascension purging, checks if all depths players active have removed an ability this floor
+	public boolean isAscensionPurgeMet() {
+		for (DepthsPlayer p : mPlayersInParty) {
+			if (!p.mUsedAbilityDeletion) {
+				return false;
 			}
 		}
+		return true;
 	}
 
 	public int getRoomX() {
@@ -570,5 +677,49 @@ public class DepthsParty {
 
 	public void setRoomX(int x) {
 		mRoomStartX = x;
+	}
+
+	public void sendMessage(String message) {
+		sendMessage(message, dp -> true);
+	}
+
+	public void sendMessage(Component message) {
+		sendMessage(message, dp -> true);
+	}
+
+	public void sendMessage(String message, Predicate<DepthsPlayer> pred) {
+		sendMessage(Component.text(message), pred);
+	}
+
+	public void sendMessage(Component message, Predicate<DepthsPlayer> pred) {
+		mPlayersInParty.stream().filter(pred).forEach(dp -> dp.sendMessage(message));
+	}
+
+	public double getZenithHealthIncreaseMultiplier() {
+		return 1 + mAscension * ZENITH_HEALTH_INCREASE_PER_ASCENSION;
+	}
+
+	public double getZenithDamageIncreaseMultiplier() {
+		return 1 + mAscension * ZENITH_DAMAGE_INCREASE_PER_ASCENSION;
+	}
+
+	public DepthsContent getContent() {
+		return mContent;
+	}
+
+	public static double getAscensionScaledHealth(double baseHealth, @Nullable DepthsParty party) {
+		return baseHealth * (party != null ? party.getZenithHealthIncreaseMultiplier() : 1);
+	}
+
+	public static double getAscensionScaledDamage(double baseDamage, @Nullable DepthsParty party) {
+		return baseDamage * (party != null ? party.getZenithDamageIncreaseMultiplier() : 1);
+	}
+
+	public static int getAscensionEigthCooldown(int baseCooldown, @Nullable DepthsParty party) {
+		return (party != null && party.getAscension() >= 8) ? baseCooldown - 40 : baseCooldown;
+	}
+
+	public List<Player> getPlayers() {
+		return mPlayersInParty.stream().map(DepthsPlayer::getPlayer).filter(Objects::nonNull).toList();
 	}
 }

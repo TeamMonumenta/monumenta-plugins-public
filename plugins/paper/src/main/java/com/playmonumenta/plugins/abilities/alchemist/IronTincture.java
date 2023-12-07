@@ -11,17 +11,12 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.IronTinctureCS;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,10 +26,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class IronTincture extends Ability {
@@ -111,26 +103,11 @@ public class IronTincture extends Ability {
 			return;
 		}
 
-		Location loc = mPlayer.getEyeLocation();
-		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
-		ItemMeta tinctMeta = itemTincture.getItemMeta();
-		tinctMeta.displayName(Component.text(mCosmetic.tinctureName(), NamedTextColor.WHITE)
-				.decoration(TextDecoration.ITALIC, false));
-		itemTincture.setItemMeta(tinctMeta);
-		// Add infinity enchantment so that potion injector cannot use it
-		ItemStatUtils.addEnchantment(itemTincture, EnchantmentType.INFINITY, 1);
-		ItemUtils.setPlainName(itemTincture, mCosmetic.tinctureName());
 		World world = mPlayer.getWorld();
+		Location loc = mPlayer.getEyeLocation();
+		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, IRON_TINCTURE_VELOCITY);
+		Item tincture = AbilityUtils.spawnAbilityItem(world, loc, Material.SPLASH_POTION, mCosmetic.tinctureName(), false, velocity, true, true);
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
-		Item tincture = world.dropItem(loc, itemTincture);
-		tincture.setPickupDelay(Integer.MAX_VALUE);
-
-		Vector vel = mPlayer.getEyeLocation().getDirection().normalize();
-		vel.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, IRON_TINCTURE_VELOCITY));
-
-		tincture.setVelocity(vel);
-		tincture.setGlowing(true);
-		EntityUtils.makeItemInvulnereable(tincture);
 
 		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
@@ -140,25 +117,26 @@ public class IronTincture extends Ability {
 
 			@Override
 			public void run() {
-				mCosmetic.onGroundEffect(tincture.getLocation(), mPlayer, mTinctureDecay / IRON_TINCTURE_TICK_PERIOD);
+				Location l = tincture.getLocation();
+				mCosmetic.onGroundEffect(l, mPlayer, mTinctureDecay / IRON_TINCTURE_TICK_PERIOD);
 
-				for (Player p : PlayerUtils.playersInRange(tincture.getLocation(), 1, true)) {
+				for (Player p : PlayerUtils.playersInRange(l, 1, true)) {
 					// Prevent players from picking up their own tincture instantly
 					if (p == mPlayer && tincture.getTicksLived() < 12) {
 						continue;
 					}
 
-					mCosmetic.pickupEffects(tincture.getLocation(), p);
+					mCosmetic.pickupEffects(l, p);
 
 					tincture.remove();
 
-					execute(mPlayer, tincture.getLocation());
+					execute(mPlayer, l);
 					if (mAlchemistPotions != null) {
 						mAlchemistPotions.incrementCharge();
 					}
 
 					if (p != mPlayer) {
-						execute(p, tincture.getLocation());
+						execute(p, l);
 						if (mAlchemistPotions != null) {
 							mAlchemistPotions.incrementCharge();
 						}
@@ -173,7 +151,7 @@ public class IronTincture extends Ability {
 
 				mTinctureDecay += IRON_TINCTURE_TICK_PERIOD;
 				if (mTinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || !tincture.isValid() || tincture.isDead()) {
-					mCosmetic.tinctureExpireEffects(tincture.getLocation(), mPlayer);
+					mCosmetic.tinctureExpireEffects(l, mPlayer);
 					tincture.remove();
 					this.cancel();
 

@@ -181,7 +181,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 
 				p.LINGERING_EFFECTS.apply(target, boss);
 			},
-			p.SPAWNED_MOB_POOL, p.Y_VELOCITY, p.LOB_VARIANCE
+			p.SPAWNED_MOB_POOL, p.Y_VELOCITY, p.LOB_VARIANCE, null, null
 		);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.SpawnerUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -50,6 +51,9 @@ public class Adrenaline implements Enchantment {
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
 		if (ItemUtils.isPickaxe(player.getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
+			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+				return;
+			}
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR).spawnAsPlayerBuff(player);
 			double speedAmount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, PERCENT_SPEED_PER_LEVEL * value * 0.5);
 			int duration = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DURATION, SPAWNER_DURATION);

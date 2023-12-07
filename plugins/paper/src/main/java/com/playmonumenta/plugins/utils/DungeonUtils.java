@@ -48,7 +48,8 @@ public class DungeonUtils {
 		RUIN(Location.BLUESTRIKE, "ruin", "DMASAccess", "DMASFinished", null, -1, null, null),
 		PORTAL(Location.SCIENCE, "portal", "DPSAccess", "DPSFinished", null, -1, null, null),
 		GALLERY(Location.GALLERYOFFEAR, "gallery", "DGAccess", "DGFinished", null, -1, "DGType", null),
-		GODSPORE(Location.GODSPORE, null, "GodsporeAccess", null, null, -1, null, null);
+		GODSPORE(Location.GODSPORE, null, "GodsporeAccess", null, null, -1, null, null),
+		ZENITH(Location.DEPTHS, "zenith", "DCZAccess", "DCZFinished", null, -1, null, null); //TODO location tag
 
 		private final Location mLocation;
 		private final @Nullable String mShardName;

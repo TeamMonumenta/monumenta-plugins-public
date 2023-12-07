@@ -124,6 +124,8 @@ public class SpawnerListener implements Listener {
 
 	private final BukkitRunnable mCleaner;
 
+	private @Nullable String mRecentlyBrokenSpawnerLosPool = null;
+
 	public SpawnerListener(Plugin plugin) {
 		mCleaner = new BukkitRunnable() {
 			@Override
@@ -179,16 +181,9 @@ public class SpawnerListener implements Listener {
 		mCleaner.runTaskTimer(plugin, 0, CLEANER_INTERVAL);
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void spawnerSpawnEvent(SpawnerSpawnEvent event) {
 		if (event.getEntity() instanceof LivingEntity mob) {
-			// Do not handle persistent mobs spawned from spawners
-			if (!mob.getRemoveWhenFarAway()) {
-				Location loc = event.getSpawner().getLocation();
-				MMLog.fine(() -> "SpawnerListener: Ignoring persistent mob from spawner at " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + "): " + mob.getUniqueId());
-				return;
-			}
-
 			List<MobInfo> spawnerInfo = mSpawnerInfos.computeIfAbsent(event.getSpawner().getLocation(), k -> new ArrayList<>());
 
 			// Generate list of player locations a single time
@@ -244,17 +239,29 @@ public class SpawnerListener implements Listener {
 				DelvesManager.setForcedReferenceToSpawner(event.getSpawner());
 				Entity spawnedEntity = losPool.spawn(mob.getLocation());
 				if (spawnedEntity instanceof LivingEntity livingEntity) {
-					MMLog.fine(() -> "SpawnerListener: Started tracking mob: " + mob.getUniqueId());
-					mMobInfos.put(livingEntity.getUniqueId(), new MobInfo(livingEntity));
+					// Persistent mobs don't need to be tracked
+					if (mob.getRemoveWhenFarAway()) {
+						Location loc = event.getSpawner().getLocation();
+						MMLog.fine(() -> "SpawnerListener: Not tracking persistent mob from spawner at " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + "): " + mob.getUniqueId());
+					} else {
+						MMLog.fine(() -> "SpawnerListener: Started tracking mob: " + mob.getUniqueId());
+						mMobInfos.put(livingEntity.getUniqueId(), new MobInfo(livingEntity));
+					}
 				} else {
 					DelvesManager.setForcedReferenceToSpawner(null);
 				}
 				event.setCancelled(true);
 			} else {
-				MMLog.fine(() -> "SpawnerListener: Started tracking mob: " + mob.getUniqueId());
-				MobInfo mobInfo = new MobInfo(mob);
-				spawnerInfo.add(mobInfo);
-				mMobInfos.put(mob.getUniqueId(), mobInfo);
+				// Persistent mobs don't need to be tracked
+				if (mob.getRemoveWhenFarAway()) {
+					Location loc = event.getSpawner().getLocation();
+					MMLog.fine(() -> "SpawnerListener: Not tracking persistent mob from spawner at " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + "): " + mob.getUniqueId());
+				} else {
+					MMLog.fine(() -> "SpawnerListener: Started tracking mob: " + mob.getUniqueId());
+					MobInfo mobInfo = new MobInfo(mob);
+					spawnerInfo.add(mobInfo);
+					mMobInfos.put(mob.getUniqueId(), mobInfo);
+				}
 			}
 		}
 	}
@@ -336,7 +343,7 @@ public class SpawnerListener implements Listener {
 
 		// Shielded spawner markers
 		if (event.getEntity() instanceof Marker marker) {
-			SpawnerUtils.startShieldedSpawnerDisplay(marker);
+			SpawnerUtils.startSpawnerEffectsDisplay(marker);
 		}
 	}
 
@@ -352,7 +359,7 @@ public class SpawnerListener implements Listener {
 		event.blockList().removeIf(block -> SpawnerUtils.isSpawner(block) && (SpawnerUtils.getShields(block) > 0 || SpawnerUtils.getBreakActionIdentifiers(block).size() > 0));
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
 		Block block = event.getBlock();
 
@@ -361,7 +368,7 @@ public class SpawnerListener implements Listener {
 		}
 
 		if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
-			SpawnerUtils.removeShieldDisplayMarker(block);
+			SpawnerUtils.removeEffectsDisplayMarker(block);
 			return;
 		}
 
@@ -372,6 +379,8 @@ public class SpawnerListener implements Listener {
 
 		if (!brokeSpawner) {
 			event.setCancelled(true);
+		} else {
+			mRecentlyBrokenSpawnerLosPool = SpawnerUtils.getLosPool(block);
 		}
 
 		Location blockLoc = BlockUtils.getCenterBlockLocation(block);
@@ -394,25 +403,31 @@ public class SpawnerListener implements Listener {
 			return;
 		}
 
-		SpawnerUtils.removeShieldDisplayMarker(block);
-		SpawnerActionManager.triggerActions(SpawnerUtils.getBreakActionIdentifiers(block), event.getPlayer(), block);
+		if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+			return;
+		}
+
+		SpawnerUtils.removeEffectsDisplayMarker(block);
+		SpawnerActionManager.triggerActions(SpawnerUtils.getBreakActionIdentifiers(block), event.getPlayer(), block, mRecentlyBrokenSpawnerLosPool);
 	}
 
 	private void doShieldBreakAnimation(Location blockLoc, int shields) {
-		blockLoc.getWorld().playSound(blockLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.6f, 2f);
-		blockLoc.getWorld().playSound(blockLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.6f, 2f);
-		if (shields >= 3) {
-			blockLoc.getNearbyPlayers(15).forEach(player ->
-				ParticleUtils.drawSevenSegmentNumber(
-					shields, blockLoc.clone().add(0, 1.5, 0),
-					player, 0.65, 0.5, Particle.REDSTONE, new Particle.DustOptions(Color.AQUA, 1f)
-				)
-			);
+		if (shields == 0) {
+			return;
 		}
+
+		blockLoc.getWorld().playSound(blockLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.6f, 2f);
+		blockLoc.getWorld().playSound(blockLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.6f, 2f);
+		blockLoc.getNearbyPlayers(15).forEach(player ->
+			ParticleUtils.drawSevenSegmentNumber(
+				shields, blockLoc.clone().add(0, 1.5, 0),
+				player, 0.65, 0.5, Particle.REDSTONE, new Particle.DustOptions(Color.AQUA, 1f)
+			)
+		);
 	}
 
 	private void doShieldFullBreakAnimation(Location blockLoc) {
-		SpawnerUtils.removeShieldDisplayMarker(blockLoc.getBlock());
+		SpawnerUtils.removeEffectsDisplayMarker(blockLoc.getBlock());
 		blockLoc.getWorld().playSound(blockLoc, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 0.6f, 2f);
 		new PPCircle(Particle.FLAME, blockLoc, 1).rotateDelta(true).delta(1, 0, 0)
 			.directionalMode(true).extra(0.1).countPerMeter(4).distanceFalloff(16).spawnFull();
@@ -433,7 +448,6 @@ public class SpawnerListener implements Listener {
 		if (shields > 0) {
 			player.sendMessage(Component.text("Placed a spawner with " + shields + " shields.", NamedTextColor.GOLD));
 			SpawnerUtils.setShields(block, shields);
-			SpawnerUtils.addShieldDisplayMarker(block);
 		}
 
 		String losPool = SpawnerUtils.getLosPool(item);
@@ -447,6 +461,10 @@ public class SpawnerListener implements Listener {
 			player.sendMessage(Component.text("Placed a spawner with " + breakActions.size() + " break action(s):", NamedTextColor.GOLD));
 			player.sendMessage(Component.text(SpawnerUtils.getBreakActionIdentifiers(item).toString(), NamedTextColor.GOLD));
 			SpawnerUtils.transferBreakActionList(item, block);
+		}
+
+		if (shields > 0 || losPool != null || breakActions.size() > 0) {
+			SpawnerUtils.addEffectsDisplayMarker(block);
 		}
 	}
 

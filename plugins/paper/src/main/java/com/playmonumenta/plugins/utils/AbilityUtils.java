@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -39,12 +40,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -52,9 +55,11 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class AbilityUtils {
@@ -66,10 +71,11 @@ public class AbilityUtils {
 	public static final String REMAINING_SKILL = "Skill";
 	public static final String REMAINING_SPEC = "SkillSpec";
 
-	public static final String CHARM_POWER = "CharmPower";
-	public static final String REMAINING_ENHANCE = "Enhancements";
 	public static final String SCOREBOARD_CLASS_NAME = "Class";
 	public static final String SCOREBOARD_SPEC_NAME = "Specialization";
+	public static final String REMAINING_ENHANCE = "Enhancements";
+	public static final String CHARM_POWER = "CharmPower";
+	public static final String DEPTHS_CHARM_POWER = "DepthsCharmPower";
 
 	public static final int MAX_SKILL_POINTS = 10;
 	public static final int MAX_SPEC_POINTS = 4;
@@ -678,5 +684,31 @@ public class AbilityUtils {
 
 	public static boolean hasPassiveAbilitySoundsEnabled(Player player) {
 		return !player.getScoreboardTags().contains(PASSIVE_SOUNDS_DISABLED_TAG);
+	}
+
+	public static Item spawnAbilityItem(World world, Location loc, Material mat, String name, boolean dropNaturally, double velocity, boolean glow, boolean invulnerable) {
+		ItemStack stack = new ItemStack(mat);
+		ItemMeta meta = stack.getItemMeta();
+		meta.displayName(Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+		stack.setItemMeta(meta);
+		if (ItemUtils.isSomePotion(mat)) {
+			// Add infinity enchantment so that potion injector cannot use it if it is a potion
+			ItemStatUtils.addEnchantment(stack, EnchantmentType.INFINITY, 1);
+		}
+		ItemUtils.setPlainName(stack, name);
+		Item droppedItem;
+		if (dropNaturally) {
+			droppedItem = world.dropItemNaturally(loc, stack);
+		} else {
+			droppedItem = world.dropItem(loc, stack);
+			Vector vel = loc.getDirection().normalize().multiply(velocity);
+			droppedItem.setVelocity(vel);
+		}
+		droppedItem.setPickupDelay(Integer.MAX_VALUE);
+		droppedItem.setGlowing(glow);
+		if (invulnerable) {
+			EntityUtils.makeItemInvulnereable(droppedItem);
+		}
+		return droppedItem;
 	}
 }

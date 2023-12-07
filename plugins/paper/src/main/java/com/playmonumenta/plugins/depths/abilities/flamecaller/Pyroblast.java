@@ -1,22 +1,24 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import java.util.WeakHashMap;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,18 +45,27 @@ public class Pyroblast extends DepthsAbility {
 	private static final int RADIUS = 4;
 	private static final int DURATION = 4 * 20;
 
+	public static final String CHARM_COOLDOWN = "Pyroblast Cooldown";
+
 	public static final DepthsAbilityInfo<Pyroblast> INFO =
 		new DepthsAbilityInfo<>(Pyroblast.class, ABILITY_NAME, Pyroblast::new, DepthsTree.FLAMECALLER, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.PYROBLAST)
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.TNT_MINECART)
 			.descriptions(Pyroblast::getDescription)
 			.priorityAmount(949); // Needs to trigger before Rapid Fire
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
+	private final double mRadius;
+	private final double mDamage;
+	private final int mFireDuration;
+
 	public Pyroblast(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.PYROBLAST_RADIUS.mEffectName, RADIUS);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.PYROBLAST_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mFireDuration = CharmManager.getDuration(mPlayer, CharmEffects.PYROBLAST_FIRE_DURATION.mEffectName, DURATION);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
@@ -78,15 +89,16 @@ public class Pyroblast extends DepthsAbility {
 	private void explode(Projectile proj, Location loc) {
 		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
 		if (playerItemStats != null) {
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius);
 			for (LivingEntity mob : mobs) {
-				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
-				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+				EntityUtils.applyFire(mPlugin, mFireDuration, mob, mPlayer);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, false, true, false);
 			}
 			World world = proj.getWorld();
+			double mult = mRadius / RADIUS;
 			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, (int) (40 * mult), 2 * mult, 2 * mult, 2 * mult, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.FLAME, loc, (int) (40 * mult), 2 * mult, 2 * mult, 2 * mult, 0).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 1);
 			proj.remove();
 		}
@@ -137,10 +149,16 @@ public class Pyroblast extends DepthsAbility {
 		return true;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Shooting a projectile while sneaking fires an exploding projectile, which deals ")
-			.append(Component.text(DAMAGE[rarity - 1], color))
-			.append(Component.text(" magic damage within a " + RADIUS + " block radius of it and sets nearby mobs on fire for " + DURATION / 20 + " seconds upon impact. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<Pyroblast> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Pyroblast>(color)
+			.add("Shooting a projectile while sneaking fires an exploding projectile, which deals ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" magic damage to mobs within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks upon impact. Affected mobs are set on fire for ")
+			.addDuration(a -> a.mFireDuration, DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
 	}
 
 

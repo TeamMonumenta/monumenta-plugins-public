@@ -33,6 +33,7 @@ import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
 import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
+import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -620,6 +621,11 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 	public void resetScoreHolderScores(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
 		Scoreboard nmsScoreboard = ((CraftScoreboard) scoreboard).getHandle();
 		nmsScoreboard.resetPlayerScore(scoreHolder, null);
+	}
+
+	@Override
+	public void disableRangedAttackGoal(LivingEntity entity) {
+		((CraftMob) entity).getHandle().goalSelector.getAvailableGoals().removeIf(w -> w.getGoal() instanceof RangedAttackGoal);
 	}
 
 }

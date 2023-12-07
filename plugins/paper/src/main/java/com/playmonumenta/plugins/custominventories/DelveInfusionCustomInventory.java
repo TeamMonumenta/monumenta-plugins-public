@@ -27,18 +27,22 @@ import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.itemstats.infusions.Unyielding;
 import com.playmonumenta.plugins.itemstats.infusions.Usurper;
 import com.playmonumenta.plugins.itemstats.infusions.Vengeful;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -80,6 +84,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	private final Map<Integer, ItemClicked> mMapFunction;
 
 	private @Nullable EquipmentSlot mSlotSelected;
+	private final boolean mZenithCompleted;
+	private final boolean mDepthsCompleted;
+	private DelveInfusionUtils.DelveInfusionMaterial mDelveInfusionMaterial;
 
 	static {
 		// Add items into mDelvePanelList and mDelveInfusionPanelsMap
@@ -182,7 +189,16 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		super(owner, 54, "Delve Infusions");
 		mMapFunction = new HashMap<>();
 		mSlotSelected = null;
-		loadInv(owner);
+		mDepthsCompleted = ScoreboardUtils.getScoreboardValue(owner, "Depths").orElse(0) > 0;
+		mZenithCompleted = ScoreboardUtils.getScoreboardValue(owner, "Zenith").orElse(0) > 0;
+		mDelveInfusionMaterial = mZenithCompleted ?
+			                         (mDepthsCompleted ?
+				                          (ServerProperties.getAbilityEnhancementsEnabled(owner) ? DelveInfusionUtils.DelveInfusionMaterial.INDIGO_BLIGHTDUST : DelveInfusionUtils.DelveInfusionMaterial.VOIDSTAINED_GEODE)
+				                          : DelveInfusionUtils.DelveInfusionMaterial.INDIGO_BLIGHTDUST)
+			                         : DelveInfusionUtils.DelveInfusionMaterial.VOIDSTAINED_GEODE;
+		if (mDepthsCompleted || mZenithCompleted) {
+			loadInv(owner);
+		}
 	}
 
 	private void loadInv(Player player) {
@@ -255,28 +271,30 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			if (infusion.isUnlocked(player)) {
 				mInventory.setItem(place, mDelvePanelList.get(infusion));
 				mMapFunction.put(place, (p, inventory, slot) -> {
-					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
+					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion, mDelveInfusionMaterial);
 					mSlotSelected = null;
 				});
 			}
 		});
 
-		ItemStack swapPage = new ItemStack(Material.PAPER);
-		ItemMeta meta = swapPage.getItemMeta();
-		meta.displayName(Component.text("Back!")
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false)
-				.color(TextColor.fromCSSHexString("ffa000")));
-		swapPage.setItemMeta(meta);
+		ItemStack swapPage = GUIUtils.createBasicItem(Material.PAPER, "Back!", TextColor.fromCSSHexString("ffa000"), true);
 		mInventory.setItem(53, swapPage);
-
 		mMapFunction.put(53, (p, clickedInventory, slot) -> {
 			mSlotSelected = null;
 		});
 
+		if (mDepthsCompleted && mZenithCompleted) {
+			ItemStack currencyItem = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(player, mDelveInfusionMaterial.mLootTable));
+			GUIUtils.splitLoreLine(currencyItem, "Currently using " + mDelveInfusionMaterial.mItemNamePlural + ". Click to switch to " + mDelveInfusionMaterial.getNext().mItemNamePlural + ".", NamedTextColor.DARK_GRAY, 30, true);
+			mInventory.setItem(49, currencyItem);
+			mMapFunction.put(49, (p, clickedInventory, slot) -> {
+				mDelveInfusionMaterial = mDelveInfusionMaterial.getNext();
+			});
+		}
+
 	}
 
-	private void attemptInfusion(Player p, ItemStack item, DelveInfusionSelection infusion) {
+	private void attemptInfusion(Player p, ItemStack item, DelveInfusionSelection infusion, DelveInfusionUtils.DelveInfusionMaterial delveInfusionMaterial) {
 		if (item.getAmount() > 1) {
 			p.sendMessage(Component.text("You cannot infuse stacked items.", NamedTextColor.RED));
 			return;
@@ -287,9 +305,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		}
 
 		try {
-			if (DelveInfusionUtils.canPayInfusion(item, infusion, p)) {
-				if (DelveInfusionUtils.payInfusion(item, infusion, p)) {
-					DelveInfusionUtils.infuseItem(p, item, infusion);
+			if (DelveInfusionUtils.canPayInfusion(item, infusion, p, delveInfusionMaterial)) {
+				if (DelveInfusionUtils.payInfusion(item, infusion, p, delveInfusionMaterial)) {
+					DelveInfusionUtils.infuseItem(p, item, infusion, delveInfusionMaterial);
 				} else {
 					p.sendMessage(Component.text("If you see this message please contact a mod! (Error in paying infusion cost)", NamedTextColor.RED));
 				}
@@ -349,11 +367,12 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					int slot = (row * 9) + 2 + level;
 					if (level < DelveInfusionUtils.MAX_LEVEL) {
 						//if we didn't reach max level then load item to infuse
+						DelveInfusionUtils.DelveInfusionMaterial delveInfusionMaterial = DelveInfusionUtils.getDelveInfusionMaterial(item);
 						ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Click to infuse to level " + (level + 1), NamedTextColor.DARK_AQUA, true,
-							"You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " Voidstained Geodes, " + DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + infusion.getDelveMatPlural() + ", and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
+							"You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " " + delveInfusionMaterial.mItemNamePlural + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + infusion.getDelveMatPlural() + ", and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
 						mInventory.setItem(slot, infuseItem);
 						mMapFunction.put(slot, (p, inventory, slotClicked) -> {
-							attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
+							attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion, delveInfusionMaterial);
 						});
 					} else {
 						//Max level reached
@@ -362,8 +381,18 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 				} else {
 					//Item with no infusion -> load item to swap page
 					//if we didn't reach max level then load item to infuse
+					String materials = "";
+					if (mDepthsCompleted) {
+						materials += "Voidstained Geodes";
+						if (mZenithCompleted) {
+							materials += " or ";
+						}
+					}
+					if (mZenithCompleted) {
+						materials += "Indigo Blightdust";
+					}
 					ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Click to select a Delve Infusion.", NamedTextColor.DARK_AQUA, true,
-						"The first Delve Infusion level costs " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[0] + " Voidstained Geodes, " + DelveInfusionUtils.MAT_COST_PER_INFUSION[0] + " corresponding Delve Materials, and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
+						"The first Delve Infusion level costs " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[0] + " " + materials + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[0] + " corresponding Delve Materials, and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
 					mInventory.setItem((rowF * 9) + 2 + 4, infuseItem);
 					mMapFunction.put((rowF * 9) + 2 + 4, (p, inventory, slot) -> {
 						mSlotSelected = equipmentSlot;

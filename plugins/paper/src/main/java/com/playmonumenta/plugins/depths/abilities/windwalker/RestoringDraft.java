@@ -2,18 +2,20 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,13 +40,20 @@ public final class RestoringDraft extends DepthsAbility {
 	public static final DepthsAbilityInfo<RestoringDraft> INFO =
 		new DepthsAbilityInfo<>(RestoringDraft.class, ABILITY_NAME, RestoringDraft::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
 			.displayItem(Material.GOLDEN_BOOTS)
-			.descriptions(RestoringDraft::getDescription);
+			.descriptions(RestoringDraft::getDescription)
+			.singleCharm(false);
+
+	private final double mHeightCap;
+	private final double mHealing;
 
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
 
 	public RestoringDraft(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mHeightCap = HEIGHT_CAP + CharmManager.getLevel(mPlayer, CharmEffects.RESTORING_DRAFT_BLOCK_CAP.mEffectName);
+		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.RESTORING_DRAFT_HEALING.mEffectName, HEALING[mRarity - 1]);
+
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -121,7 +130,8 @@ public final class RestoringDraft extends DepthsAbility {
 
 	private void heal() {
 		double fallDistance = calculateFallDistance();
-		double healing = Math.min(HEIGHT_CAP, fallDistance) * HEALING[mRarity - 1];
+		double cappedDistance = Math.min(mHeightCap, fallDistance);
+		double healing = cappedDistance * mHealing;
 		PlayerUtils.healPlayer(mPlugin, mPlayer, healing);
 
 		World world = mPlayer.getWorld();
@@ -139,10 +149,15 @@ public final class RestoringDraft extends DepthsAbility {
 	}
 
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Falling more than " + AUTOMATIC_THRESHOLD + " blocks heals you by ")
-			.append(Component.text(HEALING[rarity - 1], color))
-			.append(Component.text(" health per block fallen (up to " + HEIGHT_CAP + " blocks). All fall damage is canceled."));
+	private static Description<RestoringDraft> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<RestoringDraft>(color)
+			.add("Falling more than ")
+			.add(AUTOMATIC_THRESHOLD)
+			.add(" blocks heals you by ")
+			.addPercent(a -> a.mHealing, HEALING[rarity - 1], false, true)
+			.add(" health per block fallen (up to ")
+			.add(a -> a.mHeightCap, HEIGHT_CAP)
+			.add(" blocks). All fall damage is canceled.");
 	}
 }
 

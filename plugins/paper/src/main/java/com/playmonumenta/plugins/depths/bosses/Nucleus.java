@@ -3,25 +3,25 @@ package com.playmonumenta.plugins.depths.bosses;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveEyes;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveSummons;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellRisingTides;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellSurroundingDeath;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellTectonicDevastation;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellVolcanicDeepmise;
+import com.playmonumenta.plugins.depths.abilities.shadow.ChaosDagger;
+import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellPassiveEyes;
+import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellPassiveSummons;
+import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellRisingTides;
+import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellSurroundingDeath;
+import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellTectonicDevastation;
+import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellVolcanicDeepmise;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class Nucleus extends BossAbilityGroup {
+public final class Nucleus extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_nucleus";
 	public static final int detectionRange = 50;
 	public static final String DOOR_FILL_TAG = "Door";
@@ -67,9 +67,6 @@ public final class Nucleus extends BossAbilityGroup {
 	public static final String MUSIC_TITLE = "epic:music.nucleus";
 	private static final int MUSIC_DURATION = 152; //seconds
 
-	public final Location mSpawnLoc;
-	public final Location mEndLoc;
-
 	public int mCooldownTicks;
 	public List<Location> mEyeSpawns;
 	public Map<Location, LivingEntity> mEyes;
@@ -77,20 +74,14 @@ public final class Nucleus extends BossAbilityGroup {
 	public boolean mIsHidden;
 	public boolean mCanSpawnMobs = true;
 
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Nucleus(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mEyeSpawns = new ArrayList<>();
 		mEyes = new HashMap<>();
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
+		mBoss.addScoreboardTag(ChaosDagger.NO_GLOWING_CLEAR_TAG);
 
 		//Set/remove blocks
 		if (spawnLoc.isChunkLoaded()) {
@@ -336,7 +327,7 @@ public final class Nucleus extends BossAbilityGroup {
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
 
 		new BukkitRunnable() {
 
@@ -368,7 +359,8 @@ public final class Nucleus extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		Location loc = mBoss.getLocation();
+		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
 			player.sendMessage(Component.text("", NamedTextColor.RED)
 					.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
 					.append(Component.text(" B"))
@@ -387,17 +379,11 @@ public final class Nucleus extends BossAbilityGroup {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 		//Kill nearby mobs
-		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 40.0)) {
+		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, detectionRange)) {
 			e.damage(10000);
 		}
 
 		EntityUtils.fireworkAnimation(mBoss);
-
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
-			if (nearestPlayer != null) {
-				DepthsManager.getInstance().goToNextFloor(nearestPlayer);
-			}
-		}, 20);
+		DepthsManager.getInstance().bossDefeated(loc, detectionRange);
 	}
 }

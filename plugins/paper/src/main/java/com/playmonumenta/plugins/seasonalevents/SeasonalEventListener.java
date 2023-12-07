@@ -50,7 +50,7 @@ public class SeasonalEventListener implements Listener {
 	}
 
 	/**
-	 * Called from the depths manager, with rooms reached.
+	 * Called from DepthsParty, with rooms reached.
 	 * Run through any potential depths missions and give credit
 	 */
 	public static void playerCompletedDepths(Player p, int roomNumber) {
@@ -63,6 +63,26 @@ public class SeasonalEventListener implements Listener {
 				// Region matches up - award points
 				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 			} else if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.DEPTHS) && roomNumber >= 30) {
+				// Content matches up - award points
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
+			}
+			missionNumber++;
+		}
+	}
+
+	/**
+	 * Called from DepthsParty, with rooms reached.
+	 * Run through any potential depths missions and give credit
+	 */
+	public static void playerCompletedZenith(Player p, int roomNumber) {
+		int missionNumber = 1;
+		for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
+			if (mission.mType == WeeklyMissionType.ZENITH_ROOMS) {
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, roomNumber);
+			} else if (mission.mType == WeeklyMissionType.REGIONAL_CONTENT && 3 == mission.mRegion) {
+				// Region matches up - award points
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
+			} else if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.ZENITH) && roomNumber >= 30) {
 				// Content matches up - award points
 				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 			}

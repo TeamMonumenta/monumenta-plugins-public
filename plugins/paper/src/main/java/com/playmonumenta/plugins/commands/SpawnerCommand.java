@@ -1,21 +1,17 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
-import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -107,7 +103,6 @@ public class SpawnerCommand {
 								new StringArgument("parameter name")
 									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
 								new LiteralArgument("set"),
-								new MultiLiteralArgument(Constants.SupportedPersistentDataType.getLowerCaseNames()),
 								new TextArgument("value")
 									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getDefaultParameterValueSuggestion))
 							)
@@ -119,21 +114,13 @@ public class SpawnerCommand {
 
 								String actionIdentifier = (String) args[0];
 								String parameterName = (String) args[1];
-								String dataType = (String) args[2];
-								String valueString = (String) args[3];
+								String valueString = (String) args[2];
 								if (!SpawnerActionManager.actionExists(actionIdentifier)) {
 									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
 									return;
 								}
 
-								Constants.SupportedPersistentDataType type;
-								try {
-									type = Constants.SupportedPersistentDataType.valueOf(dataType.toUpperCase(Locale.ROOT));
-									Object value = type.mParser.apply(valueString);
-									SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, value);
-								} catch (IllegalArgumentException e) {
-									throw CommandAPI.failWithString("Invalid data type " + dataType);
-								}
+								SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, valueString);
 							}),
 							new CommandAPICommand("parameter")
 								.withArguments(

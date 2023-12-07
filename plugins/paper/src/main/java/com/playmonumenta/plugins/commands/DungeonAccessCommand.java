@@ -144,7 +144,7 @@ public class DungeonAccessCommand extends GenericCommand {
 			.register();
 	}
 
-	private static DungeonUtils.DungeonCommandMapping getMapping(String dungeon) throws WrapperCommandSyntaxException {
+	public static DungeonUtils.DungeonCommandMapping getMapping(String dungeon) throws WrapperCommandSyntaxException {
 		try {
 			return DungeonUtils.DungeonCommandMapping.valueOf(dungeon.toUpperCase(Locale.ROOT));
 		} catch (IllegalArgumentException e) {
@@ -155,7 +155,7 @@ public class DungeonAccessCommand extends GenericCommand {
 	/**
 	 * Opens a new instance of a dungeon for the key player (if they don't already have an instance), and then invites the other players into the new instance.
 	 */
-	private static void startNew(Player keyPlayer, Collection<Player> otherPlayersRaw, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch, int type, final boolean useDelvePreset) throws WrapperCommandSyntaxException {
+	public static void startNew(Player keyPlayer, Collection<Player> otherPlayersRaw, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch, int type, final boolean useDelvePreset) throws WrapperCommandSyntaxException {
 
 		if (ScoreboardUtils.getScoreboardValue(keyPlayer, mapping.getAccessName()).orElse(0) != 0) {
 			throw CommandAPI.failWithString("You already have an open instance!");

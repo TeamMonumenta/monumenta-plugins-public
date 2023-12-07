@@ -1,9 +1,19 @@
 package com.playmonumenta.plugins.itemupdater;
 
+import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.EffectType;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.QuiverListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -13,9 +23,21 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTType;
-import de.tr7zw.nbtapi.iface.*;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -152,13 +174,21 @@ public class ItemUpdateHelper {
 			return;
 		}
 
-		if (ItemStatUtils.isDirty(item)) {
+		boolean wasDirty = ItemStatUtils.isDirty(item);
+		if (wasDirty) {
 			ItemStatUtils.removeDirty(item);
 		}
 
 		// check if item has NBT data
 		boolean hasNBTData = NBT.get(item, nbt -> (boolean) nbt.hasNBTData());
 		if (!hasNBTData) {
+			return;
+		}
+
+		if (wasDirty && ItemStatUtils.isZenithCharm(item)) {
+			// Update Depths charms once a week (when not clean) to catch balance changes
+			// This calls generateItemStats again once updated. Mark clean to prevent infinite recursion
+			CharmFactory.updateCharm(item);
 			return;
 		}
 
@@ -293,11 +323,12 @@ public class ItemUpdateHelper {
 						}
 					}
 
-					if (ItemStatUtils.isCharm(item)) {
+					CharmManager.CharmType charmType = ItemStatUtils.getCharmType(item);
+					if (charmType != null) {
 						int charmPower = ItemStatUtils.getCharmPower(item);
 						if (charmPower > 0) {
 							String starString = "★".repeat(charmPower);
-							lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)).append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(ItemStatUtils.getCharmClassComponent(monumenta.getStringList(ItemStatUtils.CHARM_KEY))));
+							lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)).append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(charmType.getLabel(nbt)));
 						}
 					}
 

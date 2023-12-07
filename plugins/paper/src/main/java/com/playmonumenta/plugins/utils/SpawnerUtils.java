@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
+import com.goncalomb.bukkit.nbteditor.nbt.EntityNBT;
+import com.goncalomb.bukkit.nbteditor.nbt.SpawnerNBTWrapper;
+import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
+import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTContainer;
@@ -57,8 +63,10 @@ BreakActions [
 */
 
 public class SpawnerUtils {
-
+	// Backwards compatibility: spawners have been placed with this tag in use.
+	// Only remove this tag, and add the one below it.
 	public static final String SHIELDED_SPAWNER_MARKER_TAG = "spawner_shield_display_marker";
+	public static final String EFFECTS_SPAWNER_MARKER_TAG = "spawner_effects_display_marker";
 	public static final String SHIELDS_ATTRIBUTE = "Shields";
 	public static final String LOS_POOL_ATTRIBUTE = "LoSPool";
 	public static final String BREAK_ACTIONS_ATTRIBUTE = "BreakActions";
@@ -95,8 +103,8 @@ public class SpawnerUtils {
 		return false;
 	}
 
-	public static void startShieldedSpawnerDisplay(Marker marker) {
-		if (!marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG)) {
+	public static void startSpawnerEffectsDisplay(Marker marker) {
+		if (!marker.getScoreboardTags().contains(EFFECTS_SPAWNER_MARKER_TAG) && !marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG)) {
 			return;
 		}
 
@@ -104,10 +112,7 @@ public class SpawnerUtils {
 			final Marker mMarker = marker;
 			final PPCircle mHealthyShield = new PPCircle(Particle.SOUL_FIRE_FLAME, mMarker.getLocation(), 1)
 				.countPerMeter(2).distanceFalloff(20).ringMode(true);
-			final PPCircle mMediumShield = new PPCircle(Particle.FLAME, mMarker.getLocation(), 1)
-				.countPerMeter(2).distanceFalloff(20).ringMode(true);
-			final PPCircle mLowShield = new PPCircle(Particle.SMALL_FLAME, mMarker.getLocation(), 1)
-				.countPerMeter(2).distanceFalloff(20).ringMode(true);
+			final boolean mHasLosPool = getLosPool(marker.getLocation().getBlock()) != null;
 
 			@Override
 			public void run() {
@@ -117,13 +122,53 @@ public class SpawnerUtils {
 					return;
 				}
 
-				// Spawn the particles
-				int shields = SpawnerUtils.getShields(marker.getLocation().getBlock());
-				switch (shields) {
-					case 1 -> mLowShield.spawnFull();
-					case 2 -> mMediumShield.spawnFull();
-					default -> mHealthyShield.spawnFull();
+				Block spawnerBlock = marker.getLocation().getBlock();
+				if (!SpawnerUtils.isSpawner(spawnerBlock)) {
+					// The spawner was destroyed and the marker somehow is still lingering around.
+					cancel();
+					return;
 				}
+
+				// Spawn the particles
+				int shields = SpawnerUtils.getShields(spawnerBlock);
+				if (shields > 0) {
+					mHealthyShield.spawnFull();
+				}
+
+				if (mHasLosPool) {
+					Location centerLoc = BlockUtils.getCenterBlockLocation(spawnerBlock);
+					// Place colorful particles at the corners of the spawner.
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(0.5, 0.5, 0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(0.5, -0.5, 0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(-0.5, 0.5, 0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(-0.5, -0.5, 0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(0.5, 0.5, -0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(0.5, -0.5, -0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(-0.5, 0.5, -0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(-0.5, -0.5, -0.5), 1).data(ParticleUtils.getRandomColorOptions(150, 1)).spawnFull();
+
+					// Explicit null check for Review Dog
+					String losPool = getLosPool(spawnerBlock);
+					if (losPool != null) {
+						List<Soul> souls = LibraryOfSoulsIntegration.getPool(losPool).keySet().stream().toList();
+						if (souls.isEmpty()) {
+							return;
+						}
+						Soul soul = souls.get(0);
+						SpawnerNBTWrapper wrapper = new SpawnerNBTWrapper(spawnerBlock);
+						wrapper.clearEntities();
+						wrapper.addEntity(new SpawnerNBTWrapper.SpawnerEntity(EntityNBT.fromEntityData(soul.getNBT()), 1));
+						wrapper.save();
+					}
+				}
+
+				List<String> breakActionIdentifiers = SpawnerUtils.getBreakActionIdentifiers(spawnerBlock);
+				breakActionIdentifiers.forEach(id -> {
+					SpawnerBreakAction action = SpawnerActionManager.getAction(id);
+					if (action != null) {
+						action.periodicAesthetics(spawnerBlock);
+					}
+				});
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 20);
 	}
@@ -237,7 +282,7 @@ public class SpawnerUtils {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
-			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value));
+			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value, value.getClass()));
 			spawnerItem.setItemMeta(item.getItem().getItemMeta());
 		}
 	}
@@ -255,7 +300,7 @@ public class SpawnerUtils {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
-			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value));
+			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value, value.getClass()));
 		}
 	}
 
@@ -273,11 +318,15 @@ public class SpawnerUtils {
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			if (parameters.hasTag(parameterName)) {
-				String json = parameters.getOrDefault(parameterName, null);
+				String json = parameters.getOrNull(parameterName, String.class);
 				if (json == null) {
 					return null;
 				}
-				return MessagingUtils.GSON.fromJson(json, parameters.getType(parameterName).getDeclaringClass());
+				Object parameter = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
+				if (parameter == null) {
+					return null;
+				}
+				return MessagingUtils.GSON.fromJson(json, parameter.getClass());
 			}
 		}
 
@@ -298,11 +347,15 @@ public class SpawnerUtils {
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			if (parameters.hasTag(parameterName)) {
-				String json = parameters.getOrDefault(parameterName, null);
+				String json = parameters.getOrNull(parameterName, String.class);
 				if (json == null) {
 					return null;
 				}
-				return MessagingUtils.GSON.fromJson(json, parameters.getType(parameterName).getDeclaringClass());
+				Object parameter = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
+				if (parameter == null) {
+					return null;
+				}
+				return MessagingUtils.GSON.fromJson(json, parameter.getClass());
 			}
 		}
 
@@ -323,8 +376,11 @@ public class SpawnerUtils {
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			// Start from base parameters map and replace the values with the ones stored on the block.
 			parameterMap.forEach((key, value) -> {
-				Object currParam = parameters.getString(key);
-				parameterMap.replace(key, MessagingUtils.GSON.toJson(currParam, parameters.getType(key).getDeclaringClass()));
+				String json = parameters.getOrNull(key, String.class);
+				if (json == null) {
+					return;
+				}
+				parameterMap.replace(key, MessagingUtils.GSON.fromJson(json, value.getClass()));
 			});
 
 			return parameterMap;
@@ -387,7 +443,7 @@ public class SpawnerUtils {
 
 		NBTItem item = new NBTItem(spawnerItem);
 
-		if (!item.hasKey(SHIELDS_ATTRIBUTE)) {
+		if (!item.hasTag(SHIELDS_ATTRIBUTE)) {
 			return 0;
 		}
 
@@ -401,7 +457,7 @@ public class SpawnerUtils {
 
 		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
 
-		if (!dataContainer.hasKey(SHIELDS_ATTRIBUTE)) {
+		if (!dataContainer.hasTag(SHIELDS_ATTRIBUTE)) {
 			return 0;
 		}
 
@@ -435,20 +491,28 @@ public class SpawnerUtils {
 		return item.getType().equals(Material.SPAWNER);
 	}
 
-	public static void addShieldDisplayMarker(Block block) {
+	public static void addEffectsDisplayMarker(Block block) {
 		Entity entity = block.getWorld().spawnEntity(BlockUtils.getCenterBlockLocation(block), EntityType.MARKER);
 		if (entity instanceof Marker marker) {
-			marker.addScoreboardTag(SHIELDED_SPAWNER_MARKER_TAG);
-			startShieldedSpawnerDisplay(marker);
+			marker.addScoreboardTag(EFFECTS_SPAWNER_MARKER_TAG);
+			startSpawnerEffectsDisplay(marker);
 		}
 	}
 
-	public static void removeShieldDisplayMarker(Block block) {
+	public static void removeEffectsDisplayMarker(Block block) {
 		BlockUtils.getCenterBlockLocation(block).getNearbyEntities(0.1, 0.1, 0.1).forEach(e -> {
-			if (e instanceof Marker marker && marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG)) {
+			if (e instanceof Marker marker &&
+				(marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG) || marker.getScoreboardTags().contains(EFFECTS_SPAWNER_MARKER_TAG))) {
 				marker.remove();
 			}
 		});
+	}
+
+	public static boolean hasEffectsDisplayMarker(Block block) {
+		return BlockUtils.getCenterBlockLocation(block).getNearbyEntities(0.1, 0.1, 0.1)
+			.stream().anyMatch(e -> (e instanceof Marker marker &&
+				(marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG) || marker.getScoreboardTags().contains(EFFECTS_SPAWNER_MARKER_TAG)))
+			);
 	}
 
 	public static void addTorch(Block block) {
@@ -573,5 +637,27 @@ public class SpawnerUtils {
 		spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
 		spawner.setDelay((int) (spawner.getDelay() * multiplierRatio));
 		spawner.update(false, false);
+	}
+
+	public static void addSpawnerEffectMarkers(Location corner1, Location corner2) {
+		int minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
+		int maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());
+		int minY = Math.min(corner1.getBlockY(), corner2.getBlockY());
+		int maxY = Math.max(corner1.getBlockY(), corner2.getBlockY());
+		int minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
+		int maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
+
+		for (int x = minX; x <= maxX; x++) {
+			for (int y = minY; y <= maxY; y++) {
+				for (int z = minZ; z <= maxZ; z++) {
+					Location blockLoc = corner1.clone().set(x, y, z);
+					Block block = blockLoc.getBlock();
+
+					if (isSpawner(block) && !hasEffectsDisplayMarker(block)) {
+						addEffectsDisplayMarker(block);
+					}
+				}
+			}
+		}
 	}
 }

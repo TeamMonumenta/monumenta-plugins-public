@@ -42,7 +42,7 @@ dependencies {
     compileOnly("com.playmonumenta:scripted-quests:6.9")
     compileOnly("com.playmonumenta:redissync:4.1")
     compileOnly("com.playmonumenta:monumenta-network-relay:1.0")
-    compileOnly("com.playmonumenta:structures:8.2")
+    compileOnly("com.playmonumenta:structures:9.3")
     compileOnly("com.playmonumenta:worlds:2.0")
     compileOnly("com.playmonumenta:libraryofsouls:4.2")
     compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.19.4-v2")
@@ -233,6 +233,19 @@ tasks.create("futurama-deploy") {
             }
         }
     }
+}
+
+tasks.create("m119-deploy") {
+	val shadowJar by tasks.named<ShadowJar>("shadowJar")
+	dependsOn(shadowJar)
+	doLast {
+		ssh.runSessions {
+			session(adminssh) {
+				execute("cd /home/epic/project_epic/m119/plugins && rm -f Monumenta*.jar")
+				put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/project_epic/m119/plugins")
+			}
+		}
+	}
 }
 
 tasks.create("mobs-deploy") {

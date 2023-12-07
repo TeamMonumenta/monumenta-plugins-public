@@ -4,19 +4,22 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,18 +43,25 @@ public class Skyhook extends DepthsAbility {
 	public static final String ABILITY_NAME = "Skyhook";
 	public static final int[] COOLDOWN = {16 * 20, 14 * 20, 12 * 20, 10 * 20, 8 * 20, 4 * 20};
 	public static final int MAX_TICKS = 20 * 20;
+	public static final double CDR_PERCENT_PER_BLOCK = 0.01;
 	public static final String SKYHOOK_ARROW_METADATA = "SkyhookArrow";
+
+	public static final String CHARM_COOLDOWN = "Skyhook Cooldown";
 
 	public static final DepthsAbilityInfo<Skyhook> INFO =
 		new DepthsAbilityInfo<>(Skyhook.class, ABILITY_NAME, Skyhook::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.SKYHOOK)
-			.cooldown(COOLDOWN)
+			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.displayItem(Material.FISHING_ROD)
 			.descriptions(Skyhook::getDescription)
+			.singleCharm(false)
 			.priorityAmount(949); // Needs to trigger before Rapid Fire
+
+	private final double mCDRPerBlock;
 
 	public Skyhook(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCDRPerBlock = CDR_PERCENT_PER_BLOCK + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SKYHOOK_CDR_PER_BLOCK.mEffectName);
 	}
 
 	@Override
@@ -74,6 +84,10 @@ public class Skyhook extends DepthsAbility {
 	}
 
 	private void hook(Entity projectile) {
+		if (!DepthsManager.getInstance().isAlive(mPlayer)) {
+			return;
+		}
+
 		Location loc = projectile.getLocation();
 		Location playerStartLoc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
@@ -96,6 +110,8 @@ public class Skyhook extends DepthsAbility {
 			new PartialParticle(Particle.SWEEP_ATTACK, loc, 5, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 
 			//Refund cooldowns
+			double dist = loc.distance(playerStartLoc);
+			double percentReduction = dist * mCDRPerBlock;
 			for (Ability ability : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
 				AbilityInfo<?> info = ability.getInfo();
 				ClassAbility spell = info.getLinkedSpell();
@@ -103,7 +119,7 @@ public class Skyhook extends DepthsAbility {
 					continue;
 				}
 				int totalCD = ability.getModifiedCooldown();
-				int reducedCD = (int) (totalCD * distanceTraveled / 100.0);
+				int reducedCD = (int) (totalCD * percentReduction);
 				mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
 			}
 		}
@@ -157,10 +173,12 @@ public class Skyhook extends DepthsAbility {
 		return true;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by 1% per block traveled. Cooldown: ")
-			.append(Component.text(COOLDOWN[rarity - 1] / 20 + "s", color))
-			.append(Component.text("."));
+	private static Description<Skyhook> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Skyhook>(color)
+			.add("Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by ")
+			.addPercent(a -> a.mCDRPerBlock, CDR_PERCENT_PER_BLOCK)
+			.add(" per block traveled.")
+			.addCooldown(COOLDOWN[rarity - 1], true);
 	}
 
 

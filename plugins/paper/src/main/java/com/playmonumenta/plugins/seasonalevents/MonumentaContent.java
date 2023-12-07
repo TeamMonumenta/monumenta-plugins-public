@@ -48,6 +48,7 @@ public enum MonumentaContent {
 	RUIN("ruin", ContentType.STRIKE, 3),
 	PORTAL("portal", ContentType.STRIKE, 3),
 	GALLERY("gallery", ContentType.OTHER, 3),
+	ZENITH("zenith", ContentType.DUNGEON, 3), // Called from depths party in plugin
 	GALLERY_ROUND("galleryround", ContentType.OTHER, 0),
 	GODSPORE("godspore", ContentType.BOSS, 3),
 	KINGS_BOUNTY("r1daily", ContentType.OTHER, 0),

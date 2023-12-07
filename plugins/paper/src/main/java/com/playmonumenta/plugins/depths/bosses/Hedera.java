@@ -3,25 +3,24 @@ package com.playmonumenta.plugins.depths.bosses;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellEndlessHederaSummons;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellEvolutionSeeds;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellHederaAnticheese;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellIvyGarden;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellLeafNova;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveGarden;
+import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellEndlessHederaSummons;
+import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellEvolutionSeeds;
+import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellHederaAnticheese;
+import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellIvyGarden;
+import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellLeafNova;
+import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellPassiveGarden;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -54,7 +52,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class Hedera extends BossAbilityGroup {
+public class Hedera extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_hedera";
 	public static final int detectionRange = 70;
 	public static final String PLANT_STAND_TAG = "Plant";
@@ -66,25 +64,14 @@ public class Hedera extends BossAbilityGroup {
 	public static final String MUSIC_TITLE = "epic:music.hedera";
 	private static final int MUSIC_DURATION = 202; //seconds
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	public List<Location> mPlantSpawns;
 	public Map<Location, LivingEntity> mPlants;
 	public Map<Location, String> mPlantTypes;
 	public int mCooldownTicks;
 	public int mTimesHealed = 0;
 
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Hedera(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
-
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
 
@@ -184,7 +171,7 @@ public class Hedera extends BossAbilityGroup {
 		mBoss.setHealth(modifiedHealth);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
 
 		for (Player player : players) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Hedera", NamedTextColor.DARK_GRAY), Component.text("Venom of the Waves", NamedTextColor.GRAY));
@@ -195,7 +182,8 @@ public class Hedera extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		Location loc = mBoss.getLocation();
+		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
 			player.sendMessage(Component.text("", NamedTextColor.DARK_GREEN)
 				.append(Component.text("[Hedera]", NamedTextColor.GOLD))
 				.append(Component.text(" No! No! This cannot be! The Broken Beyond must let me flee!")));
@@ -209,26 +197,20 @@ public class Hedera extends BossAbilityGroup {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 		// Remove the plant armor stands
-		for (ArmorStand stand : mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), detectionRange)) {
+		for (ArmorStand stand : mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, loc, detectionRange)) {
 			if (stand.getName().contains(PLANT_STAND_TAG)) {
 				stand.remove();
 			}
 		}
 
 		//Kill nearby mobs
-		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
+		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, detectionRange)) {
 			e.damage(10000);
 		}
 
 		//Finish animation
 		EntityUtils.fireworkAnimation(mBoss);
-
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
-			if (nearestPlayer != null) {
-				DepthsManager.getInstance().goToNextFloor(nearestPlayer);
-			}
-		}, 20);
+		DepthsManager.getInstance().bossDefeated(loc, detectionRange);
 	}
 
 	@Override

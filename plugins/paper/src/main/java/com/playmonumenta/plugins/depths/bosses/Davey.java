@@ -3,27 +3,26 @@ package com.playmonumenta.plugins.depths.bosses;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellAbyssalCharge;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellAbyssalLeap;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellAbyssalSpawnPassive;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellDaveyAnticheese;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellLinkBeyondLife;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidBlast;
-import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidGrenades;
+import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellAbyssalCharge;
+import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellAbyssalLeap;
+import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellAbyssalSpawnPassive;
+import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellDaveyAnticheese;
+import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellLinkBeyondLife;
+import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellVoidBlast;
+import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellVoidGrenades;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -54,7 +52,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class Davey extends BossAbilityGroup {
+public class Davey extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_davey";
 	public static final int detectionRange = 50;
 	public static final String DOOR_FILL_TAG = "Door";
@@ -65,24 +63,13 @@ public class Davey extends BossAbilityGroup {
 	public static final String MUSIC_TITLE = "epic:music.davey";
 	private static final int MUSIC_DURATION = 191; //seconds
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	//Two vexes Davey controls
 	private final List<LivingEntity> mVexes = new ArrayList<>();
 
 	public int mCooldownTicks;
 
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Davey(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
-
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
 
@@ -221,7 +208,7 @@ public class Davey extends BossAbilityGroup {
 		mBoss.setHealth(modifiedHealth);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
 
 		for (Player player : players) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Lieutenant Davey", NamedTextColor.DARK_GRAY), Component.text("Void Herald", NamedTextColor.GRAY));
@@ -235,7 +222,8 @@ public class Davey extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		Location loc = mBoss.getLocation();
+		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
 			player.sendMessage(Component.text("", NamedTextColor.BLUE)
 				.append(Component.text("[Davey]", NamedTextColor.GOLD))
 				.append(Component.text(" Nay... I'll sink to ye, God of the Deep. I become a great part of ye ferever...")));
@@ -249,20 +237,14 @@ public class Davey extends BossAbilityGroup {
 		}
 
 		//Kill nearby mobs
-		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 40.0)) {
+		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, detectionRange)) {
 			e.damage(10000);
 		}
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 		EntityUtils.fireworkAnimation(mBoss);
-
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
-			if (nearestPlayer != null) {
-				DepthsManager.getInstance().goToNextFloor(nearestPlayer);
-			}
-		}, 20);
+		DepthsManager.getInstance().bossDefeated(loc, detectionRange);
 	}
 
 	@Override

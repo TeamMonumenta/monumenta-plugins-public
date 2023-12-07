@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warlock.AvalanchexCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
+import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -41,10 +42,130 @@ public class KnickKnackSackGui extends Gui {
 	private static final int INV_SIZE = 36;
 	private static final Component BASE_TITLE = Component.text("Knick-Knack Sack");
 
+	private static final Talisman[] DEPTHS_TALISMAN_LIST = {
+		// Dawnbringer talisman
+		 new Talisman(
+			"Dawnbringer",
+			"epic:r2/depths/utility/dawnbringer_talisman",
+			"DDT1Purchased",
+			1,
+			0xf0b326,
+			SunriseBrewCS.NAME),
+		// Earthbound talisman
+		new Talisman(
+			"Earthbound",
+			"epic:r2/depths/utility/earthbound_talisman",
+			"DDT2Purchased",
+			2,
+			0x6b3d2d,
+			BrambleShellCS.NAME),
+		// Flamecaller talisman
+		new Talisman(
+			"Flamecaller",
+			"epic:r2/depths/utility/flamecaller_talisman",
+			"DDT3Purchased",
+			3,
+			0xf04e21,
+			VolcanicBurstCS.NAME),
+		// Frostborn talisman
+		new Talisman(
+			"Frostborn",
+			"epic:r2/depths/utility/frostborn_talisman",
+			"DDT4Purchased",
+			4,
+			0xa3cbe1,
+			AvalanchexCS.NAME),
+		// Steelsage talisman
+		new Talisman(
+			"Steelsage",
+			"epic:r2/depths/utility/steelsage_talisman",
+			"DDT5Purchased",
+			6,
+			0x929292,
+			FireworkStrikeCS.NAME),
+		// Shadowdancer talisman
+		new Talisman(
+			"Shadowdancer",
+			"epic:r2/depths/utility/shadowdancer_talisman",
+			"DDT6Purchased",
+			5,
+			0x7948af,
+			DarkPunishmentCS.NAME),
+		// Windwalker talisman
+		new Talisman(
+			"Windwalker",
+			"epic:r2/depths/utility/windwalker_talisman",
+			"DDT7Purchased",
+			7,
+			0xc0dea9,
+			WindStepCS.NAME)
+	};
+
+	private static final Talisman[] ZENITH_TALISMAN_LIST = {
+		// Dawnbringer talisman
+		new Talisman(
+			"Dawnbringer",
+			"epic:r3/depths2/dawnbringer_talisman_zenith",
+			"CZT1Purchased",
+			1,
+			0xf0b326,
+			SunriseBrewCS.NAME),
+		// Earthbound talisman
+		new Talisman(
+			"Earthbound",
+			"epic:r3/depths2/earthbound_talisman_zenith",
+			"CZT2Purchased",
+			2,
+			0x6b3d2d,
+			BrambleShellCS.NAME),
+		// Flamecaller talisman
+		new Talisman(
+			"Flamecaller",
+			"epic:r3/depths2/flamecaller_talisman_zenith",
+			"CZT3Purchased",
+			3,
+			0xf04e21,
+			VolcanicBurstCS.NAME),
+		// Frostborn talisman
+		new Talisman(
+			"Frostborn",
+			"epic:r3/depths2/frostborn_talisman_zenith",
+			"CZT4Purchased",
+			4,
+			0xa3cbe1,
+			AvalanchexCS.NAME),
+		// Steelsage talisman
+		new Talisman(
+			"Steelsage",
+			"epic:r3/depths2/steelsage_talisman_zenith",
+			"CZT5Purchased",
+			6,
+			0x929292,
+			FireworkStrikeCS.NAME),
+		// Shadowdancer talisman
+		new Talisman(
+			"Shadowdancer",
+			"epic:r3/depths2/shadowdancer_talisman_zenith",
+			"CZT6Purchased",
+			5,
+			0x7948af,
+			DarkPunishmentCS.NAME),
+		// Windwalker talisman
+		new Talisman(
+			"Windwalker",
+			"epic:r3/depths2/windwalker_talisman_zenith",
+			"CZT7Purchased",
+			7,
+			0xc0dea9,
+			WindStepCS.NAME)
+	};
+
 	private enum Page {
 		TRINKETS1,
 		DEPTHS_TALISMANS,
-		DEPTHS_REFUNDS(Component.text("Talisman Refunds", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
+		DEPTHS_REFUNDS(Component.text("Depths Talisman Refunds", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
+		ZENITH_TALISMANS,
+		ZENITH_REFUNDS(Component.text("Celestial Zenith Talisman Refunds", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
 		CONTRACT_CONFIRM_DELETE(Component.text("Confirm Deletion", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 
 		public final Component mTitle;
@@ -70,8 +191,9 @@ public class KnickKnackSackGui extends Gui {
 		setTitle(mPage.mTitle);
 		switch (mPage) {
 			default -> setupTrinketPage1();
-			case DEPTHS_TALISMANS -> setupTalismansPage(false);
-			case DEPTHS_REFUNDS -> setupTalismansPage(true);
+			case DEPTHS_TALISMANS -> setupTalismansPage(false, false);
+			case DEPTHS_REFUNDS -> setupTalismansPage(true, false);
+			case ZENITH_TALISMANS -> setupTalismansPage(false, true);
 			case CONTRACT_CONFIRM_DELETE -> setupContractConfirmDelete();
 		}
 	}
@@ -88,6 +210,8 @@ public class KnickKnackSackGui extends Gui {
 		int depthsSlot = 20;    // Depths Trinket
 		int charmSlot = 21;     // Charms Trinket
 		int delveSlot = 22;     // Delves Trinket
+		int depthsTalismanSlot = 23;    // Depths Talisman
+		int zenithTalismanSlot = 24;    // Zenith Trinket
 
 		// Information sign
 		ItemStack info = new ItemStack(Material.OAK_SIGN);
@@ -299,10 +423,71 @@ public class KnickKnackSackGui extends Gui {
 			);
 			setItem(contractSlot, contract);
 		}
-		addNextButton(Page.DEPTHS_TALISMANS);
+
+		// Depths Talismans, unlocked with Depths access
+		if (playerFoundDepths) {
+			ItemStack dTaliBase = new ItemStack(Material.BLACK_DYE, 1);
+			ItemMeta dTaliMeta = dTaliBase.getItemMeta();
+			dTaliMeta.displayName(Component.text("Depths Talismans", Location.DEPTHS.getColor())
+				.decoration(TextDecoration.ITALIC, false)
+				.decoration(TextDecoration.BOLD, true));
+			dTaliBase.setItemMeta(dTaliMeta);
+			overrideLore(dTaliBase, NamedTextColor.YELLOW,
+				"Click to view your Depths talismans.");
+			GuiItem depthsTalismans = new GuiItem(dTaliBase)
+				.onLeftClick(() -> {
+					mPage = Page.DEPTHS_TALISMANS;
+					update();
+				});
+			setItem(depthsTalismanSlot, depthsTalismans);
+		} else {
+			ItemStack dTaliBase = new ItemStack(Material.BARRIER, 1);
+			ItemMeta dTaliMeta = dTaliBase.getItemMeta();
+			dTaliMeta.displayName(Component.text("Depths Talismans", Location.DEPTHS.getColor())
+				.decoration(TextDecoration.ITALIC, false)
+				.decoration(TextDecoration.BOLD, true));
+			overrideLore(dTaliBase, NamedTextColor.YELLOW,
+				"Click to view your Zenith talismans.");
+			dTaliBase.setItemMeta(dTaliMeta);
+			overrideLore(dTaliBase, NamedTextColor.YELLOW,
+				"Find the Darkest Depths lobby to unlock!");
+			setItem(depthsTalismanSlot, depths);
+		}
+
+		// Zenith Talismans, unlocked with Depths access
+		NamespacedKey findZenith = NamespacedKey.fromString("monumenta:dungeons/zenith/find");
+		boolean playerFoundZenith = false;
+		if (findZenith != null) {
+			Advancement foundZenithLobby = Bukkit.getAdvancement(findZenith);
+			if (foundZenithLobby != null) {
+				playerFoundZenith = mPlayer.getAdvancementProgress(foundZenithLobby).isDone();
+			}
+		}
+		if (playerFoundZenith) {
+			ItemStack zTaliBase = new ItemStack(Material.ENDER_EYE, 1);
+			ItemMeta zTaliMeta = zTaliBase.getItemMeta();
+			zTaliMeta.displayName(Component.text("Zenith Talismans", Location.ZENITH.getColor())
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			zTaliBase.setItemMeta(zTaliMeta);
+			GuiItem zenithTalismans = new GuiItem(zTaliBase)
+				.onLeftClick(() -> {
+					mPage = Page.ZENITH_TALISMANS;
+					update();
+				});
+			setItem(zenithTalismanSlot, zenithTalismans);
+		} else {
+			ItemStack zenithTalismans = new ItemStack(Material.BARRIER, 1);
+			ItemMeta zTaliMeta = zenithTalismans.getItemMeta();
+			zTaliMeta.displayName(Component.text("Zenith Talismans", Location.ZENITH.getColor())
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			zenithTalismans.setItemMeta(zTaliMeta);
+			overrideLore(zenithTalismans, NamedTextColor.YELLOW,
+				"Find the Celestial Zenith lobby to unlock!");
+			setItem(zenithTalismanSlot, zenithTalismans);
+		}
 	}
 
-	private void setupTalismansPage(boolean refund) {
+	private void setupTalismansPage(boolean refund, boolean celestialZenith) {
 		int dawnSlot = 10;
 		int earthSlot = 11;
 		int flameSlot = 12;
@@ -313,135 +498,94 @@ public class KnickKnackSackGui extends Gui {
 		int resetSlot = 22;
 		int refundSlot = 31;    // Button to access refunds
 
-		Talisman[] talismans = new Talisman[8]; // size = 8 since arrays are 0-indexed
-
-		// Dawnbringer talisman
-		Talisman dawnbringer = new Talisman(
-			"Dawnbringer",
-			"epic:r2/depths/utility/dawnbringer_talisman",
-			"DDT1Purchased",
-			1,
-			0xf0b326,
-			SunriseBrewCS.NAME);
-		talismans[1] = dawnbringer;
-
-		// Earthbound talisman
-		Talisman earthbound = new Talisman(
-			"Earthbound",
-			"epic:r2/depths/utility/earthbound_talisman",
-			"DDT2Purchased",
-			2,
-			0x6b3d2d,
-			BrambleShellCS.NAME);
-		talismans[2] = earthbound;
-
-		// Flamecaller talisman
-		Talisman flamecaller = new Talisman(
-			"Flamecaller",
-			"epic:r2/depths/utility/flamecaller_talisman",
-			"DDT3Purchased",
-			3,
-			0xf04e21,
-			VolcanicBurstCS.NAME);
-		talismans[3] = flamecaller;
-
-		// Frostborn talisman
-		Talisman frostborn = new Talisman(
-			"Frostborn",
-			"epic:r2/depths/utility/frostborn_talisman",
-			"DDT4Purchased",
-			4,
-			0xa3cbe1,
-			AvalanchexCS.NAME);
-		talismans[4] = frostborn;
-
-		// Steelsage talisman
-		Talisman steelsage = new Talisman(
-			"Steelsage",
-			"epic:r2/depths/utility/steelsage_talisman",
-			"DDT5Purchased",
-			6,
-			0x929292,
-			FireworkStrikeCS.NAME);
-		talismans[6] = steelsage;
-
-		// Shadowdancer talisman
-		Talisman shadowdancer = new Talisman(
-			"Shadowdancer",
-			"epic:r2/depths/utility/shadowdancer_talisman",
-			"DDT6Purchased",
-			5,
-			0x7948af,
-			DarkPunishmentCS.NAME);
-		talismans[5] = shadowdancer;
-
-		// Windwalker talisman
-		Talisman windwalker = new Talisman(
-			"Windwalker",
-			"epic:r2/depths/utility/windwalker_talisman",
-			"DDT7Purchased",
-			7,
-			0xc0dea9,
-			WindStepCS.NAME);
-		talismans[7] = windwalker;
+		Talisman[] talismans = celestialZenith ? ZENITH_TALISMAN_LIST : DEPTHS_TALISMAN_LIST;
 
 		if (refund) {
-			setItem(dawnSlot, makeRefundItem(dawnbringer));
-			setItem(earthSlot, makeRefundItem(earthbound));
-			setItem(flameSlot, makeRefundItem(flamecaller));
-			setItem(frostSlot, makeRefundItem(frostborn));
-			setItem(steelSlot, makeRefundItem(steelsage));
-			setItem(shadowSlot, makeRefundItem(shadowdancer));
-			setItem(windSlot, makeRefundItem(windwalker));
+			setItem(dawnSlot, makeRefundItem(talismans[0]));
+			setItem(earthSlot, makeRefundItem(talismans[1]));
+			setItem(flameSlot, makeRefundItem(talismans[2]));
+			setItem(frostSlot, makeRefundItem(talismans[3]));
+			setItem(steelSlot, makeRefundItem(talismans[4]));
+			setItem(shadowSlot, makeRefundItem(talismans[5]));
+			setItem(windSlot, makeRefundItem(talismans[6]));
 			return;
 		}
 
 		// Information sign
 		ItemStack info = new ItemStack(Material.OAK_SIGN);
 		ItemMeta meta = info.getItemMeta();
-		meta.displayName(Component.text("Depths Talismans", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		if (celestialZenith) {
+			meta.displayName(Component.text("Zenith Talismans", Location.ZENITH.getColor(), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		} else {
+			meta.displayName(Component.text("Depths Talismans", Location.DEPTHS.getColor(), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		}
 		info.setItemMeta(meta);
 		setItem(4, info);
 
-		setItem(dawnSlot, makeTalismanItem(dawnbringer));
-		setItem(earthSlot, makeTalismanItem(earthbound));
-		setItem(flameSlot, makeTalismanItem(flamecaller));
-		setItem(frostSlot, makeTalismanItem(frostborn));
-		setItem(steelSlot, makeTalismanItem(steelsage));
-		setItem(shadowSlot, makeTalismanItem(shadowdancer));
-		setItem(windSlot, makeTalismanItem(windwalker));
+		setItem(dawnSlot, makeTalismanItem(talismans[0], celestialZenith));
+		setItem(earthSlot, makeTalismanItem(talismans[1], celestialZenith));
+		setItem(flameSlot, makeTalismanItem(talismans[2], celestialZenith));
+		setItem(frostSlot, makeTalismanItem(talismans[3], celestialZenith));
+		setItem(steelSlot, makeTalismanItem(talismans[4], celestialZenith));
+		setItem(shadowSlot, makeTalismanItem(talismans[5], celestialZenith));
+		setItem(windSlot, makeTalismanItem(talismans[6], celestialZenith));
 
 		// Reset button. Ender pearl when no preference is set, ender eye when preference is set
 		ItemStack reset = new ItemStack(Material.ENDER_EYE);
-		overrideLore(reset,
-			"Click to reset your Depths tree preference."
-		);
-		meta = reset.getItemMeta();
-		int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, "DDTalisman").orElse(0);
-		if (preferenceValue == 0) {
-			reset.setType(Material.ENDER_PEARL);
-			meta.displayName(Component.text("No Depths Preference Set!").decoration(TextDecoration.ITALIC, false));
+		if (celestialZenith) {
+			overrideLore(reset,
+				"Click to reset your Zenith tree preference."
+			);
+			meta = reset.getItemMeta();
+			int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, "CZTalisman").orElse(0);
+			if (preferenceValue == 0) {
+				reset.setType(Material.ENDER_PEARL);
+				meta.displayName(Component.text("No Zenith Preference Set!").decoration(TextDecoration.ITALIC, false));
+			} else {
+				Talisman preference = talismans[preferenceValue - 1];
+				meta.displayName(Component.text("Your zenith tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), TextDecoration.BOLD)
+					.decoration(TextDecoration.ITALIC, false));
+			}
+			reset.setItemMeta(meta);
+			setItem(resetSlot, new GuiItem(reset))
+				.onClick((evt) -> {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
+					ScoreboardUtils.setScoreboardValue(mPlayer, "CZTalisman", 0);
+					mPlayer.sendMessage(Component.text("Your Zenith tree preference has been reset.", NamedTextColor.LIGHT_PURPLE));
+					update();
+				});
 		} else {
-			Talisman preference = talismans[preferenceValue];
-			meta.displayName(Component.text("Your depths tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), TextDecoration.BOLD)
-				.decoration(TextDecoration.ITALIC, false));
+			overrideLore(reset,
+				"Click to reset your Depths tree preference."
+			);
+			meta = reset.getItemMeta();
+			int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, "DDTalisman").orElse(0);
+			if (preferenceValue == 0) {
+				reset.setType(Material.ENDER_PEARL);
+				meta.displayName(Component.text("No Depths Preference Set!").decoration(TextDecoration.ITALIC, false));
+			} else {
+				Talisman preference = talismans[preferenceValue - 1];
+				meta.displayName(Component.text("Your depths tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), TextDecoration.BOLD)
+					.decoration(TextDecoration.ITALIC, false));
+			}
+			reset.setItemMeta(meta);
+			setItem(resetSlot, new GuiItem(reset))
+				.onClick((evt) -> {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
+					ScoreboardUtils.setScoreboardValue(mPlayer, "DDTalisman", 0);
+					mPlayer.sendMessage(Component.text("Your Depths tree preference has been reset.", NamedTextColor.LIGHT_PURPLE));
+					update();
+				});
 		}
-		reset.setItemMeta(meta);
-		setItem(resetSlot, new GuiItem(reset))
-			.onClick((evt) -> {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-				ScoreboardUtils.setScoreboardValue(mPlayer, "DDTalisman", 0);
-				mPlayer.sendMessage(Component.text("Your Depths tree preference has been reset.", NamedTextColor.LIGHT_PURPLE));
-				update();
-			});
 
-		if (canRefund(dawnbringer)
-			|| canRefund(shadowdancer)
-			|| canRefund(flamecaller)
-			|| canRefund(windwalker)
-			|| canRefund(steelsage)
-			|| canRefund(frostborn)
-			|| canRefund(earthbound)
+		if ((canRefund(talismans[0])
+			|| canRefund(talismans[1])
+			|| canRefund(talismans[2])
+			|| canRefund(talismans[3])
+			|| canRefund(talismans[4])
+			|| canRefund(talismans[5])
+			|| canRefund(talismans[6]))
+			&& !celestialZenith
 		) {
 			ItemStack refundButton = new ItemStack(Material.QUARTZ);
 			meta = refundButton.getItemMeta();
@@ -455,7 +599,7 @@ public class KnickKnackSackGui extends Gui {
 			});
 		}
 
-		addPrevButton(Page.TRINKETS1);
+		addPrevButton();
 	}
 
 	private boolean canRefund(Talisman t) {
@@ -464,11 +608,11 @@ public class KnickKnackSackGui extends Gui {
 
 		return cm.playerHasCosmetic(mPlayer, CosmeticType.COSMETIC_SKILL, t.mAssociatedSkill)
 			&& mPlayer.getInventory().containsAtLeast(makeTrinketItemStack(t.mPath), 1)
-			&& ScoreboardUtils.getScoreboardValue(mPlayer, t.mUnlockObjective).orElse(0) == 1;
+			&& ScoreboardUtils.getScoreboardValue(mPlayer, t.mUnlockObjective).orElse(0) >= 1;
 	}
 
-	private GuiItem makeTalismanItem(Talisman t) {
-		Component baseMessage = Component.text("Your Depths tree preference has been set to ", NamedTextColor.LIGHT_PURPLE);
+	private GuiItem makeTalismanItem(Talisman t, boolean celestialZenith) {
+		Component baseMessage = Component.text("Your " + (celestialZenith ? "Zenith" : "Depths") + " tree preference has been set to ", NamedTextColor.LIGHT_PURPLE);
 
 		ItemStack talisman = makeTrinketItemStack(t.mPath);
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, t.mUnlockObjective).orElse(0) >= 1) {
@@ -479,7 +623,7 @@ public class KnickKnackSackGui extends Gui {
 			return new GuiItem(talisman)
 				.onClick((evt) -> {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-					ScoreboardUtils.setScoreboardValue(mPlayer, "DDTalisman", t.mPreferenceValue);
+					ScoreboardUtils.setScoreboardValue(mPlayer, celestialZenith ? "CZTalisman" : "DDTalisman", t.mPreferenceValue);
 					mPlayer.sendMessage(
 						baseMessage.append(Component.text(t.mTreeName, TextColor.color(t.mColor)))
 					);
@@ -488,7 +632,7 @@ public class KnickKnackSackGui extends Gui {
 		} else {
 			talisman.setType(Material.BARRIER);
 			overrideLore(talisman, NamedTextColor.YELLOW,
-				"Purchase the " + t.mTreeName + " Talisman to unlock!"
+				"Purchase the " + t.mTreeName + " " + (celestialZenith ? "Zenith" : "Depths") + " Talisman to unlock!"
 			);
 			return new GuiItem(talisman);
 		}
@@ -517,7 +661,7 @@ public class KnickKnackSackGui extends Gui {
 		m.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		if (canRefund(t)) {
 			m.lore(List.of(
-				Component.text("Click to claim a refund of 64 Voidstaned Geodes.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+				Component.text("Click to claim a refund of 64 Voidstained Geodes.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("This will consume a " + t.mTreeName + " Talisman from your inventory.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 			));
 			i.setItemMeta(m);
@@ -591,28 +735,15 @@ public class KnickKnackSackGui extends Gui {
 		});
 	}
 
-	private void addNextButton(Page nextPage) {
+	private void addPrevButton() {
 		ItemStack arrow = new ItemStack(Material.ARROW);
 		ItemMeta meta = arrow.getItemMeta();
-		meta.displayName(Component.text("Next Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		arrow.setItemMeta(meta);
-		// Add to bottom-right corner
-		setItem(INV_SIZE - 1, new GuiItem(arrow)).onLeftClick(() -> {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
-			mPage = nextPage;
-			update();
-		});
-	}
-
-	private void addPrevButton(Page prevPage) {
-		ItemStack arrow = new ItemStack(Material.ARROW);
-		ItemMeta meta = arrow.getItemMeta();
-		meta.displayName(Component.text("Next Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		arrow.setItemMeta(meta);
 		// Add to bottom-left corner
 		setItem(INV_SIZE - 9, new GuiItem(arrow)).onLeftClick(() -> {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
-			mPage = prevPage;
+			mPage = Page.TRINKETS1;
 			update();
 		});
 	}

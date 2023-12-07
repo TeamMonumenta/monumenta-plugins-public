@@ -45,9 +45,20 @@ import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.delves.mobabilities.TwistedMiniBoss;
+import com.playmonumenta.plugins.depths.bosses.Broodmother;
+import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
+import com.playmonumenta.plugins.depths.bosses.Vesperidys;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysBlockPlacerBoss;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalDawn;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalEarth;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalFlame;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalFrost;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalShadow;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalSteel;
+import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalWind;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.bosses.GalleryMobRisingBoss;
@@ -343,6 +354,14 @@ public class BossManager implements Listener {
 		registerStatelessBoss(ParticleRingBoss.identityTag, ParticleRingBoss::new, new ParticleRingBoss.Parameters());
 		registerStatelessBoss(ShieldStunBoss.identityTag, ShieldStunBoss::new, new ShieldStunBoss.Parameters());
 		registerStatelessBoss(RiftBoss.identityTag, RiftBoss::new, new RiftBoss.Parameters());
+		registerStatelessBoss(VesperidysBlockPlacerBoss.identityTag, VesperidysBlockPlacerBoss::construct);
+		registerStatelessBoss(VesperidysVoidCrystalDawn.identityTag, VesperidysVoidCrystalDawn::construct);
+		registerStatelessBoss(VesperidysVoidCrystalEarth.identityTag, VesperidysVoidCrystalEarth::construct);
+		registerStatelessBoss(VesperidysVoidCrystalFlame.identityTag, VesperidysVoidCrystalFlame::construct);
+		registerStatelessBoss(VesperidysVoidCrystalFrost.identityTag, VesperidysVoidCrystalFrost::construct);
+		registerStatelessBoss(VesperidysVoidCrystalShadow.identityTag, VesperidysVoidCrystalShadow::construct);
+		registerStatelessBoss(VesperidysVoidCrystalSteel.identityTag, VesperidysVoidCrystalSteel::construct);
+		registerStatelessBoss(VesperidysVoidCrystalWind.identityTag, VesperidysVoidCrystalWind::construct);
 		registerStatelessBoss(LacerateBoss.identityTag, LacerateBoss::new, new LacerateBoss.Parameters());
 		registerStatelessBoss(DamageTransferBoss.identityTag, DamageTransferBoss::new, new DamageTransferBoss.Parameters());
 		registerStatelessBoss(ShockwaveBoss.identityTag, ShockwaveBoss::new, new ShockwaveBoss.Parameters());
@@ -351,6 +370,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(DevourBoss.identityTag, DevourBoss::new, new DevourBoss.Parameters());
 		registerStatelessBoss(FlamingHavocBoss.identityTag, FlamingHavocBoss::new);
 		registerStatelessBoss(FacingBoss.identityTag, FacingBoss::new, new FacingBoss.Parameters());
+		registerStatelessBoss(SpawnerMimicBoss.identityTag, SpawnerMimicBoss::new, new SpawnerMimicBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
@@ -379,6 +399,9 @@ public class BossManager implements Listener {
 		registerStatefulBoss(Hedera.identityTag, Hedera::new);
 		registerStatefulBoss(Davey.identityTag, Davey::new);
 		registerStatefulBoss(Nucleus.identityTag, Nucleus::new);
+		registerStatefulBoss(Callicarpa.identityTag, Callicarpa::new);
+		registerStatefulBoss(Broodmother.identityTag, Broodmother::new);
+		registerStatefulBoss(Vesperidys.identityTag, Vesperidys::new);
 		registerStatefulBoss(Ghalkor.identityTag, Ghalkor::new);
 		registerStatefulBoss(Svalgot.identityTag, Svalgot::new);
 		registerStatefulBoss(BeastOfTheBlackFlame.identityTag, BeastOfTheBlackFlame::new);

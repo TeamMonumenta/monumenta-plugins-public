@@ -139,6 +139,10 @@ public abstract class Ability {
 		return getModifiedCooldown(getInfo().getModifiedCooldown(mPlayer, getAbilityScore()));
 	}
 
+	public int getCharmCooldown(int baseCooldown) {
+		return getInfo().getCharmCooldown(mPlayer, baseCooldown);
+	}
+
 	public void putOnCooldown() {
 		putOnCooldown(getModifiedCooldown());
 	}
@@ -148,7 +152,7 @@ public abstract class Ability {
 		if (info.getLinkedSpell() != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.getLinkedSpell())) {
 				mPlugin.mTimers.addCooldown(mPlayer, info.getLinkedSpell(), cooldown);
-				PlayerUtils.callAbilityCastEvent(mPlayer, info.getLinkedSpell());
+				PlayerUtils.callAbilityCastEvent(mPlayer, this, info.getLinkedSpell());
 			}
 		}
 	}
@@ -342,6 +346,10 @@ public abstract class Ability {
 
 	public @Nullable Component getLevelHover(boolean useShorthand) {
 		return mInfo.getLevelHover(mPlayer, getAbilityScore(), useShorthand, true);
+	}
+
+	public Player getPlayer() {
+		return mPlayer;
 	}
 
 	@Override

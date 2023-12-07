@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -10,8 +12,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collection;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,12 +39,15 @@ public class DepthsDodging extends DepthsAbility {
 	public static final String ABILITY_NAME = "Dodging";
 	public static final int[] COOLDOWN = {20 * 16, 20 * 14, 20 * 12, 20 * 10, 20 * 8, 20 * 5};
 
+	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
+
 	public static final DepthsAbilityInfo<DepthsDodging> INFO =
 		new DepthsAbilityInfo<>(DepthsDodging.class, ABILITY_NAME, DepthsDodging::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.DODGING)
-			.cooldown(COOLDOWN)
+			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.displayItem(Material.COBWEB)
-			.descriptions(DepthsDodging::getDescription);
+			.descriptions(DepthsDodging::getDescription)
+			.singleCharm(false);
 
 	private int mTriggerTick = 0;
 
@@ -151,10 +154,10 @@ public class DepthsDodging extends DepthsAbility {
 		return true;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("You dodge the next projectile or potion attack that would have hit you, nullifying the damage. Cooldown: ")
-			.append(Component.text(COOLDOWN[rarity - 1] / 20 + "s", color))
-			.append(Component.text("."));
+	private static Description<DepthsDodging> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<DepthsDodging>(color)
+			.add("You dodge the next projectile or potion attack that would have hit you, nullifying the damage.")
+			.addCooldown(COOLDOWN[rarity - 1], true);
 	}
 }
 

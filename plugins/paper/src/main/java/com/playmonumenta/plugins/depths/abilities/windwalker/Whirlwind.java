@@ -1,17 +1,18 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,6 +20,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -39,35 +41,65 @@ public class Whirlwind extends DepthsAbility {
 			.displayItem(Material.IRON_PICKAXE)
 			.descriptions(Whirlwind::getDescription);
 
+	private final double mRadius;
+	private final double mKnockback;
+	private final double mSpeed;
+	private final int mDuration;
+
 	public Whirlwind(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.WHIRLWIND_RADIUS.mEffectName, RADIUS);
+		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.WHIRLWIND_KNOCKBACK.mEffectName, KNOCKBACK_SPEED[mRarity - 1]);
+		mSpeed = SPEED[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.WHIRLWIND_SPEED_AMPLIFIER.mEffectName);
+		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.WHIRLWIND_SPEED_DURATION.mEffectName, SPEED_DURATION);
+	}
+
+	public static void onSpawnerBreak(Plugin plugin, Player player, int rarity, Block block) {
+		double radius = CharmManager.getRadius(player, CharmEffects.WHIRLWIND_RADIUS.mEffectName, RADIUS);
+		double knockback = CharmManager.calculateFlatAndPercentValue(player, CharmEffects.WHIRLWIND_KNOCKBACK.mEffectName, KNOCKBACK_SPEED[rarity - 1]);
+		double speed = SPEED[rarity - 1] + CharmManager.getLevelPercentDecimal(player, CharmEffects.WHIRLWIND_SPEED_AMPLIFIER.mEffectName);
+		int duration = CharmManager.getDuration(player, CharmEffects.WHIRLWIND_SPEED_DURATION.mEffectName, SPEED_DURATION);
+		onSpawnerBreak(plugin, player, block, radius, knockback, speed, duration);
+	}
+
+	public static void onSpawnerBreak(Plugin plugin, Player player, Block block, double radius, double knockback, double speed, int duration) {
+		World world = player.getWorld();
+		Location loc = block.getLocation().add(0.5, 0.5, 0.5);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.25f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.35f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.45f);
+		new PartialParticle(Particle.CLOUD, loc, 30, 1, 1, 1, 0.8).spawnAsPlayerActive(player);
+		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, radius)) {
+			e.setVelocity(e.getVelocity().add(e.getLocation().toVector().subtract(loc.subtract(0, 0.5, 0).toVector()).normalize().multiply(knockback).add(new Vector(0, 0.3, 0))));
+			new PartialParticle(Particle.EXPLOSION_NORMAL, e.getLocation(), 5, 0, 0, 0, 0.35).spawnAsPlayerActive(player);
+		}
+		plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(duration, speed, SPEED_EFFECT_NAME));
 	}
 
 	@Override
 	public boolean blockBreakEvent(BlockBreakEvent event) {
-		//If we break a spawner with a pickaxe
-		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
-			World world = event.getPlayer().getWorld();
-			Location loc = event.getBlock().getLocation().add(0.5, 0.5, 0.5);
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.25f);
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.35f);
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.45f);
-			new PartialParticle(Particle.CLOUD, loc, 30, 1, 1, 1, 0.8).spawnAsPlayerActive(mPlayer);
-			for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-				e.setVelocity(e.getVelocity().add(e.getLocation().toVector().subtract(loc.subtract(0, 0.5, 0).toVector()).normalize().multiply(KNOCKBACK_SPEED[mRarity - 1]).add(new Vector(0, 0.3, 0))));
-				new PartialParticle(Particle.EXPLOSION_NORMAL, e.getLocation(), 5, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
-			}
-			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, SPEED[mRarity - 1], SPEED_EFFECT_NAME));
+		if (event.isCancelled()) {
+			return true;
+		}
+
+		Block block = event.getBlock();
+		if (ItemUtils.isPickaxe(mPlayer.getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
+			onSpawnerBreak(mPlugin, mPlayer, block, mRadius, mKnockback, mSpeed, mDuration);
 		}
 		return true;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Breaking a spawner knocks back all mobs within " + RADIUS + " blocks with a speed of ")
-			.append(Component.text(StringUtils.to2DP(KNOCKBACK_SPEED[rarity - 1]), color))
-			.append(Component.text(". Additionally, you receive "))
-			.append(Component.text(StringUtils.multiplierToPercentage(SPEED[rarity - 1]) + "%", color))
-			.append(Component.text(" speed for " + SPEED_DURATION / 20 + " seconds."));
+	private static Description<Whirlwind> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Whirlwind>(color)
+			.add("Breaking a spawner knocks back all mobs within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks with a speed of ")
+			.add(a -> a.mKnockback, KNOCKBACK_SPEED[rarity - 1], false, null, true)
+			.add(". Additionally, you receive ")
+			.addPercent(a -> a.mSpeed, SPEED[rarity - 1], false, true)
+			.add(" speed for ")
+			.addDuration(a -> a.mDuration, SPEED_DURATION)
+			.add(" seconds.");
 	}
 
 }

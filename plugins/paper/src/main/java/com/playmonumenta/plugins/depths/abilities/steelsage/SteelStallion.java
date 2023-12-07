@@ -1,19 +1,21 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,11 +24,9 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,18 +42,29 @@ public class SteelStallion extends DepthsAbility {
 	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20, 18 * 20};
 	public static final int TICK_INTERVAL = 5;
 
+	public static final String CHARM_COOLDOWN = "Steel Stallion Cooldown";
+
 	public static final DepthsAbilityInfo<SteelStallion> INFO =
 		new DepthsAbilityInfo<>(SteelStallion.class, ABILITY_NAME, SteelStallion::new, DepthsTree.STEELSAGE, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.STEEL_STALLION)
-			.cooldown(COOLDOWN)
+			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.displayItem(Material.IRON_HORSE_ARMOR)
 			.descriptions(SteelStallion::getDescription)
 			.priorityAmount(10000);
 
-	private @Nullable Mob mHorse;
+	private final double mHealth;
+	private final double mJumpStrength;
+	private final double mSpeed;
+	private final int mDuration;
+
+	private @Nullable Horse mHorse;
 
 	public SteelStallion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.STEEL_STALLION_HEALTH.mEffectName, HEALTH[mRarity - 1]);
+		mJumpStrength = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.STEEL_STALLION_JUMP_STRENGTH.mEffectName, JUMP_STRENGTH[mRarity - 1]);
+		mSpeed = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.STEEL_STALLION_HORSE_SPEED.mEffectName, SPEED[mRarity - 1]);
+		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.STEEL_STALLION_DURATION.mEffectName, DURATION[mRarity - 1]);
 	}
 
 	@Override
@@ -90,19 +101,20 @@ public class SteelStallion extends DepthsAbility {
 		// Calculate whether this effect should not be run based on player health.
 		double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
 
-		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		if (healthRemaining > maxHealth.getValue() * TRIGGER_HEALTH) {
+		if (healthRemaining > EntityUtils.getMaxHealth(mPlayer) * TRIGGER_HEALTH) {
 			return;
 		}
 
 		Location loc = mPlayer.getLocation();
-		Entity horse = LibraryOfSoulsIntegration.summon(loc, "SteelStallion");
-		if (horse != null) {
+		Entity e = LibraryOfSoulsIntegration.summon(loc, "SteelStallion");
+		if (e instanceof Horse horse) {
 			horse.addPassenger(mPlayer);
-			mHorse = (Mob) horse;
-			mHorse.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEALTH[mRarity - 1]);
+			mHorse = horse;
+			EntityUtils.setAttributeBase(mHorse, Attribute.GENERIC_MAX_HEALTH, mHealth * DepthsUtils.getDamageMultiplier());
+			EntityUtils.setAttributeBase(mHorse, Attribute.HORSE_JUMP_STRENGTH, mJumpStrength);
+			EntityUtils.setAttributeBase(mHorse, Attribute.GENERIC_MOVEMENT_SPEED, mSpeed);
 			//Horse absorbs the damage from the hit that triggers it
-			mHorse.setHealth(Math.max(HEALTH[mRarity - 1] - event.getFinalDamage(false), 0));
+			mHorse.setHealth(Math.max(0, EntityUtils.getMaxHealth(mHorse) - event.getFinalDamage(false)));
 			mHorse.setInvulnerable(true);
 			event.setDamage(0);
 			event.setCancelled(true);
@@ -113,7 +125,7 @@ public class SteelStallion extends DepthsAbility {
 			int mTicksElapsed = 0;
 			@Override
 			public void run() {
-				boolean isOutOfTime = mTicksElapsed >= DURATION[mRarity - 1];
+				boolean isOutOfTime = mTicksElapsed >= mDuration;
 				if (isOutOfTime || mHorse == null || mHorse.getHealth() <= 0 || mHorse.getPassengers().size() == 0) {
 					if (isOutOfTime && mHorse != null) {
 						Location horseLoc = mHorse.getLocation();
@@ -138,7 +150,7 @@ public class SteelStallion extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1, 1);
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.NEUTRAL, 1, 0.5f);
 
-		MessagingUtils.sendActionBarMessage(mPlayer, "Steel Stallion has been activated!");
+		sendActionBarMessage("Steel Stallion has been activated!");
 	}
 
 	@Override
@@ -153,16 +165,20 @@ public class SteelStallion extends DepthsAbility {
 		return entity instanceof Horse && ABILITY_NAME.equals(entity.getName());
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("When your health drops below " + StringUtils.multiplierToPercentage(TRIGGER_HEALTH) + "%, summon and ride a horse with ")
-			.append(Component.text(HEALTH[rarity - 1], color))
-			.append(Component.text(" health that disappears after "))
-			.append(Component.text(DURATION[rarity - 1] / 20, color))
-			.append(Component.text(" seconds. While you are riding the horse, all damage you receive is redirected to the horse, including the damage that triggered this ability. The horse has a speed of "))
-			.append(Component.text(SPEED[rarity - 1], color))
-			.append(Component.text(" and a jump strength of "))
-			.append(Component.text(JUMP_STRENGTH[rarity - 1], color))
-			.append(Component.text(". Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<SteelStallion> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<SteelStallion>(color)
+			.add("When your health drops below ")
+			.addPercent(TRIGGER_HEALTH)
+			.add(", summon and ride a horse with ")
+			.addDepthsDamage(a -> a.mHealth, HEALTH[rarity - 1], true)
+			.add(" health that disappears after ")
+			.addDuration(a -> a.mDuration, DURATION[rarity - 1], false, true)
+			.add(" seconds. While you are riding the horse, all damage you receive is redirected to the horse, including the damage that triggered this ability. The horse has a speed of ")
+			.add(a -> a.mSpeed, SPEED[rarity - 1], false, null, true)
+			.add(" and a jump strength of ")
+			.add(a -> a.mJumpStrength, JUMP_STRENGTH[rarity - 1], false, null, true)
+			.add(".")
+			.addCooldown(COOLDOWN);
 	}
 
 

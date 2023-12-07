@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations;
 
 import com.playmonumenta.plugins.classes.PlayerClass;
+import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Region;
@@ -162,12 +163,23 @@ public class ChestSortIntegration implements Listener {
 				strBookTitle = ItemUtils.toPlainTagText(strBookTitle) + " ";
 			}
 
+			boolean isZenithCharm = ItemStatUtils.isZenithCharm(item);
+
 			String strCharmClass;
 			PlayerClass playerClass = ItemStatUtils.getCharmClass(item);
-			if (playerClass == null) {
-				strCharmClass = "~Generalist";
+			if (isZenithCharm) {
+				strCharmClass = "Zenith";
+			} else if (playerClass == null) {
+				strCharmClass = "~Generalist~";
 			} else {
 				strCharmClass = playerClass.mClassName;
+			}
+
+			String strZenithCharmRarity;
+			if (!isZenithCharm) {
+				strZenithCharmRarity = "~zenithCharmRarity~";
+			} else {
+				strZenithCharmRarity = String.format("%02d", CharmFactory.getZenithCharmRarity(item));
 			}
 
 			String strCharmPower = String.valueOf(ItemStatUtils.getCharmPower(item));
@@ -229,6 +241,7 @@ public class ChestSortIntegration implements Listener {
 			sortMap.put("{bookTitle}", strBookTitle);
 			sortMap.put("{charmClass}", strCharmClass);
 			sortMap.put("{charmPower}", strCharmPower);
+			sortMap.put("{zenithCharmRarity}", strZenithCharmRarity);
 			sortMap.put("{count}", strCount);
 			sortMap.put("{damage}", strDamage);
 			sortMap.put("{fishQuality}", strFishQuality);

@@ -1,17 +1,19 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,11 +34,16 @@ public class BrambleShell extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<BrambleShell> INFO =
 		new DepthsAbilityInfo<>(BrambleShell.class, ABILITY_NAME, BrambleShell::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)
+			.linkedSpell(ClassAbility.BRAMBLE_SHELL)
 			.displayItem(Material.SWEET_BERRIES)
-			.descriptions(BrambleShell::getDescription);
+			.descriptions(BrambleShell::getDescription)
+			.singleCharm(false);
+
+	private final double mDamage;
 
 	public BrambleShell(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.BRAMBLE_SHELL_DAMAGE.mEffectName, BRAMBLE_DAMAGE[mRarity - 1]);
 	}
 
 	@Override
@@ -49,13 +56,14 @@ public class BrambleShell extends DepthsAbility {
 			new PartialParticle(Particle.BLOCK_CRACK, loc.add(0, source.getHeight() / 2, 0), 25, 0.5, 0.5, 0.5, 0.125, Bukkit.createBlockData(Material.SWEET_BERRY_BUSH)).spawnAsPlayerPassive(mPlayer);
 			world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.PLAYERS, 1, 0.8f);
 
-			DamageUtils.damage(mPlayer, source, DamageType.MELEE_SKILL, BRAMBLE_DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
+			DamageUtils.damage(mPlayer, source, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 		}
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Whenever an enemy deals melee or projectile damage to you, they take ")
-			.append(Component.text(StringUtils.to2DP(BRAMBLE_DAMAGE[rarity - 1]), color))
-			.append(Component.text(" melee damage."));
+	private static Description<BrambleShell> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<BrambleShell>(color)
+			.add("Whenever an enemy deals melee or projectile damage to you, they take ")
+			.addDepthsDamage(a -> a.mDamage, BRAMBLE_DAMAGE[rarity - 1], true)
+			.add(" melee damage.");
 	}
 }

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.destroystokyo.paper.MaterialSetTag;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -51,8 +52,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class PlayerUtils {
-	public static void callAbilityCastEvent(Player player, ClassAbility spell) {
-		AbilityCastEvent event = new AbilityCastEvent(player, spell);
+	public static void callAbilityCastEvent(Player player, Ability ability, ClassAbility spell) {
+		AbilityCastEvent event = new AbilityCastEvent(player, ability, spell);
 		Bukkit.getPluginManager().callEvent(event);
 	}
 

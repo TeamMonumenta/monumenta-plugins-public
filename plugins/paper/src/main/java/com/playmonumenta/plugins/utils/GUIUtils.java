@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -92,7 +91,7 @@ public class GUIUtils {
 		item.setItemMeta(meta);
 	}
 
-	public static void splitLoreLine(ItemStack item, TextComponent lore, int maxLength, boolean clean) {
+	public static void splitLoreLine(ItemStack item, Component lore, int maxLength, boolean clean) {
 		ItemMeta meta = item.getItemMeta();
 		splitLoreLine(meta, lore, maxLength, clean);
 		item.setItemMeta(meta);
@@ -102,20 +101,19 @@ public class GUIUtils {
 		splitLoreLine(meta, Component.text(lore, color), maxLength, clean);
 	}
 
-	public static void splitLoreLine(ItemMeta meta, TextComponent lore, int maxLength, boolean clean) {
+	public static void splitLoreLine(ItemMeta meta, Component lore, int maxLength, boolean clean) {
 		List<Component> prevLore = meta.lore();
 		List<Component> lines = clean || prevLore == null ? new ArrayList<>() : prevLore;
 		lines.addAll(splitLoreLine(lore, maxLength));
 		meta.lore(lines);
 	}
 
-	private static List<Component> splitLoreLine(TextComponent lore, int maxLength) {
-		String content = lore.content();
-		if (content.isEmpty()) {
+	private static List<Component> splitLoreLine(Component lore, int maxLength) {
+		String mini = MessagingUtils.toMiniMessage(lore);
+		if (mini.isEmpty()) {
 			return new ArrayList<>();
 		}
-		String mini = MessagingUtils.toMiniMessage(lore);
-		if (mini.length() <= maxLength && !content.contains("\n")) {
+		if (mini.length() <= maxLength && !mini.contains("\n")) {
 			return List.of(fixLoreFormatting(lore));
 		}
 		String[] splitLine = mini.split(" |(?=\n)"); // split on spaces, and on the empty string just before a line break
@@ -208,14 +206,14 @@ public class GUIUtils {
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, Component name, String desc, TextColor loreColor, int maxLoreLength, boolean setPlainTag) {
-		return createBasicItem(mat, amount, name, Component.text(desc, loreColor), maxLoreLength, setPlainTag);
+		return createBasicItem(mat, amount, name, desc.equals("") ? Component.empty() : Component.text(desc, loreColor), maxLoreLength, setPlainTag);
 	}
 
-	public static ItemStack createBasicItem(Material mat, int amount, String name, TextColor nameColor, boolean nameBold, TextComponent desc, int maxLoreLength, boolean setPlainTag) {
+	public static ItemStack createBasicItem(Material mat, int amount, String name, TextColor nameColor, boolean nameBold, Component desc, int maxLoreLength, boolean setPlainTag) {
 		return createBasicItem(mat, amount, formatName(name, nameColor, nameBold), desc, maxLoreLength, setPlainTag);
 	}
 
-	public static ItemStack createBasicItem(Material mat, int amount, Component name, TextComponent desc, int maxLoreLength, boolean setPlainTag) {
+	public static ItemStack createBasicItem(Material mat, int amount, Component name, Component desc, int maxLoreLength, boolean setPlainTag) {
 		return createBasicItem(mat, amount, name, splitLoreLine(desc, maxLoreLength), setPlainTag);
 	}
 

@@ -42,12 +42,16 @@ public abstract class LoSPool {
 
 	}
 
-	private static class InlinePool extends LoSPool {
+	public static class InlinePool extends LoSPool {
 
 		private final SoulPoolHistoryEntry mEntry;
 
 		public InlinePool(Map<String, Integer> souls) {
 			mEntry = new SoulPoolHistoryEntry("synthetic_pool", -1, "", souls);
+		}
+
+		public InlinePool(String soul) {
+			this(Map.of(soul, 1));
 		}
 
 		@Override

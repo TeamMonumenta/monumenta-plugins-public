@@ -439,7 +439,7 @@ public class AbilityManager {
 			//Depths abilities
 			mReferenceAbilities.addAll(DepthsManager.getAbilities());
 		}
-		if (!ServerProperties.getShardName().contains("depths")) {
+		if (!ServerProperties.getShardName().contains("depths") && !ServerProperties.getShardName().contains("zenith")) {
 			//Normal class and spec abilities
 			mReferenceAbilities.addAll(classAbilities);
 

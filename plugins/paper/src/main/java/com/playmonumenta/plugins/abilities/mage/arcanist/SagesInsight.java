@@ -150,7 +150,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		ClassAbility cast = event.getAbility();
+		ClassAbility cast = event.getSpell();
 		mStacksMap.put(cast, true);
 
 		mResets.add(cast);

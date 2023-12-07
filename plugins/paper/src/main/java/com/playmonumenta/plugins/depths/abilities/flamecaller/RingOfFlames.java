@@ -1,27 +1,27 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,17 +43,27 @@ public class RingOfFlames extends DepthsAbility {
 	private static final int EFFECT_DURATION = 4 * 20;
 	private static final double BLEED_AMOUNT = 0.2;
 
+	public static final String CHARM_COOLDOWN = "Ring of Flames Cooldown";
+
 	public static final DepthsAbilityInfo<RingOfFlames> INFO =
 		new DepthsAbilityInfo<>(RingOfFlames.class, ABILITY_NAME, RingOfFlames::new, DepthsTree.FLAMECALLER, DepthsTrigger.SHIFT_LEFT_CLICK)
 			.linkedSpell(ClassAbility.RING_OF_FLAMES)
-			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RingOfFlames::cast,
-				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RingOfFlames::cast, DepthsTrigger.SHIFT_LEFT_CLICK))
 			.displayItem(Material.BLAZE_POWDER)
 			.descriptions(RingOfFlames::getDescription);
 
+	private final double mDamage;
+	private final int mEffectDuration;
+	private final double mBleedAmount;
+	private final int mRingDuration;
+
 	public RingOfFlames(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.RING_OF_FLAMES_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mEffectDuration = CharmManager.getDuration(mPlayer, CharmEffects.RING_OF_FLAMES_FIRE_DURATION.mEffectName, EFFECT_DURATION);
+		mBleedAmount = BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.RING_OF_FLAMES_BLEED_AMPLIFIER.mEffectName);
+		mRingDuration = CharmManager.getDuration(mPlayer, CharmEffects.RING_OF_FLAMES_DURATION.mEffectName, DURATION[mRarity - 1]);
 	}
 
 	public void cast() {
@@ -78,7 +88,7 @@ public class RingOfFlames extends DepthsAbility {
 			private final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(loc, 4, 4 - 0.5, 4 + 0.5, Math.PI);
 			@Override
 			public void run() {
-				if (mTicks >= DURATION[mRarity - 1]) {
+				if (mTicks >= mRingDuration) {
 					this.cancel();
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 1, 0.75f);
 					return;
@@ -106,10 +116,10 @@ public class RingOfFlames extends DepthsAbility {
 							world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 0.8f, 1f);
 						}
 						new PartialParticle(Particle.SOUL_FIRE_FLAME, e.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
-						EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer, playerItemStats);
-						EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, BLEED_AMOUNT, e);
+						EntityUtils.applyFire(mPlugin, mEffectDuration, e, mPlayer, playerItemStats);
+						EntityUtils.applyBleed(mPlugin, mEffectDuration, mBleedAmount, e);
 
-						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, false, true, false);
 
 						mobsHitThisTick++;
 					}
@@ -121,11 +131,17 @@ public class RingOfFlames extends DepthsAbility {
 	}
 
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for ")
-			.append(Component.text(DURATION[rarity - 1] / 20, color))
-			.append(Component.text(" seconds. Enemies on the flame perimeter are dealt "))
-			.append(Component.text(DAMAGE[rarity - 1], color))
-			.append(Component.text(" magic damage every second, and they are inflicted with " + StringUtils.multiplierToPercentage(BLEED_AMOUNT) + "% Bleed and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<RingOfFlames> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<RingOfFlames>(color)
+			.add("Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for ")
+			.addDuration(a -> a.mRingDuration, DURATION[rarity - 1], false, true)
+			.add(" seconds. Enemies on the flame perimeter are dealt ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" magic damage every second, and they are inflicted with ")
+			.addPercent(a -> a.mBleedAmount, BLEED_AMOUNT)
+			.add(" Bleed and set on fire for ")
+			.addDuration(a -> a.mEffectDuration, EFFECT_DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
 	}
 }

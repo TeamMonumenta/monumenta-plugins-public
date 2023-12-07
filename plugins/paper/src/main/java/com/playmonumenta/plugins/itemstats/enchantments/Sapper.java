@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SpawnerUtils;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -34,6 +35,9 @@ public class Sapper implements Enchantment {
 		//Needed for check below. Probably safe?
 		ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER && !ItemUtils.isPickaxe(player.getInventory().getItemInOffHand())) {
+			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+				return;
+			}
 			value = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, value);
 			PlayerUtils.healPlayer(plugin, player, value);
 			new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1).spawnAsPlayerActive(player);

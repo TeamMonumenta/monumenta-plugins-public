@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,17 +39,26 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	private static final int COOLDOWN = 18 * 20;
 	private static final int DAMAGE_DURATION = 5 * 20;
 
+	public static final String CHARM_COOLDOWN = "Advancing Shadows Cooldown";
+
 	public static final DepthsAbilityInfo<DepthsAdvancingShadows> INFO =
 		new DepthsAbilityInfo<>(DepthsAdvancingShadows.class, ABILITY_NAME, DepthsAdvancingShadows::new, DepthsTree.SHADOWDANCER, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.ADVANCING_SHADOWS_DEPTHS)
-			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsAdvancingShadows::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsAdvancingShadows::cast, DepthsTrigger.RIGHT_CLICK))
 			.displayItem(Material.WITHER_SKELETON_SKULL)
 			.descriptions(DepthsAdvancingShadows::getDescription);
 
+	private final double mRange;
+	private final double mDamage;
+	private final int mDamageDuration;
+
 	public DepthsAdvancingShadows(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRange = CharmManager.getRadius(mPlayer, CharmEffects.ADVANCING_SHADOWS_RANGE.mEffectName, ADVANCING_SHADOWS_RANGE);
+		mDamage = DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.ADVANCING_SHADOWS_DAMAGE_MULTIPLIER.mEffectName);
+		mDamageDuration = CharmManager.getDuration(mPlayer, CharmEffects.ADVANCING_SHADOWS_DURATION.mEffectName, DAMAGE_DURATION);
+
 	}
 
 	public void cast() {
@@ -57,14 +66,14 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			return;
 		}
 
-		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, ADVANCING_SHADOWS_RANGE);
+		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange);
 
 		if (entity == null) {
 			return;
 		}
 
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
-		if (origDistance <= ADVANCING_SHADOWS_RANGE && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+		if (origDistance <= mRange && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
@@ -116,7 +125,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 
 			// Extra safeguard to prevent bizarro teleports
-			if (mPlayer.getLocation().distance(loc) > ADVANCING_SHADOWS_RANGE) {
+			if (mPlayer.getLocation().distance(loc) > mRange) {
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1.0f, 1.8f);
 				return;
 			}
@@ -132,7 +141,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 			playerLoc = mPlayer.getLocation();
 
-			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new PercentDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], DamageEvent.DamageType.getAllMeleeTypes()));
+			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new PercentDamageDealt(mDamageDuration, mDamage, DamageEvent.DamageType.getAllMeleeTypes()));
 
 			new PartialParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
@@ -141,10 +150,16 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 		}
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Right click and holding a weapon to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE + " blocks and you gain ")
-			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]) + "%", color))
-			.append(Component.text(" melee damage for " + DAMAGE_DURATION / 20 + " seconds. If you are holding a shield in your offhand, you will gain the damage buff but not be teleported. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<DepthsAdvancingShadows> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<DepthsAdvancingShadows>(color)
+			.add("Right click and holding a weapon to teleport to the target hostile enemy within ")
+			.add(a -> a.mRange, ADVANCING_SHADOWS_RANGE)
+			.add(" blocks and you gain ")
+			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
+			.add(" melee damage for ")
+			.addDuration(a -> a.mDamageDuration, DAMAGE_DURATION)
+			.add(" seconds. If you are holding a shield in your offhand, you will gain the damage buff but not be teleported.")
+			.addCooldown(COOLDOWN);
 	}
 
 

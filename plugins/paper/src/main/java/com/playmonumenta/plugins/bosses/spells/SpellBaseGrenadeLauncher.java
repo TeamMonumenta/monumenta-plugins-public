@@ -1,12 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.lang3.RandomUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -15,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellBaseGrenadeLauncher extends Spell {
 
@@ -27,12 +31,15 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	private final int mLobsDelay;
 	private final int mDuration;
 	private final int mCooldown;
-	private final GetSpellTargets<LivingEntity> mGrenadeTargets;
+	private boolean mOnCooldown = false;
+	private final GetSpellTargets<Entity> mGrenadeTargets;
 	private final GetGrenadeTarget<LivingEntity> mExplosionTargets;
 	private final InitAesthetics mAestheticsBoss;
 	private final GrenadeAesthetics mGrenadeAesthetics;
 	private final GrenadeAesthetics mExplosionAesthetics;
 	private final HitAction mHitAction;
+	private final @Nullable AdditionalParameters mAdditionalParameters;
+	private final @Nullable TelegraphAesthetics mTelegraphAesthetics;
 
 
 	//lingering stuff
@@ -61,7 +68,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		int lingeringDuration,
 		double lingeringRadius,
 
-		GetSpellTargets<LivingEntity> grenadeTargets,
+		GetSpellTargets<Entity> grenadeTargets,
 		GetGrenadeTarget<LivingEntity> explosionTargets,
 		InitAesthetics aestheticsBoss,
 		GrenadeAesthetics grenadeAesthetics,
@@ -75,7 +82,78 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0);
+			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0, null, null);
+	}
+
+	public SpellBaseGrenadeLauncher(
+		Plugin plugin,
+		LivingEntity boss,
+		Material grenadeMaterial,
+		Boolean explodeOnTouch,
+		int explodeDelay,
+		int lobs,
+		int lobsDelay,
+		int duration,
+		int cooldown,
+
+		//lingering stuff
+		int lingeringDuration,
+		double lingeringRadius,
+
+		GetSpellTargets<Entity> grenadeTargets,
+		GetGrenadeTarget<LivingEntity> explosionTargets,
+		InitAesthetics aestheticsBoss,
+		GrenadeAesthetics grenadeAesthetics,
+		GrenadeAesthetics explosionAesthetics,
+		HitAction hitAction,
+
+		//lingering stuff
+		LingeringRingAesthetics ringAesthetics,
+		LingeringCenterAesthetics cencterAesthetics,
+		HitAction lingeringHitAction,
+
+		String spawnedmob,
+		float yVelocity
+	) {
+		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
+			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, new LoSPool.InlinePool(spawnedmob), yVelocity, 0.0, null, null);
+	}
+
+	public SpellBaseGrenadeLauncher(
+		Plugin plugin,
+		LivingEntity boss,
+		Material grenadeMaterial,
+		Boolean explodeOnTouch,
+		int explodeDelay,
+		int lobs,
+		int lobsDelay,
+		int duration,
+		int cooldown,
+
+		//lingering stuff
+		int lingeringDuration,
+		double lingeringRadius,
+
+		GetSpellTargets<Entity> grenadeTargets,
+		GetGrenadeTarget<LivingEntity> explosionTargets,
+		InitAesthetics aestheticsBoss,
+		GrenadeAesthetics grenadeAesthetics,
+		GrenadeAesthetics explosionAesthetics,
+		HitAction hitAction,
+
+		//lingering stuff
+		LingeringRingAesthetics ringAesthetics,
+		LingeringCenterAesthetics cencterAesthetics,
+		HitAction lingeringHitAction,
+
+		// Additional parameters
+		AdditionalParameters additionalParameters,
+		TelegraphAesthetics telegraphAesthetics
+	) {
+		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
+			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0f, additionalParameters, telegraphAesthetics);
 	}
 
 	/*
@@ -136,7 +214,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		int lingeringDuration,
 		double lingeringRadius,
 
-		GetSpellTargets<LivingEntity> grenadeTargets,
+		GetSpellTargets<Entity> grenadeTargets,
 		GetGrenadeTarget<LivingEntity> explosionTargets,
 		InitAesthetics aestheticsBoss,
 		GrenadeAesthetics grenadeAesthetics,
@@ -150,7 +228,11 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 		LoSPool mobPool,
 		float yVelocity,
-		double throwVariance
+		double throwVariance,
+
+		// Additional parameters
+		@Nullable AdditionalParameters additionalParameters,
+		@Nullable TelegraphAesthetics telegraphAesthetics
 	) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -178,47 +260,97 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		mSummonPool = mobPool;
 		mGrenadeYVelocity = yVelocity;
 		mThrowVariance = throwVariance;
+
+		mAdditionalParameters = additionalParameters;
+		mTelegraphAesthetics = telegraphAesthetics;
 	}
 
 
 	@Override
 	public void run() {
 		final Location bossLocation = mBoss.getLocation();
-		List<? extends LivingEntity> targets = mGrenadeTargets.getTargets();
+		List<? extends Entity> targets = mGrenadeTargets.getTargets();
 
-		if (!targets.isEmpty()) {
-			mAestheticsBoss.launch(mBoss, bossLocation);
-			for (LivingEntity target : targets) {
+		AdditionalGrenadeParameters additionalParameters = (mAdditionalParameters == null ? null : mAdditionalParameters.launch());
+		// Manage Cooldown, if applicable
+		boolean scheduleCooldownReset = false;
+		int delay = 0;
+		if (additionalParameters != null) {
+			if (additionalParameters.willOverrideCanRun()) {
+				mOnCooldown = true;
+				scheduleCooldownReset = true;
+			}
+			delay = additionalParameters.getStartDelay();
+			// If the start delay is greater than 0 (the grenade cast is not instant)
+			// show the specified boss bar for the attack's cast
+			if (delay > 0) {
 				new BukkitRunnable() {
-					int mT = 0;
-
+					final ChargeUpManager mChargeupManager = additionalParameters.getChargeupManager();
 					@Override
 					public void run() {
-						if (EntityUtils.shouldCancelSpells(mBoss)) {
+						if (mChargeupManager.nextTick()) {
 							this.cancel();
-							return;
 						}
-
-						if (mT % mLobsDelay == 0) {
-							launchGrenade(bossLocation, target);
-							if (mT >= (mLobs - 1) * mLobsDelay) {
-								this.cancel();
-							}
-						}
-
-						mT++;
 					}
 				}.runTaskTimer(mPlugin, 0, 1);
 			}
 		}
+
+		if (!targets.isEmpty()) {
+			mAestheticsBoss.launch(mBoss, bossLocation);
+			for (Entity target : targets) {
+				new BukkitRunnable() {
+					int mLobsLaunched = 0;
+					final Location mBossLocation = bossLocation;
+					final Entity mTarget = target;
+					@Override
+					public void run() {
+						launchGrenade(mBossLocation, mTarget, additionalParameters);
+						mLobsLaunched++;
+						if (mLobsLaunched >= mLobs) {
+							cancel();
+						}
+					}
+				}.runTaskTimer(mPlugin, delay, mLobsDelay);
+			}
+		}
+		// Cooldown Handling, if applicable
+		if (scheduleCooldownReset) {
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mCooldown);
+		}
 	}
 
-	private void launchGrenade(Location bossLocation, LivingEntity target) {
+	@Override
+	public boolean canRun() {
+		return !mOnCooldown;
+	}
+
+	private void launchGrenade(Location bossLocation, Entity target, @Nullable AdditionalGrenadeParameters additionalParameters) {
 		try {
-			FallingBlock fallingBlock = bossLocation.getWorld().spawnFallingBlock(mBoss.getEyeLocation().add(0, 1, 0), mGrenadeMaterial.createBlockData());
+			Location pLoc = target.getLocation().clone();
+			Location offset = new Location(bossLocation.getWorld(), 0, 1, 0);
+
+			boolean alwaysAccurate = false;
+			if (additionalParameters != null) {
+				pLoc.add(additionalParameters.getRandomOffset(), 0, additionalParameters.getRandomOffset());
+				offset.add(additionalParameters.getSpawnOffset());
+				alwaysAccurate = additionalParameters.isAlwaysAccurate();
+				if (additionalParameters.getFixedY() != -1) {
+					pLoc.setY(additionalParameters.getFixedY());
+				}
+			}
+			boolean finalAlwaysAccurate = alwaysAccurate;
+
+			if (mTelegraphAesthetics != null) {
+				mTelegraphAesthetics.launch(pLoc);
+			}
+
+			bossLocation.add(offset);
+
+			FallingBlock fallingBlock = bossLocation.getWorld().spawnFallingBlock(mBoss.getEyeLocation().add(offset), mGrenadeMaterial.createBlockData());
 			fallingBlock.setDropItem(false);
 			EntityUtils.disableBlockPlacement(fallingBlock);
-			Location pLoc = target.getLocation();
+
 			Location tLoc = fallingBlock.getLocation();
 
 			// apply throw variance
@@ -262,6 +394,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				final FallingBlock mFallingBlock = fallingBlock;
 				int mDelay = mExplodeDelay;
 				int mTicks = 0;
+				final Location mPLoc = pLoc;
+				final boolean mAlwaysAccurate = finalAlwaysAccurate;
 
 				@Override
 				public void run() {
@@ -280,11 +414,12 @@ public class SpellBaseGrenadeLauncher extends Spell {
 						for (LivingEntity entity : collide) {
 							if (!entity.equals(mBoss) && entity.getBoundingBox().overlaps(box) && mDelay <= 0) {
 								mFallingBlock.remove();
-								mExplosionAesthetics.launch(mBoss, blockLocation);
-								List<? extends LivingEntity> targets = mExplosionTargets.getTargets(blockLocation);
-								launchLingering(blockLocation);
+								Location explosionLoc = mAlwaysAccurate ? mPLoc : blockLocation;
+								mExplosionAesthetics.launch(mBoss, explosionLoc);
+								List<? extends LivingEntity> targets = mExplosionTargets.getTargets(explosionLoc);
+								launchLingering(explosionLoc);
 								for (LivingEntity target : targets) {
-									mHitAction.launch(mBoss, target, blockLocation);
+									mHitAction.launch(mBoss, target, explosionLoc);
 								}
 								Entity spawn = mSummonPool.spawn(blockLocation);
 								if (spawn != null) {
@@ -303,11 +438,12 @@ public class SpellBaseGrenadeLauncher extends Spell {
 						mDelay -= 1;
 						if (mDelay <= 0) {
 							mFallingBlock.remove();
-							mExplosionAesthetics.launch(mBoss, blockLocation);
-							List<? extends LivingEntity> targets = mExplosionTargets.getTargets(blockLocation);
-							launchLingering(blockLocation);
+							Location explosionLoc = mAlwaysAccurate ? mPLoc : blockLocation;
+							mExplosionAesthetics.launch(mBoss, explosionLoc);
+							List<? extends LivingEntity> targets = mExplosionTargets.getTargets(explosionLoc);
+							launchLingering(explosionLoc);
 							for (LivingEntity target : targets) {
-								mHitAction.launch(mBoss, target, blockLocation);
+								mHitAction.launch(mBoss, target, explosionLoc);
 							}
 							Entity spawn = mSummonPool.spawn(blockLocation);
 							if (spawn != null) {
@@ -321,11 +457,12 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 					if (mTicks >= mDuration) {
 						mFallingBlock.remove();
-						mExplosionAesthetics.launch(mBoss, blockLocation);
-						List<? extends LivingEntity> targets = mExplosionTargets.getTargets(blockLocation);
-						launchLingering(blockLocation);
+						Location explosionLoc = mAlwaysAccurate ? mPLoc : blockLocation;
+						mExplosionAesthetics.launch(mBoss, explosionLoc);
+						List<? extends LivingEntity> targets = mExplosionTargets.getTargets(explosionLoc);
+						launchLingering(explosionLoc);
 						for (LivingEntity target : targets) {
-							mHitAction.launch(mBoss, target, blockLocation);
+							mHitAction.launch(mBoss, target, explosionLoc);
 						}
 						Entity entity = mSummonPool.spawn(blockLocation);
 						if (entity != null) {
@@ -356,6 +493,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 							final int mRevolutionDegrees = 360;
 							double mCurrentDegrees = FastUtils.randomDoubleInRange(0, mRevolutionDegrees);
 							final double mDegreeSpeed = mRevolutionDegrees / (mLingeringDuration / (mRadius / 2));
+							final boolean mCapLingeringApplications = (additionalParameters != null && additionalParameters.willCapLingeringApplications());
+							final int mMaxLingeringApplications = (additionalParameters != null ? additionalParameters.getMaxLingeringApplications() : 0);
+							int mCurrentLingeringApplications = 0;
 
 							@Override
 							public void run() {
@@ -371,10 +511,13 @@ public class SpellBaseGrenadeLauncher extends Spell {
 								mLingeringRingAesthetics.launch(mCenter.clone().add(offset4));
 								mLingeringCenterAesthetics.launch(mCenter, mTimer);
 
-								//each 10 ticks run damage on players
+								// Every 10 ticks, run hit actions on players
 
 								if (mTimer % 10 == 0) {
 									List<? extends LivingEntity> targets = mExplosionTargets.getTargets(mCenter);
+									if (!targets.isEmpty()) {
+										mCurrentLingeringApplications++;
+									}
 									for (LivingEntity entity : targets) {
 										if (entity.getLocation().distance(mCenter) <= mRadius) {
 											mLingeringHit.launch(mBoss, entity, mCenter);
@@ -382,7 +525,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 									}
 								}
 
-								if (mTimer >= mLingeringDuration) {
+								if (mTimer >= mLingeringDuration || (mCapLingeringApplications && mCurrentLingeringApplications >= mMaxLingeringApplications)) {
 									this.cancel();
 									return;
 								}
@@ -451,5 +594,86 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 	public void summonPlugins(Entity summon) {
 
+	}
+
+	@FunctionalInterface
+	public interface AdditionalParameters {
+		AdditionalGrenadeParameters launch();
+	}
+
+	@FunctionalInterface
+	public interface TelegraphAesthetics {
+		void launch(Location loc);
+	}
+
+	public static class AdditionalGrenadeParameters {
+		// Offset from the boss' location from which to spawn the grenade
+		public final Location mSpawnOffset;
+		// Max randomness in the targeting, or how inaccurate the targeting should be at maximum
+		public final double mTargetMaxRandomness;
+		// Extra delay before actually starting to lob grenades
+		public final int mStartDelay;
+		// Lock the targeting Y level. Pass -1 to disable the option.
+		public final double mFixedY;
+		// Name to put on the charge bar if start delay is > 0
+		public final ChargeUpManager mChargeupManager;
+		// Whether to remove the lingering effect after a certain amount of times it procced
+		public final boolean mCapLingeringApplications;
+		// How many applications the lingering will las for, max
+		public final int mMaxLingeringApplications;
+		// Whether to override canRun() with the cooldown of the spell, making it only castable by a spell manager when off cooldown.
+		public final boolean mOverrideCanRun;
+		// Whether to spawn the explosion at the registered player location, at the time of launch.
+		public final boolean mAlwaysAccurate;
+
+		public AdditionalGrenadeParameters(Location spawnOffset, double targetMaxRandomness, int startDelay, double fixedY, ChargeUpManager chargeupManager,
+			   boolean capLingeringApplications, int maxLingeringApplications, boolean overrideCanRun, boolean alwaysAccurate) {
+			mSpawnOffset = spawnOffset;
+			mTargetMaxRandomness = targetMaxRandomness;
+			mStartDelay = startDelay;
+			mFixedY = fixedY;
+			mChargeupManager = chargeupManager;
+			mCapLingeringApplications = capLingeringApplications;
+			mMaxLingeringApplications = maxLingeringApplications;
+			mOverrideCanRun = overrideCanRun;
+			mAlwaysAccurate = alwaysAccurate;
+		}
+
+		public Location getSpawnOffset() {
+			return mSpawnOffset;
+		}
+
+		public double getRandomOffset() {
+			// Returns a value between -maxRandomness and +maxRandomness
+			return RandomUtils.nextDouble(0, 2 * mTargetMaxRandomness) - mTargetMaxRandomness;
+		}
+
+		public int getStartDelay() {
+			return mStartDelay;
+		}
+
+		public double getFixedY() {
+			return mFixedY;
+		}
+
+		public ChargeUpManager getChargeupManager() {
+			return mChargeupManager;
+		}
+
+		public boolean willCapLingeringApplications() {
+			return mCapLingeringApplications;
+		}
+
+		public int getMaxLingeringApplications() {
+			return mMaxLingeringApplications;
+		}
+
+		public boolean willOverrideCanRun() {
+			return mOverrideCanRun;
+		}
+
+		public boolean isAlwaysAccurate() {
+			return mAlwaysAccurate;
+		}
 	}
 }

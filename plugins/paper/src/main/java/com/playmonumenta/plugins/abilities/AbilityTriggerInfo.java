@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -64,6 +65,10 @@ public class AbilityTriggerInfo<T extends Ability> {
 		public Predicate<Player> getPredicate() {
 			return mPredicate;
 		}
+
+		public boolean test(Player player) {
+			return mPredicate.test(player);
+		}
 	}
 
 	public AbilityTriggerInfo(String id, String displayName, Consumer<T> action, AbilityTrigger trigger) {
@@ -76,6 +81,10 @@ public class AbilityTriggerInfo<T extends Ability> {
 
 	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
 		this(id, displayName, description, action, trigger, restriction, null);
+	}
+
+	public AbilityTriggerInfo(String id, String displayName, Consumer<T> action, DepthsTrigger depthsTrigger) {
+		this(id, displayName, null, action, depthsTrigger.mTrigger, depthsTrigger.mRestriction);
 	}
 
 	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction, @Nullable Predicate<Player> prerequisite) {

@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -10,13 +13,18 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.LocationType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class CharmsCommand extends GenericCommand {
@@ -24,6 +32,7 @@ public class CharmsCommand extends GenericCommand {
 	public static void register(Plugin plugin) {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.charm");
+		CommandPermission charmFactoryPerms = CommandPermission.fromString("monumenta.command.charmfactory");
 		CommandPermission guiPerms = CommandPermission.fromString("monumenta.command.charm.gui");
 
 		//ADD COMMAND
@@ -39,7 +48,7 @@ public class CharmsCommand extends GenericCommand {
 		.executes((sender, args) -> {
 			Player player = (Player) args[0];
 
-			if (CharmManager.getInstance().addCharm(player, player.getInventory().getItemInMainHand())) {
+			if (CharmManager.getInstance().addCharm(player, player.getInventory().getItemInMainHand(), CharmManager.CharmType.NORMAL)) {
 				player.sendMessage("Charm added successfully");
 			} else {
 				player.sendMessage("Charm failed to add");
@@ -59,7 +68,7 @@ public class CharmsCommand extends GenericCommand {
 		.executes((sender, args) -> {
 			Player player = (Player) args[0];
 
-			if (CharmManager.getInstance().removeCharm(player, player.getInventory().getItemInMainHand())) {
+			if (CharmManager.getInstance().removeCharm(player, player.getInventory().getItemInMainHand(), CharmManager.CharmType.NORMAL)) {
 				player.sendMessage("Charm removed successfully");
 			} else {
 				player.sendMessage("No charm was removed");
@@ -77,7 +86,7 @@ public class CharmsCommand extends GenericCommand {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 
-				if (CharmManager.getInstance().removeCharmBySlot(player, (int) args[1])) {
+				if (CharmManager.getInstance().removeCharmBySlot(player, (int) args[1], CharmManager.CharmType.NORMAL)) {
 					player.sendMessage("Charm removed successfully");
 				} else {
 					player.sendMessage("No charm was removed");
@@ -95,7 +104,9 @@ public class CharmsCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				CharmManager.getInstance().clearCharms(player);
+				for (CharmManager.CharmType charmType : CharmManager.CharmType.values()) {
+					CharmManager.getInstance().clearCharms(player, charmType);
+				}
 			}).register();
 
 		//EFFECT SUMMARY COMMAND
@@ -109,7 +120,7 @@ public class CharmsCommand extends GenericCommand {
 		.withArguments(arguments)
 		.executes((sender, args) -> {
 			Player player = (Player) args[0];
-			List<Component> effects = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(player);
+			List<Component> effects = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(player, CharmManager.CharmType.NORMAL);
 			for (Component c : effects) {
 				player.sendMessage(c);
 			}
@@ -126,7 +137,7 @@ public class CharmsCommand extends GenericCommand {
 		.withArguments(arguments)
 		.executes((sender, args) -> {
 			Player player = (Player) args[0];
-			player.sendMessage(CharmManager.getInstance().getSummaryOfCharmNames(player));
+			player.sendMessage(CharmManager.getInstance().getSummaryOfCharmNames(player, CharmManager.CharmType.NORMAL));
 		}).register();
 
 		//CHARM CLEAR COMMAND
@@ -140,8 +151,29 @@ public class CharmsCommand extends GenericCommand {
 		.withArguments(arguments)
 		.executes((sender, args) -> {
 			Player player = (Player) args[0];
-			CharmManager.getInstance().clearCharms(player);
+			CharmManager.getInstance().clearCharms(player, CharmManager.CharmType.NORMAL);
 		}).register();
+
+		// DEPTHS CHARM MOG COMMAND
+
+		arguments.clear();
+		arguments.add(new LiteralArgument("zenithfactory"));
+		arguments.add(new IntegerArgument("rarity"));
+		arguments.add(new LocationArgument("loc", LocationType.BLOCK_POSITION));
+
+		new CommandAPICommand("charm")
+			.withPermission(charmFactoryPerms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Location loc = (Location) args[1];
+				int rarity = (int) args[0];
+				int power = new Random().nextInt(5) + 1;
+				ItemStack charm = CharmFactory.generateCharm(rarity, power, 0, null, null, null, null, null);
+				Item lootOnGround = loc.getWorld().dropItem(loc, charm);
+				lootOnGround.setGlowing(true);
+				PotionUtils.applyColoredGlowing("ZenithCharmgen", lootOnGround, DepthsUtils.getRarityNamedTextColor(rarity), 10000);
+
+			}).register();
 
 		//CHARM GUI COMMAND
 		//Usable by all players
@@ -208,6 +240,27 @@ public class CharmsCommand extends GenericCommand {
 				new CharmsGUI(sender, player).open();
 			}).register();
 
+		arguments.clear();
+
+		new CommandAPICommand("viewzenithcharms")
+			.withAliases("vzc")
+			.withPermission(guiPerms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				new CharmsGUI(player, CharmManager.CharmType.ZENITH).open();
+			}).register();
+
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+
+		new CommandAPICommand("viewzenithcharms")
+			.withAliases("vzc")
+			.withPermission(guiPerms)
+			.withArguments(arguments)
+			.executesPlayer((sender, args) -> {
+				Player player = (Player) args[0];
+				new CharmsGUI(sender, player, CharmManager.CharmType.ZENITH).open();
+			}).register();
+
 		// CHARM SEARCH COMMAND
 
 		arguments.clear();
@@ -228,7 +281,7 @@ public class CharmsCommand extends GenericCommand {
 				if (results.isEmpty()) {
 					player.sendMessage(Component.text("No effects found containing ", NamedTextColor.RED).append(Component.text(key, NamedTextColor.DARK_RED)));
 				} else {
-					player.sendMessage("Found " + results.size() + " effects containing " + ChatColor.GREEN + key);
+					player.sendMessage(Component.text("Found " + results.size() + " effects containing ").append(Component.text(key, NamedTextColor.GREEN)));
 					results.forEach(effect -> player.sendMessage(Component.text(effect, TextColor.fromHexString("#4AC2E5"))));
 				}
 			}).register();

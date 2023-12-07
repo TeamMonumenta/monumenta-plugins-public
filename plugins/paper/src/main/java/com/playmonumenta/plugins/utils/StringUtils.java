@@ -142,6 +142,10 @@ public class StringUtils {
 		return to2DP(multiplier * 100);
 	}
 
+	public static String multiplierToPercentageWithSign(double multiplier) {
+		return multiplierToPercentage(multiplier) + "%";
+	}
+
 	// 0 to 0
 	// 5 to 0.25
 	// 10 to 0.5
@@ -149,6 +153,10 @@ public class StringUtils {
 	// 1000 to 50
 	public static String ticksToSeconds(int ticks) {
 		return to2DP(ticks / 20d);
+	}
+
+	public static String ticksToSeconds(double ticks) {
+		return ticksToSeconds((int) ticks);
 	}
 
 	// Converts to 2dp with no trailing zeros, for display purposes

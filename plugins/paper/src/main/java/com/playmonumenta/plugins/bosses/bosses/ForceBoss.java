@@ -113,7 +113,6 @@ public class ForceBoss extends BossAbilityGroup {
 					p.PARTICLE_HIT.spawn(boss, target.getEyeLocation(), 0.25, 0.5, 0.25, 0);
 				}
 			}
-
 		};
 
 		super.constructBoss(spell, (int) (p.TARGETS.getRange() * 2), null, p.DELAY);

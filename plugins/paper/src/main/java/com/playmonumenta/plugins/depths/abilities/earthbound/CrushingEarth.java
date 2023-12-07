@@ -1,20 +1,20 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,17 +33,25 @@ public class CrushingEarth extends DepthsAbility {
 	private static final int CAST_RANGE = 4;
 	private static final int[] STUN_DURATION = {20, 25, 30, 35, 40, 50};
 
+	public static final String CHARM_COOLDOWN = "Crushing Earth Cooldown";
+
 	public static final DepthsAbilityInfo<CrushingEarth> INFO =
 		new DepthsAbilityInfo<>(CrushingEarth.class, ABILITY_NAME, CrushingEarth::new, DepthsTree.EARTHBOUND, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.CRUSHING_EARTH)
-			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CrushingEarth::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CrushingEarth::cast, DepthsTrigger.RIGHT_CLICK))
 			.displayItem(Material.SHIELD)
 			.descriptions(CrushingEarth::getDescription);
 
+	private final double mRange;
+	private final double mDamage;
+	private final int mStunDuration;
+
 	public CrushingEarth(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRange = CharmManager.getRadius(mPlayer, CharmEffects.CRUSHING_EARTH_RANGE.mEffectName, CAST_RANGE);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.CRUSHING_EARTH_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.CRUSHING_EARTH_STUN_DURATION.mEffectName, STUN_DURATION[mRarity - 1]);
 	}
 
 	public void cast() {
@@ -51,8 +59,7 @@ public class CrushingEarth extends DepthsAbility {
 			return;
 		}
 
-		LivingEntity mob = EntityUtils.getHostileEntityAtCursor(mPlayer, CAST_RANGE);
-
+		LivingEntity mob = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange);
 		if (mob == null) {
 			return;
 		}
@@ -66,19 +73,23 @@ public class CrushingEarth extends DepthsAbility {
 		world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
 		world.playSound(eyeLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.5f, 1.0f);
 
-		EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], mob);
-		DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
+		EntityUtils.applyStun(mPlugin, mStunDuration, mob);
+		DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell());
 
 		putOnCooldown();
 	}
 
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Right click while looking at an enemy within " + CAST_RANGE + " blocks to deal ")
-			.append(Component.text(DAMAGE[rarity - 1], color))
-			.append(Component.text(" melee damage and stun them for "))
-			.append(Component.text(StringUtils.to2DP(STUN_DURATION[rarity - 1] / 20.0), color))
-			.append(Component.text(" seconds. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<CrushingEarth> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<CrushingEarth>(color)
+			.add("Right click while looking at an enemy within ")
+			.add(a -> a.mRange, CAST_RANGE)
+			.add(" blocks to deal ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" melee damage and stun them for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], true)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
 	}
 
 

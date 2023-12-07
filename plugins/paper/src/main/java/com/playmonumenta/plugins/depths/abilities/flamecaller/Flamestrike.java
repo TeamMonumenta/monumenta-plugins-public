@@ -1,14 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -16,10 +19,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,17 +42,27 @@ public class Flamestrike extends DepthsAbility {
 	public static final int FIRE_TICKS = 4 * 20;
 	public static final float KNOCKBACK = 0.5f;
 
+	public static final String CHARM_COOLDOWN = "Flamestrike Cooldown";
+
 	public static final DepthsAbilityInfo<Flamestrike> INFO =
 		new DepthsAbilityInfo<>(Flamestrike.class, ABILITY_NAME, Flamestrike::new, DepthsTree.FLAMECALLER, DepthsTrigger.SHIFT_RIGHT_CLICK)
 			.linkedSpell(ClassAbility.FLAMESTRIKE)
-			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Flamestrike::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Flamestrike::cast, DepthsTrigger.SHIFT_RIGHT_CLICK))
 			.displayItem(Material.FLINT_AND_STEEL)
 			.descriptions(Flamestrike::getDescription);
 
+	private final double mDamage;
+	private final double mRadius;
+	private final int mFireDuration;
+	private final double mKnockback;
+
 	public Flamestrike(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FLAMESTRIKE_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.FLAMESTRIKE_RANGE.mEffectName, RADIUS);
+		mFireDuration = CharmManager.getDuration(mPlayer, CharmEffects.FLAMESTRIKE_FIRE_DURATION.mEffectName, FIRE_TICKS);
+		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FLAMESTRIKE_KNOCKBACK.mEffectName, KNOCKBACK);
 	}
 
 	public void cast() {
@@ -61,12 +71,17 @@ public class Flamestrike extends DepthsAbility {
 		}
 		putOnCooldown();
 
+
 		Hitbox hitbox = Hitbox.approximateCylinderSegment(
-			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0), 2 * HEIGHT, RADIUS, Math.toRadians(ANGLE));
+			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0),
+			2 * HEIGHT, mRadius, Math.toRadians(
+				CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FLAMESTRIKE_CONE_ANGLE.mEffectName, ANGLE)
+			));
+
 		for (LivingEntity mob : hitbox.getHitMobs()) {
-			EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true, true);
-			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK, true);
+			EntityUtils.applyFire(mPlugin, mFireDuration, mob, mPlayer);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, true);
+			MovementUtils.knockAway(mPlayer, mob, (float) mKnockback, true);
 		}
 
 		World world = mPlayer.getWorld();
@@ -93,7 +108,7 @@ public class Flamestrike extends DepthsAbility {
 					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).spawnAsPlayerActive(mPlayer);
 				}
 
-				if (mRadius >= RADIUS + 1) {
+				if (mRadius >= mRadius + 1) {
 					this.cancel();
 				}
 			}
@@ -106,10 +121,16 @@ public class Flamestrike extends DepthsAbility {
 		putOnCooldown();
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Right click while sneaking to create a torrent of flames, dealing ")
-			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
-			.append(Component.text(" magic damage to all enemies in front of you within " + RADIUS + " blocks, setting them on fire for " + FIRE_TICKS / 20 + " seconds and knocking them away. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<Flamestrike> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Flamestrike>(color)
+			.add("Right click while sneaking to create a torrent of flames, dealing ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" magic damage to all enemies in front of you within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks, setting them on fire for ")
+			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
+			.add(" seconds and knocking them away.")
+			.addCooldown(COOLDOWN);
 	}
 
 }

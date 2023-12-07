@@ -178,7 +178,7 @@ public class StatMultiplier {
 	}
 
 	public static boolean isDepthsShard() {
-		return ServerProperties.getShardName().startsWith("depths")
+		return ServerProperties.getShardName().startsWith("depths") || ServerProperties.getShardName().startsWith("zenith")
 			|| ServerProperties.getShardName().equals("mobs")
 			|| ServerProperties.getShardName().startsWith("dev");
 	}

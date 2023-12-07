@@ -3,21 +3,20 @@ package com.playmonumenta.plugins.depths;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
-import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.io.File;
@@ -25,17 +24,22 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.AbstractHorse;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -53,12 +57,7 @@ public class DepthsUtils {
 	public static final int STEELSAGE = 0x929292;
 	public static final int SHADOWDANCER = 0x7948af;
 	public static final int WINDWALKER = 0xc0dea9;
-
-	public static final int LEVELSIX = 0x703663;
-
-	//Text that gets displayed by players getting messages
-	public static final Component DEPTHS_COMPONENT_PREFIX = Component.empty().color(NamedTextColor.LIGHT_PURPLE)
-		.append(Component.text("[Depths Party] ", NamedTextColor.DARK_PURPLE));
+	public static final int PRISMATIC = 0xf4f9ff; // TODO This is only used in DiscoBall - not sure what we should do there
 
 	//Material defined as ice
 	public static final Material ICE_MATERIAL = Material.ICE;
@@ -74,8 +73,7 @@ public class DepthsUtils {
 		Material.CHEST,
 		Material.END_PORTAL,
 		Material.STONE_BUTTON,
-		Material.OBSIDIAN,
-		Material.LIGHT
+		Material.OBSIDIAN
 		);
 
 	//List of locations where ice is currently active
@@ -98,31 +96,77 @@ public class DepthsUtils {
 		return getRarity(rarity).getDisplay();
 	}
 
-	public static String getRarityText(int rarity) {
-		return getRarity(rarity).getName();
-	}
-
 	public static TextColor getRarityColor(int rarity) {
 		return getRarity(rarity).getColor();
 	}
 
+	public static TextColor getRarityTextColor(int rarity) {
+		TextColor[] colors = {
+			TextColor.fromHexString("#9f929c"),
+			TextColor.fromHexString("#70bc6d"),
+			TextColor.fromHexString("#705eca"),
+			TextColor.fromHexString("#cd5eca"),
+			TextColor.fromHexString("#e49b20"),
+			NamedTextColor.DARK_PURPLE
+		};
+		return colors[rarity - 1];
+	}
+
+	public static NamedTextColor getRarityNamedTextColor(int rarity) {
+		NamedTextColor[] colors = {
+			NamedTextColor.DARK_GRAY,
+			NamedTextColor.GREEN,
+			NamedTextColor.BLUE,
+			NamedTextColor.LIGHT_PURPLE,
+			NamedTextColor.GOLD,
+			NamedTextColor.DARK_PURPLE
+		};
+		return colors[rarity - 1];
+	}
+
 	public static void spawnIceTerrain(Location l, int ticks, Player p) {
-		spawnIceTerrain(l, ticks, p, Boolean.FALSE);
+		spawnIceTerrain(l, ticks, p, Boolean.FALSE, true);
 	}
 
 	public static void spawnIceTerrain(Location l, int ticks, Player p, Boolean isBarrier) {
+		spawnIceTerrain(l, ticks, p, isBarrier, true);
+	}
+
+	public static void spawnIceTerrain(Location l, int ticks, Player p, Boolean isBarrier, boolean withParticles) {
+
+		// when placing ice on top of existing ice, deal % damage to mobs
+		if (iceActive.get(l) != null && !isBarrier) {
+			Location aboveLoc = l.clone().add(0.5, 1, 0.5);
+
+			double hpPercentDamage = 0.15;
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.5, 5.0, 1.5)) {
+				if (!EntityUtils.isBoss(mob)) {
+					DamageUtils.damage(p, mob, DamageType.TRUE, EntityUtils.getMaxHealth(mob) * hpPercentDamage);
+				}
+			}
+
+			if (withParticles) {
+				new PartialParticle(Particle.REDSTONE, aboveLoc.clone().add(0, 0.5, 0), 24, 0.2, 0.7, 0.2, new Particle.DustOptions(Color.fromRGB(200, 225, 255), 1.0f)).spawnAsPlayerActive(p);
+			}
+
+			return;
+		}
+
 		//Check if the block is valid, or if the location is already active in the system
 		if (mIgnoredMats.contains(l.getWorld().getBlockAt(l).getType()) || iceActive.get(l) != null) {
 			return;
 		}
 
-		//Check for permafrost to increase ice duration
-		int playerPermLevel = DepthsManager.getInstance().getPlayerLevelInAbility(Permafrost.ABILITY_NAME, p);
-		if (playerPermLevel > 0) {
-			ticks += (Permafrost.ICE_BONUS_DURATION_SECONDS[playerPermLevel - 1] * 20);
-		}
+		Material iceMaterial = ICE_MATERIAL;
 
-		Material iceMaterial = playerPermLevel >= 6 ? Permafrost.PERMAFROST_ICE_MATERIAL : ICE_MATERIAL;
+		//Check for permafrost to increase ice duration
+		Permafrost permafrost = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Permafrost.class);
+		if (permafrost != null) {
+			ticks += permafrost.getBonusIceDuration();
+			if (permafrost.getAbilityScore() == 6) {
+				iceMaterial = Permafrost.PERMAFROST_ICE_MATERIAL;
+			}
+		}
 
 		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
 		l.getBlock().setType(iceMaterial);
@@ -156,12 +200,17 @@ public class DepthsUtils {
 	 * @return if the item is an axe, sword, scythe, wand, or trident
 	 */
 	public static boolean isWeaponItem(@Nullable ItemStack item) {
-		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) ||
-			ItemUtils.isWand(item) || ItemUtils.isHoe(item) || (item.getType() == Material.TRIDENT && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.RIPTIDE) == 0));
+		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) || ItemUtils.isWand(item) || ItemUtils.isHoe(item));
 	}
 
+	private static final List<String> WEAPON_ASPECT_NAMES = DepthsManager.getWeaponAspects().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList();
+
 	public static boolean isWeaponAspectAbility(String s) {
-		return s.equals(AxeAspect.ABILITY_NAME) || s.equals(WandAspect.ABILITY_NAME) || s.equals(ScytheAspect.ABILITY_NAME) || s.equals(SwordAspect.ABILITY_NAME) || s.equals(BowAspect.ABILITY_NAME);
+		return WEAPON_ASPECT_NAMES.contains(s);
+	}
+
+	public static boolean isPrismaticAbility(String s) {
+		return DepthsManager.getPrismaticAbilities().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList().contains(s);
 	}
 
 	/**
@@ -208,13 +257,17 @@ public class DepthsUtils {
 	}
 
 	public static void iceExposedBlock(Block b, int iceTicks, Player p) {
+		iceExposedBlock(b, iceTicks, p, true);
+	}
+
+	public static void iceExposedBlock(Block b, int iceTicks, Player p, boolean withParticles) {
 		//Check above block first and see if it is exposed to air
 		if (b.getRelative(BlockFace.UP).isSolid() && !(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).isSolid() || b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getType() == Material.WATER)) {
-			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), iceTicks, p);
+			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
 		} else if (b.isSolid() || b.getType() == Material.WATER) {
-			DepthsUtils.spawnIceTerrain(b.getLocation(), iceTicks, p);
+			DepthsUtils.spawnIceTerrain(b.getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
 		} else if (b.getRelative(BlockFace.DOWN).isSolid() || b.getRelative(BlockFace.DOWN).getType() == Material.WATER) {
-			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), iceTicks, p);
+			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
 		}
 	}
 
@@ -234,43 +287,87 @@ public class DepthsUtils {
 
 	}
 
-	//Store the player ability data to a file, including the name of the player and the room they died in.
-	public static void storetoFile(DepthsPlayer dp, String path) {
-		try {
-			// Name of the file and it's path
-			String fileName = path + File.separator + dp.mPlayerId + " - " + java.time.Instant.now().getEpochSecond() + ".json";
-			// Player data inside the json
-			JsonObject json = new JsonObject();
-			JsonObject abilityObjectInJson = new JsonObject();
-			for (String ability : dp.mAbilities.keySet()) {
-				abilityObjectInJson.addProperty(ability, dp.mAbilities.get(ability));
-			}
-			JsonArray initialPlayersJsonArray = new JsonArray();
-			DepthsParty depthsParty = DepthsManager.getInstance().getPartyFromId(dp);
-			if (depthsParty == null || depthsParty.mInitialPlayers == null) {
-				return;
-			}
-			for (String player : depthsParty.mInitialPlayers) {
-				initialPlayersJsonArray.add(player);
-			}
-			json.addProperty("PlayerName", Bukkit.getPlayer(dp.mPlayerId).getName());
-			json.addProperty("Room Number", depthsParty.getRoomNumber());
-			json.addProperty("Treasure Score", depthsParty.mTreasureScore);
-			json.add("Abilities", abilityObjectInJson);
-			json.add("Initial Players", initialPlayersJsonArray);
-			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() { //run async
-				@Override
-				public void run() {
-					try {
-						FileUtils.writeFile(fileName, json.toString());
-					} catch (Exception e) {
-						Plugin.getInstance().getLogger().severe("Caught exception saving file '" + fileName + "': " + e);
-						e.printStackTrace();
-					}
-				}
-			});
-		} catch (Exception ex) {
-		    ex.printStackTrace();
+	public static void sendFormattedMessage(Player player, DepthsContent content, String message) {
+		sendFormattedMessage(player, content, Component.text(message));
+	}
+
+	public static void sendFormattedMessage(Player player, DepthsContent content, Component message) {
+		if (content == null) {
+			MMLog.warning("Player " + player.getName() + " has null DepthsContent!");
+			content = DepthsContent.DARKEST_DEPTHS;
 		}
+		player.sendMessage(Component.text(content.getPrefix(), NamedTextColor.DARK_PURPLE).append(Component.text(" ")).append(message.colorIfAbsent(NamedTextColor.LIGHT_PURPLE)));
+	}
+
+	public static DepthsContent getDepthsContent() {
+		//TODO revisit after zenith release and split up dev shards for testing
+
+		if (ServerProperties.getShardName().contains("zenith") || ServerProperties.getShardName().startsWith("dev")) {
+			return DepthsContent.CELESTIAL_ZENITH;
+		} else if (ServerProperties.getShardName().contains("depths")) {
+			return DepthsContent.DARKEST_DEPTHS;
+		}
+		return DepthsContent.CELESTIAL_ZENITH;
+	}
+
+	public static double getDamageMultiplier() {
+		return getDepthsContent().getDamageMultiplier();
+	}
+
+	public static boolean isDepthsGrave(Entity entity) {
+		return entity instanceof ArmorStand && entity.getScoreboardTags().contains(DepthsListener.GRAVE_TAG);
+	}
+
+	// Stores run stats of the given DepthsPlayer to a json file.
+	public static void storeRunStatsToFile(DepthsPlayer dp, String path, boolean victory) {
+		Player player = dp.getPlayer();
+		if (player == null) {
+			return;
+		}
+
+		DepthsParty depthsParty = DepthsManager.getInstance().getPartyFromId(dp);
+		if (depthsParty == null || depthsParty.mInitialPlayers == null) {
+			return;
+		}
+
+		String playerId = dp.mPlayerId.toString();
+		long timestamp = java.time.Instant.now().getEpochSecond();
+		String fileName = path + File.separator + playerId + " - " + timestamp + ".json";
+		// Player data inside the json
+		JsonObject json = new JsonObject();
+		JsonObject abilityObjectInJson = new JsonObject();
+		for (String ability : dp.mAbilities.keySet()) {
+			abilityObjectInJson.addProperty(ability, dp.mAbilities.get(ability));
+		}
+		JsonArray initialPlayersJsonArray = new JsonArray();
+		for (String partyPlayer : depthsParty.mInitialPlayers) {
+			initialPlayersJsonArray.add(partyPlayer);
+		}
+
+		json.addProperty("player_name", player.getName());
+		json.addProperty("player_uuid", playerId);
+		json.addProperty("timestamp", timestamp);
+		json.addProperty("room_number", depthsParty.getRoomNumber());
+		json.addProperty("treasure_score", depthsParty.mTreasureScore);
+		json.addProperty("content_type", dp.getContent().name());
+		json.addProperty("victory", victory);
+		json.add("abilities", abilityObjectInJson);
+		json.add("initial_players", initialPlayersJsonArray);
+
+		if (depthsParty.getContent() == DepthsContent.DARKEST_DEPTHS) {
+			json.addProperty("endless", depthsParty.mEndlessMode);
+		}
+		if (depthsParty.getContent() == DepthsContent.CELESTIAL_ZENITH) {
+			json.addProperty("ascension", depthsParty.getAscension());
+		}
+
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				FileUtils.writeFile(fileName, json.toString());
+			} catch (Exception e) {
+				MMLog.severe("Caught exception saving file '" + fileName + "': " + e);
+				e.printStackTrace();
+			}
+		});
 	}
 }

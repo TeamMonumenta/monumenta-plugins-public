@@ -1,23 +1,24 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,22 +42,30 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class DepthsVolley extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Volley";
-	private static final int COOLDOWN = 12 * 20;
-	public static final int[] ARROWS = {7, 10, 12, 15, 18, 24};
-	private static final double[] DAMAGE_MULTIPLIER = {1.4, 1.5, 1.6, 1.7, 1.8, 2.0};
+	private static final int COOLDOWN = 15 * 20;
+	public static final int[] ARROWS = {7, 9, 11, 13, 15, 18};
+	private static final double[] DAMAGE_MULTIPLIER = {0.4, 0.5, 0.6, 0.7, 0.8, 1.0};
+
+	public static final String CHARM_COOLDOWN = "Volley Cooldown";
 
 	public static final DepthsAbilityInfo<DepthsVolley> INFO =
 		new DepthsAbilityInfo<>(DepthsVolley.class, ABILITY_NAME, DepthsVolley::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.VOLLEY_DEPTHS)
-			.cooldown(COOLDOWN)
+			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.displayItem(Material.ARROW)
 			.descriptions(DepthsVolley::getDescription)
 			.priorityAmount(900); // cancels damage events of volley arrows, so needs to run before other abilities
+
+	private final double mDamageMultiplier;
+	private final int mArrows;
+
 	public Set<Projectile> mDepthsVolley;
 	public Map<LivingEntity, Integer> mDepthsVolleyHitMap;
 
 	public DepthsVolley(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.VOLLEY_DAMAGE_MULTIPLIER.mEffectName, DAMAGE_MULTIPLIER[mRarity - 1]);
+		mArrows = ARROWS[mRarity - 1] + (int) CharmManager.getLevel(mPlayer, CharmEffects.VOLLEY_ARROWS.mEffectName);
 		mDepthsVolley = new HashSet<>();
 		mDepthsVolleyHitMap = new HashMap<>();
 	}
@@ -97,8 +106,8 @@ public class DepthsVolley extends DepthsAbility {
 						}
 					}
 				}
-
-				List<Projectile> projectiles = EntityUtils.spawnVolley(mPlayer, ARROWS[mRarity - 1], projSpeed, 5, projectile.getClass());
+				int piercing = (projectile instanceof AbstractArrow) ? (int) CharmManager.getLevel(mPlayer, CharmEffects.VOLLEY_PIERCING.mEffectName) : 0;
+				List<Projectile> projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, projSpeed, 5, projectile.getClass());
 				for (Projectile proj : projectiles) {
 					mDepthsVolley.add(proj);
 
@@ -109,7 +118,7 @@ public class DepthsVolley extends DepthsAbility {
 						}
 
 						arrow.setCritical(projectile instanceof AbstractArrow projectileArrow && projectileArrow.isCritical());
-
+						arrow.setPierceLevel(piercing);
 						// If the base arrow's potion data is still stored, apply it to the new arrows
 						if (tArrowData != null) {
 							((Arrow) proj).setBasePotionData(tArrowData);
@@ -137,8 +146,7 @@ public class DepthsVolley extends DepthsAbility {
 		Entity damager = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && damager instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && mDepthsVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
-				double damageMultiplier = DAMAGE_MULTIPLIER[mRarity - 1];
-				event.setDamage(event.getDamage() * damageMultiplier);
+				event.setDamage(event.getDamage() * (1 + mDamageMultiplier));
 			} else {
 				// Only let one Volley arrow hit a given mob
 				event.setCancelled(true);
@@ -156,12 +164,14 @@ public class DepthsVolley extends DepthsAbility {
 		return true;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Shooting a projectile while sneaking shoots a volley consisting of ")
-			.append(Component.text(ARROWS[rarity - 1], color))
-			.append(Component.text(" projectiles instead. Only one arrow is consumed, and each projectile's damage is multiplied by "))
-			.append(Component.text(StringUtils.to2DP(DAMAGE_MULTIPLIER[rarity - 1]), color))
-			.append(Component.text(". Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<DepthsVolley> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<DepthsVolley>(color)
+			.add("Shooting a projectile while sneaking shoots a volley consisting of ")
+			.add(a -> a.mArrows, ARROWS[rarity - 1], false, null, true)
+			.add(" projectiles instead. Only one arrow is consumed, and each projectile deals ")
+			.addPercent(a -> a.mDamageMultiplier, DAMAGE_MULTIPLIER[rarity - 1], false, true)
+			.add(" more damage.")
+			.addCooldown(COOLDOWN);
 
 	}
 

@@ -1,14 +1,16 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -18,16 +20,22 @@ import org.bukkit.entity.Player;
 public class Aeromancy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Aeromancy";
-	public static final double[] PLAYER_DAMAGE = {1.12, 1.15, 1.18, 1.21, 1.24, 1.3};
-	public static final double[] MOB_DAMAGE = {1.056, 1.07, 1.084, 1.098, 1.112, 1.156};
+	public static final double[] PLAYER_DAMAGE = {0.12, 0.15, 0.18, 0.21, 0.24, 0.3};
+	public static final double[] MOB_DAMAGE = {0.056, 0.07, 0.084, 0.098, 0.112, 0.156};
 
 	public static final DepthsAbilityInfo<Aeromancy> INFO =
 		new DepthsAbilityInfo<>(Aeromancy.class, ABILITY_NAME, Aeromancy::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
 			.displayItem(Material.FEATHER)
-			.descriptions(Aeromancy::getDescription);
+			.descriptions(Aeromancy::getDescription)
+			.singleCharm(false);
+
+	private final double mPlayerDamage;
+	private final double mMobDamage;
 
 	public Aeromancy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mPlayerDamage = PLAYER_DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.AEROMANCY_PLAYER_DAMAGE_AMP.mEffectName);
+		mMobDamage = MOB_DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.AEROMANCY_MOB_DAMAGE_AMP.mEffectName);
 	}
 
 	@Override
@@ -39,20 +47,21 @@ public class Aeromancy extends DepthsAbility {
 	private double damageMultiplier(Entity damagee) {
 		double multiplier = 1;
 		if (LocationUtils.isAirborne(mPlayer)) {
-			multiplier *= PLAYER_DAMAGE[mRarity - 1];
+			multiplier *= 1 + mPlayerDamage;
 		}
 		if (LocationUtils.isAirborne(damagee)) {
-			multiplier *= MOB_DAMAGE[mRarity - 1];
+			multiplier *= 1 + mMobDamage;
 		}
 		return multiplier;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("All damage you deal while airborne is multiplied by ")
-			.append(Component.text(PLAYER_DAMAGE[rarity - 1], color))
-			.append(Component.text(". Additionally, all damage you deal against airborne enemies is multiplied by "))
-			.append(Component.text(MOB_DAMAGE[rarity - 1], color))
-			.append(Component.text("."));
+	private static Description<Aeromancy> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Aeromancy>(color)
+			.add("You deal ")
+			.addPercent(a -> a.mPlayerDamage, PLAYER_DAMAGE[rarity - 1], false, true)
+			.add(" more damage while airborne and ")
+			.addPercent(a -> a.mMobDamage, MOB_DAMAGE[rarity - 1], false, true)
+			.add(" more damage to airborne enemies.");
 	}
 
 

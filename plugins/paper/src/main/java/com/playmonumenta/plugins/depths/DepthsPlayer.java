@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.depths;
 
-import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,21 +44,45 @@ public class DepthsPlayer {
 	public boolean mHasWeaponAspect;
 	//Whether or not they have used chaos room this floor already
 	public boolean mUsedChaosThisFloor;
+	//Whether or not they have used chaos room this floor already
+	public boolean mUsedWheelThisFloor;
 	//Whether or not they have deleted an ability on this floor
 	public boolean mUsedAbilityDeletion;
 	//Whether or not they have mutated an ability on this floor
 	public boolean mUsedAbilityMutation;
+	//Whether or not they have used generosity on this floor
+	public boolean mUsedGenerosity;
+	//Remaining active ability only wand aspect uses
+	public int mWandAspectCharges = 0;
 	//Individual treasure score. Copied from the party's treasure score when they die.
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later
 	public Queue<DepthsRewardType> mEarnedRewards;
 	//The room on which the player died. -1 if the player has not died
 	public int mDeathRoom;
+	// Number of times this player has died as relevant for graves (gets reduced with bosses beaten, so is not an accurate total count)
+	public int mNumDeaths;
+	// Unique mobs killed by this player with the Solar Ray ability
+	private final ArrayList<String> mSolarRayUniqueMobNames = new ArrayList<>();
+
+	// Whether the permanent effects given by Diversity have been activated
+	public boolean mDiversityActive = false;
+	// Whether the prismatic given by Diversity has been given
+	public boolean mDiversityGift = false;
+
+	public boolean mDead = false; // If true, awaiting respawn
+	public int mGraveTicks = 0;
+	public double mReviveTicks = 0;
+	boolean mCurrentlyReviving = false;
+	public transient @Nullable BukkitTask mGraveTask;
+
 	//The location to teleport offline players to; null if no teleport is required on login - DO NOT REFERENCE WORLD
 	private String mOfflineTeleportWorld = "";
 	private @Nullable Vector mOfflineTeleportLoc = null;
 	private @Nullable Float mOfflineTeleportYaw = null;
 	private @Nullable Float mOfflineTeleportPitch = null;
+	//The Depths content this player is in
+	private final DepthsContent mContent;
 
 	/*
 	 * !!!! WARNING !!!!
@@ -69,8 +94,6 @@ public class DepthsPlayer {
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
 		mAbilities = new HashMap<>();
-		p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-			"Initializing Depths System! Press button again to begin.")));
 		mEligibleTrees = initTrees(p);
 
 		//Randomize order of weapon aspects
@@ -87,15 +110,20 @@ public class DepthsPlayer {
 
 		mDeathRoom = -1;
 
+		mContent = DepthsUtils.getDepthsContent();
+
 		ScoreboardUtils.setScoreboardValue(p, "DDDelve1", 0);
 		ScoreboardUtils.setScoreboardValue(p, "DDDelve2", 0);
+
+		sendMessage("Initializing Depths System! Press button again to begin.");
 	}
 
 	public List<DepthsTree> initTrees(Player player) {
-		int talismanScore = ScoreboardUtils.getScoreboardValue(player, "DDTalisman").orElse(0);
-		if (0 < talismanScore && talismanScore <= DepthsTree.values().length) {
+		int talismanScore = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS ? ScoreboardUtils.getScoreboardValue(player, "DDTalisman").orElse(0) : ScoreboardUtils.getScoreboardValue(player, "CZTalisman").orElse(0);
+		if (0 < talismanScore && talismanScore <= DepthsTree.OWNABLE_TREES.length) {
 			double chance = 1;
-			if (player.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING)) {
+			if ((player.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING))
+				    || ((ScoreboardUtils.getScoreboardValue(player, "CurrentAscension").orElse(0) > 0) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING))) {
 				chance = 0.75;
 			}
 
@@ -105,20 +133,17 @@ public class DepthsPlayer {
 				return initTreesWithGuarantee(talismanScore);
 			} else if (rand < chance) {
 				//The Talisman granted them the tree when it wouldn't normally
-				player.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-					"Due to your Talisman, you have become a "
-						+ DepthsTree.values()[talismanScore - 1].getDisplayName()
-						+ " when you would not have otherwise!")));
+				sendMessage("Due to your Talisman, you have become a " + DepthsTree.OWNABLE_TREES[talismanScore - 1].getDisplayName() + " when you would not have otherwise!");
 				return initTreesWithGuarantee(talismanScore);
 			} else {
 				//They failed both the usual random chance of the tree and the Talisman chance
 				List<DepthsTree> randomTrees = new ArrayList<>();
 
-				DepthsTree talismanTree = DepthsTree.values()[talismanScore - 1];
+				DepthsTree talismanTree = DepthsTree.OWNABLE_TREES[talismanScore - 1];
 
 				List<DepthsTree> allTrees = new ArrayList<>();
 				//Get all possible trees and shuffle them
-				Collections.addAll(allTrees, DepthsTree.values());
+				Collections.addAll(allTrees, DepthsTree.OWNABLE_TREES);
 				//This is the 1/4 chance in Endless with the Talisman to NOT get the requested tree
 				allTrees.remove(talismanTree);
 				Collections.shuffle(allTrees);
@@ -141,7 +166,7 @@ public class DepthsPlayer {
 		List<DepthsTree> randomTrees = new ArrayList<>();
 		List<DepthsTree> allTrees = new ArrayList<>();
 		//Get all possible trees and shuffle them
-		Collections.addAll(allTrees, DepthsTree.values());
+		Collections.addAll(allTrees, DepthsTree.OWNABLE_TREES);
 		Collections.shuffle(allTrees);
 
 		//Select the first x values as valid tree offerings this run
@@ -155,12 +180,12 @@ public class DepthsPlayer {
 	public List<DepthsTree> initTreesWithGuarantee(int talismanScore) {
 		List<DepthsTree> randomTrees = new ArrayList<>();
 
-		DepthsTree talismanTree = DepthsTree.values()[talismanScore - 1];
+		DepthsTree talismanTree = DepthsTree.OWNABLE_TREES[talismanScore - 1];
 		randomTrees.add(talismanTree);
 
 		List<DepthsTree> allTrees = new ArrayList<>();
 		//Get all possible trees and shuffle them
-		Collections.addAll(allTrees, DepthsTree.values());
+		Collections.addAll(allTrees, DepthsTree.OWNABLE_TREES);
 		allTrees.remove(talismanTree);
 		Collections.shuffle(allTrees);
 
@@ -231,5 +256,28 @@ public class DepthsPlayer {
 		mOfflineTeleportLoc = null;
 		mOfflineTeleportYaw = null;
 		mOfflineTeleportPitch = null;
+	}
+
+	public ArrayList<String> getSolarRayUniqueMobNames() {
+		return mSolarRayUniqueMobNames;
+	}
+
+	public @Nullable Player getPlayer() {
+		return Bukkit.getPlayer(mPlayerId);
+	}
+
+	public void sendMessage(String message) {
+		sendMessage(Component.text(message));
+	}
+
+	public void sendMessage(Component message) {
+		Player p = Bukkit.getPlayer(mPlayerId);
+		if (p != null && p.isOnline()) {
+			DepthsUtils.sendFormattedMessage(p, mContent, message);
+		}
+	}
+
+	public DepthsContent getContent() {
+		return mContent;
 	}
 }

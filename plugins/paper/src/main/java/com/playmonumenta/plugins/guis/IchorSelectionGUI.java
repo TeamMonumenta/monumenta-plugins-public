@@ -11,21 +11,16 @@ import com.playmonumenta.plugins.itemstats.infusions.IchorShadowdancer;
 import com.playmonumenta.plugins.itemstats.infusions.IchorSteelsage;
 import com.playmonumenta.plugins.itemstats.infusions.IchorWindwalker;
 import com.playmonumenta.plugins.listeners.IchorListener;
-import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class IchorSelectionGUI extends Gui {
-	private static final String PRISMATIC_ITEM_NAME = "Prismatic";
-	private static final Material PRISMATIC_MATERIAL = Material.AMETHYST_SHARD;
 
 	public IchorSelectionGUI(Player player) {
 		super(player, 4 * 9, Component.text("Ichor Imbuement Selection"));
@@ -50,7 +45,7 @@ public class IchorSelectionGUI extends Gui {
 			infuseItem(mainhand, IchorListener.ICHOR_INFUSIONS.get(3));
 			close();
 		});
-		setItem(2, 4, GUIUtils.createBasicItem(PRISMATIC_MATERIAL, PRISMATIC_ITEM_NAME, TextColor.fromHexString("#FF9CF0"), false, IchorPrismatic.DESCRIPTION)).onClick((clickEvent) -> {
+		setItem(2, 4, DepthsTree.PRISMATIC.createItemWithDescription(IchorPrismatic.DESCRIPTION)).onClick((clickEvent) -> {
 			infuseItem(mainhand, IchorListener.ICHOR_INFUSIONS.get(4));
 			close();
 		});

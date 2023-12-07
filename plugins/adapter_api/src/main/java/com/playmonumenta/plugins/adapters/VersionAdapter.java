@@ -190,4 +190,6 @@ public interface VersionAdapter {
 
 	void resetScoreHolderScores(String scoreHolder, Scoreboard scoreboard);
 
+	void disableRangedAttackGoal(LivingEntity entity);
+
 }

@@ -186,6 +186,17 @@ public class BlockUtils {
 		return TORCHES.contains(block.getType());
 	}
 
+	public static boolean canBeBroken(Block block) {
+		if (block.getType().getHardness() == -1.0F) {
+			return false;
+		}
+		Location blockLoc = block.getLocation();
+		if (ZoneUtils.hasZoneProperty(blockLoc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
+			return false;
+		}
+		return !blockLoc.clone().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK);
+	}
+
 	public static BlockFace getCardinalBlockFace(Entity entity) {
 		return getCardinalBlockFace(entity.getLocation().getDirection());
 	}
@@ -199,6 +210,10 @@ public class BlockUtils {
 
 	public static Location getCenterBlockLocation(Block block) {
 		return block.getLocation().add(0.5, 0.5, 0.5);
+	}
+
+	public static Location getCenteredBlockBaseLocation(Block block) {
+		return block.getLocation().add(0.5, 0, 0.5);
 	}
 
 	public static int taxiCabDistance(Block block1, Block block2) {
@@ -273,4 +288,5 @@ public class BlockUtils {
 
 		return -1;
 	}
+
 }

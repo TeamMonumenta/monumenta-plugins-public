@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -10,11 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -69,8 +72,18 @@ public class ParticleUtils {
 	}
 
 	@FunctionalInterface
+	public interface PreciseParametricEquation {
+		double equation(double t);
+	}
+
+	@FunctionalInterface
 	public interface ParametricParticle {
 		void run(Location loc, int t);
+	}
+
+	@FunctionalInterface
+	public interface PreciseParametricParticle {
+		void run(Location loc, double t);
 	}
 
 	public static void explodingRingEffect(Plugin plugin, Location loc, double radius, double height, int ticks, double chance, SpawnParticleAction spawnParticleAction) {
@@ -261,7 +274,7 @@ public class ParticleUtils {
 					}
 				}
 
-				mDegrees += 40;
+				mDegrees += arcInc;
 			}
 
 		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
@@ -626,6 +639,412 @@ public class ParticleUtils {
 		}
 
 		linesToDraw.forEach(l -> l.spawnForPlayer(ParticleCategory.BOSS, player));
+	}
+
+	public static void drawLine(Location start, Location end, int units, ParametricParticle pp) {
+		Location current = start.clone();
+		Vector direction = end.clone().toVector().subtract(start.toVector());
+		Vector increment = direction.divide(new Vector(units, units, units));
+		for (int t = 0; t <= units; t++) {
+			pp.run(current, t);
+			current = current.add(increment);
+		}
+	}
+
+	public static void drawPerimeter(Location[] points, int units, boolean connect, ParametricParticle pp) {
+		for (int i = 0; i < points.length - 1; i++) {
+			drawLine(points[i], points[i + 1], units, pp);
+		}
+		if (connect) {
+			drawLine(points[0], points[points.length - 1], units, pp);
+		}
+	}
+
+	public static void drawRectangleTelegraph(Location start, double dx, double dz, int units, int pulses, int telegraphDuration, double baseSpeed, Particle particle, Plugin plugin, LivingEntity entity) {
+		drawRectangleTelegraph(start, dx, dz, units, pulses, telegraphDuration, 0, baseSpeed, particle, plugin, entity);
+	}
+
+	public static void drawRectangleTelegraph(Location start, double dx, double dz, int units, int pulses, int telegraphDuration, int pulseStartDelay, double baseSpeed, Particle particle, Plugin plugin, LivingEntity entity) {
+		// Get the particles out of the ground
+		Location adjustedStart = start.clone().add(0, 0.1, 0);
+		Location[] corners = {
+			adjustedStart,
+			adjustedStart.clone().add(dx, 0, 0),
+			adjustedStart.clone().add(dx, 0, dz),
+			adjustedStart.clone().add(0, 0, dz)
+		};
+		Location center = adjustedStart.clone().add(dx / 2, 0, dz / 2);
+		double pulseDelay = (double) (telegraphDuration - pulseStartDelay) / pulses;
+
+		Player eventualPlayer = null;
+		if (entity instanceof Player player) {
+			eventualPlayer = player;
+		}
+		Player finalPlayer = eventualPlayer;
+
+		long borderDelay = (pulseStartDelay > 0) ? (long) (pulseDelay / 2) : (long) pulseDelay;
+
+		BukkitRunnable runnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				// Border, starting immediately
+				ParticleUtils.drawPerimeter(corners, units, true,
+					(l, t) -> {
+						PartialParticle pp = new PartialParticle(particle, l, 1).extra(0);
+						if (finalPlayer != null) {
+							pp.spawnAsPlayerActive(finalPlayer);
+						} else {
+							pp.spawnAsEntityActive(entity);
+						}
+					}
+				);
+			}
+		};
+		runnable.runTaskTimer(plugin, 0, borderDelay);
+
+		new BukkitRunnable() {
+			int mTimesRun = 0;
+			@Override
+			public void run() {
+				// Pulses, starting after startDelay
+				ParticleUtils.drawPerimeter(corners, units, true,
+					(l, t) -> {
+						Vector direction = center.toVector().subtract(l.toVector()).normalize();
+						double speedMod = center.distance(l) / 2;
+						PartialParticle pp = new PartialParticle(particle, l, 1).extra(baseSpeed * speedMod).directionalMode(true)
+							.delta(direction.getX(), direction.getY(), direction.getZ());
+						if (finalPlayer != null) {
+							pp.spawnAsPlayerActive(finalPlayer);
+						} else {
+							pp.spawnAsEntityActive(entity);
+						}
+					}
+				);
+
+				mTimesRun++;
+				if (pulses == 0 || mTimesRun == pulses) {
+					this.cancel();
+					runnable.cancel();
+				}
+			}
+		}.runTaskTimer(plugin, pulseStartDelay, (long) pulseDelay);
+	}
+
+	public static void drawRectangleTelegraphAnimation(Location start, double dx, double dz, int units, int pulses, int animationTimes, int telegraphDuration, Particle particle, Object data, Plugin plugin, LivingEntity entity) {
+		// Get the particles out of the ground
+		Location adjustedStart = start.clone().add(0, 0.1, 0);
+		Location[] corners = {
+			adjustedStart.clone(),
+			adjustedStart.clone().add(dx, 0, 0),
+			adjustedStart.clone().add(dx, 0, dz),
+			adjustedStart.clone().add(0, 0, dz)
+		};
+
+		int finalAnimationTimes = (animationTimes > 0) ? animationTimes : 1;
+
+		double pulseDelay = (double) telegraphDuration / pulses / finalAnimationTimes;
+
+		double xIncrease = dx / 2 / pulses;
+		double zIncrease = dz / 2 / pulses;
+
+		Player eventualPlayer = null;
+		if (entity instanceof Player player) {
+			eventualPlayer = player;
+		}
+		Player finalPlayer = eventualPlayer;
+
+		new BukkitRunnable() {
+
+			int mTimesAnimated = 0;
+			@Override
+			public void run() {
+				Location[] innerCorners = {
+					adjustedStart.clone(),
+					adjustedStart.clone().add(dx, 0, 0),
+					adjustedStart.clone().add(dx, 0, dz),
+					adjustedStart.clone().add(0, 0, dz)
+				};
+				new BukkitRunnable() {
+					int mTimesRun = 0;
+					@Override
+					public void run() {
+						// Outline always visible
+						ParticleUtils.drawPerimeter(corners, units, true,
+							(l, t) -> {
+								PartialParticle pp = new PartialParticle(particle, l, 1).extra(0).data(data);
+								if (finalPlayer != null) {
+									pp.spawnAsPlayerActive(finalPlayer);
+								} else {
+									pp.spawnAsEntityActive(entity);
+								}
+							}
+						);
+						// Inner shrinking rectangles
+						ParticleUtils.drawPerimeter(innerCorners, units, true,
+							(l, t) -> {
+								PartialParticle pp = new PartialParticle(particle, l, 1).extra(0).data(data);
+								if (finalPlayer != null) {
+									pp.spawnAsPlayerActive(finalPlayer);
+								} else {
+									pp.spawnAsEntityActive(entity);
+								}
+							}
+						);
+
+						innerCorners[0].add(xIncrease, 0, zIncrease);
+						innerCorners[1].add(-xIncrease, 0, zIncrease);
+						innerCorners[2].add(-xIncrease, 0, -zIncrease);
+						innerCorners[3].add(xIncrease, 0, -zIncrease);
+
+						mTimesRun++;
+						if (pulses == 0 || mTimesRun == pulses) {
+							this.cancel();
+						}
+					}
+				}.runTaskTimer(plugin, 0, (long) pulseDelay);
+
+				mTimesAnimated++;
+				if (mTimesAnimated == finalAnimationTimes) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(plugin, 0, telegraphDuration / animationTimes);
+	}
+
+	public static void drawCircleTelegraph(Location center, double radius, int units, int pulses, int telegraphDuration, double baseSpeed, boolean hideMiddleCircle, Particle particle, Plugin plugin, LivingEntity entity) {
+		// Get the particles out of the ground
+		double pulseDelay = (double) telegraphDuration / pulses;
+		Vector normal = new Vector(0, 1, 0);
+		Location adjustedCenter = center.clone().add(0, 0.1, 0);
+
+		Player eventualPlayer = null;
+		if (entity instanceof Player player) {
+			eventualPlayer = player;
+		}
+		Player finalPlayer = eventualPlayer;
+
+		new BukkitRunnable() {
+			int mTimesRun = 0;
+			@Override
+			public void run() {
+				if (!hideMiddleCircle) {
+					ParticleUtils.drawRing(adjustedCenter, units, normal, radius,
+						(l, t) -> {
+							PartialParticle pp = new PartialParticle(particle, l, 1).extra(0);
+							if (finalPlayer != null) {
+								pp.spawnAsPlayerActive(finalPlayer);
+							} else {
+								pp.spawnAsEntityActive(entity);
+							}
+						}
+					);
+				}
+				ParticleUtils.drawRing(adjustedCenter, units, normal, radius,
+					(l, t) -> {
+						Vector direction = adjustedCenter.toVector().subtract(l.toVector()).normalize();
+						PartialParticle pp = new PartialParticle(particle, l, 1).extra(baseSpeed).directionalMode(true)
+							.delta(direction.getX(), direction.getY(), direction.getZ());
+						if (finalPlayer != null) {
+							pp.spawnAsPlayerActive(finalPlayer);
+						} else {
+							pp.spawnAsEntityActive(entity);
+						}
+					}
+				);
+
+				mTimesRun++;
+				if (pulses == 0 || mTimesRun == pulses) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(plugin, 0, (long) pulseDelay);
+	}
+
+	public static BukkitRunnable drawFlowerPattern(Location center, double radius, int petals, int duration, double thetaOffset,
+												   double thetaIncrement, float baseSpeed, Particle particle, Entity spawnerEntity) {
+		double pointOffset = Math.PI * 2 / petals;
+		BukkitRunnable flowerRunnable = new BukkitRunnable() {
+			int mTicks = 0;
+			double mThetaForward = thetaOffset;
+			double mThetaBackward = thetaOffset;
+			final PPCircle mCircle = new PPCircle(particle, center.clone(), radius).ringMode(true);
+
+			@Override
+			public void run() {
+				for (int i = 0; i < petals; i++) {
+					double forwardAngle = mThetaForward + i * pointOffset;
+					double backwardAngle = mThetaBackward + i * pointOffset;
+					Location forwardLoc = center.clone().add(FastUtils.cos(forwardAngle) * radius, 0, FastUtils.sin(forwardAngle) * radius);
+					Vector toCenterForward = forwardLoc.toVector().subtract(center.toVector()).normalize();
+					Location backwardLoc = center.clone().add(FastUtils.cos(backwardAngle) * radius, 0, FastUtils.sin(backwardAngle) * radius);
+					Vector toCenterBackward = backwardLoc.toVector().subtract(center.toVector()).normalize();
+
+					// Particle going forwards, shooting towards the center
+					PartialParticle forward = new PartialParticle(particle, forwardLoc, 1).extra(0).directionalMode(true)
+						.delta(toCenterForward.getX(), toCenterForward.getY(), toCenterForward.getZ())
+						.extra(baseSpeed).distanceFalloff(radius * 24);
+					// Particle going backwards, shooting towards the center
+					PartialParticle backward = new PartialParticle(particle, backwardLoc, 1).extra(0).directionalMode(true)
+						.delta(toCenterBackward.getX(), toCenterBackward.getY(), toCenterBackward.getZ())
+						.extra(baseSpeed).distanceFalloff(radius * 24);
+
+					if (spawnerEntity instanceof Player player) {
+						// Particle Base Circle
+						if (mTicks % 10 == 0) {
+							mCircle.spawnAsPlayerActive(player);
+						}
+						forward.spawnAsPlayerActive(player);
+						backward.spawnAsPlayerActive(player);
+					} else {
+						// Particle Base Circle
+						if (mTicks % 10 == 0) {
+							mCircle.spawnAsEntityActive(spawnerEntity);
+						}
+						forward.spawnAsEntityActive(spawnerEntity);
+						backward.spawnAsEntityActive(spawnerEntity);
+					}
+				}
+
+				if (mTicks >= duration) {
+					this.cancel();
+				}
+				mThetaForward += thetaIncrement;
+				mThetaBackward -= thetaIncrement;
+				mTicks++;
+			}
+		};
+		flowerRunnable.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+		return flowerRunnable;
+	}
+
+	@Deprecated
+	public static void instantlyDrawFlowerPattern(Location center, Vector normal, double radius, int petals, double thetaStep, PreciseParametricParticle pp) {
+		if (petals < 3) {
+			return;
+		}
+
+		drawPreciseCurve(center, 0, Math.PI * (petals - 2), thetaStep, normal.clone().normalize(),
+			t -> 0,
+			t -> radius * FastUtils.cos((double) petals / ((double) petals - 2) * t) * FastUtils.sin(t),
+			t -> radius * FastUtils.cos((double) petals / ((double) petals - 2) * t) * FastUtils.cos(t),
+			pp
+		);
+	}
+
+	public static void drawWeirdCirclePattern(Location center, Vector normal, double radius, int complexity, double thetaStep, PreciseParametricParticle pp) {
+
+		int actualComplexity = (complexity % 2 == 0) ? complexity + 1 : complexity;
+
+		ParticleUtils.drawPreciseCurve(center, 0, Math.PI * actualComplexity * 2, thetaStep, normal.clone().normalize(),
+			t -> 0,
+			t -> radius * FastUtils.cos(2.0 / (double) actualComplexity * t) * FastUtils.sin(t),
+			t -> radius * FastUtils.cos(2.0 / (double) actualComplexity * t) * FastUtils.cos(t),
+			pp
+		);
+	}
+
+	@Deprecated
+	public static void drawSharpPetalFlower(Location center, Vector normal, double radius, int petals, double thetaStep, PreciseParametricParticle pp) {
+		if (petals < 3) {
+			return;
+		}
+
+		int actualPetals = (petals % 2 == 0) ? 2 * petals : petals;
+
+		// maxRadius * (1 - abs(cos(n/4) * t)))
+
+		drawPreciseCurve(center, 0, Math.PI * 4, thetaStep, normal.clone().normalize(),
+			t -> 0,
+			t -> radius * (1 - Math.abs(FastUtils.cos((double) actualPetals / 4.0 * t))) * FastUtils.sin(t),
+			t -> radius * (1 - Math.abs(FastUtils.cos((double) actualPetals / 4.0 * t))) * FastUtils.cos(t),
+			pp
+		);
+	}
+
+	public static void drawPreciseCurve(Location center, double paraMin, double paraMax, double thetaStep,
+										Vector e1, Vector e2, Vector e3,
+										PreciseParametricEquation eq1, PreciseParametricEquation eq2, PreciseParametricEquation eq3,
+										PreciseParametricParticle pp) {
+		Location loc;
+		for (double t = paraMin; t <= paraMax; t += thetaStep) {
+			loc = center.clone();
+			loc.add(e1.clone().multiply(eq1.equation(t)));
+			loc.add(e2.clone().multiply(eq2.equation(t)));
+			loc.add(e3.clone().multiply(eq3.equation(t)));
+			pp.run(loc, t);
+		}
+	}
+
+	public static void drawPreciseCurve(Location center, double paraMin, double paraMax, double thetaStep, Vector front,
+										PreciseParametricEquation f, PreciseParametricEquation u, PreciseParametricEquation r,
+										PreciseParametricParticle pp) {
+		Vector right = VectorUtils.rotateTargetDirection(front.clone(), 90, 0);
+		Vector up = VectorUtils.rotateTargetDirection(front.clone(), 0, -90);
+
+		drawPreciseCurve(center, paraMin, paraMax, thetaStep, front, up, right, f, u, r, pp);
+	}
+
+	/**
+	 * Adaptation of Touch Of Entropy's code for orbs.
+	*/
+	public static void launchOrb(Vector initialDir, Location startLoc, LivingEntity launcher, LivingEntity target, int expireTime,
+								 @Nullable Location targetLoc, Particle.DustOptions dustOptions, Consumer<LivingEntity> hitAction) {
+		new BukkitRunnable() {
+			final Location mCurrLoc = startLoc.clone();
+			int mTicks = 0;
+			double mArcCurve = 0;
+			Vector mCurrDir = initialDir.clone();
+
+			@Override
+			public void run() {
+				mTicks++;
+
+				Location to = targetLoc != null ? targetLoc : LocationUtils.getHalfHeightLocation(target);
+
+				for (int i = 0; i < 4; i++) {
+					if (mTicks <= 2) {
+						mCurrDir = initialDir.clone();
+					} else {
+						mArcCurve += 0.085;
+						mCurrDir = initialDir.clone().add(LocationUtils.getDirectionTo(to, mCurrLoc).multiply(mArcCurve));
+					}
+
+					if (mCurrDir.length() > 0.2) {
+						mCurrDir.normalize().multiply(0.2);
+					}
+
+					mCurrLoc.add(mCurrDir);
+					spawnParticleAsLivingEntity(new PartialParticle(Particle.REDSTONE, mCurrLoc, 1).data(dustOptions), launcher);
+
+					if (mTicks > 5 && mCurrLoc.distance(to) < 0.35) {
+						hitAction.accept(target);
+						this.cancel();
+						return;
+					}
+				}
+
+				if (mTicks >= expireTime) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+	}
+
+	public static void spawnParticleAsLivingEntity(PartialParticle pp, LivingEntity living) {
+		if (living instanceof Player playerLiving) {
+			pp.spawnAsPlayerActive(playerLiving);
+		} else {
+			pp.spawnAsEntityActive(living);
+		}
+	}
+
+	public static Particle.DustOptions getRandomColorOptions(float size) {
+		return new Particle.DustOptions(Color.fromRGB(FastUtils.randomIntInRange(0, 255), FastUtils.randomIntInRange(0, 255), FastUtils.randomIntInRange(0, 255)), size);
+	}
+
+	public static Particle.DustOptions getRandomColorOptions(int min, float size) {
+		return new Particle.DustOptions(Color.fromRGB(FastUtils.randomIntInRange(min, 255), FastUtils.randomIntInRange(min, 255), FastUtils.randomIntInRange(min, 255)), size);
 	}
 
 }

@@ -1,21 +1,22 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,16 +37,25 @@ public class VolcanicMeteor extends DepthsAbility {
 	public static final int SIZE = 6;
 	public static final int FIRE_TICKS = 3 * 20;
 
+	public static final String CHARM_COOLDOWN = "Volcanic Meteor Cooldown";
+
 	public static final DepthsAbilityInfo<VolcanicMeteor> INFO =
 		new DepthsAbilityInfo<>(VolcanicMeteor.class, ABILITY_NAME, VolcanicMeteor::new, DepthsTree.FLAMECALLER, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.VOLCANIC_METEOR)
-			.cooldown(COOLDOWN_TICKS)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", VolcanicMeteor::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", VolcanicMeteor::cast, DepthsTrigger.SWAP))
 			.displayItem(Material.MAGMA_BLOCK)
 			.descriptions(VolcanicMeteor::getDescription);
 
+	private final double mRadius;
+	private final double mDamage;
+	private final int mFireDuration;
+
 	public VolcanicMeteor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.VOLCANIC_METEOR_RADIUS.mEffectName, SIZE);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.VOLCANIC_METEOR_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mFireDuration = CharmManager.getDuration(mPlayer, CharmEffects.VOLCANIC_METEOR_FIRE_DURATION.mEffectName, FIRE_TICKS);
 	}
 
 	public void cast() {
@@ -58,11 +68,12 @@ public class VolcanicMeteor extends DepthsAbility {
 
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.4f, 2.0f);
-		new PartialParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
+		Location playerLoc = mPlayer.getLocation();
+		world.playSound(playerLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 1.0f);
+		world.playSound(playerLoc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.4f, 2.0f);
+		new PartialParticle(Particle.LAVA, playerLoc, 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, playerLoc, 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, playerLoc, 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 		Vector dir = loc.getDirection().normalize();
 		for (int i = 0; i < DISTANCE; i++) {
 			loc.add(dir);
@@ -103,14 +114,12 @@ public class VolcanicMeteor extends DepthsAbility {
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 0.25, 0.25, 0.25, 0.2F).spawnAsPlayerActive(mPlayer);
 							this.cancel();
 
-							double damage = DAMAGE[mRarity - 1];
-
-							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, SIZE, mPlayer)) {
+							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, mRadius, mPlayer)) {
 								double distance = loc.distance(e.getLocation());
 								double multiplier = Math.min(Math.max(0, (6 - distance) / 4), 1);
 
-								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer, playerItemStats);
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage * multiplier, false, true, false);
+								EntityUtils.applyFire(mPlugin, mFireDuration, e, mPlayer, playerItemStats);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage * multiplier, false, true, false);
 							}
 							break;
 						}
@@ -128,10 +137,18 @@ public class VolcanicMeteor extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Swap hands to summon a falling meteor location where you are looking, up to " + DISTANCE + " blocks away. When the meteor lands, it deals ")
-			.append(Component.text(DAMAGE[rarity - 1], color))
-			.append(Component.text(" magic damage in a " + SIZE + " block radius and apply fire for " + (FIRE_TICKS / 20) + "s, but the damage is reduced depending on the distance from the center. Cooldown: " + COOLDOWN_TICKS / 20 + "s."));
+	private static Description<VolcanicMeteor> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<VolcanicMeteor>(color)
+			.add("Swap hands to summon a falling meteor location where you are looking, up to ")
+			.add(DISTANCE)
+			.add(" blocks away. When the meteor lands, it deals ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" magic damage in a ")
+			.add(a -> a.mRadius, SIZE)
+			.add(" block radius and apply fire for ")
+			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
+			.add(" seconds. The damage is reduced depending on the distance from the center.")
+			.addCooldown(COOLDOWN_TICKS);
 	}
 
 }

@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.depths.guis.DepthsAscensionGUI;
+import com.playmonumenta.plugins.depths.guis.ZenithCharmPowerGUI;
 import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
@@ -78,6 +80,21 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new PEBCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+
+		new CommandAPICommand("openzenithcharmpowergui")
+			.withPermission("monumenta.command.openzenithcharmpowergui")
+			.executesPlayer((player, args) -> {
+				new ZenithCharmPowerGUI(player).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("openzenithcharmpowergui")
+			.withPermission("monumenta.command.openzenithcharmpowergui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new ZenithCharmPowerGUI(player).openInventory(player, plugin);
 			})
 			.register();
 
@@ -310,6 +327,13 @@ public class CustomInventoryCommands {
 				new KnickKnackSackGui(player).open();
 			})
 			.register();
+		new CommandAPICommand("openascensiongui")
+			.withPermission("monumenta.command.openascensiongui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player p = (Player) args[0];
+				new DepthsAscensionGUI(p).open();
+			}).register();
 	}
 
 	private static void emote(Player player) {

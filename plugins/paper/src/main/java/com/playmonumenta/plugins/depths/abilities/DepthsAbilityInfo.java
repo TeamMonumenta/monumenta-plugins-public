@@ -3,21 +3,24 @@ package com.playmonumenta.plugins.depths.abilities;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -32,12 +35,14 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 
 	private final DepthsTrigger mDepthsTrigger;
 	private final @Nullable DepthsTree mDepthsTree;
+	private boolean mSingleAbilityCharm;
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
 	                         @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
 		super(abilityClass, displayName, constructor);
 		mDepthsTree = depthsTree;
 		mDepthsTrigger = depthsTrigger;
+		mSingleAbilityCharm = true;
 		canUse(player -> DepthsManager.getInstance().getPlayerLevelInAbility(displayName, player) > 0);
 	}
 
@@ -72,6 +77,18 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	@Override
+	public DepthsAbilityInfo<T> cooldown(int cooldown, String charmCooldown) {
+		super.cooldown(cooldown, charmCooldown);
+		return this;
+	}
+
+	@Override
+	public DepthsAbilityInfo<T> cooldown(String charmCooldown, int... cooldowns) {
+		super.cooldown(charmCooldown, cooldowns);
+		return this;
+	}
+
+	@Override
 	public DepthsAbilityInfo<T> displayItem(Material displayItem) {
 		super.displayItem(displayItem);
 		return this;
@@ -102,18 +119,29 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	@Override
-	public DepthsAbilityInfo<T> descriptions(IntFunction<TextComponent> supplier, int levels) {
+	public DepthsAbilityInfo<T> descriptions(IntFunction<Description<T>> supplier, int levels) {
 		super.descriptions(supplier, levels);
 		return this;
 	}
 
-	public DepthsAbilityInfo<T> descriptions(BiFunction<Integer, TextColor, TextComponent> supplier) {
+	public DepthsAbilityInfo<T> descriptions(BiFunction<Integer, TextColor, Description<T>> supplier) {
 		descriptions(i -> supplier.apply(i, DepthsUtils.getRarityColor(i)), DepthsAbility.MAX_RARITY);
 		return this;
 	}
 
+	public DepthsAbilityInfo<T> descriptions(Supplier<Description<T>> supplier) {
+		this.descriptions(unused -> supplier.get(), 1);
+		return this;
+	}
+
+	@Override
 	public DepthsAbilityInfo<T> description(String description) {
-		super.descriptions(i -> Component.text(description), 1);
+		super.description(description);
+		return this;
+	}
+
+	public DepthsAbilityInfo<T> singleCharm(boolean canBeSingleAbilityCharm) {
+		mSingleAbilityCharm = canBeSingleAbilityCharm;
 		return this;
 	}
 
@@ -140,8 +168,14 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return mDepthsTree;
 	}
 
+	public boolean getSingleAbilityCharm() {
+		return mSingleAbilityCharm;
+	}
+
+
 	//Whether the player is eligible to have this ability offered
 	public boolean canBeOffered(Player player) {
+
 
 		// Make sure the player doesn't have this ability already
 		if (DepthsManager.getInstance().getPlayerLevelInAbility(getDisplayName(), player) > 0) {
@@ -163,7 +197,20 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			}
 		}
 
+		//Skip passive abilities if they have wand aspect charges
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (dp == null) {
+			return false;
+		}
+		if (dp.mWandAspectCharges > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC) {
+			return false;
+		}
+
 		return true;
+	}
+
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity) {
+		return getAbilityItem(rarity, null);
 	}
 
 	/**
@@ -172,7 +219,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	 * @param rarity the rarity to put on the item
 	 * @return the item to display
 	 */
-	public @Nullable DepthsAbilityItem getAbilityItem(int rarity) {
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {
 		if (rarity <= 0) {
 			//This should never happen
 			return null;
@@ -181,36 +228,64 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 
 		//Don't crash our abilities because of a null item
 		try {
-			item = new DepthsAbilityItem();
 			if (mDepthsTree == null) {
 				rarity = 1;
 			}
-			item.mRarity = rarity;
-			item.mAbility = getDisplayName();
-			item.mTrigger = mDepthsTrigger;
 			Material mat = getDisplayItem();
 			if (mat == null) {
+				return null;
+			}
+			String name = getDisplayName();
+			if (name == null) {
 				return null;
 			}
 			ItemStack stack = new ItemStack(mat, 1);
 			ItemMeta meta = stack.getItemMeta();
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			TextColor color = mDepthsTree == null ? NamedTextColor.WHITE : mDepthsTree.getColor();
-			meta.displayName(Component.text(getDisplayName(), color, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			meta.displayName(getColoredName().colorIfAbsent(NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			if (mDepthsTree != null) {
 				List<Component> lore = new ArrayList<>();
 				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity));
 				meta.lore(lore);
 			}
-			GUIUtils.splitLoreLine(meta, getDescription(rarity), 30, false);
+			GUIUtils.splitLoreLine(meta, getDescription(rarity, getPlayerAbility(Plugin.getInstance(), player)), 30, false);
 			stack.setItemMeta(meta);
-			ItemUtils.setPlainName(stack, getDisplayName());
-			item.mItem = stack;
+			ItemUtils.setPlainName(stack, name);
+			item = new DepthsAbilityItem(stack, name, rarity, mDepthsTrigger);
 		} catch (Exception e) {
-			Plugin.getInstance().getLogger().info("Invalid depths ability item: " + getDisplayName());
+			MMLog.warning("Invalid depths ability item: " + getDisplayName());
 			e.printStackTrace();
 		}
 		return item;
+	}
+
+	public Component getColoredName() {
+		String name = getDisplayName();
+		if (name == null) {
+			return Component.empty();
+		}
+		if (mDepthsTree == null) {
+			return Component.text(name);
+		}
+		return mDepthsTree.color(name);
+	}
+
+	public Component getNameWithHover(Player player) {
+		T ability = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, getAbilityClass());
+		int rarity = 1;
+		if (ability != null) {
+			rarity = ability.getAbilityScore();
+		}
+		return getNameWithHover(rarity, player);
+	}
+
+	public Component getNameWithHover(int rarity, Player player) {
+		Component component = getColoredName();
+		DepthsAbilityItem item = getAbilityItem(rarity, player);
+		if (item != null) {
+			component = component.hoverEvent(item.mItem.asHoverEvent());
+		}
+		return component;
 	}
 
 }

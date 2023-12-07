@@ -4,10 +4,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,8 +12,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class BezoarCS implements CosmeticSkill {
 
@@ -34,24 +28,12 @@ public class BezoarCS implements CosmeticSkill {
 		return Material.LIME_CONCRETE;
 	}
 
-	public ItemStack bezoarItem(boolean philosophersStone) {
-		if (philosophersStone) {
-			ItemStack itemStone = new ItemStack(Material.RED_CONCRETE);
-			ItemMeta stoneMeta = itemStone.getItemMeta();
-			stoneMeta.displayName(Component.text("Philosopher's Stone", NamedTextColor.WHITE)
-				                      .decoration(TextDecoration.ITALIC, false));
-			itemStone.setItemMeta(stoneMeta);
-			ItemUtils.setPlainName(itemStone, "Philosopher's Stone");
-			return itemStone;
-		} else {
-			ItemStack itemBezoar = new ItemStack(Material.LIME_CONCRETE);
-			ItemMeta bezoarMeta = itemBezoar.getItemMeta();
-			bezoarMeta.displayName(Component.text("Bezoar", NamedTextColor.WHITE)
-				                       .decoration(TextDecoration.ITALIC, false));
-			itemBezoar.setItemMeta(bezoarMeta);
-			ItemUtils.setPlainName(itemBezoar, "Bezoar");
-			return itemBezoar;
-		}
+	public Material bezoarMat(boolean philosophersStone) {
+		return philosophersStone ? Material.RED_CONCRETE : Material.LIME_CONCRETE;
+	}
+
+	public String bezoarName(boolean philosophersStone) {
+		return philosophersStone ? "Philosopher's Stone" : "Bezoar";
 	}
 
 	public void periodicBezoarEffects(Player mPlayer, Location loc, int tick, boolean philosophersStone) {

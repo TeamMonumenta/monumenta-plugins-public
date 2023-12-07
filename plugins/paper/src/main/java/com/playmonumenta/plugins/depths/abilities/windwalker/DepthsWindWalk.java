@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Iterator;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,24 +41,35 @@ public class DepthsWindWalk extends DepthsAbility {
 	public static final int[] COOLDOWN = {14 * 20, 13 * 20, 12 * 20, 11 * 20, 10 * 20, 8 * 20};
 	private static final int LEVITATION_DURATION = 20 * 2;
 	private static final int VULN_DURATION = 20 * 5;
+	private static final int STUN_DURATION = 30;
 	private static final int WIND_WALK_RADIUS = 3;
-	private static final double WIND_WALK_Y_VELOCITY = 0.2;
-	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
-	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;
+	public static final double WIND_WALK_Y_VELOCITY = 0.2;
+	public static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
+	public static final double WIND_WALK_VELOCITY_BONUS = 1.5;
+
+	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
 
 	public static final DepthsAbilityInfo<DepthsWindWalk> INFO =
 		new DepthsAbilityInfo<>(DepthsWindWalk.class, "Wind Walk", DepthsWindWalk::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_RIGHT_CLICK)
 			.linkedSpell(ClassAbility.WIND_WALK_DEPTHS)
-			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(CHARM_COOLDOWN, COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast, DepthsTrigger.SHIFT_RIGHT_CLICK))
 			.displayItem(Material.WHITE_DYE)
 			.descriptions(DepthsWindWalk::getDescription);
+
+	private final double mVuln;
+	private final int mDuration;
+	private final int mLevitationDuration;
+	private final int mStunDuration;
 
 	private boolean mIsWalking = false;
 
 	public DepthsWindWalk(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mVuln = VULNERABILITY[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.WIND_WALK_VULNERABILITY_AMPLIFIER.mEffectName);
+		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.WIND_WALK_VULNERABILITY_DURATION.mEffectName, VULN_DURATION);
+		mLevitationDuration = CharmManager.getDuration(mPlayer, CharmEffects.WIND_WALK_LEVITATION_DURATION.mEffectName, LEVITATION_DURATION);
+		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.WIND_WALK_STUN_DURATION.mEffectName, STUN_DURATION);
 	}
 
 	public void cast() {
@@ -75,7 +86,7 @@ public class DepthsWindWalk extends DepthsAbility {
 		new PartialParticle(Particle.CLOUD, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
 		Vector direction = loc.getDirection();
 		Vector yVelocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
-		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
+		mPlayer.setVelocity(direction.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.WIND_WALK_VELOCITY.mEffectName, WIND_WALK_VELOCITY_BONUS)).add(yVelocity));
 		// Have them dodge melee attacks while casting
 		mIsWalking = true;
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mIsWalking = false, 10);
@@ -100,20 +111,15 @@ public class DepthsWindWalk extends DepthsAbility {
 					if (mob.getLocation().distance(mPlayer.getLocation()) < WIND_WALK_RADIUS) {
 						if (!EntityUtils.isBoss(mob)) {
 							new PartialParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
 							world.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 1.25f);
 
-							EntityUtils.applyVulnerability(mPlugin, VULN_DURATION, VULNERABILITY[mRarity - 1], mob);
+							EntityUtils.applyVulnerability(mPlugin, mDuration, mVuln, mob);
 
-							if (EntityUtils.isElite(mob)) {
-								new PartialParticle(Particle.EXPLOSION_NORMAL, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-								world.playSound(mob.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 0.75f);
-							} else {
-								new PartialParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-
-								if (!EntityUtils.isCCImmuneMob(mob)) {
-									mob.setVelocity(mob.getVelocity().setY(0.5));
-									PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, LEVITATION_DURATION, 0, true, false));
-								}
+							if (!EntityUtils.isCCImmuneMob(mob)) {
+								mob.setVelocity(mob.getVelocity().setY(0.5));
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, mLevitationDuration, 0, true, false));
+								EntityUtils.applyStun(mPlugin, mStunDuration, mob);
 							}
 						}
 
@@ -143,11 +149,17 @@ public class DepthsWindWalk extends DepthsAbility {
 	}
 
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Right click while sneaking to dash in the target direction, applying ")
-			.append(Component.text(StringUtils.multiplierToPercentage(VULNERABILITY[rarity - 1]) + "%", color))
-			.append(Component.text(" vulnerability for 5 seconds to all enemies dashed through, and apply Levitation I to non-elites dashed through for 2 seconds. Gain immunity to melee damage for half a second when triggered. Cooldown: "))
-			.append(Component.text((COOLDOWN[rarity - 1] / 20) + "s", color))
-			.append(Component.text("."));
+	private static Description<DepthsWindWalk> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<DepthsWindWalk>(color)
+			.add("Right click while sneaking to dash in the target direction, applying ")
+			.addPercent(a -> a.mVuln, VULNERABILITY[rarity - 1], false, true)
+			.add(" vulnerability for ")
+			.addDuration(a -> a.mDuration, VULN_DURATION)
+			.add(" seconds, Levitation I for ")
+			.addDuration(a -> a.mLevitationDuration, LEVITATION_DURATION)
+			.add(" seconds, and stun for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION)
+			.add(" seconds all non-Boss enemies dashed through. Gain immunity to melee damage for 0.5s when triggered.")
+			.addCooldown(COOLDOWN[rarity - 1], true);
 	}
 }

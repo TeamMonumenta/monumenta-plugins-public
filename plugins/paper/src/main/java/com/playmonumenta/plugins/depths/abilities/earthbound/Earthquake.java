@@ -1,22 +1,24 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.WeakHashMap;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,18 +47,27 @@ public class Earthquake extends DepthsAbility {
 	public static final double RADIUS = 4;
 	public static final double KNOCKBACK = 0.8;
 
+	public static final String CHARM_COOLDOWN = "Earthquake Cooldown";
+
 	public static final DepthsAbilityInfo<Earthquake> INFO =
 		new DepthsAbilityInfo<>(Earthquake.class, ABILITY_NAME, Earthquake::new, DepthsTree.EARTHBOUND, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.EARTHQUAKE)
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.COARSE_DIRT)
 			.descriptions(Earthquake::getDescription)
 			.priorityAmount(949); // Needs to trigger before Rapid Fire
+
+	private final double mDamage;
+	private final int mSilenceDuration;
+	private final double mRadius;
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Earthquake(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.EARTHQUAKE_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mSilenceDuration = CharmManager.getDuration(mPlayer, CharmEffects.EARTHQUAKE_SILENCE_DURATION.mEffectName, SILENCE_DURATION[mRarity - 1]);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.EARTHQUAKE_RADIUS.mEffectName, RADIUS);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
@@ -88,32 +99,32 @@ public class Earthquake extends DepthsAbility {
 				@Override
 				public void run() {
 					if (mTicks >= EARTHQUAKE_TIME) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius)) {
 							if (!EntityUtils.isCCImmuneMob(mob)) {
 								knockup(mob);
 							}
 
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, false, true, false);
 
 							if (!EntityUtils.isBoss(mob)) {
-								EntityUtils.applySilence(mPlugin, SILENCE_DURATION[mRarity - 1], mob);
+								EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
 							}
 						}
 
-						for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
+						for (Player player : PlayerUtils.playersInRange(loc, mRadius, true)) {
 							knockup(player);
 						}
 
-						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 30, RADIUS / 2, 0.1, RADIUS / 2, 0.1).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.LAVA, loc, 20, RADIUS / 2, 0.3, RADIUS / 2, 0.1).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 30, mRadius / 2, 0.1, mRadius / 2, 0.1).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.LAVA, loc, 20, mRadius / 2, 0.3, mRadius / 2, 0.1).spawnAsPlayerActive(mPlayer);
 						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.PLAYERS, 3, 1.0f);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1.0f);
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1.0f);
 						this.cancel();
 					} else {
-						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.PODZOL)).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.GRANITE)).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.IRON_ORE)).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, mRadius / 2, 0.25, mRadius / 2, 0.1, Bukkit.createBlockData(Material.PODZOL)).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, mRadius / 2, 0.25, mRadius / 2, 0.1, Bukkit.createBlockData(Material.GRANITE)).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, mRadius / 2, 0.25, mRadius / 2, 0.1, Bukkit.createBlockData(Material.IRON_ORE)).spawnAsPlayerActive(mPlayer);
 						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.PLAYERS, 2, 1.0f);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.75f, 0.5f);
 					}
@@ -127,7 +138,8 @@ public class Earthquake extends DepthsAbility {
 	}
 
 	private void knockup(LivingEntity le) {
-		le.setVelocity(le.getVelocity().add(new Vector(0.0, KNOCKBACK, 0.0)));
+		double knockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.EARTHQUAKE_KNOCKBACK.mEffectName, KNOCKBACK);
+		le.setVelocity(le.getVelocity().add(new Vector(0.0, knockback, 0.0)));
 	}
 
 	@Override
@@ -175,12 +187,18 @@ public class Earthquake extends DepthsAbility {
 		return true;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Shooting a projectile while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals ")
-			.append(Component.text(DAMAGE[rarity - 1], color))
-			.append(Component.text(" magic damage to mobs in a " + (int) RADIUS + " block radius, silencing for "))
-			.append(Component.text((float) SILENCE_DURATION[rarity - 1] / 20, color))
-			.append(Component.text(" seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<Earthquake> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Earthquake>(color)
+			.add("Shooting a projectile while sneaking causes an earthquake ")
+			.addDuration(a -> EARTHQUAKE_TIME, EARTHQUAKE_TIME)
+			.add(" second after impact. The earthquake deals ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" magic damage to mobs in a ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" block radius, silencing for ")
+			.addDuration(a -> a.mSilenceDuration, SILENCE_DURATION[rarity - 1], false, true)
+			.add(" seconds and knocking upward.")
+			.addCooldown(COOLDOWN);
 	}
 
 

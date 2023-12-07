@@ -41,6 +41,10 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 			if (p == null || p.isDead() || !p.getGameMode().equals(GameMode.SURVIVAL)) {
 				continue;
 			}
+			DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(p);
+			if (dp == null || dp.getContent() != DepthsContent.DARKEST_DEPTHS) {
+				return;
+			}
 			Location loc = p.getLocation();
 			World world = p.getWorld();
 			if (BAD_BLOCKS.contains(loc.getBlock().getRelative(BlockFace.DOWN).getType())) {

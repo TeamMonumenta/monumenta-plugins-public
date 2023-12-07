@@ -4,6 +4,9 @@ import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +32,6 @@ public class DelveInfusionUtils {
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 75% */
 	public static final boolean FULL_REFUND = false;
 	public static final double REFUND_PERCENT = 0.75;
-
-	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
 		PENNATE("pennate", InfusionType.PENNATE, Location.WHITE, Material.WHITE_WOOL, "Soul Essences", NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material"), "White"),
@@ -138,7 +139,40 @@ public class DelveInfusionUtils {
 		}
 	}
 
-	public static void infuseItem(Player player, ItemStack item, DelveInfusionSelection selection) {
+	public enum DelveInfusionMaterial {
+		VOIDSTAINED_GEODE("geode", "Voidstained Geodes", "epic:r2/depths/loot/voidstained_geode"),
+		INDIGO_BLIGHTDUST("blightdust", "Indigo Blightdust", "epic:r3/items/currency/indigo_blightdust");
+
+		public static final String KEY = "DelveInfusionMaterial";
+
+		public final String mLabel;
+		public final String mItemNamePlural;
+		public final NamespacedKey mLootTable;
+
+		DelveInfusionMaterial(String label, String itemNamePlural, String lootTable) {
+			mLabel = label;
+			mItemNamePlural = itemNamePlural;
+			mLootTable = NamespacedKeyUtils.fromString(lootTable);
+		}
+
+		public static @Nullable DelveInfusionMaterial getDelveInfusionMaterial(String label) {
+			for (DelveInfusionMaterial material : values()) {
+				if (material.mLabel.equals(label)) {
+					return material;
+				}
+			}
+			return null;
+		}
+
+		public DelveInfusionMaterial getNext() {
+			return switch (this) {
+				case VOIDSTAINED_GEODE -> DelveInfusionMaterial.INDIGO_BLIGHTDUST;
+				case INDIGO_BLIGHTDUST -> DelveInfusionMaterial.VOIDSTAINED_GEODE;
+			};
+		}
+	}
+
+	public static void infuseItem(Player player, ItemStack item, DelveInfusionSelection selection, DelveInfusionMaterial delveInfusionMaterial) {
 		if (selection.equals(DelveInfusionSelection.REFUND)) {
 			refundInfusion(item, player);
 			return;
@@ -155,6 +189,7 @@ public class DelveInfusionUtils {
 			ItemStatUtils.removeInfusion(item, infusionType, false);
 		}
 		ItemStatUtils.addInfusion(item, infusionType, prevLvl + 1, player.getUniqueId());
+		setDelveInfusionMaterial(item, delveInfusionMaterial);
 
 		EntityUtils.fireworkAnimation(player);
 	}
@@ -168,18 +203,20 @@ public class DelveInfusionUtils {
 		if (infusionType == null) {
 			return;
 		}
+		DelveInfusionMaterial delveInfusionMaterial = getDelveInfusionMaterial(item);
 
 		int level = getInfuseLevel(item) - 1;
 		int levelXp = level;
 
 		ItemStatUtils.removeInfusion(item, infusionType);
+		removeDelveInfusionMaterial(item);
 
 		/* Audit */
 		String matStr = "";
 		int auditLevel = level + 1;
 
 		while (level >= 0) {
-			List<ItemStack> mats = getCurrenciesCost(item, infusion, level, player);
+			List<ItemStack> mats = getCurrenciesCost(item, infusion, level, player, delveInfusionMaterial);
 			level--;
 
 			/* Audit */
@@ -220,13 +257,12 @@ public class DelveInfusionUtils {
 		return level;
 	}
 
-	public static boolean canPayInfusion(ItemStack item, DelveInfusionSelection selection, Player p) {
-
+	public static boolean canPayInfusion(ItemStack item, DelveInfusionSelection selection, Player p, DelveInfusionMaterial delveInfusionMaterial) {
 		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
 		int targetLevel = getInfuseLevel(item);
-		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p);
+		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p, delveInfusionMaterial);
 		int playerXP = ExperienceUtils.getTotalExperience(p);
 
 		if (playerXP < XP_COST_PER_LEVEL[targetLevel]) {
@@ -244,9 +280,9 @@ public class DelveInfusionUtils {
 		return true;
 	}
 
-	public static boolean payInfusion(ItemStack item, DelveInfusionSelection selection, Player p) {
+	public static boolean payInfusion(ItemStack item, DelveInfusionSelection selection, Player p, DelveInfusionMaterial delveInfusionMaterial) {
 		int targetLevel = getInfuseLevel(item);
-		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p);
+		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p, delveInfusionMaterial);
 
 		String matStr = mats.stream().filter(it -> it != null && it.getAmount() > 0)
 			                .map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
@@ -279,8 +315,7 @@ public class DelveInfusionUtils {
 		return true;
 	}
 
-	public static List<ItemStack> getCurrenciesCost(ItemStack item, DelveInfusionSelection selection, int level, Player p) {
-
+	public static List<ItemStack> getCurrenciesCost(ItemStack item, DelveInfusionSelection selection, int level, Player p, DelveInfusionMaterial delveInfusionMaterial) {
 		List<ItemStack> cost = new ArrayList<>();
 
 		//Get delve mat loot table
@@ -289,7 +324,7 @@ public class DelveInfusionUtils {
 		cost.add(delveMats);
 
 		//Get depth mat loot table
-		ItemStack depthMats = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(p, DEPTHS_MAT_LOOT_TABLE));
+		ItemStack depthMats = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(p, delveInfusionMaterial.mLootTable));
 		depthMats.setAmount(MAT_DEPTHS_COST_PER_INFUSION[level] * item.getAmount());
 		cost.add(depthMats);
 		return cost;
@@ -327,5 +362,35 @@ public class DelveInfusionUtils {
 			default:
 				return 0;
 		}
+	}
+
+
+	public static void setDelveInfusionMaterial(ItemStack item, DelveInfusionMaterial material) {
+		NBT.modify(item, nbt -> {
+			ItemStatUtils.addPlayerModified(nbt).setString(DelveInfusionMaterial.KEY, material.mLabel);
+		});
+	}
+
+	public static DelveInfusionMaterial getDelveInfusionMaterial(ItemStack item) {
+		ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item));
+		if (playerModified != null) {
+			String label = playerModified.getString(DelveInfusionMaterial.KEY);
+			if (label != null) {
+				DelveInfusionMaterial material = DelveInfusionMaterial.getDelveInfusionMaterial(label);
+				if (material != null) {
+					return material;
+				}
+			}
+		}
+		return DelveInfusionMaterial.VOIDSTAINED_GEODE;
+	}
+
+	public static void removeDelveInfusionMaterial(ItemStack item) {
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+			if (playerModified != null) {
+				playerModified.removeKey(DelveInfusionMaterial.KEY);
+			}
+		});
 	}
 }

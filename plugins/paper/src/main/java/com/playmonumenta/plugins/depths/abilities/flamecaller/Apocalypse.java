@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,16 +40,27 @@ public class Apocalypse extends DepthsAbility {
 	public static final double MAX_ABSORPTION = 0.25;
 	public static final int ABSORPTION_DURATION = 30 * 20;
 
+	public static final String CHARM_COOLDOWN = "Apocalypse Cooldown";
+
 	public static final DepthsAbilityInfo<Apocalypse> INFO =
 		new DepthsAbilityInfo<>(Apocalypse.class, ABILITY_NAME, Apocalypse::new, DepthsTree.FLAMECALLER, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.APOCALYPSE)
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.ORANGE_DYE)
 			.descriptions(Apocalypse::getDescription)
 			.priorityAmount(10000);
 
+	private final double mDamage;
+	private final double mRadius;
+	private final double mHealPercent;
+	private final double mMaxAbsorption;
+
 	public Apocalypse(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.APOCALYPSE_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.APOCALYPSE_RADIUS.mEffectName, RADIUS);
+		mHealPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.APOCALYPSE_HEALING.mEffectName, HEALING);
+		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.APOCALYPSE_MAX_ABSORPTION.mEffectName, MAX_ABSORPTION);
 	}
 
 	@Override
@@ -69,23 +80,25 @@ public class Apocalypse extends DepthsAbility {
 		putOnCooldown();
 
 		Location loc = mPlayer.getLocation();
-		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, RADIUS);
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, mRadius);
 		int count = 0;
+
 		for (LivingEntity mob : nearbyMobs) {
-			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 			if (mob == null || mob.isDead() || mob.getHealth() <= 0) {
 				count++;
 			}
 		}
 
-		double totalHealing = maxHealth * count * HEALING;
-		double healed = PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * count * HEALING);
+		double totalHealing = maxHealth * count * mHealPercent;
+		double healed = PlayerUtils.healPlayer(mPlugin, mPlayer, totalHealing);
 
 		double absorption = totalHealing - healed;
-		AbsorptionUtils.addAbsorption(mPlayer, absorption, maxHealth * MAX_ABSORPTION, ABSORPTION_DURATION);
+		AbsorptionUtils.addAbsorption(mPlayer, absorption, maxHealth * mMaxAbsorption, ABSORPTION_DURATION);
 
 		World world = mPlayer.getWorld();
-		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2).spawnAsPlayerActive(mPlayer);
+		double mult = mRadius / RADIUS;
+		new PartialParticle(Particle.EXPLOSION_HUGE, loc, (int) (10 * mult), 2 * mult, 2 * mult, 2 * mult).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, loc, 100, 3.5, 3.5, 3.5, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.HEART, loc.clone().add(0, 1, 0), count * 7, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
 
@@ -96,7 +109,7 @@ public class Apocalypse extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.0f, 0.1f);
 
-		MessagingUtils.sendActionBarMessage(mPlayer, "Apocalypse has been activated!");
+		sendActionBarMessage("Apocalypse has been activated!");
 		event.setCancelled(true);
 	}
 
@@ -105,10 +118,22 @@ public class Apocalypse extends DepthsAbility {
 		onHurt(event, null, null);
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("When your health drops below " + StringUtils.multiplierToPercentage(TRIGGER_HEALTH) + "%, ignore the hit and instead deal ")
-			.append(Component.text(DAMAGE[rarity - 1], color))
-			.append(Component.text(" magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + StringUtils.multiplierToPercentage(HEALING) + "% of your max health. Healing above your max health is converted into absorption, up to absorption equal to " + StringUtils.multiplierToPercentage(MAX_ABSORPTION) + "% of your max health that lasts " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<Apocalypse> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Apocalypse>(color)
+			.add("When your health drops below ")
+			.addPercent(TRIGGER_HEALTH)
+			.add(", ignore the hit and instead deal ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" magic damage in a ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" block radius. For each mob that is killed, heal ")
+			.addPercent(a -> a.mHealPercent, HEALING)
+			.add(" of your max health. Healing above your max health is converted into absorption, up to ")
+			.addPercent(a -> a.mMaxAbsorption, MAX_ABSORPTION)
+			.add(" of your max health that lasts ")
+			.addDuration(ABSORPTION_DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
 	}
 
 

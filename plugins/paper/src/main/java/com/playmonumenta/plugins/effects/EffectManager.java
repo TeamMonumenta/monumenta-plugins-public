@@ -303,6 +303,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
 		mEffectDeserializer.put(HealingSickness.effectID, HealingSickness::deserialize);
 		mEffectDeserializer.put(HealPlayerOnDeath.effectID, HealPlayerOnDeath::deserialize);
+		mEffectDeserializer.put(IceLanceMark.effectID, IceLanceMark::deserialize);
+		mEffectDeserializer.put(PermafrostMark.effectID, PermafrostMark::deserialize);
 		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
 		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);
 		mEffectDeserializer.put(JudgementChainMobEffect.effectID, JudgementChainMobEffect::deserialize);
@@ -346,6 +348,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
 		mEffectDeserializer.put(ColoredGlowingEffect.effectID, ColoredGlowingEffect::deserialize);
 		mEffectDeserializer.put(FishQualityIncrease.effectID, FishQualityIncrease::deserialize);
+		mEffectDeserializer.put(DisableAI.effectID, DisableAI::deserialize);
+		mEffectDeserializer.put(DisableGravity.effectID, DisableGravity::deserialize);
 		mEffectDeserializer.put(GiftOfTheStars.effectID, GiftOfTheStars::deserialize);
 		mEffectDeserializer.put(BoonOfTheFracturedTree.effectID, BoonOfTheFracturedTree::deserialize);
 		mEffectDeserializer.put(SkySeekersTag.effectID, SkySeekersTag::deserialize);

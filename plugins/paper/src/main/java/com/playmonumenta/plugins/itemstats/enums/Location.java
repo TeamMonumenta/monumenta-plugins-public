@@ -109,6 +109,7 @@ public enum Location {
 	INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
 	MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
 	STARPOINT("starpoint", "Star Point", TextColor.fromHexString("#342768")),
+	ZENITH("zenith", "The Celestial Zenith", TextColor.fromHexString("#FF9CF0")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
@@ -155,7 +156,7 @@ public enum Location {
 	}
 
 	Location(DepthsTree tree) {
-		this(tree.getDisplayName().toLowerCase(), tree.getDisplayName(), tree.getColor());
+		this(tree.getDisplayName().toLowerCase(), tree.getNameComponent());
 	}
 
 	public String getName() {

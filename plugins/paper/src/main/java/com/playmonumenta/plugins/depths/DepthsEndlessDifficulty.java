@@ -3,9 +3,9 @@ package com.playmonumenta.plugins.depths;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -15,37 +15,44 @@ public class DepthsEndlessDifficulty {
 	//Each index is the floor to be assigned at the end of (ex. 3rd floor -> 4th floor is 10)
 	public static final int[] DELVE_POINTS_PER_FLOOR = {0, 0, 10, 4, 4, 10, 4, 4, 10, 4, 4, 10, 4, 4};
 
-	public static void applyDelvePointsToParty(List<DepthsPlayer> depthsPlayers, int pointsToAssign, Map<DelvesModifier, Integer> delvePointsForParty, boolean twisted) {
-		//First, take an available player and assign points to them based on the party's current assignment
-		Player playerToUse = null;
-		for (DepthsPlayer dp : depthsPlayers) {
-			Player p = Bukkit.getPlayer(dp.mPlayerId);
-			if (p == null || !p.isOnline()) {
-				continue;
-			}
-			playerToUse = p;
-			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-				"Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.")));
-			break;
-		}
+	//Ascension information for Depths 2
+	public static final int[] ASCENSION_DELVE_POINTS = {1, 3, 5, 7, 9, 11, 13};
+	public static final int ASCENSION_DELVE_POINTS_AMOUNT = 10;
+	public static final int ASCENSION_UTILITY_ROOMS = 2;
+	public static final int ASCENSION_BOSS_TRICKS = 4;
+	public static final int ASCENSION_STARTING_RARITY = 6;
+	public static final int ASCENSION_STARTING_RARITY_AMOUNT = 15; //15% reduced ability odds
+	public static final int ASCENSION_BOSS_COOLDOWN = 8;
+	public static final int ASCENSION_ABILITY_PURGE = 10;
+	public static final int ASCENSION_REVIVE_TIME = 12;
+	public static final int ASCENSION_REDUCED_OPTIONS = 14;
+	public static final int ASCENSION_FINAL_BOSS = 15;
 
+	public static void applyDelvePointsToParty(DepthsParty party, int pointsToAssign, Map<DelvesModifier, Integer> delvePointsForParty, boolean twisted) {
+		//First, take an available player and assign points to them based on the party's current assignment
+		List<Player> players = new ArrayList<>();
+		party.mPlayersInParty.forEach(dp -> players.add(Bukkit.getPlayer(dp.mPlayerId)));
+		players.removeIf(p -> p == null || !p.isOnline());
+		Player playerToUse = players.stream().findAny().orElse(null);
 		if (playerToUse == null) {
 			return;
 		}
+		players.remove(playerToUse);
 
 		String shard = ServerProperties.getShardName();
 		//Get delve info for that player
-		if (delvePointsForParty != null && delvePointsForParty.size() > 0) {
+		if (delvePointsForParty != null && !delvePointsForParty.isEmpty()) {
 
 			for (DelvesModifier m : DelvesModifier.values()) {
 				DelvesUtils.setDelvePoint(null, playerToUse, shard, m, delvePointsForParty.getOrDefault(m, 0));
 			}
 		}
 
+		//TODO make twisted and entropy, etc. simply not appear in depths and depths2 shards
 		//Assign twisted and entropy if they are on the last floor
 		if (twisted) {
 			DelvesUtils.setDelvePoint(null, playerToUse, shard, DelvesModifier.ENTROPY, 5);
-			DelvesUtils.setDelvePoint(null, playerToUse, shard, DelvesModifier.TWISTED, 1);
+			DelvesUtils.setDelvePoint(null, playerToUse, shard, DelvesModifier.TWISTED, 5);
 		} else {
 			//Assign random points to that player on top of what they currently have
 			DelvesUtils.assignRandomDelvePoints(playerToUse, shard, pointsToAssign);
@@ -57,19 +64,8 @@ public class DepthsEndlessDifficulty {
 		}
 
 		//Assign the scores to all other active players
-		for (DepthsPlayer dp : depthsPlayers) {
-			Player p = Bukkit.getPlayer(dp.mPlayerId);
-			if (p == null || !p.isOnline() || p.equals(playerToUse)) {
-				continue;
-			}
-
-			if (pointsToAssign > 0) {
-				p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
-					"Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.")));
-			}
-
-			DelvesUtils.copyDelvePoint(null, playerToUse, p, shard);
-		}
+		players.forEach(p -> DelvesUtils.copyDelvePoint(null, playerToUse, p, shard));
+		party.sendMessage("Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths trinket to view all delve modifiers.");
 
 	}
 }

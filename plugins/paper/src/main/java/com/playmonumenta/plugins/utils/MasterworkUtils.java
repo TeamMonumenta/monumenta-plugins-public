@@ -67,6 +67,8 @@ public class MasterworkUtils {
 	private static final String GALLERY1_MAT = "epic:r3/gallery/items/torn_canvas";
 	private static final String GALLERY2_MAT = "epic:r3/gallery/map2/deathly_piece_of_eight";
 
+	private static final String ZENITH_MAT = "epic:r3/items/currency/indigo_blightdust";
+
 	private static final String GODSPORE_MAT = "epic:r3/godspore/items/fungal_remnants";
 
 	private static final String SIRIUS_FRAG = "epic:r3/fragments/starblight_fragment";
@@ -251,6 +253,13 @@ public class MasterworkUtils {
 		}
 	}
 
+	private static class Zenith extends MasterworkCost {
+		private Zenith(String mat) {
+			super(Masterwork.IV);
+			put(Masterwork.IV, mat, 8, HYPER_ARCHOS_RING, 4);
+		}
+	}
+
 	private static class Boss extends MasterworkCost {
 		private Boss(String mat) {
 			super(Masterwork.III);
@@ -327,6 +336,8 @@ public class MasterworkUtils {
 		MASTERWORK_COSTS.put(Location.SANGUINEHALLS, new Gallery(GALLERY1_MAT));
 		MASTERWORK_COSTS.put(Location.MARINANOIR, new Gallery(GALLERY2_MAT));
 
+		MASTERWORK_COSTS.put(Location.ZENITH, new Zenith(ZENITH_MAT));
+
 		MASTERWORK_COSTS.put(Location.GODSPORE, new Boss(GODSPORE_MAT));
 
 		MASTERWORK_COSTS.put(Location.SIRIUS, new WorldBoss(SIRIUS_FRAG));
@@ -355,8 +366,9 @@ public class MasterworkUtils {
 	private static String itemNameSuffix(Player p, String itemName) {
 		if (itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(GALLERY1_MAT)))) ||
 			itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(GALLERY2_MAT)))) ||
-			itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(GODSPORE_MAT))))) {
-			// Torn Canvas or Deathly Piece of Eight or Fungal Remnants, do nothing
+			itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(GODSPORE_MAT)))) ||
+			itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(ZENITH_MAT))))) {
+			// Torn Canvas or Deathly Piece of Eight or Fungal Remnants or Indigo Blightdust, do nothing
 			return "";
 		}
 		return "s";
@@ -386,7 +398,7 @@ public class MasterworkUtils {
 
 		//TODO: Replace with next max level
 		List<ItemStack> realItems = paths.stream().filter(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s)) != null)
-			                            .filter(s -> s.substring(s.lastIndexOf('m') + 1).matches("[0123]"))
+			                            .filter(s -> s.substring(s.lastIndexOf('m') + 1).matches("[01234]"))
 			                            .map(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s))).collect(Collectors.toList());
 		return realItems;
 	}

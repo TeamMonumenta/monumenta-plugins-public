@@ -104,29 +104,37 @@ public class BossUtils {
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth) {
-		return bossDamagePercent(boss, target, percentHealth, null, false, null);
+		return bossDamagePercent(boss, target, percentHealth, null, false, null, true);
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location) {
-		return bossDamagePercent(boss, target, percentHealth, location, false, null);
+		return bossDamagePercent(boss, target, percentHealth, location, false, null, true);
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw) {
-		return bossDamagePercent(boss, target, percentHealth, location, raw, null);
+		return bossDamagePercent(boss, target, percentHealth, location, raw, null, true);
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable String cause) {
-		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
+		return bossDamagePercent(boss, target, percentHealth, null, false, cause, true);
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
-		return bossDamagePercent(boss, target, percentHealth, location, false, cause);
+		return bossDamagePercent(boss, target, percentHealth, location, false, cause, true);
+	}
+
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable String cause, boolean knockback) {
+		return bossDamagePercent(boss, target, percentHealth, null, false, cause, knockback);
+	}
+
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
+		return bossDamagePercent(boss, target, percentHealth, location, raw, cause, true);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause, boolean knockback) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -160,7 +168,7 @@ public class BossUtils {
 			if (adjustedHealth <= 0) {
 				// Kill the player, but allow totems to trigger
 				target.setNoDamageTicks(0);
-				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), 1000, false, true, false);
+				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), 1000, false, knockback, false);
 				return false;
 			} else {
 				double originalDamage = toTake;
@@ -187,7 +195,7 @@ public class BossUtils {
 				int noDamageTicks = target.getNoDamageTicks();
 				target.setNoDamageTicks(0);
 
-				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), 0.001, false, true, false);
+				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), 0.001, false, knockback, false);
 
 				if (noDamageTicks <= target.getMaximumNoDamageTicks() / 2f) {
 					// had iframes: increase iframes by dealt damage, but keep length

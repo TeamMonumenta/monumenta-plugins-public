@@ -16,9 +16,9 @@ import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
 import com.playmonumenta.plugins.delves.DelvesCommands;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.depths.DepthsCommand;
-import com.playmonumenta.plugins.depths.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.explosions.ExplosionManager;
@@ -296,6 +296,8 @@ public class Plugin extends JavaPlugin {
 		VirtualFirmament.register();
 		WalletManager.registerCommand();
 		WorldNameCommand.register();
+		BlockDisplayCommand.register();
+		AddSpawnerEffectMarkersCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

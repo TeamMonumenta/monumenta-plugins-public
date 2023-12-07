@@ -187,7 +187,7 @@ public class ShulkerEquipmentListener implements Listener {
 					sMeta.setBlockState(sbox);
 					sboxItem.setItemMeta(sMeta);
 
-					CharmManager.getInstance().updateCharms(player);
+					CharmManager.getInstance().updateCharms(player, CharmManager.CharmType.NORMAL);
 					event.setCancelled(true);
 				} else if (lock.equals(PORTAL_EPIC_STRING)) {
 					if (!checkCooldownAndSetIfApplicable(player, "Omnilockbox")) {
@@ -228,7 +228,9 @@ public class ShulkerEquipmentListener implements Listener {
 					swapParrots(player, sboxItem);
 
 					player.updateInventory();
-					CharmManager.getInstance().updateCharms(player);
+					if (CharmManager.CharmType.NORMAL.mPlayerCharms.get(player.getUniqueId()) != null) {
+						CharmManager.getInstance().updateCharms(player, CharmManager.CharmType.NORMAL);
+					}
 					event.setCancelled(true);
 
 					mPlugin.mItemStatManager.updateStats(player);
@@ -373,7 +375,7 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	private void swapCharms(Player player, ShulkerBox shulkerBox) {
-		List<ItemStack> charmInventory = CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId());
+		List<ItemStack> charmInventory = CharmManager.CharmType.NORMAL.mPlayerCharms.get(player.getUniqueId());
 		List<ItemStack> tempInventory = new ArrayList<>();
 		if (charmInventory != null) {
 			for (ItemStack itemStack : charmInventory) {
@@ -392,10 +394,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 			if (shulkerBox.getInventory().getItem(sBoxSlot) != null) {
 				ItemStack shulkerBoxCharm = shulkerBox.getInventory().getItem(sBoxSlot);
-				if (CharmManager.getInstance().validateCharm(player, shulkerBoxCharm)) {
-					// If can equip charm, equip.
-					CharmManager.getInstance().addCharm(player, shulkerBoxCharm);
-				} else {
+				if (!CharmManager.getInstance().addCharm(player, shulkerBoxCharm, CharmManager.CharmType.NORMAL)) {
 					player.sendMessage(Component.text("Failed to equip charm " + ItemUtils.getPlainName(shulkerBoxCharm) + ", it has been re-added to your inventory.", NamedTextColor.RED));
 					InventoryUtils.giveItem(player, shulkerBoxCharm);
 				}

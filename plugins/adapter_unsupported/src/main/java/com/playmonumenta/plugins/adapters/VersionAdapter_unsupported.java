@@ -189,4 +189,8 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public void resetScoreHolderScores(String scoreHolder, Scoreboard scoreboard) {
 	}
 
+	@Override
+	public void disableRangedAttackGoal(LivingEntity entity) {
+	}
+
 }

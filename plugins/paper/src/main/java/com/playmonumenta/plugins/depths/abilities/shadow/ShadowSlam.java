@@ -2,21 +2,22 @@ package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,13 +42,20 @@ public final class ShadowSlam extends DepthsAbility {
 	public static final DepthsAbilityInfo<ShadowSlam> INFO =
 		new DepthsAbilityInfo<>(ShadowSlam.class, ABILITY_NAME, ShadowSlam::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(Material.ANVIL)
-			.descriptions(ShadowSlam::getDescription);
+			.descriptions(ShadowSlam::getDescription)
+			.singleCharm(false);
+
+	private final double mDamage;
+	private final double mRadius;
 
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
 
 	public ShadowSlam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.SHADOW_SLAM_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.SHADOW_SLAM_RADIUS.mEffectName, SIZE);
+
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -115,9 +123,9 @@ public final class ShadowSlam extends DepthsAbility {
 
 	private void doSlamAttack(Location location) {
 		double fallDistance = calculateFallDistance();
-		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * DAMAGE[mRarity - 1] + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * 0.0;
+		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * 0.0;
 
-		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, SIZE)) {
+		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mRadius)) {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.getLinkedSpell());
 		}
 
@@ -127,7 +135,7 @@ public final class ShadowSlam extends DepthsAbility {
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 2, 1.25F);
 		new PartialParticle(Particle.SPELL_WITCH, location, 60, 0F, 0F, 0F, 0.2F).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, location, 3 * SIZE * SIZE, SIZE, 0.25f, SIZE, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, location, (int) (3 * mRadius * mRadius), mRadius, 0.25f, mRadius, 0).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -143,10 +151,17 @@ public final class ShadowSlam extends DepthsAbility {
 	}
 
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("When you fall more than " + AUTOMATIC_THRESHOLD + " blocks, landing causes a slam, dealing ")
-			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
-			.append(Component.text(" melee damage per block fallen in a " + SIZE + " block radius. Falling more than " + MANUAL_THRESHOLD + " blocks and damaging an enemy also generates a slam and cancels fall damage."));
+	private static Description<ShadowSlam> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<ShadowSlam>(color)
+			.add("When you fall more than ")
+			.add(AUTOMATIC_THRESHOLD)
+			.add(" blocks, landing causes a slam, dealing ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" melee damage per block fallen in a ")
+			.add(a -> a.mRadius, SIZE)
+			.add(" block radius. Falling more than ")
+			.add(MANUAL_THRESHOLD)
+			.add(" blocks and damaging an enemy also generates a slam and cancels fall damage.");
 	}
 }
 

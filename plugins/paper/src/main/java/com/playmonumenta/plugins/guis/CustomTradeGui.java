@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.WalletUtils;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.components.QuestActions;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
@@ -149,11 +150,11 @@ public class CustomTradeGui extends Gui {
 			// Check each requirement, constructing lore and updating mHasRequirements:
 			for (ItemStack requirement : mRequirements) {
 				// Calculate amount to remove:
-				int[] result = calculateDebt(requirement, itemStacks, inventoryWallet, mPebTradeGUIWallet);
-				int inventoryDebt = result[0];
-				int walletDebt = result[1];
-				int numInWallet = result[3];
-				boolean meetsRequirement = (result[2] == 1);
+				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, itemStacks, inventoryWallet, mPebTradeGUIWallet != 0);
+				int inventoryDebt = debt.mInventoryDebt;
+				int walletDebt = debt.mWalletDebt;
+				int numInWallet = debt.mNumInWallet;
+				boolean meetsRequirement = debt.mMeetsRequirement;
 				// Remove from inventory and wallet:
 				if (meetsRequirement && inventoryDebt > 0) {
 					InventoryUtils.removeItemFromArray(itemStacks, requirement.asQuantity(inventoryDebt));
@@ -205,11 +206,11 @@ public class CustomTradeGui extends Gui {
 			WalletManager.InventoryWallet inventoryWallet = (mPebTradeGUIWallet == 1) ? null : new WalletManager.InventoryWallet(mPlayer, false);
 			for (ItemStack requirement : requirements()) {
 				// Calculate amount to remove:
-				int[] result = calculateDebt(requirement, inventory.getStorageContents(), inventoryWallet, mPebTradeGUIWallet);
-				int inventoryDebt = result[0];
-				int walletDebt = result[1];
-				boolean meetsRequirement = (result[2] == 1);
-				int numInWallet = result[3];
+				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, inventory.getStorageContents(), inventoryWallet, mPebTradeGUIWallet != 0);
+				int inventoryDebt = debt.mInventoryDebt;
+				int walletDebt = debt.mWalletDebt;
+				boolean meetsRequirement = debt.mMeetsRequirement;
+
 				// Remove from inventory and wallet:
 				if (meetsRequirement && inventoryDebt > 0) {
 					inventory.removeItem(requirement.asQuantity(inventoryDebt));
@@ -218,13 +219,8 @@ public class CustomTradeGui extends Gui {
 					inventoryWallet.removeFromWallet(requirement.asQuantity(walletDebt));
 				}
 				// Notify player:
-				if (walletDebt > 0) {
-					mPlayer.sendMessage(Component.text("Removed ", NamedTextColor.GREEN).append(
-						Component.text(walletDebt + " " + ItemUtils.getPlainNameOrDefault(requirement), NamedTextColor.WHITE).append(
-							Component.text(" from your wallet. ", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)).append(
-							Component.text("(Remaining: " + (numInWallet - walletDebt) + ")", NamedTextColor.GRAY)
-						)));
-				}
+				WalletUtils.notifyRemovalFromWallet(debt, mPlayer, requirement);
+
 				// Check for errors:
 				if (!meetsRequirement) {
 					mPlayer.sendMessage("We're sorry - there was a problem verifying a requirement: '" +
@@ -235,37 +231,6 @@ public class CustomTradeGui extends Gui {
 					return;
 				}
 			}
-		}
-
-		private static int[] calculateDebt(ItemStack requirement, ItemStack[] inventoryContents, @Nullable WalletManager.InventoryWallet inventoryWallet, int pebWalletScore) {
-			// Return the inventory debt [0], wallet debt [1], requirement status [2], and numInWallet [3] as an array.
-
-			// Find the requirement amounts in inventory and wallet:
-			int reqAmount = requirement.getAmount();
-			int numInInventory = InventoryUtils.numInInventory(inventoryContents, requirement);
-			int numInWallet = (inventoryWallet != null && WalletManager.isCurrency(requirement)) ? inventoryWallet.numInWallet(requirement) : 0;
-			boolean meetsRequirement = ((long) numInInventory + (long) numInWallet >= (long) reqAmount);
-
-			// Find the debt (amount to remove) for inventory and wallet:
-			int inventoryDebt;
-			int walletDebt;
-			if (pebWalletScore == 0) {
-				// Prioritize inventory:
-				inventoryDebt = Math.min(numInInventory, reqAmount);
-				walletDebt = Math.min(reqAmount - inventoryDebt, numInWallet);
-			} else {
-				// Prioritize wallet:
-				walletDebt = Math.min(numInWallet, reqAmount);
-				inventoryDebt = Math.min(reqAmount - walletDebt, numInInventory);
-			}
-
-			// Return:
-			int[] result = new int[4];
-			result[0] = inventoryDebt;
-			result[1] = walletDebt;
-			result[2] = meetsRequirement ? 1 : 0;
-			result[3] = numInWallet;
-			return result;
 		}
 
 		private static boolean handleMaxUses(TradeWindowOpenEvent.Trade trade, int multiplier, List<Component> mLore) {

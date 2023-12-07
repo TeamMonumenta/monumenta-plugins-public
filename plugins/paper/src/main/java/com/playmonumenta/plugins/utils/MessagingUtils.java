@@ -111,7 +111,10 @@ public class MessagingUtils {
 	}
 
 	public static int plainLengthFromMini(String mini) {
-		return plainText(fromMiniMessage(mini)).length();
+		String plain = plainText(fromMiniMessage(mini));
+		// Remove any format ends
+		plain = plain.replaceAll("<\\/[^\\s>]*>", "");
+		return plain.length();
 	}
 
 	public static Component fromGson(String gsonText) {
@@ -140,6 +143,14 @@ public class MessagingUtils {
 
 	public static String serializeComponent(Component component) {
 		return GSON_SERIALIZER.serialize(component);
+	}
+
+	public static Component addGradient(String s, String... hex) {
+		StringBuilder hexes = new StringBuilder();
+		for (String h : hex) {
+			hexes.append(":#").append(h);
+		}
+		return fromMiniMessage("<gradient" + hexes + ">" + s);
 	}
 
 	public static void sendBoldTitle(Player player, @Nullable String title, @Nullable String subtitle) {

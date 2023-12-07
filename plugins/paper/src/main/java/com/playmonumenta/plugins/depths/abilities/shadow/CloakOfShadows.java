@@ -1,27 +1,24 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -31,10 +28,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class CloakOfShadows extends DepthsAbility {
 
@@ -48,17 +42,29 @@ public class CloakOfShadows extends DepthsAbility {
 	private static final double VELOCITY = 0.7;
 	private static final int RADIUS = 5;
 
+	public static final String CHARM_COOLDOWN = "Cloak of Shadows Cooldown";
+
 	public static final DepthsAbilityInfo<CloakOfShadows> INFO =
 		new DepthsAbilityInfo<>(CloakOfShadows.class, ABILITY_NAME, CloakOfShadows::new, DepthsTree.SHADOWDANCER, DepthsTrigger.SHIFT_LEFT_CLICK)
 			.linkedSpell(ClassAbility.CLOAK_OF_SHADOWS)
-			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakOfShadows::cast,
-				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakOfShadows::cast, DepthsTrigger.SHIFT_LEFT_CLICK))
 			.displayItem(Material.BLACK_CONCRETE)
 			.descriptions(CloakOfShadows::getDescription);
 
+	private final double mRadius;
+	private final double mWeakenAmplifier;
+	private final int mStealthDuration;
+	private final int mWeakenDuration;
+	private final double mDamage;
+
 	public CloakOfShadows(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.CLOAK_OF_SHADOWS_RADIUS.mEffectName, RADIUS);
+		mWeakenAmplifier = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.CLOAK_OF_SHADOWS_WEAKEN_AMPLIFIER.mEffectName, WEAKEN_AMPLIFIER[mRarity - 1]);
+		mStealthDuration = CharmManager.getDuration(mPlayer, CharmEffects.CLOAK_OF_SHADOWS_STEALTH_DURATION.mEffectName, STEALTH_DURATION[mRarity - 1]);
+		mWeakenDuration = CharmManager.getDuration(mPlayer, CharmEffects.CLOAK_OF_SHADOWS_WEAKEN_DURATION.mEffectName, WEAKEN_DURATION);
+		mDamage = DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.CLOAK_OF_SHADOWS_DAMAGE_MULTIPLIER.mEffectName);
 	}
 
 	public void cast() {
@@ -66,27 +72,15 @@ public class CloakOfShadows extends DepthsAbility {
 			return;
 		}
 
-		Location loc = mPlayer.getEyeLocation();
-		ItemStack itemTincture = new ItemStack(Material.BLACK_CONCRETE);
-		ItemUtils.setPlainName(itemTincture, "Shadow Bomb");
-		ItemMeta tinctureMeta = itemTincture.getItemMeta();
-		tinctureMeta.displayName(Component.text("Shadow Bomb", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-		itemTincture.setItemMeta(tinctureMeta);
 		World world = mPlayer.getWorld();
+		Location loc = mPlayer.getEyeLocation();
+		Item bomb = AbilityUtils.spawnAbilityItem(world, loc, Material.BLACK_CONCRETE, "Shadow Bomb", false, VELOCITY, true, true);
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
-		Item tincture = world.dropItem(loc, itemTincture);
-		tincture.setPickupDelay(Integer.MAX_VALUE);
-
-		Vector vel = mPlayer.getEyeLocation().getDirection().normalize();
-		vel.multiply(VELOCITY);
-
-		tincture.setVelocity(vel);
-		tincture.setGlowing(true);
 
 		putOnCooldown();
-		AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION[mRarity - 1], null);
+		AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration, null);
 
-		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageEvent.DamageType.MELEE)));
+		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, mDamage, EnumSet.of(DamageEvent.DamageType.MELEE)));
 
 		new BukkitRunnable() {
 
@@ -94,35 +88,45 @@ public class CloakOfShadows extends DepthsAbility {
 
 			@Override
 			public void run() {
-				if (tincture.isOnGround()) {
-					new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, tincture.getLocation(), 30, 3, 0, 3).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.EXPLOSION_NORMAL, tincture.getLocation(), 30, 2, 0, 2).spawnAsPlayerActive(mPlayer);
-					world.playSound(tincture.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0.15f);
-					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(tincture.getLocation(), RADIUS);
+				if (bomb.isOnGround()) {
+					Location l = bomb.getLocation();
+					double mult = mRadius / RADIUS;
+					new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, l, (int) (30 * mult), 3 * mult, 0, 3 * mult).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, l, (int) (30 * mult), 2 * mult, 0, 2 * mult).spawnAsPlayerActive(mPlayer);
+					world.playSound(l, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0.15f);
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(l, mRadius);
 					for (LivingEntity mob : mobs) {
-						EntityUtils.applyWeaken(mPlugin, WEAKEN_DURATION, WEAKEN_AMPLIFIER[mRarity - 1], mob);
+						EntityUtils.applyWeaken(mPlugin, mWeakenDuration, mWeakenAmplifier, mob);
 					}
 
-					tincture.remove();
+					bomb.remove();
 					this.cancel();
 				}
 				mExpire++;
 				if (mExpire >= 10 * 20) {
-					tincture.remove();
+					bomb.remove();
 					this.cancel();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying ")
-			.append(Component.text(StringUtils.multiplierToPercentage(WEAKEN_AMPLIFIER[rarity - 1]) + "%", color))
-			.append(Component.text(" weaken for " + WEAKEN_DURATION / 20 + " seconds in a " + RADIUS + " block radius. You enter stealth for "))
-			.append(Component.text(StringUtils.to2DP(STEALTH_DURATION[rarity - 1] / 20.0), color))
-			.append(Component.text(" seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals "))
-			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]) + "%", color))
-			.append(Component.text(" more damage. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<CloakOfShadows> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<CloakOfShadows>(color)
+			.add("Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying ")
+			.addPercent(a -> a.mWeakenAmplifier, WEAKEN_AMPLIFIER[rarity - 1], false, true)
+			.add(" weaken for ")
+			.addDuration(a -> a.mWeakenDuration, WEAKEN_DURATION)
+			.add(" seconds to mobs within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks. You enter stealth for ")
+			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION[rarity - 1], false, true)
+			.add(" seconds upon casting and the next instance of melee damage you deal within ")
+			.addDuration(DAMAGE_DURATION)
+			.add(" seconds deals ")
+			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
+			.add(" more damage.")
+			.addCooldown(COOLDOWN);
 	}
 
 

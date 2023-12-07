@@ -55,6 +55,9 @@ public class SpawnerEntityReplacer extends PacketAdapter {
 			return;
 		}
 		NbtCompound entityData = spawnData.getCompound("entity");
+		if (!entityData.containsKey("id")) {
+			return;
+		}
 		String id = entityData.getString("id");
 		replaceSpawnDataSameId(spawnData, entityData, id);
 	}

@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SpawnerUtils;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -50,6 +51,9 @@ public class Eruption implements Enchantment {
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
+			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+				return;
+			}
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), CharmManager.getRadius(player, CHARM_RADIUS, RADIUS));
 
 			//Get enchant levels on pickaxe

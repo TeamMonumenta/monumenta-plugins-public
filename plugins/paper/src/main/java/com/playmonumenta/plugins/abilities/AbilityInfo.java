@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -41,8 +41,8 @@ public class AbilityInfo<T extends Ability> {
 	private final @Nullable String mDisplayName;
 	// Ability name shorthand (for statistic purposes; no use in-game. Should be the fewest characters that identifies this)
 	private @Nullable String mShorthandName;
-	// List of descriptions to aid ability selection
-	private List<TextComponent> mDescriptions = new ArrayList<>();
+	// Description provider
+	private List<Description<T>> mDescriptions = List.of(t -> Component.empty());
 	// Simplified description
 	private @Nullable String mSimpleDescription = null;
 	// Color used by action bar messages
@@ -142,23 +142,39 @@ public class AbilityInfo<T extends Ability> {
 		return this;
 	}
 
+	public AbilityInfo<T> cooldown(String charmCooldown, int... cooldowns) {
+		mCooldowns = IntList.of(cooldowns);
+		mCharmCooldown = charmCooldown;
+		return this;
+	}
+
 	public AbilityInfo<T> displayItem(Material displayItem) {
 		mDisplayItem = displayItem;
 		return this;
 	}
 
 	public AbilityInfo<T> descriptions(String level1, String level2) {
-		mDescriptions = Stream.of(level1, level2).map(Component::text).toList();
+		mDescriptions = Stream.of(level1, level2).map(Component::text).map(c -> (Description<T>) a -> c).toList();
 		return this;
 	}
 
 	public AbilityInfo<T> descriptions(String level1, String level2, String enhancement) {
-		mDescriptions = Stream.of(level1, level2, enhancement).map(Component::text).toList();
+		mDescriptions = Stream.of(level1, level2, enhancement).map(Component::text).map(c -> (Description<T>) a -> c).toList();
 		return this;
 	}
 
-	public AbilityInfo<T> descriptions(IntFunction<TextComponent> supplier, int levels) {
+	public AbilityInfo<T> descriptions(IntFunction<Description<T>> supplier, int levels) {
 		mDescriptions = IntStream.range(1, levels + 1).mapToObj(supplier).toList();
+		return this;
+	}
+
+	public AbilityInfo<T> description(Description<T> description) {
+		mDescriptions = List.of(description);
+		return this;
+	}
+
+	public AbilityInfo<T> description(String description) {
+		mDescriptions = List.of(a -> Component.text(description));
 		return this;
 	}
 
@@ -234,11 +250,16 @@ public class AbilityInfo<T extends Ability> {
 
 	public int getModifiedCooldown(Player player, int score) {
 		int baseCooldown = getBaseCooldown(player, score);
-		if (mCharmCooldown2 != null && mCharmCooldown != null) {
-			return CharmManager.getCooldown(player, mCharmCooldown2, CharmManager.getCooldown(player, mCharmCooldown, baseCooldown));
-		}
+		return getCharmCooldown(player, baseCooldown);
+	}
+
+	public int getCharmCooldown(Player player, int baseCooldown) {
 		if (mCharmCooldown != null) {
-			return CharmManager.getCooldown(player, mCharmCooldown, baseCooldown);
+			int cooldown = CharmManager.getCooldown(player, mCharmCooldown, baseCooldown);
+			if (mCharmCooldown2 != null) {
+				return CharmManager.getCooldown(player, mCharmCooldown2, cooldown);
+			}
+			return cooldown;
 		}
 		return baseCooldown;
 	}
@@ -292,12 +313,20 @@ public class AbilityInfo<T extends Ability> {
 		return mDisplayItem == null ? null : mDisplayItem;
 	}
 
-	public List<TextComponent> getDescriptions() {
-		return Collections.unmodifiableList(mDescriptions);
+	public List<Component> getDescriptions() {
+		return getDescriptions(null);
 	}
 
-	public TextComponent getDescription(int level) {
-		return mDescriptions.get(level - 1);
+	public List<Component> getDescriptions(@Nullable T ability) {
+		return mDescriptions.stream().map(d -> d.get(ability)).toList();
+	}
+
+	public Component getDescription(int level) {
+		return getDescription(level, null);
+	}
+
+	public Component getDescription(int level, @Nullable T ability) {
+		return mDescriptions.get(level - 1).get(ability);
 	}
 
 	public Component getFormattedDescription(@Nullable Player player, int skillLevel, boolean enabled) throws IndexOutOfBoundsException {
@@ -324,16 +353,13 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public Component getFormattedDescriptions(@Nullable Player player, int level, boolean isEnhanced, boolean enabled) {
-		if (mDescriptions.isEmpty()) {
-			return Component.text("No descriptions found for " + mDisplayName + "!", NamedTextColor.RED);
-		}
-
+		List<Component> descriptions = getDescriptions();
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(player, 1, enabled));
-		if (level > 1 && mDescriptions.size() > 1) {
+		if (level > 1 && descriptions.size() > 1) {
 			component = component.append(Component.newline()).append(getFormattedDescription(player, 2, enabled));
 		}
-		if (isEnhanced && mDescriptions.size() > 2) {
+		if (isEnhanced && descriptions.size() > 2) {
 			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled));
 		}
 		return component;
@@ -381,6 +407,10 @@ public class AbilityInfo<T extends Ability> {
 		sender.sendMessage(getFormattedDescriptions(sender instanceof Player player ? player : null, 2, false, true));
 	}
 
+	public @Nullable T getPlayerAbility(Plugin plugin, @Nullable Player player) {
+		return plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, getAbilityClass());
+	}
+
 	public JsonObject toJson() {
 		JsonObject info = new JsonObject();
 		if (mScoreboardId != null) {
@@ -395,10 +425,11 @@ public class AbilityInfo<T extends Ability> {
 		if (mShorthandName != null) {
 			info.addProperty("shortName", mShorthandName);
 		}
-		if (!mDescriptions.isEmpty()) {
+		List<Component> descriptionList = getDescriptions();
+		if (!descriptionList.isEmpty()) {
 			JsonArray descriptions = new JsonArray();
-			for (TextComponent description : mDescriptions) {
-				descriptions.add(description.content());
+			for (Component description : descriptionList) {
+				descriptions.add(MessagingUtils.plainText(description));
 			}
 			info.add("descriptions", descriptions);
 		}

@@ -5,13 +5,9 @@ import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -21,8 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -61,17 +55,13 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 	}
 
 	@Override
-	public ItemStack bezoarItem(boolean philosophersStone) {
-		if (philosophersStone) {
-			return super.bezoarItem(true);
-		}
-		ItemStack itemBezoar = new ItemStack(Material.HONEYCOMB_BLOCK);
-		ItemUtils.setPlainName(itemBezoar, "Sundrop");
-		ItemMeta sundropMeta = itemBezoar.getItemMeta();
-		sundropMeta.displayName(Component.text("Sundrop", NamedTextColor.WHITE)
-			                        .decoration(TextDecoration.ITALIC, false));
-		itemBezoar.setItemMeta(sundropMeta);
-		return itemBezoar;
+	public Material bezoarMat(boolean philosophersStone) {
+		return philosophersStone ? Material.RED_CONCRETE : Material.HONEYCOMB_BLOCK;
+	}
+
+	@Override
+	public String bezoarName(boolean philosophersStone) {
+		return philosophersStone ? "Philosopher's Stone" : "Sundrop";
 	}
 
 	@Override

@@ -1,18 +1,19 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,8 +26,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class FrozenDomain extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Frozen Domain";
-	public static final double[] EXTRA_SPEED_PCT = {.1, .125, .15, .175, .20, .25};
-	public static final double[] REGEN_TIME = {2, 1.75, 1.5, 1.25, 1, .75}; //seconds
+	public static final double[] SPEED_PERCENT = {.1, .125, .15, .175, .20, .25};
+	public static final int[] REGEN_INTERVAL = {40, 35, 30, 25, 20, 15};
 	private static final int DURATION_TICKS = 100;
 	private static final double PERCENT_HEAL = .05;
 	private static final String ATTR_NAME = "FrozenDomainExtraSpeedAttr";
@@ -34,13 +35,22 @@ public class FrozenDomain extends DepthsAbility {
 	public static final DepthsAbilityInfo<FrozenDomain> INFO =
 		new DepthsAbilityInfo<>(FrozenDomain.class, ABILITY_NAME, FrozenDomain::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
 			.displayItem(Material.IRON_BOOTS)
-			.descriptions(FrozenDomain::getDescription);
+			.descriptions(FrozenDomain::getDescription)
+			.singleCharm(false);
+
+	private final int mDuration;
+	private final double mSpeedPercent;
+	private final double mPercentHeal;
+
 	private boolean mWasOnIce = false;
-	private int mSecondWhenIce = 0;
-	private int mSeconds = 0;
+	private int mTickWhenIce = 0;
+	private int mTicks = 0;
 
 	public FrozenDomain(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.FROZEN_DOMAIN_DURATION.mEffectName, DURATION_TICKS);
+		mSpeedPercent = CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.FROZEN_DOMAIN_SPEED_AMPLIFIER.mEffectName) + SPEED_PERCENT[mRarity - 1];
+		mPercentHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FROZEN_DOMAIN_HEALING.mEffectName, PERCENT_HEAL);
 	}
 
 	@Override
@@ -48,19 +58,19 @@ public class FrozenDomain extends DepthsAbility {
 		if (twoHertz && isOnIce(mPlayer)) {
 			new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 		}
-		if (oneSecond) {
+		if (twoHertz) {
 			if (PlayerUtils.isOnGround(mPlayer) && isOnIce(mPlayer)) {
 				mWasOnIce = true;
-				mSecondWhenIce = mSeconds;
+				mTickWhenIce = mTicks;
 				handleSpeed();
 				handleHeal();
-			} else {
-				offIceHeal();
+			} else if (mWasOnIce) {
+				handleHeal();
 			}
-			if (mSeconds >= mSecondWhenIce + DURATION_TICKS / 20) {
+			if (mTicks >= mTickWhenIce + mDuration) {
 				mWasOnIce = false;
 			}
-			mSeconds++;
+			mTicks += 10;
 		}
 
 	}
@@ -82,25 +92,15 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	public void handleHeal() {
-		if (mSeconds % REGEN_TIME[mRarity - 1] == 0) {
-			applyHealing();
+		if (mTicks % REGEN_INTERVAL[mRarity - 1] == 0) {
+			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+			PlayerUtils.healPlayer(mPlugin, mPlayer, mPercentHeal * maxHealth, mPlayer);
+			handleParticles();
 		}
-	}
-
-	public void offIceHeal() {
-		if (mWasOnIce && mSeconds % REGEN_TIME[mRarity - 1] == 0) {
-			applyHealing();
-		}
-	}
-
-	public void applyHealing() {
-		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-		PlayerUtils.healPlayer(mPlugin, mPlayer, PERCENT_HEAL * maxHealth, mPlayer);
-		handleParticles();
 	}
 
 	public void handleSpeed() {
-		mPlugin.mEffectManager.addEffect(mPlayer, "FrozenDomainExtraSpeed", new PercentSpeed(DURATION_TICKS, EXTRA_SPEED_PCT[mRarity - 1], ATTR_NAME));
+		mPlugin.mEffectManager.addEffect(mPlayer, "FrozenDomainExtraSpeed", new PercentSpeed(mDuration, mSpeedPercent, ATTR_NAME));
 	}
 
 	public boolean isOnIce(LivingEntity entity) {
@@ -109,15 +109,17 @@ public class FrozenDomain extends DepthsAbility {
 			DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		Component s = REGEN_TIME[rarity - 1] == 20 ? Component.empty() : Component.text("s");
-		return Component.text("When standing on ice, gain ")
-			.append(Component.text(StringUtils.multiplierToPercentage(EXTRA_SPEED_PCT[rarity - 1]) + "%", color))
-			.append(Component.text(" speed and regain " + StringUtils.multiplierToPercentage(PERCENT_HEAL) + "% of your max health every "))
-			.append(Component.text(StringUtils.to2DP(REGEN_TIME[rarity - 1]), color))
-			.append(Component.text(" second"))
-			.append(s)
-			.append(Component.text(". Effects last for " + DURATION_TICKS / 20 + " seconds after leaving ice."));
+	private static Description<FrozenDomain> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<FrozenDomain>(color)
+			.add("When standing on ice, gain ")
+			.addPercent(a -> a.mSpeedPercent, SPEED_PERCENT[rarity - 1], false, true)
+			.add(" speed and heal ")
+			.addPercent(a -> a.mPercentHeal, PERCENT_HEAL)
+			.add(" of your max health every ")
+			.addDuration(a -> REGEN_INTERVAL[rarity - 1], REGEN_INTERVAL[rarity - 1], true, true)
+			.add("s. Effects last for ")
+			.addDuration(a -> a.mDuration, DURATION_TICKS)
+			.add(" seconds after leaving ice.");
 	}
 }
 

@@ -176,7 +176,7 @@ public abstract class Spell implements Cloneable {
 	}
 
 	@FunctionalInterface
-	public interface GetSpellTargets<V extends LivingEntity> {
+	public interface GetSpellTargets<V extends Entity> {
 		List<? extends V> getTargets();
 	}
 

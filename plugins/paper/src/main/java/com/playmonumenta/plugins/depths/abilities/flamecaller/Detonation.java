@@ -1,19 +1,20 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,10 +37,18 @@ public class Detonation extends DepthsAbility {
 	public static final DepthsAbilityInfo<Detonation> INFO =
 		new DepthsAbilityInfo<>(Detonation.class, ABILITY_NAME, Detonation::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
 			.displayItem(Material.TNT)
-			.descriptions(Detonation::getDescription);
+			.descriptions(Detonation::getDescription)
+			.singleCharm(false);
+
+	private final double mDamageRadius;
+	private final double mDamage;
+	private final double mDeathRadius;
 
 	public Detonation(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamageRadius = CharmManager.getRadius(mPlayer, CharmEffects.DETONATION_DAMAGE_RADIUS.mEffectName, DAMAGE_RADIUS);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.DETONATION_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
+		mDeathRadius = CharmManager.getRadius(mPlayer, CharmEffects.DETONATION_DEATH_RADIUS.mEffectName, DEATH_RADIUS);
 	}
 
 	@Override
@@ -50,9 +59,9 @@ public class Detonation extends DepthsAbility {
 		}
 		Location location = entity.getLocation();
 		World world = mPlayer.getWorld();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, DAMAGE_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, mDamage)) {
 			new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 2).spawnAsPlayerActive(mPlayer);
-			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true, false);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
 		}
 		new PartialParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1).minimumCount(1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, location.add(0, 1, 0), 3).spawnAsPlayerActive(mPlayer);
@@ -61,12 +70,17 @@ public class Detonation extends DepthsAbility {
 
 	@Override
 	public double entityDeathRadius() {
-		return DEATH_RADIUS;
+		return mDeathRadius;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("If an enemy dies within " + DEATH_RADIUS + " blocks of you it explodes, dealing ")
-			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
-			.append(Component.text(" magic damage in a " + DAMAGE_RADIUS + " block radius to other enemies."));
+	private static Description<Detonation> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<Detonation>(color)
+			.add("When an enemy dies within ")
+			.add(a -> a.mDeathRadius, DEATH_RADIUS)
+			.add(" blocks of you it explodes, dealing ")
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
+			.add(" magic damage in a ")
+			.add(a -> a.mDamageRadius, DAMAGE_RADIUS)
+			.add(" block radius to other enemies.");
 	}
 }

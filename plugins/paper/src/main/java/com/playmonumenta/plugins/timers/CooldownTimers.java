@@ -71,11 +71,17 @@ public class CooldownTimers {
 	}
 
 	public void removeCooldown(Player player, ClassAbility spell) {
+		removeCooldown(player, spell, true);
+	}
+
+	public void removeCooldown(Player player, ClassAbility spell, boolean updateMod) {
 		UUID playerID = player.getUniqueId();
 		HashMap<ClassAbility, Integer> cooldownHash = mTimers.get(playerID);
 		if (cooldownHash != null) {
 			cooldownHash.remove(spell);
-			ClientModHandler.updateAbility(player, spell);
+			if (updateMod) {
+				ClientModHandler.updateAbility(player, spell);
+			}
 		}
 	}
 

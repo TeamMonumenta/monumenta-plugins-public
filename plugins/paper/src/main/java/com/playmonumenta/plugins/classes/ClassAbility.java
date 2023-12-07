@@ -162,6 +162,7 @@ public enum ClassAbility {
 	// [Shaman]
 	CLEANSING_TOTEM("Cleansing Totem"),
 	EARTHEN_TREMOR("Earthen Tremor"),
+	FLAME_SPIRIT("Flame Spirit"),
 	FLAME_TOTEM("Flame Totem"),
 	INTERCONNECTED_HAVOC("Interconnected Havoc"),
 	CHAIN_LIGHTNING("Chain Lightning"),
@@ -219,6 +220,7 @@ public enum ClassAbility {
 	RADIANT_BLESSING("Radiant Blessing"),
 	TOTEM_OF_SALVATION("Totem of Salvation"),
 	WARD_OF_LIGHT("Ward of Light"),
+	DIVINE_BEAM("Divine Beam"),
 
 	// FROSTBORN
 	ICE_LANCE("Ice Lance"),
@@ -229,12 +231,24 @@ public enum ClassAbility {
 	CRYOBOX("Cryobox"),
 
 	// EARTHBORN
+	BRAMBLE_SHELL("Bramble Shell"),
 	BULWARK("Bulwark"),
 	CRUSHING_EARTH("Crushing Earth"),
 	EARTHEN_WRATH("Earthen Wrath"),
 	EARTHQUAKE("Earthquake"),
 	STONE_SKIN("Stone Skin"),
 	TAUNT("Taunt"),
+
+	//PRISMATIC
+	CHROMA_BLADE("Chroma Blade"),
+	COLOR_SPLASH("Color Splash"),
+	CONVERGENCE("Convergence"),
+	DISCO_BALL("Disco Ball"),
+	ENCORE("Encore"),
+	REFRACTION("Refraction"),
+	RESURRECTION("Resurrection"),
+	SOLAR_RAY("Solar Ray"),
+	REBIRTH("Rebirth"),
 
 	// Fake class abilities for some enchantments
 	// Used to trigger other events

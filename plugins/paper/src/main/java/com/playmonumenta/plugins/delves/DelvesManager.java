@@ -39,6 +39,7 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -122,6 +123,7 @@ public class DelvesManager implements Listener {
 		"portal",
 		"blue",
 		"brown",
+		"zenith",
 		"futurama"
 	);
 
@@ -388,7 +390,7 @@ public class DelvesManager implements Listener {
 			}
 		}
 
-		setForcedReferenceToSpawner(null);
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> setForcedReferenceToSpawner(null));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

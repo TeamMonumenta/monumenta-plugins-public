@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CCImmuneEffect;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.effects.DisableAI;
+import com.playmonumenta.plugins.effects.DisableGravity;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.Paralyze;
@@ -1255,6 +1257,25 @@ public class EntityUtils {
 		if (t == null || t < ticks) {
 			SILENCED_MOBS.put(mob, ticks);
 		}
+	}
+
+	private static final String DISABLE_AI_SOURCE = "DisableAI";
+
+	/*
+	 *  TODO
+	 *  There are a lot places (spells, bosses) that disable AI temporarily.
+	 *  Ideally they would all use this method to prevent interrupting each other
+	 *  but the work for that has not been done.
+	 */
+
+	public static void disableAI(Plugin plugin, LivingEntity entity, int duration) {
+		plugin.mEffectManager.addEffect(entity, DISABLE_AI_SOURCE, new DisableAI(duration));
+	}
+
+	private static final String DISABLE_GRAVITY_SOURCE = "DisableGravity";
+
+	public static void disableGravity(Plugin plugin, Entity entity, int duration) {
+		plugin.mEffectManager.addEffect(entity, DISABLE_GRAVITY_SOURCE, new DisableGravity(duration));
 	}
 
 	public static boolean shouldCancelSpells(@Nullable LivingEntity entity) {

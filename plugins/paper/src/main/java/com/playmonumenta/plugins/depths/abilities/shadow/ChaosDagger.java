@@ -1,26 +1,23 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,11 +28,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.entity.Shulker;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,26 +39,36 @@ public class ChaosDagger extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Chaos Dagger";
 	public static final int COOLDOWN = 22 * 20;
-	public static final double[] DAMAGE = {2.0, 2.25, 2.5, 2.75, 3.0, 3.5};
+	public static final double[] DAMAGE = {1.0, 1.25, 1.5, 1.75, 2.0, 2.5};
 	private static final double VELOCITY = 0.5;
 	public static final int STUN_DURATION = 3 * 20;
 	public static final int DAMAGE_DURATION = 5 * 20;
 	private static final int TARGET_RADIUS = 20;
 	private static final int ELITE_RADIUS = 5;
 	private static final int STEALTH_DURATION = 30;
+	public static final String NO_GLOWING_CLEAR_TAG = "ChaosDaggerNoGlowingClear";
+
+	public static final String CHARM_COOLDOWN = "Chaos Dagger Cooldown";
 
 	public static final DepthsAbilityInfo<ChaosDagger> INFO =
 		new DepthsAbilityInfo<>(ChaosDagger.class, ABILITY_NAME, ChaosDagger::new, DepthsTree.SHADOWDANCER, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.CHAOS_DAGGER)
-			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChaosDagger::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChaosDagger::cast, DepthsTrigger.SWAP))
 			.displayItem(Material.ITEM_FRAME)
 			.descriptions(ChaosDagger::getDescription);
+
+	private final int mStunDuration;
+	private final double mDamageMultiplier;
+	private final int mStealthDuration;
 
 	private @Nullable Entity mHitMob;
 
 	public ChaosDagger(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.CHAOS_DAGGER_STUN_DURATION.mEffectName, STUN_DURATION);
+		mDamageMultiplier = DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.CHAOS_DAGGER_DAMAGE_MULTIPLIER.mEffectName);
+		mStealthDuration = CharmManager.getDuration(mPlayer, CharmEffects.CHAOS_DAGGER_STEALTH_DURATION.mEffectName, STEALTH_DURATION);
 	}
 
 	public void cast() {
@@ -73,22 +79,10 @@ public class ChaosDagger extends DepthsAbility {
 		putOnCooldown();
 		mHitMob = null;
 
-		Location loc = mPlayer.getEyeLocation();
-		ItemStack itemDagger = new ItemStack(Material.NETHERITE_SWORD);
-		ItemUtils.setPlainName(itemDagger, "Chaos Dagger");
-		ItemMeta tinctureMeta = itemDagger.getItemMeta();
-		tinctureMeta.displayName(Component.text("Chaos Dagger", NamedTextColor.WHITE)
-			                         .decoration(TextDecoration.ITALIC, false));
-		itemDagger.setItemMeta(tinctureMeta);
 		World world = mPlayer.getWorld();
-		Item dagger = world.dropItem(loc, itemDagger);
-		dagger.setPickupDelay(Integer.MAX_VALUE);
-
-		Vector vel = mPlayer.getEyeLocation().getDirection().normalize();
-		vel.multiply(VELOCITY);
-
-		dagger.setVelocity(vel);
-		dagger.setGlowing(true);
+		Location loc = mPlayer.getEyeLocation();
+		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.CHAOS_DAGGER_VELOCITY.mEffectName, VELOCITY);
+		Item dagger = AbilityUtils.spawnAbilityItem(world, loc, Material.NETHERITE_SWORD, "Chaos Dagger", false, velocity, true, true);
 
 		world.playSound(loc, Sound.ENTITY_WARDEN_HEARTBEAT, SoundCategory.PLAYERS, 2.0f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0f, 0.1f);
@@ -97,7 +91,7 @@ public class ChaosDagger extends DepthsAbility {
 		new BukkitRunnable() {
 
 			int mExpire = 0;
-			@Nullable LivingEntity mTarget = EntityUtils.getNearestMob(dagger.getLocation(), 20.0);
+			@Nullable LivingEntity mTarget;
 			@Nullable Location mLastLocation = null;
 
 			@Override
@@ -113,12 +107,14 @@ public class ChaosDagger extends DepthsAbility {
 
 				List<LivingEntity> veryNearbyMobs = EntityUtils.getNearbyMobs(tLoc, ELITE_RADIUS);
 				veryNearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+				veryNearbyMobs.removeIf(Entity::isInvulnerable);
 				veryNearbyMobs.removeIf(mob -> !(EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)));
 				mTarget = EntityUtils.getNearestMob(tLoc, veryNearbyMobs);
 
 				if (mTarget == null) {
 					List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(tLoc, TARGET_RADIUS);
 					nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+					nearbyMobs.removeIf(Entity::isInvulnerable);
 					mTarget = EntityUtils.getNearestMob(tLoc, nearbyMobs);
 				}
 
@@ -128,7 +124,11 @@ public class ChaosDagger extends DepthsAbility {
 					return;
 				}
 
-				if (mTarget.getBoundingBox().overlaps(dagger.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+				BoundingBox targetBox = mTarget.getBoundingBox();
+				if (mTarget instanceof Shulker) {
+					targetBox.expand(0.3);
+				}
+				if (targetBox.overlaps(dagger.getBoundingBox())) {
 					new PartialParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2).spawnAsPlayerActive(mPlayer);
 					world.playSound(tLoc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.3f, 1.4f);
 					world.playSound(tLoc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 0.7f, 1.4f);
@@ -137,14 +137,14 @@ public class ChaosDagger extends DepthsAbility {
 					world.playSound(tLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 0.1f);
 					mHitMob = mTarget;
 					if (EntityUtils.isBoss(mTarget)) {
-						EntityUtils.applySlow(mPlugin, STUN_DURATION, 0.99f, mTarget);
+						EntityUtils.applySlow(mPlugin, mStunDuration, 0.99f, mTarget);
 					} else {
-						EntityUtils.applyStun(mPlugin, STUN_DURATION, mTarget);
+						EntityUtils.applyStun(mPlugin, mStunDuration, mTarget);
 					}
 					mTarget.setGlowing(true);
 
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						if (mHitMob != null && !(mHitMob instanceof MagmaCube && mHitMob.getName().contains("Gyrhaeddant"))) {
+						if (mHitMob != null && !mHitMob.getScoreboardTags().contains(NO_GLOWING_CLEAR_TAG)) {
 							mHitMob.setGlowing(false);
 						}
 						mHitMob = null;
@@ -181,14 +181,14 @@ public class ChaosDagger extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (enemy == mHitMob && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)) {
-			event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
+			event.setDamage(event.getDamage() * (1 + mDamageMultiplier));
 			mHitMob = null;
 			if (!enemy.isInvisible()) {
 				enemy.setGlowing(false);
 			}
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				if (enemy.isDead() || enemy.getHealth() < 0) {
-					AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION, null);
+					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration, null);
 				}
 			}, 1);
 
@@ -206,10 +206,18 @@ public class ChaosDagger extends DepthsAbility {
 		return false; // only changes event damage, and also prevents multiple calls itself by clearing mHitMob
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of melee or projectile damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by ")
-			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
-			.append(Component.text(". If this damage kills the target, gain stealth for 1.5s. The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s."));
+	private static Description<ChaosDagger> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<ChaosDagger>(color)
+			.add("Swap hands to throw a cursed dagger that stuns an enemy for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION)
+			.add(" seconds (rooting bosses instead). The next time you damage this mob with melee or projectile damage within ")
+			.addDuration(DAMAGE_DURATION)
+			.add(" seconds, you deal ")
+			.addPercent(a -> a.mDamageMultiplier, DAMAGE[rarity - 1], false, true)
+			.add(" more damage. If this damage kills the target, gain stealth for ")
+			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION)
+			.add(" seconds. The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path.")
+			.addCooldown(COOLDOWN);
 	}
 
 

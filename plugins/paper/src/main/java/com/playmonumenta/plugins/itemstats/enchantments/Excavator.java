@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.SpawnerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -40,6 +41,10 @@ public class Excavator implements Enchantment {
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		if (player.isSneaking()) {
+			return;
+		}
+
+		if (SpawnerUtils.getShields(event.getBlock()) > 0) {
 			return;
 		}
 

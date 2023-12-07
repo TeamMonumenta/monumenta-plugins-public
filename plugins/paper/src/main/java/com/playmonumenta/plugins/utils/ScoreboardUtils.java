@@ -144,6 +144,16 @@ public class ScoreboardUtils {
 		}
 	}
 
+	public static void addEntityToTeam(Entity entity, String teamName, NamedTextColor color) {
+		Team team = getExistingTeamOrCreate(teamName, color);
+
+		if (entity instanceof Player player) {
+			team.addEntry(player.getName());
+		} else {
+			team.addEntry(entity.getUniqueId().toString());
+		}
+	}
+
 	public static void modifyTeamColor(String teamName, NamedTextColor color) {
 		Team team = getExistingTeam(teamName);
 		if (team != null) {

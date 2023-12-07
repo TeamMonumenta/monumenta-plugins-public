@@ -1206,7 +1206,11 @@ public class ItemUtils {
 	}
 
 	public static boolean isSomePotion(@Nullable ItemStack itemStack) {
-		return itemStack != null && Materials.POTIONS.contains(itemStack.getType());
+		return itemStack != null && isSomePotion(itemStack.getType());
+	}
+
+	public static boolean isSomePotion(Material material) {
+		return Materials.POTIONS.contains(material);
 	}
 
 	public static boolean isArrow(@Nullable ItemStack itemStack) {

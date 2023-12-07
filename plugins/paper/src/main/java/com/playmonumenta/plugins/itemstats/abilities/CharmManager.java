@@ -122,6 +122,8 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
+import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
 import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
 import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
@@ -161,6 +163,7 @@ import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -168,21 +171,69 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class CharmManager {
 
+	public enum CharmType {
+		NORMAL(AbilityUtils.CHARM_POWER, KEY_PLUGIN_DATA, ItemStatUtils::isNormalCharm, ItemStatUtils::getCharmClassComponent),
+		ZENITH(AbilityUtils.DEPTHS_CHARM_POWER, KEY_PLUGIN_DATA_DEPTHS, ItemStatUtils::isZenithCharm, CharmFactory::getZenithCharmRarityComponent);
+
+		public final Map<UUID, List<ItemStack>> mPlayerCharms;
+
+		private final String mScoreboard;
+		private final String mPluginDataKey;
+		private final Predicate<ItemStack> mCharmPredicate;
+		private final @Nullable Function<ReadableItemNBT, Component> mLabelFunction;
+
+		CharmType(String scoreboard, String pluginDataKey, Predicate<ItemStack> predicate, @Nullable Function<ReadableItemNBT, @Nullable Component> labelFunction) {
+			mPlayerCharms = new HashMap<>();
+			mScoreboard = scoreboard;
+			mPluginDataKey = pluginDataKey;
+			mCharmPredicate = predicate;
+			mLabelFunction = labelFunction;
+		}
+
+		public int getTotalCharmPower(Player player) {
+			//Give 9 charm power by default for zenith
+			if (mScoreboard.equals(AbilityUtils.DEPTHS_CHARM_POWER)) {
+				int charmPower = ScoreboardUtils.getScoreboardValue(player, mScoreboard).orElse(0);
+				if (charmPower < 9) {
+					ScoreboardUtils.setScoreboardValue(player, mScoreboard, 9);
+					return 9;
+				}
+				return charmPower;
+			}
+			return ScoreboardUtils.getScoreboardValue(player, mScoreboard).orElse(0);
+		}
+
+		public boolean isCharm(@Nullable ItemStack item) {
+			return mCharmPredicate.test(item);
+		}
+
+		public @Nullable Component getLabel(ReadableItemNBT nbt) {
+			return mLabelFunction == null ? null : mLabelFunction.apply(nbt);
+		}
+
+		public String getPluginDataKey() {
+			return mPluginDataKey;
+		}
+	}
+
 	public static final String KEY_PLUGIN_DATA = "R3Charms";
+	public static final String KEY_PLUGIN_DATA_DEPTHS = "R3DepthsCharms";
 	public static final String KEY_CHARMS = "charms";
 	public static final String KEY_ITEM = "item";
 	public static final int MAX_CHARM_COUNT = 7;
@@ -193,14 +244,19 @@ public class CharmManager {
 
 	public List<String> mFlippedColorEffectSubstrings;
 
-	public Map<UUID, List<ItemStack>> mPlayerCharms;
-
 	public Map<UUID, Map<String, Double>> mPlayerCharmEffectMap;
+
+	public CharmType mEnabledCharmType;
 
 	@SuppressWarnings("NullAway.Init") // fields are initialised by called methods
 	private CharmManager() {
-		mPlayerCharms = new HashMap<>();
 		mPlayerCharmEffectMap = new HashMap<>();
+		//TODO when loading, determine which charm type is applicable on this shard
+		if (ServerProperties.getDepthsEnabled()) {
+			mEnabledCharmType = CharmType.ZENITH;
+		} else {
+			mEnabledCharmType = CharmType.NORMAL;
+		}
 		loadCharmEffects();
 		loadFlippedColorEffects();
 	}
@@ -213,6 +269,10 @@ public class CharmManager {
 	// Add the string in this list, with other effects from the same ability/enchantment
 	// If it is a "debuff" (i.e. a greater number is worse), then ALSO list it in the next method
 	private void loadCharmEffects() {
+		if (mEnabledCharmType == CharmType.ZENITH) {
+			mCharmEffectList = Arrays.stream(CharmEffects.values()).map(effect -> effect.mEffectName).toList();
+			return;
+		}
 		mCharmEffectList = Arrays.asList(
 			// Custom Enchantments
 			Inferno.CHARM_DAMAGE,
@@ -938,6 +998,11 @@ public class CharmManager {
 	}
 
 	private void loadFlippedColorEffects() {
+		if (mEnabledCharmType == CharmType.ZENITH) {
+			mFlippedColorEffectSubstrings = Arrays.stream(CharmEffects.values()).filter(effect -> effect.mEffectCap < 0).map(effect -> effect.mEffectName).toList();
+			return;
+		}
+
 		mFlippedColorEffectSubstrings = Arrays.asList(
 			JunglesNourishment.CHARM_COOLDOWN,
 			RageOfTheKeter.CHARM_COOLDOWN,
@@ -1046,30 +1111,33 @@ public class CharmManager {
 		);
 	}
 
-	public List<ItemStack> getCharms(Player player) {
-		return mPlayerCharms.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
+	public List<ItemStack> getCharms(Player player, CharmType charmType) {
+		return charmType.mPlayerCharms.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
 	}
 
-	public boolean addCharm(Player player, ItemStack charm) {
-		if (player == null) {
+	public boolean addCharm(@Nullable Player p, ItemStack charm, CharmType charmType) {
+		if (p == null || !validateCharm(p, charm, charmType)) {
 			return false;
 		}
+		UUID uuid = p.getUniqueId();
 
-		List<ItemStack> charms = getCharms(player);
-		if (validateCharm(player, charm)) {
-			ItemStack charmCopy = new ItemStack(charm);
-			charms.add(charmCopy);
+		ItemStack charmCopy = new ItemStack(charm);
 
-			updateCharms(player, charms);
-
-			return true;
+		Map<UUID, List<ItemStack>> charmMap = charmType.mPlayerCharms;
+		List<ItemStack> playerCharms = charmMap.get(uuid);
+		if (playerCharms != null) {
+			playerCharms.add(charmCopy);
+		} else {
+			playerCharms = new ArrayList<>();
+			playerCharms.add(charmCopy);
+			charmMap.put(uuid, playerCharms);
 		}
-
-		return false;
+		updateCharms(p, charmType);
+		return true;
 	}
 
 	// This method validates the charm against the player's current charm list before actually adding it
-	public boolean validateCharm(Player p, ItemStack charm) {
+	public boolean validateCharm(@Nullable Player p, @Nullable ItemStack charm, CharmType charmType) {
 		//Check to make sure the added charm is a valid charm (check lore) and not a duplicate of one they already have!
 		//Also make sure the charm list exists if we're checking against it
 		//Also make sure the charm list has space for the new charm if it exists
@@ -1077,19 +1145,20 @@ public class CharmManager {
 		//Also parse the charm's power budget and make sure adding it would not overflow
 
 		//Check item stack for valid name and amount
-		if (charm == null || charm.getAmount() != 1 || !charm.hasItemMeta() || !charm.getItemMeta().hasDisplayName()) {
+		if (charm == null || p == null || charm.getAmount() != 1 || !charm.hasItemMeta() || !charm.getItemMeta().hasDisplayName()) {
 			return false;
 		}
-		// Make sure item has Charm Tier
-		if (!ItemStatUtils.isCharm(charm)) {
+
+		if (!charmType.isCharm(charm)) {
 			return false;
 		}
+
 		// Charm Power Handling
 		int charmPower = ItemStatUtils.getCharmPower(charm);
 		if (charmPower > 0) {
 			//Now check the player charms to make sure it is different from existing charms
-			if (p != null && mPlayerCharms.get(p.getUniqueId()) != null) {
-				List<ItemStack> charms = mPlayerCharms.get(p.getUniqueId());
+			List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
+			if (charms != null) {
 				//Check max charm count in list
 				if (charms.size() >= MAX_CHARM_COUNT) {
 					return false;
@@ -1103,35 +1172,34 @@ public class CharmManager {
 					powerBudget += ItemStatUtils.getCharmPower(c);
 				}
 				//Check to see if adding the extra charm would exceed budget
-				int totalBudget = ScoreboardUtils.getScoreboardValue(p, AbilityUtils.CHARM_POWER).orElse(0);
-				if (powerBudget + charmPower > totalBudget) {
-					return false;
-				}
-				return true;
-			} else if (p != null) {
-				return true;
+				int totalBudget = charmType.getTotalCharmPower(p);
+				return powerBudget + charmPower <= totalBudget;
 			}
+			return true;
 		}
 		return false;
 	}
 
-	public boolean removeCharm(Player p, ItemStack charm) {
-		if (p != null && mPlayerCharms.get(p.getUniqueId()) != null) {
-			//TODO make sure this actually removes the right charm (due to how the itemstack equals method works)
-
-			if (mPlayerCharms.get(p.getUniqueId()).remove(charm)) {
-				updateCharms(p, mPlayerCharms.get(p.getUniqueId()));
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean removeCharmBySlot(Player p, int slot) {
+	public boolean removeCharm(@Nullable Player p, ItemStack charm, CharmType charmType) {
 		if (p == null) {
 			return false;
 		}
-		List<ItemStack> charms = mPlayerCharms.get(p.getUniqueId());
+
+		List<ItemStack> playerCharms = charmType.mPlayerCharms.get(p.getUniqueId());
+		if (playerCharms != null) {
+			if (playerCharms.remove(charm)) {
+				updateCharms(p, charmType);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean removeCharmBySlot(@Nullable Player p, int slot, CharmType charmType) {
+		if (p == null) {
+			return false;
+		}
+		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
 		if (charms != null && slot < charms.size()) {
 			charms.remove(slot);
 			return true;
@@ -1139,18 +1207,32 @@ public class CharmManager {
 		return false;
 	}
 
-
-	public void clearCharms(Player p) {
-		List<ItemStack> charms = mPlayerCharms.computeIfAbsent(p.getUniqueId(), key -> new ArrayList<>());
-		charms.clear();
-		updateCharms(p, charms);
+	public void clearCharms(@Nullable Player p, CharmType charmType) {
+		if (p == null) {
+			return;
+		}
+		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
+		if (charms != null) {
+			charms.clear();
+			updateCharms(p, charmType);
+		}
 	}
 
-	public void updateCharms(Player p) {
-		updateCharms(p, mPlayerCharms.computeIfAbsent(p.getUniqueId(), key -> new ArrayList<>()));
+	public void updateCharms(Player p, CharmType charmType) {
+		updateCharms(p, charmType, charmType.mPlayerCharms.computeIfAbsent(p.getUniqueId(), key -> new ArrayList<>()));
 	}
 
-	public void updateCharms(Player p, List<ItemStack> equippedCharms) {
+	public void updateCharms(@Nullable Player p, CharmType charmType, List<ItemStack> equippedCharms) {
+		if (p == null) {
+			return;
+		}
+
+		if (mEnabledCharmType != charmType) {
+			return;
+		}
+
+		UUID uuid = p.getUniqueId();
+
 		//Calculate the map of effects to values
 		Map<String, Double> allEffects = new HashMap<>();
 
@@ -1163,12 +1245,12 @@ public class CharmManager {
 					MMLog.warning("Unknown effect '" + info.mEffect + "' in charm '" + ItemUtils.getPlainName(charm) + "'!");
 					continue;
 				}
-				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, (a, b) -> (Math.ceil((a + b) * 1000) / 1000));
+				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, (a, b) -> Math.ceil(getValueOrCap(a + b, info.mEffect) * 1000 / 1000));
 			}
 		}
 
 		//Store to local map
-		mPlayerCharmEffectMap.put(p.getUniqueId(), allEffects);
+		mPlayerCharmEffectMap.put(uuid, allEffects);
 
 		//Refresh class of player
 		AbilityManager.getManager().updatePlayerAbilities(p, true);
@@ -1226,25 +1308,11 @@ public class CharmManager {
 		return 0;
 	}
 
-	public @Nullable String getSummaryOfAllAttributes(Player p) {
-		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
-		if (allEffects != null) {
-			String summary = "";
-			for (Map.Entry<String, Double> e : allEffects.entrySet()) {
-				if (e.getValue() != 0) {
-					if (e.getKey().contains("%")) {
-						summary += e.getKey() + " : " + (e.getValue().toString() + 100) + "%" + "\n";
-					} else {
-						summary += e.getKey() + " : " + e.getValue().toString() + "\n";
-					}
-				}
-			}
-			return summary;
+	public List<Component> getSummaryOfAllAttributesAsComponents(Player p, CharmType charmType) {
+		if (mEnabledCharmType != charmType) {
+			return List.of(Component.text("These Charms are currently disabled!", NamedTextColor.RED));
 		}
-		return null;
-	}
 
-	public List<Component> getSummaryOfAllAttributesAsComponents(Player p) {
 		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
 		if (allEffects == null) {
 			return new ArrayList<>();
@@ -1274,20 +1342,32 @@ public class CharmManager {
 					desc = desc.substring(0, desc.length() - 2);
 				}
 
-				String charmColor = getCharmEffectColor(allEffects.getOrDefault(s, 0.0) > 0, s.replace("%", ""));
+				double effectAmount = allEffects.getOrDefault(s, 0.0);
+				TextColor charmColor = getCharmEffectColor(effectAmount > 0, s.replace("%", ""));
 
 				if (s.contains("%")) {
 					desc += "%";
 				}
 
-				components.add(Component.text(desc, TextColor.fromHexString(charmColor)).decoration(TextDecoration.ITALIC, false));
+				// If depths effect is maxed, display as such
+				if (mEnabledCharmType == CharmType.ZENITH) {
+					CharmEffects effect = CharmEffects.getEffect(s.replace("%", ""));
+					if (effect != null) {
+						if (effectAmount == effect.mEffectCap) {
+							charmColor = TextColor.fromHexString("#e49b20");
+							desc += " (MAX)";
+						}
+					}
+				}
+
+				components.add(Component.text(desc, charmColor).decoration(TextDecoration.ITALIC, false));
 			}
 		}
 		return components;
 	}
 
-	public String getSummaryOfCharmNames(Player p) {
-		List<ItemStack> charms = mPlayerCharms.get(p.getUniqueId());
+	public String getSummaryOfCharmNames(Player p, CharmType charmType) {
+		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
 		if (charms != null) {
 			StringBuilder summary = new StringBuilder();
 			int powerBudget = 0;
@@ -1303,8 +1383,8 @@ public class CharmManager {
 		return NamedTextColor.GRAY + "no charms";
 	}
 
-	public int getCharmPower(Player p) {
-		List<ItemStack> charms = mPlayerCharms.get(p.getUniqueId());
+	public int getUsedCharmPower(Player p, CharmType charmType) {
+		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
 		int powerBudget = 0;
 		if (charms != null) {
 			for (ItemStack item : charms) {
@@ -1321,61 +1401,65 @@ public class CharmManager {
 	//Discard charm data a few ticks after player leaves shard
 	//(give time for save event to register)
 	public void onQuit(Player p) {
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				if (!p.isOnline()) {
-					mPlayerCharms.remove(p.getUniqueId());
-					mPlayerCharmEffectMap.remove(p.getUniqueId());
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			if (!p.isOnline()) {
+				UUID uuid = p.getUniqueId();
+				for (CharmType charmType : CharmType.values()) {
+					charmType.mPlayerCharms.remove(uuid);
 				}
+				mPlayerCharmEffectMap.remove(uuid);
 			}
-
-		}.runTaskLater(Plugin.getInstance(), 100);
+		}, 100);
 	}
 
 	//Store local charm data into plugin data
 	public void onSave(PlayerSaveEvent event) {
-		Player player = event.getPlayer();
-		List<ItemStack> charms = mPlayerCharms.get(player.getUniqueId());
-		if (charms != null) {
-			JsonObject data = new JsonObject();
-			JsonArray charmArray = new JsonArray();
-			data.add(KEY_CHARMS, charmArray);
-			Iterator<ItemStack> iterCharms = charms.iterator();
-			while (iterCharms.hasNext()) {
-				ItemStack charm = iterCharms.next();
+		for (CharmType charmType : CharmType.values()) {
+			Player player = event.getPlayer();
+			List<ItemStack> charms = charmType.mPlayerCharms.get(player.getUniqueId());
+			if (charms != null) {
+				JsonObject data = new JsonObject();
+				JsonArray charmArray = new JsonArray();
+				data.add(KEY_CHARMS, charmArray);
+				Iterator<ItemStack> iterCharms = charms.iterator();
+				while (iterCharms.hasNext()) {
+					ItemStack charm = iterCharms.next();
 
-				JsonObject charmData = new JsonObject();
-				charmData.addProperty(KEY_ITEM, NBTItem.convertItemtoNBT(charm).toString());
-				charmArray.add(charmData);
+					JsonObject charmData = new JsonObject();
+					charmData.addProperty(KEY_ITEM, NBTItem.convertItemtoNBT(charm).toString());
+					charmArray.add(charmData);
+				}
+				event.setPluginData(charmType.getPluginDataKey(), data);
 			}
-			event.setPluginData(KEY_PLUGIN_DATA, data);
 		}
 	}
 
 	//Load plugin data into local charm data
 	public void onJoin(Player p) {
-		JsonObject charmPluginData = MonumentaRedisSyncAPI.getPlayerPluginData(p.getUniqueId(), KEY_PLUGIN_DATA);
-		if (charmPluginData != null) {
-			if (charmPluginData.has(KEY_CHARMS)) {
-				JsonArray charmArray = charmPluginData.getAsJsonArray(KEY_CHARMS);
-				List<ItemStack> playerCharms = new ArrayList<>();
-				for (JsonElement charmElement : charmArray) {
-					JsonObject data = charmElement.getAsJsonObject();
-					if (data.has(KEY_ITEM) && data.get(KEY_ITEM).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_ITEM).isString()) {
-						ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_ITEM).getAsString()));
-						if (item != null) {
-							ItemStatUtils.cleanIfNecessary(item);
-							playerCharms.add(item);
+		for (CharmType charmType : CharmType.values()) {
+			JsonObject charmPluginData = MonumentaRedisSyncAPI.getPlayerPluginData(p.getUniqueId(), charmType.getPluginDataKey());
+			if (charmPluginData != null) {
+				if (charmPluginData.has(KEY_CHARMS)) {
+					JsonArray charmArray = charmPluginData.getAsJsonArray(KEY_CHARMS);
+					List<ItemStack> playerCharms = new ArrayList<>();
+					for (JsonElement charmElement : charmArray) {
+						JsonObject data = charmElement.getAsJsonObject();
+						if (data.has(KEY_ITEM) && data.get(KEY_ITEM).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_ITEM).isString()) {
+							ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_ITEM).getAsString()));
+							if (item != null) {
+
+									ItemStatUtils.cleanIfNecessary(item);
+
+								playerCharms.add(item);
+							}
 						}
 					}
-				}
-				//Check if we actually loaded any charms
-				if (playerCharms.size() > 0) {
-					mPlayerCharms.put(p.getUniqueId(), playerCharms);
-					//Recalculate the charm map based on loaded charms by calling update
-					updateCharms(p, mPlayerCharms.get(p.getUniqueId()));
+					//Check if we actually loaded any charms
+					if (!playerCharms.isEmpty()) {
+						charmType.mPlayerCharms.put(p.getUniqueId(), playerCharms);
+						//Recalculate the charm map based on loaded charms by calling update
+						updateCharms(p, charmType);
+					}
 				}
 			}
 		}
@@ -1428,8 +1512,26 @@ public class CharmManager {
 		return (baseValue + flatLevel) * ((percentLevel / 100.0) + 1);
 	}
 
-	public static String getCharmEffectColor(boolean isPositive, String charmEffectName) {
-		return isPositive != INSTANCE.mFlippedColorEffectSubstrings.contains(charmEffectName) ? "#4AC2E5" : "#D02E28";
+	public double getValueOrCap(double value, String charmEffectName) {
+		if (mEnabledCharmType != CharmType.ZENITH) {
+			return value;
+		}
+		CharmEffects effect = CharmEffects.getEffect(charmEffectName);
+		if (effect == null) {
+			return value;
+		} else if ((effect.mEffectCap > 0 && effect.mEffectCap < value) || (effect.mEffectCap < 0 && effect.mEffectCap > value)) {
+			return effect.mEffectCap;
+		} else {
+			return value;
+		}
+	}
+
+	public static TextColor getCharmEffectColor(boolean isPositive, String charmEffectName) {
+		return getCharmEffectColor(isPositive, INSTANCE.mFlippedColorEffectSubstrings.contains(charmEffectName));
+	}
+
+	public static TextColor getCharmEffectColor(boolean isPositive, boolean invertColor) {
+		return TextColor.fromHexString(isPositive != invertColor ? "#4AC2E5" : "#D02E28");
 	}
 
 	public static class CharmParsedInfo {

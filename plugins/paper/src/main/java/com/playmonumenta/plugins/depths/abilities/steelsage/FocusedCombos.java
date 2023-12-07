@@ -1,16 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,19 +24,30 @@ import org.bukkit.entity.Projectile;
 public class FocusedCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Focused Combos";
-	public static final double[] DAMAGE = {1.40, 1.45, 1.50, 1.55, 1.60, 2.00};
+	public static final double[] DAMAGE = {0.40, 0.45, 0.50, 0.55, 0.60, 1.00};
 	public static final double BLEED_AMOUNT = 0.2;
 	public static final int BLEED_DURATION = 20 * 3;
+	public static final int HIT_REQUIREMENT = 3;
 
 	public static final DepthsAbilityInfo<FocusedCombos> INFO =
 		new DepthsAbilityInfo<>(FocusedCombos.class, ABILITY_NAME, FocusedCombos::new, DepthsTree.STEELSAGE, DepthsTrigger.COMBO)
 			.displayItem(Material.SPECTRAL_ARROW)
-			.descriptions(FocusedCombos::getDescription);
+			.descriptions(FocusedCombos::getDescription)
+			.singleCharm(false);
+
+	private final int mHitRequirement;
+	private final int mBleedDuration;
+	private final double mBleedAmount;
+	private final double mDamage;
 
 	private int mComboCount = 0;
 
 	public FocusedCombos(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mHitRequirement = HIT_REQUIREMENT + (int) CharmManager.getLevel(mPlayer, CharmEffects.FOCUSED_COMBOS_HIT_REQUIREMENT.mEffectName);
+		mBleedDuration = CharmManager.getDuration(mPlayer, CharmEffects.FOCUSED_COMBOS_BLEED_DURATION.mEffectName, BLEED_DURATION);
+		mBleedAmount = BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.FOCUSED_COMBOS_BLEED_AMPLIFIER.mEffectName);
+		mDamage = DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.FOCUSED_COMBOS_DAMAGE_MULTIPLIER.mEffectName);
 	}
 
 	@Override
@@ -43,10 +55,10 @@ public class FocusedCombos extends DepthsAbility {
 		if (event.getDamager() instanceof Projectile proj && event.getType() == DamageType.PROJECTILE && EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
 			mComboCount++;
 
-			if (mComboCount >= 3) {
+			if (mComboCount >= mHitRequirement) {
 				mComboCount = 0;
-				EntityUtils.applyBleed(mPlugin, BLEED_DURATION, BLEED_AMOUNT, enemy);
-				event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
+				EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedAmount, enemy);
+				event.setDamage(event.getDamage() * (1 + mDamage));
 
 				Location playerLoc = mPlayer.getLocation();
 				mPlayer.playSound(playerLoc, Sound.BLOCK_WEEPING_VINES_BREAK, SoundCategory.PLAYERS, 2, 0.8f);
@@ -57,10 +69,17 @@ public class FocusedCombos extends DepthsAbility {
 		return false;
 	}
 
-	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Every third critical projectile shot deals ")
-			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]) + "x", color))
-			.append(Component.text(" damage and applies " + StringUtils.multiplierToPercentage(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds."));
+	private static Description<FocusedCombos> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<FocusedCombos>(color)
+			.add("Every ")
+			.add(a -> a.mHitRequirement, HIT_REQUIREMENT, true)
+			.add(" critical projectile shots, deal ")
+			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
+			.add(" more damage and apply ")
+			.addPercent(a -> a.mBleedAmount, BLEED_AMOUNT)
+			.add(" Bleed for ")
+			.addDuration(a -> a.mBleedDuration, BLEED_DURATION)
+			.add(" seconds.");
 	}
 
 

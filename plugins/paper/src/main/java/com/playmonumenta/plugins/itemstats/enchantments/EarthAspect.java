@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.SpawnerUtils;
 import java.util.EnumSet;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -59,6 +60,9 @@ public class EarthAspect implements Enchantment {
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER && !ItemUtils.isPickaxe(player.getInventory().getItemInOffHand())) {
+			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+				return;
+			}
 			apply(plugin, player, level);
 		}
 	}

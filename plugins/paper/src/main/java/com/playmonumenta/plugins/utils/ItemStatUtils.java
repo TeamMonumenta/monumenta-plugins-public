@@ -9,8 +9,17 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.itemstats.EffectType;
-import com.playmonumenta.plugins.itemstats.enums.*;
-import com.playmonumenta.plugins.itemstats.infusions.*;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
+import com.playmonumenta.plugins.itemstats.infusions.Quench;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.QuiverListener;
 import de.tr7zw.nbtapi.NBT;
@@ -20,7 +29,11 @@ import de.tr7zw.nbtapi.iface.ReadWriteNBTList;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.NavigableSet;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -518,6 +531,9 @@ public class ItemStatUtils {
 		if (itemStack == null) {
 			return null;
 		}
+		if (isZenithCharm(itemStack)) {
+			return null;
+		}
 		return NBT.get(itemStack, nbt -> {
 			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 			if (monumenta == null) {
@@ -530,7 +546,10 @@ public class ItemStatUtils {
 		});
 	}
 
-	public static @Nullable PlayerClass getCharmClass(ReadableNBTList<String> charmLore) {
+	public static @Nullable PlayerClass getCharmClass(@Nullable ReadableNBTList<String> charmLore) {
+		if (charmLore == null) {
+			return null;
+		}
 		List<PlayerClass> classes = new MonumentaClasses().getClasses();
 
 		for (String line : charmLore) {
@@ -564,10 +583,14 @@ public class ItemStatUtils {
 		return null;
 	}
 
-	public static Component getCharmClassComponent(ReadableNBTList<String> charmLore) {
-		PlayerClass playerClass = getCharmClass(charmLore);
-		if (playerClass != null) {
-			return Component.text(playerClass.mClassName, playerClass.mClassColor).decoration(TextDecoration.ITALIC, false);
+	public static Component getCharmClassComponent(ReadableNBT nbt) {
+		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta != null) {
+			ReadableNBTList<String> charmLore = monumenta.getStringList(CHARM_KEY);
+			PlayerClass playerClass = getCharmClass(charmLore);
+			if (playerClass != null) {
+				return Component.text(playerClass.mClassName, playerClass.mClassColor).decoration(TextDecoration.ITALIC, false);
+			}
 		}
 		return Component.text("Generalist", TextColor.fromHexString("#9F8F91"));
 	}
@@ -1283,12 +1306,30 @@ public class ItemStatUtils {
 		return item != null && getEnchantmentLevel(item, EnchantmentType.MATERIAL) > 0;
 	}
 
-	public static boolean isCharm(@Nullable ItemStack item) {
-		Tier tier = getTier(item);
-		if (tier == Tier.CHARM || tier == Tier.RARE_CHARM || tier == Tier.EPIC_CHARM) {
-			return true;
+	public static @Nullable CharmManager.CharmType getCharmType(@Nullable ItemStack item) {
+		if (item == null) {
+			return null;
 		}
-		return false;
+		for (CharmManager.CharmType charmType : CharmManager.CharmType.values()) {
+			if (charmType.isCharm(item)) {
+				return charmType;
+			}
+		}
+		return null;
+	}
+
+	public static boolean isCharm(@Nullable ItemStack item) {
+		return getCharmType(item) != null;
+	}
+
+	public static boolean isNormalCharm(@Nullable ItemStack item) {
+		Tier tier = getTier(item);
+		return tier == Tier.CHARM || tier == Tier.RARE_CHARM || tier == Tier.EPIC_CHARM;
+	}
+
+	public static boolean isZenithCharm(@Nullable ItemStack item) {
+		Tier tier = getTier(item);
+		return tier == Tier.ZENITH_CHARM;
 	}
 
 	public static boolean isFish(@Nullable ItemStack item) {

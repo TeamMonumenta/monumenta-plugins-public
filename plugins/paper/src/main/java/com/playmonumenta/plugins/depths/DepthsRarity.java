@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
@@ -11,7 +10,7 @@ public enum DepthsRarity {
 	RARE("Rare", TextColor.fromHexString("#705eca")),
 	EPIC("Epic", TextColor.fromHexString("#cd5eca")),
 	LEGENDARY("Legendary", TextColor.fromHexString("#e49b20")),
-	TWISTED("XXXXXX", TextColor.color(DepthsUtils.LEVELSIX), true);
+	TWISTED("XXXXXX", TextColor.fromHexString("#703663"), true);
 
 	private final String mName;
 	private final TextColor mColor;
@@ -27,7 +26,7 @@ public enum DepthsRarity {
 		mObfuscated = obfuscated;
 	}
 
-	public TextComponent getDisplay() {
+	public Component getDisplay() {
 		return Component.text(mName, mColor).decoration(TextDecoration.OBFUSCATED, mObfuscated).decoration(TextDecoration.ITALIC, false);
 	}
 

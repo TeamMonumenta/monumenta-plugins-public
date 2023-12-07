@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.guis.Gui;
@@ -668,10 +669,14 @@ public class PlayerListener implements Listener {
 		// If right-clicking charm, open GUI
 		if (event.getClick() == ClickType.RIGHT
 			    && item != null
-			    && ItemStatUtils.isCharm(item)
 			    && item.getAmount() == 1
 			    && ItemUtils.isNullOrAir(event.getCursor())) {
-			new CharmsGUI(player).open();
+			for (CharmManager.CharmType charmType : CharmManager.CharmType.values()) {
+				if (charmType.isCharm(item)) {
+					new CharmsGUI(player, charmType).open();
+					break;
+				}
+			}
 		}
 
 		if (event.getClick() == ClickType.SWAP_OFFHAND

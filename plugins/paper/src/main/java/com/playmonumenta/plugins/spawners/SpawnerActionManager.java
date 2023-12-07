@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.spawners;
 
 import com.google.common.collect.ImmutableMap;
-import com.playmonumenta.plugins.spawners.actions.ExplodeAction;
-import com.playmonumenta.plugins.spawners.actions.KnockupAction;
+import com.playmonumenta.plugins.spawners.actions.AlertAction;
+import com.playmonumenta.plugins.spawners.actions.EarthquakeAction;
+import com.playmonumenta.plugins.spawners.actions.FireworksAction;
+import com.playmonumenta.plugins.spawners.actions.HealerAction;
+import com.playmonumenta.plugins.spawners.actions.MimicAction;
+import com.playmonumenta.plugins.spawners.actions.RevengeAction;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
 import java.util.Collections;
 import java.util.List;
@@ -16,8 +20,12 @@ public class SpawnerActionManager {
 	public static final SpawnerActionManager INSTANCE = new SpawnerActionManager();
 
 	private static final ImmutableMap<String, SpawnerBreakAction> mBreakActions = ImmutableMap.<String, SpawnerBreakAction>builder()
-		.put(ExplodeAction.IDENTIFIER, new ExplodeAction())
-		.put(KnockupAction.IDENTIFIER, new KnockupAction())
+		.put(AlertAction.IDENTIFIER, new AlertAction())
+		.put(EarthquakeAction.IDENTIFIER, new EarthquakeAction())
+		.put(FireworksAction.IDENTIFIER, new FireworksAction())
+		.put(HealerAction.IDENTIFIER, new HealerAction())
+		.put(MimicAction.IDENTIFIER, new MimicAction())
+		.put(RevengeAction.IDENTIFIER, new RevengeAction())
 		.build();
 
 	private SpawnerActionManager() {
@@ -28,17 +36,17 @@ public class SpawnerActionManager {
 		return INSTANCE;
 	}
 
-	public static void triggerAction(String identifier, Player player, Block block) {
+	public static void triggerAction(String identifier, Player player, Block block, @Nullable String losPool) {
 		SpawnerBreakAction action = mBreakActions.get(identifier);
 		if (action == null) {
 			return;
 		}
 
-		action.run(player, block, SpawnerUtils.getStoredParameters(block, identifier));
+		action.run(player, block, SpawnerUtils.getStoredParameters(block, identifier), losPool);
 	}
 
-	public static void triggerActions(List<String> breakActions, Player player, Block block) {
-		breakActions.forEach(action -> triggerAction(action, player, block));
+	public static void triggerActions(List<String> breakActions, Player player, Block block, @Nullable String losPool) {
+		breakActions.forEach(action -> triggerAction(action, player, block, losPool));
 	}
 
 	public static @Nullable SpawnerBreakAction getAction(String identifier) {
