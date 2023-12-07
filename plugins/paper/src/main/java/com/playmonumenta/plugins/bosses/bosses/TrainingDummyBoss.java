@@ -7,9 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.List;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -64,7 +63,6 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				new SpellRunAction(() -> boss.setHealth(EntityUtils.getMaxHealth(boss)), 60 * 20)));
 		}
 
-		/*
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (mHologram != null) {
@@ -72,8 +70,6 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				}
 			})
 		);
-		 */
-		List<Spell> passiveSpells = Collections.emptyList();
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, null);
 		boss.setRemoveWhenFarAway(false);
@@ -109,7 +105,6 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				.append(Component.text(damageString + " " + getTypeSymbol(type), NamedTextColor.RED))
 				.hoverEvent(HoverEvent.showText(hover)));
 
-			/*
 			if (mHologram == null) {
 				mHologram = (ArmorStand) mBoss.getWorld().spawnEntity(mBoss.getEyeLocation().add(0, 0.5, 0), EntityType.ARMOR_STAND);
 				mHologram.setMarker(true);
@@ -182,7 +177,6 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 			mDPSCounter += damage;
 			mDPSCounter10s += damage;
-			*/
 		}
 
 		if (mRegen && mBoss.isValid() && !mBoss.isDead() && mBoss.getHealth() > 0) {
@@ -214,7 +208,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		};
 	}
 
-	/*
+
 	@Override
 	public void unload() {
 		super.unload();
@@ -227,7 +221,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		mDPSDisp = -1;
 		mDPSDisp10s = -1;
 		mMaxDPS = -1;
-	}*/
+	}
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
