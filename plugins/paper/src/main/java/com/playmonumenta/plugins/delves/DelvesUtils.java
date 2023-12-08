@@ -389,7 +389,7 @@ public class DelvesUtils {
 			return;
 		}
 
-		String name = mob.getCustomName();
+		String name = mob.getName();
 
 		if (Chivalrous.isChivalrousName(name)) {
 			return;

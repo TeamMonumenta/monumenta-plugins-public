@@ -118,7 +118,7 @@ public class StatTrackManager implements Listener {
 						continue dataLoop;
 					}
 				}
-				MMLog.warning("Could not update stat track for player " + player.getDisplayName() + ": item='" + ItemUtils.getPlainName(data.mOriginalItemStackClone)
+				MMLog.warning("Could not update stat track for player " + player.getName() + ": item='" + ItemUtils.getPlainName(data.mOriginalItemStackClone)
 					              + "', infusion='" + data.mInfusion.getName() + "', lost stat track amount=" + data.mUncommittedAmount);
 			}
 		}

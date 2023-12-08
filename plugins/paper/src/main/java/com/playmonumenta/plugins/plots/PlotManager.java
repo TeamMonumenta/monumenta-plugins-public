@@ -577,7 +577,7 @@ public class PlotManager {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				Map<String, String> allRemoteData = MonumentaRedisSyncAPI.remoteDataGetAll(ownerUUID).get();
+				Map<String, String> allRemoteData = RemoteDataAPI.getAll(ownerUUID).get();
 
 				/* If the player wasn't online, fetching scores already started, need to complete that and get the specific interesting values */
 				final int finalPlot;

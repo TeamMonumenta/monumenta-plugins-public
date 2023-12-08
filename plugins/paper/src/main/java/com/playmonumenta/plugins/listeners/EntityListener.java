@@ -284,7 +284,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 			if (damagee instanceof ItemFrame frame
-				&& INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getCustomName())) {
+				&& INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
 						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
@@ -1020,7 +1020,7 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {
 		if (event.getEntity() instanceof ItemFrame frame
-			&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())
+			&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())
 			&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			Location centeredLocation = frame.getLocation().toCenterLocation();

@@ -47,7 +47,7 @@ public class GenericTowerMob extends TowerAbility {
 				}
 
 				if (mGame.isGameEnded()) {
-					TowerFileUtils.warning("Game ended but mob still loaded: " + boss.getCustomName() + " Unloading..");
+					TowerFileUtils.warning("Game ended but mob still loaded: " + boss.getName() + " Unloading..");
 					cancel();
 					return;
 				}

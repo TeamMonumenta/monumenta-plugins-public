@@ -166,7 +166,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			loadMasterworkPath(items.get(mRowSelected), player);
 		}
 
-		fillWithJunk();
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 
@@ -342,7 +342,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			return;
 		}
 
-		fillWithJunk();
+		GUIUtils.fillWithFiller(mInventory);
 		mInventory.setItem(0, mBackItem);
 
 		int j = 0;
@@ -519,9 +519,6 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 	}
 
-	private void fillWithJunk() {
-		GUIUtils.fillWithFiller(mInventory);
-	}
 
 	private void fillWithColoredJunk(int slot, Material filler) {
 		ItemStack junk = new ItemStack(filler, 1);

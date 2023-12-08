@@ -215,7 +215,7 @@ public class CustomContainerItemManager implements Listener {
 			}
 		}
 		player.closeInventory();
-		player.sendMessage(Component.text("Your " + container.getItemMeta().getDisplayName() + " has disappeared from your inventory.", NamedTextColor.RED));
+		player.sendMessage(Component.text("Your ", NamedTextColor.RED).append(container.displayName()).append(Component.text("has disappeared from your inventory.")));
 		player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		return false;
 	}

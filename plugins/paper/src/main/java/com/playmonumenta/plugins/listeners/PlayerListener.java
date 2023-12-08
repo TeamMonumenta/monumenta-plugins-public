@@ -506,7 +506,7 @@ public class PlayerListener implements Listener {
 			}
 
 			if (!event.isCancelled()
-				    && EntityListener.INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())) {
+				    && EntityListener.INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
 						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));

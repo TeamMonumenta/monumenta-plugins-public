@@ -228,7 +228,10 @@ public class InventoryUtils {
 					if (itemMeta instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
 						@Nullable ItemStack[] shulkerItems = shulker.getInventory().getContents();
 						for (int j = 0; j < shulkerItems.length; j++) {
-							if (shulkerItems[j] != null && shulkerItems[j].hasItemMeta() && shulkerItems[j].getItemMeta().hasDisplayName() && MessagingUtils.plainText(shulkerItems[j].getItemMeta().displayName()).equals(name)) {
+							ItemStack shulkerItemOfJ = shulkerItems[j];
+							if (shulkerItemOfJ != null
+								&& shulkerItemOfJ.hasItemMeta() && shulkerItemOfJ.getItemMeta().hasDisplayName()
+								&& MessagingUtils.plainText(shulkerItemOfJ.getItemMeta().displayName()).equals(name)) {
 								shulkerItems[j] = null;
 							}
 						}
