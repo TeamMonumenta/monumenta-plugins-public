@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -24,13 +25,14 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class Reverb implements Enchantment {
-	public static final int DETECTION_RADIUS = 8;
-	public static final double DAMAGE_MULTIPLIER_PER_LEVEL = 0.1;
-
+	private static final int DETECTION_RADIUS = 8;
+	private static final double OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL = 0.1;
+	private static final double HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL = 0.05;
 	public static final String CHARM_RADIUS = "Reverb Radius";
-	public static final String CHARM_DAMAGE = "Reverb Damage Modifier";
+	public static final String CHARM_DAMAGE = "Reverb Damage";
 
 	private double mDamageThisTick = 0;
+	private double mHighestDamageThisTick = 0;
 	private double mEnemyHealth = 0;
 	private @Nullable LivingEntity mEntity;
 
@@ -66,17 +68,20 @@ public class Reverb implements Enchantment {
 		}
 
 		// Calculate damage dealt this tick by adding to mDamageThisTick for every valid DamageEvent.
-		mDamageThisTick += event.getDamage();
+		double damage = event.getDamage();
+		mDamageThisTick += damage;
+		mHighestDamageThisTick = FastMath.max(damage, mHighestDamageThisTick);
 
 		// Start the task 1 tick later, to give ample time to sum the damage, and check if the mob is definitely dead.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			if (mDamageThisTick != 0) {
 				// Calculate overkill damage, if it's less than 0 (thus not a kill), exit.
-				double overkill = mDamageThisTick - mEnemyHealth;
-				// mDamageThisTick, mEnemyHealth, mEntity are no longer needed, we can get rid of them safely since 1 tick has passed.
+				double overkill = FastMath.max(mDamageThisTick - mEnemyHealth, 0);
+				double highestDamage = mHighestDamageThisTick;
+				// mDamageThisTick, mHighestDamageThisTick, mEnemyHealth, mEntity are no longer needed, we can get rid of them safely since 1 tick has passed.
 				// Also prevents the task from running multiple times with the above check.
 				resetValues();
-				if (overkill <= 0 || !enemy.isDead()) {
+				if (!enemy.isDead()) {
 					return;
 				}
 
@@ -106,13 +111,9 @@ public class Reverb implements Enchantment {
 							player.playSound(player.getLocation(), Sound.BLOCK_SOUL_SAND_STEP, SoundCategory.PLAYERS, 1.5f, 0.5f);
 							new PartialParticle(Particle.SOUL, targetLocation, 25, 0.3, 0.3, 0.3, 0.05).spawnAsEnemy();
 
-							DamageUtils.damage(player,
-								hitMob,
-								DamageEvent.DamageType.OTHER,
-								Math.round(CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_MULTIPLIER_PER_LEVEL) * value * overkill),
-								ClassAbility.REVERB,
-								true,
-								false);
+							double finalDamage = value * (overkill * OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL + highestDamage * HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL);
+							DamageUtils.damage(player, hitMob, DamageEvent.DamageType.OTHER, Math.round(CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, finalDamage)), ClassAbility.REVERB, true, false);
+
 							this.cancel();
 							return;
 						}
@@ -134,6 +135,7 @@ public class Reverb implements Enchantment {
 
 	private void resetValues() {
 		mDamageThisTick = 0;
+		mHighestDamageThisTick = 0;
 		mEnemyHealth = 0;
 		mEntity = null;
 	}
