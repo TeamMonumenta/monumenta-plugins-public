@@ -50,6 +50,7 @@ public class AmplifyingHex extends Ability {
 	private static final double ANGLE = 70;
 	private static final int COOLDOWN = 20 * 10;
 	private static final float KNOCKBACK_SPEED = 0.12f;
+	private static final double ENHANCEMENT_HEALTH_THRESHOLD = 0.8;
 	private static final double ENHANCEMENT_DAMAGE_MOD = 1.25;
 
 	public static final String CHARM_DAMAGE = "Amplifying Hex Damage";
@@ -58,6 +59,7 @@ public class AmplifyingHex extends Ability {
 	public static final String CHARM_CONE = "Amplifying Hex Cone";
 	public static final String CHARM_POTENCY = "Amplifying Hex Damage per Effect Potency";
 	public static final String CHARM_POTENCY_CAP = "Amplifying Hex Potency Cap";
+	public static final String CHARM_ENHANCED = "Amplifying Hex Health Threshold";
 
 	public static final AbilityInfo<AmplifyingHex> INFO =
 		new AbilityInfo<>(AmplifyingHex.class, "Amplifying Hex", AmplifyingHex::new)
@@ -152,8 +154,8 @@ public class AmplifyingHex extends Ability {
 
 		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 		double percentBoost = 0;
-		if (isEnhanced() && mPlayer.getHealth() > maxHealth * 0.8) {
-			percentBoost = mPlayer.getHealth() / maxHealth - 0.8;
+		if (isEnhanced() && mPlayer.getHealth() > maxHealth * (ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCED))) {
+			percentBoost = mPlayer.getHealth() / maxHealth - (ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCED));
 			double selfHarm = maxHealth * percentBoost;
 			double absorp = mPlayer.getAbsorptionAmount();
 			double newAbsorp = absorp - selfHarm;

@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 
 public class VoodooBonds extends Ability {
 
-	private static final int COOLDOWN_1 = 22 * 20;
+	private static final int COOLDOWN_1 = 18 * 20;
 	private static final int COOLDOWN_2 = 12 * 20;
 	private static final int ACTIVE_RADIUS = 8;
 	private static final int PASSIVE_RADIUS = 3;

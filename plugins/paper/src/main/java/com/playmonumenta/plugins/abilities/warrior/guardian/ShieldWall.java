@@ -40,7 +40,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	private static final int SHIELD_WALL_2_DURATION = 10 * 20;
 	private static final int SHIELD_WALL_REPOSITION_PENALTY = 10;
 	private static final int SHIELD_WALL_DAMAGE = 3;
-	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
+	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 25;
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 18;
 	private static final int SHIELD_WALL_ANGLE = 180;
 	private static final float SHIELD_WALL_KNOCKBACK = 0.3f;

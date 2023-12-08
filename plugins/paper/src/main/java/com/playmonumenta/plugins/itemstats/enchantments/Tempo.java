@@ -38,7 +38,8 @@ public class Tempo implements Enchantment {
 			return;
 		}
 		plugin.mEffectManager.clearEffects(player, TEMPO_EFFECT_NAME);
-		plugin.mEffectManager.addEffect(player, TEMPO_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
+		// dummy amount (only used for inure)
+		plugin.mEffectManager.addEffect(player, TEMPO_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME, 1));
 	}
 
 	public static double applyTempo(DamageEvent event, Plugin plugin, Player player) {

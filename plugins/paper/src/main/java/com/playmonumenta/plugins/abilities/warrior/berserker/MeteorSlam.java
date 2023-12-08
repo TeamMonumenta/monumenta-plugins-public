@@ -66,6 +66,8 @@ public final class MeteorSlam extends Ability {
 	public static final String CHARM_DURATION = "Meteor Slam Duration";
 	public static final String CHARM_THRESHOLD = "Meteor Slam Fall Requirement";
 	public static final String CHARM_COOLDOWN = "Meteor Slam Cooldown";
+	public static final String CHARM_SCALING = "Meteor Slam Scaling Threshold";
+	public static final String CHARM_REDUCED = "Meteor Slam Reduced Threshold";
 
 	public static final AbilityInfo<MeteorSlam> INFO =
 		new AbilityInfo<>(MeteorSlam.class, NAME, MeteorSlam::new)
@@ -220,13 +222,16 @@ public final class MeteorSlam extends Ability {
 		double fallDistance = calculateFallDistance();
 		double linearFallDist = 0;
 		double extraFallDist = 0;
-		if (fallDistance > mReducedThreshold) {
-			extraFallDist = fallDistance - mReducedThreshold;
-			linearFallDist = mReducedThreshold - SCALING_THRESHOLD;
-			fallDistance = SCALING_THRESHOLD;
-		} else if (fallDistance > SCALING_THRESHOLD) {
-			linearFallDist = fallDistance - SCALING_THRESHOLD;
-			fallDistance = SCALING_THRESHOLD;
+		double reducedThreshold = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_REDUCED, mReducedThreshold);
+		double scalingThreshold = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SCALING, SCALING_THRESHOLD);
+
+		if (fallDistance > reducedThreshold) {
+			extraFallDist = fallDistance - reducedThreshold;
+			linearFallDist = reducedThreshold - scalingThreshold;
+			fallDistance = scalingThreshold;
+		} else if (fallDistance > scalingThreshold) {
+			linearFallDist = fallDistance - scalingThreshold;
+			fallDistance = scalingThreshold;
 		}
 		/* simplified total damage = ax^2 + bx + 0 until cap where both a and b = scaling / 2 for each respective level.
 		 * afterwards linear increment for cap damage between reduced threshold and scaling threshold

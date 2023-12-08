@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Location;
@@ -33,6 +34,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 public class GloriousBattle extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DAMAGE_1 = 20;
 	private static final int DAMAGE_2 = 25;
+	private static final int CHARGE_DAMAGE_BONUS = 5;
 	private static final double VELOCITY_1 = 1.3;
 	private static final double VELOCITY_2 = 1.6;
 	private static final double VERTICAL_SPEED_CAP = 0.3;
@@ -56,6 +59,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 	public static final String CHARM_CHARGES = "Glorious Battle Charges";
 	public static final String CHARM_DAMAGE = "Glorious Battle Damage";
+	public static final String CHARM_BONUS_DAMAGE = "Glorious Battle Bonus Damage";
 	public static final String CHARM_RADIUS = "Glorious Battle Radius";
 	public static final String CHARM_VELOCITY = "Glorious Battle Velocity";
 	public static final String CHARM_KNOCKBACK = "Glorious Battle Knockback";
@@ -70,16 +74,19 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
 					 "Shift and swap hands to consume a stack and charge forwards at %s blocks per second, gaining full knockback resistance until landing. " +
 					 "Vertical movement speed is capped at %s blocks per second upwards. " +
-					 "When you land, deal %s damage to the nearest mob within %s blocks. " +
+					 "Colliding with enemies while charging deals %s damage and %s extra damage. " +
+					 "When you land without dealing damage, deal %s damage to the nearest mob within %s blocks. " +
 					 "Additionally, knock back all mobs within %s blocks.")
 					.formatted(
 						VELOCITY_1,
 						VERTICAL_SPEED_CAP,
 						DAMAGE_1,
+						CHARGE_DAMAGE_BONUS,
+						DAMAGE_1,
 						RADIUS,
 						RADIUS
 					),
-				"Damage is increased to %s. Velocity is increased to %s. Vertical speed cap is removed."
+				"Base damage is increased to %s. Velocity is increased to %s. Vertical speed cap is removed."
 					.formatted(
 						DAMAGE_2,
 						VELOCITY_2
@@ -93,6 +100,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.displayItem(Material.IRON_SWORD);
 
 	private int mStacks;
+	private List<LivingEntity> mCharged;
 	private final int mStackLimit;
 	private final int mSpellDelay = 10;
 	private final double mDamage;
@@ -107,6 +115,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mStacks = 0;
 		mStackLimit = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS());
+		mCharged = new ArrayList<>();
 	}
 
 	public void cast() {
@@ -146,18 +155,19 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 		mRunnable = new BukkitRunnable() {
 			int mT = 0;
+			boolean mPierced = false;
 
 			@Override
 			public void run() {
 				mT++;
 				mCosmetic.gloryTick(mPlayer, mT);
-				if (PlayerUtils.isOnGround(mPlayer)) {
+				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+				List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius).getHitMobs();
+				if (PlayerUtils.isOnGround(mPlayer) && !mPierced) {
 					mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
-					double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 					Location location = mPlayer.getLocation();
 					World world = mPlayer.getWorld();
 					mCosmetic.gloryOnLand(world, mPlayer, location, radius);
-					List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius).getHitMobs();
 					mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 					LivingEntity nearest = EntityUtils.getNearestMob(location, mobs);
@@ -174,6 +184,21 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 						MovementUtils.knockAway(mPlayer, mob, knockback, true);
 					}
 					this.cancel();
+				} else if (PlayerUtils.isOnGround(mPlayer)) {
+					this.cancel();
+				}
+
+				// piercing change
+				BoundingBox mBox = BoundingBox.of(mPlayer.getLocation().add(0, 1, 0), 2, 2, 2);
+				mobs.removeIf(e -> mCharged.contains(e));
+				for (LivingEntity le : mobs) {
+					if (le.getBoundingBox().overlaps(mBox)) {
+						mPierced = true;
+						mCharged.add(le);
+						double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage) + CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_BONUS_DAMAGE, CHARGE_DAMAGE_BONUS);
+						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, damage, ClassAbility.GLORIOUS_BATTLE, true);
+						mCosmetic.gloryOnDamage(world, mPlayer, le);
+					}
 				}
 
 				//Logged off or something probably

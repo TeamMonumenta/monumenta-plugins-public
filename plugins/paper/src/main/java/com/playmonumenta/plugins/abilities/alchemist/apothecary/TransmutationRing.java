@@ -54,6 +54,7 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 			.descriptions(
 				("Sneak while throwing an Alchemist's Potion to create a Transmutation Ring at the potion's landing location that lasts for %ss. " +
 				"The ring has a radius of %s blocks. Other players within this ring deal %s%% extra damage on all attacks. " +
+				"The caster gets half the bonus of other players. " +
 				"Mobs that die within this ring increase the damage bonus by %s%% per mob, up to %s%% extra damage. Cooldown: %ss.")
 					.formatted(
 							StringUtils.ticksToSeconds(TRANSMUTATION_RING_DURATION),
@@ -138,9 +139,12 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 
 				double damageBoost = amplifier + Math.min(mKills, maxKills) * perKillAmplifier;
 				List<Player> players = PlayerUtils.playersInRange(mCenter, mRadius, true);
-				players.remove(mPlayer);
 				for (Player player : players) {
-					mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost).displaysTime(false));
+					if (player == mPlayer) {
+						mPlugin.mEffectManager.addEffect(mPlayer, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost / 2.0).displaysTime(false));
+					} else {
+						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost).displaysTime(false));
+					}
 				}
 
 				mCosmetic.periodicEffect(mPlayer, mCenter, mRadius, mTicks, mMaxTicks, duration + MAX_DURATION_INCREASE);

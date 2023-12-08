@@ -35,7 +35,8 @@ public class Guard implements Enchantment {
 			return;
 		}
 
-		plugin.mEffectManager.addEffect(player, GUARD_EFFECT_NAME, new OnHitTimerEffect(player.getInventory().getItemInMainHand().getType() == Material.SHIELD ? PAST_HIT_DURATION_TIME_MAINHAND : PAST_HIT_DURATION_TIME_OFFHAND));
+		// dummy amount (only used for inure)
+		plugin.mEffectManager.addEffect(player, GUARD_EFFECT_NAME, new OnHitTimerEffect(player.getInventory().getItemInMainHand().getType() == Material.SHIELD ? PAST_HIT_DURATION_TIME_MAINHAND : PAST_HIT_DURATION_TIME_OFFHAND, 1));
 	}
 
 	public static double applyGuard(DamageEvent event, Plugin plugin, Player player) {

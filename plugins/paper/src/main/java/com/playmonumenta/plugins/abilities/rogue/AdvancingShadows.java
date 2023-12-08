@@ -71,7 +71,7 @@ public class AdvancingShadows extends Ability {
 					DURATION / 20,
 					ADVANCING_SHADOWS_RANGE_2 - 1,
 					(int) ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE),
-				String.format("If the mob you teleported to dies within %ss, you can recast Advancing Shadows again in the next %ss.",
+				String.format("If the mob you teleported to dies within %ss, you can recast Advancing Shadows again in the next %ss. Recasts provide 50%% of the damage bonus and do not provide Deadly Ronde stacks.",
 					ENHANCEMENT_KILL_REQUIREMENT_TIME / 20,
 					ENHANCEMENT_CHAIN_DURATION / 20))
 			.simpleDescription("Teleport to a mob and gain a damage bonus.")
@@ -86,7 +86,7 @@ public class AdvancingShadows extends Ability {
 	private final Team mColorTeam;
 
 	private int mEnhancementKillTick = -999;
-	private int mEnhancementChain = 0;
+	private int mEnhancementChain;
 	private boolean mCanRecast = false;
 
 	private final AdvancingShadowsCS mCosmetic;
@@ -99,6 +99,7 @@ public class AdvancingShadows extends Ability {
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS());
 		mColorTeam = ScoreboardUtils.getExistingTeamOrCreate("advancingShadowsColor", NamedTextColor.BLACK);
+		mEnhancementChain = 0;
 	}
 
 	public void cast() {
@@ -188,7 +189,11 @@ public class AdvancingShadows extends Ability {
 				mPlayer.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 			}
 
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
+			if (mEnhancementChain == 0) {
+				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
+			} else {
+				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt / 2.0, AFFECTED_DAMAGE_TYPES));
+			}
 			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
 					ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
@@ -240,6 +245,11 @@ public class AdvancingShadows extends Ability {
 
 			putOnCooldown();
 		}
+	}
+
+	// checks kill chain count to see if it's a recast or not, and disable ronde stacks
+	public boolean isChainNotActive() {
+		return !isEnhanced() || mEnhancementChain == 0;
 	}
 
 }

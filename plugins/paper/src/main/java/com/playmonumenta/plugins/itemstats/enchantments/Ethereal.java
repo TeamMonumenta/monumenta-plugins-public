@@ -32,7 +32,8 @@ public class Ethereal implements Enchantment {
 			return;
 		}
 		plugin.mEffectManager.clearEffects(player, ETHEREAL_EFFECT_NAME);
-		plugin.mEffectManager.addEffect(player, ETHEREAL_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
+		// dummy amount (only used for inure)
+		plugin.mEffectManager.addEffect(player, ETHEREAL_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME, 1));
 	}
 
 	public static double applyEthereal(DamageEvent event, Plugin plugin, Player player) {

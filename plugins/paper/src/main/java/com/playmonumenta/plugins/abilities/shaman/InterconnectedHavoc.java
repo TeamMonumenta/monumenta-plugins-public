@@ -25,7 +25,7 @@ public class InterconnectedHavoc extends Ability {
 	private static final int RANGE_1 = 10;
 	private static final int RANGE_2 = 16;
 	public static final float KNOCKBACK = 0.2f;
-	public static final int STUN_TIME = 10;
+	public static final int STUN_TIME = 15;
 
 	public static final String CHARM_DAMAGE = "Interconnected Havoc Damage";
 	public static final String CHARM_RANGE = "Interconnected Havoc Range";

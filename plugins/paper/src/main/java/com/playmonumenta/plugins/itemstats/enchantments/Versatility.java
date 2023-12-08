@@ -56,7 +56,7 @@ public class Versatility implements Enchantment {
 			}
 
 			clearEffects(plugin, player);
-			plugin.mEffectManager.addEffect(player, VERSATILITY_MELEE_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
+			plugin.mEffectManager.addEffect(player, VERSATILITY_MELEE_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME, 1));
 		} else if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
 			if (melee != null || magic != null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
@@ -67,7 +67,7 @@ public class Versatility implements Enchantment {
 			}
 
 			clearEffects(plugin, player);
-			plugin.mEffectManager.addEffect(player, VERSATILITY_PROJ_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
+			plugin.mEffectManager.addEffect(player, VERSATILITY_PROJ_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME, 1));
 		} else if (type == DamageType.MAGIC) {
 			if (proj != null || melee != null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
@@ -78,7 +78,7 @@ public class Versatility implements Enchantment {
 			}
 
 			clearEffects(plugin, player);
-			plugin.mEffectManager.addEffect(player, VERSATILITY_MAGIC_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
+			plugin.mEffectManager.addEffect(player, VERSATILITY_MAGIC_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME, 1));
 		}
 	}
 
