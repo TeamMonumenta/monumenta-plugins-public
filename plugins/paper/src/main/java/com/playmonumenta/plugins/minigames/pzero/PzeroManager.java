@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -69,6 +70,7 @@ public class PzeroManager implements Listener {
 
 		// Anti Cheat: can't hold boost rod in offhand as it wouldn't count as an interactable,
 		// and instead allows using the vanilla pig speed boost mechanic.
+		// Also moves any carrot on a stick base item back to the player's inventory.
 		mTrackedPlayers.values().forEach(pzPlayer -> {
 			if (pzPlayer.moveRodFromOffhandToMainhand()) {
 				pzPlayer.getPlayer().updateInventory();
@@ -548,5 +550,16 @@ public class PzeroManager implements Listener {
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		returnPlayerToSpawn(event.getPlayer());
 		leave(event.getPlayer());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	public void playerInteractEvent(PlayerInteractEvent event) {
+		if (mTrackedPlayers.containsKey(event.getPlayer().getUniqueId())) {
+			PzeroPlayer pzPlayer = getPzeroPlayer(event.getPlayer());
+			if (pzPlayer == null) {
+				return;
+			}
+			pzPlayer.removeVanillaBoost();
+		}
 	}
 }

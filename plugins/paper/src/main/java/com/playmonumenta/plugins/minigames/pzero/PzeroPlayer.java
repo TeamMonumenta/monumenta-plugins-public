@@ -108,6 +108,14 @@ public class PzeroPlayer {
 		return null;
 	}
 
+	public void removeVanillaBoost() {
+		if (mPig == null) {
+			return;
+		}
+
+		mPig.setBoostTicks(0);
+	}
+
 	public void tryBoost() {
 		if (!Plugin.getInstance().mPzeroManager.getMap(mMapName).isRunning() || mCurrentEnergy < BOOST_ENERGY_CONSUMPTION || mRemainingBoostTicks > 0) {
 			return;
@@ -303,6 +311,15 @@ public class PzeroPlayer {
 			giveBoostRod();
 			return true;
 		}
+
+		// Also check for a carrot on a stick base item
+		ItemStack offhandItemStack = mPlayer.getInventory().getItemInOffHand();
+		if (offhandItemStack.getType() == Material.CARROT_ON_A_STICK) {
+			mPlayer.getInventory().removeItemAnySlot(offhandItemStack);
+			InventoryUtils.giveItem(mPlayer, offhandItemStack);
+			return true;
+		}
+
 		return false;
 	}
 
