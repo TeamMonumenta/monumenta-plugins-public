@@ -393,7 +393,7 @@ public class MasterworkUtils {
 		}
 		String abc = "abc";
 		for (int i = 0; i < abc.length(); i++) {
-			paths.add(basePath + "m7" + abc.charAt(i));
+			paths.add(basePath + "_m7" + abc.charAt(i));
 		}
 
 		//TODO: Replace with next max level

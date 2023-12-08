@@ -22,7 +22,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -43,10 +42,6 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		void run(Player player, Inventory clickedInventory, int slot);
 	}
 
-	//TODO: Replace with next max level
-	private static final int MAX_MASTERWORK_LEVEL = 4;
-
-	private static final int MAX_LORE_LENGTH = 30;
 	private static final Material ORANGE_FILLER = Material.ORANGE_STAINED_GLASS_PANE;
 	private static final Material PURPLE_FILLER = Material.PURPLE_STAINED_GLASS_PANE;
 	private static final Material A_FILLER = Material.RED_STAINED_GLASS_PANE;
@@ -54,15 +49,15 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final Material C_FILLER = Material.YELLOW_STAINED_GLASS_PANE;
 
 	private static final List<ItemStack> mInvalidItems = new ArrayList<>();
-	private static final ItemStack mUpgradeItem = new ItemStack(Material.RAW_IRON);
-	private static final ItemStack mUpgradeItemSeven = new ItemStack(Material.RAW_GOLD);
-	private static final ItemStack mNoPossibleUpgradeItem = new ItemStack(Material.NETHERITE_INGOT);
-	private static final ItemStack mFullUpgradeA = new ItemStack(Material.RED_DYE);
-	private static final ItemStack mFullUpgradeB = new ItemStack(Material.LIGHT_BLUE_DYE);
-	private static final ItemStack mFullUpgradeC = new ItemStack(Material.YELLOW_DYE);
-	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
-	private static final ItemStack mBalanceRefundItem = new ItemStack(Material.GRINDSTONE);
-	private static final ItemStack mBackItem = new ItemStack(Material.STRING);
+	private static final ItemStack mUpgradeItem;
+	private static final ItemStack mUpgradeItemSeven;
+	private static final ItemStack mNoPossibleUpgradeItem;
+	private static final ItemStack mFullUpgradeA;
+	private static final ItemStack mFullUpgradeB;
+	private static final ItemStack mFullUpgradeC;
+	private static final ItemStack mRefundItem;
+	private static final ItemStack mBalanceRefundItem;
+	private static final ItemStack mBackItem;
 	private static final ItemStack mPreviewItem = new ItemStack(Material.CHORUS_FLOWER);
 
 	private final Map<Integer, ItemClicked> mMapFunction;
@@ -112,102 +107,39 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		mInvalidItems.add(invalidItem.clone());
 
 		//Standard Level
-		ItemMeta standardMeta = mUpgradeItem.getItemMeta();
-		standardMeta.displayName(Component.text("Enhance Item", TextColor.fromHexString("#FFAA00"))
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(standardMeta, "Click to view next upgrade and associated costs.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mUpgradeItem.setItemMeta(standardMeta);
+		mUpgradeItem = GUIUtils.createBasicItem(Material.RAW_IRON, "Enhance Item", TextColor.fromHexString("#FFAA00"), true, "Click to view next upgrade and associated costs.");
 
 		//Legendary Level
-		ItemMeta legendMeta = mUpgradeItemSeven.getItemMeta();
-		legendMeta.displayName(Component.text("Enhance Item", TextColor.fromHexString("#FFAA00"))
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(legendMeta, "Click to view next upgrade and associated costs.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mUpgradeItemSeven.setItemMeta(legendMeta);
+		mUpgradeItemSeven = GUIUtils.createBasicItem(Material.RAW_GOLD, "Enhance Item", TextColor.fromHexString("#FFAA00"), true, "Click to view next upgrade and associated costs.");
 
 		//Limit Level
-		ItemMeta limitMeta = mNoPossibleUpgradeItem.getItemMeta();
-		limitMeta.displayName(Component.text("Masterwork Limit Reached", TextColor.fromHexString("#5D2D87"))
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(limitMeta, "This item cannot be upgraded at the moment. Click to view previous masterwork levels.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mNoPossibleUpgradeItem.setItemMeta(limitMeta);
+		mNoPossibleUpgradeItem = GUIUtils.createBasicItem(Material.NETHERITE_INGOT, "Masterwork Limit Reached", TextColor.fromHexString("#5D2D87"), true, "This item cannot be upgraded at the moment. Click to view previous masterwork levels.");
 
 		//Max Level Reached A
-		ItemMeta maxMetaA = mFullUpgradeA.getItemMeta();
-		maxMetaA.displayName(Component.text("Congratulations!", TextColor.fromHexString("#D02E28"))
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(maxMetaA, "You've reached the max Masterwork level on this item.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mFullUpgradeA.setItemMeta(maxMetaA);
+		mFullUpgradeA = GUIUtils.createBasicItem(Material.RED_DYE, "Congratulations!", TextColor.fromHexString("#D02E28"), true, "You've reached the max Masterwork level on this item.");
 
 		//Max Level Reached B
-		ItemMeta maxMetaB = mFullUpgradeB.getItemMeta();
-		maxMetaB.displayName(Component.text("Congratulations!", TextColor.fromHexString("#4AC2E5"))
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(maxMetaB, "You've reached the max Masterwork level on this item.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mFullUpgradeB.setItemMeta(maxMetaB);
+		mFullUpgradeB = GUIUtils.createBasicItem(Material.LIGHT_BLUE_DYE, "Congratulations!", TextColor.fromHexString("#4AC2E5"), "You've reached the max Masterwork level on this item.");
 
 		//Max Level Reached C
-		ItemMeta maxMetaC = mFullUpgradeC.getItemMeta();
-		maxMetaC.displayName(Component.text("Congratulations!", TextColor.fromHexString("#FFFA75"))
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(maxMetaC, "You've reached the max Masterwork level on this item.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mFullUpgradeC.setItemMeta(maxMetaC);
+		mFullUpgradeC = GUIUtils.createBasicItem(Material.YELLOW_DYE, "Congratulations!", TextColor.fromHexString("#FFFA75"), true, "You've reached the max Masterwork level on this item.");
 
 		//Refund
-		ItemMeta refund = mRefundItem.getItemMeta();
-		refund.displayName(Component.text("Refund Legendary Upgrade", NamedTextColor.GRAY)
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(refund, "Click to refund Legendary upgrade to Epic level. This refunds 100% of the Location Materials and 75% of the Augments.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mRefundItem.setItemMeta(refund);
+		mRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Refund Legendary Upgrade", NamedTextColor.GRAY, true, "Click to refund Legendary upgrade to Epic level. This refunds 100% of the Location Materials and 75% of the Augments.");
 
 		//Nerf Refund
-		ItemMeta balancerefund = mBalanceRefundItem.getItemMeta();
-		balancerefund.displayName(Component.text("Refund Upgrade", NamedTextColor.GRAY)
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(balancerefund, "Click to refund this item's Masterwork costs. You will get 100% of the materials back.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
-		mBalanceRefundItem.setItemMeta(balancerefund);
+		mBalanceRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Refund Upgrade", NamedTextColor.GRAY, true, "Click to refund this item's Masterwork costs. You will get 100% of the materials back.");
 
 		mPatternMap.put(0, new int[] {});
 		mPatternMap.put(1, new int[] {22});
 		mPatternMap.put(2, new int[] {22, 31});
 		mPatternMap.put(3, new int[] {30, 31, 32});
 		mPatternMap.put(4, new int[] {22, 30, 31, 32});
+		mPatternMap.put(5, new int[] {22, 30, 31, 32, 40});
 
 		// Back item
-		ItemMeta backMeta = mBackItem.getItemMeta();
-		backMeta.displayName(Component.text("Back", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, true));
-		mBackItem.setItemMeta(backMeta);
+		mBackItem = GUIUtils.createBasicItem(Material.STRING, "Back", NamedTextColor.RED, true);
 	}
-
-	private static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (!currentString.equals(defaultColor + "")) {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
-	}
-
 
 	public MasterworkCustomInventory(Player owner) {
 		super(owner, 54, "Masterwork");
@@ -482,7 +414,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 					int currMasterwork = MasterworkUtils.getMasterworkAsInt(m);
 
 					// Case where upgrade possible
-					if (currMasterwork >= 0 && currMasterwork < MAX_MASTERWORK_LEVEL && currMasterwork != 6) {
+					if (currMasterwork >= 0 && currMasterwork < Masterwork.CURRENT_MAX_MASTERWORK && currMasterwork != 6) {
 						mInventory.setItem((row * 9) + currMasterwork + 2, mUpgradeItem);
 						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
 							mRowSelected = rowF;
@@ -491,7 +423,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							fillWithColoredJunk(i, ORANGE_FILLER);
 						}
 						// Case where upgrade locked
-					} else if (currMasterwork >= MAX_MASTERWORK_LEVEL && currMasterwork != 7) {
+					} else if (currMasterwork >= Masterwork.CURRENT_MAX_MASTERWORK && currMasterwork != 7) {
 						mInventory.setItem((row * 9) + currMasterwork + 2, mNoPossibleUpgradeItem);
 						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
 							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 1.f, 1.f);
@@ -502,7 +434,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							fillWithColoredJunk(i, PURPLE_FILLER);
 						}
 						// Case where at M6
-					} else if (currMasterwork == 6 && MAX_MASTERWORK_LEVEL == 7) {
+					} else if (currMasterwork == 6 && Masterwork.CURRENT_MAX_MASTERWORK == 7) {
 						mInventory.setItem((row * 9) + currMasterwork + 2, mUpgradeItemSeven);
 						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
 							mRowSelected = rowF;

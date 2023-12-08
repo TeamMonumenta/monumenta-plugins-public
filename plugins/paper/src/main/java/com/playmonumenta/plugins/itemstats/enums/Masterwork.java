@@ -22,7 +22,7 @@ public enum Masterwork {
 	ERROR("error", Component.text("ERROR", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true));
 
 	public static final String KEY = "Masterwork";
-	public static final int CURRENT_MAX_MASTERWORK = 3;
+	public static final int CURRENT_MAX_MASTERWORK = 4;
 
 	final String mName;
 	final Component mDisplay;
