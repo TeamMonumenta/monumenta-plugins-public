@@ -246,10 +246,4 @@ public class AdvancingShadows extends Ability {
 			putOnCooldown();
 		}
 	}
-
-	// checks kill chain count to see if it's a recast or not, and disable ronde stacks
-	public boolean isChainNotActive() {
-		return !isEnhanced() || mEnhancementChain == 0;
-	}
-
 }

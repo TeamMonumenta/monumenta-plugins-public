@@ -120,11 +120,9 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		cancelOnDeath(mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER));
 
 		if (mRondeStacks < mMaxStacks) {
-			if (mAdvancingShadows == null || (mAdvancingShadows.isChainNotActive() && event.getSpell() == ClassAbility.ADVANCING_SHADOWS)) {
-				mCosmetic.rondeGainStackEffect(mPlayer, mPlayer.getLocation());
-				mRondeStacks++;
-				ClientModHandler.updateAbility(mPlayer, this);
-			}
+			mCosmetic.rondeGainStackEffect(mPlayer, mPlayer.getLocation());
+			mRondeStacks++;
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
 		showChargesMessage();
@@ -136,7 +134,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mActiveRunnable != null
 			    && event.getType() == DamageType.MELEE
-			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
+				&& mRondeStacks > 0) {
 			float cooldownRatio = mPlayer.getCooledAttackStrength(0);
 			float damageRatio = (1 - RONDE_ATTACK_SPEED_SCALING_PORTION) + (RONDE_ATTACK_SPEED_SCALING_PORTION * cooldownRatio);
 			double damage = mDamage * damageRatio;
