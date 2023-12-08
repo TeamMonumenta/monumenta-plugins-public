@@ -148,7 +148,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			}
 		}
 
-		if (identifier.startsWith("shrine")) {
+		if (identifier.startsWith("shrine_")) {
 			int remainingTime;
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrine_simplified_".length()).isEmpty() ? 0 :
