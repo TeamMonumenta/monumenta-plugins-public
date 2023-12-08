@@ -78,6 +78,11 @@ public class StringUtils {
 		}
 	}
 
+	public static String ticksToMilliseconds(int i) {
+		int ticks = i % 20;
+		return ticks == 0 ? "000" : ticks == 1 ? "050" : String.valueOf(ticks * 50);
+	}
+
 	public static String longToHoursMinuteAndSeconds(long i) {
 		long seconds = i % 60;
 		long minutes = i / 60;

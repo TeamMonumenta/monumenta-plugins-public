@@ -39,10 +39,11 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class PzeroManager implements Listener {
 	public static final String PZERO_PIG_TAG = "PZeroPig";
-	public static final int COUNTDOWN_SECONDS = 30;
+	public static final int COUNTDOWN_SECONDS = 20;
 	public static final String ICE_DIAMOND_LOOT_TABLE = "epic:event/winter2018/ice_diamond";
 	public static final String WINTER_ESSENCE_LOOT_TABLE = "epic:event/winter2019/essence_of_winter";
 	public static final int WINTER_ESSENCE_COST = 1;
+	public static final int BASE_REWARD_AMOUNT = 24;
 	public static final double REWARD_RATIO = 1.25;
 	public static final int MAX_PLAYER_COUNT = 8;
 	public static final String FINISH_LEADERBOARD = "pzerofinishes";
@@ -136,29 +137,44 @@ public class PzeroManager implements Listener {
 			int scoreboardCurrentPlace = 1;
 			for (PzeroPlayerPlacement placement : merged) {
 				map.setCurrentPlayerPlacement(placement.mPlayer, scoreboardCurrentPlace);
+				if (placement.mHasCrossedFinishLine) {
+					awardEnergyForCrossingFinishLine(placement);
+				}
 				scoreboardCurrentPlace++;
 			}
 		});
+	}
+
+	private void awardEnergyForCrossingFinishLine(PzeroPlayerPlacement placement) {
+		PzeroPlayer pzPlayer = getPzeroPlayer(placement.mPlayer);
+		if (pzPlayer == null) {
+			return;
+		}
+		pzPlayer.restoreEnergy((placement.mPlacement - 1) * 2, false);
 	}
 
 	private PzeroPlayerPlacement handleCheckpoints(PzeroPlayer pzPlayer) {
 		// Checkpoints and leaderboard logic
 		int currentCheckpoint = pzPlayer.getCurrentCheckpoint();
 		PzeroCheckpoint nextCheckpoint = getMap(pzPlayer.getMapName()).getNextCheckpoint(currentCheckpoint);
+		boolean hasCrossedFinishLine = false;
 
 		if (nextCheckpoint.isPlayerInside(pzPlayer)) {
 			if (nextCheckpoint.getId() == 0) {
 				int nextLap = pzPlayer.getCurrentLap() + 1;
 				pzPlayer.updateLap(nextLap);
-				if (nextLap == pzPlayer.getLapCount()) {
+				hasCrossedFinishLine = true;
+
+				if (nextLap == pzPlayer.getLapCount() && !pzPlayer.isPorksploding()) {
 					return win(pzPlayer);
 				}
 			}
 			pzPlayer.setCurrentCheckpoint(nextCheckpoint.getId());
+			pzPlayer.resetCheckpointTimer();
 		}
 
 		return new PzeroPlayerPlacement(pzPlayer.getPlayer(), pzPlayer.getCurrentLap(), nextCheckpoint.getId(),
-			nextCheckpoint.distanceSquaredFromCenter(pzPlayer));
+			nextCheckpoint.distanceSquaredFromCenter(pzPlayer), hasCrossedFinishLine);
 	}
 
 	private void handleCollisions(PzeroPlayer pzPlayer) {
@@ -281,6 +297,7 @@ public class PzeroManager implements Listener {
 		player.teleport(map.mSpawnPosition.toLocation(player.getWorld()));
 		PzeroPlayer pzPlayer = new PzeroPlayer(player, mapName, map.mLapCount);
 		mTrackedPlayers.put(player.getUniqueId(), pzPlayer);
+		pzPlayer.removeBoostRod();
 		pzPlayer.giveBoostRod();
 		// Reset the map and start a countdown if the map was in the WAITING state.
 		if (map.isWaiting()) {
@@ -328,6 +345,7 @@ public class PzeroManager implements Listener {
 		placement.mHasFinished = true;
 		placement.mFinalTimerTicks = pzPlayer.getTimer();
 		map.addPlacement(placement);
+		map.registerPlayerTime(pzPlayer);
 		pzPlayer.showEndingInfo(placement, true, false);
 		pzPlayer.doPorkscension(map);
 		// Increment player's finish scoreboard score
@@ -342,7 +360,7 @@ public class PzeroManager implements Listener {
 		return placement;
 	}
 
-	public void lose(PzeroPlayer pzPlayer, boolean eliminated) {
+	public void lose(PzeroPlayer pzPlayer, boolean eliminated, boolean afkKicked) {
 		// Leave is handled by the porksplosion function, and is called after the animation.
 		// However, this is called as soon as the animation starts, to solidify the placement.
 		PzeroMap map = getMap(pzPlayer.getMapName());
@@ -359,15 +377,6 @@ public class PzeroManager implements Listener {
 		leave(pzPlayer.getPlayer());
 	}
 
-	public boolean stillNeedToRemovePlayerFromMapCount(Player player) {
-		PzeroPlayer pzPlayer = getPzeroPlayer(player);
-		if (pzPlayer == null) {
-			return true;
-		}
-
-		return getMap(pzPlayer.getMapName()).getPlacements().stream().noneMatch(placement -> placement.mPlayer.getUniqueId().equals(player.getUniqueId()));
-	}
-
 	private void resetMap(PzeroMap map, World world) {
 		map.displayStandingsToNearbyPlayers(world, 200);
 		giveRewards(map, map.getPlacements());
@@ -377,23 +386,27 @@ public class PzeroManager implements Listener {
 	}
 
 	private void giveRewards(PzeroMap map, List<PzeroPlayerPlacement> finalPlacements) {
-		int finishers = 0;
-		for (PzeroPlayerPlacement placement : finalPlacements) {
-			if (placement.mHasFinished) {
-				finishers++;
+		int nonAfkParticipants = 0;
+		// Check that at least one player in the race has finished.
+		// Otherwise, don't assign rewards to anyone.
+		if (finalPlacements.stream().anyMatch(placement -> placement.mHasFinished)) {
+			for (PzeroPlayerPlacement placement : finalPlacements) {
+				if (!placement.mAfkKicked) {
+					nonAfkParticipants++;
+				}
 			}
 		}
-		int finalFinishers = finishers;
-		int totalPrize = 15 * finalFinishers + (5 * Math.max(0, finalFinishers - 1));
+		int finalNonAfkParticipants = nonAfkParticipants;
+		int totalPrize = finalNonAfkParticipants == 0 ? 0 : BASE_REWARD_AMOUNT * finalNonAfkParticipants + (5 * Math.max(0, finalNonAfkParticipants - 1));
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			for (PzeroPlayerPlacement placement : finalPlacements) {
 				// Teleport the players back to spawn first,
 				placement.mPlayer.teleport(map.mReturnPosition.toLocation(placement.mPlayer.getWorld()));
 				leave(placement.mPlayer);
-				if (placement.mHasFinished) {
+				if (!placement.mAfkKicked) {
 					// then give rewards after a delay, so that they can't drop them in the spectating area due to full inventory.
-					int rewardPortion = (int) (((Math.pow(REWARD_RATIO, finalFinishers - placement.mPlacement) * (REWARD_RATIO - 1)) / (Math.pow(REWARD_RATIO, finalFinishers) - 1)) * totalPrize);
+					int rewardPortion = totalPrize == 0 ? 0 : (int) (((Math.pow(REWARD_RATIO, finalNonAfkParticipants - placement.mPlacement) * (REWARD_RATIO - 1)) / (Math.pow(REWARD_RATIO, finalNonAfkParticipants) - 1)) * totalPrize);
 					for (int i = 0; i < rewardPortion; i++) {
 						InventoryUtils.giveItemFromLootTable(placement.mPlayer, NamespacedKeyUtils.fromString(ICE_DIAMOND_LOOT_TABLE), 1);
 					}
@@ -525,6 +538,8 @@ public class PzeroManager implements Listener {
 			event.getDismounted().getScoreboardTags().contains(PZERO_PIG_TAG)
 		) {
 			event.setCancelled(true);
+			// Car honk sound!
+			mTrackedPlayers.get(player.getUniqueId()).tryHonk();
 		}
 	}
 

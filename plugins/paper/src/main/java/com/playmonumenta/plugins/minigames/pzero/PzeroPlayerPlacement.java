@@ -8,25 +8,33 @@ public class PzeroPlayerPlacement implements Comparable<PzeroPlayerPlacement> {
 	public final int mLap;
 	public final int mCheckpoint;
 	public final double mDistance;
+	public final boolean mHasCrossedFinishLine;
+	public final boolean mAfkKicked;
 
 	public int mPlacement;
 	public boolean mHasFinished = false;
 	public int mFinalTimerTicks = 0;
 
-	public PzeroPlayerPlacement(Player player, int lap, int checkpoint, double distance) {
-		this(player, lap, checkpoint, distance, 0);
+	public PzeroPlayerPlacement(Player player, int lap, int checkpoint, double distance, boolean hasCrossedFinishLine) {
+		this(player, lap, checkpoint, distance, hasCrossedFinishLine, 0, false);
 	}
 
 	public PzeroPlayerPlacement(Player player, int placement) {
-		this(player, 0, 0, 0, placement);
+		this(player, 0, 0, 0, false, placement, false);
 	}
 
-	public PzeroPlayerPlacement(Player player, int lap, int checkpoint, double distance, int placement) {
+	public PzeroPlayerPlacement(Player player, int placement, boolean afkKicked) {
+		this(player, 0, 0, 0, false, placement, afkKicked);
+	}
+
+	public PzeroPlayerPlacement(Player player, int lap, int checkpoint, double distance, boolean hasCrossedFinishLine, int placement, boolean afkKicked) {
 		mPlayer = player;
 		mLap = lap;
 		mCheckpoint = checkpoint;
 		mDistance = distance;
 		mPlacement = placement;
+		mHasCrossedFinishLine = hasCrossedFinishLine;
+		mAfkKicked = afkKicked;
 	}
 
 	@Override

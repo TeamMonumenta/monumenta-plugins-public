@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.minigames.pzero;
 
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,14 +13,15 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public enum PzeroMap {
-	MAP_NULL("NULL", new Vector(), new Vector(), new Vector(), "", "", "", 1, Collections.emptyList()),
-	MAP_0("Test", new Vector(-1985, 212, -1175), new Vector(-2009, 206, -1172), new Vector(-1976, 229, -1210), "monumenta:events/pzero/arena0start", "monumenta:events/pzero/arena0reset", "monumenta:events/pzero/arena0win", 1, getMap0Checkpoints()),
-	MAP_1("Wintery Shroomland", new Vector(-1045, 101, -2982), new Vector(-989, 100, -2971), new Vector(-1094, 140, -3049), "monumenta:events/pzero/race1start", "monumenta:events/pzero/race1reset", "monumenta:events/pzero/race1win", 5, getMap1Checkpoints())
+	MAP_NULL("NULL", new Vector(), new Vector(), new Vector(), "", "", "", "", 1, Collections.emptyList()),
+	MAP_0("Test", new Vector(-1985, 212, -1175), new Vector(-2009, 206, -1172), new Vector(-1976, 229, -1210), "monumenta:events/pzero/arena0start", "monumenta:events/pzero/arena0reset", "monumenta:events/pzero/arena0win", "pzerotest", 1, getMap0Checkpoints()),
+	MAP_1("Wintery Shroomland", new Vector(-1045, 101, -2982), new Vector(-989, 100, -2971), new Vector(-1094, 140, -3049), "monumenta:events/pzero/race1start", "monumenta:events/pzero/race1reset", "monumenta:events/pzero/race1win", "PZero-WinteryShroomland", 3, getMap1Checkpoints())
 	;
 
 	public final String mName;
@@ -29,17 +31,18 @@ public enum PzeroMap {
 	public final String mStartFunctionName;
 	public final String mResetFunctionName;
 	public final String mWinFunctionName;
+	public final String mLeaderboardName;
 	public final int mLapCount;
 	public final List<PzeroCheckpoint> mCheckpoints;
 	// Finalized placements. These store the placements of players that have won or lost, so that the placements of the
 	// players still in the race can respect them and show the correct number.
 	private final ArrayList<PzeroPlayerPlacement> mPlacements = new ArrayList<>();
+	private final HashMap<UUID, Integer> mCurrentPlacements = new HashMap<>();
 
 	public PzeroMapState mState;
 	private int mPlayerCountAtStart;
-	private HashMap<UUID, Integer> mCurrentPlacements;
 
-	PzeroMap(String name, Vector returnPosition, Vector spawnPosition, Vector spectatePosition, String startFunctionName, String resetFunctionName, String winFunctionName, int lapCount, List<PzeroCheckpoint> checkpoints) {
+	PzeroMap(String name, Vector returnPosition, Vector spawnPosition, Vector spectatePosition, String startFunctionName, String resetFunctionName, String winFunctionName, String leaderboardName, int lapCount, List<PzeroCheckpoint> checkpoints) {
 		mName = name;
 		mReturnPosition = returnPosition;
 		mSpawnPosition = spawnPosition;
@@ -47,11 +50,11 @@ public enum PzeroMap {
 		mStartFunctionName = startFunctionName;
 		mResetFunctionName = resetFunctionName;
 		mWinFunctionName = winFunctionName;
+		mLeaderboardName = leaderboardName;
 		mLapCount = lapCount;
 		mCheckpoints = checkpoints;
 		mState = PzeroMapState.WAITING;
 		mPlayerCountAtStart = 0;
-		mCurrentPlacements = new HashMap<>();
 	}
 
 	public String getName() {
@@ -152,7 +155,7 @@ public enum PzeroMap {
 				if (placement.mHasFinished) {
 					leaderboardSpot = leaderboardSpot
 						.append(Component.text(" - ", NamedTextColor.WHITE, TextDecoration.BOLD))
-						.append(Component.text(StringUtils.intToMinuteAndSeconds(placement.mFinalTimerTicks / 20) + "." + (placement.mFinalTimerTicks % 20 * 50), PzeroPlayer.OTHER_COLOR, TextDecoration.BOLD));
+						.append(Component.text(StringUtils.intToMinuteAndSeconds(placement.mFinalTimerTicks / 20) + "." + StringUtils.ticksToMilliseconds(placement.mFinalTimerTicks), PzeroPlayer.OTHER_COLOR, TextDecoration.BOLD));
 				} else {
 					leaderboardSpot = leaderboardSpot.append(Component.text(" ❌", NamedTextColor.RED, TextDecoration.BOLD));
 				}
@@ -160,6 +163,18 @@ public enum PzeroMap {
 				player.sendMessage(leaderboardSpot);
 			}
 		});
+	}
+
+	public void registerPlayerTime(PzeroPlayer pzPlayer) {
+		int ticks = pzPlayer.getTimer();
+		int seconds = ticks / 20;
+		ticks = ticks % 20;
+		int scoreboardEntry = Integer.parseInt(seconds + StringUtils.ticksToMilliseconds(ticks));
+		int currentEntry = ScoreboardUtils.getScoreboardValue(pzPlayer.getPlayer(), mLeaderboardName).orElse(Integer.MAX_VALUE);
+		if (scoreboardEntry < currentEntry) {
+			ScoreboardUtils.setScoreboardValue(pzPlayer.getPlayer(), mLeaderboardName, scoreboardEntry);
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "leaderboard update " + pzPlayer.getPlayer().getName() + " " + mLeaderboardName);
+		}
 	}
 
 	private static List<PzeroCheckpoint> getMap0Checkpoints() {

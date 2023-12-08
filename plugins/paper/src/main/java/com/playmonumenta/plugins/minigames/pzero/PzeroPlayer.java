@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.time.Duration;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,6 +51,8 @@ public class PzeroPlayer {
 	public static final int KILL_ENERGY_AWARD = 8;
 	public static final int MAX_ENERGY_FROM_PIT_PER_LAP = 12;
 	public static final int LOW_ON_ENERGY_EFFECTS_THRESHOLD = 5;
+	public static final int HONK_COOLDOWN = 5;
+	public static final int ANTI_AFK_THRESHOLD = 15 * 20;
 
 	private final Player mPlayer;
 	private final String mMapName;
@@ -60,15 +64,17 @@ public class PzeroPlayer {
 	private int mRemainingBoostTicks;
 	private boolean mBeingLaunched;
 	private boolean mIsInGracePeriod;
-	private boolean mIsExploding;
+	private boolean mIsPorksploding;
 	private boolean mIsInWinAnimation;
 	private int mCurrentCheckpoint;
 	private int mCurrentLap;
 	private int mTimer;
 	private int mLapTimer;
+	private int mCheckpointTimer;
 	private @Nullable PzeroPlayer mLastHitBy;
 	private int mLastHitTicks;
 	private int mPitEnergyLeftThisLap;
+	private int mLastHonkTicks;
 
 	public PzeroPlayer(Player player, String mapName, int lapCount) {
 		mPlayer = player;
@@ -78,17 +84,19 @@ public class PzeroPlayer {
 		mRemainingBoostTicks = 0;
 		mBeingLaunched = false;
 		mIsInGracePeriod = false;
-		mIsExploding = false;
+		mIsPorksploding = false;
 		mIsInWinAnimation = false;
 		mCurrentCheckpoint = 0;
 		mCurrentLap = 0;
 		mTimer = 0;
 		mLapTimer = 0;
+		mCheckpointTimer = 0;
 		mLastHitBy = null;
 		mLastHitTicks = 0;
 		mPitEnergyLeftThisLap = MAX_ENERGY_FROM_PIT_PER_LAP;
 		mPig = spawnAndMountPig();
 		mRodItem = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString(BOOST_ROD_LOOT_TABLE));
+		mLastHonkTicks = 0;
 	}
 
 	private @Nullable Pig spawnAndMountPig() {
@@ -134,11 +142,15 @@ public class PzeroPlayer {
 	}
 
 	private void doPorksplosion(boolean eliminated) {
+		doPorksplosion(eliminated, false);
+	}
+
+	private void doPorksplosion(boolean eliminated, boolean afkKicked) {
 		// Lose animation
-		mIsExploding = true;
+		mIsPorksploding = true;
 		removeBoostRod();
 		PzeroPlayer pzPlayer = this;
-		Plugin.getInstance().mPzeroManager.lose(pzPlayer, eliminated);
+		Plugin.getInstance().mPzeroManager.lose(pzPlayer, eliminated, afkKicked);
 		if (mPig != null) {
 			mPig.setAI(false);
 		}
@@ -276,7 +288,9 @@ public class PzeroPlayer {
 			return;
 		}
 
-		mPlayer.getInventory().removeItemAnySlot(mRodItem);
+		while (mPlayer.getInventory().contains(mRodItem) || mPlayer.getInventory().getItemInOffHand().equals(mRodItem)) {
+			mPlayer.getInventory().removeItemAnySlot(mRodItem);
+		}
 	}
 
 	public boolean moveRodFromOffhandToMainhand() {
@@ -333,7 +347,7 @@ public class PzeroPlayer {
 		}
 
 		mCurrentEnergy = Math.max(0, mCurrentEnergy - amount);
-		if (mCurrentEnergy == 0 && !mIsExploding) {
+		if (mCurrentEnergy == 0 && !mIsPorksploding) {
 			boolean eliminated = false;
 			if (mLastHitBy != null && Bukkit.getCurrentTick() - mLastHitTicks <= KILL_CREDIT_MAX_TICKS) {
 				eliminated = true;
@@ -360,7 +374,7 @@ public class PzeroPlayer {
 		Component title = Component.text(finished ? "FINISH!" : "CRASH OUT!", finished ? NamedTextColor.GREEN : NamedTextColor.RED, TextDecoration.BOLD);
 		Component subtitleTime = Component.text(StringUtils.intToOrdinal(placement.mPlacement), getPlacementColor(placement.mPlacement), TextDecoration.BOLD)
 				.append(Component.text(" - ", NamedTextColor.WHITE, TextDecoration.BOLD))
-				.append(Component.text(StringUtils.intToMinuteAndSeconds(mTimer / 20) + "." + (mTimer % 20 * 50), OTHER_COLOR, TextDecoration.BOLD));
+				.append(Component.text(StringUtils.intToMinuteAndSeconds(mTimer / 20) + "." + StringUtils.ticksToMilliseconds(mTimer), OTHER_COLOR, TextDecoration.BOLD));
 
 		if (mLastHitBy != null && eliminated) {
 			Component subtitleEliminated = Component.text("❌ Eliminated", NamedTextColor.RED, TextDecoration.BOLD)
@@ -380,6 +394,30 @@ public class PzeroPlayer {
 					.append(Component.text(mLastHitBy.getPlayer().getName(), NamedTextColor.WHITE, TextDecoration.BOLD))
 			);
 		}
+
+		// Notify other players too
+		Component otherPlayersMessage;
+		if (finished) {
+			otherPlayersMessage = Component.text(mPlayer.getName(), NamedTextColor.WHITE, TextDecoration.BOLD)
+				.append(Component.text(" has FINISHED!", NamedTextColor.GREEN, TextDecoration.BOLD));
+		} else {
+			if (mLastHitBy != null && eliminated) {
+				otherPlayersMessage = Component.text(mPlayer.getName(), NamedTextColor.WHITE, TextDecoration.BOLD)
+					.append(Component.text(" has been Eliminated by ", NamedTextColor.RED, TextDecoration.BOLD))
+					.append(Component.text(mLastHitBy.getPlayer().getName(), NamedTextColor.WHITE, TextDecoration.BOLD));
+			} else {
+				otherPlayersMessage = Component.text(mPlayer.getName(), NamedTextColor.WHITE, TextDecoration.BOLD)
+					.append(Component.text(" has CRASHED OUT!", NamedTextColor.RED, TextDecoration.BOLD));
+			}
+		}
+
+		PlayerUtils.playersInRange(mPlayer.getLocation(), 200, true).forEach(player -> {
+			if (player == mPlayer) {
+				return;
+			}
+
+			player.sendMessage(otherPlayersMessage);
+		});
 	}
 
 	public void doPeriodicEffects() {
@@ -409,10 +447,17 @@ public class PzeroPlayer {
 		// Send the lap time to the player
 		mPlayer.sendMessage(
 			Component.text("Lap Time: ", NamedTextColor.WHITE, TextDecoration.BOLD)
-				.append(Component.text(StringUtils.intToMinuteAndSeconds(mLapTimer / 20) + "." + (mLapTimer % 20 * 50), OTHER_COLOR, TextDecoration.BOLD))
+				.append(Component.text(StringUtils.intToMinuteAndSeconds(mLapTimer / 20) + "." + StringUtils.ticksToMilliseconds(mLapTimer), OTHER_COLOR, TextDecoration.BOLD))
 		);
 		mPlayer.playSound(mPlayer, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 2, 2);
 		mLapTimer = 0;
+	}
+
+	public void tryHonk() {
+		if (Bukkit.getCurrentTick() - mLastHonkTicks >= HONK_COOLDOWN) {
+			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.15f);
+			mLastHonkTicks = Bukkit.getCurrentTick();
+		}
 	}
 
 	public static TextColor getPlacementColor(int placement) {
@@ -480,6 +525,10 @@ public class PzeroPlayer {
 		return mIsInGracePeriod;
 	}
 
+	public boolean isPorksploding() {
+		return mIsPorksploding;
+	}
+
 	public boolean isInWinAnimation() {
 		return mIsInWinAnimation;
 	}
@@ -500,6 +549,29 @@ public class PzeroPlayer {
 	public void incrementTimer() {
 		mTimer++;
 		mLapTimer++;
+		mCheckpointTimer++;
+
+		if (isPorksploding() || isInWinAnimation()) {
+			return;
+		}
+
+		if (mCheckpointTimer >= ANTI_AFK_THRESHOLD - 60 && mCheckpointTimer < ANTI_AFK_THRESHOLD) {
+			mPlayer.showTitle(Title.title(
+					Component.text("HURRY UP!", NamedTextColor.RED, TextDecoration.BOLD),
+					Component.empty(),
+					Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)
+				)
+			);
+		}
+
+		if (mCheckpointTimer >= ANTI_AFK_THRESHOLD) {
+			doPorksplosion(false, true);
+			mCheckpointTimer = 0;
+		}
+	}
+
+	public void resetCheckpointTimer() {
+		mCheckpointTimer = 0;
 	}
 
 	public @Nullable Pig getPig() {
