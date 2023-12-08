@@ -1460,9 +1460,9 @@ public class DepthsManager {
 					playerInParty.setDeathRoom(30);
 					Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 					if (player != null) {
-						DepthsUtils.storeRunStatsToFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", true); //Save the player's stats
-						dp.mFinalTreasureScore = party.mTreasureScore;
-						dp.sendMessage("Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
+						DepthsUtils.storeRunStatsToFile(playerInParty, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", true); //Save the player's stats
+						playerInParty.mFinalTreasureScore = party.mTreasureScore;
+						playerInParty.sendMessage("Congratulations! Your final treasure score is " + playerInParty.mFinalTreasureScore + "!");
 						party.populateLootRoom(player, true);
 						if (party.getContent() == DepthsContent.DARKEST_DEPTHS) {
 							int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
