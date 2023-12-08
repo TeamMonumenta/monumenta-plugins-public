@@ -30,6 +30,9 @@ public class MobRisingBoss extends BossAbilityGroup {
 		public int MOB_NUMBER = 0;
 		public float DEPTH = 2.5f;
 
+		public boolean SELF_GLOWING = true;
+		public boolean SUMMON_GLOWING = true;
+
 		public LoSPool MOB_POOL = LoSPool.EMPTY;
 
 		public EntityTargets TARGETS = EntityTargets.GENERIC_SELF_TARGET;
@@ -72,7 +75,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 					return p.MOB_POOL.spawn(loc);
 				},
 				(LivingEntity bos, Location loc, int ticks) -> {
-					if (ticks == 0) {
+					if (p.SELF_GLOWING && ticks == 0) {
 						bos.setGlowing(true);
 					}
 
@@ -82,18 +85,18 @@ public class MobRisingBoss extends BossAbilityGroup {
 
 					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
-					if (ticks >= p.DURATION) {
+					if (p.SELF_GLOWING && ticks >= p.DURATION) {
 						bos.setGlowing(false);
 					}
 
 				},
 				(LivingEntity mob, Location loc, int ticks) -> {
-					if (ticks == 0) {
+					if (p.SUMMON_GLOWING && ticks == 0) {
 						mob.setGlowing(true);
 					}
 					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
-					if (ticks >= p.DURATION) {
+					if (p.SUMMON_GLOWING && ticks >= p.DURATION) {
 						mob.setGlowing(false);
 					}
 				});
