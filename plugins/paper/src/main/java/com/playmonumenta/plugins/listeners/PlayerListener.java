@@ -4,8 +4,8 @@ import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.commands.ShardSorterCommand;
 import com.playmonumenta.plugins.commands.ToggleSwap;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
@@ -153,10 +153,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerListener implements Listener {
 
@@ -166,6 +168,7 @@ public class PlayerListener implements Listener {
 
 
 	private final Plugin mPlugin;
+	private @Nullable BukkitTask mContentRunnable = null;
 
 	public PlayerListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -175,11 +178,45 @@ public class PlayerListener implements Listener {
 		if (playersTeam != null) {
 			playersTeam.unregister();
 		}
+
+		contentLockCheckOnReload();
+	}
+
+	public void contentLockCheckOnReload() {
+		if (!ServerProperties.getShardOpen() && mContentRunnable == null) {
+			mContentRunnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (player.getScoreboardTags().contains("MidTransfer") || player.hasPermission("group.stealthmod")) {
+							continue;
+						}
+						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1, false, false));
+						player.teleport(player.getWorld().getSpawnLocation());
+						AuditListener.logPlayer(player.getName() + " was kicked from a content-locked shard");
+						player.sendMessage(Component.text(
+								"The shard is currently closed for maintenance. Please try again later.")
+							.color(NamedTextColor.RED));
+						try {
+							ShardSorterCommand.sortToShard(player, "valley");
+						} catch (Exception e) {
+							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 15, 1, false, false));
+							e.printStackTrace();
+						}
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 40);
+		} else if (ServerProperties.getShardOpen() && mContentRunnable != null) {
+			mContentRunnable.cancel();
+			mContentRunnable = null;
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
+
+		contentLockCheckOnReload();
 
 		if (!ServerProperties.getJoinMessagesEnabled()) {
 			event.joinMessage(null);

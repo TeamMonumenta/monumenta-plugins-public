@@ -85,7 +85,6 @@ public class ShardSorterCommand {
 				return;
 			}
 			int shardCount = possibleShards.size();
-			sender.sendMessage("Found " + shardCount + " shards for " + shard + ", list=" + possibleShards);
 			if (shardCount == 0) {
 				sender.sendMessage("No shards found for " + shard);
 				return;
@@ -100,6 +99,47 @@ public class ShardSorterCommand {
 			} catch (Exception e) {
 				MMLog.severe("Failed to send player to shard for sort-to-shard command, user="
 					+ sender.getName() + ", shard=" + shard + ", targetShard=" + targetShard + " error=" + e);
+			}
+		}
+	}
+
+	public static void sortToShard(Player player, String shard) {
+		if (shard == null || shard.isEmpty()
+			|| ServerProperties.getShardName().startsWith(shard)) {
+			return;
+		}
+		ShardType shardType = null;
+		for (ShardSorterData shardSorterData : SHARD_SORTER_DATA) {
+			if (shardSorterData.mShardName.equals(shard)) {
+				shardType = shardSorterData.mShardType;
+				break;
+			}
+		}
+		if (shardType == null) {
+			//TODO: add instance math
+		} else {
+			List<String> possibleShards = null;
+			try {
+				possibleShards = NetworkRelayAPI.getOnlineShardNames().stream().filter(shardName -> shardName.startsWith(shard)).toList();
+			} catch (Exception e) {
+				MMLog.severe("Failed to get shard names from network relay for sort-to-shard command, user="
+					+ player.getName() + ", shard=" + shard + " error=" + e.getMessage());
+				return;
+			}
+			int shardCount = possibleShards.size();
+			if (shardCount == 0) {
+				player.sendMessage("No shards found for " + shard);
+				return;
+			}
+			possibleShards = sortShardNames(possibleShards, shard);
+			Calendar now = Calendar.getInstance();
+			int index = now.get(Calendar.MINUTE) % shardCount;
+			String targetShard = possibleShards.get(index);
+			try {
+				MonumentaRedisSyncAPI.sendPlayer(player, targetShard);
+			} catch (Exception e) {
+				MMLog.severe("Failed to send player to shard for sort-to-shard command, user="
+					+ player.getName() + ", shard=" + shard + ", targetShard=" + targetShard + " error=" + e);
 			}
 		}
 	}

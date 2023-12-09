@@ -54,6 +54,7 @@ public class ServerProperties {
 	private boolean mInfusionsEnabled = true;
 	private boolean mMasterworkRefundEnabled = false;
 	private boolean mLootBoxEnabled = true;
+	private boolean mShardOpen = true;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
@@ -161,6 +162,10 @@ public class ServerProperties {
 		return INSTANCE.mLootBoxEnabled;
 	}
 
+	public static boolean getShardOpen() {
+		return INSTANCE.mShardOpen;
+	}
+
 	public static int getHTTPStatusPort() {
 		return INSTANCE.mHTTPStatusPort;
 	}
@@ -231,6 +236,7 @@ public class ServerProperties {
 
 	public static void load(Plugin plugin, @Nullable CommandSender sender) {
 		INSTANCE.loadInternal(plugin, sender);
+
 	}
 
 	private void loadInternal(Plugin plugin, @Nullable CommandSender sender) {
@@ -262,6 +268,7 @@ public class ServerProperties {
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
 			mMasterworkRefundEnabled = getPropertyValueBool(object, "masterworkRefundEnabled", mMasterworkRefundEnabled);
 			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
+			mShardOpen = getPropertyValueBool(object, "shardOpen", mShardOpen);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
 			mDisableEntityScoresInDefaultWorld = getPropertyValueBool(object,
@@ -335,6 +342,7 @@ public class ServerProperties {
 		out.add("infusionsEnabled = " + mInfusionsEnabled);
 		out.add("masterworkRefundEnabled = " + mMasterworkRefundEnabled);
 		out.add("lootBoxEnabled = " + mLootBoxEnabled);
+		out.add("shardOpen = " + mShardOpen);
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 
 		out.add("shardName = " + mShardName);
