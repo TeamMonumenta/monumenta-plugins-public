@@ -4,10 +4,12 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.util.BoundingBox;
 
 public class Legionary {
 
@@ -28,20 +30,23 @@ public class Legionary {
 		}
 
 		for (int i = FastUtils.roundRandomly(SPAWN_CHANCE_PER_LEVEL * level); i > 0; i--) {
-			Location spawningLoc = mob.getLocation().clone();
+			Location spawningLoc = mob.getLocation();
 
 			// don't spawn directly in the mob, and try 20 times to find an open spot
+			double offset = Math.max(1, 0.8 * mob.getWidth());
+			outer:
 			for (int j = 0; j < 20; j++) {
-				double r = FastUtils.randomDoubleInRange(0.5, 1);
+				double r = FastUtils.randomDoubleInRange(0.5 * offset, offset);
 				double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 				double x = r * Math.cos(theta);
 				double z = r * Math.sin(theta);
 
-				Location testLoc = spawningLoc.clone().add(x, 0, z);
-
-				if (mob.getWorld().getBlockAt(testLoc).isPassable()) {
-					spawningLoc = testLoc.clone();
-					break;
+				for (double y = -1; y <= 1; y += 0.5) {
+					BoundingBox testBB = mob.getBoundingBox().shift(x, y, z);
+					if (!LocationUtils.collidesWithBlocks(testBB, mob.getWorld(), false)) {
+						spawningLoc.add(x, y, z);
+						break outer;
+					}
 				}
 			}
 
