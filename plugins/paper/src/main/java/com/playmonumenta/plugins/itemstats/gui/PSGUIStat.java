@@ -126,7 +126,7 @@ enum PSGUIStat {
 		if (mainhand.getType() == Material.BOW) {
 			return 1;
 		} else if (mainhand.getType() == Material.CROSSBOW) {
-			return Math.max(0, 1.25 - mainhand.getEnchantmentLevel(Enchantment.QUICK_CHARGE) * 0.25);
+			return 1 / Math.max(0.25, 1.25 - mainhand.getEnchantmentLevel(Enchantment.QUICK_CHARGE) * 0.25);
 		}
 		return 0;
 	}),
