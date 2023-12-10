@@ -361,7 +361,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		Masterwork next = ItemStatUtils.getMasterwork(nextItem);
 		if (MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item)) >
 			MasterworkUtils.getMasterworkAsInt(next)) {
-			cost.payCost(p, item, true, next);
+			cost.tryPayCost(p, item, true, next);
 			item.setType(nextItem.getType());
 			item.setItemMeta(nextItem.getItemMeta());
 			ItemUpdateHelper.generateItemStats(item);
@@ -370,8 +370,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 
 		try {
-			if (cost.canPayCost(p, false)) {
-				cost.payCost(p, item, false, next);
+			if (cost.tryPayCost(p, item, false, next)) {
 				item.setType(nextItem.getType());
 				item.setItemMeta(nextItem.getItemMeta());
 				ItemUpdateHelper.generateItemStats(item);

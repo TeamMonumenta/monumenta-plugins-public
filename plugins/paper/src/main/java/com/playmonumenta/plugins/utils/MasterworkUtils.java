@@ -125,23 +125,11 @@ public class MasterworkUtils {
 			return List.of(strA, strB, strC);
 		}
 
-		public boolean canPayCost(Player p, boolean isRefund) {
-			if (p.getGameMode() == GameMode.CREATIVE || isRefund) {
-				return true;
-			}
-
-			PlayerInventory inventory = p.getInventory();
-			ItemStack itemA = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(item1));
-			ItemStack itemB = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(item2));
-			ItemStack itemC = item3 == null ? null : InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(item3));
-			return inventory.containsAtLeast(itemA, amount1) && inventory.containsAtLeast(itemB, amount2) && (itemC == null || inventory.containsAtLeast(itemC, amount3));
-		}
-
-		public void payCost(Player p, ItemStack item, boolean isRefund, Masterwork masterwork) {
+		public boolean tryPayCost(Player p, ItemStack item, boolean isRefund, Masterwork masterwork) {
 			//if the player is in creative -> free upgrade
 			if (p.getGameMode() == GameMode.CREATIVE) {
 				AuditListener.log("[Masterwork] Player " + p.getName() + (isRefund ? " downgraded" : " upgraded") + " an item in creative mode");
-				return;
+				return true;
 			}
 
 			PlayerInventory inventory = p.getInventory();
@@ -168,19 +156,18 @@ public class MasterworkUtils {
 				if (itemC != null) {
 					InventoryUtils.giveItem(p, itemC);
 				}
+				return true;
 			} else {
-				String auditString = "[Masterwork] Purchase - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' to level=" + masterwork.getName() + " stack size=" + item.getAmount()
-					+ " material refund=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount();
-				if (itemC != null) {
-					auditString += "," + ItemUtils.getPlainName(itemC) + ":" + itemC.getAmount();
+				if (WalletUtils.tryToPayFromInventoryAndWallet(p, itemC == null ? List.of(itemA, itemB) : List.of(itemA, itemB, itemC), false, true)) {
+					String auditString = "[Masterwork] Purchase - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' to level=" + masterwork.getName() + " stack size=" + item.getAmount()
+						                     + " material refund=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount();
+					if (itemC != null) {
+						auditString += "," + ItemUtils.getPlainName(itemC) + ":" + itemC.getAmount();
+					}
+					AuditListener.logPlayer(auditString);
+					return true;
 				}
-				AuditListener.logPlayer(auditString);
-
-				inventory.removeItem(itemA);
-				inventory.removeItem(itemB);
-				if (itemC != null) {
-					inventory.removeItem(itemC);
-				}
+				return false;
 			}
 		}
 	}

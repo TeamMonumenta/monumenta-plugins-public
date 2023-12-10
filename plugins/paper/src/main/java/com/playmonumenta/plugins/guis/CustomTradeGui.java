@@ -145,22 +145,22 @@ public class CustomTradeGui extends Gui {
 				return;
 			}
 			// Copy of player's inventory and wallet (if enabled):
-			ItemStack[] itemStacks = player.getInventory().getStorageContents().clone();
-			WalletManager.InventoryWallet inventoryWallet = (mPebTradeGUIWallet == 1) ? null : new WalletManager.InventoryWallet(player, true);
+			ItemStack[] inventoryShallowClone = player.getInventory().getStorageContents().clone();
+			WalletManager.Wallet walletClone = (mPebTradeGUIWallet == 1) ? null : WalletManager.getWallet(player).deepClone();
 			// Check each requirement, constructing lore and updating mHasRequirements:
 			for (ItemStack requirement : mRequirements) {
 				// Calculate amount to remove:
-				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, itemStacks, inventoryWallet, mPebTradeGUIWallet != 0);
+				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, inventoryShallowClone, walletClone, mPebTradeGUIWallet != 0);
 				int inventoryDebt = debt.mInventoryDebt;
 				int walletDebt = debt.mWalletDebt;
-				int numInWallet = debt.mNumInWallet;
+				long numInWallet = debt.mNumInWallet;
 				boolean meetsRequirement = debt.mMeetsRequirement;
-				// Remove from inventory and wallet:
+				// Remove from inventory and wallet clones:
 				if (meetsRequirement && inventoryDebt > 0) {
-					InventoryUtils.removeItemFromArray(itemStacks, requirement.asQuantity(inventoryDebt));
+					InventoryUtils.removeItemFromArray(inventoryShallowClone, requirement.asQuantity(inventoryDebt));
 				}
-				if (meetsRequirement && walletDebt > 0 && inventoryWallet != null) {
-					inventoryWallet.removeFromWallet(requirement.asQuantity(walletDebt));
+				if (meetsRequirement && walletDebt > 0 && walletClone != null) {
+					walletClone.remove(player, requirement.asQuantity(walletDebt));
 				}
 				// Construct lore:
 				String plainName = ItemUtils.getPlainNameOrDefault(requirement);
@@ -203,10 +203,10 @@ public class CustomTradeGui extends Gui {
 		public void removeRequirements() {
 			// Remove requirements from actual inventory and wallet:
 			Inventory inventory = mPlayer.getInventory();
-			WalletManager.InventoryWallet inventoryWallet = (mPebTradeGUIWallet == 1) ? null : new WalletManager.InventoryWallet(mPlayer, false);
+			WalletManager.Wallet wallet = (mPebTradeGUIWallet == 1) ? null : WalletManager.getWallet(mPlayer);
 			for (ItemStack requirement : requirements()) {
 				// Calculate amount to remove:
-				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, inventory.getStorageContents(), inventoryWallet, mPebTradeGUIWallet != 0);
+				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, inventory.getStorageContents(), wallet, mPebTradeGUIWallet != 0);
 				int inventoryDebt = debt.mInventoryDebt;
 				int walletDebt = debt.mWalletDebt;
 				boolean meetsRequirement = debt.mMeetsRequirement;
@@ -215,11 +215,11 @@ public class CustomTradeGui extends Gui {
 				if (meetsRequirement && inventoryDebt > 0) {
 					inventory.removeItem(requirement.asQuantity(inventoryDebt));
 				}
-				if (meetsRequirement && walletDebt > 0 && inventoryWallet != null) {
-					inventoryWallet.removeFromWallet(requirement.asQuantity(walletDebt));
+				if (meetsRequirement && walletDebt > 0 && wallet != null) {
+					wallet.remove(mPlayer, requirement.asQuantity(walletDebt));
 				}
 				// Notify player:
-				WalletUtils.notifyRemovalFromWallet(debt, mPlayer, requirement);
+				WalletUtils.notifyRemovalFromWallet(debt, mPlayer);
 
 				// Check for errors:
 				if (!meetsRequirement) {

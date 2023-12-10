@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.depths.guis;
 
-import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -109,21 +108,8 @@ public final class ZenithCharmPowerGUI extends CustomInventory {
 		if (currencyItemReq == null) {
 			return false;
 		}
-
 		currencyItemReq.setAmount(totalToRemove);
-		WalletManager.InventoryWallet inventoryWallet = new WalletManager.InventoryWallet(player, false);
-		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currencyItemReq, player.getInventory().getStorageContents(), inventoryWallet, false);
-		if (debt.mMeetsRequirement) {
-			if (debt.mInventoryDebt > 0) {
-				player.getInventory().removeItem(currencyItemReq.asQuantity(debt.mInventoryDebt));
-			}
-			if (debt.mWalletDebt > 0) {
-				inventoryWallet.removeFromWallet(currencyItemReq.asQuantity(debt.mWalletDebt));
-				WalletUtils.notifyRemovalFromWallet(debt, player, currencyItemReq);
-			}
-			return true;
-		}
-		return false;
+		return WalletUtils.tryToPayFromInventoryAndWallet(player, List.of(currencyItemReq), false, true);
 	}
 
 	int getCharmPowerLevel(Player player) {

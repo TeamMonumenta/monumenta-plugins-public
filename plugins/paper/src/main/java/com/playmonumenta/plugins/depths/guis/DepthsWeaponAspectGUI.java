@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -166,24 +165,12 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 	boolean attemptUpgrade(Player player) {
 		boolean r2 = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS;
 		int totalToRemove = r2 ? CCS_AMOUNT : AR_AMOUNT;
-		ItemStack currencyItemReq = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(r2 ? "epic:r2/items/currency/compressed_crystalline_shard" : "epic:r3/items/currency/archos_ring"));
+		ItemStack currencyItemReq = InventoryUtils.getItemFromLootTable(player,
+			NamespacedKeyUtils.fromString(r2 ? "epic:r2/items/currency/compressed_crystalline_shard" : "epic:r3/items/currency/archos_ring"));
 		if (currencyItemReq == null) {
 			return false;
 		}
-
 		currencyItemReq.setAmount(totalToRemove);
-		WalletManager.InventoryWallet inventoryWallet = new WalletManager.InventoryWallet(player, false);
-		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currencyItemReq, player.getInventory().getStorageContents(), inventoryWallet, false);
-		if (debt.mMeetsRequirement) {
-			if (debt.mInventoryDebt > 0) {
-				player.getInventory().removeItem(currencyItemReq.asQuantity(debt.mInventoryDebt));
-			}
-			if (debt.mWalletDebt > 0) {
-				inventoryWallet.removeFromWallet(currencyItemReq.asQuantity(debt.mWalletDebt));
-				WalletUtils.notifyRemovalFromWallet(debt, player, currencyItemReq);
-			}
-			return true;
-		}
-		return false;
+		return WalletUtils.tryToPayFromInventoryAndWallet(player, List.of(currencyItemReq), false, true);
 	}
 }

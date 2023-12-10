@@ -229,7 +229,7 @@ public class WalletManager implements Listener {
 		}
 	}
 
-	private static class Wallet {
+	public static class Wallet {
 		final UUID mOwner;
 		final ArrayList<WalletItem> mItems = new ArrayList<>();
 
@@ -246,7 +246,7 @@ public class WalletManager implements Listener {
 			return null;
 		}
 
-		private void add(Player player, ItemStack currency) {
+		public void add(Player player, ItemStack currency) {
 			if (ItemUtils.isNullOrAir(currency)) {
 				throw new IllegalArgumentException("Tried to add air to wallet!");
 			}
@@ -281,16 +281,30 @@ public class WalletManager implements Listener {
 			currency.setAmount(0);
 		}
 
-		private long count(ItemStack currency) {
+		/**
+		 * Counts the number of items of the given type in the wallet.
+		 * If passed a compressed currency, will return the number of whole compressed items (ignoring any uncompressed remainder).
+		 */
+		public long count(ItemStack currency) {
 			CompressionInfo compressionInfo = getCompressionInfo(currency);
 			if (compressionInfo != null) {
-				return count(compressionInfo.mBase) * compressionInfo.mAmount;
+				return count(compressionInfo.mBase) / compressionInfo.mAmount;
 			}
 			WalletItem walletItem = find(currency);
 			return walletItem != null ? walletItem.mAmount : 0;
 		}
 
-		private void remove(Player player, ItemStack currency) {
+		/**
+		 * Removes a certain quantity of currency from this wallet. Does not check if there actually is enough currency in the wallet.
+		 * <p>
+		 * See also {@link com.playmonumenta.plugins.utils.WalletUtils} for some utilities to pay a cost from the player's wallet and inventory.
+		 *
+		 * @param player The player that removes the items - used to audit mods removing stuff from other players' wallets
+		 */
+		public void remove(Player player, ItemStack currency) {
+			if (ItemUtils.isNullOrAir(currency)) {
+				return;
+			}
 
 			// If removing a compressed item, we need to actually remove uncompressed items as only those are stored.
 			CompressionInfo compressionInfo = getCompressionInfo(currency);
@@ -340,6 +354,18 @@ public class WalletManager implements Listener {
 			}
 
 			currency.setAmount(0);
+		}
+
+		/**
+		 * Create a clone of this wallet. The returned wallet can freely be modified without affecting the real wallet.
+		 * Care should be taken to perform operations with the correct player, as audit messages can be logged otherwise still.
+		 */
+		public Wallet deepClone() {
+			Wallet clone = new Wallet(mOwner);
+			mItems.stream()
+				.map(item -> new WalletItem(ItemUtils.clone(item.mItem), item.mAmount))
+				.forEach(clone.mItems::add);
+			return clone;
 		}
 
 		JsonObject serialize() {
@@ -527,9 +553,8 @@ public class WalletManager implements Listener {
 						Component name = Component.text(amount + " ", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)
 							                 .append(ItemUtils.getDisplayName(item.mItem));
 						for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
-							boolean isBase = compressionInfo.mBase.isSimilar(item.mItem);
-							if (isBase || compressionInfo.mCompressed.isSimilar(item.mItem)) {
-								long count = isBase ? mWallet.count(compressionInfo.mBase) : mWallet.count(compressionInfo.mBase) / compressionInfo.mAmount;
+							if (compressionInfo.mBase.isSimilar(item.mItem) || compressionInfo.mCompressed.isSimilar(item.mItem)) {
+								long count = mWallet.count(item.mItem);
 								if (count != item.mAmount) {
 									name = name.append(Component.text(" (" + count + " total)", NamedTextColor.GOLD));
 								}
@@ -772,7 +797,7 @@ public class WalletManager implements Listener {
 
 			ItemStack walletItem = event.getCurrentItem();
 
-			Wallet wallet = mWallets.computeIfAbsent(player.getUniqueId(), Wallet::new);
+			Wallet wallet = getWallet(player);
 
 			if (ItemUtils.isNullOrAir(event.getCursor())) {
 				if (event.getClick() == ClickType.RIGHT) {
@@ -853,6 +878,10 @@ public class WalletManager implements Listener {
 		}
 	}
 
+	public static Wallet getWallet(Player player) {
+		return mWallets.computeIfAbsent(player.getUniqueId(), Wallet::new);
+	}
+
 	private static boolean checkNotSoulbound(Player player, ItemStack item) {
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
 			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
@@ -912,7 +941,7 @@ public class WalletManager implements Listener {
 			.executes((sender, args) -> {
 				Player viewer = CommandUtils.getPlayerFromSender(sender);
 				Player viewee = (Player) args[0];
-				new WalletGui(viewer, mWallets.computeIfAbsent(viewee.getUniqueId(), Wallet::new), MAX_SETTINGS,
+				new WalletGui(viewer, getWallet(viewee), MAX_SETTINGS,
 					Component.text("Wallet of ", NamedTextColor.GOLD).append(viewee.displayName())).open();
 			})
 			.register();
@@ -941,75 +970,4 @@ public class WalletManager implements Listener {
 		}
 	}
 
-	public static class InventoryWallet {
-		final Wallet mWallet;
-		final Player mPlayer;
-
-		public InventoryWallet(Player player, boolean isClone) {
-			mPlayer = player;
-			// Either grab actual wallet or clone it:
-			Wallet walletRef = mWallets.computeIfAbsent(player.getUniqueId(), Wallet::new);
-			if (isClone) {
-				// Deep clone of wallet.
-				// Note: because the only link between wallets and playerdata is through mWallets Map(),
-				//          a deep copy of the player's wallet cannot modify the player's actual wallet.
-				mWallet = new Wallet(walletRef.mOwner);
-				List<WalletItem> walletItemsCopy = new ArrayList<>(
-					walletRef.mItems.stream()
-						.map(item -> new WalletItem(ItemUtils.clone(item.mItem), item.mAmount))
-						.toList());
-				mWallet.mItems.addAll(walletItemsCopy);
-			} else {
-				// Reference player's actual wallet:
-				mWallet = walletRef;
-			}
-		}
-
-		public int numInWallet(ItemStack currency) {
-			// Returns the nearest integer multiple of the specified currency.asOne(), rounding down.
-			// EX: if your wallet contains 600 xp, and currency={hxp}, it will return 1.
-
-			// Find the amount of the base currency in wallet:
-			long result;
-			long amountBase = mWallet.count(currency);
-			CompressionInfo compressionInfo = getCompressionInfo(currency);
-			if (compressionInfo != null) {
-				// Compressible currency:
-				// Wallet's count() will multiply the amount of base currency by the compressed multiplier (so that it can determine the amount of base to remove).
-				// However, since we want the base amount itself, we reverse this by dividing by the compressed multiplier.
-				// Finally, to get the base amount in terms of the compressed currency, we divide once again.
-				long multiplier = compressionInfo.mAmount;
-				long normalizedAmount = amountBase / multiplier;
-				result = normalizedAmount / multiplier;
-			} else {
-				// Normal, incompressible currency:
-				result = amountBase;
-			}
-			// Return an int, prevent overflow:
-			return (result > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) result;
-		}
-
-		public @Nullable ItemStack removeFromWallet(ItemStack currency) {
-			// Attempts to remove currency from the wallet of a player, returns the leftovers (not removed).
-			// EX: if your wallet contains 600 xp, and currency={2 hxp}, it will remove 512 xp from wallet. It will return {1 hxp}, and 88 xp will remain in wallet.
-
-			// Setup:
-			ItemStack currencyClone = currency.clone();
-			int itemCount = currencyClone.getAmount();
-			int walletCount = numInWallet(currencyClone);
-			if (walletCount == 0) {
-				// No items removed:
-				return currencyClone;
-			} else if (walletCount >= itemCount) {
-				// No leftovers:
-				mWallet.remove(mPlayer, currencyClone);
-				return null;
-			} else {
-				// Some leftovers:
-				mWallet.remove(mPlayer, currencyClone);
-				currencyClone.setAmount(itemCount - walletCount); // itemCount is always positive and walletCount < itemCount.
-				return currencyClone;
-			}
-		}
-	}
 }
