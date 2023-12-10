@@ -70,7 +70,7 @@ public class IchorSelectionGUI extends Gui {
 		ItemStatUtils.addInfusion(mainhand, infusionType, 1, mPlayer.getUniqueId());
 	}
 
-	private void clearIchorInfusions(ItemStack item) {
+	public static void clearIchorInfusions(ItemStack item) {
 		for (InfusionType type : IchorListener.ICHOR_INFUSIONS) {
 			if (ItemStatUtils.hasInfusion(item, type)) {
 				ItemStatUtils.removeInfusion(item, type);

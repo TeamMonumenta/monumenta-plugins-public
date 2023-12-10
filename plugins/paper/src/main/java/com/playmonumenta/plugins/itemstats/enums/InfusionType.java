@@ -52,15 +52,6 @@ public enum InfusionType {
 	UNYIELDING(new Unyielding(), "", true, false, false, false, true, true),
 	USURPER(new Usurper(), "", true, false, false, false, true, true),
 	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true),
-	// Ichor Imbuements
-	ICHOR_DAWNBRINGER(new IchorDawnbringer(), "Imbued", false, false, false, false, false, false),
-	ICHOR_EARTHBOUND(new IchorEarthbound(), "Imbued", false, false, false, false, false, false),
-	ICHOR_FLAMECALLER(new IchorFlamecaller(), "Imbued", false, false, false, false, false, false),
-	ICHOR_FROSTBORN(new IchorFrostborn(), "Imbued", false, false, false, false, false, false),
-	ICHOR_PRISMATIC(new IchorPrismatic(), "Imbued", false, false, false, false, false, false),
-	ICHOR_SHADOWDANCER(new IchorShadowdancer(), "Imbued", false, false, false, false, false, false),
-	ICHOR_STEELSAGE(new IchorSteelsage(), "Imbued", false, false, false, false, false, false),
-	ICHOR_WINDWALKER(new IchorWindwalker(), "Imbued", false, false, false, false, false, false),
 	// Other Added Tags
 	LOCKED(new Locked(), "", false, false, false, false, false, false),
 	BARKING(new Barking(), "", true, false, true, false, false, false),
@@ -69,6 +60,16 @@ public enum InfusionType {
 	UNRUSTWORTHY(new Unrustworthy(), "", false, false, false, false, false, false),
 	WAX_ON(new WaxOn(), "", false, false, false, false, false, false),
 	WAX_OFF(new WaxOff(), "", false, false, false, false, false, false),
+	// Ichor Imbuements
+	ICHOR_DAWNBRINGER(new IchorDawnbringer(), "", false, false, false, false, false, false),
+	ICHOR_EARTHBOUND(new IchorEarthbound(), "", false, false, false, false, false, false),
+	ICHOR_FLAMECALLER(new IchorFlamecaller(), "", false, false, false, false, false, false),
+	ICHOR_FROSTBORN(new IchorFrostborn(), "", false, false, false, false, false, false),
+	ICHOR_PRISMATIC(new IchorPrismatic(), "", false, false, false, false, false, false),
+	ICHOR_SHADOWDANCER(new IchorShadowdancer(), "", false, false, false, false, false, false),
+	ICHOR_STEELSAGE(new IchorSteelsage(), "", false, false, false, false, false, false),
+	ICHOR_WINDWALKER(new IchorWindwalker(), "", false, false, false, false, false, false),
+	// Boss/Special Infusions
 	HOPE(new Hope(), "Hoped", false, false, true, false, false, false),
 	COLOSSAL(new Colossal(), "Reinforced", false, false, false, false, false, false),
 	PHYLACTERY(new Phylactery(), "Embalmed", false, false, false, false, false, false),

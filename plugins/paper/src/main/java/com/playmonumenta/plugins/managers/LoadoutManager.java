@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
+import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -23,6 +24,7 @@ import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
 import com.playmonumenta.plugins.parrots.ParrotManager;
@@ -190,7 +192,14 @@ public class LoadoutManager implements Listener {
 							return true;
 						}
 						if (isLoadoutItem(loadoutItem, matchInfusion, playerItem)) {
-							// Item already equipped, nothing to do
+							// Item already equipped, nothing to do, unless they have an ichor infusion, in which case, check if it needs to be swapped
+							InfusionType ichorInfusion = IchorListener.getIchorInfusion(playerItem);
+							InfusionType targetIchorInfusion = loadoutItem.mIchorInfusionType;
+							if (targetIchorInfusion != null && ichorInfusion != null && ichorInfusion != targetIchorInfusion) {
+								IchorSelectionGUI.clearIchorInfusions(playerItem);
+								ItemStatUtils.addInfusion(playerItem, targetIchorInfusion, 1, player.getUniqueId());
+								swappedEquipment.set(true);
+							}
 							return true;
 						}
 						for (ItemInventory inventory : inventories) {
@@ -203,6 +212,13 @@ public class LoadoutManager implements Listener {
 								if (newItem != null && isLoadoutItem(loadoutItem, matchInfusion, newItem)) {
 									swappedEquipment.set(true);
 									EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
+
+									InfusionType ichorInfusion = IchorListener.getIchorInfusion(newItem);
+									InfusionType targetIchorInfusion = loadoutItem.mIchorInfusionType;
+									if (targetIchorInfusion != null && ichorInfusion != null) {
+										IchorSelectionGUI.clearIchorInfusions(newItem);
+										ItemStatUtils.addInfusion(newItem, targetIchorInfusion, 1, player.getUniqueId());
+									}
 
 									ItemStatUtils.cleanIfNecessary(newItem);
 
@@ -660,7 +676,8 @@ public class LoadoutManager implements Listener {
 					mEquipment.add(new LoadoutItem(i, ItemUtils.getIdentifier(item, false),
 						EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) && ItemStatUtils.getRegion(item) == Region.RING,
 						InfusionUtils.getCurrentInfusion(item).getInfusionType(),
-						Objects.requireNonNullElse(DelveInfusionUtils.getCurrentInfusion(item), DelveInfusionUtils.DelveInfusionSelection.REFUND).getInfusionType()));
+						Objects.requireNonNullElse(DelveInfusionUtils.getCurrentInfusion(item), DelveInfusionUtils.DelveInfusionSelection.REFUND).getInfusionType(),
+						IchorListener.getIchorInfusion(item)));
 				}
 			}
 		}
@@ -828,13 +845,15 @@ public class LoadoutManager implements Listener {
 		public boolean mIsExalted;
 		public @Nullable InfusionType mInfusionType;
 		public @Nullable InfusionType mDelveInfusionType;
+		public @Nullable InfusionType mIchorInfusionType;
 
-		public LoadoutItem(int slot, ItemUtils.ItemIdentifier identifier, boolean isExalted, @Nullable InfusionType infusionType, @Nullable InfusionType delveInfusionType) {
+		public LoadoutItem(int slot, ItemUtils.ItemIdentifier identifier, boolean isExalted, @Nullable InfusionType infusionType, @Nullable InfusionType delveInfusionType, @Nullable InfusionType ichorInfusionType) {
 			mSlot = slot;
 			mIdentifier = identifier;
 			mIsExalted = isExalted;
 			mInfusionType = infusionType;
 			mDelveInfusionType = delveInfusionType;
+			mIchorInfusionType = ichorInfusionType;
 		}
 
 		public JsonObject toJson() {
@@ -845,6 +864,7 @@ public class LoadoutManager implements Listener {
 			json.addProperty("exalted", mIsExalted);
 			json.addProperty("infusion", mInfusionType == null ? null : mInfusionType.name());
 			json.addProperty("delveInfusion", mDelveInfusionType == null ? null : mDelveInfusionType.name());
+			json.addProperty("ichorInfusion", mIchorInfusionType == null ? null : mIchorInfusionType.name());
 			return json;
 		}
 
@@ -866,7 +886,14 @@ public class LoadoutManager implements Listener {
 			} catch (IllegalArgumentException e) {
 				delveInfusion = null;
 			}
-			return new LoadoutItem(slot, identifier, exalted, infusion, delveInfusion);
+			InfusionType ichorInfusion;
+			try {
+				JsonPrimitive infusionElement = json.getAsJsonPrimitive("ichorInfusion");
+				ichorInfusion = infusionElement == null ? null : InfusionType.valueOf(infusionElement.getAsString());
+			} catch (IllegalArgumentException e) {
+				ichorInfusion = null;
+			}
+			return new LoadoutItem(slot, identifier, exalted, infusion, delveInfusion, ichorInfusion);
 		}
 	}
 

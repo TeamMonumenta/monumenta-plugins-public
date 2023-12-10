@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -404,6 +405,11 @@ public class LoadoutManagerGui extends Gui {
 						if (loadoutItem.mDelveInfusionType != null) {
 							lore.add(Component.text("  (left click to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 						}
+						if (loadoutItem.mIchorInfusionType != null) {
+							lore.add(Component.text("Will swap Ichor Imbuement to: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+									 .append(IchorListener.getCorrespondingDepthsTree(loadoutItem.mIchorInfusionType).getNameComponent()));
+							lore.add(Component.text("  (swap hands to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+						}
 						meta.lore(lore);
 						meta.addItemFlags(ItemFlag.values());
 					});
@@ -415,6 +421,12 @@ public class LoadoutManagerGui extends Gui {
 						.onLeftClick(() -> {
 							loadoutItem.mDelveInfusionType = null;
 							update();
+						})
+						.onClick((event) -> {
+							if (event.getClick() == ClickType.SWAP_OFFHAND) {
+								loadoutItem.mIchorInfusionType = null;
+								update();
+							}
 						});
 				}
 

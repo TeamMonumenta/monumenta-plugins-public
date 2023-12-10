@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -134,12 +135,41 @@ public class IchorListener implements Listener {
 		return (item.getType().isEdible() || item.getType() == Material.POTION) && ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY);
 	}
 
-	private @Nullable InfusionType getIchorInfusion(ItemStack item) {
+	public static @Nullable InfusionType getIchorInfusion(ItemStack item) {
 		for (InfusionType infusionType : ICHOR_INFUSIONS) {
 			if (ItemStatUtils.hasInfusion(item, infusionType)) {
 				return infusionType;
 			}
 		}
 		return null;
+	}
+
+	public static DepthsTree getCorrespondingDepthsTree(InfusionType ichorInfusion) {
+		switch (ichorInfusion) {
+			case ICHOR_DAWNBRINGER -> {
+				return DepthsTree.DAWNBRINGER;
+			}
+			case ICHOR_EARTHBOUND -> {
+				return DepthsTree.EARTHBOUND;
+			}
+			case ICHOR_FLAMECALLER -> {
+				return DepthsTree.FLAMECALLER;
+			}
+			case ICHOR_FROSTBORN -> {
+				return DepthsTree.FROSTBORN;
+			}
+			case ICHOR_PRISMATIC -> {
+				return DepthsTree.PRISMATIC;
+			}
+			case ICHOR_SHADOWDANCER -> {
+				return DepthsTree.SHADOWDANCER;
+			}
+			case ICHOR_STEELSAGE -> {
+				return DepthsTree.STEELSAGE;
+			}
+			default -> {
+				return DepthsTree.WINDWALKER;
+			}
+		}
 	}
 }
