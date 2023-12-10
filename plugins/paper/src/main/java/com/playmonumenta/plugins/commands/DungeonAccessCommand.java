@@ -37,6 +37,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class DungeonAccessCommand extends GenericCommand {
 
@@ -266,7 +267,12 @@ public class DungeonAccessCommand extends GenericCommand {
 	/**
 	 * Sends players to their existing instance for the given dungeon, if they have an instance.
 	 */
-	private static void send(Collection<Player> players, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch) {
+	private static void send(Collection<Player> players, @Nullable DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch) {
+		if (mapping == null) {
+			MMLog.warning("Invalid dungeon mapping");
+			return;
+		}
+
 		for (Iterator<Player> iterator = players.iterator(); iterator.hasNext(); ) {
 			Player player = iterator.next();
 			int accessScore = ScoreboardUtils.getScoreboardValue(player, mapping.getAccessName()).orElse(0);
@@ -303,8 +309,16 @@ public class DungeonAccessCommand extends GenericCommand {
 		}
 	}
 
-	public static void send(Player player, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation) {
+	public static void send(Player player, @Nullable DungeonUtils.DungeonCommandMapping mapping, Location returnLocation) {
 		send(List.of(player), mapping, returnLocation, returnLocation.getYaw(), returnLocation.getPitch());
+	}
+
+	public static void send(Player player, String dungeonName) throws WrapperCommandSyntaxException {
+		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(dungeonName);
+		if (mapping == null) {
+			throw CommandAPI.failWithString("No such dungeon " + dungeonName);
+		}
+		send(player, mapping, player.getLocation());
 	}
 
 	/**

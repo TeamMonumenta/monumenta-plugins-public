@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DateUtils;
+import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -9,6 +11,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -51,6 +54,12 @@ public class ShardSorterCommand {
 						for (ShardSorterData shardSorterData : SHARD_SORTER_DATA) {
 							shards.add(shardSorterData.mShardName);
 						}
+						for (DungeonUtils.DungeonCommandMapping mapping : DungeonUtils.DungeonCommandMapping.values()) {
+							String shardName = mapping.getShardName();
+							if (shardName != null) {
+								shards.add(shardName);
+							}
+						}
 						return shards;
 					})))
 			.withArguments(new PlayerArgument("target"))
@@ -60,7 +69,7 @@ public class ShardSorterCommand {
 			.register();
 	}
 
-	private static void run(CommandSender sender, String shard, Player player) {
+	private static void run(CommandSender sender, String shard, Player player) throws WrapperCommandSyntaxException {
 		if (shard == null || shard.isEmpty()
 			|| ServerProperties.getShardName().startsWith(shard)) {
 			sender.sendMessage("No shard specified or player is already on shard");
@@ -74,7 +83,7 @@ public class ShardSorterCommand {
 			}
 		}
 		if (shardType == null) {
-			//TODO: add instance math
+			DungeonAccessCommand.send(player, shard);
 		} else {
 			List<String> possibleShards = null;
 			try {
@@ -91,7 +100,8 @@ public class ShardSorterCommand {
 			}
 			possibleShards = sortShardNames(possibleShards, shard);
 			Calendar now = Calendar.getInstance();
-			int index = now.get(Calendar.MINUTE) % shardCount;
+			long minute = DateUtils.getSecondsSinceEpoch() / 60L;
+			int index = (int) (minute % shardCount);
 			String targetShard = possibleShards.get(index);
 			sender.sendMessage("Sending " + player.getName() + " to shard " + targetShard);
 			try {
