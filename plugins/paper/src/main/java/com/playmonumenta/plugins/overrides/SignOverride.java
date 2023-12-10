@@ -12,7 +12,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -101,7 +100,8 @@ public class SignOverride extends BaseOverride {
 		boolean output = item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && (ItemUtils.isDye(item.getType()) || item.getType() == Material.GLOW_INK_SAC));
 
 		// Compile all the lines of text together and make sure it is not a leaderboard that is being clicked
-		StringBuilder display = new StringBuilder();
+		boolean hasText = false;
+		Component display = Component.empty();
 		for (Component component : sign.lines()) {
 			if (component.clickEvent() != null) {
 				return output;
@@ -112,13 +112,18 @@ public class SignOverride extends BaseOverride {
 				continue;
 			}
 			line = line.replaceAll("[${}]", "");
+			Component part;
 			if (component.hasDecoration(TextDecoration.OBFUSCATED)) {
-				line = ChatColor.MAGIC + line + ChatColor.RESET;
+				part = Component.text("no spoiler for you")
+					.decoration(TextDecoration.OBFUSCATED, true);
+			} else {
+				part = Component.text(line);
 			}
-			display.append(line).append(" ");
+			hasText = true;
+			display = display.append(part).append(Component.space());
 		}
 
-		if (display.length() > 0) {
+		if (hasText) {
 			player.sendMessage(Component.text(display.toString()));
 		}
 
@@ -134,25 +139,29 @@ public class SignOverride extends BaseOverride {
 				    meta instanceof BlockStateMeta blockStateMeta) {
 					BlockState blockState = blockStateMeta.getBlockState();
 					if (blockState instanceof Sign signItem) {
-						@Nullable DyeColor dyeColor = sign.getColor();
+						DyeColor dyeColor = sign.getColor();
 						List<Component> signLines = sign.lines();
 						List<Component> loreLines = new ArrayList<>();
 						loreLines.add(Component.text(COPIED_SIGN_HEADER, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
-						Component loreBase = Component.text("> ").color(NamedTextColor.BLACK).decoration(TextDecoration.ITALIC, false);
-						if (dyeColor != null) {
-							signItem.setColor(dyeColor);
-							Color color = dyeColor.getColor();
-							float r = color.getRed() / 255.0f;
-							float g = color.getGreen() / 255.0f;
-							float b = color.getBlue() / 255.0f;
-							loreBase = loreBase.color(TextColor.color(r, g, b));
-						} else {
-							signItem.setColor(null);
-						}
+						Component loreHeader = Component.text("> ").color(NamedTextColor.BLACK).decoration(TextDecoration.ITALIC, false);
+						Component loreBase = Component.text("").color(NamedTextColor.BLACK);
+
+						signItem.setColor(dyeColor);
+						Color color = dyeColor.getColor();
+						float r = color.getRed() / 255.0f;
+						float g = color.getGreen() / 255.0f;
+						float b = color.getBlue() / 255.0f;
+						loreHeader = loreHeader.color(TextColor.color(r, g, b));
+						loreBase = loreBase.color(TextColor.color(
+							0.2f + 0.8f * r,
+							0.2f + 0.8f * g,
+							0.2f + 0.8f * b
+						));
+
 						for (int lineNum = 0; lineNum < signLines.size(); ++lineNum) {
 							Component line = signLines.get(lineNum);
 							signItem.line(lineNum, line);
-							Component loreLine = loreBase.append(line);
+							Component loreLine = loreHeader.append(loreBase.append(line));
 							loreLines.add(loreLine);
 						}
 						boolean signGlowing = sign.isGlowingText();
