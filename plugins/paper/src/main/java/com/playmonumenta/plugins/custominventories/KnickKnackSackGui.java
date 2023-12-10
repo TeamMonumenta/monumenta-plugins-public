@@ -79,7 +79,7 @@ public class KnickKnackSackGui extends Gui {
 		new Talisman(
 			"Steelsage",
 			"epic:r2/depths/utility/steelsage_talisman",
-			"DDT5Purchased",
+			"DDT6Purchased",
 			6,
 			0x929292,
 			FireworkStrikeCS.NAME),
@@ -87,7 +87,7 @@ public class KnickKnackSackGui extends Gui {
 		new Talisman(
 			"Shadowdancer",
 			"epic:r2/depths/utility/shadowdancer_talisman",
-			"DDT6Purchased",
+			"DDT5Purchased",
 			5,
 			0x7948af,
 			DarkPunishmentCS.NAME),
@@ -138,7 +138,7 @@ public class KnickKnackSackGui extends Gui {
 		new Talisman(
 			"Steelsage",
 			"epic:r3/depths2/steelsage_talisman_zenith",
-			"CZT5Purchased",
+			"CZT6Purchased",
 			6,
 			0x929292,
 			FireworkStrikeCS.NAME),
@@ -146,7 +146,7 @@ public class KnickKnackSackGui extends Gui {
 		new Talisman(
 			"Shadowdancer",
 			"epic:r3/depths2/shadowdancer_talisman_zenith",
-			"CZT6Purchased",
+			"CZT5Purchased",
 			5,
 			0x7948af,
 			DarkPunishmentCS.NAME),
