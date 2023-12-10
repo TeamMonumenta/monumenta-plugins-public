@@ -100,25 +100,21 @@ public class ItemUpdateHelper {
 					paths.add(baseKey);
 					break;
 				}
-				if (baseKey.isBlank()) {
-					baseKey = key;
-				}
-				paths = getEmptyKeys(compound, paths, baseKey);
-				break;
-			}
-
-			NBTType listType = nbt.getListType(key);
-			// MMLog.info(key + "-" + listType);
-			// if the compound isn't a compound but a list instead
-			if (listType == NBTType.NBTTagCompound) {
-				ReadableNBTList<ReadWriteNBT> compoundList = nbt.getCompoundList(key);
-				if (compoundList == null || compoundList.isEmpty()) {
+				paths = getEmptyKeys(compound, paths, baseKey.isBlank() ? key : baseKey);
+			} else {
+				NBTType listType = nbt.getListType(key);
+				// MMLog.info(key + "-" + listType);
+				// if the compound isn't a compound but a list instead
+				if (listType == NBTType.NBTTagCompound) {
+					ReadableNBTList<ReadWriteNBT> compoundList = nbt.getCompoundList(key);
+					if (compoundList == null || compoundList.isEmpty()) {
+						paths.add(baseKey);
+						break;
+					}
+				} else if (listType == NBTType.NBTTagEnd) {
 					paths.add(baseKey);
+					break;
 				}
-				break;
-			} else if (listType == NBTType.NBTTagEnd) {
-				paths.add(baseKey);
-				break;
 			}
 		}
 		return paths;
@@ -292,7 +288,7 @@ public class ItemUpdateHelper {
 			lore.addAll(tagsLater);
 
 			// TIER/MASTERWORK
-			if (monumenta != null && ItemStatUtils.getEnchantmentLevel(enchantments, EnchantmentType.HIDE_INFO) == 0) {
+			if (ItemStatUtils.getEnchantmentLevel(enchantments, EnchantmentType.HIDE_INFO) == 0) {
 				String regionString = monumenta.getString(Region.KEY);
 				if (regionString != null && !regionString.isEmpty()) {
 					Region region = Region.getRegion(regionString);
@@ -351,56 +347,54 @@ public class ItemUpdateHelper {
 			}
 
 			// LORE (Description)
-			if (monumenta != null) {
-				ReadableNBTList<String> description = monumenta.getStringList(ItemStatUtils.LORE_KEY);
-				if (description != null) {
-					for (String serializedLine : description) {
-						Component lineAdd = Component.text("", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
-						lineAdd = lineAdd.append(MessagingUtils.parseComponent(serializedLine));
-						lore.add(lineAdd);
-					}
+			ReadableNBTList<String> description = monumenta.getStringList(ItemStatUtils.LORE_KEY);
+			if (description != null) {
+				for (String serializedLine : description) {
+					Component lineAdd = Component.text("", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
+					lineAdd = lineAdd.append(MessagingUtils.parseComponent(serializedLine));
+					lore.add(lineAdd);
 				}
-				if (ItemStatUtils.isArrowTransformingQuiver(item)) {
-					QuiverListener.ArrowTransformMode transformMode = ItemStatUtils.getArrowTransformMode(item);
-					if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
-						lore.add(Component.text("Arrow transformation ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-							.append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-					} else {
-						lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-							.append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-					}
+			}
+			if (ItemStatUtils.isArrowTransformingQuiver(item)) {
+				QuiverListener.ArrowTransformMode transformMode = ItemStatUtils.getArrowTransformMode(item);
+				if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
+					lore.add(Component.text("Arrow transformation ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+						         .append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+				} else {
+					lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+						         .append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 				}
+			}
 
-				CustomContainerItemManager.generateDescription(item, monumenta, lore::add);
+			CustomContainerItemManager.generateDescription(item, monumenta, lore::add);
 
-				if (ItemStatUtils.isUpgradedLimeTesseract(item)) {
-					lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-						.append(Component.text(ItemStatUtils.getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
-				}
+			if (ItemStatUtils.isUpgradedLimeTesseract(item)) {
+				lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+					         .append(Component.text(ItemStatUtils.getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+			}
 
-				int shatterLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
-				if (shatterLevel > 0) {
-					TextColor color = TextColor.color(155 + (int) (100.0 * (shatterLevel - 1) / (Shattered.MAX_LEVEL - 1)), 0, 0);
-					lore.add(Component.text("* SHATTERED - " + StringUtils.toRoman(shatterLevel) + " *", color, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-					lore.add(Component.text("Return to your grave to remove one level", color).decoration(TextDecoration.ITALIC, false));
-					lore.add(Component.text("of Shattered, or use an anvil on this item.", color).decoration(TextDecoration.ITALIC, false));
-				}
+			int shatterLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
+			if (shatterLevel > 0) {
+				TextColor color = TextColor.color(155 + (int) (100.0 * (shatterLevel - 1) / (Shattered.MAX_LEVEL - 1)), 0, 0);
+				lore.add(Component.text("* SHATTERED - " + StringUtils.toRoman(shatterLevel) + " *", color, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Return to your grave to remove one level", color).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("of Shattered, or use an anvil on this item.", color).decoration(TextDecoration.ITALIC, false));
+			}
 
-				ReadableNBTList<ReadWriteNBT> effects = ItemStatUtils.getEffects(nbt);
-				if (effects != null && !effects.isEmpty()) {
-					lore.add(Component.empty());
-					lore.add(Component.text("When Consumed:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			ReadableNBTList<ReadWriteNBT> effects = ItemStatUtils.getEffects(nbt);
+			if (effects != null && !effects.isEmpty()) {
+				lore.add(Component.empty());
+				lore.add(Component.text("When Consumed:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 
-					for (ReadWriteNBT effect : effects) {
-						String type = effect.getString(ItemStatUtils.EFFECT_TYPE_KEY);
-						EffectType effectType = EffectType.fromType(type);
-						if (effectType != null) {
-							int duration = effect.getInteger(ItemStatUtils.EFFECT_DURATION_KEY);
-							double strength = effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY);
-							Component comp = EffectType.getComponent(effectType, strength, duration);
-							if (!lore.contains(comp)) {
-								lore.add(comp);
-							}
+				for (ReadWriteNBT effect : effects) {
+					String type = effect.getString(ItemStatUtils.EFFECT_TYPE_KEY);
+					EffectType effectType = EffectType.fromType(type);
+					if (effectType != null) {
+						int duration = effect.getInteger(ItemStatUtils.EFFECT_DURATION_KEY);
+						double strength = effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY);
+						Component comp = EffectType.getComponent(effectType, strength, duration);
+						if (!lore.contains(comp)) {
+							lore.add(comp);
 						}
 					}
 				}
@@ -482,15 +476,13 @@ public class ItemUpdateHelper {
 			}
 
 			// CHARM
-			if (monumenta != null) {
-				ReadableNBTList<String> charmLore = monumenta.getStringList(ItemStatUtils.CHARM_KEY);
-				if (charmLore != null && ItemStatUtils.isCharm(item)) {
-					lore.add(Component.empty());
-					lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-					for (String serializedLine : charmLore) {
-						Component lineAdd = MessagingUtils.parseComponent(serializedLine);
-						lore.add(lineAdd);
-					}
+			ReadableNBTList<String> charmLore = monumenta.getStringList(ItemStatUtils.CHARM_KEY);
+			if (charmLore != null && ItemStatUtils.isCharm(item)) {
+				lore.add(Component.empty());
+				lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				for (String serializedLine : charmLore) {
+					Component lineAdd = MessagingUtils.parseComponent(serializedLine);
+					lore.add(lineAdd);
 				}
 			}
 		});
@@ -503,10 +495,8 @@ public class ItemUpdateHelper {
 		lore.removeAll(loreToRemove);
 		NBT.modify(item, nbt -> {
 			// remove unused keys
-			if (!unusedKeys.isEmpty()) {
-				for (String path : unusedKeys) {
-					cleanEmptyTags(nbt, path);
-				}
+			for (String path : unusedKeys) {
+				cleanEmptyTags(nbt, path);
 			}
 
 			// return if no NBT
