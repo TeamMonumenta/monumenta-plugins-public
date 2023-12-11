@@ -10,11 +10,11 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
@@ -50,9 +50,13 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import de.tr7zw.nbtapi.NBTEntity;
-
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -1011,6 +1015,11 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 
+		if (ItemStatUtils.isCharm(item)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (item.getItemMeta() instanceof PotionMeta potionMeta) {
 			if (ItemStatUtils.hasConsumeEffect(item)) {
 				// If it's a custom potion, remove all effects
@@ -1068,6 +1077,11 @@ public class PlayerListener implements Listener {
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
+
+		if (ItemStatUtils.isCharm(item)) {
+			event.setCancelled(true);
+			return;
+		}
 
 		mPlugin.mAbilityManager.playerItemDamageEvent(player, event);
 
