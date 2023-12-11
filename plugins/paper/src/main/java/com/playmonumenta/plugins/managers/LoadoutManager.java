@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
@@ -41,6 +42,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +59,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -111,6 +117,40 @@ public class LoadoutManager implements Listener {
 		Location.RUSH, Location.TREASURE, Location.INTELLECT
 	);
 
+	private enum EquipmentCaseTag {
+		R1((item) -> ItemStatUtils.getRegion(item) == Region.VALLEY, "r1|valley"),
+		R2((item) -> ItemStatUtils.getRegion(item) == Region.ISLES, "r2|isles"),
+		R3((item) -> ItemStatUtils.getRegion(item) == Region.RING, "r3|ring"),
+		ARMOR(item -> ItemUtils.isArmorOrWearable(item) || ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND), "armors?"),
+		WEAPON(item -> ItemStatUtils.hasAttributeInSlot(item, Slot.MAINHAND) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND), "weapons?"),
+		CHARM(item -> ItemStatUtils.isCharm(item), "charms?"),
+		;
+
+		private final Pattern mTagPattern;
+		private final Predicate<ItemStack> mPredicate;
+
+		EquipmentCaseTag(Predicate<ItemStack> predicate, String tagPattern) {
+			mTagPattern = Pattern.compile("\\b(?:" + tagPattern + ")\\b", Pattern.CASE_INSENSITIVE);
+			mPredicate = predicate;
+		}
+
+		static Set<EquipmentCaseTag> getTags(ItemStack item) {
+			String caseName = NBT.get(item, nbt -> {
+				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+				if (playerModified != null) {
+					return playerModified.getString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
+				}
+				return null;
+			});
+			if (caseName == null) {
+				return Set.of();
+			}
+			return Arrays.stream(values())
+				       .filter(tag -> tag.mTagPattern.matcher(caseName).find())
+				       .collect(Collectors.toSet());
+		}
+	}
+
 	private final Map<UUID, LoadoutData> mData = new HashMap<>();
 
 	public LoadoutData getData(Player player) {
@@ -127,7 +167,7 @@ public class LoadoutManager implements Listener {
 		return item != null && ItemUtils.isShulkerBox(item.getType()) && STORAGE_SHULKER_NAME.equals(ItemUtils.getPlainNameIfExists(item));
 	}
 
-	private record ItemInventory(Inventory mInventory, Runnable mSaveAction) {
+	private record ItemInventory(Inventory mInventory, Runnable mSaveAction, Set<EquipmentCaseTag> tags) {
 	}
 
 	public void swapTo(Player player, Loadout loadout, boolean full) {
@@ -165,7 +205,7 @@ public class LoadoutManager implements Listener {
 						inventories.add(new ItemInventory(shulkerBox.getInventory(), () -> {
 							blockStateMeta.setBlockState(shulkerBox);
 							item.setItemMeta(blockStateMeta);
-						}));
+						}, EquipmentCaseTag.getTags(item)));
 					}
 				}
 			};
@@ -174,10 +214,10 @@ public class LoadoutManager implements Listener {
 			if (hasEnderChest) {
 				findStorageShulkers.accept(player.getEnderChest());
 				inventories.add(new ItemInventory(player.getEnderChest(), () -> {
-				}));
+				}, Set.of()));
 			}
 			inventories.add(new ItemInventory(player.getInventory(), () -> {
-			}));
+			}, Set.of()));
 
 			try {
 				// Swap equipment
@@ -232,21 +272,7 @@ public class LoadoutManager implements Listener {
 									player.getInventory().setItem(loadoutItem.mSlot, newItemClone);
 
 									if (!ItemUtils.isNullOrAir(playerItem)) {
-										if (newItem.getAmount() == 0
-											    && (!ItemUtils.isShulkerBox(playerItem.getType())
-												        || inventory.mInventory.equals(player.getInventory())
-												        || inventory.mInventory.equals(player.getEnderChest())
-												        || (ShulkerEquipmentListener.canSwapItem(playerItem)
-													            && canPutMoreShulkersIntoEquipmentBox(inventory.mInventory)))) {
-											// Swap item if that is allowed: target slot is empty, and:
-											// - the item swapped is not a shulker box
-											// - or is swapping to inventory or ender chest
-											// - or is an allowed shulker box and the targeted equipment case is below the shulker box limit
-											inventory.mInventory.setItem(i, playerItem);
-										} else {
-											// Otherwise, put into any valid inventory
-											giveItem(player, inventories, playerItem);
-										}
+										giveItem(player, inventories, playerItem, List.of(inventory), i);
 									}
 									return true;
 								}
@@ -277,7 +303,7 @@ public class LoadoutManager implements Listener {
 								}
 								if (playerItem != null && !playerItem.getType().isAir()) {
 									player.getInventory().setItem(slot, null);
-									giveItem(player, inventories, playerItem);
+									giveItem(player, inventories, playerItem, List.of(), 0);
 									swappedEquipment.set(true);
 								}
 							}
@@ -299,7 +325,7 @@ public class LoadoutManager implements Listener {
 					Set<ItemStack> oldCharmsSet = new HashSet<>(activeCharms);
 					List<ItemStack> oldCharms = new ArrayList<>(activeCharms);
 					activeCharms.clear();
-					List<Inventory> charmInventories = new ArrayList<>(); // Try to put extra charms in the same boxes where we got the charms from
+					List<ItemInventory> charmInventories = new ArrayList<>(); // Try to put extra charms in the same boxes where we got the charms from
 
 					// Equip new charms, swapping with old charms as far as possible
 					charmLoop:
@@ -329,14 +355,10 @@ public class LoadoutManager implements Listener {
 									activeCharms.add(newItemClone);
 									if (!oldCharms.isEmpty()) {
 										ItemStack oldCharm = oldCharms.remove(0);
-										if (newItem.getAmount() == 0) {
-											inventory.mInventory.setItem(invI, oldCharm);
-										} else {
-											giveItem(player, inventories, oldCharm);
-										}
+										giveItem(player, inventories, oldCharm, List.of(inventory), invI);
 									}
-									if (!charmInventories.contains(inventory.mInventory)) {
-										charmInventories.add(inventory.mInventory);
+									if (!charmInventories.contains(inventory)) {
+										charmInventories.add(inventory);
 									}
 									continue charmLoop;
 								}
@@ -346,21 +368,8 @@ public class LoadoutManager implements Listener {
 					}
 
 					// Put any extra old charms into any free storage boxes, prioritising the boxes where charms were swapped from
-					charmLoop:
 					for (ItemStack charm : oldCharms) {
-						for (Inventory charmInventory : charmInventories) {
-							if (InventoryUtils.canFitInInventory(charm, charmInventory)) {
-								charmInventory.addItem(charm);
-								continue charmLoop;
-							}
-						}
-						for (ItemInventory inventory : inventories) {
-							if (InventoryUtils.canFitInInventory(charm, inventory.mInventory)) {
-								inventory.mInventory.addItem(charm);
-								continue charmLoop;
-							}
-						}
-						InventoryUtils.giveItem(player, charm);
+						giveItem(player, inventories, charm, charmInventories, -1);
 					}
 
 					swappedCharms = !oldCharmsSet.equals(new HashSet<>(activeCharms));
@@ -487,33 +496,63 @@ public class LoadoutManager implements Listener {
 			                           .orElse(Component.empty()));
 	}
 
-	private static void giveItem(Player player, List<ItemInventory> inventories, ItemStack item) {
+	private static void giveItem(Player player, List<ItemInventory> inventories, ItemStack item, List<ItemInventory> preferredInventories, int preferredSlot) {
 		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
-		if (ItemUtils.isShulkerBox(item.getType())) {
-			// shulker box: allow in player inventory and ender chest, and allow specific shulkers in equipment cases up to a limit
-			boolean canSwapItem = ShulkerEquipmentListener.canSwapItem(item);
-			for (ItemInventory inv : inventories) {
-				if (InventoryUtils.numEmptySlots(inv.mInventory) > 0
-					    && (inv.mInventory.equals(player.getEnderChest())
-						        || inv.mInventory.equals(player.getInventory())
-						        || (canSwapItem && canPutMoreShulkersIntoEquipmentBox(inv.mInventory)))) {
-					inv.mInventory.addItem(item);
-					return;
-				}
+
+		// Find the best place to store an item following these priorities:
+		// 1. The case with the most matching tags and no negative tag matches [+100 per tag]
+		// 2. Any case with no tags (so that these work as a general/misc case) [+10]
+		// 3. The equipment case & slot that the previous item(s) was/were taken from (preferredInventories & preferredSlot parameters) [+1 if any space in case]
+		// 4. Any case [0]
+		ItemInventory bestInventory = null;
+		int bestPriority = -1;
+		int bestSlot = -1;
+
+		Set<EquipmentCaseTag> itemTags = Arrays.stream(EquipmentCaseTag.values())
+			                                 .filter(tag -> tag.mPredicate.test(item))
+			                                 .collect(Collectors.toSet());
+		boolean isShulker = ItemUtils.isShulkerBox(item.getType());
+		boolean isSwappableShulker = isShulker && ShulkerEquipmentListener.canSwapItem(item);
+
+		for (ItemInventory inv : inventories) {
+			int priority = 0;
+			int slot = -1;
+			if (itemTags.containsAll(inv.tags)) {
+				priority += inv.tags.size() * 100;
 			}
-		} else {
-			// normal item: just place where it fits
-			for (ItemInventory inv : inventories) {
-				if (InventoryUtils.canFitInInventory(item, inv.mInventory)) {
-					inv.mInventory.addItem(item);
-					return;
-				}
+			if (inv.tags.isEmpty()) {
+				priority += 10;
+			}
+			if (preferredInventories.contains(inv)) {
+				priority += 1;
+				slot = preferredSlot;
+			}
+			// if best inventory so far, and there's space, set as new best inventory
+			if (priority > bestPriority
+				    && (isShulker
+					        ? (InventoryUtils.numEmptySlots(inv.mInventory) > 0
+						           && (inv.mInventory.equals(player.getEnderChest())
+							               || inv.mInventory.equals(player.getInventory())
+							               || (isSwappableShulker && canPutMoreShulkersIntoEquipmentBox(inv.mInventory))))
+					        : InventoryUtils.canFitInInventory(item, inv.mInventory))) {
+				bestInventory = inv;
+				bestPriority = priority;
+				bestSlot = slot;
 			}
 		}
-		// no good place found: give to player
-		InventoryUtils.giveItem(player, item);
+
+		if (bestInventory != null) {
+			if (bestSlot >= 0 && bestSlot < bestInventory.mInventory.getSize() && ItemUtils.isNullOrAir(bestInventory.mInventory.getItem(bestSlot))) {
+				bestInventory.mInventory.setItem(bestSlot, item);
+			} else {
+				bestInventory.mInventory.addItem(item);
+			}
+		} else {
+			// no good place found: give to player (most likely drops on the ground)
+			InventoryUtils.giveItem(player, item);
+		}
 	}
 
 	public boolean isEquipped(Player player, Loadout loadout) {
@@ -571,6 +610,71 @@ public class LoadoutManager implements Listener {
 			}
 		}
 		player.sendMessage(Component.text("No quickswap loadout defined. Open the GUI to define one!", NamedTextColor.RED));
+	}
+
+	public void retrieveUnusedItems(Player player) {
+		try {
+			if (InventoryUtils.numEmptySlots(player.getInventory()) == 0) {
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.1f);
+				player.sendMessage(Component.text("Make some space in your inventory first!", NamedTextColor.GRAY));
+				return;
+			}
+			int totalRetrieved = 0;
+			boolean finished = true;
+			LoadoutData data = getData(player);
+			inventoryLoop:
+			for (Inventory inventory : ItemUtils.hasPortableEnderOrIsNearEnderChest(player)
+				                           ? new Inventory[] {player.getEnderChest(), player.getInventory()}
+				                           : new Inventory[] {player.getInventory()}) {
+				for (ItemStack shulkerItem : inventory.getContents()) {
+					if (shulkerItem != null
+						    && isEquipmentStorageBox(shulkerItem)
+						    && shulkerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+						    && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+						boolean changed = false;
+						for (ItemStack item : shulkerBox.getInventory()) {
+							if (!ItemUtils.isNullOrAir(item)
+								    && data.mLoadouts.stream()
+									       .noneMatch(loadout -> loadout.mEquipment.stream().anyMatch(loadoutItem -> isLoadoutItem(loadoutItem, false, item))
+										                             || loadout.mCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false)))) {
+								if (InventoryUtils.canFitInInventory(item, player.getInventory())) {
+									player.getInventory().addItem(ItemUtils.clone(item));
+									item.setAmount(0);
+									changed = true;
+									totalRetrieved++;
+								} else {
+									finished = false;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							blockStateMeta.setBlockState(shulkerBox);
+							shulkerItem.setItemMeta(blockStateMeta);
+						}
+						if (InventoryUtils.numEmptySlots(player.getInventory()) == 0) {
+							finished = false;
+							break inventoryLoop;
+						}
+					}
+				}
+			}
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.1f);
+			if (totalRetrieved > 0) {
+				player.sendMessage(Component.text("Retrieved " + totalRetrieved + " item" + (totalRetrieved == 1 ? "" : "s") + ".", NamedTextColor.GOLD));
+				if (finished) {
+					player.sendMessage(Component.text("There are no more items to retrieve.", NamedTextColor.GRAY));
+				} else {
+					player.sendMessage(Component.text("There may be more items to retrieve.", NamedTextColor.WHITE));
+				}
+			} else {
+				player.sendMessage(Component.text("No items were retrieved.", NamedTextColor.WHITE));
+			}
+		} catch (Exception e) {
+			String message = "Exception in Loadout Manager swap code, items have likely been duped or deleted. Affected player: " + player.getName();
+			AuditListener.logSevere(message);
+			MMLog.severe(message, e);
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -732,10 +836,6 @@ public class LoadoutManager implements Listener {
 			}
 		}
 
-		public @Nullable LoadoutItem getEquipmentInSlot(int slot) {
-			return mEquipment.stream().filter(i -> i.mSlot == slot).findFirst().orElse(null);
-		}
-
 		public JsonObject toJson() {
 			JsonObject json = new JsonObject();
 
@@ -841,7 +941,7 @@ public class LoadoutManager implements Listener {
 
 	public static class LoadoutItem {
 		public int mSlot;
-		public ItemUtils.ItemIdentifier mIdentifier; // TODO r3 exalted items
+		public ItemUtils.ItemIdentifier mIdentifier;
 		public boolean mIsExalted;
 		public @Nullable InfusionType mInfusionType;
 		public @Nullable InfusionType mDelveInfusionType;

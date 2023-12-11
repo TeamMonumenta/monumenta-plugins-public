@@ -14,8 +14,8 @@ plugins {
     id("net.minecrell.plugin-yml.bungee") version "0.5.1" // Generates bungee.yml
     id("org.hidetake.ssh") version "2.10.1"
     id("java")
-    id("net.ltgt.errorprone") version "2.0.2"
-    id("net.ltgt.nullaway") version "1.3.0"
+    id("net.ltgt.errorprone") version "3.1.0"
+    id("net.ltgt.nullaway") version "1.6.0"
 }
 
 dependencies {
@@ -52,8 +52,8 @@ dependencies {
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     compileOnly("io.prometheus:simpleclient:0.11.0")
     compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
-    errorprone("com.google.errorprone:error_prone_core:2.10.0")
-    errorprone("com.uber.nullaway:nullaway:0.9.5")
+    errorprone("com.google.errorprone:error_prone_core:2.23.0")
+    errorprone("com.uber.nullaway:nullaway:0.10.18")
 
     // Bungeecord deps
     compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")

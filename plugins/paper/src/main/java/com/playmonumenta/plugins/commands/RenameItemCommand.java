@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -108,7 +109,8 @@ public class RenameItemCommand {
 		}
 		if (ItemStatUtils.getRegion(itemStack) != Region.SHULKER_BOX
 			    && !ShulkerEquipmentListener.isEquipmentBox(itemStack)
-			    && !ShulkerEquipmentListener.isCharmBox(itemStack)) {
+			    && !ShulkerEquipmentListener.isCharmBox(itemStack)
+			    && !LoadoutManager.isEquipmentStorageBox(itemStack)) {
 			player.sendMessage(Component.text("This item cannot be renamed!", NamedTextColor.RED));
 			throw CommandAPI.failWithString("This item cannot be renamed!");
 		}

@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -283,21 +284,26 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					suffix = "´";
 				} else {
 					String lock = NBT.get(itemStack, ItemUtils::getContainerLock);
-					if (lock == null || lock.isBlank()) {
-						prefix = null;
-						suffix = null;
-					} else if (lock.equals(ShulkerEquipmentListener.LOCK_STRING)) { // loadout lockboxes
-						prefix = "Loadout: ";
-						suffix = "";
-					} else if (lock.equals(ShulkerEquipmentListener.CHARM_STRING)) { // charm boxes
-						prefix = "C.H.A.R.M.: ";
+					if (lock != null && !lock.isBlank()) {
+						if (lock.equals(ShulkerEquipmentListener.LOCK_STRING)) { // loadout lockboxes
+							prefix = "Loadout: ";
+							suffix = "";
+						} else if (lock.equals(ShulkerEquipmentListener.CHARM_STRING)) { // charm boxes
+							prefix = "C.H.A.R.M.: ";
+							suffix = "";
+						} else {
+							prefix = null;
+							suffix = null;
+						}
+					} else if (LoadoutManager.isEquipmentStorageBox(itemStack)) { // equipment cases
+						prefix = "Case: ";
 						suffix = "";
 					} else {
 						prefix = null;
 						suffix = null;
 					}
 				}
-				if (prefix != null && customName != null && !customName.isEmpty()) {
+				if (prefix != null && !customName.isEmpty()) {
 					NBT.modify(itemStack, nbt -> {
 						nbt.modifyMeta((nbtr, meta) -> {
 							Component existingName = meta.displayName();

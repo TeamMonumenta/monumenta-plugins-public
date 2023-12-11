@@ -150,10 +150,11 @@ public class LoadoutManagerGui extends Gui {
 				});
 
 			// stash equipment button
-			setItem(0, 7, GUIUtils.createBasicItem(Material.CHEST, "Stash Equipment", NamedTextColor.WHITE, true,
-				"Click to store your current equipment and charms in any free " + LoadoutManager.STORAGE_SHULKER_NAME + "s.\n" +
+			setItem(0, 7, GUIUtils.createBasicItem(Material.CHEST, "Stash/Retrieve Equipment", NamedTextColor.WHITE, true,
+				"- Left-click to store your current equipment and charms in any free " + LoadoutManager.STORAGE_SHULKER_NAME + "s.\n" +
 					"Use for example to get a clean slate to start a new loadout.\n" +
-					"Shift click to only store equipment and not charms."))
+					"- Shift left-click to only store equipment and not charms.\n" +
+					"- Right-click to take all items out of " + LoadoutManager.STORAGE_SHULKER_NAME + "s that are not used in any loadout."))
 				.onClick(event -> {
 					if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.SHIFT_LEFT) {
 						LoadoutManager.Loadout loadout = new LoadoutManager.Loadout(-1, "temp");
@@ -163,6 +164,9 @@ public class LoadoutManagerGui extends Gui {
 						loadout.mClearEmpty = true;
 						Plugin.getInstance().mLoadoutManager.swapTo(mPlayer, loadout, true);
 						update();
+					} else if (event.getClick() == ClickType.RIGHT) {
+						Plugin.getInstance().mLoadoutManager.retrieveUnusedItems(mPlayer);
+						close();
 					}
 				});
 
