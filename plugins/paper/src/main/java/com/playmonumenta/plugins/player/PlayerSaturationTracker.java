@@ -18,7 +18,7 @@ public class PlayerSaturationTracker {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				float newSaturation = player.getSaturation();
-				if (player.getHealth() < EntityUtils.getMaxHealth(player)
+				if ((float) player.getHealth() < (float) EntityUtils.getMaxHealth(player) // float comparison just like in vanilla (Player.isHurt())
 					    || player.getFoodLevel() < 20) {
 					// Health updates are sent automatically in these conditions, so just update the tracked value
 					saturationLevels.put(player.getUniqueId(), newSaturation);
