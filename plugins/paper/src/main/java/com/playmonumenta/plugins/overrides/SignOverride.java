@@ -124,7 +124,7 @@ public class SignOverride extends BaseOverride {
 		}
 
 		if (hasText) {
-			player.sendMessage(Component.text(display.toString()));
+			player.sendMessage(display);
 		}
 
 		if (player.isSneaking()) {
