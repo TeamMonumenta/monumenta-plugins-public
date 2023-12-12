@@ -638,7 +638,7 @@ public class ParticleUtils {
 			default -> linesToDraw = List.of(top, topLeft, topRight, middle, bottomRight);
 		}
 
-		linesToDraw.forEach(l -> l.spawnForPlayer(ParticleCategory.BOSS, player));
+		linesToDraw.forEach(l -> l.spawnForPlayer(ParticleCategory.FULL, player));
 	}
 
 	public static void drawLine(Location start, Location end, int units, ParametricParticle pp) {

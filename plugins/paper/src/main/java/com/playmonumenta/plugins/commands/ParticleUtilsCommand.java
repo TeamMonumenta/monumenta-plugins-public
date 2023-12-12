@@ -5,11 +5,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.AbstractPartialParticle;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PPParametric;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.StringTooltip;
 import dev.jorel.commandapi.arguments.Argument;
@@ -22,6 +22,7 @@ import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -50,9 +51,8 @@ public class ParticleUtilsCommand {
 		ArgumentSuggestions.strings("null", "\"255,0,0,2.5\"", "REDSTONE_BLOCK")
 	);
 
-
+	@SuppressWarnings("unchecked")
 	public static void register() {
-		// Line
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.particleutils")
 			.withSubcommands(
@@ -68,15 +68,45 @@ public class ParticleUtilsCommand {
 						extraDataArgument
 					)
 					.executes((sender, args) -> {
-						Location start = (Location) args[0];
-						Location end = (Location) args[1];
-						double countPerMeter = (double) args[2];
 						Particle particle = Particle.valueOf((String) args[3]);
 						double distanceFalloff = (double) args[4];
-						String extraData = (String) args[5];
 
-						CommandSender callee = getFinalCallee(sender, distanceFalloff);
-						doLine(callee, start, end, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
+						doLine(
+							getFinalCallee(sender, distanceFalloff),
+							(Location) args[0],
+							(Location) args[1],
+							(double) args[2],
+							particle,
+							distanceFalloff,
+							parseExtraData((String) args[5], particle),
+							null
+						);
+					}),
+				// Line - optional player selector argument
+				new CommandAPICommand("line")
+					.withPermission("monumenta.particleutils.line")
+					.withArguments(
+						new LocationArgument("start"),
+						new LocationArgument("end"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument,
+						new EntitySelectorArgument.ManyPlayers("allowed viewers")
+					)
+					.executes((sender, args) -> {
+						Particle particle = Particle.valueOf((String) args[3]);
+						double distanceFalloff = (double) args[4];
+						doLine(
+							getFinalCallee(sender, distanceFalloff),
+							(Location) args[0],
+							(Location) args[1],
+							(double) args[2],
+							particle,
+							distanceFalloff,
+							parseExtraData((String) args[5], particle),
+							(List<Player>) args[6]
+						);
 					}),
 				// Rectangle
 				new CommandAPICommand("rectangle")
@@ -91,16 +121,51 @@ public class ParticleUtilsCommand {
 						extraDataArgument
 					)
 					.executes((sender, args) -> {
-						Location start = (Location) args[0];
-						double dx = (double) args[1];
-						double dz = (double) args[2];
-						double countPerMeter = (double) args[3];
 						Particle particle = Particle.valueOf((String) args[4]);
 						double distanceFalloff = (double) args[5];
 						String extraData = (String) args[6];
 
-						CommandSender callee = getFinalCallee(sender, distanceFalloff);
-						doRectangle(callee, start, dx, dz, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
+						doRectangle(
+							getFinalCallee(sender, distanceFalloff),
+							(Location) args[0],
+							(double) args[1],
+							(double) args[2],
+							(double) args[3],
+							particle,
+							distanceFalloff,
+							parseExtraData(extraData, particle),
+							null
+						);
+					}),
+				// Rectangle - optional player selector argument
+				new CommandAPICommand("rectangle")
+					.withPermission("monumenta.particleutils.rectangle")
+					.withArguments(
+						new LocationArgument("start"),
+						new DoubleArgument("dx"),
+						new DoubleArgument("dz"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument,
+						new EntitySelectorArgument.ManyPlayers("allowed viewers")
+					)
+					.executes((sender, args) -> {
+						Particle particle = Particle.valueOf((String) args[4]);
+						double distanceFalloff = (double) args[5];
+						String extraData = (String) args[6];
+
+						doRectangle(
+							getFinalCallee(sender, distanceFalloff),
+							(Location) args[0],
+							(double) args[1],
+							(double) args[2],
+							(double) args[3],
+							particle,
+							distanceFalloff,
+							parseExtraData(extraData, particle),
+							(List<Player>) args[7]
+						);
 					}),
 				// Circle
 				new CommandAPICommand("circle")
@@ -115,16 +180,116 @@ public class ParticleUtilsCommand {
 						extraDataArgument
 					)
 					.executes((sender, args) -> {
-						boolean ringMode = (boolean) args[0];
-						Location center = (Location) args[1];
-						double radius = (double) args[2];
-						double countPerMeter = (double) args[3];
 						Particle particle = Particle.valueOf((String) args[4]);
 						double distanceFalloff = (double) args[5];
 						String extraData = (String) args[6];
 
-						CommandSender callee = getFinalCallee(sender, distanceFalloff);
-						doCircle(callee, ringMode, center, radius, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
+						doCircle(
+							getFinalCallee(sender, distanceFalloff),
+							(boolean) args[0],
+							(Location) args[1],
+							(double) args[2],
+							(double) args[3],
+							particle,
+							distanceFalloff,
+							parseExtraData(extraData, particle),
+							null,
+							null
+						);
+					}),
+				// Circle - optional player selector argument
+				new CommandAPICommand("circle")
+					.withPermission("monumenta.particleutils.circle")
+					.withArguments(
+						new BooleanArgument("ring mode"),
+						new LocationArgument("center"),
+						new DoubleArgument("radius"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument,
+						new EntitySelectorArgument.ManyPlayers("allowed viewers")
+					)
+					.executes((sender, args) -> {
+						Particle particle = Particle.valueOf((String) args[4]);
+						double distanceFalloff = (double) args[5];
+						String extraData = (String) args[6];
+
+						doCircle(
+							getFinalCallee(sender, distanceFalloff),
+							(boolean) args[0],
+							(Location) args[1],
+							(double) args[2],
+							(double) args[3],
+							particle,
+							distanceFalloff,
+							parseExtraData(extraData, particle),
+							(List<Player>) args[7],
+							null
+						);
+					}),
+				// Circle - optional normal argument
+				new CommandAPICommand("circle")
+					.withPermission("monumenta.particleutils.circle")
+					.withArguments(
+						new BooleanArgument("ring mode"),
+						new LocationArgument("center"),
+						new DoubleArgument("radius"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument,
+						new LocationArgument("normal")
+					)
+					.executes((sender, args) -> {
+						Particle particle = Particle.valueOf((String) args[4]);
+						double distanceFalloff = (double) args[5];
+						String extraData = (String) args[6];
+
+						doCircle(
+							getFinalCallee(sender, distanceFalloff),
+							(boolean) args[0],
+							(Location) args[1],
+							(double) args[2],
+							(double) args[3],
+							particle,
+							distanceFalloff,
+							parseExtraData(extraData, particle),
+							null,
+							(Location) args[7]
+						);
+					}),
+				// Circle - player selector argument + normal argument
+				new CommandAPICommand("circle")
+					.withPermission("monumenta.particleutils.circle")
+					.withArguments(
+						new BooleanArgument("ring mode"),
+						new LocationArgument("center"),
+						new DoubleArgument("radius"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument,
+						new EntitySelectorArgument.ManyPlayers("allowed viewers"),
+						new LocationArgument("normal")
+					)
+					.executes((sender, args) -> {
+						Particle particle = Particle.valueOf((String) args[4]);
+						double distanceFalloff = (double) args[5];
+						String extraData = (String) args[6];
+
+						doCircle(
+							getFinalCallee(sender, distanceFalloff),
+							(boolean) args[0],
+							(Location) args[1],
+							(double) args[2],
+							(double) args[3],
+							particle,
+							distanceFalloff,
+							parseExtraData(extraData, particle),
+							(List<Player>) args[7],
+							(Location) args[8]
+						);
 					}),
 				// Circle Telegraph
 				new CommandAPICommand("circletelegraph")
@@ -132,7 +297,7 @@ public class ParticleUtilsCommand {
 					.withArguments(
 						new LocationArgument("center"),
 						new DoubleArgument("radius"),
-						new IntegerArgument("count"),
+						new IntegerArgument("count per meter"),
 						particleArgument,
 						distanceFalloffArgument,
 						new DoubleArgument("particle speed"),
@@ -142,19 +307,60 @@ public class ParticleUtilsCommand {
 						extraDataArgument
 					)
 					.executes((sender, args) -> {
-						Location center = (Location) args[0];
-						double radius = (double) args[1];
-						int count = (int) args[2];
 						Particle particle = Particle.valueOf((String) args[3]);
 						double distanceFalloff = (double) args[4];
-						double particleSpeed = (double) args[5];
-						int pulses = (int) args[6];
-						int telegraphDuration = (int) args[7];
-						int pulseStartOffset = (int) args[8];
 						String extraData = (String) args[9];
 
-						CommandSender callee = getFinalCallee(sender, distanceFalloff);
-						doCircleTelegraph(callee, center, radius, count, particle, distanceFalloff, particleSpeed, pulses, telegraphDuration, pulseStartOffset, parseExtraData(extraData, particle));
+						doCircleTelegraph(
+							getFinalCallee(sender, distanceFalloff),
+							(Location) args[0],
+							(double) args[1],
+							(int) args[2],
+							particle,
+							distanceFalloff,
+							(double) args[5],
+							(int) args[6],
+							(int) args[7],
+							(int) args[8],
+							parseExtraData(extraData, particle),
+							null
+						);
+					}),
+				// Circle Telegraph - optional player selector argument
+				new CommandAPICommand("circletelegraph")
+					.withPermission("monumenta.particleutils.circletelegraph")
+					.withArguments(
+						new LocationArgument("center"),
+						new DoubleArgument("radius"),
+						new IntegerArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						new DoubleArgument("particle speed"),
+						new IntegerArgument("pulses"),
+						new IntegerArgument("telegraph duration"),
+						new IntegerArgument("pulse start offset"),
+						extraDataArgument,
+						new EntitySelectorArgument.ManyPlayers("allowed viewers")
+					)
+					.executes((sender, args) -> {
+						Particle particle = Particle.valueOf((String) args[3]);
+						double distanceFalloff = (double) args[4];
+						String extraData = (String) args[9];
+
+						doCircleTelegraph(
+							getFinalCallee(sender, distanceFalloff),
+							(Location) args[0],
+							(double) args[1],
+							(int) args[2],
+							particle,
+							distanceFalloff,
+							(double) args[5],
+							(int) args[6],
+							(int) args[7],
+							(int) args[8],
+							parseExtraData(extraData, particle),
+							(List<Player>) args[10]
+						);
 					}),
 				// Number
 				new CommandAPICommand("number")
@@ -166,7 +372,6 @@ public class ParticleUtilsCommand {
 							new DoubleArgument("spacing"),
 							new EntitySelectorArgument.OnePlayer("facing player"),
 							particleArgument,
-							//distanceFalloffArgument,
 							extraDataArgument
 						)
 						.executes((sender, args) -> {
@@ -176,20 +381,18 @@ public class ParticleUtilsCommand {
 							double spacing = (double) args[3];
 							Player player = (Player) args[4];
 							Particle particle = Particle.valueOf((String) args[5]);
-							//double distanceFalloff = (double) args[6];
-							// String extraData = (String) args[7];
 							String extraData = (String) args[6];
 
-							//CommandSender callee = getFinalCallee(sender, distanceFalloff);
 							ParticleUtils.drawSevenSegmentNumber(number, location, player, scale, spacing, particle, parseExtraData(extraData, particle));
 						})
 			)
 			.register();
 	}
 
-	// Can return null if distanceFalloff is 0 (or lower), which will be interpreted as
-	// wanting to spawn the full amount of particles, bypassing player/entity PEB settings.
-	// Useful for puzzles!
+	/** Returns null if distanceFalloff is 0 (or lower), which will be interpreted as
+	 * wanting to spawn the full amount of particles, bypassing player/entity PEB settings.
+	 * Useful for puzzles!
+	 */
 	private static @Nullable CommandSender getFinalCallee(CommandSender sender, double distanceFalloff) {
 		if (distanceFalloff <= 0) {
 			return null;
@@ -250,17 +453,27 @@ public class ParticleUtilsCommand {
 		}
 	}
 
-	private static void doLine(@Nullable CommandSender callee, Location start, Location end, double countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data) {
+	private static void spawnForViewers(List<Player> allowedViewers, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle) {
+		allowedViewers.forEach(viewer -> particle.spawnForPlayer(ParticleCategory.FULL, viewer));
+	}
+
+	private static void doLine(@Nullable CommandSender callee, Location start, Location end, double countPerMeter, Particle particle,
+							   double distanceFalloff, @Nullable Object data, @Nullable List<Player> allowedViewers) {
 		PPLine line = new PPLine(particle, start, end).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff);
 
 		if (data != null) {
 			line.data(data);
 		}
 
-		spawnAsActive(callee, line);
+		if (allowedViewers != null) {
+			spawnForViewers(allowedViewers, line);
+		} else {
+			spawnAsActive(callee, line);
+		}
 	}
 
-	private static void doRectangle(@Nullable CommandSender callee, Location start, double dx, double dz, double countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data) {
+	private static void doRectangle(@Nullable CommandSender callee, Location start, double dx, double dz, double countPerMeter,
+									Particle particle, double distanceFalloff, @Nullable Object data, @Nullable List<Player> allowedViewers) {
 		PPLine[] sides = {
 			new PPLine(particle, start, start.clone().add(dx, 0, 0)).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff),
 			new PPLine(particle, start.clone().add(dx, 0, 0), start.clone().add(dx, 0, dz)).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff),
@@ -272,20 +485,38 @@ public class ParticleUtilsCommand {
 			Arrays.stream(sides).forEach(side -> side.data(data));
 		}
 
-		Arrays.stream(sides).forEach(side -> spawnAsActive(callee, side));
+		if (allowedViewers != null) {
+			Arrays.stream(sides).forEach(side -> spawnForViewers(allowedViewers, side));
+		} else {
+			Arrays.stream(sides).forEach(side -> spawnAsActive(callee, side));
+		}
 	}
 
-	private static void doCircle(@Nullable CommandSender callee, boolean ringMode, Location center, double radius, double countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data) {
+	private static void doCircle(@Nullable CommandSender callee, boolean ringMode, Location center, double radius,
+								 double countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data,
+								 @Nullable List<Player> allowedViewers, @Nullable Location normalLoc) {
 		PPCircle circle = new PPCircle(particle, center, radius).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff).ringMode(ringMode);
 
 		if (data != null) {
 			circle.data(data);
 		}
 
-		spawnAsActive(callee, circle);
+		if (normalLoc != null) {
+			Vector up = VectorUtils.rotationToVector(normalLoc.getYaw(), normalLoc.getPitch() - 90);
+			Vector right = up.clone().crossProduct(normalLoc.toVector().normalize());
+			circle.axes(right, up);
+		}
+
+		if (allowedViewers != null) {
+			spawnForViewers(allowedViewers, circle);
+		} else {
+			spawnAsActive(callee, circle);
+		}
 	}
 
-	private static void doCircleTelegraph(@Nullable CommandSender callee, Location center, double radius, int count, Particle particle, double distanceFalloff, double particleSpeed, int pulses, int telegraphDuration, int pulseStartOffset, @Nullable Object data) {
+	private static void doCircleTelegraph(@Nullable CommandSender callee, Location center, double radius, int countPerMeter,
+										  Particle particle, double distanceFalloff, double particleSpeed, int pulses, int telegraphDuration,
+										  int pulseStartOffset, @Nullable Object data, @Nullable List<Player> allowedViewers) {
 		// Input Validation
 		int finalPulseStartOffset = Math.max(pulseStartOffset, 0);
 		int finalTelegraphDuration = Math.max(telegraphDuration, 1);
@@ -293,29 +524,30 @@ public class ParticleUtilsCommand {
 		int finalPulses = Math.max(pulses, 1);
 		int finalPulseDelay = Math.max(totalPulseTime / finalPulses, 1);
 
+		// Static radius ring
+		PPCircle circle = new PPCircle(particle, center, radius).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff);
+		// Moving pulse ring
+		PPCircle pulse = new PPCircle(particle, center, radius).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff)
+			.delta(-1, 0, 0).rotateDelta(true).directionalMode(true).extra(particleSpeed);
+
+		if (data != null) {
+			circle.data(data);
+			pulse.data(data);
+		}
+
 		new BukkitRunnable() {
 
 			int mPulses = 0;
 
 			@Override
 			public void run() {
-				// Ring around it
-				PPCircle circle = new PPCircle(particle, center, radius).count(count).distanceFalloff(distanceFalloff);
-				// Pulse Ring
-				PPParametric pulse = new PPParametric(particle, center, (t, builder) -> {
-					Location particleLoc = center.clone().add(radius * FastUtils.cos(t * Math.PI * 2), 0, radius * FastUtils.sin(t * Math.PI * 2));
-					Vector toCenter = center.toVector().subtract(particleLoc.toVector()).normalize();
-					builder.location(particleLoc);
-					builder.offset(toCenter.getX(), 0, toCenter.getZ());
-				}).count(count).directionalMode(true).extra(particleSpeed).distanceFalloff(distanceFalloff);
-
-				if (data != null) {
-					circle.data(data);
-					pulse.data(data);
+				if (allowedViewers != null) {
+					spawnForViewers(allowedViewers, circle);
+					spawnForViewers(allowedViewers, pulse);
+				} else {
+					spawnAsActive(callee, circle);
+					spawnAsActive(callee, pulse);
 				}
-
-				spawnAsActive(callee, circle);
-				spawnAsActive(callee, pulse);
 
 				mPulses++;
 				if (mPulses >= finalPulses) {
