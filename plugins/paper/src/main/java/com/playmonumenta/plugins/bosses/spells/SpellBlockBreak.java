@@ -156,7 +156,7 @@ public class SpellBlockBreak extends Spell {
 
 			/* Remove any remaining blocks, which might have been modified by the event */
 			for (Block block : breakBlockList) {
-				if (BlockUtils.isValuableBlock(block.getType())) {
+				if (BlockUtils.isValuableBlock(block.getType()) || BlockUtils.isNonEmptyContainer(block)) {
 					block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
 				} else {
 					block.setType(Material.AIR);

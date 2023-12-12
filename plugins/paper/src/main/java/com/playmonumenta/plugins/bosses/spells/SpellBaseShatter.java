@@ -154,7 +154,7 @@ public class SpellBaseShatter extends Spell {
 											l.subtract(0, 1, 0);
 										}
 										//Move up one block if on barrier or bedrock level
-										if (BlockUtils.isMechanicalBlock(l.getBlock().getType()) || BlockUtils.isValuableBlock(l.getBlock().getType())) {
+										if (BlockUtils.isMechanicalBlock(l.getBlock().getType()) || BlockUtils.isValuableBlock(l.getBlock().getType()) || BlockUtils.isNonEmptyContainer(l.getBlock())) {
 											l.add(0, 1, 0);
 										}
 										if (l.getBlock().getType() != mIndicator && l.getBlock().getType().isSolid()) {

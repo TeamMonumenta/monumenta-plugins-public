@@ -18,6 +18,7 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -107,6 +108,42 @@ public class BlockUtils {
 		Material.DAMAGED_ANVIL
 	);
 
+	public static final EnumSet<Material> CONTAINERS = EnumSet.of(
+		Material.SHULKER_BOX,
+		Material.BLACK_SHULKER_BOX,
+		Material.BLUE_SHULKER_BOX,
+		Material.BROWN_SHULKER_BOX,
+		Material.CYAN_SHULKER_BOX,
+		Material.GREEN_SHULKER_BOX,
+		Material.LIME_SHULKER_BOX,
+		Material.LIGHT_BLUE_SHULKER_BOX,
+		Material.LIGHT_GRAY_SHULKER_BOX,
+		Material.MAGENTA_SHULKER_BOX,
+		Material.ORANGE_SHULKER_BOX,
+		Material.PINK_SHULKER_BOX,
+		Material.PURPLE_SHULKER_BOX,
+		Material.RED_SHULKER_BOX,
+		Material.WHITE_SHULKER_BOX,
+		Material.YELLOW_SHULKER_BOX,
+		Material.GRAY_SHULKER_BOX,
+
+		Material.CHEST,
+		Material.TRAPPED_CHEST,
+		Material.BARREL,
+
+		Material.FURNACE,
+		Material.SMOKER,
+		Material.BLAST_FURNACE,
+
+		Material.DISPENSER,
+		Material.DROPPER,
+
+		Material.BREWING_STAND,
+
+		Material.JUKEBOX,
+		Material.LECTERN
+	);
+
 	public static final EnumSet<Material> TORCHES = EnumSet.of(
 		Material.TORCH,
 		Material.WALL_TORCH
@@ -142,6 +179,14 @@ public class BlockUtils {
 
 	public static boolean isValuableBlock(Material material) {
 		return VALUABLES.contains(material);
+	}
+
+	public static boolean isContainer(Material material) {
+		return CONTAINERS.contains(material);
+	}
+
+	public static boolean isNonEmptyContainer(Block block) {
+		return CONTAINERS.contains(block.getType()) && block.getState() instanceof BlockInventoryHolder inventoryHolder && !inventoryHolder.getInventory().isEmpty();
 	}
 
 	public static boolean isWaterSource(Block block) {
