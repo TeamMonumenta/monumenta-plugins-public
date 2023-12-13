@@ -352,6 +352,7 @@ public class SpellBullet extends Spell {
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
 		double mInnerVelocity = mVelocity;
 		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
+		double y = mCaster.getLocation().getY();
 		return new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -366,7 +367,7 @@ public class SpellBullet extends Spell {
 					mDir = mDir.normalize();
 				}
 				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
-				teleportBullet(bullet, box);
+				teleportBullet(bullet, box, y);
 				mTicks++;
 				checkIfBulletExpired(mTicks + offsetTicks, mBulletDuration, bullet, this);
 			}
@@ -377,6 +378,7 @@ public class SpellBullet extends Spell {
 		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
 		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
+		double y = mCaster.getLocation().getY();
 		return new BukkitRunnable() {
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
@@ -398,7 +400,7 @@ public class SpellBullet extends Spell {
 					mDir = collapseDir;
 				}
 				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
-				teleportBullet(bullet, box);
+				teleportBullet(bullet, box, y);
 				mTicks++;
 				checkIfBulletExpired(mTicks + offsetTicks, mBulletDuration, bullet, this);
 			}
@@ -412,6 +414,7 @@ public class SpellBullet extends Spell {
 		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
 		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
+		double y = mCaster.getLocation().getY();
 		return new BukkitRunnable() {
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
@@ -431,7 +434,7 @@ public class SpellBullet extends Spell {
 					mInnerVelocity = mVelocity;
 				}
 				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
-				teleportBullet(bullet, box);
+				teleportBullet(bullet, box, y);
 				mTicks++;
 				checkIfBulletExpired(mTicks, mBulletDuration, bullet, this);
 			}
@@ -444,6 +447,7 @@ public class SpellBullet extends Spell {
 		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
 		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
+		double y = mCaster.getLocation().getY();
 		return new BukkitRunnable() {
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
@@ -464,7 +468,7 @@ public class SpellBullet extends Spell {
 					mInnerVelocity += 0.025;
 				}
 				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
-				teleportBullet(bullet, box);
+				teleportBullet(bullet, box, y);
 				mTicks++;
 				checkIfBulletExpired(mTicks + offsetTicks, mBulletDuration, bullet, this);
 			}
@@ -503,6 +507,7 @@ public class SpellBullet extends Spell {
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
 
 		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
+		double y = mCaster.getLocation().getY();
 		new BukkitRunnable() {
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
@@ -510,7 +515,7 @@ public class SpellBullet extends Spell {
 			@Override
 			public void run() {
 				checkForCollisions(box, mInnerVelocity, dir, bullet, players, this, playerHitboxSize);
-				teleportBullet(bullet, box);
+				teleportBullet(bullet, box, y);
 				mTicks++;
 				checkIfBulletExpired(mTicks, bulletDuration, bullet, this);
 				if (mTicks >= accelStart && mTicks < accelEnd) {
@@ -559,9 +564,9 @@ public class SpellBullet extends Spell {
 		checkForCollisions(box, velocity, dir, bullet, players, runnable, 1);
 	}
 
-	public void teleportBullet(BlockDisplay bullet, BoundingBox box) {
+	public void teleportBullet(BlockDisplay bullet, BoundingBox box, double y) {
 		Location loc = box.getCenter().toLocation(mCaster.getWorld());
-		loc.setY(mCaster.getLocation().getY() - getBulletHeight(bullet) / 2);
+		loc.setY(y - getBulletHeight(bullet) / 2);
 		float widthOffset = getBulletWidth(bullet) / 2;
 		loc.subtract(widthOffset, 0, widthOffset);
 		bullet.teleport(loc);
