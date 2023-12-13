@@ -88,9 +88,9 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.abilities.shaman.CrystallineCombos;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
+import com.playmonumenta.plugins.abilities.shaman.CrystallineCombos;
 import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
 import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
 import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
@@ -167,7 +167,7 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -915,18 +915,21 @@ public class AbilityManager {
 				       .flatMap(a -> a.mCustomTriggers.stream())
 				       .anyMatch(t -> t.check(player, key));
 		}
+
+		boolean foundTrigger = false;
 		for (Ability ability : playerAbilities.getAbilitiesInTriggerOrder()) {
 			for (AbilityTriggerInfo<?> triggerInfo : ability.mCustomTriggers) {
 				if (triggerInfo.check(player, key)) {
+					foundTrigger = true;
 					// the cast here is fine, as we're calling the action with the ability we got the action from
-					((Consumer<Ability>) triggerInfo.getAction()).accept(ability);
-					if (!(ability instanceof EagleEye)) { // hardcoded exception for eagle eye to keep triggering other abilities
+					boolean succeeded = ((Predicate<Ability>) triggerInfo.getAction()).test(ability);
+					if (succeeded || !triggerInfo.getTrigger().isFallThrough()) {
 						return true;
 					}
 				}
 			}
 		}
-		return false;
+		return foundTrigger;
 	}
 
 	//---------------------------------------------------------------------------------------------------------------

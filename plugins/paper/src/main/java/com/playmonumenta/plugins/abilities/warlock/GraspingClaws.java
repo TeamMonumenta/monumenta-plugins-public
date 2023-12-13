@@ -102,15 +102,16 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GraspingClawsCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		World world = mPlayer.getWorld();
 		double speed = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
 		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, speed, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle());
 		mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		putOnCooldown();
+		return true;
 	}
 
 	@Override

@@ -70,9 +70,9 @@ public class GuardingBolt extends DepthsAbility {
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.GUARDING_BOLT_STUN_DURATION.mEffectName, STUN_DURATION[mRarity - 1]);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		Location startLoc = mPlayer.getEyeLocation();
@@ -83,7 +83,7 @@ public class GuardingBolt extends DepthsAbility {
 
 		if (result != null && result.getHitEntity() instanceof LivingEntity target) {
 			if (ZoneUtils.hasZoneProperty(target, ZoneUtils.ZoneProperty.LOOTROOM)) {
-				return;
+				return false;
 			}
 
 			putOnCooldown();
@@ -117,7 +117,11 @@ public class GuardingBolt extends DepthsAbility {
 			}
 
 			world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	private void doDamage(Location location) {

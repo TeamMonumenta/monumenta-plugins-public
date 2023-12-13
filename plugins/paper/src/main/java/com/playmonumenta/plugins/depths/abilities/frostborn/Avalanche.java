@@ -65,9 +65,9 @@ public class Avalanche extends DepthsAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.AVALANCHE_ROOT_DURATION.mEffectName, SLOW_DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -75,7 +75,7 @@ public class Avalanche extends DepthsAbility {
 
 		HashSet<Location> checkIce = getNearbyIce(loc, mRadius);
 		if (checkIce.size() == 0) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -144,6 +144,7 @@ public class Avalanche extends DepthsAbility {
 			}
 		}.runTaskTimer(mPlugin, 0, 3);
 
+		return true;
 	}
 
 	private HashSet<Location> getNearbyIce(Location loc, double radius) {

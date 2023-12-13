@@ -83,9 +83,9 @@ public class CholericFlames extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CholericFlamesCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mCosmetic.flameEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation(), range);
@@ -115,6 +115,7 @@ public class CholericFlames extends Ability {
 		}
 
 		putOnCooldown();
+		return true;
 	}
 
 }

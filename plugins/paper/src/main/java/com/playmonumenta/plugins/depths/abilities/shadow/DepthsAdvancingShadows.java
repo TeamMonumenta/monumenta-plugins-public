@@ -61,15 +61,15 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange);
 
 		if (entity == null) {
-			return;
+			return false;
 		}
 
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
@@ -99,7 +99,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			// If still solid, something is wrong.
 			if (loc.getBlock().getType().isSolid()) {
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1.0f, 1.8f);
-				return;
+				return false;
 			}
 
 			// Prevent the player from teleporting over void
@@ -117,7 +117,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 				// Maybe void - not worth it
 				if (!safe) {
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1.0f, 1.8f);
-					return;
+					return false;
 				}
 
 				// Don't teleport players below y = 1.1 to avoid clipping into oblivion
@@ -127,7 +127,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			// Extra safeguard to prevent bizarro teleports
 			if (mPlayer.getLocation().distance(loc) > mRange) {
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1.0f, 1.8f);
-				return;
+				return false;
 			}
 
 			Location playerLoc = mPlayer.getLocation();
@@ -147,7 +147,10 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			new PartialParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
 			world.playSound(playerLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1.0f, 1.1f);
 			putOnCooldown();
+			return true;
 		}
+
+		return false;
 	}
 
 	private static Description<DepthsAdvancingShadows> getDescription(int rarity, TextColor color) {

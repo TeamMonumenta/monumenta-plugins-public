@@ -63,9 +63,9 @@ public class Scrapshot extends DepthsAbility {
 		mRange = CharmManager.getRadius(mPlayer, CharmEffects.SCRAPSHOT_RANGE.mEffectName, RANGE);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -119,6 +119,8 @@ public class Scrapshot extends DepthsAbility {
 			new PartialParticle(Particle.SQUID_INK, l, (int) ((mRange - dist) * 2), 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 			world.playSound(l, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
 		}
+
+		return true;
 	}
 
 	private static Description<Scrapshot> getDescription(int rarity, TextColor color) {

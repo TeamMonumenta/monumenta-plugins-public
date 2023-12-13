@@ -71,10 +71,10 @@ public class ChaosDagger extends DepthsAbility {
 		mStealthDuration = CharmManager.getDuration(mPlayer, CharmEffects.CHAOS_DAGGER_STEALTH_DURATION.mEffectName, STEALTH_DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown() ||
 			    EntityUtils.getNearestMob(mPlayer.getLocation(), 20.0) == null) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		mHitMob = null;
@@ -176,6 +176,8 @@ public class ChaosDagger extends DepthsAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		return true;
 	}
 
 	@Override

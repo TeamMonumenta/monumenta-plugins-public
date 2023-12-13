@@ -107,9 +107,9 @@ public class AmplifyingHex extends Ability {
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		double angle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
@@ -245,6 +245,7 @@ public class AmplifyingHex extends Ability {
 			}
 		}
 		putOnCooldown();
+		return true;
 	}
 
 }

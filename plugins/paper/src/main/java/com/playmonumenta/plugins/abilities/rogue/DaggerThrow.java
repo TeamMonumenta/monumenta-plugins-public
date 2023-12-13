@@ -79,9 +79,9 @@ public class DaggerThrow extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DaggerThrowCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -114,6 +114,8 @@ public class DaggerThrow extends Ability {
 			}
 			mCosmetic.daggerParticle(startLoc, endLoc, mPlayer);
 		}
+
+		return true;
 	}
 
 }

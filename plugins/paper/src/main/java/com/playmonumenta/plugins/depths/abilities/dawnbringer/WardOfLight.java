@@ -55,9 +55,9 @@ public class WardOfLight extends DepthsAbility {
 		mConeAngle = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.WARD_OF_LIGHT_CONE_ANGLE.mEffectName, HEALING_CONE_ANGLE);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -89,6 +89,8 @@ public class WardOfLight extends DepthsAbility {
 			ParticleUtils.explodingConeEffectSkill(mPlugin, mPlayer, (float) mRadius, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, dotAngle, mPlayer);
 			putOnCooldown();
 		}
+
+		return true;
 	}
 
 	private static Description<WardOfLight> getDescription(int rarity, TextColor color) {

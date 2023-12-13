@@ -79,9 +79,9 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHADES_DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -105,7 +105,7 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isHostileMob(mob)) {
 						placeShade(bLoc);
-						return;
+						return true;
 					}
 				}
 			}
@@ -115,13 +115,14 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 				if (!bLoc.getBlock().isPassable() && !mPlayer.hasLineOfSight(box.shift(shift).getCenter().toLocation(world))) {
 					bLoc.subtract(direction.multiply(0.5));
 					placeShade(bLoc);
-					return;
+					return true;
 				}
 			}
 
 			box.shift(shift);
 		}
 		placeShade(box.getCenter().toLocation(world));
+		return true;
 	}
 
 	private void placeShade(Location bLoc) {

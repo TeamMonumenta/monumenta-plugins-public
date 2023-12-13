@@ -54,9 +54,9 @@ public class StoneSkin extends DepthsAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.STONE_SKIN_DURATION.mEffectName, DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		World world = mPlayer.getWorld();
@@ -71,6 +71,8 @@ public class StoneSkin extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1.25f, 1.35f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.25f, 1.1f);
 		new PartialParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25).spawnAsPlayerBuff(mPlayer);
+
+		return true;
 	}
 
 

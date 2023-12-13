@@ -80,9 +80,9 @@ public class FireworkBlast extends DepthsAbility {
 		mDirectHitRadius = CharmManager.getRadius(mPlayer, CharmEffects.FIREWORK_BLAST_RADIUS.mEffectName, DIRECT_HIT_RADIUS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -157,6 +157,8 @@ public class FireworkBlast extends DepthsAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		return true;
 	}
 
 	public static boolean isDamaging(Firework fw) {

@@ -146,11 +146,11 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
 			clearTargetGlowing();
 			mSummons.entrySet().forEach(entry -> entry.setValue(null));
-			return;
+			return true;
 		}
 
 		putOnCooldown();
@@ -173,7 +173,7 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 		if (foxCount > 5) {
 			Class<? extends Entity> type = !isInLava ? (!isInWater ? Fox.class : Axolotl.class) : Strider.class;
 			if (loc.getWorld().getNearbyEntitiesByType(type, loc, 50).size() > 10) {
-				return;
+				return false;
 			}
 		}
 
@@ -263,6 +263,8 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 			}
 		};
 		mRunnable.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+
+		return true;
 	}
 
 	@Override

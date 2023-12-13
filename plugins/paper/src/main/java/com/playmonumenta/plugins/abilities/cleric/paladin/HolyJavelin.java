@@ -83,8 +83,8 @@ public class HolyJavelin extends Ability {
 		});
 	}
 
-	public void cast() {
-		execute(0, null);
+	public boolean cast() {
+		return execute(0, null);
 	}
 
 	@Override
@@ -107,9 +107,9 @@ public class HolyJavelin extends Ability {
 		return false;
 	}
 
-	public void execute(double bonusDamage, @Nullable LivingEntity triggeringEnemy) {
+	public boolean execute(double bonusDamage, @Nullable LivingEntity triggeringEnemy) {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
@@ -132,5 +132,6 @@ public class HolyJavelin extends Ability {
 			EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 		}
+		return true;
 	}
 }

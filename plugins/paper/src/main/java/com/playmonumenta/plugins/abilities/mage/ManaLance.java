@@ -73,11 +73,11 @@ public class ManaLance extends MultipleChargeAbility {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ManaLanceCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		int ticks = Bukkit.getServer().getCurrentTick();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
-			return;
+			return false;
 		}
 		mLastCastTicks = ticks;
 
@@ -105,6 +105,8 @@ public class ManaLance extends MultipleChargeAbility {
 
 		mCosmetic.lanceParticle(mPlayer, startLoc, endLoc);
 		mCosmetic.lanceSound(world, mPlayer, mPlayer.getLocation());
+
+		return true;
 	}
 
 }

@@ -101,7 +101,7 @@ public class Swiftness extends Ability {
 		}
 	}
 
-	public void toggleJumpBoost() {
+	public boolean toggleJumpBoost() {
 		if (mJumpBoost) {
 			mJumpBoost = false;
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
@@ -114,6 +114,7 @@ public class Swiftness extends Ability {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		}
 		ClientModHandler.updateAbility(mPlayer, this);
+		return true;
 	}
 
 	private static void addModifier(Player player) {

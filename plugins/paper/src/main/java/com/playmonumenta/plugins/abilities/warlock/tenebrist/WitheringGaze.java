@@ -72,9 +72,9 @@ public class WitheringGaze extends Ability {
 		mDOTDuration = CharmManager.getDuration(player, CHARM_DOT, (isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2));
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		Location loc = mPlayer.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
@@ -126,6 +126,8 @@ public class WitheringGaze extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		return true;
 	}
 
 }

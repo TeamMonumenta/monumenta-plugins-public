@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -50,9 +50,9 @@ public class Encore extends DepthsAbility {
 		super(plugin, player, INFO);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		mActive = true;
 		putOnCooldown();
@@ -87,6 +87,8 @@ public class Encore extends DepthsAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	@Override
@@ -108,6 +110,7 @@ public class Encore extends DepthsAbility {
 		return true;
 	}
 
+	@SuppressWarnings("unused")
 	private <T extends DepthsAbility> void abilityCastEventInner(DepthsAbility a, DepthsAbilityInfo<T> info, ClassAbility spell) {
 		Class<T> clazz = info.getAbilityClass();
 		if (a.getClass() != clazz) {
@@ -135,8 +138,8 @@ public class Encore extends DepthsAbility {
 			if (triggers.isEmpty()) {
 				return;
 			}
-			Consumer<T> method = triggers.get(0).getAction();
-			action = () -> method.accept(ability);
+			Predicate<T> method = triggers.get(0).getAction();
+			action = () -> method.test(ability);
 		}
 
 		// start the countdown!

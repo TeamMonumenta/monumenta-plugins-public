@@ -120,9 +120,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		});
 	}
 
-	public void prime() {
+	public boolean prime() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		if (mDeactivationRunnable == null) {
@@ -156,13 +156,16 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		};
 		cancelOnDeath(mDeactivationRunnable.runTaskTimer(mPlugin, 0, 1));
 		ClientModHandler.updateAbility(mPlayer, this);
+		return true;
 	}
 
-	public void unprime() {
+	public boolean unprime() {
 		if (mDeactivationRunnable != null) {
 			mDeactivationRunnable.cancel();
 			mCosmetic.onUnprime(mPlayer, mPlayer.getLocation());
+			return true;
 		}
+		return false;
 	}
 
 	@Override

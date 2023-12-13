@@ -58,9 +58,9 @@ public class Fireball extends DepthsAbility {
 		mFireDuration = CharmManager.getDuration(mPlayer, CharmEffects.FIREBALL_FIRE_DURATION.mEffectName, FIRE_TICKS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -75,11 +75,12 @@ public class Fireball extends DepthsAbility {
 			if (loc.getBlock().getType().isSolid() || EntityUtils.getNearbyMobs(loc, 1).size() > 0) {
 				explode(loc);
 
-				return;
+				return true;
 			}
 		}
 
 		explode(loc);
+		return true;
 	}
 
 	private void explode(Location loc) {

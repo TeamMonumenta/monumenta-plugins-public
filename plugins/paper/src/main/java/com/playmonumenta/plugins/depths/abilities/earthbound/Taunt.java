@@ -58,9 +58,9 @@ public class Taunt extends DepthsAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.TAUNT_ABSORPTION_DURATION.mEffectName, ABSORPTION_DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
@@ -79,7 +79,10 @@ public class Taunt extends DepthsAbility {
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 1, 1.2f);
 			new PartialParticle(Particle.BLOCK_DUST, mPlayer.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
+
+			return true;
 		}
+		return false;
 	}
 
 	private static Description<Taunt> getDescription(int rarity, TextColor color) {

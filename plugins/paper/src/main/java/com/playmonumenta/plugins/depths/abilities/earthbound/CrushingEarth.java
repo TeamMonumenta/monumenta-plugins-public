@@ -54,14 +54,14 @@ public class CrushingEarth extends DepthsAbility {
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.CRUSHING_EARTH_STUN_DURATION.mEffectName, STUN_DURATION[mRarity - 1]);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		LivingEntity mob = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange);
 		if (mob == null) {
-			return;
+			return false;
 		}
 
 		Location mobLoc = mob.getEyeLocation();
@@ -77,6 +77,7 @@ public class CrushingEarth extends DepthsAbility {
 		DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell());
 
 		putOnCooldown();
+		return true;
 	}
 
 

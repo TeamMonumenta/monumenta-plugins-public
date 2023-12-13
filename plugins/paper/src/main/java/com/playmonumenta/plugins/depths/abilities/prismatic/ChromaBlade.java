@@ -89,9 +89,9 @@ public class ChromaBlade extends DepthsAbility {
 		mLastTree = null;
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -130,6 +130,8 @@ public class ChromaBlade extends DepthsAbility {
 		if (!isFast) {
 			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.CHROMA_BLADE, (int) (-0.25 * getModifiedCooldown()));
 		}
+
+		return true;
 	}
 
 	public void flamecallerAttack(boolean isFast) {

@@ -57,7 +57,7 @@ public class EagleEye extends Ability {
 				"Your first attack against every enemy affected by this ability will deal " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.")
 			.simpleDescription("Reveal nearby mobs, making them more vulnerable to attacks.")
 			.cooldown(EAGLE_EYE_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EagleEye::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EagleEye::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).fallThrough()
 				                                                                     .keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.ENDER_EYE);
 
@@ -74,9 +74,9 @@ public class EagleEye extends Ability {
 	}
 
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -127,6 +127,9 @@ public class EagleEye extends Ability {
 		}
 
 		putOnCooldown();
+
+		// Always return false - Eagle Eye is a special case where we want other abilities to trigger regardless of success
+		return false;
 	}
 
 	@Override

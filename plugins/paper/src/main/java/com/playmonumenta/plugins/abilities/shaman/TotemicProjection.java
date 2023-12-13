@@ -101,9 +101,9 @@ public class TotemicProjection extends Ability {
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE_RADIUS, RADIUS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -141,6 +141,8 @@ public class TotemicProjection extends Ability {
 				mT++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		return true;
 	}
 
 	@Override

@@ -125,7 +125,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new JudgementChainCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (mChainActive) {
 			mChainActive = false;
 			breakChain(true, true);
@@ -133,11 +133,12 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 			ClientModHandler.updateAbility(mPlayer, this);
 		} else {
 			if (isOnCooldown()) {
-				return;
+				return false;
 			}
 			summonChain();
 			mChainActive = true;
 		}
+		return true;
 	}
 
 	public void passDamage(DamageEvent event) {

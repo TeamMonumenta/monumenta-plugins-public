@@ -83,9 +83,9 @@ public class MelancholicLament extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MelancholicLamentCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		Location loc = mPlayer.getLocation();
@@ -155,6 +155,7 @@ public class MelancholicLament extends Ability {
 			}
 		}
 		putOnCooldown();
+		return true;
 	}
 
 	@Override

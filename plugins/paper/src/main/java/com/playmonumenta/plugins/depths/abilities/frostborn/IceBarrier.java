@@ -74,9 +74,9 @@ public class IceBarrier extends DepthsAbility {
 		mPrimedLoc = null;
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -84,7 +84,7 @@ public class IceBarrier extends DepthsAbility {
 		ImmutableSet<Material> excludedBlocks = ImmutableSet.of(Material.AIR, Material.LIGHT);
 		Block block = mPlayer.getTargetBlock(excludedBlocks, mRange);
 		if (block == null) {
-			return;
+			return false;
 		}
 
 		boolean validLength = mPrimedLoc == null || (!(mPrimedLoc.distance(block.getLocation()) > mLength) && !(mPrimedLoc.distance(block.getLocation()) < 1));
@@ -170,6 +170,8 @@ public class IceBarrier extends DepthsAbility {
 				mPrimedLoc = null;
 			}
 		}
+
+		return true;
 	}
 
 	private static Description<IceBarrier> getDescription(int rarity, TextColor color) {

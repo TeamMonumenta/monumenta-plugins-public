@@ -123,10 +123,10 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		mShotDelay = CharmManager.getCooldown(player, CHARM_SHOT_DELAY, SHOT_DELAY);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (!isEnhanced() || mSpendingStacks
 			|| mCrystalStacks == 0 || isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -135,6 +135,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		updateNotify();
 		mPlugin.mEffectManager.addEffect(mPlayer, "CrystalCombosSpeed", new PercentSpeed(mSpeedDuration,
 			Math.min(mMaxSpeed, savedStacks * mSpeedPerStack), "CrystalCombosSpeed"));
+		return true;
 	}
 
 	@Override

@@ -140,11 +140,11 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		// cast preconditions
 		if (mAlchemistPotions == null
 				|| mPlugin.mEffectManager.hasEffect(mPlayer, DISABLE_SOURCE)) {
-			return;
+			return false;
 		}
 
 		// explode existing amalgam
@@ -152,10 +152,10 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			explode(mAmalgam.getLocation());
 			mAmalgam.remove();
 			mAmalgam = null;
-			return;
+			return true;
 		}
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		// cast new amalgam
@@ -173,12 +173,13 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 					loc.subtract(dir);
 					spawnAmalgam(loc);
 
-					return;
+					return true;
 				}
 			}
 
 			spawnAmalgam(loc);
 		}
+		return true;
 	}
 
 	private void spawnAmalgam(Location loc) {
@@ -374,7 +375,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 		}
 	}
 
-	private void toggleRocketJump() {
+	private boolean toggleRocketJump() {
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, ROCKET_JUMP_OBJECTIVE).orElse(0) == 0) {
 			ScoreboardUtils.setScoreboardValue(mPlayer, ROCKET_JUMP_OBJECTIVE, 1);
 			mPlayer.sendActionBar(Component.text("Rocket jump enabled"));
@@ -382,6 +383,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			ScoreboardUtils.setScoreboardValue(mPlayer, ROCKET_JUMP_OBJECTIVE, 0);
 			mPlayer.sendActionBar(Component.text("Rocket jump disabled"));
 		}
+		return true;
 	}
 
 	@Override

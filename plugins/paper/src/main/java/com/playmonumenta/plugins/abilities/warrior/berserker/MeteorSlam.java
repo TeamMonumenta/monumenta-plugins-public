@@ -180,10 +180,10 @@ public final class MeteorSlam extends Ability {
 		cancelOnDeath(mSlamAttackRunner.runTaskTimer(plugin, 0, 1));
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()
 			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -192,6 +192,7 @@ public final class MeteorSlam extends Ability {
 		World world = mPlayer.getWorld();
 		Location location = mPlayer.getLocation().add(0, 0.15, 0);
 		mCosmetic.slamCastEffect(world, location, mPlayer);
+		return true;
 	}
 
 	@Override

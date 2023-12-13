@@ -72,9 +72,9 @@ public class EnchantedPrayer extends Ability {
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -88,5 +88,6 @@ public class EnchantedPrayer extends Ability {
 			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",
 					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_TYPES, CharmManager.getRadius(mPlayer, CHARM_EFFECT_RANGE, ENCHANTED_PRAYER_EFFECT_SIZE), mPlayer, mCrusade, mCosmetic));
 		}
+		return true;
 	}
 }

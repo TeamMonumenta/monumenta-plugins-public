@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -26,7 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -58,9 +56,9 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		mDisplayName = displayName;
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		if (mTotemTickingRunnable != null) {
 			mTotemTickingRunnable.cancel();
@@ -112,6 +110,8 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				mT++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		return true;
 	}
 
 	@Override

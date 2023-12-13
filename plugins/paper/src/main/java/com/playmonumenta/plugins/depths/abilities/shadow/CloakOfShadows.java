@@ -67,9 +67,9 @@ public class CloakOfShadows extends DepthsAbility {
 		mDamage = DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.CLOAK_OF_SHADOWS_DAMAGE_MULTIPLIER.mEffectName);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -109,6 +109,8 @@ public class CloakOfShadows extends DepthsAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		return true;
 	}
 
 	private static Description<CloakOfShadows> getDescription(int rarity, TextColor color) {

@@ -73,9 +73,9 @@ public class EarthenWrath extends DepthsAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.EARTHEN_WRATH_RADIUS.mEffectName, DAMAGE_RADIUS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		mDamageAbsorbed = 0;
@@ -85,7 +85,7 @@ public class EarthenWrath extends DepthsAbility {
 
 		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
 		if (party == null) {
-			return;
+			return false;
 		}
 
 		cancelOnDeath(new BukkitRunnable() {
@@ -149,6 +149,7 @@ public class EarthenWrath extends DepthsAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+		return true;
 	}
 
 	//Returns true if the damage was absorbed

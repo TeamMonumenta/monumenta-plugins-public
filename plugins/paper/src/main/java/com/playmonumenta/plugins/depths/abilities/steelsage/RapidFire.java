@@ -52,7 +52,7 @@ public class RapidFire extends DepthsAbility {
 		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.RAPIDFIRE)
 			.cooldown(CHARM_COOLDOWN, COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).fallThrough(),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.REPEATER)
 			.descriptions(RapidFire::getDescription)
@@ -70,9 +70,9 @@ public class RapidFire extends DepthsAbility {
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -114,6 +114,7 @@ public class RapidFire extends DepthsAbility {
 			}
 		}.runTaskTimer(mPlugin, 0, 3));
 		putOnCooldown();
+		return true;
 	}
 
 	@Override

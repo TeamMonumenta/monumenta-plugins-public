@@ -124,9 +124,9 @@ public class Panacea extends Ability implements AbilityWithDuration {
 
 	private int mCurrDuration = -1;
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown() || mAlchemistPotions == null) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -249,6 +249,8 @@ public class Panacea extends Ability implements AbilityWithDuration {
 				ClientModHandler.updateAbility(mPlayer, Panacea.this);
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	@Override

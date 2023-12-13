@@ -61,9 +61,9 @@ public class BottledSunlight extends DepthsAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.BOTTLED_SUNLIGHT_ABSORPTION_DURATION.mEffectName, BOTTLE_ABSORPTION_DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -116,6 +116,8 @@ public class BottledSunlight extends DepthsAbility {
 			}
 
 		}.runTaskTimer(mPlugin, 0, BOTTLE_TICK_PERIOD);
+
+		return true;
 	}
 
 	private void execute(Player player) {

@@ -120,9 +120,9 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mCharged = new ArrayList<>();
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (mStacks < 1 || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
+			return false;
 		}
 
 		mStacks--;
@@ -210,6 +210,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			}
 		};
 		cancelOnDeath(mRunnable.runTaskTimer(mPlugin, mSpellDelay, 1));
+		return true;
 	}
 
 	@Override

@@ -58,9 +58,9 @@ public class RadiantBlessing extends DepthsAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.RADIANT_BLESSING_BUFF_DURATION.mEffectName, DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		Location userLoc = mPlayer.getLocation();
@@ -104,6 +104,7 @@ public class RadiantBlessing extends DepthsAbility {
 		world.playSound(userLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.05f, 1.0f);
 
 		putOnCooldown();
+		return true;
 	}
 
 	private static Description<RadiantBlessing> getDescription(int rarity, TextColor color) {

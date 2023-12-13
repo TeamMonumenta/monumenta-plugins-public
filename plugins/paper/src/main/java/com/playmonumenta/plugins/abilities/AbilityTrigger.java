@@ -156,6 +156,8 @@ public class AbilityTrigger {
 
 	private boolean mDoubleClick = false;
 
+	private boolean mFallThrough = false;
+
 
 	// Note: if you add a new field, make sure to update the copy constructor, fromJson, toJson, equals, and hashCode
 
@@ -174,6 +176,7 @@ public class AbilityTrigger {
 		mLookDirections.clear();
 		mLookDirections.addAll(original.mLookDirections);
 		mDoubleClick = original.mDoubleClick;
+		mFallThrough = original.mFallThrough;
 	}
 
 	// builder methods
@@ -216,6 +219,11 @@ public class AbilityTrigger {
 
 	public AbilityTrigger doubleClick() {
 		mDoubleClick = true;
+		return this;
+	}
+
+	public AbilityTrigger fallThrough() {
+		mFallThrough = true;
 		return this;
 	}
 
@@ -277,6 +285,14 @@ public class AbilityTrigger {
 		this.mDoubleClick = doubleClick;
 	}
 
+	public boolean isFallThrough() {
+		return mFallThrough;
+	}
+
+	public void setFallThrough(boolean fallThrough) {
+		this.mFallThrough = fallThrough;
+	}
+
 	// other methods
 
 	public static @Nullable AbilityTrigger fromJson(JsonObject json) {
@@ -300,6 +316,7 @@ public class AbilityTrigger {
 				trigger.mLookDirections.add(LookDirection.valueOf(lookDirection.getAsString()));
 			}
 			trigger.mDoubleClick = json.get("doubleClick").getAsBoolean();
+			trigger.mFallThrough = json.get("fallThrough").getAsBoolean();
 			return trigger;
 		} catch (NullPointerException | IllegalArgumentException | ClassCastException | IllegalStateException e) {
 			// Missing or invalid value: ignore the custom trigger and reset to default.
@@ -327,6 +344,7 @@ public class AbilityTrigger {
 		}
 		json.add("lookDirections", lookDirection);
 		json.addProperty("doubleClick", mDoubleClick);
+		json.addProperty("fallThrough", mFallThrough);
 		return json;
 	}
 
@@ -382,12 +400,12 @@ public class AbilityTrigger {
 			return false;
 		}
 		return mEnabled == that.mEnabled && mDoubleClick == that.mDoubleClick && mKey == that.mKey && mKeyOptions.equals(that.mKeyOptions) && mSneaking == that.mSneaking
-			       && mSprinting == that.mSprinting && mOnGround == that.mOnGround && mLookDirections.equals(that.mLookDirections);
+			       && mSprinting == that.mSprinting && mOnGround == that.mOnGround && mFallThrough == that.mFallThrough && mLookDirections.equals(that.mLookDirections);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(mEnabled, mKey, mKeyOptions, mSneaking, mSprinting, mOnGround, mLookDirections, mDoubleClick);
+		return Objects.hash(mEnabled, mKey, mKeyOptions, mSneaking, mSprinting, mOnGround, mLookDirections, mDoubleClick, mFallThrough);
 	}
 
 	public List<Component> getDescription() {

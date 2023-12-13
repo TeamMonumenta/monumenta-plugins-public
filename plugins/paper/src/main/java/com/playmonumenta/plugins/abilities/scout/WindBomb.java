@@ -102,9 +102,9 @@ public class WindBomb extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WindBombCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -124,6 +124,8 @@ public class WindBomb extends Ability {
 
 		// Clear out list just in case
 		mProjectiles.removeIf(triple -> triple.getLeft().isDead() || !triple.getLeft().isValid());
+
+		return true;
 	}
 
 	@Override

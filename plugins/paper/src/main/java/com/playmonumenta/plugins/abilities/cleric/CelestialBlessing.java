@@ -100,9 +100,9 @@ public class CelestialBlessing extends Ability {
 		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -141,6 +141,7 @@ public class CelestialBlessing extends Ability {
 		}
 
 		putOnCooldown();
+		return true;
 	}
 
 	@Override

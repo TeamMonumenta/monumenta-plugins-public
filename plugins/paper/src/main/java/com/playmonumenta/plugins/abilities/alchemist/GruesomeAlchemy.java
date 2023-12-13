@@ -93,17 +93,21 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 		}
 	}
 
-	public void toggle() {
+	public boolean toggle() {
 		if (mAlchemistPotions != null) {
 			mCosmetic.effectsOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
 			mAlchemistPotions.swapMode();
+			return true;
 		}
+		return false;
 	}
 
-	private void throwOpposite() {
+	private boolean throwOpposite() {
 		if (mAlchemistPotions != null && MetadataUtils.checkOnceInRecentTicks(mPlugin, mPlayer, "GruesomeAlchemy_throwOpposite", 3)) {
 			mAlchemistPotions.throwPotion(!mAlchemistPotions.isGruesomeMode());
+			return true;
 		}
+		return false;
 	}
 
 }

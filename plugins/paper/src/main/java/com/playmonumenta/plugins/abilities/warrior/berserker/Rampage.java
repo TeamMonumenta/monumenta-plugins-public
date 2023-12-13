@@ -100,7 +100,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new RampageCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (mStacks >= ACTIVE_MIN_STACKS) {
 			World world = mPlayer.getWorld();
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mStacks * RAMPAGE_STACK_PERCENTAGE);
@@ -119,7 +119,9 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			mStacks = 0;
 			showChargesMessage();
 			ClientModHandler.updateAbility(mPlayer, this);
+			return true;
 		}
+		return false;
 	}
 
 	@Override

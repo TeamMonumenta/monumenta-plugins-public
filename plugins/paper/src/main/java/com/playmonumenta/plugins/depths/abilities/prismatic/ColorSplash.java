@@ -140,18 +140,19 @@ public class ColorSplash extends DepthsAbility {
 		mCanCastWindwalk = false;
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
 			if (mWindwalkerActive && mCanCastWindwalk) {
 				castWindwalk();
+				return true;
 			}
-			return;
+			return false;
 		}
 
 		putOnCooldown();
 		DepthsPlayer dPlayer = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
 		if (dPlayer == null) {
-			return;
+			return false;
 		}
 
 		List<DepthsTree> availableTrees = dPlayer.mEligibleTrees;
@@ -175,6 +176,8 @@ public class ColorSplash extends DepthsAbility {
 				}
 			}
 		}, ACTIVATION_DELAY);
+
+		return true;
 	}
 
 	private void preActivationAesthetics(DepthsTree selectedTree) {

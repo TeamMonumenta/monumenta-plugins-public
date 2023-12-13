@@ -83,9 +83,9 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 
 	private int mCurrDuration = -1;
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -142,6 +142,8 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 				ClientModHandler.updateAbility(mPlayer, WardingRemedy.this);
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	@Override

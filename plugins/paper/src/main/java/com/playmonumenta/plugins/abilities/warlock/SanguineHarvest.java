@@ -105,9 +105,9 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanguineHarvestCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -173,6 +173,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 			explode(endLoc);
 		}
 		mCosmetic.projectileParticle(mPlayer, loc, endLoc);
+		return true;
 	}
 
 	private void explode(Location loc) {

@@ -83,9 +83,9 @@ public class LuminousInfusion extends Ability {
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		mActive = true;
@@ -113,6 +113,7 @@ public class LuminousInfusion extends Ability {
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 1, 1));
+		return true;
 	}
 
 	@Override

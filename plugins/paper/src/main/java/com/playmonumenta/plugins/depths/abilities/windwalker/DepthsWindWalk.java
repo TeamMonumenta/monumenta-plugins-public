@@ -72,9 +72,9 @@ public class DepthsWindWalk extends DepthsAbility {
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.WIND_WALK_STUN_DURATION.mEffectName, STUN_DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -136,6 +136,8 @@ public class DepthsWindWalk extends DepthsAbility {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	//Cancel melee damage within 10 ticks of casting

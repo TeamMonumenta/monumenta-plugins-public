@@ -82,7 +82,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CloakAndDaggerCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (mCloak >= CLOAK_MIN_STACKS) {
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
@@ -91,7 +91,9 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			mCosmetic.castEffects(mPlayer);
 
 			ClientModHandler.updateAbility(mPlayer, this);
+			return true;
 		}
+		return false;
 	}
 
 	@Override

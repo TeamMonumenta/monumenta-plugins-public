@@ -99,9 +99,9 @@ public class FrostNova extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new FrostNovaCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
@@ -135,6 +135,8 @@ public class FrostNova extends Ability {
 
 		World world = mPlayer.getWorld();
 		mCosmetic.onCast(mPlugin, mPlayer, world, size);
+
+		return true;
 	}
 
 }

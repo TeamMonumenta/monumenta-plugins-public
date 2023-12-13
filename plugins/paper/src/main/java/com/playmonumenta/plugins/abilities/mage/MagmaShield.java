@@ -97,9 +97,9 @@ public class MagmaShield extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MagmaShieldCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -127,6 +127,8 @@ public class MagmaShield extends Ability {
 		}
 
 		mCosmetic.magmaEffects(mPlayer.getWorld(), mPlayer, radius, angle);
+
+		return true;
 	}
 
 }

@@ -118,9 +118,9 @@ public class HandOfLight extends Ability {
 		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		World world = mPlayer.getWorld();
 		Location userLoc = mPlayer.getLocation();
@@ -184,9 +184,12 @@ public class HandOfLight extends Ability {
 			}
 		}
 
-		if (doCooldown) {
-			putOnCooldown((int) cooldown);
+		if (!doCooldown) {
+			return false;
 		}
+
+		putOnCooldown((int) cooldown);
+		return true;
 	}
 
 }

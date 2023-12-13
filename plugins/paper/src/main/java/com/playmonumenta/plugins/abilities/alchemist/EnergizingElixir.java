@@ -121,24 +121,25 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		if (MetadataUtils.happenedThisTick(mPlayer, AlchemistPotions.METADATA_KEY, -1)) {
 			//this may be strange but sometime for some player, when they throw an Alch pot, elixir is randomly cast
 			//Stopping elixir since was caused by potion
-			return;
+			return false;
 		}
 		if (mAlchemistPotions == null || !mAlchemistPotions.decrementCharges(mPrice)) {
 			// If no charges, do not activate ability
-			return;
+			return false;
 		}
 
 		activate(true);
 
 		putOnCooldown();
+		return true;
 	}
 
 	private void activate(boolean soundAndParticles) {
@@ -160,7 +161,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	private void toggleRecast() {
+	private boolean toggleRecast() {
 		// Toggling off is always possible. Toggling on casts the ability once, so requires being off cooldown and having enough potions to use it.
 		if (mPlayer.getScoreboardTags().remove(TOGGLE_TAG)) {
 			mPlayer.sendActionBar(Component.text("Energizing Elixir automatic recast has been disabled"));
@@ -171,6 +172,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			activate(true);
 			putOnCooldown();
 		}
+		return true;
 	}
 
 	private void applyEffects() {
@@ -189,7 +191,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	private void toggleJumpBoost() {
+	private boolean toggleJumpBoost() {
 		if (ScoreboardUtils.toggleTag(mPlayer, DISABLE_JUMP_BOOST_TAG)) {
 			// jump boost disabled: remove jump boost if active
 			mPlayer.sendActionBar(Component.text("Energizing Elixir's Jump Boost has been disabled"));
@@ -203,6 +205,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 					true, false, !mPlayer.getScoreboardTags().contains(TOGGLE_TAG)));
 			}
 		}
+		return true;
 	}
 
 	@Override

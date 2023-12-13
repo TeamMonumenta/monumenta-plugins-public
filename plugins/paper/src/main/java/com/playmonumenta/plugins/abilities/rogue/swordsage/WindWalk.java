@@ -77,15 +77,15 @@ public class WindWalk extends MultipleChargeAbility {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WindWalkCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
+			return false;
 		}
 
 		int ticks = Bukkit.getServer().getCurrentTick();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
-			return;
+			return false;
 		}
 		mLastCastTicks = ticks;
 
@@ -95,6 +95,7 @@ public class WindWalk extends MultipleChargeAbility {
 		if (isLevelTwo()) {
 			mPlugin.mTimers.updateCooldownsExcept(mPlayer, ClassAbility.WIND_WALK, CharmManager.getDuration(mPlayer, CHARM_COOLDOWN_REDUCTION, WIND_WALK_CDR));
 		}
+		return true;
 	}
 
 	public void walk() {

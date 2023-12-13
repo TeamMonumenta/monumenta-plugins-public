@@ -94,10 +94,10 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodkinBlitzCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (mTeleporting
 			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
+			return false;
 		}
 
 		Location loc = mPlayer.getLocation();
@@ -105,7 +105,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		int ticks = Bukkit.getServer().getCurrentTick();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 4 || !consumeCharge()) {
-			return;
+			return false;
 		}
 		mLastCastTicks = ticks;
 
@@ -185,6 +185,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	@Override

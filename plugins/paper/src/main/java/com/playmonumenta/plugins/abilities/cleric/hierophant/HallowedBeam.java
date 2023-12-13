@@ -131,7 +131,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		return le.getHealth()/EntityUtils.getMaxHealth(le);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		World world = mPlayer.getWorld();
 
 		// Targeting
@@ -159,13 +159,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 		}
 
 		if (e == null) {
-			return;
+			return false;
 		}
 
 		int ticks = Bukkit.getServer().getCurrentTick();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
-			return;
+			return false;
 		}
 		mLastCastTicks = ticks;
 
@@ -223,6 +223,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 			}
 			applyRecoil();
 		});
+
+		return true;
 	}
 
 	public void applyRecoil() {
@@ -237,7 +239,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		}
 	}
 
-	public void swapMode() {
+	public boolean swapMode() {
 		if (mMode == Mode.DEFAULT) {
 			mMode = Mode.HEALING;
 		} else if (mMode == Mode.HEALING) {
@@ -248,6 +250,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		sendActionBarMessage(ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + mMode.mLabel);
 		ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode.ordinal());
 		ClientModHandler.updateAbility(mPlayer, this);
+		return true;
 	}
 
 	@Override

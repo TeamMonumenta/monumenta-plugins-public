@@ -81,9 +81,9 @@ public class Starfall extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new StarfallCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -105,6 +105,8 @@ public class Starfall extends Ability {
 				break;
 			}
 		}
+
+		return true;
 	}
 
 	private void launchMeteor(final Location loc, final ItemStatManager.PlayerItemStats playerItemStats, final float damage) {

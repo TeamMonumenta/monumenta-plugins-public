@@ -72,14 +72,14 @@ public class Devastation extends Ability {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		List<LivingEntity> totemList = TotemicEmpowerment.getTotemList(mPlayer);
 		if (totemList.isEmpty()) {
-			return;
+			return false;
 		}
 		LivingEntity totemToNuke = totemList.get(0);
 		for (LivingEntity totem : totemList) {
@@ -111,5 +111,7 @@ public class Devastation extends Ability {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, mRadius)) {
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
 		}
+
+		return true;
 	}
 }

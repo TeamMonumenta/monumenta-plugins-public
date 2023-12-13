@@ -81,9 +81,9 @@ public class CosmicMoonblade extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CosmicMoonbladeCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mDamage);
@@ -116,6 +116,8 @@ public class CosmicMoonblade extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 7));
+
+		return true;
 	}
 
 	public void updateCooldowns(double percent) {

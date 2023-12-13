@@ -71,9 +71,9 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -183,6 +183,8 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 				mPlayer.getWorld().playSound(mCurrentLoc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 2, 2);
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1));
+
+		return true;
 	}
 
 	private double getDamage() {

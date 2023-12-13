@@ -66,16 +66,16 @@ public class Quickdraw extends Ability {
 		super(plugin, player, INFO);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if ((ItemStatUtils.hasEnchantment(inMainHand, EnchantmentType.TWO_HANDED)
 			&& !(ItemUtils.isNullOrAir(inOffHand) || ItemStatUtils.hasEnchantment(inOffHand, EnchantmentType.WEIGHTLESS)))
 			|| ItemUtils.isShootableItem(inOffHand)) {
-			return;
+			return false;
 		}
 		World world = mPlayer.getWorld();
 
@@ -93,7 +93,9 @@ public class Quickdraw extends Ability {
 					shootProjectile(inMainHand, 2 * i - 1);
 				}
 			}
+			return true;
 		}
+		return false;
 	}
 
 	private boolean shootProjectile(ItemStack inMainHand, int deviation) {

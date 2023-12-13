@@ -69,9 +69,9 @@ public class Bodyguard extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodyguardCS());
 	}
 
-	public void cast(boolean allowSelfCast) {
+	public boolean cast(boolean allowSelfCast) {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -93,7 +93,7 @@ public class Bodyguard extends Ability {
 				mPlayer.teleport(targetLoc);
 			}
 		} else if (!allowSelfCast) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -110,7 +110,7 @@ public class Bodyguard extends Ability {
 				EntityUtils.applyStun(mPlugin, duration, mob);
 			}
 		}
-
+		return true;
 	}
 
 	private void giveAbsorption(Player player) {

@@ -80,9 +80,9 @@ public class VoodooBonds extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new VoodooBondsCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -94,6 +94,8 @@ public class VoodooBonds extends Ability {
 			mPlugin.mEffectManager.addEffect(p, EFFECT_NAME,
 				new VoodooBondsOtherPlayer(getModifiedCooldown(), mTransferDuration, mPlayer, mPlugin));
 		}
+
+		return true;
 	}
 
 	@Override

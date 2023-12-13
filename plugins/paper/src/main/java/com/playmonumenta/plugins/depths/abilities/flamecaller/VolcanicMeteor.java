@@ -58,9 +58,9 @@ public class VolcanicMeteor extends DepthsAbility {
 		mFireDuration = CharmManager.getDuration(mPlayer, CharmEffects.VOLCANIC_METEOR_FIRE_DURATION.mEffectName, FIRE_TICKS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -85,6 +85,7 @@ public class VolcanicMeteor extends DepthsAbility {
 				break;
 			}
 		}
+		return true;
 	}
 
 

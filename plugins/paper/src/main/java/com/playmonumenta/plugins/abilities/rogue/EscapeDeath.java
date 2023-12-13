@@ -85,12 +85,13 @@ public class EscapeDeath extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EscapeDeathCS());
 	}
 
-	private void toggleJumpBoost() {
+	private boolean toggleJumpBoost() {
 		if (ScoreboardUtils.toggleTag(mPlayer, DISABLE_JUMP_BOOST_TAG)) {
 			mPlayer.sendActionBar(Component.text("Escape Death's Jump Boost has been disabled"));
 		} else {
 			mPlayer.sendActionBar(Component.text("Escape Death's Jump Boost has been enabled"));
 		}
+		return true;
 	}
 
 	@Override

@@ -79,9 +79,9 @@ public class TotemOfSalvation extends DepthsAbility {
 		mMaxAbsorption = MAX_ABSORPTION + CharmManager.getLevel(mPlayer, CharmEffects.TOTEM_OF_SALVATION_MAX_ABSORPTION.mEffectName);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -138,6 +138,8 @@ public class TotemOfSalvation extends DepthsAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
+
+		return true;
 	}
 
 	private static Description<TotemOfSalvation> getDescription(int rarity, TextColor color) {

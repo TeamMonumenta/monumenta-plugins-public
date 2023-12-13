@@ -67,9 +67,9 @@ public class Slipstream extends DepthsAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.SLIPSTREAM_RADIUS.mEffectName, RADIUS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -104,6 +104,8 @@ public class Slipstream extends DepthsAbility {
 				MovementUtils.knockAway(mPlayer.getLocation(), mob, mKnockbackSpeed, mKnockbackSpeed / 2, true);
 			}
 		}
+
+		return true;
 	}
 
 	private static Description<Slipstream> getDescription(int rarity, TextColor color) {

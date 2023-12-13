@@ -85,9 +85,9 @@ public class ChainHealingWave extends Ability {
 		mHealPercent = CharmManager.getExtraPercent(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		mHitTargets.clear();
 		mHitTargets.add(mPlayer);
@@ -108,6 +108,8 @@ public class ChainHealingWave extends Ability {
 			mHitTargets.add(nearbyPlayers.get(0));
 			startChain(nearbyPlayers.get(0));
 		}
+
+		return true;
 	}
 
 	private void startChain(LivingEntity starterEntity) {

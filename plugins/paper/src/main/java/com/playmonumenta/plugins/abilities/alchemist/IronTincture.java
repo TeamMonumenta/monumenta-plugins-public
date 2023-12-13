@@ -98,9 +98,9 @@ public class IronTincture extends Ability {
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -161,6 +161,8 @@ public class IronTincture extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, IRON_TINCTURE_TICK_PERIOD);
+
+		return true;
 	}
 
 	private void execute(Player player, Location tinctureLocation) {

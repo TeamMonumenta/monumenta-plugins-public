@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -41,7 +40,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 	private final String mDisplayName;
 	private final @Nullable String mDescription;
 
-	private final Consumer<T> mAction;
+	private final Predicate<T> mAction;
 
 	private AbilityTrigger mTrigger;
 
@@ -71,23 +70,23 @@ public class AbilityTriggerInfo<T extends Ability> {
 		}
 	}
 
-	public AbilityTriggerInfo(String id, String displayName, Consumer<T> action, AbilityTrigger trigger) {
+	public AbilityTriggerInfo(String id, String displayName, Predicate<T> action, AbilityTrigger trigger) {
 		this(id, displayName, null, action, trigger, null);
 	}
 
-	public AbilityTriggerInfo(String id, String displayName, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
+	public AbilityTriggerInfo(String id, String displayName, Predicate<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
 		this(id, displayName, null, action, trigger, restriction);
 	}
 
-	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
+	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Predicate<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
 		this(id, displayName, description, action, trigger, restriction, null);
 	}
 
-	public AbilityTriggerInfo(String id, String displayName, Consumer<T> action, DepthsTrigger depthsTrigger) {
+	public AbilityTriggerInfo(String id, String displayName, Predicate<T> action, DepthsTrigger depthsTrigger) {
 		this(id, displayName, null, action, depthsTrigger.mTrigger, depthsTrigger.mRestriction);
 	}
 
-	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction, @Nullable Predicate<Player> prerequisite) {
+	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Predicate<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction, @Nullable Predicate<Player> prerequisite) {
 		mId = id;
 		mDisplayName = displayName;
 		mDescription = description;
@@ -105,7 +104,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 		return mDescription;
 	}
 
-	public Consumer<T> getAction() {
+	public Predicate<T> getAction() {
 		return mAction;
 	}
 

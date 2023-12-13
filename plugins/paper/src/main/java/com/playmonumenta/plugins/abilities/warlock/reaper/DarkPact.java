@@ -86,9 +86,9 @@ public class DarkPact extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DarkPactCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -102,7 +102,7 @@ public class DarkPact extends Ability {
 			(entity) -> mCosmetic.loseEffect(mPlayer)));
 
 		putOnCooldown();
-
+		return true;
 	}
 
 	@Override

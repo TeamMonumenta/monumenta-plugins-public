@@ -141,10 +141,10 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		});
 	}
 
-	public void toggle() {
+	public boolean toggle() {
 		// Don't allow toggling during burst.
 		if (mCurrentState == TabooState.BURST) {
-			return;
+			return false;
 		}
 
 		if (mCurrentState == TabooState.INACTIVE) {
@@ -152,6 +152,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		} else {
 			deactivate();
 		}
+		return true;
 	}
 
 	public void activate() {
@@ -182,14 +183,16 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
-	public void burst() {
+	public boolean burst() {
 		if (!isOnCooldown() && mCurrentState == TabooState.ACTIVE && mAlchemistPotions != null && mAlchemistPotions.decrementCharges(1)) {
 			mBurstTimer = BURST_SECONDS;
 			mCurrentState = TabooState.BURST;
 			mCosmetic.burstEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
 			mCurrDuration = 0;
 			ClientModHandler.updateAbility(mPlayer, this);
+			return true;
 		}
+		return false;
 	}
 
 	public void unburst() {

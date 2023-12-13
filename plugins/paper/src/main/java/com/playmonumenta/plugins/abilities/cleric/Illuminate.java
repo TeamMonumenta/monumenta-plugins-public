@@ -141,9 +141,9 @@ public class Illuminate extends Ability {
 		mEnhanceZone = null;
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -219,6 +219,8 @@ public class Illuminate extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	public void layTrail(Location loc, double radius, int maxDuration, Vector direction) {

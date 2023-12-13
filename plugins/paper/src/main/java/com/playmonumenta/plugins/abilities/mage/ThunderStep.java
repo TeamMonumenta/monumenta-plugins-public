@@ -121,9 +121,9 @@ public class ThunderStep extends Ability {
 		mLevelDistance = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
+			return false;
 		}
 
 		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
@@ -144,12 +144,12 @@ public class ThunderStep extends Ability {
 			mLastCastLocation = null;
 			mLastCastTick = -1;
 			mCanParalyze = false;
-			return;
+			return true;
 		}
 
 		// on cooldown and didn't teleport back: stop here
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		boolean doParalyze = isEnhanced() && mCanParalyze && Bukkit.getServer().getCurrentTick() <= mLastCastTick + ENHANCEMENT_BONUS_DAMAGE_TIMER;
@@ -182,11 +182,13 @@ public class ThunderStep extends Ability {
 
 		if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
 			    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
+			return true;
 		}
 
 		mPlayer.teleport(playerEndLocation);
 		doDamage(playerEndLocation, spellDamage, doParalyze);
+
+		return true;
 	}
 
 	private void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {

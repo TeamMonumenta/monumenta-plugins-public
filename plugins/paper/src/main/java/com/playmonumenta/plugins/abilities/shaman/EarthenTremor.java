@@ -104,9 +104,9 @@ public class EarthenTremor extends Ability {
 		mShockwaveRadius = CharmManager.getRadius(mPlayer, CHARM_SHOCKWAVE_RADIUS, SHOCKWAVE_RADIUS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -157,5 +157,6 @@ public class EarthenTremor extends Ability {
 			}
 		}
 		mHitEntities.clear();
+		return true;
 	}
 }

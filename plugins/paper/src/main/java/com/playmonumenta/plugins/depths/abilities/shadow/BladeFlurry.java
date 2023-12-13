@@ -58,9 +58,9 @@ public class BladeFlurry extends DepthsAbility {
 		mSilenceDuration = CharmManager.getDuration(mPlayer, CharmEffects.BLADE_FLURRY_SILENCE_DURATION.mEffectName, SILENCE_DURATION[mRarity - 1]);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -102,6 +102,8 @@ public class BladeFlurry extends DepthsAbility {
 				mIncrementDegrees += 30;
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	private static Description<BladeFlurry> getDescription(int rarity, TextColor color) {

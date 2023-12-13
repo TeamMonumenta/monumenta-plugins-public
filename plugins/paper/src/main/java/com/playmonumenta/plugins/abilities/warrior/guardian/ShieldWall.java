@@ -97,12 +97,12 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
 			if (mCurrDuration + SHIELD_WALL_REPOSITION_PENALTY < mDuration) {
 				mReposition = true;
 			}
-			return;
+			return true;
 		}
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_KNOCKBACK);
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_WALL_DAMAGE);
@@ -208,6 +208,8 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 				ClientModHandler.updateAbility(mPlayer, ShieldWall.this);
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 	@Override

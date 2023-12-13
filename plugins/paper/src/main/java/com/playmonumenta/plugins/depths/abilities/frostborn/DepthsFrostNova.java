@@ -68,9 +68,9 @@ public class DepthsFrostNova extends DepthsAbility {
 		mIceDuration = CharmManager.getDuration(mPlayer, CharmEffects.FROST_NOVA_ICE_DURATION.mEffectName, ICE_TICKS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
@@ -128,6 +128,8 @@ public class DepthsFrostNova extends DepthsAbility {
 
 		new PartialParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45).spawnAsPlayerActive(mPlayer);
+
+		return true;
 	}
 
 	private List<Block> getBlocksInCircle(Block b, int radius) {

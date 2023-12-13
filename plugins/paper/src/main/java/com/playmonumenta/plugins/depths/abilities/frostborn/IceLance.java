@@ -75,9 +75,9 @@ public class IceLance extends DepthsAbility {
 		mIceDuration = CharmManager.getDuration(mPlayer, CharmEffects.ICE_LANCE_ICE_DURATION.mEffectName, ICE_TICKS);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -128,6 +128,8 @@ public class IceLance extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 1, 0.7f);
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1, 0.7f);
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 0.7f);
+
+		return true;
 	}
 
 	private static Description<IceLance> getDescription(int rarity, TextColor color) {

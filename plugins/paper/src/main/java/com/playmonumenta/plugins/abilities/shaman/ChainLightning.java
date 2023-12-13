@@ -103,10 +103,10 @@ public class ChainLightning extends MultipleChargeAbility {
 		mInitialRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_INITIAL_RANGE, INITIAL_RANGE);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		int ticks = Bukkit.getServer().getCurrentTick();
 		if (ticks - mLastCastTicks <= 10 || mCharges <= 0) {
-			return;
+			return false;
 		}
 		mLastCastTicks = ticks;
 		mHitTargets.clear();
@@ -133,6 +133,8 @@ public class ChainLightning extends MultipleChargeAbility {
 				startChain(totem, false);
 			}
 		}
+
+		return true;
 	}
 
 	private void startChain(LivingEntity starterEntity, boolean foundMob) {

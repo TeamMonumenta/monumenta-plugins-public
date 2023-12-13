@@ -98,9 +98,9 @@ public class AlchemicalArtillery extends Ability {
 			() -> mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (mAlchemistPotions == null || isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		// Cast new grenade
@@ -109,6 +109,7 @@ public class AlchemicalArtillery extends Ability {
 			Location loc = mPlayer.getEyeLocation();
 			spawnGrenade(loc, mAlchemistPotions.isGruesomeMode());
 		}
+		return true;
 	}
 
 	private void spawnGrenade(Location loc, boolean isGruesome) {

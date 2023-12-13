@@ -39,6 +39,7 @@ public class AbilityTriggersGui extends Gui {
 	}
 
 	@Override
+	@SuppressWarnings("unused")
 	protected void setup() {
 		if (mSelectedAbility == null) {
 			// back icon
@@ -84,7 +85,7 @@ public class AbilityTriggersGui extends Gui {
 						.onRightClick(() -> {
 							if (trigger.getRestriction() == null || trigger.getRestriction().getPredicate().test(mPlayer)) {
 								// cast is fine here, as the trigger is for the ability we got it from
-								((AbilityTriggerInfo) trigger).getAction().accept(ability);
+								((AbilityTriggerInfo) trigger).getAction().test(ability);
 							}
 						});
 					i++;
@@ -168,7 +169,7 @@ public class AbilityTriggersGui extends Gui {
 
 			String looking = "Looking " + (mNewTrigger.getLookDirections().size() == 3 ? "anywhere"
 					: mNewTrigger.getLookDirections().stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or ")));
-			makeOptionIcons(1, 7, GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.WHITE, false,
+			makeOptionIcons(1, 7, GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.GRAY, false,
 					"Click to cycle through look directions", NamedTextColor.GRAY, 40), mNewTrigger.getLookDirections().size() == 3 ? Material.GRAY_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				EnumSet<AbilityTrigger.LookDirection> lookDirections = mNewTrigger.getLookDirections();
 				AbilityTrigger.LookDirection[] values = AbilityTrigger.LookDirection.values();
@@ -192,6 +193,12 @@ public class AbilityTriggersGui extends Gui {
 						lookDirections.remove(values[missingDirection.ordinal() - 1]);
 					}
 				}
+				update();
+			});
+
+			makeOptionIcons(1, 8, GUIUtils.createBasicItem(Material.POINTED_DRIPSTONE, "Allow fall-through: " + (mNewTrigger.isFallThrough() ? "yes" : "no"), mNewTrigger.isFallThrough() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
+				"Click to toggle whether another ability with an overlapping trigger will be triggered if this ability fails or is on cooldown.", NamedTextColor.GRAY, 40), mNewTrigger.isFallThrough() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
+				mNewTrigger.setFallThrough(!mNewTrigger.isFallThrough());
 				update();
 			});
 

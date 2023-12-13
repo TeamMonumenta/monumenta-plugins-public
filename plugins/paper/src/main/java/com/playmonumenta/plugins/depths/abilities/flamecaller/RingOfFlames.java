@@ -66,9 +66,9 @@ public class RingOfFlames extends DepthsAbility {
 		mRingDuration = CharmManager.getDuration(mPlayer, CharmEffects.RING_OF_FLAMES_DURATION.mEffectName, DURATION[mRarity - 1]);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -128,6 +128,7 @@ public class RingOfFlames extends DepthsAbility {
 				mTicks++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+		return true;
 	}
 
 

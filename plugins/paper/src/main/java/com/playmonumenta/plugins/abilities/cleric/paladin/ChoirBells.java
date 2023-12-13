@@ -76,9 +76,9 @@ public class ChoirBells extends Ability {
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		mCosmetic.bellsCastEffect(mPlayer, CHOIR_BELLS_RANGE);
 
@@ -97,5 +97,6 @@ public class ChoirBells extends Ability {
 			Crusade.addCrusadeTag(mob, mCrusade);
 		}
 		putOnCooldown();
+		return true;
 	}
 }

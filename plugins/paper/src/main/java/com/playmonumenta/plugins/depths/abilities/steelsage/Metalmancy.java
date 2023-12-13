@@ -73,10 +73,10 @@ public class Metalmancy extends DepthsAbility {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.METALMANCY_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
 			resetTarget();
-			return;
+			return false;
 		}
 
 		putOnCooldown();
@@ -91,14 +91,14 @@ public class Metalmancy extends DepthsAbility {
 		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
 		mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME);
 		if (mGolem == null) {
-			return;
+			return false;
 		}
 		mGolem.setVelocity(facingDirection.multiply(VELOCITY));
 
 		MetalmancyBoss metalmancyBoss = BossUtils.getBossOfClass(mGolem, MetalmancyBoss.class);
 		if (metalmancyBoss == null) {
 			MMLog.warning("Failed to get MetalmancyBoss");
-			return;
+			return false;
 		}
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -152,6 +152,8 @@ public class Metalmancy extends DepthsAbility {
 				mTicksElapsed += TICK_INTERVAL;
 			}
 		}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+
+		return true;
 	}
 
 	@Override

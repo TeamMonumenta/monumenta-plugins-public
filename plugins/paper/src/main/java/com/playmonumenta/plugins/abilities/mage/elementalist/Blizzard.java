@@ -91,9 +91,9 @@ public class Blizzard extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BlizzardCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -137,6 +137,8 @@ public class Blizzard extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+
+		return true;
 	}
 
 }

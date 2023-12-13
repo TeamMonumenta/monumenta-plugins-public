@@ -64,9 +64,9 @@ public class Sidearm extends DepthsAbility {
 		mCDR = KILL_COOLDOWN_REDUCTION + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SIDEARM_KILL_CDR.mEffectName);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -80,7 +80,7 @@ public class Sidearm extends DepthsAbility {
 			Location endLoc = startLoc.clone().add(dir.multiply(mRange));
 			hitEffect(endLoc);
 			lineEffect(startLoc, endLoc);
-			return;
+			return true;
 		}
 
 		Location endLoc = result.getHitPosition().toLocation(world);
@@ -98,6 +98,7 @@ public class Sidearm extends DepthsAbility {
 		}
 
 		lineEffect(startLoc, endLoc);
+		return true;
 	}
 
 	private void lineEffect(Location startLoc, Location endLoc) {

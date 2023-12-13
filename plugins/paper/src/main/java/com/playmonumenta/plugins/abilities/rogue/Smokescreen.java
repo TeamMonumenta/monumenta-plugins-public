@@ -79,9 +79,9 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ENHANCEMENT_SMOKECLOUD_DURATION);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
@@ -120,6 +120,7 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 		}
 
 		ClientModHandler.updateAbility(mPlayer, this);
+		return true;
 	}
 
 	private void applyEffects(Location loc) {

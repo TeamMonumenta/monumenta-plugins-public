@@ -104,9 +104,9 @@ public class Challenge extends Ability {
 		});
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		Location loc = mPlayer.getLocation();
 		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, CHALLENGE_RANGE)).getHitMobs();
@@ -131,7 +131,9 @@ public class Challenge extends Ability {
 			mCosmetic.onCast(mPlayer, world, loc);
 
 			putOnCooldown();
+			return true;
 		}
+		return false;
 	}
 
 	public void incrementKills() {

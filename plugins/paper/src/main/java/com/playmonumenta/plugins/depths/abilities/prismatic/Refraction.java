@@ -64,15 +64,15 @@ public class Refraction extends DepthsAbility {
 		super(plugin, player, INFO);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
 		DepthsPlayer dPlayer = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
 		if (dPlayer == null) {
-			return;
+			return false;
 		}
 
 		mPlugin.mEffectManager.addEffect(mPlayer, WIND_UP_EFFECT, new PercentSpeed(DURATION + 30, -0.5, WIND_UP_EFFECT));
@@ -147,6 +147,8 @@ public class Refraction extends DepthsAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		return true;
 	}
 
 	private void pulseLaser(ItemStatManager.PlayerItemStats playerItemStats, DepthsPlayer depthsPlayer) {

@@ -60,9 +60,9 @@ public class HowlingWinds extends DepthsAbility {
 
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
 
@@ -83,6 +83,8 @@ public class HowlingWinds extends DepthsAbility {
 				break;
 			}
 		}
+
+		return true;
 	}
 
 	private void explode(Location loc) {

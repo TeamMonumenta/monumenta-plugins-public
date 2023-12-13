@@ -102,16 +102,16 @@ public class AdvancingShadows extends Ability {
 		mEnhancementChain = 0;
 	}
 
-	public void cast() {
+	public boolean cast() {
 		// Enhancement: If mCanRecast is true (which shows that targeted mob died in 1s), allow recast of AS for next 3 seconds.
 		if (isOnCooldown() && !(isEnhanced() && mCanRecast && mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION >= Bukkit.getCurrentTick())) {
-			return;
+			return false;
 		}
 
 		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mActivationRange);
 
 		if (entity == null) {
-			return;
+			return false;
 		}
 
 		if (isEnhanced() && (mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION < Bukkit.getCurrentTick())) {
@@ -151,7 +151,7 @@ public class AdvancingShadows extends Ability {
 			// If still solid, something is wrong.
 			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 				mCosmetic.tpSoundFail(world, mPlayer);
-				return;
+				return false;
 			}
 
 			// Prevent the player from teleporting over void
@@ -172,7 +172,7 @@ public class AdvancingShadows extends Ability {
 				// Maybe void - not worth it
 				if (!safe) {
 					mCosmetic.tpSoundFail(world, mPlayer);
-					return;
+					return false;
 				}
 
 				// Don't teleport players below y = 1.1 to avoid clipping into oblivion
@@ -182,7 +182,7 @@ public class AdvancingShadows extends Ability {
 			// Extra safeguard to prevent bizarro teleports
 			if (mPlayer.getLocation().distance(loc) > maxRange) {
 				mCosmetic.tpSoundFail(world, mPlayer);
-				return;
+				return false;
 			}
 
 			if (loc.distance(entity.getLocation()) <= origDistance && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
@@ -244,6 +244,8 @@ public class AdvancingShadows extends Ability {
 			mCosmetic.tpSound(world, mPlayer);
 
 			putOnCooldown();
+			return true;
 		}
+		return false;
 	}
 }

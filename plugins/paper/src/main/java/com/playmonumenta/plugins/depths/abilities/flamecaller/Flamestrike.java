@@ -65,12 +65,11 @@ public class Flamestrike extends DepthsAbility {
 		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FLAMESTRIKE_KNOCKBACK.mEffectName, KNOCKBACK);
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		putOnCooldown();
-
 
 		Hitbox hitbox = Hitbox.approximateCylinderSegment(
 			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0),
@@ -118,7 +117,7 @@ public class Flamestrike extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, SoundCategory.PLAYERS, 1f, 1.25f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.5f);
-		putOnCooldown();
+		return true;
 	}
 
 	private static Description<Flamestrike> getDescription(int rarity, TextColor color) {

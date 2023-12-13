@@ -82,9 +82,9 @@ public class BladeDance extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BladeDanceCS());
 	}
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS);
 
@@ -124,5 +124,6 @@ public class BladeDance extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1));
 
 		putOnCooldown();
+		return true;
 	}
 }

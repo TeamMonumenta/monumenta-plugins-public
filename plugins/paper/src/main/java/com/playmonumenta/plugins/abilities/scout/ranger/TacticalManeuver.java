@@ -80,16 +80,16 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		});
 	}
 
-	public void cast(boolean forwards) {
+	public boolean cast(boolean forwards) {
 		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
+			return false;
 		}
 
 		int ticks = Bukkit.getServer().getCurrentTick();
 
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 10 || !consumeCharge()) {
-			return;
+			return false;
 		}
 
 		mLastCastTicks = ticks;
@@ -167,5 +167,6 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			vel.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1));
 			mPlayer.setVelocity(vel);
 		}
+		return true;
 	}
 }

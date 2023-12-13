@@ -71,9 +71,9 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 
 	private int mCurrDuration = -1;
 
-	public void cast() {
+	public boolean cast() {
 		if (isOnCooldown()) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -160,6 +160,8 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 				ClientModHandler.updateAbility(mPlayer, CleansingRain.this);
 			}
 		}.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD));
+
+		return true;
 	}
 
 	@Override
