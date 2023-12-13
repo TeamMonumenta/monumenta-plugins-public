@@ -1,20 +1,30 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.scriptedquests.zones.ZonePropertyChangeEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.CauldronLevelChangeEvent;
+import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -74,9 +84,55 @@ public class ZoneListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockFadeEvent(BlockFadeEvent event) {
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockFormEvent(BlockFormEvent event) {
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockFromToEvent(BlockFromToEvent event) {
 		if (event.getBlock().getType() == Material.DRAGON_EGG
 			&& ZoneUtils.hasZoneProperty(event.getToBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockGrowEvent(BlockGrowEvent event) {
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockSpreadEvent(BlockSpreadEvent event) {
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void cauldronLevelChangeEvent(CauldronLevelChangeEvent event) {
+		if (event.getReason().equals(CauldronLevelChangeEvent.ChangeReason.EXTINGUISH) &&
+			ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			final Block blockToRestore = event.getBlock();
+			final BlockState restoredState = event.getBlock().getState();
+			Bukkit.getScheduler().runTask(Plugin.getInstance(),
+				() -> blockToRestore.setBlockData(restoredState.getBlockData()));
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityBlockFormEvent(EntityBlockFormEvent event) {
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
 			event.setCancelled(true);
 		}
 	}
