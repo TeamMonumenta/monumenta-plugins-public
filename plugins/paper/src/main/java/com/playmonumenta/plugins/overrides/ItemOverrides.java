@@ -284,6 +284,12 @@ public final class ItemOverrides {
 		mItems.put(Material.END_CRYSTAL, new EndCrystalOverride());
 		mItems.put(Material.QUARTZ, new QuartzOverride());
 
+		BaseOverride sculkOverride = new SculkOverride();
+		mItems.put(Material.SCULK, sculkOverride);
+		mItems.put(Material.SCULK_CATALYST, sculkOverride);
+		mItems.put(Material.SCULK_SENSOR, sculkOverride);
+		mItems.put(Material.SCULK_SHRIEKER, sculkOverride);
+
 		BaseOverride signOverride = new SignOverride();
 		mItems.put(Material.ACACIA_SIGN, signOverride);
 		mItems.put(Material.ACACIA_WALL_SIGN, signOverride);
