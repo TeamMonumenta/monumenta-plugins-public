@@ -34,11 +34,9 @@ import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,20 +44,17 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,16 +65,14 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		void run(Player player, Inventory clickedInventory, int slot);
 	}
 
-	private static final int MAX_LORE_LENGTH = 30;
-
 	private static final Map<DelveInfusionSelection, List<ItemStack>> mDelveInfusionPanelsMap = new HashMap<>();
 	private static final HashMap<DelveInfusionSelection, ItemStack> mDelvePanelList = new HashMap<>();
 
 	private static final ImmutableList<EquipmentSlot> SLOT_ORDER = ImmutableList.of(
 		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
-	private static final List<ItemStack> mInvalidItems = new ArrayList<>();
-	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
-	private static final ItemStack mMaxLevelReachedItem = new ItemStack(Material.CAKE);
+	private static final List<ItemStack> mInvalidItems;
+	private static final ItemStack mRefundItem;
+	private static final ItemStack mMaxLevelReachedItem;
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 
@@ -121,68 +114,20 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.SOOTHING, (i, perLevel) -> "Regenerate " + Soothing.HEAL_PER_LEVEL * i + " health" + perLevel + " each second.");
 		addItems(DelveInfusionSelection.FUELED, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Fueled.DR_PER_MOB * i) + "% Damage Reduction" + perLevel + " for every enemy on fire, slowed, or stunned within 8 blocks, capped at 4 mobs.");
 		addItems(DelveInfusionSelection.REFRESH, (i, perLevel) -> "Reduces the cooldown of infinite consumable foods by " + StringUtils.multiplierToPercentage(Refresh.REDUCTION_PER_LEVEL * i) + "%" + perLevel + ".");
-		addItems(DelveInfusionSelection.QUENCH, (i, perLevel) -> "Increase duration of consumables by " + StringUtils.multiplierToPercentage(Quench.DURATION_BONUS_PER_LVL * i) + "%.");
+		addItems(DelveInfusionSelection.QUENCH, (i, perLevel) -> "Increase duration of consumables by " + StringUtils.multiplierToPercentage(Quench.DURATION_BONUS_PER_LVL * i) + "%" + perLevel + ".");
 		addItems(DelveInfusionSelection.GRACE, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Grace.ATKS_BONUS * i) + "% attack speed" + perLevel + ".");
 		addItems(DelveInfusionSelection.GALVANIC, (i, perLevel) -> "Gain a " + StringUtils.multiplierToPercentage(Galvanic.STUN_CHANCE_PER_LVL * i) + "% chance" + perLevel + " to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.");
 		addItems(DelveInfusionSelection.DECAPITATION, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Decapitation.DAMAGE_MLT_PER_LVL * i) + "% additional damage" + perLevel + " on a critical melee strike.");
 		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
 
-		//INVALIDS ITEM.
-		//placeholder when an item can't be infused.
-
-		ItemStack invalidItem = new ItemStack(Material.ARMOR_STAND, 1);
-		ItemMeta meta = invalidItem.getItemMeta();
-		meta.displayName(Component.text("Invalid item", NamedTextColor.GRAY)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, true));
-
-		List<Component> itemLore = new ArrayList<>();
-		itemLore.add(Component.text("Your helmet can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your chestplate can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your leggings can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your boots can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("The item in your main hand can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("The item in your off hand can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
+		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
+			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be infused.", NamedTextColor.DARK_GRAY)).toList();
 
 		//Refund item
-		ItemMeta refundMeta = mRefundItem.getItemMeta();
-		refundMeta.displayName(Component.text("Click to refund this item's infusions.", NamedTextColor.DARK_GRAY)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, true));
-		GUIUtils.splitLoreLine(refundMeta, "You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : (int) (DelveInfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", NamedTextColor.GRAY, MAX_LORE_LENGTH, true);
-		mRefundItem.setItemMeta(refundMeta);
+		mRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true, "You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : (int) (DelveInfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", NamedTextColor.GRAY);
 
 		//Cake for max level reached
-		ItemMeta maxMeta = mMaxLevelReachedItem.getItemMeta();
-		maxMeta.displayName(Component.text("Congratulations!", NamedTextColor.DARK_AQUA)
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
-		GUIUtils.splitLoreLine(maxMeta, "You've reached the max Delve Infusion level on this item.", NamedTextColor.DARK_AQUA, MAX_LORE_LENGTH, true);
-		mMaxLevelReachedItem.setItemMeta(maxMeta);
+		mMaxLevelReachedItem = GUIUtils.createBasicItem(Material.CAKE, "Congratulations!", NamedTextColor.DARK_AQUA, true, "You've reached the max Delve Infusion level on this item.", NamedTextColor.DARK_AQUA);
 	}
 
 	public DelveInfusionCustomInventory(Player owner) {
@@ -198,6 +143,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			                         : DelveInfusionUtils.DelveInfusionMaterial.VOIDSTAINED_GEODE;
 		if (mDepthsCompleted || mZenithCompleted) {
 			loadInv(owner);
+		} else {
+			close();
+			owner.sendMessage(Component.text("You have not completed the content required to access Delve Infusions.", NamedTextColor.RED));
 		}
 	}
 
@@ -221,17 +169,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				ItemStack itemStack = new ItemStack(infusedItem.getType());
-				ItemMeta originalMeta = infusedItem.getItemMeta();
-				ItemMeta meta = itemStack.getItemMeta();
-				if (originalMeta instanceof LeatherArmorMeta oldLeather && meta instanceof LeatherArmorMeta newLeather) {
-					newLeather.setColor(oldLeather.getColor());
-				}
-				meta.displayName(Component.text("Placeholder", TextColor.fromCSSHexString("000000"))
-					                 .decoration(TextDecoration.BOLD, true)
-					                 .decoration(TextDecoration.ITALIC, false));
-				itemStack.setItemMeta(meta);
-				ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(infusedItem));
+				ItemStack itemStack = GUIUtils.createItemPlaceholder(infusedItem);
 				mInventory.setItem(4, itemStack);
 			}
 		}.runTaskLater(Plugin.getInstance(), 2);
@@ -335,14 +273,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						ItemStack itemStack = new ItemStack(item.getType());
-						ItemMeta meta = itemStack.getItemMeta();
-						meta.displayName(item.getItemMeta().displayName()
-							                 .decoration(TextDecoration.BOLD, true)
-							                 .decoration(TextDecoration.ITALIC, false));
-						meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-						itemStack.setItemMeta(meta);
-						ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(item));
+						ItemStack itemStack = GUIUtils.createItemPlaceholder(item);
 						mInventory.setItem((rowF * 9) + 1, itemStack);
 					}
 				}.runTaskLater(Plugin.getInstance(), 2);
@@ -416,14 +347,14 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	}
 
 	private static void addSelectionItem(DelveInfusionSelection infusion, String desc) {
-		ItemStack item = GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel(), infusion.getColor(), true, desc, NamedTextColor.GRAY, MAX_LORE_LENGTH);
-		GUIUtils.splitLoreLine(item, "Requires " + infusion.getDelveMatPlural(), TextColor.fromHexString("#555555"), MAX_LORE_LENGTH, false);
+		ItemStack item = GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel(), infusion.getColor(), true, desc, NamedTextColor.GRAY);
+		GUIUtils.splitLoreLine(item, "Requires " + infusion.getDelveMatPlural(), TextColor.fromHexString("#555555"), false);
 		mDelvePanelList.put(infusion, item);
 	}
 
 	private static void addInfoItems(DelveInfusionSelection infusion, IntFunction<String> function) {
 		List<ItemStack> items = IntStream.range(1, 5)
-			.mapToObj(i -> GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel() + " level " + i, infusion.getColor(), true, function.apply(i), NamedTextColor.GRAY, MAX_LORE_LENGTH))
+			.mapToObj(i -> GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel() + " level " + i, infusion.getColor(), true, function.apply(i), NamedTextColor.GRAY))
 			.toList();
 		mDelveInfusionPanelsMap.put(infusion, items);
 	}

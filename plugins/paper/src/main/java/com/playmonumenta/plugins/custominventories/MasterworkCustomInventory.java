@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MasterworkUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -18,10 +17,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -29,7 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -48,7 +46,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final Material B_FILLER = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
 	private static final Material C_FILLER = Material.YELLOW_STAINED_GLASS_PANE;
 
-	private static final List<ItemStack> mInvalidItems = new ArrayList<>();
+	private static final List<ItemStack> mInvalidItems;
 	private static final ItemStack mUpgradeItem;
 	private static final ItemStack mUpgradeItemSeven;
 	private static final ItemStack mNoPossibleUpgradeItem;
@@ -58,53 +56,18 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final ItemStack mRefundItem;
 	private static final ItemStack mBalanceRefundItem;
 	private static final ItemStack mBackItem;
-	private static final ItemStack mPreviewItem = new ItemStack(Material.CHORUS_FLOWER);
+	private static final ItemStack mPreviewItem;
 
 	private final Map<Integer, ItemClicked> mMapFunction;
-	private int mRowSelected = 99;
+	private int mRowSelected;
 	private boolean mIsPreview = false;
-	private static HashMap<Integer, int[]> mPatternMap = new HashMap<>();
+	private static final HashMap<Integer, int[]> mPatternMap = new HashMap<>();
 	private int mMagicRow = Integer.MAX_VALUE;
 
 
 	static {
-		ItemStack invalidItem = new ItemStack(Material.ARMOR_STAND, 1);
-		ItemMeta meta = invalidItem.getItemMeta();
-		meta.displayName(Component.text("Invalid item", NamedTextColor.GRAY)
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
-
-		List<Component> itemLore = new ArrayList<Component>();
-		itemLore.add(Component.text("Your helmet can't be upgraded.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your chestplate can't be upgraded.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your leggings can't be upgraded.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your boots can't be upgraded.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("The item in your main hand can't be upgraded.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("The item in your off hand can't be upgraded.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
+		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
+			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be upgraded.", NamedTextColor.DARK_GRAY)).toList();
 
 		//Standard Level
 		mUpgradeItem = GUIUtils.createBasicItem(Material.RAW_IRON, "Enhance Item", TextColor.fromHexString("#FFAA00"), true, "Click to view next upgrade and associated costs.");
@@ -130,6 +93,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		//Nerf Refund
 		mBalanceRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Refund Upgrade", NamedTextColor.GRAY, true, "Click to refund this item's Masterwork costs. You will get 100% of the materials back.");
 
+		mPreviewItem = GUIUtils.createBasicItem(Material.CHORUS_FLOWER, "Preview Masterwork Levels", TextColor.fromHexString("#FFAA00"), true);
+
 		mPatternMap.put(0, new int[] {});
 		mPatternMap.put(1, new int[] {22});
 		mPatternMap.put(2, new int[] {22, 31});
@@ -152,8 +117,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		mInventory.clear();
 		mMapFunction.clear();
 		PlayerInventory pi = player.getInventory();
-		List<ItemStack> items = new ArrayList<>();
-		items.addAll(Arrays.asList(pi.getArmorContents()));
+		List<ItemStack> items = new ArrayList<>(Arrays.asList(pi.getArmorContents()));
 		Collections.reverse(items);
 		items.add(pi.getItemInMainHand());
 		items.add(pi.getItemInOffHand());
@@ -192,65 +156,24 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			mInventory.setItem(40, newItemB);
 			mInventory.setItem(41, newItemC);
 			// Fill in mid material + cost
-			ItemStack upgradeIconA = new ItemStack(Material.RED_DYE);
-			ItemMeta standardMetaA = upgradeIconA.getItemMeta();
-			standardMetaA.displayName(Component.text("Enhance Item (Fortitude)", TextColor.fromHexString("#D02E28"))
-					.decoration(TextDecoration.BOLD, true)
-					.decoration(TextDecoration.ITALIC, false));
-			List<Component> itemLoreA = new ArrayList<>();
-			itemLoreA.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
-				.decoration(TextDecoration.ITALIC, false));
-			for (String str : costA.getCostStringList(p)) {
-				itemLoreA.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-			}
-			standardMetaA.lore(itemLoreA);
-			upgradeIconA.setItemMeta(standardMetaA);
+			ItemStack upgradeIconA = createCostItem(p, Material.RED_DYE, "Enhance Item (Fortitude)", TextColor.fromHexString("#D02E28"), costA);
 			mInventory.setItem(21, upgradeIconA);
 			mMapFunction.put(21, (player, inventory, slot) -> {
 				attemptUpgrade(p, item, newItemA, costA);
 			});
 
-			ItemStack upgradeIconB = new ItemStack(Material.LIGHT_BLUE_DYE);
-			ItemMeta standardMetaB = upgradeIconB.getItemMeta();
-			standardMetaB.displayName(Component.text("Enhance Item (Potency)", TextColor.fromHexString("#4AC2E5"))
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false));
-			List<Component> itemLoreB = new ArrayList<>();
-			itemLoreB.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
-				.decoration(TextDecoration.ITALIC, false));
-			for (String str : costB.getCostStringList(p)) {
-				itemLoreB.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-			}
-			standardMetaB.lore(itemLoreB);
-			upgradeIconB.setItemMeta(standardMetaB);
+			ItemStack upgradeIconB = createCostItem(p, Material.LIGHT_BLUE_DYE, "Enhance Item (Potency)", TextColor.fromHexString("#4AC2E5"), costB);
 			mInventory.setItem(22, upgradeIconB);
 			mMapFunction.put(22, (player, inventory, slot) -> {
 				attemptUpgrade(p, item, newItemB, costB);
 			});
 
-			ItemStack upgradeIconC = new ItemStack(Material.YELLOW_DYE);
-			ItemMeta standardMetaC = upgradeIconC.getItemMeta();
-			standardMetaC.displayName(Component.text("Enhance Item (Alacrity)", TextColor.fromHexString("#FFFA75"))
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false));
-			List<Component> itemLoreC = new ArrayList<>();
-			itemLoreC.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
-				.decoration(TextDecoration.ITALIC, false));
-			for (String str : costC.getCostStringList(p)) {
-				itemLoreC.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-			}
-			standardMetaC.lore(itemLoreC);
-			upgradeIconC.setItemMeta(standardMetaC);
+			ItemStack upgradeIconC = createCostItem(p, Material.YELLOW_DYE, "Enhance Item (Alacrity)", TextColor.fromHexString("#FFFA75"), costC);
 			mInventory.setItem(23, upgradeIconC);
 			mMapFunction.put(23, (player, inventory, slot) -> {
 				attemptUpgrade(p, item, newItemC, costC);
 			});
 
-			ItemMeta previewMeta = mPreviewItem.getItemMeta();
-			previewMeta.displayName(Component.text("Preview Masterwork Levels", TextColor.fromHexString("#FFAA00"))
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
-			mPreviewItem.setItemMeta(previewMeta);
 			mInventory.setItem(49, mPreviewItem);
 			mMapFunction.put(49, (player, inventory, slot) -> {
 				mIsPreview = true;
@@ -282,29 +205,12 @@ public final class MasterworkCustomInventory extends CustomInventory {
 					NamespacedKeyUtils.fromString(MasterworkUtils.getNextItemPath(item))));
 			mInventory.setItem(40, newItem);
 			// Fill in mid material + cost
-			ItemStack upgradeIcon = new ItemStack(Material.RAW_IRON);
-			ItemMeta standardMeta = upgradeIcon.getItemMeta();
-			standardMeta.displayName(Component.text("Enhance Item", TextColor.fromHexString("#FFAA00"))
-					.decoration(TextDecoration.BOLD, true)
-					.decoration(TextDecoration.ITALIC, false));
-			List<Component> itemLore = new ArrayList<>();
-			itemLore.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
-					.decoration(TextDecoration.ITALIC, false));
-			for (String str : cost.getCostStringList(p)) {
-				itemLore.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-			}
-			standardMeta.lore(itemLore);
-			upgradeIcon.setItemMeta(standardMeta);
+			ItemStack upgradeIcon = createCostItem(p, Material.RAW_IRON, "Enhance Item", TextColor.fromHexString("#FFAA00"), cost);
 			mInventory.setItem(22, upgradeIcon);
 			mMapFunction.put(22, (player, inventory, slot) -> {
 				attemptUpgrade(p, item, newItem, cost);
 			});
 
-			ItemMeta previewMeta = mPreviewItem.getItemMeta();
-			previewMeta.displayName(Component.text("Preview Masterwork Levels", TextColor.fromHexString("#FFAA00"))
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
-			mPreviewItem.setItemMeta(previewMeta);
 			mInventory.setItem(49, mPreviewItem);
 			mMapFunction.put(49, (player, inventory, slot) -> {
 				mIsPreview = true;
@@ -397,14 +303,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							ItemStack itemStack = new ItemStack(item.getType());
-							ItemMeta meta = itemStack.getItemMeta();
-							meta.displayName(item.getItemMeta().displayName()
-								.decoration(TextDecoration.BOLD, true)
-								.decoration(TextDecoration.ITALIC, false));
-							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-							itemStack.setItemMeta(meta);
-							ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(item));
+							ItemStack itemStack = GUIUtils.createItemPlaceholder(item);
 							mInventory.setItem(rowF * 9, itemStack);
 						}
 					}.runTaskLater(Plugin.getInstance(), 2);
@@ -518,13 +417,20 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 	}
 
-
 	private void fillWithColoredJunk(int slot, Material filler) {
 		ItemStack junk = new ItemStack(filler, 1);
 		ItemMeta meta = junk.getItemMeta();
 		meta.displayName(Component.text(""));
 		junk.setItemMeta(meta);
 		mInventory.setItem(slot, junk);
+	}
+
+	private ItemStack createCostItem(Player player, Material mat, String name, TextColor color, MasterworkUtils.MasterworkCostLevel cost) {
+		Component lore = Component.text("To enhance the selected item, you will need ", NamedTextColor.DARK_GRAY);
+		for (String str : cost.getCostStringList(player)) {
+			lore = lore.append(Component.text(str + " ", NamedTextColor.DARK_GRAY));
+		}
+		return GUIUtils.createBasicItem(mat, 1, name, color, true, lore, 30, true);
 	}
 
 	@Override

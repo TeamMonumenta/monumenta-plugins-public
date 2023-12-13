@@ -85,6 +85,10 @@ public class GUIUtils {
 		return exclamation;
 	}
 
+	public static void splitLoreLine(ItemStack item, String lore, TextColor color, boolean clean) {
+		splitLoreLine(item, lore, color, 30, clean);
+	}
+
 	public static void splitLoreLine(ItemStack item, String lore, TextColor color, int maxLength, boolean clean) {
 		ItemMeta meta = item.getItemMeta();
 		splitLoreLine(meta, lore, color, maxLength, clean);
@@ -337,6 +341,13 @@ public class GUIUtils {
 			ItemStack offhandItem = inventory.getItemInOffHand();
 			inventory.setItemInOffHand(offhandItem);
 		}
+	}
+
+	public static ItemStack createItemPlaceholder(ItemStack item) {
+		ItemStack placeholder = item.clone();
+		placeholder.lore(List.of());
+		setPlaceholder(placeholder);
+		return placeholder;
 	}
 
 }

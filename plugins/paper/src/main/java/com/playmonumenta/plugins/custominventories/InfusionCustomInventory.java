@@ -15,30 +15,25 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
@@ -51,23 +46,20 @@ public class InfusionCustomInventory extends CustomInventory {
 
 	private static final int ROW = 6;
 	private static final int COLUMNS = 9;
-	private static final int MAX_LORE_LENGTH = 30;
-	private static final Material JUNK_ITEM = Material.GRAY_STAINED_GLASS_PANE;
 
 	private static final ImmutableList<EquipmentSlot> SLOT_ORDER = ImmutableList.of(
 		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final Map<InfusionSelection, List<ItemStack>> mInfusionPanelsMap = new HashMap<>();
 	private static final Map<InfusionSelection, ItemStack> mPanelList = new HashMap<>();
 
-	private static final List<ItemStack> mInvalidItems = new ArrayList<>();
-	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
-	private static final ItemStack mMaxLevelReachedItem = new ItemStack(Material.CAKE);
+	private static final List<ItemStack> mInvalidItems;
+	private static final ItemStack mRefundItem;
+	private static final ItemStack mMaxLevelReachedItem;
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 
 
 	static {
-
 		// Add items to mPanelList and mInfusionPanelsMap
 
 		addItems(InfusionSelection.VITALITY, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Vitality.HEALTH_MOD_PER_LEVEL * i) + "% max health" + perLevel + ".");
@@ -77,62 +69,14 @@ public class InfusionCustomInventory extends CustomInventory {
 		addItems(InfusionSelection.PERSPICACITY, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Perspicacity.DAMAGE_MOD_PER_LEVEL * i) + "% more magic damage" + perLevel + ".");
 		addItems(InfusionSelection.ACUMEN, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Acumen.ACUMEN_MULTIPLIER * i) + "% more experience" + perLevel + ".");
 
-		//INVALID ITEM.
-		//placeholder when an item can't be infused.
-
-		ItemStack invalidItem = new ItemStack(Material.ARMOR_STAND, 1);
-		ItemMeta meta = invalidItem.getItemMeta();
-		meta.displayName(Component.text("Invalid item", NamedTextColor.GRAY)
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
-
-		List<Component> itemLore = new ArrayList<Component>();
-		itemLore.add(Component.text("Your helmet can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your chestplate can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your leggings can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("Your boots can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("The item in your main hand can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
-		itemLore.clear();
-		itemLore.add(Component.text("The item in your off hand can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-		meta.lore(itemLore);
-		invalidItem.setItemMeta(meta);
-		mInvalidItems.add(invalidItem.clone());
+		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
+			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be infused.", NamedTextColor.DARK_GRAY)).toList();
 
 		//Refund item
-		ItemMeta refundMeta = mRefundItem.getItemMeta();
-		refundMeta.displayName(Component.text("Click to refund this item's infusions", NamedTextColor.DARK_GRAY)
-							.decoration(TextDecoration.ITALIC, false)
-							.decoration(TextDecoration.BOLD, true));
-		GUIUtils.splitLoreLine(refundMeta, "You will receive " + (InfusionUtils.FULL_REFUND ? "100" : (int) (InfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", NamedTextColor.GRAY, MAX_LORE_LENGTH, true);
-		mRefundItem.setItemMeta(refundMeta);
+		mRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions", NamedTextColor.DARK_GRAY, true, "You will receive " + (InfusionUtils.FULL_REFUND ? "100" : (int) (InfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", NamedTextColor.GRAY);
 
 		//Cake for max level reached
-		ItemMeta maxMeta = mMaxLevelReachedItem.getItemMeta();
-		maxMeta.displayName(Component.text("Congratulations!", NamedTextColor.DARK_AQUA)
-						.decoration(TextDecoration.BOLD, true)
-						.decoration(TextDecoration.ITALIC, false));
-		GUIUtils.splitLoreLine(maxMeta, "You've reached the max Infusion level on this item.", NamedTextColor.DARK_AQUA, MAX_LORE_LENGTH, true);
-		mMaxLevelReachedItem.setItemMeta(maxMeta);
+		mMaxLevelReachedItem = GUIUtils.createBasicItem(Material.CAKE, "Congratulations!", NamedTextColor.DARK_AQUA, true, "You've reached the max Infusion level on this item.", NamedTextColor.DARK_AQUA);
 	}
 
 	public InfusionCustomInventory(Player owner) {
@@ -159,18 +103,7 @@ public class InfusionCustomInventory extends CustomInventory {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						ItemStack itemStack = new ItemStack(is.getType());
-						ItemMeta originalMeta = is.getItemMeta();
-						ItemMeta meta = itemStack.getItemMeta();
-						if (originalMeta instanceof LeatherArmorMeta oldLeather && meta instanceof LeatherArmorMeta newLeather) {
-							newLeather.setColor(oldLeather.getColor());
-						}
-						meta.displayName(originalMeta.displayName()
-							                 .decoration(TextDecoration.BOLD, true)
-							                 .decoration(TextDecoration.ITALIC, false));
-						meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-						itemStack.setItemMeta(meta);
-						ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(is));
+						ItemStack itemStack = GUIUtils.createItemPlaceholder(is);
 						mInventory.setItem((mRow * 9) + 1, itemStack);
 					}
 				}.runTaskLater(Plugin.getInstance(), 2);
@@ -183,8 +116,6 @@ public class InfusionCustomInventory extends CustomInventory {
 		}
 	}
 
-
-
 	private void fillWithJunk() {
 		GUIUtils.fillWithFiller(mInventory);
 	}
@@ -195,13 +126,13 @@ public class InfusionCustomInventory extends CustomInventory {
 	}
 
 	private static void addSelectionItem(InfusionSelection infusion, String desc) {
-		ItemStack item = GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel(), infusion.getColor(), true, desc, NamedTextColor.GRAY, MAX_LORE_LENGTH);
+		ItemStack item = GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel(), infusion.getColor(), true, desc, NamedTextColor.GRAY);
 		mPanelList.put(infusion, item);
 	}
 
 	private static void addInfoItems(InfusionSelection infusion, IntFunction<String> function) {
 		List<ItemStack> items = IntStream.range(1, 5)
-			.mapToObj(i -> GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel() + " level " + i, infusion.getColor(), true, function.apply(i), NamedTextColor.GRAY, MAX_LORE_LENGTH))
+			.mapToObj(i -> GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel() + " level " + i, infusion.getColor(), true, function.apply(i), NamedTextColor.GRAY))
 			.toList();
 		mInfusionPanelsMap.put(infusion, items);
 	}
@@ -236,17 +167,9 @@ public class InfusionCustomInventory extends CustomInventory {
 
 			if (infusionLvl < 4) {
 				int slot = (row * 9) + 2 + infusionLvl;
-				//creating item and setting the meta
-				ItemStack infuseItem = new ItemStack(Material.ENCHANTED_BOOK, 1);
-				ItemMeta infuseMeta = infuseItem.getItemMeta();
-				infuseMeta.displayName(Component.text("Click to infuse to level " + (infusionLvl + 1), NamedTextColor.DARK_AQUA)
-						                       .decoration(TextDecoration.ITALIC, false)
-						                       .decoration(TextDecoration.BOLD, true));
-				List<Component> itemLore = new ArrayList<>();
-				itemLore.add(Component.text("You need " + InfusionUtils.getExpLvlInfuseCost(plugin, player, item) + " experience levels", NamedTextColor.GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				int currency = -1;
+				Component lore = Component.text("You need " + InfusionUtils.getExpLvlInfuseCost(plugin, player, item) + " experience levels", NamedTextColor.GRAY);
 
+				int currency = -1;
 				try {
 					currency = InfusionUtils.calcInfuseCost(item);
 				} catch (WrapperCommandSyntaxException e) {
@@ -256,23 +179,21 @@ public class InfusionCustomInventory extends CustomInventory {
 				if (currency > 0) {
 					Region region = ItemStatUtils.getRegion(item);
 					if (region == Region.RING) {
-						itemLore.add(Component.text("and " + currency + " Pulsating Diamonds", NamedTextColor.GRAY)
-							.decoration(TextDecoration.ITALIC, false));
+						lore = lore.append(Component.text("and " + currency + " Pulsating Diamonds", NamedTextColor.GRAY));
 					}
 
 					if (region == Region.ISLES) {
-						itemLore.add(Component.text("and " + currency + " Pulsating Emeralds", NamedTextColor.GRAY)
-							.decoration(TextDecoration.ITALIC, false));
+						lore = lore.append(Component.text("and " + currency + " Pulsating Emeralds", NamedTextColor.GRAY));
 					}
 
 					if (region == Region.VALLEY) {
-						itemLore.add(Component.text("and " + currency + " Pulsating Gold", NamedTextColor.GRAY)
-							.decoration(TextDecoration.ITALIC, false));
+						lore = lore.append(Component.text("and " + currency + " Pulsating Gold", NamedTextColor.GRAY));
 					}
 				}
-				infuseMeta.lore(itemLore);
-				infuseItem.setItemMeta(infuseMeta);
+
+				ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, 1, "Click to infuse to level " + (infusionLvl + 1), NamedTextColor.DARK_AQUA, true, lore, 30, true);
 				mInventory.setItem(slot, infuseItem);
+
 
 				mMapFunction.put(slot, (p, inventory, itemSlot) -> {
 					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
@@ -282,16 +203,8 @@ public class InfusionCustomInventory extends CustomInventory {
 				mInventory.setItem(slot, mMaxLevelReachedItem);
 			}
 		} else {
-			ItemStack mInfuseStack = new ItemStack(Material.ENCHANTED_BOOK, 1);
-			ItemMeta meta = mInfuseStack.getItemMeta();
-			meta.displayName(Component.text("Click to select an Infusion to infuse this item with", NamedTextColor.DARK_GRAY)
-								.decoration(TextDecoration.ITALIC, false)
-								.decoration(TextDecoration.BOLD, true));
-			List<Component> lore = new ArrayList<>();
-			lore.add(Component.text("The first infusion costs only " + InfusionUtils.getExpLvlInfuseCost(plugin, player, item) + " experience levels", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			meta.lore(lore);
-			mInfuseStack.setItemMeta(meta);
-			mInventory.setItem((row * 9), mInfuseStack);
+			ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Click to select an Infusion to infuse this item with", NamedTextColor.DARK_GRAY, true, "The first infusion costs only " + InfusionUtils.getExpLvlInfuseCost(plugin, player, item) + " experience levels", NamedTextColor.GRAY);
+			mInventory.setItem((row * 9), infuseItem);
 
 			//set the function when the item is clicked
 
