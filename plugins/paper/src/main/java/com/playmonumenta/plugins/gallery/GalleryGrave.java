@@ -38,7 +38,9 @@ public class GalleryGrave {
 		mRunnable = new BukkitRunnable() {
 			int mTimer = 0;
 			int mReanimationTimer = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				if (!mPlayer.isOnline()) {
 					cancel();
 					removeGrave();
@@ -127,6 +129,8 @@ public class GalleryGrave {
 		Player player = mPlayer.getPlayer();
 		if (player != null) {
 			player.teleport(mGrave);
+			mGame.sendMessageToPlayers(player.getName() + " has been revived!", mPlayer);
+			mPlayer.sendMessage("You have been revived!");
 		} else {
 			mPlayer.setShouldTeleportWhenJoining(true);
 		}

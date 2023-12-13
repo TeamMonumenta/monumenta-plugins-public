@@ -649,7 +649,17 @@ public class GalleryGame {
 	}
 
 	public void sendMessageToPlayers(String msg) {
-		for (GalleryPlayer player : mPlayersMap.values()) {
+		sendMessageToPlayers(msg, mPlayersMap.values());
+	}
+
+	public void sendMessageToPlayers(String msg, GalleryPlayer exclude) {
+		Set<GalleryPlayer> players = new HashSet<>(mPlayersMap.values());
+		players.remove(exclude);
+		sendMessageToPlayers(msg, players);
+	}
+
+	public void sendMessageToPlayers(String msg, Collection<GalleryPlayer> players) {
+		for (GalleryPlayer player : players) {
 			player.sendMessage(msg);
 		}
 	}
@@ -908,12 +918,7 @@ public class GalleryGame {
 			Component subTitle = Component.text("⎩", NamedTextColor.BLACK).decoration(TextDecoration.BOLD, true).append(Component.text("ᴿᴵᴾ", NamedTextColor.BLACK)).append(Component.text("⎭", NamedTextColor.BLACK));
 			MessagingUtils.sendTitle(player, mainTitle, subTitle, 20, 100, 20);
 
-			for (GalleryPlayer gPlayer : mPlayersMap.values()) {
-				if (gPlayer != realPlayer) {
-					gPlayer.sendMessage(player.getName() + " has fallen, rush to their grave");
-					gPlayer.sendMessage("hold crouch to revive them");
-				}
-			}
+			sendMessageToPlayers(player.getName() + " has fallen! Sneak while near on the grave to revive them!", realPlayer);
 			GalleryGrave.createGrave(realPlayer, player, deadLoc, this);
 			return;
 		}
