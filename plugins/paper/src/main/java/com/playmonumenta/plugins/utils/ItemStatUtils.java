@@ -268,10 +268,8 @@ public class ItemStatUtils {
 				String type = effect.getString(EFFECT_TYPE_KEY);
 
 				EffectType effectType = EffectType.fromType(type);
-				if (effectType != null) {
-					if (!effectType.isPositive()) {
-						return true;
-					}
+				if (effectType != null && !effectType.isPositive() && effectType != EffectType.CLUCKING) {
+					return true;
 				}
 			}
 
