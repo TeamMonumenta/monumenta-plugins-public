@@ -23,12 +23,16 @@ public class SpellStarProjectiles extends Spell {
 	private final LivingEntity mBoss;
 	private final Vesperidys mVesperidys;
 
-	private final int INIT_TICKS = 20;
-	private final int VOLLEYS = 3;
-	private final double DAMAGE = 50;
+	private static final int INIT_TICKS = 20;
+	private static final int VOLLEYS = 3;
+	private static final int VOLLEYS_A4 = 4;
+	private static final int VOLLEYS_A15 = 5;
+	private static final double DAMAGE = 50;
 
 	private final int mTelegraphWaitTicks;
 	private final int mCycleTicks;
+
+	private final int mVolleyTotal;
 
 	private boolean mOnCooldown = false;
 
@@ -39,12 +43,14 @@ public class SpellStarProjectiles extends Spell {
 
 		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) {
 			mTelegraphWaitTicks = 10;
-		} else if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8) {
+			mVolleyTotal = VOLLEYS_A15;
+		} else if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 4) {
 			mTelegraphWaitTicks = 15;
+			mVolleyTotal = VOLLEYS_A4;
 		} else {
 			mTelegraphWaitTicks = 20;
+			mVolleyTotal = VOLLEYS;
 		}
-
 		mCycleTicks = mTelegraphWaitTicks + 5;
 	}
 
@@ -63,10 +69,15 @@ public class SpellStarProjectiles extends Spell {
 			private int mT = -INIT_TICKS;
 
 			@Override
+			public synchronized void cancel() throws IllegalStateException {
+				super.cancel();
+				mVesperidys.mCastTeam.removeEntry(mBoss.getUniqueId().toString());
+			}
+
+			@Override
 			public void run() {
-				if (mVolley >= VOLLEYS) {
+				if (mVolley >= mVolleyTotal) {
 					this.cancel();
-					mVesperidys.mCastTeam.removeEntry(mBoss.getUniqueId().toString());
 					return;
 				}
 

@@ -193,7 +193,7 @@ public class SpellVesperidysFeintParticleBeam extends Spell {
 
 						@Override
 						public void run() {
-							if (mT > 6) {
+							if (mT > 6 || (mT > 0 && mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
 								this.cancel();
 								return;
 							}
@@ -215,7 +215,11 @@ public class SpellVesperidysFeintParticleBeam extends Spell {
 					runnableEnd.runTaskTimer(mPlugin, 0, 3);
 					mActiveRunnables.add(runnableEnd);
 
-					ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), 20, new Vector(0, 1, 0), 0.2,
+					int particleAmount = 20;
+					if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8) {
+						particleAmount = 10;
+					}
+					ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), particleAmount, new Vector(0, 1, 0), 0.2,
 						(l, t) -> {
 							Location center = strikeLocation.clone().add(0, 0.1, 0);
 							Vector vector = l.toVector().subtract(center.toVector()).normalize();
@@ -227,8 +231,9 @@ public class SpellVesperidysFeintParticleBeam extends Spell {
 						}
 					);
 
+					int finalParticleAmount = particleAmount;
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), 10, new Vector(0, 1, 0), SHOCK_RADIUS,
+						ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), finalParticleAmount / 2, new Vector(0, 1, 0), SHOCK_RADIUS,
 							(l, t) -> {
 								Location center = strikeLocation.clone().add(0, 0.1, 0);
 								Vector vector = l.toVector().subtract(center.toVector()).normalize();

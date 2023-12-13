@@ -43,7 +43,6 @@ public class SpellStarStorm extends Spell {
 	private static final String SPELL_NAME = "Star Storm";
 
 	private final PartialParticle mPHit;
-	private final List<Player> mHitPlayers = new ArrayList<>();
 	private final ChargeUpManager mChargeUp;
 
 	private static final int PATTERN1_CHARGE_TIME = 70;
@@ -99,7 +98,6 @@ public class SpellStarStorm extends Spell {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 1);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 1.4f);
-			mHitPlayers.clear();
 
 			BukkitRunnable runnableA = new BukkitRunnable() {
 
@@ -136,40 +134,110 @@ public class SpellStarStorm extends Spell {
 			runnableA.runTaskTimer(mPlugin, 0, 2);
 			mActiveRunnables.add(runnableA);
 
-			BukkitRunnable runnableC = new BukkitRunnable() {
-				int mT = 0;
-				int mBullets = 0;
+			if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) {
+				BukkitRunnable runnableC = new BukkitRunnable() {
+					int mT = 0;
+					int mBullets = 0;
 
-				@Override
-				public void run() {
-					// Aim to spawn everything in 3 seconds, which suggests spawning 1 every tick.
-					// If Phase 4, then spawn two bullets per tick.
-					double r = 25;
-					double angle = (180.0 / PATTERN1_NUM_BULLETS) * mBullets;
-					double radians = Math.toRadians(angle);
-					Location loc = mVesperidys.mSpawnLoc.clone().add(r * Math.cos(radians), 0, r * Math.sin(radians));
-					Location loc2 = mVesperidys.mSpawnLoc.clone().add(-r * Math.cos(radians), 0, -r * Math.sin(radians));
-					loc.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
-					loc2.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
+					@Override
+					public void run() {
+						// Aim to spawn everything in 3 seconds, which suggests spawning 1 every tick.
+						// If Phase 4, then spawn two bullets per tick.
+						double r = 25;
+						double angle = (180.0 / PATTERN1_NUM_BULLETS) * mBullets;
+						double radians = Math.toRadians(angle);
+						Location loc = mVesperidys.mSpawnLoc.clone().add(r * Math.cos(radians), 0, r * Math.sin(radians));
+						Location loc2 = mVesperidys.mSpawnLoc.clone().add(-r * Math.cos(radians), 0, -r * Math.sin(radians));
+						loc.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
+						loc2.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
 
-					int timeStart = PATTERN1_CHARGE_TIME - mT;
-					launchPattern1Bullet(loc, timeStart);
-					launchPattern1Bullet(loc2, timeStart);
-					mBullets += 2;
+						int timeStart = PATTERN1_CHARGE_TIME - mT;
+						launchPattern1Bullet(loc, timeStart, false);
+						launchPattern1Bullet(loc2, timeStart, false);
+						mBullets += 2;
 
-					loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.HOSTILE, 5, 1);
-					loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 5, 0.5f + 1.5f * mT / PATTERN1_CHARGE_TIME);
+						loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.HOSTILE, 5, 1);
+						loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 5, 0.5f + 1.5f * mT / PATTERN1_CHARGE_TIME);
 
 
-					if (mBullets >= PATTERN1_NUM_BULLETS) {
-						this.cancel();
+						if (mBullets >= PATTERN1_NUM_BULLETS) {
+							this.cancel();
+						}
+
+						mT += 2;
 					}
+				};
+				runnableC.runTaskTimer(mPlugin, 0, 2);
+				mActiveRunnables.add(runnableC);
 
-					mT += 2;
-				}
-			};
-			runnableC.runTaskTimer(mPlugin, 0, 2);
-			mActiveRunnables.add(runnableC);
+				BukkitRunnable runnableE = new BukkitRunnable() {
+					int mT = 0;
+					int mBullets = 0;
+
+					@Override
+					public void run() {
+						// Aim to spawn everything in 3 seconds, which suggests spawning 1 every tick.
+						// If Phase 4, then spawn two bullets per tick.
+						double r = 25;
+						double angle = -(180.0 / PATTERN1_NUM_BULLETS) * mBullets;
+						double radians = Math.toRadians(angle);
+						Location loc = mVesperidys.mSpawnLoc.clone().add(r * Math.cos(radians), 0, r * Math.sin(radians));
+						Location loc2 = mVesperidys.mSpawnLoc.clone().add(-r * Math.cos(radians), 0, -r * Math.sin(radians));
+						loc.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
+						loc2.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
+
+						int timeStart = PATTERN1_CHARGE_TIME - mT;
+						launchPattern1Bullet(loc, timeStart, true);
+						launchPattern1Bullet(loc2, timeStart, true);
+						mBullets += 2;
+
+						if (mBullets >= PATTERN1_NUM_BULLETS) {
+							this.cancel();
+						}
+
+						mT += 2;
+					}
+				};
+				runnableE.runTaskTimer(mPlugin, 0, 2);
+				mActiveRunnables.add(runnableE);
+			} else {
+				boolean reverse = (FastUtils.randomIntInRange(0, 1) == 0);
+
+				BukkitRunnable runnableC = new BukkitRunnable() {
+					int mT = 0;
+					int mBullets = 0;
+
+					@Override
+					public void run() {
+						// Aim to spawn everything in 3 seconds, which suggests spawning 1 every tick.
+						// If Phase 4, then spawn two bullets per tick.
+						double r = 25;
+						double angle = (180.0 / PATTERN1_NUM_BULLETS) * mBullets * (reverse ? -1 : 1);
+						double radians = Math.toRadians(angle);
+						Location loc = mVesperidys.mSpawnLoc.clone().add(r * Math.cos(radians), 0, r * Math.sin(radians));
+						Location loc2 = mVesperidys.mSpawnLoc.clone().add(-r * Math.cos(radians), 0, -r * Math.sin(radians));
+						loc.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
+						loc2.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
+
+						int timeStart = PATTERN1_CHARGE_TIME - mT;
+						launchPattern1Bullet(loc, timeStart, reverse);
+						launchPattern1Bullet(loc2, timeStart, reverse);
+						mBullets += 2;
+
+						loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.HOSTILE, 5, 1);
+						loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 5, 0.5f + 1.5f * mT / PATTERN1_CHARGE_TIME);
+
+
+						if (mBullets >= PATTERN1_NUM_BULLETS) {
+							this.cancel();
+						}
+
+						mT += 2;
+					}
+				};
+				runnableC.runTaskTimer(mPlugin, 0, 2);
+				mActiveRunnables.add(runnableC);
+			}
 		}, 20);
 	}
 
@@ -179,7 +247,6 @@ public class SpellStarStorm extends Spell {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 1);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 1.4f);
-			mHitPlayers.clear();
 
 			BukkitRunnable runnableA = new BukkitRunnable() {
 
@@ -298,7 +365,7 @@ public class SpellStarStorm extends Spell {
 		}, 20);
 	}
 
-	private void launchPattern1Bullet(Location detLoc, double accelStart) {
+	private void launchPattern1Bullet(Location detLoc, double accelStart, boolean reverse) {
 		List<Player> players = PlayerUtils.playersInRange(detLoc, 75, true);
 
 		BlockDisplay bullet = spawnBullet(detLoc, false);
@@ -327,7 +394,11 @@ public class SpellStarStorm extends Spell {
 					} else {
 						mR += mInnerVelocity * 0.5;
 					}
-					mTheta += mInnerVelocity * 0.5 * Math.toRadians(5);
+					if (reverse) {
+						mTheta -= mInnerVelocity * 0.5 * Math.toRadians(5);
+					} else {
+						mTheta += mInnerVelocity * 0.5 * Math.toRadians(5);
+					}
 
 					mLocation.set(mVesperidys.mSpawnLoc.getX() + mR * Math.cos(mTheta), mLocation.getY(), mVesperidys.mSpawnLoc.getZ() + mR * Math.sin(mTheta));
 					BoundingBox box = BoundingBox.of(mLocation, HITBOX, HITBOX, HITBOX);

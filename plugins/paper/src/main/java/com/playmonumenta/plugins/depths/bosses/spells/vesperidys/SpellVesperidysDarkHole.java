@@ -112,8 +112,10 @@ public class SpellVesperidysDarkHole extends Spell {
 		mBoss.setInvulnerable(true);
 		mVesperidys.mInvincible = true;
 
-		// Teleport Boss Randomly.
-		mVesperidys.mTeleportSpell.teleport(mVesperidys.mSpawnLoc.clone().add(0, 4, 0), false);
+		Location skyLocation = mVesperidys.mSpawnLoc.clone().add(0, 4, 0);
+
+		// Teleport check.
+		mVesperidys.mTeleportSpell.teleport(skyLocation, false);
 
 		mVesperidys.mInvinicibleWarned.clear();
 
@@ -222,6 +224,11 @@ public class SpellVesperidysDarkHole extends Spell {
 
 								this.cancel();
 								return;
+							}
+
+							// if Boss is not near the sky location, teleport back. (In case of epic teleportation failure)
+							if (mBoss.getLocation().distance(skyLocation) > 3) {
+								mVesperidys.mTeleportSpell.teleport(skyLocation, false);
 							}
 
 							mTicksDarkHoleCharge++;

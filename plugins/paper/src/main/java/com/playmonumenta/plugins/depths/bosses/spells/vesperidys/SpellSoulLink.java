@@ -34,10 +34,7 @@ public class SpellSoulLink extends Spell {
 	private static final int FORECAST_TICKS = 3 * 20 + 1;
 
 	private static final double DISTANCE_THRESHOLD = 8;
-	private static final double TOO_FAR_THRESHOLD = 5 * 20;
-	private static final double TOO_FAR_THRESHOLD_ASCENSION_8 = 4 * 20;
-	private static final double TOO_FAR_THRESHOLD_ASCENSION_15 = 3 * 20;
-	private static final double BOSS_THRESHOLD = 2 * 20; // Extra time given by being tethered to boss.
+	private static final double TOO_FAR_THRESHOLD_ASCENSION_15 = 5 * 20;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -53,13 +50,7 @@ public class SpellSoulLink extends Spell {
 		mBoss = boss;
 		mVesperidys = vesperidys;
 
-		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) {
-			mTooFarThreshold = TOO_FAR_THRESHOLD_ASCENSION_15;
-		} else if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8) {
-			mTooFarThreshold = TOO_FAR_THRESHOLD_ASCENSION_8;
-		} else {
-			mTooFarThreshold = TOO_FAR_THRESHOLD;
-		}
+		mTooFarThreshold = TOO_FAR_THRESHOLD_ASCENSION_15;
 	}
 
 	@Override
@@ -258,7 +249,7 @@ public class SpellSoulLink extends Spell {
 	}
 
 	public void soulLinkWithBoss(Player player) {
-		double tooFarThreshold = mTooFarThreshold + BOSS_THRESHOLD;
+		double tooFarThreshold = mTooFarThreshold;
 
 		player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.45f);
 		MessagingUtils.sendTitle(player, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text("Vesperidys", NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5*20, 10);

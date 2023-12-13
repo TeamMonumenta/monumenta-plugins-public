@@ -59,6 +59,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.boss.BarColor;
@@ -644,9 +645,13 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 				}
 			}
 		} else {
-			// Ridiculous burst prevention
-			// The following code is from Lich.java
 			if (event.getSource() instanceof Player) {
+				// Ridiculous burst prevention (Maximum of 3% of Vesperidys' Max HP)
+				double maxHealth = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, BOSS_HEALTH);
+				if (event.getDamage() > maxHealth * 0.03) {
+					event.setDamage(maxHealth * 0.03);
+				}
+
 				event.setDamage(event.getDamage() * crystalResistanceMultiplier());
 
 				// Earthbound Crystal Absorb Damage
