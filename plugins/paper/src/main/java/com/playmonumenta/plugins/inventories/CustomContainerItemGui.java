@@ -51,13 +51,15 @@ public class CustomContainerItemGui extends Gui {
 			return;
 		}
 
+		CustomContainerItemManager.deduplicateItems(mContainer);
+
 		List<ItemStack> items = NBT.get(mContainer, nbt -> {
 			ReadableNBTList<ReadWriteNBT> list = ItemStatUtils.getItemList(nbt);
 			if (list == null) {
 				return new ArrayList<>();
 			}
 			return list.toListCopy()
-				.stream().map(NBT::itemStackFromNBT).toList();
+				       .stream().map(NBT::itemStackFromNBT).toList();
 		});
 
 		// Fill GUI with items

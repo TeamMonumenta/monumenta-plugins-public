@@ -16,6 +16,7 @@ import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -221,6 +222,36 @@ public class CustomContainerItemManager implements Listener {
 	}
 
 	/**
+	 * Merges duplicate entries (can happen after a weekly update)
+	 */
+	public static void deduplicateItems(ItemStack container) {
+		NBT.modify(container, nbt -> {
+			ReadWriteNBTCompoundList list = ItemStatUtils.getItemList(nbt);
+			if (list == null) {
+				return;
+			}
+
+			List<ItemStack> itemStacks = list.toListCopy().stream().map(t -> Objects.requireNonNull(NBT.itemStackFromNBT(t))).toList();
+			for (ItemStack item : itemStacks) {
+				NBT.modify(item, ItemStatUtils::removePlayerModified);
+			}
+			for (int i = 0; i < list.size(); i++) {
+				ItemStack item1 = itemStacks.get(i);
+				ReadWriteNBT playerModified1 = ItemStatUtils.addPlayerModified(Objects.requireNonNull(list.get(i).getCompound("tag")));
+				for (int j = i + 1; j < list.size(); j++) {
+					ItemStack item2 = itemStacks.get(j);
+					if (item1.isSimilar(item2)) {
+						ReadWriteNBT playerModified2 = ItemStatUtils.addPlayerModified(Objects.requireNonNull(list.get(j).getCompound("tag")));
+						playerModified1.setLong(AMOUNT_KEY, playerModified1.getLong(AMOUNT_KEY) + playerModified2.getLong(AMOUNT_KEY));
+						list.remove(j);
+						j--;
+					}
+				}
+			}
+		});
+	}
+
+	/**
 	 * Adds as many of the given item to this container as possible. Modifies the given item stack amount to hold what did not fit.
 	 */
 	public static void addToContainer(Player player, ItemStack container, CustomContainerItemConfiguration config, ItemStack item, boolean generateItemStats, boolean silent) {
@@ -236,18 +267,11 @@ public class CustomContainerItemManager implements Listener {
 			long totalCount = 0;
 			ReadWriteNBT foundCompound = null;
 			for (ReadWriteNBT compound : itemsList) {
-				ItemStack containedItem = NBT.itemStackFromNBT(compound);
-				if (containedItem == null) {
-					continue;
-				}
+				ItemStack containedItem = Objects.requireNonNull(NBT.itemStackFromNBT(compound));
 				NBT.modify(containedItem, inbt -> {
 					ItemStatUtils.removePlayerModified(inbt);
 				});
-				ReadableNBT playerModified = ItemStatUtils.addPlayerModified(compound.getCompound("tag"));
-				if (playerModified == null) {
-					continue;
-				}
-				// this can be null
+				ReadableNBT playerModified = ItemStatUtils.addPlayerModified(Objects.requireNonNull(compound.getCompound("tag")));
 				totalCount += playerModified.getLong(AMOUNT_KEY);
 				if (containedItem.isSimilar(item)) {
 					foundCompound = compound;
@@ -262,12 +286,9 @@ public class CustomContainerItemManager implements Listener {
 				return false;
 			}
 
+			// Found matching item stack, add to it
 			if (foundCompound != null) {
-				ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(foundCompound.getCompound("tag"));
-				if (playerModified == null) {
-					return false;
-				}
-				// this can be null
+				ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(Objects.requireNonNull(foundCompound.getCompound("tag")));
 				Long existingAmount = playerModified.getLong(AMOUNT_KEY);
 				int deposited = config.mTotalItemsLimit <= 0 ? item.getAmount() : (int) Math.min(item.getAmount(), config.mTotalItemsLimit - totalCount);
 				if (config.mItemsPerTypeLimit > 0) {
@@ -285,6 +306,8 @@ public class CustomContainerItemManager implements Listener {
 				return true;
 			}
 
+			// else found no matching stack, add new stack unless limit has been reached
+
 			if (config.mTypesLimit > 0 && itemsList.size() >= config.mTypesLimit) {
 				if (!silent) {
 					player.sendMessage(Component.text("Cannot store any more different item types in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
@@ -295,10 +318,24 @@ public class CustomContainerItemManager implements Listener {
 
 			ReadWriteNBT newCompound = itemsList.addCompound();
 			ReadWriteNBT addedItem = NBT.itemStackToNBT(item);
-			ItemStatUtils.addPlayerModified(addedItem.getOrCreateCompound("tag")).setLong(AMOUNT_KEY, (long) item.getAmount());
+			int added = item.getAmount();
+			if (config.mItemsPerTypeLimit > 0) {
+				added = Math.min(added, config.mItemsPerTypeLimit);
+			}
+			if (config.mTotalItemsLimit > 0) {
+				added = (int) Math.min(added, config.mTotalItemsLimit - totalCount);
+			}
+			if (added <= 0) { // this shouldn't be possible, but guard anyway
+				if (!silent) {
+					player.sendMessage(Component.text("Cannot store any more items in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				}
+				return false;
+			}
+			ItemStatUtils.addPlayerModified(addedItem.getOrCreateCompound("tag")).setLong(AMOUNT_KEY, (long) added);
 			addedItem.setByte("Count", (byte) 1);
 			newCompound.mergeCompound(addedItem);
-			item.setAmount(0);
+			item.setAmount(item.getAmount() - added);
 			return true;
 		});
 
@@ -323,15 +360,11 @@ public class CustomContainerItemManager implements Listener {
 				if (playerModified == null) {
 					continue;
 				}
-				ItemStack containedItem = NBT.itemStackFromNBT(compound);
-				if (containedItem == null) {
-					continue;
-				}
+				ItemStack containedItem = Objects.requireNonNull(NBT.itemStackFromNBT(compound));
 				NBT.modify(containedItem, inbt -> {
 					ItemStatUtils.removePlayerModified(inbt);
 				});
 				if (containedItem.isSimilar(currency)) {
-					// this can be null
 					return playerModified.getLong(AMOUNT_KEY);
 				}
 			}
@@ -351,16 +384,12 @@ public class CustomContainerItemManager implements Listener {
 			ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
 			for (int i = 0; i < itemsList.size(); i++) {
 				ReadWriteNBT compound = itemsList.get(i);
-				ItemStack containedItem = NBT.itemStackFromNBT(compound);
-				if (containedItem == null) {
-					continue;
-				}
+				ItemStack containedItem = Objects.requireNonNull(NBT.itemStackFromNBT(compound));
 				NBT.modify(containedItem, inbt -> {
 					ItemStatUtils.removePlayerModified(inbt);
 				});
 				if (containedItem.isSimilar(item)) {
 					ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag"));
-					// this can be null
 					long containedAmount = playerModified.getLong(AMOUNT_KEY);
 					if (item.getAmount() >= containedAmount) {
 						item.setAmount((int) containedAmount);
@@ -392,19 +421,12 @@ public class CustomContainerItemManager implements Listener {
 			List<ReadWriteNBT> itemsListCopy = itemsList.toListCopy();
 			for (int i = 0; i < itemsListCopy.size(); i++) {
 				ReadWriteNBT compound = itemsList.get(i);
-				ItemStack removedItem = NBT.itemStackFromNBT(compound);
-				if (removedItem == null) {
-					continue;
-				}
+				ItemStack removedItem = Objects.requireNonNull(NBT.itemStackFromNBT(compound));
 				NBT.modify(removedItem, ItemStatUtils::removePlayerModified);
 				if (!testPredicate.test(removedItem)) {
 					continue;
 				}
-				ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(compound.getCompound("tag"));
-				if (playerModified == null) {
-					continue;
-				}
-				// this can be null
+				ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(Objects.requireNonNull(compound.getCompound("tag")));
 				long containedAmount = playerModified.getLong(AMOUNT_KEY);
 				boolean consumed;
 				if (maxAmount >= containedAmount) {
@@ -443,10 +465,7 @@ public class CustomContainerItemManager implements Listener {
 
 			for (int i = 0; i < itemsList.size(); i++) {
 				ReadWriteNBT compound = itemsList.get(i);
-				ItemStack containedItem = NBT.itemStackFromNBT(compound);
-				if (containedItem == null) {
-					continue;
-				}
+				ItemStack containedItem = Objects.requireNonNull(NBT.itemStackFromNBT(compound));
 				NBT.modify(containedItem, inbt -> {
 					ItemStatUtils.removePlayerModified(inbt);
 				});
