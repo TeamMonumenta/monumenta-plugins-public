@@ -1439,9 +1439,9 @@ public class DepthsManager {
 			DepthsUtils.sendFormattedMessage(p, DepthsContent.DARKEST_DEPTHS, "Player not in depths system!");
 			return;
 		}
-		if (dp.mGraveTask != null) {
+		if (dp.mGraveRunnable != null) {
 			dp.mDead = false;
-			dp.mGraveTask.cancel();
+			dp.mGraveRunnable.cancel();
 		}
 		dp.mNumDeaths = Math.max(0, dp.mNumDeaths - 1);
 		int partyFloor = party.getFloor();

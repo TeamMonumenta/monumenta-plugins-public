@@ -17,7 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +74,7 @@ public class DepthsPlayer {
 	public int mGraveTicks = 0;
 	public double mReviveTicks = 0;
 	boolean mCurrentlyReviving = false;
-	public transient @Nullable BukkitTask mGraveTask;
+	public transient @Nullable BukkitRunnable mGraveRunnable;
 
 	//The location to teleport offline players to; null if no teleport is required on login - DO NOT REFERENCE WORLD
 	private String mOfflineTeleportWorld = "";

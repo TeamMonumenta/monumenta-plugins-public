@@ -180,7 +180,7 @@ public class DepthsListener implements Listener {
 				return;
 			}
 			//If the player is in the revive room, make them immune to damage
-			if (dp != null && dp.mGraveTask != null) {
+			if (dp != null && dp.mGraveRunnable != null) {
 				event.setCancelled(true);
 				return;
 			}
@@ -228,10 +228,14 @@ public class DepthsListener implements Listener {
 		DepthsPlayer dp = dm.getDepthsPlayer(player);
 
 		if (dp != null) {
-			if (dp.mGraveTask != null) {
+			if (dp.mGraveRunnable != null) {
 				// Died in death waiting room (e.g. used the exit button): send player to loot room
-				dp.mGraveTask.cancel();
-				sendPlayerToLootRoom(player, true);
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					if (dp.mGraveRunnable != null) {
+						dp.mGraveRunnable.cancel();
+					}
+					sendPlayerToLootRoom(player, true);
+				});
 				event.setCancelled(true);
 				return;
 			}
@@ -243,7 +247,7 @@ public class DepthsListener implements Listener {
 				// Check how many players on team don't have an active grave. If it's less than 1 (current player), we can skip and send to loot room
 				int partyAliveCount = 0;
 				for (DepthsPlayer depthsPlayer : party.mPlayersInParty) {
-					if (depthsPlayer.mGraveTask == null) {
+					if (depthsPlayer.mGraveRunnable == null) {
 						partyAliveCount++;
 					}
 				}
@@ -327,7 +331,7 @@ public class DepthsListener implements Listener {
 						dp.mGraveTicks = 0;
 						dp.mReviveTicks = 0;
 						dp.mCurrentlyReviving = false;
-						dp.mGraveTask = new BukkitRunnable() {
+						dp.mGraveRunnable = new BukkitRunnable() {
 							final double mBaseReviveRadiusSquared = 2;
 							@Nullable BossBar mReviveBar;
 
@@ -427,11 +431,12 @@ public class DepthsListener implements Listener {
 											p.hideBossBar(mReviveBar);
 										}
 									}
-									dp.mGraveTask = null;
+									dp.mGraveRunnable = null;
 								}
 								super.cancel();
 							}
-						}.runTaskTimer(Plugin.getInstance(), 0, 1);
+						};
+						dp.mGraveRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 					} else {
 						// died too often: immediately send to loot room
 						dp.sendMessage("You have died too often and have been sent directly to the loot room!");
