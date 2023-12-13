@@ -53,9 +53,11 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(
 		ClassAbility.BRUTE_FORCE_AOE,
 		ClassAbility.COUNTER_STRIKE_AOE,
+		ClassAbility.RIPOSTE,
 		ClassAbility.SHIELD_BASH_AOE,
 		ClassAbility.METEOR_SLAM,
-		ClassAbility.RAMPAGE);
+		ClassAbility.RAMPAGE
+	);
 
 	public static final String CHARM_CHARGES = "Glorious Battle Charges";
 	public static final String CHARM_DAMAGE = "Glorious Battle Damage";
