@@ -633,8 +633,14 @@ public class SpawnerUtils {
 		double multiplierRatio = multiplier / lastMultiplier;
 		persistentDataContainer.set(LAST_MULTIPLIER, PersistentDataType.DOUBLE, multiplier);
 
-		spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
-		spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
+		// Need to do them in the right order or else it sometimes throws an IllegalArgumentException
+		if (multiplierRatio > 1) {
+			spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
+			spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
+		} else {
+			spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
+			spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
+		}
 		spawner.setDelay((int) (spawner.getDelay() * multiplierRatio));
 		spawner.update(false, false);
 	}

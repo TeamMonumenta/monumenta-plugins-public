@@ -50,7 +50,7 @@ public class SpellDash extends Spell {
 	public void run() {
 		Location bossLoc = mBoss.getLocation();
 		List<? extends LivingEntity> targets = mTarget.getTargetsList(mBoss);
-		if (targets == null) {
+		if (targets.isEmpty()) {
 			return;
 		}
 		LivingEntity dashTarget = targets.get(0);

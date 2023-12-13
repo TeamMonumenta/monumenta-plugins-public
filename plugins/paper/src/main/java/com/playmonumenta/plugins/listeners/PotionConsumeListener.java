@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -210,7 +209,7 @@ public class PotionConsumeListener implements Listener {
 						Starvation.apply(player, starvation);
 
 						//Remove glass bottle from inventory once drinked
-						postPotionDrink(player, clickedInventory, null, false);
+						postPotionDrink(player, clickedInventory, false);
 
 						this.cancel();
 						mRunnables.remove(uuid);
@@ -236,10 +235,9 @@ public class PotionConsumeListener implements Listener {
 	 * This is called after the potion drink runnable has finished and when InventoryCloseEvent is called
 	 * @param player - player that drank the potion
 	 * @param inventory - inventory to check and refund potion
-	 * @param potion - potion to refund
 	 * @param inventoryClose - if this is an InventoryClose event
 	 */
-	private void postPotionDrink(Player player, Inventory inventory, @Nullable ItemStack potion, Boolean inventoryClose) {
+	private void postPotionDrink(Player player, Inventory inventory, boolean inventoryClose) {
 		UUID uuid = player.getUniqueId();
 		BukkitRunnable runnable = mRunnables.get(uuid);
 		// return if there is no drink in progress
@@ -248,24 +246,11 @@ public class PotionConsumeListener implements Listener {
 		}
 
 		Integer slot = mPotionsSlot.get(uuid);
-		if (slot == null) {
+		if (slot == null || slot >= inventory.getSize()) {
 			return;
 		}
 		ItemStack invItem = inventory.getItem(slot);
-		if (potion != null) { // if potion is not null, then assume that provisions is triggered
-			// only run if player still has container open
-			if (inventory.equals(player.getOpenInventory().getTopInventory()) || inventory.equals(player.getOpenInventory().getBottomInventory())) {
-				if (invItem == null || invItem.getType().isAir() || invItem.getType().equals(Material.GLASS_BOTTLE)) {
-					inventory.setItem(slot, potion);
-				} else {
-					InventoryUtils.giveItem(player, potion, inventory);
-				}
-			} else {
-				// otherwise put the potion anywhere in player inventory
-				InventoryUtils.giveItem(player, potion);
-			}
-			mPotionsSlot.remove(uuid); // provisions should NEVER be triggered by InventoryCloseEvent
-		} else if (invItem != null && invItem.getType().equals(Material.GLASS_BOTTLE) && !invItem.hasItemMeta()) {
+		if (invItem != null && invItem.getType().equals(Material.GLASS_BOTTLE) && !invItem.hasItemMeta()) {
 			inventory.setItem(slot, null);
 			if (!inventoryClose) {
 				mPotionsSlot.remove(uuid);
@@ -411,6 +396,6 @@ public class PotionConsumeListener implements Listener {
 		if (inventory == null) {
 			return;
 		}
-		postPotionDrink((Player) event.getPlayer(), inventory, null, true);
+		postPotionDrink((Player) event.getPlayer(), inventory, true);
 	}
 }
