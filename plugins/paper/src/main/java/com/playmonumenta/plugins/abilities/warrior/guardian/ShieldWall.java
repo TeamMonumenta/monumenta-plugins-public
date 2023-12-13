@@ -99,7 +99,9 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 
 	public void cast() {
 		if (isOnCooldown()) {
-			mReposition = true;
+			if (mCurrDuration + SHIELD_WALL_REPOSITION_PENALTY < mDuration) {
+				mReposition = true;
+			}
 			return;
 		}
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_KNOCKBACK);
@@ -113,28 +115,27 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
+		mCurrDuration = 0;
 		cancelOnDeath(new BukkitRunnable() {
-			int mT = 0;
 			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
 			Location mLoc = loc;
 			@Nullable Hitbox mHitbox = null;
 
 			@Override
 			public void run() {
-				mT++;
 				mCurrDuration++;
 				Vector vec;
 
 				if (mReposition || mHitbox == null) {
 					if (mReposition) {
-						mT += SHIELD_WALL_REPOSITION_PENALTY;
+						mCurrDuration += SHIELD_WALL_REPOSITION_PENALTY;
 					}
 					mReposition = false;
 					mLoc = mPlayer.getLocation();
 					mHitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().subtract(0, -1, 0), mHeight + 1, SHIELD_WALL_RADIUS - 0.6, SHIELD_WALL_RADIUS + 0.6, Math.toRadians(angle) / 2);
 				}
 
-				if (mT % 4 == 0) {
+				if (mCurrDuration % 4 == 0) {
 					for (double degree = 0; degree < angle; degree += 10) {
 						double radian1 = Math.toRadians(degree - 0.5 * angle);
 						vec = new Vector(-FastUtils.sin(radian1) * SHIELD_WALL_RADIUS, -1, FastUtils.cos(radian1) * SHIELD_WALL_RADIUS);
@@ -195,7 +196,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 					}
 				}
 				mMobsAlreadyHit = mobsAlreadyHitAdjusted;
-				if (mT >= mDuration) {
+				if (mCurrDuration >= mDuration) {
 					this.cancel();
 				}
 			}
