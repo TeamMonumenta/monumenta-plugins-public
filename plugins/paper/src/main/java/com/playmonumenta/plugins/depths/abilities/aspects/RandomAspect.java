@@ -32,7 +32,7 @@ public class RandomAspect extends WeaponAspectDepthsAbility {
 				.add(" level.");
 		} else {
 			return new DescriptionBuilder<RandomAspect>()
-				.add("Obtain a random ability.  Transforms into a random other aspect after defeating floor 3.");
+				.add("Obtain a random ability. Transforms into a random other aspect after defeating floor 3.");
 		}
 	}
 

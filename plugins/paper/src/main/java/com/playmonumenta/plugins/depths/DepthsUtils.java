@@ -239,7 +239,7 @@ public class DepthsUtils {
 	}
 
 	public static boolean isValidComboAttack(DamageEvent event, Player player) {
-		return event.getType() == DamageType.MELEE && player.getCooledAttackStrength(0) == 1 && isWeaponItem(player.getInventory().getItemInMainHand());
+		return event.getType() == DamageType.MELEE && player.getCooledAttackStrength(0) == 1;
 	}
 
 	public static @Nullable DepthsRewardType rewardFromRoom(@Nullable DepthsRoomType roomType) {

@@ -65,6 +65,7 @@ import com.playmonumenta.plugins.depths.abilities.prismatic.Encore;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Flexibility;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Generosity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Multiplicity;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Prosperity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Rebirth;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Refraction;
 import com.playmonumenta.plugins.depths.abilities.prismatic.SolarRay;
@@ -608,6 +609,7 @@ public class DepthsManager {
 			Convergence.INFO,
 			Flexibility.INFO,
 			Multiplicity.INFO,
+			Prosperity.INFO,
 			Refraction.INFO,
 			Rebirth.INFO,
 			ColorSplash.INFO,
@@ -730,8 +732,8 @@ public class DepthsManager {
 	public @Nullable List<DepthsAbilityItem> getAbilityUnlocks(Player p) {
 
 		DepthsPlayer dp = getDepthsPlayer(p);
-
-		if (dp == null) {
+		DepthsParty party = getPartyFromId(dp);
+		if (dp == null || party == null) {
 			return null;
 		}
 
@@ -759,8 +761,11 @@ public class DepthsManager {
 		offeredItems = new ArrayList<>();
 		Collections.shuffle(mItems);
 		// Add the first 3 items the player is eligible for to the thing
-		DepthsParty party = getPartyFromId(dp);
-		int options = (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_REDUCED_OPTIONS) ? 2 : 3;
+		int options = party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_REDUCED_OPTIONS ? 2 : 3;
+		Prosperity prosperity = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, Prosperity.class);
+		if (prosperity != null) {
+			options += prosperity.getExtraChoices();
+		}
 		for (DepthsAbilityItem item : mItems) {
 			if (offeredItems.size() >= options) {
 				break;
@@ -1293,7 +1298,8 @@ public class DepthsManager {
 		}
 
 		DepthsPlayer dp = getDepthsPlayer(uuid);
-		if (dp == null) {
+		DepthsParty party = getPartyFromId(dp);
+		if (dp == null || party == null) {
 			return null;
 		}
 		// Return up to 3 random choices of items that are one level above the current level
@@ -1305,8 +1311,13 @@ public class DepthsManager {
 		int depths2UpgradeBonus = (dp.getContent() == DepthsContent.CELESTIAL_ZENITH) ? 1 : 0;
 
 		// Loop through all possible abilities and show random ones they have at a higher rarity
+		int options = party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_REDUCED_OPTIONS ? 2 : 3;
+		Prosperity prosperity = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, Prosperity.class);
+		if (prosperity != null) {
+			options += prosperity.getExtraChoices();
+		}
 		for (DepthsAbilityInfo<?> da : abilities) {
-			if (offeredItems.size() >= 3) {
+			if (offeredItems.size() >= options) {
 				break;
 			}
 			int level = getPlayerLevelInAbility(da.getDisplayName(), p);

@@ -251,7 +251,6 @@ public class CharmManager {
 	@SuppressWarnings("NullAway.Init") // fields are initialised by called methods
 	private CharmManager() {
 		mPlayerCharmEffectMap = new HashMap<>();
-		//TODO when loading, determine which charm type is applicable on this shard
 		if (ServerProperties.getDepthsEnabled()) {
 			mEnabledCharmType = CharmType.ZENITH;
 		} else {

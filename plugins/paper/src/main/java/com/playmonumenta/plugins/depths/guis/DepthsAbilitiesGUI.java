@@ -7,43 +7,43 @@ import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class DepthsAbilitiesGUI extends CustomInventory {
+
+	// Also used in DepthsUpgradeGUI
+	public static final List<List<Integer>> SLOT_MAP = Arrays.asList(
+		Arrays.asList(13),
+		Arrays.asList(11, 15),
+		Arrays.asList(10, 13, 16),
+		Arrays.asList(10, 12, 14, 16),
+		Arrays.asList(9, 11, 13, 15, 17)
+	);
+
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private final boolean mReturnToSummary;
-
-	private final List<Integer> mSlotsUsed = new ArrayList<>();
+	private final List<Integer> mSlotsUsed;
 
 	public DepthsAbilitiesGUI(Player player, boolean fromSummaryGUI) {
 		super(player, 27, "Select an Ability");
 		mReturnToSummary = fromSummaryGUI;
 
-
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getAbilityUnlocks(player);
 		if (items == null || items.isEmpty()) {
+			mSlotsUsed = new ArrayList<>();
 			return;
-		} else if (items.size() == 1) {
-			mSlotsUsed.add(13);
-		} else if (items.size() == 2) {
-			mSlotsUsed.addAll(List.of(11, 15));
-		} else {
-			mSlotsUsed.addAll(List.of(10, 13, 16));
 		}
+
+		mSlotsUsed = DepthsAbilitiesGUI.SLOT_MAP.get(items.size() - 1);
 
 		GUIUtils.fillWithFiller(mInventory, true);
 
-		mInventory.setItem(mSlotsUsed.get(0), items.get(0).mItem);
-
-		if (items.size() > 1) {
-			mInventory.setItem(mSlotsUsed.get(1), items.get(1).mItem);
-		}
-
-		if (items.size() > 2) {
-			mInventory.setItem(mSlotsUsed.get(2), items.get(2).mItem);
+		for (int i = 0; i < mSlotsUsed.size(); i++) {
+			mInventory.setItem(mSlotsUsed.get(i), items.get(i).mItem);
 		}
 	}
 
@@ -57,14 +57,15 @@ public class DepthsAbilitiesGUI extends CustomInventory {
 			    event.isShiftClick()) {
 			return;
 		}
-		int slot;
-		if (event.getSlot() == mSlotsUsed.get(0)) {
-			slot = 0;
-		} else if (event.getSlot() == mSlotsUsed.get(1)) {
-			slot = 1;
-		} else if (event.getSlot() == mSlotsUsed.get(2)) {
-			slot = 2;
-		} else {
+
+		int slot = -1;
+		for (int i = 0; i < mSlotsUsed.size(); i++) {
+			if (event.getSlot() == mSlotsUsed.get(i)) {
+				slot = i;
+				break;
+			}
+		}
+		if (slot < 0) {
 			return;
 		}
 

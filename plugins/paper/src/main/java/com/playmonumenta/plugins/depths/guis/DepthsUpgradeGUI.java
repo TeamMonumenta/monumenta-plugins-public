@@ -15,8 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 public class DepthsUpgradeGUI extends CustomInventory {
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private final boolean mReturnToSummary;
-	private final List<Integer> mSlotsUsed = new ArrayList<>();
-
+	private final List<Integer> mSlotsUsed;
 
 	public DepthsUpgradeGUI(Player player, boolean fromSummaryGUI) {
 		super(player, 27, "Select an Upgrade");
@@ -24,26 +23,16 @@ public class DepthsUpgradeGUI extends CustomInventory {
 
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getAbilityUpgradeOptions(player);
 		if (items == null || items.isEmpty()) {
+			mSlotsUsed = new ArrayList<>();
 			return;
-		} else if (items.size() == 1) {
-			mSlotsUsed.add(13);
-		} else if (items.size() == 2) {
-			mSlotsUsed.addAll(List.of(11, 15));
-		} else {
-			mSlotsUsed.addAll(List.of(10, 13, 16));
 		}
+
+		mSlotsUsed = DepthsAbilitiesGUI.SLOT_MAP.get(items.size() - 1);
 
 		GUIUtils.fillWithFiller(mInventory, true);
 
-
-		mInventory.setItem(mSlotsUsed.get(0), items.get(0).mItem);
-
-		if (items.size() > 1) {
-			mInventory.setItem(mSlotsUsed.get(1), items.get(1).mItem);
-		}
-
-		if (items.size() > 2) {
-			mInventory.setItem(mSlotsUsed.get(2), items.get(2).mItem);
+		for (int i = 0; i < mSlotsUsed.size(); i++) {
+			mInventory.setItem(mSlotsUsed.get(i), items.get(i).mItem);
 		}
 	}
 
@@ -57,14 +46,15 @@ public class DepthsUpgradeGUI extends CustomInventory {
 			    || event.isShiftClick()) {
 			return;
 		}
-		int slot;
-		if (event.getSlot() == mSlotsUsed.get(0)) {
-			slot = 0;
-		} else if (event.getSlot() == mSlotsUsed.get(1)) {
-			slot = 1;
-		} else if (event.getSlot() == mSlotsUsed.get(2)) {
-			slot = 2;
-		} else {
+
+		int slot = -1;
+		for (int i = 0; i < mSlotsUsed.size(); i++) {
+			if (event.getSlot() == mSlotsUsed.get(i)) {
+				slot = i;
+				break;
+			}
+		}
+		if (slot < 0) {
 			return;
 		}
 
