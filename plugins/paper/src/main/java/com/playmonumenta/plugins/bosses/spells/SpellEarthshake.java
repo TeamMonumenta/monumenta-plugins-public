@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -153,6 +155,11 @@ public class SpellEarthshake extends Spell {
 				}
 
 				Material material = b.getType();
+				Block setToAir = null;
+				if (ItemUtils.CARPETS.contains(material)) {
+					setToAir = b;
+					b = b.getRelative(BlockFace.DOWN);
+				}
 				if (!mIgnoredMats.contains(material) && !BlockUtils.containsWater(b) && !(b.getBlockData() instanceof Bed) && FastUtils.RANDOM.nextDouble() < mParameters.FLY_BLOCKS_CHANCE && !ZoneUtils.hasZoneProperty(b.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
 					if (mParameters.FLY_BLOCKS) {
 						double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
@@ -161,6 +168,9 @@ public class SpellEarthshake extends Spell {
 						block.setVelocity(new Vector(x, 1.0, z));
 					}
 					world.getBlockAt(b.getLocation()).setType(mParameters.REPLACE_BLOCKS);
+					if (setToAir != null) {
+						setToAir.setType(Material.AIR);
+					}
 				}
 			}
 		}
