@@ -23,7 +23,7 @@ import org.bukkit.entity.Projectile;
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
 	public static final String ABILITY_NAME = "Sharpshooter";
-	public static final double[] DAMAGE_PER_STACK = {0.025, 0.032, 0.038, 0.044, 0.050, 0.07};
+	public static final double[] DAMAGE_PER_STACK = {0.024, 0.028, 0.032, 0.036, 0.040, 0.048};
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
 	private static final int TWISTED_SHARPSHOOTER_DECAY_TIMER = 20 * 6;
 	private static final int MAX_STACKS = 8;

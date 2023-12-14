@@ -92,7 +92,7 @@ public class Avalanche extends DepthsAbility {
 					Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 
 					//Damage and root mobs
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.5, 5.0, 1.5)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 2, 5.0, 2)) {
 						if (!mHitMobs.contains(mob)) {
 							EntityUtils.applySlow(mPlugin, mDuration, SLOW_MODIFIER, mob);
 							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);

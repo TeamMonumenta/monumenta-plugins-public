@@ -24,7 +24,7 @@ import org.bukkit.entity.Projectile;
 public class FocusedCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Focused Combos";
-	public static final double[] DAMAGE = {0.40, 0.45, 0.50, 0.55, 0.60, 1.00};
+		public static final double[] DAMAGE = {0.30, 0.35, 0.40, 0.45, 0.50, 0.80};
 	public static final double BLEED_AMOUNT = 0.2;
 	public static final int BLEED_DURATION = 20 * 3;
 	public static final int HIT_REQUIREMENT = 3;

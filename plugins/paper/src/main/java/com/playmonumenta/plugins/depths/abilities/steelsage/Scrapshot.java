@@ -114,7 +114,7 @@ public class Scrapshot extends DepthsAbility {
 		for (LivingEntity mob : hitMobs) {
 			Location l = mob.getLocation();
 			double dist = mob.getLocation().distance(loc);
-			double mult = Math.min(1, (mRange * 1.5 - dist) / mRange);
+			double mult = Math.min(1, (mRange * 1.25 - dist) / mRange);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, mult * mDamage, mInfo.getLinkedSpell());
 			new PartialParticle(Particle.SQUID_INK, l, (int) ((mRange - dist) * 2), 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 			world.playSound(l, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
@@ -129,7 +129,7 @@ public class Scrapshot extends DepthsAbility {
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks, in a cone that deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" projectile damage and knocks you backward. Damage is decreased based on distance if the distance is greater than half of the range.")
+			.add(" projectile damage and knocks you backward. Damage is decreased based on distance if the distance is greater than 25% of the max range.")
 			.addCooldown(COOLDOWN);
 	}
 }

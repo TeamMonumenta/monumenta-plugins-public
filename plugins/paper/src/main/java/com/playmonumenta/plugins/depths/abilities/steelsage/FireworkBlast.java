@@ -45,10 +45,10 @@ public class FireworkBlast extends DepthsAbility {
 	public static final String ABILITY_NAME = "Firework Blast";
 	private static final String ABILITY_METAKEY = "FireworkBlastMetakey";
 	private static final int COOLDOWN = 12 * 20;
-	private static final int[] DAMAGE = {16, 20, 24, 28, 32, 40};
-	private static final int[] DAMAGE_CAP = {32, 40, 48, 56, 64, 80};
+	private static final int[] DAMAGE = {12, 16, 20, 24, 28, 36};
+	private static final int[] DAMAGE_CAP = {24, 32, 40, 48, 56, 72};
 	private static final double DAMAGE_INCREASE_PER_BLOCK = 0.05;
-	private static final double RADIUS = 1.5;
+	private static final double RADIUS = 2;
 	private static final double DIRECT_HIT_RADIUS = 4;
 
 	private static final Particle.DustOptions GRAY_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
@@ -116,7 +116,8 @@ public class FireworkBlast extends DepthsAbility {
 					Location loc = rocket.getLocation();
 					World world = rocket.getWorld();
 
-					double dist = mPlayer.getLocation().distance(loc);
+					// only start scaling damage past 6 blocks travelled
+					double dist = Math.max(0, mPlayer.getLocation().distance(loc) - 6);
 					double mult = 1 + dist * mDamagePerBlock;
 					double damage = Math.min(mBaseDamage * mult, mDamageCap);
 
@@ -175,7 +176,7 @@ public class FireworkBlast extends DepthsAbility {
 			.add(a -> a.mDirectHitRadius, DIRECT_HIT_RADIUS)
 			.add(" blocks instead. The damage is increased by ")
 			.addPercent(a -> a.mDamagePerBlock, DAMAGE_INCREASE_PER_BLOCK)
-			.add(" for every block the firework travels, up to ")
+			.add(" for every block the firework travels past 6 blocks, up to ")
 			.addDepthsDamage(a -> a.mDamageCap, DAMAGE_CAP[rarity - 1], true)
 			.add(" damage.")
 			.addCooldown(COOLDOWN);

@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 public class ProjectileMastery extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Projectile Mastery";
-	public static final double[] SPELL_MOD = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
+	public static final double[] SPELL_MOD = {0.08, 0.10, 0.12, 0.14, 0.16, 0.20};
 
 	public static final DepthsAbilityInfo<ProjectileMastery> INFO =
 		new DepthsAbilityInfo<>(ProjectileMastery.class, ABILITY_NAME, ProjectileMastery::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
