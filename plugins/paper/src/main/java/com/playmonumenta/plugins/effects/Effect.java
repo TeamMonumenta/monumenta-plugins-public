@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
@@ -113,6 +114,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	public double getFishQualityIncrease(Player player) {
 		return 1;
+	}
+
+	public void onExplode(EntityExplodeEvent event) {
+
 	}
 
 	public void onDeath(EntityDeathEvent event) {

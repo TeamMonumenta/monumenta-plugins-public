@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
 public class ChallengeMobEffect extends Effect {
 	private static final String effectId = "ChallengeMobEffect";
@@ -15,6 +16,11 @@ public class ChallengeMobEffect extends Effect {
 
 	@Override
 	public void onDeath(EntityDeathEvent event) {
+		mChallenge.incrementKills();
+	}
+
+	@Override
+	public void onExplode(EntityExplodeEvent event) {
 		mChallenge.incrementKills();
 	}
 
