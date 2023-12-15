@@ -53,6 +53,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	public static final String CHARM_ANGLE = "Shield Wall Angle";
 	public static final String CHARM_KNOCKBACK = "Shield Wall Knockback";
 	public static final String CHARM_HEIGHT = "Shield Wall Height";
+	public static final String CHARM_RADIUS = "Shield Wall Radius";
 
 	public static final AbilityInfo<ShieldWall> INFO =
 			new AbilityInfo<>(ShieldWall.class, "Shield Wall", ShieldWall::new)
@@ -107,6 +108,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_KNOCKBACK);
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_WALL_DAMAGE);
 		double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
+		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SHIELD_WALL_RADIUS);
 
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
@@ -132,13 +134,13 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 					}
 					mReposition = false;
 					mLoc = mPlayer.getLocation();
-					mHitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().subtract(0, -1, 0), mHeight + 1, SHIELD_WALL_RADIUS - 0.6, SHIELD_WALL_RADIUS + 0.6, Math.toRadians(angle) / 2);
+					mHitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().subtract(0, -1, 0), mHeight + 1, radius - 0.6, radius + 0.6, Math.toRadians(angle) / 2);
 				}
 
 				if (mCurrDuration % 4 == 0) {
 					for (double degree = 0; degree < angle; degree += 10) {
 						double radian1 = Math.toRadians(degree - 0.5 * angle);
-						vec = new Vector(-FastUtils.sin(radian1) * SHIELD_WALL_RADIUS, -1, FastUtils.cos(radian1) * SHIELD_WALL_RADIUS);
+						vec = new Vector(-FastUtils.sin(radian1) * radius, -1, FastUtils.cos(radian1) * radius);
 						vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 						Location l = mLoc.clone().add(vec);
 						for (int y = 0; y < mHeight + 1; y++) {

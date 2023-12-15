@@ -638,6 +638,7 @@ public class CharmManager {
 			ShieldWall.CHARM_ANGLE,
 			ShieldWall.CHARM_KNOCKBACK,
 			ShieldWall.CHARM_HEIGHT,
+			ShieldWall.CHARM_RADIUS,
 
 			//Alchemist
 			AlchemistPotions.CHARM_DAMAGE,

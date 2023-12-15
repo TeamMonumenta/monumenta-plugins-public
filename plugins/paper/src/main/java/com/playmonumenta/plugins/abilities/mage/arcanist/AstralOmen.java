@@ -122,7 +122,7 @@ public class AstralOmen extends Ability {
 
 	public AstralOmen(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER : 0) + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
+		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER) : 0);
 	}
 
 	@Override
