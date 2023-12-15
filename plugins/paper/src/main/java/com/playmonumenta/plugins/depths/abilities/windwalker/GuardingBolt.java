@@ -33,6 +33,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -110,11 +111,16 @@ public class GuardingBolt extends DepthsAbility {
 			}
 
 			Location userLoc = mPlayer.getLocation();
-			Location targetLoc = target.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+			Location otherLoc = target.getLocation().setDirection(mPlayer.getEyeLocation().getDirection());
+			Location targetLoc = otherLoc.clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+			BoundingBox box = mPlayer.getBoundingBox().shift(targetLoc.subtract(mPlayer.getLocation()));
+			if (LocationUtils.collidesWithBlocks(box, mPlayer.getWorld())) {
+				targetLoc = otherLoc;
+			}
 			if (userLoc.distance(targetLoc) > 1) {
 				mPlayer.teleport(targetLoc);
-				doDamage(targetLoc);
 			}
+			doDamage(targetLoc);
 
 			world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
 

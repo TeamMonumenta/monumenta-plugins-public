@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.BodyguardCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -19,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class Bodyguard extends Ability {
@@ -83,7 +85,12 @@ public class Bodyguard extends Ability {
 			mCosmetic.onBodyguardOther(mPlayer, targetPlayer, world);
 
 			Vector dir = userLoc.getDirection();
-			Location targetLoc = targetPlayer.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+			Location otherLoc = targetPlayer.getLocation().setDirection(mPlayer.getEyeLocation().getDirection());
+			Location targetLoc = otherLoc.clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+			BoundingBox box = mPlayer.getBoundingBox().shift(targetLoc.subtract(mPlayer.getLocation()));
+			if (LocationUtils.collidesWithBlocks(box, mPlayer.getWorld())) {
+				targetLoc = otherLoc;
+			}
 
 			giveAbsorption(targetPlayer);
 
