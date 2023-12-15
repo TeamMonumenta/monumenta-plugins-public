@@ -113,7 +113,7 @@ public class GuardingBolt extends DepthsAbility {
 			Location userLoc = mPlayer.getLocation();
 			Location otherLoc = target.getLocation().setDirection(mPlayer.getEyeLocation().getDirection());
 			Location targetLoc = otherLoc.clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-			BoundingBox box = mPlayer.getBoundingBox().shift(targetLoc.subtract(mPlayer.getLocation()));
+			BoundingBox box = mPlayer.getBoundingBox().shift(targetLoc.clone().subtract(mPlayer.getLocation()));
 			if (LocationUtils.collidesWithBlocks(box, mPlayer.getWorld())) {
 				targetLoc = otherLoc;
 			}
