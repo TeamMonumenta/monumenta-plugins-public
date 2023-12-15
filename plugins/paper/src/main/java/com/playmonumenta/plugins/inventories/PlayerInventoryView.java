@@ -1,128 +1,50 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.gui.PlayerItemStatsGUI;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import java.util.ArrayList;
+import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
+import com.playmonumenta.plugins.utils.*;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";
-	private static final List<HumanEntity> mPlayers = new ArrayList<>(10);
-	private static final List<Inventory> mInventories = new ArrayList<>(10);
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
-	public void playerInteractEvent(PlayerInteractEvent event) {
-		if ((event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY)
-			    || (!event.getAction().equals(Action.LEFT_CLICK_AIR) && !event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
-			return;
-		}
+	public void playerAnimationEvent(PlayerAnimationEvent event) {
+		checkAndTriggerOpenEvent(event.getPlayer());
+	}
 
-		Player player = event.getPlayer();
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+	private void checkAndTriggerOpenEvent(Player requestingPlayer) {
+		ItemStack mainHand = requestingPlayer.getInventory().getItemInMainHand();
 		if (mainHand.getType().equals(Material.WRITTEN_BOOK)
-			    && InventoryUtils.testForItemWithName(mainHand, "Personal Enchanted Book", true)
-			    && InventoryUtils.testForItemWithLore(mainHand, "* Skin :")
-			    && player.hasPermission(PERMISSION)) {
+			&& InventoryUtils.testForItemWithName(mainHand, "Personal Enchanted Book", true)
+			&& InventoryUtils.testForItemWithLore(mainHand, "* Skin :")
+			&& requestingPlayer.hasPermission(PERMISSION)) {
 
-			Player clickedPlayer = EntityUtils.getPlayerAtCursor(player, 3);
+			Hitbox hitbox = Hitbox.approximateCone(requestingPlayer.getLocation(), 7, Math.toRadians(30));
+
+			List<Player> nearbyPlayers = hitbox.getHitPlayers(requestingPlayer, true);
+			if (nearbyPlayers.isEmpty()) {
+				return;
+			}
+			Player clickedPlayer = nearbyPlayers.get(0);
+			if (clickedPlayer != null && clickedPlayer.getScoreboardTags().contains("inventoryPrivacy")
+					&& !requestingPlayer.hasPermission("stealthmod")) {
+				requestingPlayer.sendMessage(Component.text("This player has opted out of inventory viewing.",
+					NamedTextColor.RED));
+				return;
+			}
 			if (clickedPlayer != null) {
-				inventoryView(player, clickedPlayer);
+				new PlayerDisplayCustomInventory(requestingPlayer, clickedPlayer).openInventory(requestingPlayer, Plugin.getInstance());
 			}
 		}
-	}
-
-	//This handles clicking, shift clicking, double clicking, etc.
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (mPlayers.contains(event.getWhoClicked())
-		    || mInventories.contains(event.getClickedInventory())
-		    || mInventories.contains(event.getInventory())) {
-			event.setCancelled(true);
-			GUIUtils.refreshOffhand(event);
-		}
-	}
-
-	//Just as a precaution
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void inventoryDragEvent(InventoryDragEvent event) {
-		if (mPlayers.contains(event.getWhoClicked()) || mInventories.contains(event.getInventory())) {
-			event.setCancelled(true);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		mPlayers.remove(event.getPlayer());
-		mInventories.remove(event.getInventory());
-	}
-
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void playerLoginEvent(PlayerLoginEvent event) {
-		mPlayers.remove(event.getPlayer());
-	}
-
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void playerQuitEvent(PlayerQuitEvent event) {
-		mPlayers.remove(event.getPlayer());
-	}
-
-	public void inventoryView(Player player, Player clickedPlayer) {
-		//Make sure whoever is getting hit with a PEB doesn't have the tag that opts them out of this feature
-		if (clickedPlayer.getScoreboardTags().contains("inventoryPrivacy")) {
-			player.sendMessage(Component.text("This player has opted out of inventory viewing.", NamedTextColor.RED));
-			return;
-		}
-		//Added for tracking to prevent them from clicking on stuff
-		mPlayers.add(player);
-
-		PlayerInventory playInv = clickedPlayer.getInventory();
-		Inventory openInv = Bukkit.createInventory(null, 18, Component.text(clickedPlayer.getName() + "'s Inventory"));
-		mInventories.add(openInv);
-
-		boolean showVanity = Plugin.getInstance().mVanityManager.getData(player).mGuiVanityEnabled;
-
-		//Set the fake inventory's top row to be the armor and offhand of the player
-		openInv.setItem(0, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.HEAD, showVanity));
-		openInv.setItem(1, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.CHEST, showVanity));
-		openInv.setItem(2, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.LEGS, showVanity));
-		openInv.setItem(3, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.FEET, showVanity));
-		openInv.setItem(4, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.OFF_HAND, showVanity));
-
-		//Set the fake inventory's bottom row to be the players hotbar
-		openInv.setItem(9, playInv.getItem(0));
-		openInv.setItem(10, playInv.getItem(1));
-		openInv.setItem(11, playInv.getItem(2));
-		openInv.setItem(12, playInv.getItem(3));
-		openInv.setItem(13, playInv.getItem(4));
-		openInv.setItem(14, playInv.getItem(5));
-		openInv.setItem(15, playInv.getItem(6));
-		openInv.setItem(16, playInv.getItem(7));
-		openInv.setItem(17, playInv.getItem(8));
-
-		player.openInventory(openInv);
 	}
 }

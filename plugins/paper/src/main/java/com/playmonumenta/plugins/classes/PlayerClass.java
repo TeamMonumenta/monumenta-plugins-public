@@ -16,6 +16,7 @@ public abstract class PlayerClass {
 	public int mClass;
 	public String mClassName;
 	public TextColor mClassColor;
+	public Material mClassGlassFiller;
 	public Material mDisplayItem;
 	public @Nullable String mQuestReq = null;
 	public @Nullable String mPermissionString = null;

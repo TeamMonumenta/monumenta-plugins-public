@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.abilities;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -29,13 +30,14 @@ public class CharmsGUI extends Gui {
 	private final Player mTargetPlayer;
 	private final boolean mMayEdit;
 	private final CharmManager.CharmType mCharmType;
+	private final boolean mFromPDGUI;
 
 	public CharmsGUI(Player player) {
 		this(player, player, true); // a player can always edit their own charms
 	}
 
 	public CharmsGUI(Player player, CharmManager.CharmType charmType) {
-		this(player, player, true, charmType);
+		this(player, player, true, charmType, false);
 	}
 
 	public CharmsGUI(Player requestingPlayer, Player targetPlayer) {
@@ -43,19 +45,25 @@ public class CharmsGUI extends Gui {
 	}
 
 	public CharmsGUI(Player requestingPlayer, Player targetPlayer, CharmManager.CharmType charmType) {
-		this(requestingPlayer, targetPlayer, requestingPlayer.equals(targetPlayer), charmType);
+		this(requestingPlayer, targetPlayer, requestingPlayer.equals(targetPlayer), charmType, false);
 	}
 
 	public CharmsGUI(Player requestingPlayer, Player targetPlayer, boolean mayEdit) {
-		this(requestingPlayer, targetPlayer, mayEdit, CharmManager.getInstance().mEnabledCharmType);
+		this(requestingPlayer, targetPlayer, mayEdit, CharmManager.getInstance().mEnabledCharmType, false);
 	}
 
-	public CharmsGUI(Player requestingPlayer, Player targetPlayer, boolean mayEdit, CharmManager.CharmType charmType) {
+	public CharmsGUI(Player requestingPlayer, Player targetPlayer, boolean mayEdit, boolean fromPDGUI) {
+		this(requestingPlayer, targetPlayer, mayEdit, CharmManager.getInstance().mEnabledCharmType, fromPDGUI);
+	}
+
+	public CharmsGUI(Player requestingPlayer, Player targetPlayer, boolean mayEdit, CharmManager.CharmType charmType, boolean fromPDGUI) {
 		super(requestingPlayer, 54, Component.text(targetPlayer.getName() + "'s Charms"));
 		mTargetPlayer = targetPlayer;
 		mMayEdit = mayEdit;
 		mCharmType = charmType;
+		mFromPDGUI = fromPDGUI;
 	}
+
 
 	@Override
 	protected void setup() {
@@ -148,7 +156,7 @@ public class CharmsGUI extends Gui {
 
 			item.setItemMeta(meta);
 			ItemUtils.setPlainTag(item);
-			setItem(0, item);
+			setItem(9, item);
 		}
 
 		{ // Charm effect indicator
@@ -164,7 +172,24 @@ public class CharmsGUI extends Gui {
 
 			item.setItemMeta(meta);
 			ItemUtils.setPlainTag(item);
-			setItem(9, item);
+			setItem(18, item);
+		}
+
+		{ // Back gui button (if here from player details GUI
+			if (mFromPDGUI) {
+				ItemStack item = new ItemStack(Material.ARROW, 1);
+
+				ItemMeta meta = item.getItemMeta();
+				meta.displayName(Component.text("Back to Player Details GUI", NamedTextColor.GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+
+				item.setItemMeta(meta);
+				ItemUtils.setPlainTag(item);
+				setItem(0, item).onLeftClick(() -> {
+					this.close();
+					new PlayerDisplayCustomInventory(mPlayer, mTargetPlayer).openInventory(mPlayer, mPlugin);
+				});
+			}
 		}
 
 		{ // Escape gui button
@@ -176,7 +201,7 @@ public class CharmsGUI extends Gui {
 
 			item.setItemMeta(meta);
 			ItemUtils.setPlainTag(item);
-			setItem(53, item).onLeftClick(this::close);
+			setItem(8, item).onLeftClick(this::close);
 		}
 
 		if (charmPower > totalBudget && mMayEdit && mPlayer.equals(mTargetPlayer)) {
@@ -193,7 +218,10 @@ public class CharmsGUI extends Gui {
 
 	@Override
 	protected boolean onGuiClick(InventoryClickEvent event) {
-		return mMayEdit;
+		if (event.getSlot() != 0) {
+			return mMayEdit;
+		}
+		return true;
 	}
 
 	@Override

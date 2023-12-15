@@ -47,6 +47,7 @@ public class Shaman extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103o";
 		mSpecOne.mSpecialization = SOOTHSAYER_ID;
 		mClassColor = TextColor.fromHexString("#009900");
+		mClassGlassFiller = Material.GREEN_STAINED_GLASS_PANE;
 		mSpecOne.mSpecName = "Soothsayer";
 		mSpecOne.mDisplayItem = Material.OAK_SAPLING;
 		mSpecOne.mDescription = "Focuses on using your tools to support your team and turn the tide of battle.";

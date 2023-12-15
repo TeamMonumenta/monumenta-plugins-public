@@ -37,6 +37,8 @@ public class Rogue extends PlayerClass {
 		mAbilities.add(ViciousCombos.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Rogue";
+		mClassColor = TextColor.fromHexString("#36393D");
+		mClassGlassFiller = Material.GRAY_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_SWORD;
 		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
 		mClassPassiveDescription = String.format("While holding two swords, deal %s%% more melee damage to elite enemies, and %s%% more to bosses.",
@@ -48,7 +50,6 @@ public class Rogue extends PlayerClass {
 		mSpecOne.mAbilities.add(WindWalk.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103c";
 		mSpecOne.mSpecialization = SWORDSAGE_SPEC_ID;
-		mClassColor = TextColor.fromHexString("#36393D");
 		mSpecOne.mSpecName = "Swordsage";
 		mSpecOne.mDisplayItem = Material.IRON_HELMET;
 		mSpecOne.mDescription = "Swordsages specialize in tackling multiple enemies through dexterous movement.";

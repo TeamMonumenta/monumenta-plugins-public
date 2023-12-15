@@ -37,6 +37,7 @@ public class Cleric extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Cleric";
 		mClassColor = TextColor.fromHexString("#FFC644");
+		mClassGlassFiller = Material.YELLOW_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POPPY;
 		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
 		mClassPassiveDescription = "You and all allies in a 12 block radius heal 5% of max health every 5s while under 50% health.";

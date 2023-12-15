@@ -19,11 +19,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
 enum PSGUISecondaryStat {
-	SHIELDING(0, Material.NAUTILUS_SHELL, EnchantmentType.SHIELDING, true, """
-		Gain (Level*20%%) effective Armor
-		when taking damage from an enemy within %s blocks.
-		Taking damage that would stun a shield
-		halves Shielding reduction for %s seconds.""".formatted(Shielding.DISTANCE, StringUtils.ticksToSeconds(Shielding.DISABLE_DURATION))),
 	POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
 		Gain (Level*20%%) effective Armor
 		when above %s%% Max Health.""".formatted(StringUtils.multiplierToPercentage(Poise.MIN_HEALTH_PERCENT))),
@@ -38,12 +33,6 @@ enum PSGUISecondaryStat {
 		gain up to (Level*20%%) effective Armor
 		(%s%% armor per 1%% health lost, up to 20%% armor).
 		Also calculates bonus from Second Wind when enabled.""".formatted(Steadfast.BONUS_SCALING_RATE)),
-	GUARD(9, Material.SHULKER_SHELL, EnchantmentType.GUARD, true, """
-		Gain (Level*20%%) effective Armor
-		after blocking an attack with a shield.
-		The duration lasts for %ss if blocked
-		from offhand, and %ss from mainhand.""".formatted(
-		StringUtils.ticksToSeconds(Guard.PAST_HIT_DURATION_TIME_OFFHAND), StringUtils.ticksToSeconds(Guard.PAST_HIT_DURATION_TIME_MAINHAND))),
 	ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
 		Gain (Level*20%%) effective Agility
 		on hits taken within %s seconds of any previous hit.""".formatted(StringUtils.ticksToSeconds(Ethereal.PAST_HIT_DURATION_TIME))),
@@ -54,7 +43,18 @@ enum PSGUISecondaryStat {
 		Gain (Level*20%%) effective Agility
 		when taking damage from a source further
 		than %s blocks from the player.""".formatted(Evasion.DISTANCE)),
-	TEMPO(8, Material.CLOCK, EnchantmentType.TEMPO, false, """
+	SHIELDING(10, Material.NAUTILUS_SHELL, EnchantmentType.SHIELDING, true, """
+		Gain (Level*20%%) effective Armor
+		when taking damage from an enemy within %s blocks.
+		Taking damage that would stun a shield
+		halves Shielding reduction for %s seconds.""".formatted(Shielding.DISTANCE, StringUtils.ticksToSeconds(Shielding.DISABLE_DURATION))),
+	GUARD(11, Material.SHULKER_SHELL, EnchantmentType.GUARD, true, """
+		Gain (Level*20%%) effective Armor
+		after blocking an attack with a shield.
+		The duration lasts for %ss if blocked
+		from offhand, and %ss from mainhand.""".formatted(
+		StringUtils.ticksToSeconds(Guard.PAST_HIT_DURATION_TIME_OFFHAND), StringUtils.ticksToSeconds(Guard.PAST_HIT_DURATION_TIME_MAINHAND))),
+	TEMPO(15, Material.CLOCK, EnchantmentType.TEMPO, false, """
 		Gain (Level*20%%) effective Agility
 		on the first hit taken after
 		%s seconds of taking no damage.
@@ -63,7 +63,7 @@ enum PSGUISecondaryStat {
 		StringUtils.ticksToSeconds(Tempo.PAST_HIT_DURATION_TIME),
 		StringUtils.ticksToSeconds(Tempo.PAST_HIT_DURATION_TIME_HALF)
 	)),
-	CLOAKED(17, Material.BLACK_DYE, EnchantmentType.CLOAKED, false, """
+	CLOAKED(16, Material.BLACK_DYE, EnchantmentType.CLOAKED, false, """
 		Gain (Level*20%%) effective Agility
 		when there are %s or less enemies within %s blocks.""".formatted(Cloaked.MOB_CAP, Cloaked.RADIUS));
 

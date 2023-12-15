@@ -37,6 +37,7 @@ public class Warlock extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Warlock";
 		mClassColor = TextColor.fromHexString("#F0489E");
+		mClassGlassFiller = Material.MAGENTA_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_HOE;
 		mQuestReq = "Quest13";
 		mQuestReqMin = 1;

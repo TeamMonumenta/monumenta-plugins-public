@@ -37,6 +37,7 @@ public class Warrior extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Warrior";
 		mClassColor = TextColor.fromHexString("#D32818");
+		mClassGlassFiller = Material.RED_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_AXE;
 		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
 		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";

@@ -38,6 +38,7 @@ public class Scout extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Scout";
 		mClassColor = TextColor.fromHexString("#59B4EB");
+		mClassGlassFiller = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
 		mDisplayItem = Material.BOW;
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
 		mClassPassiveDescription = String.format("You gain %d%% of your Projectile Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Projectile Damage.",

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.listeners.IchorListener;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -237,7 +238,39 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
+				new ClassSelectionCustomInventory(player).openInventory((Player) sender, plugin);
+			})
+			.register();
+		new CommandAPICommand("openclassdisplaygui")
+			.withPermission("monumenta.command.openclassdisplaygui")
+			.executesPlayer((player, args) -> {
+				if (!AbilityUtils.getClass(player).equals("No Class")) {
+					new ClassDisplayCustomInventory(player).openInventory(player, plugin);
+				}
+			})
+			.register();
+		new CommandAPICommand("openclassdisplaygui")
+			.withPermission("monumenta.command.openclassdisplaygui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				if (!AbilityUtils.getClass(player).equals("No Class")) {
+					new ClassDisplayCustomInventory(player).openInventory(player, plugin);
+				}
+			})
+			.register();
+		new CommandAPICommand("playerdetails")
+			.withPermission("monumenta.command.playerdetails")
+			.executesPlayer((player, args) -> {
 				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("playerdetails")
+			.withPermission("monumenta.command.playerdetails")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new PlayerDisplayCustomInventory((Player) sender, player).openInventory((Player) sender, plugin);
 			})
 			.register();
 		new CommandAPICommand("openmasterworkgui")

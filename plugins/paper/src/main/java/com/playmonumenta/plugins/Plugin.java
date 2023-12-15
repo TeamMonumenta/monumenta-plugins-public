@@ -255,6 +255,7 @@ public class Plugin extends JavaPlugin {
 		ParticlesCommand.register();
 		PersistentDataCommand.register();
 		PickLevelAfterAnvils.register();
+		PlayerCommand.register(this);
 		PlayerItemStatsGUICommand.register(this);
 		Portal1.register();
 		Portal2.register();

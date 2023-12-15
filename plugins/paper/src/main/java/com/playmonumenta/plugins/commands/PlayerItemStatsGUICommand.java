@@ -27,7 +27,7 @@ public class PlayerItemStatsGUICommand {
 					sender.sendMessage(Component.text("That player does not exist", NamedTextColor.RED));
 					return;
 				}
-				new PlayerItemStatsGUI(sender, otherPlayer).openInventory(sender, plugin);
+				new PlayerItemStatsGUI(sender, otherPlayer, false).openInventory(sender, plugin);
 			}).register();
 
 		new CommandAPICommand("playerstats").withPermission(perms).withAliases("ps")
@@ -39,7 +39,7 @@ public class PlayerItemStatsGUICommand {
 					sender.sendMessage(Component.text("That player does not exist", NamedTextColor.RED));
 					return;
 				}
-				new PlayerItemStatsGUI(player1, player2).openInventory(sender, plugin);
+				new PlayerItemStatsGUI(player1, player2, false).openInventory(sender, plugin);
 			}).register();
 
 	}

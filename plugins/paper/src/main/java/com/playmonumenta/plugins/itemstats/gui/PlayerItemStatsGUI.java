@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Region;
@@ -162,13 +163,19 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private boolean mSelectedRightEquipmentSet;
 	private @Nullable PSGUIEquipment mSelectedEquipmentsSlot = null;
+	private final Player mViewer;
+	private final @Nullable Player mTargetPlayer;
+	private final boolean mFromPDGui;
 
 	public PlayerItemStatsGUI(Player player) {
-		this(player, null);
+		this(player, null, false);
 	}
 
-	public PlayerItemStatsGUI(Player player, @Nullable Player otherPlayer) {
+	public PlayerItemStatsGUI(Player player, @Nullable Player otherPlayer, boolean fromPDGui) {
 		super(player, 54, Component.text("Player Stats Calculator", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		mViewer = player;
+		mTargetPlayer = otherPlayer;
+		mFromPDGui = fromPDGui;
 		mShowVanity = Plugin.getInstance().mVanityManager.getData(player).mGuiVanityEnabled;
 		mLeftStats = new PSGUIStats(player, null, mSettings);
 		mRightStats = new PSGUIStats(player, mLeftStats, mSettings);
@@ -283,6 +290,15 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				mRightStats.mPlayerItemStats.setRegion(region);
 				generateInventory();
 				return;
+			}
+
+			if (slot == 0 && mFromPDGui) {
+				mInventory.close();
+				if (mTargetPlayer == null) {
+					new PlayerDisplayCustomInventory(mViewer, mViewer).openInventory(mViewer, Plugin.getInstance());
+				} else {
+					new PlayerDisplayCustomInventory(mViewer, mTargetPlayer).openInventory(mViewer, Plugin.getInstance());
+				}
 			}
 
 			for (PSGUISecondaryStat stat : PSGUISecondaryStat.values()) {
@@ -536,6 +552,12 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			ItemStack rightItem = mRightStats.mDisplayedEquipment.get(equipment);
 			mInventory.setItem(equipment.mRightSlot, rightItem != null && rightItem.getType() != Material.AIR ? rightItem
 				                                         : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
+		}
+
+		if (mFromPDGui) {
+			ItemStack backItem = GUIUtils.createBasicItem(Material.ARROW, "Back to Player Display GUI", NamedTextColor.GRAY, true,
+				"", NamedTextColor.WHITE);
+			mInventory.setItem(0, backItem);
 		}
 
 		GUIUtils.fillWithFiller(mInventory);

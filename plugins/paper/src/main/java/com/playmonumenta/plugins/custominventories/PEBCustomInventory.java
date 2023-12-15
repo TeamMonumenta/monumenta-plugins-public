@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
@@ -37,7 +38,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 public class PEBCustomInventory extends CustomInventory {
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 
-	private enum PebPage {
+	public enum PebPage {
 		COMMON,
 		MAIN,
 		PLAYER_INFO,
@@ -199,7 +200,10 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.PLAYER_HEAD, false),
 			new PebItem(20, "Class",
 				"Click to view your class and skills.", NamedTextColor.LIGHT_PURPLE,
-				Material.STONE_SWORD, true).playerCommand("clickable peb_class"),
+				Material.STONE_SWORD, true).action((peb, event) -> {
+				peb.mInventory.close();
+				new ClassDisplayCustomInventory(peb.mPlayer).openInventory(peb.mPlayer, Plugin.getInstance());
+			}),
 			new PebItem(22, "Dailies",
 				"Click to see what daily content you have and haven't done today.", NamedTextColor.LIGHT_PURPLE,
 				Material.ACACIA_BOAT, true).playerCommand("clickable peb_dailies"),
@@ -904,10 +908,14 @@ public class PEBCustomInventory extends CustomInventory {
 
 
 	public PEBCustomInventory(Player player) {
+		this(player, PebPage.MAIN);
+	}
+
+	public PEBCustomInventory(Player player, PebPage page) {
 		super(player, 54, player.getName() + "'s P.E.B");
 
 		mPlayer = player;
-		mCurrentPage = PebPage.MAIN;
+		mCurrentPage = page;
 
 		setLayout(mCurrentPage);
 	}
