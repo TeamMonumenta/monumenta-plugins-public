@@ -9,9 +9,9 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,6 +51,19 @@ public class Excavator implements Enchantment {
 		Block block = event.getBlock();
 		if (mIgnoredMats.contains(block.getType())) {
 			return;
+		}
+
+		int currentTick = Bukkit.getCurrentTick();
+		if (mLastUpdateTick != currentTick) {
+			mLastUpdateTick = currentTick;
+			mAlreadyBrokenLocations.clear();
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				if (mLastUpdateTick == currentTick) {
+					// This event did not run again the next tick;
+					// clear Location list to avoid keeping chunks/worlds loaded
+					mAlreadyBrokenLocations.clear();
+				}
+			}, 1L);
 		}
 
 		if (mAlreadyBrokenLocations.contains(block.getLocation())) {
@@ -93,7 +106,6 @@ public class Excavator implements Enchantment {
 				player.sendMessage("Block face was Non-Cartesian.");
 				break;
 		}
-		mAlreadyBrokenLocations.clear();
 	}
 
 	private void breakBlock(Player player, ItemStack mainHand, Block block, int x, int y, int z) {
@@ -115,19 +127,27 @@ public class Excavator implements Enchantment {
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 		Material.AIR,
+		Material.CAVE_AIR,
+		Material.VOID_AIR,
+		Material.STRUCTURE_VOID,
+		Material.LIGHT,
+		Material.MOVING_PISTON,
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.REPEATING_COMMAND_BLOCK,
+		Material.STRUCTURE_BLOCK,
 		Material.BEDROCK,
 		Material.BARRIER,
 		Material.SPAWNER,
 		Material.CHEST,
 		Material.TRAPPED_CHEST,
+		Material.BARREL,
 		Material.WATER,
 		Material.LAVA
 	);
 
-	private List<Location> mAlreadyBrokenLocations = new ArrayList<>();
+	private int mLastUpdateTick = Integer.MIN_VALUE;
+	private final Set<Location> mAlreadyBrokenLocations = new HashSet<>();
 
 	private boolean canBreakBlock(Block block, Player player) {
 		if (block.isLiquid() || block.isEmpty()) {
@@ -137,7 +157,7 @@ public class Excavator implements Enchantment {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		mainHand = mainHand.clone();
 		mainHand.addEnchantment(org.bukkit.enchantments.Enchantment.SILK_TOUCH, 1);
-		if (block.getDrops(mainHand).size() == 0) {
+		if (block.getDrops(mainHand).isEmpty()) {
 			return false;
 		}
 
