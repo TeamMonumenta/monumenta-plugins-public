@@ -231,6 +231,11 @@ public class DelveCustomInventory extends CustomInventory {
 			if (mDungeonName.startsWith("portal") || mDungeonName.startsWith("ruin")) {
 				mods.remove(DelvesModifier.FRAGILE);
 			}
+			if (mDungeonName.startsWith("depths") || mDungeonName.startsWith("zenith")) {
+				mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+				mods.remove(DelvesModifier.ENTROPY);
+				mods.remove(DelvesModifier.TWISTED);
+			}
 		}
 		return mods;
 	}

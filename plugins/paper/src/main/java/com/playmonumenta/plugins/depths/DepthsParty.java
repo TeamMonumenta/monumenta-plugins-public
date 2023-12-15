@@ -434,11 +434,11 @@ public class DepthsParty {
 							totalPoints += DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS_AMOUNT;
 						}
 					}
+					DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints, mDelveModifiers, false);
 					if (mAscension >= 13) {
 						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints, mDelveModifiers, true);
-					} else {
-						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints, mDelveModifiers, false);
 					}
+
 				}
 			} catch (Exception e) {
 				MMLog.warning("Null depths party member");

@@ -306,7 +306,6 @@ public class DelvesUtils {
 			List<DelvesModifier> mods = DelvesModifier.valuesList();
 			mods.remove(DelvesModifier.ENTROPY);
 			mods.remove(DelvesModifier.TWISTED);
-			mods.remove(DelvesModifier.FRAGILE);
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 
 			while (pointsToAssign > 0) {

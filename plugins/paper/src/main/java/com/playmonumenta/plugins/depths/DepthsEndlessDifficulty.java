@@ -51,7 +51,6 @@ public class DepthsEndlessDifficulty {
 		//TODO make twisted and entropy, etc. simply not appear in depths and depths2 shards
 		//Assign twisted and entropy if they are on the last floor
 		if (twisted) {
-			DelvesUtils.setDelvePoint(null, playerToUse, shard, DelvesModifier.ENTROPY, 5);
 			DelvesUtils.setDelvePoint(null, playerToUse, shard, DelvesModifier.TWISTED, 5);
 		} else {
 			//Assign random points to that player on top of what they currently have

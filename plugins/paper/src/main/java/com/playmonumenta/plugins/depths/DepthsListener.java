@@ -148,7 +148,7 @@ public class DepthsListener implements Listener {
 			.mapToDouble(Enlightenment::getXPMultiplier)
 			.max().orElse(1);
 
-		if (party.mEndlessMode) {
+		if (party.mEndlessMode || party.getAscension() > 0) {
 			xpFactor *= 0.5;
 		}
 
@@ -450,7 +450,7 @@ public class DepthsListener implements Listener {
 					dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 					dp.sendMessage("You reached room " + party.mRoomNumber + "!");
 
-					if (!party.mEndlessMode) {
+					if (!party.mEndlessMode && party.mAscension == 0) {
 						event.setKeepLevel(false);
 						event.setDroppedExp(0);
 						int keptXp = (int) (0.5 * ExperienceUtils.getTotalExperience(player));
