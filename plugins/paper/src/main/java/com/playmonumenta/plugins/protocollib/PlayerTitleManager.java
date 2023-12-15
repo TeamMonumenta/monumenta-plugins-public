@@ -101,7 +101,7 @@ public class PlayerTitleManager {
 			PlayerMetadata metadata = METADATA.get(player.getUniqueId());
 
 			// If the player became invalid (died, maybe more), logged out (despite being online?), or became spectator/vanished remove all titles
-			if (!player.isValid() || !player.isOnline() || PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
+			if (player.isDead() || !player.isOnline() || PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 				if (metadata != null) {
 					METADATA.remove(player.getUniqueId());
 					destroyEntities(metadata);

@@ -388,7 +388,7 @@ public class PlayerUtils {
 	}
 
 	public static boolean checkPlayer(Player player) {
-		return player.isValid() && player.getGameMode() != GameMode.SPECTATOR;
+		return player.isOnline() && !player.isDead() && player.getGameMode() != GameMode.SPECTATOR;
 	}
 
 	/*

@@ -102,7 +102,8 @@ public abstract class BaseElementalSpirit extends Ability {
 				@Override
 				public void run() {
 					if (isOnCooldown()
-						    || !mPlayer.isValid() // Ensure player is not dead, is still online?
+						    || !mPlayer.isOnline()
+							|| mPlayer.isDead()
 						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;

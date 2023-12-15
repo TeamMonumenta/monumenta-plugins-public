@@ -167,7 +167,7 @@ public class ParrotManager implements Listener {
 					for (int i = 0; i < 10 && mPlayers.hasNext(); i++) {
 						Player player = mPlayers.next();
 						// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
-						if (player.isValid() && !player.isFlying() && !PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
+						if (player.isOnline() && !player.isDead() && !player.isFlying() && !PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 							respawnParrots(player);
 						}
 					}

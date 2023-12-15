@@ -166,7 +166,7 @@ public class PassGui extends Gui {
 			.onClick((InventoryClickEvent event) -> {
 				if (mIsModerator
 					&& event.getClick().equals(ClickType.SWAP_OFFHAND)) {
-					if (!displayedPlayer.isValid()) {
+					if (!displayedPlayer.isOnline() || displayedPlayer.isDead()) {
 						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						mPlayer.sendMessage(Component.text("That player is no longer online.",
 							NamedTextColor.RED));

@@ -89,7 +89,7 @@ public class ItemStatUtils {
 			return;
 		}
 
-		if (player.isDead() || !player.isValid()) {
+		if (player.isDead() || !player.isOnline()) {
 			return;
 		}
 

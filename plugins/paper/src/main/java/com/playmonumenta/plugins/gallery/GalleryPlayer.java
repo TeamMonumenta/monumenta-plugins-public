@@ -6,7 +6,11 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -172,7 +176,7 @@ public class GalleryPlayer {
 					Location loc = game.getSpawnLocation();
 					Player player = getPlayer();
 					if (loc != null) {
-						if (player != null && player.isOnline() && player.isValid()) {
+						if (player != null && player.isOnline() && !player.isDead()) {
 							player.teleport(loc);
 						} else {
 							GalleryUtils.printDebugMessage("Somehow teleporting a player== null? or an invalid player!");

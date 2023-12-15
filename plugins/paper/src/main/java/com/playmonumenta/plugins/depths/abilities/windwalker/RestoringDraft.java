@@ -80,7 +80,8 @@ public final class RestoringDraft extends DepthsAbility {
 		}
 		if (
 			DepthsManager.getInstance().getPlayerLevelInAbility(ABILITY_NAME, player) == 0
-				|| !player.isValid() // Ensure player is not dead, is still online?
+				|| player.isDead()
+				|| !player.isOnline()
 		) {
 			// If reached this point but not silenced, then proceed with cancelling
 			// If silenced, only return to not run anything, but don't cancel runnable

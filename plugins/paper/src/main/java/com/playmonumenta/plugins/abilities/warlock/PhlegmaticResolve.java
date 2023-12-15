@@ -117,7 +117,7 @@ public class PhlegmaticResolve extends Ability {
 				}
 
 				// If player has died, reset the array
-				if (mPlayer.isDead() || !mPlayer.isValid()) {
+				if (mPlayer.isDead() || !mPlayer.isOnline()) {
 					mEnhancementDamageSpread[0] = 0;
 					mEnhancementDamageSpread[1] = 0;
 					mEnhancementDamageSpread[2] = 0;

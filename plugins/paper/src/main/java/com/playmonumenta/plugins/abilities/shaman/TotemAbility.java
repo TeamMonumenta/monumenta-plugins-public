@@ -183,7 +183,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				}
 
 				if (((mWhirlwindBuffPercent != 0 && mT >= duration * mWhirlwindBuffPercent) || (mWhirlwindBuffPercent == 0 && mT >= duration))
-					|| mPlayer.isDead() || !mPlayer.isValid()
+					|| mPlayer.isDead() || !mPlayer.isOnline()
 					|| !mPlayer.getWorld().equals(standLocation.getWorld())) {
 					mWhirlwindBuffPercent = 0;
 					mDecayedBuffed = false;

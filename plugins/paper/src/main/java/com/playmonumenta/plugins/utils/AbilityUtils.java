@@ -99,7 +99,7 @@ public class AbilityUtils {
 						Entry<Player, Integer> entry = iter.next();
 
 						Player player = entry.getKey();
-						if (!player.isValid() || player.isDead() || !player.isOnline()) {
+						if (player.isDead() || !player.isOnline()) {
 							iter.remove();
 							continue;
 						}

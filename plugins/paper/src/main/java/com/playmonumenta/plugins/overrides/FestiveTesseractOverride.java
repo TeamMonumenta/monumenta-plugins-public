@@ -150,7 +150,7 @@ public class FestiveTesseractOverride extends BaseOverride implements Listener {
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			PLAYERS_ON_COOLDOWN.remove(player.getUniqueId());
 
-			if (player.isOnline() && player.isValid()) {
+			if (player.isOnline() && !player.isDead()) {
 				MessagingUtils.sendActionBarMessage(player, "Your Tesseract of Festivity is off cooldown");
 			}
 		}, COOLDOWN);

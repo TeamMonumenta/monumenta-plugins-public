@@ -54,7 +54,7 @@ public class ClaimRaffle {
 					}
 				}
 
-				if (!player.isOnline() || !player.isValid()) {
+				if (!player.isOnline() || player.isDead()) {
 					// Silently abort, the player left
 					return;
 				}
@@ -83,7 +83,7 @@ public class ClaimRaffle {
 							return;
 						}
 
-						if (resultRemaining < 0 || !player.isOnline() || !player.isValid()) {
+						if (resultRemaining < 0 || !player.isOnline() || player.isDead()) {
 							// This can happen if you try to claim the rewards twice at the same time - need to abort this attempt and re-add the values
 							if (player.isOnline()) {
 								MessagingUtils.sendError(player, "Got negative remaining raffle rewards after redeeming - be patient and only try once at a time.");

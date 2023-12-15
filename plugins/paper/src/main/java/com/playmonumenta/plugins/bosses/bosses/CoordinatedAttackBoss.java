@@ -61,8 +61,8 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 			public void run() {
 				LivingEntity target = ((Mob) boss).getTarget();
 
-				if (target instanceof Player mTarget) {
-					if (mTarget.isDead() || !mTarget.isValid() || !mTarget.isOnline()) {
+				if (target instanceof Player playerTarget) {
+					if (playerTarget.isDead() || !playerTarget.isOnline()) {
 						return;
 					}
 
@@ -86,7 +86,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 					int i = 0;
 					for (LivingEntity le : mobs) {
-						if (le instanceof Mob mob && mob.hasLineOfSight(mTarget) && !AbilityUtils.isStealthed(mTarget)) {
+						if (le instanceof Mob mob && mob.hasLineOfSight(playerTarget) && !AbilityUtils.isStealthed(playerTarget)) {
 							Set<String> tags = mob.getScoreboardTags();
 							if (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG) && !EntityUtils.isBoss(mob)) {
 								PotionUtils.applyColoredGlowing(identityTag, mob, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.WINDUP);
@@ -98,9 +98,9 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 								new BukkitRunnable() {
 									@Override
 									public void run() {
-										Location locTarget = mTarget.getLocation();
+										Location locTarget = playerTarget.getLocation();
 
-										mob.setTarget(mTarget);
+										mob.setTarget(playerTarget);
 										Location loc = mob.getLocation();
 										double distance = loc.distance(locTarget);
 										Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19 * p.DISTANCE_SCALAR);

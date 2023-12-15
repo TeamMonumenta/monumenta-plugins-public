@@ -42,7 +42,8 @@ public class BroomstickSlowFalling extends ZeroArgumentEffect {
 			mTask = new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (!player.isValid()
+					if (player.isDead()
+							|| !player.isOnline()
 						    || player.getHealth() <= 0
 						    || getDuration() <= 0) {
 						cancel();

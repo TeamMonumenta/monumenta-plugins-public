@@ -402,7 +402,7 @@ public class PlayerListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (!player.isValid() || !player.isOnline()) {
+					if (player.isDead() || !player.isOnline()) {
 						this.cancel();
 						return;
 					}
@@ -1141,7 +1141,7 @@ public class PlayerListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (!player.isRiptiding() || !player.isOnline() || !player.isValid()) {
+					if (!player.isRiptiding() || !player.isOnline() || player.isDead()) {
 						this.cancel();
 						return;
 					}
@@ -1351,7 +1351,7 @@ public class PlayerListener implements Listener {
 								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 1.0f, 1.3f);
 
 								this.cancel();
-							} else if (!player.isSleeping() || !player.isOnline() || !player.isValid()) {
+							} else if (!player.isSleeping() || !player.isOnline() || player.isDead()) {
 								// Abort, player got out of bed early
 								this.cancel();
 								return;

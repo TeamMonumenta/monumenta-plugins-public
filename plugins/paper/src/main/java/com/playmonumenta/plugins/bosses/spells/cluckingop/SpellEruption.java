@@ -67,7 +67,7 @@ public class SpellEruption extends Spell {
 									@Override
 									public void run() {
 										new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 1, 0, 0, 0, 0.05).spawnAsEntityActive(mBoss);
-										if (PlayerUtils.isOnGround(player) || player.isDead() || !player.isValid() || !player.isOnline()) {
+										if (PlayerUtils.isOnGround(player) || player.isDead() || !player.isOnline()) {
 											this.cancel();
 											new BukkitRunnable() {
 

@@ -174,7 +174,7 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 
 				mCosmetic.shadesTickEffect(mPlugin, world, mPlayer, bLoc, mAoeRadius, mT);
 
-				if (mT >= mMaxDuration || mPlayer.isDead() || !mPlayer.isValid()) {
+				if (mT >= mMaxDuration || mPlayer.isDead() || !mPlayer.isOnline()) {
 					stand.remove();
 					mCosmetic.shadesEndEffect(world, mPlayer, bLoc, mAoeRadius);
 					this.cancel();

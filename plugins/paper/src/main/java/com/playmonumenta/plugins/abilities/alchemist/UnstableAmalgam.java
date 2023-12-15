@@ -329,7 +329,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 					}
 				}
 
-				if (mobs.isEmpty() || mTimes >= duration || !mPlayer.isValid()) {
+				if (mobs.isEmpty() || mTimes >= duration || !mPlayer.isOnline() || mPlayer.isDead()) {
 					mobs.clear();
 					cancel();
 				}

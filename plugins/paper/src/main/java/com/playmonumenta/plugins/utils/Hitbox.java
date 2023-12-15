@@ -452,7 +452,8 @@ public abstract class Hitbox {
 			       .filter(player -> player.getGameMode() != GameMode.SPECTATOR
 				                         && player != exclude
 				                         && player.getHealth() > 0
-				                         && player.isValid()
+										 && !player.isDead()
+				                         && player.isOnline()
 				                         && (includeNonTargetable || !AbilityUtils.isStealthed(player))
 				                         && intersects(player.getBoundingBox()))
 			       .collect(Collectors.toCollection(ArrayList::new));
