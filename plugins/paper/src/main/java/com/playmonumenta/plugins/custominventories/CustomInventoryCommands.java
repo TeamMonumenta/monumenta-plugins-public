@@ -238,7 +238,11 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				new ClassSelectionCustomInventory(player).openInventory((Player) sender, plugin);
+				Player viewer = player;
+				if (sender instanceof Player playerSender) {
+					viewer = playerSender;
+				}
+				new ClassSelectionCustomInventory(player).openInventory(viewer, plugin);
 			})
 			.register();
 		new CommandAPICommand("openclassdisplaygui")
@@ -270,7 +274,11 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				new PlayerDisplayCustomInventory((Player) sender, player).openInventory((Player) sender, plugin);
+				Player viewer = player;
+				if (sender instanceof Player playerSender) {
+					viewer = playerSender;
+				}
+				new PlayerDisplayCustomInventory(viewer, player).openInventory(viewer, plugin);
 			})
 			.register();
 		new CommandAPICommand("openmasterworkgui")
