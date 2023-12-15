@@ -14,6 +14,7 @@ import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -231,7 +232,7 @@ public class CustomContainerItemManager implements Listener {
 				return;
 			}
 
-			List<ItemStack> itemStacks = list.toListCopy().stream().map(t -> Objects.requireNonNull(NBT.itemStackFromNBT(t))).toList();
+			List<ItemStack> itemStacks = new ArrayList<>(list.toListCopy().stream().map(t -> Objects.requireNonNull(NBT.itemStackFromNBT(t))).toList());
 			for (ItemStack item : itemStacks) {
 				NBT.modify(item, ItemStatUtils::removePlayerModified);
 			}
@@ -244,6 +245,7 @@ public class CustomContainerItemManager implements Listener {
 						ReadWriteNBT playerModified2 = ItemStatUtils.addPlayerModified(Objects.requireNonNull(list.get(j).getCompound("tag")));
 						playerModified1.setLong(AMOUNT_KEY, playerModified1.getLong(AMOUNT_KEY) + playerModified2.getLong(AMOUNT_KEY));
 						list.remove(j);
+						itemStacks.remove(j);
 						j--;
 					}
 				}
