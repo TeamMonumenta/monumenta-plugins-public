@@ -316,7 +316,9 @@ public class AbilityTrigger {
 				trigger.mLookDirections.add(LookDirection.valueOf(lookDirection.getAsString()));
 			}
 			trigger.mDoubleClick = json.get("doubleClick").getAsBoolean();
-			trigger.mFallThrough = json.get("fallThrough").getAsBoolean();
+			if (json.has("fallThrough")) {
+				trigger.mFallThrough = json.get("fallThrough").getAsBoolean();
+			}
 			return trigger;
 		} catch (NullPointerException | IllegalArgumentException | ClassCastException | IllegalStateException e) {
 			// Missing or invalid value: ignore the custom trigger and reset to default.
