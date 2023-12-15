@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellLacerate;
@@ -123,8 +124,11 @@ public class LacerateBoss extends BossAbilityGroup {
 		@BossParam(help = "background sound of the flurries. does not increment")
 		public SoundsList SOUND_FLURRY_BACKGROUND = SoundsList.fromString("[(ITEM_TRIDENT_HIT, 1.1, 0.75),(ITEM_TRIDENT_RETURN, 1.1, 1.25)]");
 
-		@BossParam(help = "Particles used in telegraph")
-		public Particle TELEGRAPH_CIRCLE = Particle.ELECTRIC_SPARK;
+		@BossParam(help = "Particles used in telegraph beam")
+		public ParticlesList TELEGRAPH_BEAM = ParticlesList.fromString("[(ELECTRIC_SPARK)]");
+
+		@BossParam(help = "Particles used in telegraph circle")
+		public ParticlesList TELEGRAPH_CIRCLE = ParticlesList.fromString("[(ELECTRIC_SPARK)]");
 
 		@BossParam(help = "Particles used when hit")
 		public Particle ON_HIT_PARTICLE = Particle.WAX_OFF;

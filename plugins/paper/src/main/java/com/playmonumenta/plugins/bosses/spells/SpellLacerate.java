@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.bosses.LacerateBoss;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -30,10 +31,13 @@ public class SpellLacerate extends Spell {
 	public void run() {
 		for (LivingEntity target : mParameters.TARGETS.getTargetsList(mLauncher)) {
 			mParameters.SOUND_WARNING.play(target.getLocation());
-			new PPLine(mParameters.TELEGRAPH_CIRCLE, mLauncher.getEyeLocation(), target.getLocation())
-				.delta(0.4, 0.4, 0.4)
-				.countPerMeter(20)
-				.spawnAsEntityActive(mLauncher);
+			for (ParticlesList.CParticle particle : mParameters.TELEGRAPH_BEAM.getParticleList()) {
+				new PPLine(particle.mParticle, mLauncher.getEyeLocation(), target.getLocation())
+					.delta(0.4, 0.4, 0.4)
+					.data(particle.mExtra2)
+					.countPerMeter(20)
+					.spawnAsEntityActive(mLauncher);
+			}
 			performFlurry(target);
 		}
 	}
@@ -74,10 +78,14 @@ public class SpellLacerate extends Spell {
 		if (ticks <= (mParameters.TELEGRAPH_DURATION - 5)) {
 			mParameters.SOUND_CHARGE_BOSS.play(loc);
 			if (ticks % 2 == 0) {
-				new PPCircle(mParameters.TELEGRAPH_CIRCLE, loc, mParameters.RADIUS)
-					.count(20)
-					.delta(0.02, 0.08, 0.02)
-					.spawnAsEntityActive(mLauncher);
+				for (ParticlesList.CParticle particle : mParameters.TELEGRAPH_CIRCLE.getParticleList()) {
+					new PPCircle(particle.mParticle, loc, mParameters.RADIUS)
+						.count(20)
+						.randomizeAngle(true)
+						.data(particle.mExtra2)
+						.delta(0.02, 0.08, 0.02)
+						.spawnAsEntityActive(mLauncher);
+				}
 			}
 		}
 	}
