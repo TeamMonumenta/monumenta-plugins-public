@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.effects.FirstStrikeCooldown;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -27,6 +28,7 @@ public class FirstStrike implements Enchantment {
 	private static final int DURATION = 10000 * 20;
 	private static final String SOURCE = "FirstStrikeDisable";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
+	public static final String CHARM_DAMAGE = "First Strike Damage";
 
 	@Override
 	public String getName() {
@@ -59,7 +61,7 @@ public class FirstStrike implements Enchantment {
 				if (type == DamageType.PROJECTILE) {
 					bonus *= PROJ_REDUCTION;
 				}
-				double damage = event.getDamage() * (1 + bonus);
+				double damage = event.getDamage() * (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, bonus));
 				event.setDamage(damage);
 
 				double widthDelta = PartialParticle.getWidthDelta(enemy);
