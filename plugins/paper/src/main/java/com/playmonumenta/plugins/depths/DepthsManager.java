@@ -1780,22 +1780,22 @@ public class DepthsManager {
 				break;
 			case 2:
 				DepthsTree chosenTree = dp.mEligibleTrees.get(mRandom.nextInt(dp.mEligibleTrees.size()));
+				boolean removed = false;
 				for (DepthsAbilityInfo<?> da : getAbilities()) {
 					String name = da.getDisplayName();
 					DepthsTree tree = da.getDepthsTree();
 					if (name == null || tree == null) {
 						continue;
 					}
-					boolean removed = false;
 					if (tree.equals(chosenTree) && getPlayerLevelInAbility(name, player) > 0) {
 						dp.sendMessage(Component.text("Removed ability: ").append(da.getNameWithHover(player)));
 						setPlayerLevelInAbility(name, player, 0);
 						validateOfferings(dp, name);
 						removed = true;
 					}
-					if (!removed) {
-						dp.sendMessage(Component.text("You would have lost all of your ").append(tree.getNameComponent()).append(Component.text(" abilities, but you had none.")));
-					}
+				}
+				if (!removed) {
+					dp.sendMessage(Component.text("You would have lost all of your ").append(chosenTree.getNameComponent()).append(Component.text(" abilities, but you had none.")));
 				}
 
 				break;
