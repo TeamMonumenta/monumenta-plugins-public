@@ -87,18 +87,18 @@ public class Flamestrike extends DepthsAbility {
 		new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
-			double mRadius = 0;
+			double mTempRadius = 0;
 
 			@Override
 			public void run() {
-				if (mRadius == 0) {
+				if (mTempRadius == 0) {
 					mLoc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
 				}
 				Vector vec;
-				mRadius += 1.25;
+				mTempRadius += 1.25;
 				for (double degree = 30; degree <= 150; degree += 10) {
 					double radian1 = Math.toRadians(degree);
-					vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.125, FastUtils.sin(radian1) * mRadius);
+					vec = new Vector(FastUtils.cos(radian1) * mTempRadius, 0.125, FastUtils.sin(radian1) * mTempRadius);
 					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
@@ -107,7 +107,7 @@ public class Flamestrike extends DepthsAbility {
 					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).spawnAsPlayerActive(mPlayer);
 				}
 
-				if (mRadius >= mRadius + 1) {
+				if (mTempRadius >= mRadius + 1 || !mPlayer.isOnline()) {
 					this.cancel();
 				}
 			}
