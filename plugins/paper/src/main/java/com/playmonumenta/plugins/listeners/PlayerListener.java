@@ -48,6 +48,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
+import com.playmonumenta.redissync.event.PlayerTransferFailEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import de.tr7zw.nbtapi.NBTEntity;
 import java.util.ArrayList;
@@ -173,6 +175,7 @@ public class PlayerListener implements Listener {
 
 	private final Plugin mPlugin;
 	private @Nullable BukkitTask mContentRunnable = null;
+	private final Set<UUID> mTransferringPlayers = new HashSet();
 
 	public PlayerListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -1750,5 +1753,24 @@ public class PlayerListener implements Listener {
 				AbsorptionUtils.addAbsorption(player, 8, 8, 5 * 20);
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
+		mTransferringPlayers.add(event.getPlayer().getUniqueId());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+	public void playerTransferFailEvent(PlayerTransferFailEvent event) {
+		mTransferringPlayers.remove(event.getPlayer().getUniqueId());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+	public void playerFinishedTransferring(PlayerQuitEvent event) {
+		mTransferringPlayers.remove(event.getPlayer().getUniqueId());
+	}
+
+	public boolean isPlayerTransferring(Player player) {
+		return mTransferringPlayers.contains(player.getUniqueId());
 	}
 }

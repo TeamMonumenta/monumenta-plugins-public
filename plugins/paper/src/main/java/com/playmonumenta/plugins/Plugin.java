@@ -168,6 +168,7 @@ public class Plugin extends JavaPlugin {
 	public LoadoutManager mLoadoutManager;
 	public PzeroManager mPzeroManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
+	public PlayerListener mPlayerListener;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -378,6 +379,7 @@ public class Plugin extends JavaPlugin {
 		mLoadoutManager = new LoadoutManager();
 		mPzeroManager = new PzeroManager();
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
+		mPlayerListener = new PlayerListener(this);
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
@@ -427,7 +429,7 @@ public class Plugin extends JavaPlugin {
 		}
 		manager.registerEvents(new AnimalLimits(), this);
 		manager.registerEvents(new ExceptionListener(this), this);
-		manager.registerEvents(new PlayerListener(this), this);
+		manager.registerEvents(mPlayerListener, this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);

@@ -14,12 +14,16 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Charity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.ColorSplash;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
+import com.playmonumenta.plugins.depths.bosses.Broodmother;
+import com.playmonumenta.plugins.depths.bosses.Callicarpa;
+import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -65,6 +69,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -76,6 +81,8 @@ public class DepthsListener implements Listener {
 	public static final String GRAVE_TAG = "DepthsGrave";
 	private static final int GRAVE_DURATION = 20 * 20;
 	private static final int ASCENSION_GRAVE_DURATION_DECREASE = 5 * 20;
+	private static final int GRAVE_REVIVE_DURATION = 3 * 20;
+	private static final int DISCONNECT_ANTICHEESE_RADIUS = 6;
 
 	public DepthsListener() {
 	}
@@ -221,6 +228,16 @@ public class DepthsListener implements Listener {
 		}
 	}
 
+	public int getGraveDuration(DepthsParty party, DepthsPlayer dp, boolean allowPermadeath) {
+		int baseGraveDuration = party.getAscension() < DepthsEndlessDifficulty.ASCENSION_REVIVE_TIME ? GRAVE_DURATION : GRAVE_DURATION - ASCENSION_GRAVE_DURATION_DECREASE;
+		int duration = baseGraveDuration - (int) (Math.sqrt(dp.mNumDeaths) * 7 * 20);
+
+		if (allowPermadeath) {
+			return Math.max(1, duration);
+		}
+		return Math.max(61, duration);
+	}
+
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		DepthsManager dm = DepthsManager.getInstance();
@@ -271,12 +288,9 @@ public class DepthsListener implements Listener {
 					}
 
 					Location deathLocation = player.getLocation();
-					int baseGraveDuration = party.getAscension() < DepthsEndlessDifficulty.ASCENSION_REVIVE_TIME ? GRAVE_DURATION : GRAVE_DURATION - ASCENSION_GRAVE_DURATION_DECREASE;
-					int graveDuration = Math.max(61, baseGraveDuration - (int) (Math.sqrt(dp.mNumDeaths) * 7 * 20));
 					dp.mNumDeaths++;
-
-					int graveReviveDuration = 3 * 20;
-					if (graveDuration > graveReviveDuration) {
+					int graveDuration = getGraveDuration(party, dp, false);
+					if (graveDuration > GRAVE_REVIVE_DURATION) {
 						Location waitingRoomLocation = party.mDeathWaitingRoomPoint.toLocation(player.getWorld());
 						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(waitingRoomLocation));
 						MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED),
@@ -370,12 +384,12 @@ public class DepthsListener implements Listener {
 									}
 									if (dp.mReviveTicks > 3 && mReviveBar == null) {
 										mReviveBar = BossBar.bossBar(Component.text("Reviving " + player.getName(), NamedTextColor.GREEN),
-											1f * (int) dp.mReviveTicks / graveReviveDuration, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, Set.of());
+											1f * (int) dp.mReviveTicks / GRAVE_REVIVE_DURATION, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, Set.of());
 										for (Player p : player.getWorld().getPlayers()) {
 											p.showBossBar(mReviveBar);
 										}
 									}
-									if (dp.mReviveTicks >= graveReviveDuration) {
+									if (dp.mReviveTicks >= GRAVE_REVIVE_DURATION) {
 										// Successfully revived the player
 										Plugin.getInstance().mEffectManager.addEffect(player, "ZenithReviveResistance", new PercentDamageReceived(20, -100));
 										player.teleport(grave.getLocation());
@@ -411,7 +425,7 @@ public class DepthsListener implements Listener {
 								graveBar.name(titleName);
 								grave.customName(titleName);
 								if (mReviveBar != null) {
-									mReviveBar.progress(1f * (int) dp.mReviveTicks / graveReviveDuration);
+									mReviveBar.progress(1f * (int) dp.mReviveTicks / GRAVE_REVIVE_DURATION);
 								}
 
 								if (oldRemaining > 0.66 && remaining <= 0.66) {
@@ -440,7 +454,7 @@ public class DepthsListener implements Listener {
 					} else {
 						// died too often: immediately send to loot room
 						dp.sendMessage("You have died too often and have been sent directly to the loot room!");
-						sendPlayerToLootRoom(player, true);
+						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> sendPlayerToLootRoom(player, true));
 					}
 				} else {
 					// else send to loot room on death
@@ -459,6 +473,37 @@ public class DepthsListener implements Listener {
 						event.setNewExp(keptXp - ExperienceUtils.getTotalExperience(keptLevel));
 					}
 				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+		DepthsManager dm = DepthsManager.getInstance();
+		DepthsPlayer dp = dm.getDepthsPlayer(player);
+
+		if (
+			dp != null &&
+			!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
+			event.getReason() == PlayerQuitEvent.QuitReason.DISCONNECTED
+		) {
+			if (dp.getContent() == DepthsContent.DARKEST_DEPTHS) {
+				return;
+			}
+
+			// Check if in active bossfight
+			List<String> applicableBossTags = List.of(Callicarpa.identityTag, Broodmother.identityTag, Vesperidys.identityTag);
+			boolean nearZenithBoss = new Hitbox.SphereHitbox(player.getLocation(), 150).getHitMobs().stream()
+				.anyMatch(living -> {
+					Set<String> scoreboardTags = living.getScoreboardTags();
+					return applicableBossTags.stream().anyMatch(scoreboardTags::contains);
+				});
+
+			if (nearZenithBoss) {
+				dp.mNumDeaths += 2;
+			} else if (EntityUtils.getNearestHostile(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null) {
+				dp.mNumDeaths++;
 			}
 		}
 	}
@@ -551,15 +596,23 @@ public class DepthsListener implements Listener {
 		DepthsManager manager = DepthsManager.getInstance();
 		DepthsPlayer dp = manager.getDepthsPlayer(player);
 		if (dp != null) {
+			boolean shouldOfflineTeleport = true;
 			DepthsParty party = manager.getPartyFromId(dp);
 			if (party != null) {
 				Map<DelvesModifier, Integer> delvePointsForParty = party.mDelveModifiers;
 				for (DelvesModifier m : DelvesModifier.values()) {
 					DelvesUtils.setDelvePoint(null, player, ServerProperties.getShardName(), m, delvePointsForParty.getOrDefault(m, 0));
-
+				}
+				// Check if the player should be dead due to too many logout cheese penalties
+				if (getGraveDuration(party, dp, true) < GRAVE_REVIVE_DURATION) {
+					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
+					sendPlayerToLootRoom(player, true);
+					shouldOfflineTeleport = false;
 				}
 			}
-			dp.doOfflineTeleport();
+			if (shouldOfflineTeleport) {
+				dp.doOfflineTeleport();
+			}
 		}
 	}
 }
