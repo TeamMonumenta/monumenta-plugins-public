@@ -10,6 +10,9 @@ import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -78,6 +81,8 @@ public class ThornIvy extends Spell {
 			// This is used to increase the speed as time goes on. Add a certain portion that allows the attack to
 			// reach max speed within DURATION - MAX_ROTATION_SPEED_TICKS ticks, remaining at max speed for MAX_ROTATION_SPEED_TICKS.
 			final double mRotationSpeedChange = (ROTATION_SPEED_MAX - ROTATION_SPEED_INIT) / (double) (DURATION - MAX_ROTATION_SPEED_TICKS);
+			final int mIframeTicks = 10;
+			final Map<UUID, Integer> mIframeMap = new HashMap<>();
 
 			int mTicks = 0;
 			double mTheta = 0;
@@ -112,7 +117,18 @@ public class ThornIvy extends Spell {
 							if (mDischarging) {
 								Hitbox hitbox = new Hitbox.SphereHitbox(pointLoc, 0.3);
 								hitbox.getHitPlayers(true).forEach(
-									hitPlayer -> DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME)
+									hitPlayer -> {
+										int ticks = Bukkit.getCurrentTick();
+										if (mIframeMap.containsKey(hitPlayer.getUniqueId())) {
+											if (mIframeMap.get(hitPlayer.getUniqueId()) <= ticks - mIframeTicks) {
+												DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
+												mIframeMap.put(hitPlayer.getUniqueId(), ticks);
+											}
+										} else {
+											DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
+											mIframeMap.put(hitPlayer.getUniqueId(), ticks);
+										}
+									}
 								);
 							}
 						}

@@ -259,21 +259,25 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		mLimbsRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-			if (!mIsRespawningLimbs && (mLimbsDied || haveAllLimbsDied())) {
-				if (mVulnerableTicks == 0) {
-					// Set this boolean so that it doesn't have to do the calculation again
-					mLimbsDied = true;
-					makeBossVulnerable();
-					spawnElites();
+				if (!mIsRespawningLimbs && (mLimbsDied || haveAllLimbsDied())) {
+					if (mVulnerableTicks == 0) {
+						// Set this boolean so that it doesn't have to do the calculation again
+						mLimbsDied = true;
+						makeBossVulnerable();
+						spawnElites();
+					}
+					if (mVulnerableTicks >= VULNERABILITY_TIME) {
+						// Respawn the limbs
+						makeBossInvulnerable();
+						spawnLimbs();
+					} else if (!mPausedVulnerableTimer) {
+						mVulnerableTicks++;
+					}
 				}
-				if (mVulnerableTicks >= VULNERABILITY_TIME) {
-					// Respawn the limbs
-					makeBossInvulnerable();
-					spawnLimbs();
-				} else if (!mPausedVulnerableTimer) {
-					mVulnerableTicks++;
+
+				if (!mBoss.isValid()) {
+					this.cancel();
 				}
-			}
 			}
 		};
 		mLimbsRunnable.runTaskTimer(mPlugin, 0, 1);
@@ -283,6 +287,10 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				if (!mPausedVulnerableTimer) {
 					Broodmother.super.forceCastSpell(SpellBite.class);
+				}
+
+				if (!mBoss.isValid()) {
+					this.cancel();
 				}
 			}
 		};
