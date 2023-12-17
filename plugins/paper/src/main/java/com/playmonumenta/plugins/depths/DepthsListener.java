@@ -83,6 +83,8 @@ public class DepthsListener implements Listener {
 	private static final int ASCENSION_GRAVE_DURATION_DECREASE = 5 * 20;
 	private static final int GRAVE_REVIVE_DURATION = 3 * 20;
 	private static final int DISCONNECT_ANTICHEESE_RADIUS = 6;
+	private static final String DISCONNECT_ANTICHEESE_MOB_TAG = "ZenithDisconnectedNearMobs";
+	private static final String DISCONNECT_ANTICHEESE_BOSS_TAG = "ZenithDisconnectedNearBoss";
 
 	public DepthsListener() {
 	}
@@ -501,9 +503,9 @@ public class DepthsListener implements Listener {
 				});
 
 			if (nearZenithBoss) {
-				dp.mNumDeaths += 2;
+				player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_BOSS_TAG);
 			} else if (EntityUtils.getNearestHostile(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null) {
-				dp.mNumDeaths++;
+				player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_MOB_TAG);
 			}
 		}
 	}
@@ -603,7 +605,15 @@ public class DepthsListener implements Listener {
 				for (DelvesModifier m : DelvesModifier.values()) {
 					DelvesUtils.setDelvePoint(null, player, ServerProperties.getShardName(), m, delvePointsForParty.getOrDefault(m, 0));
 				}
+
 				// Check if the player should be dead due to too many logout cheese penalties
+				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_MOB_TAG)) {
+					dp.mNumDeaths++;
+				}
+				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_BOSS_TAG)) {
+					dp.mNumDeaths += 2;
+				}
+
 				if (getGraveDuration(party, dp, true) < GRAVE_REVIVE_DURATION) {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
@@ -614,5 +624,9 @@ public class DepthsListener implements Listener {
 				dp.doOfflineTeleport();
 			}
 		}
+
+		// Make sure to remove anticheese tags
+		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_MOB_TAG);
+		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_BOSS_TAG);
 	}
 }
