@@ -1455,6 +1455,7 @@ public class DepthsManager {
 			dp.mGraveRunnable.cancel();
 		}
 		dp.mNumDeaths = Math.max(0, dp.mNumDeaths - 1);
+		MMLog.finer(p.getName() + " went to next floor. mNumDeaths = " + dp.mNumDeaths);
 		int partyFloor = party.getFloor();
 		int treasureScoreIncrease = TREASURE_PER_FLOOR * partyFloor + 2;
 		party.mTreasureScore += treasureScoreIncrease;

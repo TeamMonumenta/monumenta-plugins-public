@@ -19,12 +19,14 @@ import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -290,8 +292,9 @@ public class DepthsListener implements Listener {
 					}
 
 					Location deathLocation = player.getLocation();
-					dp.mNumDeaths++;
+					MMLog.finer(player.getName() + " died. mNumDeaths = " + dp.mNumDeaths);
 					int graveDuration = getGraveDuration(party, dp, false);
+					dp.mNumDeaths++;
 					if (graveDuration > GRAVE_REVIVE_DURATION) {
 						Location waitingRoomLocation = party.mDeathWaitingRoomPoint.toLocation(player.getWorld());
 						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(waitingRoomLocation));
@@ -609,15 +612,18 @@ public class DepthsListener implements Listener {
 				// Check if the player should be dead due to too many logout cheese penalties
 				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_MOB_TAG)) {
 					dp.mNumDeaths++;
+					MMLog.finer(player.getName() + " logged in with anticheese mob tag. mNumDeaths = " + dp.mNumDeaths);
 				}
 				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_BOSS_TAG)) {
 					dp.mNumDeaths += 2;
+					MMLog.finer(player.getName() + " logged in with anticheese boss tag. mNumDeaths = " + dp.mNumDeaths);
 				}
 
 				if (getGraveDuration(party, dp, true) < GRAVE_REVIVE_DURATION) {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
 					shouldOfflineTeleport = false;
+					AuditListener.logDeath(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 				}
 			}
 			if (shouldOfflineTeleport) {

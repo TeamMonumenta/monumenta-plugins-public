@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -123,9 +125,14 @@ public class Boss {
 		if (EntityUtils.isSilenced(event.getBoss())) {
 			return;
 		}
-		for (BossAbilityGroup ability : mAbilities) {
-			ability.bossCastAbility(event);
-			ability.triggerOnSpells(spell -> spell.bossCastAbility(event));
+		try {
+			for (BossAbilityGroup ability : mAbilities) {
+				ability.bossCastAbility(event);
+				ability.triggerOnSpells(spell -> spell.bossCastAbility(event));
+			}
+		} catch (ConcurrentModificationException cme) {
+			MMLog.severe("Caught CME in SpellCastEvent of " + event.getBoss().getName());
+			cme.printStackTrace();
 		}
 	}
 
