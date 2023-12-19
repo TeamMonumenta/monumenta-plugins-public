@@ -95,13 +95,14 @@ public class AuditListener implements Listener {
 		exactNoArguments("(minecraft:)?grave list"),
 		exactOptionalArguments("(minecraft:)?particles"),
 		exactOptionalArguments("(playerstats|ps)"),
+		exactOptionalArguments("(minecraft:)?player"),
 		exactOptionalArguments("peb"),
 		exactOptionalArguments("(minecraft:)?race leaderboard"),
 		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
 		exactOptionalArguments("(minecraft:)?toggleswap"),
 		exactOptionalArguments("(minecraft:)?toggleworldnames"),
 		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
-		exactOptionalArguments("(minecraft:)?(viewcharms|vc)"),
+		exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
 		exactOptionalArguments("(minecraft:)?plot access (help|add|remove|info$)"),
 		exactOptionalArguments("(spark:)?tps")
 	);
