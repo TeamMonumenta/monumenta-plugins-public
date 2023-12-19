@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
 import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
+import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
@@ -458,6 +459,9 @@ public class CharmManager {
 			HallowedBeam.CHARM_RESISTANCE,
 			HallowedBeam.CHARM_RESISTANCE_DURATION,
 			Rejuvenation.CHARM_THRESHOLD,
+			SanctifiedArmor.CHARM_DAMAGE,
+			SanctifiedArmor.CHARM_SLOW,
+			SanctifiedArmor.CHARM_DURATION,
 
 			//Rogue
 			AdvancingShadows.CHARM_COOLDOWN,
@@ -530,12 +534,10 @@ public class CharmManager {
 			CounterStrike.CHARM_DAMAGE,
 			CounterStrike.CHARM_RADIUS,
 			CounterStrike.CHARM_DURATION,
-			CounterStrike.CHARM_DAMAGE,
 			CounterStrike.CHARM_DAMAGE_REDUCTION,
 			CounterStrike.CHARM_KBR,
 			CounterStrike.CHARM_BLEED,
 			CounterStrike.CHARM_BLEED_DURATION,
-			CounterStrike.CHARM_RADIUS,
 			DefensiveLine.CHARM_COOLDOWN,
 			DefensiveLine.CHARM_DURATION,
 			DefensiveLine.CHARM_KNOCKBACK,
