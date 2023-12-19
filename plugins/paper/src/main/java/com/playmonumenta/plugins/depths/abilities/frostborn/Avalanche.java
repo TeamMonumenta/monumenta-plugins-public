@@ -149,7 +149,7 @@ public class Avalanche extends DepthsAbility {
 
 	private HashSet<Location> getNearbyIce(Location loc, double radius) {
 		HashSet<Location> nearbyIce = new HashSet<>(DepthsUtils.iceActive.keySet());
-		nearbyIce.removeIf(l -> l.getWorld() != loc.getWorld() || l.distance(loc) > radius || !DepthsUtils.isIce(l.getBlock().getType()));
+		nearbyIce.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != loc.getWorld() || l.distance(loc) > radius || !DepthsUtils.isIce(l.getBlock().getType()));
 		return nearbyIce;
 	}
 
