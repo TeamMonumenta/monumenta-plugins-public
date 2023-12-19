@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -70,7 +71,7 @@ public class CustomDamageOverTime extends Effect {
 			mTicks += 5; //Activates 4 times a second
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
-				DamageUtils.damage(mPlayer, le, mDamageType, mDamage, mSpell, true, false);
+				DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(mDamageType, mSpell, mPlayerItemStats), mDamage, true, false, false);
 				mVisuals.accept(le);
 			}
 		}

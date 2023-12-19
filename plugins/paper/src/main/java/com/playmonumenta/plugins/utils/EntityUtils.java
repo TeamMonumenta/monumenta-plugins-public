@@ -1050,20 +1050,6 @@ public class EntityUtils {
 		return highest;
 	}
 
-	public static void amplifyDamageOverTime(Plugin plugin, LivingEntity en, String source, int ampAmount, int ampCap) {
-		Effect dot = EffectManager.getInstance().getActiveEffect(en, source);
-		if (dot != null) {
-			int duration = dot.getDuration();
-			double level = dot.getMagnitude();
-			double ampLvl = level + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = Math.max(ampCap, ampLvl);
-			}
-			// Apply Dot
-			plugin.mEffectManager.addEffect(en, source, new CustomDamageOverTime(duration, 1, (int) Math.round(40 / ampLvl), null, null));
-		}
-	}
-
 	public static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
 		if (target.getFireTicks() < fireTicks && !isFireResistant(target)) {
 			target.setFireTicks(fireTicks);

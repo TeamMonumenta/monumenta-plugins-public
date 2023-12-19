@@ -58,6 +58,7 @@ public class Decay implements Enchantment {
 		// The DoT effect only runs every 5 ticks, so select the period as a multiple of 5 ticks and adjust damage instead to match expected DPS
 		int adjustedPeriod = (int) Math.ceil(desiredPeriod / 5) * 5;
 		double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, 1) * adjustedPeriod / desiredPeriod;
-		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME, new CustomDamageOverTime(finalDuration, damage, adjustedPeriod, player, null));
+		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME,
+			new CustomDamageOverTime(finalDuration, damage, adjustedPeriod, player, plugin.mItemStatManager.getPlayerItemStatsCopy(player), null, DamageType.AILMENT));
 	}
 }

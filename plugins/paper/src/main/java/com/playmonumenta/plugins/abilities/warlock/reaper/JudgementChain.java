@@ -352,15 +352,16 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 				player -> mPlugin.mEffectManager.addEffect(player, DEF_NAME, new PercentDamageReceived(duration, -mAmplifier))));
 
 		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.POISON) || mTarget.hasPotionEffect(PotionEffectType.WITHER) || EntityUtils.hasDamageOverTime(mPlugin, mTarget),
-				mob -> mPlugin.mEffectManager.addEffect(mob, DOT_NAME, new CustomDamageOverTime(duration, 1, 20, mPlayer, null)),
-				player -> {
-					if (player == mPlayer) {
-						// 1 / 60 = 1/60th HP every tick, 60 ticks in 3 second interval
-						// We do this because constant re-application doesn't actually do anything
-						PlayerUtils.healPlayer(mPlugin, player, 1.0d / 60.0d, player);
-					}
-					mPlugin.mEffectManager.addEffect(player, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlayer, mPlugin));
-				}));
+			mob -> mPlugin.mEffectManager.addEffect(mob, DOT_NAME,
+				new CustomDamageOverTime(duration, 1, 20, mPlayer, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), null, DamageType.AILMENT)),
+			player -> {
+				if (player == mPlayer) {
+					// 1 / 60 = 1/60th HP every tick, 60 ticks in 3 second interval
+					// We do this because constant re-application doesn't actually do anything
+					PlayerUtils.healPlayer(mPlugin, player, 1.0d / 60.0d, player);
+				}
+				mPlugin.mEffectManager.addEffect(player, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlayer, mPlugin));
+			}));
 
 		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.HUNGER),
 				mob -> PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true)),

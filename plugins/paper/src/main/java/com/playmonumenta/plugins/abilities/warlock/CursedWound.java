@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -128,9 +129,12 @@ public class CursedWound extends Ability {
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				mCosmetic.onCriticalAttack(world, mPlayer.getLocation());
+				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 				for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CURSED_WOUND_RADIUS).getHitMobs()) {
 					mCosmetic.onEffectApplication(mPlayer, mob);
-					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE), CURSED_WOUND_DOT_PERIOD, mPlayer, null));
+					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME,
+						new CustomDamageOverTime(CURSED_WOUND_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE),
+							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, null, DamageType.AILMENT));
 				}
 			}
 			return true;
