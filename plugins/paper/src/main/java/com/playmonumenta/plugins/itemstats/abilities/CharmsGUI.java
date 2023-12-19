@@ -226,6 +226,10 @@ public class CharmsGUI extends Gui {
 
 	@Override
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
+		if (!mMayEdit) {
+			event.setCancelled(true);
+			return;
+		}
 		// Attempt to load charm if clicked in inventory
 		ItemStack item = event.getCurrentItem();
 		if (!ItemUtils.isNullOrAir(item) && CharmManager.getInstance().addCharm(mTargetPlayer, item, mCharmType)) {
