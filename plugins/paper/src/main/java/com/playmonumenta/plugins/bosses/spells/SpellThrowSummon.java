@@ -6,8 +6,8 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.List;
-import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -105,7 +105,11 @@ public class SpellThrowSummon extends Spell {
 				List<String> souls = LibraryOfSoulsIntegration.getPool(mSummonName).keySet().stream().map((x) -> x.getLabel()).toList();
 				soul = souls.get(FastUtils.RANDOM.nextInt(souls.size()));
 			}
-			Entity e = Objects.requireNonNull(LibraryOfSoulsIntegration.summon(sLoc, soul));
+			Entity e = LibraryOfSoulsIntegration.summon(sLoc, soul);
+			if (e == null) {
+				MMLog.warning("Misconfigured SpellThrowSummon boss, unknown soul '" + soul + "' used by boss '" + mBoss.getName() + "'");
+				return;
+			}
 
 			Location pLoc = target.getLocation();
 			Location tLoc = e.getLocation();

@@ -64,7 +64,7 @@ public class TotemicEmpowerment extends Ability {
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 			for (LivingEntity totem : activeList) {
-				if (mPlayer.getLocation().distance(totem.getLocation()) <= radius) {
+				if (mPlayer.getWorld().equals(totem.getWorld()) && mPlayer.getLocation().distance(totem.getLocation()) <= radius) {
 					double selfSpeed = SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 					double selfResist = RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
 					if (mSupportExpertise != null) {

@@ -115,6 +115,9 @@ public class BrambleBall extends Spell {
 		// Select a random, non-spectator player as target.
 		List<Player> players = mBoss.getLocation().getNearbyPlayers(100).stream()
 			.filter(p -> !p.getGameMode().equals(GameMode.SPECTATOR)).toList();
+		if (players.isEmpty()) {
+			return;
+		}
 		Player target = players.get(FastUtils.randomIntInRange(0, players.size() - 1));
 
 		// Cast out the vine bramble.

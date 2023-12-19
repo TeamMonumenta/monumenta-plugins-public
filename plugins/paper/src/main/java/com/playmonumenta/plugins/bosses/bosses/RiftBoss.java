@@ -2,10 +2,17 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
-import com.playmonumenta.plugins.bosses.parameters.*;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
@@ -186,6 +193,9 @@ public class RiftBoss extends BossAbilityGroup {
 
 					@Override
 					public void run() {
+						if (!Double.isFinite(mDir.getX())) {
+							mDir.setX(1).setY(0).setZ(0);
+						}
 						mBox.shift(mDir.clone().multiply(p.RIFT_STEP));
 						Location bLoc = mBox.getCenter().toLocation(mLoc.getWorld());
 

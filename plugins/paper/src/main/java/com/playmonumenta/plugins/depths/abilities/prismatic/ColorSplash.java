@@ -227,7 +227,11 @@ public class ColorSplash extends DepthsAbility {
 					)
 				);
 				groundBlocks.removeIf(block -> !block.isSolid());
-				DisplayEntityUtils.groundBlockQuake(mPlayer.getLocation(), 3, groundBlocks.stream().map(Block::getType).toList(), null);
+				List<Material> groundBlockTypes = groundBlocks.stream().map(Block::getType).toList();
+				if (groundBlockTypes.isEmpty()) {
+					groundBlockTypes = List.of(Material.PODZOL, Material.DIRT, Material.MUD);
+				}
+				DisplayEntityUtils.groundBlockQuake(mPlayer.getLocation(), 3, groundBlockTypes, null);
 			}
 			case SHADOWDANCER -> {
 				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.PLAYERS, 2, 0.8f);

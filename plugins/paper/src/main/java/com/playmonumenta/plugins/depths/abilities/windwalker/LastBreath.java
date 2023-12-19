@@ -104,7 +104,11 @@ public class LastBreath extends DepthsAbility {
 		mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, mResistDuration, 4));
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, mRadius)) {
 			if (!EntityUtils.isCCImmuneMob(e)) {
-				Vector knockback = e.getVelocity().add(e.getLocation().toVector().subtract(loc.toVector()).normalize().multiply(KNOCKBACK_SPEED));
+				Vector relative = e.getLocation().toVector().subtract(loc.toVector()).normalize();
+				if (!Double.isFinite(relative.getX())) {
+					relative = new Vector(0, 1, 0);
+				}
+				Vector knockback = e.getVelocity().add(relative.multiply(KNOCKBACK_SPEED));
 				knockback.setY(knockback.getY() * 2);
 				e.setVelocity(knockback.add(new Vector(0, 0.25, 0)));
 				new PartialParticle(Particle.EXPLOSION_NORMAL, e.getLocation(), 5, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);

@@ -1748,7 +1748,7 @@ public class PlayerListener implements Listener {
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			// If Player pops a totem of undying, replace absorption event with absorption utils.
-			if (event.getCause() == EntityPotionEffectEvent.Cause.TOTEM && event.getNewEffect().getType().equals(PotionEffectType.ABSORPTION)) {
+			if (event.getCause() == EntityPotionEffectEvent.Cause.TOTEM && event.getNewEffect() != null && event.getNewEffect().getType().equals(PotionEffectType.ABSORPTION)) {
 				event.setCancelled(true);
 				AbsorptionUtils.addAbsorption(player, 8, 8, 5 * 20);
 			}

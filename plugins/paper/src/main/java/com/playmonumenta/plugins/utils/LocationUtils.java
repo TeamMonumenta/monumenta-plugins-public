@@ -157,6 +157,9 @@ public class LocationUtils {
 		}
 		int range = (int)fromLocation.distance(toLocation) + 1;
 		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
+		if (!Double.isFinite(direction.getX())) {
+			return true;
+		}
 
 		try {
 			BlockIterator bi = new BlockIterator(fromLocation.getWorld(), fromLocation.toVector(), direction, 0, range);

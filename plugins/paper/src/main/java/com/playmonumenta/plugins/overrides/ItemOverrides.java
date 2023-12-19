@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import de.tr7zw.nbtapi.NBTItem;
@@ -537,6 +538,7 @@ public final class ItemOverrides {
 			    && item.getItemMeta().hasLore()
 			    && player.getGameMode() != GameMode.CREATIVE
 			    && !EXCEPTION_LORED_MATERIALS.contains(item.getType())
+			    && !ItemUtils.isNullOrAir(item)
 			    && !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
 			eventCancelled |= true;
 		}

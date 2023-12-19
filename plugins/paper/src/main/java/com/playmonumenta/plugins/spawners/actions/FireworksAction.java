@@ -37,7 +37,7 @@ public class FireworksAction extends SpawnerBreakAction {
 		int sideCount = (int) getParameter(parameters, "side_count");
 		double launchVel = (double) getParameter(parameters, "launch_velocity");
 		int fuseTicks = (int) getParameter(parameters, "fuse_ticks");
-		int volleyCount = (int) getParameter(parameters, "volley_count");
+		int volleyCount = Math.max(1, (int) getParameter(parameters, "volley_count"));
 		Entity entity = spawner.getWorld().spawnEntity(spawnerLoc, EntityType.PRIMED_TNT);
 		if (entity instanceof TNTPrimed tnt) {
 			tnt.setFuseTicks(fuseTicks);

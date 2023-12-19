@@ -161,6 +161,9 @@ public class SpellBaseLeapAttack extends Spell {
 	}
 
 	public void launch(Location locTarget, Location loc, Player targetPlayer, boolean checkPassable) {
+		if (!locTarget.getWorld().equals(loc.getWorld())) {
+			return;
+		}
 		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation());
 
 		Vector offset = locTarget.clone().subtract(loc).toVector().normalize().multiply(mRunDistance);

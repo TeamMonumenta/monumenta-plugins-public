@@ -43,7 +43,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			)
 	);
 
-	private List<Pair<String, String>> mActiveShrines = new ArrayList<>();
+	private volatile List<Pair<String, String>> mActiveShrines = new ArrayList<>();
 
 	protected @Nullable BukkitTask mSystemTask = null;
 
@@ -124,9 +124,10 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		if (identifier.startsWith("shrineicon")) {
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrineicon_simplified_".length()).isEmpty() ? 0 :
-						Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
-				if (index < mActiveShrines.size()) {
-					Pair<String, String> currentShrine = mActiveShrines.get(index);
+					            Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
+				List<Pair<String, String>> activeShrines = mActiveShrines;
+				if (index < activeShrines.size()) {
+					Pair<String, String> currentShrine = activeShrines.get(index);
 					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0) > 1) {
 						return "active/" + currentShrine.getLeft();
 					} else {
@@ -152,15 +153,16 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			int remainingTime;
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrine_simplified_".length()).isEmpty() ? 0 :
-						Integer.parseInt(identifier.substring("shrine_simplified_".length()));
-				if (index < mActiveShrines.size()) {
-					Pair<String, String> currentShrine = mActiveShrines.get(index);
+					            Integer.parseInt(identifier.substring("shrine_simplified_".length()));
+				List<Pair<String, String>> activeShrines = mActiveShrines;
+				if (index < activeShrines.size()) {
+					Pair<String, String> currentShrine = activeShrines.get(index);
 					remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0);
 					if (remainingTime >= 1) {
 						remainingTime = (int) Math.floor(remainingTime / 60.0);
 						return ChatColor.AQUA + currentShrine.getLeft() + ": " + ChatColor.WHITE + remainingTime + "m";
 					} else {
-						mActiveShrines.remove(index);
+						activeShrines.remove(index);
 						return "";
 					}
 				} else {

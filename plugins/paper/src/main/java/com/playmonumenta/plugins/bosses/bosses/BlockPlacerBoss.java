@@ -91,6 +91,10 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 					LivingEntity target = mMob.getTarget();
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), NEW_TARGET_RANGE, false);
 					if (target instanceof Player player && !players.isEmpty()) {
+						if (!player.getWorld().equals(mMob.getWorld())) {
+							mMob.setTarget(null);
+							return;
+						}
 						mNoTargetTicks = 0;
 						execute(player);
 					} else {

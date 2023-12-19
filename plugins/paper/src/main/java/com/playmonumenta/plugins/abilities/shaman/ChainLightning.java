@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.abilities.shaman;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.*;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -18,6 +22,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -116,7 +121,7 @@ public class ChainLightning extends MultipleChargeAbility {
 			.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), 1.5));
 
 		List<LivingEntity> nearbyMobs = hitbox.getHitMobs();
-		nearbyMobs.sort((a, b) -> (int) (a.getLocation().distance(mPlayer.getLocation()) - b.getLocation().distance(mPlayer.getLocation())));
+		nearbyMobs.sort(Comparator.comparing(e -> e.getLocation().distance(mPlayer.getLocation())));
 		List<LivingEntity> nearbyTotems = new ArrayList<>(TotemicEmpowerment.getTotemList(mPlayer));
 		nearbyTotems.removeIf(totem -> !hitbox.intersects(totem.getBoundingBox()));
 		if (!nearbyMobs.isEmpty()) {
@@ -204,7 +209,6 @@ public class ChainLightning extends MultipleChargeAbility {
 
 	private @Nullable LivingEntity locateMobInRange(Location loc) {
 		List<LivingEntity> possibleMobs = EntityUtils.getNearbyMobsInSphere(loc, mBounceRange, null);
-		possibleMobs.sort((a, b) -> (int) (a.getLocation().distance(loc) - b.getLocation().distance(loc)));
 		for (LivingEntity entity : mHitTargets) {
 			possibleMobs.removeIf(mob -> entity.getUniqueId().equals(mob.getUniqueId()));
 		}

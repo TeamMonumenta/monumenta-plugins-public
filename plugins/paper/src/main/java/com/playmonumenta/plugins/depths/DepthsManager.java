@@ -788,7 +788,7 @@ public class DepthsManager {
 	 */
 	public void playerChoseItem(Player p, int slot) {
 		List<DepthsAbilityItem> itemChoices = mAbilityOfferings.get(p.getUniqueId());
-		if (itemChoices == null) {
+		if (itemChoices == null || slot >= itemChoices.size()) {
 			return;
 		}
 		DepthsAbilityItem choice = itemChoices.get(slot);
@@ -1271,7 +1271,7 @@ public class DepthsManager {
 		if (itemChoices == null) {
 			return;
 		}
-		if (slot > itemChoices.size() + 1) {
+		if (slot >= itemChoices.size()) {
 			return;
 		}
 		DepthsAbilityItem choice = itemChoices.get(slot);
@@ -1691,14 +1691,17 @@ public class DepthsManager {
 		if (abilities.size() > 1) {
 			abilities.remove(currentAbility);
 		}
+		if (abilities.isEmpty()) {
+			return;
+		}
 		Collections.shuffle(abilities);
 		DepthsAbilityInfo<?> newAbility = abilities.get(0);
 		setPlayerLevelInAbility(Objects.requireNonNull(newAbility.getDisplayName()), p, 1);
 		dp.sendMessage(Component.text("You gained ability ")
-			.append(newAbility.getNameWithHover(1, p))
-			.append(Component.text(" at "))
-			.append(DepthsUtils.getRarityComponent(1))
-			.append(Component.text(" level!")));
+			               .append(newAbility.getNameWithHover(1, p))
+			               .append(Component.text(" at "))
+			               .append(DepthsUtils.getRarityComponent(1))
+			               .append(Component.text(" level!")));
 
 	}
 

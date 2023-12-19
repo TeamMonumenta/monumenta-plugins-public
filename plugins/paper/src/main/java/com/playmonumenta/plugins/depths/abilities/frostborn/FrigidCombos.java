@@ -82,7 +82,7 @@ public class FrigidCombos extends DepthsAbility {
 
 				if (isOnIce) {
 					HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
-					iceToBreak.removeIf(l -> l.getWorld() != targetLoc.getWorld() || l.distance(targetLoc) > 1.5 || !DepthsUtils.isIce(l.getBlock().getType()));
+					iceToBreak.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != targetLoc.getWorld() || l.distance(targetLoc) > 1.5 || !DepthsUtils.isIce(l.getBlock().getType()));
 					for (Location l : iceToBreak) {
 						Block b = l.getBlock();
 						if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {

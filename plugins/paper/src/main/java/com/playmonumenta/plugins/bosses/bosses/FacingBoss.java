@@ -25,7 +25,7 @@ public final class FacingBoss extends BossAbilityGroup {
 
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		List<? extends LivingEntity> targets = p.TARGET.getTargetsList(mBoss);
-		if (targets == null) {
+		if (targets == null || targets.isEmpty()) {
 			return;
 		}
 		LivingEntity facingTarget = targets.get(0);

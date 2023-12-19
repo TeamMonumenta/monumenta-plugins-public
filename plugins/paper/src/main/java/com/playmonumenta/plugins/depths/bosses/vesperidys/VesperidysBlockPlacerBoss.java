@@ -74,23 +74,25 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 					if (mMob.getLocation().getY() < mVesperidys.mSpawnLoc.getY() - 5) {
 						// Teleport back up
 						Location newLoc = mVesperidys.mPlatformList.getRandomPlatform(null).getCenter().add(0, 1, 0);
-						Location bossLoc = mBoss.getLocation();
+						if (newLoc != null) {
+							Location bossLoc = mBoss.getLocation();
 
-						for (int i = 0; i < 50; i++) {
-							Vector vec = LocationUtils.getDirectionTo(newLoc, bossLoc);
-							Location pLoc = mBoss.getEyeLocation();
-							pLoc.add(vec.multiply(i * 0.5));
-							if (pLoc.distance(mBoss.getEyeLocation()) > newLoc.distance(bossLoc)) {
-								break;
+							for (int i = 0; i < 50; i++) {
+								Vector vec = LocationUtils.getDirectionTo(newLoc, bossLoc);
+								Location pLoc = mBoss.getEyeLocation();
+								pLoc.add(vec.multiply(i * 0.5));
+								if (pLoc.distance(mBoss.getEyeLocation()) > newLoc.distance(bossLoc)) {
+									break;
+								}
+								new PartialParticle(Particle.VILLAGER_ANGRY, pLoc, 1, 0, 0, 0, 0).spawnAsBoss();
 							}
-							new PartialParticle(Particle.VILLAGER_ANGRY, pLoc, 1, 0, 0, 0, 0).spawnAsBoss();
+
+							mBoss.getWorld().playSound(bossLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
+							mBoss.getWorld().playSound(newLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
+
+							mMob.teleport(newLoc);
+							mMob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 5 * 20, 0));
 						}
-
-						mBoss.getWorld().playSound(bossLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
-						mBoss.getWorld().playSound(newLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
-
-						mMob.teleport(newLoc);
-						mMob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 5 * 20, 0));
 					}
 
 					// Get Y level for platform blocks.
