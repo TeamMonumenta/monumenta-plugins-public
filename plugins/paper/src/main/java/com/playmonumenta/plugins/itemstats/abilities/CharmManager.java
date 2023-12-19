@@ -124,35 +124,7 @@ import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
-import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
-import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
-import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
-import com.playmonumenta.plugins.itemstats.enchantments.Decay;
-import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
-import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
-import com.playmonumenta.plugins.itemstats.enchantments.Explosive;
-import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
-import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
-import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
-import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
-import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
-import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
-import com.playmonumenta.plugins.itemstats.enchantments.Quake;
-import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
-import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
-import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
-import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
-import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
-import com.playmonumenta.plugins.itemstats.enchantments.Reverb;
-import com.playmonumenta.plugins.itemstats.enchantments.Sapper;
-import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
-import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
-import com.playmonumenta.plugins.itemstats.enchantments.Smite;
-import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
-import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
-import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
+import com.playmonumenta.plugins.itemstats.enchantments.*;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -323,6 +295,7 @@ public class CharmManager {
 			Explosive.CHARM_RADIUS,
 			Reverb.CHARM_DAMAGE,
 			Reverb.CHARM_RADIUS,
+			FirstStrike.CHARM_DAMAGE,
 
 			// Classes
 			// Mage
