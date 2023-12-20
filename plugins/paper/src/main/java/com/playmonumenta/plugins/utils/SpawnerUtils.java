@@ -608,6 +608,12 @@ public class SpawnerUtils {
 		} else {
 			originalMaxDelay = Objects.requireNonNull(persistentDataContainer.get(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER));
 		}
+		if (originalMaxDelay <= 0) {
+			MMLog.warning("Non-positive spawner delay detected, setting it to 100. location=" + spawner.getLocation() + ", delay on spawner=" + spawner.getMaxSpawnDelay()
+				              + ", delay in persistent container=" + Objects.requireNonNull(persistentDataContainer.get(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER)));
+			originalMaxDelay = 100;
+			persistentDataContainer.set(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER, originalMaxDelay);
+		}
 
 		int originalMinDelay;
 		if (!persistentDataContainer.has(ORIGINAL_MIN_DELAY)) {
@@ -615,6 +621,9 @@ public class SpawnerUtils {
 			persistentDataContainer.set(ORIGINAL_MIN_DELAY, PersistentDataType.INTEGER, originalMinDelay);
 		} else {
 			originalMinDelay = Objects.requireNonNull(persistentDataContainer.get(ORIGINAL_MIN_DELAY, PersistentDataType.INTEGER));
+		}
+		if (originalMinDelay < 0) {
+			originalMinDelay = 0;
 		}
 
 		double lastMultiplier = !persistentDataContainer.has(LAST_MULTIPLIER) ? 1 : Objects.requireNonNull(persistentDataContainer.get(LAST_MULTIPLIER, PersistentDataType.DOUBLE));
@@ -634,13 +643,9 @@ public class SpawnerUtils {
 		persistentDataContainer.set(LAST_MULTIPLIER, PersistentDataType.DOUBLE, multiplier);
 
 		// Need to do them in the right order or else it sometimes throws an IllegalArgumentException
-		if (multiplierRatio > 1) {
-			spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
-			spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
-		} else {
-			spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
-			spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
-		}
+		spawner.setMinSpawnDelay(0);
+		spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
+		spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
 		spawner.setDelay((int) (spawner.getDelay() * multiplierRatio));
 		spawner.update(false, false);
 	}

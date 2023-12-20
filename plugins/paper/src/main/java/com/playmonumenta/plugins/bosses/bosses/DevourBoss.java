@@ -58,7 +58,7 @@ public class DevourBoss extends BossAbilityGroup {
 		@BossParam(help = "Particles spawn at beginning of Cast.")
 		public ParticlesList PARTICLES_INITIAL = ParticlesList.fromString("[(SPELL_WITCH,20)]");
 		@BossParam(help = "Particles spawn at beginning of indicators at every fang spot.")
-		public ParticlesList PARTICLES_INDICATOR = ParticlesList.fromString("[(REDSTONE, 2,0,0.5,0,0.5,1,BLACK)]");
+		public ParticlesList PARTICLES_INDICATOR = ParticlesList.fromString("[(REDSTONE,2,0,0.5,0,0.5,BLACK,1)]");
 		@BossParam(help = "Offset for Particles that spawn at beginning of indicators at every fang spot.")
 		public double PARTICLES_INDICATOR_Y_OFFSET = 0;
 		@BossParam(help = "If false, evoker fangs are silenced and don't do the chomping sound.")

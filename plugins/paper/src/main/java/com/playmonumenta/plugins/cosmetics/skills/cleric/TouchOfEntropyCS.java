@@ -156,6 +156,10 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 				mT++;
 
 				Location to = optLoc != null ? optLoc : LocationUtils.getHalfHeightLocation(target);
+				if (!to.getWorld().equals(mL.getWorld())) {
+					cancel();
+					return;
+				}
 
 				for (int i = 0; i < (damage ? 3 : 4); i++) {
 					if (mT <= 2) {

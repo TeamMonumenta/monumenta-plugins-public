@@ -74,7 +74,7 @@ public class CustomRegeneration extends Effect {
 	public static CustomRegeneration deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		double amount = object.get("amount").getAsDouble();
-		int interval = object.get("interval").getAsInt();
+		int interval = object.has("interval") ? object.get("interval").getAsInt() : 20;
 
 		@Nullable Player sourcePlayer = null;
 		if (object.has("sourcePlayer")) {

@@ -103,7 +103,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 
 			super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 		} else {
-			Plugin.getInstance().getLogger().warning("[MobRisingBoss] tried to summon a boss with default LoSPool MOB_POOL = EMPTY");
+			Plugin.getInstance().getLogger().warning("[MobRisingBoss] tried to summon a boss with default LoSPool MOB_POOL = EMPTY, boss name=" + boss.getName());
 		}
 	}
 

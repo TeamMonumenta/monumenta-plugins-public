@@ -127,7 +127,7 @@ public class DecayedTotem extends TotemAbility {
 			stand.getWorld().playSound(stand, Sound.ENTITY_SKELETON_HURT, 0.6f, 0.3f);
 			stand.getWorld().playSound(stand, Sound.ENTITY_PHANTOM_DEATH, 0.5f, 0.2f);
 		}
-		mTargets.removeIf(mob -> standLocation.distance(mob.getLocation()) >= mRadius || mob.isDead());
+		mTargets.removeIf(mob -> !mob.getWorld().equals(standLocation.getWorld()) || standLocation.distance(mob.getLocation()) >= mRadius || mob.isDead());
 		if (mTargets.size() < mTargetCount) {
 			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
 			Collections.shuffle(affectedMobs);

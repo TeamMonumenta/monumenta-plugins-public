@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ParticlesList {
-	private static final EnumSet<Particle> PARTICLES_WITH_PARAMETERS = EnumSet.of(Particle.REDSTONE, Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_DUST, Particle.FALLING_DUST);
+	private static final EnumSet<Particle> PARTICLES_WITH_PARAMETERS = EnumSet.of(Particle.REDSTONE, Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_DUST, Particle.FALLING_DUST, Particle.DUST_COLOR_TRANSITION);
 
 	public static class CParticle {
 		public Particle mParticle;
@@ -327,7 +327,7 @@ public class ParticlesList {
 					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "Specify particle-specific parameters")));
 				}
 
-				if (particle.equals(Particle.REDSTONE)) {
+				if (particle == Particle.REDSTONE || particle == Particle.DUST_COLOR_TRANSITION) {
 					// Redstone takes a color, and an optional size
 					Color color = reader.readColor();
 					if (color == null) {
@@ -341,29 +341,52 @@ public class ParticlesList {
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
 
-					if (!reader.advance(",")) {
+					Color toColor = color;
+					if (particle == Particle.DUST_COLOR_TRANSITION) {
+						if (!reader.advance(",")) {
+							return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "add end color transition")));
+						}
+						toColor = reader.readColor();
+						if (toColor == null) {
+							// Color not valid - need to offer all colors as a completion option, plus #FFFFFF
+							List<Tooltip<String>> suggArgs = new ArrayList<>(1 + StringReader.COLOR_MAP.size());
+							String soFar = reader.readSoFar();
+							for (String valid : StringReader.COLOR_MAP.keySet()) {
+								suggArgs.add(Tooltip.ofString(soFar + valid, "Particle end color"));
+							}
+							suggArgs.add(Tooltip.ofString("#FFFFFF", "Particle end color"));
+							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
+						}
+					}
+
+					float size = 1;
+					if (reader.advance(",")) {
+						Double parsedSize = reader.readDouble();
+						if (parsedSize == null || parsedSize <= 0) {
+							return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Size > 0")));
+						}
+						size = parsedSize.floatValue();
+						if (!reader.advance(")")) {
+							return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
+						}
+					} else {
 						if (!reader.advance(")")) {
 							return ParseResult.of(Tooltip.arrayOf(
 								Tooltip.ofString(reader.readSoFar() + ",", "Specify redstone particle size"),
 								Tooltip.ofString(reader.readSoFar() + ")", "Use default 1 redstone size")
 							));
 						}
-						// End of this particle, loop to next
-						particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, new DustOptions(color, 1.0f)));
-						continue;
 					}
 
-					Double size = reader.readDouble();
-					if (size == null || size <= 0) {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Size > 0")));
-					}
-
-					if (!reader.advance(")")) {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
+					DustOptions data;
+					if (particle == Particle.DUST_COLOR_TRANSITION) {
+						data = new Particle.DustTransition(color, toColor, size);
+					} else {
+						data = new DustOptions(color, size);
 					}
 
 					// End of this particle, loop to next
-					particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, new DustOptions(color, size.floatValue())));
+					particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, data));
 					continue;
 				} else {
 					// All other supported parameter particles take a material
