@@ -158,7 +158,7 @@ public class MasterworkUtils {
 				}
 				return true;
 			} else {
-				if (WalletUtils.tryToPayFromInventoryAndWallet(p, itemC == null ? List.of(itemA, itemB) : List.of(itemA, itemB, itemC), false, true)) {
+				if (WalletUtils.tryToPayFromInventoryAndWallet(p, itemC == null ? List.of(itemA, itemB) : List.of(itemA, itemB, itemC))) {
 					String auditString = "[Masterwork] Purchase - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' to level=" + masterwork.getName() + " stack size=" + item.getAmount()
 						                     + " material refund=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount();
 					if (itemC != null) {

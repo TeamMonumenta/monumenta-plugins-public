@@ -19,7 +19,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.Nullable;
 
 public class DelveInfusionUtils {
@@ -257,30 +256,7 @@ public class DelveInfusionUtils {
 		return level;
 	}
 
-	public static boolean canPayInfusion(ItemStack item, DelveInfusionSelection selection, Player p, DelveInfusionMaterial delveInfusionMaterial) {
-		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
-			return true;
-		}
-		int targetLevel = getInfuseLevel(item);
-		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p, delveInfusionMaterial);
-		int playerXP = ExperienceUtils.getTotalExperience(p);
-
-		if (playerXP < XP_COST_PER_LEVEL[targetLevel]) {
-			return false;
-		}
-
-		PlayerInventory inventory = p.getInventory();
-
-		for (ItemStack currencies : mats) {
-			if (!inventory.containsAtLeast(currencies, currencies.getAmount())) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public static boolean payInfusion(ItemStack item, DelveInfusionSelection selection, Player p, DelveInfusionMaterial delveInfusionMaterial) {
+	public static boolean tryToPayInfusion(ItemStack item, DelveInfusionSelection selection, Player p, DelveInfusionMaterial delveInfusionMaterial) {
 		int targetLevel = getInfuseLevel(item);
 		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p, delveInfusionMaterial);
 
@@ -288,29 +264,28 @@ public class DelveInfusionUtils {
 			                .map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
 			                .collect(Collectors.joining(","));
 
+		int xpCost = XP_COST_PER_LEVEL[targetLevel];
+
 		//if the player is in creative -> free infusion
 		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Delve Infusion] Player " + p.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
-				                  + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + XP_COST_PER_LEVEL[targetLevel]);
+				                  + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + xpCost);
 			return true;
 		}
 
 		int playerXP = ExperienceUtils.getTotalExperience(p);
-
-		if (playerXP < XP_COST_PER_LEVEL[targetLevel]) {
+		if (playerXP < xpCost) {
 			return false;
-		} else {
-			ExperienceUtils.setTotalExperience(p, playerXP - XP_COST_PER_LEVEL[targetLevel]);
 		}
 
-		PlayerInventory inventory = p.getInventory();
-
-		for (ItemStack currencies : mats) {
-			inventory.removeItem(currencies);
+		if (!WalletUtils.tryToPayFromInventoryAndWallet(p, mats)) {
+			return false;
 		}
+
+		ExperienceUtils.setTotalExperience(p, playerXP - xpCost);
 
 		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + p.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
-			                        + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + XP_COST_PER_LEVEL[targetLevel]);
+			                        + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
 
 		return true;
 	}

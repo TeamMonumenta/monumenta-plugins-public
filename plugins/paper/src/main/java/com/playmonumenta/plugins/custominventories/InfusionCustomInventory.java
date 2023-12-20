@@ -228,13 +228,9 @@ public class InfusionCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (InfusionUtils.canPayInfusion(p, item)) {
-			if (InfusionUtils.payInfusion(p, item)) {
-				EntityUtils.fireworkAnimation(p);
-				InfusionUtils.infuseItem(p, item, infusion);
-			} else {
-				p.sendMessage(Component.text("If you see this message please contact a mod! (Error in paying infusion cost)", NamedTextColor.RED));
-			}
+		if (InfusionUtils.tryToPayInfusion(p, item)) {
+			EntityUtils.fireworkAnimation(p);
+			InfusionUtils.infuseItem(p, item, infusion);
 		} else {
 			p.sendMessage(Component.text("You don't have enough currency and/or experience for this infusion.", NamedTextColor.RED));
 		}

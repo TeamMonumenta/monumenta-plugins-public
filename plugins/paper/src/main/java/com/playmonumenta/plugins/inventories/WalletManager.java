@@ -902,9 +902,10 @@ public class WalletManager implements Listener {
 	}
 
 	public static boolean isCurrency(ItemStack item) {
-		return (ItemStatUtils.getTier(item) == Tier.CURRENCY
-			 || ItemStatUtils.getTier(item) == Tier.EVENT_CURRENCY
-			 || InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."));
+		return !ItemUtils.isNullOrAir(item)
+			       && (ItemStatUtils.getTier(item) == Tier.CURRENCY
+				           || ItemStatUtils.getTier(item) == Tier.EVENT_CURRENCY
+				           || InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."));
 	}
 
 	private static boolean isBase(ItemStack item) {

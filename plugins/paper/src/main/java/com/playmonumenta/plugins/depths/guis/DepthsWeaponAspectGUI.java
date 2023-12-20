@@ -171,6 +171,6 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 			return false;
 		}
 		currencyItemReq.setAmount(totalToRemove);
-		return WalletUtils.tryToPayFromInventoryAndWallet(player, List.of(currencyItemReq), false, true);
+		return WalletUtils.tryToPayFromInventoryAndWallet(player, currencyItemReq);
 	}
 }

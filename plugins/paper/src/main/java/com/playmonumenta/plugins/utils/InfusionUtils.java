@@ -457,75 +457,7 @@ public class InfusionUtils {
 		}
 	}
 
-	public static boolean canPayExp(Player player, ItemStack item) {
-		if (player.getGameMode() == GameMode.CREATIVE) {
-			return true;
-		}
-
-		int expCost;
-		int currentExp;
-
-		try {
-			expCost = getExpInfuseCost(item);
-		} catch (WrapperCommandSyntaxException e) {
-			return false;
-		}
-
-		currentExp = ExperienceUtils.getTotalExperience(player);
-
-		if (currentExp < expCost) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public static boolean canPayPulsating(Player player, ItemStack item) {
-		if (player.getGameMode() == GameMode.CREATIVE) {
-			return true;
-		}
-
-		ItemStack currency = null;
-
-		if (ItemStatUtils.getRegion(item) == Region.RING) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_DIAMOND));
-		}
-
-		if (ItemStatUtils.getRegion(item) == Region.ISLES) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_EMERALD));
-		}
-
-		if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_GOLD));
-		}
-
-		if (currency == null) {
-			//something went wrong
-			return false;
-		}
-
-		int amount;
-
-		try {
-			amount = calcInfuseCost(item);
-		} catch (WrapperCommandSyntaxException e) {
-			return false;
-		}
-
-		currency.setAmount(amount);
-
-		if (!player.getInventory().containsAtLeast(currency, amount)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public static boolean canPayInfusion(Player player, ItemStack item) {
-		return canPayExp(player, item) && canPayPulsating(player, item);
-	}
-
-	public static boolean payInfusion(Player player, ItemStack item) {
+	public static boolean tryToPayInfusion(Player player, ItemStack item) {
 		//currency
 		ItemStack currency = null;
 		if (ItemStatUtils.getRegion(item) == Region.RING) {
@@ -556,31 +488,28 @@ public class InfusionUtils {
 		}
 
 		int newLevel = getInfuseLevel(item) + 1;
+
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Infusion] Player " + player.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel
 				                  + ", stack size=" + item.getAmount() + ", normal material cost count=" + amount + ", normal XP cost=" + expCost);
 			return true;
 		}
 
-		AuditListener.logPlayer("[Infusion] Item infused - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel + ", stack size=" + item.getAmount()
-			                        + ", material cost count=" + amount + ", XP cost=" + expCost);
-
-
-		currency.setAmount(amount);
-		player.getInventory().removeItem(currency);
-
-		//exp
-		int currentExp;
-
-		currentExp = ExperienceUtils.getTotalExperience(player);
-
-		currentExp = currentExp - expCost;
-
-		if (currentExp < 0) {
+		int currentExp = ExperienceUtils.getTotalExperience(player);
+		if (currentExp < expCost) {
 			return false;
 		}
 
-		ExperienceUtils.setTotalExperience(player, currentExp);
+		currency.setAmount(amount);
+		if (!WalletUtils.tryToPayFromInventoryAndWallet(player, currency)) {
+			return false;
+		}
+
+		ExperienceUtils.setTotalExperience(player, currentExp - expCost);
+
+		AuditListener.logPlayer("[Infusion] Item infused - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel + ", stack size=" + item.getAmount()
+			                        + ", material cost count=" + amount + ", XP cost=" + expCost);
+
 
 		return true;
 	}

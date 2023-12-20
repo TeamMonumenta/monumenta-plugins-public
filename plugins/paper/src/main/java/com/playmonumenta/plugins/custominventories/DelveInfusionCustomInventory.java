@@ -243,12 +243,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		}
 
 		try {
-			if (DelveInfusionUtils.canPayInfusion(item, infusion, p, delveInfusionMaterial)) {
-				if (DelveInfusionUtils.payInfusion(item, infusion, p, delveInfusionMaterial)) {
-					DelveInfusionUtils.infuseItem(p, item, infusion, delveInfusionMaterial);
-				} else {
-					p.sendMessage(Component.text("If you see this message please contact a mod! (Error in paying infusion cost)", NamedTextColor.RED));
-				}
+			if (DelveInfusionUtils.tryToPayInfusion(item, infusion, p, delveInfusionMaterial)) {
+				DelveInfusionUtils.infuseItem(p, item, infusion, delveInfusionMaterial);
 			} else {
 				p.sendMessage(Component.text("You don't have enough experience and/or currency for this infusion.", NamedTextColor.RED));
 			}

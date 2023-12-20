@@ -87,11 +87,22 @@ public class WalletUtils {
 		}
 	}
 
+	public static boolean tryToPayFromInventoryAndWallet(Player player, ItemStack cost) {
+		return tryToPayFromInventoryAndWallet(player, List.of(cost));
+	}
+
+	public static boolean tryToPayFromInventoryAndWallet(Player player, List<ItemStack> costs) {
+		return tryToPayFromInventoryAndWallet(player, costs, false, true);
+	}
+
 	public static boolean tryToPayFromInventoryAndWallet(Player player, List<ItemStack> costs, boolean prioritizeWallet, boolean notify) {
 		PlayerInventory playerInventory = player.getInventory();
 		WalletManager.Wallet wallet = WalletManager.getWallet(player);
 		List<Debt> debts = new ArrayList<>(costs.size());
 		for (ItemStack cost : costs) {
+			if (ItemUtils.isNullOrAir(cost)) {
+				continue;
+			}
 			Debt debt = calculateInventoryAndWalletDebt(cost, playerInventory.getStorageContents(), wallet, prioritizeWallet);
 			if (!debt.mMeetsRequirement) {
 				return false;
