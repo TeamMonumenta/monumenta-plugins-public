@@ -118,19 +118,40 @@ public class LoadoutManager implements Listener {
 	);
 
 	private enum EquipmentCaseTag {
-		R1((item) -> ItemStatUtils.getRegion(item) == Region.VALLEY, "r1|valley"),
-		R2((item) -> ItemStatUtils.getRegion(item) == Region.ISLES, "r2|isles"),
-		R3((item) -> ItemStatUtils.getRegion(item) == Region.RING, "r3|ring"),
-		ARMOR(item -> ItemUtils.isArmorOrWearable(item) || ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND), "armors?"),
-		WEAPON(item -> ItemStatUtils.hasAttributeInSlot(item, Slot.MAINHAND) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND), "weapons?"),
-		CHARM(item -> ItemStatUtils.isCharm(item), "charms?"),
+		R1("r1|valley", 0, (item) -> ItemStatUtils.getRegion(item) == Region.VALLEY),
+		R2("r2|isles", 0, (item) -> ItemStatUtils.getRegion(item) == Region.ISLES),
+		R3("r3|ring", 0, (item) -> ItemStatUtils.getRegion(item) == Region.RING),
+
+		ARMOR("armou?rs?", 1, item -> ItemUtils.isArmorOrWearable(item) || ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
+		WEAPON("weapons?|mainhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.MAINHAND) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
+		OFFHAND("offhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
+		HELMET("helmets?|hats?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.HEAD),
+		CHEST("chest(?:plate)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.CHEST),
+		LEGS("leg(?:ging)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.LEGS),
+		BOOTS("boots?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.FEET),
+
+		// Consumables are (mostly) region-independent, and charms always R3, so their priority includes the priority a region tag would add
+		// this for example makes 'consumables' higher priority than 'r2 weapons', thus sorting Fruit of Life into 'consumables' rather than 'weapons'
+		CHARM("charms?", 103, item -> ItemStatUtils.isCharm(item)),
+		CONSUMABLE("consumables?|foods?|potions?", 103, item -> ItemStatUtils.isConsumable(item)
+			                                                        || (item.getType().isEdible() && !ItemStatUtils.isCharm(item))
+			                                                        || ItemUtils.isSomePotion(item)
+			                                                        || ShulkerEquipmentListener.isPotionInjectorItem(item)),
 		;
 
 		private final Pattern mTagPattern;
+		private final int mPriority;
 		private final Predicate<ItemStack> mPredicate;
 
-		EquipmentCaseTag(Predicate<ItemStack> predicate, String tagPattern) {
+		// groupings for case tag matching - for each group, either none of the tags must be on the case or at least one tag must apply to an item for it to go into that case
+		private static final List<Set<EquipmentCaseTag>> TAG_GROUPS = List.of(
+			Set.of(R1, R2, R3),
+			Set.of(ARMOR, WEAPON, OFFHAND, HELMET, CHEST, LEGS, BOOTS, CHARM, CONSUMABLE)
+		);
+
+		EquipmentCaseTag(String tagPattern, int priority, Predicate<ItemStack> predicate) {
 			mTagPattern = Pattern.compile("\\b(?:" + tagPattern + ")\\b", Pattern.CASE_INSENSITIVE);
+			mPriority = priority;
 			mPredicate = predicate;
 		}
 
@@ -519,11 +540,13 @@ public class LoadoutManager implements Listener {
 		for (ItemInventory inv : inventories) {
 			int priority = 0;
 			int slot = -1;
-			if (itemTags.containsAll(inv.tags)) {
-				priority += inv.tags.size() * 100;
-			}
 			if (inv.tags.isEmpty()) {
 				priority += 10;
+			} else if (EquipmentCaseTag.TAG_GROUPS.stream()
+				           // groupings for case tag matching - for each group, either none of the tags must be on the case,
+				           // or at least one tag must apply to an item for it to go into that case
+				           .allMatch(tagGroup -> tagGroup.stream().noneMatch(inv.tags::contains) || itemTags.stream().anyMatch(t -> inv.tags.contains(t) && tagGroup.contains(t)))) {
+				priority += inv.tags.stream().mapToInt(tag -> 1000 + 10 * tag.mPriority).sum();
 			}
 			if (preferredInventories.contains(inv)) {
 				priority += 1;
