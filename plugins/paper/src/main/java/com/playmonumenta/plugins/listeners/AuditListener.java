@@ -104,6 +104,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
 		exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
 		exactOptionalArguments("(minecraft:)?plot access (help|add|remove|info$)"),
+		exactOptionalArguments("(minecraft:)?claimraffle"),
 		exactOptionalArguments("(spark:)?tps")
 	);
 
