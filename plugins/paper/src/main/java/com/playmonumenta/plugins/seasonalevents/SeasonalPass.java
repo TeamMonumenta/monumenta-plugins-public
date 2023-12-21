@@ -107,8 +107,20 @@ public class SeasonalPass {
 				}
 
 				//Check if loot table is given
-				if (toParse.get("loottable") != null) {
-					String lootTable = toParse.get("loottable").getAsString();
+				if (toParse.get("loottable") != null
+					|| type == SeasonalRewardType.LOOT_SPIN
+					|| type == SeasonalRewardType.UNIQUE_SPIN
+					|| type == SeasonalRewardType.ITEM_SKIN) {
+					String lootTable = null;
+					if (toParse.get("loottable") != null) {
+						lootTable = toParse.get("loottable").getAsString();
+					} else if (type == SeasonalRewardType.LOOT_SPIN) {
+						lootTable = TREASURE_WHEEL_KEY;
+					} else if (type == SeasonalRewardType.UNIQUE_SPIN) {
+						lootTable = RELIC_WHEEL_KEY;
+					} else if (type == SeasonalRewardType.ITEM_SKIN) {
+						lootTable = ITEM_SKIN_KEY;
+					}
 					if (lootTable != null && lootTable.length() > 0) {
 						LootContext context = new LootContext.Builder(Bukkit.getWorlds().get(0).getSpawnLocation()).build();
 						LootTable rewardTable;
