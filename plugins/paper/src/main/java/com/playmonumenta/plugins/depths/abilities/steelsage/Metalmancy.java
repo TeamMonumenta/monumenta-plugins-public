@@ -11,17 +11,23 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
@@ -64,8 +70,8 @@ public class Metalmancy extends DepthsAbility {
 	private final int mDuration;
 	private final double mDamage;
 
-	private @Nullable Mob mGolem;
-	private @Nullable LivingEntity mTarget;
+	private final Map<Mob, LivingEntity> mSummons = new HashMap<>();
+	private final Map<Mob, BukkitRunnable> mRunnables = new HashMap<>();
 
 	public Metalmancy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -75,31 +81,26 @@ public class Metalmancy extends DepthsAbility {
 
 	public boolean cast() {
 		if (isOnCooldown()) {
-			resetTarget();
-			return false;
+			return resetTarget();
 		}
 
 		putOnCooldown();
 
-		if (mGolem != null) {
-			mGolem.remove();
-			mGolem = null;
-		}
-
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
-		mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME);
-		if (mGolem == null) {
+		Mob golem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME);
+		if (golem == null) {
 			return false;
 		}
-		mGolem.setVelocity(facingDirection.multiply(VELOCITY));
+		golem.setVelocity(facingDirection.multiply(VELOCITY));
 
-		MetalmancyBoss metalmancyBoss = BossUtils.getBossOfClass(mGolem, MetalmancyBoss.class);
+		MetalmancyBoss metalmancyBoss = BossUtils.getBossOfClass(golem, MetalmancyBoss.class);
 		if (metalmancyBoss == null) {
 			MMLog.warning("Failed to get MetalmancyBoss");
 			return false;
 		}
+		mSummons.put(golem, null);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		metalmancyBoss.spawn(mPlayer, mDamage, playerItemStats);
@@ -108,71 +109,111 @@ public class Metalmancy extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicksElapsed = 0;
 			@Override
 			public void run() {
 				boolean isOutOfTime = mTicksElapsed >= mDuration;
-				if (isOutOfTime || mGolem == null) {
-					if (isOutOfTime && mGolem != null) {
-						Location golemLoc = mGolem.getLocation();
-						world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 0.8f, 1.0f);
-						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15).delta(0.5).extra(0.1).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SMOKE_NORMAL, golemLoc, 20).delta(0.5).extra(0.1).spawnAsPlayerActive(mPlayer);
-					}
+				if (isOutOfTime) {
+					Location golemLoc = golem.getLocation();
+					world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 0.8f, 1.0f);
+					new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15).delta(0.5).extra(0.1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, golemLoc, 20).delta(0.5).extra(0.1).spawnAsPlayerActive(mPlayer);
 
-					resetTarget();
-
-					if (mGolem != null) {
-						mGolem.remove();
-						mGolem = null;
-					}
+					golem.remove();
+					mSummons.remove(golem);
 					this.cancel();
 				}
 
-				if (!(mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0)) {
-					if (mTarget == mGolem) {
-						mTarget = null;
-					} else if (mGolem != null) {
-						mGolem.setTarget(mTarget);
-					}
-				}
-
-				if (mGolem != null && (mGolem.getTarget() == null || mGolem.getTarget().isDead() || mGolem.getTarget().getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
-					Location golemLoc = mGolem.getLocation();
-					List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(golemLoc, DETECTION_RANGE, mGolem);
-					nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || mob.isInvulnerable());
-					nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - golemLoc.getY()) > MAX_TARGET_Y);
-					LivingEntity nearestMob = EntityUtils.getNearestMob(golemLoc, nearbyMobs);
-					if (nearestMob != null) {
-						mGolem.setTarget(nearestMob);
+				LivingEntity target = mSummons.get(golem);
+				if (target != null && target.isValid()) {
+					golem.setTarget(target);
+				} else {
+					mSummons.replace(golem, null);
+					if (golem.getTarget() == null) {
+						golem.setTarget(findNearestNonTargetedMob(golem));
 					}
 				}
 
 				mTicksElapsed += TICK_INTERVAL;
 			}
-		}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				golem.remove();
+				mSummons.remove(golem);
+				mRunnables.remove(golem);
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+		mRunnables.put(golem, runnable);
 
 		return true;
 	}
 
-	@Override
-	public void playerQuitEvent(PlayerQuitEvent event) {
-		if (mGolem != null) {
-			mGolem.remove();
-			mGolem = null;
+	private @Nullable LivingEntity findNearestNonTargetedMob(LivingEntity summon) {
+		Location summonLoc = summon.getLocation();
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(summon.getLocation(), DETECTION_RANGE);
+		nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.PROJECTILE_SKILL));
+		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+		mSummons.keySet().stream().map(Mob::getTarget).filter(Objects::nonNull).forEach(nearbyMobs::remove);
+
+		List<LivingEntity> unfilteredNearbyMobs = new ArrayList<>(nearbyMobs);
+
+		nearbyMobs.removeIf(mob -> Math.abs(mob.getLocation().getY() - summonLoc.getY()) > MAX_TARGET_Y);
+		nearbyMobs.removeIf(mob -> EntityUtils.isFlyingMob(EntityUtils.getEntityStackBase(mob)));
+
+		// if there are no other mobs to target, we can double up
+		if (nearbyMobs.isEmpty()) {
+			return EntityUtils.getNearestMob(summon.getLocation(), unfilteredNearbyMobs);
 		}
+
+		return EntityUtils.getNearestMob(summon.getLocation(), nearbyMobs);
 	}
 
-	private void resetTarget() {
-		mTarget = null;
+	@Override
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		// This despawns the summons and clears all lists. new ArrayList needed to prevent CME
+		new ArrayList<>(mRunnables.values()).forEach(BukkitRunnable::cancel);
+	}
 
+	private boolean resetTarget() {
 		LivingEntity newTarget = EntityUtils.getEntityAtCursor(mPlayer, 40, e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 		if (newTarget != null) {
-			mTarget = newTarget;
-			PotionUtils.applyColoredGlowing("MetalmancyTarget", newTarget, NamedTextColor.RED, 10);
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 1.0f, 1.5f);
+			Mob summon = findNearestAvailableSummon(newTarget);
+			if (summon != null) {
+				mSummons.put(summon, newTarget);
+				summon.setTarget(newTarget);
+				PotionUtils.applyColoredGlowing("MetalmancyTarget", newTarget, NamedTextColor.RED, 10);
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				return true;
+			}
 		}
+		return false;
+	}
+
+	private @Nullable Mob findNearestAvailableSummon(LivingEntity target) {
+		List<Mob> summons = new ArrayList<>(mSummons.keySet());
+
+		// If a summon is already targeting this mob, choose that summon
+		for (Mob summon : summons) {
+			if (summon.getTarget() == target) {
+				return summon;
+			}
+		}
+
+		Location targetLoc = target.getLocation();
+		summons.removeIf(summon -> summon.getLocation().distance(targetLoc) > DETECTION_RANGE);
+
+		List<Mob> nonTargetingSummons = new ArrayList<>(summons);
+		nonTargetingSummons.removeIf(summon -> mSummons.get(summon) != null);
+
+		if (nonTargetingSummons.isEmpty()) {
+			nonTargetingSummons = summons;
+		}
+
+		return EntityUtils.getNearestMob(targetLoc, nonTargetingSummons);
 	}
 
 	private static Description<Metalmancy> getDescription(int rarity, TextColor color) {

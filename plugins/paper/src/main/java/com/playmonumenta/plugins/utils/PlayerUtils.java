@@ -44,6 +44,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
@@ -520,5 +521,13 @@ public class PlayerUtils {
 	 */
 	public static boolean isOnGround(Player player) {
 		return player.isOnGround();
+	}
+
+	public static boolean canRiptide(Player player) {
+		return canRiptide(player, player.getInventory().getItemInMainHand());
+	}
+
+	public static boolean canRiptide(Player player, ItemStack mainhand) {
+		return (LocationUtils.isLocationInWater(player.getLocation()) || player.isInRain()) && ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.RIPTIDE);
 	}
 }

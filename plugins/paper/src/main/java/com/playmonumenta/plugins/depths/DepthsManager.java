@@ -1098,7 +1098,8 @@ public class DepthsManager {
 			roomType = DepthsRoomType.BOSS;
 		}
 
-		if (roomType == DepthsRoomType.WILDCARD) {
+		boolean wildcard = roomType == DepthsRoomType.WILDCARD;
+		if (wildcard) {
 			incrementTreasure(player.getLocation(), player, 1);
 			roomType = getWildcardRoomType();
 		}
@@ -1117,7 +1118,7 @@ public class DepthsManager {
 
 		// Summon the new room and give it to the party
 		Location l = new Location(world, roomSpawnerLocation.getX(), roomSpawnerLocation.getY(), roomSpawnerLocation.getZ());
-		party.setNewRoom(mRoomRepository.summonRoom(l, roomType, party));
+		party.setNewRoom(mRoomRepository.summonRoom(l, roomType, party), wildcard);
 	}
 
 	private DepthsRoomType getWildcardRoomType() {
@@ -1483,19 +1484,21 @@ public class DepthsManager {
 							} else {
 								Bukkit.getServer().sendMessage(Component.empty()
 									.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
-									.append(Component.text(" defeated the Darkest Depths!")));
+									.append(Component.text(" defeated the Darkest Depths!", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 							}
 							//Set score
 							ScoreboardUtils.setScoreboardValue(player, "Depths", depthsWins + 1);
 							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
 						} else if (party.getContent() == DepthsContent.CELESTIAL_ZENITH) {
 							int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Zenith").orElse(0);
-							if (depthsWins == 0) {
-								MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
-							} else if (party.getAscension() == 0) {
-								Bukkit.getServer().sendMessage(Component.empty()
-									.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
-									.append(Component.text(" defeated the Celestial Zenith!")));
+							if (party.getAscension() == 0) {
+								if (depthsWins == 0) {
+									MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+								} else {
+									Bukkit.getServer().sendMessage(Component.empty()
+										.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+										.append(Component.text(" defeated the Celestial Zenith!", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+								}
 							}
 							//Set score
 							ScoreboardUtils.setScoreboardValue(player, "Zenith", depthsWins + 1);
@@ -1827,7 +1830,7 @@ public class DepthsManager {
 					String test = abilityList.get(index);
 					//Make sure the player has the ability AND it's not a weapon aspect
 					int testLevel = getPlayerLevelInAbility(test, player);
-					if (testLevel > 0 && !DepthsUtils.isWeaponAspectAbility(test)) {
+					if (testLevel > 0 && testLevel < 6 && !DepthsUtils.isWeaponAspectAbility(test)) {
 						abilityToUpgrade = test;
 					}
 					index++;

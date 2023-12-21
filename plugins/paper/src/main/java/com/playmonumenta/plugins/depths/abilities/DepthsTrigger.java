@@ -3,8 +3,14 @@ package com.playmonumenta.plugins.depths.abilities;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,18 +56,21 @@ public enum DepthsTrigger {
 
 	private static AbilityTriggerInfo.TriggerRestriction getRestriction(boolean proj, boolean tool) {
 		String display = "holding a melee weapon" + (proj ? (tool ? ", projectile weapon, or tool" : " or projectile weapon") : (tool ? " or tool" : ""));
-		Predicate<ItemStack> predicate = DepthsUtils::isWeaponItem;
+		BiPredicate<Player, ItemStack> predicate = (player, mainhand) -> DepthsUtils.isWeaponItem(mainhand);
 		if (proj) {
-			predicate = predicate.or(ItemUtils::isProjectileWeapon);
+			// or any projectile weapon or riptide trident
+			predicate = predicate.or((player, mainhand) -> ItemUtils.isProjectileWeapon(mainhand) || mainhand.getType() == Material.TRIDENT);
 		} else {
-			predicate = predicate.and(((Predicate<ItemStack>) ItemUtils::isProjectileWeapon).negate());
+			// or a riptide trident, if we can't riptide
+			predicate = predicate.or((player, mainhand) -> ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.RIPTIDE) && !PlayerUtils.canRiptide(player, mainhand));
 		}
 		if (tool) {
-			predicate = predicate.or(ItemUtils::isPickaxe).or(ItemUtils::isShovel);
+			predicate = predicate.or((player, mainhand) -> ItemUtils.isPickaxe(mainhand) || ItemUtils.isShovel(mainhand));
 		} else {
-			predicate = predicate.and(((Predicate<ItemStack>) ItemUtils::isPickaxe).or(ItemUtils::isShovel).negate());
+			predicate = predicate.and((player, mainhand) -> !(ItemUtils.isPickaxe(mainhand) || ItemUtils.isShovel(mainhand)));
 		}
-		Predicate<ItemStack> finalPredicate = predicate;
-		return new AbilityTriggerInfo.TriggerRestriction(display, player -> finalPredicate.test(player.getInventory().getItemInMainHand()));
+		BiPredicate<Player, ItemStack> finalPredicate = predicate;
+		Predicate<Player> playerPredicate = player -> finalPredicate.test(player, player.getInventory().getItemInMainHand());
+		return new AbilityTriggerInfo.TriggerRestriction(display, playerPredicate);
 	}
 }

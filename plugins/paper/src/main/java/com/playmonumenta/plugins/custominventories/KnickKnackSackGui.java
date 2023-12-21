@@ -76,10 +76,11 @@ public class KnickKnackSackGui extends Gui {
 			0xa3cbe1,
 			AvalanchexCS.NAME),
 		// Steelsage talisman
+		// The unlcok and preference scores for shadow and steel are switched!!
 		new Talisman(
 			"Steelsage",
 			"epic:r2/depths/utility/steelsage_talisman",
-			"DDT6Purchased",
+			"DDT5Purchased",
 			6,
 			0x929292,
 			FireworkStrikeCS.NAME),
@@ -87,7 +88,7 @@ public class KnickKnackSackGui extends Gui {
 		new Talisman(
 			"Shadowdancer",
 			"epic:r2/depths/utility/shadowdancer_talisman",
-			"DDT5Purchased",
+			"DDT6Purchased",
 			5,
 			0x7948af,
 			DarkPunishmentCS.NAME),
@@ -135,10 +136,11 @@ public class KnickKnackSackGui extends Gui {
 			0xa3cbe1,
 			AvalanchexCS.NAME),
 		// Steelsage talisman
+		// The unlcok and preference scores for shadow and steel are switched!!
 		new Talisman(
 			"Steelsage",
 			"epic:r3/depths2/steelsage_talisman_zenith",
-			"CZT6Purchased",
+			"CZT5Purchased",
 			6,
 			0x929292,
 			FireworkStrikeCS.NAME),
@@ -146,7 +148,7 @@ public class KnickKnackSackGui extends Gui {
 		new Talisman(
 			"Shadowdancer",
 			"epic:r3/depths2/shadowdancer_talisman_zenith",
-			"CZT5Purchased",
+			"CZT6Purchased",
 			5,
 			0x7948af,
 			DarkPunishmentCS.NAME),
@@ -538,11 +540,16 @@ public class KnickKnackSackGui extends Gui {
 			);
 			meta = reset.getItemMeta();
 			int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, "CZTalisman").orElse(0);
-			if (preferenceValue == 0) {
+			Talisman preference = null;
+			for (Talisman t : DEPTHS_TALISMAN_LIST) {
+				if (t.mPreferenceValue == preferenceValue) {
+					preference = t;
+				}
+			}
+			if (preference == null) {
 				reset.setType(Material.ENDER_PEARL);
 				meta.displayName(Component.text("No Zenith Preference Set!").decoration(TextDecoration.ITALIC, false));
 			} else {
-				Talisman preference = talismans[preferenceValue - 1];
 				meta.displayName(Component.text("Your zenith tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), TextDecoration.BOLD)
 					.decoration(TextDecoration.ITALIC, false));
 			}
@@ -560,11 +567,16 @@ public class KnickKnackSackGui extends Gui {
 			);
 			meta = reset.getItemMeta();
 			int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, "DDTalisman").orElse(0);
-			if (preferenceValue == 0) {
+			Talisman preference = null;
+			for (Talisman t : DEPTHS_TALISMAN_LIST) {
+				if (t.mPreferenceValue == preferenceValue) {
+					preference = t;
+				}
+			}
+			if (preference == null) {
 				reset.setType(Material.ENDER_PEARL);
 				meta.displayName(Component.text("No Depths Preference Set!").decoration(TextDecoration.ITALIC, false));
 			} else {
-				Talisman preference = talismans[preferenceValue - 1];
 				meta.displayName(Component.text("Your depths tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), TextDecoration.BOLD)
 					.decoration(TextDecoration.ITALIC, false));
 			}

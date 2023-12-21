@@ -98,7 +98,7 @@ public class Encore extends DepthsAbility {
 		}
 
 		ClassAbility spell = event.getSpell();
-		if (spell == ClassAbility.METALMANCY || spell == ClassAbility.ICE_BARRIER || spell == ClassAbility.ENCORE || spell == ClassAbility.RAPIDFIRE) {
+		if (spell == ClassAbility.ICE_BARRIER || spell == ClassAbility.ENCORE || spell == ClassAbility.RAPIDFIRE) {
 			return true;
 		}
 

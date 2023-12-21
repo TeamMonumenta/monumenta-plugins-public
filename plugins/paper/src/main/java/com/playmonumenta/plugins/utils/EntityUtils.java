@@ -708,7 +708,7 @@ public class EntityUtils {
 		return getNearestMob(loc, getNearbyMobs(loc, radius));
 	}
 
-	public static @Nullable LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
+	public static @Nullable <T extends LivingEntity> T getNearestMob(Location loc, List<T> nearbyMobs) {
 		return nearbyMobs
 			       .stream()
 			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))

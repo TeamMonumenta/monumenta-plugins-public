@@ -249,6 +249,7 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 			.add(" magic damage when it comes into contact with a mob. The same mob can be hit " +
 				"one time per bounce, and up to " + SAME_MOB_MAX_HITS + " times in total. " +
 				"Killing unique mobs with this ability permanently increases its damage by " + DAMAGE_INCREASE + ".")
+			.addCooldown(COOLDOWN)
 			.addConditional(a -> a != null ? Component.text("\nCurrent stacks: " + a.getCharges()) : Component.empty());
 	}
 }

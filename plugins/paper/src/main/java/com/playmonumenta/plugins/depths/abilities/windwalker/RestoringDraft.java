@@ -155,7 +155,7 @@ public final class RestoringDraft extends DepthsAbility {
 			.add("Falling more than ")
 			.add(AUTOMATIC_THRESHOLD)
 			.add(" blocks heals you by ")
-			.addPercent(a -> a.mHealing, HEALING[rarity - 1], false, true)
+			.add(a -> a.mHealing, HEALING[rarity - 1], false, null, true)
 			.add(" health per block fallen (up to ")
 			.add(a -> a.mHeightCap, HEIGHT_CAP)
 			.add(" blocks). All fall damage is canceled.");

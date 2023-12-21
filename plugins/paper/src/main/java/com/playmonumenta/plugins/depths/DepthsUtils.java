@@ -73,7 +73,9 @@ public class DepthsUtils {
 		Material.CHEST,
 		Material.END_PORTAL,
 		Material.STONE_BUTTON,
-		Material.OBSIDIAN
+		Material.OBSIDIAN,
+		Material.PISTON,
+		Material.STICKY_PISTON
 		);
 
 	//List of locations where ice is currently active

@@ -384,7 +384,7 @@ public class DepthsParty {
 	 *
 	 * @param room the room that was just spawned for the party
 	 */
-	public void setNewRoom(DepthsRoom room) {
+	public void setNewRoom(DepthsRoom room, boolean wildcard) {
 		mCurrentRoom = room;
 		mCurrentRoomType = room.mRoomType;
 		//Set to percentage of total spawners in the room
@@ -461,7 +461,7 @@ public class DepthsParty {
 			}
 		}
 
-		sendMessage("Spawned new " + room.mRoomType.getRoomString() + " room!");
+		sendMessage("Spawned new " + room.mRoomType.getRoomString() + " room" + (wildcard ? " (Wildcard)" : "") + "!");
 
 		mBeatBoss = false;
 	}

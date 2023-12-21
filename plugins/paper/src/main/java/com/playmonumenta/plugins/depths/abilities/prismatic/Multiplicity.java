@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.earthbound.Bulwark;
+import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -44,12 +46,15 @@ public class Multiplicity extends DepthsAbility {
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		//TODO bulwark + dodging maybe shouldn't count?
 		if (!(event.getAbility() instanceof DepthsAbility ability)) {
 			return true;
 		}
 
 		DepthsAbilityInfo<?> info = ability.getInfo();
+		if (info == Bulwark.INFO || info == DepthsDodging.INFO || info.getDepthsTrigger() == DepthsTrigger.LIFELINE) {
+			return true;
+		}
+
 		DepthsTree tree = info.getDepthsTree();
 		if (tree == null) {
 			return true;

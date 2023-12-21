@@ -659,13 +659,8 @@ public class ChromaBlade extends DepthsAbility {
 			return true;
 		}
 
-		// don't count itself
-		if (event.getAbility() instanceof ChromaBlade) {
-			return true;
-		}
-
-		// don't count passives either
-		if (event.getAbility() instanceof Bulwark || event.getAbility() instanceof DepthsDodging) {
+		DepthsAbilityInfo<?> info = ability.getInfo();
+		if (info == ChromaBlade.INFO || info == Bulwark.INFO || info == DepthsDodging.INFO || info.getDepthsTrigger() == DepthsTrigger.LIFELINE) {
 			return true;
 		}
 

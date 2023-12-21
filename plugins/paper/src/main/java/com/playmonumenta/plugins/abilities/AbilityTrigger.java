@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -78,7 +77,7 @@ public class AbilityTrigger {
 				ItemStack mainhand = player.getInventory().getItemInMainHand();
 				return !(mainhand.getType() == Material.COMPASS
 					|| ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.MULTITOOL)
-					|| ((LocationUtils.isLocationInWater(player.getLocation()) || player.isInRain()) && ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.RIPTIDE)));
+					|| PlayerUtils.canRiptide(player, mainhand));
 			}),
 		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe", Material.IRON_PICKAXE,
 			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
