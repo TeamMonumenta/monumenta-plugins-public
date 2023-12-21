@@ -273,13 +273,10 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 		AdditionalGrenadeParameters additionalParameters = (mAdditionalParameters == null ? null : mAdditionalParameters.launch());
 		// Manage Cooldown, if applicable
-		boolean scheduleCooldownReset = false;
+		int internalCooldown = 0;
 		int delay = 0;
 		if (additionalParameters != null) {
-			if (additionalParameters.willOverrideCanRun()) {
-				mOnCooldown = true;
-				scheduleCooldownReset = true;
-			}
+			internalCooldown = additionalParameters.getInternalCooldownTicks();
 			delay = additionalParameters.getStartDelay();
 			// If the start delay is greater than 0 (the grenade cast is not instant)
 			// show the specified boss bar for the attack's cast
@@ -315,8 +312,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			}
 		}
 		// Cooldown Handling, if applicable
-		if (scheduleCooldownReset) {
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mCooldown);
+		if (internalCooldown > 0) {
+			mOnCooldown = true;
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, internalCooldown);
 		}
 	}
 
@@ -621,13 +619,13 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		public final boolean mCapLingeringApplications;
 		// How many applications the lingering will las for, max
 		public final int mMaxLingeringApplications;
-		// Whether to override canRun() with the cooldown of the spell, making it only castable by a spell manager when off cooldown.
-		public final boolean mOverrideCanRun;
+		// Whether the spell has internal cooldown, useful to have it cast less often compared to other spells
+		public final int mInternalCooldownTicks;
 		// Whether to spawn the explosion at the registered player location, at the time of launch.
 		public final boolean mAlwaysAccurate;
 
 		public AdditionalGrenadeParameters(Location spawnOffset, double targetMaxRandomness, int startDelay, double fixedY, ChargeUpManager chargeupManager,
-			   boolean capLingeringApplications, int maxLingeringApplications, boolean overrideCanRun, boolean alwaysAccurate) {
+			   boolean capLingeringApplications, int maxLingeringApplications, int internalCooldownTicks, boolean alwaysAccurate) {
 			mSpawnOffset = spawnOffset;
 			mTargetMaxRandomness = targetMaxRandomness;
 			mStartDelay = startDelay;
@@ -635,7 +633,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			mChargeupManager = chargeupManager;
 			mCapLingeringApplications = capLingeringApplications;
 			mMaxLingeringApplications = maxLingeringApplications;
-			mOverrideCanRun = overrideCanRun;
+			mInternalCooldownTicks = internalCooldownTicks;
 			mAlwaysAccurate = alwaysAccurate;
 		}
 
@@ -668,8 +666,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			return mMaxLingeringApplications;
 		}
 
-		public boolean willOverrideCanRun() {
-			return mOverrideCanRun;
+		public int getInternalCooldownTicks() {
+			return mInternalCooldownTicks;
 		}
 
 		public boolean isAlwaysAccurate() {

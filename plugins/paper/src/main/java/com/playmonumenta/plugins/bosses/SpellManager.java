@@ -64,7 +64,7 @@ public class SpellManager {
 		mCooldown = (int)Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
 	}
 
-	public int runNextSpell() {
+	public int runNextSpell(boolean preventSameSpellTwiceInARow) {
 		/* Standard 1s delay with no spells */
 		if (mIsEmpty) {
 			return 20;
@@ -89,11 +89,15 @@ public class SpellManager {
 		 */
 		List<Spell> spells = new ArrayList<Spell>(mReadySpells.values());
 		Collections.shuffle(spells);
+		Spell previousSpell = mLastCasted;
 		mLastCasted = null;
 		Iterator<Spell> iterator = spells.iterator();
 		while (iterator.hasNext()) {
 			Spell spell = iterator.next();
 			if (spell.canRun() && !spell.onlyForceCasted()) {
+				if (preventSameSpellTwiceInARow && previousSpell != null && spell.getClass().equals(previousSpell.getClass())) {
+					continue;
+				}
 				spell.run();
 				mLastCasted = spell;
 				mCooldownSpells.add(spell);

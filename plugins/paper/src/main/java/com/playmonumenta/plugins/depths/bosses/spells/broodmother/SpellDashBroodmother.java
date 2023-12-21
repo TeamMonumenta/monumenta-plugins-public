@@ -28,18 +28,23 @@ import org.jetbrains.annotations.Nullable;
 public class SpellDashBroodmother extends Spell {
 
 	public static final String SPELL_NAME = "Dash";
-	public static final int CAST_DELAY = 100;
+	public static final int CAST_TIME = 100;
+	public static final int CAST_TIME_A15_DECREASE = 20;
 	public static final int SWEEP_DELAY = 2;
-	public static final int COOLDOWN = 900;
+	public static final int COOLDOWN = 240;
+	public static final int INTERNAL_COOLDOWN = 600;
 	public static final double DAMAGE = 200;
 	public static final int ANIMATION_LINGER_TIME = 20;
-	public static final int SOUND_INCREASE_MODULO = 10;
+	public static final int SOUND_INCREASES = 10;
 	public static final float SOUND_PITCH_INCREASE = 0.1f;
 	public static final int TELEGRAPH_UNITS = 100;
 	public static final int TELEGRAPH_PULSES = 4;
 	public static final float PARTICLE_SPEED = 0.14f;
 	public static final int DASH_FORWARD_INTERPOLATION_TICKS = 10;
 	public static final int DASH_RETURN_INTERPOLATION_TICKS = 4;
+	public static final double SWEEP_Z_OFFSET = 14.5;
+	public static final double SWEEP_DZ_VALUE = -29;
+	public static final double SWEEP_SIZE_A15_INCREASE = 3;
 
 	private final LivingEntity mBoss;
 	private final Plugin mPlugin;
@@ -53,6 +58,8 @@ public class SpellDashBroodmother extends Spell {
 	private final SpellBaseAbstractRectangleAttack mSweepAttack4;
 	private final ChargeUpManager mChargeUp;
 	private final int mFinalCooldown;
+	private final int mFinalCastTime;
+	private final int mSoundIncreaseModulo;
 
 	private boolean mOnCooldown = false;
 
@@ -60,16 +67,20 @@ public class SpellDashBroodmother extends Spell {
 		mBoss = boss;
 		mPlugin = Plugin.getInstance();
 
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(COOLDOWN, party);
+		mFinalCastTime = getCastTime(party);
+		mSoundIncreaseModulo = mFinalCastTime / SOUND_INCREASES;
+		double zOffset = getSweepZOffset(party);
+		double dzValue = getSweepDzValue(party);
 
 		// Parts of the dash
-		mSweep1 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(7.5, -1, 14.5), -19, -29);
-		mSweep2 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-11.5, -1, 14.5), -19, -29);
-		mSweep3 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-30.5, -1, 14.5), -19, -29);
-		mSweep4 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-49.5, -1, 14.5), -19, -29);
+		mSweep1 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(9, -1, zOffset), -20.5, dzValue);
+		mSweep2 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-11.5, -1, zOffset), -19, dzValue);
+		mSweep3 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-30.5, -1, zOffset), -19, dzValue);
+		mSweep4 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-49.5, -1, zOffset), -19, dzValue);
 
 		mSweepAttack1 = new SpellBaseAbstractRectangleAttack(
-			mSweep1, TELEGRAPH_UNITS, TELEGRAPH_PULSES, CAST_DELAY, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
+			mSweep1, TELEGRAPH_UNITS, TELEGRAPH_PULSES, mFinalCastTime, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
@@ -77,7 +88,7 @@ public class SpellDashBroodmother extends Spell {
 		);
 
 		mSweepAttack2 = new SpellBaseAbstractRectangleAttack(
-			mSweep2, TELEGRAPH_UNITS, TELEGRAPH_PULSES, CAST_DELAY, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
+			mSweep2, TELEGRAPH_UNITS, TELEGRAPH_PULSES, mFinalCastTime, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
@@ -85,7 +96,7 @@ public class SpellDashBroodmother extends Spell {
 		);
 
 		mSweepAttack3 = new SpellBaseAbstractRectangleAttack(
-			mSweep3, TELEGRAPH_UNITS, TELEGRAPH_PULSES, CAST_DELAY, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
+			mSweep3, TELEGRAPH_UNITS, TELEGRAPH_PULSES, mFinalCastTime, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
@@ -93,20 +104,19 @@ public class SpellDashBroodmother extends Spell {
 		);
 
 		mSweepAttack4 = new SpellBaseAbstractRectangleAttack(
-			mSweep4, TELEGRAPH_UNITS, TELEGRAPH_PULSES, CAST_DELAY, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
+			mSweep4, TELEGRAPH_UNITS, TELEGRAPH_PULSES, mFinalCastTime, PARTICLE_SPEED, Particle.SQUID_INK, DamageEvent.DamageType.MELEE_SKILL, DAMAGE,
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
 			}
 		);
 
-		mChargeUp = new ChargeUpManager(mBoss, CAST_DELAY, Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
+		mChargeUp = new ChargeUpManager(mBoss, mFinalCastTime, Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
 			BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS, 100);
 	}
 
 	@Override
 	public void run() {
-		mOnCooldown = true;
 		mChargeUp.reset();
 		// Start the delayed "attacks"
 		doSweepSequence();
@@ -117,15 +127,16 @@ public class SpellDashBroodmother extends Spell {
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 				}
-				if (mChargeUp.getTime() % SOUND_INCREASE_MODULO == 0) {
+				if (mChargeUp.getTime() % mSoundIncreaseModulo == 0) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 1 + mPitchIncrease);
 					mPitchIncrease += SOUND_PITCH_INCREASE;
 				}
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
-		// Cooldown Handling
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mFinalCooldown);
+
+		mOnCooldown = true;
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, INTERNAL_COOLDOWN);
 	}
 
 	@Override
@@ -134,13 +145,13 @@ public class SpellDashBroodmother extends Spell {
 	}
 
 	@Override
-	public int castTicks() {
-		return CAST_DELAY;
+	public boolean canRun() {
+		return !mOnCooldown;
 	}
 
 	@Override
-	public boolean canRun() {
-		return !mOnCooldown;
+	public int castTicks() {
+		return mFinalCastTime;
 	}
 
 	private void doSweepSequence() {
@@ -170,20 +181,20 @@ public class SpellDashBroodmother extends Spell {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> blockDisplays.forEach(Entity::remove), DASH_RETURN_INTERPOLATION_TICKS);
 				StructuresAPI.loadAndPasteStructure("BikeSpiderBase", mBoss.getLocation().clone().add(-8, -1, -12), false, false);
 			}, ANIMATION_LINGER_TIME + SWEEP_DELAY * 3);
-		}, CAST_DELAY);
+		}, mFinalCastTime);
 
 		// First sweep
 		mSweepAttack1.run();
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			sweepAesthetics(mSweep1);
-		}, CAST_DELAY);
+		}, mFinalCastTime);
 
 		// Second sweep: after SWEEP_DELAY from the first.
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			mSweepAttack2.run();
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				sweepAesthetics(mSweep2);
-			}, CAST_DELAY);
+			}, mFinalCastTime);
 		}, SWEEP_DELAY);
 
 		// Third sweep: after SWEEP_DELAY * 2 from the first.
@@ -191,7 +202,7 @@ public class SpellDashBroodmother extends Spell {
 			mSweepAttack3.run();
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				sweepAesthetics(mSweep3);
-			}, CAST_DELAY);
+			}, mFinalCastTime);
 		}, SWEEP_DELAY * 2);
 
 		// Fourth sweep: after SWEEP_DELAY * 3 from the first.
@@ -199,7 +210,7 @@ public class SpellDashBroodmother extends Spell {
 			mSweepAttack4.run();
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				sweepAesthetics(mSweep4);
-			}, CAST_DELAY);
+			}, mFinalCastTime);
 		}, SWEEP_DELAY * 3);
 	}
 
@@ -213,5 +224,29 @@ public class SpellDashBroodmother extends Spell {
 			new PartialParticle(Particle.FIREWORKS_SPARK, sweepInfo.getCenter().clone().add(deltaX, deltaY, deltaZ), 1).extra(1)
 				.directionalMode(true).delta(-1, 0, 0).spawnAsEntityActive(mBoss);
 		}
+	}
+
+	private int getCastTime(@Nullable DepthsParty party) {
+		int castTime = CAST_TIME;
+		if (party != null && party.getAscension() >= 15) {
+			castTime -= CAST_TIME_A15_DECREASE;
+		}
+		return castTime;
+	}
+
+	private double getSweepZOffset(@Nullable DepthsParty party) {
+		double offset = SWEEP_Z_OFFSET;
+		if (party != null && party.getAscension() >= 15) {
+			offset += SWEEP_SIZE_A15_INCREASE;
+		}
+		return offset;
+	}
+
+	private double getSweepDzValue(@Nullable DepthsParty party) {
+		double value = SWEEP_DZ_VALUE;
+		if (party != null && party.getAscension() >= 15) {
+			value -= SWEEP_SIZE_A15_INCREASE * 2;
+		}
+		return value;
 	}
 }

@@ -10,6 +10,10 @@ import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +26,7 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -29,24 +34,34 @@ import org.bukkit.util.Vector;
 public class PassiveLaserCores extends Spell {
 
 	public static final String SPELL_NAME = "Laser Cores";
-	public static final int TRIGGER_COOLDOWN = 200;
-	public static final int TELEGRAPH_TIME = 20;
+	public static final int TRIGGER_COOLDOWN = 250;
+	public static final int TELEGRAPH_TIME = 40;
 	public static final int ACTIVE_TIME = 50;
 	public static final double CORE_MOVEMENT_SPEED = 0.3;
+	public static final double CORE_MOVEMENT_SPEED_DISCHARGING = 0.1;
 	public static final double MAX_X_DISTANCE_FROM_BOSS = 50;
-	public static final double DAMAGE = 15;
+	public static final double DAMAGE = 20;
+	public static final double IFRAMES = 5;
 
 	private final LivingEntity mBoss;
 	private final Location mCoreSpawnLocation;
 	private final ArrayList<LaserCore> mCores = new ArrayList<>();
 	private final double mBarrierX;
+	private final Map<UUID, Integer> mHitPlayers = new HashMap<>();
 
 	private int mSpellTicks = 0;
+	private boolean mDischarging = false;
 
 	public PassiveLaserCores(LivingEntity boss) {
 		mBoss = boss;
 		mCoreSpawnLocation = boss.getLocation().add(-34.5, -0.2, 0);
 		mBarrierX = boss.getLocation().getX() - MAX_X_DISTANCE_FROM_BOSS;
+
+		// Spawn initial cores, in strategic locations
+		spawnCore(mCoreSpawnLocation.clone().add(12, 0, 12), new Vector(1, 0, 0));
+		spawnCore(mCoreSpawnLocation.clone().add(-12, 0, 12), new Vector(1, 0, 0));
+		spawnCore(mCoreSpawnLocation.clone().add(12, 0, -12), new Vector(1, 0, 0));
+		spawnCore(mCoreSpawnLocation.clone().add(-12, 0, -12), new Vector(1, 0, 0));
 	}
 
 	@Override
@@ -73,28 +88,26 @@ public class PassiveLaserCores extends Spell {
 	}
 
 	public void spawnNewCores(int amount) {
-		new PartialParticle(Particle.FLASH, mCoreSpawnLocation, 1).spawnFull();
-		for (int i = 0; i < amount; i++) {
-			Location newCoreLoc = mCoreSpawnLocation.clone();
-			// Prevent the movement from being too straight
-			double randomAngle = Math.random();
-			if (randomAngle < 0.25) {
-				newCoreLoc.setYaw(FastUtils.randomFloatInRange(-170, -100));
-			} else if (randomAngle < 0.5) {
-				newCoreLoc.setYaw(FastUtils.randomFloatInRange(-80, -10));
-			} else if (randomAngle < 0.75) {
-				newCoreLoc.setYaw(FastUtils.randomFloatInRange(10, 80));
-			} else {
-				newCoreLoc.setYaw(FastUtils.randomFloatInRange(100, 170));
-			}
-			newCoreLoc.setPitch(0);
+		double theta = Math.random();
+		double thetaIncrease = 2 * Math.PI / amount;
 
-			Entity entity = mBoss.getWorld().spawnEntity(newCoreLoc, EntityType.BLOCK_DISPLAY);
-			if (entity instanceof BlockDisplay blockDisplay) {
-				blockDisplay.setBlock(Material.RED_GLAZED_TERRACOTTA.createBlockData());
-				blockDisplay.setTransformation(DisplayEntityUtils.getTranslation(-0.5f, -0.5f, -0.5f));
-				mCores.add(new LaserCore(blockDisplay, newCoreLoc.getDirection()));
-			}
+		for (int i = 0; i < amount; i++) {
+			Vector dir = new Vector(FastUtils.cos(theta), 0, FastUtils.sin(theta));
+			theta += thetaIncrease;
+
+			spawnCore(mCoreSpawnLocation, dir);
+		}
+	}
+
+	private void spawnCore(Location loc, Vector dir) {
+		Location spawnLoc = loc.clone().setDirection(dir);
+		new PartialParticle(Particle.FLASH, spawnLoc, 1).spawnAsBoss();
+
+		Entity entity = mBoss.getWorld().spawnEntity(spawnLoc, EntityType.BLOCK_DISPLAY);
+		if (entity instanceof BlockDisplay blockDisplay) {
+			blockDisplay.setBlock(Material.RED_GLAZED_TERRACOTTA.createBlockData());
+			blockDisplay.setTransformation(DisplayEntityUtils.getTranslation(-0.5f, -0.5f, -0.5f));
+			mCores.add(new LaserCore(blockDisplay, spawnLoc.getDirection()));
 		}
 	}
 
@@ -107,12 +120,27 @@ public class PassiveLaserCores extends Spell {
 	}
 
 	private void telegraphDischarge() {
+		mDischarging = true;
 		for (int i = 0; i < mCores.size() - 1; i++) {
 			for (int j = i + 1; j < mCores.size(); j++) {
 				new PPLine(Particle.CRIT, mCores.get(i).getLocation(), mCores.get(j).getLocation())
 					.countPerMeter(0.25).offset(FastUtils.randomDoubleInRange(0.5, 1.5)).extra(0.05).spawnAsBoss();
 			}
 		}
+	}
+
+	private boolean shouldBeHit(Player player) {
+		if (!mHitPlayers.containsKey(player.getUniqueId())) {
+			mHitPlayers.put(player.getUniqueId(), Bukkit.getCurrentTick());
+			return true;
+		}
+
+		if (mHitPlayers.get(player.getUniqueId()) <= Bukkit.getCurrentTick() - IFRAMES) {
+			mHitPlayers.put(player.getUniqueId(), Bukkit.getCurrentTick());
+			return true;
+		}
+
+		return false;
 	}
 
 	private void discharge() {
@@ -129,7 +157,9 @@ public class PassiveLaserCores extends Spell {
 						Hitbox.approximateCylinder(mCores.get(i).getLocation(), mCores.get(j).getLocation(), 0.65, true)
 							.getHitPlayers(true).forEach(hitPlayer -> {
 								hitPlayer.getWorld().playSound(hitPlayer, Sound.ENTITY_FIREWORK_ROCKET_BLAST_FAR, SoundCategory.HOSTILE, 0.5f, 2);
-								DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, SPELL_NAME);
+								if (shouldBeHit(hitPlayer)) {
+									DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, true, false, SPELL_NAME);
+								}
 							});
 						playSound(mCores.get(j));
 					}
@@ -137,6 +167,7 @@ public class PassiveLaserCores extends Spell {
 
 				mTicks++;
 				if (mTicks >= ACTIVE_TIME) {
+					mDischarging = false;
 					cancel();
 				}
 			}
@@ -172,7 +203,11 @@ public class PassiveLaserCores extends Spell {
 			if (rayTraceResult == null) {
 				// Nothing hit. Check if it has reached the maximum X wall
 				checkAndShowBarrierCollision(newLoc);
-				newLoc.add(mDir.clone().multiply(CORE_MOVEMENT_SPEED));
+				if (mDischarging) {
+					newLoc.add(mDir.clone().multiply(CORE_MOVEMENT_SPEED_DISCHARGING));
+				} else {
+					newLoc.add(mDir.clone().multiply(CORE_MOVEMENT_SPEED));
+				}
 				mDisplay.teleport(newLoc);
 			} else {
 				Block block = rayTraceResult.getHitBlock();
@@ -208,7 +243,9 @@ public class PassiveLaserCores extends Spell {
 		public void doContactDamage() {
 			new Hitbox.SphereHitbox(mDisplay.getLocation(), 1).getHitPlayers(true).forEach(hitPlayer -> {
 				hitPlayer.getWorld().playSound(hitPlayer, Sound.ENTITY_FIREWORK_ROCKET_BLAST_FAR, SoundCategory.HOSTILE, 0.5f, 2);
-				DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, SPELL_NAME);
+				if (shouldBeHit(hitPlayer)) {
+					DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, true, false, SPELL_NAME);
+				}
 			});
 		}
 
@@ -223,6 +260,7 @@ public class PassiveLaserCores extends Spell {
 		}
 
 		public void remove() {
+			new PartialParticle(Particle.FLASH, mDisplay.getLocation(), 1).spawnAsBoss();
 			mDisplay.remove();
 		}
 

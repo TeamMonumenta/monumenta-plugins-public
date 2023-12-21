@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.bosses.Callicarpa;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -18,7 +19,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,10 +37,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class FlowerPower extends Spell {
 	public static final String SPELL_NAME = "Flower Power";
 	public static final int DURATION = 140;
+	public static final int DURATION_A15_DECREASE = 30;
 	public static final double LASER_TRAVEL_SPEED = 2.7;
 	public static final int LASER_MOVEMENT_STEPS = 8;
 	public static final int LASER_MAX_LIFETIME = 200;
@@ -48,9 +50,11 @@ public class FlowerPower extends Spell {
 	public static final int LASER_CAST_DELAY = 5;
 	public static final int LASER_MAX_CAST_TIME = 40;
 	public static final int LASERS_PER_FLOWER = 3;
+	public static final double FLOWER_RESISTANCE_PER_ASCENSION_FROM_A8 = 0.02;
+	public static final String FLOWER_RESISTANCE_EFFECT_SOURCE = "FlowerPowerResistanceEffect";
 	public static final Color ENERGY_COLOR = Color.fromRGB(252, 223, 78);
 	public static final Color[] ACCUMULATION_COLORS = {Color.fromRGB(27, 140, 44), Color.fromRGB(230, 115, 197), Color.fromRGB(147, 201, 38)};
-	public static final int COOLDOWN = (int) (DURATION * 1.5);
+	public static final int INTERNAL_COOLDOWN = 350;
 
 	// For natural block break purposes.
 	private final Particle.DustOptions mEnergyOptions = new Particle.DustOptions(ENERGY_COLOR, 2);
@@ -66,6 +70,8 @@ public class FlowerPower extends Spell {
 	private final int mFloorY;
 	private final PassiveGardenTwo mGarden;
 	private final int mFinalCooldown;
+	private final @Nullable DepthsParty mParty;
+	private final int mFinalDuration;
 
 	private boolean mOnCooldown = false;
 
@@ -73,13 +79,15 @@ public class FlowerPower extends Spell {
 		mBoss = boss;
 		mFloorY = floorY;
 		mGarden = garden;
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalDuration = getDuration(party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown((int) (mFinalDuration * 1.5), party);
+		mParty = party;
 	}
 
 	@Override
 	public void run() {
 		mOnCooldown = true;
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, mFinalCooldown);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, INTERNAL_COOLDOWN);
 
 		// Spawn one additional flower.
 		mGarden.spawnFlowers(1);
@@ -111,13 +119,24 @@ public class FlowerPower extends Spell {
 		activeFlowers.forEach(flower -> animateEnergyParticle(flower, accumulationPoint.clone()));
 
 		// Start the cast by storing the cast location and starting the telegraph
-		BukkitRunnable flowerRunnable = ParticleUtils.drawFlowerPattern(accumulationPoint.clone(), 2, 6, DURATION,
+		BukkitRunnable flowerRunnable = ParticleUtils.drawFlowerPattern(accumulationPoint.clone(), 2, 6, mFinalDuration,
 			0, Math.PI / 90, 0.2f, Particle.FLAME, mBoss);
+
+		// If ascension 8+, give resistance to the active flowers
+		if (mParty != null && mParty.getAscension() >= 8) {
+			activeFlowers.forEach(flower ->
+				Plugin.getInstance().mEffectManager.addEffect(
+					flower,
+					FLOWER_RESISTANCE_EFFECT_SOURCE,
+					new PercentDamageReceived(mFinalDuration, -FLOWER_RESISTANCE_PER_ASCENSION_FROM_A8 * (mParty.getAscension() - 7))
+				)
+			);
+		}
 
 		BukkitRunnable spellRunnable = new BukkitRunnable() {
 			final Location mActiveCastLoc = activeCastLoc;
 			final Location mAccumulationPoint = accumulationPoint;
-			final ChargeUpManager mChargeUp = new ChargeUpManager(mBoss, DURATION, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME, NamedTextColor.GOLD, TextDecoration.BOLD)), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, 200);
+			final ChargeUpManager mChargeUp = new ChargeUpManager(mBoss, mFinalDuration, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME, NamedTextColor.GOLD, TextDecoration.BOLD)), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, 200);
 			final List<Entity> mActiveFlowers = activeFlowers; // Will be useful at the end of the animation to determine how many flowers are still alive
 
 			int mTicks = 0;
@@ -126,7 +145,7 @@ public class FlowerPower extends Spell {
 			public void run() {
 				// Accumulation Sphere particles
 				new PartialParticle(Particle.REDSTONE, mAccumulationPoint, 5).data(getRandomAccumulationOptions())
-					.extra(0).delta(0.2 + (double) mTicks / (double) DURATION).spawnAsBoss();
+					.extra(0).delta(0.2 + (double) mTicks / (double) mFinalDuration).spawnAsBoss();
 				// Background noise for charging
 				mBoss.getWorld().playSound(mAccumulationPoint, Sound.BLOCK_ROOTED_DIRT_BREAK, SoundCategory.HOSTILE, 10f, 0f);
 
@@ -147,7 +166,9 @@ public class FlowerPower extends Spell {
 
 				if (mChargeUp.nextTick()) {
 					// Charge finished. Proceed with the rest of the attack.
-					int laserCount = flowerCount * LASERS_PER_FLOWER;
+					int evolvedFlowerCount = (int) mActiveFlowers.stream().filter(Entity::isValid)
+						.filter(flower -> flower.getScoreboardTags().contains(Callicarpa.FLOWER_EVOLVED_TAG)).count();
+					int laserCount = flowerCount * LASERS_PER_FLOWER + evolvedFlowerCount * LASERS_PER_FLOWER;
 
 					// Signify charge finished with a sound.
 					mBoss.getWorld().playSound(mAccumulationPoint, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.HOSTILE, 10f, 2f);
@@ -197,7 +218,7 @@ public class FlowerPower extends Spell {
 	}
 
 	public static void launchEnergyLaser(Player target, Location accumulationPoint, LivingEntity boss, Particle.DustOptions laserOptions,
-			 int floorY, Set<BukkitRunnable> activeRunnables, boolean onlyShowToThatPlayer) {
+			 int floorY, @Nullable Set<BukkitRunnable> activeRunnables, boolean onlyShowToThatPlayer) {
 
 		BukkitRunnable energyLaserRunnable = new BukkitRunnable() {
 			final Location mCurrentLaserLoc = accumulationPoint.clone();
@@ -285,7 +306,9 @@ public class FlowerPower extends Spell {
 			}
 		};
 
-		activeRunnables.add(energyLaserRunnable);
+		if (activeRunnables != null) {
+			activeRunnables.add(energyLaserRunnable);
+		}
 		energyLaserRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
@@ -299,7 +322,7 @@ public class FlowerPower extends Spell {
 			final Location mCurrEnergyLoc = mCastLoc.clone();
 			final Location mAccumulationPoint = accumulationPoint;
 			final Vector mDirection = mAccumulationPoint.toVector().subtract(mCastLoc.toVector()).normalize();
-			final Vector mEnergyStep = mDirection.multiply(mCastLoc.distance(mAccumulationPoint) / DURATION);
+			final Vector mEnergyStep = mDirection.multiply(mCastLoc.distance(mAccumulationPoint) / mFinalDuration);
 
 			int mTicks = 0;
 
@@ -328,7 +351,7 @@ public class FlowerPower extends Spell {
 					.extra(0).spawnAsEntityActive(mFlower);
 
 				// Check if spell has finished casting.
-				if (mTicks >= DURATION) {
+				if (mTicks >= mFinalDuration) {
 					yellowTeam.removeEntity(mFlower);
 					this.cancel();
 				}
@@ -342,5 +365,13 @@ public class FlowerPower extends Spell {
 
 	private Particle.DustOptions getRandomAccumulationOptions() {
 		return mAccumulationOptions[FastUtils.randomIntInRange(0, mAccumulationOptions.length - 1)];
+	}
+
+	private int getDuration(@Nullable DepthsParty party) {
+		int duration = DURATION;
+		if (party != null && party.getAscension() >= 15) {
+			duration -= DURATION_A15_DECREASE;
+		}
+		return duration;
 	}
 }

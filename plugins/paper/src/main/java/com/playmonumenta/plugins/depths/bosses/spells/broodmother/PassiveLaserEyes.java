@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.bosses.spells.broodmother;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.bosses.Broodmother;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -27,12 +28,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PassiveLaserEyes extends Spell {
 
 	public static final String SPELL_NAME = "Laser Eyes";
-	public static final double MAGIC_DAMAGE = 6;
-	public static final double FIRE_DAMAGE = 3;
+	public static final double MAGIC_DAMAGE = 8;
+	public static final double FIRE_DAMAGE = 4;
 	public static final int MOVEMENT_COOLDOWN = 140;
 	public static final int TRIGGER_COOLDOWN = 4;
 	public static final int TRIGGERS_PER_MOVEMENT = MOVEMENT_COOLDOWN / TRIGGER_COOLDOWN;
@@ -55,7 +57,7 @@ public class PassiveLaserEyes extends Spell {
 	private int mSpellTicks = 0;
 	private int mTriggers = 0;
 
-	public PassiveLaserEyes(LivingEntity boss, Broodmother broodmother) {
+	public PassiveLaserEyes(LivingEntity boss, Broodmother broodmother, @Nullable DepthsParty party) {
 		mBoss = boss;
 		mBroodmother = broodmother;
 		Vector baseDirection = VectorUtils.rotationToVector(90, 25);
@@ -66,6 +68,10 @@ public class PassiveLaserEyes extends Spell {
 		mEyes.add(mBoss.getLocation().add(-1.5, 6.5, -3).setDirection(baseDirection));
 		mEyes.add(mBoss.getLocation().add(-1.5, 5.5, 1).setDirection(baseDirection));
 		mEyes.add(mBoss.getLocation().add(-1.5, 5.5, -1).setDirection(baseDirection));
+		if (party != null && party.getAscension() >= 15) {
+			mEyes.add(mBoss.getLocation().add(-1.5, 5.5, 2).setDirection(baseDirection));
+			mEyes.add(mBoss.getLocation().add(-1.5, 5.5, -2).setDirection(baseDirection));
+		}
 		mAccumulationPoint = mBoss.getLocation().add(-6, 8, 0);
 	}
 

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.bosses.AntiRangeBoss;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
@@ -11,11 +12,11 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.shadow.ChaosDagger;
+import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassiveBite;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassiveLaserCores;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassiveLaserEyes;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassivePoisonousSkin;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassiveSpider;
-import com.playmonumenta.plugins.depths.bosses.spells.broodmother.SpellBite;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.SpellBloodyFang;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.SpellDashBroodmother;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.SpellEggThrow;
@@ -74,6 +75,9 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	public static final int GROUND_Y_LEVEL = 129;
 	public static final double HEALTH = 5000;
 	public static final double LIMB_HEALTH = 600;
+	public static final double VULNERABILITY_A4_INCREASE = 0.15;
+	public static final double VULNERABILITY_A8_INCREASE = 0.15;
+	public static final double VULNERABILITY_A15_INCREASE = 0.2;
 
 	public static final String MUSIC_TITLE = "epic:music.broodmother_phase1";
 	public static final double MUSIC_DURATION = 2 * 60 + 53; // seconds
@@ -81,13 +85,11 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	public static final double MUSIC_DURATION_2 = 3 * 60 + 21; // seconds
 
 	private final BukkitRunnable mLimbsRunnable;
-	private final BukkitRunnable mBiteRunnable;
 	private final Slime[] mLimbs = new Slime[4];
 	private final Location[] mLimbLocs = new Location[4];
 	private final @Nullable DepthsParty mParty;
 	// Needed references to cancel structure pastings on death.
 	private final SpellLegSweep mLegSweep;
-	private final SpellBite mBite;
 	private final SpellTantrum mTantrum;
 	private final @Nullable PassiveLaserCores mLaserCores;
 
@@ -100,6 +102,13 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	public Broodmother(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
+		mParty = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc.clone().subtract(30, 0, 0));
+
+		// Range immunity for main weakpoint is a8+. Remove it if lower.
+		if (mParty != null && mParty.getAscension() < 8) {
+			Plugin.getInstance().mBossManager.removeAbility(mBoss, AntiRangeBoss.identityTag);
+		}
+
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
 		mBoss.addScoreboardTag(ChaosDagger.NO_GLOWING_CLEAR_TAG);
@@ -108,25 +117,23 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		mBoss.teleport(mBoss.getLocation().add(0, 0, 0.5));
 
 		// Health is scaled by party ascension
-		mParty = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc.clone().subtract(30, 0, 0));
 		EntityUtils.setMaxHealthAndHealth(mBoss, DepthsParty.getAscensionScaledHealth(HEALTH, mParty));
 
-		startEffects();
-
-		// For testing, respawn the boss structure
+		// Respawn the boss structure
 		StructuresAPI.loadAndPasteStructure("BikeSpiderBase", mBoss.getLocation().clone().add(-8, -1, -12), false, false);
+		startEffects();
 
 		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 1.0f, 1.0f, false), true, mBoss, true, 0, 5);
 
 		PassiveSpider passiveSpider = new PassiveSpider(mBoss);
 		PassivePoisonousSkin passivePoisonousSkin = new PassivePoisonousSkin(mBoss, mParty);
+		PassiveBite passiveBite = new PassiveBite(this, mBoss, mParty);
 
 		mLegSweep = new SpellLegSweep(mBoss, mParty, this);
 		SpellVenomSpray spellVenomSpray = new SpellVenomSpray(mBoss, mParty);
 		SpellWebCarpet spellWebCarpet = new SpellWebCarpet(mBoss, mParty);
 		SpellEggThrow spellEggThrow = new SpellEggThrow(mBoss, mParty);
-		mBite = new SpellBite(mBoss, mParty);
 		SpellDashBroodmother spellDashBroodmother = new SpellDashBroodmother(mBoss, mParty);
 		SpellSlam spellSlam = new SpellSlam(mBoss, mParty);
 		SpellBloodyFang spellBloodyFang = new SpellBloodyFang(mBoss, mParty);
@@ -136,23 +143,25 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		if (mParty != null && mParty.getAscension() >= 15) {
 			mLaserCores = new PassiveLaserCores(mBoss);
 			passives = List.of(
-				new PassiveLaserEyes(mBoss, this),
+				new PassiveLaserEyes(mBoss, this, mParty),
 				mLaserCores,
 				passiveSpider,
+				passiveBite,
 				passivePoisonousSkin
 			);
-			mLaserCores.spawnNewCores(2);
 		} else if (mParty != null && mParty.getAscension() >= 8) {
 			mLaserCores = null;
 			passives = List.of(
-				new PassiveLaserEyes(mBoss, this),
+				new PassiveLaserEyes(mBoss, this, mParty),
 				passiveSpider,
+				passiveBite,
 				passivePoisonousSkin
 			);
 		} else {
 			mLaserCores = null;
 			passives = List.of(
 				passiveSpider,
+				passiveBite,
 				passivePoisonousSkin
 			);
 		}
@@ -163,7 +172,6 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 				spellVenomSpray,
 				spellWebCarpet,
 				spellEggThrow,
-				mBite,
 				spellBloodyFang
 			)
 		);
@@ -174,7 +182,6 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 				spellVenomSpray,
 				spellWebCarpet,
 				spellEggThrow,
-				mBite,
 				spellBloodyFang,
 				mTantrum
 			)
@@ -187,7 +194,6 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 				spellVenomSpray,
 				spellWebCarpet,
 				spellEggThrow,
-				mBite,
 				spellBloodyFang,
 				mTantrum
 			)
@@ -201,7 +207,6 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 				spellSlam,
 				spellWebCarpet,
 				spellEggThrow,
-				mBite,
 				spellBloodyFang,
 				mTantrum
 			)
@@ -243,7 +248,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		constructBoss(phase1Spells, passives, detectionRange, bossBar, 20, 1);
+		constructBoss(phase1Spells, passives, detectionRange, bossBar, 140, 1, true);
 
 		// Right front limb
 		mLimbLocs[0] = mBoss.getLocation().add(-4.5, 0, 9);
@@ -281,26 +286,11 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			}
 		};
 		mLimbsRunnable.runTaskTimer(mPlugin, 0, 1);
-
-		mBiteRunnable = new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!mPausedVulnerableTimer) {
-					Broodmother.super.forceCastSpell(SpellBite.class);
-				}
-
-				if (!mBoss.isValid()) {
-					this.cancel();
-				}
-			}
-		};
-		mBiteRunnable.runTaskTimer(mPlugin, 0, DepthsParty.getAscensionEigthCooldown(SpellBite.RECOVERY_TIME, mParty));
 	}
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		mLimbsRunnable.cancel();
-		mBiteRunnable.cancel();
 		clearLimbs();
 		if (mLaserCores != null) {
 			mLaserCores.removeAllCores();
@@ -312,7 +302,6 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		}
 
 		mLegSweep.stopLegTasks();
-		mBite.stopBiteTasks();
 		mTantrum.stopTantrumTasks();
 
 		// Prepare for explosion
@@ -372,16 +361,15 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	private void startEffects() {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 10, 0.5f), 20);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 10, 0.5f), 50);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 10, 0.5f), 60);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 10, 0.5f), 80);
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 10, 0.5f), 90);
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 10, 0.5f), 110);
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 1.5f), 140);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 1.5f), 100);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 				MessagingUtils.sendBoldTitle(player, Component.text("The Broodmother", NamedTextColor.DARK_RED), Component.text("Norvigut Deity", NamedTextColor.GOLD));
 				player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0));
 			}
-		}, 160);
+		}, 100);
 	}
 
 	@Override
@@ -400,7 +388,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		}
 
 		Slime limb = mLimbs[index];
-		if (!limb.isValid()) {
+		if (limb == null || !limb.isValid()) {
 			return;
 		}
 
@@ -506,6 +494,22 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		if (event.getBossSpellName() != null) {
 			event.setDamage(DepthsParty.getAscensionScaledDamage(event.getDamage(), mParty));
 		}
+	}
+
+	public static double getVulnerabilityAmount(@Nullable DepthsParty party) {
+		double amount = 0;
+		if (party != null) {
+			if (party.getAscension() >= 4) {
+				amount += VULNERABILITY_A4_INCREASE;
+			}
+			if (party.getAscension() >= 8) {
+				amount += VULNERABILITY_A8_INCREASE;
+			}
+			if (party.getAscension() >= 15) {
+				amount += VULNERABILITY_A15_INCREASE;
+			}
+		}
+		return amount;
 	}
 }
 

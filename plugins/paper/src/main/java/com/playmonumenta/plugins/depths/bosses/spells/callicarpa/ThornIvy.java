@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsParty;
+import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
@@ -13,7 +14,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -28,11 +28,14 @@ import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ThornIvy extends Spell {
 
 	public static final String SPELL_NAME = "Thorn Ivy";
 	public static final int CAST_TIME = 40;
+	// Note: this also increases the Ivy radius
+	public static final int CAST_TIME_A15_DECREASE = 8;
 	public static final int DURATION = 80;
 	public static final int VINE_POINTS = 8;
 	public static final int VINES = 4;
@@ -45,7 +48,6 @@ public class ThornIvy extends Spell {
 	public static final int MAX_ROTATION_SPEED_TICKS = 40;
 	public static final double DAMAGE = 50;
 	public static final Color[] VINE_COLORS = {Color.fromRGB(55, 173, 26), Color.fromRGB(43, 120, 24), Color.fromRGB(112, 72, 17)};
-	public static final int COOLDOWN = (int) (DURATION * 1.5) + CAST_TIME;
 
 	private final Particle.DustOptions[] mVineOptions = {
 		new Particle.DustOptions(VINE_COLORS[0], 1f),
@@ -58,26 +60,27 @@ public class ThornIvy extends Spell {
 	private final LivingEntity mBoss;
 	private final int mFloorY;
 	private final int mFinalCooldown;
+	private final @Nullable DepthsParty mParty;
+	private final Callicarpa mCallicarpa;
+	private final int mFinalCastTime;
 
-	private boolean mOnCooldown = false;
-
-	public ThornIvy(LivingEntity boss, int floorY, @Nullable DepthsParty party) {
+	public ThornIvy(LivingEntity boss, int floorY, @Nullable DepthsParty party, Callicarpa callicarpa) {
 		mBoss = boss;
 		mFloorY = floorY;
-
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalCastTime = getCastTime(party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(DURATION * 2 + mFinalCastTime, party);
+		mParty = party;
+		mCallicarpa = callicarpa;
 	}
 
 	@Override
 	public void run() {
-		mOnCooldown = true;
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, mFinalCooldown);
 		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, DURATION, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME, NamedTextColor.DARK_GREEN, TextDecoration.BOLD)), BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, 200);
 
 		BukkitRunnable vinesRunnable = new BukkitRunnable() {
 			final double mPointOffset = 2 * Math.PI / VINES;
-			final int mAnimationTicksIncrement = CAST_TIME / VINE_POINTS;
-			final int mChargingTickSpeed = DURATION / CAST_TIME;
+			final int mAnimationTicksIncrement = mFinalCastTime / VINE_POINTS;
+			final int mChargingTickSpeed = DURATION / mFinalCastTime;
 			// This is used to increase the speed as time goes on. Add a certain portion that allows the attack to
 			// reach max speed within DURATION - MAX_ROTATION_SPEED_TICKS ticks, remaining at max speed for MAX_ROTATION_SPEED_TICKS.
 			final double mRotationSpeedChange = (ROTATION_SPEED_MAX - ROTATION_SPEED_INIT) / (double) (DURATION - MAX_ROTATION_SPEED_TICKS);
@@ -153,12 +156,16 @@ public class ThornIvy extends Spell {
 				}
 
 				if (mDischarging && chargeUp.previousTick()) {
+					mCallicarpa.isReflectingProjectiles(false);
 					this.cancel();
 				}
 
 				if (!mDischarging && chargeUp.nextTick(mChargingTickSpeed)) {
 					chargeUp.setTitle(Component.text("Unleashing ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME, NamedTextColor.DARK_GREEN, TextDecoration.BOLD)));
 					mDischarging = true;
+					if (shouldReflectProjectiles()) {
+						mCallicarpa.isReflectingProjectiles(true);
+					}
 				}
 
 				mTicks++;
@@ -203,12 +210,19 @@ public class ThornIvy extends Spell {
 		return mFinalCooldown;
 	}
 
-	@Override
-	public boolean canRun() {
-		return !mOnCooldown;
-	}
-
 	private Particle.DustOptions getRandomVineOptions() {
 		return mVineOptions[FastUtils.randomIntInRange(0, mVineOptions.length - 1)];
+	}
+
+	private boolean shouldReflectProjectiles() {
+		return mParty != null && mParty.getAscension() >= 15;
+	}
+
+	private int getCastTime(@Nullable DepthsParty party) {
+		int time = CAST_TIME;
+		if (party != null && party.getAscension() >= 15) {
+			time -= CAST_TIME_A15_DECREASE;
+		}
+		return time;
 	}
 }

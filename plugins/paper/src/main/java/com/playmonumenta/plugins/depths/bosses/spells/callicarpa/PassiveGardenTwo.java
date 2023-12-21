@@ -38,7 +38,9 @@ public class PassiveGardenTwo extends Spell {
 	public static final String[] EVOLVED_FLOWER_NAMES = {"InfernalLily", "RoyalHydrangea", "SporeBlossom", "Sunflower"};
 	public static final double FLOWER_HP = 100;
 	public static final double ELITE_FLOWER_HP = 200;
-	public static final String ADDS_LOSPOOL = "~DD2_F1_Callicarpa_Minions";
+	public static final String ADDS_A4_LOS_POOL = "~DD2_F1_Callicarpa_Minions_A4";
+	public static final String ADDS_A8_LOS_POOL = "~DD2_F1_Callicarpa_Minions_A8";
+	public static final String ADDS_A15_LOS_POOL = "~DD2_F1_Callicarpa_Minions_A15";
 	public static final int MAX_MOBS = 16;
 
 	private final LivingEntity mBoss;
@@ -50,6 +52,8 @@ public class PassiveGardenTwo extends Spell {
 	private final Particle.DustOptions mSpawnOptions = new Particle.DustOptions(mSpawnColor, 2.5f);
 	private final Particle.DustOptions mSpawnFlowerOptions = new Particle.DustOptions(mSpawnFlowerColor, 2.5f);
 	private final Particle.DustOptions mEvolveFlowerOptions = new Particle.DustOptions(Color.ORANGE, 2f);
+	private final boolean mSpawnAlreadyEvolved;
+	private final String mAddsLosPool;
 
 	private int mSpellTicks = 0;
 	private int mPlayerScaledCooldown = 100;
@@ -64,6 +68,26 @@ public class PassiveGardenTwo extends Spell {
 		// Store the spots where adds can be spawned.
 		mAddsSpawns = mBoss.getNearbyEntities(200, 30, 200).stream()
 			.filter(e -> e.getScoreboardTags().contains(Callicarpa.MOB_SPAWN_SPOT_TAG)).map(Entity::getLocation).toList();
+
+		if (party != null) {
+			int ascension = party.getAscension();
+			if (ascension < 4) {
+				mAddsLosPool = "";
+				mSpawnAlreadyEvolved = false;
+			} else if (ascension < 8) {
+				mAddsLosPool = ADDS_A4_LOS_POOL;
+				mSpawnAlreadyEvolved = false;
+			} else if (ascension < 15) {
+				mAddsLosPool = ADDS_A8_LOS_POOL;
+				mSpawnAlreadyEvolved = false;
+			} else {
+				mAddsLosPool = ADDS_A15_LOS_POOL;
+				mSpawnAlreadyEvolved = true;
+			}
+		} else {
+			mAddsLosPool = "";
+			mSpawnAlreadyEvolved = false;
+		}
 	}
 
 	@Override
@@ -122,6 +146,9 @@ public class PassiveGardenTwo extends Spell {
 						randomLoc.clone().subtract(0, 1, 0).getBlock().setType(Material.OAK_WOOD);
 						randomLoc.getBlock().setType(Material.POTTED_FERN);
 						aboutToSpawn.remove(randomLoc);
+						if (mSpawnAlreadyEvolved) {
+							evolveRandomFlowers(1);
+						}
 					}, SPAWN_DELAY);
 					spawned = true;
 				}
@@ -223,7 +250,7 @@ public class PassiveGardenTwo extends Spell {
 
 		for (int i = 0; i < finalCount; i++) {
 			Location chosenLoc = mAddsSpawns.get(FastUtils.randomIntInRange(0, spawnSpotCount - 1));
-			LoSPool.fromString(ADDS_LOSPOOL).spawn(chosenLoc);
+			LoSPool.fromString(mAddsLosPool).spawn(chosenLoc);
 			new PPFlower(Particle.REDSTONE, chosenLoc, 3).petals(5).data(mEvolveFlowerOptions).spawnAsBoss();
 		}
 	}

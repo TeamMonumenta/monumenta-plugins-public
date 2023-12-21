@@ -48,6 +48,7 @@ import org.bukkit.entity.Hoglin;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -72,12 +73,13 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	public static final Particle.DustOptions mMenaceLinkOptions = new Particle.DustOptions(MENACE_LINK_COLOR, 2);
 
 	public static final String MUSIC_TITLE = "epic:music.hedera";
-	private static final int MUSIC_DURATION = 202; //seconds
+	private static final int MUSIC_DURATION = 202; // seconds
 
-	public final int mFloorY;
+	private final int mFloorY;
 	private final @Nullable DepthsParty mParty;
 
-	public @Nullable Hoglin mMenace;
+	private @Nullable Hoglin mMenace;
+	private boolean mIsReflectingProjectiles = false;
 
 	public Callicarpa(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
@@ -116,7 +118,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		}
 
 		FlowerPower flowerPower = new FlowerPower(mBoss, mFloorY, mParty, garden);
-		ThornIvy thornIvy = new ThornIvy(mBoss, mFloorY, mParty);
+		ThornIvy thornIvy = new ThornIvy(mBoss, mFloorY, mParty, this);
 		BrambleBall brambleBall = new BrambleBall(mBoss, mFloorY, mParty);
 		EvolutionSeeds evolutionSeeds = new EvolutionSeeds(mBoss, mParty, garden);
 		LeafNova leafNova = new LeafNova(mBoss, mParty);
@@ -211,57 +213,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 
 		// Boss Bar and Construct
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
-		constructBoss(phase1Spells, passives, detectionRange, bossBar, 100, 1);
-	}
-
-	@Override
-	public void death(@Nullable EntityDeathEvent event) {
-		// Kill off the Menace
-		if (mMenace != null) {
-			mMenace.setHealth(0);
-			mMenace.remove();
-		}
-
-		// Kill off all the Flowers
-		Location loc = mBoss.getLocation();
-		loc.getNearbyEntities(200, 30, 200).stream()
-			.filter(e -> e.getScoreboardTags().contains(FLOWER_TAG)).forEach(Entity::remove);
-
-		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
-			player.sendMessage(
-				Component.text("[Callicarpa] ", NamedTextColor.GOLD)
-					.append(Component.text("Oh yes, at last, the voice recedes... with final breath... I am now freed...", NamedTextColor.DARK_GREEN))
-			);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
-		}
-
-		new BukkitRunnable() {
-			final int mMaxTimesRun = 20;
-			final double mYIncrease = 2;
-			final Location mCurrLoc = mBoss.getLocation();
-			final Particle.DustOptions mBaseColor = new Particle.DustOptions(Color.fromRGB(232, 46, 124), 2);
-			final Particle.DustOptions mFlowerColor = new Particle.DustOptions(Color.fromRGB(237, 145, 242), 1);
-
-			int mRuns = 0;
-
-			@Override
-			public void run() {
-				if (mRuns == 0) {
-					new PPFlower(Particle.REDSTONE, mCurrLoc, 6).data(mBaseColor).petals(9).angleStep(0.05).spawnAsBoss();
-				} else {
-					new PPFlower(Particle.REDSTONE, mCurrLoc, 2).data(mFlowerColor).petals(5).spawnAsBoss();
-				}
-
-				mCurrLoc.add(0, mYIncrease, 0);
-
-				mRuns++;
-				if (mRuns >= mMaxTimesRun) {
-					DepthsManager.getInstance().bossDefeated(loc, detectionRange);
-					cancel();
-				}
-			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		constructBoss(phase1Spells, passives, detectionRange, bossBar, 100, 1, true);
 	}
 
 	private void summonMenace(Location loc) {
@@ -328,10 +280,101 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
+	public void isReflectingProjectiles(boolean isReflectingProjectiles) {
+		mIsReflectingProjectiles = isReflectingProjectiles;
+	}
+
+	@Override
+	public void death(@Nullable EntityDeathEvent event) {
+		// Kill off the Menace
+		if (mMenace != null) {
+			mMenace.setHealth(0);
+			mMenace.remove();
+		}
+
+		// Kill off all the Flowers
+		Location loc = mBoss.getLocation();
+		loc.getNearbyEntities(200, 30, 200).stream()
+			.filter(e -> e.getScoreboardTags().contains(FLOWER_TAG)).forEach(Entity::remove);
+
+		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
+			player.sendMessage(
+				Component.text("[Callicarpa] ", NamedTextColor.GOLD)
+					.append(Component.text("Oh yes, at last, the voice recedes... with final breath... I am now freed...", NamedTextColor.DARK_GREEN))
+			);
+			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
+		}
+
+		new BukkitRunnable() {
+			final int mMaxTimesRun = 20;
+			final double mYIncrease = 2;
+			final Location mCurrLoc = mBoss.getLocation();
+			final Particle.DustOptions mBaseColor = new Particle.DustOptions(Color.fromRGB(232, 46, 124), 2);
+			final Particle.DustOptions mFlowerColor = new Particle.DustOptions(Color.fromRGB(237, 145, 242), 1);
+
+			int mRuns = 0;
+
+			@Override
+			public void run() {
+				if (mRuns == 0) {
+					new PPFlower(Particle.REDSTONE, mCurrLoc, 6).data(mBaseColor).petals(9).angleStep(0.05).spawnAsBoss();
+				} else {
+					new PPFlower(Particle.REDSTONE, mCurrLoc, 2).data(mFlowerColor).petals(5).spawnAsBoss();
+				}
+
+				mCurrLoc.add(0, mYIncrease, 0);
+
+				mRuns++;
+				if (mRuns >= mMaxTimesRun) {
+					DepthsManager.getInstance().bossDefeated(loc, detectionRange);
+					cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 2);
+	}
+
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (event.getBossSpellName() != null) {
 			event.setDamage(DepthsParty.getAscensionScaledDamage(event.getDamage(), mParty));
+		}
+	}
+
+	@Override
+	public void onHurt(DamageEvent event) {
+		if (
+			mIsReflectingProjectiles &&
+			event.getDamager() instanceof Player damager &&
+			DamageEvent.DamageType.getAllProjectileTypes().contains(event.getType())
+		) {
+			FlowerPower.launchEnergyLaser(
+				damager,
+				mBoss.getEyeLocation(),
+				mBoss, new Particle.DustOptions(FlowerPower.ENERGY_COLOR, 1.5f),
+				mFloorY,
+				null,
+				false
+			);
+			event.setCancelled(true);
+		}
+	}
+
+	@Override
+	public void bossHitByProjectile(ProjectileHitEvent event) {
+		if (
+			mIsReflectingProjectiles &&
+			event.getEntity().getShooter() instanceof Player shooter
+		) {
+			FlowerPower.launchEnergyLaser(
+				shooter,
+				mBoss.getEyeLocation(),
+				mBoss, new Particle.DustOptions(FlowerPower.ENERGY_COLOR, 1.5f),
+				mFloorY,
+				null,
+				false
+			);
+			event.setCancelled(true);
 		}
 	}
 }

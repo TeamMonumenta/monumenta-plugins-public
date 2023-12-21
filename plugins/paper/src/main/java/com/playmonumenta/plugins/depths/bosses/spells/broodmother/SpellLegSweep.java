@@ -28,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
 public class SpellLegSweep extends Spell {
 
 	public static final String SPELL_NAME = "Leg Sweep";
-	public static final int COOLDOWN = 180;
+	public static final int COOLDOWN = 160;
 	public static final int CAST_FIRST_DELAY = 60;
-	public static final double CAST_SECOND_DELAY = CAST_FIRST_DELAY / 2.0;
+	public static final int CAST_FIRST_DELAY_A15_DECREASE = 20;
 	public static final int ANIMATION_TIME = 10;
 	public static final int ANIMATION_LINGER_TIME = 15;
 	public static final double DAMAGE = 50;
@@ -48,21 +48,23 @@ public class SpellLegSweep extends Spell {
 	private final ChargeUpManager mChargeUp;
 	private final ArrayList<BukkitTask> mLegTasks = new ArrayList<>();
 	private final int mFinalCooldown;
-
-	private boolean mOnCooldown = false;
+	private final int mFinalCastFirstDelay;
+	private final int mFinalCastSecondDelay;
 
 	public SpellLegSweep(LivingEntity boss, @Nullable DepthsParty party, Broodmother broodmother) {
 		mBoss = boss;
 		mBroodmother = broodmother;
 		mPlugin = Plugin.getInstance();
 		// 3 away, 4 in, 1 away
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(COOLDOWN, party);
+		mFinalCastFirstDelay = getFirstCastDelay(party);
+		mFinalCastSecondDelay = mFinalCastFirstDelay / 2;
 
 		mSweepRight1 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-5, -1, 2.5), -18.5, 13);
-		mSweepRight2 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-5, -1, 2.5), 12.5, 18);
+		mSweepRight2 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-5, -1, 2.5), 14, 18);
 		mSweepLeft1 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-5, -1, -2.5), -18.5, -13);
-		mSweepLeft2 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-5, -1, -2.5), 12.5, -18);
-		mChargeUp = new ChargeUpManager(mBoss, CAST_FIRST_DELAY,
+		mSweepLeft2 = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(-5, -1, -2.5), 14, -18);
+		mChargeUp = new ChargeUpManager(mBoss, mFinalCastFirstDelay,
 			Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_RED, TextDecoration.BOLD)),
 			BossBar.Color.RED, BossBar.Overlay.PROGRESS, 100
 		);
@@ -70,8 +72,6 @@ public class SpellLegSweep extends Spell {
 
 	@Override
 	public void run() {
-		mOnCooldown = true;
-
 		mChargeUp.reset();
 		mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 
@@ -95,7 +95,7 @@ public class SpellLegSweep extends Spell {
 					sweep(mSweepRight1, true, true);
 					sweep(mSweepRight2, true, true);
 				}
-			}, CAST_FIRST_DELAY)
+			}, mFinalCastFirstDelay)
 		);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -106,30 +106,23 @@ public class SpellLegSweep extends Spell {
 					if (mChargeUp.nextTick()) {
 						mChargeUp.setTitle(Component.text("Casting ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 						mSwitchedDirection = true;
-						mChargeUp.setChargeTime((int) CAST_SECOND_DELAY);
-						mChargeUp.setTime((int) CAST_SECOND_DELAY);
+						mChargeUp.setChargeTime(mFinalCastSecondDelay);
+						mChargeUp.setTime(mFinalCastSecondDelay);
 					}
 				} else {
 					if (mChargeUp.previousTick()) {
-						mChargeUp.setChargeTime(CAST_FIRST_DELAY);
+						mChargeUp.setChargeTime(mFinalCastFirstDelay);
 						this.cancel();
 					}
 				}
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
-		// Cooldown Handling
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mFinalCooldown);
 	}
 
 	@Override
 	public int cooldownTicks() {
 		return mFinalCooldown;
-	}
-
-	@Override
-	public boolean canRun() {
-		return !mOnCooldown;
 	}
 
 	public void stopLegTasks() {
@@ -138,7 +131,7 @@ public class SpellLegSweep extends Spell {
 
 	private void sweep(SpellBaseAbstractRectangleAttack.RectangleInfo sweepInfo, boolean right, boolean isSecondCast) {
 		// Telegraph the attack
-		new SpellBaseAbstractRectangleAttack(sweepInfo, PARTICLE_AMOUNT, TELEGRAPH_PULSES, (isSecondCast ? (int) CAST_SECOND_DELAY : CAST_FIRST_DELAY), PARTICLE_SPEED,
+		new SpellBaseAbstractRectangleAttack(sweepInfo, PARTICLE_AMOUNT, TELEGRAPH_PULSES, (isSecondCast ? mFinalCastSecondDelay : mFinalCastFirstDelay), PARTICLE_SPEED,
 			Particle.END_ROD, DamageEvent.DamageType.MELEE, DAMAGE, true, true, SPELL_NAME,
 			Particle.SWEEP_ATTACK, mPlugin, mBoss,
 			(boss) -> {
@@ -176,7 +169,15 @@ public class SpellLegSweep extends Spell {
 						mBroodmother.moveLimb(1, new Vector(0, 0, -0.5));
 					}
 				}, ANIMATION_LINGER_TIME);
-			}, isSecondCast ? (int) CAST_SECOND_DELAY - ANIMATION_TIME : CAST_FIRST_DELAY - ANIMATION_TIME)
+			}, isSecondCast ? mFinalCastSecondDelay - ANIMATION_TIME : mFinalCastFirstDelay - ANIMATION_TIME)
 		);
+	}
+
+	private int getFirstCastDelay(@Nullable DepthsParty party) {
+		int delay = CAST_FIRST_DELAY;
+		if (party != null && party.getAscension() >= 15) {
+			delay -= CAST_FIRST_DELAY_A15_DECREASE;
+		}
+		return delay;
 	}
 }

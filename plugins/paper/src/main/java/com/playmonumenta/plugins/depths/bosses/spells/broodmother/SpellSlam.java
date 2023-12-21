@@ -33,8 +33,10 @@ import org.jetbrains.annotations.Nullable;
 public class SpellSlam extends Spell {
 
 	public static final String SPELL_NAME = "Body Slam";
-	public static final int COOLDOWN = 800;
+	public static final int COOLDOWN = 200;
+	public static final int INTERNAL_COOLDOWN = 800;
 	public static final int CAST_TIME = 130;
+	public static final int CAST_TIME_A15_DECREASE = 30;
 	public static final double ATTACK_RADIUS = 40;
 	public static final int TICKS_BEFORE_CAST_END_JUMP = 20;
 	public static final int TICKS_BEFORE_CAST_END_GALLOP = 40;
@@ -52,6 +54,7 @@ public class SpellSlam extends Spell {
 	private final SpellBaseAbstractCircleAttack mSlamAttack;
 	private final ChargeUpManager mChargeUp;
 	private final int mFinalCooldown;
+	private final int mFinalCastTime;
 
 	private boolean mOnCooldown = false;
 
@@ -59,11 +62,12 @@ public class SpellSlam extends Spell {
 		mBoss = boss;
 		mPlugin = Plugin.getInstance();
 
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(COOLDOWN, party);
+		mFinalCastTime = getCastTime(party);
 
 		mSlam = new SpellBaseAbstractCircleAttack.CircleInfo(mBoss.getLocation().subtract(0, 1, 0), ATTACK_RADIUS);
 		mSlamAttack = new SpellBaseAbstractCircleAttack(
-			mSlam, TELEGRAPH_UNITS, TELEGRAPH_PULSES, CAST_TIME, PARTICLE_SPEED, Particle.SOUL_FIRE_FLAME, DamageEvent.DamageType.MELEE_SKILL, 0, true,
+			mSlam, TELEGRAPH_UNITS, TELEGRAPH_PULSES, mFinalCastTime, PARTICLE_SPEED, Particle.SOUL_FIRE_FLAME, DamageEvent.DamageType.MELEE_SKILL, 0, true,
 			true, SPELL_NAME, Particle.CRIT, mPlugin, mBoss,
 			(bosss) -> {
 				bosss.getWorld().playSound(bosss.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 12f, 0);
@@ -72,14 +76,13 @@ public class SpellSlam extends Spell {
 			}
 		);
 
-		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME,
+		mChargeUp = new ChargeUpManager(mBoss, mFinalCastTime,
 			Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.BLUE, TextDecoration.BOLD)),
 			BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_20, 100);
 	}
 
 	@Override
 	public void run() {
-		mOnCooldown = true;
 		mChargeUp.reset();
 
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -89,14 +92,14 @@ public class SpellSlam extends Spell {
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 				}
-				if (mTicks >= WARNING_SOUND_LOWER_BOUND && mTicks <= CAST_TIME - TICKS_BEFORE_CAST_END_GALLOP && mTicks % WARNING_SOUND_MODULO == 0) {
+				if (mTicks >= WARNING_SOUND_LOWER_BOUND && mTicks <= mFinalCastTime - TICKS_BEFORE_CAST_END_GALLOP && mTicks % WARNING_SOUND_MODULO == 0) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 12f, 0);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 12f, 0);
 				}
-				if (mTicks >= CAST_TIME - TICKS_BEFORE_CAST_END_GALLOP && mTicks < CAST_TIME - TICKS_BEFORE_CAST_END_JUMP) {
+				if (mTicks >= mFinalCastTime - TICKS_BEFORE_CAST_END_GALLOP && mTicks < mFinalCastTime - TICKS_BEFORE_CAST_END_JUMP) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_GALLOP, 9f, 2f);
 				}
-				if (mTicks == CAST_TIME - TICKS_BEFORE_CAST_END_JUMP) {
+				if (mTicks == mFinalCastTime - TICKS_BEFORE_CAST_END_JUMP) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 9f, 0f);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 9f, 0f);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 9f, 0f);
@@ -123,9 +126,10 @@ public class SpellSlam extends Spell {
 			new PartialParticle(Particle.EXPLOSION_HUGE, mSlam.getCenter(), 1).extra(0).spawnAsEntityActive(mBoss);
 			// Send the quake
 			doQuake();
-		}, CAST_TIME);
-		// Cooldown Handling
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mFinalCooldown);
+		}, mFinalCastTime);
+
+		mOnCooldown = true;
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, INTERNAL_COOLDOWN);
 	}
 
 	private void doQuake() {
@@ -178,7 +182,14 @@ public class SpellSlam extends Spell {
 
 	@Override
 	public int castTicks() {
-		return CAST_TIME;
+		return mFinalCastTime;
 	}
 
+	private int getCastTime(@Nullable DepthsParty party) {
+		int castTime = CAST_TIME;
+		if (party != null && party.getAscension() >= 15) {
+			castTime -= CAST_TIME_A15_DECREASE;
+		}
+		return castTime;
+	}
 }

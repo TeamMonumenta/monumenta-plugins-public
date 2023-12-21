@@ -488,6 +488,12 @@ public class DepthsListener implements Listener {
 		DepthsManager dm = DepthsManager.getInstance();
 		DepthsPlayer dp = dm.getDepthsPlayer(player);
 
+		MMLog.finer("Player " + player.getName() + " quit." +
+			" has_depths_player=" + (dp != null) +
+			" transferring=" + Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) +
+			" quit_reason=" + event.getReason().name()
+		);
+
 		if (
 			dp != null &&
 			!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
@@ -504,6 +510,11 @@ public class DepthsListener implements Listener {
 					Set<String> scoreboardTags = living.getScoreboardTags();
 					return applicableBossTags.stream().anyMatch(scoreboardTags::contains);
 				});
+
+			MMLog.finer("Player " + player.getName() +
+				" nearZenithBoss=" + nearZenithBoss +
+				" nearHostileMob=" + (EntityUtils.getNearestHostile(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null)
+			);
 
 			if (nearZenithBoss) {
 				player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_BOSS_TAG);
@@ -600,9 +611,11 @@ public class DepthsListener implements Listener {
 		Player player = event.getPlayer();
 		DepthsManager manager = DepthsManager.getInstance();
 		DepthsPlayer dp = manager.getDepthsPlayer(player);
+		MMLog.finer("Player " + player.getName() + " logged in. has_depths_player=" + (dp != null));
 		if (dp != null) {
 			boolean shouldOfflineTeleport = true;
 			DepthsParty party = manager.getPartyFromId(dp);
+			MMLog.finer("Player " + player.getName() + " has_party=" + (party != null));
 			if (party != null) {
 				Map<DelvesModifier, Integer> delvePointsForParty = party.mDelveModifiers;
 				for (DelvesModifier m : DelvesModifier.values()) {

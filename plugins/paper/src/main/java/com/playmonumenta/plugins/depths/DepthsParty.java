@@ -715,7 +715,7 @@ public class DepthsParty {
 		return baseDamage * (party != null ? party.getZenithDamageIncreaseMultiplier() : 1);
 	}
 
-	public static int getAscensionEigthCooldown(int baseCooldown, @Nullable DepthsParty party) {
+	public static int getAscensionEightCooldown(int baseCooldown, @Nullable DepthsParty party) {
 		return (party != null && party.getAscension() >= 8) ? baseCooldown - 40 : baseCooldown;
 	}
 

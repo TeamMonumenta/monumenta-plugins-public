@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public class LeafNova extends Spell {
 
 	public static final int DURATION = 4 * 20;
+	public static final int DURATION_A15_DECREASE = 20;
 	public static final int COOLDOWN = 10 * 20;
 	public static final int MAX_RANGE = 10;
 	public static final Particle.DustOptions LEAF_COLOR = new Particle.DustOptions(Color.fromRGB(14, 123, 8), 1.0f);
@@ -40,20 +40,17 @@ public class LeafNova extends Spell {
 
 	private final LivingEntity mBoss;
 	private final int mFinalCooldown;
-
-	private boolean mOnCooldown = false;
+	private final int mFinalDuration;
 
 	public LeafNova(LivingEntity boss, @Nullable DepthsParty party) {
 		mBoss = boss;
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(COOLDOWN, party);
+		mFinalDuration = getDuration(party);
 	}
 
 	@Override
 	public void run() {
-		mOnCooldown = true;
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, mFinalCooldown);
-
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, DURATION, 20));
+		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mFinalDuration, 20));
 		new BukkitRunnable() {
 			int mTicks = 0;
 			Location mOldLoc = mBoss.getLocation();
@@ -72,7 +69,7 @@ public class LeafNova extends Spell {
 				// Nova
 				new PartialParticle(Particle.REDSTONE, mBossLoc.clone().add(0, 1, 0), 1, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, LEAF_COLOR).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.COMPOSTER, mBossLoc.clone().add(0, 1, 0), 1, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0.05).spawnAsEntityActive(mBoss);
-				if (mTicks <= DURATION - 5) {
+				if (mTicks <= mFinalDuration - 5) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), CHARGE_SOUND, SoundCategory.HOSTILE, 1f, 0.25f + ((float) mTicks / 100));
 				}
 				for (double i = 0; i < 360; i += 30) {
@@ -83,7 +80,7 @@ public class LeafNova extends Spell {
 					new PartialParticle(Particle.COMPOSTER, mBossLoc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mBoss);
 					mBossLoc.subtract(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
 				}
-				mCurrentRadius -= (RADIUS / ((double) DURATION));
+				mCurrentRadius -= (RADIUS / ((double) mFinalDuration));
 				if (mCurrentRadius <= 0) {
 					dealDamageAction(mBossLoc);
 					new BukkitRunnable() {
@@ -110,7 +107,7 @@ public class LeafNova extends Spell {
 					}.runTaskTimer(Plugin.getInstance(), 0, 1);
 				}
 				//end condition
-				if (mTicks >= DURATION) {
+				if (mTicks >= mFinalDuration) {
 					this.cancel();
 				}
 				mTicks += 1;
@@ -130,11 +127,6 @@ public class LeafNova extends Spell {
 	@Override
 	public int cooldownTicks() {
 		return mFinalCooldown;
-	}
-
-	@Override
-	public boolean canRun() {
-		return !mOnCooldown;
 	}
 
 	private void checkForCollisions(BoundingBox box, Vector vec) {
@@ -160,5 +152,13 @@ public class LeafNova extends Spell {
 			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, NOVA_DAMAGE, null, false, true, "Trembling Roots");
 			player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 4));
 		}
+	}
+
+	private int getDuration(@Nullable DepthsParty party) {
+		int duration = DURATION;
+		if (party != null && party.getAscension() >= 15) {
+			duration -= DURATION_A15_DECREASE;
+		}
+		return duration;
 	}
 }

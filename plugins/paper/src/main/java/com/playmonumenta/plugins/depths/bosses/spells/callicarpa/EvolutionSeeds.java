@@ -18,7 +18,8 @@ import org.jetbrains.annotations.Nullable;
 public class EvolutionSeeds extends Spell {
 
 	public static final String SPELL_NAME = "Evolution Seeds";
-	public static final int COOLDOWN = 200;
+	public static final int COOLDOWN = 160;
+	public static final int INTERNAL_COOLDOWN = 300;
 	public static final int CAST_DELAY = 40;
 	public static final int EVOLVE_COUNT_PER_PLAYER = 1;
 
@@ -31,13 +32,13 @@ public class EvolutionSeeds extends Spell {
 	public EvolutionSeeds(LivingEntity boss, @Nullable DepthsParty party, PassiveGardenTwo garden) {
 		mBoss = boss;
 		mGarden = garden;
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(COOLDOWN, party);
 	}
 
 	@Override
 	public void run() {
 		mOnCooldown = true;
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, mFinalCooldown);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, INTERNAL_COOLDOWN);
 
 		BukkitRunnable evolveRunnable = new BukkitRunnable() {
 			final ChargeUpManager mChargeUp = new ChargeUpManager(mBoss, CAST_DELAY,

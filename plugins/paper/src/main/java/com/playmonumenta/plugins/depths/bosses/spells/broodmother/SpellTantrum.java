@@ -42,11 +42,13 @@ import org.joml.Vector3f;
 public class SpellTantrum extends Spell {
 
 	public static final String SPELL_NAME = "Tantrum";
-	public static final int COOLDOWN = 800;
 	public static final int FISSURE_COUNT = 5;
+	public static final int FISSURE_COUNT_A8_INCREASE = 2;
+	public static final int FISSURE_COUNT_A15_INCREASE = 2;
 	public static final int FISSURE_DELAY = 10;
-	public static final int CAST_TIME = FISSURE_COUNT * (FISSURE_DELAY + 1);
+	public static final int FISSURE_DELAY_A8_DECREASE = 4;
 	public static final int FISSURE_TRAVEL_TICKS = 60;
+	public static final int CAST_TIME_A15_DECREASE = 20;
 	public static final double TRAVEL_SPEED = 1;
 	public static final double TRAVEL_QUAKE_RADIUS = 1.75;
 	public static final double HIT_QUAKE_RADIUS = 5;
@@ -58,25 +60,27 @@ public class SpellTantrum extends Spell {
 	private final LivingEntity mBoss;
 	private final ChargeUpManager mChargeUp;
 	private final ArrayList<BukkitTask> mTantrumTasks = new ArrayList<>();
+	private final int mFinalFissureCount;
+	private final int mFinalFissureDelay;
 	private final int mFinalCooldown;
-
-	private boolean mOnCooldown = false;
 
 	public SpellTantrum(LivingEntity boss, @Nullable DepthsParty party) {
 		mBoss = boss;
 		mPlugin = Plugin.getInstance();
 
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalFissureCount = getFissureCount(party);
+		mFinalFissureDelay = getFissureDelay(party);
+		int castTime = getCastTime(party);
+		int baseCooldown = castTime + 140;
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(baseCooldown, party);
 
-		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME,
+		mChargeUp = new ChargeUpManager(mBoss, castTime,
 			Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
 			BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS, 100);
 	}
 
 	@Override
 	public void run() {
-		mOnCooldown = true;
-
 		mChargeUp.reset();
 		mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)));
 
@@ -90,19 +94,11 @@ public class SpellTantrum extends Spell {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-
-		// Handle Cooldown
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mFinalCooldown);
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return CAST_TIME;
-	}
-
-	@Override
-	public boolean canRun() {
-		return !mOnCooldown;
+		return mFinalCooldown;
 	}
 
 	private void tantrumInternal() {
@@ -128,35 +124,35 @@ public class SpellTantrum extends Spell {
 					// Launch the spell after a slight delay
 					int fissureNumber = mTimesRun + 1;
 					mTantrumTasks.add(
-						Bukkit.getScheduler().runTaskLater(mPlugin, () -> launchFissure(startLoc, endLoc, leftSide, fissureNumber, mChargeUp), FISSURE_DELAY)
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> launchFissure(startLoc, endLoc, leftSide, fissureNumber, mChargeUp), mFinalFissureDelay)
 					);
 				}
 
 				mTimesRun++;
-				if (mTimesRun >= FISSURE_COUNT) {
+				if (mTimesRun >= mFinalFissureCount) {
 					cancel();
 				}
 			}
 		};
 		mTantrumTasks.add(
-			runnable.runTaskTimer(mPlugin, 0, FISSURE_DELAY)
+			runnable.runTaskTimer(mPlugin, 0, mFinalFissureDelay)
 		);
 	}
 
 	private void launchFissure(Location startLoc, Location endLoc, boolean leftSide, int fissureNumber, ChargeUpManager chargeUp) {
 		startLoc.getWorld().playSound(startLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 5.0f, 0.5f);
-		chargeUp.setProgress(1.0 - ((double) fissureNumber / (double) FISSURE_COUNT));
+		chargeUp.setProgress(1.0 - ((double) fissureNumber / (double) mFinalFissureCount));
 
 		// Animate the legs slamming the ground
 		if (leftSide) {
 			StructuresAPI.loadAndPasteStructure("BikeSpiderTantrumLeft", mBoss.getLocation().clone().add(-8, -1, -12), false, false);
 			mTantrumTasks.add(
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> StructuresAPI.loadAndPasteStructure("BikeSpiderLeftLegReset", mBoss.getLocation().clone().add(-8, -1, -12), false, false), FISSURE_DELAY)
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> StructuresAPI.loadAndPasteStructure("BikeSpiderLeftLegReset", mBoss.getLocation().clone().add(-8, -1, -12), false, false), mFinalFissureDelay)
 			);
 		} else {
 			StructuresAPI.loadAndPasteStructure("BikeSpiderTantrumRight", mBoss.getLocation().clone().add(-8, -1, -12), false, false);
 			mTantrumTasks.add(
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> StructuresAPI.loadAndPasteStructure("BikeSpiderRightLegReset", mBoss.getLocation().clone().add(-8, -1, -12), false, false), FISSURE_DELAY)
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> StructuresAPI.loadAndPasteStructure("BikeSpiderRightLegReset", mBoss.getLocation().clone().add(-8, -1, -12), false, false), mFinalFissureDelay)
 			);
 		}
 
@@ -264,5 +260,34 @@ public class SpellTantrum extends Spell {
 
 	public void stopTantrumTasks() {
 		mTantrumTasks.forEach(BukkitTask::cancel);
+	}
+
+	private int getFissureDelay(@Nullable DepthsParty party) {
+		int fissureDelay = FISSURE_DELAY;
+		if (party != null && party.getAscension() >= 8) {
+			fissureDelay -= FISSURE_DELAY_A8_DECREASE;
+		}
+		return fissureDelay;
+	}
+
+	private int getFissureCount(@Nullable DepthsParty party) {
+		int fissureCount = FISSURE_COUNT;
+		if (party != null) {
+			if (party.getAscension() >= 8) {
+				fissureCount += FISSURE_COUNT_A8_INCREASE;
+			}
+			if (party.getAscension() >= 15) {
+				fissureCount += FISSURE_COUNT_A15_INCREASE;
+			}
+		}
+		return fissureCount;
+	}
+
+	private int getCastTime(@Nullable DepthsParty party) {
+		int castTime = mFinalFissureCount * (mFinalFissureDelay + 1);
+		if (party != null && party.getAscension() >= 15) {
+			castTime -= CAST_TIME_A15_DECREASE;
+		}
+		return castTime;
 	}
 }

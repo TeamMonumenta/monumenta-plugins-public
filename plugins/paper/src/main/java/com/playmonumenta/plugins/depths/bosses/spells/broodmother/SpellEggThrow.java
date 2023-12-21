@@ -36,17 +36,22 @@ public class SpellEggThrow extends SpellBaseGrenadeLauncher {
 	public static final int LOBS_DELAY = 5;
 	public static final int START_DELAY = 30;
 	public static final int DURATION = 250;
-	public static final int COOLDOWN = 700;
+	public static final int COOLDOWN = 100;
+	public static final int INTERNAL_COOLDOWN = 250;
 	public static final double DAMAGE = 0;
 	public static final int LINGERING_DURATION = 300;
 	public static final int MAX_GROUND_TARGETS = 2;
+	public static final int MAX_GROUND_TARGETS_A8_INCREASE = 1;
 	public static final int MAX_FLYING_TARGETS = 1;
+	public static final int MAX_FLYING_TARGETS_A15_INCREASE = 1;
 	public static final int GROUND_SPAWNS = 3;
 	public static final int FLYING_SPAWNS = 3;
+	public static final int SPAWNS_A15_INCREASE = 2;
 	public static final int EGG_HATCH_TIME = 200;
+	public static final int EGG_HATCH_TIME_A15_DECREASE = 30;
 
 	public SpellEggThrow(LivingEntity boss, @Nullable DepthsParty party) {
-		super(Plugin.getInstance(), boss, GRENADE_MATERIAL, false, EXPLODE_DELAY, LOBS, LOBS_DELAY, DURATION, DepthsParty.getAscensionEigthCooldown(COOLDOWN, party), LINGERING_DURATION, 0,
+		super(Plugin.getInstance(), boss, GRENADE_MATERIAL, false, EXPLODE_DELAY, LOBS, LOBS_DELAY, DURATION, DepthsParty.getAscensionEightCooldown(COOLDOWN, party), LINGERING_DURATION, 0,
 				() -> {
 					// Grenade Targets
 					// Ground spider eggs
@@ -56,8 +61,8 @@ public class SpellEggThrow extends SpellBaseGrenadeLauncher {
 					List<Entity> flyingTargets = new ArrayList<>(boss.getLocation().getNearbyEntities(60, 60, 60).stream().filter(e -> e.getScoreboardTags().contains("flying_egg_target")).toList());
 					Collections.shuffle(flyingTargets);
 					// Choose MAX_GROUND_TARGETS and MAX_FLYING_TARGETS
-					List<Entity> finalTargets = new ArrayList<>(groundTargets.stream().limit(MAX_GROUND_TARGETS).toList());
-					finalTargets.addAll(flyingTargets.stream().limit(MAX_FLYING_TARGETS).toList());
+					List<Entity> finalTargets = new ArrayList<>(groundTargets.stream().limit(getMaxGroundTargets(party)).toList());
+					finalTargets.addAll(flyingTargets.stream().limit(getMaxFlyingTargets(party)).toList());
 					return finalTargets;
 				},
 				(Location loc) -> {
@@ -77,23 +82,25 @@ public class SpellEggThrow extends SpellBaseGrenadeLauncher {
 					bosss.getWorld().playSound(loc, Sound.ENTITY_TURTLE_EGG_BREAK, SoundCategory.HOSTILE, 1.2f, 2f);
 					Entity entity = LibraryOfSoulsIntegration.summon(loc.clone().add(0.5, 0, 0.5), "SpiderEgg");
 					if (entity instanceof Slime slime) {
-						buildEgg(loc);
+						int hatchTime = getHatchTime(party);
+						buildEgg(loc, hatchTime);
 						new BukkitRunnable() {
 							final Slime mSlime = slime;
 							final Location mLoc = loc.clone();
 							final boolean mIsGround = isGroundEgg(mLoc);
+							final int mHatchTime = hatchTime;
 							int mTicks = 0;
 							@Override
 							public void run() {
-								if (mTicks >= EGG_HATCH_TIME) {
+								if (mTicks >= mHatchTime) {
 									// Hatch with spawning spiders
 									bosss.getWorld().playSound(mLoc, Sound.ENTITY_TURTLE_EGG_HATCH, SoundCategory.HOSTILE, 1.2f, 1f);
 									if (mIsGround) {
-										for (int i = 0; i < GROUND_SPAWNS; i++) {
+										for (int i = 0; i < getGroundSpawns(party); i++) {
 											spawnGroundSpider(mLoc);
 										}
 									} else {
-										for (int i = 0; i < FLYING_SPAWNS; i++) {
+										for (int i = 0; i < getFlyingSpawns(party); i++) {
 											spawnFlyingSpider(mLoc);
 										}
 									}
@@ -131,7 +138,7 @@ public class SpellEggThrow extends SpellBaseGrenadeLauncher {
 					// Additional parameters
 					return new AdditionalGrenadeParameters(new Location(boss.getWorld(), -4, 8, 0), 0, START_DELAY, -1,
 						new ChargeUpManager(boss, START_DELAY, Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.YELLOW, TextDecoration.BOLD)),
-							BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, 100), true, 1, true, true);
+							BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, 100), true, 1, INTERNAL_COOLDOWN, true);
 				},
 				(Location loc) -> {
 					// Landing Location telegraph
@@ -143,18 +150,18 @@ public class SpellEggThrow extends SpellBaseGrenadeLauncher {
 		return loc.getNearbyEntities(2, 2, 2).stream().anyMatch(e -> e.getScoreboardTags().contains("ground_egg_target"));
 	}
 
-	private static void buildEgg(Location loc) {
+	private static void buildEgg(Location loc, int hatchTime) {
 		Block block = loc.getBlock();
 
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block, Material.WHITE_TERRACOTTA, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 0, 1), Material.WHITE_TERRACOTTA, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(1, 0, 0), Material.WHITE_TERRACOTTA, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 1, 0), Material.WHITE_TERRACOTTA, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(1, 1, 0), Material.WHITE_TERRACOTTA, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 2, 0), Material.WHITE_TERRACOTTA, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(-1, 0, 0), Material.COBWEB, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(1, 0, -1), Material.COBWEB, EGG_HATCH_TIME, true);
-		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 1, 1), Material.COBWEB, EGG_HATCH_TIME, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block, Material.WHITE_TERRACOTTA, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 0, 1), Material.WHITE_TERRACOTTA, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(1, 0, 0), Material.WHITE_TERRACOTTA, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 1, 0), Material.WHITE_TERRACOTTA, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(1, 1, 0), Material.WHITE_TERRACOTTA, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 2, 0), Material.WHITE_TERRACOTTA, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(-1, 0, 0), Material.COBWEB, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(1, 0, -1), Material.COBWEB, hatchTime, true);
+		TemporaryBlockChangeManager.INSTANCE.changeBlock(block.getRelative(0, 1, 1), Material.COBWEB, hatchTime, true);
 	}
 
 	private static void removeEgg(Location loc) {
@@ -182,5 +189,45 @@ public class SpellEggThrow extends SpellBaseGrenadeLauncher {
 
 	private static void spawnFlyingSpider(Location loc) {
 		LoSPool.fromString("~DD2_Broodmother_EggPlatform").spawn(loc);
+	}
+
+	private static int getMaxGroundTargets(@Nullable DepthsParty party) {
+		int targets = MAX_GROUND_TARGETS;
+		if (party != null && party.getAscension() >= 8) {
+			targets += MAX_GROUND_TARGETS_A8_INCREASE;
+		}
+		return targets;
+	}
+
+	private static int getMaxFlyingTargets(@Nullable DepthsParty party) {
+		int targets = MAX_FLYING_TARGETS;
+		if (party != null && party.getAscension() >= 8) {
+			targets += MAX_FLYING_TARGETS_A15_INCREASE;
+		}
+		return targets;
+	}
+
+	private static int getGroundSpawns(@Nullable DepthsParty party) {
+		int spawns = GROUND_SPAWNS;
+		if (party != null && party.getAscension() >= 15) {
+			spawns += SPAWNS_A15_INCREASE;
+		}
+		return spawns;
+	}
+
+	private static int getFlyingSpawns(@Nullable DepthsParty party) {
+		int spawns = FLYING_SPAWNS;
+		if (party != null && party.getAscension() >= 15) {
+			spawns += SPAWNS_A15_INCREASE;
+		}
+		return spawns;
+	}
+
+	private static int getHatchTime(@Nullable DepthsParty party) {
+		int hatchTime = EGG_HATCH_TIME;
+		if (party != null && party.getAscension() >= 15) {
+			hatchTime -= EGG_HATCH_TIME_A15_DECREASE;
+		}
+		return hatchTime;
 	}
 }

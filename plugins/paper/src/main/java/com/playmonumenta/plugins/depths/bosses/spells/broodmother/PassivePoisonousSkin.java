@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells.broodmother;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsParty;
+import com.playmonumenta.plugins.depths.bosses.Broodmother;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -40,7 +41,7 @@ public class PassivePoisonousSkin extends Spell {
 					PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 100, 1));
 					PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.WITHER, 100, 1));
 					if (mParty != null && mParty.getAscension() >= 4) {
-						EntityUtils.applyVulnerability(Plugin.getInstance(), 100, 0.2, player);
+						EntityUtils.applyVulnerability(Plugin.getInstance(), 100, Broodmother.getVulnerabilityAmount(mParty), player);
 					}
 				}
 			});

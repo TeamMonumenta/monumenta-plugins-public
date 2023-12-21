@@ -19,7 +19,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -38,11 +37,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class BrambleBall extends Spell {
 	public static final String SPELL_NAME = "Bramble Ball";
-	public static final int COOLDOWN = 120;
+	public static final int COOLDOWN = 200;
 	public static final int CAST_DELAY = 30;
 	public static final int AIR_TIME = 200;
 	public static final double DAMAGE = 50;
 	public static final double BRAMBLE_SPEED = 0.175;
+	public static final double BRAMBLE_SPEED_A8_INCREASE = 0.025;
 	public static final double BRAMBLE_FALL_SPEED = 0.05;
 	public static final int PLAYER_HIT_DEBUFFS_DURATION = 100;
 	public static final int BRAMBLE_FIELD_DURATION = 400;
@@ -59,20 +59,17 @@ public class BrambleBall extends Spell {
 	private final LivingEntity mBoss;
 	private final int mFloorY;
 	private final int mFinalCooldown;
-
-	private boolean mOnCooldown = false;
+	private final @Nullable DepthsParty mParty;
 
 	public BrambleBall(LivingEntity boss, int floorY, @Nullable DepthsParty party) {
 		mBoss = boss;
 		mFloorY = floorY;
-		mFinalCooldown = DepthsParty.getAscensionEigthCooldown(COOLDOWN, party);
+		mFinalCooldown = DepthsParty.getAscensionEightCooldown(COOLDOWN, party);
+		mParty = party;
 	}
 
 	@Override
 	public void run() {
-		mOnCooldown = true;
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, mFinalCooldown);
-
 		// Play sounds to indicate the attack is going to happen (don't want to use a boss bar for this one).
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_DEATH, SoundCategory.HOSTILE, 10f, 0.7f);
 
@@ -106,31 +103,34 @@ public class BrambleBall extends Spell {
 		return mFinalCooldown;
 	}
 
-	@Override
-	public boolean canRun() {
-		return !mOnCooldown;
-	}
-
 	private void launchBramble() {
-		// Select a random, non-spectator player as target.
 		List<Player> players = mBoss.getLocation().getNearbyPlayers(100).stream()
 			.filter(p -> !p.getGameMode().equals(GameMode.SPECTATOR)).toList();
+
 		if (players.isEmpty()) {
 			return;
 		}
-		Player target = players.get(FastUtils.randomIntInRange(0, players.size() - 1));
 
+		if (mParty != null && mParty.getAscension() >= 15) {
+			players.forEach(this::launchBrambleInternal);
+		} else {
+			launchBrambleInternal(FastUtils.getRandomElement(players));
+		}
+	}
+
+	private void launchBrambleInternal(Player target) {
 		// Cast out the vine bramble.
 		BukkitRunnable vineRunnable = new BukkitRunnable() {
 			final Location mCurrLoc = mBoss.getLocation().clone().add(0, 1, 0);
 			final Player mTarget = target;
+			final double mBrambleSpeed = getBrambleSpeed(mParty);
 
 			int mTicks = 0;
 
 			@Override
 			public void run() {
 				// Update the location to move towards a player.
-				Vector dir = LocationUtils.getDirectionTo(mTarget.getLocation().clone().add(0, 1, 0), mCurrLoc).multiply(BRAMBLE_SPEED);
+				Vector dir = LocationUtils.getDirectionTo(mTarget.getLocation().clone().add(0, 1, 0), mCurrLoc).multiply(mBrambleSpeed);
 				mCurrLoc.add(dir);
 
 				mBoss.getWorld().playSound(mCurrLoc, Sound.BLOCK_AZALEA_BREAK, SoundCategory.HOSTILE, 1f, 0.7f);
@@ -181,13 +181,14 @@ public class BrambleBall extends Spell {
 		BukkitRunnable dropBrambleRunnable = new BukkitRunnable() {
 			final Location mCurrLoc = currLoc;
 			final Player mTarget = target;
+			final double mBrambleSpeed = getBrambleSpeed(mParty);
 
 			double mTicks = BRAMBLE_FALL_SPEED;
 
 			@Override
 			public void run() {
 				// The bramble should both keep moving towards the player, and slowly fall to the ground.
-				Vector dir = LocationUtils.getDirectionTo(mTarget.getLocation().clone().add(0, 1, 0), mCurrLoc).multiply(BRAMBLE_SPEED);
+				Vector dir = LocationUtils.getDirectionTo(mTarget.getLocation().clone().add(0, 1, 0), mCurrLoc).multiply(mBrambleSpeed);
 				mCurrLoc.add(dir);
 				// It has a bit of an upwards curve initially.
 				mCurrLoc.subtract(0, mTicks - 0.5, 0);
@@ -251,5 +252,13 @@ public class BrambleBall extends Spell {
 
 	private Particle.DustOptions getRandomBrambleOptions() {
 		return mBrambleOptions[FastUtils.randomIntInRange(0, mBrambleOptions.length - 1)];
+	}
+
+	private double getBrambleSpeed(@Nullable DepthsParty party) {
+		double speed = BRAMBLE_SPEED;
+		if (party != null && party.getAscension() >= 8) {
+			speed += BRAMBLE_SPEED_A8_INCREASE;
+		}
+		return speed;
 	}
 }

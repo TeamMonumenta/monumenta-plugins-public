@@ -49,6 +49,7 @@ public abstract class BossAbilityGroup {
 	private @Nullable BossBarManager mBossBar;
 	private SpellManager mActiveSpells;
 	private List<Spell> mPassiveSpells;
+	private boolean mPreventSameSpellTwiceInARow;
 	private @Nullable BukkitRunnable mTaskPassive = null;
 	private @Nullable BukkitRunnable mTaskActive = null;
 	private boolean mUnloaded = false;
@@ -102,12 +103,19 @@ public abstract class BossAbilityGroup {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 
-	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
 	public void constructBoss(BossAbilityGroup this,
-	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, passiveIntervalTicks, false);
+	}
+
+	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
+	public void constructBoss(BossAbilityGroup this, SpellManager activeSpells, List<Spell> passiveSpells,
+							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
+							  long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
+		mPreventSameSpellTwiceInARow = preventSameSpellTwiceInARow;
 
 		mTaskPassive = new BukkitRunnable() {
 			private long mMissingTicks = 0;
@@ -186,7 +194,7 @@ public abstract class BossAbilityGroup {
 
 				if (!EntityUtils.isSilenced(mBoss)) {
 					// Run the next spell and store how long before the next spell can run
-					mNextActiveTimer = mActiveSpells.runNextSpell();
+					mNextActiveTimer = mActiveSpells.runNextSpell(mPreventSameSpellTwiceInARow);
 
 					// The event goes after the spell casts because Kaul's abilities take place where he previously was.
 					Spell spell = mActiveSpells.getLastCastedSpell();
