@@ -119,7 +119,7 @@ public class Skyhook extends DepthsAbility {
 					continue;
 				}
 				int totalCD = ability.getModifiedCooldown();
-				int reducedCD = (int) (totalCD * percentReduction);
+				int reducedCD = Math.min(5 * 20, (int) (totalCD * percentReduction));
 				mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
 			}
 		}
@@ -177,7 +177,7 @@ public class Skyhook extends DepthsAbility {
 		return new DescriptionBuilder<Skyhook>(color)
 			.add("Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by ")
 			.addPercent(a -> a.mCDRPerBlock, CDR_PERCENT_PER_BLOCK)
-			.add(" per block traveled.")
+			.add(" per block traveled, up to a maximum of 5 seconds.")
 			.addCooldown(COOLDOWN[rarity - 1], true);
 	}
 

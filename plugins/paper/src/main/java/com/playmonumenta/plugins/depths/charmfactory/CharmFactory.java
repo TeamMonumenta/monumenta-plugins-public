@@ -65,27 +65,27 @@ public class CharmFactory {
 			List<Double> charmRollsOrder = new ArrayList<>();
 
 			int count = 1;
-			while (playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count) != null
-				       && !playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count).isEmpty()) {
-				charmEffectOrder.add(playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count));
-				MMLog.fine("retrieved nbt " + charmEffectOrder.get(count - 1) + " " + count);
-				count++;
-			}
-
-			count = 1;
 			while (playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count) != null
-				       && !playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count).isEmpty()) {
+				&& !playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count).isEmpty()) {
 				charmActionOrder.add(playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count));
 				MMLog.fine("retrieved nbt " + charmActionOrder.get(count - 1) + " " + count);
 				count++;
 			}
 
 			count = 1;
-			while (playerModified.getString(CharmFactory.CHARM_ROLLS_KEY + count) != null
-				       && !playerModified.getString(CharmFactory.CHARM_ROLLS_KEY + count).isEmpty()) {
-				charmRollsOrder.add(playerModified.getDouble(CharmFactory.CHARM_ROLLS_KEY + count));
-				MMLog.fine("retrieved nbt " + charmRollsOrder.get(count - 1) + " " + count);
+			while (playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count) != null
+				&& !playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count).isEmpty()) {
+				charmEffectOrder.add(playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count));
+				MMLog.fine("retrieved nbt " + charmEffectOrder.get(count - 1) + " " + count);
 				count++;
+			}
+
+			// we can't use the previous method because getDouble returns 0.0 for rolls past the end-of-list
+			// which is indistinguishable from a roll that was actually rolled as 0.0.
+			// effects and rolls should always come in the same amount, so this should work instead
+			for (int i = 1; i < count; i++) {
+				charmRollsOrder.add(playerModified.getDouble(CharmFactory.CHARM_ROLLS_KEY + i));
+				MMLog.fine("retrieved nbt " + charmRollsOrder.get(i - 1) + " " + i);
 			}
 
 			for (String action : charmActionOrder) {

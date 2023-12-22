@@ -615,7 +615,7 @@ public class ColorSplash extends DepthsAbility {
 					.delta(0.25, 0.45, 0.25).spawnAsPlayerActive(mPlayer);
 
 				new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), WINDWALKER_RADIUS).getHitMobs()
-					.stream().filter(mob -> !mHitMobs.contains(mob.getUniqueId()) && !EntityUtils.isElite(mob)).forEach(mob -> {
+					.stream().filter(mob -> !mHitMobs.contains(mob.getUniqueId()) && !EntityUtils.isBoss(mob)).forEach(mob -> {
 						mHitMobs.add(mob.getUniqueId());
 
 						new PartialParticle(Particle.SWEEP_ATTACK, LocationUtils.getHalfHeightLocation(mob), 16)
@@ -623,7 +623,12 @@ public class ColorSplash extends DepthsAbility {
 						mPlayer.getWorld().playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 1.25f);
 
 						EntityUtils.applyVulnerability(mPlugin, WINDWALKER_EFFECTS_DURATION, WINDWALKER_VULNERABILITY, mob);
-						PotionUtils.apply(mob, new PotionUtils.PotionInfo(PotionEffectType.LEVITATION, WINDWALKER_EFFECTS_DURATION, 1, false, false, false));
+
+						if (!EntityUtils.isCCImmuneMob(mob)) {
+							mob.setVelocity(mob.getVelocity().setY(0.5));
+							PotionUtils.apply(mob, new PotionUtils.PotionInfo(PotionEffectType.LEVITATION, WINDWALKER_EFFECTS_DURATION, 1, false, false, false));
+							EntityUtils.applyStun(mPlugin, 30, mob);
+						}
 					});
 
 				mTicks++;
@@ -789,7 +794,7 @@ public class ColorSplash extends DepthsAbility {
 			.addDuration(WINDWALKER_IFRAMES)
 			.add("s of Invincibility Frames, launching yourself, and applying levitation and ")
 			.addPercent(WINDWALKER_VULNERABILITY)
-			.add(" vulnerability to non-Elite mobs hit. This secondary effect has a cooldown of ")
+			.add(" vulnerability, and stunning for 1.5s non-Boss mobs you hit. This secondary effect has a cooldown of ")
 			.addDuration(WINDWALKER_LAND_COOLDOWN)
 			.add("s, which starts counting down from the moment the Wind Walk ends.");
 	}

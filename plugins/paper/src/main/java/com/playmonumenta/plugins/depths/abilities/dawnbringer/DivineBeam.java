@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -43,6 +44,8 @@ public class DivineBeam extends DepthsAbility {
 	public static final int[] STUN_DURATION = {10, 12, 14, 16, 20, 30};
 	public static double HEAL_INCREASE_PER_TARGET = 0.2;
 	public static int STUN_INCREASE_PER_TARGET = 5;
+	public static int ABSORPTION_DURATION = 6 * 20;
+	public static double MAX_ABSORPTION = 4;
 	public static int MAX_TARGET_BONUS = 4;
 	public static int COOLDOWN_REDUCTION = 4 * 20;
 	public static final int COOLDOWN = 20 * 20;
@@ -62,6 +65,8 @@ public class DivineBeam extends DepthsAbility {
 	private final int mStunDuration;
 	private final int mMaxTargetBonus;
 	private final int mCDR;
+	private final double mMaxAbsorption;
+	private final int mAbsorptionDuration;
 
 	public DivineBeam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -69,6 +74,8 @@ public class DivineBeam extends DepthsAbility {
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.DIVINE_BEAM_STUN_DURATION.mEffectName, STUN_DURATION[mRarity - 1]);
 		mMaxTargetBonus = MAX_TARGET_BONUS + (int) CharmManager.getLevel(mPlayer, CharmEffects.DIVINE_BEAM_MAX_TARGETS_BONUS.mEffectName);
 		mCDR = CharmManager.getDuration(mPlayer, CharmEffects.DIVINE_BEAM_COOLDOWN_REDUCTION.mEffectName, COOLDOWN_REDUCTION);
+		mMaxAbsorption = MAX_ABSORPTION + CharmManager.getLevel(mPlayer, CharmEffects.DIVINE_BEAM_MAX_ABSORPTION.mEffectName);
+		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CharmEffects.DIVINE_BEAM_ABSORPTION_DURATION.mEffectName, ABSORPTION_DURATION);
 	}
 
 	@Override
@@ -143,7 +150,13 @@ public class DivineBeam extends DepthsAbility {
 			}
 		}
 		for (Player player : hitPlayers) {
-			PlayerUtils.healPlayer(mPlugin, player, EntityUtils.getMaxHealth(player) * heal, mPlayer);
+			double healthToHeal = EntityUtils.getMaxHealth(player) * heal;
+			double healed = PlayerUtils.healPlayer(mPlugin, player, healthToHeal, mPlayer);
+			double remainingHealing = healthToHeal - healed;
+			if (remainingHealing > 0) {
+				AbsorptionUtils.addAbsorption(player, remainingHealing, mMaxAbsorption, mAbsorptionDuration);
+			}
+
 			new PartialParticle(Particle.HEART, player.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
 		}
 
@@ -163,7 +176,11 @@ public class DivineBeam extends DepthsAbility {
 			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], false, true)
 			.add(" seconds. Elites are rooted instead. Healing is increased by " + StringUtils.multiplierToPercentage(HEAL_INCREASE_PER_TARGET) + "% and stun duration is increased by " + StringUtils.ticksToSeconds(STUN_INCREASE_PER_TARGET) + "s per player or mob hit, up to ")
 			.add(a -> a.mMaxTargetBonus, MAX_TARGET_BONUS)
-			.add(" targets. If at least " + MAX_TARGET_BONUS + " targets were hit, also reduce the cooldown of this ability by ")
+			.add(" targets. Excess healing is converted to absorption, up to ")
+			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION)
+			.add(", that lasts for ")
+			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
+			.add(" seconds. If at least " + MAX_TARGET_BONUS + " targets were hit, also reduce the cooldown of this ability by ")
 			.addDuration(a -> a.mCDR, COOLDOWN_REDUCTION)
 			.add("s.")
 			.addCooldown(COOLDOWN);

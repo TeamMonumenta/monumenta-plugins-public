@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -25,6 +26,8 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
+import java.util.NavigableSet;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
@@ -37,6 +40,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -44,13 +48,16 @@ import static java.awt.Color.HSBtoRGB;
 
 public class Refraction extends DepthsAbility {
 	public static final String ABILITY_NAME = "Refraction";
-	public static final double[] DAMAGE = {3, 3.25, 3.5, 3.75, 4, 4.5};
+	public static final double[] DAMAGE = {3.5, 3.75, 4, 4.25, 4.5, 5};
 	public static final int COOLDOWN_TICKS = 25 * 20;
 	public static final int DISTANCE = 50;
 	public static final int DURATION = 5 * 20;
 	public static final int EFFECT_DURATION = 3 * 20;
 	public static final int BUFF_DURATION = 10 * 20;
+	public static final int DURATION_ON_KILL = 20;
 	public static final String WIND_UP_EFFECT = "RefractionWindUpEffect";
+
+	public int mDuration;
 
 	public static final DepthsAbilityInfo<Refraction> INFO =
 		new DepthsAbilityInfo<>(Refraction.class, ABILITY_NAME, Refraction::new, DepthsTree.PRISMATIC, DepthsTrigger.SWAP)
@@ -78,6 +85,8 @@ public class Refraction extends DepthsAbility {
 		mPlugin.mEffectManager.addEffect(mPlayer, WIND_UP_EFFECT, new PercentSpeed(DURATION + 30, -0.5, WIND_UP_EFFECT));
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+
+		mDuration = DURATION;
 
 		Location loc = mPlayer.getEyeLocation();
 		new BukkitRunnable() {
@@ -272,21 +281,36 @@ public class Refraction extends DepthsAbility {
 				}
 
 
-				if (mT >= DURATION) {
+				if (mT >= mDuration) {
 					this.cancel();
 					world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1.2f, 1f);
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
 
+	@Override
+	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
+		NavigableSet<Effect> slowEffects = mPlugin.mEffectManager.getEffects(mPlayer, WIND_UP_EFFECT);
+		if (slowEffects != null) {
+			for (Effect effect : slowEffects) {
+				effect.setDuration(effect.getDuration() + DURATION_ON_KILL);
+			}
+		}
+		mDuration = Math.min(mDuration + DURATION_ON_KILL, 10 * 20);
+
+		mPlayer.getWorld().playSound(mPlayer, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1f, 1.3f);
+		mPlayer.getWorld().playSound(mPlayer, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1f, 1.3f);
 	}
 
 
 	private static Description<Refraction> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Refraction>(color)
-			.add("Swap hands to begin channeling a powerful beam. After this period, release a constant stream of prismatic energy which deals ")
-			.addDepthsDamage(a -> DAMAGE[rarity - 1], DAMAGE[rarity - 1], true)
-			.add(" magic damage every 0.25 seconds for 5 seconds. You are slowed by 50% for the entire duration of this ability and must continue to hold a weapon throughout. Additionally, every hit by the beam will apply status effects to allies and enemies depending on the available trees.")
+			.add("Swap hands to begin channeling a powerful beam. After this period, release a beam of prismatic energy which deals ")
+			.addDepthsDamage(a -> DAMAGE[rarity - 1] * 4, DAMAGE[rarity - 1] * 4, true)
+			.add(" magic damage per second for ")
+			.addDuration(a -> DURATION, DURATION)
+			.add(" seconds. Each mob killed increases the duration by 1 second, up to a max of 10 seconds. You are slowed by 50% for the entire duration of this ability and must continue to hold a weapon throughout. Additionally, every hit by the beam will apply status effects to allies and enemies depending on your available trees.")
 			.addCooldown(COOLDOWN_TICKS)
 			.addConditionalTree(DepthsTree.FROSTBORN, getFrostbornDescription(color))
 			.addConditionalTree(DepthsTree.FLAMECALLER, getFlamecallerDescription(color))

@@ -41,6 +41,7 @@ public class Avalanche extends DepthsAbility {
 	public static final int SLOW_DURATION = 2 * 20;
 	public static final double SLOW_MODIFIER = 1;
 	public static final int RADIUS = 10;
+	public static final int NUM_PULSES = 4;
 	private static final Particle.DustOptions ICE_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(200, 225, 255), 1.0f);
 
 	public static final String CHARM_COOLDOWN = "Avalanche Cooldown";
@@ -88,6 +89,7 @@ public class Avalanche extends DepthsAbility {
 			public void run() {
 				// re-obtain nearby ice every pulse in case ice disappears in the middle of casting
 				mIceToBreak = getNearbyIce(loc, mRadius);
+				mHitMobs.clear();
 				for (Location l : mIceToBreak) {
 					Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 
@@ -95,7 +97,7 @@ public class Avalanche extends DepthsAbility {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 2, 5.0, 2)) {
 						if (!mHitMobs.contains(mob)) {
 							EntityUtils.applySlow(mPlugin, mDuration, SLOW_MODIFIER, mob);
-							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
+							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage / NUM_PULSES, mInfo.getLinkedSpell(), true);
 							mHitMobs.add(mob);
 						}
 					}
@@ -109,7 +111,7 @@ public class Avalanche extends DepthsAbility {
 				world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.0f, 1.2f);
 
 				mPulses++;
-				if (mPulses > 3) {
+				if (mPulses >= NUM_PULSES) {
 					for (Location l : mIceToBreak) {
 						Block b = l.getBlock();
 						if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {
@@ -157,9 +159,9 @@ public class Avalanche extends DepthsAbility {
 		return new DescriptionBuilder<Avalanche>(color)
 			.add("Swap hands to shatter all ice blocks within a radius of ")
 			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks, dealing 4 pulses of ")
+			.add(" blocks, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" magic damage to enemies above the shattered ice over 0.5s. Cannot hit the same enemy more than once. Affected enemies are rooted for ")
+			.add(" magic damage spread across 4 pulses over 0.5s to enemies above the shattered ice. Affected enemies are rooted for ")
 			.addDuration(a -> a.mDuration, SLOW_DURATION)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN_TICKS);

@@ -88,7 +88,7 @@ public class CrushingEarth extends DepthsAbility {
 			.add(" blocks to deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" melee damage and stun them for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], true)
+			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], false, true)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN);
 	}

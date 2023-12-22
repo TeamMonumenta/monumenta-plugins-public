@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
@@ -150,7 +151,7 @@ public class DepthsUtils {
 
 			double hpPercentDamage = 0.15;
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.5, 5.0, 1.5)) {
-				if (!EntityUtils.isBoss(mob)) {
+				if (!(EntityUtils.isBoss(mob) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG))) {
 					DamageUtils.damage(p, mob, DamageType.TRUE, EntityUtils.getMaxHealth(mob) * hpPercentDamage);
 				}
 			}
@@ -288,7 +289,7 @@ public class DepthsUtils {
 		}
 		List<Block> blocks = event.blockList();
 		for (Block b : blocks) {
-			if (Boolean.TRUE.equals(iceBarrier.get(b.getLocation()))) {
+			if (Boolean.TRUE.equals(iceBarrier.get(b.getLocation())) && !ScoreboardUtils.checkTag(event.getEntity(), MetalmancyBoss.identityTag)) {
 				// Apply ice barrier stun passive effect to the mob
 				EntityUtils.applyStun(Plugin.getInstance(), 2 * 20, (LivingEntity) event.getEntity());
 				return;

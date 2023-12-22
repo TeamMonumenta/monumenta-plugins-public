@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -45,6 +47,7 @@ public class EarthenWrath extends DepthsAbility {
 	private static final double[] PERCENT_DAMAGE_REDUCTION = {0.35, 0.375, 0.4, 0.425, 0.45, 0.5};
 	private static final int COOLDOWN = 20 * 30;
 	private static final int DURATION = 6 * 20;
+	private static final int TRANSFER_RADIUS = 20;
 	private static final int DAMAGE_RADIUS = 6;
 
 	public static final String CHARM_COOLDOWN = "Earthen Wrath Cooldown";
@@ -60,17 +63,19 @@ public class EarthenWrath extends DepthsAbility {
 	private final double mDamageReduction;
 	private final int mDuration;
 	private final double mDamageReflected;
-	private final double mRadius;
+	private final double mTransferRadius;
+	private final double mDamageRadius;
 
 	public boolean mAbsorbDamage = false;
 	private double mDamageAbsorbed;
 
 	public EarthenWrath(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mTransferRadius = CharmManager.getRadius(mPlayer, CharmEffects.EARTHEN_WRATH_TRANSFER_RADIUS.mEffectName, TRANSFER_RADIUS);
 		mDamageReduction = PERCENT_DAMAGE_REDUCTION[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.EARTHEN_WRATH_DAMAGE_REDUCTION.mEffectName);
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.EARTHEN_WRATH_DURATION.mEffectName, DURATION);
 		mDamageReflected = PERCENT_DAMAGE_REFLECTED[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.EARTHEN_WRATH_DAMAGE_REFLECTED.mEffectName);
-		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.EARTHEN_WRATH_RADIUS.mEffectName, DAMAGE_RADIUS);
+		mDamageRadius = CharmManager.getRadius(mPlayer, CharmEffects.EARTHEN_WRATH_RADIUS.mEffectName, DAMAGE_RADIUS);
 	}
 
 	public boolean cast() {
@@ -100,7 +105,7 @@ public class EarthenWrath extends DepthsAbility {
 				if (mTicks % 10 == 0) {
 					for (DepthsPlayer dp : party.mPlayersInParty) {
 						Player p = Bukkit.getPlayer(dp.mPlayerId);
-						if (p != null && p.isOnline() && !dp.mPlayerId.equals(mPlayer.getUniqueId())) {
+						if (p != null && p.isOnline() && !dp.mPlayerId.equals(mPlayer.getUniqueId()) && mPlayer.getLocation().distance(p.getLocation()) <= mTransferRadius) {
 							Location loc = p.getLocation();
 
 							Location tempLoc = loc.clone();
@@ -116,6 +121,11 @@ public class EarthenWrath extends DepthsAbility {
 
 					new PartialParticle(Particle.CRIT_MAGIC, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.BLOCK_DUST, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
+					new PPCircle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.5, 0), mTransferRadius)
+						.countPerMeter(3)
+						.data(new Particle.DustOptions(Color.fromRGB(100, 50, 0), 1f))
+						.randomizeAngle(true)
+						.spawnAsPlayerActive(mPlayer);
 
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 10, mPitch);
 
@@ -129,7 +139,7 @@ public class EarthenWrath extends DepthsAbility {
 					Location loc = mPlayer.getLocation();
 
 					if (mDamageAbsorbed > 0) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius)) {
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mDamageRadius)) {
 							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamageAbsorbed * mDamageReflected, mInfo.getLinkedSpell());
 						}
 
@@ -138,7 +148,7 @@ public class EarthenWrath extends DepthsAbility {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.7f, 0.4f);
 						world.playSound(loc, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, SoundCategory.PLAYERS, 0.7f, 0.1f);
 						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 1.0f, 0.1f);
-						double mult = mRadius / DAMAGE_RADIUS;
+						double mult = mDamageRadius / DAMAGE_RADIUS;
 						new PartialParticle(Particle.BLOCK_DUST, loc, (int) (250 * mult), 3 * mult, 0.1 * mult, 3 * mult, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.LAVA, loc, (int) (100 * mult), 3 * mult, 0.1 * mult, 3 * mult, 0.25).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, (int) (75 * mult), 3 * mult, 0.1 * mult, 3 * mult, 0.25).spawnAsPlayerActive(mPlayer);
@@ -163,7 +173,7 @@ public class EarthenWrath extends DepthsAbility {
 			}
 		}
 
-		if (isWrathing() && !otherPlayer.equals(mPlayer)) {
+		if (isWrathing() && !otherPlayer.equals(mPlayer) && mPlayer.getLocation().distance(otherPlayer.getLocation()) <= mTransferRadius) {
 			double originalDamage = event.getOriginalDamage();
 			mDamageAbsorbed += originalDamage;
 
@@ -243,13 +253,17 @@ public class EarthenWrath extends DepthsAbility {
 
 	private static Description<EarthenWrath> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<EarthenWrath>(color)
-			.add("Swap while holding a weapon to redirect all damage allies take from mobs (excluding percent health damage) to you at a ")
+			.add("Swap while holding a weapon to redirect all damage allies in a ")
+			.add(a -> a.mTransferRadius, TRANSFER_RADIUS)
+			.add(" block radius take from mobs (excluding percent health damage) to you at a ")
 			.addPercent(a -> a.mDamageReduction, PERCENT_DAMAGE_REDUCTION[rarity - 1], false, true)
 			.add(" damage reduction for ")
 			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds, then deal burst damage in a ")
+			.add(" seconds, then deal ")
 			.addPercent(a -> a.mDamageReflected, PERCENT_DAMAGE_REFLECTED[rarity - 1], false, true)
-			.add(" of original damage absorbed as melee damage.")
+			.add(" of the original damage absorbed as melee damage in a ")
+			.add(a -> a.mDamageRadius, DAMAGE_RADIUS)
+			.add(" block radius.")
 			.addCooldown(COOLDOWN);
 	}
 

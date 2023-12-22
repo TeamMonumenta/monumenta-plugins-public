@@ -136,16 +136,33 @@ public class Cryobox extends DepthsAbility {
 				center.clone().add(-1, 0, 0),
 				center.clone().add(0, 0, 1),
 				center.clone().add(0, 0, -1),
+				center.clone().add(1, 0, 1),
+				center.clone().add(-1, 0, 1),
+				center.clone().add(1, 0, -1),
+				center.clone().add(-1, 0, -1),
 
 				//Second Layer
 				center.clone().add(1, 1, 0),
 				center.clone().add(-1, 1, 0),
 				center.clone().add(0, 1, 1),
 				center.clone().add(0, 1, -1),
+				center.clone().add(1, 1, 1),
+				center.clone().add(-1, 1, 1),
+				center.clone().add(1, 1, -1),
+				center.clone().add(-1, 1, -1),
 
 				//Top & Bottom
 				center.clone().add(0, 2, 0),
+				center.clone().add(1, 2, 0),
+				center.clone().add(-1, 2, 0),
+				center.clone().add(0, 2, 1),
+				center.clone().add(0, 2, -1),
+
 				center.clone().add(0, -1, 0),
+				center.clone().add(1, -1, 0),
+				center.clone().add(-1, -1, 0),
+				center.clone().add(0, -1, 1),
+				center.clone().add(0, -1, -1),
 				};
 
 			for (Location loc : locs) {

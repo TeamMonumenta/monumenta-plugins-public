@@ -687,8 +687,8 @@ public class ChromaBlade extends DepthsAbility {
 
 			Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 			Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-			new PartialParticle(Particle.REDSTONE, leftHand, 4, 0.1f, 0.1f, 0.1f, 0, color).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, rightHand, 4, 0.1f, 0.1f, 0.1f, 0, color).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, leftHand, 4, 0.1f, 0.1f, 0.1f, 0, color).spawnAsPlayerPassive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, rightHand, 4, 0.1f, 0.1f, 0.1f, 0, color).spawnAsPlayerPassive(mPlayer);
 		}
 	}
 

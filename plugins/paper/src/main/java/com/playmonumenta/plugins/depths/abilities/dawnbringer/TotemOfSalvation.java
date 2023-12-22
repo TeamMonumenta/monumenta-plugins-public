@@ -114,7 +114,7 @@ public class TotemOfSalvation extends DepthsAbility {
 						if (p != mPlayer) {
 							healthToHeal *= 1.5;
 						}
-						double healed = PlayerUtils.healPlayer(mPlugin, p, healthToHeal);
+						double healed = PlayerUtils.healPlayer(mPlugin, p, healthToHeal, mPlayer);
 
 						double remainingHealing = healthToHeal - healed;
 						if (remainingHealing > 0) {
