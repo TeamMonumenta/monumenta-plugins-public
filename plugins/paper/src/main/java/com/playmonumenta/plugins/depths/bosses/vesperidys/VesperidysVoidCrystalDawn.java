@@ -53,8 +53,8 @@ public class VesperidysVoidCrystalDawn extends BossAbilityGroup {
 	private final Vesperidys mVesperidys;
 	private final Plugin mMonuPlugin;
 
-	private static final int HEAL = 100;
-	private static final double MAX_HEALTH_PERCENTAGE = 0.25;
+	private static final int HEAL = 200;
+	private static final double MAX_HEALTH_PERCENTAGE = 0.5;
 	private static final int DELAY = 2 * 20;
 	private static final int COOLDOWN = 20 * 20;
 	private static final int DURATION = 4 * 20;

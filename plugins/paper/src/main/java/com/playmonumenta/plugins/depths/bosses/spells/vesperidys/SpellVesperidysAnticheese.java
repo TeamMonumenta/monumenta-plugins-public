@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysBlockPlacerBoss;
+import com.playmonumenta.plugins.effects.PercentAbsorption;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.VoidCorruption;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -16,8 +18,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
@@ -28,8 +31,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -84,7 +88,6 @@ public class SpellVesperidysAnticheese extends Spell {
 					mVesperidys.dealPercentageAndCorruptionDamage(player, 0.1, "The Void");
 					player.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1f, 0.5f);
 
-
 					// Draw tether line from Player to Boss.
 					Location playerLoc = player.getLocation();
 					Vector dir = LocationUtils.getVectorTo(mBoss.getLocation(), playerLoc).normalize().multiply(0.5);
@@ -138,11 +141,15 @@ public class SpellVesperidysAnticheese extends Spell {
 			}
 
 			// Metalmancy Build Platform Checkers
-			for (LivingEntity le : EntityUtils.getNearbyMobs(mSpawnLoc, Vesperidys.detectionRange, EnumSet.of(EntityType.IRON_GOLEM))) {
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mSpawnLoc, Vesperidys.detectionRange)) {
 				Set<String> tags = le.getScoreboardTags();
 				if (tags.contains(MetalmancyBoss.identityTag) && !tags.contains(VesperidysBlockPlacerBoss.identityTag)) {
 					// Metalmancy now places blocks on void and tps back up. (and cleanse corruption but we don't talk about that)
-					mPlugin.mBossManager.manuallyRegisterBoss(le, new VesperidysBlockPlacerBoss(mPlugin, le, mVesperidys));
+					mPlugin.mBossManager.manuallyRegisterBoss(le, new VesperidysBlockPlacerBoss(mPlugin, le, mVesperidys, 0));
+				}
+
+				if (ScoreboardUtils.checkTag(le, "delve_mob")) {
+					mPlugin.mBossManager.manuallyRegisterBoss(le, new VesperidysBlockPlacerBoss(mPlugin, le, mVesperidys, 0));
 				}
 			}
 
@@ -159,6 +166,13 @@ public class SpellVesperidysAnticheese extends Spell {
 					Location l = player.getEyeLocation();
 					new PartialParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
 					mVesperidys.dealPercentageAndCorruptionDamage(player, 0.3, "The Void");
+
+					if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
+						mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(6 * 20, -1.00));
+						mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(6 * 20, -1.00));
+						player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
+						PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
+					}
 
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 2 * 20, 0));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0));
@@ -181,8 +195,12 @@ public class SpellVesperidysAnticheese extends Spell {
 
 					Location newLoc;
 					if (selectedPlatform == null) {
-						// Failsafe. Should not happen, ever.
-						newLoc = mVesperidys.mSpawnLoc;
+						// Failsafe. Should not happen, ever. Forcefully load middle platform lol.
+						newLoc = mVesperidys.mSpawnLoc.clone().add(0, 1, 0);
+						Vesperidys.Platform centrePlatform = mVesperidys.mPlatformList.getPlatform(0, 0);
+						if (centrePlatform != null) {
+							centrePlatform.generateInstantFull();
+						}
 					} else {
 						newLoc = selectedPlatform.getCenter().add(0, 1, 0);
 					}
@@ -240,7 +258,16 @@ public class SpellVesperidysAnticheese extends Spell {
 				block.setType(Material.AIR);
 			} else if (FastUtils.randomIntInRange(0, 2) == 0) {
 				new PartialParticle(Particle.SQUID_INK, block.getLocation(), 5, 0.5, 0.5, 0.5, 0).spawnAsBoss();
-				block.setType(Material.STRIPPED_CRIMSON_HYPHAE);
+				if (DepthsUtils.isIce(block.getType())) {
+					block.setType(Material.FROSTED_ICE);
+					BlockData blockData = block.getState().getBlockData();
+					if (blockData instanceof Ageable frostedIce) {
+						frostedIce.setAge(3);
+						block.setBlockData(frostedIce);
+					}
+				} else {
+					block.setType(Material.STRIPPED_CRIMSON_HYPHAE);
+				}
 				mMarked.add(block);
 			}
 		}

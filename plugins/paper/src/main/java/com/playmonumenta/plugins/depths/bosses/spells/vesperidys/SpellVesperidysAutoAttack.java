@@ -277,20 +277,22 @@ public class SpellVesperidysAutoAttack extends Spell {
 						}
 
 						for (Block block : platform.mBlocks) {
-							Location loc = block.getLocation().add(0.5, 1.2, 0.5);
-							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
-							if (FastUtils.randomIntInRange(0, 2) == 0) {
-								// 1/3 chance for particle
+							if (block.getLocation().getBlockY() == platform.getCenter().getBlockY()) {
+								Location loc = block.getLocation().add(0.5, 1.2, 0.5);
+								new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 								if (FastUtils.randomIntInRange(0, 2) == 0) {
-									new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.BLACK_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
-								} else {
-									new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+									// 1/3 chance for particle
+									if (FastUtils.randomIntInRange(0, 2) == 0) {
+										new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.BLACK_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
+									} else {
+										new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+									}
 								}
-							}
 
-							if (FastUtils.randomIntInRange(0, 10) == 0) {
-								// 1/10 chance for particle
-								new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+								if (FastUtils.randomIntInRange(0, 10) == 0) {
+									// 1/10 chance for particle
+									new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+								}
 							}
 						}
 					}
@@ -302,12 +304,14 @@ public class SpellVesperidysAutoAttack extends Spell {
 
 						if (mRunnableTicks % 2 == 0) {
 							for (Block block : platform.mBlocks) {
-								if (FastUtils.randomIntInRange(0, 1) == 0) {
-									if (FastUtils.randomIntInRange(0, 100) == 0) {
-										new PartialParticle(Particle.EXPLOSION_NORMAL, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.25, 0.1, 0.25, 0).spawnAsEntityActive(mBoss);
-									} else {
-										new PartialParticle(Particle.BLOCK_DUST, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0, Material.BLACK_CONCRETE.createBlockData())
-											.spawnAsEntityActive(mBoss);
+								if (block.getLocation().getBlockY() == platform.getCenter().getBlockY()) {
+									if (FastUtils.randomIntInRange(0, 1) == 0) {
+										if (FastUtils.randomIntInRange(0, 100) == 0) {
+											new PartialParticle(Particle.EXPLOSION_NORMAL, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.25, 0.1, 0.25, 0).spawnAsEntityActive(mBoss);
+										} else {
+											new PartialParticle(Particle.BLOCK_DUST, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0, Material.BLACK_CONCRETE.createBlockData())
+												.spawnAsEntityActive(mBoss);
+										}
 									}
 								}
 							}
@@ -470,7 +474,7 @@ public class SpellVesperidysAutoAttack extends Spell {
 			mPSmoke.location(player.getLocation().add(0, 1.25, 0)).count(20).extra(1).spawnAsBoss();
 			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, true, false, "Black Lightning");
 			MovementUtils.knockAway(origin, player, 0.2f, 0.2f, true);
-			mPlugin.mEffectManager.addEffect(player, "LightningSpearVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
+			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
 		}
 	}
 

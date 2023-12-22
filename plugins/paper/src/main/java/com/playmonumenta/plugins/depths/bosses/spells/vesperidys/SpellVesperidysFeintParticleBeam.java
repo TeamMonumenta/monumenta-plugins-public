@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPillar;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -301,6 +303,10 @@ public class SpellVesperidysFeintParticleBeam extends Spell {
 	) {
 		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Feint Particle Beam", strikeLocation);
 		MovementUtils.knockAway(strikeLocation, player, 1f, 0.5f);
+
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 12) {
+			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
+		}
 	}
 
 	@Override public boolean canRun() {

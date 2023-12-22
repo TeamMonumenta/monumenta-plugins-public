@@ -1,12 +1,16 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import java.util.NavigableSet;
 import net.kyori.adventure.bossbar.BossBar;
@@ -22,6 +26,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * Void Corruption: Effect given in Vesperidys DD2 Boss 3.
@@ -78,6 +84,12 @@ public class VoidCorruption extends Effect {
 		}
 
 		if (entity instanceof Player player) {
+			DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
+			if (dp != null && dp.mGraveRunnable != null) {
+				mDuration = 0;
+				return;
+			}
+
 			player.showBossBar(mBossBar);
 
 			if (oneHertz) {
@@ -142,6 +154,13 @@ public class VoidCorruption extends Effect {
 						List<Player> playersInRange = PlayerUtils.playersInRange(player.getLocation(), RANGE, true);
 						for (Player p : playersInRange) {
 							mVesperidys.dealPercentageAndCorruptionDamage(p, 0.5, "Corruption Explosion");
+
+							if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
+								mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(10 * 20, -1.00));
+								mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(10 * 20, -1.00));
+								player.sendActionBar(Component.text("You cannot heal for 10s", NamedTextColor.RED));
+								PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 10 * 20, 1));
+							}
 						}
 
 						mExplosionTick = -1;
@@ -198,6 +217,12 @@ public class VoidCorruption extends Effect {
 	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		event.setAmount(event.getAmount() * (1 - getHealingReduction() * 0.01));
 		return -getHealingReduction() * 0.01 > -1;
+	}
+
+	@Override
+	public void entityGainAbsorptionEvent(EntityGainAbsorptionEvent event) {
+		event.setAmount(event.getAmount() * (1 - getHealingReduction() * 0.01));
+		event.setMaxAmount(event.getMaxAmount() * (1 - getHealingReduction() * 0.01));
 	}
 
 	public void updateBossBar() {

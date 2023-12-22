@@ -7,6 +7,9 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysBlockPlacerBoss;
+import com.playmonumenta.plugins.effects.PercentAbsorption;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -23,9 +26,11 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
@@ -123,6 +128,10 @@ public class SpellVesperidysDarkHole extends Spell {
 		List<Vesperidys.Platform> bossPlatform = List.of(Objects.requireNonNull(mVesperidys.mPlatformList.getPlatformNearestToEntity(mBoss)));
 		List<LivingEntity> darkHoleSummoners = new ArrayList<>();
 		int numberOfSummoners = (int) Math.ceil(0.5 * PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true).size());
+
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) {
+			numberOfSummoners += 1;
+		}
 
 		List<Vesperidys.Platform> summonerPlatforms = mVesperidys.mPlatformList.getRandomPlatforms(bossPlatform, numberOfSummoners);
 
@@ -273,6 +282,13 @@ public class SpellVesperidysDarkHole extends Spell {
 												double percentDamage = 0.5;
 												mVesperidys.dealPercentageAndCorruptionDamage(player, percentDamage, "Dark Hole");
 												MovementUtils.knockAway(mDarkHoleCenter, player, 3f, 0.2f);
+
+												if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
+													mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(10 * 20, -1.00));
+													mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(10 * 20, -1.00));
+													player.sendActionBar(Component.text("You cannot heal for 10s", NamedTextColor.RED));
+													PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 10 * 20, 1));
+												}
 											}
 
 											for (LivingEntity summoner : darkHoleSummoners) {
@@ -291,7 +307,7 @@ public class SpellVesperidysDarkHole extends Spell {
 											mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.HOSTILE, 3f, 0.5f);
 
 											for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true)) {
-												MovementUtils.pullTowardsNormalized(mDarkHoleCenter, player, 0.5f);
+												MovementUtils.pullTowardsNormalized(mDarkHoleCenter, player, 0.5f, false);
 											}
 
 											new PartialParticle(Particle.ENCHANTMENT_TABLE, mDarkHoleCenter, (int) (blackHoleRadius * 10), blackHoleRadius, blackHoleRadius, blackHoleRadius).spawnAsBoss();
@@ -703,7 +719,8 @@ public class SpellVesperidysDarkHole extends Spell {
 
 			int mT = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mT > SHOCK_DELAY_TICKS) {
 					Collection<Player> shockPlayers = PlayerUtils.playersInCylinder(
 						strikeLocation,
@@ -718,13 +735,14 @@ public class SpellVesperidysDarkHole extends Spell {
 					BukkitRunnable runnableEnd = new BukkitRunnable() {
 						int mT = 0;
 
-						@Override public void run() {
-							if (mT > 5) {
+						@Override
+						public void run() {
+							if (mT > 6 || (mT > 0 && mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
 								this.cancel();
 								return;
 							}
 
-							for (int i = 0; i <= 10; i++) {
+							for (int i = 0; i <= 8; i++) {
 								double rad = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 								Location l = strikeLocation.clone().add(0.2 * Math.cos(rad), 0.2 + FastUtils.randomDoubleInRange(0, 0.2), 0.2 * Math.sin(rad));
 								Location center = strikeLocation.clone().add(0, 0.2, 0);
@@ -735,34 +753,37 @@ public class SpellVesperidysDarkHole extends Spell {
 									.directionalMode(true)
 									.spawnAsBoss();
 							}
-							mT += 1;
+							mT += 3;
 						}
 					};
-					runnableEnd.runTaskTimer(mPlugin, 0, 1);
+					runnableEnd.runTaskTimer(mPlugin, 0, 3);
 					mActiveRunnables.add(runnableEnd);
 
-					ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), 60, new Vector(0, 1, 0), 0.2,
+					int particleAmount = 20;
+					if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8) {
+						particleAmount = 10;
+					}
+					ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), particleAmount, new Vector(0, 1, 0), 0.2,
 						(l, t) -> {
 							Location center = strikeLocation.clone().add(0, 0.1, 0);
 							Vector vector = l.toVector().subtract(center.toVector()).normalize();
 							new PartialParticle(Particle.END_ROD, l).delta(vector.getX(), vector.getY(), vector.getZ())
 								.count(1)
 								.extra(0.25)
-								.distanceFalloff(15)
 								.directionalMode(true)
 								.spawnAsBoss();
 						}
 					);
 
+					int finalParticleAmount = particleAmount;
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), 10, new Vector(0, 1, 0), SHOCK_RADIUS,
+						ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), finalParticleAmount / 2, new Vector(0, 1, 0), SHOCK_RADIUS,
 							(l, t) -> {
 								Location center = strikeLocation.clone().add(0, 0.1, 0);
 								Vector vector = l.toVector().subtract(center.toVector()).normalize();
 								new PartialParticle(Particle.END_ROD, l).delta(vector.getX(), vector.getY(), vector.getZ())
 									.count(1)
 									.extra(0.25)
-									.distanceFalloff(15)
 									.directionalMode(true)
 									.spawnAsBoss();
 							}
@@ -788,26 +809,25 @@ public class SpellVesperidysDarkHole extends Spell {
 
 				if (mT % 4 == 0) {
 
-					ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), 30, new Vector(0, 1, 0), SHOCK_RADIUS * (1 - progress),
+					ParticleUtils.drawRing(strikeLocation.clone().add(0, 0.1, 0), 25, new Vector(0, 1, 0), SHOCK_RADIUS * (1 - progress),
 						(l, t) -> {
 							Color color = Color.fromRGB(240 + FastUtils.randomIntInRange(-5, 5), (int) (240 * (1 - progress) + FastUtils.randomIntInRange(0, 5)), FastUtils.randomIntInRange(0, 5));
 
 							new PartialParticle(Particle.REDSTONE, l).delta(0, 0, 0)
 								.count(1)
 								.extra(0.15)
-								.distanceFalloff(15)
 								.data(new Particle.DustOptions(color, 1f))
 								.spawnAsBoss();
 						}
 					);
+				}
 
-
+				if (mT % 4 == 0) {
 					new PPCircle(Particle.REDSTONE, strikeLocation.clone().add(0, 0.1, 0), SHOCK_RADIUS)
-						.count(30)
+						.count(25)
 						.extra(0)
 						.data(new Particle.DustOptions(Color.fromRGB(240 + FastUtils.randomIntInRange(-5, 5), 0, 240 + FastUtils.randomIntInRange(-5, 5)), 1))
-						.distanceFalloff(15).spawnAsBoss();
-
+						.spawnAsBoss();
 				}
 
 				mT++;
@@ -826,6 +846,10 @@ public class SpellVesperidysDarkHole extends Spell {
 	) {
 		DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, SHOCK_DAMAGE, null, false, false, "Feint Particle Beam");
 		MovementUtils.knockAway(strikeLocation, player, 1f, 0.5f);
+
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 12) {
+			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
+		}
 	}
 
 	@Override

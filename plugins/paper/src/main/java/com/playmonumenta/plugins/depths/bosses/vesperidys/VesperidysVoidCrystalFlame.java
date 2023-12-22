@@ -293,7 +293,7 @@ public class VesperidysVoidCrystalFlame extends BossAbilityGroup {
 						targetPlatform.destroy();
 
 						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-								if (mVesperidys.mPhase <= 4 || (mVesperidys.mPhase == 5 && Math.abs(targetPlatform.mX) <= 1 && Math.abs(targetPlatform.mY) <= 1)) {
+								if (mVesperidys.mPhase < 4 || (mVesperidys.mPhase >= 4 && Math.abs(targetPlatform.mX) <= 1 && Math.abs(targetPlatform.mY) <= 1)) {
 									if (mVesperidys.mFullPlatforms) {
 										targetPlatform.generateFull();
 									} else {

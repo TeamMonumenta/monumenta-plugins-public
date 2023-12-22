@@ -38,6 +38,7 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 
 	private final Vesperidys mVesperidys;
 	private final Plugin mMonuPlugin;
+	private final int mCorruptionCleanse;
 
 	public static @Nullable VesperidysBlockPlacerBoss deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return construct(plugin, boss);
@@ -61,9 +62,14 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 	}
 
 	public VesperidysBlockPlacerBoss(Plugin plugin, LivingEntity boss, Vesperidys vesperidys) {
+		this(plugin, boss, vesperidys, 5);
+	}
+
+	public VesperidysBlockPlacerBoss(Plugin plugin, LivingEntity boss, Vesperidys vesperidys, int corruptionCleanse) {
 		super(plugin, identityTag, boss);
 		mMonuPlugin = plugin;
 		mVesperidys = vesperidys;
+		mCorruptionCleanse = corruptionCleanse;
 
 		List<Spell> spells = List.of(
 			new Spell() {
@@ -137,7 +143,7 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 		for (Player player : PlayerUtils.playersInRange(mVesperidys.mSpawnLoc, Vesperidys.detectionRange, true)) {
 			NavigableSet<VoidCorruption> corruptionSet = mMonuPlugin.mEffectManager.getEffects(player, VoidCorruption.class);
 			if (corruptionSet.size() > 0) {
-				corruptionSet.last().addCorruption(-5);
+				corruptionSet.last().addCorruption(-mCorruptionCleanse);
 			}
 		}
 	}

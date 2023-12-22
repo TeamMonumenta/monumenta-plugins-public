@@ -51,7 +51,7 @@ public class VesperidysVoidCrystalShadow extends BossAbilityGroup {
 	private final Plugin mMonuPlugin;
 
 	private static final int DELAY = 2 * 20;
-	private static final int DUMMY_HEALTH = 100;
+	private static final int DUMMY_HEALTH = 1000;
 	private static final int DAMAGE = 80;
 
 	public static @Nullable VesperidysVoidCrystalShadow deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -176,7 +176,7 @@ public class VesperidysVoidCrystalShadow extends BossAbilityGroup {
 					}
 
 					for (LivingEntity le : EntityUtils.getNearbyMobs(dummy.getLocation(), 3, dummy)) {
-						if (ScoreboardUtils.checkTag(le, "Boss")) {
+						if (ScoreboardUtils.checkTag(le, "Boss") && !mVesperidys.mTeleportSpell.mTeleporting) {
 							this.cancel();
 							return;
 						}
@@ -228,7 +228,7 @@ public class VesperidysVoidCrystalShadow extends BossAbilityGroup {
 											platform.destroy();
 
 											Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-												if (mVesperidys.mPhase <= 4 || (mVesperidys.mPhase == 5 && Math.abs(platform.mX) <= 1 && Math.abs(platform.mY) <= 1)) {
+												if (mVesperidys.mPhase < 4 || (mVesperidys.mPhase >= 4 && Math.abs(platform.mX) <= 1 && Math.abs(platform.mY) <= 1)) {
 													if (mVesperidys.mFullPlatforms) {
 														platform.generateFull();
 													} else {

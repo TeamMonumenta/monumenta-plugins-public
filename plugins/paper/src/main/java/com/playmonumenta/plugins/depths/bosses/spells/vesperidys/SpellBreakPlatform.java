@@ -3,12 +3,17 @@ package com.playmonumenta.plugins.depths.bosses.spells.vesperidys;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
+import com.playmonumenta.plugins.effects.PercentAbsorption;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,6 +23,8 @@ import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -51,6 +58,22 @@ public class SpellBreakPlatform extends Spell {
 			mOnCooldown = false;
 		}, cooldownTicks() + 20 * 20);
 
+		runSpell(mTotalBroken);
+
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) {
+			BukkitRunnable runSpellLater = new BukkitRunnable() {
+				@Override
+				public void run() {
+					runSpell(mTotalBroken / 2);
+				}
+			};
+
+			runSpellLater.runTaskLater(mPlugin, 10 * 20);
+			mActiveRunnables.add(runSpellLater);
+		}
+	}
+
+	public void runSpell(int amount) {
 		List<Player> hitPlayers = new ArrayList<>();
 
 		// Select all players
@@ -62,13 +85,13 @@ public class SpellBreakPlatform extends Spell {
 				platforms.add(platform);
 			}
 
-			if (platforms.size() >= mTotalBroken) {
+			if (platforms.size() >= amount) {
 				break;
 			}
 		}
 
-		if (platforms.size() < mTotalBroken) {
-			int diff = mTotalBroken - platforms.size();
+		if (platforms.size() < amount) {
+			int diff = amount - platforms.size();
 			List<Vesperidys.Platform> randomPlatforms = mVesperidys.mPlatformList.getRandomPlatforms(platforms, diff);
 			platforms.addAll(randomPlatforms);
 		}
@@ -88,9 +111,17 @@ public class SpellBreakPlatform extends Spell {
 							}
 						}
 
+						int currentPhase = mVesperidys.mPhase;
+
 						BukkitRunnable runnableB = new BukkitRunnable() {
+
 							@Override public void run() {
-								if (mVesperidys.mPhase <= 4 || (mVesperidys.mPhase == 5 && Math.abs(platform.mX) <= 1 && Math.abs(platform.mY) <= 1)) {
+								if (currentPhase < 4 && (currentPhase != mVesperidys.mPhase)) {
+									this.cancel();
+									return;
+								}
+
+								if (mVesperidys.mPhase < 4 || (mVesperidys.mPhase >= 4 && Math.abs(platform.mX) <= 1 && Math.abs(platform.mY) <= 1)) {
 									if (mVesperidys.mFullPlatforms) {
 										platform.generateFull();
 									} else {
@@ -101,7 +132,6 @@ public class SpellBreakPlatform extends Spell {
 						};
 
 						runnableB.runTaskLater(mPlugin, BROKEN_DURATION);
-						mActiveRunnables.add(runnableB);
 					}
 					this.cancel();
 				} else {
@@ -130,6 +160,13 @@ public class SpellBreakPlatform extends Spell {
 	public void damage(Player player, Location location) {
 		mVesperidys.dealPercentageAndCorruptionDamage(player, 0.5, "Platform Breaker");
 		MovementUtils.knockAway(location, player, 0.5f, 0.75f, false);
+
+		if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
+			mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(6 * 20, -1.00));
+			mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(6 * 20, -1.00));
+			player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
+			PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
+		}
 	}
 
 	@Override public boolean canRun() {

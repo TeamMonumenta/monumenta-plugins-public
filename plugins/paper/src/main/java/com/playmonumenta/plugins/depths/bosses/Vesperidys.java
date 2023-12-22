@@ -22,10 +22,13 @@ import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVesperidys
 import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVesperidysSummonAdds;
 import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVesperidysTeleport;
 import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalEarth;
+import com.playmonumenta.plugins.effects.PercentAbsorption;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.VoidCorruption;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -35,6 +38,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
@@ -174,7 +178,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 
 		mDarkHole = new SpellVesperidysDarkHole(mMonuPlugin, boss, this);
-		mTeleportSpell = new SpellVesperidysTeleport(mMonuPlugin, boss, this, 1000);
+		mTeleportSpell = new SpellVesperidysTeleport(mMonuPlugin, boss, this, 2000);
 		mAnticheese = new SpellVesperidysAnticheese(mMonuPlugin, boss, spawnLoc, this);
 		mAutoAttack = new SpellVesperidysAutoAttack(plugin, boss, this, detectionRange, 4, 3, 2 * 20, 3 * 20, 2 * 20, 10 * 20);
 
@@ -245,33 +249,33 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		if (mParty != null && mParty.getAscension() >= 15) {
 			phase1ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 2, 25),
-				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 8),
+				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 10),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 7, 15, 4)
 			));
 			phase2ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 2, 25),
-				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 5),
+				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 6),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 7, 15, 4)
 			));
 			phase3ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 3, 20),
-				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 8),
+				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 10),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 8, 12, 4)
 			));
 			phase4ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 3, 20),
-				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 2),
+				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 3),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 8, 12, 4)
 			));
 			phase5ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 3, 20),
-				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 2),
+				new SpellBreakPlatform(mMonuPlugin, boss, this, 2 * 20, 3),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 8, 12, 4)
 			));
 		} else if (mParty != null && mParty.getAscension() >= 8) {
 			phase1ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 2, 30),
-				new SpellBreakPlatform(mMonuPlugin, boss, this, 3 * 20, 6),
+				new SpellBreakPlatform(mMonuPlugin, boss, this, 3 * 20, 8),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 6, 20, 3)
 			));
 			phase2ActivesList.addAll(List.of(
@@ -281,7 +285,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			));
 			phase3ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 2, 30),
-				new SpellBreakPlatform(mMonuPlugin, boss, this, 3 * 20, 6),
+				new SpellBreakPlatform(mMonuPlugin, boss, this, 3 * 20, 8),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 7, 15, 3)
 			));
 			phase4ActivesList.addAll(List.of(
@@ -331,7 +335,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			));
 		}
 
-		if (mParty != null && mParty.getAscension() >= 15) {
+		if (mParty != null && mParty.getAscension() >= 12) {
 			phase3ActivesList.addAll(List.of(
 				new SpellSoulLink(plugin, boss, this)
 			));
@@ -566,6 +570,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 5 * 20, 0));
 
 						changePhase(mPhase1Actives, mPhase1Passives, null);
+						if (mParty != null && mParty.getAscension() >= 15) {
+							forceCastSpell(SpellBreakPlatform.class);
+						}
 
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 							MessagingUtils.sendBoldTitle(player, Component.text("The " + bossName, NamedTextColor.DARK_RED), Component.text("The Abyssal Overmind", NamedTextColor.DARK_RED));
@@ -582,7 +589,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 						double followAngle = EYE_ORDER[mEyeIndex]; // 0, 36, 72, 108, 144, 180
 
-						summonEyes(followAngle, true);
+						summonEyes(followAngle, true, mEyeIndex + 1);
 						mEyeIndex++;
 					}
 
@@ -645,7 +652,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 				}
 			}
 		} else {
-			if (event.getSource() instanceof Player) {
+			if (event.getSource() instanceof Player player) {
 				// Ridiculous burst prevention (Maximum of 3% of Vesperidys' Max HP)
 				double maxHealth = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, BOSS_HEALTH);
 				if (event.getDamage() > maxHealth * 0.03) {
@@ -653,6 +660,39 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 				}
 
 				event.setDamage(event.getDamage() * crystalResistanceMultiplier());
+
+				if (mParty != null && mParty.getAscension() >= 15) {
+					double distance = player.getLocation().distance(mBoss.getLocation());
+					double minDistance = 10;
+
+					if (distance > minDistance) {
+						event.setDamage(0);
+						Location loc = mBoss.getLocation();
+						loc.add(0, 1, 0);
+
+						new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.3)
+							.spawnForPlayer(ParticleCategory.BOSS, player);
+						player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.2f, 1.5f);
+					}
+				} else if (mParty != null && mParty.getAscension() >= 4) {
+					// Range Resistance
+					double distance = player.getLocation().distance(mBoss.getLocation());
+					double minPercent = 0.5;
+					double maxDistance = 20;
+					double minDistance = 10;
+					if (distance > minDistance) {
+						double percentDamage = Math.max(minPercent, Math.min(1.0, -((1 - minPercent) / (maxDistance - minDistance)) * (distance - minDistance) + 1));
+						event.setDamage(event.getDamage() * percentDamage);
+						if (distance > minDistance + (maxDistance - minDistance) / 2) {
+							Location loc = mBoss.getLocation();
+							loc.add(0, 1, 0);
+
+							new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.3)
+								.spawnForPlayer(ParticleCategory.BOSS, player);
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.2f, 1.5f);
+						}
+					}
+				}
 
 				// Earthbound Crystal Absorb Damage
 				List<LivingEntity> shulkers = EntityUtils.getNearbyMobs(mBoss.getLocation(), 30, EnumSet.of(EntityType.SHULKER));
@@ -853,6 +893,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			switch (mPhase) {
 				case 1:
 					changePhase(mPhase1Actives, mPhase1Passives, null);
+					if (mParty != null && mParty.getAscension() >= 15) {
+						forceCastSpell(SpellStarStorm.class);
+					}
 					break;
 				case 2:
 					changePhase(mPhase2Actives, mPhase2Passives, null);
@@ -862,7 +905,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					break;
 				case 3:
 					changePhase(mPhase3Actives, mPhase3Passives, null);
-					if (mParty != null && mParty.getAscension() >= 15) {
+					if (mParty != null && mParty.getAscension() >= 12) {
 						forceCastSpell(SpellSoulLink.class);
 					} else {
 						forceCastSpell(SpellSeekingEyes.class);
@@ -870,7 +913,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					break;
 				case 4:
 					changePhase(mPhase4Actives, mPhase4Passives, null);
-					if (mParty != null && mParty.getAscension() >= 15) {
+					if (mParty != null && mParty.getAscension() >= 12) {
 						forceCastSpell(SpellSoulLink.class);
 					} else {
 						forceCastSpell(SpellSeekingEyes.class);
@@ -878,8 +921,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					break;
 				case 5:
 					changePhase(mPhase5Actives, mPhase5Passives, null);
-					if (mParty != null && mParty.getAscension() >= 15) {
-						forceCastSpell(SpellSoulLink.class);
+					if (mParty != null && mParty.getAscension() >= 12) {
+						forceCastSpell(SpellBreakPlatform.class);
 					} else {
 						forceCastSpell(SpellSeekingEyes.class);
 					}
@@ -974,6 +1017,13 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 								hitPlayers.add(player);
 								dealPercentageAndCorruptionDamage(player, 0.5, "Reality Distortion");
 								MovementUtils.knockAway(platform.getCenter(), player, 0.0f, 0.75f);
+
+								if ((mParty != null && mParty.getAscension() >= 8)) {
+									mMonuPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(6 * 20, -1.00));
+									mMonuPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(6 * 20, -1.00));
+									player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
+									PotionUtils.applyPotion(mMonuPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
+								}
 							}
 						}
 						platform.destroy();
@@ -1447,8 +1497,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	public void resummonAllEyes() {
 		for (int i = 0; i < 6; i += 1) {
 			double summonAngle = EYE_ORDER[i];
+			int finalI = i;
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				summonEyes(summonAngle, false);
+				summonEyes(summonAngle, false, finalI + 1);
 			}, i * 5);
 		}
 	}
@@ -1459,7 +1510,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
-	public void summonEyes(double followAngle, boolean flash) {
+	public void summonEyes(double followAngle, boolean flash, int index) {
 		double r = 1.25;
 		double yaw = Math.toRadians(mBoss.getLocation().getYaw());
 		double pitch = Math.toRadians(followAngle);
@@ -1474,9 +1525,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		eyes.setMarker(true);
 		eyes.setCollidable(false);
 		ItemStack enderEye = new ItemStack(Material.ENDER_EYE);
-		ItemUtils.setPlainName(enderEye, "Vesperidys Eye");
+		ItemUtils.setPlainName(enderEye, "Vesperidys Eye " + index);
 
-		eyes.getEquipment().setHelmet(new ItemStack(Material.ENDER_EYE));
+		eyes.getEquipment().setHelmet(enderEye);
 
 		mEyes.add(eyes);
 

@@ -107,37 +107,41 @@ public class VesperidysVoidCrystalEarth extends BossAbilityGroup {
 							}
 
 							for (Block block : platform.mBlocks) {
-								Location loc = block.getLocation().add(0.5, 1.2, 0.5);
-								new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
-								if (FastUtils.randomIntInRange(0, 2) == 0) {
-									// 1/3 chance for particle
+								if (block.getLocation().getBlockY() == platform.getCenter().getBlockY()) {
+									Location loc = block.getLocation().add(0.5, 1.2, 0.5);
+									new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 									if (FastUtils.randomIntInRange(0, 2) == 0) {
-										new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
-									} else {
-										new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+										// 1/3 chance for particle
+										if (FastUtils.randomIntInRange(0, 2) == 0) {
+											new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+										} else {
+											new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+										}
+									}
+
+									if (FastUtils.randomIntInRange(0, 10) == 0) {
+										// 1/10 chance for particle
+										new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
 									}
 								}
 
-								if (FastUtils.randomIntInRange(0, 10) == 0) {
-									// 1/10 chance for particle
-									new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
-								}
+								this.cancel();
+								return;
 							}
-
-							this.cancel();
-							return;
 						}
 
 						if (mRunnableTicks % 5 == 0) {
 							mBoss.getWorld().playSound(platform.getCenter(), Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 1, 0.9f);
 						}
 						for (Block block : platform.mBlocks) {
-							if (FastUtils.randomIntInRange(0, 2) == 0) {
-								if (FastUtils.randomIntInRange(0, 100) == 0) {
-									new PartialParticle(Particle.EXPLOSION_NORMAL, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.25, 0.1, 0.25, 0).spawnAsEntityActive(mBoss);
-								} else {
-									new PartialParticle(Particle.BLOCK_DUST, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0, Material.DIRT.createBlockData())
-										.spawnAsEntityActive(mBoss);
+							if (block.getLocation().getBlockY() == platform.getCenter().getBlockY()) {
+								if (FastUtils.randomIntInRange(0, 2) == 0) {
+									if (FastUtils.randomIntInRange(0, 100) == 0) {
+										new PartialParticle(Particle.EXPLOSION_NORMAL, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.25, 0.1, 0.25, 0).spawnAsEntityActive(mBoss);
+									} else {
+										new PartialParticle(Particle.BLOCK_DUST, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0, Material.DIRT.createBlockData())
+											.spawnAsEntityActive(mBoss);
+									}
 								}
 							}
 						}
@@ -259,7 +263,7 @@ public class VesperidysVoidCrystalEarth extends BossAbilityGroup {
 						targetPlatform.destroy();
 
 						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-							if (mVesperidys.mPhase <= 4 || (mVesperidys.mPhase == 5 && Math.abs(targetPlatform.mX) <= 1 && Math.abs(targetPlatform.mY) <= 1)) {
+							if (mVesperidys.mPhase < 4 || (mVesperidys.mPhase >= 4 && Math.abs(targetPlatform.mX) <= 1 && Math.abs(targetPlatform.mY) <= 1)) {
 								if (mVesperidys.mFullPlatforms) {
 									targetPlatform.generateFull();
 								} else {

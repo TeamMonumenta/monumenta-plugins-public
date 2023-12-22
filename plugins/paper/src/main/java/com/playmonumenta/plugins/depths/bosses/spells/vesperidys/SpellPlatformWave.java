@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells.vesperidys;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -10,6 +11,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -97,18 +99,20 @@ public class SpellPlatformWave extends Spell {
 						}
 
 						for (Block block : platform.mBlocks) {
-							Location loc = block.getLocation().add(0.5, 1.2, 0.5);
-							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
-							if (FastUtils.randomIntInRange(0, 5) == 0) {
-								if (FastUtils.randomIntInRange(0, 2) == 0) {
-									new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).spawnAsEntityActive(mBoss);
-								} else {
-									new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).spawnAsEntityActive(mBoss);
+							if (block.getLocation().getBlockY() == platform.getCenter().getBlockY()) {
+								Location loc = block.getLocation().add(0.5, 1.2, 0.5);
+								new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
+								if (FastUtils.randomIntInRange(0, 5) == 0) {
+									if (FastUtils.randomIntInRange(0, 2) == 0) {
+										new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).spawnAsEntityActive(mBoss);
+									} else {
+										new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).spawnAsEntityActive(mBoss);
+									}
 								}
-							}
 
-							if (FastUtils.randomIntInRange(0, 10) == 0) {
-								new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+								if (FastUtils.randomIntInRange(0, 10) == 0) {
+									new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
+								}
 							}
 						}
 					}
@@ -116,7 +120,7 @@ public class SpellPlatformWave extends Spell {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 5f, 0f);
 					for (Vesperidys.Platform platform : platforms) {
 						for (Block block : platform.mBlocks) {
-							if (FastUtils.randomIntInRange(0, 1) == 0) {
+							if (block.getLocation().getBlockY() == platform.getCenter().getBlockY() && FastUtils.randomIntInRange(0, 1) == 0) {
 								new PartialParticle(Particle.SPELL_WITCH, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0)
 									.spawnAsEntityActive(mBoss);
 							}
@@ -143,6 +147,10 @@ public class SpellPlatformWave extends Spell {
 	private void hit(Player player) {
 		DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, true, false, "Void Wave");
 		MovementUtils.knockAway(mBoss.getLocation(), player, 0, .75f, false);
+
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 12) {
+			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
+		}
 	}
 
 	private enum Directions {
