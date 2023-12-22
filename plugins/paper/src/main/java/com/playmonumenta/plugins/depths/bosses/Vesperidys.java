@@ -501,6 +501,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 1.0f, 1.0f, false), true, mBoss, true, 0, 5);
+
 		TextComponent[] dio = new TextComponent[]{
 			obfuscate("Yet still does the filthy dirtspawn limps in.", 0, NamedTextColor.DARK_AQUA),
 			obfuscate("We are The Vesperidys.", 0, NamedTextColor.DARK_AQUA),
@@ -518,8 +520,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				//launch event related spawn commands
 				if (mTicks >= 5 * 20 + 10) {
-					SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 1.0f, 1.0f, false), true, mBoss, true, 0, 5);
-
 					mBoss.setInvisible(false);
 					mBoss.getEquipment().setHelmet(mTeleportSpell.mHelmet, true);
 					mBoss.getEquipment().setChestplate(mTeleportSpell.mChestplate, true);
