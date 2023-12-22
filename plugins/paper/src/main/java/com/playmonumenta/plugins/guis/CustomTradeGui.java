@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.WalletUtils;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -64,6 +66,7 @@ public class CustomTradeGui extends Gui {
 	// Final:
 	private final List<TradeWindowOpenEvent.Trade> mTrades;
 	private final Villager mVillager;
+	private final String mTitle;
 	private final String mCustomTagKey = "trade_preview";
 	private final NamespacedKey mCustomTagNamespacedKey = new NamespacedKey(mPlugin, mCustomTagKey);
 
@@ -116,7 +119,7 @@ public class CustomTradeGui extends Gui {
 		private final List<ItemStack> mRequirements = new ArrayList<>();
 		private final int mNumRequirements;
 		private boolean mHasRequirements = true;
-		private TradeWindowOpenEvent.Trade mTrade;
+		private final TradeWindowOpenEvent.Trade mTrade;
 
 		public TradeReq(Player player, TradeWindowOpenEvent.Trade trade, int multiplier, boolean useCache) {
 			// Store trade:
@@ -226,7 +229,7 @@ public class CustomTradeGui extends Gui {
 					mPlayer.sendMessage("We're sorry - there was a problem verifying a requirement: '" +
 						                    ItemUtils.getPlainNameOrDefault(requirement) +
 						                    "'. Please contact a moderator if a refund is needed.");
-					MMLog.warning("Custom Trade GUI: requirement - removal mismatch @buyNow: " + mVillager.getName());
+					MMLog.warning("Custom Trade GUI: requirement - removal mismatch @buyNow: " + mTitle);
 					close();
 					return;
 				}
@@ -247,8 +250,8 @@ public class CustomTradeGui extends Gui {
 	}
 
 	private static class TradeStatusWrapper {
-		private boolean mHasRequirements;
-		private List<Component> mLore;
+		private final boolean mHasRequirements;
+		private final List<Component> mLore;
 
 
 		public TradeStatusWrapper(boolean hasRequirements, List<Component> lore) {
@@ -281,10 +284,11 @@ public class CustomTradeGui extends Gui {
 	private final int mPebTradeGUIWallet; // 0: enabled, prioritize inventory. 1: disabled. 2: enabled, prioritize wallet.
 
 	// Interface:
-	public CustomTradeGui(Player player, Villager villager, List<TradeWindowOpenEvent.Trade> trades) {
-		super(player, 6 * 9, villager.customName() == null ? Component.text("NPC trader") : villager.customName());
-		mTrades = trades;
+	public CustomTradeGui(Player player, @Nullable Villager villager, Component title, List<TradeWindowOpenEvent.Trade> trades) {
+		super(player, 6 * 9, title);
 		mVillager = villager;
+		mTrades = trades;
+		mTitle = MessagingUtils.plainText(title);
 		// Setup PEB options:
 		mPebTradeGUITheme = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.THEME).orElse(0);
 		mPebTradeGUISpacing = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SPACING).orElse(0);
@@ -361,7 +365,7 @@ public class CustomTradeGui extends Gui {
 		int pageCount = getMaxPages(numTrades);
 		// Display header and icons for all tabs:
 		setItem(0, 4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
-			"Tab: " + mCurrentTab.toString() + "\nPage: " + mCurrentPage + "/" + pageCount, NamedTextColor.GRAY, 20));
+			"Tab: " + mCurrentTab + "\nPage: " + mCurrentPage + "/" + pageCount, NamedTextColor.GRAY, 20));
 		int guiCol = 1;
 		for (TradeType tradeType : mDisplayTradeTypes) {
 			setItem(5, guiCol, GUIUtils.createBasicItem((mCurrentTab == tradeType ? Material.BLUE_STAINED_GLASS_PANE : Material.CYAN_STAINED_GLASS_PANE), tradeType.toString() + (mCurrentTab == tradeType ? " (Selected)" : ""), NamedTextColor.YELLOW, false,
@@ -417,7 +421,7 @@ public class CustomTradeGui extends Gui {
 			// Note: these error messages are similar to the message you get if you access a village UI you aren't supposed to -
 			// None will pretty much never happen, but just adding a failsafe + letting the player know.
 			mPlayer.sendMessage("Something went wrong - if this keeps happening, please report it!");
-			MMLog.warning("Custom Trade GUI: null trade at: " + mVillager.getName());
+			MMLog.warning("Custom Trade GUI: null trade at: " + mTitle);
 			close();
 			return;
 		}
@@ -434,7 +438,7 @@ public class CustomTradeGui extends Gui {
 		int numRequirements = tradeReq.size();
 		if (numRequirements <= 0) {
 			mPlayer.sendMessage("Something went wrong - if this keeps happening, please report it!");
-			MMLog.warning("Custom Trade GUI: trade with no requirements at: " + mVillager.getName() + ", " + mSelectedTrade);
+			MMLog.warning("Custom Trade GUI: trade with no requirements at: " + mTitle + ", " + mSelectedTrade);
 			close();
 			return;
 		} else if (numRequirements == 1) {
@@ -444,7 +448,7 @@ public class CustomTradeGui extends Gui {
 			setItem(2, 2, createTradePreviewGuiItem(tradeReq.requirements().get(0)));
 		} else {
 			mPlayer.sendMessage("Something went wrong - if this keeps happening, please report it!");
-			MMLog.warning("Custom Trade GUI: trade with too many requirements at: " + mVillager.getName() + ", " + mSelectedTrade);
+			MMLog.warning("Custom Trade GUI: trade with too many requirements at: " + mTitle + ", " + mSelectedTrade);
 			close();
 			return;
 		}
@@ -524,7 +528,7 @@ public class CustomTradeGui extends Gui {
 				if (guiRow == 4) {
 					// We should never get to this point:
 					mPlayer.sendMessage("Something went wrong - if this keeps happening, please report it!");
-					MMLog.warning("Custom Trade GUI: overflow trades: " + mVillager.getName() + ", " + trades.get(i));
+					MMLog.warning("Custom Trade GUI: overflow trades: " + mTitle + ", " + trades.get(i));
 					close();
 					return 0;
 				} else {
@@ -572,7 +576,7 @@ public class CustomTradeGui extends Gui {
 	private void buyNow(@Nullable TradeWindowOpenEvent.Trade trade, int multiplier) {
 		if (trade == null) {
 			mPlayer.sendMessage("Something went wrong - if this keeps happening, please report it!");
-			MMLog.warning("Custom Trade GUI: null trade @buyNow: " + mVillager.getName());
+			MMLog.warning("Custom Trade GUI: null trade @buyNow: " + mTitle);
 			close();
 			return;
 		}
@@ -932,7 +936,7 @@ public class CustomTradeGui extends Gui {
 			// Add to previous lore (if any):
 			List<Component> prevLore = new ArrayList<>();
 			if (itemMeta.hasLore()) {
-				prevLore = itemMeta.lore();
+				prevLore.addAll(Objects.requireNonNull(itemMeta.lore()));
 			}
 			prevLore.addAll(newLore);
 			itemMeta.lore(prevLore);

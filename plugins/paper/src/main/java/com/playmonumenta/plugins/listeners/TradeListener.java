@@ -111,7 +111,7 @@ public class TradeListener implements Listener {
 			}
 			// Custom Trade GUI Enabled:
 			event.setCancelled(true);
-			new CustomTradeGui(player, event.getVillager(), trades).open();
+			new CustomTradeGui(player, event.getVillager(), event.getTitle(), trades).open();
 		}
 	}
 
