@@ -434,9 +434,9 @@ public class DepthsParty {
 							totalPoints += DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS_AMOUNT;
 						}
 					}
-					DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints, mDelveModifiers, false);
+					DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints / 2, mDelveModifiers, false);
 					if (mAscension >= 13) {
-						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints, mDelveModifiers, true);
+						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints / 2, mDelveModifiers, true);
 					}
 
 				}
@@ -563,7 +563,7 @@ public class DepthsParty {
 			if (getContent() == DepthsContent.DARKEST_DEPTHS) {
 				DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, (roomReached > 120) && !mIsSixPlayerMode);
 			} else {
-				ZenithLoot.generateLoot(lootRoomLoc.clone().add(ZenithLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, getAscension() >= 15 && !mIsSixPlayerMode && victory, getAscension());
+				ZenithLoot.generateLoot(lootRoomLoc.clone().add(ZenithLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, getAscension() >= 15 && !mIsSixPlayerMode && victory, getAscension(), victory);
 			}
 
 			//Set their highest room score and do announcements

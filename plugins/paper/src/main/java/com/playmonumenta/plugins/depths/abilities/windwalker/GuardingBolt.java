@@ -43,7 +43,7 @@ public class GuardingBolt extends DepthsAbility {
 	public static final int COOLDOWN = 24 * 20;
 	private static final int RADIUS = 4;
 	private static final int RANGE = 25;
-	private static final int[] DAMAGE = {12, 14, 16, 18, 20, 24};
+	private static final int[] DAMAGE = {15, 18, 21, 24, 27, 35};
 	private static final int[] STUN_DURATION = {20, 25, 30, 35, 40, 50};
 	public static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
 	public static final Particle.DustOptions COLOR_AQUA = new Particle.DustOptions(Color.AQUA, 0.75f);

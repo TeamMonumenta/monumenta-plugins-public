@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 
 public class Flexibility extends DepthsAbility {
 	public static final String ABILITY_NAME = "Flexibility";
-	public static final double[] DAMAGE = {0.02, 0.025, 0.03, 0.035, 0.04, 0.05};
+	public static final double[] DAMAGE = {0.015, 0.02, 0.025, 0.03, 0.035, 0.045};
 
 	public static final DepthsAbilityInfo<Flexibility> INFO =
 		new DepthsAbilityInfo<>(Flexibility.class, ABILITY_NAME, Flexibility::new, DepthsTree.PRISMATIC, DepthsTrigger.PASSIVE)

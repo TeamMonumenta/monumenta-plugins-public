@@ -55,7 +55,7 @@ public class DepthsAscensionGUI extends Gui {
 			DELVE_POINTS_PER_LEVEL * 3, Material.BLACK_CONCRETE, 15),
 		new AscensionLevelDetails(7, null,
 			DELVE_POINTS_PER_LEVEL * 4, Material.BLACK_CONCRETE, 16),
-		new AscensionLevelDetails(8, "Bosses cast attacks more frequently.",
+		new AscensionLevelDetails(8, "Bosses cast attacks more frequently and have new patterns.",
 			DELVE_POINTS_PER_LEVEL * 4, Material.BLACK_CONCRETE, 19),
 		new AscensionLevelDetails(9, null,
 			DELVE_POINTS_PER_LEVEL * 5, Material.CRYING_OBSIDIAN, 20),
@@ -65,11 +65,11 @@ public class DepthsAscensionGUI extends Gui {
 			DELVE_POINTS_PER_LEVEL * 6, Material.CRYING_OBSIDIAN, 22),
 		new AscensionLevelDetails(12, "The time to revive is reduced.",
 			DELVE_POINTS_PER_LEVEL * 6, Material.CRYING_OBSIDIAN, 23),
-		new AscensionLevelDetails(13, "Your party is assigned max Twisted and Entropy modifiers",
+		new AscensionLevelDetails(13, "Your party is assigned max Twisted delve points.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 24),
 		new AscensionLevelDetails(14, "Ability and upgrade options are reduced.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 25),
-		new AscensionLevelDetails(15, "The final boss is now stronger.",
+		new AscensionLevelDetails(15, "All bosses are now stronger.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 40)
 	));
 
@@ -118,7 +118,7 @@ public class DepthsAscensionGUI extends Gui {
 				NamedTextColor.GREEN, 30, false);
 
 			GUIUtils.splitLoreLine(clickableItem, "- Your party is randomly assigned "
-					+ details.mAscensionDelvePoints + " delve points.",
+					+ details.mAscensionDelvePoints + " delve points, split between F1 and F2.",
 				NamedTextColor.RED, 30, false);
 			//Difficulties
 			for (int i = 0; i < details.mLevel; i++) {

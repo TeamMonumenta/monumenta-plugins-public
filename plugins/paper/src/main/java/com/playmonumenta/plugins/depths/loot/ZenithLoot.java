@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.depths.loot;
 
+import com.playmonumenta.plugins.depths.DepthsContent;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,11 +37,13 @@ public class ZenithLoot {
 	public static final NamespacedKey TROPHY_KEY = NamespacedKeyUtils.fromString("epic:r3/depths2/uriddans_eternal_call");
 	public static final NamespacedKey HALLOWEEN_KEY = NamespacedKey.fromString("epic:event/halloween2019/creepers_delight");
 
+	public static final String DAILY_TAG = "zenith_daily";
+
 	public static final int RELIC_CHANCE = 250;
 	//Scales the currency drops by x per ascension level
-	public static final double CURRENCY_PER_ASC_LEVEL = 0.05;
+	public static final double CURRENCY_PER_ASC_LEVEL = 0.1;
 	//Scales the dungeon mats and relics by x per ascension level
-	public static final double DUNGEON_PER_ASC_LEVEL = 0.1;
+	public static final double DUNGEON_PER_ASC_LEVEL = 0.2;
 
 	//Starts at ascension level 0, ends at 15 odds
 	public static final int[] ASCENSION_CHARM_ROLLS_SCORE = {18, 18, 17, 16, 15, 16, 15, 14, 13, 12, 13, 12, 11, 10, 9, 9};
@@ -74,7 +78,7 @@ public class ZenithLoot {
 	 * @param loc loot room spawn location
 	 * @param treasureScore amount of loot to spawn
 	 */
-	public static void generateLoot(Location loc, int treasureScore, Player p, boolean trophy, int ascensionLevel) {
+	public static void generateLoot(Location loc, int treasureScore, Player p, boolean trophy, int ascensionLevel, boolean victory) {
 
 		//Load the main reward table with ccs and depths mats and spawn it in
 		LootContext context = new LootContext.Builder(loc).build();
@@ -156,6 +160,17 @@ public class ZenithLoot {
 				for (ItemStack item : loot) {
 					loc.getWorld().dropItem(loc, item);
 				}
+			}
+			if (!ScoreboardUtils.checkTag(p, DAILY_TAG) && victory) {
+				//drop two mats for daily bonus and add tag
+				for (ItemStack item : loot) {
+					loc.getWorld().dropItem(loc, item);
+				}
+				for (ItemStack item : loot) {
+					loc.getWorld().dropItem(loc, item);
+				}
+				p.addScoreboardTag(DAILY_TAG);
+				DepthsUtils.sendFormattedMessage(p, DepthsContent.CELESTIAL_ZENITH, "You received your daily Zenith clear bonus!");
 			}
 		}
 

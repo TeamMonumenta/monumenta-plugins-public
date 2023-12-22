@@ -1531,6 +1531,17 @@ public class DepthsManager {
 			//Give twisted reward for beating boss in depths 2
 			party.mPlayersInParty.forEach(dp2 -> dp2.mEarnedRewards.add(DepthsRewardType.TWISTED));
 			party.sendMessage("You received a celestial gift for clearing the floor! Check your trinket to see the upgrade.");
+
+			// Give delve points for ascension level
+			if (partyFloor == 1 && party.getAscension() > 1) {
+				int totalPoints = 0;
+				for (int x : DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS) {
+					if (x <= party.getAscension()) {
+						totalPoints += DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS_AMOUNT;
+					}
+				}
+				DepthsEndlessDifficulty.applyDelvePointsToParty(party, totalPoints / 2, party.mDelveModifiers, false);
+			}
 		}
 
 		//Check to see if we're in endless mode and need to assign delve points to players

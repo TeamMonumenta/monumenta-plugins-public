@@ -219,6 +219,7 @@ public abstract class RoomRepository {
 		//Get the first room in the list the party hasn't gotten already
 		for (DepthsRoom room : roomOptions) {
 			//Account for height
+
 			if ((yLevel < 70.0 && room.mDirection == RoomDirection.DOWN) || (yLevel > 446.0 && room.mDirection == RoomDirection.UP)) {
 				continue;
 			}
@@ -231,6 +232,7 @@ public abstract class RoomRepository {
 
 		for (DepthsRoom room : roomOptions) {
 			//Account for height
+
 			if ((yLevel < 70.0 && room.mDirection == RoomDirection.DOWN) || (yLevel > 446.0 && room.mDirection == RoomDirection.UP)) {
 				continue;
 			}

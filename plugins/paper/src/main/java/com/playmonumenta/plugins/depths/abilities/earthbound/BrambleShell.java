@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 public class BrambleShell extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Bramble Shell";
-	public static final double[] BRAMBLE_DAMAGE = {6, 7.5, 9, 10.5, 12, 15};
+	public static final double[] BRAMBLE_DAMAGE = {5, 6, 7, 8, 9, 12};
 
 	public static final DepthsAbilityInfo<BrambleShell> INFO =
 		new DepthsAbilityInfo<>(BrambleShell.class, ABILITY_NAME, BrambleShell::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)

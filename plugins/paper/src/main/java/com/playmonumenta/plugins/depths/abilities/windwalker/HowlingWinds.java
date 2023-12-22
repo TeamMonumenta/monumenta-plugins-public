@@ -33,8 +33,8 @@ public class HowlingWinds extends DepthsAbility {
 	public static final int PULL_RADIUS = 16;
 	public static final int DISTANCE = 6;
 	public static final int[] PULL_INTERVAL = {20, 18, 16, 14, 12, 8};
-	public static final int DURATION_TICKS = 6 * 20;
-	public static final double PULL_VELOCITY = 0.6;
+	public static final int DURATION_TICKS = 8 * 20;
+	public static final double PULL_VELOCITY = 0.7;
 	public static final double BASE_RATIO = 0.15;
 
 	public static final String CHARM_COOLDOWN = "Howling Winds Cooldown";

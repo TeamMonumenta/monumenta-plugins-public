@@ -21,7 +21,7 @@ public class Charity extends DepthsAbility {
 	public static final String ABILITY_NAME = "Charity";
 	private static final int[] ABSORPTION = {4, 5, 6, 7, 8, 10};
 	private static final int DURATION = 10 * 20;
-	public static final double[] REVIVE_POWER = {1.5, 1.6, 1.7, 1.8, 1.9, 2.2};
+	public static final double[] REVIVE_POWER = {1.4, 1.5, 1.6, 1.7, 1.8, 2.0};
 
 	public static final DepthsAbilityInfo<Charity> INFO =
 		new DepthsAbilityInfo<>(Charity.class, ABILITY_NAME, Charity::new, DepthsTree.PRISMATIC, DepthsTrigger.PASSIVE)

@@ -42,7 +42,7 @@ public class DummyDecoy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dummy Decoy";
 
-	public static final int COOLDOWN = 25 * 20;
+	public static final int COOLDOWN = 22 * 20;
 	public static final String DUMMY_NAME = "AlluringShadow";
 	public static final int[] HEALTH = {40, 50, 60, 70, 80, 150};
 	public static final int[] STUN_TICKS = {20, 25, 30, 35, 40, 60};

@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 public class Prosperity extends DepthsAbility {
 	public static final String ABILITY_NAME = "Prosperity";
-	public static final double[] CHANCE = {0.4, 0.6, 0.8, 1, 1.2, 1.6};
+	public static final double[] CHANCE = {0.3, 0.5, 0.7, 0.9, 1.1, 1.5};
 
 	public static final DepthsAbilityInfo<Prosperity> INFO =
 		new DepthsAbilityInfo<>(Prosperity.class, ABILITY_NAME, Prosperity::new, DepthsTree.PRISMATIC, DepthsTrigger.PASSIVE)

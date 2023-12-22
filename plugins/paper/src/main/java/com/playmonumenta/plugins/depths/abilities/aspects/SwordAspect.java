@@ -14,12 +14,12 @@ import org.bukkit.entity.Player;
 public class SwordAspect extends WeaponAspectDepthsAbility {
 
 	public static final String ABILITY_NAME = "Aspect of the Sword";
-	public static final double DAMAGE = 2.5;
+	public static final double DAMAGE = 3;
 
 	public static final DepthsAbilityInfo<SwordAspect> INFO =
 		new DepthsAbilityInfo<>(SwordAspect.class, ABILITY_NAME, SwordAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
 			.displayItem(Material.IRON_SWORD)
-			.description("You deal 2.5 extra melee damage when holding a sword.");
+			.description("You deal 3 extra melee damage when holding a sword.");
 
 	public SwordAspect(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

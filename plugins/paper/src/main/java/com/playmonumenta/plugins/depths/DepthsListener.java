@@ -589,7 +589,7 @@ public class DepthsListener implements Listener {
 					dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 					dp.sendMessage("You reached room " + party.mRoomNumber + "!");
 
-					if (!party.mEndlessMode) {
+					if (!party.mEndlessMode && party.mAscension == 0) {
 						ExperienceUtils.setTotalExperience(player, (int) (0.5 * ExperienceUtils.getTotalExperience(player)));
 					}
 				}

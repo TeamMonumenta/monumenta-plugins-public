@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 
 public class VolcanicCombos extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Combos";
-	public static final int[] DAMAGE = {6, 7, 8, 9, 10, 12};
+	public static final int[] DAMAGE = {6, 8, 10, 12, 14, 18};
 	public static final int RADIUS = 4;
 	public static final int FIRE_TICKS = 3 * 20;
 	public static final int HIT_REQUIREMENT = 3;

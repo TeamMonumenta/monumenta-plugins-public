@@ -106,7 +106,7 @@ public class ColorSplash extends DepthsAbility {
 	public static final double[] STEELSAGE_PROJ_DAMAGE_MULTIPLIER = {0.2, 0.24, 0.28, 0.32, 0.36, 0.44};
 
 	public static final int WINDWALKER_DURATION = 10 * 20;
-	public static final int WINDWALKER_LAND_COOLDOWN = 20;
+	public static final int WINDWALKER_LAND_COOLDOWN = 12;
 	public static final int WINDWALKER_IFRAMES = 10;
 	public static final double WINDWALKER_RADIUS = 3;
 	public static final int WINDWALKER_EFFECTS_DURATION = 2 * 20;

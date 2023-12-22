@@ -38,7 +38,7 @@ public class RingOfFlames extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ring of Flames";
 	private static final int COOLDOWN = 18 * 20;
-	private static final int[] DAMAGE = {4, 5, 6, 7, 8, 10};
+	private static final int[] DAMAGE = {6, 7, 8, 9, 10, 12};
 	private static final int[] DURATION = {8 * 20, 9 * 20, 10 * 20, 11 * 20, 12 * 20, 14 * 20};
 	private static final int EFFECT_DURATION = 4 * 20;
 	private static final double BLEED_AMOUNT = 0.2;
