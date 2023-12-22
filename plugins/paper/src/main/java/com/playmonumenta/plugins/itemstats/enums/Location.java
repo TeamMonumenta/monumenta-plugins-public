@@ -13,6 +13,7 @@ public enum Location {
 	NONE("none", ItemStatUtils.DUMMY_LORE_TO_REMOVE),
 	OVERWORLD1("overworld1", "King's Valley Overworld", TextColor.fromHexString("#DCAE32")),
 	OVERWORLD2("overworld2", "Celsian Isles Overworld", TextColor.fromHexString("#32D7DC")),
+	OVERWORLD3("overworld3", "Architect's Ring Overworld", TextColor.fromHexString("#C2C4C4")),
 	FOREST("forest", "The Wolfswood", TextColor.fromHexString("#4C8F4D")),
 	KEEP("keep", "Pelias' Keep", TextColor.fromHexString("#C4BBA5")),
 	CASINO1("casino1", "Rock's Little Casino", TextColor.fromHexString("#EDC863")),
