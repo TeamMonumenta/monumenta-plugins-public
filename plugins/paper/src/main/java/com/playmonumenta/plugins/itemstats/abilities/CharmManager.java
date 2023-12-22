@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats.abilities;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -139,6 +140,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1286,6 +1288,31 @@ public class CharmManager {
 			return allEffects.get(charmAttribute).doubleValue();
 		}
 		return 0;
+	}
+
+	public Map<String, Double> getSummaryOfAllAttributes(Player p, CharmType charmType) {
+		if (mEnabledCharmType != charmType) {
+			return Collections.emptyMap();
+		}
+
+		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
+		if (allEffects == null) {
+			return Collections.emptyMap();
+		}
+
+		Map<String, Double> result = new HashMap<>();
+		for (String effect : mCharmEffectList) {
+			if (allEffects.containsKey(effect)) {
+				result.put(effect, allEffects.get(effect));
+			}
+
+			String percentEffect = effect + "%";
+			if (allEffects.containsKey(percentEffect)) {
+				result.put(percentEffect, allEffects.get(percentEffect));
+			}
+		}
+
+		return ImmutableMap.copyOf(result);
 	}
 
 	public List<Component> getSummaryOfAllAttributesAsComponents(Player p, CharmType charmType) {

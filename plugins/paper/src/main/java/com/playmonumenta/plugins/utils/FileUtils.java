@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import io.papermc.paper.datapack.Datapack;
@@ -126,6 +127,10 @@ public class FileUtils {
 	}
 
 	public static void writeJson(String fileName, JsonObject json) throws IOException {
+		writeJson(fileName, json, true);
+	}
+
+	public static void writeJson(String fileName, JsonObject json, boolean escapeHtmlCharacters) throws IOException {
 		// Do not attempt to catch exceptions here - let them propagate to the caller
 		File file = new File(fileName);
 
@@ -139,7 +144,11 @@ public class FileUtils {
 		Gson gson;
 		try {
 			writer = new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8);
-			gson = new Gson();
+			GsonBuilder gsonBuilder = new GsonBuilder();
+			if (!escapeHtmlCharacters) {
+				gsonBuilder.disableHtmlEscaping();
+			}
+			gson = gsonBuilder.create();
 			jsonWriter = gson.newJsonWriter(writer);
 			jsonWriter.setIndent("    ");
 			gson.toJson(json, jsonWriter);

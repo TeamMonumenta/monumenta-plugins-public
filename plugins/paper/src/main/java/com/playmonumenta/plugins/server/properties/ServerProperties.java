@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -72,6 +73,7 @@ public class ServerProperties {
 	private boolean mLootingLimiterIgnoreBreakingChests = false;
 	private boolean mDepthsEnabled = false;
 	private boolean mTrickyCreepersEnabled = true;
+	private @Nullable String mGameplayDataExportPath = null;
 
 	private final Map<String, Integer> mShardCounts = new HashMap<>();
 
@@ -132,6 +134,13 @@ public class ServerProperties {
 			return false;
 		}
 		return ScoreboardUtils.getScoreboardValue(player.getName(), typeName).orElse(0) == 1;
+	}
+
+	public static String getGameplayDataExportPath() {
+		if (INSTANCE.mGameplayDataExportPath == null) {
+			return Plugin.getInstance().getDataFolder() + File.separator;
+		}
+		return INSTANCE.mGameplayDataExportPath;
 	}
 
 	public static boolean getAuditMessagesEnabled() {
@@ -286,6 +295,7 @@ public class ServerProperties {
 			}
 
 			mShardName = getPropertyValueString(object, "shardName", mShardName);
+			mGameplayDataExportPath = getPropertyValueString(object, "gameplayDataExportPath", mGameplayDataExportPath);
 
 			getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender, mUnbreakableBlocks);
 			getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender, mAlwaysPickupMats);
@@ -346,6 +356,7 @@ public class ServerProperties {
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 
 		out.add("shardName = " + mShardName);
+		out.add("gameplayDataExportPath = " + mGameplayDataExportPath);
 
 		out.add("disableEntityScoresInDefaultWorld = " + mDisableEntityScoresInDefaultWorld);
 		out.add("disableEntityScoresInWorlds = [" + String.join(" ", mDisableEntityScoresInWorlds) + "]");
