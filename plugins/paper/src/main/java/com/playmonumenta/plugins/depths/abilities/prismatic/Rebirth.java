@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -22,10 +23,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class Rebirth extends DepthsAbility {
 
@@ -33,11 +31,12 @@ public class Rebirth extends DepthsAbility {
 	public static final String RESISTANCE_EFFECT_NAME = "RebirthResistance";
 	public static final int UPGRADE_LEVELS = 2;
 	public static final int[] RESISTANCE_DURATION = {3 * 20, 4 * 20, 5 * 20, 6 * 20, 7 * 20, 10 * 20};
+	public static final int[] EXTRA_ABILITIES = {0, 1, 2, 3, 4, 6};
 
 	// Give it a dummy cooldown so that its icon appears for Monumenta Mod users.
 	// The cooldown doesn't matter, since the ability is removed immediately upon use.
 	public static final DepthsAbilityInfo<Rebirth> INFO =
-		new DepthsAbilityInfo<>(Rebirth.class, ABILITY_NAME, Rebirth::new, DepthsTree.PRISMATIC, DepthsTrigger.LIFELINE)
+		new DepthsAbilityInfo<>(Rebirth.class, ABILITY_NAME, Rebirth::new, DepthsTree.PRISMATIC, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.REBIRTH)
 			.displayItem(Material.CRIMSON_HYPHAE)
 			.descriptions(Rebirth::getDescription)
@@ -46,27 +45,6 @@ public class Rebirth extends DepthsAbility {
 
 	public Rebirth(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-	}
-
-	@Override
-	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.isBlocked() || isOnCooldown() || event.getType() == DamageEvent.DamageType.TRUE) {
-			return;
-		}
-
-		// Calculate whether this effect should not be run based on player health.
-		double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
-
-		if (healthRemaining > 0) {
-			return;
-		}
-
-		mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(RESISTANCE_DURATION[mRarity - 1], -1));
-		sendActionBarMessage("Rebirth has been activated!");
-		event.setCancelled(true);
-
-		activationEffects();
-		rerollAbilities();
 	}
 
 	@Override
@@ -94,7 +72,7 @@ public class Rebirth extends DepthsAbility {
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 2, 1);
 	}
 
-	private void rerollAbilities() {
+	public void rerollAbilities(DepthsPlayer dp) {
 		List<DepthsAbilityInfo<?>> playerAbilities = DepthsManager.getInstance().getPlayerAbilities(mPlayer);
 
 		ArrayList<DepthsAbilityInfo<?>> eligibleAbilities = new ArrayList<>(
@@ -125,15 +103,30 @@ public class Rebirth extends DepthsAbility {
 			DepthsManager.getInstance().setPlayerLevelInAbility(abilityInfo.getDisplayName(), mPlayer, 0, false);
 			DepthsManager.getInstance().setPlayerLevelInAbility(chosenOne.getDisplayName(), mPlayer, finalLevel, false);
 		});
+
+		int[] chances = {80, 15, 5, 0, 0};
+		for (int i = 0; i < EXTRA_ABILITIES[mRarity - 1]; i++) {
+			DepthsManager.getInstance().getRandomAbility(mPlayer, dp, chances, false, false, false);
+		}
+	}
+
+	public void applyResistance() {
+		mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(RESISTANCE_DURATION[mRarity - 1], -1));
 	}
 
 	private static Description<Rebirth> getDescription(int rarity, TextColor textColor) {
-		return new DescriptionBuilder<Rebirth>(textColor)
-			.add("If you would die, instead gain 100% Resistance for ")
+		DescriptionBuilder<Rebirth> desc = new DescriptionBuilder<Rebirth>(textColor)
+			.add("When you would permanently die, you are reborn, gaining 100% Resistance for ")
 			.addDuration(a -> RESISTANCE_DURATION[rarity - 1], RESISTANCE_DURATION[rarity - 1], false, true)
-			.add(" seconds. When this happens, all of your abilities are replaced with completely random ones")
-			.add(" from any tree, including prismatic, and all of your new abilities are upgraded by " + UPGRADE_LEVELS + " levels")
-			.add(" from what they were before. The random abilities take the same slot as the replaced ones.");
+			.add(" seconds and refunding the revive duration lost from that death.")
+			.add(" When this happens, all of your abilities are replaced with random new abilities in the same slot from any tree, including Prismatic.")
+			.add(" These abilities are upgraded by " + UPGRADE_LEVELS + " levels.");
+		if (rarity > 1) {
+			desc = desc.add(" In addition, gain ")
+				.add(a -> EXTRA_ABILITIES[rarity - 1], EXTRA_ABILITIES[rarity - 1], false, null, true)
+				.add(" more random abilities.");
+		}
+		return desc;
 	}
 
 

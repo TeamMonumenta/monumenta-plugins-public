@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.attributes;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Attribute;
@@ -32,7 +33,14 @@ public class AttackDamageMultiply implements Attribute {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL) {
+		DamageType type = event.getType();
+
+		if (type == DamageType.MELEE_SKILL && DepthsManager.getInstance().isInSystem(player)) {
+			// Handled in DepthsListener
+			return;
+		}
+
+		if (type == DamageType.MELEE || type == DamageType.MELEE_SKILL) {
 			event.setDamage(event.getDamage() * value);
 		}
 	}

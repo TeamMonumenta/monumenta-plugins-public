@@ -12,7 +12,12 @@ import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.DamageListener;
@@ -31,6 +36,7 @@ import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -890,6 +896,16 @@ public class ItemStatManager implements Listener {
 		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ANTI_SPEED)) {
 			PlayerUtils.cancelGearSpeed(player);
 		}
+	}
+
+	public static Map<AttributeType, Double> getDamageMultipliers(PlayerItemStats playerItemStats) {
+		PlayerItemStats.ItemStatsMap itemStatsMap = playerItemStats.getItemStats();
+		List<AttributeType> types = Arrays.asList(AttributeType.ATTACK_DAMAGE_MULTIPLY, AttributeType.PROJECTILE_DAMAGE_MULTIPLY, AttributeType.MAGIC_DAMAGE_MULTIPLY);
+		Map<AttributeType, Double> map = new HashMap<>();
+		for (AttributeType type : types) {
+			map.put(type, itemStatsMap.get(type.getItemStat()));
+		}
+		return map;
 	}
 
 }

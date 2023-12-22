@@ -1325,15 +1325,17 @@ public class DepthsManager {
 			if (level == 0 || (level >= 5 && !(dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED)) || level >= 6 || WeaponAspectDepthsAbility.class.isAssignableFrom(da.getAbilityClass())) {
 				continue;
 			} else {
-				DepthsAbilityItem item;
+				int newRarity;
 				//If they're in an elite room, their reward is +2 levels instead
 				if (dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE_ELITE) {
-					item = da.getAbilityItem(Math.min(5, level + 2 + depths2UpgradeBonus));
+					newRarity = Math.min(5, level + 2 + depths2UpgradeBonus);
 				} else if (dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED) {
-					item = da.getAbilityItem(6);
+					newRarity = 6;
 				} else {
-					item = da.getAbilityItem(Math.min(5, level + 1 + depths2UpgradeBonus));
+					newRarity = Math.min(5, level + 1 + depths2UpgradeBonus);
 				}
+				int oldRarity = getPlayerLevelInAbility(da.getDisplayName(), p);
+				DepthsAbilityItem item = da.getAbilityItem(newRarity, oldRarity);
 
 				offeredItems.add(item);
 			}
@@ -1617,6 +1619,10 @@ public class DepthsManager {
 		return chance;
 	}
 
+	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances, boolean isPrismatic, boolean isTwisted) {
+		getRandomAbility(p, dp, chances, isPrismatic, isTwisted, true);
+	}
+
 	/**
 	 * Gives the player a random ability at low rarity, for run start or mystery box
 	 *
@@ -1624,7 +1630,7 @@ public class DepthsManager {
 	 * @param dp      depths player
 	 * @param chances the array of odds for each rarity, length 5
 	 */
-	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances, boolean isPrismatic, boolean isTwisted) {
+	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances, boolean isPrismatic, boolean isTwisted, boolean sendMessage) {
 		//Give random ability
 
 		List<DepthsAbilityInfo<?>> abilities;
@@ -1658,19 +1664,13 @@ public class DepthsManager {
 				int roll = mRandom.nextInt(100) + 1;
 				for (int i = 0; i < 5; i++) {
 					if (roll < addUpChances(i, chances)) {
-						if (isTwisted) {
-							setPlayerLevelInAbility(da.getDisplayName(), p, 6);
+						int rarity = isTwisted ? 6 : i + 1;
+						setPlayerLevelInAbility(da.getDisplayName(), p, rarity);
+						if (sendMessage) {
 							dp.sendMessage(Component.text("You gained ability ")
-								.append(da.getNameWithHover(6, p))
+								.append(da.getNameWithHover(rarity, p))
 								.append(Component.text(" at "))
-								.append(DepthsUtils.getRarityComponent(6))
-								.append(Component.text(" level!")));
-						} else {
-							setPlayerLevelInAbility(da.getDisplayName(), p, i + 1);
-							dp.sendMessage(Component.text("You gained ability ")
-								.append(da.getNameWithHover(i + 1, p))
-								.append(Component.text(" at "))
-								.append(DepthsUtils.getRarityComponent(i + 1))
+								.append(DepthsUtils.getRarityComponent(rarity))
 								.append(Component.text(" level!")));
 						}
 						break;

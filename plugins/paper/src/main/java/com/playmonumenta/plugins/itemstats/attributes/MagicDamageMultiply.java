@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.attributes;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Attribute;
@@ -32,6 +33,11 @@ public class MagicDamageMultiply implements Attribute {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		if (DepthsManager.getInstance().isInSystem(player)) {
+			// Handled in DepthsListener
+			return;
+		}
+
 		if (event.getType() == DamageType.MAGIC) {
 			event.setDamage(event.getDamage() * value);
 		}

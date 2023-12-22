@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -83,9 +85,15 @@ public class DepthsUtils {
 	//List of locations where ice is spawned by a barrier
 	public static Map<Location, Boolean> iceBarrier = new HashMap<>();
 
-	public static Component getLoreForItem(DepthsTree tree, int rarity) {
+	public static Component getLoreForItem(DepthsTree tree, int rarity, int oldRarity) {
+		Component oldRarityComponent = Component.empty();
+		if (oldRarity != 0 && oldRarity != rarity) {
+			oldRarityComponent = Component.empty().append(getRarityComponent(oldRarity)).append(Component.text(" → ", NamedTextColor.DARK_GRAY));
+		}
+
 		return tree.getNameComponent()
 			       .append(Component.text(" : ", NamedTextColor.DARK_GRAY))
+			       .append(oldRarityComponent)
 			       .append(getRarityComponent(rarity))
 			       .decoration(TextDecoration.ITALIC, false);
 	}
@@ -318,6 +326,22 @@ public class DepthsUtils {
 
 	public static boolean isDepthsGrave(Entity entity) {
 		return entity instanceof ArmorStand && entity.getScoreboardTags().contains(DepthsListener.GRAVE_TAG);
+	}
+
+	public static double getAdaptiveDamageMultiplier(ItemStatManager.PlayerItemStats playerItemStats, DamageType damageType) {
+		AttributeType correctAttributeType = switch (damageType) {
+			case MELEE_SKILL -> AttributeType.ATTACK_DAMAGE_MULTIPLY;
+			case PROJECTILE_SKILL -> AttributeType.PROJECTILE_DAMAGE_MULTIPLY;
+			case MAGIC -> AttributeType.MAGIC_DAMAGE_MULTIPLY;
+			default -> null;
+		};
+		if (correctAttributeType == null) {
+			return 0;
+		}
+		Map<AttributeType, Double> damageMultipliers = ItemStatManager.getDamageMultipliers(playerItemStats);
+		Map<AttributeType, Double> adjustedMultipliers = new HashMap<>();
+		damageMultipliers.forEach((type, mult) -> adjustedMultipliers.put(type, 1 + ((mult - 1) * (type == correctAttributeType ? 1 : 0.5))));
+		return adjustedMultipliers.values().stream().mapToDouble(a -> a).max().orElse(0);
 	}
 
 	// Stores run stats of the given DepthsPlayer to a json file.

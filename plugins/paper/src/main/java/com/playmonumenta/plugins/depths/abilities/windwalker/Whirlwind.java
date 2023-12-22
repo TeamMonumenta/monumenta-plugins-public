@@ -54,17 +54,17 @@ public class Whirlwind extends DepthsAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.WHIRLWIND_SPEED_DURATION.mEffectName, SPEED_DURATION);
 	}
 
-	public static void onSpawnerBreak(Plugin plugin, Player player, int rarity, Block block) {
+	public static void onSpawnerBreak(Plugin plugin, Player player, int rarity, Location loc) {
 		double radius = CharmManager.getRadius(player, CharmEffects.WHIRLWIND_RADIUS.mEffectName, RADIUS);
 		double knockback = CharmManager.calculateFlatAndPercentValue(player, CharmEffects.WHIRLWIND_KNOCKBACK.mEffectName, KNOCKBACK_SPEED[rarity - 1]);
 		double speed = SPEED[rarity - 1] + CharmManager.getLevelPercentDecimal(player, CharmEffects.WHIRLWIND_SPEED_AMPLIFIER.mEffectName);
 		int duration = CharmManager.getDuration(player, CharmEffects.WHIRLWIND_SPEED_DURATION.mEffectName, SPEED_DURATION);
-		onSpawnerBreak(plugin, player, block, radius, knockback, speed, duration);
+		onSpawnerBreak(plugin, player, loc, radius, knockback, speed, duration);
 	}
 
-	public static void onSpawnerBreak(Plugin plugin, Player player, Block block, double radius, double knockback, double speed, int duration) {
+	public static void onSpawnerBreak(Plugin plugin, Player player, Location loc, double radius, double knockback, double speed, int duration) {
 		World world = player.getWorld();
-		Location loc = block.getLocation().add(0.5, 0.5, 0.5);
+		loc = loc.clone().add(0, 0.5, 0);
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.25f);
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.35f);
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.45f);
@@ -84,7 +84,7 @@ public class Whirlwind extends DepthsAbility {
 
 		Block block = event.getBlock();
 		if (ItemUtils.isPickaxe(mPlayer.getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
-			onSpawnerBreak(mPlugin, mPlayer, block, mRadius, mKnockback, mSpeed, mDuration);
+			onSpawnerBreak(mPlugin, mPlayer, block.getLocation().add(0.5, 0, 0.5), mRadius, mKnockback, mSpeed, mDuration);
 		}
 		return true;
 	}

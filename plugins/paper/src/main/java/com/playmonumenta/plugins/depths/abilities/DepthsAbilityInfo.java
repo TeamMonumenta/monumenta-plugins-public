@@ -213,13 +213,21 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return getAbilityItem(rarity, null);
 	}
 
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {
+		return getAbilityItem(rarity, player, 0);
+	}
+
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, int oldRarity) {
+		return getAbilityItem(rarity, null, oldRarity);
+	}
+
 	/**
 	 * Returns the ability item to display in GUIs given the input rarity
 	 *
 	 * @param rarity the rarity to put on the item
 	 * @return the item to display
 	 */
-	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity) {
 		if (rarity <= 0) {
 			//This should never happen
 			return null;
@@ -245,7 +253,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			meta.displayName(getColoredName().colorIfAbsent(NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			if (mDepthsTree != null) {
 				List<Component> lore = new ArrayList<>();
-				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity));
+				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity, oldRarity));
 				meta.lore(lore);
 			}
 			GUIUtils.splitLoreLine(meta, getDescription(rarity, getPlayerAbility(Plugin.getInstance(), player)), 30, false);

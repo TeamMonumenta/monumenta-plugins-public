@@ -156,7 +156,7 @@ public class GuardingBolt extends DepthsAbility {
 
 	private static Description<GuardingBolt> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<GuardingBolt>(color)
-			.add("Left click the air while sneaking and looking directly at a player")
+			.add("Left click while sneaking and looking directly at a player")
 			.addConditionalDepthsContent(DepthsContent.CELESTIAL_ZENITH, " or grave")
 			.add(" within ")
 			.add(a -> a.mRange, RANGE)

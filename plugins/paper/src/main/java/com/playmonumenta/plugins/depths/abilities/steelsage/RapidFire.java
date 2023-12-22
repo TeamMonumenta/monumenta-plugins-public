@@ -75,6 +75,8 @@ public class RapidFire extends DepthsAbility {
 			return false;
 		}
 
+		boolean encoreProjectileOverride = !ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand());
+
 		World world = mPlayer.getWorld();
 		cancelOnDeath(new BukkitRunnable() {
 			int mCount = 0;
@@ -88,7 +90,7 @@ public class RapidFire extends DepthsAbility {
 				}
 
 				ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-				if (ItemUtils.isProjectileWeapon(inMainHand)) {
+				if (ItemUtils.isProjectileWeapon(inMainHand) || encoreProjectileOverride) {
 					Location eyeLoc = mPlayer.getEyeLocation();
 					Vector direction = mPlayer.getLocation().getDirection();
 					AbstractArrow arrow = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);

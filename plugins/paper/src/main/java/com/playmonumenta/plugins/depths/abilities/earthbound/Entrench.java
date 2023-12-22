@@ -47,23 +47,22 @@ public class Entrench extends DepthsAbility {
 		mRadius = CharmManager.getRadius(player, CharmEffects.ENTRENCH_RADIUS.mEffectName, RADIUS);
 	}
 
-	public static void onSpawnerBreak(Plugin plugin, Player player, int rarity, Block block) {
+	public static void onSpawnerBreak(Plugin plugin, Player player, int rarity, Location loc) {
 		int duration = CharmManager.getDuration(player, CharmEffects.ENTRENCH_ROOT_DURATION.mEffectName, DURATION[rarity - 1]);
 		double radius = CharmManager.getRadius(player, CharmEffects.ENTRENCH_RADIUS.mEffectName, RADIUS);
-		onSpawnerBreak(plugin, player, block, duration, radius);
+		onSpawnerBreak(plugin, player, loc, duration, radius);
 	}
 
-	public static void onSpawnerBreak(Plugin plugin, Player player, Block block, int duration, double radius) {
-		Location centerLoc = block.getLocation().add(0.5, 0, 0.5);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(centerLoc, radius)) {
+	public static void onSpawnerBreak(Plugin plugin, Player player, Location loc, int duration, double radius) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius)) {
 			EntityUtils.applySlow(plugin, duration, SLOW_MODIFIER, mob);
 		}
 
 		World world = player.getWorld();
-		world.playSound(centerLoc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 1.2f, 0.45f);
-		world.playSound(centerLoc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.PLAYERS, 1, 0.6f);
+		world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 1.2f, 0.45f);
+		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.PLAYERS, 1, 0.6f);
 		double mult = radius / RADIUS;
-		new PartialParticle(Particle.BLOCK_DUST, centerLoc, (int) (35 * mult), 1.5 * mult, 1.5 * mult, 1.5 * mult, 1, Material.SOUL_SOIL.createBlockData()).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_DUST, loc, (int) (35 * mult), 1.5 * mult, 1.5 * mult, 1.5 * mult, 1, Material.SOUL_SOIL.createBlockData()).spawnAsPlayerActive(player);
 	}
 
 	@Override
@@ -73,7 +72,7 @@ public class Entrench extends DepthsAbility {
 		}
 		Block block = event.getBlock();
 		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
-			onSpawnerBreak(mPlugin, mPlayer, block, mDuration, mRadius);
+			onSpawnerBreak(mPlugin, mPlayer, block.getLocation().add(0.5, 0, 0.5), mDuration, mRadius);
 		}
 		return true;
 	}

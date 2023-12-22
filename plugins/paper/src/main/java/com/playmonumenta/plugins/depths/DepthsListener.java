@@ -13,14 +13,17 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Charity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.ColorSplash;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Rebirth;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.depths.bosses.Broodmother;
 import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -107,37 +110,42 @@ public class DepthsListener implements Listener {
 		if (type == Material.SPAWNER) {
 			dm.playerBrokeSpawner(player, block.getLocation());
 
-			DepthsParty party = dm.getDepthsParty(player);
-			if (party == null) {
-				return;
-			}
-
-			List<Sundrops> sundrops = party.getPlayers().stream().map(p -> Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Sundrops.class)).filter(Objects::nonNull).toList();
-			Map<Sundrops, Double> weights = new HashMap<>();
-			for (Sundrops ability : sundrops) {
-				weights.put(ability, ability.getChance());
-			}
-			double total = weights.values().stream().mapToDouble(c -> c).sum();
-			if (total > 1) {
-				for (Sundrops ability : sundrops) {
-					weights.put(ability, ability.getChance() / total);
-				}
-			}
-			double roll = FastUtils.RANDOM.nextDouble();
-			if (roll <= total) {
-				for (Map.Entry<Sundrops, Double> weight : weights.entrySet()) {
-					double chance = weight.getValue();
-					if (roll <= chance) {
-						weight.getKey().summonSundrop(block);
-						break;
-					} else {
-						roll -= chance;
-					}
-				}
-			}
+			Location loc = block.getLocation().toCenterLocation();
+			attemptSundrops(loc, player);
 		} else if (type == Material.CHEST) {
 			//Player's can't break chests themselves
 			event.setCancelled(true);
+		}
+	}
+
+	public static void attemptSundrops(Location loc, Player player) {
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(player);
+		if (party == null) {
+			return;
+		}
+
+		List<Sundrops> sundrops = party.getPlayers().stream().map(p -> Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Sundrops.class)).filter(Objects::nonNull).toList();
+		Map<Sundrops, Double> weights = new HashMap<>();
+		for (Sundrops ability : sundrops) {
+			weights.put(ability, ability.getChance());
+		}
+		double total = weights.values().stream().mapToDouble(c -> c).sum();
+		if (total > 1) {
+			for (Sundrops ability : sundrops) {
+				weights.put(ability, ability.getChance() / total);
+			}
+		}
+		double roll = FastUtils.RANDOM.nextDouble();
+		if (roll <= total) {
+			for (Map.Entry<Sundrops, Double> weight : weights.entrySet()) {
+				double chance = weight.getValue();
+				if (roll <= chance) {
+					weight.getKey().summonSundrop(loc);
+					break;
+				} else {
+					roll -= chance;
+				}
+			}
 		}
 	}
 
@@ -213,8 +221,17 @@ public class DepthsListener implements Listener {
 
 		ClassAbility ability = event.getAbility();
 		DamageEvent.DamageType type = event.getType();
-		if (ability != null && !ability.isFake() && type != DamageEvent.DamageType.TRUE && type != DamageEvent.DamageType.OTHER) {
+		if (ability != null && !ability.isFake() && type != DamageEvent.DamageType.TRUE && type != DamageEvent.DamageType.OTHER && event.getSource() instanceof Player player) {
 			event.setDamage(event.getDamage() * DepthsUtils.getDamageMultiplier());
+
+			ItemStatManager.PlayerItemStats playerItemStats = event.getPlayerItemStats();
+			if (playerItemStats == null) {
+				playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+			}
+			double adaptiveMultiplier = DepthsUtils.getAdaptiveDamageMultiplier(playerItemStats, type);
+			if (adaptiveMultiplier > 0) {
+				event.setDamage(event.getDamage() * adaptiveMultiplier);
+			}
 		}
 	}
 
@@ -419,7 +436,9 @@ public class DepthsListener implements Listener {
 								}
 								if (dp.mGraveTicks > graveDuration && !dp.mCurrentlyReviving) {
 									cancel();
-									sendPlayerToLootRoom(player, true);
+									if (!attemptRebirth(player, dp, grave.getLocation())) {
+										sendPlayerToLootRoom(player, true);
+									}
 									return;
 								}
 								float remaining = 1 - 1f * dp.mGraveTicks / graveDuration;
@@ -457,11 +476,13 @@ public class DepthsListener implements Listener {
 						};
 						dp.mGraveRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 					} else {
-						// died too often: immediately send to loot room
-						dp.sendMessage("You have died too often and have been sent directly to the loot room!");
-						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> sendPlayerToLootRoom(player, true));
+						if (!attemptRebirth(player, dp, player.getLocation())) {
+							// died too often: immediately send to loot room
+							dp.sendMessage("You have died too often and have been sent directly to the loot room!");
+							Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> sendPlayerToLootRoom(player, true));
+						}
 					}
-				} else {
+				} else if (!attemptRebirth(player, dp, player.getLocation())) {
 					// else send to loot room on death
 					//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
 					dp.mFinalTreasureScore = party.mTreasureScore;
@@ -477,9 +498,31 @@ public class DepthsListener implements Listener {
 						event.setNewLevel(keptLevel);
 						event.setNewExp(keptXp - ExperienceUtils.getTotalExperience(keptLevel));
 					}
+				} else {
+					event.setCancelled(true);
 				}
 			}
 		}
+	}
+
+	public boolean attemptRebirth(Player player, DepthsPlayer dp, Location teleportTo) {
+		Rebirth rebirth = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Rebirth.class);
+		if (rebirth != null) {
+			rebirth.activationEffects();
+			rebirth.rerollAbilities(dp);
+			rebirth.applyResistance();
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(teleportTo));
+			dp.mNumDeaths++;
+			dp.sendMessage("You have been reborn!");
+			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
+			if (party != null) {
+				party.sendMessage(player.getName() + " has been reborn!", other -> other != dp);
+			}
+			// Might need more protections but I think this should be enough
+			DepthsManager.getInstance().validateOfferings(dp);
+			return true;
+		}
+		return false;
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -518,8 +561,12 @@ public class DepthsListener implements Listener {
 
 			if (nearZenithBoss) {
 				player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_BOSS_TAG);
-			} else if (EntityUtils.getNearestHostile(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null) {
-				player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_MOB_TAG);
+			} else {
+				List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS);
+				nearbyMobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+				if (!nearbyMobs.isEmpty()) {
+					player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_MOB_TAG);
+				}
 			}
 		}
 	}

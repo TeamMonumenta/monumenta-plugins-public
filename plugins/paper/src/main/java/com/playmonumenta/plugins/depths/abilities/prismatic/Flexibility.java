@@ -9,8 +9,10 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -51,6 +53,7 @@ public class Flexibility extends DepthsAbility {
 		return new DescriptionBuilder<Flexibility>(color)
 			.add("Gain ")
 			.addPercent(a -> DAMAGE[rarity - 1], DAMAGE[rarity - 1], false, true)
-			.add(" damage for each unique tree featured in your active ability slots.");
+			.add(" damage for each unique tree featured in your active ability slots.")
+			.addConditional(a -> a != null ? Component.text("\nCurrent damage increase: " + StringUtils.multiplierToPercentageWithSign(a.mDamage - 1)) : Component.empty());
 	}
 }

@@ -74,7 +74,7 @@ public class Brutalize extends DepthsAbility {
 		return new DescriptionBuilder<Brutalize>(color)
 			.add("When you critically strike you deal ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
-			.add(" of the damage to all enemies in a ")
+			.add(" of the damage to all enemies (including the target) in a ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" block radius and knock other enemies away from the target.");
 	}

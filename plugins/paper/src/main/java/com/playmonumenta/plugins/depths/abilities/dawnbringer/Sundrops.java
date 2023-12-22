@@ -60,8 +60,7 @@ public class Sundrops extends DepthsAbility {
 		mSpeed = PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SUNDROPS_SPEED_AMPLIFIER.mEffectName);
 	}
 
-	public void summonSundrop(Block block) {
-		Location loc = block.getLocation().toCenterLocation();
+	public void summonSundrop(Location loc) {
 		World world = loc.getWorld();
 		Item sundrop = AbilityUtils.spawnAbilityItem(world, loc, Material.HONEYCOMB_BLOCK, "Sundrop", true, 0, true, true);
 

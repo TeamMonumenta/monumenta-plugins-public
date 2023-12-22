@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -36,6 +37,7 @@ public class Diversity extends DepthsAbility {
 			.descriptions(Diversity::getDescription);
 
 	private boolean mActive = false;
+	private int mTreeCount = 0;
 
 	public Diversity(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -45,6 +47,7 @@ public class Diversity extends DepthsAbility {
 		}
 
 		if (depthsPlayer.mDiversityActive) {
+			mTreeCount = TREES_REQUIRED;
 			mActive = true;
 		} else {
 			// Since all abilities are refreshed when we get a new ability, we only have to calculate the value once
@@ -53,10 +56,11 @@ public class Diversity extends DepthsAbility {
 					.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT))
 					.map(DepthsAbilityInfo::getDepthsTree).collect(Collectors.toSet());
 
-				if (uniqueTrees.size() >= TREES_REQUIRED) {
+				mTreeCount = Math.min(uniqueTrees.size(), TREES_REQUIRED);
+				if (mTreeCount >= TREES_REQUIRED) {
 					//Give a random prismatic the first time this effect is reached
 					if (!depthsPlayer.mDiversityGift) {
-						depthsPlayer.sendMessage("Due to achieving your Diversity goal, you've received a random prismatic ability!");
+						depthsPlayer.sendMessage(Component.text("Due to achieving your Diversity goal, you've received a random ").append(DepthsTree.PRISMATIC.getNameComponent()).append(Component.text(" ability!")));
 						int[] chances = {70, 25, 4, 1, 0};
 						DepthsManager.getInstance().getRandomAbility(player, depthsPlayer, chances, true, false);
 						depthsPlayer.mDiversityGift = true;
@@ -100,6 +104,7 @@ public class Diversity extends DepthsAbility {
 			.addPercent(a -> SPEED[rarity - 1], SPEED[rarity - 1], false, true)
 			.add(" speed permanently, and your chances of finding better abilities are increased by ")
 			.addPercent(a -> RARITY_INCREASE[rarity - 1], RARITY_INCREASE[rarity - 1], false, true)
-			.add(". The first time you reach this goal, you will receive a random other prismatic ability.");
+			.add(". The first time you reach this goal, you will receive a random other Prismatic ability.")
+			.addConditional(a -> a != null ? Component.text("\nCurrent status: " + (a.mActive ? "Active" : a.mTreeCount + "/" + TREES_REQUIRED)) : Component.empty());
 	}
 }

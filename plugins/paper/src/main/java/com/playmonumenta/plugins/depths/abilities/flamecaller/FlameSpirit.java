@@ -57,19 +57,18 @@ public class FlameSpirit extends DepthsAbility {
 		mDuration = CharmManager.getDuration(player, CharmEffects.FLAME_SPIRIT_DURATION.mEffectName, DURATION);
 	}
 
-	public static void onSpawnerBreak(Plugin plugin, Player player, int rarity, Block block) {
+	public static void onSpawnerBreak(Plugin plugin, Player player, int rarity, Location loc) {
 		double damage = CharmManager.calculateFlatAndPercentValue(player, CharmEffects.FLAME_SPIRIT_DAMAGE.mEffectName, DAMAGE[rarity - 1]);
 		double radius = CharmManager.getRadius(player, CharmEffects.FLAME_SPIRIT_RADIUS.mEffectName, RADIUS);
 		int fireDuration = CharmManager.getDuration(player, CharmEffects.FLAME_SPIRIT_FIRE_DURATION.mEffectName, FIRE_TICKS);
 		int duration = CharmManager.getDuration(player, CharmEffects.FLAME_SPIRIT_DURATION.mEffectName, DURATION);
-		onSpawnerBreak(plugin, player, block, damage, radius, fireDuration, duration);
+		onSpawnerBreak(plugin, player, loc, damage, radius, fireDuration, duration);
 	}
 
-	public static void onSpawnerBreak(Plugin plugin, Player player, Block block, double damage, double radius, int fireDuration, int duration) {
+	public static void onSpawnerBreak(Plugin plugin, Player player, Location loc, double damage, double radius, int fireDuration, int duration) {
 
 		ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStatsCopy(player);
 
-		Location centerLoc = block.getLocation().add(0.5, 0, 0.5);
 		new BukkitRunnable() {
 			int mTickCount = 0;
 
@@ -79,7 +78,7 @@ public class FlameSpirit extends DepthsAbility {
 					this.cancel();
 				}
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(centerLoc, radius)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius)) {
 					EntityUtils.applyFire(plugin, fireDuration, mob, player, playerItemStats);
 					DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.FLAME_SPIRIT, playerItemStats), damage, true, false, false);
 				}
@@ -102,7 +101,7 @@ public class FlameSpirit extends DepthsAbility {
 
 						new PartialParticle(
 							Particle.FLAME,
-							centerLoc
+							loc
 								.add(
 									FastUtils.cos(Math.toRadians(mRotationAngle)) * 2,
 									FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.02,
@@ -112,7 +111,7 @@ public class FlameSpirit extends DepthsAbility {
 
 						new PartialParticle(
 							Particle.FLAME,
-							centerLoc
+							loc
 								.add(
 									FastUtils.cos(Math.toRadians(mRotationAngle)) * -2,
 									FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.02,
@@ -135,7 +134,7 @@ public class FlameSpirit extends DepthsAbility {
 		}
 		Block block = event.getBlock();
 		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
-			onSpawnerBreak(mPlugin, mPlayer, block, mDamage, mRadius, mFireDuration, mDuration);
+			onSpawnerBreak(mPlugin, mPlayer, block.getLocation().add(0.5, 0, 0.5), mDamage, mRadius, mFireDuration, mDuration);
 		}
 		return true;
 	}

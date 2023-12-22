@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
@@ -18,15 +19,19 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.Entrench;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.FlameSpirit;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 public class Convergence extends DepthsAbility {
 	public static final String ABILITY_NAME = "Convergence";
@@ -47,31 +52,53 @@ public class Convergence extends DepthsAbility {
 		}
 		Block block = event.getBlock();
 		if (ItemUtils.isPickaxe(mPlayer.getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
-			DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
-			if (party == null) {
-				return true;
-			}
-			Set<AbilityInfo<?>> spawnerAbilities = new HashSet<>();
-			party.mPlayersInParty.stream().map(DepthsPlayer::getPlayer).filter(Objects::nonNull).map(mPlugin.mAbilityManager::getPlayerAbilities).map(AbilityCollection::getAbilitiesIgnoringSilence)
-				.forEach(abilities -> abilities.stream().map(Ability::getInfo).filter(info -> info instanceof DepthsAbilityInfo<?> dinfo && dinfo.getDepthsTrigger() == DepthsTrigger.SPAWNER).forEach(spawnerAbilities::add));
-			for (AbilityInfo<?> info : spawnerAbilities) {
-				if (info == Entrench.INFO) {
-					Entrench.onSpawnerBreak(mPlugin, mPlayer, mRarity, block);
-				} else if (info == FlameSpirit.INFO) {
-					FlameSpirit.onSpawnerBreak(mPlugin, mPlayer, mRarity, block);
-				} else if (info == Permafrost.INFO) {
-					Permafrost.onSpawnerBreak(mPlayer, mRarity, block);
-				} else if (info == Whirlwind.INFO) {
-					Whirlwind.onSpawnerBreak(mPlugin, mPlayer, mRarity, block);
-				}
-			}
+			activate(block);
 		}
 		return true;
 	}
 
+	@Override
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		LivingEntity entity = event.getEntity();
+		if (EntityUtils.isElite(entity)) {
+			Location loc = entity.getLocation();
+			activate(loc);
+			DepthsListener.attemptSundrops(loc, mPlayer);
+		}
+	}
+
+	private void activate(Location loc) {
+		activate(loc, loc.getBlock());
+	}
+
+	private void activate(Block block) {
+		activate(block.getLocation().add(0.5, 0, 0.5), block);
+	}
+
+	private void activate(Location loc, Block block) {
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+		if (party == null) {
+			return;
+		}
+		Set<AbilityInfo<?>> spawnerAbilities = new HashSet<>();
+		party.mPlayersInParty.stream().map(DepthsPlayer::getPlayer).filter(Objects::nonNull).map(mPlugin.mAbilityManager::getPlayerAbilities).map(AbilityCollection::getAbilitiesIgnoringSilence)
+			.forEach(abilities -> abilities.stream().map(Ability::getInfo).filter(info -> info instanceof DepthsAbilityInfo<?> dinfo && dinfo.getDepthsTrigger() == DepthsTrigger.SPAWNER).forEach(spawnerAbilities::add));
+		for (AbilityInfo<?> info : spawnerAbilities) {
+			if (info == Entrench.INFO) {
+				Entrench.onSpawnerBreak(mPlugin, mPlayer, mRarity, loc);
+			} else if (info == FlameSpirit.INFO) {
+				FlameSpirit.onSpawnerBreak(mPlugin, mPlayer, mRarity, loc);
+			} else if (info == Permafrost.INFO) {
+				Permafrost.onSpawnerBreak(mPlayer, mRarity, block);
+			} else if (info == Whirlwind.INFO) {
+				Whirlwind.onSpawnerBreak(mPlugin, mPlayer, mRarity, loc);
+			}
+		}
+	}
+
 	private static Description<Convergence> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Convergence>(color)
-			.add("Breaking a spawner triggers each of your living teammates' spawner break abilities at ")
+			.add("Breaking a spawner or killing an Elite mob triggers each of your living teammates' spawner break abilities at ")
 			.add(DepthsUtils.getRarityComponent(rarity))
 			.add(" level");
 	}
