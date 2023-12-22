@@ -1533,7 +1533,7 @@ public class DepthsManager {
 			party.sendMessage("You received a celestial gift for clearing the floor! Check your trinket to see the upgrade.");
 
 			// Give delve points for ascension level
-			if (partyFloor == 1 && party.getAscension() > 1) {
+			if (partyFloor == 1 && party.getAscension() > 0) {
 				int totalPoints = 0;
 				for (int x : DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS) {
 					if (x <= party.getAscension()) {
