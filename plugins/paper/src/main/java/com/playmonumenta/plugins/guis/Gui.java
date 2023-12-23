@@ -229,6 +229,7 @@ public abstract class Gui {
 		protected void inventoryClose(InventoryCloseEvent event) {
 			if (!mDiscarded) {
 				onClose(event);
+				LAST_OPENED_INVENTORY.remove(mPlayer.getUniqueId());
 				mDiscarded = true;
 			}
 		}
