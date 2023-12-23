@@ -51,7 +51,7 @@ public class SpellWebCarpet extends SpellBaseGrenadeLauncher {
 	public static final int WEB_TRAP_MAX_TICKS = 160;
 	public static final double WEB_TRAP_ASC4_HEALTH = 75;
 	public static final double WEB_TRAP_BASE_DAMAGE = 0.5;
-	public static final double WEB_TRAP_ASC_DAMAGE_INCREASE = 0.5;
+	public static final double WEB_TRAP_ASC_DAMAGE_INCREASE = 0.25;
 
 	public SpellWebCarpet(LivingEntity boss, @Nullable DepthsParty party) {
 		super(Plugin.getInstance(), boss, GRENADE_MATERIAL, false, EXPLODE_DELAY, LOBS, LOBS_DELAY, DURATION, DepthsParty.getAscensionEightCooldown(COOLDOWN, party), LINGERING_DURATION, getWebTrapRadius(party),

@@ -55,7 +55,7 @@ public class PassiveBite extends Spell {
 		mParty = party;
 		mPlugin = Plugin.getInstance();
 
-		mFinalRecoveryTime = DepthsParty.getAscensionEightCooldown(RECOVERY_TIME, party);
+		mFinalRecoveryTime = RECOVERY_TIME;
 		mFinalCastDelay = getCastDelay(party);
 
 		mBiteInfo = new SpellBaseAbstractRectangleAttack.RectangleInfo(mBoss.getLocation().clone().add(2.5, -1, -6.5), -13, 13);

@@ -129,7 +129,7 @@ public class SpellVesperidysDarkHole extends Spell {
 		List<LivingEntity> darkHoleSummoners = new ArrayList<>();
 		int numberOfSummoners = (int) Math.ceil(0.5 * PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true).size());
 
-		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) {
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 20) {
 			numberOfSummoners += 1;
 		}
 

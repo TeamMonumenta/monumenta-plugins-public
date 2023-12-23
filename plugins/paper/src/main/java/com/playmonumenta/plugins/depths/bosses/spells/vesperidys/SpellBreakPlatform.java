@@ -60,7 +60,7 @@ public class SpellBreakPlatform extends Spell {
 
 		runSpell(mTotalBroken);
 
-		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) {
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 20) {
 			BukkitRunnable runSpellLater = new BukkitRunnable() {
 				@Override
 				public void run() {
