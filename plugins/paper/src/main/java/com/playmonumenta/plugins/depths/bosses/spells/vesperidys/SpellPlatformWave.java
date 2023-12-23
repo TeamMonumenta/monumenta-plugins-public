@@ -148,7 +148,7 @@ public class SpellPlatformWave extends Spell {
 		DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, true, false, "Void Wave");
 		MovementUtils.knockAway(mBoss.getLocation(), player, 0, .75f, false);
 
-		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 12) {
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8) {
 			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
 		}
 	}

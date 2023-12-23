@@ -22,8 +22,6 @@ import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVesperidys
 import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVesperidysSummonAdds;
 import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVesperidysTeleport;
 import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalEarth;
-import com.playmonumenta.plugins.effects.PercentAbsorption;
-import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.VoidCorruption;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPExplosion;
@@ -38,7 +36,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
@@ -1017,13 +1014,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 								hitPlayers.add(player);
 								dealPercentageAndCorruptionDamage(player, 0.5, "Reality Distortion");
 								MovementUtils.knockAway(platform.getCenter(), player, 0.0f, 0.75f);
-
-								if ((mParty != null && mParty.getAscension() >= 8)) {
-									mMonuPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(6 * 20, -1.00));
-									mMonuPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(6 * 20, -1.00));
-									player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
-									PotionUtils.applyPotion(mMonuPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
-								}
 							}
 						}
 						platform.destroy();

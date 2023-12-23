@@ -283,12 +283,10 @@ public class SpellVesperidysDarkHole extends Spell {
 												mVesperidys.dealPercentageAndCorruptionDamage(player, percentDamage, "Dark Hole");
 												MovementUtils.knockAway(mDarkHoleCenter, player, 3f, 0.2f);
 
-												if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
-													mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(10 * 20, -1.00));
-													mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(10 * 20, -1.00));
-													player.sendActionBar(Component.text("You cannot heal for 10s", NamedTextColor.RED));
-													PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 10 * 20, 1));
-												}
+												mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(10 * 20, -1.00));
+												mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(10 * 20, -1.00));
+												player.sendActionBar(Component.text("You cannot heal for 10s", NamedTextColor.RED));
+												PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 10 * 20, 1));
 											}
 
 											for (LivingEntity summoner : darkHoleSummoners) {
@@ -847,7 +845,7 @@ public class SpellVesperidysDarkHole extends Spell {
 		DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, SHOCK_DAMAGE, null, false, false, "Feint Particle Beam");
 		MovementUtils.knockAway(strikeLocation, player, 1f, 0.5f);
 
-		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 12) {
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8) {
 			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
 		}
 	}

@@ -304,7 +304,7 @@ public class SpellVesperidysFeintParticleBeam extends Spell {
 		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Feint Particle Beam", strikeLocation);
 		MovementUtils.knockAway(strikeLocation, player, 1f, 0.5f);
 
-		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 12) {
+		if (mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8) {
 			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
 		}
 	}

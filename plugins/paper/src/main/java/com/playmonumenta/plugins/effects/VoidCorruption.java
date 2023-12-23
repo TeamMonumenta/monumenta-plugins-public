@@ -155,12 +155,10 @@ public class VoidCorruption extends Effect {
 						for (Player p : playersInRange) {
 							mVesperidys.dealPercentageAndCorruptionDamage(p, 0.5, "Corruption Explosion");
 
-							if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
-								mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(10 * 20, -1.00));
-								mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(10 * 20, -1.00));
-								player.sendActionBar(Component.text("You cannot heal for 10s", NamedTextColor.RED));
-								PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 10 * 20, 1));
-							}
+							mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(10 * 20, -1.00));
+							mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(10 * 20, -1.00));
+							player.sendActionBar(Component.text("You cannot heal for 10s", NamedTextColor.RED));
+							PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 10 * 20, 1));
 						}
 
 						mExplosionTick = -1;

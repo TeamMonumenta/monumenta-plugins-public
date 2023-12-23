@@ -6,9 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysBlockPlacerBoss;
-import com.playmonumenta.plugins.effects.PercentAbsorption;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.VoidCorruption;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -18,7 +16,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,13 +163,6 @@ public class SpellVesperidysAnticheese extends Spell {
 					Location l = player.getEyeLocation();
 					new PartialParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
 					mVesperidys.dealPercentageAndCorruptionDamage(player, 0.3, "The Void");
-
-					if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
-						mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(6 * 20, -1.00));
-						mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(6 * 20, -1.00));
-						player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
-						PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
-					}
 
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 2 * 20, 0));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0));

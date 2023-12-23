@@ -3,17 +3,12 @@ package com.playmonumenta.plugins.depths.bosses.spells.vesperidys;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
-import com.playmonumenta.plugins.effects.PercentAbsorption;
-import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,8 +18,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -160,13 +153,6 @@ public class SpellBreakPlatform extends Spell {
 	public void damage(Player player, Location location) {
 		mVesperidys.dealPercentageAndCorruptionDamage(player, 0.5, "Platform Breaker");
 		MovementUtils.knockAway(location, player, 0.5f, 0.75f, false);
-
-		if ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 8)) {
-			mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiheal", new PercentHeal(6 * 20, -1.00));
-			mPlugin.mEffectManager.addEffect(player, "Vesperidys Antiabsroption", new PercentAbsorption(6 * 20, -1.00));
-			player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
-			PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
-		}
 	}
 
 	@Override public boolean canRun() {
