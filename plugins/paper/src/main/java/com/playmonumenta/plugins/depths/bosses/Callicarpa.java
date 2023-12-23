@@ -353,6 +353,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 				mBoss.getEyeLocation(),
 				mBoss, new Particle.DustOptions(FlowerPower.ENERGY_COLOR, 1.5f),
 				mFloorY,
+				FlowerPower.LASER_TRAVEL_SPEED,
 				null,
 				false
 			);
@@ -371,6 +372,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 				mBoss.getEyeLocation(),
 				mBoss, new Particle.DustOptions(FlowerPower.ENERGY_COLOR, 1.5f),
 				mFloorY,
+				FlowerPower.LASER_TRAVEL_SPEED,
 				null,
 				false
 			);

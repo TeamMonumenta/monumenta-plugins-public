@@ -106,7 +106,7 @@ public class PassiveFloralInsignia extends Spell {
 		mInsigniaLoc.getWorld().playSound(mInsigniaLoc, Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.HOSTILE, 10, 1.5f);
 		mInsigniaLoc.getWorld().playSound(mInsigniaLoc, Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.HOSTILE, 10, 1.5f);
 		PlayerUtils.playersInRange(mInsigniaLoc, 100, true).forEach(player -> {
-			FlowerPower.launchEnergyLaser(player, mInsigniaLoc, mBoss, mLaserOptions, mFloorY, mActiveRunnables, true);
+			FlowerPower.launchEnergyLaser(player, mInsigniaLoc, mBoss, mLaserOptions, mFloorY, FlowerPower.LASER_TRAVEL_SPEED, mActiveRunnables, true);
 		});
 	}
 

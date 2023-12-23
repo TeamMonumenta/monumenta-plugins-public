@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -25,6 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,6 +37,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +46,7 @@ public class FlowerPower extends Spell {
 	public static final int DURATION = 140;
 	public static final int DURATION_A15_DECREASE = 30;
 	public static final double LASER_TRAVEL_SPEED = 2.7;
-	public static final int LASER_MOVEMENT_STEPS = 8;
+	public static final double LASER_TRAVEL_SPEED_A15_INCREASE = 0.8;
 	public static final int LASER_MAX_LIFETIME = 200;
 	public static final double LASER_DAMAGE = 20;
 	public static final int LASER_CAST_DELAY = 5;
@@ -88,12 +90,17 @@ public class FlowerPower extends Spell {
 	public void run() {
 		mOnCooldown = true;
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mOnCooldown = false, INTERNAL_COOLDOWN);
+		int spawnDelay = PassiveGardenTwo.SPAWN_DELAY;
 
-		// Spawn one additional flower.
-		mGarden.spawnFlowers(1);
+		if (mParty != null && mParty.getAscension() >= 15) {
+			mGarden.spawnFlowers(1, true);
+			spawnDelay *= 2;
+		} else {
+			mGarden.spawnFlowers(1);
+		}
 
 		// After the flowers have spawned, start the spell.
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::doRunSpell, PassiveGardenTwo.SPAWN_DELAY);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::doRunSpell, spawnDelay);
 	}
 
 	@Override
@@ -184,7 +191,7 @@ public class FlowerPower extends Spell {
 						public void run() {
 							// Launch a laser.
 							List<Player> targets = PlayerUtils.playersInRange(mActiveCastLoc, 50, false);
-							targets.forEach(target -> launchEnergyLaser(target, mAccumulationPoint, mBoss, mLaserOptions, mFloorY, mActiveRunnables, false));
+							targets.forEach(target -> launchEnergyLaser(target, mAccumulationPoint, mBoss, mLaserOptions, mFloorY, getLaserTravelSpeed(mParty), mActiveRunnables, false));
 							// Keep the accumulated energy ball showing.
 							new PartialParticle(Particle.REDSTONE, mAccumulationPoint, 30).data(mEnergyOptions)
 									.extra(0).delta(1.2 - (double) mLasersShot / Math.max(laserCount, 1)).spawnAsBoss();
@@ -218,24 +225,52 @@ public class FlowerPower extends Spell {
 	}
 
 	public static void launchEnergyLaser(Player target, Location accumulationPoint, LivingEntity boss, Particle.DustOptions laserOptions,
-			 int floorY, @Nullable Set<BukkitRunnable> activeRunnables, boolean onlyShowToThatPlayer) {
+			 int floorY, double laserSpeed, @Nullable Set<BukkitRunnable> activeRunnables, boolean onlyShowToThatPlayer) {
 
 		BukkitRunnable energyLaserRunnable = new BukkitRunnable() {
-			final Location mCurrentLaserLoc = accumulationPoint.clone();
-			final Vector mDirection = target.getLocation().clone().add(0, 1, 0).toVector().subtract(accumulationPoint.toVector()).normalize();
-			final Vector mLaserStep = mDirection.multiply(LASER_TRAVEL_SPEED).multiply(1.0 / (double) LASER_MOVEMENT_STEPS);
+			final Vector mDirection = LocationUtils.getDirectionTo(target.getLocation().clone().add(0, 1, 0), accumulationPoint).normalize();
+			final double mLaserSpeed = laserSpeed;
 
+			Location mCurrentLaserLoc = accumulationPoint.clone();
 			int mTicks = 0;
 
 			@Override
 			public void run() {
-				// Do the movement in two halves, checking collision with blocks/players at both steps.
-				for (int i = 0; i < LASER_MOVEMENT_STEPS; i++) {
-					if (doMovementStep()) {
-						// The laser has collided during this step.
+				RayTraceResult rayTraceResult = mCurrentLaserLoc.getWorld().rayTrace(
+					mCurrentLaserLoc,
+					mDirection,
+					mLaserSpeed,
+					FluidCollisionMode.NEVER,
+					true,
+					0.5,
+					entity -> entity instanceof Player player && (!onlyShowToThatPlayer || player.getUniqueId().equals(target.getUniqueId()))
+				);
+
+				if (rayTraceResult != null) {
+					Vector hitPosition = rayTraceResult.getHitPosition();
+					showTravelParticles(mCurrentLaserLoc, hitPosition.toLocation(mCurrentLaserLoc.getWorld()));
+
+					Entity hitEntity = rayTraceResult.getHitEntity();
+					if (hitEntity instanceof Player player) {
+						hitPlayer(player);
+						playHitEffects(hitPosition);
 						this.cancel();
 						return;
 					}
+
+					Block hitBlock = rayTraceResult.getHitBlock();
+					if (hitBlock != null) {
+						breakNearbyBlocks(hitBlock);
+						playHitEffects(hitPosition);
+						this.cancel();
+						return;
+					}
+
+					mCurrentLaserLoc = hitPosition.toLocation(mCurrentLaserLoc.getWorld());
+				} else {
+					Location oldLoc = mCurrentLaserLoc.clone();
+					mCurrentLaserLoc.add(mDirection.clone().multiply(mLaserSpeed));
+					showTravelParticles(oldLoc, mCurrentLaserLoc);
 				}
 
 				// If the laser exceeds max lifetime, end it.
@@ -245,63 +280,45 @@ public class FlowerPower extends Spell {
 				mTicks++;
 			}
 
-			private boolean doMovementStep() {
-				mCurrentLaserLoc.add(mLaserStep);
-				// Spawn a particle for the laser
-				PartialParticle laserParticle = new PartialParticle(Particle.REDSTONE, mCurrentLaserLoc, 1).data(laserOptions);
-				if (onlyShowToThatPlayer) {
-					laserParticle.spawnForPlayer(ParticleCategory.BOSS, target);
-				} else {
-					laserParticle.spawnAsBoss();
-				}
-
-				if (doLaserCollision()) {
-					PartialParticle hitParticle = new PartialParticle(Particle.FLAME, mCurrentLaserLoc, 15).extra(0.1);
-					if (onlyShowToThatPlayer) {
-						hitParticle.spawnForPlayer(ParticleCategory.BOSS, target);
-						boss.getWorld().playSound(target, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 2f);
-					} else {
-						hitParticle.spawnAsBoss();
-						boss.getWorld().playSound(mCurrentLaserLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 2f);
-					}
-					return true;
-				}
-				return false;
-			}
-
-			private boolean doLaserCollision() {
-				// If the laser hits a player, damage it
-				Hitbox hitbox = new Hitbox.SphereHitbox(mCurrentLaserLoc, 0.5);
-				List<Player> hitPlayers = hitbox.getHitPlayers(false);
-				if (onlyShowToThatPlayer) {
-					// Only allow hitting that player, to avoid being hit by invisible projectiles
-					hitPlayers = hitPlayers.stream().filter(player -> player.getUniqueId().equals(target.getUniqueId())).toList();
-				}
-				if (hitPlayers.size() != 0) {
-					Player hitPlayer = hitPlayers.get(0);
-					DamageUtils.damage(boss, hitPlayer, DamageEvent.DamageType.MAGIC, LASER_DAMAGE, null, true, true, SPELL_NAME);
-					return true;
-				}
-
-				// If the laser hits a block, destroy it.
-				// Also try to delete all the blocks in a 3D + shape around the block hit.
-				Block currentBlock = mCurrentLaserLoc.getBlock();
-				if (currentBlock.isCollidable()) {
-					tryDeleteBlock(currentBlock);
-					tryDeleteBlock(mCurrentLaserLoc.clone().add(0, 1, 0).getBlock());
-					tryDeleteBlock(mCurrentLaserLoc.clone().add(0, -1, 0).getBlock());
-					tryDeleteBlock(mCurrentLaserLoc.clone().add(1, 0, 0).getBlock());
-					tryDeleteBlock(mCurrentLaserLoc.clone().add(-1, 0, 0).getBlock());
-					tryDeleteBlock(mCurrentLaserLoc.clone().add(0, 0, 1).getBlock());
-					tryDeleteBlock(mCurrentLaserLoc.clone().add(0, 0, -1).getBlock());
-					return true;
-				}
-				return false;
+			private void hitPlayer(Player player) {
+				DamageUtils.damage(boss, player, DamageEvent.DamageType.MAGIC, LASER_DAMAGE, null, true, true, SPELL_NAME);
 			}
 
 			private void tryDeleteBlock(Block block) {
 				if (block.getY() > floorY && BlockUtils.canBeBroken(block)) {
 					block.setType(Material.AIR);
+				}
+			}
+
+			private void breakNearbyBlocks(Block block) {
+				tryDeleteBlock(block);
+				tryDeleteBlock(block.getRelative(0, 1, 0));
+				tryDeleteBlock(block.getRelative(0, -1, 0));
+				tryDeleteBlock(block.getRelative(1, 0, 0));
+				tryDeleteBlock(block.getRelative(-1, 0, 0));
+				tryDeleteBlock(block.getRelative(0, 0, 1));
+				tryDeleteBlock(block.getRelative(0, 0, -1));
+			}
+
+			private void showTravelParticles(Location from, Location to) {
+				PPLine laserLine = new PPLine(Particle.REDSTONE, from, to)
+					.countPerMeter(3).data(laserOptions);
+				if (onlyShowToThatPlayer) {
+					laserLine.spawnForPlayer(ParticleCategory.BOSS, target);
+				} else {
+					laserLine.spawnAsBoss();
+				}
+			}
+
+			private void playHitEffects(Vector hitPosition) {
+				Location loc = hitPosition.toLocation(mCurrentLaserLoc.getWorld());
+				PartialParticle hitParticle = new PartialParticle(Particle.FLAME, loc, 15).extra(0.1);
+				if (onlyShowToThatPlayer) {
+					hitParticle.spawnForPlayer(ParticleCategory.BOSS, target);
+					boss.getWorld().playSound(target, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 2f);
+				} else {
+					hitParticle.spawnAsBoss();
+					boss.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 2f);
 				}
 			}
 		};
@@ -373,5 +390,13 @@ public class FlowerPower extends Spell {
 			duration -= DURATION_A15_DECREASE;
 		}
 		return duration;
+	}
+
+	private double getLaserTravelSpeed(@Nullable DepthsParty party) {
+		double speed = LASER_TRAVEL_SPEED;
+		if (party != null && party.getAscension() >= 15) {
+			speed += LASER_TRAVEL_SPEED_A15_INCREASE;
+		}
+		return speed;
 	}
 }

@@ -52,7 +52,6 @@ public class PassiveGardenTwo extends Spell {
 	private final Particle.DustOptions mSpawnOptions = new Particle.DustOptions(mSpawnColor, 2.5f);
 	private final Particle.DustOptions mSpawnFlowerOptions = new Particle.DustOptions(mSpawnFlowerColor, 2.5f);
 	private final Particle.DustOptions mEvolveFlowerOptions = new Particle.DustOptions(Color.ORANGE, 2f);
-	private final boolean mSpawnAlreadyEvolved;
 	private final String mAddsLosPool;
 
 	private int mSpellTicks = 0;
@@ -73,20 +72,15 @@ public class PassiveGardenTwo extends Spell {
 			int ascension = party.getAscension();
 			if (ascension < 4) {
 				mAddsLosPool = "";
-				mSpawnAlreadyEvolved = false;
 			} else if (ascension < 8) {
 				mAddsLosPool = ADDS_A4_LOS_POOL;
-				mSpawnAlreadyEvolved = false;
 			} else if (ascension < 15) {
 				mAddsLosPool = ADDS_A8_LOS_POOL;
-				mSpawnAlreadyEvolved = false;
 			} else {
 				mAddsLosPool = ADDS_A15_LOS_POOL;
-				mSpawnAlreadyEvolved = true;
 			}
 		} else {
 			mAddsLosPool = "";
-			mSpawnAlreadyEvolved = false;
 		}
 	}
 
@@ -120,6 +114,10 @@ public class PassiveGardenTwo extends Spell {
 	}
 
 	public void spawnFlowers(int count) {
+		spawnFlowers(count, false);
+	}
+
+	public void spawnFlowers(int count, boolean evolved) {
 		// For each flower, attempt to find a random location to spawn it at, by copying the list of all possible
 		// spawn locations, picking one at random, and either spawning the plant there if it isn't already occupied,
 		// or removing it from the copied list, and trying again, by picking a new random location in said list.
@@ -142,13 +140,13 @@ public class PassiveGardenTwo extends Spell {
 						if (flower instanceof LivingEntity livingFlower) {
 							EntityUtils.setMaxHealthAndHealth(livingFlower, DepthsParty.getAscensionScaledHealth(FLOWER_HP, mParty));
 							flower.setGlowing(true);
+							if (evolved) {
+								evolveFlower(livingFlower);
+							}
 						}
 						randomLoc.clone().subtract(0, 1, 0).getBlock().setType(Material.OAK_WOOD);
 						randomLoc.getBlock().setType(Material.POTTED_FERN);
 						aboutToSpawn.remove(randomLoc);
-						if (mSpawnAlreadyEvolved) {
-							evolveRandomFlowers(1);
-						}
 					}, SPAWN_DELAY);
 					spawned = true;
 				}
@@ -158,6 +156,22 @@ public class PassiveGardenTwo extends Spell {
 			if (!spawned) {
 				break;
 			}
+		}
+	}
+
+	private void evolveFlower(LivingEntity flower) {
+		Location flowerLoc = flower.getLocation();
+		double missingHealth = EntityUtils.getMaxHealth(flower) - flower.getHealth();
+		flower.remove();
+		Entity newFlower = LibraryOfSoulsIntegration.summon(flowerLoc, EVOLVED_FLOWER_NAMES[FastUtils.randomIntInRange(0, EVOLVED_FLOWER_NAMES.length - 1)]);
+		if (newFlower instanceof LivingEntity livingFlower) {
+			EntityUtils.setMaxHealthAndHealth(livingFlower, DepthsParty.getAscensionScaledHealth(ELITE_FLOWER_HP, mParty));
+			livingFlower.setHealth(EntityUtils.getMaxHealth(livingFlower) - missingHealth);
+			livingFlower.setGlowing(true);
+			Vector dir = LocationUtils.getDirectionTo(mBoss.getLocation(), flowerLoc.clone().add(0, 1, 0));
+			new PPFlower(Particle.REDSTONE, flowerLoc.clone().add(0, 1, 0), 5).petals(9)
+				.normal(dir).data(mEvolveFlowerOptions).spawnAsBoss();
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> doFlowerSpawnAnimation(flowerLoc), SPAWN_DELAY);
 		}
 	}
 
@@ -175,25 +189,9 @@ public class PassiveGardenTwo extends Spell {
 			}
 
 			// Calculate the missing health in order to keep the damage done by players, on the evolved version.
-			int randomFlowerIndex = FastUtils.randomIntInRange(0, evolutionCandidates.size() - 1);
-			LivingEntity randomFlower = (LivingEntity) evolutionCandidates.get(randomFlowerIndex);
-			double missingHealth = EntityUtils.getMaxHealth(randomFlower) - randomFlower.getHealth();
-			Location chosenLocation = randomFlower.getLocation();
-
-			// Kill off the flower and spawn a random other flower in its place
-			randomFlower.remove();
-			evolutionCandidates.remove(randomFlowerIndex);
-
-			Entity newFlower = LibraryOfSoulsIntegration.summon(chosenLocation, EVOLVED_FLOWER_NAMES[FastUtils.randomIntInRange(0, EVOLVED_FLOWER_NAMES.length - 1)]);
-			if (newFlower instanceof LivingEntity livingFlower) {
-				EntityUtils.setMaxHealthAndHealth(livingFlower, DepthsParty.getAscensionScaledHealth(ELITE_FLOWER_HP, mParty));
-				livingFlower.setHealth(EntityUtils.getMaxHealth(livingFlower) - missingHealth);
-				livingFlower.setGlowing(true);
-				Vector dir = LocationUtils.getDirectionTo(mBoss.getLocation(), chosenLocation.clone().add(0, 1, 0));
-				new PPFlower(Particle.REDSTONE, chosenLocation.clone().add(0, 1, 0), 5).petals(9)
-					.normal(dir).data(mEvolveFlowerOptions).spawnAsBoss();
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> doFlowerSpawnAnimation(chosenLocation), SPAWN_DELAY);
-			}
+			LivingEntity randomFlower = (LivingEntity) FastUtils.getRandomElement(evolutionCandidates);
+			evolutionCandidates.remove(randomFlower);
+			evolveFlower(randomFlower);
 		}
 	}
 
