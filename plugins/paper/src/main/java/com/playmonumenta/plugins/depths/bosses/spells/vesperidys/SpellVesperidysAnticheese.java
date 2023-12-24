@@ -31,8 +31,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownExpBottle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -135,6 +137,11 @@ public class SpellVesperidysAnticheese extends Spell {
 
 					armorStand.teleport(newLoc);
 				}
+			}
+
+			// Kill all XP Bottles. (It was messing up teleportation of some delve mobs)
+			for (Entity e : mSpawnLoc.getWorld().getNearbyEntitiesByType(ThrownExpBottle.class, mSpawnLoc, Vesperidys.detectionRange)) {
+				e.remove();
 			}
 
 			// Metalmancy Build Platform Checkers
