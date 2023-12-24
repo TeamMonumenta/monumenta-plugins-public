@@ -79,8 +79,7 @@ public class Rebirth extends DepthsAbility {
 			DepthsManager.getAbilities().stream().filter(info ->
 				info.getDisplayName() != null &&
 				!info.getDisplayName().equals(ABILITY_NAME) &&
-				!info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT) &&
-				!playerAbilities.contains(info)
+				!info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT)
 			).toList()
 		);
 
@@ -93,6 +92,9 @@ public class Rebirth extends DepthsAbility {
 			DepthsTrigger trigger = abilityInfo.getDepthsTrigger();
 			ArrayList<DepthsAbilityInfo<?>> eligibleCopy = new ArrayList<>(eligibleAbilities);
 			eligibleCopy.removeIf(info -> !info.getDepthsTrigger().equals(trigger));
+			if (eligibleCopy.isEmpty()) {
+				return;
+			}
 			DepthsAbilityInfo<?> chosenOne = FastUtils.getRandomElement(eligibleCopy);
 			// Remove the chosen ability from the original list so that it can't get chosen again
 			eligibleAbilities.remove(chosenOne);
