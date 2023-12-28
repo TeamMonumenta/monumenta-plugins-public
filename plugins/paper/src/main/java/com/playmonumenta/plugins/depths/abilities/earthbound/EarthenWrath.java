@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -45,10 +46,11 @@ public class EarthenWrath extends DepthsAbility {
 	public static final String ABILITY_NAME = "Earthen Wrath";
 	private static final double[] PERCENT_DAMAGE_REFLECTED = {0.8, 1.0, 1.2, 1.4, 1.6, 2.0};
 	private static final double[] PERCENT_DAMAGE_REDUCTION = {0.35, 0.375, 0.4, 0.425, 0.45, 0.5};
-	private static final int COOLDOWN = 20 * 30;
+	private static final int COOLDOWN = 24 * 20;
 	private static final int DURATION = 6 * 20;
 	private static final int TRANSFER_RADIUS = 20;
 	private static final int DAMAGE_RADIUS = 6;
+	private static final double DAMAGE_CAP = 160;
 
 	public static final String CHARM_COOLDOWN = "Earthen Wrath Cooldown";
 
@@ -79,11 +81,12 @@ public class EarthenWrath extends DepthsAbility {
 	}
 
 	public boolean cast() {
-		if (isOnCooldown()) {
+		if (isOnCooldown() || isWrathing()) {
 			return false;
 		}
-		putOnCooldown();
+
 		mDamageAbsorbed = 0;
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 10, 1);
@@ -140,7 +143,10 @@ public class EarthenWrath extends DepthsAbility {
 
 					if (mDamageAbsorbed > 0) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mDamageRadius)) {
-							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamageAbsorbed * mDamageReflected, mInfo.getLinkedSpell());
+							double returnedDamage = Math.min(DAMAGE_CAP, mDamageAbsorbed * mDamageReflected);
+							DamageUtils.damage(mPlayer, mob,
+								new DamageEvent.Metadata(DamageType.MELEE_SKILL, mInfo.getLinkedSpell(), playerItemStats),
+								returnedDamage, true, true, false);
 						}
 
 						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 1.0f, 0.6f);
@@ -155,7 +161,6 @@ public class EarthenWrath extends DepthsAbility {
 					} else {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 1f, 2f);
 					}
-
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
@@ -248,6 +253,7 @@ public class EarthenWrath extends DepthsAbility {
 	}
 
 	private void endWrath() {
+		putOnCooldown();
 		mAbsorbDamage = false;
 	}
 
@@ -263,7 +269,9 @@ public class EarthenWrath extends DepthsAbility {
 			.addPercent(a -> a.mDamageReflected, PERCENT_DAMAGE_REFLECTED[rarity - 1], false, true)
 			.add(" of the original damage absorbed as melee damage in a ")
 			.add(a -> a.mDamageRadius, DAMAGE_RADIUS)
-			.add(" block radius.")
+			.add(" block radius, with a cap of ")
+			.addDepthsDamage(a -> DAMAGE_CAP, DAMAGE_CAP, false)
+			.add(" damage. Cooldown begins after the effect ends.")
 			.addCooldown(COOLDOWN);
 	}
 
