@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.effects.DisplayableEffect;
+import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -218,6 +219,49 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
 			if (title != null) {
 				return title.getName() + " ";
+			} else {
+				return "";
+			}
+		}
+
+		//%monumenta_boss_details_<number>%
+		if (identifier.startsWith("boss_details_")) {
+			int index = Integer.parseInt(identifier.substring("boss_details_".length())) - 1;
+
+			List<BroadcastedEvents.Event> events = BroadcastedEvents.getPerceptibleEvents(player);
+			if (events.size() > index) {
+				BroadcastedEvents.Event event = events.get(index);
+
+				String display = event.getDisplay();
+
+				//funny mirrored stuff that only happen when both sides are filled.
+				if ((index + 1) % 2 == 1 && events.size() > (index + 1)) {
+					//Current is on the left
+					BroadcastedEvents.Event mirroredEvent = events.get(index + 1);
+					String mirroredDisplay = mirroredEvent.getDisplay();
+
+					int lengthDiff = mirroredDisplay.length() - display.length();
+					if (lengthDiff > 0) {
+						//mirrored display is bigger
+						return " ".repeat(lengthDiff) + display;
+					}
+				} else if ((index + 1) % 2 == 0) {
+					//Current is on the right
+					BroadcastedEvents.Event mirroredEvent = events.get(index - 1);
+					String mirroredDisplay = mirroredEvent.getDisplay();
+
+					int lengthDiff = mirroredDisplay.length() - display.length();
+					if (lengthDiff > 0) {
+						//mirrored display is bigger
+						return display + " ".repeat(lengthDiff);
+					}
+				}
+
+				return event.getDisplay();
+			} else if ((index + 1) % 2 == 0 && (events.size() > (index - 1) && !events.isEmpty())) {
+				//Allows for centering footer when first element exists but second doesn't.
+				BroadcastedEvents.Event event = events.get(index - 1);
+				return " ".repeat(event.getDisplay().length());
 			} else {
 				return "";
 			}

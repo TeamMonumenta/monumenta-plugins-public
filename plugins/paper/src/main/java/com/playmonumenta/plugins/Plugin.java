@@ -36,6 +36,7 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
@@ -598,6 +599,11 @@ public class Plugin extends JavaPlugin {
 		// Hook into Monumenta Network Relay for message brokering if available
 		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaNetworkRelay")) {
 			new MonumentaNetworkRelayIntegration(this.getLogger());
+
+			//relies on it, so only register if the plugin is available.
+			BroadcastedEvents.registerCommand(this);
+			manager.registerEvents(new BroadcastedEvents(), this);
+			BroadcastedEvents.registerTask(this);
 		}
 
 		// Hook into Library of Souls for mob management if available
