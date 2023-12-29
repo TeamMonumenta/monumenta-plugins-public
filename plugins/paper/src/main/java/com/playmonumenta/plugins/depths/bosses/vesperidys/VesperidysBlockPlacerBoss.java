@@ -111,7 +111,7 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 								loc.setY(yLevel);
 
 								Block block = loc.getBlock();
-								if (block.getType() == Material.AIR) {
+								if (block.getType() == Material.AIR || block.getType() == Material.LIGHT) {
 									loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, SoundCategory.HOSTILE, 1f, 0.7f);
 									block.setType(Material.TINTED_GLASS);
 									mVesperidys.mAnticheese.mIgnored.add(block);

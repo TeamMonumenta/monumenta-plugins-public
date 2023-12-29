@@ -27,7 +27,7 @@ public class SpellStarProjectiles extends Spell {
 	private static final int VOLLEYS = 3;
 	private static final int VOLLEYS_A4 = 4;
 	private static final int VOLLEYS_A15 = 5;
-	private static final double DAMAGE = 50;
+	private static final double DAMAGE = 60;
 
 	private final int mTelegraphWaitTicks;
 	private final int mCycleTicks;
@@ -138,7 +138,7 @@ public class SpellStarProjectiles extends Spell {
 
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true)) {
 						if (box.overlaps(player.getBoundingBox())) {
-							BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Pointed Stars", origin);
+							BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.PROJECTILE, DAMAGE, "Pointed Stars", origin);
 							new PartialParticle(Particle.CRIT_MAGIC, player.getLocation(), 25, 0.5, 1, 0.5, 0).spawnAsBoss();
 							mBoss.getWorld().playSound(mProjLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
 							this.cancel();

@@ -78,7 +78,7 @@ public class SpellVesperidysAutoAttack extends Spell {
 	private final PartialParticle mPHitCone1;
 	private final PartialParticle mPHitCone2;
 
-	private final double DAMAGE = 55;
+	private final double DAMAGE = 60;
 
 	public SpellVesperidysAutoAttack(Plugin plugin, LivingEntity boss, Vesperidys vesperidys, double detectionRange, int maxTargets, int barrages, int lightningCastTicks, int earthCastTicks, int voidCastTicks, int cooldown) {
 		mPlugin = plugin;

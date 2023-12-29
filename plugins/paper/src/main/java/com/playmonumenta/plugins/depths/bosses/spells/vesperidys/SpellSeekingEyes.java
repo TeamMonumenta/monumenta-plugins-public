@@ -83,7 +83,7 @@ public class SpellSeekingEyes extends Spell {
 
 			for (int num = 0; num < mEyeCount; num++) {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					if (player.isDead() || player.getLocation().distance(mBoss.getLocation()) > 100) {
+					if (player.isDead() || mVesperidys.mInvincible || player.getLocation().distance(mBoss.getLocation()) > 100) {
 						this.cancel();
 						return;
 					}
