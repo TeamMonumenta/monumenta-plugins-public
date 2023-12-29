@@ -26,6 +26,7 @@ public enum WeeklyMissionType {
 	ROD_WAVES("rod_waves"),
 	DEPTHS_ROOMS("depths_rooms"),
 	ZENITH_ROOMS("zenith_rooms"),
+	ZENITH_ASCENSION("zenith_ascension"),
 	DAILY_BOUNTY("daily_bounty"),
 	DELVE_BOUNTY("delve_bounty"),
 	REGIONAL_CONTENT("regional_content");

@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CharmFactory {
 
-	public static final int[] CHARM_BUDGET_PER_POWER = {2, 4, 7, 10, 13};
+	public static final int[] CHARM_BUDGET_PER_POWER = {2, 4, 7, 11, 16};
 	public static final double[] CHARM_BUDGET_PER_LEVEL = {2, 3, 4, 5, 6};
 	public static final String CHARM_UUID_KEY = "DEPTHS_CHARM_UUID";
 	public static final String CHARM_RARITY_KEY = "DEPTHS_CHARM_RARITY";
@@ -41,7 +41,7 @@ public class CharmFactory {
 	public static final String CHARM_ACTIONS_KEY = "DEPTHS_CHARM_ACTIONS";
 	public static final String CHARM_ROLLS_KEY = "DEPTHS_CHARM_ROLLS";
 	public static final double TREE_BUDGET_MODIFIER = 1.35;
-	public static final double WILDCARD_BUDGET_MODIFIER = 1.75;
+	public static final double WILDCARD_BUDGET_MODIFIER = 1.8;
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
 		if (!item.getType().isAir()) {

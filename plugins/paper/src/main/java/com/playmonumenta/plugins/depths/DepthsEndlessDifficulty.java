@@ -16,7 +16,7 @@ public class DepthsEndlessDifficulty {
 	public static final int[] DELVE_POINTS_PER_FLOOR = {0, 0, 10, 4, 4, 10, 4, 4, 10, 4, 4, 10, 4, 4};
 
 	//Ascension information for Depths 2
-	public static final int[] ASCENSION_DELVE_POINTS = {1, 3, 5, 7, 9, 11, 13};
+	public static final int[] ASCENSION_DELVE_POINTS = {1, 3, 5, 7, 9, 11};
 	public static final int ASCENSION_DELVE_POINTS_AMOUNT = 10;
 	public static final int ASCENSION_UTILITY_ROOMS = 2;
 	public static final int ASCENSION_BOSS_TRICKS = 4;
@@ -64,7 +64,8 @@ public class DepthsEndlessDifficulty {
 
 		//Assign the scores to all other active players
 		players.forEach(p -> DelvesUtils.copyDelvePoint(null, playerToUse, p, shard));
-		party.sendMessage("Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths trinket to view all delve modifiers.");
-
+		if (!twisted) {
+			party.sendMessage("Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths trinket to view all delve modifiers.");
+		}
 	}
 }

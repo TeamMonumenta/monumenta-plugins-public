@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -60,11 +61,9 @@ public class Diversity extends DepthsAbility {
 				if (mTreeCount >= TREES_REQUIRED) {
 					//Give a random prismatic the first time this effect is reached
 					if (!depthsPlayer.mDiversityGift) {
-						depthsPlayer.sendMessage(Component.text("Due to achieving your Diversity goal, you've received a random ").append(DepthsTree.PRISMATIC.getNameComponent()).append(Component.text(" ability!")));
-						int[] chances = {70, 25, 4, 1, 0};
-						DepthsManager.getInstance().getRandomAbility(player, depthsPlayer, chances, true, false);
+						depthsPlayer.sendMessage(Component.text("Due to achieving your Diversity goal, you've received a prismatic ability reward in your trinket!"));
+						depthsPlayer.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.PRISMATIC);
 						depthsPlayer.mDiversityGift = true;
-						DepthsManager.getInstance().validateOfferings(depthsPlayer);
 					}
 
 
@@ -104,7 +103,7 @@ public class Diversity extends DepthsAbility {
 			.addPercent(a -> SPEED[rarity - 1], SPEED[rarity - 1], false, true)
 			.add(" speed permanently, and your chances of finding better abilities are increased by ")
 			.addPercent(a -> RARITY_INCREASE[rarity - 1], RARITY_INCREASE[rarity - 1], false, true)
-			.add(". The first time you reach this goal, you will receive a random other Prismatic ability.")
+			.add(". The first time you reach this goal, you will receive a selection of other Prismatics.")
 			.addConditional(a -> a != null ? Component.text("\nCurrent status: " + (a.mActive ? "Active" : a.mTreeCount + "/" + TREES_REQUIRED)) : Component.empty());
 	}
 }

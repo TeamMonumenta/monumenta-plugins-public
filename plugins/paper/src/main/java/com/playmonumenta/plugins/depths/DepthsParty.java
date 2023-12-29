@@ -636,7 +636,7 @@ public class DepthsParty {
 			if (getContent() == DepthsContent.DARKEST_DEPTHS) {
 				SeasonalEventListener.playerCompletedDepths(p, roomReached);
 			} else {
-				SeasonalEventListener.playerCompletedZenith(p, roomReached);
+				SeasonalEventListener.playerCompletedZenith(p, roomReached, mAscension);
 			}
 
 			if (victory && getContent() == DepthsContent.DARKEST_DEPTHS) {

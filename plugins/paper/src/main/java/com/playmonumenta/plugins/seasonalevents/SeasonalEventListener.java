@@ -74,7 +74,7 @@ public class SeasonalEventListener implements Listener {
 	 * Called from DepthsParty, with rooms reached.
 	 * Run through any potential depths missions and give credit
 	 */
-	public static void playerCompletedZenith(Player p, int roomNumber) {
+	public static void playerCompletedZenith(Player p, int roomNumber, int ascension) {
 		int missionNumber = 1;
 		for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == WeeklyMissionType.ZENITH_ROOMS) {
@@ -85,6 +85,8 @@ public class SeasonalEventListener implements Listener {
 			} else if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.ZENITH) && roomNumber >= 30) {
 				// Content matches up - award points
 				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
+			} else if (mission.mType == WeeklyMissionType.ZENITH_ASCENSION && ascension >= mission.mAmount) {
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, ascension);
 			}
 			missionNumber++;
 		}

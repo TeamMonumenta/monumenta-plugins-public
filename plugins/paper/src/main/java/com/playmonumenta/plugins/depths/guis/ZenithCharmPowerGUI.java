@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.depths.guis;
 
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -11,6 +13,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.tuple.Triple;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -63,6 +67,10 @@ public final class ZenithCharmPowerGUI extends CustomInventory {
 				if (getCharmPowerLevel(player) == slotInfo.getMiddle() - 1) {
 					if (attemptUpgrade(player, slotInfo)) {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_CELEBRATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						EntityUtils.fireworkAnimation(player.getLocation(), List.of(Color.GRAY, Color.WHITE, Color.RED), FireworkEffect.Type.BURST, 5);
+						if (slotInfo.getMiddle() == 15) {
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":true,\"italic\":true},{\"text\":\" has purchased the final charm power upgrade for Celestial Zenith! Congratulations!\",\"color\":\"gold\",\"italic\":true,\"bold\":false}]");
+						}
 						ScoreboardUtils.setScoreboardValue(player, CHARM_SCOREBOARD, slotInfo.getMiddle());
 					} else {
 						player.sendMessage("Need more Indigo Blightdust to purchase this!");
