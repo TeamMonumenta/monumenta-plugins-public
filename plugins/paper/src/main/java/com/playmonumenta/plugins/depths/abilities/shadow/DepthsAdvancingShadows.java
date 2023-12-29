@@ -155,9 +155,9 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 
 	private static Description<DepthsAdvancingShadows> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<DepthsAdvancingShadows>(color)
-			.add("Right click and holding a weapon to teleport to the target hostile enemy within ")
+			.add("Right click while looking directly at a hostile mob within ")
 			.add(a -> a.mRange, ADVANCING_SHADOWS_RANGE)
-			.add(" blocks and you gain ")
+			.add(" blocks to teleport to it and gain ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
 			.add(" melee damage for ")
 			.addDuration(a -> a.mDamageDuration, DAMAGE_DURATION)

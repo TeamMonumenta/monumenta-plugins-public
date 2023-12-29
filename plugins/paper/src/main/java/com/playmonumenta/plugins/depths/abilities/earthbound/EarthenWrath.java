@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -24,6 +23,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +58,7 @@ public class EarthenWrath extends DepthsAbility {
 		new DepthsAbilityInfo<>(EarthenWrath.class, ABILITY_NAME, EarthenWrath::new, DepthsTree.EARTHBOUND, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.EARTHEN_WRATH)
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenWrath::cast, DepthsTrigger.SWAP))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenWrath::cast, DepthsTrigger.SWAP.mTrigger, new AbilityTriggerInfo.TriggerRestriction(DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION.getDisplay(), DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION.getPredicate().and(p -> !isWrathing(p)))))
 			.displayItem(Material.TURTLE_HELMET)
 			.descriptions(EarthenWrath::getDescription);
 
@@ -81,13 +81,11 @@ public class EarthenWrath extends DepthsAbility {
 	}
 
 	public boolean cast() {
-		if (isOnCooldown() || isWrathing()) {
+		if (isOnCooldown()) {
 			return false;
 		}
 
 		mDamageAbsorbed = 0;
-		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 10, 1);
 
@@ -95,6 +93,8 @@ public class EarthenWrath extends DepthsAbility {
 		if (party == null) {
 			return false;
 		}
+
+		PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.EARTHEN_WRATH);
 
 		cancelOnDeath(new BukkitRunnable() {
 			private int mTicks = 0;
@@ -144,9 +144,7 @@ public class EarthenWrath extends DepthsAbility {
 					if (mDamageAbsorbed > 0) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mDamageRadius)) {
 							double returnedDamage = Math.min(DAMAGE_CAP, mDamageAbsorbed * mDamageReflected);
-							DamageUtils.damage(mPlayer, mob,
-								new DamageEvent.Metadata(DamageType.MELEE_SKILL, mInfo.getLinkedSpell(), playerItemStats),
-								returnedDamage, true, true, false);
+							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, returnedDamage, mInfo.getLinkedSpell(), true, true);
 						}
 
 						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 1.0f, 0.6f);
@@ -169,13 +167,8 @@ public class EarthenWrath extends DepthsAbility {
 
 	//Returns true if the damage was absorbed
 	public boolean damagedEntity(Player otherPlayer, DamageEvent event) {
-		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(otherPlayer.getUniqueId());
-
-		if (dp != null) {
-			EarthenWrath otherWrath = AbilityManager.getManager().getPlayerAbility(otherPlayer, EarthenWrath.class);
-			if (otherWrath != null && otherWrath.isWrathing()) {
-				return false;
-			}
+		if (isWrathing(otherPlayer)) {
+			return false;
 		}
 
 		if (isWrathing() && !otherPlayer.equals(mPlayer) && mPlayer.getLocation().distance(otherPlayer.getLocation()) <= mTransferRadius) {
@@ -244,22 +237,27 @@ public class EarthenWrath extends DepthsAbility {
 		}
 	}
 
-	public boolean isWrathing() {
-		return mAbsorbDamage;
-	}
-
 	private void startWrath() {
 		mAbsorbDamage = true;
 	}
 
 	private void endWrath() {
-		putOnCooldown();
+		putOnCooldown(false);
 		mAbsorbDamage = false;
+	}
+
+	public boolean isWrathing() {
+		return mAbsorbDamage;
+	}
+
+	public static boolean isWrathing(Player player) {
+		EarthenWrath wrath = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EarthenWrath.class);
+		return wrath != null && wrath.isWrathing();
 	}
 
 	private static Description<EarthenWrath> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<EarthenWrath>(color)
-			.add("Swap while holding a weapon to redirect all damage allies in a ")
+			.add("Swap while to redirect all damage allies in a ")
 			.add(a -> a.mTransferRadius, TRANSFER_RADIUS)
 			.add(" block radius take from mobs (excluding percent health damage) to you at a ")
 			.addPercent(a -> a.mDamageReduction, PERCENT_DAMAGE_REDUCTION[rarity - 1], false, true)

@@ -113,7 +113,7 @@ public class Sidearm extends DepthsAbility {
 
 	private static Description<Sidearm> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Sidearm>(color)
-			.add("Right click while holding a weapon to fire a short range flintlock shot that goes up to ")
+			.add("Right click to fire a short range flintlock shot that goes up to ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks, stopping at the first enemy hit, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -194,14 +195,17 @@ public class Encore extends DepthsAbility {
 			int prevCooldown = mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), spell);
 			mPlugin.mTimers.removeCooldown(mPlayer, spell, false);
 			action.run();
-			mPlugin.mTimers.addCooldown(mPlayer, spell, prevCooldown);
+			// Earthen Wrath cooldown starts later - let the ability handle all of the cooldown stuff
+			if (!(ability instanceof EarthenWrath)) {
+				mPlugin.mTimers.addCooldown(mPlayer, spell, prevCooldown);
+			}
 		}, DELAY));
 		mActive = false;
 	}
 
 	private static Description<Encore> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Encore>(color)
-			.add("Left click while sneaking and holding a weapon to cause the next active ability you cast to be recast at no cooldown cost ")
+			.add("Left click while sneaking to cause the next active ability you cast to be recast at no cooldown cost ")
 			.addDuration(DELAY)
 			.add(" seconds later.")
 			.addCooldown(COOLDOWN[rarity - 1], true);

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.guis.AbilityTriggersGui;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -32,6 +33,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 	private static final int START_OF_PASSIVES = 27;
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	private static final int REWARD_LOCATION = 49;
+	private static final int TRIGGER_GUI_LOCATION = 53;
 	private Boolean mDebugVersion = false;
 	private @Nullable DepthsParty mDepthsParty;
 	private final DepthsPlayer mRequestingPlayer;
@@ -110,6 +112,9 @@ public class DepthsSummaryGUI extends CustomInventory {
 				event.getWhoClicked().closeInventory();
 				DepthsManager.getInstance().getRoomReward((Player) event.getWhoClicked(), null, true);
 			}
+		}
+		if (event.getSlot() == TRIGGER_GUI_LOCATION) {
+			new AbilityTriggersGui(clicker, false).open();
 		}
 	}
 
@@ -216,6 +221,10 @@ public class DepthsSummaryGUI extends CustomInventory {
 			}
 		}
 		updatePlayerHeads(targetPlayer);
+
+		ItemStack triggersItem = GUIUtils.createBasicItem(Material.JIGSAW, "Change Ability Triggers", NamedTextColor.WHITE, false,
+			"Click here to change which key combinations are used to cast abilities.", NamedTextColor.LIGHT_PURPLE);
+		mInventory.setItem(TRIGGER_GUI_LOCATION, triggersItem);
 		return true;
 	}
 

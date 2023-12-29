@@ -218,7 +218,7 @@ public class Metalmancy extends DepthsAbility {
 
 	private static Description<Metalmancy> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Metalmancy>(color)
-			.add("Swap hands while holding a weapon to summon an invulnerable steel construct. The Construct attacks the nearest mob within ")
+			.add("Swap hands to summon an invulnerable steel construct. The Construct attacks the nearest mob within ")
 			.add(DETECTION_RANGE)
 			.add(" blocks. The Construct deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

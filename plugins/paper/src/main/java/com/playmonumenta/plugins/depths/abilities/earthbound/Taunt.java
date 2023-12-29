@@ -87,7 +87,7 @@ public class Taunt extends DepthsAbility {
 
 	private static Description<Taunt> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Taunt>(color)
-			.add("Left click while sneaking and holding a weapon to have all enemies within ")
+			.add("Left click while sneaking to have all enemies within ")
 			.add(a -> a.mRange, CAST_RANGE)
 			.add(" blocks target you, and you gain ")
 			.add(a -> a.mAbsorptionPerMob, ABSORPTION[rarity - 1], false, null, true)

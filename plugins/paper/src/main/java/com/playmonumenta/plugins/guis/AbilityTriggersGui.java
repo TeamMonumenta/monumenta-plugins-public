@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
+import com.playmonumenta.plugins.depths.guis.DepthsSummaryGUI;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
@@ -33,9 +34,12 @@ public class AbilityTriggersGui extends Gui {
 	private @Nullable AbilityTriggerInfo<?> mSelectedTrigger;
 	private @Nullable AbilityTrigger mNewTrigger;
 	private int mKeyOptionsStartIndex = 0;
+	// true for class GUI, false for depths summary GUI
+	private boolean mPreviousGUI;
 
-	public AbilityTriggersGui(Player player) {
+	public AbilityTriggersGui(Player player, boolean previousGUI) {
 		super(player, 6 * 9, MAIN_PAGE_TITLE);
+		mPreviousGUI = previousGUI;
 	}
 
 	@Override
@@ -43,9 +47,15 @@ public class AbilityTriggersGui extends Gui {
 	protected void setup() {
 		if (mSelectedAbility == null) {
 			// back icon
-			setItem(0, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
+			if (mPreviousGUI) {
+				setItem(0, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
 					"Return to the class selection page.", NamedTextColor.GRAY, 40))
 					.onLeftClick(() -> new ClassSelectionCustomInventory(mPlayer).openInventory(mPlayer, mPlugin));
+			} else {
+				setItem(0, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
+					"Return to the ability summary page.", NamedTextColor.GRAY, 40))
+					.onLeftClick(() -> new DepthsSummaryGUI(mPlayer).openInventory(mPlayer, mPlugin));
+			}
 
 			// help icon
 			setItem(4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Help", NamedTextColor.WHITE, false,

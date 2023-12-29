@@ -144,7 +144,7 @@ public class TotemOfSalvation extends DepthsAbility {
 
 	private static Description<TotemOfSalvation> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<TotemOfSalvation>(color)
-			.add("Swap hands while holding a weapon to summon a totem that lasts ")
+			.add("Swap hands to summon a totem that lasts ")
 			.addDuration(a -> a.mDuration, DURATION)
 			.add(" seconds. The totem heals all players within ")
 			.add(a -> a.mRadius, EFFECT_RADIUS)

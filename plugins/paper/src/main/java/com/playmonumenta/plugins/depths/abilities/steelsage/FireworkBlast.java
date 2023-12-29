@@ -168,7 +168,7 @@ public class FireworkBlast extends DepthsAbility {
 
 	private static Description<FireworkBlast> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<FireworkBlast>(color)
-			.add("Right click while sneaking and holding a weapon to shoot a firework that deals ")
+			.add("Right click while sneaking to shoot a firework that deals ")
 			.addDepthsDamage(a -> a.mBaseDamage, DAMAGE[rarity - 1], true)
 			.add(" projectile damage to enemies within ")
 			.add(RADIUS)

@@ -115,7 +115,7 @@ public class CloakOfShadows extends DepthsAbility {
 
 	private static Description<CloakOfShadows> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<CloakOfShadows>(color)
-			.add("Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying ")
+			.add("Left click while sneaking to throw a shadow bomb, which explodes on landing, applying ")
 			.addPercent(a -> a.mWeakenAmplifier, WEAKEN_AMPLIFIER[rarity - 1], false, true)
 			.add(" weaken for ")
 			.addDuration(a -> a.mWeakenDuration, WEAKEN_DURATION)

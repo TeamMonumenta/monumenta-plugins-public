@@ -150,7 +150,7 @@ public class BladeFlurry extends DepthsAbility {
 
 	private static Description<BladeFlurry> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<BladeFlurry>(color)
-			.add("Right click while sneaking and holding a weapon to deal ")
+			.add("Right click while sneaking to deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" melee damage in a ")
 			.add(a -> a.mRadius, RADIUS)

@@ -134,7 +134,7 @@ public class RingOfFlames extends DepthsAbility {
 
 	private static Description<RingOfFlames> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<RingOfFlames>(color)
-			.add("Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for ")
+			.add("Left click while sneaking to summon a ring of flames around you that lasts for ")
 			.addDuration(a -> a.mRingDuration, DURATION[rarity - 1], false, true)
 			.add(" seconds. Enemies on the flame perimeter are dealt ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

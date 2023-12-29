@@ -95,7 +95,7 @@ public class WardOfLight extends DepthsAbility {
 
 	private static Description<WardOfLight> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<WardOfLight>(color)
-			.add("Right click while holding a weapon and not sneaking to heal nearby players within ")
+			.add("Right click while not sneaking to heal nearby players within ")
 			.add(a -> a.mRadius, HEALING_RADIUS)
 			.add(" blocks in front of you for ")
 			.addPercent(a -> a.mHealPercent, HEAL[rarity - 1], false, true)

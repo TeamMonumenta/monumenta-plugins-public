@@ -97,7 +97,7 @@ public class Refraction extends DepthsAbility {
 			@Override
 			public void run() {
 				World world = mPlayer.getWorld();
-				AbilityTriggerInfo.TriggerRestriction holdingWeapon = DepthsTrigger.SWAP.mRestriction;
+				AbilityTriggerInfo.TriggerRestriction holdingWeapon = DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION;
 				if (holdingWeapon != null && !holdingWeapon.test(mPlayer)) {
 					mPlugin.mEffectManager.clearEffects(mPlayer, WIND_UP_EFFECT);
 					world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1.2f, 1f);
@@ -171,7 +171,7 @@ public class Refraction extends DepthsAbility {
 			@Override
 			public void run() {
 				World world = mPlayer.getWorld();
-				AbilityTriggerInfo.TriggerRestriction holdingWeapon = DepthsTrigger.SWAP.mRestriction;
+				AbilityTriggerInfo.TriggerRestriction holdingWeapon = DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION;
 				if (holdingWeapon != null && !holdingWeapon.test(mPlayer)) {
 					mPlugin.mEffectManager.clearEffects(mPlayer, WIND_UP_EFFECT);
 					world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1.2f, 1f);

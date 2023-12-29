@@ -113,7 +113,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					updateYellowTessCooldown(player);
 					makeClassSelectPage(player);
 				} else if (chosenSlot == P1_CHANGE_TRIGGERS_LOC) {
-					new AbilityTriggersGui(player).open();
+					new AbilityTriggersGui(player, true).open();
 					return;
 				}
 				break;

@@ -685,7 +685,7 @@ public class ColorSplash extends DepthsAbility {
 
 	private static Description<ColorSplash> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<ColorSplash>(color)
-			.add("Swap while holding a weapon to cast a unique ability after ")
+			.add("Swap hands to cast a unique ability after ")
 			.addDuration(ACTIVATION_DELAY)
 			.add("s. This ability is chosen at random from one of your available trees.")
 			.addCooldown(COOLDOWN)

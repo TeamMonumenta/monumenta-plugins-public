@@ -83,7 +83,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 	}
 
 	public AbilityTriggerInfo(String id, String displayName, Predicate<T> action, DepthsTrigger depthsTrigger) {
-		this(id, displayName, null, action, depthsTrigger.mTrigger, depthsTrigger.mRestriction);
+		this(id, displayName, null, action, depthsTrigger.mTrigger, DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION);
 	}
 
 	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Predicate<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction, @Nullable Predicate<Player> prerequisite) {

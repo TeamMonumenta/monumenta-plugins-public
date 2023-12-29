@@ -151,7 +151,7 @@ public class DepthsFrostNova extends DepthsAbility {
 
 	private static Description<DepthsFrostNova> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<DepthsFrostNova>(color)
-			.add("Left click while sneaking and holding a weapon to unleash a frost nova, dealing ")
+			.add("Left click while sneaking to unleash a frost nova, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to all enemies in a ")
 			.add(a -> a.mRadius, SIZE)
