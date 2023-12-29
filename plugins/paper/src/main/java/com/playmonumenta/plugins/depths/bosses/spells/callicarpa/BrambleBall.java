@@ -84,6 +84,11 @@ public class BrambleBall extends Spell {
 
 			@Override
 			public void run() {
+				if (mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+
 				if (mChargeUp.nextTick()) {
 					// Restore the original glowing.
 					Team darkGreenTeam = ScoreboardUtils.getExistingTeamOrCreate("dark_green", NamedTextColor.DARK_GREEN);
@@ -129,6 +134,11 @@ public class BrambleBall extends Spell {
 
 			@Override
 			public void run() {
+				if (mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+
 				// Update the location to move towards a player.
 				Vector dir = LocationUtils.getDirectionTo(mTarget.getLocation().clone().add(0, 1, 0), mCurrLoc).multiply(mBrambleSpeed);
 				mCurrLoc.add(dir);
@@ -187,6 +197,11 @@ public class BrambleBall extends Spell {
 
 			@Override
 			public void run() {
+				if (mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+
 				// The bramble should both keep moving towards the player, and slowly fall to the ground.
 				Vector dir = LocationUtils.getDirectionTo(mTarget.getLocation().clone().add(0, 1, 0), mCurrLoc).multiply(mBrambleSpeed);
 				mCurrLoc.add(dir);
@@ -225,6 +240,11 @@ public class BrambleBall extends Spell {
 
 			@Override
 			public void run() {
+				if (mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+
 				mBoss.getWorld().playSound(mPulseLoc, Sound.BLOCK_GRASS_BREAK, SoundCategory.HOSTILE, 1f, 0.7f);
 				// Have a specifically defined ring
 				new PPCircle(Particle.REDSTONE, mPulseLoc, BRAMBLE_FIELD_RADIUS).countPerMeter(3).ringMode(true)

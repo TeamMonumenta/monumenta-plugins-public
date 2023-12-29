@@ -96,6 +96,11 @@ public class ThornIvy extends Spell {
 
 			@Override
 			public void run() {
+				if (mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+
 				Location center = mBoss.getLocation().clone().add(0, 0.1, 0);
 				mTotalThetaOffset = 0;
 				boolean hasBrokenBlock = false;

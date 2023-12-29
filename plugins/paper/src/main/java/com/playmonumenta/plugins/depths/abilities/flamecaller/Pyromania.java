@@ -40,6 +40,11 @@ public class Pyromania extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		DamageEvent.DamageType type = event.getType();
+		if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER) {
+			return false;
+		}
+
 		int fireCount = 0;
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius)) {

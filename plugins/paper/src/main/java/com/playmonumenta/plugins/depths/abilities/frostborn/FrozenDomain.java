@@ -55,11 +55,13 @@ public class FrozenDomain extends DepthsAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (twoHertz && isOnIce(mPlayer)) {
-			new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
-		}
+		boolean isOnIce = isOnIce(mPlayer);
 		if (twoHertz) {
-			if (PlayerUtils.isOnGround(mPlayer) && isOnIce(mPlayer)) {
+			if (isOnIce) {
+				new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
+			}
+
+			if (PlayerUtils.isOnGround(mPlayer) && isOnIce) {
 				mWasOnIce = true;
 				mTickWhenIce = mTicks;
 				handleSpeed();
@@ -71,6 +73,10 @@ public class FrozenDomain extends DepthsAbility {
 				mWasOnIce = false;
 			}
 			mTicks += 10;
+		}
+
+		if (isOnIce && mPlayer.getFireTicks() > 1) {
+			mPlayer.setFireTicks(1);
 		}
 
 	}
@@ -119,7 +125,7 @@ public class FrozenDomain extends DepthsAbility {
 			.addDuration(a -> REGEN_INTERVAL[rarity - 1], REGEN_INTERVAL[rarity - 1], true, true)
 			.add("s. Effects last for ")
 			.addDuration(a -> a.mDuration, DURATION_TICKS)
-			.add(" seconds after leaving ice.");
+			.add(" seconds after leaving ice. Standing on ice also extinguishes you if you are on fire.");
 	}
 }
 

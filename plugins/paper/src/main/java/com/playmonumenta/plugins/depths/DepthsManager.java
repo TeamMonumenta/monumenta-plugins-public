@@ -444,10 +444,8 @@ public class DepthsManager {
 		}
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp != null) {
-			int displayLevel = level;
-			if (displayLevel == 0) {
-				displayLevel = dp.mAbilities.getOrDefault(name, 1);
-			}
+			int previousLevel = dp.mAbilities.getOrDefault(name, 0);
+			int displayLevel = level == 0 ? previousLevel : level;
 			dp.mAbilities.put(name, level);
 			AbilityManager.getManager().updatePlayerAbilities(p, false);
 
@@ -468,6 +466,8 @@ public class DepthsManager {
 					party.mHasAtLeastOneAbility = true;
 					if (level == 0) {
 						message = playerName.append(Component.text(" has lost ability: ").append(abilityName).append(Component.text("!")));
+					} else if (previousLevel > 0) {
+						message = playerName.append(Component.text(" upgraded ability: ")).append(abilityName).append(Component.text(" to ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
 					} else {
 						message = playerName.append(Component.text(" now has ability: ")).append(abilityName).append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
 					}
@@ -1813,7 +1813,7 @@ public class DepthsManager {
 					}
 				}
 				if (!removed) {
-					dp.sendMessage(Component.text("You would have lost all of your ").append(chosenTree.getNameComponent()).append(Component.text(" abilities, but you had none.")));
+					dp.sendMessage(Component.text("You would have lost all of your ").append(chosenTree.getNameComponent().hoverEvent(chosenTree.createItem().asHoverEvent())).append(Component.text(" abilities, but you had none.")));
 				}
 
 				break;
@@ -1865,8 +1865,9 @@ public class DepthsManager {
 					}
 				}
 				dp.mEligibleTrees.add(randomTree);
-				dp.sendMessage(Component.text("You unlocked the ").append(randomTree.getNameComponent()).append(Component.text(" tree!")));
-				party.sendMessage(Component.text(playerName + " unlocked the ").append(randomTree.getNameComponent()).append(Component.text(" tree!")), o -> !uuid.equals(o.mPlayerId));
+				Component tree = randomTree.getNameComponent().hoverEvent(randomTree.createItem().asHoverEvent());
+				dp.sendMessage(Component.text("You unlocked the ").append(tree).append(Component.text(" tree!")));
+				party.sendMessage(Component.text(playerName + " unlocked the ").append(tree).append(Component.text(" tree!")), o -> !uuid.equals(o.mPlayerId));
 
 				break;
 			case 6:
@@ -1916,8 +1917,7 @@ public class DepthsManager {
 
 		List<DepthsAbilityItem> abilityOfferings = mAbilityOfferings.get(dp.mPlayerId);
 		if (abilityOfferings != null) {
-			abilityOfferings.removeIf(dai -> dai.mTrigger != DepthsTrigger.PASSIVE
-				&& dp.mAbilities.keySet().stream().map(this::getAbility).filter(Objects::nonNull).anyMatch(info -> info.getDepthsTrigger() == dai.mTrigger));
+			abilityOfferings.removeIf(dai -> dp.mAbilities.keySet().stream().map(this::getAbility).filter(Objects::nonNull).anyMatch(info -> dai.mAbility.equals(info.getDisplayName()) || (dai.mTrigger != DepthsTrigger.PASSIVE && info.getDepthsTrigger() == dai.mTrigger)));
 			if (abilityOfferings.isEmpty()) {
 				mAbilityOfferings.remove(dp.mPlayerId);
 			}

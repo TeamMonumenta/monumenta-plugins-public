@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -219,6 +220,7 @@ public class DiscoBall extends DepthsAbility {
 					public void run() {
 						// Try to target mobs under the cone of the disco ball first.
 						List<LivingEntity> hitMobs = Hitbox.approximateCone(mBallLoc, mDistanceFromGround, Math.PI).getHitMobs();
+						hitMobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 						if (hitMobs.size() > 0) {
 							Collections.shuffle(hitMobs);
 							impactLocationSpecial(hitMobs.get(0).getLocation(), mRuns);

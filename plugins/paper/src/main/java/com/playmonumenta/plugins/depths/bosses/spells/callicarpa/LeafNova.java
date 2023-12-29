@@ -50,13 +50,19 @@ public class LeafNova extends Spell {
 
 	@Override
 	public void run() {
+		if (mBoss.isDead()) {
+			this.cancel();
+			return;
+		}
+
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mFinalDuration, 20));
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 			Location mOldLoc = mBoss.getLocation();
 			double mCurrentRadius = RADIUS;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				Location mBossLoc = mBoss.getLocation();
 				// Spiraling Bullets
 				for (int i = 0; i < 4; i++) {
@@ -113,7 +119,8 @@ public class LeafNova extends Spell {
 				mTicks += 1;
 				mOldLoc = mBoss.getLocation();
 			}
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+		};
+		runnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	private double calculateX(double t, double angle) {

@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.Bulwark;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -104,23 +105,25 @@ public class ChromaBlade extends DepthsAbility {
 			startup = 0;
 		}
 
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			if (mLastTree == null) {
-				noTreeAttack(isFast);
+				noTreeAttack(isFast, playerItemStats);
 				mLastTree = DepthsTree.PRISMATIC;
 				return;
 			}
 
 			switch (mLastTree) {
-				case FROSTBORN -> frostbornAttack(isFast);
-				case FLAMECALLER -> flamecallerAttack(isFast);
-				case DAWNBRINGER -> dawnbringerAttack(isFast);
-				case EARTHBOUND -> earthboundAttack(isFast);
-				case SHADOWDANCER -> shadowdancerAttack(isFast);
-				case STEELSAGE -> steelsageAttack(isFast);
-				case WINDWALKER -> windwalkerAttack(isFast);
-				case PRISMATIC -> prismaticAttack(isFast);
-				default -> noTreeAttack(isFast);
+				case FROSTBORN -> frostbornAttack(isFast, playerItemStats);
+				case FLAMECALLER -> flamecallerAttack(isFast, playerItemStats);
+				case DAWNBRINGER -> dawnbringerAttack(isFast, playerItemStats);
+				case EARTHBOUND -> earthboundAttack(isFast, playerItemStats);
+				case SHADOWDANCER -> shadowdancerAttack(isFast, playerItemStats);
+				case STEELSAGE -> steelsageAttack(isFast, playerItemStats);
+				case WINDWALKER -> windwalkerAttack(isFast, playerItemStats);
+				case PRISMATIC -> prismaticAttack(isFast, playerItemStats);
+				default -> noTreeAttack(isFast, playerItemStats);
 			}
 
 			mLastTree = DepthsTree.PRISMATIC;
@@ -134,7 +137,7 @@ public class ChromaBlade extends DepthsAbility {
 		return true;
 	}
 
-	public void flamecallerAttack(boolean isFast) {
+	public void flamecallerAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// flamecaller: 75% larger slash size
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -148,7 +151,7 @@ public class ChromaBlade extends DepthsAbility {
 		long delay = isFast ? 7 : 14;
 
 		Consumer<Double> action = angle -> {
-			slash(isFast, DepthsTree.FLAMECALLER, hitMobs, angle, startingDegrees, endingDegrees, rings);
+			slash(isFast, playerItemStats, DepthsTree.FLAMECALLER, hitMobs, angle, startingDegrees, endingDegrees, rings);
 		};
 
 		action.accept(angle1);
@@ -159,7 +162,7 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay);
 	}
 
-	public void frostbornAttack(boolean isFast) {
+	public void frostbornAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// frostborn: 2nd slash replaced by an ice shockwave
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -175,13 +178,13 @@ public class ChromaBlade extends DepthsAbility {
 		float pitch = isFast ? 0.9f : 0.8f;
 		long delay = isFast ? 7 : 14;
 
-		slash(isFast, DepthsTree.FROSTBORN, hitMobs, 0, startingDegrees, endingDegrees, rings);
+		slash(isFast, playerItemStats, DepthsTree.FROSTBORN, hitMobs, 0, startingDegrees, endingDegrees, rings);
 
 		World world = mPlayer.getWorld();
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			Hitbox hitbox = Hitbox.approximateCone(getPlayerLocation(0), radius, Math.toRadians(hitboxHalfAngle));
 			for (LivingEntity mob : hitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mDamage, ClassAbility.CHROMA_BLADE, true);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MELEE_SKILL, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, false, false);
 				MovementUtils.knockAway(mPlayer, mob, 0.30f, 0.30f);
 				EntityUtils.applySlow(mPlugin, 8 * 20, 0.2, mob);
 			}
@@ -244,7 +247,7 @@ public class ChromaBlade extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	public void dawnbringerAttack(boolean isFast) {
+	public void dawnbringerAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// dawnbringer: mobs hit drop a bezoar-like that grants absorption
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -258,7 +261,7 @@ public class ChromaBlade extends DepthsAbility {
 		long delay = isFast ? 7 : 14;
 
 		Consumer<Double> action = angle -> {
-			slash(isFast, DepthsTree.DAWNBRINGER, hitMobs, angle, startingDegrees, endingDegrees, rings);
+			slash(isFast, playerItemStats, DepthsTree.DAWNBRINGER, hitMobs, angle, startingDegrees, endingDegrees, rings);
 		};
 
 		action.accept(angle1);
@@ -269,7 +272,7 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay);
 	}
 
-	public void earthboundAttack(boolean isFast) {
+	public void earthboundAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// earthbound: 2nd slash replaced by an earthquake
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -281,13 +284,13 @@ public class ChromaBlade extends DepthsAbility {
 		double radius = isFast ? 7 : 9;
 		long delay = isFast ? 7 : 14;
 
-		slash(isFast, DepthsTree.EARTHBOUND, hitMobs, 0, startingDegrees, endingDegrees, rings);
+		slash(isFast, playerItemStats, DepthsTree.EARTHBOUND, hitMobs, 0, startingDegrees, endingDegrees, rings);
 
 		World world = mPlayer.getWorld();
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			Hitbox hitbox = new Hitbox.SphereHitbox(getPlayerLocation(0), radius);
 			for (LivingEntity mob : hitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mDamage, ClassAbility.CHROMA_BLADE, true);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MELEE_SKILL, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, false, false);
 				MovementUtils.pullTowards(mPlayer.getLocation().add(0, 7, 0), mob, 0.12f);
 				EntityUtils.applyWeaken(mPlugin, 8 * 20, 0.2, mob);
 				EntityUtils.applyTaunt(mob, mPlayer);
@@ -304,7 +307,7 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay);
 	}
 
-	public void shadowdancerAttack(boolean isFast) {
+	public void shadowdancerAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// shadowdancer: silence mobs hit, and instakill mobs brought below an HP threshold
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -318,7 +321,7 @@ public class ChromaBlade extends DepthsAbility {
 		long delay = isFast ? 7 : 14;
 
 		Consumer<Double> action = angle -> {
-			slash(isFast, DepthsTree.SHADOWDANCER, hitMobs, angle, startingDegrees, endingDegrees, rings);
+			slash(isFast, playerItemStats, DepthsTree.SHADOWDANCER, hitMobs, angle, startingDegrees, endingDegrees, rings);
 		};
 
 		action.accept(angle1);
@@ -329,7 +332,7 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay);
 	}
 
-	public void steelsageAttack(boolean isFast) {
+	public void steelsageAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// steelsage: slashes continue as projectiles and launch mobs upwards
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -344,10 +347,10 @@ public class ChromaBlade extends DepthsAbility {
 		long delay = isFast ? 7 : 14;
 
 		BiConsumer<Double, Boolean> action = (angle, isLeft) -> {
-			slash(isFast, DepthsTree.STEELSAGE, hitMobs, angle, startingDegrees, endingDegrees, rings);
+			slash(isFast, playerItemStats, DepthsTree.STEELSAGE, hitMobs, angle, startingDegrees, endingDegrees, rings);
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				if (hitMobs.isEmpty()) {
-					launchSlash(isLeft, isFast);
+					launchSlash(isLeft, isFast, playerItemStats);
 				}
 			}, launchDelay);
 		};
@@ -360,7 +363,7 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay);
 	}
 
-	public void windwalkerAttack(boolean isFast) {
+	public void windwalkerAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// windwalker: adds a dash, and CDR based on slash hits
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -378,7 +381,7 @@ public class ChromaBlade extends DepthsAbility {
 		long delay = isFast ? 7 : 14;
 
 		Consumer<Double> action = angle -> {
-			slash(isFast, DepthsTree.WINDWALKER, hitMobs, angle, startingDegrees, endingDegrees, rings);
+			slash(isFast, playerItemStats, DepthsTree.WINDWALKER, hitMobs, angle, startingDegrees, endingDegrees, rings);
 			if (!hitMobs.isEmpty()) {
 				reduceCooldowns();
 			}
@@ -392,7 +395,7 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay);
 	}
 
-	public void prismaticAttack(boolean isFast) {
+	public void prismaticAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		// prismatic: add a third slash that deals extra damage
 
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
@@ -410,7 +413,7 @@ public class ChromaBlade extends DepthsAbility {
 		long delay2 = isFast ? 15 : 24;
 
 		TriConsumer<Double, Integer, Double> action = (angle, rings, damageMultiplier) -> {
-			slash(isFast, DepthsTree.PRISMATIC, hitMobs, angle, startingDegrees, endingDegrees, rings, damageMultiplier);
+			slash(isFast, playerItemStats, DepthsTree.PRISMATIC, hitMobs, angle, startingDegrees, endingDegrees, rings, damageMultiplier);
 		};
 
 		action.accept(angle1, rings1, 1.0);
@@ -427,7 +430,7 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay2);
 	}
 
-	public void noTreeAttack(boolean isFast) {
+	public void noTreeAttack(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		ArrayList<LivingEntity> hitMobs = new ArrayList<>();
 		new PartialParticle(Particle.CRIT, getPlayerLocation(0.5), 40, 0.5, 0.5, 0.5, 1).spawnAsPlayerActive(mPlayer);
 
@@ -439,7 +442,7 @@ public class ChromaBlade extends DepthsAbility {
 		long delay = isFast ? 7 : 14;
 
 		Consumer<Double> action = angle -> {
-			slash(isFast, null, hitMobs, angle, startingDegrees, endingDegrees, rings);
+			slash(isFast, playerItemStats, null, hitMobs, angle, startingDegrees, endingDegrees, rings);
 		};
 
 		action.accept(angle1);
@@ -450,14 +453,14 @@ public class ChromaBlade extends DepthsAbility {
 		}, delay);
 	}
 
-	private void slash(boolean isFast, @Nullable DepthsTree tree, List<LivingEntity> hitMobs, double angle, double startingDegrees, double endingDegrees, int rings) {
-		slash(isFast, tree, hitMobs, angle, startingDegrees, endingDegrees, rings, 1);
+	private void slash(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats, @Nullable DepthsTree tree, List<LivingEntity> hitMobs, double angle, double startingDegrees, double endingDegrees, int rings) {
+		slash(isFast, playerItemStats, tree, hitMobs, angle, startingDegrees, endingDegrees, rings, 1);
 	}
 
-	private void slash(boolean isFast, @Nullable DepthsTree tree, List<LivingEntity> hitMobs, double angle, double startingDegrees, double endingDegrees, int rings, double damageMutliplier) {
+	private void slash(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats, @Nullable DepthsTree tree, List<LivingEntity> hitMobs, double angle, double startingDegrees, double endingDegrees, int rings, double damageMutliplier) {
 		// Perhaps all heights should be the same?
 		ParticleUtils.drawHalfArc(getPlayerLocation(0.5), 1.5, angle, startingDegrees, endingDegrees, rings, 0.32, false, isFast ? 50 : 25,
-			(Location l, int ring) -> doSlashParticle(l, ring, hitMobs, isFast, tree, damageMutliplier)
+			(Location l, int ring) -> doSlashParticle(l, ring, hitMobs, isFast, playerItemStats, tree, damageMutliplier)
 		);
 		playSlashSound(isFast, tree);
 	}
@@ -470,7 +473,7 @@ public class ChromaBlade extends DepthsAbility {
 	}
 
 	// we need a separate case for prismatic's cross-slash bonus damage
-	private void doSlashParticle(Location loc, int ring, List<LivingEntity> hitMobs, boolean isFast, @Nullable DepthsTree tree, double damageMultiplier) {
+	private void doSlashParticle(Location loc, int ring, List<LivingEntity> hitMobs, boolean isFast, ItemStatManager.PlayerItemStats playerItemStats, @Nullable DepthsTree tree, double damageMultiplier) {
 		if (tree != null) {
 			switch (tree) {
 				case FLAMECALLER -> new PartialParticle(Particle.REDSTONE, loc, 1, FLAMECALLER_COLOR).spawnAsPlayerActive(mPlayer);
@@ -498,7 +501,7 @@ public class ChromaBlade extends DepthsAbility {
 		for (LivingEntity target : targets) {
 			hitMobs.add(target);
 
-			DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MELEE_SKILL, mDamage * damageMultiplier, ClassAbility.CHROMA_BLADE, true);
+			DamageUtils.damage(mPlayer, target, new DamageEvent.Metadata(DamageEvent.DamageType.MELEE_SKILL, mInfo.getLinkedSpell(), playerItemStats), mDamage * damageMultiplier, true, false, false);
 			if (isFast) {
 				MovementUtils.knockAway(mPlayer, target, 0.30f, 0.30f);
 			} else {
@@ -596,49 +599,46 @@ public class ChromaBlade extends DepthsAbility {
 		new PartialParticle(Particle.BLOCK_CRACK, le.getEyeLocation(), 20, 0.3, 0.3, 0.3, 1, Material.REDSTONE_BLOCK.createBlockData()).spawnAsPlayerActive(mPlayer);
 	}
 
-	private void launchSlash(boolean isLeft, boolean isFast) {
+	private void launchSlash(boolean isLeft, boolean isFast, ItemStatManager.PlayerItemStats playerItemStats) {
 		Location playerLoc = mPlayer.getLocation().add(0, 1, 0);
 		new BukkitRunnable() {
 			final Vector mDir = playerLoc.getDirection();
 			final Location mLoc = playerLoc.add(mDir.clone().multiply(3));
+			final double mAngle = isFast ? (isLeft ? -25 : 205) : (isLeft ? -10 : 190);
+			final double mSize = isFast ? 1.75 : 2.5;
 			double mDistance = 0;
+
 			@Override
 			public void run() {
-				double angle = isFast ? (isLeft ? -25 : 205) : (isLeft ? -10 : 190);
-				double size = isFast ? 1.75 : 2.5;
-
-				ParticleUtils.drawHalfArc(mLoc, size, angle, 30, 150, 1, 0, false, 180,
+				ParticleUtils.drawHalfArc(mLoc, mSize, mAngle, 30, 150, 1, 0, false, 180,
 					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
 				);
-				ParticleUtils.drawHalfArc(mLoc.subtract(mDir.clone().multiply(0.15)), size, angle, 30, 150, 1, 0, false, 180,
+				ParticleUtils.drawHalfArc(mLoc.subtract(mDir.clone().multiply(0.15)), mSize, mAngle, 30, 150, 1, 0, false, 180,
 					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 
-				List<LivingEntity> collision = new Hitbox.SphereHitbox(mLoc, size).getHitMobs();
+				List<LivingEntity> collision = new Hitbox.SphereHitbox(mLoc, mSize).getHitMobs();
 				// if something was hit
 				if (!collision.isEmpty()) {
-					List<LivingEntity> hitMobs = new Hitbox.SphereHitbox(mLoc, size * 2).getHitMobs();
-					new PartialParticle(Particle.FIREWORKS_SPARK, mLoc, 50, 0.5, 0.5, 0.5, 0.2).spawnAsPlayerActive(mPlayer);
-					for (LivingEntity mob : hitMobs) {
-						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mDamage, ClassAbility.CHROMA_BLADE, true);
-						MovementUtils.knockAway(mPlayer, mob, 0.40f, 0.40f);
-					}
-
-					this.cancel();
+					hit();
 				}
 
 				mLoc.add(mDir);
 				mDistance++;
 				if (mDistance > 50 || !mLoc.getBlock().isPassable()) {
-					List<LivingEntity> hitMobs = new Hitbox.SphereHitbox(mLoc, size * 2).getHitMobs();
-					new PartialParticle(Particle.FIREWORKS_SPARK, mLoc, 50, 0.5, 0.5, 0.5, 0.2).spawnAsPlayerActive(mPlayer);
-					for (LivingEntity mob : hitMobs) {
-						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mDamage, ClassAbility.CHROMA_BLADE, true);
-						MovementUtils.knockAway(mPlayer, mob, 0.40f, 0.40f);
-					}
-
-					this.cancel();
+					hit();
 				}
+			}
+
+			private void hit() {
+				List<LivingEntity> hitMobs = new Hitbox.SphereHitbox(mLoc, mSize * 2).getHitMobs();
+				new PartialParticle(Particle.FIREWORKS_SPARK, mLoc, 50, 0.5, 0.5, 0.5, 0.2).spawnAsPlayerActive(mPlayer);
+				for (LivingEntity mob : hitMobs) {
+					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MELEE_SKILL, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, false, false);
+					MovementUtils.knockAway(mPlayer, mob, 0.40f, 0.40f);
+				}
+
+				this.cancel();
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}

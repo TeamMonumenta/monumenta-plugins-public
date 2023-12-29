@@ -48,7 +48,7 @@ public class DepthsRejuvenation extends DepthsAbility {
 		for (Player player : players) {
 			double maxHealth = EntityUtils.getMaxHealth(player);
 			double healing = mHealPercent * maxHealth;
-			mPlugin.mEffectManager.addEffect(player, REGENERATION_EFFECT, new CustomRegeneration(10, healing, mHealInterval, mPlayer, mPlugin));
+			mPlugin.mEffectManager.addEffect(player, REGENERATION_EFFECT, new CustomRegeneration(10, healing, mHealInterval, mPlayer, mPlugin).displaysTime(false));
 		}
 	}
 

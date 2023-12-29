@@ -406,12 +406,20 @@ public class EntityUtils {
 		return getPlayerAtCursor(player, range, null);
 	}
 
+	public static @Nullable Player getPlayerAtCursor(Player player, double range, double hitboxSize) {
+		return getPlayerAtCursor(player, range, null, hitboxSize);
+	}
+
 	public static @Nullable Player getPlayerAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+		return getPlayerAtCursor(player, range, filter, 0.425);
+	}
+
+	public static @Nullable Player getPlayerAtCursor(Player player, double range, @Nullable Predicate<Entity> filter, double hitboxSize) {
 		Predicate<Entity> playerFilter = e -> e instanceof Player p && p != player && p.getGameMode() != GameMode.SPECTATOR;
 		if (filter != null) {
 			playerFilter = playerFilter.and(filter);
 		}
-		return (Player) getEntityAtCursor(player, range, playerFilter);
+		return (Player) getEntityAtCursor(player, range, playerFilter, hitboxSize);
 	}
 
 	public static @Nullable LivingEntity getHostileEntityAtCursor(Player player, double range) {
@@ -430,19 +438,23 @@ public class EntityUtils {
 		return getEntityAtCursor(player, range, null);
 	}
 
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+		return getEntityAtCursor(player, range, filter, 0.425);
+	}
+
 	/**
 	 * Get the nearest entity that the player is looking at
 	 *
-	 * @param player player
-	 * @param range  range
-	 * @param filter predicate to filter mobs
+	 * @param player      player
+	 * @param range       range
+	 * @param filter      predicate to filter mobs
+	 * @param hitboxSize  the size of the ray traced
 	 * @return entity
 	 */
-	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter, double hitboxSize) {
 		World world = player.getWorld();
 		Location eyeLoc = player.getEyeLocation();
-		// Stole 0.425 ray size from hallowed beam. Could be made into an argument, but it's probably good that it is consistent everywhere
-		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, 0.425, filter);
+		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, hitboxSize, filter);
 		// the raySize parameter changes the size of entity bounding boxes, so the entity may actually be outside the max range, hence the range check here
 		if (result != null && result.getHitEntity() instanceof LivingEntity le && le.getLocation().distance(player.getLocation()) < range) {
 			return le;

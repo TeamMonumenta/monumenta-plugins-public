@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -135,6 +136,7 @@ public class DivineBeam extends DepthsAbility {
 		}
 
 		List<LivingEntity> hitMobs = Hitbox.approximateCylinder(startLoc, endLoc, STUN_HITBOX_SIZE, true).accuracy(0.5).getHitMobs();
+		hitMobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 		List<Player> hitPlayers = Hitbox.approximateCylinder(startLoc, endLoc, HEAL_HITBOX_SIZE, true).accuracy(0.5).getHitPlayers(mPlayer, true);
 
 		// count things hit and apply effects

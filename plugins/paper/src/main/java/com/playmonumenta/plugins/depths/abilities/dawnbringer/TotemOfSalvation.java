@@ -18,10 +18,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -88,6 +90,7 @@ public class TotemOfSalvation extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getEyeLocation();
 		Item totem = AbilityUtils.spawnAbilityItem(world, loc, Material.TOTEM_OF_UNDYING, "Totem of Salvation", false, VELOCITY, true, true);
+		ScoreboardUtils.addEntityToTeam(totem, "TotemOfSalavation", NamedTextColor.YELLOW);
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1.0f, 2.5f);
 
 		new BukkitRunnable() {

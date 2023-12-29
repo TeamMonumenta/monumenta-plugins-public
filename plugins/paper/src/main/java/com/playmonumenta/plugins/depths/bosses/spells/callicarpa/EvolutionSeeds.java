@@ -47,6 +47,11 @@ public class EvolutionSeeds extends Spell {
 
 			@Override
 			public void run() {
+				if (mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+
 				if (mChargeUp.nextTick()) {
 					int playerCount = mBoss.getLocation().getNearbyPlayers(200).size();
 					mGarden.evolveRandomFlowers(1 + playerCount * EVOLVE_COUNT_PER_PLAYER);

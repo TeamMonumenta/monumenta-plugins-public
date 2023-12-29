@@ -11,7 +11,9 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,6 +22,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -74,17 +77,19 @@ public class Avalanche extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 
-		HashSet<Location> checkIce = getNearbyIce(loc, mRadius);
+		Set<Location> checkIce = getNearbyIce(loc, mRadius);
 		if (checkIce.size() == 0) {
 			return false;
 		}
 
 		putOnCooldown();
 
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+
 		new BukkitRunnable() {
 			int mPulses = 0;
 			final List<LivingEntity> mHitMobs = new ArrayList<>();
-			HashSet<Location> mIceToBreak = new HashSet<>();
+			Set<Location> mIceToBreak = new HashSet<>();
 			@Override
 			public void run() {
 				// re-obtain nearby ice every pulse in case ice disappears in the middle of casting
@@ -97,7 +102,7 @@ public class Avalanche extends DepthsAbility {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 2, 5.0, 2)) {
 						if (!mHitMobs.contains(mob)) {
 							EntityUtils.applySlow(mPlugin, mDuration, SLOW_MODIFIER, mob);
-							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage / NUM_PULSES, mInfo.getLinkedSpell(), true);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage / NUM_PULSES, true, false, false);
 							mHitMobs.add(mob);
 						}
 					}
@@ -149,8 +154,8 @@ public class Avalanche extends DepthsAbility {
 		return true;
 	}
 
-	private HashSet<Location> getNearbyIce(Location loc, double radius) {
-		HashSet<Location> nearbyIce = new HashSet<>(DepthsUtils.iceActive.keySet());
+	private Set<Location> getNearbyIce(Location loc, double radius) {
+		Set<Location> nearbyIce = new HashSet<>(DepthsUtils.iceActive.keySet());
 		nearbyIce.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != loc.getWorld() || l.distance(loc) > radius || !DepthsUtils.isIce(l.getBlock().getType()));
 		return nearbyIce;
 	}

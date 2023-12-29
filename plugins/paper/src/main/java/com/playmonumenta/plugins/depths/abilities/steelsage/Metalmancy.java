@@ -36,6 +36,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -214,6 +215,10 @@ public class Metalmancy extends DepthsAbility {
 		}
 
 		return EntityUtils.getNearestMob(targetLoc, nonTargetingSummons);
+	}
+
+	public static boolean isMetalmancy(Entity entity) {
+		return entity.getScoreboardTags().contains(MetalmancyBoss.identityTag);
 	}
 
 	private static Description<Metalmancy> getDescription(int rarity, TextColor color) {

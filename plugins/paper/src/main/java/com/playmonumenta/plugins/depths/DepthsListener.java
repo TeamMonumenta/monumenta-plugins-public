@@ -413,7 +413,7 @@ public class DepthsListener implements Listener {
 									}
 									if (dp.mReviveTicks >= GRAVE_REVIVE_DURATION) {
 										// Successfully revived the player
-										Plugin.getInstance().mEffectManager.addEffect(player, "ZenithReviveResistance", new PercentDamageReceived(20, -100));
+										Plugin.getInstance().mEffectManager.addEffect(player, "ZenithReviveResistance", new PercentDamageReceived(20, -1));
 										player.teleport(grave.getLocation());
 										Charity.onCharityRevive(player, nearbyPlayers, maxCharityLevel);
 										dp.sendMessage("You have been revived!");

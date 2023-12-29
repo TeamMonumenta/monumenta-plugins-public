@@ -39,6 +39,11 @@ public class DepthsDethroner extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		DamageEvent.DamageType type = event.getType();
+		if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER) {
+			return false;
+		}
+
 		if (EntityUtils.isBoss(enemy)) {
 			event.setDamage(event.getDamage() * (1 + mBossDamage));
 		} else if (EntityUtils.isElite(enemy)) {

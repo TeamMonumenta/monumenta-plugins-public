@@ -80,7 +80,7 @@ public class Bodyguard extends Ability {
 		Location userLoc = mPlayer.getLocation();
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, range);
+		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, range, 0.5);
 		if (targetPlayer != null) {
 			mCosmetic.onBodyguardOther(mPlayer, targetPlayer, world);
 
