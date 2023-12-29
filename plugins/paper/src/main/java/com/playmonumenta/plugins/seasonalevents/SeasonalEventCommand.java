@@ -10,7 +10,6 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -109,7 +108,7 @@ public class SeasonalEventCommand extends GenericCommand {
 					player.sendMessage(Component.text("Could not load a season pass", NamedTextColor.RED));
 					return;
 				}
-				LocalDateTime dateTime = seasonalPass.mPassStart.plus(week - 1, ChronoUnit.WEEKS);
+				LocalDateTime dateTime = seasonalPass.mPassStart.plusWeeks(week - 1);
 				new PassGui(seasonalPass, player, player, dateTime, false).open();
 			}).register();
 

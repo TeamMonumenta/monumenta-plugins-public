@@ -21,7 +21,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -358,12 +357,24 @@ public class PassGui extends Gui {
 			progressColor = NamedTextColor.DARK_GREEN;
 			statusLore = Component.text("Obtained", NamedTextColor.GREEN);
 		} else if (isOwned) {
-			mat = Material.LIME_CONCRETE_POWDER;
-			if (DateUtils.getWeeklyVersion(mPass.mPassStart) < SeasonalEventManager.PLAYER_PROGRESS_REWORK_WEEK) {
-				mpStr = "?";
+			if (!mPass.isActive()) {
+				mat = Material.LIME_CONCRETE_POWDER;
+				if (DateUtils.getWeeklyVersion(mPass.mPassStart) < SeasonalEventManager.PLAYER_PROGRESS_REWORK_WEEK) {
+					mpStr = "?";
+				}
+				progressColor = NamedTextColor.GREEN;
+				statusLore = Component.text("Purchased", NamedTextColor.GREEN);
+			} else if (level == rewardIndex) {
+				// Repeat pass; alt rewards available; in progress
+				mat = Material.ORANGE_CONCRETE_POWDER;
+				progressColor = NamedTextColor.GOLD;
+				statusLore = Component.text("In Progress (Alt Reward)", NamedTextColor.YELLOW);
+			} else {
+				// Repeat pass; alt rewards available; locked
+				mat = Material.PINK_CONCRETE_POWDER;
+				progressColor = NamedTextColor.RED;
+				statusLore = Component.text("Locked (Alt Reward)", NamedTextColor.DARK_RED);
 			}
-			progressColor = NamedTextColor.GREEN;
-			statusLore = Component.text("Purchased", NamedTextColor.GREEN);
 		} else if (DateUtils.getWeeklyVersion(mPass.mPassStart) < SeasonalEventManager.PLAYER_PROGRESS_REWORK_WEEK) {
 			mat = Material.LIGHT_GRAY_CONCRETE_POWDER;
 			mpStr = "?";
@@ -503,8 +514,25 @@ public class PassGui extends Gui {
 					GUIUtils.splitLoreLine(meta, description, namedTextColor, 30, false));
 			}
 
-			// Current pass gets no additional lore about purchasing the item
-			if (!isCurrentPass) {
+			if (isCurrentPass) {
+				SeasonalReward altReward = reward.rewardToGive(displayedPlayer);
+				if (altReward != null && reward != altReward) {
+					ItemUtils.modifyMeta(item, meta -> {
+						List<Component> lore = meta.lore();
+						if (lore == null) {
+							lore = new ArrayList<>();
+						}
+						lore.add(Component.text("Since you already own this", NamedTextColor.YELLOW)
+							.decoration(TextDecoration.ITALIC, false));
+						lore.add(Component.text(" you will instead receive:", NamedTextColor.YELLOW)
+							.decoration(TextDecoration.ITALIC, false));
+						lore.add(Component.text("- ", NamedTextColor.YELLOW)
+							.decoration(TextDecoration.ITALIC, false)
+							.append(altReward.getDisplayItemName()));
+						meta.lore(lore);
+					});
+				}
+			} else {
 				if (isFuturePass) {
 					ItemUtils.modifyMeta(item, meta -> {
 						List<Component> lore = meta.lore();
@@ -531,10 +559,10 @@ public class PassGui extends Gui {
 						if (lore == null) {
 							lore = new ArrayList<>();
 						}
-						meta.lore(Stream.concat(lore.stream(), Stream.of(
-							Component.text("You already own this.", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false)
-						)).toList());
+
+						lore.add(Component.text("You already own this.", NamedTextColor.GRAY)
+							.decoration(TextDecoration.ITALIC, false));
+						meta.lore(lore);
 					});
 				} else if (isPreviousPass) {
 					ItemUtils.modifyMeta(item, meta -> {
@@ -667,7 +695,7 @@ public class PassGui extends Gui {
 		}
 		String missionAmount = String.valueOf(mission.mAmount);
 
-		LocalDateTime weekStart = mPass.mPassStart.plus(week, ChronoUnit.WEEKS);
+		LocalDateTime weekStart = mPass.mPassStart.plusWeeks(week);
 		long weeklyVersion = DateUtils.getWeeklyVersion(weekStart);
 		if (weeklyVersion < SeasonalEventManager.PLAYER_PROGRESS_REWORK_WEEK) {
 			// Legacy pass missions, no progress saved

@@ -84,9 +84,7 @@ public class PassesView extends View {
 							+ pass.mPassStart.format(DATE_FORMAT), NamedTextColor.WHITE)
 						.decoration(TextDecoration.ITALIC, false)));
 				} else {
-					LocalDateTime passEnd = pass.mPassStart
-						.plus(pass.mNumberOfWeeks, ChronoUnit.WEEKS)
-						.minus(1, ChronoUnit.DAYS);
+					LocalDateTime passEnd = pass.mPassStart.plusWeeks(pass.mNumberOfWeeks).minusDays(1);
 
 					meta.lore(List.of(Component.text("Ran from "
 							+ pass.mPassStart.format(DATE_FORMAT)
