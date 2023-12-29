@@ -151,7 +151,15 @@ public class BroadcastedEvents implements Listener {
 	}
 
 	private static void runCommandLogic(CommandSender sender, String shard, String eventName, Integer timeLeft, boolean isPlayerSender) {
-		if (!Objects.equals(ServerProperties.getShardName(), shard)) {
+		String expectedShard;
+		try {
+			expectedShard = NetworkRelayAPI.getShardName();
+		} catch (Exception ex) {
+			//If failed use the short version.
+			expectedShard = ServerProperties.getShardName();
+		}
+
+		if (!Objects.equals(expectedShard, shard)) {
 			if (timeLeft == -1) {
 				//send clear task to the actual shard.
 				JsonObject data = new JsonObject();
@@ -439,7 +447,7 @@ public class BroadcastedEvents implements Listener {
 				statusPart = "" + statusColor + ChatColor.BOLD + mStatus.mDisplayedAs;
 			}
 
-			return eventNamePart + " " + shardPart + ": " + statusPart;
+			return eventNamePart + " " + shardPart + ": " + statusPart + ChatColor.RESET;
 		}
 
 		public KnownEvent getAsKnownEvent() {
