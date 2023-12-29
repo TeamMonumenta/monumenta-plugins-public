@@ -386,7 +386,11 @@ public class EntityListener implements Listener {
 		Entity damager = event.getRemover();
 
 		if (ZoneUtils.hasZoneProperty(event.getEntity().getLocation(), ZoneProperty.ADVENTURE_MODE)
-			    && !(damager instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
+			&& !(damager instanceof Player player
+				&& (player.getGameMode() == GameMode.CREATIVE
+					|| (player.getGameMode() == GameMode.SURVIVAL
+						&& ZoneUtils.isInPlot(player)
+						&& ZoneUtils.isInPlot(event.getEntity().getLocation()))))) {
 			event.setCancelled(true);
 			return;
 		}
