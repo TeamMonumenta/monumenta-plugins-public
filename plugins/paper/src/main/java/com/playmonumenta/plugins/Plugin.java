@@ -56,6 +56,7 @@ import com.playmonumenta.plugins.minigames.pzero.PzeroManager;
 import com.playmonumenta.plugins.mmquest.commands.MMQuest;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
+import com.playmonumenta.plugins.nodeplanner.NodePlanner;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.player.PlayerSaturationTracker;
@@ -252,6 +253,9 @@ public class Plugin extends JavaPlugin {
 		MonumentaReload.register(this);
 		MonumentaTrigger.register();
 		NameMCVerify.register(this);
+		if (!IS_PLAY_SERVER) {
+			NodePlanner.registerCommands();
+		}
 		POICommands.register();
 		PartialParticleCommand.register();
 		ParticleUtilsCommand.register();
@@ -430,6 +434,9 @@ public class Plugin extends JavaPlugin {
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
 			manager.registerEvents(new AuditListener(getLogger()), this);
+		}
+		if (!IS_PLAY_SERVER) {
+			manager.registerEvents(NodePlanner.getInstance(), this);
 		}
 		manager.registerEvents(new AnimalLimits(), this);
 		manager.registerEvents(new ExceptionListener(this), this);

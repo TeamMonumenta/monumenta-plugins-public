@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -496,5 +497,11 @@ public class DisplayEntityUtils {
 		display.setInterpolationDelay(-1);
 	}
 
+	// Ignore deprecation; API subject to change, but no replacement is provided at this time
+	// This is the only way I could silence IntelliJ and the reviewdog about Bukkit's decisions
+	@SuppressWarnings("deprecation")
+	public static void setTextDisplayBackgroundColor(TextDisplay textDisplay, Color backgroundColor) {
+		textDisplay.setBackgroundColor(backgroundColor);
+	}
 
 }
