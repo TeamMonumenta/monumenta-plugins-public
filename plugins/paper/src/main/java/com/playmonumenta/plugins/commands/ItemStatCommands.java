@@ -567,6 +567,25 @@ public class ItemStatCommands {
 			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
 
+		arguments.add(new StringArgument("NPC Name"));
+
+		new CommandAPICommand("editench").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			String enchantment = (String) args[0];
+			Integer level = (Integer) args[1];
+			String npcName = (String) args[2];
+
+			if (npcName == null || npcName.isEmpty()) {
+				player.sendMessage(Component.text("Invalid NPC name!", NamedTextColor.RED));
+				return;
+			}
+
+			addNpcInfusion(item, player, enchantment, level, npcName);
+		}).register();
+
 		List<Argument<?>> argumentsOther = new ArrayList<>();
 		argumentsOther.add(new EntitySelectorArgument.OnePlayer("player"));
 		argumentsOther.add(enchantmentArgument);
@@ -584,24 +603,61 @@ public class ItemStatCommands {
 
 			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
+
+		arguments.add(new StringArgument("NPC Name"));
+
+		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther).executes((sender, args) -> {
+			Player player = (Player) args[0];
+			String enchantment = (String) args[1];
+			Integer level = (Integer) args[2];
+			String npcName = (String) args[3];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(Component.text("Must be holding an item!", NamedTextColor.RED));
+				return;
+			}
+			if (npcName == null || npcName.isEmpty()) {
+				player.sendMessage(Component.text("Invalid NPC name!", NamedTextColor.RED));
+				return;
+			}
+
+			addNpcInfusion(item, player, enchantment, level, npcName);
+		}).register();
 	}
 
 	private static void addEnchantmentOrInfusion(ItemStack item, Player player, String enchantment, int level) {
-		EnchantmentType type1 = EnchantmentType.getEnchantmentType(enchantment);
-		if (type1 != null) {
+		EnchantmentType enchantmentType = EnchantmentType.getEnchantmentType(enchantment);
+		if (enchantmentType != null) {
 			if (level > 0) {
-				ItemStatUtils.addEnchantment(item, type1, level);
+				ItemStatUtils.addEnchantment(item, enchantmentType, level);
 			} else {
-				ItemStatUtils.removeEnchantment(item, type1);
+				ItemStatUtils.removeEnchantment(item, enchantmentType);
 			}
 		}
 
-		InfusionType type2 = InfusionType.getInfusionType(enchantment);
-		if (type2 != null) {
+		InfusionType infusionType = InfusionType.getInfusionType(enchantment);
+		if (infusionType != null) {
 			if (level > 0) {
-				ItemStatUtils.addInfusion(item, type2, level, player.getUniqueId(), false);
+				ItemStatUtils.addInfusion(item, infusionType, level, player.getUniqueId(), false);
 			} else {
-				ItemStatUtils.removeInfusion(item, type2, false);
+				ItemStatUtils.removeInfusion(item, infusionType, false);
+			}
+		}
+
+		ItemUpdateHelper.generateItemStats(item);
+		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+		if (playerItemStats != null) {
+			playerItemStats.updateStats(player, true, true);
+		}
+	}
+
+	private static void addNpcInfusion(ItemStack item, Player player, String enchantment, int level, String npcName) {
+		InfusionType infusionType = InfusionType.getInfusionType(enchantment);
+		if (infusionType != null) {
+			if (level > 0) {
+				ItemStatUtils.addInfusion(item, infusionType, level, npcName, false);
+			} else {
+				ItemStatUtils.removeInfusion(item, infusionType, false);
 			}
 		}
 

@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enums;
 
 import com.playmonumenta.plugins.itemstats.ItemStat;
-import com.playmonumenta.plugins.itemstats.enchantments.Festive;
-import com.playmonumenta.plugins.itemstats.enchantments.Gilded;
 import com.playmonumenta.plugins.itemstats.infusions.*;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Arrays;

@@ -277,7 +277,12 @@ public class ItemUpdateHelper {
 						continue;
 					}
 					if (!type.getMessage().isEmpty()) {
-						infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(ItemStatUtils.INFUSER_KEY)))));
+						String name = infusion.getString(ItemStatUtils.INFUSER_NPC_KEY);
+						if (name == null || name.isEmpty()) {
+							UUID playerUuid = UUID.fromString(infusion.getString(ItemStatUtils.INFUSER_KEY));
+							name = MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(playerUuid);
+						}
+						infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), name));
 						continue;
 					}
 					infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY)));

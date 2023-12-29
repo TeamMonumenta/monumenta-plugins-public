@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.itemstats.enchantments;
+package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;

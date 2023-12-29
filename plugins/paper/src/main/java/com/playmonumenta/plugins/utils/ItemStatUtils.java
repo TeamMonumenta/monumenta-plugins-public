@@ -56,6 +56,7 @@ public class ItemStatUtils {
 	public static final String PLAYER_MODIFIED_KEY = "PlayerModified";
 	public static final String LEVEL_KEY = "Level";
 	public static final String INFUSER_KEY = "Infuser";
+	public static final String INFUSER_NPC_KEY = "InfuserNpc";
 	public static final String ATTRIBUTE_NAME_KEY = "AttributeName";
 	public static final String CHARM_KEY = "CharmText";
 	public static final String CHARM_POWER_KEY = "CharmPower";
@@ -927,6 +928,27 @@ public class ItemStatUtils {
 		});
 	}
 
+	public static @Nullable String getInfuserNpc(final @Nullable ItemStack item, final @Nullable InfusionType type) {
+		if (ItemUtils.isNullOrAir(item) || type == null || type.getName() == null) {
+			return null;
+		}
+		return NBT.get(item, nbt -> {
+			ReadableNBT infusions = getInfusions(nbt);
+			if (infusions == null) {
+				return null;
+			}
+			ReadableNBT infusion = infusions.getCompound(type.getName());
+			if (infusion == null) {
+				return null;
+			}
+			String npcName = infusion.getString(INFUSER_NPC_KEY);
+			if (npcName == null || npcName.isEmpty()) {
+				return null;
+			}
+			return npcName;
+		});
+	}
+
 	public static void addInfusion(final @Nullable ItemStack item, final InfusionType type, final int level, final UUID infuser) {
 		addInfusion(item, type, level, infuser, true);
 	}
@@ -939,6 +961,20 @@ public class ItemStatUtils {
 			ReadWriteNBT infusion = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(PLAYER_MODIFIED_KEY).getOrCreateCompound(InfusionType.KEY).getOrCreateCompound(type.getName());
 			infusion.setInteger(LEVEL_KEY, level);
 			infusion.setString(INFUSER_KEY, infuser.toString());
+		});
+		if (updateItem) {
+			ItemUpdateHelper.generateItemStats(item);
+		}
+	}
+
+	public static void addInfusion(final @Nullable ItemStack item, final InfusionType type, final int level, final String npcName, boolean updateItem) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT infusion = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(PLAYER_MODIFIED_KEY).getOrCreateCompound(InfusionType.KEY).getOrCreateCompound(type.getName());
+			infusion.setInteger(LEVEL_KEY, level);
+			infusion.setString(INFUSER_NPC_KEY, npcName);
 		});
 		if (updateItem) {
 			ItemUpdateHelper.generateItemStats(item);
