@@ -8,6 +8,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
@@ -52,7 +53,8 @@ public class DepthsCommand extends GenericCommand {
 		arguments.clear();
 		arguments.add(new LiteralArgument("ability"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new TextArgument("Ability Name"));
+		arguments.add(new TextArgument("Ability Name")
+			              .replaceSuggestions(ArgumentSuggestions.strings(DepthsManager.getAbilities().stream().map(a -> '"' + a.getDisplayName() + '"').toList())));
 		arguments.add(new IntegerArgument("Rarity"));
 
 		new CommandAPICommand("depths")

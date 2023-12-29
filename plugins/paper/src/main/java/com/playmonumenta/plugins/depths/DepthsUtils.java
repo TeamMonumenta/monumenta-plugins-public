@@ -66,20 +66,43 @@ public class DepthsUtils {
 	public static final Material ICE_MATERIAL = Material.ICE;
 
 	//Forbidden blocks for replacing with ice
-	private static final EnumSet<Material> mIgnoredMats = EnumSet.of(
+	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.REPEATING_COMMAND_BLOCK,
+		Material.STRUCTURE_BLOCK,
+		Material.JIGSAW,
 		Material.BEDROCK,
 		Material.BARRIER,
 		Material.SPAWNER,
 		Material.CHEST,
+		Material.BARREL,
 		Material.END_PORTAL,
+		Material.END_PORTAL_FRAME,
+		Material.END_GATEWAY,
 		Material.STONE_BUTTON,
 		Material.OBSIDIAN,
 		Material.PISTON,
-		Material.STICKY_PISTON
-		);
+		Material.STICKY_PISTON,
+		Material.MOVING_PISTON,
+		Material.SHULKER_BOX,
+		Material.WHITE_SHULKER_BOX,
+		Material.ORANGE_SHULKER_BOX,
+		Material.MAGENTA_SHULKER_BOX,
+		Material.LIGHT_BLUE_SHULKER_BOX,
+		Material.YELLOW_SHULKER_BOX,
+		Material.LIME_SHULKER_BOX,
+		Material.PINK_SHULKER_BOX,
+		Material.GRAY_SHULKER_BOX,
+		Material.LIGHT_GRAY_SHULKER_BOX,
+		Material.CYAN_SHULKER_BOX,
+		Material.PURPLE_SHULKER_BOX,
+		Material.BLUE_SHULKER_BOX,
+		Material.BROWN_SHULKER_BOX,
+		Material.GREEN_SHULKER_BOX,
+		Material.RED_SHULKER_BOX,
+		Material.BLACK_SHULKER_BOX
+	);
 
 	//List of locations where ice is currently active
 	public static Map<Location, BlockData> iceActive = new HashMap<>();
@@ -164,7 +187,7 @@ public class DepthsUtils {
 		}
 
 		//Check if the block is valid, or if the location is already active in the system
-		if (mIgnoredMats.contains(l.getWorld().getBlockAt(l).getType()) || iceActive.get(l) != null) {
+		if (IGNORED_MATS.contains(l.getWorld().getBlockAt(l).getType()) || iceActive.get(l) != null) {
 			return;
 		}
 
@@ -267,19 +290,55 @@ public class DepthsUtils {
 		return "";
 	}
 
+	private static boolean canConvertToIce(Block b) {
+		return canConvertToIce(b.getType());
+	}
+
+	/**
+	 * Checks if a block of the given type can be converted to ice.
+	 * All blocks with collision (plus water) can be converted, except if they are special blocks like spawners or chests, or if they only have very small collision like carpets.
+	 */
+	private static boolean canConvertToIce(Material mat) {
+		if (mat == Material.WATER) {
+			return true;
+		}
+		if (!mat.isBlock() || !mat.isCollidable() || IGNORED_MATS.contains(mat)) {
+			return false;
+		}
+		return switch (mat) {
+			case // carpets
+				RED_CARPET, BLACK_CARPET, BLUE_CARPET, BROWN_CARPET, CYAN_CARPET, GRAY_CARPET, GREEN_CARPET, LIGHT_BLUE_CARPET,
+					LIGHT_GRAY_CARPET, LIME_CARPET, MAGENTA_CARPET, ORANGE_CARPET, PINK_CARPET, PURPLE_CARPET, WHITE_CARPET, YELLOW_CARPET,
+					MOSS_CARPET,
+					// trapdoors
+					BIRCH_TRAPDOOR, ACACIA_TRAPDOOR, CRIMSON_TRAPDOOR, DARK_OAK_TRAPDOOR, IRON_TRAPDOOR, JUNGLE_TRAPDOOR, MANGROVE_TRAPDOOR,
+					OAK_TRAPDOOR, SPRUCE_TRAPDOOR, WARPED_TRAPDOOR, BAMBOO_TRAPDOOR, CHERRY_TRAPDOOR,
+					// candles
+					CANDLE, CYAN_CANDLE, BLACK_CANDLE, BLUE_CANDLE, BROWN_CANDLE, GRAY_CANDLE, GREEN_CANDLE, LIME_CANDLE, MAGENTA_CANDLE,
+					ORANGE_CANDLE, PINK_CANDLE, PURPLE_CANDLE, RED_CANDLE, WHITE_CANDLE, YELLOW_CANDLE, LIGHT_BLUE_CANDLE, LIGHT_GRAY_CANDLE,
+					// rails
+					RAIL, ACTIVATOR_RAIL, DETECTOR_RAIL, POWERED_RAIL -> false;
+			default -> true;
+		};
+	}
+
 	public static void iceExposedBlock(Block b, int iceTicks, Player p) {
 		iceExposedBlock(b, iceTicks, p, true);
 	}
 
 	public static void iceExposedBlock(Block b, int iceTicks, Player p, boolean withParticles) {
-		//Check above block first and see if it is exposed to air
-		if (b.getRelative(BlockFace.UP).isSolid() && !(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).isSolid() || b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getType() == Material.WATER)) {
-			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
-		} else if (b.isSolid() || b.getType() == Material.WATER) {
-			DepthsUtils.spawnIceTerrain(b.getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
-		} else if (b.getRelative(BlockFace.DOWN).isSolid() || b.getRelative(BlockFace.DOWN).getType() == Material.WATER) {
-			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
+		// Try the block above and below the desired block for a block that is near the surface
+		Block converted;
+		if (canConvertToIce(b.getRelative(BlockFace.UP)) && !canConvertToIce(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP))) {
+			converted = b.getRelative(BlockFace.UP);
+		} else if (canConvertToIce(b)) {
+			converted = b;
+		} else if (canConvertToIce(b.getRelative(BlockFace.DOWN))) {
+			converted = b.getRelative(BlockFace.DOWN);
+		} else {
+			return;
 		}
+		DepthsUtils.spawnIceTerrain(converted.getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
 	}
 
 	public static void explodeEvent(EntityExplodeEvent event) {

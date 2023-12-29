@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
-import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
@@ -21,6 +20,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,6 +33,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,94 +82,98 @@ public class IceBarrier extends DepthsAbility {
 
 		World world = mPlayer.getWorld();
 
-		ImmutableSet<Material> excludedBlocks = ImmutableSet.of(Material.AIR, Material.LIGHT);
-		Block block = mPlayer.getTargetBlock(excludedBlocks, mRange);
+		RayTraceResult rayTraceResult = mPlayer.getWorld().rayTraceBlocks(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), mRange, FluidCollisionMode.NEVER, true);
+		if (rayTraceResult == null) {
+			return true;
+		}
+		Block block = rayTraceResult.getHitBlock();
 		if (block == null) {
-			return false;
+			return true;
 		}
 
-		boolean validLength = mPrimedLoc == null || (!(mPrimedLoc.distance(block.getLocation()) > mLength) && !(mPrimedLoc.distance(block.getLocation()) < 1));
+		boolean validLength = !mIsPrimed || mPrimedLoc == null || (mPrimedLoc.distance(block.getLocation()) <= mLength && mPrimedLoc.distance(block.getLocation()) >= 1);
+		if (!validLength || block.getType().isAir() || block.getType() == Material.BEDROCK) {
+			return true;
+		}
 
-		if (block.getType() != Material.AIR && block.getType() != Material.BEDROCK && validLength) {
-			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME, mPlayer);
-			new PartialParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-			Location loc = mPlayer.getLocation();
-			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.0f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 1.0f);
-			world.playSound(loc, Sound.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 0.8f, 2.0f);
-			if (!mIsPrimed || mPrimedLoc == null) {
-				mIsPrimed = true;
-				mPrimedLoc = block.getLocation();
-				ClientModHandler.updateAbility(mPlayer, this);
+		DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME, mPlayer);
+		new PartialParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+		Location loc = mPlayer.getLocation();
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 0.8f, 2.0f);
+		if (!mIsPrimed || mPrimedLoc == null) {
+			mIsPrimed = true;
+			mPrimedLoc = block.getLocation();
+			ClientModHandler.updateAbility(mPlayer, this);
 
-				new BukkitRunnable() {
+			new BukkitRunnable() {
 
-					@Override
-					public void run() {
-						if (mIsPrimed && mPrimedLoc != null) {
-							mIsPrimed = false;
-							mPrimedLoc = null;
-							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.5f);
-							//Reset cd
-							mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.ICE_BARRIER, 0);
-						}
-					}
-
-				}.runTaskLater(mPlugin, CAST_TIME);
-			} else {
-				//Build the wall
-				mIsPrimed = false;
-				putOnCooldown();
-
-				ArrayList<Block> blocksToIce = new ArrayList<>();
-
-				Vector v = block.getLocation().toVector().subtract(mPrimedLoc.toVector());
-				BlockIterator iterator = new BlockIterator(world, mPrimedLoc.toVector(), v, 0.0, (int) block.getLocation().distance(mPrimedLoc));
-				while (iterator.hasNext()) {
-					Block b = iterator.next();
-
-					if (!(Math.abs(mPrimedLoc.getY() - block.getLocation().getY()) >= 4)) {
-						// barrier mode
-						blocksToIce.add(b);
-						blocksToIce.add(b.getRelative(BlockFace.UP));
-						blocksToIce.add(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP));
-						blocksToIce.add(b.getRelative(BlockFace.DOWN));
-					} else {
-						// stairway mode
-						blocksToIce.add(b.getRelative(BlockFace.DOWN));
-						blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST));
-						blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST));
-						blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH));
-						blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH));
+				@Override
+				public void run() {
+					if (mIsPrimed && mPrimedLoc != null) {
+						mIsPrimed = false;
+						mPrimedLoc = null;
+						world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.5f);
+						//Reset cd
+						mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.ICE_BARRIER, 0);
 					}
 				}
 
-				List<LivingEntity> hitMobs = new ArrayList<>();
-				for (Block b : blocksToIce) {
-					DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), mIceDuration, mPlayer, Boolean.TRUE);
-					new PartialParticle(Particle.CRIT, b.getLocation(), 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CRIT_MAGIC, b.getLocation(), 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+			}.runTaskLater(mPlugin, CAST_TIME);
+		} else {
+			//Build the wall
+			mIsPrimed = false;
+			putOnCooldown();
 
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(b.getLocation(), 2, 2, 2)) {
-						if (!hitMobs.contains(mob)) {
-							DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
-							hitMobs.add(mob);
-						}
-					}
+			ArrayList<Block> blocksToIce = new ArrayList<>();
+
+			Vector v = block.getLocation().toVector().subtract(mPrimedLoc.toVector());
+			BlockIterator iterator = new BlockIterator(world, mPrimedLoc.toVector(), v, 0.0, (int) block.getLocation().distance(mPrimedLoc));
+			while (iterator.hasNext()) {
+				Block b = iterator.next();
+
+				if (!(Math.abs(mPrimedLoc.getY() - block.getLocation().getY()) >= 4)) {
+					// barrier mode
+					blocksToIce.add(b);
+					blocksToIce.add(b.getRelative(BlockFace.UP));
+					blocksToIce.add(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP));
+					blocksToIce.add(b.getRelative(BlockFace.DOWN));
+				} else {
+					// stairway mode
+					blocksToIce.add(b.getRelative(BlockFace.DOWN));
+					blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST));
+					blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST));
+					blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH));
+					blocksToIce.add(b.getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH));
 				}
-
-				world.playSound(loc, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 0.8f, 2.0f);
-				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 0.5f);
-				world.playSound(loc, Sound.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 0.8f, 1.0f);
-				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 0.6f, 1.6f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.2f, 2.0f);
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 0.8f, 2.0f);
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 0.4f, 0.7f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 2.0f);
-
-				mPrimedLoc = null;
 			}
+
+			List<LivingEntity> hitMobs = new ArrayList<>();
+			for (Block b : blocksToIce) {
+				DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), mIceDuration, mPlayer, Boolean.TRUE);
+				new PartialParticle(Particle.CRIT, b.getLocation(), 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT_MAGIC, b.getLocation(), 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(b.getLocation(), 2, 2, 2)) {
+					if (!hitMobs.contains(mob)) {
+						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
+						hitMobs.add(mob);
+					}
+				}
+			}
+
+			world.playSound(loc, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 0.8f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 0.8f, 1.0f);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 0.6f, 1.6f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.2f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 0.8f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 0.4f, 0.7f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 2.0f);
+
+			mPrimedLoc = null;
 		}
 
 		return true;
