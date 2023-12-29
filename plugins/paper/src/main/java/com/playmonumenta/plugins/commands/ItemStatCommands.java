@@ -604,7 +604,7 @@ public class ItemStatCommands {
 			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
 
-		arguments.add(new StringArgument("NPC Name"));
+		argumentsOther.add(new StringArgument("NPC Name"));
 
 		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther).executes((sender, args) -> {
 			Player player = (Player) args[0];
