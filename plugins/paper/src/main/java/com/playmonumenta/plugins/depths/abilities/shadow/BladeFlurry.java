@@ -15,9 +15,13 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import java.util.List;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,6 +40,8 @@ public class BladeFlurry extends DepthsAbility {
 	public static final int[] DAMAGE = {8, 10, 12, 14, 16, 20};
 	public static final int RADIUS = 3;
 	public static final int[] SILENCE_DURATION = {20, 25, 30, 35, 40, 50};
+	public static final Color SLASH_COLOR_TIP = Color.fromRGB(40, 19, 102);
+	public static final Color SLASH_COLOR_BASE = Color.fromRGB(83, 60, 153);
 
 	public static final String CHARM_COOLDOWN = "Blade Flurry Cooldown";
 
@@ -66,42 +72,78 @@ public class BladeFlurry extends DepthsAbility {
 
 		World mWorld = mPlayer.getWorld();
 		Location loc = mPlayer.getEyeLocation().add(0, -0.5, 0);
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius);
-		for (LivingEntity mob : mobs) {
+		loc.setPitch(0);
+		for (LivingEntity mob : Hitbox.approximateCylinder(loc.clone().add(0, 0.05, 0), loc.clone().subtract(0, 0.1, 0), mRadius, true).accuracy(0.5).getHitMobs()) {
 			EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
 			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell());
 			MovementUtils.knockAway(mPlayer, mob, 0.8f, true);
 		}
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 0.75f);
+		ParticleUtils.drawCleaveArc(loc, mRadius * 0.7, 160, -80, 260, 6, 0, 0, 0.2, 60,
+			(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+				new Particle.DustOptions(
+					ParticleUtils.getTransition(SLASH_COLOR_BASE, SLASH_COLOR_TIP, ring / 8D),
+					0.6f + (ring * 0.1f)
+				)).spawnAsPlayerActive(mPlayer));
 
-		cancelOnDeath(new BukkitRunnable() {
-			final Vector mEyeDir = loc.getDirection();
+		ParticleUtils.drawCleaveArc(loc, mRadius * 0.7, 20, -80, 260, 6, 0, 0, 0.2, 60,
+			(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+				new Particle.DustOptions(
+					ParticleUtils.getTransition(SLASH_COLOR_BASE, SLASH_COLOR_TIP, ring / 8D),
+					0.6f + (ring * 0.1f)
+				)).spawnAsPlayerActive(mPlayer));
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.9f, 0.9f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.7f, 1.4f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 0.5f, 0.5f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1f, 1.9f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.2f, 0.9f);
 
-			double mStartAngle = Math.atan(mEyeDir.getZ() / mEyeDir.getX());
-			int mIncrementDegrees = 0;
+		new BukkitRunnable() {
+			int mTicks = 0;
+			double mRadians = Math.toRadians(75);
+			double mReverseRadians = Math.toRadians(105);
+			final Location mLoc = mPlayer.getEyeLocation();
 
 			@Override
 			public void run() {
-				if (mIncrementDegrees == 0) {
-					if (mEyeDir.getX() < 0) {
-						mStartAngle += Math.PI;
-					}
-					mStartAngle += Math.PI * 90 / 180;
+				if (mTicks == 0) {
+					mLoc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
 				}
-				Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
-				Vector direction = new Vector(Math.cos(mStartAngle - Math.PI * mIncrementDegrees / 180), 0, Math.sin(mStartAngle - Math.PI * mIncrementDegrees / 180));
-				Location bladeLoc = mLoc.clone().add(direction.clone().multiply(mRadius));
+				Vector vec = new Vector(FastUtils.cos(mRadians) * mRadius / 1.5, -0.5, FastUtils.sin(mRadians) * mRadius / 1.5);
+				vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
+				vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
-				new PartialParticle(Particle.SPELL_WITCH, bladeLoc, (int) (10 * mRadius / RADIUS), 0.35, 0, 0.35, 1).spawnAsPlayerActive(mPlayer);
-				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
+				Vector reverseVec = new Vector(FastUtils.cos(mReverseRadians) * mRadius / 1.5, -0.5, FastUtils.sin(mReverseRadians) * mRadius / 1.5);
+				reverseVec = VectorUtils.rotateXAxis(reverseVec, mLoc.getPitch());
+				reverseVec = VectorUtils.rotateYAxis(reverseVec, mLoc.getYaw());
 
-				if (mIncrementDegrees >= 360) {
+				Location bladeLoc = mPlayer.getEyeLocation().add(vec);
+				Location reverseBladeLoc = mPlayer.getEyeLocation().add(reverseVec);
+				new PartialParticle(Particle.SWEEP_ATTACK, bladeLoc, 3, 0.5, 0.25, 0.5, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SPELL_WITCH, bladeLoc, 6, 0.5, 0.25, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, bladeLoc, 6, 0.5, 0.25, 0.5, 0, new Particle.DustOptions(SLASH_COLOR_BASE, 1)).spawnAsPlayerActive(mPlayer);
+
+				new PartialParticle(Particle.SWEEP_ATTACK, reverseBladeLoc, 3, 0.5, 0.25, 0.5, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SPELL_WITCH, reverseBladeLoc, 6, 0.5, 0.25, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, reverseBladeLoc, 6, 0.5, 0.25, 0.5, 0, new Particle.DustOptions(SLASH_COLOR_BASE, 1)).spawnAsPlayerActive(mPlayer);
+
+				mWorld.playSound(bladeLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.2f, 0.75f);
+				mWorld.playSound(bladeLoc, Sound.ITEM_ARMOR_EQUIP_CHAIN, SoundCategory.PLAYERS, 2f, 0.9f);
+				mWorld.playSound(bladeLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 0.5f);
+				mWorld.playSound(bladeLoc, Sound.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 0.7f, 0.5f);
+
+				if (mTicks >= 4) {
 					this.cancel();
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1.0f, 0.8f);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.4f, 0.6f);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.4f, 1.5f);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.5f);
 				}
 
-				mIncrementDegrees += 30;
+				mTicks++;
+				mRadians += Math.toRadians(45);
+				mReverseRadians -= Math.toRadians(45);
 			}
-		}.runTaskTimer(mPlugin, 0, 1));
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
 		return true;
 	}
