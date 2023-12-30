@@ -284,6 +284,7 @@ public class Plugin extends JavaPlugin {
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		ShardSorterCommand.register();
+		SimulateLoot.register(this);
 		SpawnerCountCommand.register();
 		Spawn.register();
 		SpellDetectionCircle.registerCommand(this);

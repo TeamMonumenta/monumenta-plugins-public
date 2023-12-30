@@ -39,8 +39,6 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-
-
 public class InventoryUtils {
 	private static final int OFFHAND_SLOT = 40;
 	private static final int HELMET_SLOT = 39;
@@ -75,7 +73,7 @@ public class InventoryUtils {
 		final String loreText = ItemUtils.toPlainTagText(legacyLoreText);
 		// TODO END
 
-		if (loreText == null || loreText.isEmpty()) {
+		if (loreText.isEmpty()) {
 			return true;
 		}
 
@@ -84,7 +82,7 @@ public class InventoryUtils {
 		}
 
 		final List<String> lore = ItemUtils.getPlainLore(item);
-		if (lore == null || lore.isEmpty()) {
+		if (lore.isEmpty()) {
 			return false;
 		}
 
@@ -105,13 +103,13 @@ public class InventoryUtils {
 		final String nameText = ItemUtils.toPlainTagText(legacyNameText);
 		// TODO END
 
-		if (nameText == null || nameText.isEmpty()) {
+		if (nameText.isEmpty()) {
 			return true;
 		}
 
 		if (item != null) {
 			final String displayName = ItemUtils.getPlainName(item);
-			if (displayName != null && !displayName.isEmpty()) {
+			if (!displayName.isEmpty()) {
 				return exact ? displayName.equals(nameText) : displayName.contains(nameText);
 			}
 		}
@@ -123,10 +121,7 @@ public class InventoryUtils {
 		if (player == null || ItemUtils.isNullOrAir(item) || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return false;
 		}
-		if (player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
-			return true;
-		}
-		return false;
+		return player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND));
 	}
 
 	public static int removeSpecialItems(Player player, boolean ephemeralOnly, boolean includeSubInventories) {
@@ -191,8 +186,8 @@ public class InventoryUtils {
 						/* There's a weird exception within Paper here that sometimes happens
 						 * Need to make sure this doesn't cause item dropping to fail
 						 */
-						Plugin.getInstance().getLogger().warning("Caught exception trying to remove special items from inventory: " + ex.getMessage());
-						ex.printStackTrace();
+						MMLog.warning("Caught exception trying to remove special items from inventory: " + ex.getMessage());
+						MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 					}
 				}
 			}
@@ -259,7 +254,8 @@ public class InventoryUtils {
 		List<Integer> matched = new ArrayList<>();
 		for (int i = 0; i < items.length; i++) {
 			ItemStack slot = items[i];
-			if (ItemUtils.getPlainName(slot).equals(itemPlainName) &&
+			if (slot != null &&
+				ItemUtils.getPlainName(slot).equals(itemPlainName) &&
 				    isSoulboundToPlayer(slot, player)) {
 				total += slot.getAmount();
 				matched.add(i);
@@ -268,17 +264,19 @@ public class InventoryUtils {
 		if (total >= amount) {
 			for (int i : matched) {
 				ItemStack slot = items[i];
-				if (slot.getAmount() > amount - dropped) {
-					slot.setAmount(slot.getAmount() - (amount - dropped));
-					dropped = amount;
-					player.updateInventory();
-					break;
-				} else {
-					dropped += slot.getAmount();
-					slot.setAmount(0);
-					player.updateInventory();
-					if (dropped >= amount) {
+				if (slot != null) {
+					if (slot.getAmount() > amount - dropped) {
+						slot.setAmount(slot.getAmount() - (amount - dropped));
+						dropped = amount;
+						player.updateInventory();
 						break;
+					} else {
+						dropped += slot.getAmount();
+						slot.setAmount(0);
+						player.updateInventory();
+						if (dropped >= amount) {
+							break;
+						}
 					}
 				}
 			}
@@ -299,8 +297,8 @@ public class InventoryUtils {
 			dataOutput.writeInt(items.length);
 
 			//  Save all the elements.
-			for (int i = 0; i < items.length; i++) {
-				dataOutput.writeObject(items[i]);
+			for (ItemStack item : items) {
+				dataOutput.writeObject(item);
 			}
 
 			//  Serialize the array.
@@ -386,7 +384,7 @@ public class InventoryUtils {
 			LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 			LootContext context = builder.build();
 			Collection<ItemStack> items = lt.populateLoot(FastUtils.RANDOM, context);
-			if (items.size() > 0) {
+			if (!items.isEmpty()) {
 				ItemStack materials = items.iterator().next();
 				materials.setAmount(amount);
 				InventoryUtils.giveItem(player, materials);
@@ -397,7 +395,7 @@ public class InventoryUtils {
 	}
 
 	/**
-	 * Drops an item that can only be picked up by the given player for the first 10 secconds, and any player afterwards.
+	 * Drops an item that can only be picked up by the given player for the first 10 seconds, and any player afterward.
 	 * The item will also count as dropped by the player for graving purposes.
 	 *
 	 * @param item     The item to drop
@@ -430,7 +428,7 @@ public class InventoryUtils {
 
 		if (ItemUtils.isSword(mainhand)) {
 			if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TWO_HANDED) > 0) {
-				return offhand == null || offhand.getType().isAir() || (ItemUtils.isSword(offhand) && plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WEIGHTLESS) > 0);
+				return offhand.getType().isAir() || (ItemUtils.isSword(offhand) && plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WEIGHTLESS) > 0);
 			} else {
 				return ItemUtils.isSword(offhand);
 			}
@@ -615,7 +613,7 @@ public class InventoryUtils {
 	}
 
 	public static void removeItemFromArray(ItemStack[] inventory, ItemStack item) {
-		// Note: works on shallow inventory copies, with a workaround to avoid modifying original itemstacks.
+		// Note: works on shallow inventory copies, with a workaround to avoid modifying original ItemStacks.
 		int numItems = item.getAmount();
 		ItemStack oneItem = item.asOne();
 		for (int i = 0; i < inventory.length; i++) {
