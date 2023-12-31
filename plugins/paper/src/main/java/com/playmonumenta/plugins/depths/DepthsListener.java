@@ -669,17 +669,21 @@ public class DepthsListener implements Listener {
 					DelvesUtils.setDelvePoint(null, player, ServerProperties.getShardName(), m, delvePointsForParty.getOrDefault(m, 0));
 				}
 
+				boolean disconnectAnticheese = false;
+
 				// Check if the player should be dead due to too many logout cheese penalties
 				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_MOB_TAG)) {
+					disconnectAnticheese = true;
 					dp.mNumDeaths++;
 					MMLog.finer(player.getName() + " logged in with anticheese mob tag. mNumDeaths = " + dp.mNumDeaths);
 				}
 				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_BOSS_TAG)) {
+					disconnectAnticheese = true;
 					dp.mNumDeaths += 2;
 					MMLog.finer(player.getName() + " logged in with anticheese boss tag. mNumDeaths = " + dp.mNumDeaths);
 				}
 
-				if (getGraveDuration(party, dp, true) < GRAVE_REVIVE_DURATION) {
+				if (disconnectAnticheese && getGraveDuration(party, dp, true) < GRAVE_REVIVE_DURATION) {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
 					shouldOfflineTeleport = false;
