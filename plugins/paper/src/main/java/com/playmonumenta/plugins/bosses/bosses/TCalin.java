@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,8 +81,12 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 		);
 
 		SpellBaseBolt bolt = new SpellBaseBolt(plugin, mBoss, (int) (20 * 2.25), 20 * 5, 1.15, detectionRange, 0.5, true, true, 2, 10,
+			// Charge-up action
 			(Entity entity, int tick) -> {
 				float t = tick / 15.0f;
+				if (tick == 1) {
+					PotionUtils.applyColoredGlowing(identityTag, mBoss, NamedTextColor.RED, (int) (20 * 2.25));
+				}
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.05).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation().add(0, 1, 0), 5, 0.25, 0.45, 0.25,
 					0.5, Material.OAK_LEAVES.createBlockData()).spawnAsEntityActive(boss);
@@ -90,6 +95,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 2, 1));
 			},
 
+			// Cast action
 			(Entity entity) -> {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 1f);
 				new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 80, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);

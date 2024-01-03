@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,6 +35,11 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				}
 				float t = tick / 15;
 				World world = boss.getWorld();
+				if (tick == 1) {
+					PotionUtils.applyColoredGlowing(PrimordialElementalKaulBoss.identityTag, boss, NamedTextColor.RED, 20 * 2);
+					world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
+					world.playSound(boss.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
+				}
 				new PartialParticle(Particle.LAVA, boss.getLocation(), 1, 0.35, 0, 0.35, 0.005).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.BLOCK_CRACK, boss.getLocation(), 3, 0, 0, 0, 0.5,
 					Material.STONE.createBlockData()).spawnAsEntityActive(boss);

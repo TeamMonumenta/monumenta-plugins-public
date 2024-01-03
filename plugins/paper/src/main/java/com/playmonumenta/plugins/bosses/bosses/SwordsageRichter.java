@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +64,9 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 			new SpellBaseBolt(plugin, mBoss, (int) (20 * 2.5), 30, 1.4, 20, 0.5, false, false, 1, 1,
 				(Entity entity, int tick) -> {
 					float t = tick / 10;
+					if (tick == 1) {
+						PotionUtils.applyColoredGlowing(identityTag, mBoss, NamedTextColor.RED, (int) (20 * 2.5));
+					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, t);
