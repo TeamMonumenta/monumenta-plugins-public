@@ -83,7 +83,7 @@ public class TradeListener implements Listener {
 	// Items for which to completely disable reskin/dye trades
 	private static final ImmutableSet<String> DISABLED_ITEMS = ImmutableSet.of("Soulsinger");
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void tradeWindowOpenEvent(TradeWindowOpenEvent event) {
 
 		// For "re-skin" trades, add trades matching a player's existing items that preserve added infusions etc.
