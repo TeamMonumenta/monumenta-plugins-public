@@ -116,11 +116,14 @@ public class LastBreath extends DepthsAbility {
 		}
 
 		Location loc2 = loc.clone().add(0, 1, 0);
-		new PartialParticle(Particle.END_ROD, loc2, 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, loc2, 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.END_ROD, loc2, 50, 0.2, 0.2, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CLOUD, loc2, 75, 0.2, 0.2, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FIREWORKS_SPARK, loc2, 75, 0.2, 0.2, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.VILLAGER_HAPPY, loc2, 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.2f);
+		world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 2.0f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 2.0f, 1.2f);
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 2.0f, 0.4f);
 
 		sendActionBarMessage("Last Breath has been activated!");

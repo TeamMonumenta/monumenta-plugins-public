@@ -101,6 +101,7 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Slipstream;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
+import com.playmonumenta.plugins.depths.abilities.windwalker.WindsweptCombos;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
@@ -538,6 +539,7 @@ public class DepthsManager {
 			Slipstream.INFO,
 			DepthsWindWalk.INFO,
 			Whirlwind.INFO,
+			WindsweptCombos.INFO,
 
 			//Shadow abilities
 			DepthsAdvancingShadows.INFO,
@@ -1712,10 +1714,10 @@ public class DepthsManager {
 		DepthsAbilityInfo<?> newAbility = abilities.get(0);
 		setPlayerLevelInAbility(Objects.requireNonNull(newAbility.getDisplayName()), p, 1);
 		dp.sendMessage(Component.text("You gained ability ")
-			               .append(newAbility.getNameWithHover(1, p))
-			               .append(Component.text(" at "))
-			               .append(DepthsUtils.getRarityComponent(1))
-			               .append(Component.text(" level!")));
+			.append(newAbility.getNameWithHover(1, p))
+			.append(Component.text(" at "))
+			.append(DepthsUtils.getRarityComponent(1))
+			.append(Component.text(" level!")));
 
 	}
 
