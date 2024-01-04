@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class Technique implements Enchantment {
 	private static final double DAMAGE_PER_LEVEL = 0.1;
 	private static final double PROJ_REDUCTION = 0.75;
-	private static final double DISTANCE_SQUARED = 6.25;
+	private static final double DISTANCE_SQUARED = 9;
 
 	public static boolean withinDistance(Player player, @Nullable LivingEntity source) {
 		return source != null && player.getWorld() == source.getWorld() && player.getLocation().distanceSquared(source.getLocation()) <= DISTANCE_SQUARED;

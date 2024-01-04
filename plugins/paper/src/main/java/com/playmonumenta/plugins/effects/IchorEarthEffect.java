@@ -15,6 +15,26 @@ public class IchorEarthEffect extends Effect {
 	public static final String effectID = "IchorEarthEffect";
 	private static final String SOURCE_RESISTANCE = "IchorEarthResistance";
 	private static final String SOURCE_DAMAGE = "IchorEarthDamage";
+	private static final EnumSet<DamageType> VALID_HIT_DAMAGE_TYPES = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.PROJECTILE,
+		DamageType.FIRE,
+		DamageType.BLAST,
+		DamageType.MAGIC
+	);
+	private static final EnumSet<DamageType> ALL_DAMAGE_TYPES = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.MELEE_ENCH,
+		DamageType.MELEE_SKILL,
+		DamageType.PROJECTILE,
+		DamageType.PROJECTILE_SKILL,
+		DamageType.MAGIC
+	);
+	private static final EnumSet<DamageType> MELEE_DAMAGE_TYPES = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.MELEE_ENCH,
+		DamageType.MELEE_SKILL
+	);
 
 	private boolean mWasHit = false;
 	private final double mEffectMultiplier;
@@ -22,20 +42,25 @@ public class IchorEarthEffect extends Effect {
 	private final double mDamage;
 	private final int mBuffDuration;
 	private final String mSource;
+	private final boolean mPrismatic;
 
-	public IchorEarthEffect(int duration, double effectMultiplier, double resistance, double damage, int buffDuration, String source) {
+	public IchorEarthEffect(int duration, double effectMultiplier, double resistance, double damage, int buffDuration, String source, boolean prismatic) {
 		super(duration, effectID);
 		mEffectMultiplier = effectMultiplier;
 		mResistance = resistance;
 		mDamage = damage;
 		mBuffDuration = buffDuration;
 		mSource = source;
+		mPrismatic = prismatic;
 	}
 
 	@Override
 	public void onHurtByEntity(LivingEntity entity, DamageEvent event, Entity damager) {
-		mWasHit = true;
 		DamageType type = event.getType();
+		if (!VALID_HIT_DAMAGE_TYPES.contains(type)) {
+			return;
+		}
+		mWasHit = true;
 		EffectManager.getInstance().addEffect(entity, SOURCE_RESISTANCE, new PercentDamageReceived(mBuffDuration, mResistance * mEffectMultiplier, EnumSet.of(type)));
 		EffectManager.getInstance().clearEffects(entity, mSource);
 
@@ -46,7 +71,7 @@ public class IchorEarthEffect extends Effect {
 	@Override
 	public void entityLoseEffect(Entity entity) {
 		if (!mWasHit) {
-			EffectManager.getInstance().addEffect(entity, SOURCE_DAMAGE, new PercentDamageDealt(mBuffDuration, mDamage * mEffectMultiplier, EnumSet.of(DamageType.MELEE, DamageType.MELEE_SKILL, DamageType.MELEE_ENCH)));
+			EffectManager.getInstance().addEffect(entity, SOURCE_DAMAGE, new PercentDamageDealt(mBuffDuration, mDamage * mEffectMultiplier, mPrismatic ? ALL_DAMAGE_TYPES : MELEE_DAMAGE_TYPES));
 
 			Player player = (Player) entity;
 			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 0.3f, 1.5f);

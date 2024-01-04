@@ -39,21 +39,23 @@ public class IchorFrostborn implements Infusion {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double value, PlayerItemConsumeEvent event) {
+		int adjustedCooldown = Refresh.reduceCooldown(plugin, player, COOLDOWN);
 		if (plugin.mEffectManager.hasEffect(player, ICHOR_FROSTBORN_COOLDOWN)) {
 			return;
 		}
-		plugin.mEffectManager.addEffect(player, ICHOR_FROSTBORN_COOLDOWN, new IchorCooldown(COOLDOWN, ICHOR_FROSTBORN_COOLDOWN));
-		ichorFrostborn(player, 1);
+		plugin.mEffectManager.addEffect(player, ICHOR_FROSTBORN_COOLDOWN, new IchorCooldown(adjustedCooldown, ICHOR_FROSTBORN_COOLDOWN));
+		ichorFrostborn(plugin, player, 1);
 	}
 
-	public static void ichorFrostborn(Player player, double multiplier) {
+	public static void ichorFrostborn(Plugin plugin, Player player, double multiplier) {
 		if (AbsorptionUtils.getAbsorption(player) > 0) {
 			player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 0.5f);
 			return;
 		}
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		double absorptionQuantity = maxHealth * ABSORPTION * multiplier;
-		AbsorptionUtils.addAbsorption(player, absorptionQuantity, absorptionQuantity, BUFF_DURATION);
+		int adjustedDuration = (int) (Quench.getDurationScaling(plugin, player) * BUFF_DURATION);
+		AbsorptionUtils.addAbsorption(player, absorptionQuantity, absorptionQuantity, adjustedDuration);
 
 		player.playSound(player.getLocation(), Sound.ENTITY_SNOW_GOLEM_SHEAR, SoundCategory.PLAYERS, 1f, 0.5f);
 		player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 1f);

@@ -24,8 +24,8 @@ public class IchorShadowdancer implements Infusion {
 	private static final double THRESHOLD2 = 0.4;
 	private static final double VULN1 = 0.075;
 	private static final double VULN2 = 0.1;
-	private static final int RANGE1 = 5;
-	private static final int RANGE2 = 7;
+	private static final int RANGE1 = 7;
+	private static final int RANGE2 = 10;
 	private static final int DURATION = 5 * 20;
 	public static final String DESCRIPTION = String.format("If you are below %s%% health, apply %s%% vulnerability to enemies within %s blocks for %s seconds. If you are below %s%% health, apply %s%% vulnerability to enemies within %s blocks for %s seconds instead. Cooldown: %s seconds.",
 		StringUtils.multiplierToPercentage(THRESHOLD1),
@@ -57,24 +57,26 @@ public class IchorShadowdancer implements Infusion {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double value, PlayerItemConsumeEvent event) {
+		int adjustedCooldown = Refresh.reduceCooldown(plugin, player, COOLDOWN);
 		if (plugin.mEffectManager.hasEffect(player, ICHOR_SHADOWDANCER_COOLDOWN)) {
 			return;
 		}
-		plugin.mEffectManager.addEffect(player, ICHOR_SHADOWDANCER_COOLDOWN, new IchorCooldown(COOLDOWN, ICHOR_SHADOWDANCER_COOLDOWN));
+		plugin.mEffectManager.addEffect(player, ICHOR_SHADOWDANCER_COOLDOWN, new IchorCooldown(adjustedCooldown, ICHOR_SHADOWDANCER_COOLDOWN));
 		ichorShadowdancer(plugin, player, 1);
 	}
 
 	public static void ichorShadowdancer(Plugin plugin, Player player, double multiplier) {
 		double healthProportion = player.getHealth() / EntityUtils.getMaxHealth(player);
+		int adjustedDuration = (int) (Quench.getDurationScaling(plugin, player) * DURATION);
 		if (healthProportion <= THRESHOLD2) {
 			for (LivingEntity e : EntityUtils.getNearbyMobs(player.getLocation(), RANGE2)) {
-				EntityUtils.applyVulnerability(plugin, DURATION, VULN2 * multiplier, e);
+				EntityUtils.applyVulnerability(plugin, adjustedDuration, VULN2 * multiplier, e);
 				new PPCircle(Particle.REDSTONE, e.getLocation().add(new Vector(0, e.getHeight() + 0.3, 0)), 1).ringMode(true).count(15).data(new Particle.DustOptions(Color.fromRGB(60, 60, 60), 1.1f)).spawnAsPlayerPassive(player);
 			}
 			player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.PLAYERS, 1f, 0.9f);
 		} else if (healthProportion <= THRESHOLD1) {
 			for (LivingEntity e : EntityUtils.getNearbyMobs(player.getLocation(), RANGE1)) {
-				EntityUtils.applyVulnerability(plugin, DURATION, VULN1 * multiplier, e);
+				EntityUtils.applyVulnerability(plugin, adjustedDuration, VULN1 * multiplier, e);
 				new PPCircle(Particle.REDSTONE, e.getLocation().add(new Vector(0, e.getHeight() + 0.3, 0)), 1).ringMode(true).count(15).data(new Particle.DustOptions(Color.fromRGB(20, 20, 20), 1.1f)).spawnAsPlayerPassive(player);
 			}
 			player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.PLAYERS, 1f, 0.9f);

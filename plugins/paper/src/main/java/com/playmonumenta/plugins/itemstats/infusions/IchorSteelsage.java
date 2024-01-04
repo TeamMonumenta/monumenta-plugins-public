@@ -27,7 +27,7 @@ public class IchorSteelsage implements Infusion {
 	private static final double DAMAGE = 0.08;
 	private static final int JUMP_DURATION = 6 * 20;
 	private static final int EFFECT_DURATION = 8 * 20;
-	public static final String DESCRIPTION = String.format("Gain +%s Jump Boost for %s seconds, additionally gain %s%% projectile damage while in midair for %s seconds. Cooldown: %s seconds.",
+	public static final String DESCRIPTION = String.format("Gain +%s Jump Boost for %s seconds if you currently have jump boost, additionally gain %s%% projectile damage while in midair for %s seconds. Cooldown: %s seconds.",
 		JUMP_AMPLIFIER,
 		StringUtils.ticksToSeconds(JUMP_DURATION),
 		StringUtils.multiplierToPercentage(DAMAGE),
@@ -47,19 +47,22 @@ public class IchorSteelsage implements Infusion {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double value, PlayerItemConsumeEvent event) {
+		int adjustedCooldown = Refresh.reduceCooldown(plugin, player, COOLDOWN);
 		if (plugin.mEffectManager.hasEffect(player, ICHOR_STEELSAGE_COOLDOWN)) {
 			return;
 		}
-		plugin.mEffectManager.addEffect(player, ICHOR_STEELSAGE_COOLDOWN, new IchorCooldown(COOLDOWN, ICHOR_STEELSAGE_COOLDOWN));
-		ichorSteelsage(plugin, player, 1);
+		plugin.mEffectManager.addEffect(player, ICHOR_STEELSAGE_COOLDOWN, new IchorCooldown(adjustedCooldown, ICHOR_STEELSAGE_COOLDOWN));
+		ichorSteelsage(plugin, player, 1, false);
 	}
 
-	public static void ichorSteelsage(Plugin plugin, Player player, double multiplier) {
+	public static void ichorSteelsage(Plugin plugin, Player player, double multiplier, boolean isPrismatic) {
+		int adjustedJumpDuration = (int) (Quench.getDurationScaling(plugin, player) * JUMP_DURATION);
+		int adjustedEffectDuration = (int) (Quench.getDurationScaling(plugin, player) * EFFECT_DURATION);
 		PotionEffect playerJumpBoost = player.getPotionEffect(PotionEffectType.JUMP);
-		// -1 because Jump Boost level starts counting from 0, and we're adding 1 to it in that case...
-		int jumpAmplifier = playerJumpBoost == null ? -1 : playerJumpBoost.getAmplifier();
-		plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.JUMP, JUMP_DURATION, jumpAmplifier + JUMP_AMPLIFIER));
-		plugin.mEffectManager.addEffect(player, EFFECT, new IchorSteelEffect(EFFECT_DURATION, DAMAGE * multiplier));
+		if (playerJumpBoost != null) {
+			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.JUMP, adjustedJumpDuration, playerJumpBoost.getAmplifier() + JUMP_AMPLIFIER));
+		}
+		plugin.mEffectManager.addEffect(player, EFFECT, new IchorSteelEffect(adjustedEffectDuration, DAMAGE * multiplier, isPrismatic));
 
 		player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1f, 2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.8f, 1.3f);

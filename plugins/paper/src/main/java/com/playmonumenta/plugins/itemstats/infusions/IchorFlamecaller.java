@@ -23,13 +23,21 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 public class IchorFlamecaller implements Infusion {
 	private static final int COOLDOWN = 20 * 20;
 	private static final String ICHOR_FLAMECALLER_COOLDOWN = IchorListener.ITEM_NAME + " - Flamecaller";
-	private static final double MAGIC_DAMAGE_PER = 0.02;
-	private static final int MOB_CAP = 6;
+	private static final double MAGIC_DAMAGE_PER = 0.04;
+	private static final int MOB_CAP = 3;
 	private static final int BUFF_DURATION = 8 * 20;
 	private static final double RANGE = 8;
 	private static final double SPEED = 0.1;
 	private static final String EFFECT = "IchorFlameDamageEffect";
 	private static final String SPEED_EFFECT = "IchorFlameSpeedEffect";
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_PRISMATIC_DAMAGE_TYPES = EnumSet.of(
+		DamageEvent.DamageType.MELEE,
+		DamageEvent.DamageType.MELEE_ENCH,
+		DamageEvent.DamageType.MELEE_SKILL,
+		DamageEvent.DamageType.PROJECTILE,
+		DamageEvent.DamageType.PROJECTILE_SKILL,
+		DamageEvent.DamageType.MAGIC
+	);
 	public static final String DESCRIPTION = String.format("Gain %s%% magic damage per mob on fire within %s blocks (%s%% cap) for %s seconds. Gain %s%% speed for %s seconds instead if there are none. Cooldown: %s seconds.",
 		StringUtils.multiplierToPercentage(MAGIC_DAMAGE_PER),
 		RANGE,
@@ -52,14 +60,16 @@ public class IchorFlamecaller implements Infusion {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double value, PlayerItemConsumeEvent event) {
+		int adjustedCooldown = Refresh.reduceCooldown(plugin, player, COOLDOWN);
 		if (plugin.mEffectManager.hasEffect(player, ICHOR_FLAMECALLER_COOLDOWN)) {
 			return;
 		}
-		plugin.mEffectManager.addEffect(player, ICHOR_FLAMECALLER_COOLDOWN, new IchorCooldown(COOLDOWN, ICHOR_FLAMECALLER_COOLDOWN));
-		ichorFlamecaller(plugin, player, 1);
+		plugin.mEffectManager.addEffect(player, ICHOR_FLAMECALLER_COOLDOWN, new IchorCooldown(adjustedCooldown, ICHOR_FLAMECALLER_COOLDOWN));
+		ichorFlamecaller(plugin, player, 1, false);
 	}
 
-	public static void ichorFlamecaller(Plugin plugin, Player player, double multiplier) {
+	public static void ichorFlamecaller(Plugin plugin, Player player, double multiplier, boolean isPrismatic) {
+		int adjustedDuration = (int) (Quench.getDurationScaling(plugin, player) * BUFF_DURATION);
 		int fireCount = 0;
 		for (LivingEntity e : EntityUtils.getNearbyMobs(player.getLocation(), RANGE)) {
 			if (e.getFireTicks() > 0) {
@@ -70,13 +80,13 @@ public class IchorFlamecaller implements Infusion {
 		if (fireCount > 0) {
 			int cappedFireCount = FastMath.min(fireCount, MOB_CAP);
 			double buffMultiplier = cappedFireCount * multiplier;
-			plugin.mEffectManager.addEffect(player, EFFECT, new PercentDamageDealt(BUFF_DURATION, MAGIC_DAMAGE_PER * buffMultiplier, EnumSet.of(DamageEvent.DamageType.MAGIC)));
+			plugin.mEffectManager.addEffect(player, EFFECT, new PercentDamageDealt(adjustedDuration, MAGIC_DAMAGE_PER * buffMultiplier, isPrismatic ? AFFECTED_PRISMATIC_DAMAGE_TYPES : EnumSet.of(DamageEvent.DamageType.MAGIC)));
 
 			player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.9f + 0.05f * cappedFireCount);
 			player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.65f + 0.04f * cappedFireCount);
 			player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, SoundCategory.PLAYERS, 1f, 1.40f + 0.07f * cappedFireCount);
 		} else {
-			plugin.mEffectManager.addEffect(player, SPEED_EFFECT, new PercentSpeed(BUFF_DURATION, SPEED * multiplier, SPEED_EFFECT));
+			plugin.mEffectManager.addEffect(player, SPEED_EFFECT, new PercentSpeed(adjustedDuration, SPEED * multiplier, SPEED_EFFECT));
 			player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 0.3f, 0.9f);
 			new PPCircle(Particle.FLAME, player.getLocation(), 1).ringMode(true).count(15).spawnAsPlayerPassive(player);
 		}

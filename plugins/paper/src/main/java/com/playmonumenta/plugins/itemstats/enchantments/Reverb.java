@@ -95,7 +95,7 @@ public class Reverb implements Enchantment {
 				new BukkitRunnable() {
 					int mTicks = 0;
 					double mScaledTicks;
-					final int mBoltDurations = 10;
+					final int mBoltDurations = 7;
 					final double[] mRotation = { -3 * Math.PI / 8, 0, 3 * Math.PI / 8 };
 					final Color[] mColor = { rollColor(), rollColor(), rollColor() };
 					@Override

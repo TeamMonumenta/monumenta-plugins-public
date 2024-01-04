@@ -44,15 +44,18 @@ public class IchorEarthbound implements Infusion {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double value, PlayerItemConsumeEvent event) {
+		int adjustedCooldown = Refresh.reduceCooldown(plugin, player, COOLDOWN);
 		if (plugin.mEffectManager.hasEffect(player, ICHOR_EARTHBOUND_COOLDOWN)) {
 			return;
 		}
-		plugin.mEffectManager.addEffect(player, ICHOR_EARTHBOUND_COOLDOWN, new IchorCooldown(COOLDOWN, ICHOR_EARTHBOUND_COOLDOWN));
-		ichorEarthbound(plugin, player, 1);
+		plugin.mEffectManager.addEffect(player, ICHOR_EARTHBOUND_COOLDOWN, new IchorCooldown(adjustedCooldown, ICHOR_EARTHBOUND_COOLDOWN));
+		ichorEarthbound(plugin, player, 1, false);
 	}
 
-	public static void ichorEarthbound(Plugin plugin, Player player, double multiplier) {
-		plugin.mEffectManager.addEffect(player, EFFECT, new IchorEarthEffect(EFFECT_DURATION, multiplier, RESISTANCE, DAMAGE, BUFF_DURATION, EFFECT));
+	public static void ichorEarthbound(Plugin plugin, Player player, double multiplier, boolean isPrismatic) {
+		int adjustedEffectDuration = (int) (Quench.getDurationScaling(plugin, player) * EFFECT_DURATION);
+		int adjustedBuffDuration = (int) (Quench.getDurationScaling(plugin, player) * BUFF_DURATION);
+		plugin.mEffectManager.addEffect(player, EFFECT, new IchorEarthEffect(adjustedEffectDuration, multiplier, RESISTANCE, DAMAGE, adjustedBuffDuration, EFFECT, isPrismatic));
 
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1f, 1.2f);
 

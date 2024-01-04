@@ -49,10 +49,11 @@ public class IchorWindwalker implements Infusion {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double value, PlayerItemConsumeEvent event) {
+		int adjustedCooldown = Refresh.reduceCooldown(plugin, player, COOLDOWN);
 		if (plugin.mEffectManager.hasEffect(player, ICHOR_WINDWALKER_COOLDOWN)) {
 			return;
 		}
-		plugin.mEffectManager.addEffect(player, ICHOR_WINDWALKER_COOLDOWN, new IchorCooldown(COOLDOWN, ICHOR_WINDWALKER_COOLDOWN));
+		plugin.mEffectManager.addEffect(player, ICHOR_WINDWALKER_COOLDOWN, new IchorCooldown(adjustedCooldown, ICHOR_WINDWALKER_COOLDOWN));
 		ichorWindwalker(plugin, player, 1);
 	}
 
@@ -60,7 +61,8 @@ public class IchorWindwalker implements Infusion {
 		int abilitiesReduced = plugin.mTimers.updateCooldownsPercent(player, CDR * multiplier);
 		double speed = FastMath.min(abilitiesReduced, ABILITY_CAP) * SPEED_PER * multiplier;
 		if (speed > 0) {
-			plugin.mEffectManager.addEffect(player, EFFECT, new PercentSpeed(DURATION, speed, EFFECT));
+			int adjustedDuration = (int) (Quench.getDurationScaling(plugin, player) * DURATION);
+			plugin.mEffectManager.addEffect(player, EFFECT, new PercentSpeed(adjustedDuration, speed, EFFECT));
 		}
 
 		player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.PLAYERS, 0.5f, 2f);
