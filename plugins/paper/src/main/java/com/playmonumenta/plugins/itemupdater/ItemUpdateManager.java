@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemupdater;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -13,9 +14,8 @@ import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.AbstractArrow;
@@ -214,6 +214,21 @@ public class ItemUpdateManager implements Listener {
 		updateNested(path, event.getArmorStandItem());
 	}
 
+	public static void updateCharms(Player p, CharmManager.CharmType charmType, List<ItemStack> equippedCharms) {
+		List<String> path = new ArrayList<>();
+		path.add("Player " + p.getName()
+		+ " updating charms (" + charmType + ")");
+
+		List<String> subPath;
+		int i = 0;
+		for (ItemStack equippedCharm : equippedCharms) {
+			subPath = new ArrayList<>(path);
+			subPath.add(Integer.toString(i));
+			updateNested(subPath, equippedCharm);
+			i++;
+		}
+	}
+
 	public static void updateNested(List<String> path, @Nullable ItemStack item) {
 		updateNested(path, item, false);
 	}
@@ -235,22 +250,23 @@ public class ItemUpdateManager implements Listener {
 					ReadWriteNBTCompoundList arrowNBTs = ItemStatUtils.getItemList(nbt);
 					List<String> arrowPath = new ArrayList<>(pathClone);
 					arrowPath.add("in quiver");
-					for (Iterator<ReadWriteNBT> it = arrowNBTs.iterator(); it.hasNext();) {
-						ReadWriteNBT arrowNBT = it.next();
+					for (ReadWriteNBT arrowNBT : arrowNBTs) {
 						ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
-						long currentAmount = NBT.modify(arrow, anbt -> {
-							long a = ItemStatUtils.addPlayerModified(anbt).getLong(CustomContainerItemManager.AMOUNT_KEY);
-							ItemStatUtils.removePlayerModified(anbt);
+						if (arrow == null) {
+							continue;
+						}
+						long currentAmount = NBT.modify(arrow, arrowTag -> {
+							long a = ItemStatUtils.addPlayerModified(arrowTag).getLong(CustomContainerItemManager.AMOUNT_KEY);
+							ItemStatUtils.removePlayerModified(arrowTag);
 							return a;
 						});
 						updateNested(arrowPath, arrow, true);
-						NBT.modify(arrow, anbt -> {
-							ItemStatUtils.addPlayerModified(anbt).setLong(CustomContainerItemManager.AMOUNT_KEY, currentAmount);
+						NBT.modify(arrow, arrowTag -> {
+							ItemStatUtils.addPlayerModified(arrowTag).setLong(CustomContainerItemManager.AMOUNT_KEY, currentAmount);
 						});
 						arrowNBT.clearNBT();
 						arrowNBT.mergeCompound(NBT.itemStackToNBT(arrow));
 					}
-					return;
 				});
 			}
 
@@ -314,7 +330,10 @@ public class ItemUpdateManager implements Listener {
 		}
 
 		path = new ArrayList<>(path);
-		path.add("in Entity " + entity.getType().getKey().asString() + " named " + entity.getName() + " at " + entity.getLocation().toString());
+		Location location = entity.getLocation();
+		path.add("in Entity " + entity.getType().getKey().asString()
+			+ " named " + entity.getName()
+			+ " at " + location.getWorld().getName() + " " + location.toVector());
 
 		if (entity instanceof AbstractArrow) {
 			// Includes tridents and all arrow types.
@@ -389,8 +408,7 @@ public class ItemUpdateManager implements Listener {
 			}
 		}
 
-		if (entity instanceof Merchant) {
-			Merchant merchant = (Merchant) entity;
+		if (entity instanceof Merchant merchant) {
 			for (int i = 0; i < merchant.getRecipeCount(); i++) {
 				MerchantRecipe trade = merchant.getRecipe(i);
 				List<ItemStack> ingredients = trade.getIngredients();
@@ -475,14 +493,6 @@ public class ItemUpdateManager implements Listener {
 				}
 			}
 		}
-	}
-
-	public static void broadcastPath(List<String> path, NamedTextColor color) {
-		String fox = "ItemUpdateManager: An exception occurred:\n";
-		for (String node : path) {
-			fox += node + "\n";
-		}
-		Plugin.getInstance().getLogger().warning(fox);
 	}
 
 	public static void logNestedException(List<String> path, Exception e) {

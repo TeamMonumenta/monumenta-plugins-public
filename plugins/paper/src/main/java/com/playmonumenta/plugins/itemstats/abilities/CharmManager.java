@@ -127,6 +127,7 @@ import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enchantments.*;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -142,9 +143,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -1148,7 +1149,7 @@ public class CharmManager {
 				int powerBudget = 0;
 				//Check naming of each charm
 				for (ItemStack c : charms) {
-					if (c.getItemMeta().displayName().equals(charm.getItemMeta().displayName())) {
+					if (Objects.equals(c.getItemMeta().displayName(), charm.getItemMeta().displayName())) {
 						return false;
 					}
 					powerBudget += ItemStatUtils.getCharmPower(c);
@@ -1212,6 +1213,8 @@ public class CharmManager {
 		if (mEnabledCharmType != charmType) {
 			return;
 		}
+
+		ItemUpdateManager.updateCharms(p, charmType, equippedCharms);
 
 		UUID uuid = p.getUniqueId();
 
@@ -1285,7 +1288,7 @@ public class CharmManager {
 
 		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
 		if (allEffects != null && allEffects.get(charmAttribute) != null) {
-			return allEffects.get(charmAttribute).doubleValue();
+			return allEffects.get(charmAttribute);
 		}
 		return 0;
 	}
@@ -1428,10 +1431,7 @@ public class CharmManager {
 				JsonObject data = new JsonObject();
 				JsonArray charmArray = new JsonArray();
 				data.add(KEY_CHARMS, charmArray);
-				Iterator<ItemStack> iterCharms = charms.iterator();
-				while (iterCharms.hasNext()) {
-					ItemStack charm = iterCharms.next();
-
+				for (ItemStack charm : charms) {
 					JsonObject charmData = new JsonObject();
 					charmData.addProperty(KEY_ITEM, NBTItem.convertItemtoNBT(charm).toString());
 					charmArray.add(charmData);
