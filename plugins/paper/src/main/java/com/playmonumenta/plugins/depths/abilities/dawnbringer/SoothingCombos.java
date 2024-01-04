@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -31,9 +33,10 @@ import org.bukkit.potion.PotionEffectType;
 public class SoothingCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Soothing Combos";
+	public static final double[] HEAL = {0.12, 0.14, 0.16, 0.18, 0.20, 0.24};
 	public static final double[] SPEED_PERCENT = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
 	public static final String SPEED_EFFECT_NAME = "SoothingCombosPercentSpeedEffect";
-	public static final int[] DURATION = {40, 50, 60, 70, 80, 120};
+	public static final int DURATION = 6 * 20;
 	public static final int RANGE = 12;
 	public static final int HIT_REQ = 3;
 
@@ -44,6 +47,7 @@ public class SoothingCombos extends DepthsAbility {
 			.singleCharm(false);
 
 	private final int mHitRequirement;
+	private final double mHeal;
 	private final int mDuration;
 	private final double mSpeed;
 	private final int mHaste;
@@ -54,7 +58,8 @@ public class SoothingCombos extends DepthsAbility {
 	public SoothingCombos(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mHitRequirement = HIT_REQ + (int) CharmManager.getLevel(mPlayer, CharmEffects.SOOTHING_COMBOS_HIT_REQUIREMENT.mEffectName);
-		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.SOOTHING_COMBOS_DURATION.mEffectName, DURATION[mRarity - 1]);
+		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.SOOTHING_COMBOS_HEALING.mEffectName, HEAL[mRarity - 1]);
+		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.SOOTHING_COMBOS_DURATION.mEffectName, DURATION);
 		mSpeed = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.SOOTHING_COMBOS_SPEED_AMPLIFIER.mEffectName, SPEED_PERCENT[mRarity - 1]);
 		mHaste = (int) CharmManager.getLevel(mPlayer, CharmEffects.SOOTHING_COMBOS_HASTE_LEVEL.mEffectName) + mRarity == 6 ? 1 : 0;
 		mRange = CharmManager.getRadius(mPlayer, CharmEffects.SOOTHING_COMBOS_RANGE.mEffectName, RANGE);
@@ -68,9 +73,16 @@ public class SoothingCombos extends DepthsAbility {
 				mComboCount = 0;
 				PotionEffect hasteEffect = new PotionEffect(PotionEffectType.FAST_DIGGING, mDuration, mHaste, false, true);
 
-				List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), mRange, true);
+				List<Player> nearPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRange / 2.0, true);
+				for (Player p : nearPlayers) {
+					double healed = PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * mHeal, mPlayer);
+					if (healed > 0) {
+						new PartialParticle(Particle.HEART, LocationUtils.getHalfHeightLocation(p), 6, 0.5, 1, 0.5, 0).spawnAsPlayerActive(mPlayer);
+					}
+				}
 
-				for (Player p : players) {
+				List<Player> farPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRange, true);
+				for (Player p : farPlayers) {
 					p.addPotionEffect(hasteEffect);
 					mPlugin.mEffectManager.addEffect(p, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, mSpeed, SPEED_EFFECT_NAME));
 					new PartialParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
@@ -92,15 +104,19 @@ public class SoothingCombos extends DepthsAbility {
 		return new DescriptionBuilder<SoothingCombos>(color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQ, true)
-			.add(" melee strikes, apply ")
+			.add(" melee strikes, heal all players within ")
+			.add(a -> a.mRange / 2, RANGE / 2.0)
+			.add(" blocks for ")
+			.addPercent(a -> a.mHeal, HEAL[rarity - 1], false, true)
+			.add(" of their max health, and give ")
 			.addPercent(a -> a.mSpeed, SPEED_PERCENT[rarity - 1], false, true)
 			.add(" speed and Haste ")
 			.add(haste)
 			.add(" for ")
-			.addDuration(a -> a.mDuration, DURATION[rarity - 1], false, true)
-			.add(" seconds to players within ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds to all players within ")
 			.add(a -> a.mRange, RANGE)
-			.add(" blocks, including the user.");
+			.add(" blocks.");
 	}
 
 

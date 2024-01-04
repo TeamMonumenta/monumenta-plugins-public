@@ -67,6 +67,7 @@ public class DepthsUtils {
 
 	//Forbidden blocks for replacing with ice
 	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
+		Material.LIGHT,
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.REPEATING_COMMAND_BLOCK,

@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -214,6 +215,13 @@ public class StasisListener implements Listener {
 	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
 		if (event.getNewGameMode() == GameMode.SPECTATOR) {
 			endRespawnStasis(event.getPlayer(), true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityRegainHealthEvent(EntityRegainHealthEvent event) {
+		if (isInStasis(event.getEntity())) {
+			event.setCancelled(true);
 		}
 	}
 

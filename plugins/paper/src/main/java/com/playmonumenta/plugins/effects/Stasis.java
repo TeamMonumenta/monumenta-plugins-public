@@ -51,7 +51,7 @@ public class Stasis extends ZeroArgumentEffect {
 		}
 		if (fourHertz) {
 			Location loc = entity.getLocation();
-			new PartialParticle(Particle.END_ROD, loc, 45, 1, 1, 1, .00000001).spawnAsEntityActive(entity);
+			new PartialParticle(Particle.END_ROD, loc, 10, 1, 1, 1, .00000001).spawnAsEntityActive(entity);
 		}
 	}
 

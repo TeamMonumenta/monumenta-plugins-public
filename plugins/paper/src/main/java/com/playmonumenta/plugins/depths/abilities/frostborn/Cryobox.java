@@ -100,7 +100,7 @@ public class Cryobox extends DepthsAbility {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> EntityUtils.disableGravity(mPlugin, mob, mFrozenDuration - 5), 5);
 		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, ELEVATE_RADIUS, mPlayer)) {
-			if (EntityUtils.isCCImmuneMob(mob) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG) || mob.getVehicle() != null) {
+			if (EntityUtils.isCCImmuneMob(mob) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG)) {
 				continue;
 			}
 			Location mobLoc = mob.getLocation();

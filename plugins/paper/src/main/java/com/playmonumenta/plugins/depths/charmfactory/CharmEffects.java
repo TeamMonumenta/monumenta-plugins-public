@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.BottledSunlight;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.DepthsRejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.DivineBeam;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.EternalSavior;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.RadiantBlessing;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
@@ -52,6 +53,7 @@ import com.playmonumenta.plugins.depths.abilities.shadow.DeadlyStrike;
 import com.playmonumenta.plugins.depths.abilities.shadow.DepthsAdvancingShadows;
 import com.playmonumenta.plugins.depths.abilities.shadow.DepthsDethroner;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
+import com.playmonumenta.plugins.depths.abilities.shadow.EscapeArtist;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowSlam;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSharpshooter;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSplitArrow;
@@ -95,6 +97,11 @@ public enum CharmEffects {
 	DIVINE_BEAM_ABSORPTION_DURATION("Divine Beam Absorption Duration", TotemOfSalvation.INFO, true, false, 1.0, 10.0, new double[] {0.0, 0.0, 2.0, 4.0, 6.0}),
 	ENLIGHTENMENT_XP_MULTIPLIER("Enlightenment Experience Multiplier", Enlightenment.INFO, true, true, 10.0, 100.0, new double[] {10.0, 20.0, 30.0, 40.0, 50.0}),
 	ENLIGHTENMENT_RARITY_INCREASE("Enlightenment Rarity Increase Chance", Enlightenment.INFO, true, true, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
+	ETERNAL_SAVIOR_COOLDOWN(EternalSavior.CHARM_COOLDOWN, EternalSavior.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
+	ETERNAL_SAVIOR_HEALING("Eternal Savior Healing", EternalSavior.INFO, true, true, 10.0, 100.0, new double[] {10.0, 20.0, 30.0, 40.0, 50.0}),
+	ETERNAL_SAVIOR_RADIUS("Eternal Savior Radius", EternalSavior.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	ETERNAL_SAVIOR_ABSORPTION("Eternal Savior Absorption", EternalSavior.INFO, false, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
+	ETERNAL_SAVIOR_ABSORPTION_DURATION("Eternal Savior Absorption Duration", EternalSavior.INFO, false, false, 2.0, 20.0, new double[] {2.0, 4.0, 6.0, 8.0, 10.0}),
 	LIGHTNING_BOTTLE_DAMAGE("Lightning Bottle Damage", LightningBottle.INFO, false, true, 10.0, 200.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	LIGHTNING_BOTTLE_RADIUS("Lightning Bottle Radius", LightningBottle.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 	LIGHTNING_BOTTLE_SLOW_AMPLIFIER("Lightning Bottle Slowness Amplifier", LightningBottle.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
@@ -110,10 +117,11 @@ public enum CharmEffects {
 	REJUVENATION_HEAL_RADIUS("Rejuvenation Radius", DepthsRejuvenation.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 	REJUVENATION_HEALING("Rejuvenation Healing", DepthsRejuvenation.INFO, true, true, 20, 100, new double[] {0.0, 0.0, 20, 40, 60}),
 	SOOTHING_COMBOS_HIT_REQUIREMENT("Soothing Combos Hit Requirement", SoothingCombos.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
+	SOOTHING_COMBOS_RANGE("Soothing Combos Range", SoothingCombos.INFO, false, true, 20, 100, new double[] {20, 30, 40, 50, 60}),
+	SOOTHING_COMBOS_HEALING("Soothing Combos Healing", TotemOfSalvation.INFO, true, true, 5, 50, new double[] {5, 10, 15, 20, 25}),
 	SOOTHING_COMBOS_SPEED_AMPLIFIER("Soothing Combos Speed Amplifier", SoothingCombos.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
 	SOOTHING_COMBOS_HASTE_LEVEL("Soothing Combos Haste Level", SoothingCombos.INFO, true, false, 0.0, 1.0, new double[] {0.0, 0.0, 0.0, 0.0, 1.0}),
 	SOOTHING_COMBOS_DURATION("Soothing Combos Buff Duration", SoothingCombos.INFO, true, false, 1.0, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
-	SOOTHING_COMBOS_RANGE("Soothing Combos Range", SoothingCombos.INFO, false, true, 20, 100, new double[] {20, 30, 40, 50, 60}),
 	SUNDROPS_DROP_CHANCE("Sundrops Drop Chance", Sundrops.INFO, true, true, 5.0, 30.0, new double[] {3.0, 6.0, 9.0, 12.0, 15.0}),
 	SUNDROPS_LINGER_TIME("Sundrops Linger Time", Sundrops.INFO, true, false, 2.0, 20.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
 	SUNDROPS_SPEED_AMPLIFIER("Sundrops Speed Amplifier", Sundrops.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
@@ -290,6 +298,11 @@ public enum CharmEffects {
 	DUMMY_DECOY_MAX_LIFE_DURATION("Dummy Decoy Max Life Duration", DummyDecoy.INFO, true, false, 1.0, 5.0, new double[] {0.0, 0.0, 1.0, 2.0, 3.0}),
 	DUMMY_DECOY_AGGRO_RADIUS("Dummy Decoy Aggro Radius", DummyDecoy.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 	DUMMY_DECOY_STUN_RADIUS("Dummy Decoy Stun Radius", DummyDecoy.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	ESCAPE_ARTIST_COOLDOWN(EscapeArtist.CHARM_COOLDOWN, EscapeArtist.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
+	ESCAPE_ARTIST_STEALTH_DURATION("Escape Artist Stealth Duration", EscapeArtist.INFO, true, false, 0.25, 4.0, new double[] {0.5, 0.75, 1.0, 1.25, 1.5}),
+	ESCAPE_ARTIST_MAX_TP_DISTANCE("Escape Artist Max Teleport Distance", EscapeArtist.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	ESCAPE_ARTIST_STUN_RADIUS("Escape Artist Stun Radius", EscapeArtist.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	ESCAPE_ARTIST_STUN_DURATION("Escape Artist Stun Duration", EscapeArtist.INFO, true, false, 0.25, 4.0, new double[] {0.5, 0.75, 1.0, 1.25, 1.5}),
 	SHADOW_SLAM_DAMAGE("Shadow Slam Damage", ShadowSlam.INFO, false, true, 10.0, 200.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	SHADOW_SLAM_RADIUS("Shadow Slam Radius", ShadowSlam.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 

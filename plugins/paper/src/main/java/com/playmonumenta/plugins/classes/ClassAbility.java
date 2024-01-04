@@ -213,6 +213,7 @@ public enum ClassAbility {
 	CLOAK_OF_SHADOWS("Cloak of Shadows"),
 	CHAOS_DAGGER("Chaos Dagger"),
 	DUMMY_DECOY("Dummy Decoy"),
+	ESCAPE_ARTIST("Escape Artist"),
 
 	// SUNLIGHT
 	BOTTLED_SUNLIGHT("Bottled Sunlight"),
@@ -221,6 +222,7 @@ public enum ClassAbility {
 	TOTEM_OF_SALVATION("Totem of Salvation"),
 	WARD_OF_LIGHT("Ward of Light"),
 	DIVINE_BEAM("Divine Beam"),
+	ETERNAL_SAVIOR("Eternal Savior"),
 
 	// FROSTBORN
 	ICE_LANCE("Ice Lance"),

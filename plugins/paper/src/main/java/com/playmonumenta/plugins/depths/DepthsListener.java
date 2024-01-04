@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.EternalSavior;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Charity;
@@ -385,14 +386,26 @@ public class DepthsListener implements Listener {
 								ArrayList<Player> nearbyPlayers = new ArrayList<>(party.mPlayersInParty.stream()
 									.map(DepthsPlayer::getPlayer)
 									.filter(Objects::nonNull)
-									.filter(p -> p.getLocation().distanceSquared(grave.getLocation()) <= mBaseReviveRadiusSquared + Math.pow(ColorSplash.DAWNBRINGER_EXTRA_REVIVE_RADIUS, 2)).toList());
+									.toList());
 
 								nearbyPlayers.removeIf(player -> {
+									// if a player is within range due to any one of their abilities, ensure they won't be removed
+
 									ColorSplash colorSplash = AbilityManager.getManager().getPlayerAbility(player, ColorSplash.class);
-									if (colorSplash == null || !colorSplash.hasIncreasedReviveRadius()) {
-										return player.getLocation().distanceSquared(grave.getLocation()) > mBaseReviveRadiusSquared;
+									if (colorSplash != null && colorSplash.hasIncreasedReviveRadius()) {
+										if (player.getLocation().distanceSquared(grave.getLocation()) <= mBaseReviveRadiusSquared + Math.pow(ColorSplash.DAWNBRINGER_EXTRA_REVIVE_RADIUS, 2)) {
+											return false;
+										}
 									}
-									return false;
+
+									EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbility(player, EternalSavior.class);
+									if (eternalSavior != null && eternalSavior.hasIncreasedReviveRadius()) {
+										if (player.getLocation().distanceSquared(grave.getLocation()) <= Math.pow(eternalSavior.getIncreasedReviveRadius(), 2)) {
+											return false;
+										}
+									}
+
+									return player.getLocation().distanceSquared(grave.getLocation()) > mBaseReviveRadiusSquared;
 								});
 
 								if (!nearbyPlayers.isEmpty()) {

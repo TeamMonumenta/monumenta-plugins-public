@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.BottledSunlight;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.DepthsRejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.DivineBeam;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.EternalSavior;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.RadiantBlessing;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
@@ -78,6 +79,7 @@ import com.playmonumenta.plugins.depths.abilities.shadow.DeadlyStrike;
 import com.playmonumenta.plugins.depths.abilities.shadow.DepthsAdvancingShadows;
 import com.playmonumenta.plugins.depths.abilities.shadow.DepthsDethroner;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
+import com.playmonumenta.plugins.depths.abilities.shadow.EscapeArtist;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowSlam;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSharpshooter;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSplitArrow;
@@ -552,6 +554,7 @@ public class DepthsManager {
 			DummyDecoy.INFO,
 			CloakOfShadows.INFO,
 			ShadowSlam.INFO,
+			EscapeArtist.INFO,
 
 			//Dawnbringer abilities
 			BottledSunlight.INFO,
@@ -564,6 +567,7 @@ public class DepthsManager {
 			TotemOfSalvation.INFO,
 			WardOfLight.INFO,
 			DivineBeam.INFO,
+			EternalSavior.INFO,
 
 			//Flamecaller abilities
 			Apocalypse.INFO,
