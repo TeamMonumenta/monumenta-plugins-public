@@ -100,7 +100,9 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 									public void run() {
 										Location locTarget = playerTarget.getLocation();
 
-										mob.setTarget(playerTarget);
+										if (!AbilityUtils.isStealthed(playerTarget)) {
+											mob.setTarget(playerTarget);
+										}
 										Location loc = mob.getLocation();
 										double distance = loc.distance(locTarget);
 										Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19 * p.DISTANCE_SCALAR);
