@@ -134,7 +134,7 @@ public class CursedWound extends Ability {
 					mCosmetic.onEffectApplication(mPlayer, mob);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME,
 						new CustomDamageOverTime(CURSED_WOUND_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE),
-							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, null, DamageType.AILMENT));
+							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageType.AILMENT));
 				}
 			}
 			return true;

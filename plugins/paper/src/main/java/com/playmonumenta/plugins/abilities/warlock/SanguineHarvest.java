@@ -78,9 +78,9 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 									.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS_1, StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
 							"Increase passive Bleed level to II, and increase the radius to %s blocks. Healing from killing affected mobs is increased to %s%%."
 									.formatted(RADIUS_2, StringUtils.multiplierToPercentage(HEAL_PERCENT_2)),
-							("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
-									"Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")
-									.formatted(StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE), StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION)))
+							("Sanguine Harvest creates a %s-block cone of blight on the ground that lasts for %ss. " +
+									"Mobs in the blighted area take %s%% extra damage per debuff they currently have. Blight is not counted as a debuff.")
+									.formatted(RANGE, StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION), StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE)))
 					.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
 					.cooldown(COOLDOWN, CHARM_COOLDOWN)
 					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", SanguineHarvest::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),

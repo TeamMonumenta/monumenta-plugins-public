@@ -788,6 +788,7 @@ public class CharmManager {
 			WitheringGaze.CHARM_STUN,
 			WitheringGaze.CHARM_DOT,
 			WitheringGaze.CHARM_RANGE,
+			WitheringGaze.CHARM_CONE,
 			DarkPact.CHARM_ABSORPTION,
 			DarkPact.CHARM_ATTACK_SPEED,
 			DarkPact.CHARM_CAP,

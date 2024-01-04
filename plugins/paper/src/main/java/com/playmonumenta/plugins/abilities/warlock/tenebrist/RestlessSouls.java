@@ -83,7 +83,7 @@ public class RestlessSouls extends Ability {
 	private final int mVexCap;
 	private final double mDebuffRange;
 	private final double mMoveSpeed;
-	private final List<Vex> mVexList = new ArrayList<Vex>();
+	private final List<Vex> mVexList = new ArrayList<>();
 
 	public RestlessSouls(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -160,7 +160,9 @@ public class RestlessSouls extends Ability {
 							world.playSound(vexLoc, Sound.ENTITY_VEX_DEATH, SoundCategory.PLAYERS, 1.5f, 1.0f);
 							new PartialParticle(Particle.SOUL, vexLoc, 20, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 						}
+						mVexList.remove(mBoss);
 						mBoss.remove();
+
 						this.cancel();
 						return;
 					}
@@ -200,6 +202,7 @@ public class RestlessSouls extends Ability {
 						vexLoc.add(direction.multiply(mMoveSpeed * TICK_INTERVAL / 20));
 						// attack
 						if (mBoss.getBoundingBox().overlaps(mTarget.getBoundingBox())) {
+							mVexList.remove(mBoss);
 							mBoss.attack(mTarget);
 						}
 					} else {

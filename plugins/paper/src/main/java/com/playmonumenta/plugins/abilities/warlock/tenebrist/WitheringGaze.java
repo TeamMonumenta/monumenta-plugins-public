@@ -45,6 +45,7 @@ public class WitheringGaze extends Ability {
 	public static final String CHARM_STUN = "Withering Gaze Stun Duration";
 	public static final String CHARM_COOLDOWN = "Withering Gaze Cooldown";
 	public static final String CHARM_RANGE = "Withering Gaze Range";
+	public static final String CHARM_CONE = "Withering Gaze Cone";
 	public static final String CHARM_DOT = "Withering Gaze Dot Duration";
 	public static final String CHARM_DAMAGE = "Withering Gaze Damage";
 
@@ -68,10 +69,15 @@ public class WitheringGaze extends Ability {
 			.displayItem(Material.WITHER_ROSE);
 
 	private final int mDOTDuration;
+	private final double mAngle;
+	private final double mRange;
 
 	public WitheringGaze(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mAngle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, WITHERING_GAZE_RANGE);
 		mDOTDuration = CharmManager.getDuration(player, CHARM_DOT, (isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2));
+
 	}
 
 	public boolean cast() {
@@ -79,56 +85,64 @@ public class WitheringGaze extends Ability {
 			return false;
 		}
 		putOnCooldown();
-		Location loc = mPlayer.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
-		Vector direction = loc.getDirection().setY(0).normalize();
+
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 1f, 0.4f);
-		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1f, 1f);
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RANGE, WITHERING_GAZE_RANGE);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 1f, 0.4f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1f, 1f);
+
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		new BukkitRunnable() {
-			double mT = 0;
-			double mDamageRange = 1.15;
-			double mR = 1;
+			double mCurrentRadius = 1.15;
 
 			@Override
 			public void run() {
-
-				for (double degree = 0; degree < 150; degree += 10) {
+				Location loc = mPlayer.getLocation().add(0, 0.65, 0);
+				double degree = 90 - mAngle;
+				// particles about every 10 degrees
+				int degreeSteps = ((int) (2 * mAngle)) / 8;
+				double degreeStep = 2 * mAngle / degreeSteps;
+				for (int step = 0; step < degreeSteps + 1; step++, degree += degreeStep) {
 					double radian1 = Math.toRadians(degree);
-					Vector vec = new Vector(FastUtils.cos(radian1) * mR, 0, FastUtils.sin(radian1) * mR);
+					Vector vec = new Vector(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
 					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+					Location l1 = loc.clone().add(vec);
 
-					Location l = loc.clone().add(vec);
-					new PartialParticle(Particle.SPELL_WITCH, l, 3, 0.15, 0.15, 0.15, 0.15).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPELL_MOB, l, 3, 0.15, 0.15, 0.15, 0).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.05).spawnAsPlayerActive(mPlayer);
+					vec = new Vector(FastUtils.cos(radian1) * (mCurrentRadius - 0.5), 0, FastUtils.sin(radian1) * (mCurrentRadius - 0.5));
+					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+					Location l2 = loc.clone().add(vec);
+
+					if (mPlayer.hasLineOfSight(l1)) {
+						new PartialParticle(Particle.SPELL_WITCH, l1, 3, 0.15, 0.15, 0.15, 0.15).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SPELL_MOB, l1, 3, 0.15, 0.15, 0.15, 0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, l1, 2, 0.15, 0.15, 0.15, 0.05).spawnAsPlayerActive(mPlayer);
+					}
+					if (mPlayer.hasLineOfSight(l2)) {
+						new PartialParticle(Particle.SPELL_WITCH, l2, 3, 0.15, 0.15, 0.15, 0.15).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SPELL_MOB, l2, 3, 0.15, 0.15, 0.15, 0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, l2, 2, 0.15, 0.15, 0.15, 0.05).spawnAsPlayerActive(mPlayer);
+					}
 				}
-				mR += 0.55;
 
-				Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mDamageRange, 0), 2 * mDamageRange, mDamageRange, Math.toRadians(ANGLE));
+				Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mCurrentRadius, 0), 2 * mCurrentRadius, mCurrentRadius, Math.toRadians(ANGLE));
 				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN, WITHERING_GAZE_STUN_DURATION);
 				for (LivingEntity e : hitbox.getHitMobs()) {
-					if (EntityUtils.isElite(e) || EntityUtils.isBoss(e)) {
-						EntityUtils.applySlow(mPlugin, stunDuration, 1.0, e);
-					} else {
-						EntityUtils.applyStun(mPlugin, stunDuration, e);
+					if (mPlayer.hasLineOfSight(e)) {
+						if (EntityUtils.isElite(e) || EntityUtils.isBoss(e)) {
+							EntityUtils.applySlow(mPlugin, stunDuration, 1.0, e);
+						} else {
+							EntityUtils.applyStun(mPlugin, stunDuration, e);
+						}
+						mPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration,
+							CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, WITHERING_GAZE_DOT_DAMAGE),
+							WITHERING_GAZE_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.AILMENT));
 					}
-					mPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration,
-						CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, WITHERING_GAZE_DOT_DAMAGE),
-						WITHERING_GAZE_DOT_PERIOD, mPlayer, playerItemStats, null, DamageEvent.DamageType.AILMENT));
 				}
 
-				mDamageRange += 1;
-				loc.add(direction.clone().multiply(0.75));
-				if (loc.getBlock().getType().isSolid()) {
+				if (mCurrentRadius > mRange) {
 					this.cancel();
 				}
 
-				mT += 1;
-				if (mT >= radius) {
-					this.cancel();
-				}
+				mCurrentRadius += 1;
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 
