@@ -14,7 +14,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class Technique implements Enchantment {
@@ -28,7 +27,9 @@ public class Technique implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && withinDistance(player, enemy)) {
+		if ((event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MAGIC ||
+			     event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) &&
+			    withinDistance(player, enemy)) {
 			double bonus = DAMAGE_PER_LEVEL * level;
 			if (event.getType() == DamageType.PROJECTILE) {
 				bonus *= PROJ_REDUCTION;
@@ -59,5 +60,10 @@ public class Technique implements Enchantment {
 	@Override
 	public EnumSet<Slot> getSlots() {
 		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND, Slot.HEAD, Slot.CHEST, Slot.LEGS, Slot.FEET, Slot.PROJECTILE);
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 999; //same as first strike
 	}
 }
