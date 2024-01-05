@@ -369,6 +369,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(IchorCooldown.effectID, IchorCooldown::deserialize);
 		mEffectDeserializer.put(IchorEarthEffect.effectID, IchorEarthEffect::deserialize);
 		mEffectDeserializer.put(IchorSteelEffect.effectID, IchorSteelEffect::deserialize);
+		mEffectDeserializer.put(PrecisionStrikeDamage.effectID, PrecisionStrikeDamage::deserialize);
 	}
 
 	private static final int PERIOD = 5;

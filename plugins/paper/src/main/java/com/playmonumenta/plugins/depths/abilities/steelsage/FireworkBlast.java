@@ -59,7 +59,7 @@ public class FireworkBlast extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<FireworkBlast> INFO =
 		new DepthsAbilityInfo<>(FireworkBlast.class, ABILITY_NAME, FireworkBlast::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_RIGHT_CLICK)
-			.linkedSpell(ClassAbility.FIREWORKBLAST)
+			.linkedSpell(ClassAbility.FIREWORK_BLAST)
 			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FireworkBlast::cast, DepthsTrigger.SHIFT_RIGHT_CLICK))
 			.displayItem(Material.FIREWORK_ROCKET)

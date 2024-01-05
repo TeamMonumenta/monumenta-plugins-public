@@ -191,10 +191,11 @@ public enum ClassAbility {
 
 	// STEELSAGE
 	METALMANCY("Metalmancy"),
+	FIREWORK_BLAST("Firework Blast"),
+	PRECISION_STRIKE("Precision Strike"),
 	RAPIDFIRE("Rapid Fire"),
-	SIDEARM("Sidearm"),
 	SCRAPSHOT("Scrapshot"),
-	FIREWORKBLAST("Firework Blast"),
+	SIDEARM("Sidearm"),
 	STEEL_STALLION("Steel Stallion"),
 	VOLLEY_DEPTHS("Volley"),
 

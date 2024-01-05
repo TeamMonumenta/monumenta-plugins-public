@@ -87,6 +87,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FocusedCombos;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
+import com.playmonumenta.plugins.depths.abilities.steelsage.PrecisionStrike;
 import com.playmonumenta.plugins.depths.abilities.steelsage.ProjectileMastery;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
@@ -520,6 +521,7 @@ public class DepthsManager {
 			FireworkBlast.INFO,
 			FocusedCombos.INFO,
 			Metalmancy.INFO,
+			PrecisionStrike.INFO,
 			ProjectileMastery.INFO,
 			RapidFire.INFO,
 			Scrapshot.INFO,
