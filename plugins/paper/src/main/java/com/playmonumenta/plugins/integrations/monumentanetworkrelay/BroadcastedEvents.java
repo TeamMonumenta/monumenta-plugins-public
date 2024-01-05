@@ -259,9 +259,18 @@ public class BroadcastedEvents implements Listener {
 		for (Event event : getCurrentEvents().values()) {
 			KnownEvent knownEvent = KnownEvent.get(event.mEventName.toUpperCase(Locale.getDefault()));
 			if (knownEvent != KnownEvent.UNKNOWN) {
-				if (knownEvent.mScoreName != null) {
-					OptionalInt score = ScoreboardUtils.getScoreboardValue(player, knownEvent.mScoreName);
-					if (score.isEmpty() || score.getAsInt() < knownEvent.mMinStep) {
+				if (knownEvent.mPossibilities.length > 0) {
+					boolean canSee = false;
+					for (int i = 0; i < knownEvent.mPossibilities.length; i++) {
+						EventRequirement possibility = knownEvent.mPossibilities[i];
+						OptionalInt score = ScoreboardUtils.getScoreboardValue(player, possibility.mScoreboard);
+						if (score.isPresent() && score.getAsInt() >= possibility.mStep) {
+							canSee = true;
+							break;
+						}
+					}
+
+					if (!canSee) {
 						continue;
 					}
 				}
@@ -283,7 +292,7 @@ public class BroadcastedEvents implements Listener {
 				return;
 			}
 
-			if (!(data.get(Event.EVENT_PROP_KEY) instanceof JsonPrimitive eventPropPrimitive && eventPropPrimitive.isString())) {
+			if (!(data.get(Event.EVENT_PROP_KEY) instanceof JsonPrimitive eventPrimitive && eventPrimitive.isString())) {
 				MMLog.warning(BroadcastedEvents.UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.EVENT_PROP_KEY + "'");
 				return;
 			}
@@ -293,7 +302,7 @@ public class BroadcastedEvents implements Listener {
 				return;
 			}
 
-			if (!(data.get(Event.STATUS_PROP_KEY) instanceof JsonPrimitive statusPropPrimitive && statusPropPrimitive.isString())) {
+			if (!(data.get(Event.STATUS_PROP_KEY) instanceof JsonPrimitive statusPrimitive && statusPrimitive.isString())) {
 				MMLog.warning(BroadcastedEvents.UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.STATUS_PROP_KEY + "'");
 				return;
 			}
@@ -317,7 +326,7 @@ public class BroadcastedEvents implements Listener {
 		} else if (event.getChannel().equals(PROXIED_TASK_BROADCAST_CHANNEL)) {
 			JsonObject data = event.getData();
 
-			if (!(data.get(Event.EVENT_PROP_KEY) instanceof JsonPrimitive eventPropPrimitive && eventPropPrimitive.isString())) {
+			if (!(data.get(Event.EVENT_PROP_KEY) instanceof JsonPrimitive eventPrimitive && eventPrimitive.isString())) {
 				MMLog.warning(BroadcastedEvents.PROXIED_TASK_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.EVENT_PROP_KEY + "'");
 				return;
 			}
@@ -455,28 +464,34 @@ public class BroadcastedEvents implements Listener {
 		}
 	}
 
+	public static class EventRequirement {
+		@NotNull
+		public final String mScoreboard;
+		public final int mStep;
+
+		EventRequirement(@NotNull String scoreboard, int step) {
+			mScoreboard = scoreboard;
+			mStep = step;
+		}
+	}
+
 	@SuppressWarnings("deprecation")
 	public enum KnownEvent {
-		KAUL("Quest21", 20, ChatColor.DARK_GREEN),
-		ELDRASK("Teal", 1, ChatColor.AQUA),
-		HEKAWT("Quest101", 12, ChatColor.GOLD),
-		SIRIUS("Quest217", 100, ChatColor.GRAY),
-		UNKNOWN(null, 0, null);
-
-		//if scoreName is null, not required
-		@Nullable
-		public final String mScoreName;
-
-		//if step is 0, not required
-		public final int mMinStep;
+		KAUL(ChatColor.DARK_GREEN, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
+		ELDRASK(ChatColor.AQUA, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
+		HEKAWT(ChatColor.GOLD, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
+		SIRIUS(ChatColor.GRAY, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
+		UNKNOWN(null);
 
 		@Nullable
 		public final ChatColor mColor;
 
-		KnownEvent(@Nullable String scoreName, int step, @Nullable ChatColor color) {
-			this.mScoreName = scoreName;
-			this.mMinStep = step;
+		//If none, will not require anything.
+		public final EventRequirement[] mPossibilities;
+
+		KnownEvent(@Nullable ChatColor color, EventRequirement... possibleRequirements) {
 			this.mColor = color;
+			this.mPossibilities = possibleRequirements;
 		}
 
 		public static String[] names() {
