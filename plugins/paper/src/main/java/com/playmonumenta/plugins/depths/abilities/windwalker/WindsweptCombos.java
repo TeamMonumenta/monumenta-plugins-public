@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,7 +36,7 @@ public class WindsweptCombos extends DepthsAbility {
 	private static final double[] COOLDOWN_REDUCTION = {0.05, 0.075, 0.1, 0.125, 0.15, 0.2};
 	private static final int HIT_REQUIREMENT = 3;
 	private static final int RADIUS = 4;
-	private static final double KNOCKBACK_SPEED = 0.5;
+	private static final double PULL_STRENGTH = 0.5;
 	public static final int CAP_TICKS = 5 * Constants.TICKS_PER_SECOND;
 
 	public static final DepthsAbilityInfo<WindsweptCombos> INFO =
@@ -47,7 +48,7 @@ public class WindsweptCombos extends DepthsAbility {
 	private final int mHitRequirement;
 	private final double mCooldownReduction;
 	private final double mRadius;
-	private final double mKnockback;
+	private final double mPull;
 
 
 	private int mComboCount = 0;
@@ -56,7 +57,7 @@ public class WindsweptCombos extends DepthsAbility {
 		super(plugin, player, INFO);
 		mHitRequirement = HIT_REQUIREMENT + (int) CharmManager.getLevel(mPlayer, CharmEffects.WINDSWEPT_COMBOS_HIT_REQUIREMENT.mEffectName);
 		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.WINDSWEPT_COMBOS_RADIUS.mEffectName, RADIUS);
-		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.WINDSWEPT_COMBOS_KNOCKBACK.mEffectName, KNOCKBACK_SPEED);
+		mPull = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.WINDSWEPT_COMBOS_PULL_STRENGTH.mEffectName, PULL_STRENGTH);
 		mCooldownReduction = COOLDOWN_REDUCTION[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.WINDSWEPT_COMBOS_COOLDOWN_REDUCTION.mEffectName);
 	}
 
@@ -68,7 +69,7 @@ public class WindsweptCombos extends DepthsAbility {
 				Location location = enemy.getLocation();
 				for (LivingEntity e : EntityUtils.getNearbyMobs(location, mRadius)) {
 					if (e != enemy) {
-						e.setVelocity(e.getVelocity().add(e.getLocation().toVector().subtract(location.subtract(0, 0.3, 0).toVector()).normalize().multiply(mKnockback).add(new Vector(0, 0.2, 0))));
+						e.setVelocity(e.getVelocity().add(e.getLocation().toVector().subtract(location.subtract(0, 0.3, 0).toVector()).normalize().multiply(-mPull).add(new Vector(0, 0.2, 0))));
 					}
 
 				}
@@ -91,6 +92,11 @@ public class WindsweptCombos extends DepthsAbility {
 				playSounds(world, loc);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, entityLoc, 20, 0, 0.2, 0, 0.2).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.FIREWORKS_SPARK, entityLoc, 20, 0, 0.2, 0, 0.2).spawnAsPlayerActive(mPlayer);
+				for (double j = 0; j < 360; j += 12) {
+					double radian = Math.toRadians(j);
+					Location angleLoc = loc.clone().add(FastUtils.cos(radian) * mRadius, 0.15, FastUtils.sin(radian) * mRadius);
+					new PartialParticle(Particle.CLOUD, angleLoc, 1, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+				}
 				mComboCount = 0;
 			}
 			return true;
@@ -116,7 +122,7 @@ public class WindsweptCombos extends DepthsAbility {
 			.addPercent(a -> a.mCooldownReduction, COOLDOWN_REDUCTION[rarity - 1], false, true)
 			.add(" cooldown reduction for your abilities (max ")
 			.addDuration(CAP_TICKS)
-			.add("s) and knocks back nearby mobs in a ")
+			.add("s) and pulls nearby mobs inwards in a ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" block radius.");
 	}

@@ -65,14 +65,16 @@ public class VolcanicCombos extends DepthsAbility {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 				}
 				World world = mPlayer.getWorld();
-				for (int i = 0; i < 360; i += 45) {
+				for (int i = 0; i < 360; i += 12) {
 					double rad = Math.toRadians(i);
 					Location locationDelta = new Location(world, mRadius / 2.0 * FastUtils.cos(rad), 0.5, mRadius / 2.0 * FastUtils.sin(rad));
 					location.add(locationDelta);
-					new PartialParticle(Particle.FLAME, location, 1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.FLAME, location, 2).spawnAsPlayerActive(mPlayer);
 					location.subtract(locationDelta);
+					new PartialParticle(Particle.LAVA, location, 25, 0, 0.2, 0, 1).spawnAsPlayerActive(mPlayer);
 				}
-				world.playSound(location, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1);
+				world.playSound(location, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 1f, 1);
+				world.playSound(location, Sound.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 1f, 1);
 				mComboCount = 0;
 			}
 			return true;

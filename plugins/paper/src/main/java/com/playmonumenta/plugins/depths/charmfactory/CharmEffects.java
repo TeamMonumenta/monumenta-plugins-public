@@ -387,7 +387,7 @@ public enum CharmEffects {
 	WINDSWEPT_COMBOS_HIT_REQUIREMENT("Windswept Combos Hit Requirement", WindsweptCombos.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
 	WINDSWEPT_COMBOS_COOLDOWN_REDUCTION("Windswept Combos Cooldown Reduction", WindsweptCombos.INFO, false, true, 2, 10, new double[] {0.0, 0.0, 2.0, 3.0, 5.0}),
 	WINDSWEPT_COMBOS_RADIUS("Windswept Combos Radius", WindsweptCombos.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
-	WINDSWEPT_COMBOS_KNOCKBACK("Windswept Combos Knockback", Whirlwind.INFO, true, true, 0.0, 40, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
+	WINDSWEPT_COMBOS_PULL_STRENGTH("Windswept Combos Pull Strength", WindsweptCombos.INFO, true, true, 0.0, 40, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	WIND_WALK_COOLDOWN(DepthsWindWalk.CHARM_COOLDOWN, DepthsWindWalk.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	WIND_WALK_VELOCITY("Wind Walk Velocity", DepthsWindWalk.INFO, true, true, 20.0, 100.0, new double[] {0.0, 0.0, 0.0, 30.0, 50.0}),
 	WIND_WALK_VULNERABILITY_AMPLIFIER("Wind Walk Vulnerability Amplifier", DepthsWindWalk.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
