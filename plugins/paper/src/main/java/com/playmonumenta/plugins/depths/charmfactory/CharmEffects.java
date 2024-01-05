@@ -365,6 +365,7 @@ public enum CharmEffects {
 	HOWLING_WINDS_DURATION("Howling Winds Duration", HowlingWinds.INFO, true, false, 0.5, 6.0, new double[] {1.0, 1.5, 2.0, 2.5, 3.0}),
 	HOWLING_WINDS_VELOCITY("Howling Winds Velocity", HowlingWinds.INFO, true, true, 0.0, 40.0, new double[] {0.0, 0.0, 0.0, 0.0, 20.0}),
 	HOWLING_WINDS_RANGE("Howling Winds Cast Range", HowlingWinds.INFO, false, true, 10, 100, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	HOWLING_WINDS_VULNERABILITY_AMPLIFIER("Howling Winds Vulnerability Amplifier", HowlingWinds.INFO, false, true, 2, 10, new double[] {3, 4, 5, 6, 7}),
 	LAST_BREATH_COOLDOWN(LastBreath.CHARM_COOLDOWN, LastBreath.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	LAST_BREATH_COOLDOWN_REDUCTION("Last Breath Cooldown Reduction", LastBreath.INFO, true, true, 10.0, 50.0, new double[] {5.0, 10.0, 15.0, 20.0, 25.0}),
 	LAST_BREATH_SPEED_AMPLIFIER("Last Breath Speed Amplifier", LastBreath.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),

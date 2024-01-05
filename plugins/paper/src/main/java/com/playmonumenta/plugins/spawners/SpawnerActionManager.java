@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.spawners.actions.FireworksAction;
 import com.playmonumenta.plugins.spawners.actions.HealerAction;
 import com.playmonumenta.plugins.spawners.actions.MimicAction;
 import com.playmonumenta.plugins.spawners.actions.RevengeAction;
+import com.playmonumenta.plugins.spawners.actions.TreasureAction;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +27,7 @@ public class SpawnerActionManager {
 		.put(HealerAction.IDENTIFIER, new HealerAction())
 		.put(MimicAction.IDENTIFIER, new MimicAction())
 		.put(RevengeAction.IDENTIFIER, new RevengeAction())
+		.put(TreasureAction.IDENTIFIER, new TreasureAction())
 		.build();
 
 	private SpawnerActionManager() {

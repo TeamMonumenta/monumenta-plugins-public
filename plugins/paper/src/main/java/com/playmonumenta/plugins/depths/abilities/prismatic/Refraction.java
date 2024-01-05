@@ -47,7 +47,7 @@ import static java.awt.Color.HSBtoRGB;
 
 public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	public static final String ABILITY_NAME = "Refraction";
-	public static final double[] DAMAGE = {3.5, 3.75, 4, 4.25, 4.5, 5};
+	public static final double[] DAMAGE = {3.5, 4, 4.5, 5, 5.5, 6.5};
 	public static final int COOLDOWN_TICKS = 25 * 20;
 	public static final int DISTANCE = 50;
 	public static final int DURATION = 5 * 20;

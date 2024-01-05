@@ -19,9 +19,11 @@ import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -40,8 +42,10 @@ public class CharmFactory {
 	public static final String CHARM_EFFECTS_KEY = "DEPTHS_CHARM_EFFECT";
 	public static final String CHARM_ACTIONS_KEY = "DEPTHS_CHARM_ACTIONS";
 	public static final String CHARM_ROLLS_KEY = "DEPTHS_CHARM_ROLLS";
+	public static final String CHARM_WILDCARD_TREE_CAP_KEY = "DEPTHS_CHARM_WILDCARD_TREE_CAP";
 	public static final double TREE_BUDGET_MODIFIER = 1.35;
 	public static final double WILDCARD_BUDGET_MODIFIER = 1.8;
+	public static final int[] WILDCARD_TREE_CAP_CHANCES = {0, 33, 33, 17, 8, 5, 4};
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
 		if (!item.getType().isAir()) {
@@ -167,6 +171,24 @@ public class CharmFactory {
 			if (effect != null) {
 				chosenTree = effect.mTree;
 			}
+			if (getWildcardTreeCap(item) == 0) {
+				Random r2 = new Random();
+				r2.setSeed(seed);
+				int roll = r2.nextInt(0, 100);
+				int cap = 1;
+				int total = 0;
+				while (total <= roll || cap >= WILDCARD_TREE_CAP_CHANCES.length) {
+					total += WILDCARD_TREE_CAP_CHANCES[cap - 1];
+					cap++;
+				}
+				int finalCap = cap;
+				NBT.modify(item, nbt -> {
+					ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
+					playerModified.setInteger(CHARM_WILDCARD_TREE_CAP_KEY, finalCap);
+				});
+				MMLog.finest("tree cap: " + cap);
+			}
+
 		}
 		ItemMeta itemMeta = item.getItemMeta();
 
@@ -344,11 +366,24 @@ public class CharmFactory {
 					}
 				}
 			} else {
-				//Could be anything
+				int treeCap = getWildcardTreeCap(charm);
+
+				//Could be anything- check tree count
+				Set<DepthsTree> activeTrees = new HashSet<>();
+				for (String s : effectHistory) {
+					CharmEffects effect = CharmEffects.getEffect(s);
+					if (effect != null) {
+						activeTrees.add(effect.mTree);
+					}
+				}
 				for (CharmEffects ce : charmEffects) {
 					if (!effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && !isNegative) {
 						//Skip if it's the first effect of a single ability charm and the ability doesn't support it
 						if (isFirstSingleAbilityCharm && !ce.mInfo.getSingleAbilityCharm()) {
+							continue;
+						}
+						// Skip this effect if we don't currently have its tree and are capped on trees
+						if (treeCap > 0 && activeTrees.size() >= treeCap && !activeTrees.contains(ce.mTree)) {
 							continue;
 						}
 						chosenEffect = ce;
@@ -478,6 +513,21 @@ public class CharmFactory {
 			return null;
 		}
 		return DepthsUtils.getRarityComponent(rarity);
+	}
+
+	public static int getWildcardTreeCap(ItemStack item) {
+		return NBT.get(item, nbt -> {
+			return getWildcardTreeCap(nbt);
+		});
+	}
+
+	public static int getWildcardTreeCap(ReadableItemNBT nbt) {
+		ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+		if (playerModified == null || !playerModified.hasTag(CharmFactory.CHARM_WILDCARD_TREE_CAP_KEY)) {
+			// Not a Zenith charm/no rarity
+			return 0;
+		}
+		return playerModified.getInteger(CharmFactory.CHARM_WILDCARD_TREE_CAP_KEY);
 	}
 
 }

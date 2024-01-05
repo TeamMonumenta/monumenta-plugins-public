@@ -28,13 +28,14 @@ import org.bukkit.util.Vector;
 public class HowlingWinds extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Howling Winds";
-	public static final int COOLDOWN = 25 * 20;
-	public static final int DAMAGE_RADIUS = 4;
+	public static final int COOLDOWN = 20 * 20;
+	public static final int VULN_RADIUS = 4;
 	public static final int PULL_RADIUS = 16;
 	public static final int DISTANCE = 6;
 	public static final int[] PULL_INTERVAL = {20, 18, 16, 14, 12, 8};
-	public static final int DURATION_TICKS = 8 * 20;
-	public static final double PULL_VELOCITY = 0.7;
+	public static final double[] VULN_AMPLIFIER = {0.075, 0.1, 0.125, 0.15, 0.175, 0.225};
+	public static final int DURATION_TICKS = 5 * 20;
+	public static final double PULL_VELOCITY = 0.9;
 	public static final double BASE_RATIO = 0.15;
 
 	public static final String CHARM_COOLDOWN = "Howling Winds Cooldown";
@@ -50,6 +51,8 @@ public class HowlingWinds extends DepthsAbility {
 	private final int mDuration;
 	private final double mDistance;
 	private final double mRadius;
+	private final double mVulnRadius;
+	private final double mVuln;
 
 
 	public HowlingWinds(Plugin plugin, Player player) {
@@ -57,6 +60,8 @@ public class HowlingWinds extends DepthsAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.HOWLING_WINDS_DURATION.mEffectName, DURATION_TICKS);
 		mDistance = CharmManager.getRadius(mPlayer, CharmEffects.HOWLING_WINDS_RANGE.mEffectName, DISTANCE);
 		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.HOWLING_WINDS_RADIUS.mEffectName, PULL_RADIUS);
+		mVulnRadius = CharmManager.getRadius(mPlayer, CharmEffects.HOWLING_WINDS_RADIUS.mEffectName, VULN_RADIUS);
+		mVuln = VULN_AMPLIFIER[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.HOWLING_WINDS_VULNERABILITY_AMPLIFIER.mEffectName);
 
 	}
 
@@ -115,6 +120,9 @@ public class HowlingWinds extends DepthsAbility {
 							double ratio = BASE_RATIO + vector.length() / mRadius;
 							mob.setVelocity(mob.getVelocity().add(vector.normalize().multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.HOWLING_WINDS_VELOCITY.mEffectName, PULL_VELOCITY)).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0))));
 						}
+						if (loc.distance(mob.getLocation()) < mVulnRadius) {
+							EntityUtils.applyVulnerability(mPlugin, mDuration, mVuln, mob);
+						}
 					}
 					if (mTicks <= DURATION_TICKS - 5 * 20) {
 						world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.8f, 1);
@@ -143,6 +151,12 @@ public class HowlingWinds extends DepthsAbility {
 			.addDuration(a -> PULL_INTERVAL[rarity - 1], PULL_INTERVAL[rarity - 1], true, true)
 			.add(" second")
 			.add(PULL_INTERVAL[rarity - 1] == 20 ? "" : "s")
+			.add(". Enemies within ")
+			.add(a -> a.mVulnRadius, VULN_RADIUS)
+			.add(" are applied ")
+			.addPercent(a -> a.mVuln, VULN_AMPLIFIER[rarity - 1], false, true)
+			.add(" vulnerability for ")
+			.addDuration(a -> a.mDuration, DURATION_TICKS)
 			.add(".")
 			.addCooldown(COOLDOWN);
 	}
