@@ -10,11 +10,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,15 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
@@ -41,9 +29,8 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class BossAbilityGroup {
 	public static final int PASSIVE_RUN_INTERVAL_DEFAULT = Constants.QUARTER_TICKS_PER_SECOND;
-
+	public final LivingEntity mBoss;
 	protected final Plugin mPlugin;
-	protected final LivingEntity mBoss;
 	private final String mIdentityTag;
 
 	private @Nullable BossBarManager mBossBar;
@@ -66,7 +53,7 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void changePhase(SpellManager activeSpells,
-	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
+							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
 
 		if (phaseAction != null) {
 			phaseAction.accept(mBoss);
@@ -94,12 +81,12 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 

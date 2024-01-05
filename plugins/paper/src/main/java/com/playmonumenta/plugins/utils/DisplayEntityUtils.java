@@ -3,22 +3,13 @@ package com.playmonumenta.plugins.utils;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.playmonumenta.plugins.Plugin;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -35,11 +26,11 @@ import org.joml.Vector3f;
 
 public class DisplayEntityUtils {
 
-	public static BukkitTask groundBlockQuake(Location center, double radius, List<Material> possibleMaterials, Display.@Nullable Brightness brightness) {
+	public static BukkitTask groundBlockQuake(Location center, double radius, List<Material> possibleMaterials, @Nullable Display.Brightness brightness) {
 		return groundBlockQuake(center, radius, possibleMaterials, brightness, 0.06);
 	}
 
-	public static BukkitTask groundBlockQuake(Location center, double radius, List<Material> possibleMaterials, Display.@Nullable Brightness brightness, double blockDensity) {
+	public static BukkitTask groundBlockQuake(Location center, double radius, List<Material> possibleMaterials, @Nullable Display.Brightness brightness, double blockDensity) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 			final Map<Integer, ArrayList<Location>> mLocationDelays = new HashMap<>();
@@ -322,7 +313,12 @@ public class DisplayEntityUtils {
 		private final ArrayList<Matrix4f> mFrames = new ArrayList<>();
 		private final ArrayList<Integer> mDurations = new ArrayList<>();
 		private ArrayList<Display> mDisplays = new ArrayList<>();
+		private Matrix4f mCancelFrame;
+		private Integer mCancelDuration;
+		private Integer mCancelDelay;
 		private boolean mRemoveDisplaysAfterwards = false;
+		private boolean mCancel = false;
+
 
 		public DisplayAnimation(Display display) {
 			mDisplays.add(display);
@@ -350,8 +346,30 @@ public class DisplayEntityUtils {
 			return this;
 		}
 
+		public DisplayAnimation addCancelFrame(Transformation frame, int duration) {
+			mCancelFrame = transformationToMatrix4(frame);
+			mCancelDuration = duration;
+			return this;
+		}
+
+		public DisplayAnimation addCancelFrame(Matrix4f frame, int duration) {
+			mCancelFrame = frame;
+			mCancelDuration = duration;
+			return this;
+		}
+
+		public DisplayAnimation addCancelDelay(int amount) {
+			mCancelDelay = amount;
+			return this;
+		}
+
 		public DisplayAnimation removeDisplaysAfterwards() {
 			mRemoveDisplaysAfterwards = true;
+			return this;
+		}
+
+		public DisplayAnimation cancel() {
+			mCancel = true;
 			return this;
 		}
 
@@ -371,6 +389,21 @@ public class DisplayEntityUtils {
 					});
 					mDisplays = teleportedDisplays;
 				}
+			}
+
+			if (mCancel) {
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					if (mCancelFrame != null) {
+						mDisplays.forEach(display -> {
+							display.setInterpolationDelay(-1);
+							display.setInterpolationDuration(mCancelDuration);
+							display.setTransformationMatrix(mCancelFrame);
+						});
+					}
+					mCancel = false;
+					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> playInternal(mFrames.size()), mCancelDuration + mCancelDelay);
+				}, 1);
+				return;
 			}
 
 			if (currentFrame >= mFrames.size()) {

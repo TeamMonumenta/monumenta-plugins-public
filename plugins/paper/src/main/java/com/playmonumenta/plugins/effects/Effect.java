@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.jetbrains.annotations.Nullable;
@@ -141,6 +142,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	}
 
 	public void entityUpdateEffect(Entity entity) {
+
+	}
+
+	public void onTargetSwap(EntityTargetEvent event) {
 
 	}
 

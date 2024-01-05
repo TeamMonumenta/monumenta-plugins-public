@@ -12,17 +12,8 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MMLog;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.TreeSet;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.bukkit.Bukkit;
@@ -33,10 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -83,7 +71,7 @@ public final class EffectManager implements Listener {
 			if (effect.mUsed) {
 				// Each entity must have their own instance of an effect, they cannot be shared
 				MMLog.severe("Attempted to add an effect multiple times or to multiple entities! source="
-					             + source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
+					+ source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
 				return;
 			}
 			effect.mUsed = true;
@@ -370,6 +358,10 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(IchorEarthEffect.effectID, IchorEarthEffect::deserialize);
 		mEffectDeserializer.put(IchorSteelEffect.effectID, IchorSteelEffect::deserialize);
 		mEffectDeserializer.put(PrecisionStrikeDamage.effectID, PrecisionStrikeDamage::deserialize);
+		mEffectDeserializer.put(FlatHealthBoost.effectID, FlatHealthBoost::deserialize);
+		mEffectDeserializer.put(CustomTimerEffect.effectID, CustomTimerEffect::deserialize);
+		mEffectDeserializer.put(SiriusContagion.effectID, SiriusContagion::deserialize);
+		mEffectDeserializer.put(SiriusSetTargetEffect.effectID, SiriusSetTargetEffect::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -377,6 +369,7 @@ public final class EffectManager implements Listener {
 	private final HashMap<Entity, Effects> mEntities = new HashMap<>();
 	private final BukkitRunnable mTimer;
 	private static @Nullable EffectManager INSTANCE = null;
+	private static final String PLAYEREFFECTDEATHKEY = "player_effect_death_key";
 
 	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {
@@ -850,7 +843,7 @@ public final class EffectManager implements Listener {
 			}
 		}
 
-		if (killed instanceof Player player) {
+		if (killed instanceof Player player && MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, PLAYEREFFECTDEATHKEY, 5)) {
 			// Default phylactery level is 10 (should already be accounted for).
 			double phylactery = Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.PHYLACTERY);
 
@@ -1025,6 +1018,19 @@ public final class EffectManager implements Listener {
 			// NOTE: If the Entity map is ever changed to key'd by Entity UUID, this will need a guard to check that the player didn't log back in
 			mEntities.remove(player);
 		}, 20);
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entitySwapTarget(EntityTargetEvent event) {
+		Entity entity = event.getEntity();
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onTargetSwap(event);
+				}
+			}
+		}
 	}
 
 	public void applyEffectsOnRespawn(Plugin plugin, Player player) {

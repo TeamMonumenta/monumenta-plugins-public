@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
+import com.playmonumenta.plugins.bosses.bosses.sirius.SiriusNPCBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
@@ -28,21 +29,10 @@ import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
-import com.playmonumenta.plugins.integrations.ChestSortIntegration;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
-import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.integrations.*;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
-import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
-import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
-import com.playmonumenta.plugins.inventories.LootChestsInInventory;
-import com.playmonumenta.plugins.inventories.PlayerInventoryView;
-import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
-import com.playmonumenta.plugins.inventories.WalletManager;
+import com.playmonumenta.plugins.inventories.*;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
@@ -309,6 +299,7 @@ public class Plugin extends JavaPlugin {
 		WorldNameCommand.register();
 		BlockDisplayCommand.register();
 		AddSpawnerEffectMarkersCommand.register();
+		SiriusNPCBoss.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -321,9 +312,9 @@ public class Plugin extends JavaPlugin {
 
 		/* If this is the plots shard, register /plotaccess functions and enable functionality */
 		if (ServerProperties.getShardName().equals("plots")
-				|| ServerProperties.getShardName().equals("mobs")
-				|| ServerProperties.getShardName().equals("dev1")
-				|| ServerProperties.getShardName().equals("dev2")) {
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().equals("dev1")
+			|| ServerProperties.getShardName().equals("dev2")) {
 			ShopManager.registerCommands();
 		}
 
@@ -415,14 +406,14 @@ public class Plugin extends JavaPlugin {
 
 		/* If this is the plots shard, register /plotaccess functions and enable functionality */
 		if (ServerProperties.getShardName().equals("plots")
-				|| ServerProperties.getShardName().equals("mobs")
-				|| ServerProperties.getShardName().equals("dev1")
-				|| ServerProperties.getShardName().equals("dev2")) {
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().equals("dev1")
+			|| ServerProperties.getShardName().equals("dev2")) {
 			manager.registerEvents(new ShopManager(), this);
 		}
 
 		if (ServerProperties.getShardName().contains("valley")
-				|| ServerProperties.getShardName().contains("dev")) {
+			|| ServerProperties.getShardName().contains("dev")) {
 
 			//minigames can only be on devshard or valley
 			TowerCommands.register(this);
@@ -506,13 +497,13 @@ public class Plugin extends JavaPlugin {
 		}
 
 		if (ServerProperties.getShardName().contains("gallery")
-				|| ServerProperties.getShardName().startsWith("dev")) {
+			|| ServerProperties.getShardName().startsWith("dev")) {
 			GalleryCommands.register();
 			manager.registerEvents(new GalleryManager(this), this);
 		}
 
 		if (ServerProperties.getShardName().contains("ring")
-				|| ServerProperties.getShardName().startsWith("dev")) {
+			|| ServerProperties.getShardName().startsWith("dev")) {
 			FishingCombatManager fishingCombatManager = new FishingCombatManager();
 			manager.registerEvents(fishingCombatManager, this);
 			manager.registerEvents(new FishingManager(fishingCombatManager), this);

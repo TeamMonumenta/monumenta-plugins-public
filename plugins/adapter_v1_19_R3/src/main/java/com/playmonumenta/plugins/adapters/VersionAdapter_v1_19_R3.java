@@ -5,13 +5,7 @@ import io.papermc.paper.adventure.PaperAdventure;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -28,13 +22,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
-import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
-import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.PanicGoal;
-import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
-import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
@@ -55,34 +43,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftCreature;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMob;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftParrot;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.entity.*;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboard;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
-import org.bukkit.entity.AbstractSkeleton;
-import org.bukkit.entity.Bee;
-import org.bukkit.entity.CaveSpider;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Drowned;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Evoker;
-import org.bukkit.entity.Fox;
-import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Parrot;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Spider;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkeleton;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -447,16 +412,16 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 	@Override
 	public boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks, Predicate<Material> checkedTypes) {
 		return io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
-				new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), null, loadChunks, false, false, true,
-				(state, pos) -> checkedTypes.test(state.getBukkitMaterial()));
+			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), null, loadChunks, false, false, true,
+			(state, pos) -> checkedTypes.test(state.getBukkitMaterial()));
 	}
 
 	@Override
 	public Set<Block> getCollidingBlocks(World world, BoundingBox aabb, boolean loadChunks) {
 		List<AABB> collisions = new ArrayList<>();
 		io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
-				new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), collisions, loadChunks, false, false, false,
-				(state, pos) -> state.getBukkitMaterial() != Material.SCAFFOLDING);
+			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), collisions, loadChunks, false, false, false,
+			(state, pos) -> state.getBukkitMaterial() != Material.SCAFFOLDING);
 		Set<Block> result = new HashSet<>();
 		for (AABB collision : collisions) {
 			// This assumes that block collision centers are within their block.
@@ -489,17 +454,17 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 			if (mob instanceof WitherSkeleton) {
 				// prevent wither skeletons from attacking piglins
 				availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
-						&& AbstractPiglin.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
+					&& AbstractPiglin.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
 			}
 		} else if (mob instanceof IronGolem) {
 			// prevent iron golems defending villages and attacking mobs
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof DefendVillageTargetGoal);
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
-					&& getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.Mob.class);
+				&& getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.Mob.class);
 		} else if (mob instanceof Drowned) {
 			// prevent drowneds from attacking mobs
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
-					&& net.minecraft.world.entity.Mob.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
+				&& net.minecraft.world.entity.Mob.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
 		} else if (mob instanceof Evoker) {
 			// disable vexes and fangs on evokers with the proper tags
 			if (mob.getScoreboardTags().contains("boss_evoker_no_vex")) {
@@ -511,7 +476,7 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		} else if (mob instanceof Wolf) {
 			// prevent wolves from attacking animals and skeletons
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
-					&& net.minecraft.world.entity.monster.AbstractSkeleton.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
+				&& net.minecraft.world.entity.monster.AbstractSkeleton.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NonTameRandomTargetGoal);
 			// disable panicking and avoiding llamas
 			availableGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == net.minecraft.world.entity.animal.Wolf.class);
@@ -537,18 +502,19 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 			// for bees used as aggressive mobs, disable the peaceful behaviours of pollination and using bee hives
 			if (mob.getScoreboardTags().contains("boss_targetplayer") || mob.getScoreboardTags().contains("boss_generictarget")) {
 				availableGoals.removeIf(goal -> goal.getGoal().getClass().getSimpleName().equals("d") // BeeEnterHiveGoal
-						|| goal.getGoal().getClass().getSimpleName().equals("k") // BeePollinateGoal
-						|| goal.getGoal().getClass().getSimpleName().equals("i") // BeeLocateHiveGoal
-						|| goal.getGoal().getClass().getSimpleName().equals("e") // BeeGoToHiveGoal
-						|| goal.getGoal().getClass().getSimpleName().equals("f") // BeeGoToKnownFlowerGoal
-						|| goal.getGoal().getClass().getSimpleName().equals("g") // BeeGrowCropGoal
+					|| goal.getGoal().getClass().getSimpleName().equals("k") // BeePollinateGoal
+					|| goal.getGoal().getClass().getSimpleName().equals("i") // BeeLocateHiveGoal
+					|| goal.getGoal().getClass().getSimpleName().equals("e") // BeeGoToHiveGoal
+					|| goal.getGoal().getClass().getSimpleName().equals("f") // BeeGoToKnownFlowerGoal
+					|| goal.getGoal().getClass().getSimpleName().equals("g") // BeeGrowCropGoal
 				);
 			}
 		}
 		// prevent all mobs from attacking iron golems and turtles
 		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
-				&& (getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.IronGolem.class
-				|| getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.Turtle.class));
+			&& (getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.IronGolem.class
+			|| getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.Turtle.class
+			|| getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.npc.AbstractVillager.class));
 	}
 
 	@Override
@@ -559,8 +525,8 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 	@Override
 	public boolean isSameItem(@Nullable org.bukkit.inventory.ItemStack item1, @Nullable org.bukkit.inventory.ItemStack item2) {
 		return item1 == item2
-				|| item1 instanceof CraftItemStack craftItem1 && item2 instanceof CraftItemStack craftItem2
-				&& craftItem1.handle == craftItem2.handle;
+			|| item1 instanceof CraftItemStack craftItem1 && item2 instanceof CraftItemStack craftItem2
+			&& craftItem1.handle == craftItem2.handle;
 	}
 
 	@Override

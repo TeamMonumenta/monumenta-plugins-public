@@ -171,6 +171,7 @@ public class PlayerListener implements Listener {
 	private static final String PLAYERS_TEAM_NAME = "players";
 	public static final String SOLO_DEATH_MOB_SLOW_EFFECT_NAME = "SoloDeathMobSlownessDebuff";
 	public static final String SOLO_DEATH_MOB_WEAKEN_EFFECT_NAME = "SoloDeathMobWeakenDebuff";
+	public static final String PLAYER_DEATH_TICK_TAG = "PlayerDeathTick";
 
 
 	private final Plugin mPlugin;
@@ -912,10 +913,13 @@ public class PlayerListener implements Listener {
 			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
 			event.deathMessage(null);
 		}
-
-		// Clear effects
-		mPlugin.mPotionManager.clearAllPotions(player);
-		mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
+		//Dont repeat if they died in the last 5 ticks
+		if (!MetadataUtils.checkOnceInRecentTicks(mPlugin, player, PLAYER_DEATH_TICK_TAG, 5)) {
+			event.deathMessage(null);
+			// Clear effects
+			mPlugin.mPotionManager.clearAllPotions(player);
+			mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
+		}
 	}
 
 	// The player has respawned.
