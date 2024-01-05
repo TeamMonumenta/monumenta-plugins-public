@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -180,7 +181,18 @@ public class RestlessSouls extends Ability {
 								LivingEntity randomMob = nearbyMobs.get(0);
 								if (randomMob != null) {
 									mBoss.setTarget(randomMob);
+									mTarget = randomMob;
 									world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.0f);
+
+									Vector dir = LocationUtils.getHalfHeightLocation(randomMob).subtract(mBoss.getLocation()).toVector().normalize();
+									new PPLine(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), LocationUtils.getEntityCenter(randomMob))
+										.countPerMeter(1.5)
+										.directionalMode(true)
+										.delta(dir.getX(), dir.getY(), dir.getZ())
+										.extra(0.12)
+										.includeEnd(false)
+										.spawnAsPlayerActive(mPlayer);
+									new PartialParticle(Particle.SOUL, randomMob.getLocation().add(0, randomMob.getEyeHeight() + 1, 0), 8).extra(0.02).spawnAsPlayerActive(mPlayer);
 								}
 							}
 						}
