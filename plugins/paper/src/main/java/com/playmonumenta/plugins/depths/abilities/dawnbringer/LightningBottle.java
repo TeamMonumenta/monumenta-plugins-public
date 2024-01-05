@@ -48,11 +48,12 @@ import org.jetbrains.annotations.Nullable;
 public class LightningBottle extends DepthsAbility {
 	public static final String ABILITY_NAME = "Lightning Bottle";
 	public static final String POTION_NAME = ABILITY_NAME;
-	public static final double[] DAMAGE = {6, 7.5, 9, 10.5, 12, 20};
+	public static final double[] DAMAGE = {6, 7.5, 9, 10.5, 12, 15};
 	public static final double[] VULNERABILITY = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
 	public static final double SLOWNESS = 0.2;
 	public static final int MAX_STACK = 12;
-	public static final int KILLS_PER = 2;
+	public static final int KILLS_PER = 4;
+	public static final int BOTTLES_GIVEN = 2;
 	public static final int DURATION = 3 * 20;
 	public static final int DEATH_RADIUS = 32;
 	public static final double RADIUS = 4;
@@ -64,12 +65,14 @@ public class LightningBottle extends DepthsAbility {
 			.descriptions(LightningBottle::getDescription);
 
 	private final int mKillsPer;
+	private final int mBottlesGiven;
 	private final double mDeathRadius;
 	private final int mMaxStack;
 	private final double mSlow;
 	private final double mVuln;
 	private final double mDamage;
 	private final int mDuration;
+	private final double mRadius;
 
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 	private int mCount = 0;
@@ -79,12 +82,14 @@ public class LightningBottle extends DepthsAbility {
 		super(plugin, player, INFO);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 		mKillsPer = KILLS_PER + (int) CharmManager.getLevel(mPlayer, CharmEffects.LIGHTNING_BOTTLE_KILLS_PER_BOTTLE.mEffectName);
+		mBottlesGiven = BOTTLES_GIVEN;
 		mDeathRadius = DEATH_RADIUS;
 		mMaxStack = MAX_STACK + (int) CharmManager.getLevel(mPlayer, CharmEffects.LIGHTNING_BOTTLE_MAX_STACKS.mEffectName);
 		mSlow = SLOWNESS + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.LIGHTNING_BOTTLE_SLOW_AMPLIFIER.mEffectName);
 		mVuln = VULNERABILITY[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.LIGHTNING_BOTTLE_VULN_AMPLIFIER.mEffectName);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.LIGHTNING_BOTTLE_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.LIGHTNING_BOTTLE_DURATION.mEffectName, DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.LIGHTNING_BOTTLE_RADIUS.mEffectName, RADIUS);
 	}
 
 	@Override
@@ -126,9 +131,7 @@ public class LightningBottle extends DepthsAbility {
 			potion.teleport(loc.clone().add(0, 0.25, 0));
 			potion.setVelocity(new Vector(0, 0, 0));
 
-			double radius = CharmManager.getRadius(mPlayer, CharmEffects.LIGHTNING_BOTTLE_RADIUS.mEffectName, RADIUS);
-
-			Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
+			Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 			for (LivingEntity entity : hitbox.getHitMobs()) {
 				DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, false, true, false);
 
@@ -161,10 +164,10 @@ public class LightningBottle extends DepthsAbility {
 
 			if (potCount < mMaxStack) {
 				if (firstFoundPotStack != null) {
-					firstFoundPotStack.setAmount(firstFoundPotStack.getAmount() + 1);
+					firstFoundPotStack.setAmount(Math.min(mMaxStack, firstFoundPotStack.getAmount() + mBottlesGiven));
 				} else {
 					ItemStack newPotions = getLightningBottle();
-					newPotions.setAmount(1);
+					newPotions.setAmount(mBottlesGiven);
 					inv.addItem(newPotions);
 				}
 			}
@@ -201,11 +204,15 @@ public class LightningBottle extends DepthsAbility {
 			.add(a -> a.mKillsPer, KILLS_PER, true)
 			.add(" mobs that die within ")
 			.add(a -> a.mDeathRadius, DEATH_RADIUS)
-			.add(" blocks of you, you gain a lightning bottle, which stack up to ")
+			.add(" blocks of you, gain ")
+			.add(a -> a.mBottlesGiven, BOTTLES_GIVEN)
+			.add(" lightning bottles, which stack up to ")
 			.add(a -> a.mMaxStack, MAX_STACK)
 			.add(". Throwing a lightning bottle deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" magic damage and applies ")
+			.add(" magic damage in a ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" block radius and applies ")
 			.addPercent(a -> a.mSlow, SLOWNESS)
 			.add(" slowness and ")
 			.addPercent(a -> a.mVuln, VULNERABILITY[rarity - 1], false, true)

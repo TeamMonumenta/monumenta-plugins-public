@@ -146,7 +146,7 @@ public class DivineBeam extends DepthsAbility {
 
 		for (LivingEntity mob : hitMobs) {
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-				EntityUtils.applySlow(mPlugin, stun, 1, mob);
+				EntityUtils.applyStun(mPlugin, stun / 2, mob);
 			} else {
 				EntityUtils.applyStun(mPlugin, stun, mob);
 			}
@@ -176,7 +176,7 @@ public class DivineBeam extends DepthsAbility {
 			.addPercent(a -> a.mHeal, HEAL[rarity - 1], false, true)
 			.add(" of their max health and stunning non-Elite mobs hit for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], false, true)
-			.add(" seconds. Elites are rooted instead. Healing is increased by " + StringUtils.multiplierToPercentage(HEAL_INCREASE_PER_TARGET) + "% and stun duration is increased by " + StringUtils.ticksToSeconds(STUN_INCREASE_PER_TARGET) + "s per player or mob hit, up to ")
+			.add(" seconds. Elites are stunned for half the duration instead. Healing is increased by " + StringUtils.multiplierToPercentage(HEAL_INCREASE_PER_TARGET) + "% and stun duration is increased by " + StringUtils.ticksToSeconds(STUN_INCREASE_PER_TARGET) + "s per player or mob hit, up to ")
 			.add(a -> a.mMaxTargetBonus, MAX_TARGET_BONUS)
 			.add(" targets. Excess healing is converted to absorption, up to ")
 			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION)
