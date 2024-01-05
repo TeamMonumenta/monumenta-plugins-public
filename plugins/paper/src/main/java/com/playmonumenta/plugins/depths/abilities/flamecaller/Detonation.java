@@ -77,10 +77,10 @@ public class Detonation extends DepthsAbility {
 		return new DescriptionBuilder<Detonation>(color)
 			.add("When an enemy dies within ")
 			.add(a -> a.mDeathRadius, DEATH_RADIUS)
-			.add(" blocks of you it explodes, dealing ")
+			.add(" blocks of you, it explodes, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" magic damage in a ")
+			.add(" magic damage to other enemies within ")
 			.add(a -> a.mDamageRadius, DAMAGE_RADIUS)
-			.add(" block radius to other enemies.");
+			.add(" blocks.");
 	}
 }

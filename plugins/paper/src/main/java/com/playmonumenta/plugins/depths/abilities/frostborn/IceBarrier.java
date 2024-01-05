@@ -188,7 +188,7 @@ public class IceBarrier extends DepthsAbility {
 			.add(" seconds and within ")
 			.add(a -> a.mLength, MAX_LENGTH[rarity - 1], false, null, true)
 			.add(" blocks of the first marker forms a wall of ice connecting the two points, lasting for ")
-			.addDuration(ICE_TICKS[rarity - 1])
+			.addDuration(a -> a.mIceDuration, ICE_TICKS[rarity - 1])
 			.add(" seconds. If there is a height difference of 4 or more blocks between the two markers, an ice staircase is placed instead. Deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs near the ice when placed. Enemies that break the barrier are stunned for 2s. Cooldown is refunded if no second marker is placed.")

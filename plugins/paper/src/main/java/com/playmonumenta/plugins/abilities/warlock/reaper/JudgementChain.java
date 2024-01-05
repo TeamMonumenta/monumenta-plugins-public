@@ -97,7 +97,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 									"For the next 20s, long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. " +
 									"All damage taken by the chained mob is passed to the nearest mob in 8 blocks. " +
 									"All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. " +
-									"Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. " +
+									"Swap hands while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. " +
 									"Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.",
 							"While a mob is chained, the reaper gains 10% damage resistance. " +
 									"When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. " +

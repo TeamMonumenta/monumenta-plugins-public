@@ -130,7 +130,7 @@ public class Permafrost extends DepthsAbility {
 			.add(a -> a.mRadius, TRAIL_MARK_RADIUS)
 			.add(" blocks leave a trail of ice that lasts ")
 			.addDuration(a -> a.mTrailIceDuration, ICE_TRAIL_TICKS)
-			.add(" seconds whereever they walk for the next ")
+			.add(" seconds wherever they walk for the next ")
 			.addDuration(a -> a.mTrailDuration, TRAIL_MARK_DURATION)
 			.add(" seconds. All ice you place with abilities lasts ")
 			.addDuration(a -> a.mBonusIceDuration, ICE_BONUS_DURATION[rarity - 1], false, true)

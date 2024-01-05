@@ -525,7 +525,7 @@ public class DepthsListener implements Listener {
 			rebirth.rerollAbilities(dp);
 			rebirth.applyResistance();
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(teleportTo));
-			dp.mNumDeaths++;
+			dp.mNumDeaths--;
 			dp.sendMessage("You have been reborn!");
 			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
 			if (party != null) {

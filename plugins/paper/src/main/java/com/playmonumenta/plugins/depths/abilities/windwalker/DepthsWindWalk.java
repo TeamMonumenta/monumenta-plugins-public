@@ -161,7 +161,7 @@ public class DepthsWindWalk extends DepthsAbility {
 			.addDuration(a -> a.mLevitationDuration, LEVITATION_DURATION)
 			.add(" seconds, and stun for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds all non-Boss enemies dashed through. Gain immunity to melee damage for 0.5s when triggered.")
+			.add(" seconds to all non-Boss enemies dashed through. Gain immunity to melee damage for 0.5s when triggered.")
 			.addCooldown(COOLDOWN[rarity - 1], true);
 	}
 }

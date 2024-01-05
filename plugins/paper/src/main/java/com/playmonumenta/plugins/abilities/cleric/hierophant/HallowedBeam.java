@@ -81,7 +81,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 					"If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. " +
 					"If aimed at an Undead, it instantly deals magic damage equal to your projectile damage to the target, and stuns them for one second. " +
 					"If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. " +
-					"Pressing Swap while holding a projectile weapon will change the mode of Hallowed Beam between 'Default' (default), " +
+					"Swap hands while holding a projectile weapon will change the mode of Hallowed Beam between 'Default' (default), " +
 					"'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). " +
 					"This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.",
 				"Hallowed Beam gains a third charge (and can apply Recoil three times before touching the ground), " +

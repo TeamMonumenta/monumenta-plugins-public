@@ -156,7 +156,7 @@ public class TotemOfSalvation extends DepthsAbility {
 			.add(" of their max health every ")
 			.addDuration(a -> a.mTickFrequency, TICK_FREQUENCY[rarity - 1], true, true)
 			.add(" second")
-			.add(TICK_FREQUENCY[rarity - 1] == 20 ? "s" : "")
+			.add(TICK_FREQUENCY[rarity - 1] == 20 ? "" : "s")
 			.add(". If a player has full health, the healing will be converted into absorption that lasts ")
 			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
 			.add(" seconds and caps at ")

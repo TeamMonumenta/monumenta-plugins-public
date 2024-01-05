@@ -71,7 +71,10 @@ public class AbilityTrigger {
 		NO_SHIELD("not holding a shield", "may be holding a shield", Material.SHIELD,
 			player -> player.getInventory().getItemInMainHand().getType() != Material.SHIELD),
 		NO_BLOCKS("not holding blocks", "may be holding blocks", Material.COBBLESTONE,
-			player -> !player.getInventory().getItemInMainHand().getType().isBlock()),
+			player -> {
+				ItemStack mainhand = player.getInventory().getItemInMainHand();
+				return !mainhand.getType().isBlock() || ItemUtils.isWand(mainhand);
+			}),
 		NO_MISC("not holding a compass, a multitool, or a riptide trident while swimming", "may be holding a compass, a multitool, or a riptide trident while swimming", Material.COMPASS,
 			player -> {
 				ItemStack mainhand = player.getInventory().getItemInMainHand();

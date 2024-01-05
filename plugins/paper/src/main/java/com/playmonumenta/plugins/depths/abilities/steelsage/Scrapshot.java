@@ -127,7 +127,7 @@ public class Scrapshot extends DepthsAbility {
 		return new DescriptionBuilder<Scrapshot>(color)
 			.add("Left click while sneaking to fire a blunderbuss shot that goes up to ")
 			.add(a -> a.mRange, RANGE)
-			.add(" blocks, in a cone that deals ")
+			.add(" blocks in a cone, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" projectile damage and knocks you backward. Damage is decreased based on distance if the distance is greater than 25% of the max range.")
 			.addCooldown(COOLDOWN);

@@ -83,7 +83,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 				String.format("Damage is increased to %s, number of shots increased to %s, " +
 					"stack decay rate is reduced to 1 stack per %ss.",
 					CRYSTAL_DAMAGE_2, SHOT_COUNT_2, STACK_DECAY_TIME_2),
-				String.format("Pressing swap while sneaking and holding a projectile weapon " +
+				String.format("Swap hands while sneaking and holding a projectile weapon " +
 					"will use all existing crystal stacks to provide %s%% speed per stack (max %s%%) to the Shaman " +
 					"for %ss. Decay rate reduced to 1 stack per %ss. Can now target outside of line of sight. Cooldown %ss.",
 					StringUtils.multiplierToPercentage(SPEED_PER_STACK),

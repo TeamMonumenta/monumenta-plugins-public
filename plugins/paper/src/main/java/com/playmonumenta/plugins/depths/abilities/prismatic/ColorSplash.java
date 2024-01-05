@@ -717,11 +717,11 @@ public class ColorSplash extends DepthsAbility {
 			.add(Component.text("\nFlamecaller").color(TextColor.color(DepthsUtils.FLAMECALLER)))
 			.add(" - For ")
 			.addDuration(FLAMECALLER_DURATION)
-			.add("s, summon a meteor shower at your cursor, dealing ")
+			.add("s, summon a meteor shower at the location where you are looking, dealing ")
 			.addDepthsDamage(a -> FLAMECALLER_DAMAGE[rarity - 1], FLAMECALLER_DAMAGE[rarity - 1], true)
-			.add(" magic damage per hit, in a ")
+			.add(" magic damage to mobs within ")
 			.add(FLAMECALLER_IMPACT_RADIUS)
-			.add(" block radius.");
+			.add(" blocks upon impact.");
 	}
 
 	private static Description<ColorSplash> getDawnbringerDescription(int rarity, TextColor color) {

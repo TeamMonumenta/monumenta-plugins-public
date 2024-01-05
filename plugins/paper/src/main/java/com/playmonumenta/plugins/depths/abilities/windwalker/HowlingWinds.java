@@ -142,7 +142,7 @@ public class HowlingWinds extends DepthsAbility {
 			.add(" blocks towards its center on spawn and continues pulling every ")
 			.addDuration(a -> PULL_INTERVAL[rarity - 1], PULL_INTERVAL[rarity - 1], true, true)
 			.add(" second")
-			.add(PULL_INTERVAL[rarity - 1] == 20 ? "s" : "")
+			.add(PULL_INTERVAL[rarity - 1] == 20 ? "" : "s")
 			.add(".")
 			.addCooldown(COOLDOWN);
 	}
