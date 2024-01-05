@@ -3,17 +3,15 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 
-public class Understanding implements Infusion {
-
-	public static final double POINTS_PER_LEVEL = 0.20;
+public class Revelation implements Infusion {
 
 	@Override
 	public String getName() {
-		return "Understanding";
+		return "Revelation";
 	}
 
 	@Override
 	public InfusionType getInfusionType() {
-		return InfusionType.UNDERSTANDING;
+		return InfusionType.REVELATION;
 	}
 }

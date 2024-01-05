@@ -15,86 +15,87 @@ import org.jetbrains.annotations.Nullable;
 
 public enum InfusionType {
 	// Infusions
-	ACUMEN(new Acumen(), "", true, false, false, false, true, false, true),
-	FOCUS(new Focus(), "", true, false, false, false, true, false, true),
-	PERSPICACITY(new Perspicacity(), "", true, false, false, false, true, false, true),
-	TENACITY(new Tenacity(), "", true, false, false, false, true, false, true),
-	VIGOR(new Vigor(), "", true, false, false, false, true, false, true),
-	VITALITY(new Vitality(), "", true, false, false, false, true, false, true),
+	ACUMEN(new Acumen(), "", true, false, false, false, true, false, true, true),
+	FOCUS(new Focus(), "", true, false, false, false, true, false, true, true),
+	PERSPICACITY(new Perspicacity(), "", true, false, false, false, true, false, true, true),
+	TENACITY(new Tenacity(), "", true, false, false, false, true, false, true, true),
+	VIGOR(new Vigor(), "", true, false, false, false, true, false, true, true),
+	VITALITY(new Vitality(), "", true, false, false, false, true, false, true, true),
 
 	// Delve Infusions
-	ANTIGRAV(new AntiGrav(), "", true, false, false, false, true, true, true),
-	ARDOR(new Ardor(), "", true, false, false, false, true, true, true),
-	AURA(new Aura(), "", true, false, false, false, true, true, true),
-	CARAPACE(new Carapace(), "", true, false, false, false, true, true, true),
-	CELESTIAL(new Celestial(), "", true, false, false, false, true, true, true),
-	CHOLER(new Choler(), "", true, false, false, false, true, true, true),
-	DECAPITATION(new Decapitation(), "", true, false, false, false, true, true, true),
-	EMPOWERED(new Empowered(), "", true, false, false, false, true, true, true),
-	ENERGIZE(new Energize(), "", true, false, false, false, true, true, true),
-	EPOCH(new Epoch(), "", true, false, false, false, true, true, true),
-	EXECUTION(new Execution(), "", true, false, false, false, true, true, true),
-	EXPEDITE(new Expedite(), "", true, false, false, false, true, true, true),
-	FUELED(new Fueled(), "", true, false, false, false, true, true, true),
-	GALVANIC(new Galvanic(), "", true, false, false, false, true, true, true),
-	GRACE(new Grace(), "", true, false, false, false, true, true, true),
-	MITOSIS(new Mitosis(), "", true, false, false, false, true, true, true),
-	NATANT(new Natant(), "", true, false, false, false, true, true, true),
-	NUTRIMENT(new Nutriment(), "", true, false, false, false, true, true, true),
-	PENNATE(new Pennate(), "", true, false, false, false, true, true, true),
-	QUENCH(new Quench(), "", true, false, false, false, true, true, true),
-	REFLECTION(new Reflection(), "", true, false, false, false, true, true, true),
-	REFRESH(new Refresh(), "", true, false, false, false, true, true, true),
-	SOOTHING(new Soothing(), "", true, false, false, false, true, true, true),
-	UNDERSTANDING(new Understanding(), "", true, false, false, false, true, false, true),
-	UNYIELDING(new Unyielding(), "", true, false, false, false, true, true, true),
-	USURPER(new Usurper(), "", true, false, false, false, true, true, true),
-	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true, true),
+	ANTIGRAV(new AntiGrav(), "", true, false, false, false, true, true, true, false),
+	ARDOR(new Ardor(), "", true, false, false, false, true, true, true, false),
+	AURA(new Aura(), "", true, false, false, false, true, true, true, false),
+	CARAPACE(new Carapace(), "", true, false, false, false, true, true, true, false),
+	CELESTIAL(new Celestial(), "", true, false, false, false, true, true, true, false),
+	CHOLER(new Choler(), "", true, false, false, false, true, true, true, false),
+	DECAPITATION(new Decapitation(), "", true, false, false, false, true, true, true, false),
+	EMPOWERED(new Empowered(), "", true, false, false, false, true, true, true, false),
+	ENERGIZE(new Energize(), "", true, false, false, false, true, true, true, false),
+	EPOCH(new Epoch(), "", true, false, false, false, true, true, true, false),
+	EXECUTION(new Execution(), "", true, false, false, false, true, true, true, false),
+	EXPEDITE(new Expedite(), "", true, false, false, false, true, true, true, false),
+	FUELED(new Fueled(), "", true, false, false, false, true, true, true, false),
+	GALVANIC(new Galvanic(), "", true, false, false, false, true, true, true, false),
+	GRACE(new Grace(), "", true, false, false, false, true, true, true, false),
+	MITOSIS(new Mitosis(), "", true, false, false, false, true, true, true, false),
+	NATANT(new Natant(), "", true, false, false, false, true, true, true, false),
+	NUTRIMENT(new Nutriment(), "", true, false, false, false, true, true, true, false),
+	PENNATE(new Pennate(), "", true, false, false, false, true, true, true, false),
+	QUENCH(new Quench(), "", true, false, false, false, true, true, true, false),
+	REFLECTION(new Reflection(), "", true, false, false, false, true, true, true, false),
+	REFRESH(new Refresh(), "", true, false, false, false, true, true, true, false),
+	SOOTHING(new Soothing(), "", true, false, false, false, true, true, true, false),
+	UNDERSTANDING(new Understanding(), "", true, false, false, false, true, true, true, false),
+	UNYIELDING(new Unyielding(), "", true, false, false, false, true, true, true, false),
+	USURPER(new Usurper(), "", true, false, false, false, true, true, true, false),
+	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true, true, false),
 	// Other Added Tags
-	LOCKED(new Locked(), "", false, false, false, false, false, false, false),
-	BARKING(new Barking(), "", true, false, true, false, false, false, false),
-	DEBARKING(new Debarking(), "", false, false, false, false, false, false, false),
-	RUSTWORTHY(new Rustworthy(), "", true, true, false, false, false, false, false),
-	UNRUSTWORTHY(new Unrustworthy(), "", false, false, false, false, false, false, false),
-	WAX_ON(new WaxOn(), "", false, false, false, false, false, false, false),
-	WAX_OFF(new WaxOff(), "", false, false, false, false, false, false, false),
+	LOCKED(new Locked(), "", false, false, false, false, false, false, false, false),
+	BARKING(new Barking(), "", true, false, true, false, false, false, false, false),
+	DEBARKING(new Debarking(), "", false, false, false, false, false, false, false, false),
+	RUSTWORTHY(new Rustworthy(), "", true, true, false, false, false, false, false, false),
+	UNRUSTWORTHY(new Unrustworthy(), "", false, false, false, false, false, false, false, false),
+	WAX_ON(new WaxOn(), "", false, false, false, false, false, false, false, false),
+	WAX_OFF(new WaxOff(), "", false, false, false, false, false, false, false, false),
 	// Ichor Imbuements
-	ICHOR_DAWNBRINGER(new IchorDawnbringer(), "", false, false, false, false, false, false, true),
-	ICHOR_EARTHBOUND(new IchorEarthbound(), "", false, false, false, false, false, false, true),
-	ICHOR_FLAMECALLER(new IchorFlamecaller(), "", false, false, false, false, false, false, true),
-	ICHOR_FROSTBORN(new IchorFrostborn(), "", false, false, false, false, false, false, true),
-	ICHOR_PRISMATIC(new IchorPrismatic(), "", false, false, false, false, false, false, true),
-	ICHOR_SHADOWDANCER(new IchorShadowdancer(), "", false, false, false, false, false, false, true),
-	ICHOR_STEELSAGE(new IchorSteelsage(), "", false, false, false, false, false, false, true),
-	ICHOR_WINDWALKER(new IchorWindwalker(), "", false, false, false, false, false, false, true),
+	ICHOR_DAWNBRINGER(new IchorDawnbringer(), "", false, false, false, false, false, false, true, false),
+	ICHOR_EARTHBOUND(new IchorEarthbound(), "", false, false, false, false, false, false, true, false),
+	ICHOR_FLAMECALLER(new IchorFlamecaller(), "", false, false, false, false, false, false, true, false),
+	ICHOR_FROSTBORN(new IchorFrostborn(), "", false, false, false, false, false, false, true, false),
+	ICHOR_PRISMATIC(new IchorPrismatic(), "", false, false, false, false, false, false, true, false),
+	ICHOR_SHADOWDANCER(new IchorShadowdancer(), "", false, false, false, false, false, false, true, false),
+	ICHOR_STEELSAGE(new IchorSteelsage(), "", false, false, false, false, false, false, true, false),
+	ICHOR_WINDWALKER(new IchorWindwalker(), "", false, false, false, false, false, false, true, false),
 	// Boss/Special Infusions
-	HOPE(new Hope(), "Hoped", false, false, true, false, false, false, true),
-	COLOSSAL(new Colossal(), "Reinforced", false, false, false, false, false, false, true),
-	PHYLACTERY(new Phylactery(), "Embalmed", false, false, false, false, false, false, true),
-	SOULBOUND(new Soulbound(), "Soulbound", false, false, false, false, false, false, false),
-	FESTIVE(new Festive(), "Decorated", false, false, true, false, false, false, false),
-	GILDED(new Gilded(), "Gilded", false, false, true, false, false, false, false),
-	SHATTERED(new Shattered(), "", true, false, false, false, false, false, false),
+	HOPE(new Hope(), "Hoped", false, false, true, false, false, false, true, false),
+	COLOSSAL(new Colossal(), "Reinforced", false, false, false, false, false, false, true, false),
+	PHYLACTERY(new Phylactery(), "Embalmed", false, false, false, false, false, false, true, false),
+	REVELATION(new Revelation(), "Invoked", false, false, false, false, false, false, true, false),
+	SOULBOUND(new Soulbound(), "Soulbound", false, false, false, false, false, false, false, false),
+	FESTIVE(new Festive(), "Decorated", false, false, true, false, false, false, false, false),
+	GILDED(new Gilded(), "Gilded", false, false, true, false, false, false, false, false),
+	SHATTERED(new Shattered(), "", true, false, false, false, false, false, false, false),
 	// Stat tracking stuff
-	STAT_TRACK(new StatTrack(), "Tracked", false, false, false, false, false, false, false),
-	STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_DAMAGE(new StatTrackDamage(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_MELEE(new StatTrackMelee(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_PROJECTILE(new StatTrackProjectile(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_MAGIC(new StatTrackMagic(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_BOSS(new StatTrackBoss(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_SPAWNER(new StatTrackSpawners(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_RIPTIDE(new StatTrackRiptide(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_BLOCKS_BROKEN(new StatTrackBlocksBroken(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_SHIELD_BLOCKED(new StatTrackShielded(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_DEATH(new StatTrackDeath(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_REPAIR(new StatTrackRepair(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_CONVERT(new StatTrackConvert(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_HEALING_DONE(new StatTrackHealingDone(), "", true, false, false, true, false, false, false),
-	STAT_TRACK_FISH_CAUGHT(new StatTrackFishCaught(), "", true, false, false, true, false, false, false);
+	STAT_TRACK(new StatTrack(), "Tracked", false, false, false, false, false, false, false, false),
+	STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_DAMAGE(new StatTrackDamage(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_MELEE(new StatTrackMelee(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_PROJECTILE(new StatTrackProjectile(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_MAGIC(new StatTrackMagic(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_BOSS(new StatTrackBoss(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_SPAWNER(new StatTrackSpawners(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_RIPTIDE(new StatTrackRiptide(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_BLOCKS_BROKEN(new StatTrackBlocksBroken(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_SHIELD_BLOCKED(new StatTrackShielded(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_DEATH(new StatTrackDeath(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_REPAIR(new StatTrackRepair(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_CONVERT(new StatTrackConvert(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_HEALING_DONE(new StatTrackHealingDone(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_FISH_CAUGHT(new StatTrackFishCaught(), "", true, false, false, true, false, false, false, false);
 
 	public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
 		.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
@@ -119,8 +120,9 @@ public enum InfusionType {
 	final boolean mIsDisabledByShatter;
 	final boolean mIsDelveInfusion;
 	final boolean mIsDataCollected;
+	final boolean mIsBaseInfusion;
 
-	InfusionType(ItemStat itemStat, String message, boolean hasLevels, boolean isCurse, boolean isSpawnable, boolean isStatTrackOption, boolean isDisabledByShatter, boolean isDelveInfusion, boolean isDataCollected) {
+	InfusionType(ItemStat itemStat, String message, boolean hasLevels, boolean isCurse, boolean isSpawnable, boolean isStatTrackOption, boolean isDisabledByShatter, boolean isDelveInfusion, boolean isDataCollected, boolean isBaseInfusion) {
 		mItemStat = itemStat;
 		mName = itemStat.getName();
 		mIsSpawnable = isSpawnable;
@@ -131,6 +133,7 @@ public enum InfusionType {
 		mIsDisabledByShatter = isDisabledByShatter;
 		mIsDelveInfusion = isDelveInfusion;
 		mIsDataCollected = isDataCollected;
+		mIsBaseInfusion = isBaseInfusion;
 	}
 
 	public ItemStat getItemStat() {
@@ -159,6 +162,10 @@ public enum InfusionType {
 
 	public boolean isDataCollected() {
 		return mIsDataCollected;
+	}
+
+	public boolean isBaseInfusion() {
+		return mIsBaseInfusion;
 	}
 
 	public Component getDisplay(int level, @Nullable String infuser) {

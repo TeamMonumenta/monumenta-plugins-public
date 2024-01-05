@@ -228,6 +228,14 @@ public class ItemStatManager implements Listener {
 			ItemStatsMap newArmorMultiplyStats;
 			ItemStatsMap newMainhandMultiplyStats = new ItemStatsMap();
 			ItemStatsMap newStats = new ItemStatsMap();
+			List<Infusion> baseInfusionsArmor = new ArrayList<>();
+			List<Infusion> baseInfusionsMainhand = new ArrayList<>();
+			Set<InfusionType> delveInfusionsWithRevelation = new HashSet<>();
+
+			if (!updateAll && mMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) != ItemStatUtils.getInfusionLevel(mainhand, InfusionType.UNDERSTANDING)) {
+				updateStats(mainhand, player.getInventory().getItemInOffHand(), player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots(), player, true, region);
+				return;
+			}
 
 			if (updateAll) {
 				newArmorAddStats = new ItemStatsMap();
@@ -260,6 +268,7 @@ public class ItemStatManager implements Listener {
 
 						double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.33, 0.165);
 						boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
+						boolean appliedUnderstanding = false;
 
 						for (ItemStat stat : ITEM_STATS) {
 							if (stat instanceof Attribute attribute) {
@@ -279,7 +288,20 @@ public class ItemStatManager implements Listener {
 								}
 							} else if (stat instanceof Infusion infusion) {
 								if (!(infusion.getInfusionType().isDisabledByShatter() && shattered)) {
-									newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
+									int revelation = 0;
+									int infusionLevel = ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType());
+
+									if (infusion.getInfusionType().isDelveInfusion() && infusion.getInfusionType() != InfusionType.REVELATION && infusionLevel > 0) {
+										revelation = Math.min(1, ItemStatUtils.getInfusionLevel(infusions, InfusionType.REVELATION));
+										if (revelation == 1) {
+											delveInfusionsWithRevelation.add(infusion.getInfusionType());
+										}
+									}
+									if (infusion.getInfusionType().isBaseInfusion() && infusionLevel > 0 && !appliedUnderstanding) {
+										baseInfusionsArmor.add(infusion);
+										appliedUnderstanding = true;
+									}
+									newArmorAddStats.add(stat, revelation + infusionLevel);
 								}
 							}
 						}
@@ -297,6 +319,7 @@ public class ItemStatManager implements Listener {
 					ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
 
 					double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.33, 0.165);
+					boolean appliedUnderstanding = false;
 
 					if (!ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) ||
 							(ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) && PlayerUtils.isAlchemist(player))) {
@@ -323,14 +346,36 @@ public class ItemStatManager implements Listener {
 									newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
 								}
 							} else if (stat instanceof Infusion infusion) {
-								newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
+								int revelation = 0;
+								int infusionLevel = ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType());
+
+								if (infusion.getInfusionType().isDelveInfusion() && infusion.getInfusionType() != InfusionType.REVELATION && infusionLevel > 0) {
+									revelation = Math.min(1, ItemStatUtils.getInfusionLevel(infusions, InfusionType.REVELATION));
+									if (revelation == 1) {
+										delveInfusionsWithRevelation.add(infusion.getInfusionType());
+									}
+								}
+								if (infusion.getInfusionType().isBaseInfusion() && infusionLevel > 0 && !appliedUnderstanding) {
+									baseInfusionsMainhand.add(infusion);
+									appliedUnderstanding = true;
+								}
+								newMainhandAddStats.add(stat, revelation + infusionLevel);
 							}
 						}
 					}
 				});
 			}
 
-			int understanding = Math.min(DelveInfusionUtils.MAX_LEVEL, (int) (newArmorAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) + newMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat())));
+			int understanding = Math.min(delveInfusionsWithRevelation.contains(InfusionType.UNDERSTANDING) ? DelveInfusionUtils.MAX_LEVEL : DelveInfusionUtils.MAX_LEVEL + 1,
+				(int) (newArmorAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) + newMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat())));
+
+			for (Infusion infusion : baseInfusionsArmor) {
+				newArmorAddStats.set(infusion.getInfusionType().getItemStat(), newArmorAddStats.get(infusion.getInfusionType().getItemStat()) + understanding * Understanding.POINTS_PER_LEVEL);
+			}
+
+			for (Infusion infusion : baseInfusionsMainhand) {
+				newMainhandAddStats.set(infusion.getInfusionType().getItemStat(), newMainhandAddStats.get(infusion.getInfusionType().getItemStat()) + understanding * Understanding.POINTS_PER_LEVEL);
+			}
 
 			for (ItemStat stat : ITEM_STATS) {
 				double newAdd = newArmorAddStats.mMap.getOrDefault(stat, 0.0) + newMainhandAddStats.mMap.getOrDefault(stat, 0.0);
@@ -340,7 +385,7 @@ public class ItemStatManager implements Listener {
 				} else if (stat instanceof Phylactery) {
 					newStats.set(stat, newAdd * (1 + newMultiply) + Phylactery.BASE_POTION_KEEP_LEVEL);
 				} else if (stat instanceof Infusion infusion && infusion.getInfusionType().isDelveInfusion() && newAdd > 0) {
-					newStats.set(stat, Math.min(newAdd, DelveInfusionUtils.MAX_LEVEL) + understanding * Understanding.POINTS_PER_LEVEL);
+					newStats.set(stat, Math.min(newAdd, delveInfusionsWithRevelation.contains(infusion.getInfusionType()) ? DelveInfusionUtils.MAX_LEVEL + 1 : DelveInfusionUtils.MAX_LEVEL));
 				} else {
 					newStats.set(stat, newAdd * (1 + newMultiply));
 				}

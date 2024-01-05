@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.custominventories;
 
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Ardor;
 import com.playmonumenta.plugins.itemstats.infusions.Aura;
 import com.playmonumenta.plugins.itemstats.infusions.Carapace;
@@ -32,6 +33,7 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -72,7 +74,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final List<ItemStack> mInvalidItems;
 	private static final ItemStack mRefundItem;
+	private static final ItemStack mFullRefundItem;
 	private static final ItemStack mMaxLevelReachedItem;
+	private static final ItemStack mMaxLevelReachedRevelationItem;
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 
@@ -108,7 +112,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			if (!perLevel.isEmpty()) {
 				perLevel += " of this Infusion";
 			}
-			return "All other Delve Infusions you are currently benefiting from gain " + levels + " level" + s + perLevel + ".";
+			return "All non-Delve Infusions you are currently benefiting from gain " + StringUtils.to2DP(levels) + " level" + s + " per item" + perLevel + ".";
 		});
 		//R3
 		addItems(DelveInfusionSelection.SOOTHING, (i, perLevel) -> "Regenerate " + Soothing.HEAL_PER_LEVEL * i + " health" + perLevel + " each second.");
@@ -126,8 +130,14 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		//Refund item
 		mRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true, "You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : (int) (DelveInfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", NamedTextColor.GRAY);
 
+		//Refund item
+		mFullRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true, "You will receive 100% of the experience, and all of the materials back.", NamedTextColor.GRAY);
+
 		//Cake for max level reached
 		mMaxLevelReachedItem = GUIUtils.createBasicItem(Material.CAKE, "Congratulations!", NamedTextColor.DARK_AQUA, true, "You've reached the max Delve Infusion level on this item.", NamedTextColor.DARK_AQUA);
+
+		// Echo shard for item with Revelation & max level
+		mMaxLevelReachedRevelationItem = GUIUtils.createBasicItem(Material.ECHO_SHARD, "Revelation!", NamedTextColor.DARK_AQUA, true, "You've reached the max Delve Infusion level on this item, and Invoked it to its true potential.", NamedTextColor.DARK_AQUA);
 	}
 
 	public DelveInfusionCustomInventory(Player owner) {
@@ -275,7 +285,11 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 				}.runTaskLater(Plugin.getInstance(), 2);
 
 				if (infusion != null) {
-					mInventory.setItem((row * 9), mRefundItem);
+					if (infusion.getInfusionType() == InfusionType.UNDERSTANDING) { // TODO: REMOVE THIS IF ON WEEKLY RESET (UNDERSTANDING REFUND)
+						mInventory.setItem((row * 9), mFullRefundItem);
+					} else {
+						mInventory.setItem((row * 9), mRefundItem);
+					}
 					mMapFunction.put((row * 9), (p, inventory, slot) -> {
 						DelveInfusionUtils.refundInfusion(player.getEquipment().getItem(equipmentSlot), p);
 					});
@@ -303,7 +317,16 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						});
 					} else {
 						//Max level reached
-						mInventory.setItem(slot, mMaxLevelReachedItem);
+
+						if (ItemStatUtils.hasInfusion(item, InfusionType.REVELATION)) {
+							if (panelsList != null && panelsList.get(DelveInfusionUtils.MAX_LEVEL) != null) {
+								mInventory.setItem(slot, panelsList.get(DelveInfusionUtils.MAX_LEVEL));
+								slot++;
+								mInventory.setItem(slot, mMaxLevelReachedRevelationItem);
+							}
+						} else {
+							mInventory.setItem(slot, mMaxLevelReachedItem);
+						}
 					}
 				} else {
 					//Item with no infusion -> load item to swap page
@@ -349,7 +372,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	}
 
 	private static void addInfoItems(DelveInfusionSelection infusion, IntFunction<String> function) {
-		List<ItemStack> items = IntStream.range(1, 5)
+		List<ItemStack> items = IntStream.range(1, DelveInfusionUtils.MAX_LEVEL + 2)
 			.mapToObj(i -> GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel() + " level " + i, infusion.getColor(), true, function.apply(i), NamedTextColor.GRAY))
 			.toList();
 		mDelveInfusionPanelsMap.put(infusion, items);
