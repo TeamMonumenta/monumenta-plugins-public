@@ -177,7 +177,7 @@ public class CharmFactory {
 				int roll = r2.nextInt(0, 100);
 				int cap = 1;
 				int total = 0;
-				while (total <= roll || cap >= WILDCARD_TREE_CAP_CHANCES.length) {
+				while (total <= roll && cap < WILDCARD_TREE_CAP_CHANCES.length) {
 					total += WILDCARD_TREE_CAP_CHANCES[cap - 1];
 					cap++;
 				}
