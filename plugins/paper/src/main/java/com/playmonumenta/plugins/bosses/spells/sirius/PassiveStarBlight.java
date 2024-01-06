@@ -53,7 +53,7 @@ public class PassiveStarBlight extends Spell {
 	}
 
 	public static void applyStarBlight(Player p) {
-		if (p.isDead()) {
+		if (p.isDead() || Plugin.getInstance().mEffectManager.getActiveEffect(p, "Stasis") != null) {
 			return;
 		}
 		Effect blight = EffectManager.getInstance().getActiveEffect(p, STARBLIGHTAG);

@@ -27,7 +27,7 @@ import org.joml.AxisAngle4f;
 
 public class DeclarationTp extends Spell {
 	private static final int RADIUS = 7;
-	private static final int PORTALHEIGHT = 4;
+	private static final int PORTALHEIGHT = 1;
 	private static final int DURATION = 14 * 20;
 	private Location mPortalOneLoc;
 	private Location mPortalTwoLoc;
@@ -124,7 +124,7 @@ public class DeclarationTp extends Spell {
 					mManager.update();
 					List<Player> pList = mSirius.getPlayersInArena(false);
 					for (Player p : pList) {
-						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text(" There is no time, woolbearer! Come behind the tomb and be cleansed!", NamedTextColor.GRAY, TextDecoration.BOLD));
+						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("There is no time, woolbearer! Come behind the tomb and be cleansed!", NamedTextColor.GRAY, TextDecoration.BOLD));
 					}
 					for (Player p : pList) {
 						if (FastUtils.randomIntInRange(0, 1) == 0) {
@@ -186,7 +186,7 @@ public class DeclarationTp extends Spell {
 					} else {
 						mSirius.changeHp(true, -1);
 						for (Player p : mSirius.getPlayersInArena(false)) {
-							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text(" There is no escape...", NamedTextColor.AQUA));
+							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("There is no escape...", NamedTextColor.AQUA));
 						}
 					}
 					if (mTuulenSword != null) {

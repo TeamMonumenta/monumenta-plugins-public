@@ -12,6 +12,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 
 public class SpellCosmicPortals extends Spell {
 
@@ -70,7 +71,9 @@ public class SpellCosmicPortals extends Spell {
 
 			@Override
 			public void run() {
-				if (mTicks < DURATION - 2 * 20) {
+				if (mTicks < DURATION - 2 * 20 && new BoundingBox(
+					mSirius.mCornerOne.getX(), mSirius.mCornerOne.getY(), mSirius.mCornerOne.getZ(),
+					mSirius.mCornerTwo.getX(), mSirius.mCornerTwo.getY(), mSirius.mCornerTwo.getZ()).overlaps(target.getBoundingBox())) {
 					mPortalLoc = target.getLocation().add(0, 0.1, 0);
 				}
 				if (mTicks == DURATION - 2 * 20) {
