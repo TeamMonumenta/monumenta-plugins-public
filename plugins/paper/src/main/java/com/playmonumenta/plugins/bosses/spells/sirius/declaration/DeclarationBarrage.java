@@ -85,13 +85,13 @@ public class DeclarationBarrage extends Spell {
 							}
 							if (valid) {
 								Location loc = LocationUtils.fallToGround(p.getLocation().clone().add(FastUtils.randomDoubleInRange(-SPREAD, SPREAD), 1, FastUtils.randomDoubleInRange(-SPREAD, SPREAD)), p.getLocation().getY() - 7);
-								if (!loc.getBlock().isSolid()) {
+								if (!loc.getBlock().isSolid() && !loc.clone().subtract(0, 1, 0).getBlock().getType().equals(Material.AIR)) {
 									mTargetLocs.add(loc);
 									meteor(loc);
 									Bukkit.getScheduler().runTaskLater(mPlugin, () -> mTargetLocs.remove(loc), METEORDURATION);
 								} else if (!p.getLocation().getBlock().isSolid()) {
 									mTargetLocs.add(p.getLocation());
-									meteor(p.getLocation());
+									meteor(LocationUtils.fallToGround(p.getLocation(), mSirius.mBoss.getLocation().getY() - 10));
 									Bukkit.getScheduler().runTaskLater(mPlugin, () -> mTargetLocs.remove(loc), METEORDURATION);
 								}
 							}

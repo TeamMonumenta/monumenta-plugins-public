@@ -135,7 +135,7 @@ public class SpellFromTheStars extends Spell {
 					DisplayEntityUtils.groundBlockQuake(mSirius.mBoss.getLocation().subtract(0, 2, 0), mRadius,
 						List.of(Material.WARPED_WART_BLOCK, Material.STRIPPED_WARPED_HYPHAE), new Display.Brightness(8, 8), 0.015);
 					for (Player p : PlayerUtils.playersInRange(mCircleLoc, mRadius, false, true)) {
-						DamageUtils.damage(null, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, " corrupted by blight");
+						DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, "corrupting blight.");
 					}
 					mSirius.mBoss.setVisibleByDefault(true); //unhide it
 					mSirius.startCollision();

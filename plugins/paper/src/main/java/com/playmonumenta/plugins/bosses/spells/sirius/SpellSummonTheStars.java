@@ -300,6 +300,7 @@ public class SpellSummonTheStars extends Spell {
 			FastUtils.randomDoubleInRange(0, 3),
 			FastUtils.randomDoubleInRange(-10, 10)
 		);
+		loc = LocationUtils.fallToGround(loc, mSirius.mBoss.getLocation().getY() - 10);
 		if (loc.getX() < mSirius.mCornerTwo.getX() || loc.getX() > mSirius.mCornerOne.getX()) {
 			return getNearbyLoc(p, attempt + 1);
 

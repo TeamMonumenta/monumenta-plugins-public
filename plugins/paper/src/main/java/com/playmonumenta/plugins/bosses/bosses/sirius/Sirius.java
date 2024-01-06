@@ -116,7 +116,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mTuulenLocation = spawnLoc.clone().add(-24, 0, -24);
 		mAuroraLocation = spawnLoc.clone().add(-24, 0, 24);
 		mTuulen = mBoss.getWorld().spawn(mTuulenLocation, Villager.class);
-		mTuulen.customName(Component.text("Silver Knight Tuulen "));
+		mTuulen.customName(Component.text("Silver Knight Tuulen"));
 		mAurora = mBoss.getWorld().spawn(mAuroraLocation, Villager.class);
 		mAurora.customName(Component.text("Aurora"));
 		mTuulenBoss = new SiriusNPCBoss(mPlugin, mTuulen, this);
@@ -219,7 +219,15 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			mBoss.setHealth(mBlocks);
 			loseAnimation();
 			for (Player p : getPlayersInArena(false)) {
-				DamageUtils.damage(null, p, DamageEvent.DamageType.TRUE, 5000);
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
+				if (p.isInvulnerable()) {
+					p.setInvulnerable(false);
+				}
+				DamageUtils.damage(null, p, DamageEvent.DamageType.OTHER, 999999999, null, true, false, "Devoid from Protection");
+				if (p.getHealth() > 0) {
+					p.setHealth(0); // For good measure
+				}
 			}
 		} else {
 			mBoss.setHealth(mBlocks);
@@ -575,6 +583,9 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				for (Player p : mLastTickPlayers) {
 					EffectManager.getInstance().clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 					EffectManager.getInstance().clearEffects(p, SpellBlightedBolts.BLIGHTEDBOLTTAG);
+					if (mDamagePhaseHPBar != null) {
+						p.hideBossBar(mDamagePhaseHPBar);
+					}
 				}
 				if (!mLastTickPlayers.isEmpty()) {
 					mPlayerCount = mCurrentPlayears.size();
@@ -753,7 +764,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						if (ratio >= 0.5 && p.isInvulnerable()) {
 							p.setInvulnerable(false);
 						}
-						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, maxOriginalDamage * ratio, null, true, true, "blown to smithereens.");
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, maxOriginalDamage * ratio, null, true, true, "crushing weight.");
 					}
 					for (int i = 0; i < mStoredTransformations.size(); i++) {
 						Display mDisplay = mDisplays.get(i);

@@ -41,6 +41,10 @@ public class SpellSiriusBeams {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				if (mSirius.mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
 				soundEffect();
 				for (Location loc : mTargetLocs) {
 					Player mTarget = EntityUtils.getNearestPlayer(loc, 50);
@@ -79,9 +83,6 @@ public class SpellSiriusBeams {
 					new PPExplosion(Particle.SCRAPE, loc).count(5).delta(0.5f).spawnAsBoss();
 					mSirius.mStarBlightConverter.convertPartialSphere(2, loc);
 					//new PPLine(Particle.REDSTONE, loc, mBeamStartLoc).countPerMeter(4).data(new Particle.DustOptions(Color.fromRGB(0, 130, 130), 1f)).spawnAsBoss();
-				}
-				if (mSirius.mBoss.isDead()) {
-					this.cancel();
 				}
 			}
 		}.runTaskTimer(mPlugin, 10, 10);

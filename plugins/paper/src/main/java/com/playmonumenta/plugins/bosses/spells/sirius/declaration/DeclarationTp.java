@@ -157,7 +157,7 @@ public class DeclarationTp extends Spell {
 					if (mTicks <= DURATION - 40) {
 						mRadius += 5 * (RADIUS / (DURATION - 40.0));
 					}
-					new PPCircle(Particle.END_ROD, mMidPoint, mRadius).count(20).ringMode(true).spawnAsBoss();
+					new PPCircle(Particle.END_ROD, mMidPoint.clone().add(0, 0.1, 0), mRadius).count(20).ringMode(true).spawnAsBoss();
 					//Aurora
 					createBeam(mSirius.mAuroraLocation.clone().add(0, 0.5, 0), mMidPoint.clone().add(0, 0.60, 0), mMaxDistance);
 				}

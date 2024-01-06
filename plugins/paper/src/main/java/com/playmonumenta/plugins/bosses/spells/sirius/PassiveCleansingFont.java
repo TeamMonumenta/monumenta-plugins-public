@@ -28,8 +28,8 @@ public class PassiveCleansingFont extends Spell {
 	private static final int HEALAMOUNT = 4;
 
 	public PassiveCleansingFont(Sirius sirius) {
-		mFontLocOne = sirius.mBoss.getLocation().clone().add(-6.5, 12, 17);
-		mFontLocTwo = sirius.mBoss.getLocation().clone().add(-6.5, 12, -17);
+		mFontLocOne = sirius.mBoss.getLocation().clone().add(-6.5, 12.1, 17);
+		mFontLocTwo = sirius.mBoss.getLocation().clone().add(-6.5, 12.1, -17);
 		mSirius = sirius;
 		mWeakened = false;
 		mCount = 0;

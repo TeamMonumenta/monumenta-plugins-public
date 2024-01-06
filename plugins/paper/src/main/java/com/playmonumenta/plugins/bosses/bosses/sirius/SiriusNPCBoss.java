@@ -90,7 +90,7 @@ public class SiriusNPCBoss extends BossAbilityGroup {
 			case "aurora" -> {
 				MessagingUtils.sendNPCMessage(player, npcName, Component.text("No time to chit-chat, we've got a Sirius to kill.", NamedTextColor.DARK_PURPLE));
 			}
-			case "silver knight tuulen " -> {
+			case "silver knight tuulen" -> {
 				MessagingUtils.sendNPCMessage(player, npcName, Component.text("This is a time to fight, not a time to talk. Get back to destroying the Herald and listen for our instructions!", NamedTextColor.GRAY));
 			}
 			default -> {

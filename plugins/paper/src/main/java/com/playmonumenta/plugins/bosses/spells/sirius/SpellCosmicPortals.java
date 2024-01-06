@@ -73,6 +73,9 @@ public class SpellCosmicPortals extends Spell {
 				if (mTicks < DURATION - 2 * 20) {
 					mPortalLoc = target.getLocation().add(0, 0.1, 0);
 				}
+				if (mTicks == DURATION - 2 * 20) {
+					mPortalLoc = LocationUtils.fallToGround(mPortalLoc, mSirius.mBoss.getLocation().getY() - 10).add(0, 0.1, 0);
+				}
 				new PPCircle(Particle.REDSTONE, mPortalLoc, finalMRadius).ringMode(true).count(30).data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 2.0f)).spawnAsBoss();
 				if (mTicks >= DURATION - 2 * 20 && mTicks % 10 == 0) {
 					new PPSpiral(Particle.END_ROD, mPortalLoc, finalMRadius).count(10).spawnAsBoss();
