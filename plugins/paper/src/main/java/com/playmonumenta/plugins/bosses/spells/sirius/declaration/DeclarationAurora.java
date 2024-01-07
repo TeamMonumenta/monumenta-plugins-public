@@ -93,7 +93,7 @@ public class DeclarationAurora extends Spell {
 					//PEW PEW
 					mManager.remove();
 					for (Player p : mSirius.getPlayersInArena(false)) {
-						MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("That should be enough. Let me shape it into a weapon... \n Strike the Herald! Now!", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
+						MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("That should be enough. Let me shape it into a weapon... \nStrike the Herald! Now!", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
 						//p.sendMessage(Component.text("[Aurora]", NamedTextColor.GOLD).append(Component.text(" That should be enough. Let me shape it into a weapon... \n Strike the Herald! Now!", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)));
 					}
 					//Bukkit.getScheduler().runTaskLater(mPlugin, () -> mSirius.changeHp(true, 2), 1);
