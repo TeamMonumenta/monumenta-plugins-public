@@ -227,7 +227,7 @@ public class SpellSummonTheStars extends Spell {
 				if (mTicks >= duration) {
 					mSirius.changeHp(true, -1);
 					for (Player p : mSirius.getPlayersInArena(false)) {
-						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text(" The starlight will shine brighter while they live. You have failed, conquerers.", NamedTextColor.AQUA));
+						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("The starlight will shine brighter while they live. You have failed, conquerers.", NamedTextColor.AQUA));
 					}
 					for (Entity entity : mActiveMobs) {
 						mAqua.removeEntity(entity);

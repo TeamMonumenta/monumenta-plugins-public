@@ -2365,15 +2365,12 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						if (p.isInvulnerable()) {
 							p.setInvulnerable(false);
 						}
-						DamageUtils.damage(null, p, DamageEvent.DamageType.OTHER, 999999999, null, true, false, "Devoid from Protection");
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.OTHER, 999999999, null, true, false, "never ending blight.");
 						if (p.getHealth() > 0) {
 							p.setHealth(0); // For good measure
 						}
 					}
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), 200, true, true)) {
-							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("Vermin skittering across this earth. You have no hope of conquering the Stars.", NamedTextColor.AQUA));
-						}
 						mTuulenDisplay.remove();
 						mAuroraDisplay.remove();
 					}, 20);

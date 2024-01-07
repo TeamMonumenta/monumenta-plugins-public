@@ -58,9 +58,9 @@ public class DeclarationDamage extends Spell {
 		}
 		mSirius.startDamagePhase(
 			"Tuulen",
-			Component.text(" Sirius has taken so much damage from your assault he couldn't fire his blast. Well done.", NamedTextColor.GRAY),
+			Component.text("Sirius has taken so much damage from your assault he couldn't fire his blast. Well done.", NamedTextColor.GRAY),
 			"Tuulen",
-			Component.text(" No! You need to damage Sirius more if we ever want a chance at disrupting that blast!", NamedTextColor.GRAY));
+			Component.text("No! You need to damage Sirius more if we ever want a chance at disrupting that blast!", NamedTextColor.GRAY));
 		new BukkitRunnable() {
 			int mTicks = 0;
 			double mXOne = mOrbLocation.getX();

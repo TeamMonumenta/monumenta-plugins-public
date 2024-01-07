@@ -138,7 +138,7 @@ public class DeclerationTuulen extends Spell {
 						if (mHitsRemaining <= 0) {
 							swing();
 							for (Player p : mSirius.getPlayersInArena(false)) {
-								MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text(" I hath lost the magic. Protect me better, woolbearer", NamedTextColor.GRAY));
+								MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("I hath lost the magic. Protect me better, woolbearer", NamedTextColor.GRAY));
 							}
 							mBar.remove();
 							Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -162,7 +162,7 @@ public class DeclerationTuulen extends Spell {
 				if (mTicks == DURATION) {
 					swing();
 					for (Player p : mSirius.getPlayersInArena(false)) {
-						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("Unleash thy fury on the Hearld!", NamedTextColor.GRAY, TextDecoration.BOLD));
+						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("Unleash thy fury on the Herald!", NamedTextColor.GRAY, TextDecoration.BOLD));
 					}
 					for (Location loc : SILVERKNIGHTLOCATIONS) {
 						swordflysound(loc);

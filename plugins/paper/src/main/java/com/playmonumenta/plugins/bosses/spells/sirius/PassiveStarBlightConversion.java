@@ -187,7 +187,7 @@ public class PassiveStarBlightConversion extends Spell {
 
 	//get Horizontal distance from loc2 to loc1. The result is not square rooted
 	private double getHorizontalDistance(Location loc1, Location loc2) {
-		return Math.pow(loc1.getX() - loc2.getX(), 2) + Math.pow(loc1.getZ() - loc2.getZ(), 2);
+		return Math.pow(Math.abs(loc1.getX()) - Math.abs(loc2.getX()), 2) + Math.pow(Math.abs(loc1.getZ()) - Math.abs(loc2.getZ()), 2);
 	}
 
 	public void convertSphere(int radius, Location center) {
@@ -272,6 +272,7 @@ public class PassiveStarBlightConversion extends Spell {
 		double linesperconversion = ((Math.abs(mSirius.mBoss.getLocation().getX() - mSirius.mSpawnCornerTwo.getX()) / ((double) timetoconvertarena)) * 10.0);
 		double linesperoutsideconversion = (Math.abs(mSirius.mSpawnCornerTwo.getX() - mCornerTwo.getX()) / ((double) timetoconvertoutside) * 10.0);
 
+
 		new BukkitRunnable() {
 			int mTicks = 0;
 			boolean mExtraBlight = false;
@@ -284,7 +285,7 @@ public class PassiveStarBlightConversion extends Spell {
 				}
 				for (double x = mLineTwo.getX(); x > mLineTwo.getX() - linesperconversion && mLineTwo.getX() > mCornerTwo.getX(); x--) {
 					for (double z = mCornerOne.getZ(); z > mCornerTwo.getZ(); z--) {
-						Location loc = new Location(mSirius.mBoss.getWorld(), x, mSirius.mBoss.getLocation().getY(), z);
+						Location loc = new Location(mSirius.mBoss.getWorld(), x, mSirius.mBoss.getLocation().getY(), z).getBlock().getLocation();
 						boolean safeloc = false;
 						for (Location safe : safezone) {
 							if (getHorizontalDistance(safe, loc) <= safezoneradius * safezoneradius) {
@@ -307,7 +308,7 @@ public class PassiveStarBlightConversion extends Spell {
 					mExtraBlight = true;
 					for (double x = mLineTwo.getX(); x > mSirius.mCornerTwo.getX(); x--) {
 						for (double z = mCornerOne.getZ(); z > mCornerTwo.getZ(); z--) {
-							Location loc = new Location(mSirius.mBoss.getWorld(), mLineTwo.getX(), mLineTwo.getY(), z);
+							Location loc = new Location(mSirius.mBoss.getWorld(), mLineTwo.getX(), mLineTwo.getY(), z).getBlock().getLocation();
 							boolean safeloc = false;
 							for (Location safe : safezone) {
 								if (getHorizontalDistance(loc, safe) <= safezoneradius * safezoneradius) {
@@ -326,7 +327,7 @@ public class PassiveStarBlightConversion extends Spell {
 					if (mDeltaX - 1 % 2 != 0) {
 						for (double x = mLineTwo.getX(); x > mCornerTwo.getX(); x--) {
 							for (double z = mCornerOne.getZ(); z > mCornerTwo.getZ(); z--) {
-								Location loc = new Location(mSirius.mBoss.getWorld(), mLineTwo.getX(), mLineTwo.getY(), z);
+								Location loc = new Location(mSirius.mBoss.getWorld(), mLineTwo.getX(), mLineTwo.getY(), z).getBlock().getLocation();
 								boolean safeloc = false;
 								for (Location safe : safezone) {
 									if (getHorizontalDistance(loc, safe) <= safezoneradius * safezoneradius) {

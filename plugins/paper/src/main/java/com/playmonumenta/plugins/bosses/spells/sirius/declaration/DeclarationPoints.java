@@ -26,7 +26,7 @@ public class DeclarationPoints extends Spell {
 	private Plugin mPlugin;
 	private PassiveStarBlightConversion mConverter;
 	private static final int DURATION = 11 * 20;
-	private static final int RADIUS = 6;
+	private static final double RADIUS = 6;
 	private static final int CLEANSEDURATION = 3 * 20;
 
 	public DeclarationPoints(Sirius sirius, Plugin plugin, PassiveStarBlightConversion converter) {
@@ -38,9 +38,9 @@ public class DeclarationPoints extends Spell {
 	@Override
 	public void run() {
 		for (Player p : mSirius.getPlayersInArena(false)) {
-			MessagingUtils.sendNPCMessage(p, "Sirius", Component.text(" This tomb will be yours. There is no escape from this blight.", NamedTextColor.AQUA, TextDecoration.BOLD));
+			MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("This tomb will be yours. There is no escape from this blight.", NamedTextColor.AQUA, TextDecoration.BOLD));
 		}
-		mConverter.blightArena(List.of(mSirius.mAuroraLocation, mSirius.mTuulenLocation), RADIUS, 8 * 20, 4 * 20, mPlugin);
+		mConverter.blightArena(List.of(mSirius.mAuroraLocation.getBlock().getLocation(), mSirius.mTuulenLocation.getBlock().getLocation()), RADIUS, 8 * 20, 4 * 20, mPlugin);
 		new BukkitRunnable() {
 			int mTicks = 0;
 			final ChargeUpManager mManager = new ChargeUpManager(mSirius.mBoss, DURATION, Component.text("Encroaching Blight", NamedTextColor.AQUA), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 75);
@@ -61,12 +61,12 @@ public class DeclarationPoints extends Spell {
 					if (mProtectedPlayers.size() >= (int) (mSirius.getValidDeclarationPlayersInArena(false).size() / 2.0 + 0.5)) {
 						mSirius.changeHp(true, 1);
 						for (Player p : mSirius.getPlayersInArena(false)) {
-							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text(" This place should have been theirs! How have you stopped this?", NamedTextColor.AQUA));
+							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("This place should have been theirs! How have you stopped this?", NamedTextColor.AQUA));
 						}
 					} else {
 						mSirius.changeHp(true, -1);
 						for (Player p : mSirius.getPlayersInArena(false)) {
-							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text(" Yes, this tomb will become a portal to the Beyond...", NamedTextColor.AQUA));
+							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("Yes, this tomb will become a portal to the Beyond...", NamedTextColor.AQUA));
 						}
 					}
 					for (Player p : mAttemptPlayers) {

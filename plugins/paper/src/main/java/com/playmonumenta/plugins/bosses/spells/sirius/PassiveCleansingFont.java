@@ -24,7 +24,7 @@ public class PassiveCleansingFont extends Spell {
 	private boolean mWeakened;
 	private final Sirius mSirius;
 	private static final int RADIUS = 3;
-	private static final int TICKSBETWEENCLEANSE = 2 * 20;
+	private static final int TICKSBETWEENCLEANSE = 3 * 20;
 	private static final int HEALAMOUNT = 4;
 
 	public PassiveCleansingFont(Sirius sirius) {
@@ -60,7 +60,7 @@ public class PassiveCleansingFont extends Spell {
 			cleanse(p);
 		}
 		mCount++;
-		if (mCount >= 15 && mSirius.mCheeseLock) {
+		if (mCount >= 25 && mSirius.mCheeseLock) {
 			mCount = 0;
 			mSirius.mStarBlightConverter.restoreFullCircle(mFontLocOne, RADIUS + 1);
 			mSirius.mStarBlightConverter.restoreFullCircle(mFontLocTwo, RADIUS + 1);
@@ -87,7 +87,7 @@ public class PassiveCleansingFont extends Spell {
 						}
 					} else {
 						if (!mWeakened) {
-							EffectManager.getInstance().addEffect(p, PassiveStarBlight.STARBLIGHTAG, new FlatHealthBoost(PassiveStarBlight.STARBLIGHTDURATION, magnitude + (HEALAMOUNT / 2.0), PassiveStarBlight.STARBLIGHTAG));
+							EffectManager.getInstance().addEffect(p, PassiveStarBlight.STARBLIGHTAG, new FlatHealthBoost(PassiveStarBlight.STARBLIGHTDURATION, magnitude + (HEALAMOUNT / 4.0), PassiveStarBlight.STARBLIGHTAG));
 						}
 					}
 				}
