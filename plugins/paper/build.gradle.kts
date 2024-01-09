@@ -38,7 +38,9 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.10.4")
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
     compileOnly("net.luckperms:api:5.3")
-    compileOnly("net.coreprotect:coreprotect:2.15.0")
+    compileOnly("net.coreprotect:coreprotect:2.15.0") {
+        exclude(group = "org.bukkit")
+    }
     compileOnly("com.playmonumenta:scripted-quests:7.0")
     compileOnly("com.playmonumenta:redissync:4.1")
     compileOnly("com.playmonumenta:monumenta-network-relay:1.0")
