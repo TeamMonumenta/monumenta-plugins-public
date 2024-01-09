@@ -126,34 +126,26 @@ public class ZoneUtils {
 		return hasZoneProperty(entity.getLocation(), property);
 	}
 
-	public static boolean hasZoneProperty(Entity entity, ZoneProperty property, String layerName) {
-		return hasZoneProperty(entity.getLocation(), property, layerName);
+	public static boolean hasZoneProperty(Entity entity, ZoneProperty property, String namespace) {
+		return hasZoneProperty(entity.getLocation(), property, namespace);
 	}
 
 	public static boolean hasZoneProperty(Location loc, ZoneProperty property) {
-		return hasZoneProperty(loc.toVector(), property, "default");
-	}
-
-	public static boolean hasZoneProperty(Location loc, ZoneProperty property, String layerName) {
-		return hasZoneProperty(loc.toVector(), property, layerName);
-	}
-
-	public static boolean hasZoneProperty(Vector loc, ZoneProperty property) {
 		return hasZoneProperty(loc, property, "default");
 	}
 
-	public static boolean hasZoneProperty(Vector loc, ZoneProperty property, String layerName) {
+	public static boolean hasZoneProperty(Location loc, ZoneProperty property, String namespace) {
 		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
 		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 
-		return scriptedQuestsPlugin.mZoneManager.hasProperty(loc, layerName, property.getPropertyName());
+		return scriptedQuestsPlugin.mZoneManager.hasProperty(loc, namespace, property.getPropertyName());
 	}
 
 	public static Optional<Zone> getZone(Location loc) {
 		return getZone(loc, "default");
 	}
 
-	public static Optional<Zone> getZone(Location loc, String layerName) {
+	public static Optional<Zone> getZone(Location loc, String namespace) {
 		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
 		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 
@@ -161,7 +153,7 @@ public class ZoneUtils {
 			return Optional.empty();
 		}
 
-		@Nullable Zone zone = scriptedQuestsPlugin.mZoneManager.getZone(loc, layerName);
+		@Nullable Zone zone = scriptedQuestsPlugin.mZoneManager.getZone(loc, namespace);
 		if (zone == null) {
 			return Optional.empty();
 		} else {

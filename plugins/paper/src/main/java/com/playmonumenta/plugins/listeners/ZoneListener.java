@@ -34,12 +34,12 @@ public class ZoneListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void zonePropertyChangeEvent(ZonePropertyChangeEvent event) {
 		Player player = event.getPlayer();
-		String layer = event.getLayer();
+		String namespace = event.getNamespaceName();
 		String property = event.getProperty();
 
 		GameMode mode = player.getGameMode();
 
-		if (layer.equals("default")) {
+		if (namespace.equals("default")) {
 			switch (property) {
 			case "Adventure Mode":
 				if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
