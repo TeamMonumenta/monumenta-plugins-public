@@ -100,7 +100,7 @@ public class ViciousCombos extends Ability {
 				mCosmetic.comboOnElite(world, loc, mPlayer, radius, killedEntity);
 
 			} else if (EntityUtils.isHostileMob(killedEntity)) {
-				int timeReduction = isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2 + (int) (CharmManager.getLevel(mPlayer, CHARM_CDR) * 20);
+				int timeReduction = (isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2) + (int) (CharmManager.getLevel(mPlayer, CHARM_CDR) * 20);
 
 				mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);
 				mCosmetic.comboOnKill(world, loc, mPlayer, radius, killedEntity);
