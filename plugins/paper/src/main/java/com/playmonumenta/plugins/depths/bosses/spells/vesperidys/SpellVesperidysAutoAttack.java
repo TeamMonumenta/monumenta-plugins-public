@@ -472,7 +472,7 @@ public class SpellVesperidysAutoAttack extends Spell {
 			mActiveRunnables.add(runnableC);
 
 			mPSmoke.location(player.getLocation().add(0, 1.25, 0)).count(20).extra(1).spawnAsBoss();
-			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, true, false, "Black Lightning");
+			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, "Black Lightning");
 			MovementUtils.knockAway(origin, player, 0.2f, 0.2f, true);
 			mPlugin.mEffectManager.addEffect(player, "VesperidysMagicVuln", new PercentDamageReceived(15 * 20, 0.3, EnumSet.of(DamageEvent.DamageType.MAGIC)));
 		}

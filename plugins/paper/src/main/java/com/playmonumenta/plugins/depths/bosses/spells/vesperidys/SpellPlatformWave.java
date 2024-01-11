@@ -91,6 +91,10 @@ public class SpellPlatformWave extends Spell {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 5f, 1f);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 5f, 2f);
 					for (Vesperidys.Platform platform : platforms) {
+						if (mVesperidys.mPhase >= 4 && (Math.abs(platform.mX) > 1 || Math.abs(platform.mY) > 1)) {
+							continue;
+						}
+
 						for (Player player : platform.getPlayersOnPlatform()) {
 							if (!hitPlayers.contains(player)) {
 								hit(player);
@@ -98,9 +102,9 @@ public class SpellPlatformWave extends Spell {
 							}
 						}
 
-						for (Block block : platform.mBlocks) {
-							if (block.getLocation().getBlockY() == platform.getCenter().getBlockY()) {
-								Location loc = block.getLocation().add(0.5, 1.2, 0.5);
+						for (int x = -3; x <= 3; x++) {
+							for (int z = -3; z <= 3; z++) {
+								Location loc = platform.getCenter().add(x, 1.2, z);
 								new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 								if (FastUtils.randomIntInRange(0, 5) == 0) {
 									if (FastUtils.randomIntInRange(0, 2) == 0) {
@@ -119,10 +123,17 @@ public class SpellPlatformWave extends Spell {
 				} else if (mTicks >= 0 && mTicks % (mCastTicks / 5) == 0) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 5f, 0f);
 					for (Vesperidys.Platform platform : platforms) {
-						for (Block block : platform.mBlocks) {
-							if (block.getLocation().getBlockY() == platform.getCenter().getBlockY() && FastUtils.randomIntInRange(0, 1) == 0) {
-								new PartialParticle(Particle.SPELL_WITCH, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0)
-									.spawnAsEntityActive(mBoss);
+						if (mVesperidys.mPhase >= 4 && (Math.abs(platform.mX) > 1 || Math.abs(platform.mY) > 1)) {
+							continue;
+						}
+
+						for (int x = -3; x <= 3; x++) {
+							for (int z = -3; z <= 3; z++) {
+								Location loc = platform.getCenter().add(x, 1.2, z);
+								if (FastUtils.randomIntInRange(0, 1) == 0) {
+									new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.1, 0.1, 0.1, 0)
+										.spawnAsEntityActive(mBoss);
+								}
 							}
 						}
 					}
@@ -181,16 +192,16 @@ public class SpellPlatformWave extends Spell {
 					for (Integer y : innerMap.keySet()) {
 						if (innerMap.get(y) != null && !innerMap.get(y).mBroken) {
 							if (x < minX) {
-								minX = x;
+								minX = Math.min(-1, x);
 							}
 							if (x > maxX) {
-								maxX = x;
+								maxX = Math.max(1, x);
 							}
 							if (y < minY) {
-								minY = y;
+								minY = Math.min(-1, y);
 							}
 							if (y > maxY) {
-								maxY = y;
+								maxY = Math.max(1, y);
 							}
 						}
 					}
