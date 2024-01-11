@@ -40,6 +40,7 @@ public class ProtocolLibIntegration {
 		syncManager.addPacketListener(new EntityNameReplacer(plugin));
 		syncManager.addPacketListener(new DropKeyPacketListener(plugin));
 		syncManager.addPacketListener(new FishingParticleListener(plugin));
+		syncManager.addPacketListener(new NBTBanFix(plugin));
 
 		mPlayerTitleManager = new PlayerTitleManager(syncManager);
 

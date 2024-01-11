@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.protocollib;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWindowItemsHandle;
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
@@ -28,6 +29,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.List;
@@ -61,7 +63,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 	private final Plugin mPlugin;
 
 	public VirtualItemsReplacer(Plugin plugin) {
-		super(plugin, PacketType.Play.Server.WINDOW_ITEMS, PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.OPEN_WINDOW_MERCHANT);
+		super(plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.WINDOW_ITEMS, PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.OPEN_WINDOW_MERCHANT);
 		mPlugin = plugin;
 	}
 
@@ -269,6 +271,8 @@ public class VirtualItemsReplacer extends PacketAdapter {
 
 		// Custom shulker names
 		if (ItemUtils.isShulkerBox(itemStack.getType())) {
+			// add back if people are somehow getting themselves inventory banned with shulkers again
+			// nestedContainerCheck(itemStack);
 			String customName = NBT.get(itemStack, nbt -> {
 				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
 				if (playerModified != null) {
@@ -342,4 +346,30 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(IS_VIRTUAL_ITEM_NBT_KEY, true);
 	}
 
+	public static void nestedContainerCheck(ItemStack itemStack) {
+		NBT.modify(itemStack, nbt -> {
+			// new chests/shulkers don't have a BlockEntityTag
+			ReadWriteNBT blockEntityTag = nbt.getCompound("BlockEntityTag");
+			if (blockEntityTag == null) {
+				return;
+			}
+			ReadWriteNBTCompoundList items = blockEntityTag.getCompoundList("Items");
+			if (items == null || items.isEmpty()) {
+				return;
+			}
+			boolean found = false;
+			for (ReadWriteNBT item : items) {
+				ReadWriteNBT tag = item.getCompound("tag");
+				if (tag == null) {
+					continue;
+				}
+				// we can attempt to remove the tag without checking if it exists
+				tag.removeKey("BlockEntityTag");
+				found = true;
+			}
+			if (found) {
+				markVirtual(nbt);
+			}
+		});
+	}
 }
