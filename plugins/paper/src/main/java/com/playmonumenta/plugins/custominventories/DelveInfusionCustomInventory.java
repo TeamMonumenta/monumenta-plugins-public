@@ -285,11 +285,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 				}.runTaskLater(Plugin.getInstance(), 2);
 
 				if (infusion != null) {
-					if (infusion.getInfusionType() == InfusionType.UNDERSTANDING) { // TODO: REMOVE THIS IF ON WEEKLY RESET (UNDERSTANDING REFUND)
-						mInventory.setItem((row * 9), mFullRefundItem);
-					} else {
-						mInventory.setItem((row * 9), mRefundItem);
-					}
+					mInventory.setItem((row * 9), mRefundItem);
+
 					mMapFunction.put((row * 9), (p, inventory, slot) -> {
 						DelveInfusionUtils.refundInfusion(player.getEquipment().getItem(equipmentSlot), p);
 					});

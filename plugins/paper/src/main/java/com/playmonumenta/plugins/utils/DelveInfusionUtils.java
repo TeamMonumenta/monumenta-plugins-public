@@ -233,11 +233,7 @@ public class DelveInfusionUtils {
 
 		int xp = 0;
 		for (int i = 0; i <= levelXp; i++) {
-			if (infusion.mInfusionType == InfusionType.UNDERSTANDING) { // TODO: REMOVE THIS IF ON WEEKLY RESET (UNDERSTANDING REFUND)
-				xp += (XP_COST_PER_LEVEL[i] * item.getAmount());
-			} else {
-				xp += (int) (XP_COST_PER_LEVEL[i] * (FULL_REFUND ? 1 : REFUND_PERCENT) * item.getAmount());
-			}
+			xp += (int) (XP_COST_PER_LEVEL[i] * (FULL_REFUND ? 1 : REFUND_PERCENT) * item.getAmount());
 		}
 		ExperienceUtils.setTotalExperience(player, ExperienceUtils.getTotalExperience(player) + xp);
 
