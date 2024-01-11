@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPillar;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.DisplayEntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -15,12 +15,20 @@ import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class SpellFromTheStars extends Spell {
@@ -31,11 +39,12 @@ public class SpellFromTheStars extends Spell {
 	private boolean mPrimed;
 	private final PassiveTentacleManager mTentancleManager;
 	private final PassiveDeclaration mDeclerations;
+	private int mDamage = 50;
+	private int mShockwaves = 1;
 
 	private static final int COOLDOWN = 10 * 20;
-	private static final int RADIUS = 15;
+	private static final int RADIUS = 55;
 	private static final int JUMPHEIGHT = 15;
-	private static final int DAMAGE = 50;
 
 
 	public SpellFromTheStars(Sirius sirius, Plugin plugin, PassiveTentacleManager tentacles, PassiveDeclaration declaration) {
@@ -51,7 +60,7 @@ public class SpellFromTheStars extends Spell {
 	@Override
 	public void run() {
 		mPrimed = true;
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
@@ -67,12 +76,14 @@ public class SpellFromTheStars extends Spell {
 				}
 				mTicks += 5;
 			}
-		}.runTaskTimer(mPlugin, 0, 5);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 5);
+		mActiveRunnables.add(runnable);
 	}
 
 	private void slam() {
 		mOnCooldown = true;
-		Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN + 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, COOLDOWN + 20);
 		//DELAY till sirius slams down. Probably goes up for 2 seconds and slams down in 0.5 second.
 		List<Vector3f> mTranslations = new ArrayList<>();
 		for (Display display : mSirius.mDisplays) {
@@ -80,11 +91,11 @@ public class SpellFromTheStars extends Spell {
 		}
 		mSirius.stopCollision();
 		mTentancleManager.mCancelMovements = true;
-		new BukkitRunnable() {
+		BukkitRunnable castRunnable = new BukkitRunnable() {
 			int mTicks = 0;
 			int mRadius = RADIUS;
 			Location mCircleLoc = LocationUtils.fallToGround(mSirius.mBoss.getLocation(), mSirius.mBoss.getLocation().subtract(0, 10, 0).getY());
-			ChargeUpManager mManager = new ChargeUpManager(mSirius.mBoss, 50, Component.text("Preparing to Slam", NamedTextColor.RED), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 50);
+			ChargeUpManager mManager = new ChargeUpManager(mSirius.mBoss, 50, Component.text("From The Stars", NamedTextColor.RED), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 50);
 
 			@Override
 			public void run() {
@@ -126,17 +137,117 @@ public class SpellFromTheStars extends Spell {
 				}
 				if (mTicks == 50) {
 					World world = mSirius.mBoss.getWorld();
-					Location loc = mSirius.mBoss.getLocation();
+					Location loc = mSirius.mBoss.getLocation().add(0, 10, 0);
 					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1.0f, 0.1f);
 					world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.6f, 2.0f);
 					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 0.1f);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2.0f, 0.1f);
 					mManager.remove();
-					DisplayEntityUtils.groundBlockQuake(mSirius.mBoss.getLocation().subtract(0, 2, 0), mRadius,
-						List.of(Material.WARPED_WART_BLOCK, Material.STRIPPED_WARPED_HYPHAE), new Display.Brightness(8, 8), 0.015);
-					for (Player p : PlayerUtils.playersInRange(mCircleLoc, mRadius, false, true)) {
-						DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, "corrupting blight.");
+
+					if (mSirius.mBlocks <= 5) {
+						mDamage = 80;
+						mShockwaves = 3;
+					} else if (mSirius.mBlocks <= 10) {
+						mDamage = 65;
+						mShockwaves = 2;
+					} else {
+						mDamage = 50;
+						mShockwaves = 1;
 					}
+					for (int i = 0; i < mShockwaves; i++) {
+						BukkitRunnable shockwaveRunnable = new BukkitRunnable() {
+
+							double mR = 0;
+							final Location mLoc = mSirius.mBoss.getLocation().subtract(0, 2, 0);
+							final double mMinY = mLoc.getY() - 1;
+							final double mBlockDensity = 0.4;
+							final Display.Brightness mBrightness = new Display.Brightness(8, 8);
+							final List<Material> mPossibleMaterials = List.of(Material.WARPED_WART_BLOCK, Material.STRIPPED_WARPED_HYPHAE);
+
+							@Override
+							public void run() {
+
+								final List<Location> blockLocations = new ArrayList<>();
+
+								for (int blockCounter = 0; blockCounter < mR * 2 * Math.PI * mBlockDensity; blockCounter++) {
+									double theta = FastUtils.randomDoubleInRange(0, Math.PI * 2);
+									Location finalBlockLocation = LocationUtils.fallToGround(mLoc.clone().add(FastUtils.cos(theta) * mR, 0, FastUtils.sin(theta) * mR).toCenterLocation().add(0, -1.4, 0), mMinY);
+									if (!blockLocations.contains(finalBlockLocation)) {
+										blockLocations.add(finalBlockLocation);
+									}
+								}
+
+								blockLocations.removeIf(location -> location.clone().subtract(0, 1, 0).getBlock().getType() == Material.AIR);
+
+								blockLocations.forEach(l -> {
+									BlockDisplay blockDisplay = mLoc.getWorld().spawn(l.clone().add(-0.5, -0.3, -0.5), BlockDisplay.class);
+									blockDisplay.setBlock(mPossibleMaterials.get(FastUtils.randomIntInRange(0, mPossibleMaterials.size() - 1)).createBlockData());
+									blockDisplay.setBrightness(mBrightness);
+									blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
+									blockDisplay.setInterpolationDuration(2);
+									blockDisplay.addScoreboardTag("SiriusDisplay");
+
+									BukkitRunnable runnable = new BukkitRunnable() {
+										int mTicks = 0;
+										final double mMaxHeight = 0.3;
+
+										@Override
+										public void run() {
+											double currentHeight = mMaxHeight * (-0.3 * ((mTicks - 3) * (mTicks - 3)) + 1);
+											blockDisplay.setTransformation(new Transformation(new Vector3f(0, (float) currentHeight, 0), blockDisplay.getTransformation().getLeftRotation(), blockDisplay.getTransformation().getScale(), blockDisplay.getTransformation().getRightRotation()));
+											blockDisplay.setInterpolationDelay(-1);
+
+											mTicks++;
+											if (mTicks > 12) {
+												this.cancel();
+											}
+										}
+
+										@Override
+										public synchronized void cancel() throws IllegalStateException {
+											super.cancel();
+											blockDisplay.remove();
+										}
+									};
+									runnable.runTaskTimer(mPlugin, 0, 1);
+									mActiveRunnables.add(runnable);
+								});
+
+								BukkitRunnable groundQuakeDelayForDamageRunnable = new BukkitRunnable() {
+									final double mHitRadius = mR;
+									int mT = 0;
+									final double MAX_HEIGHT_DELAY = 0.3;
+
+									@Override
+									public void run() {
+										mT++;
+										if (mT > 6 || (MAX_HEIGHT_DELAY * (-0.3 * ((mT - 3) * (mT - 3)) + 1) >= -0.5)) {
+											this.cancel();
+
+											for (Player p : PlayerUtils.playersInRange(mLoc, RADIUS, false, true)) {
+												Location yAdjusted = LocationUtils.fallToGround(p.getLocation(), mMinY);
+												Location yAdjustedOrigin = mLoc.clone().set(mLoc.getX(), yAdjusted.getY(), mLoc.getZ());
+												double distance = yAdjusted.distance(yAdjustedOrigin);
+												if (distance <= mHitRadius + 0.5 && distance >= mHitRadius - 0.5 && Math.abs(p.getLocation().getY() - yAdjusted.getY()) <= 0.6) {
+													DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, false, true, "From the Stars");
+												}
+											}
+										}
+									}
+								};
+								groundQuakeDelayForDamageRunnable.runTaskTimer(mPlugin, 0, 1);
+								mActiveRunnables.add(groundQuakeDelayForDamageRunnable);
+
+								mR += 0.25;
+								if (mR > mRadius) {
+									this.cancel();
+								}
+							}
+						};
+						shockwaveRunnable.runTaskTimer(mPlugin, i * 40L, 1);
+						mActiveRunnables.add(shockwaveRunnable);
+					}
+
 					mSirius.mBoss.setVisibleByDefault(true); //unhide it
 					mSirius.startCollision();
 					mTentancleManager.mCancelMovements = false;
@@ -146,7 +257,9 @@ public class SpellFromTheStars extends Spell {
 				mTicks++;
 
 			}
-		}.runTaskTimer(mPlugin, 5, 1);
+		};
+		castRunnable.runTaskTimer(mPlugin, 5, 1);
+		mActiveRunnables.add(castRunnable);
 
 	}
 
