@@ -109,7 +109,7 @@ public class SpellBlightWall extends Spell {
 	}
 
 	private void wave(Location loc1, Location loc2, double speed) {
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 			Location mLocOne = loc1.clone();
 			Location mLocTwo = loc2.clone();
@@ -133,8 +133,14 @@ public class SpellBlightWall extends Spell {
 				for (int i = 0; i < 15; i += mDamageHeight + mDamageHeight) {
 					Location mLocOneClone = mLocOne.clone().add(0, i, 0);
 					Location mLocTwoClone = mLocTwo.clone().add(0, i, 0);
-					for (double j = 0; j <= mDamageHeight; j += mDamageHeight / 3.0) {
-						new PPLine(Particle.REDSTONE, mLocOneClone.clone().add(0, j, 0), mLocTwoClone.clone().add(0, j, 0)).countPerMeter(0.25).data(new Particle.DustOptions(Color.fromRGB(0, 242, 242), 1f)).spawnAsBoss();
+
+					if (mTicks % 5 == 0) {
+						for (double j = 0; j <= mDamageHeight; j += mDamageHeight / 2.0) {
+							new PPLine(Particle.REDSTONE, mLocOneClone.clone().add(0, j, 0), mLocTwoClone.clone().add(0, j, 0))
+								.countPerMeter(2)
+								.data(new Particle.DustOptions(Color.fromRGB(0, 242, 242), 1.65f))
+								.spawnAsBoss();
+						}
 					}
 					BoundingBox box = BoundingBox.of(mLocOneClone, mLocTwoClone.add(0, mDamageHeight, 0));
 					for (Player p : pList) {
@@ -155,6 +161,8 @@ public class SpellBlightWall extends Spell {
 				}
 				mTicks++;
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 }

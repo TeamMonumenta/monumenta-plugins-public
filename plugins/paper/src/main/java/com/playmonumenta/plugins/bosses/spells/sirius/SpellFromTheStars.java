@@ -160,183 +160,98 @@ public class SpellFromTheStars extends Spell {
 							double mR = 0;
 							final Location mLoc = mSirius.mBoss.getLocation().subtract(0, 2, 0);
 							final double mMinY = mLoc.getY() - 1;
-							final double mBlockDensity = 0.2;
+							final double mBlockDensity = 0.4;
 							final Display.Brightness mBrightness = new Display.Brightness(8, 8);
 							final List<Material> mPossibleMaterials = List.of(Material.WARPED_WART_BLOCK, Material.STRIPPED_WARPED_HYPHAE);
+							int mT = 0;
 
 							@Override
 							public void run() {
 
-								final List<Location> blockLocations = new ArrayList<>();
+								if (mT % 2 == 0) {
+									final List<Location> blockLocations = new ArrayList<>();
 
-								for (int blockCounter = 0; blockCounter < mR * 2 * Math.PI * mBlockDensity; blockCounter++) {
-									double theta = FastUtils.randomDoubleInRange(0, Math.PI * 2);
-									Location finalBlockLocation = LocationUtils.fallToGround(mLoc.clone().add(FastUtils.cos(theta) * mR, 0, FastUtils.sin(theta) * mR).toCenterLocation().add(0, -1.4, 0), mMinY);
-									if (!blockLocations.contains(finalBlockLocation)) {
-										blockLocations.add(finalBlockLocation);
+									for (int blockCounter = 0; blockCounter < mR * 2 * Math.PI * mBlockDensity; blockCounter++) {
+										double theta = FastUtils.randomDoubleInRange(0, Math.PI * 2);
+										Location finalBlockLocation = LocationUtils.fallToGround(mLoc.clone().add(FastUtils.cos(theta) * mR, 0, FastUtils.sin(theta) * mR).toCenterLocation().add(0, -1.4, 0), mMinY);
+										if (!blockLocations.contains(finalBlockLocation)) {
+											blockLocations.add(finalBlockLocation);
+										}
 									}
-								}
 
-								blockLocations.removeIf(location -> location.clone().subtract(0, 1, 0).getBlock().getType() == Material.AIR);
+									blockLocations.removeIf(location -> location.clone().subtract(0, 1, 0).getBlock().getType() == Material.AIR || location.getX() > mSirius.mBoss.getLocation().getX());
 
-								blockLocations.forEach(l -> {
-									BlockDisplay blockDisplay = mLoc.getWorld().spawn(l.clone().add(-0.5, -0.3, -0.5), BlockDisplay.class);
-									blockDisplay.setBlock(mPossibleMaterials.get(FastUtils.randomIntInRange(0, mPossibleMaterials.size() - 1)).createBlockData());
-									blockDisplay.setBrightness(mBrightness);
-									blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
-									blockDisplay.setInterpolationDuration(2);
-									blockDisplay.addScoreboardTag("SiriusDisplay");
+									blockLocations.forEach(l -> {
+										BlockDisplay blockDisplay = mLoc.getWorld().spawn(l.clone().add(-0.5, -0.3, -0.5), BlockDisplay.class);
+										blockDisplay.setBlock(mPossibleMaterials.get(FastUtils.randomIntInRange(0, mPossibleMaterials.size() - 1)).createBlockData());
+										blockDisplay.setBrightness(mBrightness);
+										blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
+										blockDisplay.setInterpolationDuration(2);
+										blockDisplay.addScoreboardTag("SiriusDisplay");
 
-									BukkitRunnable runnable = new BukkitRunnable() {
-										int mTicks = 0;
-										final double mMaxHeight = 0.3;
+										BukkitRunnable runnable = new BukkitRunnable() {
+											int mTicks = 0;
+											final double mMaxHeight = 0.3;
+
+											@Override
+											public void run() {
+												double currentHeight = mMaxHeight * (-0.3 * ((mTicks - 3) * (mTicks - 3)) + 1);
+												blockDisplay.setTransformation(new Transformation(new Vector3f(0, (float) currentHeight, 0), blockDisplay.getTransformation().getLeftRotation(), blockDisplay.getTransformation().getScale(), blockDisplay.getTransformation().getRightRotation()));
+												blockDisplay.setInterpolationDelay(-1);
+
+												mTicks++;
+												if (mTicks > 12 || mSirius.mDone) {
+													this.cancel();
+												}
+											}
+
+											@Override
+											public synchronized void cancel() throws IllegalStateException {
+												super.cancel();
+												blockDisplay.remove();
+											}
+										};
+										runnable.runTaskTimer(mPlugin, 0, 1);
+										mActiveRunnables.add(runnable);
+									});
+
+									BukkitRunnable groundQuakeDelayForDamageRunnable = new BukkitRunnable() {
+										final double mHitRadius = mR;
+										int mTT = 0;
+										final double MAX_HEIGHT_DELAY = 0.3;
 
 										@Override
 										public void run() {
-											double currentHeight = mMaxHeight * (-0.3 * ((mTicks - 3) * (mTicks - 3)) + 1);
-											blockDisplay.setTransformation(new Transformation(new Vector3f(0, (float) currentHeight, 0), blockDisplay.getTransformation().getLeftRotation(), blockDisplay.getTransformation().getScale(), blockDisplay.getTransformation().getRightRotation()));
-											blockDisplay.setInterpolationDelay(-1);
-
-											mTicks++;
-											if (mTicks > 12 || mSirius.mDone) {
+											mTT++;
+											if (mTT > 6 || (MAX_HEIGHT_DELAY * (-0.3 * ((mTT - 3) * (mTT - 3)) + 1) >= -0.5) || mSirius.mDone) {
 												this.cancel();
-											}
-										}
 
-										@Override
-										public synchronized void cancel() throws IllegalStateException {
-											super.cancel();
-											blockDisplay.remove();
-										}
-									};
-									runnable.runTaskTimer(mPlugin, 0, 1);
-									mActiveRunnables.add(runnable);
-								});
-
-								BukkitRunnable groundQuakeDelayForDamageRunnable = new BukkitRunnable() {
-									final double mHitRadius = mR;
-									int mT = 0;
-									final double MAX_HEIGHT_DELAY = 0.3;
-
-									@Override
-									public void run() {
-										mT++;
-										if (mT > 6 || (MAX_HEIGHT_DELAY * (-0.3 * ((mT - 3) * (mT - 3)) + 1) >= -0.5) || mSirius.mDone) {
-											this.cancel();
-
-											for (Player p : PlayerUtils.playersInRange(mLoc, RADIUS, false, true)) {
-												Location yAdjusted = LocationUtils.fallToGround(p.getLocation(), mMinY);
-												Location yAdjustedOrigin = mLoc.clone().set(mLoc.getX(), yAdjusted.getY(), mLoc.getZ());
-												double distance = yAdjusted.distance(yAdjustedOrigin);
-												if (distance <= mHitRadius + 0.5 && distance >= mHitRadius - 0.5 && Math.abs(p.getLocation().getY() - yAdjusted.getY()) <= 0.6) {
-													DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, false, true, "From the Stars");
+												for (Player p : PlayerUtils.playersInRange(mLoc, RADIUS, false, true)) {
+													Location yAdjusted = LocationUtils.fallToGround(p.getLocation(), mMinY);
+													Location yAdjustedOrigin = mLoc.clone().set(mLoc.getX(), yAdjusted.getY(), mLoc.getZ());
+													double distance = yAdjusted.distance(yAdjustedOrigin);
+													if (distance <= mHitRadius + 0.5 && distance >= mHitRadius - 0.5
+														&& Math.abs(p.getLocation().getY() - yAdjusted.getY()) <= 0.6
+														&& p.getLocation().getX() < mSirius.mBoss.getLocation().getX()) {
+														DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, false, true, "From the Stars");
+													}
 												}
 											}
 										}
-									}
-								};
-								groundQuakeDelayForDamageRunnable.runTaskTimer(mPlugin, 0, 1);
-								mActiveRunnables.add(groundQuakeDelayForDamageRunnable);
+									};
+									groundQuakeDelayForDamageRunnable.runTaskTimer(mPlugin, 0, 1);
+									mActiveRunnables.add(groundQuakeDelayForDamageRunnable);
+								}
+
 								if (mR % 2 == 0) {
 									for (Player p : mSirius.getPlayersInArena(false)) {
 										p.playSound(p, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 0.6f, 2f);
 									}
 								}
+
+								mT++;
 								mR += 0.25;
 								if (mR > mRadius || mSirius.mDone) {
-									this.cancel();
-								}
-							}
-						};
-						shockwaveRunnable.runTaskTimer(mPlugin, i * 40L, 1);
-						mActiveRunnables.add(shockwaveRunnable);
-					}
-					for (int i = 0; i < mShockwaves; i++) {
-						BukkitRunnable shockwaveRunnable = new BukkitRunnable() {
-
-							double mR = 0;
-							final Location mLoc = mSirius.mBoss.getLocation().subtract(0, 2, 0);
-							final double mMinY = mLoc.getY() - 1;
-							final double mBlockDensity = 0.4;
-							final Display.Brightness mBrightness = new Display.Brightness(8, 8);
-							final List<Material> mPossibleMaterials = List.of(Material.WARPED_WART_BLOCK, Material.STRIPPED_WARPED_HYPHAE);
-
-							@Override
-							public void run() {
-
-								final List<Location> blockLocations = new ArrayList<>();
-
-								for (int blockCounter = 0; blockCounter < mR * 2 * Math.PI * mBlockDensity; blockCounter++) {
-									double theta = FastUtils.randomDoubleInRange(0, Math.PI * 2);
-									Location finalBlockLocation = LocationUtils.fallToGround(mLoc.clone().add(FastUtils.cos(theta) * mR, 0, FastUtils.sin(theta) * mR).toCenterLocation().add(0, -1.4, 0), mMinY);
-									if (!blockLocations.contains(finalBlockLocation)) {
-										blockLocations.add(finalBlockLocation);
-									}
-								}
-
-								blockLocations.removeIf(location -> location.clone().subtract(0, 1, 0).getBlock().getType() == Material.AIR);
-
-								blockLocations.forEach(l -> {
-									BlockDisplay blockDisplay = mLoc.getWorld().spawn(l.clone().add(-0.5, -0.3, -0.5), BlockDisplay.class);
-									blockDisplay.setBlock(mPossibleMaterials.get(FastUtils.randomIntInRange(0, mPossibleMaterials.size() - 1)).createBlockData());
-									blockDisplay.setBrightness(mBrightness);
-									blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
-									blockDisplay.setInterpolationDuration(2);
-									blockDisplay.addScoreboardTag("SiriusDisplay");
-
-									BukkitRunnable runnable = new BukkitRunnable() {
-										int mTicks = 0;
-										final double mMaxHeight = 0.3;
-
-										@Override
-										public void run() {
-											double currentHeight = mMaxHeight * (-0.3 * ((mTicks - 3) * (mTicks - 3)) + 1);
-											blockDisplay.setTransformation(new Transformation(new Vector3f(0, (float) currentHeight, 0), blockDisplay.getTransformation().getLeftRotation(), blockDisplay.getTransformation().getScale(), blockDisplay.getTransformation().getRightRotation()));
-											blockDisplay.setInterpolationDelay(-1);
-
-											mTicks++;
-											if (mTicks > 12) {
-												this.cancel();
-											}
-										}
-
-										@Override
-										public synchronized void cancel() throws IllegalStateException {
-											super.cancel();
-											blockDisplay.remove();
-										}
-									};
-									runnable.runTaskTimer(mPlugin, 0, 1);
-									mActiveRunnables.add(runnable);
-								});
-
-								BukkitRunnable groundQuakeDelayForDamageRunnable = new BukkitRunnable() {
-									final double mHitRadius = mR;
-									int mT = 0;
-									final double MAX_HEIGHT_DELAY = 0.3;
-
-									@Override
-									public void run() {
-										mT++;
-										if (mT > 6 || (MAX_HEIGHT_DELAY * (-0.3 * ((mT - 3) * (mT - 3)) + 1) >= -0.5)) {
-											this.cancel();
-
-											for (Player p : PlayerUtils.playersInRange(mLoc, RADIUS, false, true)) {
-												Location yAdjusted = LocationUtils.fallToGround(p.getLocation(), mMinY);
-												Location yAdjustedOrigin = mLoc.clone().set(mLoc.getX(), yAdjusted.getY(), mLoc.getZ());
-												double distance = yAdjusted.distance(yAdjustedOrigin);
-												if (distance <= mHitRadius + 0.5 && distance >= mHitRadius - 0.5 && Math.abs(p.getLocation().getY() - yAdjusted.getY()) <= 0.6) {
-													DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, false, true, "From the Stars");
-												}
-											}
-										}
-									}
-								};
-								groundQuakeDelayForDamageRunnable.runTaskTimer(mPlugin, 0, 1);
-								mActiveRunnables.add(groundQuakeDelayForDamageRunnable);
-
-								mR += 0.25;
-								if (mR > mRadius) {
 									this.cancel();
 								}
 							}
