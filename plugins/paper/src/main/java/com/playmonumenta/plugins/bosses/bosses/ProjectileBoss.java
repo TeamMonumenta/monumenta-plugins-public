@@ -11,7 +11,9 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -123,6 +125,12 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "Force launch at a fixed pitch degree. [-90, 90] is valid.")
 		public double FIX_PITCH = 100.0;
 
+		@BossParam(help = "overheal y/n")
+		public boolean OVERHEAL = false;
+
+		@BossParam(help = "amount healed")
+		public double HEAL_AMOUNT = 0;
+
 		//particle & sound used!
 		@BossParam(help = "Sound played at the start")
 		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_BLAZE_AMBIENT,1.5,1)]");
@@ -171,49 +179,63 @@ public class ProjectileBoss extends BossAbilityGroup {
 		}
 
 		Spell spell = new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL, p.COOLDOWN, p.SPELL_DELAY,
-				p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH, p.SPLIT, p.SPLIT_ANGLE,
-				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS, p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
-				//spell targets
-				() -> {
-					return p.TARGETS.getTargetsList(mBoss);
-				},
-				// Initiate Aesthetic
-				(World world, Location loc, int ticks) -> {
-					if (p.SPELL_DELAY > 0) {
-						PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY);
-					}
-					p.SOUND_START.play(loc);
-				},
-				// Launch Aesthetic
-				(World world, Location loc, int ticks) -> {
-					p.PARTICLE_LAUNCH.spawn(boss, loc);
-					p.SOUND_LAUNCH.play(loc);
-				},
-				// Projectile Aesthetic
-				(World world, Location loc, int ticks) -> {
-					p.PARTICLE_PROJECTILE.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
-					if (ticks % 40 == 0) {
-						p.SOUND_PROJECTILE.play(loc);
-					}
-				},
-				// Hit Action
-				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
-					if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
-						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
-						p.PARTICLE_HIT.spawn(boss, loc, 0d, 0d, 0d, 0.25d);
+			p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH, p.SPLIT, p.SPLIT_ANGLE,
+			p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS, p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
+			//spell targets
+			() -> {
+				return p.TARGETS.getTargetsList(mBoss);
+			},
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				if (p.SPELL_DELAY > 0) {
+					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY);
+				}
+				p.SOUND_START.play(loc);
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				p.PARTICLE_LAUNCH.spawn(boss, loc);
+				p.SOUND_LAUNCH.play(loc);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
+				p.PARTICLE_PROJECTILE.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
+				if (ticks % 40 == 0) {
+					p.SOUND_PROJECTILE.play(loc);
+				}
+			},
+			// Hit Action
+			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
+				if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
+					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
+					p.PARTICLE_HIT.spawn(boss, loc, 0d, 0d, 0d, 0.25d);
 
-						if (target != null) {
-							if (p.DAMAGE > 0) {
-								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc);
-							}
-
-							if (p.DAMAGE_PERCENTAGE > 0.0) {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME);
-							}
-							p.EFFECTS.apply(target, boss);
+					if (target != null) {
+						if (p.DAMAGE > 0) {
+							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc);
 						}
+
+						if (p.DAMAGE_PERCENTAGE > 0.0) {
+							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME);
+						}
+
+						if (p.HEAL_AMOUNT > 0) {
+							double hp = target.getHealth() + p.HEAL_AMOUNT;
+							double max = EntityUtils.getMaxHealth(target);
+							if (hp >= max) {
+								target.setHealth(max);
+								if (p.OVERHEAL) {
+									int missing = (int) (hp - max);
+									AbsorptionUtils.addAbsorption(target, missing, p.HEAL_AMOUNT, -1);
+								}
+							} else {
+								target.setHealth(hp);
+							}
+						}
+						p.EFFECTS.apply(target, boss);
 					}
-				});
+				}
+			});
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 
