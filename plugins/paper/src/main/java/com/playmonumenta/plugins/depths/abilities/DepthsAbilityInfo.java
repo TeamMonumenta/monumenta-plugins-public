@@ -259,7 +259,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			GUIUtils.splitLoreLine(meta, getDescription(rarity, getPlayerAbility(Plugin.getInstance(), player)), 30, false);
 			stack.setItemMeta(meta);
 			ItemUtils.setPlainName(stack, name);
-			item = new DepthsAbilityItem(stack, name, rarity, mDepthsTrigger);
+			item = new DepthsAbilityItem(stack, name, rarity, mDepthsTrigger, mDepthsTree);
 		} catch (Exception e) {
 			MMLog.warning("Invalid depths ability item: " + getDisplayName());
 			e.printStackTrace();

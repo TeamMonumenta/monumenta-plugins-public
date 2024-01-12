@@ -59,7 +59,7 @@ public class DepthsAscensionGUI extends Gui {
 			DELVE_POINTS_PER_LEVEL * 4, Material.BLACK_CONCRETE, 19),
 		new AscensionLevelDetails(9, null,
 			DELVE_POINTS_PER_LEVEL * 5, Material.CRYING_OBSIDIAN, 20),
-		new AscensionLevelDetails(10, "You must remove an ability before each boss fight.",
+		new AscensionLevelDetails(10, "You must remove an active ability before each boss fight.",
 			DELVE_POINTS_PER_LEVEL * 5, Material.CRYING_OBSIDIAN, 21),
 		new AscensionLevelDetails(11, null,
 			DELVE_POINTS_PER_LEVEL * 6, Material.CRYING_OBSIDIAN, 22),
@@ -67,7 +67,7 @@ public class DepthsAscensionGUI extends Gui {
 			DELVE_POINTS_PER_LEVEL * 6, Material.CRYING_OBSIDIAN, 23),
 		new AscensionLevelDetails(13, "Your party is assigned max Twisted delve points.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 24),
-		new AscensionLevelDetails(14, "Ability and upgrade options are reduced.",
+		new AscensionLevelDetails(14, "You will no longer be offered active abilities in a tree that you have 4 active abilities from.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 25),
 		new AscensionLevelDetails(15, "All bosses are now stronger.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 40)

@@ -63,12 +63,15 @@ public class DepthsPlayer {
 	// Number of times this player has died as relevant for graves (gets reduced with bosses beaten, so is not an accurate total count)
 	public int mNumDeaths;
 	// Unique mobs killed by this player with the Solar Ray ability
-	private final ArrayList<String> mSolarRayUniqueMobNames = new ArrayList<>();
+	private final List<String> mSolarRayUniqueMobNames = new ArrayList<>();
 
 	// Whether the permanent effects given by Diversity have been activated
 	public boolean mDiversityActive = false;
 	// Whether the prismatic given by Diversity has been given
 	public boolean mDiversityGift = false;
+
+	// Abilities that the player can receive from Generosity
+	public final List<DepthsAbilityItem> mGenerosityGifts = new ArrayList<>();
 
 	public boolean mDead = false; // If true, awaiting respawn
 	public int mGraveTicks = 0;

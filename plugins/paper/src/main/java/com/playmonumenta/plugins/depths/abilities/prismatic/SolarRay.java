@@ -224,9 +224,6 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 		}
 
 		List<String> uniqueMobsKilled = dPlayer.getSolarRayUniqueMobNames();
-		if (uniqueMobsKilled == null) {
-			return 0;
-		}
 		return uniqueMobsKilled.size();
 	}
 

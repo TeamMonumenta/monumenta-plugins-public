@@ -98,6 +98,7 @@ public abstract class RoomRepository {
 			}
 			party.mRoomNumber--;
 			party.sendMessage("Each player must remove an ability before moving on!");
+			party.mNoPassiveRemoveRoomStartX = Math.min(party.mNoPassiveRemoveRoomStartX, spawnPoint.getBlockX());
 
 		} else {
 			//Standard case- call valid room
@@ -292,6 +293,7 @@ public abstract class RoomRepository {
 				party.mOldRooms.clear();
 				//Just in case they get stuck, set the spawner break trigger to zero
 				party.mSpawnersToBreak = 0;
+				party.mNoPassiveRemoveRoomStartX = Integer.MAX_VALUE;
 			}
 		});
 	}

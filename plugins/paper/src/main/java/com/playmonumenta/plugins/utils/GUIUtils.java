@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -191,6 +193,10 @@ public class GUIUtils {
 		return createBasicItem(mat, name, nameColor, nameBold, "");
 	}
 
+	public static ItemStack createBasicItem(Material mat, int amount, String name, TextColor nameColor) {
+		return createBasicItem(mat, amount, name, nameColor, false, "", NamedTextColor.GRAY, 30, true);
+	}
+
 	public static ItemStack createBasicItem(Material mat, String name, TextColor nameColor, String desc) {
 		return createBasicItem(mat, name, nameColor, false, desc);
 	}
@@ -354,6 +360,13 @@ public class GUIUtils {
 		placeholder.lore(List.of());
 		setPlaceholder(placeholder);
 		return placeholder;
+	}
+
+	public static void setSkullOwner(ItemStack item, OfflinePlayer player) {
+		if (item.getItemMeta() instanceof SkullMeta skullMeta) {
+			skullMeta.setOwningPlayer(player);
+			item.setItemMeta(skullMeta);
+		}
 	}
 
 }

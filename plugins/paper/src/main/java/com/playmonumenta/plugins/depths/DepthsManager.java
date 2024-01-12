@@ -626,16 +626,21 @@ public class DepthsManager {
 		);
 	}
 
+	public static List<DepthsAbilityInfo<?>> getFilteredAbilities(List<DepthsTree> filter) {
+		return getFilteredAbilities(filter, List.of());
+	}
+
 	/**
 	 * Returns a list of depth abilities filtered by certain trees
 	 *
 	 * @param filter the valid trees to filter by
 	 * @return list of filtered abilities
 	 */
-	public static List<DepthsAbilityInfo<?>> getFilteredAbilities(List<DepthsTree> filter) {
+	public static List<DepthsAbilityInfo<?>> getFilteredAbilities(List<DepthsTree> filter, List<DepthsTree> noActiveTrees) {
 		List<DepthsAbilityInfo<?>> filteredList = new ArrayList<>();
 		for (DepthsAbilityInfo<?> da : getAbilities()) {
-			if (filter.contains(da.getDepthsTree())) {
+			DepthsTree tree = da.getDepthsTree();
+			if (filter.contains(tree) && !(da.getDepthsTrigger() != DepthsTrigger.PASSIVE && noActiveTrees.contains(tree))) {
 				filteredList.add(da);
 			}
 		}
@@ -666,15 +671,17 @@ public class DepthsManager {
 		return getAbilities().stream().filter(info -> info.getDepthsTree() == DepthsTree.PRISMATIC).toList();
 	}
 
+	private void initItems(List<DepthsTree> filter, boolean isElite, Player p) {
+		initItems(filter, isElite, p, List.of());
+	}
+
 	/**
 	 * This method generates ability items for the players with random rarities.
-	 * In the future, this might be more applicable to work on a per-player basis,
-	 * with active skills they have influencing rarities or available abilities.
 	 */
-	private void initItems(List<DepthsTree> filter, boolean isElite, Player p) {
+	private void initItems(List<DepthsTree> filter, boolean isElite, Player p, List<DepthsTree> noActiveTrees) {
 		// Replace this with a dedicated place later
 		mItems.clear();
-		for (DepthsAbilityInfo<?> da : getFilteredAbilities(filter)) {
+		for (DepthsAbilityInfo<?> da : getFilteredAbilities(filter, noActiveTrees)) {
 			// Get a number 1 to 100
 			int roll = mRandom.nextInt(100) + 1;
 			DepthsAbilityItem item;
@@ -753,7 +760,12 @@ public class DepthsManager {
 				prismaticFilter.add(DepthsTree.PRISMATIC);
 				initItems(prismaticFilter, false, p);
 			} else {
-				initItems(dp.mEligibleTrees, dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY_ELITE, p);
+				List<DepthsTree> cappedTrees = new ArrayList<>();
+				if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
+					List<DepthsTree> trees = getActiveAbilityTrees(dp);
+					cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
+				}
+				initItems(dp.mEligibleTrees, dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY_ELITE, p, cappedTrees);
 			}
 		} else {
 			return offeredItems;
@@ -769,7 +781,7 @@ public class DepthsManager {
 		offeredItems = new ArrayList<>();
 		Collections.shuffle(mItems);
 		// Add the first 3 items the player is eligible for to the thing
-		int options = party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_REDUCED_OPTIONS ? 2 : 3;
+		int options = 3;
 		Prosperity prosperity = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, Prosperity.class);
 		if (prosperity != null) {
 			options += prosperity.getExtraChoices();
@@ -1247,6 +1259,9 @@ public class DepthsManager {
 			} else if (reward == DepthsRewardType.UPGRADE || reward == DepthsRewardType.UPGRADE_ELITE || reward == DepthsRewardType.TWISTED) {
 				DepthsGUICommands.upgrade(Plugin.getInstance(), p, fromSummaryGUI);
 				return true;
+			} else if (reward == DepthsRewardType.GENEROSITY) {
+				DepthsGUICommands.generosity(Plugin.getInstance(), p, fromSummaryGUI);
+				return true;
 			}
 		}
 
@@ -1320,7 +1335,7 @@ public class DepthsManager {
 		int depths2UpgradeBonus = (dp.getContent() == DepthsContent.CELESTIAL_ZENITH) ? 1 : 0;
 
 		// Loop through all possible abilities and show random ones they have at a higher rarity
-		int options = party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_REDUCED_OPTIONS ? 2 : 3;
+		int options = 3;
 		Prosperity prosperity = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, Prosperity.class);
 		if (prosperity != null) {
 			options += prosperity.getExtraChoices();
@@ -1926,9 +1941,22 @@ public class DepthsManager {
 		List<DepthsAbilityItem> abilityOfferings = mAbilityOfferings.get(dp.mPlayerId);
 		if (abilityOfferings != null) {
 			abilityOfferings.removeIf(dai -> dp.mAbilities.keySet().stream().map(this::getAbility).filter(Objects::nonNull).anyMatch(info -> dai.mAbility.equals(info.getDisplayName()) || (dai.mTrigger != DepthsTrigger.PASSIVE && info.getDepthsTrigger() == dai.mTrigger)));
+			DepthsParty party = getPartyFromId(dp);
+			if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
+				List<DepthsTree> trees = getActiveAbilityTrees(dp);
+				abilityOfferings.removeIf(dai -> dai.mTrigger != DepthsTrigger.PASSIVE && trees.stream().filter(t -> t == dai.mTree).count() >= 4);
+			}
 			if (abilityOfferings.isEmpty()) {
 				mAbilityOfferings.remove(dp.mPlayerId);
 			}
 		}
+	}
+
+	private List<DepthsTree> getActiveAbilityTrees(DepthsPlayer dp) {
+		return dp.mAbilities.keySet().stream()
+			.map(this::getAbility).filter(Objects::nonNull)
+			.filter(info -> info.getDepthsTrigger() != DepthsTrigger.PASSIVE && info.getDepthsTrigger() != DepthsTrigger.WEAPON_ASPECT)
+			.map(DepthsAbilityInfo::getDepthsTree).filter(Objects::nonNull)
+			.toList();
 	}
 }

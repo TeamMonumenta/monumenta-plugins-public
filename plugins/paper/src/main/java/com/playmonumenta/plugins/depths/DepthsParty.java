@@ -115,6 +115,8 @@ public class DepthsParty {
 	public transient ArrayList<String> mInitialPlayers = new ArrayList<>();
 	//The X value of the start side of the current room
 	public int mRoomStartX;
+	//The X value of the start side of the (first) a10+ remove room in this floor (Integer.MAX_VALUE if unset)
+	public int mNoPassiveRemoveRoomStartX = Integer.MAX_VALUE;
 	//Whether the party has exceeded four players
 	public boolean mIsSixPlayerMode;
 	//The Depths content this party is in

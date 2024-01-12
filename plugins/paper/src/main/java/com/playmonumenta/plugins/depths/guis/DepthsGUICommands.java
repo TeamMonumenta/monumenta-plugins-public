@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.guis;
 
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
@@ -73,8 +74,12 @@ public class DepthsGUICommands {
 							MessagingUtils.sendActionBarMessage(player, "You've already removed your ability for this floor!");
 							return;
 						}
+						DepthsParty party = DepthsManager.getInstance().getPartyFromId(depthsPlayer);
+						if (party == null) {
+							return;
+						}
 
-						new DepthsRemoveAbilityGUI(player).openInventory(player, plugin);
+						new DepthsRemoveAbilityGUI(player, player.getLocation().getX() < party.mNoPassiveRemoveRoomStartX).openInventory(player, plugin);
 					}))
 			.withSubcommand(new CommandAPICommand("mutateability")
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
@@ -129,6 +134,18 @@ public class DepthsGUICommands {
 			return;
 		}
 		new DepthsAbilitiesGUI(player, fromSummaryGUI).openInventory(player, plugin);
+	}
+
+	public static void generosity(Plugin plugin, Player player, boolean fromSummaryGUI) {
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (dp == null || dp.mGenerosityGifts.isEmpty()) {
+			MessagingUtils.sendActionBarMessage(player, "No abilities to choose from.");
+			if (dp != null) {
+				dp.mEarnedRewards.poll();
+			}
+			return;
+		}
+		new DepthsGenerosityGUI(player, fromSummaryGUI).openInventory(player, plugin);
 	}
 
 	public static void summary(Plugin plugin, Player player) {

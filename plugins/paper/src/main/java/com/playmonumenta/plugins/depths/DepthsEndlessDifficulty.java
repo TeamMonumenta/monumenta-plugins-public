@@ -25,7 +25,7 @@ public class DepthsEndlessDifficulty {
 	public static final int ASCENSION_BOSS_COOLDOWN = 8;
 	public static final int ASCENSION_ABILITY_PURGE = 10;
 	public static final int ASCENSION_REVIVE_TIME = 12;
-	public static final int ASCENSION_REDUCED_OPTIONS = 14;
+	public static final int ASCENSION_ACTIVE_TREE_CAP = 14;
 	public static final int ASCENSION_FINAL_BOSS = 15;
 
 	public static void applyDelvePointsToParty(DepthsParty party, int pointsToAssign, Map<DelvesModifier, Integer> delvePointsForParty, boolean twisted) {

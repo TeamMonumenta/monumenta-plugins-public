@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
@@ -56,6 +57,7 @@ public class Generosity extends DepthsAbility {
 			}
 		}
 		Player removedPlayer = depthsPlayer.getPlayer();
+		boolean foundPlayer = false;
 		if (party != null && removedAbilityInfo != null && removedPlayer != null) {
 			DepthsAbilityInfo<?> finalRemovedAbilityInfo = removedAbilityInfo;
 			for (DepthsPlayer dp : party.mPlayersInParty) {
@@ -68,15 +70,17 @@ public class Generosity extends DepthsAbility {
 						.filter(abilityInfo -> !abilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
 						.noneMatch(abilityInfo -> abilityInfo.getDepthsTrigger().equals(finalRemovedAbilityInfo.getDepthsTrigger()))
 				) {
-					DepthsManager.getInstance().setPlayerLevelInAbility(removedAbility, otherPlayer, generosityLevel);
+					foundPlayer = true;
+					dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.GENEROSITY);
+					dp.mGenerosityGifts.add(removedAbilityInfo.getAbilityItem(generosityLevel));
 					otherPlayer.playSound(otherPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					Component abilityName = DepthsManager.getInstance().colorAbilityWithHover(removedAbility, generosityLevel, otherPlayer);
-					dp.sendMessage(removedPlayer.displayName().append(Component.text(" has generously gifted you: ")).append(abilityName).append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(generosityLevel)).append(Component.text(" level!")));
-
-					DepthsManager.getInstance().validateOfferings(dp);
+					dp.sendMessage(removedPlayer.displayName().append(Component.text(" has generously gifted you: ")).append(abilityName).append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(generosityLevel)).append(Component.text(" level! You can accept the gift in the rewards in your trinket.")));
 				}
 			}
 		}
-		depthsPlayer.mUsedGenerosity = true;
+		if (foundPlayer) {
+			depthsPlayer.mUsedGenerosity = true;
+		}
 	}
 }
