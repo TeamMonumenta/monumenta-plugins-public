@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.format.TextColor;
@@ -147,7 +148,6 @@ public class EscapeArtist extends DepthsAbility {
 		}
 
 		mTPReady = false;
-		mPlugin.mEffectManager.clearEffects(mPlayer, RESISTANCE_EFFECT_NAME);
 
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
@@ -241,6 +241,8 @@ public class EscapeArtist extends DepthsAbility {
 			vec.setY(0.4);
 			mPlayer.setVelocity(vec);
 
+			mPlugin.mEffectManager.addEffect(mPlayer, "EscapeArtistFallImmunity", new PercentDamageReceived(60, -1, EnumSet.of(DamageType.FALL)));
+
 			new PPLine(Particle.SQUID_INK, originalLoc, destination, 0.2)
 				.countPerMeter(3)
 				.spawnAsPlayerActive(mPlayer);
@@ -268,7 +270,7 @@ public class EscapeArtist extends DepthsAbility {
 			.addDuration(a -> TP_WINDOW, TP_WINDOW)
 			.add(" seconds throws a projectile that travels up to ")
 			.add(a -> a.mMaxTPDistance, MAX_TP_DISTANCE)
-			.add(" blocks away and removes the resistance buff. Upon hitting a mob, block, or reaching its max distance, you teleport to its location and leave behind a smoke bomb that stuns all mobs in a ")
+			.add(" blocks away. Upon hitting a mob, block, or reaching its max distance, you teleport to its location and leave behind a smoke bomb that stuns all mobs in a ")
 			.add(a -> a.mStunRadius, STUN_RADIUS)
 			.add(" block radius for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], false, true)

@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
@@ -50,6 +51,7 @@ public class EternalSavior extends DepthsAbility {
 	public static final int STASIS_DURATION = 5 * 20;
 	public static final double[] ABSORPTION = {4, 5, 6, 7, 8, 10};
 	public static final int ABSORPTION_DURATION = 5 * 20;
+	public static final int STUN_DURATION = 20;
 
 	public static final String CHARM_COOLDOWN = "Eternal Savior Cooldown";
 
@@ -69,6 +71,7 @@ public class EternalSavior extends DepthsAbility {
 	private final double mRadius;
 	private final double mAbsorption;
 	private final int mAbsorptionDuration;
+	private final int mStunDuration;
 	private boolean mStasisActive;
 
 	public EternalSavior(Plugin plugin, Player player) {
@@ -78,6 +81,7 @@ public class EternalSavior extends DepthsAbility {
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.ETERNAL_SAVIOR_HEALING.mEffectName, HEAL_PER_SECOND[mRarity - 1]);
 		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.ETERNAL_SAVIOR_ABSORPTION.mEffectName, ABSORPTION[mRarity - 1]);
 		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CharmEffects.ETERNAL_SAVIOR_ABSORPTION_DURATION.mEffectName, ABSORPTION_DURATION);
+		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.ETERNAL_SAVIOR_STUN_DURATION.mEffectName, STUN_DURATION);
 	}
 
 	@Override
@@ -227,6 +231,11 @@ public class EternalSavior extends DepthsAbility {
 					new PartialParticle(Particle.SPELL_INSTANT, LocationUtils.getHalfHeightLocation(p), 30, 0.4, 0.4, 0.4, 0.5).spawnAsPlayerActive(mPlayer);
 				}
 
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius)) {
+					EntityUtils.applyStun(mPlugin, mStunDuration, mob);
+					MovementUtils.knockAway(loc, mob, 0.4f);
+				}
+
 				mStasisActive = false;
 				super.cancel();
 			}
@@ -324,7 +333,9 @@ public class EternalSavior extends DepthsAbility {
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks for ")
 			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
-			.add(" seconds.")
+			.add(" seconds and stun nearby mobs for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION)
+			.add(" and knock them away.")
 			.addCooldown(COOLDOWN);
 	}
 

@@ -71,8 +71,8 @@ public class VolcanicCombos extends DepthsAbility {
 					location.add(locationDelta);
 					new PartialParticle(Particle.FLAME, location, 2).spawnAsPlayerActive(mPlayer);
 					location.subtract(locationDelta);
-					new PartialParticle(Particle.LAVA, location, 25, 0, 0.2, 0, 1).spawnAsPlayerActive(mPlayer);
 				}
+				new PartialParticle(Particle.LAVA, location, 25, 0, 0.2, 0, 1).spawnAsPlayerActive(mPlayer);
 				world.playSound(location, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 1f, 1);
 				world.playSound(location, Sound.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 1f, 1);
 				mComboCount = 0;
