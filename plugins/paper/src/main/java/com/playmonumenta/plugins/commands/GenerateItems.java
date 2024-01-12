@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -49,7 +50,7 @@ public class GenerateItems extends GenericCommand {
 			// Item Params
 			String itemName = row.get(0);
 			String baseItem = row.get(1);
-			baseItem = baseItem.split(":", 2)[1].toUpperCase();
+			baseItem = baseItem.split(":", 2)[1].toUpperCase(Locale.getDefault());
 			Boolean isMainhand = row.get(73).equals("1");
 			String slot;
 			if (isMainhand) {
@@ -80,7 +81,7 @@ public class GenerateItems extends GenericCommand {
 			} else {
 				region = "none";
 			}
-			String tier = row.get(3).toLowerCase();
+			String tier = row.get(3).toLowerCase(Locale.getDefault());
 			String masterwork = row.get(4);
 			String nameColor = row.get(5);
 			if (nameColor == null || nameColor.equals("")) {

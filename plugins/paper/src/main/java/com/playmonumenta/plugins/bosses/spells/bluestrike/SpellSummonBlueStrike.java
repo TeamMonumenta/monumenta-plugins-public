@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.bukkit.Bukkit;
@@ -27,17 +28,17 @@ import org.bukkit.util.Vector;
 
 public class SpellSummonBlueStrike extends Spell {
 	private final LivingEntity mBoss;
-	private final HashMap<Double, LoSPool> mWeights;
+	private final Map<Double, LoSPool> mWeights;
 	private final int mTimeBetween;
 	private final int mMobsPer;
 	private int mTimer;
 	private final Location mCenter;
 	private final ArrayList<Vector> mLocationOffsets;
 	private static final int BASE_SPAWNS = 1;
-	private final HashMap<LoSPool, ArrayList<Soul>> mPoolMap = new HashMap<>();
+	private final Map<LoSPool, ArrayList<Soul>> mPoolMap = new HashMap<>();
 	private final Plugin mPlugin;
 
-	public SpellSummonBlueStrike(Plugin plugin, LivingEntity boss, Location center, HashMap<Double, LoSPool> weights, int timeBetween,
+	public SpellSummonBlueStrike(Plugin plugin, LivingEntity boss, Location center, Map<Double, LoSPool> weights, int timeBetween,
 	                             int innerCircleR, int outerCircleR) {
 		mBoss = boss;
 		mWeights = weights;

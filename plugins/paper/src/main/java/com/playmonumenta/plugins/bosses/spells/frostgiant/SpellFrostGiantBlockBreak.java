@@ -92,7 +92,7 @@ public class SpellFrostGiantBlockBreak extends Spell {
 							}
 						}
 					} else if (!mIgnoredMats.contains(material) && !mNoBreak.contains(material)
-						           && (material.isSolid() || material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor || ItemUtils.CARPETS.contains(material))
+						           && (material.isSolid() || block.getBlockData() instanceof TrapDoor || ItemUtils.CARPETS.contains(material))
 						           && (!(block.getState() instanceof Lootable) || !((Lootable) block.getState()).hasLootTable())) {
 						badBlockList.add(block);
 					}

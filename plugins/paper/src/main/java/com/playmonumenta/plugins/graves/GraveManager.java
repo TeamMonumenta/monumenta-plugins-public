@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import net.kyori.adventure.text.Component;
@@ -198,7 +199,7 @@ public class GraveManager {
 	}
 
 	// Called only on a death that would result in a grave
-	public static void onDeath(Player player, HashMap<EquipmentSlot, ItemStack> equipment) {
+	public static void onDeath(Player player, Map<EquipmentSlot, ItemStack> equipment) {
 		GraveManager manager = INSTANCES.computeIfAbsent(player.getUniqueId(), key -> new GraveManager(player));
 		String shard = ServerProperties.getShardName();
 
@@ -285,14 +286,14 @@ public class GraveManager {
 		return entity.getScoreboardTags().contains("ThrownItem") || THROWN_ITEMS.containsKey(entity.getUniqueId());
 	}
 
-	private static HashSet<Grave> getUnloadedGraves(Long key) {
+	private static Set<Grave> getUnloadedGraves(Long key) {
 		if (!UNLOADED_GRAVES.containsKey(key)) {
 			UNLOADED_GRAVES.put(key, new HashSet<>());
 		}
 		return UNLOADED_GRAVES.get(key);
 	}
 
-	private static HashSet<ThrownItem> getUnloadedThrownItems(Long key) {
+	private static Set<ThrownItem> getUnloadedThrownItems(Long key) {
 		if (!UNLOADED_THROWN_ITEMS.containsKey(key)) {
 			UNLOADED_THROWN_ITEMS.put(key, new HashSet<>());
 		}
@@ -353,13 +354,13 @@ public class GraveManager {
 		return (mGraves.size() / 5) + 1;
 	}
 
-	public ArrayList<Component> getGravesList(int page) {
+	public List<Component> getGravesList(int page) {
 		return getGravesList(page, grave -> null);
 	}
 
-	public ArrayList<Component> getGravesList(int page, Function<Grave, Component> extraText) {
+	public List<Component> getGravesList(int page, Function<Grave, Component> extraText) {
 		removeEmptyGraves();
-		ArrayList<Component> list = new ArrayList<>();
+		List<Component> list = new ArrayList<>();
 		int first = 5 * (page - 1);
 		int last = first + 4;
 		if (mGraves.size() > first) {

@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -101,7 +102,7 @@ public class PlotManager {
 						.executesPlayer((player, args) -> {
 							plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), (String) args[1]);
 					}))
-				/***** MODERATOR ADD *****/
+				/* MODERATOR ADD */
 				.withSubcommand(new CommandAPICommand("add_other")
 					.withPermission("monumenta.command.plot.add.others")
 					.withArguments(
@@ -123,13 +124,13 @@ public class PlotManager {
 						UUID otherPlayerUUID = resolveUUID((String) args[1]);
 						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, (String) args[2]);
 						}))
-					/***** REMOVE *****/
+					/* REMOVE */
 					.withSubcommand(new CommandAPICommand("remove")
 							.withArguments(new StringArgument("name")) // TODO: Suggestions? Annoying to do
 							.executesPlayer((player, args) -> {
 								plotAccessRemove(player, (String) args[0]);
 							}))
-					/***** MODERATOR REMOVE *****/
+					/* MODERATOR REMOVE */
 					.withSubcommand(new CommandAPICommand("remove_other")
 							.withPermission("monumenta.command.plot.remove.others")
 							.withArguments(
@@ -337,7 +338,7 @@ public class PlotManager {
 	private static void plotAccessAdd(CommandSender sender, UUID ownerUUID, UUID otherUUID, @Nullable String duration) throws WrapperCommandSyntaxException {
 		long expiration = -1;
 		if (duration != null) {
-			duration = duration.toUpperCase();
+			duration = duration.toUpperCase(Locale.getDefault());
 			if (duration.contains("D")) {
 				duration = "P" + (duration.endsWith("D") ? duration : duration.replaceAll("D", "DT"));
 			} else {

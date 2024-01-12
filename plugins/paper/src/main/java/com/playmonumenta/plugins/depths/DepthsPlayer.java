@@ -258,7 +258,7 @@ public class DepthsPlayer {
 		mOfflineTeleportPitch = null;
 	}
 
-	public ArrayList<String> getSolarRayUniqueMobNames() {
+	public List<String> getSolarRayUniqueMobNames() {
 		return mSolarRayUniqueMobNames;
 	}
 

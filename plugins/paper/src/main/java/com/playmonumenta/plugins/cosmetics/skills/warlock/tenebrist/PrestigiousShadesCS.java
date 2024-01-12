@@ -144,7 +144,7 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 					public void run() {
 						new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0.1, GOLD_COLOR).spawnAsPlayerActive(player);
 					}
-				}.runTaskLater(Plugin.getInstance(), 2 * frame)
+				}.runTaskLater(Plugin.getInstance(), 2L * frame)
 			);
 		}
 

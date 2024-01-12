@@ -55,7 +55,7 @@ public class StarburstCS extends ViciousCombosCS {
 		Vector direction = player.getLocation().clone().subtract(starCentre.clone()).getDirection();
 		double angle = Math.atan2(direction.getX(), direction.getZ());
 
-		ArrayList<Vector> starFull = generateStar(starCentre, 3.6, 0.8, 3, angle);
+		List<Vector> starFull = generateStar(starCentre, 3.6, 0.8, 3, angle);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -91,7 +91,7 @@ public class StarburstCS extends ViciousCombosCS {
 		Vector direction = player.getLocation().clone().subtract(starCentre.clone()).getDirection();
 		double angle = Math.atan2(direction.getX(), direction.getZ());
 
-		ArrayList<Vector> starFull = generateStar(starCentre, 0.3, 0.06, 2, angle);
+		List<Vector> starFull = generateStar(starCentre, 0.3, 0.06, 2, angle);
 
 		Color c = colors[FastUtils.randomIntInRange(0, 2)];
 		for (Vector v : starFull) {
@@ -115,7 +115,7 @@ public class StarburstCS extends ViciousCombosCS {
 		return vector.clone().subtract(centre).multiply(scale).add(centre);
 	}
 
-	private ArrayList<Vector> generateStar(Vector starCentre, double starSize, double starHeaviness, double particlesPerEdge, double rotation) {
+	private List<Vector> generateStar(Vector starCentre, double starSize, double starHeaviness, double particlesPerEdge, double rotation) {
 		Vector[][] starPoints = new Vector[][] {
 			new Vector[] {
 				new Vector(starSize, 0, 0),

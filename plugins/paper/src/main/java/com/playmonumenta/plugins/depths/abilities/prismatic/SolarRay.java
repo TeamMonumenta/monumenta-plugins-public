@@ -193,7 +193,7 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 			return 0;
 		}
 
-		ArrayList<String> uniqueMobsKilled = dPlayer.getSolarRayUniqueMobNames();
+		List<String> uniqueMobsKilled = dPlayer.getSolarRayUniqueMobNames();
 		if (uniqueMobsKilled == null) {
 			return BASE_DAMAGE[mRarity - 1];
 		}
@@ -206,7 +206,7 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 			return;
 		}
 
-		ArrayList<String> uniqueMobsKilled = dPlayer.getSolarRayUniqueMobNames();
+		List<String> uniqueMobsKilled = dPlayer.getSolarRayUniqueMobNames();
 		if (uniqueMobsKilled != null && !uniqueMobsKilled.contains(mobName)) {
 			uniqueMobsKilled.add(mobName);
 			mPlayer.getWorld().playSound(mPlayer, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1, 1);
@@ -223,7 +223,7 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 			return 0;
 		}
 
-		ArrayList<String> uniqueMobsKilled = dPlayer.getSolarRayUniqueMobNames();
+		List<String> uniqueMobsKilled = dPlayer.getSolarRayUniqueMobNames();
 		if (uniqueMobsKilled == null) {
 			return 0;
 		}

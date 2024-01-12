@@ -316,7 +316,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				if (mPitch > 2.0f) {
 					// Death explosion
-					ArrayList<BlockDisplay> blockDisplays = DisplayEntityUtils.turnBlockCuboidIntoBlockDisplays(mBoss.getLocation().clone().add(-8, -1, -12), mBoss.getLocation().clone().add(19, 9, 12), true);
+					List<BlockDisplay> blockDisplays = DisplayEntityUtils.turnBlockCuboidIntoBlockDisplays(mBoss.getLocation().clone().add(-8, -1, -12), mBoss.getLocation().clone().add(19, 9, 12), true);
 					// Remove a percentage of the block displays for performance reasons
 					ArrayList<BlockDisplay> toRemove = new ArrayList<>();
 					blockDisplays.forEach(blockDisplay -> {

@@ -633,7 +633,7 @@ public final class EffectManager implements Listener {
 		return false;
 	}
 
-	public HashMap<String, Effect> getPriorityEffects(Entity entity) {
+	public Map<String, Effect> getPriorityEffects(Entity entity) {
 		EffectManager.Effects effects = mEntities.get(entity);
 		HashMap<String, Effect> output = new HashMap<>();
 		if (effects != null) {
@@ -1041,8 +1041,8 @@ public final class EffectManager implements Listener {
 					String source = getSource(player, effect);
 					// Recall Effect Gain Function to regain buffs one tick later.
 					effect.entityLoseEffect(player);
-					ClientModHandler.updateEffect(player, effect, source, true);
 					if (source != null) {
+						ClientModHandler.updateEffect(player, effect, source, true);
 						Bukkit.getScheduler().runTaskLater(plugin, () -> {
 							NavigableSet<Effect> effectsInSource = getEffects(player, source);
 							// Ensure that:

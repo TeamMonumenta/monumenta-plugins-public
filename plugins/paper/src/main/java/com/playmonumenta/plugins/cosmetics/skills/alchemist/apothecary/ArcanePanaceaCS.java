@@ -56,7 +56,7 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		for (int i = 0; i < 5; i++) {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
-			}, 3 * i);
+			}, 3L * i);
 		}
 
 		// big circle
@@ -130,7 +130,7 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		for (int i = 0; i < 3; i++) {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
-			}, 3 * i);
+			}, 3L * i);
 		}
 
 		Vector vec1 = VectorUtils.rotateYAxis(new Vector(1, 0, 0), loc.getYaw());
@@ -146,7 +146,7 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		for (int i = 0; i < 3; i++) {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
-			}, 3 * i);
+			}, 3L * i);
 		}
 	}
 

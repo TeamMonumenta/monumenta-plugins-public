@@ -105,12 +105,12 @@ public class DisplayEntityUtils {
 		return runnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
-	public static ArrayList<BlockDisplay> turnBlockCuboidIntoBlockDisplays(Location corner1, Location corner2) {
+	public static List<BlockDisplay> turnBlockCuboidIntoBlockDisplays(Location corner1, Location corner2) {
 		return turnBlockCuboidIntoBlockDisplays(corner1, corner2, false);
 	}
 
-	public static ArrayList<BlockDisplay> turnBlockCuboidIntoBlockDisplays(Location corner1, Location corner2, boolean ignoreBarriersBedrock) {
-		ArrayList<BlockDisplay> blockDisplays = new ArrayList<>();
+	public static List<BlockDisplay> turnBlockCuboidIntoBlockDisplays(Location corner1, Location corner2, boolean ignoreBarriersBedrock) {
+		List<BlockDisplay> blockDisplays = new ArrayList<>();
 
 		int minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
 		int maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());

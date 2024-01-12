@@ -376,7 +376,7 @@ public class SpellVesperidysDarkHole extends Spell {
 									// MovementUtils.pullTowardsNormalized(mDarkHoleCenter, player, 0.2f * blackHoleRadius);
 
 									for (int i = 0; i < DARK_HOLE_PROJECTILES_PER_PLAYER; i++) {
-										/**
+										/*
 										 * Quadratic Math.
 										 * x * (x - distance) from player to get it to intersect at player's position.
 										 *

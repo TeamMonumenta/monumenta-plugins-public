@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
+import java.util.Locale;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -97,7 +98,7 @@ public class MessagingUtils {
 		return remaining.toString()
 			.substring(2)
 			.replaceAll("(\\d[HMS])(?!$)", "$1 ")
-			.toLowerCase();
+			.toLowerCase(Locale.getDefault());
 	}
 
 	public static String plainText(Component formattedText) {

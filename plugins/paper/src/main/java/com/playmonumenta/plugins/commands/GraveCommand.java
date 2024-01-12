@@ -114,7 +114,7 @@ public class GraveCommand {
 			if (page > pages || page < 1) {
 				page = pages;
 			}
-			ArrayList<Component> entries = manager.getGravesList(page);
+			List<Component> entries = manager.getGravesList(page);
 			Component message = Component.text("List of ", NamedTextColor.AQUA)
 				.append(player.displayName().hoverEvent(player))
 				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
@@ -154,7 +154,7 @@ public class GraveCommand {
 			if (page > pages || page < 1) {
 				page = pages;
 			}
-			ArrayList<Component> entries = manager.getGravesList(page);
+			List<Component> entries = manager.getGravesList(page);
 			Component message = Component.text("List of ", NamedTextColor.AQUA)
 				.append(player.displayName().hoverEvent(player))
 				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
@@ -200,7 +200,7 @@ public class GraveCommand {
 					page = pages;
 				}
 				String coordinates = String.format("%s %s %s", location.getX(), location.getY(), location.getZ());
-				ArrayList<Component> entries = manager.getGravesList(page, grave -> Component.text(" ")
+				List<Component> entries = manager.getGravesList(page, grave -> Component.text(" ")
 					.append(Component.text("[S]", NamedTextColor.GOLD))
 					.hoverEvent(HoverEvent.showText(Component.text("Click to summon")))
 					.clickEvent(ClickEvent.runCommand("/grave summon list select " + coordinates + " " + grave.mUuid)));

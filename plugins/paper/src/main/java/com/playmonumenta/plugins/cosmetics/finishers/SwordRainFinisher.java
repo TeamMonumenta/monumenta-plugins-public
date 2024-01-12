@@ -422,7 +422,7 @@ public class SwordRainFinisher implements EliteFinisher {
 					}
 					mTicks++;
 				}
-			}.runTaskTimer(Plugin.getInstance(), 5 * i, 1);
+			}.runTaskTimer(Plugin.getInstance(), 5L * i, 1);
 		}
 	}
 

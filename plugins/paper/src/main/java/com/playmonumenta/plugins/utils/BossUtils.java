@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -276,7 +277,7 @@ public class BossUtils {
 			if (squareBrackets == 0 && roundBrackets == 0 && quoteCount == 0 && charAtI == ',') {
 				toMap = s.substring(lastSplitIndex, i).split("=");
 				if (toMap.length == 2) {
-					map.put(toMap[0].replace(" ", "").toLowerCase(), toMap[1]);
+					map.put(toMap[0].replace(" ", "").toLowerCase(Locale.getDefault()), toMap[1]);
 				} else {
 					Plugin.getInstance().getLogger().warning("Fail to load: " + s.substring(lastSplitIndex, i) + ". Illegal declaration");
 				}
@@ -287,7 +288,7 @@ public class BossUtils {
 		if (squareBrackets == 0 && roundBrackets == 0 && quoteCount == 0 && lastSplitIndex != s.length()) {
 			toMap = s.substring(lastSplitIndex, s.length()).split("=");
 			if (toMap.length == 2) {
-				map.put(toMap[0].replace(" ", "").toLowerCase(), toMap[1]);
+				map.put(toMap[0].replace(" ", "").toLowerCase(Locale.getDefault()), toMap[1]);
 			} else {
 				Plugin.getInstance().getLogger().warning("Fail to load: [" + String.join(",", toMap) + "]. Illegal declaration");
 			}
@@ -297,7 +298,7 @@ public class BossUtils {
 	}
 
 	public static String translateFieldNameToTag(String fieldName) {
-		return fieldName.toLowerCase().replaceAll("[^a-z0-9]", "");
+		return fieldName.toLowerCase(Locale.getDefault()).replaceAll("[^a-z0-9]", "");
 	}
 
 	public static boolean checkParametersStringProperty(String tag) throws Exception {

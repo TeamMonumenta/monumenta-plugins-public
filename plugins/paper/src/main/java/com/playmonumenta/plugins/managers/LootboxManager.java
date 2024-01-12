@@ -195,7 +195,7 @@ public class LootboxManager implements Listener {
 	 * Returns whether this was possible. If false the loot should be shared back
 	 * into the generating chest.
 	 */
-	public static @Nullable List<ItemStack> giveShareToPlayer(ArrayList<ItemStack> loot, Player player) {
+	public static @Nullable List<ItemStack> giveShareToPlayer(List<ItemStack> loot, Player player) {
 		ItemStack lootbox = getLootBox(player);
 		// No lootbox space. Indicate to the caller that the items should be distributed
 		// in the original chest

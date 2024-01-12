@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Supplier;
 import net.kyori.adventure.text.Component;
@@ -384,9 +385,9 @@ public class FishingManager implements Listener {
 		StringBuilder lootTablePath = new StringBuilder("epic:r3/items/fishing/fish/t" + newQuality + "/");
 		String[] previousFishNameSplit = previousFishName.split(" ");
 		for (int i = 1; i < previousFishNameSplit.length - 1; i++) {
-			lootTablePath.append(previousFishNameSplit[i].toLowerCase()).append("_");
+			lootTablePath.append(previousFishNameSplit[i].toLowerCase(Locale.getDefault())).append("_");
 		}
-		lootTablePath.append(previousFishNameSplit[previousFishNameSplit.length - 1].toLowerCase());
+		lootTablePath.append(previousFishNameSplit[previousFishNameSplit.length - 1].toLowerCase(Locale.getDefault()));
 		return InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(lootTablePath.toString()));
 	}
 

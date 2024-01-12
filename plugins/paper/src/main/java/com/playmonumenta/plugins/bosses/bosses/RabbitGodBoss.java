@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -234,7 +235,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 				@Override
 				public void run() {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.5f, 1f);
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mTime].toUpperCase() + "\",\"color\":\"dark_red\"}]");
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mTime].toUpperCase(Locale.getDefault()) + "\",\"color\":\"dark_red\"}]");
 					mTime++;
 					if (mTime == dio.length) {
 						this.cancel();

@@ -211,7 +211,7 @@ public abstract class RoomRepository {
 	}
 
 	//This method actually does the randomization aspect after finding the right array to roll from
-	public DepthsRoom randomRoom(DepthsParty party, ArrayList<DepthsRoom> roomList, double yLevel) {
+	public DepthsRoom randomRoom(DepthsParty party, List<DepthsRoom> roomList, double yLevel) {
 		List<DepthsRoom> oldRooms = party.mOldRooms;
 		//Copy the list and shuffle it
 		List<DepthsRoom> roomOptions = new ArrayList<>(roomList);

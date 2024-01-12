@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
+import java.util.Locale;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -115,7 +116,7 @@ public class SpellBullet extends Spell {
 		mTickAction = tickAction;
 		mCooldown = cooldown;
 		mBulletDuration = bulletDuration;
-		mPattern = Pattern.valueOfLabel(pattern.toLowerCase());
+		mPattern = Pattern.valueOfLabel(pattern.toLowerCase(Locale.getDefault()));
 		mAccel = accel;
 		mAccelStart = accelStart;
 		mAccelEnd = accelEnd;

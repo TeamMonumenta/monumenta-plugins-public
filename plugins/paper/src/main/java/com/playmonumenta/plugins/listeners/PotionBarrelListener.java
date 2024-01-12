@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -370,7 +371,7 @@ public class PotionBarrelListener implements Listener {
 	}
 
 	/* Recursive depth-first search over all adjacent barrels */
-	private void explore(Location loc, HashSet<Location> exploredLocations, List<BarrelInstance> barrels) {
+	private void explore(Location loc, Set<Location> exploredLocations, List<BarrelInstance> barrels) {
 		/*
 		 * Couple notes:
 		 * - The same Location object is reused to avoid a bunch of unnecessary clones

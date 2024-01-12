@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
@@ -226,9 +227,9 @@ public class ChessManager implements Listener {
 				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("gui"));
-			arguments.add(new MultiLiteralArgument(ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(),
-					ChessInterface.InterfaceType.BLACKPLAYER.name().toLowerCase(),
-					ChessInterface.InterfaceType.SPECTATOR.name().toLowerCase()));
+			arguments.add(new MultiLiteralArgument(ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(Locale.getDefault()),
+					ChessInterface.InterfaceType.BLACKPLAYER.name().toLowerCase(Locale.getDefault()),
+					ChessInterface.InterfaceType.SPECTATOR.name().toLowerCase(Locale.getDefault())));
 			arguments.add(new LocationArgument("starting positions", LocationType.BLOCK_POSITION));
 			arguments.add(new MultiLiteralArgument(ChessInterface.FacingPosition.NORTH.getLabel(),
 					ChessInterface.FacingPosition.SOUTH.getLabel()));
@@ -269,7 +270,7 @@ public class ChessManager implements Listener {
 			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 		ChessBoard board = mBoards.get(name);
-		final ChessInterface newChessInterface = new ChessInterface(board, InterfaceType.valueOf(type.toUpperCase()));
+		final ChessInterface newChessInterface = new ChessInterface(board, InterfaceType.valueOf(type.toUpperCase(Locale.getDefault())));
 		for (ChessInterface chessInterface : new HashSet<>(mBoardsInterfaces.get(board))) {
 			if (chessInterface.mType == newChessInterface.mType) {
 				chessInterface.removeFrames();
@@ -366,7 +367,7 @@ public class ChessManager implements Listener {
 		}
 
 		ChessBoard board = mBoards.get(name);
-		board.setPlayer(player, ChessTeam.valueOf(role.toUpperCase()));
+		board.setPlayer(player, ChessTeam.valueOf(role.toUpperCase(Locale.getDefault())));
 	}
 
 	public static void setPiece(String name, String piece, String teamString, int pos) throws WrapperCommandSyntaxException {
@@ -374,8 +375,8 @@ public class ChessManager implements Listener {
 			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 
-		ChessPieceType type = ChessPieceType.valueOf(piece.toUpperCase());
-		ChessTeam team = ChessTeam.valueOf(teamString.toUpperCase());
+		ChessPieceType type = ChessPieceType.valueOf(piece.toUpperCase(Locale.getDefault()));
+		ChessTeam team = ChessTeam.valueOf(teamString.toUpperCase(Locale.getDefault()));
 		if (type == null || team == null || pos < 0 || pos > 63) {
 			throw CommandAPI.failWithString("Error. type: " + type + " team: " + team + " pos: " + pos);
 		}

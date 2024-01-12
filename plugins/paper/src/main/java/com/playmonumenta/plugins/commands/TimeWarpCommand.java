@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.bukkit.command.CommandSender;
 
 public class TimeWarpCommand {
@@ -118,7 +119,7 @@ public class TimeWarpCommand {
 			new CommandAPICommand(COMMAND)
 				.withPermission(PERMISSION)
 				.withArguments(arguments)
-				.withArguments(new MultiLiteralArgument(unit.name().toLowerCase()))
+				.withArguments(new MultiLiteralArgument(unit.name().toLowerCase(Locale.getDefault())))
 				.executes(TimeWarpCommand::runAdd)
 				.register();
 		}
@@ -140,7 +141,7 @@ public class TimeWarpCommand {
 			new CommandAPICommand(COMMAND)
 				.withPermission(PERMISSION)
 				.withArguments(arguments)
-				.withArguments(new MultiLiteralArgument(unit.name().toLowerCase()))
+				.withArguments(new MultiLiteralArgument(unit.name().toLowerCase(Locale.getDefault())))
 				.executes(TimeWarpCommand::runRemove)
 				.register();
 		}
@@ -257,7 +258,7 @@ public class TimeWarpCommand {
 		}
 
 		if (args.length > 2 && args[2] instanceof String arg) {
-			unit = ChronoUnit.valueOf(arg.toUpperCase());
+			unit = ChronoUnit.valueOf(arg.toUpperCase(Locale.getDefault()));
 		}
 
 		TimeWarpManager.add(amount, unit);
@@ -277,7 +278,7 @@ public class TimeWarpCommand {
 		}
 
 		if (args.length > 2 && args[2] instanceof String arg) {
-			unit = ChronoUnit.valueOf(arg.toUpperCase());
+			unit = ChronoUnit.valueOf(arg.toUpperCase(Locale.getDefault()));
 		}
 
 		TimeWarpManager.add(-amount, unit);

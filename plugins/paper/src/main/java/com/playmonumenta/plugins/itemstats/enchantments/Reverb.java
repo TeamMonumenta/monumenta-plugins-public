@@ -112,7 +112,7 @@ public class Reverb implements Enchantment {
 							new PartialParticle(Particle.SOUL, targetLocation, 25, 0.3, 0.3, 0.3, 0.05).spawnAsEnemy();
 
 							double finalDamage = value * (overkill * OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL + highestDamage * HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL);
-							DamageUtils.damage(player, hitMob, DamageEvent.DamageType.OTHER, Math.round(CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, finalDamage)), ClassAbility.REVERB, true, false);
+							DamageUtils.damage(player, hitMob, DamageEvent.DamageType.OTHER, (double) Math.round(CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, finalDamage)), ClassAbility.REVERB, true, false);
 
 							this.cancel();
 							return;

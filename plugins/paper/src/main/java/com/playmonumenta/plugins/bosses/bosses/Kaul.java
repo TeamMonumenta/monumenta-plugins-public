@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
@@ -989,7 +990,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-				sendDialogue(dio[mT].toUpperCase());
+				sendDialogue(dio[mT].toUpperCase(Locale.getDefault()));
 				mT++;
 				if (mT == dio.length) {
 					this.cancel();
@@ -1087,7 +1088,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 						if (mT % (20 * 4) == 0) {
 							if (mIndex < dio.length) {
-								sendDialogue(dio[mIndex].toUpperCase());
+								sendDialogue(dio[mIndex].toUpperCase(Locale.getDefault()));
 								mIndex++;
 							}
 						}

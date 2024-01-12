@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillShopGUI;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -153,11 +154,11 @@ public enum Location {
 	}
 
 	Location(PlayerClass cls) {
-		this(cls.mClassName.toLowerCase(), cls.mClassName, cls.mClassColor);
+		this(cls.mClassName.toLowerCase(Locale.getDefault()), cls.mClassName, cls.mClassColor);
 	}
 
 	Location(DepthsTree tree) {
-		this(tree.getDisplayName().toLowerCase(), tree.getNameComponent());
+		this(tree.getDisplayName().toLowerCase(Locale.getDefault()), tree.getNameComponent());
 	}
 
 	public String getName() {

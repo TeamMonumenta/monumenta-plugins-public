@@ -324,6 +324,21 @@ public class PotionUtils {
 		plugin.mPotionManager.refreshEffects(player);
 	}
 
+	public static void clearNegatives(LivingEntity entity) {
+		boolean dolphin = entity.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE);
+		for (PotionEffectType type : NEGATIVE_EFFECTS) {
+			if (entity.hasPotionEffect(type)) {
+				if ("SLOW".equals(type.getName()) && dolphin) {
+					continue;
+				}
+				PotionEffect effect = entity.getPotionEffect(type);
+				if (effect != null && effect.getDuration() < Constants.THIRTY_MINUTES) {
+					entity.removePotionEffect(type);
+				}
+			}
+		}
+	}
+
 	public static void reduceNegatives(Plugin plugin, Player player, double reduction) {
 		plugin.mPotionManager.modifyPotionDuration(player, potionInfo -> {
 			if (NEGATIVE_EFFECTS.contains(potionInfo.mType)) {
@@ -341,22 +356,6 @@ public class PotionUtils {
 				effect.setDuration((int) (effect.getDuration() * reduction));
 			}
 		}
-	}
-
-	public static void clearNegatives(LivingEntity entity) {
-		boolean dolphin = entity.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE);
-		for (PotionEffectType type : NEGATIVE_EFFECTS) {
-			if (entity.hasPotionEffect(type)) {
-				if ("SLOW".equals(type.getName()) && dolphin) {
-					continue;
-				}
-				PotionEffect effect = entity.getPotionEffect(type);
-				if (effect != null && effect.getDuration() < Constants.THIRTY_MINUTES) {
-					entity.removePotionEffect(type);
-				}
-			}
-		}
-
 	}
 
 	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {

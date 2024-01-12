@@ -186,19 +186,21 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
 
-						Location tpLoc = mTp.getLocation();
-						tpLoc.add(FastUtils.randomDoubleInRange(-6, 6), 0, FastUtils.randomDoubleInRange(-6, 6));
-						tpLoc.setYaw(tpLoc.getYaw() + FastUtils.randomFloatInRange(-30, 30));
-						tpLoc.setPitch(tpLoc.getPitch() + FastUtils.randomFloatInRange(-10, 10));
-						player.teleport(tpLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+						if (mTp != null) {
+							Location tpLoc = mTp.getLocation();
+							tpLoc.add(FastUtils.randomDoubleInRange(-6, 6), 0, FastUtils.randomDoubleInRange(-6, 6));
+							tpLoc.setYaw(tpLoc.getYaw() + FastUtils.randomFloatInRange(-30, 30));
+							tpLoc.setPitch(tpLoc.getPitch() + FastUtils.randomFloatInRange(-10, 10));
+							player.teleport(tpLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
-						/* Spawn a copy of particles and sounds at arrival location */
-						player.playSound(tpLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
-						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
-						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
+							/* Spawn a copy of particles and sounds at arrival location */
+							player.playSound(tpLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
+							new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
+							new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
 
-						player.sendMessage(Component.text("What happened!? You need to find your way out of here quickly!", NamedTextColor.AQUA));
-						MessagingUtils.sendTitle(player, Component.text("ESCAPE", NamedTextColor.RED, TextDecoration.BOLD), Component.empty(), 1, 20 * 3, 1);
+							player.sendMessage(Component.text("What happened!? You need to find your way out of here quickly!", NamedTextColor.AQUA));
+							MessagingUtils.sendTitle(player, Component.text("ESCAPE", NamedTextColor.RED, TextDecoration.BOLD), Component.empty(), 1, 20 * 3, 1);
+						}
 					});
 				} else if (mTicks < KAULS_JUDGEMENT_TOTAL_TIME) {
 					if (mBoss.isDead()) {

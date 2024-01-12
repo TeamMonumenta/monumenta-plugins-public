@@ -53,6 +53,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
@@ -822,7 +823,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 								public void run() {
 									if (mIter < dio.length) {
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.sendMessage(Component.text(dio[mIter].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
+											p.sendMessage(Component.text(dio[mIter].toUpperCase(Locale.getDefault()), NamedTextColor.LIGHT_PURPLE));
 										}
 										mIter++;
 									} else {
@@ -1266,7 +1267,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				if (mT < dio1.length) {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(Component.text(dio1[mT].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
+						p.sendMessage(Component.text(dio1[mT].toUpperCase(Locale.getDefault()), NamedTextColor.LIGHT_PURPLE));
 					}
 					mT++;
 				} else {
@@ -1446,7 +1447,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				if (mT < dio.length) {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(Component.text(dio[mT].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
+						p.sendMessage(Component.text(dio[mT].toUpperCase(Locale.getDefault()), NamedTextColor.LIGHT_PURPLE));
 					}
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 1);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 3, 1);
@@ -1829,7 +1830,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						}
 						if (mT % 3 == 0 && mDio < finalDialog.length) {
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(Component.text(finalDialog[mDio].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
+								p.sendMessage(Component.text(finalDialog[mDio].toUpperCase(Locale.getDefault()), NamedTextColor.LIGHT_PURPLE));
 							}
 							mDio++;
 						}
@@ -1929,7 +1930,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 								public void run() {
 									if (mT != 1 && mDio < endDialog.length) {
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.sendMessage(Component.text(endDialog[mDio].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
+											p.sendMessage(Component.text(endDialog[mDio].toUpperCase(Locale.getDefault()), NamedTextColor.LIGHT_PURPLE));
 										}
 										mDio++;
 									}

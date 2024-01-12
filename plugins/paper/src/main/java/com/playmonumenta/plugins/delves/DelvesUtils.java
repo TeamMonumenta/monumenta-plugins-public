@@ -535,11 +535,14 @@ public class DelvesUtils {
 
 			// Find the structure(s) the party is in
 			List<RespawningStructure> structures = new ArrayList<>();
-			for (Player player : party) {
-				List<RespawningStructure> playerStructures = StructuresPlugin.getInstance().mRespawnManager.getStructures(player.getLocation().toVector(), false);
-				playerStructures.removeIf(structure -> !structure.isWithin(player));
-				playerStructures.removeAll(structures);
-				structures.addAll(playerStructures);
+			StructuresPlugin structuresPlugin = StructuresPlugin.getInstance();
+			if (structuresPlugin.mRespawnManager != null) {
+				for (Player player : party) {
+					List<RespawningStructure> playerStructures = structuresPlugin.mRespawnManager.getStructures(player.getLocation().toVector(), false);
+					playerStructures.removeIf(structure -> !structure.isWithin(player));
+					playerStructures.removeAll(structures);
+					structures.addAll(playerStructures);
+				}
 			}
 
 			if (structures.isEmpty()) {

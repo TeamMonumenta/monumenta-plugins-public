@@ -10,6 +10,7 @@ import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -58,7 +59,7 @@ public class ToggleTrail extends GenericCommand implements Listener {
 	private static void run(Player player, @Nullable String material) {
 		Material block = Material.SPONGE;
 		if (material != null) {
-			block = Material.getMaterial(material.toUpperCase());
+			block = Material.getMaterial(material.toUpperCase(Locale.getDefault()));
 		}
 
 		if (!mTrackedPlayers.containsKey(player.getUniqueId())) {

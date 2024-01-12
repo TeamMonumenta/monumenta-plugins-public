@@ -195,7 +195,7 @@ public class VesperidysVoidCrystalDawn extends BossAbilityGroup {
 				trident.setVelocity(new Vector(0, 5, 0));
 				trident.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 				trident.setHasDealtDamage(true);
-			}, i * 10);
+			}, i * 10L);
 		}
 
 		// Telegraph the fang, damocles sword

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
@@ -162,7 +163,7 @@ public class SpellEchoCharge extends Spell {
 		return mCooldown + mExecutionTime + 20 * 3;
 	}
 
-	private void telegraphParticles(int index, HashMap<Location, Location> lines, List<Location> lineKeysArray) {
+	private void telegraphParticles(int index, Map<Location, Location> lines, List<Location> lineKeysArray) {
 		Location startLoc1 = Objects.requireNonNull(lines.get(lineKeysArray.get(index)));
 		Location endLoc1 = lineKeysArray.get(index);
 		Vector baseVector1 = endLoc1.clone().subtract(startLoc1).toVector();

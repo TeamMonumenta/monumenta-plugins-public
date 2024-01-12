@@ -84,8 +84,8 @@ public final class Grave {
 	private final boolean mSmall;
 	String mShardName;
 	Location mLocation;
-	private final HashMap<String, EulerAngle> mPose;
-	private final HashMap<String, ItemStack> mEquipment;
+	private final Map<String, EulerAngle> mPose;
+	private final Map<String, ItemStack> mEquipment;
 	HashSet<GraveItem> mItems;
 	private @Nullable ArmorStand mEntity;
 	private final HashSet<UUID> mGraveMessageCooldown = new HashSet<>();
@@ -98,8 +98,8 @@ public final class Grave {
 
 	// For deserializing a grave from data
 	private Grave(GraveManager manager, Player player, UUID uuid, String shard,
-	              Instant time, boolean small, Location location, boolean isGhost, HashMap<String, EulerAngle> pose,
-	              HashMap<String, ItemStack> equipment, JsonArray items) {
+	              Instant time, boolean small, Location location, boolean isGhost, Map<String, EulerAngle> pose,
+	              Map<String, ItemStack> equipment, JsonArray items) {
 		mManager = manager;
 		mPlayer = player;
 		mUuid = uuid;
@@ -122,7 +122,7 @@ public final class Grave {
 	}
 
 	// For spawning a new grave on death
-	public Grave(GraveManager manager, Player player, HashMap<EquipmentSlot, ItemStack> equipment) {
+	public Grave(GraveManager manager, Player player, Map<EquipmentSlot, ItemStack> equipment) {
 		mManager = manager;
 		mPlayer = player;
 		mUuid = UUID.randomUUID();

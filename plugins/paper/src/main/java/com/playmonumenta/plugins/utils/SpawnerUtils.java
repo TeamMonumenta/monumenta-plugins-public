@@ -362,7 +362,7 @@ public class SpawnerUtils {
 		return null;
 	}
 
-	public static HashMap<String, Object> getStoredParameters(Block spawnerBlock, String actionIdentifier) {
+	public static Map<String, Object> getStoredParameters(Block spawnerBlock, String actionIdentifier) {
 		if (!isSpawner(spawnerBlock)) {
 			return new HashMap<>();
 		}

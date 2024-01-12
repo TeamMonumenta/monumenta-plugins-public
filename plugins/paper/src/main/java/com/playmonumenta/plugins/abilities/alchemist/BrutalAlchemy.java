@@ -84,7 +84,9 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 				// Apply the enhanced dot a little later for a cool effect
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					CustomDamageOverTime enhancementDot = new CustomDamageOverTime(duration, Math.max(1, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, finalEnhancedDamage)), mPeriod * 2, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
-					enhancementDot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
+					if (mAlchemistPotions != null) {
+						enhancementDot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
+					}
 					mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_ENHANCED_EFFECT_NAME, enhancementDot);
 				}, 10);
 			}

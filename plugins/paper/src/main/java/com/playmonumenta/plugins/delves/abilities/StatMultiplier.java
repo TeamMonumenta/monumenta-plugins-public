@@ -126,12 +126,16 @@ public class StatMultiplier {
 		String shardType = shard.split("-")[0];
 
 		if (shardType.equals("ring")) {
-			List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), false);
-			for (RespawningStructure rs : structures) {
-				String name = (String) rs.getConfig().get("name");
-				Double value = STAT_COMPENSATION_MAPPINGS_RING_POI.get(name);
-				if (value != null) {
-					return value;
+			StructuresPlugin structuresPlugin = StructuresPlugin.getInstance();
+
+			if (structuresPlugin.mRespawnManager != null) {
+				List<RespawningStructure> structures = structuresPlugin.mRespawnManager.getStructures(loc.toVector(), false);
+				for (RespawningStructure rs : structures) {
+					String name = (String) rs.getConfig().get("name");
+					Double value = STAT_COMPENSATION_MAPPINGS_RING_POI.get(name);
+					if (value != null) {
+						return value;
+					}
 				}
 			}
 			//no match -> return default value from shard mapping

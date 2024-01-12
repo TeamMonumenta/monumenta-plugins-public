@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -173,7 +174,7 @@ public class PointAndClickFM extends FishingMinigame {
 		drawRectangle(progressBottomCorner, planeVectorX, planeVectorY, PROGRESS_WIDTH, PROGRESS_HEIGHT, 16, player);
 	}
 
-	private boolean pointOverlapCircle(Vector vector, ArrayList<Vector> circles) {
+	private boolean pointOverlapCircle(Vector vector, List<Vector> circles) {
 		for (Vector v : circles) {
 			if (v.equals(vector)) {
 				continue;
@@ -200,7 +201,7 @@ public class PointAndClickFM extends FishingMinigame {
 		}
 	}
 
-	private void drawCircle(int circleNum, ArrayList<Location> adjustedCircleLocations, Vector planeVectorX, Vector planeVectorY, Player player) {
+	private void drawCircle(int circleNum, List<Location> adjustedCircleLocations, Vector planeVectorX, Vector planeVectorY, Player player) {
 		Color circleColor = mTwoClickMode ? (CIRCLE_IS_LEFT_CLICK.get(circleNum) ? LEFT_CIRCLE_COLOR : RIGHT_CIRCLE_COLOR) : CIRCLE_COLOR;
 		for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
 			drawParticle(adjustedCircleLocations.get(circleNum).clone().add(planeVectorX.clone().multiply(mCircleRadius * FastUtils.cos(angle)).add(planeVectorY.clone().multiply(mCircleRadius * FastUtils.sin(angle)))), player, circleColor);

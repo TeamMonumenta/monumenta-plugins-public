@@ -634,7 +634,7 @@ public class DelvesManager implements Listener {
 			return info;
 		}
 
-		public HashMap<DelvesModifier, Integer> getMap() {
+		public Map<DelvesModifier, Integer> getMap() {
 			return new HashMap<>(mModifierPoint);
 		}
 

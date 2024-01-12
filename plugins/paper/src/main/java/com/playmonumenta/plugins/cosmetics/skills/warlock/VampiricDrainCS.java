@@ -139,7 +139,7 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 						(l, t) -> new PartialParticle(Particle.DAMAGE_INDICATOR, l, 4, 0.75, 0.5, 0.75, 0.6).spawnAsPlayerActive(player)
 					);
 				}
-			}.runTaskLater(Plugin.getInstance(), (int) Math.round(r / radius * RING_FRAMES));
+			}.runTaskLater(Plugin.getInstance(), Math.round(r / radius * RING_FRAMES));
 		}
 	}
 

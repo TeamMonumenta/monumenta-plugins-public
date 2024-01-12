@@ -15,6 +15,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -104,7 +105,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		String npcName = mBoss.getName();
 
 		if (mSamwellAbility.mDefeated) {
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					MessagingUtils.sendNPCMessage(player, npcName, "Quick, grab the wool. Let’s get out of here...");
 				}
@@ -122,7 +123,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		}
 
 		if (mSamwellAbility.mCraftPhase) {
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					MessagingUtils.sendNPCMessage(player, npcName, "I’ve started crafting the dagger. Keep them off me!");
 				}
@@ -140,7 +141,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		}
 
 		if (mSamwellAbility.mPhase >= 4) {
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					MessagingUtils.sendNPCMessage(player, npcName, "He’s vulnerable now, don’t worry about the stupid daggers!");
 				}
@@ -158,7 +159,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		}
 
 		if (mSamwellAbility.mDaggerPhase) {
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					MessagingUtils.sendNPCMessage(player, npcName, "It's done! Collect the dagger and let's take this monster down.");
 				}
@@ -193,7 +194,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		}
 
 		if (shards == mSamwellAbility.getShards()) {
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					MessagingUtils.sendNPCMessage(player, npcName, "If you want me to do anything, I need you to grab some Blackblood Shards.");
 				}
@@ -212,7 +213,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 
 		if (mSamwellAbility.getShards() >= mSamwellAbility.mShardsReq) {
 			// Begin Crafting
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "That's enough. We'll start conjuring the dagger!"));
 				}
@@ -229,7 +230,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			mIsCrafter = true;
 			mSamwellAbility.startCraftPhase();
 		} else {
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Thank you. We'll need " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more to put together the dagger."));
 				}
@@ -254,7 +255,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		changePhase(mSpellManager, mOfflinePassives, null);
 		if (mIsCrafter) {
 			String npcName = mBoss.getName();
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "It's done! Collect the dagger and let's take this monster down."));
 				}
@@ -277,7 +278,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		String npcName = mBoss.getName();
 		if (mSamwellAbility.getFails() < 2) {
 			mSamwellAbility.addFail();
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Help! The Masked are on me! I can't focus!"));
 				}
@@ -301,7 +302,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			}
 		} else {
 			// 3 Fails = Restart!
-			switch (npcName.toLowerCase()) {
+			switch (npcName.toLowerCase(Locale.getDefault())) {
 				case "bhairavi" -> {
 					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "There was too many of them... We'll need new shards - the Masked ruined it..."));
 				}

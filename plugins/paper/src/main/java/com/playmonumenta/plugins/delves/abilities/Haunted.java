@@ -50,7 +50,6 @@ public class Haunted {
 			double mSpeed = MAX_SPEED;
 
 			int mHitTimer = 0;
-			int mBeatCD = 0;
 
 			int mRangeCD = 0;
 			@Override

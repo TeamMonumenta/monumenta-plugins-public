@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.Locale;
 import java.util.Optional;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -117,7 +118,7 @@ public class LuckPermsIntegration {
 
 	public static String getCleanGuildName(String guildName) {
 		// Guild name sanitization for command usage
-		return guildName.toLowerCase().replace(" ", "_");
+		return guildName.toLowerCase(Locale.getDefault()).replace(" ", "_");
 	}
 
 	public static void pushUpdate() {

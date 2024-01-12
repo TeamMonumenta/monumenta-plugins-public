@@ -90,7 +90,7 @@ public class PzeroManager implements Listener {
 		handleLeaderboard(placements);
 	}
 
-	private void handleLeaderboard(ArrayList<PzeroPlayerPlacement> placements) {
+	private void handleLeaderboard(List<PzeroPlayerPlacement> placements) {
 		// Leaderboard logic
 
 		// Remove placements which already have a value set for placement
@@ -103,8 +103,8 @@ public class PzeroManager implements Listener {
 			}
 
 			// Remove the placements that are not for the currently examined map
-			ArrayList<PzeroPlayerPlacement> placementCopy = new ArrayList<>(placements);
-			ArrayList<PzeroPlayerPlacement> mapPlacements = map.getPlacements();
+			List<PzeroPlayerPlacement> placementCopy = new ArrayList<>(placements);
+			List<PzeroPlayerPlacement> mapPlacements = map.getPlacements();
 			placementCopy.removeIf(placement -> {
 				PzeroPlayer pzPlayer = getPzeroPlayer(placement.mPlayer);
 				if (pzPlayer == null) {

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -50,7 +51,7 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 
 	static {
 		for (Material mat : Material.values()) {
-			if (mat.name().toLowerCase().contains("carpet")) {
+			if (mat.name().toLowerCase(Locale.getDefault()).contains("carpet")) {
 				BLACKLIST_MATERIALS.add(mat);
 			}
 		}

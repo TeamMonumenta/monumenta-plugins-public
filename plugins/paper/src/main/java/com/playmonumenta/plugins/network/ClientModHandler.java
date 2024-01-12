@@ -16,12 +16,11 @@ import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
+import com.playmonumenta.plugins.effects.Effect;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.function.Predicate;
-
-import com.playmonumenta.plugins.effects.Effect;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

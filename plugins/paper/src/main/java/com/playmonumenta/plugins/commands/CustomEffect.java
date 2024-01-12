@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -29,7 +30,7 @@ public class CustomEffect {
 	@SuppressWarnings("unchecked")
 	public static void register() {
 		Argument<?> entitiesArgument = new EntitySelectorArgument.ManyEntities("entities");
-		Argument<?> effectArgument = new MultiLiteralArgument(Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase()).toArray(String[]::new));
+		Argument<?> effectArgument = new MultiLiteralArgument(Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase(Locale.getDefault())).toArray(String[]::new));
 		Argument<?> durationArgument = new TimeArgument("duration");
 		Argument<?> objectiveArgument = new ObjectiveArgument("objective").replaceSuggestions(ArgumentSuggestions.strings("objective", "amount"));
 		Argument<?> scoreholderArgument = new ScoreHolderArgument.Single("scoreholder").replaceSuggestions(ArgumentSuggestions.strings("scoreholder", "amount"));

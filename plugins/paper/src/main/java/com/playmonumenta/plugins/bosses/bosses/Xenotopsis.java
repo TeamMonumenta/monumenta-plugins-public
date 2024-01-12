@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -228,7 +229,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 			mTicksSinceLastDeathChange.put(player, 0);
 
 			String playerName = player.getName();
-			BossBar bar = BossBar.bossBar(Component.text(playerName + "'" + (playerName.toLowerCase().endsWith("s") ? "" : "s") + " Death", NamedTextColor.DARK_PURPLE), 0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
+			BossBar bar = BossBar.bossBar(Component.text(playerName + "'" + (playerName.toLowerCase(Locale.getDefault()).endsWith("s") ? "" : "s") + " Death", NamedTextColor.DARK_PURPLE), 0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
 			player.showBossBar(bar);
 			mDeathBossBars.put(player, bar);
 		});
@@ -306,20 +307,20 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 	public void sendWorldDialogueMessage(String text) {
 		mWorld.getPlayers().forEach(player -> {
-			player.sendMessage(Component.text(text.toUpperCase(), DIALOGUE_COLOR));
+			player.sendMessage(Component.text(text.toUpperCase(Locale.getDefault()), DIALOGUE_COLOR));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 0.9f, 0.8f);
 		});
 	}
 
 	public void sendDialogueMessage(String text) {
 		PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).forEach(player -> {
-			player.sendMessage(Component.text(text.toUpperCase(), DIALOGUE_COLOR));
+			player.sendMessage(Component.text(text.toUpperCase(Locale.getDefault()), DIALOGUE_COLOR));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 0.9f, 0.8f);
 		});
 	}
 
 	public void sendDialogueMessageToPlayer(Player player, String text) {
-		player.sendMessage(Component.text(text.toUpperCase(), DIALOGUE_COLOR));
+		player.sendMessage(Component.text(text.toUpperCase(Locale.getDefault()), DIALOGUE_COLOR));
 		player.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 0.9f, 0.8f);
 	}
 

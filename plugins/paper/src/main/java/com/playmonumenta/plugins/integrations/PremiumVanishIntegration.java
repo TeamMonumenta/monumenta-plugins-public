@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class PremiumVanishIntegration {
 	private static boolean DISABLED = true;

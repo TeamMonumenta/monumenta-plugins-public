@@ -116,7 +116,7 @@ public enum PzeroMap {
 		mPlacements.add(placement);
 	}
 
-	public ArrayList<PzeroPlayerPlacement> getPlacements() {
+	public List<PzeroPlayerPlacement> getPlacements() {
 		return new ArrayList<>(mPlacements);
 	}
 
@@ -143,7 +143,7 @@ public enum PzeroMap {
 	public void displayStandingsToNearbyPlayers(World world, double radius) {
 		PlayerUtils.playersInRange(mReturnPosition.toLocation(world), radius, true).forEach(player -> {
 			player.sendMessage(Component.text("▂▄▆ Race Results ▆▄▂", PzeroPlayer.SILVER_COLOR, TextDecoration.BOLD));
-			ArrayList<PzeroPlayerPlacement> placementsCopy = getPlacements();
+			List<PzeroPlayerPlacement> placementsCopy = getPlacements();
 			if (placementsCopy.size() == 0) {
 				player.sendMessage(Component.text("Race Cancelled - All players left", NamedTextColor.RED, TextDecoration.BOLD));
 			}

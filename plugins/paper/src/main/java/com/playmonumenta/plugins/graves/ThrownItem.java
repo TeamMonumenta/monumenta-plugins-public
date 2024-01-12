@@ -9,6 +9,7 @@ import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -112,9 +113,11 @@ public class ThrownItem {
 	private void remove() {
 		if (mEntity != null) {
 			mManager.removeItem(mEntity);
+			Location entityLocation = mEntity.getLocation();
+			Material material = mEntity.getItemStack().getType();
 			// Note that as of 1.19, mEntity.isValid() is false at this point.
 			// We need to remove it anyway - it's still in the chunk that is unloading.
-			Plugin.getInstance().getLogger().fine(() -> "Removing thrown item due to chunk unload at " + mEntity.getLocation() + " " + mEntity.getItemStack().getType());
+			Plugin.getInstance().getLogger().fine(() -> "Removing thrown item due to chunk unload at " + entityLocation + " " + material);
 			mEntity.remove();
 			mEntity = null;
 			stopTracking();

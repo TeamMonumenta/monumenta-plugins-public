@@ -95,12 +95,15 @@ public class PlayerUtils {
 		}
 
 		// In a POI, all players within the same POI are in range
-		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), false)
-												   .stream().filter(structure -> structure.isWithin(loc)).toList();
-		if (!structures.isEmpty()) {
-			return loc.getWorld().getPlayers().stream()
-					   .filter(p -> playerCountsForLootScaling(p) && playerIsInPOI(structures, p))
-					   .toList();
+		StructuresPlugin structuresPlugin = StructuresPlugin.getInstance();
+		if (structuresPlugin.mRespawnManager != null) {
+			List<RespawningStructure> structures = structuresPlugin.mRespawnManager.getStructures(loc.toVector(), false)
+				.stream().filter(structure -> structure.isWithin(loc)).toList();
+			if (!structures.isEmpty()) {
+				return loc.getWorld().getPlayers().stream()
+					.filter(p -> playerCountsForLootScaling(p) && playerIsInPOI(structures, p))
+					.toList();
+			}
 		}
 
 		// Otherwise, perform no loot scaling
@@ -122,7 +125,13 @@ public class PlayerUtils {
 	}
 
 	public static boolean playerIsInPOI(Location loc, Player player) {
-		return playerIsInPOI(StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), true), player);
+		StructuresPlugin structuresPlugin = StructuresPlugin.getInstance();
+
+		if (structuresPlugin.mRespawnManager != null) {
+			return playerIsInPOI(structuresPlugin.mRespawnManager.getStructures(loc.toVector(), true), player);
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean playerIsInPOI(Player player) {

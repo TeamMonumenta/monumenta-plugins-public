@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.ToIntFunction;
 import org.bukkit.entity.Player;
@@ -137,8 +138,8 @@ public class PotionManager {
 		player.removePotionEffect(type);
 	}
 
-	public HashMap<PotionID, List<PotionInfo>> getAllPotionInfos(Player player) {
-		HashMap<PotionID, List<PotionInfo>> infos = new HashMap<>();
+	public Map<PotionID, List<PotionInfo>> getAllPotionInfos(Player player) {
+		Map<PotionID, List<PotionInfo>> infos = new HashMap<>();
 		for (PotionID id : PotionID.values()) {
 			infos.put(id, new ArrayList<>());
 		}

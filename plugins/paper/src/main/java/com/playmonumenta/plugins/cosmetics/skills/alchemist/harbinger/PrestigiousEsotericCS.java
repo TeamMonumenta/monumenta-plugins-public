@@ -72,7 +72,7 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 		final double theta = FastUtils.RANDOM.nextDouble(120);
 		final double dRadius = -1.2;
 		final double dTheta = 30;
-		final int interval = 3;
+		final long interval = 3;
 
 		for (int i = 0; i < DATA.length; i++) {
 			final double mRadius = radius + i * dRadius;

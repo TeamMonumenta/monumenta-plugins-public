@@ -138,8 +138,8 @@ public class Samwell extends BossAbilityGroup {
 		mLevynLoc = mSpawnLoc.clone().add(-8, 1, -12);
 		mDaggerLoc = mSpawnLoc.clone().add(0, 8, 0);
 
-		mDagger = InventoryUtils.getItemFromLootTable(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_dagger"));
-		mShards = InventoryUtils.getItemFromLootTable(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_shard"));
+		mDagger = InventoryUtils.getItemFromLootTableOrThrow(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_dagger"));
+		mShards = InventoryUtils.getItemFromLootTableOrThrow(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_shard"));
 
 		mCraftingBar = BossBar.bossBar(Component.text("Crafting...", NamedTextColor.YELLOW, TextDecoration.BOLD), 0, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_6);
 		mGatheringBar = BossBar.bossBar(Component.empty(), 0, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_6);

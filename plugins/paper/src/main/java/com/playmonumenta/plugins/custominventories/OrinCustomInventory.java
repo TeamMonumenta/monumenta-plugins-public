@@ -12,6 +12,7 @@ import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -431,9 +432,9 @@ public class OrinCustomInventory extends CustomInventory {
 		String shardName = "";
 		for (Integer shard : resultSortedList) {
 			if (shard == 0) {
-				shardName = searchTerm.substring(0, 1).toUpperCase() + searchTerm.substring(1);
+				shardName = searchTerm.substring(0, 1).toUpperCase(Locale.getDefault()) + searchTerm.substring(1);
 			} else {
-				shardName = searchTerm.substring(0, 1).toUpperCase() + searchTerm.substring(1) + "-" + shard;
+				shardName = searchTerm.substring(0, 1).toUpperCase(Locale.getDefault()) + searchTerm.substring(1) + "-" + shard;
 			}
 			if (index <= instanceLocations.length) {
 				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shardName, "", shard < 1 ? 1 : shard));

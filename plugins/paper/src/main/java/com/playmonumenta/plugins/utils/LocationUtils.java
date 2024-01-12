@@ -319,8 +319,8 @@ public class LocationUtils {
 		return blocks;
 	}
 
-	public static ArrayList<Block> getNearbyBlocks(Block start, int radius) {
-		ArrayList<Block> blocks = new ArrayList<>();
+	public static List<Block> getNearbyBlocks(Block start, int radius) {
+		List<Block> blocks = new ArrayList<>();
 		for (double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++) {
 			for (double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++) {
 				for (double z = start.getLocation().getZ() - radius; z <= start.getLocation().getZ() + radius; z++) {
@@ -335,8 +335,8 @@ public class LocationUtils {
 	// Returns all block locations the bounding box touches.
 	// Eg for a player, this could be as little as 2 or as many as 12 full blocks,
 	// depending on how offset their bounding box's location is
-	public static ArrayList<Location> getLocationsTouching(BoundingBox boundingBox, World world) {
-		ArrayList<Location> locationsTouching = new ArrayList<>();
+	public static List<Location> getLocationsTouching(BoundingBox boundingBox, World world) {
+		List<Location> locationsTouching = new ArrayList<>();
 		int startX = (int) Math.floor(boundingBox.getMinX());
 		int endX = (int) Math.ceil(boundingBox.getMaxX());
 		int startY = (int) Math.floor(boundingBox.getMinY());
@@ -692,12 +692,13 @@ public class LocationUtils {
 	}
 
 	public static @Nullable String getPoiNameFromLocation(Location location) {
-		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(location.toVector(), false);
-
-		for (RespawningStructure structure : structures) {
-			return (String) structure.getConfig().get("name");
+		StructuresPlugin structuresPlugin = StructuresPlugin.getInstance();
+		if (structuresPlugin.mRespawnManager != null) {
+			List<RespawningStructure> structures = structuresPlugin.mRespawnManager.getStructures(location.toVector(), false);
+			for (RespawningStructure structure : structures) {
+				return (String) structure.getConfig().get("name");
+			}
 		}
-
 		return null;
 	}
 

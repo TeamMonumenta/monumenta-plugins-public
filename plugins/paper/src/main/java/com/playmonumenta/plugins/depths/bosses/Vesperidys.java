@@ -1490,7 +1490,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			int finalI = i;
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				summonEyes(summonAngle, false, finalI + 1);
-			}, i * 5);
+			}, i * 5L);
 		}
 	}
 

@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -52,7 +53,7 @@ public class GenerateCharms extends GenericCommand {
 			if (baseItem == null || baseItem.equals("")) {
 				baseItem = "minecraft:stone";
 			}
-			baseItem = baseItem.split(":", 2)[1].toUpperCase();
+			baseItem = baseItem.split(":", 2)[1].toUpperCase(Locale.getDefault());
 			String nameColor = row.get(2);
 			if (nameColor == null || nameColor.equals("")) {
 				nameColor = "white";

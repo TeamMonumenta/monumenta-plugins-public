@@ -75,7 +75,7 @@ public class ElfSummon extends Spell {
 			}
 		};
 		for (int i = 0; i < mRepeats; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, singleSpawn, 40 + 15 * i);
+			scheduler.scheduleSyncDelayedTask(mPlugin, singleSpawn, 40 + 15L * i);
 		}
 	}
 
@@ -92,7 +92,7 @@ public class ElfSummon extends Spell {
 			}
 		};
 		for (int i = 0; i < (40 + mRepeats * 15) / 3; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, animLoop, i * 3);
+			scheduler.scheduleSyncDelayedTask(mPlugin, animLoop, i * 3L);
 		}
 	}
 }

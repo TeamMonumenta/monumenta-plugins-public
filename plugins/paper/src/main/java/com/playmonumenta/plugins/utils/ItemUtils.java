@@ -808,7 +808,7 @@ public class ItemUtils {
 		ArrayList<String> strList = new ArrayList<>();
 		for (Material m : Material.values()) {
 			if (m.isItem()) {
-				strList.add(m.toString().toLowerCase());
+				strList.add(m.toString().toLowerCase(Locale.getDefault()));
 			}
 		}
 		return strList.toArray(new String[0]);

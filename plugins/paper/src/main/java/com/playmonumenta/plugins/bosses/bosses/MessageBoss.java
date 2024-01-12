@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -51,7 +52,7 @@ public class MessageBoss extends BossAbilityGroup {
 		if (textColor != null) {
 			return textColor;
 		}
-		return NamedTextColor.NAMES.value(string.toLowerCase());
+		return NamedTextColor.NAMES.value(string.toLowerCase(Locale.getDefault()));
 	}
 
 }

@@ -11,6 +11,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -132,7 +133,6 @@ public class MasterworkUtils {
 				return true;
 			}
 
-			PlayerInventory inventory = p.getInventory();
 			ItemStack itemA = InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(item1));
 			ItemStack itemB = InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(item2));
 			ItemStack itemC = item3 == null ? null : InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(item3));
@@ -564,7 +564,7 @@ public class MasterworkUtils {
 
 	private static String toCleanPathName(String str) {
 		// Copied logic from automation code
-		str = str.toLowerCase();
+		str = str.toLowerCase(Locale.getDefault());
 		str = str.replaceAll("\\s+", "_");
 		str = str.replaceAll("~", "_");
 		str = str.replaceAll("[^a-zA-Z0-9-_]", "");

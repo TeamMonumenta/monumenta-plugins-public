@@ -50,7 +50,9 @@ public class GUIUtils {
 		ItemStack confirm = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 		ItemMeta meta = confirm.getItemMeta();
 		meta.displayName(Component.text("Confirm", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-		if (lore != null) { meta.lore(lore); }
+		if (lore != null) {
+			meta.lore(lore);
+		}
 		confirm.setItemMeta(meta);
 		ItemUtils.setPlainTag(confirm);
 		NBT.modify(confirm, nbt -> {
@@ -63,7 +65,9 @@ public class GUIUtils {
 		ItemStack cancel = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
 		ItemMeta meta = cancel.getItemMeta();
 		meta.displayName(Component.text("Cancel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-		if (lore != null) { meta.lore(lore); }
+		if (lore != null) {
+			meta.lore(lore);
+		}
 		cancel.setItemMeta(meta);
 		ItemUtils.setPlainTag(cancel);
 		NBT.modify(cancel, nbt -> {
@@ -76,7 +80,9 @@ public class GUIUtils {
 		ItemStack exclamation = new ItemStack(Material.GOLD_INGOT);
 		ItemMeta meta = exclamation.getItemMeta();
 		meta.displayName(Component.text("!", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-		if (lore != null) { meta.lore(lore); }
+		if (lore != null) {
+			meta.lore(lore);
+		}
 		exclamation.setItemMeta(meta);
 		ItemUtils.setPlainTag(exclamation);
 		NBT.modify(exclamation, nbt -> {

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -41,7 +42,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 	private static final int HOP_MINIMUM_PARTICLES = 4;
 
 	private final ArrayList<Location> mGeneratedHops = new ArrayList<>();
-	private final HashMap<Integer, ArrayList<Location>> mParticleLocations = new HashMap<>();
+	private final HashMap<Integer, List<Location>> mParticleLocations = new HashMap<>();
 
 	/*-------------------------------------------------------------------------------
 	 * Constructors
@@ -133,7 +134,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 		generateHopsOnce(packagedValues.location());
 
 		int hopParticleCount = Math.max(HOP_MINIMUM_PARTICLES, packagedValues.count());
-		ArrayList<Location> hopParticleLocations = generateParticleLocationsOnce(hopParticleCount);
+		List<Location> hopParticleLocations = generateParticleLocationsOnce(hopParticleCount);
 		double particlesPerTick = hopParticleLocations.size() / (double) mDuration;
 
 		packagedValues.count(1);
@@ -228,10 +229,8 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 	// Store locations for the same hopParticleCount for performance,
 	// generating the same results only once,
 	// then referring to them again as the timer loops
-	private ArrayList<Location> generateParticleLocationsOnce(
-		int hopParticleCount
-	) {
-		@Nullable ArrayList<Location> hopParticleLocations = mParticleLocations.get(hopParticleCount);
+	private List<Location> generateParticleLocationsOnce(int hopParticleCount) {
+		@Nullable List<Location> hopParticleLocations = mParticleLocations.get(hopParticleCount);
 		if (hopParticleLocations != null) {
 			return hopParticleLocations;
 		} else {

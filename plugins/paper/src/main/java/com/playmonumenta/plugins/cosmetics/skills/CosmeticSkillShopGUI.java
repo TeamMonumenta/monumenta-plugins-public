@@ -690,7 +690,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		if (cosmetic != null && cosmetic.getDescription() != null) {
 			extraLore = cosmetic.getDescription();
 		}
-		if (CosmeticsManager.getInstance().playerHasCosmetic(player, CosmeticType.COSMETIC_SKILL, skill.getCosmetic().getName())) {
+		Cosmetic skillCosmetic = skill.getCosmetic();
+		if (skillCosmetic != null && CosmeticsManager.getInstance().playerHasCosmetic(player, CosmeticType.COSMETIC_SKILL, skillCosmetic.getName())) {
 			// attach
 			desc.add("Owned");
 		} else {

@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -341,10 +342,10 @@ public class AbilityInfo<T extends Ability> {
 
 		String skillHeader;
 		if (skillLevel <= 2) {
-			skillHeader = "[" + displayName.toUpperCase() + " Level " + skillLevel + "] : ";
+			skillHeader = "[" + displayName.toUpperCase(Locale.getDefault()) + " Level " + skillLevel + "] : ";
 		} else {
 			coloured &= ServerProperties.getAbilityEnhancementsEnabled(player);
-			skillHeader = "[" + displayName.toUpperCase() + " Enhancement] " + (enabled && !ServerProperties.getAbilityEnhancementsEnabled(player) ? "(disabled in this region) " : "") + ": ";
+			skillHeader = "[" + displayName.toUpperCase(Locale.getDefault()) + " Enhancement] " + (enabled && !ServerProperties.getAbilityEnhancementsEnabled(player) ? "(disabled in this region) " : "") + ": ";
 		}
 
 		return Component.text("")
@@ -390,7 +391,7 @@ public class AbilityInfo<T extends Ability> {
 			if (mDisplayName == null) {
 				return null;
 			}
-			hoverableString = mDisplayName.toUpperCase() + " Level " + level;
+			hoverableString = mDisplayName.toUpperCase(Locale.getDefault()) + " Level " + level;
 		}
 		if (isEnhanced) {
 			hoverableString += "*";

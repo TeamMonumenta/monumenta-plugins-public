@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -107,7 +108,7 @@ public class ChessBoard {
 
 		@Override
 		public String toString() {
-			return "Chess Piece type: " + mType.name().toLowerCase() + " Team: " + mTeam.name().toLowerCase() + " Loc: " + mBoardLoc;
+			return "Chess Piece type: " + mType.name().toLowerCase(Locale.getDefault()) + " Team: " + mTeam.name().toLowerCase(Locale.getDefault()) + " Loc: " + mBoardLoc;
 		}
 	}
 
