@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PPPillar;
@@ -16,10 +17,12 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -69,7 +72,7 @@ public class SpellSummonTheStars extends Spell {
 	}
 
 	public void raiseMobs(float count, boolean inBlight, double scaleAmount) {
-		List<Mob> summoned = new ArrayList<>();
+		List<LivingEntity> summoned = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			Location loc = findSpawnLocation(0, inBlight);
 			if (!mSirius.mBoss.getLocation().equals(loc)) {
@@ -83,7 +86,7 @@ public class SpellSummonTheStars extends Spell {
 				}
 			}
 		}
-		scaleMobs(summoned, scaleAmount);
+		//scaleMobs(summoned, scaleAmount);
 		mobSpawnAnimation(summoned);
 
 	}
@@ -122,8 +125,8 @@ public class SpellSummonTheStars extends Spell {
 		}
 	}
 
-	public void mobSpawnAnimation(List<Mob> spawns) {
-		for (Mob spawn : spawns) {
+	public void mobSpawnAnimation(List<LivingEntity> spawns) {
+		for (LivingEntity spawn : spawns) {
 			spawn.setAI(false);
 			spawn.setInvulnerable(false);
 		}
@@ -133,7 +136,7 @@ public class SpellSummonTheStars extends Spell {
 			@Override
 			public void run() {
 				if (mTicks >= 40) {
-					for (Mob spawn : spawns) {
+					for (LivingEntity spawn : spawns) {
 						if (spawn != null) {
 							spawn.setAI(true);
 							new PPExplosion(Particle.REDSTONE, spawn.getEyeLocation()).count(5).data(new Particle.DustOptions(STARBLIGHT, 0.5f)).spawnAsBoss();
@@ -143,7 +146,7 @@ public class SpellSummonTheStars extends Spell {
 					this.cancel();
 					return;
 				}
-				for (Mob spawn : spawns) {
+				for (LivingEntity spawn : spawns) {
 					Location summonLoc = spawn.getLocation().add(0, 0.05, 0);
 					spawn.teleport(summonLoc);
 					new PPPillar(Particle.REDSTONE, summonLoc, spawn.getHeight()).data(new Particle.DustOptions(STARBLIGHT, 0.75f)).count(10).delta(0.5, 0, 0.5).spawnAsBoss();
@@ -162,7 +165,7 @@ public class SpellSummonTheStars extends Spell {
 		Collections.shuffle(pList);
 		mMobsAlive = Math.min(21, mMobsAlive);
 		int spawned = 0;
-		List<Mob> summoned = new ArrayList<>();
+		List<LivingEntity> summoned = new ArrayList<>();
 		for (Player p : pList) {
 			for (int i = 0; i < 3; i++) {
 				if (spawned >= mMobsAlive) {
@@ -172,7 +175,17 @@ public class SpellSummonTheStars extends Spell {
 				if (!p.getLocation().equals(loc)) {
 					//sink them
 					loc.subtract(0, 0.5, 0);
-					Mob spawn = (Mob) mMobPool.spawn(loc);
+					LivingEntity spawn;
+					if (spawned == 0 || spawned % 7 != 0) {
+						spawn = (LivingEntity) mMobPool.spawn(loc);
+					} else {
+						spawn = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, FastUtils.getRandomElement(SpellBlightedPods.MINIBOSSES));
+						if (spawn != null) {
+							int maxHealth = SpellBlightedPods.BASEHEALTH + mSirius.getPlayersInArena(false).size() * SpellBlightedPods.HPSCALEPERPLAYER;
+							Objects.requireNonNull(spawn.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(maxHealth);
+							spawn.setHealth(maxHealth); //half of the hp is effected by damage done to the pod
+						}
+					}
 					//Check that it didnt failed to find.
 					if (spawn != null) {
 						spawn.addScoreboardTag(Sirius.MOB_TAG);
@@ -205,7 +218,7 @@ public class SpellSummonTheStars extends Spell {
 					if (entity.isDead()) {
 						LivingEntity livingEntity = ((LivingEntity) entity).getKiller();
 						if (livingEntity != null) {
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(livingEntity, mSirius.PARTICIPATION_TAG, new CustomTimerEffect(duration, "Participated").displays(false));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(livingEntity, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(duration, "Participated").displays(false));
 						}
 						mDead.add(entity);
 					}

@@ -28,7 +28,7 @@ import org.joml.AxisAngle4f;
 public class DeclarationTp extends Spell {
 	private static final int RADIUS = 7;
 	private static final int PORTALHEIGHT = 1;
-	private static final int DURATION = 14 * 20;
+	private static final int DURATION = 12 * 20;
 	private Location mPortalOneLoc;
 	private Location mPortalTwoLoc;
 	private Plugin mPlugin;
@@ -184,7 +184,7 @@ public class DeclarationTp extends Spell {
 							MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("You have bathed in the blood of the Stars and lived. Rejoin the battle!", NamedTextColor.DARK_PURPLE));
 						}
 					} else {
-						mSirius.changeHp(true, -1);
+						mSirius.changeHp(true, -5);
 						for (Player p : mSirius.getPlayersInArena(false)) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("There is no escape...", NamedTextColor.AQUA));
 						}

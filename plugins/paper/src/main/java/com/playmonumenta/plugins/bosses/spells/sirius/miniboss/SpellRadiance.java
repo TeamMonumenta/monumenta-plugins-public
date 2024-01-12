@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
@@ -39,7 +38,7 @@ public class SpellRadiance extends Spell {
 		}
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_HIT, 1, 0.2f);
 		for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), RADIUS, false, true)) {
-			DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Starblight Radiance");
+			DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, "Starblight Radiance");
 		}
 	}
 
@@ -59,7 +58,7 @@ public class SpellRadiance extends Spell {
 		}
 		int mRealX = (int) Math.abs(mConverter.mCornerOne.getX() - mBoss.getLocation().getX() - x);
 		int mRealZ = (int) Math.abs(mConverter.mCornerOne.getZ() - mBoss.getLocation().getZ());
-		Location mIrradiate = LocationUtils.fallToGround(mBoss.getLocation().add(x, 0, z), 0);
+		Location mIrradiate = mBoss.getLocation().add(x, 0, z);
 		if (!mConverter.mBlighted[mRealX][mRealZ]) {
 			attempts++;
 			return getNewLoc(attempts);

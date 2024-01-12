@@ -85,21 +85,30 @@ public class SpellCosmicPortals extends Spell {
 				}
 
 				if (mTicks > DURATION) {
+					List<Player> pList = mSirius.getPlayersInArena(false);
 					for (Player p : mPortalLoc.getNearbyPlayers(finalMRadius)) {
-						int rand = FastUtils.randomIntInRange(0, 1);
-						Location tpLoc = mSirius.mBoss.getLocation().add(15, PORTALHEIGHT, (Math.pow(-1, rand) * 30));
-						//stops falling off the back
-						if (tpLoc.getX() - mSirius.mStartLocation.getX() > 35) {
-							tpLoc.setX(mSirius.mStartLocation.getX() + 35);
+						if (pList.contains(p)) {
+							int rand = FastUtils.randomIntInRange(0, 1);
+							Location tpLoc = mSirius.mBoss.getLocation().add(15, PORTALHEIGHT, (Math.pow(-1, rand) * 30));
+							//stops falling off the back
+							if (tpLoc.getX() - mSirius.mStartLocation.getX() > 35) {
+								tpLoc.setX(mSirius.mStartLocation.getX() + 35);
+							}
+							if (tpLoc.getBlock().isSolid()) {
+								tpLoc = LocationUtils.fallToGround(tpLoc.clone().add(0, 10, 0), tpLoc.getY());
+							}
+							if (mSirius.mBlocks <= 10) {
+								PassiveStarBlight.applyStarBlightNoCoolodown(p);
+							}
+							if (mSirius.mBlocks <= 5) {
+								PassiveStarBlight.applyStarBlightNoCoolodown(p);
+							}
+							p.playSound(p, Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.4f, 0.9f);
+							p.playSound(p, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.HOSTILE, 0.8f, 0.8f);
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 0.8f, 0.4f);
+							p.playSound(p, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.HOSTILE, 2f, 0.6f);
+							p.teleport(tpLoc);
 						}
-						if (tpLoc.getBlock().isSolid()) {
-							tpLoc = LocationUtils.fallToGround(tpLoc.clone().add(0, 10, 0), tpLoc.getY());
-						}
-						p.playSound(p, Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.4f, 0.9f);
-						p.playSound(p, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.HOSTILE, 0.8f, 0.8f);
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 0.8f, 0.4f);
-						p.playSound(p, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.HOSTILE, 2f, 0.6f);
-						p.teleport(tpLoc);
 					}
 					this.cancel();
 				}

@@ -97,9 +97,9 @@ public class DeclerationTuulen extends Spell {
 			@Override
 			public void run() {
 				mBar.nextTick();
-				List<Mob> toRemove = new ArrayList<>();
+				List<LivingEntity> toRemove = new ArrayList<>();
 				mMobCount += Math.min(mSirius.getPlayersInArena(false).size() * MOBSPERPLAYERPERTICK, MOBSPERPLAYERPERTICK * 5);
-				List<Mob> mobs = new ArrayList<>();
+				List<LivingEntity> mobs = new ArrayList<>();
 				while (mMobCount >= 1) {
 					mMobCount--;
 					Location loc = findSpawnLocation(0);
@@ -122,7 +122,7 @@ public class DeclerationTuulen extends Spell {
 					}
 				}
 
-				for (Mob mob : mSpawnedMobs) {
+				for (LivingEntity mob : mSpawnedMobs) {
 					if (LocationUtils.getVectorTo(mTarget.getLocation(), mob.getLocation()).length() <= 1.5) {
 						mob.remove();
 						toRemove.add(mob);
@@ -146,7 +146,7 @@ public class DeclerationTuulen extends Spell {
 									display.cancel();
 								}
 							}, 30);
-							mSirius.changeHp(true, -1);
+							mSirius.changeHp(true, -5);
 							this.cancel();
 							return;
 						}

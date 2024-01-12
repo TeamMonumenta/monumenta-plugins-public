@@ -33,12 +33,12 @@ public class SpellBlightedPods extends Spell {
 	private Plugin mPlugin;
 	private boolean mOnCooldown;
 	private int mPodCount;
-	private static final int BASEHEALTH = 750;
-	private static final int HPSCALEPERPLAYER = 125;
+	public static final int BASEHEALTH = 750;
+	public static final int HPSCALEPERPLAYER = 125;
 	private static final int COOLDOWN = 25 * 20;
 	private static final int DURATION = 15 * 20;
 	private static final int FLIGHTTIME = 1 * 20;
-	private static final List<String> MINIBOSSES = List.of(
+	public static final List<String> MINIBOSSES = List.of(
 		"ProcyonsGazer",
 		"ArcturussBeast",
 		"VegasMonstrosity"
@@ -149,7 +149,11 @@ public class SpellBlightedPods extends Spell {
 						new PPExplosion(Particle.REDSTONE, mHitBox.getLocation()).count(50).delta(1.5f).data(new Particle.DustOptions(Color.fromRGB(3, 135, 126), 2.0f)).spawnAsBoss();
 						World world = mHitBox.getWorld();
 						Location loc = mHitBox.getLocation();
-						mSirius.mStarBlightConverter.convertPartialSphere(3, loc);
+						if (mSirius.mBlocks > 5) {
+							mSirius.mStarBlightConverter.convertPartialSphere(3, loc);
+						} else {
+							mSirius.mStarBlightConverter.convertPartialSphere(5, loc);
+						}
 						world.playSound(loc, Sound.BLOCK_SCULK_SHRIEKER_SHRIEK, SoundCategory.HOSTILE, 0.3f, 1.2f);
 						world.playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.HOSTILE, 0.7f, 1.4f);
 						world.playSound(loc, Sound.ENTITY_TURTLE_EGG_HATCH, SoundCategory.HOSTILE, 0.7f, 0.4f);

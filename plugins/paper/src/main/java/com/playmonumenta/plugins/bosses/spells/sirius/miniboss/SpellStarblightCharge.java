@@ -21,7 +21,7 @@ public class SpellStarblightCharge extends Spell {
 	private boolean mOnCooldown;
 	private static final int COOLDOWN = 10 * 20;
 	private static final int CHARGERANGE = 15;
-	private static final int CHARGEUPTIME = 5 * 20;
+	private static final int CHARGEUPTIME = 2 * 20;
 	private static final int DAMAGE = 40;
 
 	public SpellStarblightCharge(Plugin plugin, LivingEntity boss, PassiveStarBlightConversion converter) {
@@ -54,7 +54,7 @@ public class SpellStarblightCharge extends Spell {
 				if (mTick <= CHARGEUPTIME) {
 					new PPLine(Particle.VILLAGER_ANGRY, mBoss.getLocation().add(0, 1, 0), mTargetLoc).countPerMeter(5).delta(0.75).spawnAsBoss();
 				}
-				if (CHARGEUPTIME > mTick) {
+				if (mTick > CHARGEUPTIME) {
 					World world = mBoss.getWorld();
 					Location loc = mBoss.getLocation();
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.HOSTILE, 1f, 0.4f);
@@ -91,7 +91,7 @@ public class SpellStarblightCharge extends Spell {
 					}
 					this.cancel();
 				}
-				mTick++;
+				mTick += 5;
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
 

@@ -23,7 +23,7 @@ public class PassiveTentacleManager extends Spell {
 	private Plugin mPlugin;
 	private List<Tentacle> mTentacles;
 	private static final int TELEGRAPHDURATION = 1 * 20;
-	private static final int DAMAGE = 40;
+	private static final int DAMAGE = 60;
 	private static final int SPEED = 2; //knockback
 
 	public PassiveTentacleManager(Sirius sirius, Plugin plugin) {
@@ -54,7 +54,7 @@ public class PassiveTentacleManager extends Spell {
 				new Matrix4f(0.0132f, -0.1454f, 0.0344f, 0.0000f, 0.9413f, 0.0056f, -0.3375f, 0.0000f, 0.0489f, 0.0369f, 0.1369f, 0.0000f, -3.1250f, 0.5000f, -1.5625f, 1.0000f))),
 			0,
 			new Vector(-5, -2, 4),
-			new Vector(0, 0, -4),
+			new Vector(0, -1, -4),
 			List.of(//option 1
 				List.of(new Matrix4f(-0.0237f, 0.3062f, -0.3946f, 0.0000f, -0.7500f, 0.5000f, 0.4330f, 0.0000f, 0.3299f, 0.3062f, 0.2178f, 0.0000f, -2.3323f, 3.3793f, 1.5870f, 1.0000f),
 					new Matrix4f(0.0402f, 0.2202f, -0.3315f, 0.0000f, -0.5975f, 0.6995f, 0.3921f, 0.0000f, 0.3182f, 0.1823f, 0.1597f, 0.0000f, -3.0487f, 3.9544f, 2.0528f, 1.0000f),
@@ -95,7 +95,7 @@ public class PassiveTentacleManager extends Spell {
 			)),
 			1,
 			new Vector(-5, -2, -2),
-			new Vector(3, 0, -6),
+			new Vector(3, -1, -6),
 			List.of(//option 1
 				List.of(new Matrix4f(0.3944f, 0.3062f, -0.0270f, 0.0000f, -0.4394f, 0.5000f, -0.7463f, 0.0000f, -0.2150f, 0.3062f, 0.3317f, 0.0000f, -0.4038f, 2.1057f, -1.8659f, 1.0000f),
 					new Matrix4f(0.3318f, 0.2202f, 0.0374f, 0.0000f, -0.3972f, 0.6995f, -0.5941f, 0.0000f, -0.1570f, 0.1823f, 0.3196f, 0.0000f, -0.8756f, 2.6807f, -2.5782f, 1.0000f),
@@ -135,7 +135,7 @@ public class PassiveTentacleManager extends Spell {
 			)),
 			2,
 			new Vector(6, -2, 4),
-			new Vector(1, 0, -4), List.of(//option 1
+			new Vector(1, -1, -4), List.of(//option 1
 			List.of(new Matrix4f(0.0237f, 0.3062f, 0.3946f, 0.0000f, 0.7500f, 0.5000f, -0.4330f, 0.0000f, -0.3299f, 0.3062f, -0.2178f, 0.0000f, 2.7475f, 2.2611f, -0.5059f, 1.0000f),
 				new Matrix4f(-0.0402f, 0.2202f, 0.3315f, 0.0000f, 0.5975f, 0.6995f, -0.3921f, 0.0000f, -0.3182f, 0.1823f, -0.1597f, 0.0000f, 3.4639f, 2.8362f, -0.9717f, 1.0000f),
 				new Matrix4f(0.0617f, 0.1898f, 0.2240f, 0.0000f, 0.8475f, 0.2665f, -0.4591f, 0.0000f, -0.1468f, 0.2182f, -0.1444f, 0.0000f, 3.8567f, 3.5265f, -1.2653f, 1.0000f),
@@ -175,7 +175,7 @@ public class PassiveTentacleManager extends Spell {
 			)),
 			3,
 			new Vector(-3, -2, 2),
-			new Vector(5, 0, 6),
+			new Vector(5, -1, 6),
 			List.of(//option 1
 				List.of(new Matrix4f(-0.3946f, 0.3062f, 0.0237f, 0.0000f, 0.4330f, 0.5000f, 0.7500f, 0.0000f, 0.2178f, 0.3062f, -0.3299f, 0.0000f, 1.4787f, 2.2767f, 3.0585f, 1.0000f),
 					new Matrix4f(-0.3315f, 0.2202f, -0.0402f, 0.0000f, 0.3921f, 0.6995f, 0.5975f, 0.0000f, 0.1597f, 0.1823f, -0.3182f, 0.0000f, 1.9445f, 2.8518f, 3.7749f, 1.0000f),

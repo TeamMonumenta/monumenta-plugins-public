@@ -116,7 +116,7 @@ public class DeclarationAurora extends Spell {
 						MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("No! I needed more! Incompetence!", NamedTextColor.DARK_PURPLE));
 					}
 					mSirius.mAnimationLock = false;
-					mSirius.changeHp(true, -1);
+					mSirius.changeHp(true, -5);
 					this.cancel();
 				}
 				int mRemaining = mSpawns - mKilled;
@@ -223,7 +223,7 @@ public class DeclarationAurora extends Spell {
 	private void generateEnergy(int count) {
 		mPowerLocation.clear();
 		for (int i = 0; i < Math.min(count, 18); i++) {
-			Location loc = mCenter.clone().add(FastUtils.randomIntInRange(-12, 12), 10, FastUtils.randomIntInRange(-12, 12));
+			Location loc = mCenter.clone().add(FastUtils.randomIntInRange(-12, 12), 10 + FastUtils.randomIntInRange(-3, 3), FastUtils.randomIntInRange(-36, 36));
 			if (loc.getBlock().getType().isSolid() && !mPowerLocation.contains(loc)) {
 				i--;
 			} else {

@@ -145,7 +145,11 @@ public class SpellBlightBomb extends Spell {
 					if (mBomb != null && !mBomb.isDead()) {
 						World world = mBomb.getWorld();
 						Location loc = mBomb.getLocation();
-						mConverter.convertSphere(RADIUS, mBomb.getLocation());
+						if (mSirius.mBlocks <= 5) {
+							mConverter.convertSphere(RADIUS, mBomb.getLocation());
+						} else {
+							mConverter.convertSphere(RADIUS + 2, mBomb.getLocation());
+						}
 						mBomb.remove();
 						world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 0.3f, 0.6f);
 						world.playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.HOSTILE, 0.6f, 0.6f);

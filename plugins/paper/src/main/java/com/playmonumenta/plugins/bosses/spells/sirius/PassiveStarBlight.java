@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
-import com.playmonumenta.plugins.effects.FlatHealthBoost;
+import com.playmonumenta.plugins.effects.StarBlight;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
@@ -33,6 +34,7 @@ public class PassiveStarBlight extends Spell {
 	@Override
 	public void run() {
 		List<Player> mPlayers = mSirius.getPlayersInArena(false);
+		EffectManager manager = Plugin.getInstance().mEffectManager;
 		for (Player p : mPlayers) {
 			int x = (int) p.getLocation().getX();
 			int z = (int) p.getLocation().getZ();
@@ -48,16 +50,58 @@ public class PassiveStarBlight extends Spell {
 			//stops people standing on top
 			if (p.getLocation().clone().subtract(0, 1, 0).getBlock().getType().equals(Material.BARRIER)) {
 				applyStarBlight(p);
+				continue;
+			}
+			//remove 0 magnitude effects from people who are not effected by it for 3 seconds.
+			Effect effect = manager.getActiveEffect(p, STARBLIGHTAG);
+			if (effect != null && effect.getMagnitude() == 0 && STARBLIGHTDURATION - effect.getDuration() > TICKSBETWENSTARBLIGHT) {
+				manager.clearEffects(p, STARBLIGHTAG);
 			}
 		}
 	}
 
-	public static void applyStarBlight(Player p) {
-		if (p.isDead() || Plugin.getInstance().mEffectManager.getActiveEffect(p, "Stasis") != null) {
+	public static void applyStarBlightNoCoolodown(Player p) {
+		EffectManager manager = Plugin.getInstance().mEffectManager;
+		if (p.isDead() || StasisListener.isInStasis(p)) {
 			return;
 		}
-		Effect blight = EffectManager.getInstance().getActiveEffect(p, STARBLIGHTAG);
-		Effect fail = EffectManager.getInstance().getActiveEffect(p, Sirius.FAIL_PARTICIPATION_TAG);
+		Effect blight = manager.getActiveEffect(p, STARBLIGHTAG);
+		Effect fail = manager.getActiveEffect(p, Sirius.FAIL_PARTICIPATION_TAG);
+		int blightmultiplier = 1;
+		if (fail != null && fail.getMagnitude() >= 3) {
+			//increase strength if you dont participate
+			blightmultiplier = 2;
+		}
+		if (blight != null) {
+			playSound(p);
+			if (EntityUtils.getMaxHealth(p) < 2) {
+				//death
+				manager.clearEffects(p, STARBLIGHTAG);
+				DamageUtils.damage(null, p, DamageEvent.DamageType.TRUE, EntityUtils.getMaxHealth(p), null, true, false, "Starblighten");
+				p.setHealth(0);
+			} else {
+				manager.clearEffects(p, STARBLIGHTAG);
+				manager.addEffect(p, STARBLIGHTAG, new StarBlight(STARBLIGHTDURATION, blightmultiplier * STARBLIGHTCHANGEAMOUNT - blight.getMagnitude(), STARBLIGHTAG).deleteOnLogout(true));
+			}
+		} else if (EntityUtils.getMaxHealth(p) > 2) {
+			playSound(p);
+			manager.addEffect(p, STARBLIGHTAG, new StarBlight(STARBLIGHTDURATION, STARBLIGHTCHANGEAMOUNT, STARBLIGHTAG).deleteOnLogout(true).displays(false));
+		} else {
+			playSound(p);
+			//has less then 2 hp so starblight insta kills
+			manager.clearEffects(p, STARBLIGHTAG);
+			DamageUtils.damage(null, p, DamageEvent.DamageType.TRUE, p.getHealth(), null, true, false, "Starblighten");
+			p.setHealth(0);
+		}
+	}
+
+	public static void applyStarBlight(Player p) {
+		EffectManager manager = Plugin.getInstance().mEffectManager;
+		if (p.isDead() || StasisListener.isInStasis(p)) {
+			return;
+		}
+		Effect blight = manager.getActiveEffect(p, STARBLIGHTAG);
+		Effect fail = manager.getActiveEffect(p, Sirius.FAIL_PARTICIPATION_TAG);
 		int blightmultiplier = 1;
 		if (fail != null && fail.getMagnitude() >= 3) {
 			//increase strength if you dont participate
@@ -68,21 +112,23 @@ public class PassiveStarBlight extends Spell {
 				playSound(p);
 				if (EntityUtils.getMaxHealth(p) < 2) {
 					//death
-					Plugin.getInstance().mEffectManager.clearEffects(p, STARBLIGHTAG);
+					manager.clearEffects(p, STARBLIGHTAG);
 					DamageUtils.damage(null, p, DamageEvent.DamageType.TRUE, EntityUtils.getMaxHealth(p), null, true, false, "Starblighten");
+					p.setHealth(0);
 				} else {
-					Plugin.getInstance().mEffectManager.clearEffects(p, STARBLIGHTAG);
-					Plugin.getInstance().mEffectManager.addEffect(p, STARBLIGHTAG, new FlatHealthBoost(STARBLIGHTDURATION, blightmultiplier * STARBLIGHTCHANGEAMOUNT - blight.getMagnitude(), STARBLIGHTAG).deleteOnLogout(true));
+					manager.clearEffects(p, STARBLIGHTAG);
+					manager.addEffect(p, STARBLIGHTAG, new StarBlight(STARBLIGHTDURATION, blightmultiplier * STARBLIGHTCHANGEAMOUNT - blight.getMagnitude(), STARBLIGHTAG).deleteOnLogout(true));
 				}
 			}
 		} else if (EntityUtils.getMaxHealth(p) > 2) {
 			playSound(p);
-			Plugin.getInstance().mEffectManager.addEffect(p, STARBLIGHTAG, new FlatHealthBoost(STARBLIGHTDURATION, blightmultiplier * STARBLIGHTCHANGEAMOUNT, STARBLIGHTAG).deleteOnLogout(true));
+			manager.addEffect(p, STARBLIGHTAG, new StarBlight(STARBLIGHTDURATION, 0, STARBLIGHTAG).deleteOnLogout(true).displays(false));
 		} else {
 			playSound(p);
 			//has less then 2 hp so starblight insta kills
-			Plugin.getInstance().mEffectManager.clearEffects(p, STARBLIGHTAG);
+			manager.clearEffects(p, STARBLIGHTAG);
 			DamageUtils.damage(null, p, DamageEvent.DamageType.TRUE, p.getHealth(), null, true, false, "Starblighten");
+			p.setHealth(0);
 		}
 	}
 

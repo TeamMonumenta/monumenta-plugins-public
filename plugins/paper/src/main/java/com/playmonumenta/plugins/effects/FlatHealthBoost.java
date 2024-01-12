@@ -23,7 +23,6 @@ public class FlatHealthBoost extends Effect {
 		super(duration, effectID);
 		mAmount = amount;
 		mModifierName = modifierName;
-
 	}
 
 	@Override

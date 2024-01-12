@@ -14,7 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class PassiveDeclaration extends Spell {
-	public static final int COOLDOWN = 20 * 20;
+	public static final int COOLDOWN = 17 * 20;
 	public boolean mSwapping;
 	public List<Spell> mDeclerations;
 	public Sirius mSirius;
@@ -80,7 +80,7 @@ public class PassiveDeclaration extends Spell {
 				declaration = mDeclerations.get(11);
 				mLastSpell = mDeclerations.get(0);
 			}
-			while (mLastSpell.getClass().equals(declaration.getClass())) {
+			while (mLastSpell.getClass().equals(declaration.getClass()) || (declaration.getClass().equals(DeclarationBarrage.class) && mSirius.mDamagePhase)) {
 				declaration = FastUtils.getRandomElement(mDeclerations);
 			}
 			declaration.run();

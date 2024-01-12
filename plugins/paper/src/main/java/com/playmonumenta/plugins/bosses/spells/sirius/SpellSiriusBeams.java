@@ -4,11 +4,22 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,10 +31,13 @@ public class SpellSiriusBeams {
 	private Location mBeamStartLoc;
 	private Plugin mPlugin;
 	private static final float SPEED = 2;
+	private static final int DAMAGE = 40;
+	private boolean mCancel;
 
 	public SpellSiriusBeams(Sirius sirius, Plugin plugin) {
 		mSirius = sirius;
 		mPlugin = plugin;
+		mCancel = false;
 		mBeamStartLoc = mSirius.mBoss.getLocation().add(0, 4, 0);
 		run();
 	}
@@ -34,14 +48,14 @@ public class SpellSiriusBeams {
 		List<Player> mPList = mSirius.getPlayersInArena(false);
 		Collections.shuffle(mPList);
 		if (!mPList.isEmpty()) {
-			for (int i = 0; i < mPList.size() / 4.0; i++) {
+			for (int i = 0; i < Math.min(mPList.size() / 4.0, 4); i++) {
 				mTargetLocs.add(mPList.get(i).getLocation());
 			}
 		}
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (mSirius.mBoss.isDead()) {
+				if (mSirius.mBoss.isDead() || mCancel) {
 					this.cancel();
 					return;
 				}
@@ -66,8 +80,8 @@ public class SpellSiriusBeams {
 					Vector dir = LocationUtils.getDirectionTo(loc, mBeamStartLoc);
 					for (int i = 0; i < mStepCount; i++) {
 						for (Player player : PlayerUtils.playersInRange(mBox.getCenter().toLocation(mSirius.mBoss.getWorld()), 5, true)) {
-							if (player.getBoundingBox().overlaps(mBox) && player.getNoDamageTicks() <= 0) {
-								DamageUtils.damage(mSirius.mBoss, player, DamageEvent.DamageType.MAGIC, 50, null, false, true, "Blight Beams");
+							if (player.getBoundingBox().overlaps(mBox) && player.getNoDamageTicks() < 0) {
+								DamageUtils.damage(mSirius.mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Blight Beams");
 								MovementUtils.knockAway(mBox.getCenter().toLocation(mSirius.mBoss.getWorld()), player, 0.3f, 0.1f);
 								PassiveStarBlight.applyStarBlight(player);
 								new PPExplosion(Particle.REDSTONE, player.getLocation()).count(15).delta(2.5).data(new Particle.DustOptions(Color.fromRGB(0, 130, 130), 1f)).spawnAsBoss();
@@ -114,5 +128,9 @@ public class SpellSiriusBeams {
 			);
 		}
 		return data;
+	}
+
+	public void cancel() {
+		mCancel = true;
 	}
 }

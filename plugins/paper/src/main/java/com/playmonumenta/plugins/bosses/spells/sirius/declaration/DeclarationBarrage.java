@@ -29,8 +29,8 @@ import org.joml.Vector3f;
 public class DeclarationBarrage extends Spell {
 	private Sirius mSirius;
 	private Plugin mPlugin;
-	private static final int DAMAGE = 50;
-	private static final int DURATION = 10 * 20;
+	private static final int DAMAGE = 85;
+	private static final int DURATION = 15 * 20;
 	private static final int RADIUS = 3;
 	private static final int SPREAD = 5;
 	private static final int METEORDURATION = 2 * 20;
@@ -63,9 +63,9 @@ public class DeclarationBarrage extends Spell {
 				mMeteorcount += 0.1f;
 				while (mMeteorcount >= 1) {
 					mMeteorcount--;
-					//stop more than 10 players getting meteored per time to prevent lag
+					//stop more than 15 players getting meteored per time to prevent lag
 					//also players will bunch up more.
-					int mPlayerCount = 10;
+					int mPlayerCount = 15;
 					List<Player> mPList = mSirius.getPlayersInArena(false);
 					Collections.shuffle(mPList);
 					for (Player p : mPList) {
@@ -102,7 +102,7 @@ public class DeclarationBarrage extends Spell {
 					this.cancel();
 				}
 				if (mTicks >= DURATION) {
-					if (mCount * 0.75 <= mSirius.getPlayersInArena(false).size()) {
+					if (mCount * 0.90 <= mSirius.getPlayersInArena(false).size()) {
 						for (Player p : mSirius.getPlayersInArena(false)) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("No! Your flesh must bind with their blood! Do not escape!", NamedTextColor.AQUA));
 						}
@@ -111,7 +111,7 @@ public class DeclarationBarrage extends Spell {
 						for (Player p : mSirius.getPlayersInArena(false)) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("Yes, I can feel their blood take hold... One step closer...", NamedTextColor.AQUA));
 						}
-						mSirius.changeHp(false, -1);
+						mSirius.changeHp(false, -5);
 					}
 					mBar.remove();
 					this.cancel();
@@ -170,7 +170,7 @@ public class DeclarationBarrage extends Spell {
 					for (Player p : new ArrayList<>(hitBox.getHitPlayers(true))) {
 						p.playSound(p, Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.HOSTILE, 2f, 0.2f);
 						p.playSound(p, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 0.4f, 0.8f);
-						DamageUtils.damage(null, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, false, "impaled on starblight spike");
+						DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, false, "Impaling Doom");
 						MovementUtils.knockAway(loc, p, 0.25f, 0.8f);
 					}
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
