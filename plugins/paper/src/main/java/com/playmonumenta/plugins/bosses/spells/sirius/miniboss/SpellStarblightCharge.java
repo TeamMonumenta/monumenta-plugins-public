@@ -1,12 +1,22 @@
 package com.playmonumenta.plugins.bosses.spells.sirius.miniboss;
 
+import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlightConversion;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -18,16 +28,18 @@ public class SpellStarblightCharge extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private PassiveStarBlightConversion mConverter;
+	private Sirius mSirius;
 	private boolean mOnCooldown;
 	private static final int COOLDOWN = 10 * 20;
 	private static final int CHARGERANGE = 15;
 	private static final int CHARGEUPTIME = 2 * 20;
 	private static final int DAMAGE = 40;
 
-	public SpellStarblightCharge(Plugin plugin, LivingEntity boss, PassiveStarBlightConversion converter) {
+	public SpellStarblightCharge(Plugin plugin, LivingEntity boss, PassiveStarBlightConversion converter, Sirius sirius) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mConverter = converter;
+		mSirius = sirius;
 	}
 
 	@Override
@@ -38,6 +50,9 @@ public class SpellStarblightCharge extends Spell {
 		Location mTargetLoc;
 		if (pList.isEmpty()) {
 			mTargetLoc = mBoss.getLocation().clone().add(-CHARGERANGE, 0, 0);
+			if (mTargetLoc.getX() < mSirius.mSpawnCornerTwo.getX()) {
+				mTargetLoc.setX(mSirius.mSpawnCornerTwo.getX());
+			}
 		} else {
 			mTargetLoc = FastUtils.getRandomElement(pList).getLocation();
 		}

@@ -47,6 +47,7 @@ public class SpellGhostWalk extends Spell {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			final Team mPurple = ScoreboardUtils.getExistingTeamOrCreate("light_purple", NamedTextColor.LIGHT_PURPLE);
+			boolean mGlowingBefore = mBoss.isGlowing();
 
 			@Override
 			public void run() {
@@ -61,7 +62,7 @@ public class SpellGhostWalk extends Spell {
 				}
 				if (mTicks >= DURATION) {
 					mGhost = false;
-					mBoss.setGlowing(false);
+					mBoss.setGlowing(mGlowingBefore);
 					mPurple.removeEntity(mBoss);
 					World world = mBoss.getWorld();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 0.4f, 1.2f);
@@ -80,7 +81,7 @@ public class SpellGhostWalk extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return !mOnCooldown;
+		return !mOnCooldown || !mBoss.isGlowing();
 	}
 
 	@Override

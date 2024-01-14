@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class SiriusMeleeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_siriusmeleeboss";
 	private @Nullable PassiveStarBlightConversion mConverter;
+	private @Nullable Sirius mSirius;
 	private static final int DETECTIONRANGE = 80;
 
 	public SiriusMeleeBoss(Plugin plugin, LivingEntity boss) {
@@ -28,19 +29,20 @@ public class SiriusMeleeBoss extends BossAbilityGroup {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.SLIME));
 		for (LivingEntity mob : mobs) {
 			if (mob.getScoreboardTags().contains(Sirius.identityTag)) {
-				Sirius mSirius = BossUtils.getBossOfClass(mob, Sirius.class);
-				if (mSirius == null) {
+				Sirius sirius = BossUtils.getBossOfClass(mob, Sirius.class);
+				if (sirius == null) {
 					MMLog.warning("SiriusMeleeBoss: Didn't find Sirius! (Likely bug)");
 				} else {
-					mConverter = mSirius.mStarBlightConverter;
+					mConverter = sirius.mStarBlightConverter;
+					mSirius = sirius;
 				}
 			}
 		}
 
-		if (mConverter != null) {
+		if (mConverter != null && mSirius != null) {
 			SpellManager activeSpells = new SpellManager(List.of(
 				new SpellSwordCleave(plugin, mConverter, mBoss),
-				new SpellStarblightCharge(plugin, mBoss, mConverter)
+				new SpellStarblightCharge(plugin, mBoss, mConverter, mSirius)
 			));
 
 			List<Spell> passiveSpells = List.of(

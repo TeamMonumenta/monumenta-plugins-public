@@ -8,7 +8,18 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBasePassiveAbility;
-import com.playmonumenta.plugins.bosses.spells.sirius.*;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveDeclaration;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlight;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlightConversion;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveTentacleManager;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightBomb;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightWall;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedBolts;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedPods;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellCosmicPortals;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellFromTheStars;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellSiriusBeams;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellSummonTheStars;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -18,7 +29,12 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,14 +43,27 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.AmethystCluster;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.*;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.plugin.Plugin;
@@ -142,7 +171,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			mStarBlightConverter
 		);
 		SpellManager spells = new SpellManager(List.of(
-			new SpellBlightWall(plugin, this),
+			new SpellBlightWall(plugin, this, declarations),
 			new SpellBlightBomb(this, plugin, mStarBlightConverter),
 			new SpellCosmicPortals(this, plugin),
 			new SpellFromTheStars(this, plugin, mTentacleManager, declarations),

@@ -2,7 +2,13 @@ package com.playmonumenta.plugins.bosses.spells.sirius;
 
 import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.sirius.declaration.*;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationAurora;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationBarrage;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationDamage;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationMobs;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationPoints;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationTp;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclerationTuulen;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +24,7 @@ public class PassiveDeclaration extends Spell {
 	public boolean mSwapping;
 	public List<Spell> mDeclerations;
 	public Sirius mSirius;
+	public boolean mTp;
 	private boolean mOnCooldown;
 	private boolean mFirstRun;
 	private Plugin mPlugin;
@@ -27,6 +34,7 @@ public class PassiveDeclaration extends Spell {
 		mSirius = sirius;
 		mSwapping = false;
 		mFirstRun = true;
+		mTp = false;
 		mDeclerations = new ArrayList<>();
 		mPlugin = plugin;
 		//Less common as they are more powerful
@@ -57,6 +65,7 @@ public class PassiveDeclaration extends Spell {
 			return;
 		}
 		if (!mOnCooldown && !mSirius.mCheeseLock) {
+			mTp = false;
 			for (Player p : mSirius.getPlayersInArena(false)) {
 				p.playSound(p, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.2f, 0.1f);
 				p.playSound(p, Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.4f, 0.1f);
@@ -82,6 +91,9 @@ public class PassiveDeclaration extends Spell {
 			}
 			while (mLastSpell.getClass().equals(declaration.getClass()) || (declaration.getClass().equals(DeclarationBarrage.class) && mSirius.mDamagePhase)) {
 				declaration = FastUtils.getRandomElement(mDeclerations);
+			}
+			if (declaration.getClass() == DeclarationTp.class) {
+				mTp = true;
 			}
 			declaration.run();
 			mLastSpell = declaration;

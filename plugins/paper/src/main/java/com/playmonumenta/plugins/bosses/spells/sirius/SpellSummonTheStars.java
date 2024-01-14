@@ -21,7 +21,13 @@ import java.util.Objects;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -314,11 +320,10 @@ public class SpellSummonTheStars extends Spell {
 			FastUtils.randomDoubleInRange(-10, 10)
 		);
 		loc = LocationUtils.fallToGround(loc, mSirius.mBoss.getLocation().getY() - 10);
-		if (loc.getX() < mSirius.mCornerTwo.getX() || loc.getX() > mSirius.mCornerOne.getX()) {
+		if (loc.getX() < mSirius.mSpawnCornerTwo.getX() || loc.getX() > mSirius.mSpawnCornerOne.getX()) {
 			return getNearbyLoc(p, attempt + 1);
-
 		}
-		if (loc.getZ() < mSirius.mCornerTwo.getZ() || loc.getZ() > mSirius.mCornerOne.getZ()) {
+		if (loc.getZ() < mSirius.mSpawnCornerTwo.getZ() || loc.getZ() > mSirius.mSpawnCornerOne.getZ()) {
 			return getNearbyLoc(p, attempt + 1);
 		}
 		if (loc.getBlock().isSolid() || loc.getY() == mSirius.mBoss.getLocation().getY() - 10 || loc.clone().subtract(0, 1, 0).getBlock().getType().equals(Material.BARRIER)) {
