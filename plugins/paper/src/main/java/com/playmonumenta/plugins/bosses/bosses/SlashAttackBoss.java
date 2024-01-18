@@ -67,6 +67,12 @@ public class SlashAttackBoss extends BossAbilityGroup {
 		public double HITBOX_SIZE = 0.2;
 		@BossParam(help = "Force the size of each dust particle to this one, if a positive value. Default: -1")
 		public double FORCED_PARTICLE_SIZE = -1;
+		@BossParam(help = "Whether or not the slash respects iframes")
+		public boolean RESPECT_IFRAMES = true;
+		@BossParam(help = "Whether or not the slash can hit people again")
+		public boolean MULTI_HIT = false;
+		@BossParam(help = "Minimum interval to when slashattack can hit again")
+		public int MULTIHIT_INTERVAL = 8;
 		@BossParam(help = "The type of the damage dealt by the attack. Default: MELEE")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
 		@BossParam(help = "The sound at the start of telegraph. Default: EMPTY")
@@ -87,14 +93,14 @@ public class SlashAttackBoss extends BossAbilityGroup {
 		mParams = Parameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(List.of(
-				new SpellSlashAttack(plugin, boss,
-					mParams.COOLDOWN, mParams.DAMAGE, mParams.TELEGRAPH_DURATION, mParams.RADIUS, mParams.MIN_ANGLE,
-					mParams.MAX_ANGLE, mParams.ATTACK_NAME, mParams.RINGS, mParams.START_ANGLE, mParams.END_ANGLE,
-					mParams.SPACING, mParams.START_HEX_COLOR, mParams.MID_HEX_COLOR, mParams.END_HEX_COLOR,
-					mParams.X_SLASH, mParams.HORIZONTAL_COLOR, new Vector(mParams.KB_X, mParams.KB_Y, mParams.KB_Z),
-					mParams.KNOCK_AWAY, mParams.KBR_EFFECTIVENESS, mParams.FOLLOW_CASTER, mParams.HITBOX_SIZE,
-					mParams.FORCED_PARTICLE_SIZE, mParams.DAMAGE_TYPE, mParams.SOUND_TELEGRAPH, mParams.SOUND_SLASH_START, mParams.SOUND_SLASH_TICK, mParams.SOUND_SLASH_END
-				)
+			new SpellSlashAttack(plugin, boss,
+				mParams.COOLDOWN, mParams.DAMAGE, mParams.TELEGRAPH_DURATION, mParams.RADIUS, mParams.MIN_ANGLE,
+				mParams.MAX_ANGLE, mParams.ATTACK_NAME, mParams.RINGS, mParams.START_ANGLE, mParams.END_ANGLE,
+				mParams.SPACING, mParams.START_HEX_COLOR, mParams.MID_HEX_COLOR, mParams.END_HEX_COLOR,
+				mParams.X_SLASH, mParams.HORIZONTAL_COLOR, new Vector(mParams.KB_X, mParams.KB_Y, mParams.KB_Z),
+				mParams.KNOCK_AWAY, mParams.KBR_EFFECTIVENESS, mParams.FOLLOW_CASTER, mParams.HITBOX_SIZE,
+				mParams.FORCED_PARTICLE_SIZE, mParams.DAMAGE_TYPE, mParams.SOUND_TELEGRAPH, mParams.SOUND_SLASH_START, mParams.SOUND_SLASH_TICK, mParams.SOUND_SLASH_END, mParams.MULTI_HIT, mParams.MULTIHIT_INTERVAL, mParams.RESPECT_IFRAMES
+			)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), mParams.DETECTION_RANGE, null, mParams.DELAY);

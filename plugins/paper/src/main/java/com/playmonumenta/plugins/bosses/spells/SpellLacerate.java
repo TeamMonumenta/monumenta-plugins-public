@@ -5,7 +5,13 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -120,8 +126,10 @@ public class SpellLacerate extends Spell {
 				} else {
 					for (Player p : PlayerUtils.playersInRange(loc, mParameters.RADIUS, true)) {
 						new PartialParticle(mParameters.FINISHER_PARTICLE, p.getLocation(), 3, 0.1, 0.1, 0.1, 0.75).spawnAsEntityActive(mLauncher);
-						DamageUtils.damage(mLauncher, p, mParameters.DAMAGE_TYPE, mParameters.FINISHER_DAMAGE, null, true);
-						MovementUtils.knockAwayRealistic(mLauncher.getLocation(), p, (float) mParameters.KNOCK_AWAY, (float) mParameters.KNOCK_UP, false);
+						if (!mParameters.RESPECT_IFRAMES || p.getNoDamageTicks() == 0) {
+							DamageUtils.damage(mLauncher, p, mParameters.DAMAGE_TYPE, mParameters.FINISHER_DAMAGE, null, !mParameters.RESPECT_IFRAMES);
+							MovementUtils.knockAwayRealistic(mLauncher.getLocation(), p, (float) mParameters.KNOCK_AWAY, (float) mParameters.KNOCK_UP, false);
+						}
 					}
 
 					if (mParameters.SHOW_SLASHES) {
@@ -164,7 +172,7 @@ public class SpellLacerate extends Spell {
 				}
 			}
 		};
-		doFlurry.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 2);
+		doFlurry.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, mParameters.LINE_INTERVAL);
 	}
 
 	private void createRandomLine(Location loc, LivingEntity mLauncher) {

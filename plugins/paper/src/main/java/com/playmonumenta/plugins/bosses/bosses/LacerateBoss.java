@@ -81,6 +81,10 @@ public class LacerateBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Density of line particles")
 		public int LINE_PARTICLE_COUNT = 3;
+		@BossParam(help = "interval at which the lines show up (also how often the player is ticked for damage")
+		public int LINE_INTERVAL = 2;
+		@BossParam(help = "whether attack respects iframes")
+		public boolean RESPECT_IFRAMES = false;
 
 		@BossParam(help = "Number of points for the explosion's circle")
 		public int EXPLOSION_POINTS = 60;

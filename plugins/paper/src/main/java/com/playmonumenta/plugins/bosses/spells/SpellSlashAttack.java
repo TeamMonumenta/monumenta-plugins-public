@@ -55,6 +55,9 @@ public class SpellSlashAttack extends Spell {
 	public final SoundsList mSoundsSlashStart;
 	public final SoundsList mSoundsSlashTick;
 	public final SoundsList mSoundsSlashEnd;
+	public final boolean mMultiHit;
+	public final int mMultihitInterval;
+	public final boolean mRespectIframes;
 
 	public Vector mKnockback;
 
@@ -65,11 +68,11 @@ public class SpellSlashAttack extends Spell {
 	public static final int KNOCKBACK_IFRAMES = 5;
 
 	public SpellSlashAttack(Plugin plugin, LivingEntity boss, int cooldown, double damage, int telegraphDuration,
-			double radius, double minAngle, double maxAngle, String attackName, int rings, double startAngle,
-			double endAngle, double spacing, String startColorHex, String midColorHex, String endColorHex,
-			String xSlash, String horizontalColor, Vector knockback, String knockAway, double kbrEffectiveness,
-			String followCaster, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
-			SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd) {
+							double radius, double minAngle, double maxAngle, String attackName, int rings, double startAngle,
+							double endAngle, double spacing, String startColorHex, String midColorHex, String endColorHex,
+							String xSlash, String horizontalColor, Vector knockback, String knockAway, double kbrEffectiveness,
+							String followCaster, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
+							SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd, boolean multiHit, int multihitInterval, boolean respectIframes) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCooldown = cooldown;
@@ -99,6 +102,10 @@ public class SpellSlashAttack extends Spell {
 		mSoundsSlashStart = soundsSlashStart;
 		mSoundsSlashTick = soundsSlashTick;
 		mSoundsSlashEnd = soundsSlashEnd;
+		mMultiHit = multiHit;
+		mMultihitInterval = multihitInterval;
+		mRespectIframes = respectIframes;
+
 	}
 
 	@Override
@@ -140,7 +147,8 @@ public class SpellSlashAttack extends Spell {
 		BukkitRunnable runnableSounds = new BukkitRunnable() {
 			int mT = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				mT++;
 
 				if (mT % 5 == 0) {
@@ -191,10 +199,20 @@ public class SpellSlashAttack extends Spell {
 		List<Player> targets = hitbox.getHitPlayers(true);
 		targets.removeAll(hitPlayers);
 		for (Player target : targets) {
-			DamageUtils.damage(mBoss, target, mDamageType, mDamage, null, false, false, mAttackName);
-			applyKnockback(target);
-			hitPlayers.add(target);
+			if (!mRespectIframes || target.getNoDamageTicks() == 0) {
+				DamageUtils.damage(mBoss, target, mDamageType, mDamage, null, !mRespectIframes, false, mAttackName);
+				applyKnockback(target);
+				hitPlayers.add(target);
+				if (mMultiHit) {
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> targets.removeAll(hitPlayers), mMultihitInterval);
+				}
+			}
 		}
+	}
+
+	@Override
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+
 	}
 
 	private void applyKnockback(Player target) {

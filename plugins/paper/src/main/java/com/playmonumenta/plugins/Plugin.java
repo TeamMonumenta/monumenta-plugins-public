@@ -296,6 +296,7 @@ public class Plugin extends JavaPlugin {
 		ViewActivity.register();
 		VirtualFirmament.register();
 		WalletManager.registerCommand();
+		WeaponDash.register();
 		WorldNameCommand.register();
 		BlockDisplayCommand.register();
 		AddSpawnerEffectMarkersCommand.register();

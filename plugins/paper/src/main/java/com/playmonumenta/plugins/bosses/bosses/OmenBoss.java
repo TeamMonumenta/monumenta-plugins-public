@@ -50,8 +50,10 @@ public class OmenBoss extends BossAbilityGroup {
 		public double BLADE_TAIL_OFFSET = 0.0;
 		@BossParam(help = "blade y offset")
 		public double HEIGHT_OFFSET = 1.0;
-		@BossParam(help = "how many branches the omen will split into, all equal in angle in between each other (try not to go below 3 or so as theres no targeting param)")
+		@BossParam(help = "how many branches the omen will split into, all equal in angle in between each other (try not to go below 3 or so if you arent using targeting)")
 		public int SPLITS = 4;
+		@BossParam(help = "angle between each split")
+		public int SPLIT_ANGLE = 90;
 		@BossParam(help = "spell damage")
 		public double DAMAGE = 20;
 		@BossParam(help = "spell damage in %")
@@ -66,10 +68,14 @@ public class OmenBoss extends BossAbilityGroup {
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 		@BossParam(help = "width of the gap between omen particles, across the omen horizontally")
 		public double PARTICLE_GAP = 1.0;
+		@BossParam(help = "particle gap but for tel")
+		public double PARTICLE_GAP_TEL = 1.0;
 		@BossParam(help = "whether boss can move during the cast")
 		public boolean CAN_MOVE = true;
 		@BossParam(help = "whether the omen will be directed at a player")
 		public boolean DO_TARGETING = false;
+		@BossParam(help = "whether the spell respects iframes")
+		public boolean RESPECT_IFRAMES = true;
 		@BossParam(help = "sound of omen launch")
 		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_WITHER_SHOOT, 1, 0.75)]");
 		@BossParam(help = "sound of getting hit")
@@ -162,13 +168,13 @@ public class OmenBoss extends BossAbilityGroup {
 
 			public void launchBlade(List<Vector> basevec, boolean warning, double[] targetYawPitch) {
 				//loop for each direction, starting +Z, clockwise
-				for (int i = 0; i <= p.SPLITS; i++) {
+				for (int i = 0; i < p.SPLITS; i++) {
 					List<Vector> vec = new ArrayList<>(basevec);
 
 					//rotate vectors
 					for (int j = 0; j < vec.size(); j++) {
 						Vector v = vec.get(j);
-						Vector v2 = VectorUtils.rotateYAxis(v, (i * (double) 360 / p.SPLITS) + p.DEGREE_OFFSET + targetYawPitch[0]);
+						Vector v2 = VectorUtils.rotateYAxis(v, (i * p.SPLIT_ANGLE) + p.DEGREE_OFFSET + targetYawPitch[0]);
 						vec.set(j, v2);
 					}
 
@@ -211,7 +217,14 @@ public class OmenBoss extends BossAbilityGroup {
 					Vector v = vec.get(j);
 					//for 1 side, 5 locations
 					for (int k = 0; k < p.WIDTH; k++) {
-						if (k % p.PARTICLE_GAP == 0) {
+						if (k % p.PARTICLE_GAP == 0 && !warning) {
+							Location l = startLoc.clone();
+							l.add(v.clone().multiply(0.25 * k));
+							if (!locAll.contains(l)) {
+								locAll.add(l);
+							}
+						}
+						if (k % p.PARTICLE_GAP_TEL == 0 && warning) {
 							Location l = startLoc.clone();
 							l.add(v.clone().multiply(0.25 * k));
 							if (!locAll.contains(l)) {
@@ -241,8 +254,14 @@ public class OmenBoss extends BossAbilityGroup {
 					for (Player player : damage) {
 						p.SOUND_HIT.play(player.getLocation());
 						if (p.DAMAGE > 0) {
-							BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
-							MovementUtils.knockAway(origin, player, p.KB_X, p.KB_Y);
+							if (p.RESPECT_IFRAMES && player.getNoDamageTicks() == 0) {
+								BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+								MovementUtils.knockAway(origin, player, p.KB_X, p.KB_Y);
+							} else if (!p.RESPECT_IFRAMES) {
+								BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+								MovementUtils.knockAway(origin, player, p.KB_X, p.KB_Y);
+							}
+
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {

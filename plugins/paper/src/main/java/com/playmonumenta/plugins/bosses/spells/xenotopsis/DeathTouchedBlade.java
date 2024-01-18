@@ -65,13 +65,13 @@ public class DeathTouchedBlade extends Spell {
 
 	@Override
 	public void run() {
-		final SpellSlashAttack mVisualSlash = new SpellSlashAttack(mPlugin, mBoss, 0, mXenotopsis.scaleDamage(ATTACK_DAMAGE), 0, mBladeRadius, -50, 50, "Death Touched Blade", 8, -40, 540, 0.12, "505a63", "323947", "09091B", "false", "false", new Vector(0.2, 0.15, 0.2), "true", 0.65, "false", 0.2, 0.8, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY);
+		final SpellSlashAttack mVisualSlash = new SpellSlashAttack(mPlugin, mBoss, 0, mXenotopsis.scaleDamage(ATTACK_DAMAGE), 0, mBladeRadius, -50, 50, "Death Touched Blade", 8, -40, 540, 0.12, "505a63", "323947", "09091B", "false", "false", new Vector(0.2, 0.15, 0.2), "true", 0.65, "false", 0.2, 0.8, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY, false, 8, true);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-		    int mTicks = 0;
+			int mTicks = 0;
 
-		    @Override
-		    public void run() {
+			@Override
+			public void run() {
 				if (mTicks == 0) {
 					mXenotopsis.setMeleeDeathDamageOverride(DEATH_DAMAGE);
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, BOSS_SPEED);
@@ -145,13 +145,13 @@ public class DeathTouchedBlade extends Spell {
 					}
 				}
 
-		        mTicks++;
+				mTicks++;
 				if (mTicks > 88 + WINDUP_DURATION || mBoss.isDead()) {
 					mXenotopsis.removeMeleeDeathDamageOverride();
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, mXenotopsis.getMovementSpeed());
 					this.cancel();
 				}
-		    }
+			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(runnable);
