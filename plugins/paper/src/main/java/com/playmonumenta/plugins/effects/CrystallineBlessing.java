@@ -16,13 +16,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class CrystalineBlessing extends ZeroArgumentEffect {
-	public static final String GENERIC_NAME = "CrystalineBlessing";
-	public static final String effectID = "CrystalineBlessing";
+public class CrystallineBlessing extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "CrystallineBlessing";
+	public static final String effectID = "CrystallineBlessing";
 
 	private static final int DUR = 3 * 20;
 	private static final double DAMAGE_PERCENT = 0.15;
-	private static final String ATTR_NAME = "CrystalineBlessing";
+	private static final String ATTR_NAME = "CrystallineBlessing";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 		DamageType.MELEE,
 		DamageType.MELEE_ENCH,
@@ -35,14 +35,14 @@ public class CrystalineBlessing extends ZeroArgumentEffect {
 	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(131, 63, 171), 1.0f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(201, 127, 245), 1.0f);
 
-	public CrystalineBlessing(int duration) {
+	public CrystallineBlessing(int duration) {
 		super(duration, effectID);
 	}
 
-	public static CrystalineBlessing deserialize(JsonObject object, Plugin plugin) {
+	public static CrystallineBlessing deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 
-		return new CrystalineBlessing(duration);
+		return new CrystallineBlessing(duration);
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class CrystalineBlessing extends ZeroArgumentEffect {
 
 	@Override
 	public String toString() {
-		return String.format("CrystalineBlessing duration:%d", this.getDuration());
+		return String.format("CrystallineBlessing duration:%d", this.getDuration());
 	}
 
 	@Override

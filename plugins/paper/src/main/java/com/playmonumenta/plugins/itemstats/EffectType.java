@@ -440,7 +440,7 @@ public enum EffectType {
 			case BOON_OF_THE_PIT -> new BoonOfThePit(duration);
 			case BOON_OF_SILVER_SCALES -> new AbilityCooldownDecrease(duration, 0.05);
 			case BOON_OF_KNIGHTLY_PRAYER -> new BoonOfKnightlyPrayer(duration);
-			case CRYSTALLINE_BLESSING -> new CrystalineBlessing(duration);
+			case CRYSTALLINE_BLESSING -> new CrystallineBlessing(duration);
 			case CURSE_OF_THE_DARK_SOUL -> new PercentDamageReceived(duration, 1);
 			case DEEP_GODS_ENDOWMENT -> new DeepGodsEndowment(duration);
 			case HARRAKFARS_BLESSING -> new PercentHeal(duration, 0.1);
