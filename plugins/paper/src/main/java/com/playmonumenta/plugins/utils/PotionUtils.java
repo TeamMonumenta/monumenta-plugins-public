@@ -77,7 +77,8 @@ public class PotionUtils {
 			PotionEffectType.HARM,
 			PotionEffectType.HUNGER,
 			PotionEffectType.LEVITATION,
-			PotionEffectType.UNLUCK
+			PotionEffectType.UNLUCK,
+			PotionEffectType.DARKNESS
 	);
 
 	public static final ImmutableSet<PotionType> BASE_POTION_ITEM_TYPES = ImmutableSet.of(PotionType.AWKWARD, PotionType.THICK, PotionType.MUNDANE, PotionType.WATER);
