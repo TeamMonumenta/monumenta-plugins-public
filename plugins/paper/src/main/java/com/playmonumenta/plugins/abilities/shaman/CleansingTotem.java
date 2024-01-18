@@ -109,14 +109,8 @@ public class CleansingTotem extends TotemAbility {
 			world.playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8f, 2.0f);
 			if (isEnhanced()) {
 				List<Player> players = PlayerUtils.playersInRange(standLocation, ENHANCE_RADIUS, true);
-				cleanseTargets(players);
 				players.removeIf(player -> player == mPlayer);
-				for (Player player : players) {
-					PlayerUtils.healPlayer(mPlugin, player, CharmManager.calculateFlatAndPercentValue(mPlayer,
-						CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(player)), mPlayer);
-					new PPCircle(Particle.HEART, player.getLocation(), 1).ringMode(true)
-						.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
-				}
+				triggerEnhancement(players);
 			}
 		}
 		if (ticks % mInterval == 0) {
@@ -173,10 +167,16 @@ public class CleansingTotem extends TotemAbility {
 	@Override
 	public void onTotemCast() {
 		if (isEnhanced()) {
-			cleanseTargets(List.of(mPlayer));
-			PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer,
-				CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlayer);
-			new PPCircle(Particle.HEART, mPlayer.getLocation(), 1).ringMode(true)
+			triggerEnhancement(List.of(mPlayer));
+		}
+	}
+
+	private void triggerEnhancement(List<Player> players) {
+		cleanseTargets(players);
+		for (Player player : players) {
+			PlayerUtils.healPlayer(mPlugin, player, CharmManager.calculateFlatAndPercentValue(mPlayer,
+				CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(player)), mPlayer);
+			new PPCircle(Particle.HEART, player.getLocation(), 1).ringMode(true)
 				.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
 		}
 	}
