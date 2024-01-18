@@ -127,6 +127,7 @@ public class PotionConsumeListener implements Listener {
 	}
 
 	private void rightClickPotion(InventoryClickEvent event, Player player, ItemStack item, Inventory clickedInventory) {
+		Material mat = item.getType();
 		boolean cancel = NBT.get(item, nbt -> {
 			ReadableNBTList<ReadWriteNBT> customEffects = ItemStatUtils.getEffects(nbt);
 			if (customEffects == null || customEffects.isEmpty()) {
@@ -147,7 +148,8 @@ public class PotionConsumeListener implements Listener {
 					player.sendMessage(Component.text("Quick drink is still on cooldown!", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					return true;
-				} else {
+				} else if (mat != Material.POTION || mRunnables.get(player.getUniqueId()) == null || ItemStatUtils.hasEnchantment(item, EnchantmentType.INSTANT_DRINK)) {
+					// Additional checks ensure that the cooldown is not started if the potion cannot be consumed because another potion is currently being consumed
 					setPotionCooldown(player);
 				}
 			}
@@ -158,7 +160,6 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		Material mat = item.getType();
 		if (mat == Material.POTION) {
 			rightClickDrinkablePotion(event, player, item, clickedInventory);
 		} else {
