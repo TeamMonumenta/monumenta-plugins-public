@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
@@ -30,10 +29,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
 public class PEBCustomInventory extends CustomInventory {
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
@@ -975,23 +971,10 @@ public class PEBCustomInventory extends CustomInventory {
 	}
 
 	private ItemStack createCustomItem(PebItem item, Player player) {
-		ItemStack newItem = new ItemStack(item.mType == Material.PLAYER_WALL_HEAD ? Material.PLAYER_HEAD : item.mType, 1);
-		if (item.mType == Material.PLAYER_HEAD) {
-			SkullMeta meta = (SkullMeta) newItem.getItemMeta();
-			meta.setOwningPlayer(player);
-			newItem.setItemMeta(meta);
-		}
-		ItemMeta meta = newItem.getItemMeta();
-		String name = item.mName.apply(this);
-		if (!name.isEmpty()) {
-			meta.displayName(Component.text(name, NamedTextColor.WHITE)
-				.decoration(TextDecoration.ITALIC, false));
-		}
-		TextComponent lore = item.mLore.apply(this);
-		GUIUtils.splitLoreLine(meta, lore, 30, true);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		newItem.setItemMeta(meta);
-		ItemUtils.setPlainName(newItem);
+		// Not sure why this wall head thing exists
+		Material type = item.mType == Material.PLAYER_WALL_HEAD ? Material.PLAYER_HEAD : item.mType;
+		ItemStack newItem = GUIUtils.createBasicItem(type, 1, item.mName.apply(this), NamedTextColor.WHITE, false, item.mLore.apply(this), 30, true);
+		GUIUtils.setSkullOwner(newItem, player);
 		return newItem;
 	}
 
