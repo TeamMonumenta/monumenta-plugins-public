@@ -87,6 +87,10 @@ public class ChargedDeath extends Spell {
 				if (mTicks < WINDUP_DURATION) {
 					if (mTicks % WINDUP_LOCATION_DELAY == 0) {
 						Location loc = player.getLocation();
+						if (loc.distanceSquared(mBoss.getLocation()) > Xenotopsis.DETECTION_RANGE * Xenotopsis.DETECTION_RANGE) {
+							this.cancel();
+							return;
+						}
 						loc.setY(mXenotopsis.mSpawnLoc.getY());
 						mTargetLocations.add(loc);
 					}
