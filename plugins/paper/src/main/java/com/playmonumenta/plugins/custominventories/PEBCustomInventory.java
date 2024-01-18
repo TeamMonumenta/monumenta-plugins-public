@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.protocollib.EntityEquipmentReplacer;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -251,12 +252,14 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(4, "Technical Options",
 				"", NamedTextColor.LIGHT_PURPLE,
 				Material.COMPARATOR, false),
-			new PebItem(20, gui -> "Toggle display other player's gear (" +
+			new PebItem(20, gui -> "Toggle display other players' gear (" +
 				(ScoreboardUtils.getScoreboardValue(gui.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1) == 1 ? "Enabled)" : "Disabled)"),
 				gui -> Component.text("Toggles if you want to see the gear on other players, which may improve performance ", NamedTextColor.LIGHT_PURPLE),
-				Material.LEATHER_HELMET, false).action((inventory, action) -> {
-				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1);
-				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear", oldValue == 0 ? 1 : 0);
+				Material.LEATHER_HELMET, false).action((peb, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(peb.mPlayer, EntityEquipmentReplacer.SCOREBOARD).orElse(1);
+				int newValue = oldValue == 0 ? 1 : 0;
+				ScoreboardUtils.setScoreboardValue(peb.mPlayer, EntityEquipmentReplacer.SCOREBOARD, newValue);
+				peb.mPlayer.sendMessage(Component.text("Displaying other players' gear has been " + (oldValue == 1 ? "enabled." : "disabled."), NamedTextColor.GOLD));
 			}),
 			new PebItem(21, "Compass Particles",
 				"Click to toggle a trail of guiding particles when following the quest compass.", NamedTextColor.LIGHT_PURPLE,

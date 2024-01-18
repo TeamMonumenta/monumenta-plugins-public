@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
  * Mostly benefits shulker boxes that by default have their entire contents sent to every other player nearby.
  */
 public class EntityEquipmentReplacer extends PacketAdapter {
+	public static final String SCOREBOARD = "ShouldDisplayOtherPlayerGear";
 
 	private final Plugin mPlugin;
 
@@ -46,7 +47,7 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 			// and for a player that is not the current player
 			!entity.getUniqueId().equals(event.getPlayer().getUniqueId()) &&
 			// and if the player that the packet is sent to has gear disabled
-			ScoreboardUtils.getScoreboardValue(event.getPlayer(), "ShouldDisplayOtherPlayerGear").orElse(1) == 0;
+			ScoreboardUtils.getScoreboardValue(event.getPlayer(), SCOREBOARD).orElse(1) == 0;
 
 		List<Pair<EnumWrappers.ItemSlot, ItemStack>> items = packet.getSlotStackPairLists().read(0);
 		for (Pair<EnumWrappers.ItemSlot, ItemStack> pair : items) {
