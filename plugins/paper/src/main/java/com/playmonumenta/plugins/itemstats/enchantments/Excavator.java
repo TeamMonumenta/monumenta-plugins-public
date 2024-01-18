@@ -72,7 +72,6 @@ public class Excavator implements Enchantment {
 
 		BlockFace brokenFace = player.getTargetBlockFace(7);
 		if (brokenFace == null) {
-			player.sendMessage("Somehow, the blockface was null");
 			return;
 		}
 
@@ -103,7 +102,6 @@ public class Excavator implements Enchantment {
 				}
 				break;
 			default:
-				player.sendMessage("Block face was Non-Cartesian.");
 				break;
 		}
 	}
