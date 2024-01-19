@@ -9,7 +9,6 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -31,10 +30,6 @@ public final class JunkItemListener implements Listener {
 	public static final String COMMAND = "pickup";
 	public static final String ALIAS = "pu";
 	public static final Set<Tier> IGNORED_TIERS = Set.of(Tier.NONE, Tier.ZERO);
-
-	private static final String TIERED_TAG = Objects.requireNonNull(PickupFilterResult.TIERED.mTag);
-	private static final String LORE_TAG = Objects.requireNonNull(PickupFilterResult.LORE.mTag);
-	private static final String INTERESTING_TAG = Objects.requireNonNull(PickupFilterResult.INTERESTING.mTag);
 
 	private static final String PICKUP_MIN_OBJ_NAME = "PickupMin";
 	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
@@ -121,11 +116,11 @@ public final class JunkItemListener implements Listener {
 		Player player = event.getPlayer();
 		Set<String> tags = player.getScoreboardTags();
 		UUID uuid = player.getUniqueId();
-		if (tags.contains(TIERED_TAG)) {
+		if (tags.contains(PickupFilterResult.TIERED_TAG)) {
 			mTieredPlayers.add(uuid);
-		} else if (tags.contains(LORE_TAG)) {
+		} else if (tags.contains(PickupFilterResult.LORE_TAG)) {
 			mLorePlayers.add(uuid);
-		} else if (tags.contains(INTERESTING_TAG)) {
+		} else if (tags.contains(PickupFilterResult.INTERESTING_TAG)) {
 			mInterestingPlayers.add(uuid);
 		}
 	}
@@ -137,21 +132,21 @@ public final class JunkItemListener implements Listener {
 
 	private void pickupTiered(Player player) {
 		remove(player);
-		player.addScoreboardTag(TIERED_TAG);
+		player.addScoreboardTag(PickupFilterResult.TIERED_TAG);
 		mTieredPlayers.add(player.getUniqueId());
 		player.sendMessage(Component.text("You will now only pick up items with a tier.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void pickupLore(Player player) {
 		remove(player);
-		player.addScoreboardTag(LORE_TAG);
+		player.addScoreboardTag(PickupFilterResult.LORE_TAG);
 		mLorePlayers.add(player.getUniqueId());
 		player.sendMessage(Component.text("You will now only pick up items with lore text.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void pickupInteresting(Player player) {
 		remove(player);
-		player.addScoreboardTag(INTERESTING_TAG);
+		player.addScoreboardTag(PickupFilterResult.INTERESTING_TAG);
 		mInterestingPlayers.add(player.getUniqueId());
 		player.sendMessage(Component.text("You will no longer pick up uninteresting items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
@@ -225,22 +220,22 @@ public final class JunkItemListener implements Listener {
 		if (mTieredPlayers.contains(uuid)) {
 			return !PickupFilterResult.TIERED.equals(filterResult);
 		} else if (mLorePlayers.contains(uuid)) {
-			return filterResult.compareTo(PickupFilterResult.LORE) > 0;
+			return !filterResult.mTags.contains(PickupFilterResult.LORE_TAG);
 		} else if (mInterestingPlayers.contains(uuid)) {
-			return filterResult.compareTo(PickupFilterResult.INTERESTING) > 0;
+			return !filterResult.mTags.contains(PickupFilterResult.INTERESTING_TAG);
 		}
 		return false;
 	}
 
 	private boolean hasTag(Player player) {
 		Set<String> tags = player.getScoreboardTags();
-		return tags.contains(INTERESTING_TAG) || tags.contains(LORE_TAG) || tags.contains(TIERED_TAG);
+		return tags.contains(PickupFilterResult.INTERESTING_TAG) || tags.contains(PickupFilterResult.LORE_TAG) || tags.contains(PickupFilterResult.TIERED_TAG);
 	}
 
 	private void remove(Player player) {
-		player.removeScoreboardTag(TIERED_TAG);
-		player.removeScoreboardTag(LORE_TAG);
-		player.removeScoreboardTag(INTERESTING_TAG);
+		player.removeScoreboardTag(PickupFilterResult.TIERED_TAG);
+		player.removeScoreboardTag(PickupFilterResult.LORE_TAG);
+		player.removeScoreboardTag(PickupFilterResult.INTERESTING_TAG);
 		removeFromSets(player);
 	}
 

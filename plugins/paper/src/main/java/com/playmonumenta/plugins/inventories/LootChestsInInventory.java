@@ -9,6 +9,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -79,14 +80,14 @@ public class LootChestsInInventory implements Listener {
 		if (item.isSimilar(event.getCursor())) {
 			return;
 		}
-		if (!event.getCursor().getType().equals(Material.AIR)) {
+		if (ItemUtils.isNullOrAir(event.getCursor())) {
 			player.sendMessage(Component.text("You must have an empty cursor to open loot chests!", NamedTextColor.DARK_RED));
 			event.setCancelled(true);
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return;
 		}
 		//Make an inventory and do some good ol roundabout population of the loot
-		Inventory inventory = Bukkit.createInventory(null, 27, item.getItemMeta().displayName());
+		Inventory inventory = Bukkit.createInventory(null, 27, Objects.requireNonNull(item.getItemMeta().displayName()));
 		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
@@ -109,7 +110,7 @@ public class LootChestsInInventory implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		if (event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST) && event.getView().getTopInventory().getSize() == 27
-			    && event.getPlayer() instanceof Player player) {
+			&& event.getPlayer() instanceof Player player) {
 			/* Right type of inventory - check if the player is in the map */
 
 			/* Check if the player had a loot table chest open, and if so, decrement the count by 1. If it decrements to 0, remove from the map */
@@ -150,7 +151,7 @@ public class LootChestsInInventory implements Listener {
 		mLootMenu.put(player.getUniqueId(), value);
 	}
 
-	/* Returns whether or not the player was in the map to begin with */
+	/* Returns whether the player was in the map to begin with */
 	private boolean decrementOrClearPlayer(HumanEntity player) {
 		Integer value = mLootMenu.get(player.getUniqueId());
 		if (value == null) {

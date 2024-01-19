@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -149,6 +150,10 @@ public class Shattered implements Infusion {
 	public static int shatter(ItemStack item, int numLevels) {
 		if (ItemStatUtils.hasEnchantment(item, EnchantmentType.DELETE_ON_SHATTER)) {
 			item.setAmount(0);
+			return 0;
+		}
+		Tier tier = ItemStatUtils.getTier(item);
+		if (Tier.CURRENCY.equals(tier) || Tier.EVENT_CURRENCY.equals(tier)) {
 			return 0;
 		}
 		int oldLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);

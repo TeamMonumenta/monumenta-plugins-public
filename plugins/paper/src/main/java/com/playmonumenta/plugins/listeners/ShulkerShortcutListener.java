@@ -408,13 +408,19 @@ public class ShulkerShortcutListener implements Listener {
 		}
 	}
 
+	public static boolean isCarrierOfExplosions(ItemStack item) {
+		return item != null
+			&& ItemUtils.isShulkerBox(item.getType())
+			&& InventoryUtils.testForItemWithName(item, "Carrier of Explosions", true);
+	}
+
 	public static boolean isPurpleTesseractContainer(ItemStack item) {
 		return item != null
 			&& ItemUtils.isShulkerBox(item.getType())
 			&& (
 			InventoryUtils.testForItemWithName(item, "Carrier of Emotion", true)
 				|| InventoryUtils.testForItemWithName(item, "Carrier of Festivity", true)
-				|| InventoryUtils.testForItemWithName(item, "Carrier of Explosions", true)
+				|| isCarrierOfExplosions(item)
 		);
 	}
 

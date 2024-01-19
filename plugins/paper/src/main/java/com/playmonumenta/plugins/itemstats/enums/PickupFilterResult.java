@@ -8,26 +8,31 @@ import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTType;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
+import java.util.List;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public enum PickupFilterResult {
 	// In order from most to least strict (used to optimize code)
-	TIERED("tiered", "OnlyTieredItemsPickup"),
-	LORE("lore", "OnlyLoredItemsPickup"),
-	INTERESTING("interesting", "NoJunkItemsPickup"),
-	COUNT("count", null);
+	TIERED("tiered", List.of("OnlyTieredItemsPickup", "OnlyLoredItemsPickup", "NoJunkItemsPickup")),
+	LORE_AND_INTERESTING("loreAndInteresting", List.of("OnlyLoredItemsPickup", "NoJunkItemsPickup")),
+	LORE("lore", List.of("OnlyLoredItemsPickup")),
+	INTERESTING("interesting", List.of("NoJunkItemsPickup")),
+	COUNT("count", List.of());
+
+	public static final String TIERED_TAG = "OnlyTieredItemsPickup";
+	public static final String LORE_TAG = "OnlyLoredItemsPickup";
+	public static final String INTERESTING_TAG = "NoJunkItemsPickup";
 
 	public static final String PICKUP_TAG = "Pickup";
 	public static final String PICKUP_FILTER_TAG = "FilterResult";
 	public static final String PICKUP_COUNT_TAG = "PickupCount";
 
 	public final String mId;
-	public final @Nullable String mTag;
+	public final List<String> mTags;
 
-	PickupFilterResult(String id, @Nullable String tag) {
+	PickupFilterResult(String id, List<String> tags) {
 		mId = id;
-		mTag = tag;
+		mTags = tags;
 	}
 
 	public static PickupFilterResult getFilterResult(ItemStack item) {
@@ -69,13 +74,18 @@ public enum PickupFilterResult {
 		if (!JunkItemListener.IGNORED_TIERS.contains(tier) || ItemUtils.isQuestItem(item) || InventoryUtils.containsSpecialLore(item)) {
 			return PickupFilterResult.TIERED;
 		}
-		if (ItemUtils.hasLore(item)) {
+
+		boolean hasLore = ItemUtils.hasLore(item);
+		boolean isInteresting = ItemUtils.isInteresting(item);
+		if (hasLore && isInteresting) {
+			return PickupFilterResult.LORE_AND_INTERESTING;
+		} else if (hasLore) {
 			return PickupFilterResult.LORE;
-		}
-		if (ItemUtils.isInteresting(item)) {
+		} else if (isInteresting) {
 			return PickupFilterResult.INTERESTING;
+		} else {
+			return PickupFilterResult.COUNT;
 		}
-		return PickupFilterResult.COUNT;
 	}
 
 	public static void setFilterResult(ItemStack item, PickupFilterResult result) {

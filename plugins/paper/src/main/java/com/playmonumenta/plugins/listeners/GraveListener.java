@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.PickupFilterResult;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -223,6 +224,8 @@ public class GraveListener implements Listener {
 	public static boolean doesGrave(ItemStack item) {
 		return switch (ItemStatUtils.getTier(item)) {
 			case NONE, ZERO, I, II, III, KEYTIER, QUEST_COMPASS -> false;
+			// Do not grave Carriers of Explosions unless they carry contents that can grave
+			case SHULKER_BOX -> PickupFilterResult.TIERED.equals(PickupFilterResult.getFilterResult(item));
 			default -> true;
 		};
 	}
