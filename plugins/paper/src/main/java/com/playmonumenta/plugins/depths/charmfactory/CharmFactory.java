@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.charmfactory;
 
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
 import com.playmonumenta.plugins.itemstats.enums.Region;
@@ -96,12 +97,12 @@ public class CharmFactory {
 				MMLog.fine("" + action);
 			}
 
-			return CharmFactory.generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item.getType());
+			return CharmFactory.generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item);
 		}
 		return null;
 	}
 
-	public static ItemStack generateCharm(int level, int power, long seed, @Nullable List<String> effectOrder, @Nullable List<String> actionOrder, @Nullable List<Double> rollsOrder, @Nullable Component fixedName, @Nullable Material oldMat) {
+	public static ItemStack generateCharm(int level, int power, long seed, @Nullable List<String> effectOrder, @Nullable List<String> actionOrder, @Nullable List<Double> rollsOrder, @Nullable Component fixedName, @Nullable ItemStack oldItem) {
 		// Keeps track of which effect names are already in the charm
 		List<String> activeEffects = new ArrayList<>();
 		// Keep track of text components to put them in sorted order later
@@ -122,8 +123,15 @@ public class CharmFactory {
 
 		Random r = new Random(seed);
 		ItemStack item = new ItemStack(Material.STONE);
-		if (oldMat != null) {
-			item.setType(oldMat);
+		if (oldItem != null) {
+			item.setType(oldItem.getType());
+			NBT.modify(item, nbt -> {
+				ReadableNBT infusions = NBT.get(oldItem, rnbt -> {
+					return ItemStatUtils.getInfusions(rnbt);
+				});
+				ReadWriteNBT newInfusions = ItemStatUtils.addPlayerModified(nbt).getOrCreateCompound(InfusionType.KEY);
+				newInfusions.mergeCompound(infusions);
+			});
 		}
 
 		// Add seed

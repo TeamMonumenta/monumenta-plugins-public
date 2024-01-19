@@ -451,8 +451,8 @@ public class ItemStatUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			ReadWriteNBT charmPower = nbt.getOrCreateCompound(MONUMENTA_KEY);
-			charmPower.setInteger(CHARM_POWER_KEY, level);
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(MONUMENTA_KEY);
+			monumenta.setInteger(CHARM_POWER_KEY, level);
 		});
 	}
 
@@ -461,11 +461,11 @@ public class ItemStatUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			ReadWriteNBT charmPower = nbt.getCompound(CHARM_POWER_KEY);
-			if (charmPower == null) {
+			ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
 				return;
 			}
-			charmPower.removeKey(CHARM_POWER_KEY);
+			monumenta.removeKey(CHARM_POWER_KEY);
 		});
 	}
 
@@ -474,8 +474,8 @@ public class ItemStatUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-				ReadWriteNBT fishQuality = nbt.getOrCreateCompound(MONUMENTA_KEY);
-				fishQuality.setInteger(FISH_QUALITY_KEY, level);
+				ReadWriteNBT monumenta = nbt.getOrCreateCompound(MONUMENTA_KEY);
+				monumenta.setInteger(FISH_QUALITY_KEY, level);
 		});
 	}
 
