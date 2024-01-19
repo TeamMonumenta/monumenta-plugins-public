@@ -8,18 +8,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBasePassiveAbility;
-import com.playmonumenta.plugins.bosses.spells.sirius.PassiveDeclaration;
-import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlight;
-import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlightConversion;
-import com.playmonumenta.plugins.bosses.spells.sirius.PassiveTentacleManager;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightBomb;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightWall;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedBolts;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedPods;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellCosmicPortals;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellFromTheStars;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellSiriusBeams;
-import com.playmonumenta.plugins.bosses.spells.sirius.SpellSummonTheStars;
+import com.playmonumenta.plugins.bosses.spells.sirius.*;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -29,12 +18,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,11 +101,13 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	private double mMaxHp;
 	private int mMobsKilled;
 	private int mMobsToMove;
+	private SpellBlightedPods mPods;
 	//Defense scaling stuff
 	private int mPlayerCount;
 	private double mDefenseScaling;
-	private static final double SCALING_X = 0.75;
-	private static final double SCALING_Y = 0.575;
+	private boolean mClose;
+	private static final double SCALING_X = 0.6;
+	private static final double SCALING_Y = 0.35;
 
 	//z is star blight line
 
@@ -142,6 +128,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mTempDisplay = new ArrayList<>();
 		mDamagePhase = false;
 		mAnimationLock = false;
+		mClose = false;
 		mCornerOne = spawnLoc.clone().add(73, 38, 45);
 		mCornerTwo = spawnLoc.clone().subtract(42, 35, 45);
 		mSpawnCornerOne = spawnLoc.clone().add(37, 1, 39);
@@ -163,6 +150,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mMobsToMove = getPlayersInArena(false).size() * 20;
 		mTentacleManager = new PassiveTentacleManager(this, mPlugin);
 		PassiveDeclaration declarations = new PassiveDeclaration(plugin, this, mStarBlightConverter, mSpawner);
+		mPods = new SpellBlightedPods(this, plugin);
 		List<Spell> passives = List.of(
 			new SpellBasePassiveAbility(1 * 20, mTentacleManager),
 			new SpellBasePassiveAbility(declarations.cooldownTicks(), declarations),
@@ -171,11 +159,11 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			mStarBlightConverter
 		);
 		SpellManager spells = new SpellManager(List.of(
-			new SpellBlightWall(plugin, this, declarations),
-			new SpellBlightBomb(this, plugin, mStarBlightConverter),
-			new SpellCosmicPortals(this, plugin),
-			new SpellFromTheStars(this, plugin, mTentacleManager, declarations),
-			new SpellBlightedPods(this, plugin)
+				new SpellBlightWall(plugin, this, declarations),
+				new SpellBlightBomb(this, plugin, mStarBlightConverter),
+				new SpellCosmicPortals(this, plugin),
+				new SpellFromTheStars(this, plugin, mTentacleManager, declarations),
+				mPods
 		));
 		//Boss visuals
 		spawnGate();
@@ -234,6 +222,9 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				p.playSound(p, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 2f, 0.1f);
 				p.playSound(p, Sound.ENTITY_WARDEN_EMERGE, SoundCategory.HOSTILE, 0.8f, 1.2f);
 			}
+		}
+		if (mBlocks >= 37) {
+			mClose = true;
 		}
 		if (mBlocks <= 0) {
 			mBoss.setHealth(0.1);
@@ -816,10 +807,20 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						Vector vec = LocationUtils.getVectorTo(mBoss.getLocation().clone(), p.getLocation().clone());
 						vec.setY(0); //remove y
 						double ratio = Math.max(0, (12 - vec.length()) / (5 * vec.length()));
-						if (ratio >= 0.5 && p.isInvulnerable()) {
-							p.setInvulnerable(false);
+						if (ratio >= 0.5) {
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
+							if (p.isInvulnerable()) {
+								p.setInvulnerable(false);
+							}
+							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.OTHER, 999999999, null, true, false, "crushing weight.");
+							if (p.getHealth() > 0) {
+								p.setHealth(0); // For good measure
+							}
+							AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r3/sirius/starfall");
+						} else {
+							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, maxOriginalDamage * ratio, null, true, true, "crushing weight.");
 						}
-						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, maxOriginalDamage * ratio, null, true, true, "crushing weight.");
 					}
 					for (int i = 0; i < mStoredTransformations.size(); i++) {
 						Display mDisplay = mDisplays.get(i);
@@ -2405,6 +2406,12 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						for (Player player : getPlayersInArena(false)) {
 							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.DARK_AQUA), Component.text("Sirius, The Star Herald", NamedTextColor.AQUA));
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
+							if (mClose) {
+								AdvancementUtils.grantAdvancement(player, "monumenta:challenges/r3/sirius/condition");
+							}
+							if (!mPods.mEvolved) {
+								AdvancementUtils.grantAdvancement(player, "monumenta:challenges/r3/sirius/blight");
+							}
 						}
 						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 						Collections.shuffle(mDisplays);
@@ -2442,6 +2449,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				if (mTicks >= 30 * 20) {
 					mStarBlightConverter.blightArena(List.of(mBoss.getLocation()), 0, 20, 20, mPlugin);
 					for (Player p : getPlayersInArena(false)) {
+						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r3/sirius/fault");
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
 						if (p.isInvulnerable()) {

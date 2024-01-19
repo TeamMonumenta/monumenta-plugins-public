@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PPPillar;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -187,7 +188,7 @@ public class SpellSummonTheStars extends Spell {
 					} else {
 						spawn = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, FastUtils.getRandomElement(SpellBlightedPods.MINIBOSSES));
 						if (spawn != null) {
-							int maxHealth = SpellBlightedPods.BASEHEALTH + mSirius.getPlayersInArena(false).size() * SpellBlightedPods.HPSCALEPERPLAYER;
+							int maxHealth = (int) (SpellBlightedPods.BASEHEALTH * BossUtils.healthScalingCoef(+mSirius.getPlayersInArena(false).size(), SpellBlightedPods.SCALING_X, SpellBlightedPods.SCALING_Y));
 							Objects.requireNonNull(spawn.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(maxHealth);
 							spawn.setHealth(maxHealth); //half of the hp is effected by damage done to the pod
 						}
@@ -244,7 +245,7 @@ public class SpellSummonTheStars extends Spell {
 					return;
 				}
 				if (mTicks >= duration) {
-					mSirius.changeHp(true, -1);
+					mSirius.changeHp(true, -5);
 					for (Player p : mSirius.getPlayersInArena(false)) {
 						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("The starlight will shine brighter while they live. You have failed, conquerers.", NamedTextColor.AQUA));
 					}

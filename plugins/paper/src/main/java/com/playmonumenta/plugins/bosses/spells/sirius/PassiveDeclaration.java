@@ -29,12 +29,14 @@ public class PassiveDeclaration extends Spell {
 	private boolean mFirstRun;
 	private Plugin mPlugin;
 	private @Nullable Spell mLastSpell;
+	public boolean mTpBlocked;
 
 	public PassiveDeclaration(Plugin plugin, Sirius sirius, PassiveStarBlightConversion converter, SpellSummonTheStars spawner) {
 		mSirius = sirius;
 		mSwapping = false;
 		mFirstRun = true;
 		mTp = false;
+		mTpBlocked = false;
 		mDeclerations = new ArrayList<>();
 		mPlugin = plugin;
 		//Less common as they are more powerful
@@ -54,6 +56,7 @@ public class PassiveDeclaration extends Spell {
 		//mDeclerations.add(new DeclerationTemp(mSirius));
 		mOnCooldown = false;
 		mLastSpell = null;
+		mTpBlocked = false;
 	}
 
 
@@ -89,7 +92,9 @@ public class PassiveDeclaration extends Spell {
 				declaration = mDeclerations.get(11);
 				mLastSpell = mDeclerations.get(0);
 			}
-			while (mLastSpell.getClass().equals(declaration.getClass()) || (declaration.getClass().equals(DeclarationBarrage.class) && mSirius.mDamagePhase)) {
+			while (mLastSpell.getClass().equals(declaration.getClass())
+					|| (declaration.getClass().equals(DeclarationBarrage.class) && mSirius.mDamagePhase)
+					|| (mTpBlocked && declaration.getClass().equals(DeclarationTp.class))) {
 				declaration = FastUtils.getRandomElement(mDeclerations);
 			}
 			if (declaration.getClass() == DeclarationTp.class) {

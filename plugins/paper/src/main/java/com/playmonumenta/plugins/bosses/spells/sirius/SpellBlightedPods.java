@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPExplosion;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
@@ -33,7 +34,8 @@ public class SpellBlightedPods extends Spell {
 	private Plugin mPlugin;
 	private boolean mOnCooldown;
 	private int mPodCount;
-	public static final int BASEHEALTH = 750;
+	public boolean mEvolved;
+	public static final int BASEHEALTH = 1200;
 	public static final int HPSCALEPERPLAYER = 125;
 	private static final int COOLDOWN = 25 * 20;
 	private static final int DURATION = 15 * 20;
@@ -43,6 +45,8 @@ public class SpellBlightedPods extends Spell {
 		"ArcturussBeast",
 		"VegasMonstrosity"
 	);
+	public static final double SCALING_X = 0.5;
+	public static final double SCALING_Y = 0.5;
 	//always spawns 1
 	private static final int PLAYERSPERPOD = 4;
 
@@ -50,6 +54,7 @@ public class SpellBlightedPods extends Spell {
 		mSirius = sirius;
 		mPlugin = plugin;
 		mOnCooldown = false;
+		mEvolved = false;
 	}
 
 	@Override
@@ -110,7 +115,7 @@ public class SpellBlightedPods extends Spell {
 				}
 				if (mTicks == FLIGHTTIME + 1) {
 					int count = mSirius.getPlayersInArena(false).size();
-					int hp = 250 + 75 * count;
+					int hp = (int) (450 * BossUtils.healthScalingCoef(count, SCALING_X, SCALING_Y));
 					new PPExplosion(Particle.SCRAPE, loc).delta(2).count(25).spawnAsBoss();
 					mHitBox = (LivingEntity) LibraryOfSoulsIntegration.summon(loc.clone().add(0.75, 0, 0.75), "BlightedPod");
 					if (mHitBox != null) {
@@ -194,11 +199,12 @@ public class SpellBlightedPods extends Spell {
 	}
 
 	private void spawn(LivingEntity hitbox) {
+		mEvolved = true;
 		double currentHP = hitbox.getHealth();
 		double maxHP = Objects.requireNonNull(hitbox.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
 		LivingEntity boss = (LivingEntity) LibraryOfSoulsIntegration.summon(hitbox.getLocation(), FastUtils.getRandomElement(MINIBOSSES));
 		if (boss != null) {
-			int maxHealth = BASEHEALTH + mSirius.getPlayersInArena(false).size() * HPSCALEPERPLAYER;
+			int maxHealth = (int) (BASEHEALTH * BossUtils.healthScalingCoef(mSirius.getPlayersInArena(false).size(), SCALING_X, SCALING_Y));
 			Objects.requireNonNull(boss.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(maxHealth);
 			boss.setHealth(maxHealth / 2.0f + (maxHealth / 2.0f) * (currentHP / maxHP)); //half of the hp is effected by damage done to the pod
 			boss.addScoreboardTag(Sirius.MOB_TAG);

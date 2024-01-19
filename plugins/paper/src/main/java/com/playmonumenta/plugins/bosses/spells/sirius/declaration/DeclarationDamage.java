@@ -123,7 +123,7 @@ public class DeclarationDamage extends Spell {
 				}
 				if (mTicks >= Sirius.DURATIONOFDAMAGEPHASE + ANIMATIONDURATION) {
 					if (mDone) {
-						mSirius.changeHp(true, -1);
+						mSirius.changeHp(true, -5);
 					}
 					this.cancel();
 				}

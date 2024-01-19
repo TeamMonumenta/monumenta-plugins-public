@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -84,6 +85,7 @@ public class SpellBlightWall extends Spell {
 	}
 
 	private void cast() {
+		mDeclerations.mTpBlocked = true;
 		int duration = (int) (mLength / SPEED) + 1;
 		if (mSirius.mBlocks <= 10) {
 			duration = (int) (mLength / SPEED) + WAVEDELAY + 1;
@@ -132,9 +134,11 @@ public class SpellBlightWall extends Spell {
 					}
 				}
 				if (mTicks >= DELAY + finalDuration) {
+					mDeclerations.mTpBlocked = false;
 					this.cancel();
 				}
 				if (mSirius.mDone) {
+					mDeclerations.mTpBlocked = false;
 					this.cancel();
 					mBar.remove();
 				}
@@ -158,7 +162,7 @@ public class SpellBlightWall extends Spell {
 			int mTicks = 0;
 			Location mLocOne = loc1.clone();
 			Location mLocTwo = loc2.clone();
-			int mGapPos = FastUtils.randomIntInRange(1, 7);
+			int mGapPos = FastUtils.randomIntInRange(2, 6);
 			double mSpeed = speed;
 			List<BlockDisplay> mDisplays = new ArrayList<>();
 
@@ -176,16 +180,11 @@ public class SpellBlightWall extends Spell {
 								BlockDisplay display = mSirius.mBoss.getWorld().spawn(loc, BlockDisplay.class);
 								mDisplays.add(display);
 								display.setBlock(Bukkit.createBlockData(Material.CYAN_STAINED_GLASS));
-								display.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(1, 10, (float) Math.min(10, mWidth - i)), new AxisAngle4f()));
+								Transformation trans = new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(1, 10, (float) Math.min(10, mWidth - i)), new AxisAngle4f());
+								display.setTransformation(trans);
 								display.setInterpolationDelay(-1);
 								display.setInterpolationDuration(1);
 								display.addScoreboardTag("SiriusDisplay");
-								Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-									Transformation trans = display.getTransformation();
-									display.setTransformation(new Transformation(new Vector3f((float) mLength, 0, 0), trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
-									display.setInterpolationDelay(-1);
-									display.setInterpolationDuration((int) (mLength / mSpeed));
-								}, 1);
 							}
 						}
 					}
@@ -202,10 +201,10 @@ public class SpellBlightWall extends Spell {
 				//in case displays fail
 				new PPLine(Particle.REDSTONE, mLocOne, mLocOneClone.clone().add(0, 0, 10 * mGapPos)).countPerMeter(1).data(new Particle.DustOptions(Color.fromRGB(0, 242, 242), 1.0f)).spawnAsBoss();
 				new PPLine(Particle.REDSTONE, mLocOneClone.clone().add(0, 0, 10 + 10 * mGapPos), mLocTwo).countPerMeter(1).data(new Particle.DustOptions(Color.fromRGB(0, 242, 242), 1.0f)).spawnAsBoss();
-				BoundingBox boxOne = BoundingBox.of(mLocOneClone, mLocOneClone.clone().add(0, 30, 10 * mGapPos));
-				BoundingBox boxTwo = BoundingBox.of(mLocOneClone.clone().add(0, 0, 10 + 10 * mGapPos), mLocTwoClone.add(0, 30, 0));
+				BoundingBox boxOne = BoundingBox.of(mLocOneClone, mLocOneClone.clone().add(0.25, 30, 10 * mGapPos));
+				BoundingBox boxTwo = BoundingBox.of(mLocOneClone.clone().add(0, 0, 10 + 10 * mGapPos), mLocTwoClone.add(0.25, 30, 0));
 				for (Player p : pList) {
-					if (p.getBoundingBox().overlaps(boxOne) || p.getBoundingBox().overlaps(boxTwo)) {
+					if (!StasisListener.isInStasis(p) && (p.getBoundingBox().overlaps(boxOne) || p.getBoundingBox().overlaps(boxTwo))) {
 						DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, "Blight Wave");
 						MovementUtils.knockAway(p.getLocation().subtract(mSpeed, 0, 0), p, KNOCKBACKSTRENGTH, false);
 						p.playSound(p, Sound.ENTITY_BLAZE_HURT, SoundCategory.HOSTILE, 0.5f, 0.4f);
@@ -216,7 +215,14 @@ public class SpellBlightWall extends Spell {
 				}
 				mLocOne.add(mSpeed, 0, 0);
 				mLocTwo.add(mSpeed, 0, 0);
-				if (mTicks >= mLength / Math.abs(mSpeed) || mSirius.mDone) {
+				for (Display display : mDisplays) {
+					Transformation trans = display.getTransformation();
+					display.setTransformation(trans);
+					display.setInterpolationDelay(-1);
+					display.setInterpolationDuration(1);
+					display.teleport(display.getLocation().add(mSpeed, 0, 0));
+				}
+				if (mTicks >= mLength / Math.abs(mSpeed) || mSirius.mDone || mSirius.mBoss.isDead()) {
 					this.cancel();
 					for (Display display : mDisplays) {
 						display.remove();
