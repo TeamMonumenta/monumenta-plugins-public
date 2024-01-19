@@ -12,10 +12,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 public class AbsorptionCommand {
+	private static final String COMMAND = "absorption";
+	private static final String PERMISSION = "monumenta.command.absorption";
+
 	@SuppressWarnings("unchecked")
 	public static void register() {
-		new CommandAPICommand("absorption")
-			.withPermission("monumenta.command.absorption")
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
 			.withArguments(
 				new LiteralArgument("flat"),
 				new EntitySelectorArgument.ManyEntities("entities"),
@@ -30,8 +33,8 @@ public class AbsorptionCommand {
 				}
 			}).register();
 
-		new CommandAPICommand("absorption")
-			.withPermission("monumenta.command.absorption")
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
 			.withArguments(
 				new LiteralArgument("percent"),
 				new EntitySelectorArgument.ManyEntities("entities"),
@@ -43,6 +46,19 @@ public class AbsorptionCommand {
 					if (e instanceof LivingEntity le) {
 						double maxHealth = EntityUtils.getMaxHealth(le);
 						AbsorptionUtils.addAbsorption(le, (double) args[1] * maxHealth, (double) args[2] * maxHealth, (int) args[3]);
+					}
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(
+				new LiteralArgument("clear"),
+				new EntitySelectorArgument.ManyEntities("entities")
+			).executes((sender, args) -> {
+				for (Entity e : (Collection<Entity>) args[0]) {
+					if (e instanceof LivingEntity le) {
+						AbsorptionUtils.clearAbsorption(le);
 					}
 				}
 			}).register();

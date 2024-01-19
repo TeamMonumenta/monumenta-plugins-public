@@ -119,6 +119,11 @@ public class AbsorptionUtils {
 		}
 	}
 
+	public static void clearAbsorption(LivingEntity entity) {
+		ABSORPTION_INFO_MAPPINGS.remove(entity);
+		entity.setAbsorptionAmount(0);
+	}
+
 	private static void initializeTracker() {
 		if (ABSORPTION_INFO_TRACKER == null || ABSORPTION_INFO_TRACKER.isCancelled()) {
 			ABSORPTION_INFO_TRACKER = new BukkitRunnable() {
