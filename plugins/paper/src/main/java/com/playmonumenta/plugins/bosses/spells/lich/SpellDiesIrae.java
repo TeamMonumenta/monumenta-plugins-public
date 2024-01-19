@@ -12,18 +12,15 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -39,15 +36,15 @@ import org.bukkit.util.Vector;
 
 public class SpellDiesIrae extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private LivingEntity mKey;
-	private Location mCenter;
-	private double mRange;
-	private int mCeiling;
-	private List<Location> mCrystalLoc;
-	private Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
-	private String mCrystalNBT;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final LivingEntity mKey;
+	private final Location mCenter;
+	private final double mRange;
+	private final int mCeiling;
+	private final List<Location> mCrystalLoc;
+	private final Collection<EnderCrystal> mCrystal = new ArrayList<>();
+	private final String mCrystalNBT;
 	private static double mCrystalDmg;
 	private final PartialParticle mCloud;
 	private final PartialParticle mExpH;
@@ -89,17 +86,13 @@ public class SpellDiesIrae extends Spell {
 
 	@Override
 	public boolean canRun() {
-		if (Lich.getCD()) {
-			return false;
-		}
-		return true;
+		return !Lich.getCD();
 	}
 
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-		bar.setVisible(true);
+		BossBar bar = BossBar.bossBar(Component.empty(), 1, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
 		//only spawn crystals if auto respawn didn't summon a wave 2 seconds before
 		if (!SpellCrystalRespawn.getmSpawned()) {
 			Lich.spawnCrystal(mCrystalLoc, 4, mCrystalNBT);
@@ -121,7 +114,7 @@ public class SpellDiesIrae extends Spell {
 		//time limit 6s to break all active crystals
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT;
-			int mCount = mCrystal.size();
+			final int mCount = mCrystal.size();
 
 			@Override
 			public void run() {
@@ -144,7 +137,9 @@ public class SpellDiesIrae extends Spell {
 					mBoss.setAI(true);
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
-					bar.setVisible(false);
+					for (Player player : Lich.playersInRange(mCenter, mRange, true)) {
+						player.hideBossBar(bar);
+					}
 					this.cancel();
 					return;
 				}
@@ -160,26 +155,28 @@ public class SpellDiesIrae extends Spell {
 				}
 				//execute order 66
 				if (mT >= 20 * 6) {
-					bar.setVisible(false);
+					for (Player player : Lich.playersInRange(mCenter, mRange, true)) {
+						player.hideBossBar(bar);
+					}
 					attack();
 					this.cancel();
 				}
 				mT++;
 				//boss bar stuff
 				int remain = mCrystal.size();
-				double progress = remain * 1.0d / mCount;
-				bar.setTitle(ChatColor.YELLOW + "" + remain + " Death Crystals Remaining!");
-				bar.setProgress(progress);
+				float progress = remain * 1.0f / mCount;
+				bar.name(Component.text(remain + " Death Crystals Remaining!", NamedTextColor.YELLOW));
+				bar.progress(progress);
 				if (progress <= 0.34) {
-					bar.setColor(BarColor.RED);
+					bar.color(BossBar.Color.RED);
 				} else if (progress <= 0.67) {
-					bar.setColor(BarColor.YELLOW);
+					bar.color(BossBar.Color.YELLOW);
 				}
 				for (Player player : Lich.playersInRange(mCenter, mRange, true)) {
 					if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
-						bar.addPlayer(player);
+						player.showBossBar(bar);
 					} else {
-						bar.removePlayer(player);
+						player.hideBossBar(bar);
 					}
 				}
 			}

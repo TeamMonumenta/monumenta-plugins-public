@@ -56,11 +56,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -71,9 +72,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creature;
@@ -1238,17 +1237,17 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 	private void die() {
 		mDefeated = true;
+
+		//force leave shadow realm
+		for (Player p : SpellDimensionDoor.getShadowed()) {
+			Location loc = p.getLocation();
+			loc.setY(mStart.getLocation().getY());
+			p.teleport(loc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+		}
+
 		List<Player> players = playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.isEmpty()) {
 			return;
-		}
-		//force leave shadow realm
-		if (SpellDimensionDoor.getShadowed().size() > 0) {
-			for (Player p : SpellDimensionDoor.getShadowed()) {
-				Location loc = p.getLocation();
-				loc.setY(mStart.getLocation().getY());
-				p.teleport(loc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
-			}
 		}
 
 		for (Player player : players) {
@@ -1563,8 +1562,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 2);
 
 		// spawn crystals, delay to allow for arena respawn
-		BossBar timer = Bukkit.getServer().createBossBar(null, BarColor.PURPLE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-		timer.setVisible(true); //p4 substitute
+		BossBar timer = BossBar.bossBar(Component.empty(), 1, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
 		double timeLimit = 200.0d * 20.0d;
 
 		//initialize
@@ -1640,7 +1638,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						}
 					} else if (mCounter == 4) {
 						changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-						timer.setVisible(false);
+						for (Player player : playersInRange(mStart.getLocation(), detectionRange, true)) {
+							player.hideBossBar(timer);
+						}
 						mBoss.setHealth(100);
 						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 10));
 						this.cancel();
@@ -1648,24 +1648,25 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					}
 				}
 				//boss bar stuff, 200s time limit
-				double progress = (timeLimit - mT) / timeLimit;
+				float progress = (float) ((timeLimit - mT) / timeLimit);
 				if (progress >= 0) {
-					timer.setProgress(progress);
+					timer.progress(progress);
 				}
 				if (progress <= 0.34) {
-					timer.setColor(BarColor.RED);
+					timer.color(BossBar.Color.RED);
 				} else if (progress <= 0.67) {
-					timer.setColor(BarColor.YELLOW);
+					timer.color(BossBar.Color.YELLOW);
 				}
 				if (mT % 20 == 0) {
 					int chat = (int) timeLimit;
-					timer.setTitle(ChatColor.YELLOW + "Soul dissipating in " + (chat - mT) / 20 + " seconds!");
+					timer.name(Component.text("Soul dissipating in " + (chat - mT) / 20 + " seconds!", NamedTextColor.YELLOW));
 				}
+				List<Player> checkPlayers = playersInRange(mStart.getLocation(), detectionRange, true);
 				for (Player player : remaining) {
-					if (!playersInRange(mStart.getLocation(), detectionRange, true).contains(player)) {
-						timer.removePlayer(player);
+					if (!checkPlayers.contains(player)) {
+						player.hideBossBar(timer);
 					} else {
-						timer.addPlayer(player);
+						player.showBossBar(timer);
 					}
 					//kill player if time runs out. show that they are dying extremely quickly
 					if (mT > timeLimit) {
@@ -1673,7 +1674,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						BossUtils.bossDamagePercent(mBoss, player, 0.1);
 					}
 				}
-				remaining.removeIf(p -> !playersInRange(mStart.getLocation(), detectionRange, true).contains(p));
+				remaining.removeIf(p -> !checkPlayers.contains(p));
 
 				//Psychological bell ringing
 				int bellCD = 4 * 20;
@@ -1692,7 +1693,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 					mCounter = 0;
-					timer.setVisible(false);
+					for (Player player : checkPlayers) {
+						player.hideBossBar(timer);
+					}
 				}
 			}
 

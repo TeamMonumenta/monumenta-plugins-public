@@ -12,19 +12,17 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -91,8 +89,7 @@ public class SpellFinalCrystal extends Spell {
 
 	private void holyChestModified() {
 		World world = mBoss.getWorld();
-		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-		bar.setVisible(true);
+		BossBar bar = BossBar.bossBar(Component.empty(), 1, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
 		//get all active crystals
 		for (Location l : mCrystalLoc) {
 			mCrystal.addAll(l.getNearbyEntitiesByType(EnderCrystal.class, 3));
@@ -126,11 +123,14 @@ public class SpellFinalCrystal extends Spell {
 						ScoreboardUtils.addEntityToTeam(e, "crystal");
 					}
 				}
+				List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 				//exit function
 				mCrystal.removeIf(en -> !en.isValid());
 				if (mCrystal.size() == 0 || Lich.bossDead()) {
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 4.0f, 0.5f);
-					bar.setVisible(false);
+					for (Player player : players) {
+						player.hideBossBar(bar);
+					}
 					this.cancel();
 				}
 				//warning 1
@@ -146,7 +146,9 @@ public class SpellFinalCrystal extends Spell {
 				//execute order 66
 				if (mT >= 20 * 6) {
 					attack();
-					bar.setVisible(false);
+					for (Player player : players) {
+						player.hideBossBar(bar);
+					}
 					if (!mRecast) {
 						mTriggered = true;
 					}
@@ -155,20 +157,19 @@ public class SpellFinalCrystal extends Spell {
 				mT++;
 				//boss bar stuff
 				int remain = mCrystal.size();
-				double progress = Math.min(remain * 1.0d / mCount, 1);
-				bar.setTitle(ChatColor.YELLOW + String.valueOf(remain) + " Death Crystals Remaining!");
-				bar.setProgress(progress);
+				float progress = Math.min(remain * 1.0f / mCount, 1);
+				bar.name(Component.text(remain + " Death Crystals Remaining!", NamedTextColor.YELLOW));
+				bar.progress(progress);
 				if (progress <= 0.34) {
-					bar.setColor(BarColor.RED);
+					bar.color(BossBar.Color.RED);
 				} else if (progress <= 0.67) {
-					bar.setColor(BarColor.YELLOW);
+					bar.color(BossBar.Color.YELLOW);
 				}
-				List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 				for (Player player : players) {
 					if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
-						bar.addPlayer(player);
+						player.showBossBar(bar);
 					} else {
-						bar.removePlayer(player);
+						player.hideBossBar(bar);
 					}
 				}
 			}

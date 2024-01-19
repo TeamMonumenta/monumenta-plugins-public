@@ -15,18 +15,15 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -132,9 +129,8 @@ public class SpellSoulShackle extends Spell {
 		AbilityUtils.silencePlayer(p, 5 * 20);
 		mRod.location(pLoc).spawnAsBoss();
 		world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 0.7f, 0.5f);
-		org.bukkit.boss.BossBar bar = Bukkit.getServer().createBossBar(ChatColor.RED + SPELL_NAME + " Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-		bar.setVisible(true);
-		bar.addPlayer(p);
+		BossBar bar = BossBar.bossBar(Component.text(SPELL_NAME + " Duration", NamedTextColor.RED), 1, BossBar.Color.RED, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
+		p.showBossBar(bar);
 
 		PPCircle indicator = new PPCircle(Particle.END_ROD, pLoc, 3).count(36);
 
@@ -148,8 +144,6 @@ public class SpellSoulShackle extends Spell {
 				mINC++;
 				if (SpellDimensionDoor.getShadowed().contains(p)) {
 					this.cancel();
-					bar.setVisible(false);
-					bar.removePlayer(p);
 					return;
 				}
 
@@ -187,36 +181,26 @@ public class SpellSoulShackle extends Spell {
 				}
 
 				//boss bar
-				double progress = 1.0d - mINC / (20.0d * 5.0d);
+				float progress = 1.0f - mINC / (20.0f * 5.0f);
 				if (progress > 0) {
-					bar.setProgress(progress);
+					bar.progress(progress);
 				}
 
 				// cancel
 				if (mINC >= 20 * 5 || p.isDead() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
-					bar.setVisible(false);
-					bar.removePlayer(p);
-					mGotHit.remove(p);
+					p.hideBossBar(bar);
 					this.cancel();
 				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				p.hideBossBar(bar);
 			}
 		};
 		run.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(run);
-
-		//do not put this in activerunnables or else the boss bar will linger when phase change
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				if (run.isCancelled()) {
-					bar.setVisible(false);
-					bar.removeAll();
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 5);
 	}
 
 	@Override

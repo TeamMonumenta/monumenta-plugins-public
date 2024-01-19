@@ -4,17 +4,15 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,42 +30,31 @@ public class TemporalFlux extends Effect {
 
 	public TemporalFlux(int duration) {
 		super(duration, effectID);
-		mBossBar = Bukkit.getServer().createBossBar(null, BarColor.BLUE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-		mBossBar.setTitle(ChatColor.BLUE + "Paradox expires in " + (duration / 20) + "seconds!");
-		mBossBar.setVisible(true);
+		mBossBar = BossBar.bossBar(Component.text("Paradox expires in " + (duration / 20) + "seconds!", NamedTextColor.BLUE), 1, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
 	}
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz) {
-			/*
-			if (entity instanceof Player player && getDuration() <= 10) {
-				if (player.getGameMode() == GameMode.SURVIVAL) {
-					player.setHealth(0);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 20, 100));
-				}
-			}
-			 */
 			entity.getWorld().playSound(entity.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_HIT, SoundCategory.HOSTILE, 30, 1);
 		}
 
 		if (fourHertz) {
-			double progress = ((double) getDuration() / (double) MAX_TIME);
-			mBossBar.setProgress(progress);
-			mBossBar.setTitle(ChatColor.BLUE + "Paradox expires in " + (getDuration() / 20) + " seconds!");
+			float progress = ((float) getDuration() / (float) MAX_TIME);
+			mBossBar.progress(progress);
+			mBossBar.name(Component.text("Paradox expires in " + (getDuration() / 20) + " seconds!", NamedTextColor.BLUE));
 			if (progress <= 0.01) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, Stasis.GENERIC_NAME);
 				DamageUtils.damage(null, (LivingEntity) entity, DamageEvent.DamageType.TRUE, 999999999, null, true, false, "Temporal Flux");
-				mBossBar.setVisible(false);
-				mBossBar.removeAll();
+				entity.hideBossBar(mBossBar);
 				return;
 			}
 			if (progress <= 0.25) {
-				mBossBar.setColor(BarColor.RED);
+				mBossBar.color(BossBar.Color.RED);
 			} else if (progress <= 0.5) {
-				mBossBar.setColor(BarColor.YELLOW);
+				mBossBar.color(BossBar.Color.YELLOW);
 			} else if (progress > 0.5) {
-				mBossBar.setColor(BarColor.BLUE);
+				mBossBar.color(BossBar.Color.BLUE);
 			}
 			if (getDuration() % (20 * 10) == 0) {
 				entity.sendMessage(ChatColor.RED + "Paradox has " + ChatColor.BOLD + getDuration() / 20 + ChatColor.RESET + ChatColor.RED + " seconds remaining!");
@@ -90,26 +77,30 @@ public class TemporalFlux extends Effect {
 	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Player player) {
+			Component message = Component.text("")
+				.append(Component.text(entity.getName(), NamedTextColor.BLUE, TextDecoration.BOLD))
+				.append(Component.text(" has been given the Paradox effect!", NamedTextColor.BLUE));
 			for (Player p : PlayerUtils.playersInRange(entity.getLocation(), 50, true)) {
-				p.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "" + entity.getName() + ChatColor.RESET + " " + ChatColor.BLUE + "has been given the Paradox effect!");
+				p.sendMessage(message);
 			}
-			player.sendMessage(ChatColor.RED + "You have been inflicted with Paradox! Quickly transfer " +
-					"it using the " + ChatColor.GOLD + "Temporal Exchanger" + ChatColor.WHITE + "!");
+			player.sendMessage(
+				Component.text("You have been inflicted with Paradox! Quickly transfer it using the ", NamedTextColor.RED)
+					.append(Component.text("Temporal Exchanger", NamedTextColor.GOLD))
+					.append(Component.text("!", NamedTextColor.WHITE))
+			);
 			player.playSound(entity.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 20, 1);
-			mBossBar.addPlayer((Player) entity);
+			player.showBossBar(mBossBar);
 		}
 	}
 
 	@Override
 	public void onDeath(EntityDeathEvent event) {
-		mBossBar.setVisible(false);
-		mBossBar.removeAll();
+		event.getEntity().hideBossBar(mBossBar);
 	}
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		mBossBar.setVisible(false);
-		mBossBar.removeAll();
+		entity.hideBossBar(mBossBar);
 		entity.sendMessage(Component.text("You are no longer inflicted with Paradox, you are safe for now.", NamedTextColor.GRAY));
 	}
 

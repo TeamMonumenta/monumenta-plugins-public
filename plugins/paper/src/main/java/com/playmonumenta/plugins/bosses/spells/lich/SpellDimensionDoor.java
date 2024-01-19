@@ -16,20 +16,20 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -38,9 +38,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -90,7 +87,7 @@ public class SpellDimensionDoor extends Spell {
 
 	public static List<Player> getShadowed() {
 		// Return to the caller a list of all the non-garbage-collected player entries
-		return mShadowed.stream().map((playerref) -> playerref.get()).filter(Objects::nonNull).collect(Collectors.toList());
+		return mShadowed.stream().map(Reference::get).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	public static void clearShadowed() {
@@ -373,10 +370,8 @@ public class SpellDimensionDoor extends Spell {
 		ScoreboardUtils.addEntityToTeam(spectre, "Hekawt");
 		((Creature) spectre).setTarget(p);
 
-		org.bukkit.boss.BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.PURPLE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-		bar.setTitle(ChatColor.YELLOW + "Soul dissipating in " + tick / 20 + " seconds!");
-		bar.setVisible(true);
-		bar.addPlayer(p);
+		BossBar bar = BossBar.bossBar(Component.text("Soul dissipating in " + tick / 20 + " seconds!", NamedTextColor.YELLOW), 1, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
+		p.showBossBar(bar);
 
 		new BukkitRunnable() {
 			int mT = tick;
@@ -386,17 +381,17 @@ public class SpellDimensionDoor extends Spell {
 			public void run() {
 				mT -= 2;
 				new PartialParticle(Particle.SPELL_WITCH, spectre.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
-				double progress = mT * 1.0d / tick;
+				float progress = mT * 1.0f / tick;
 				if (progress >= 0) {
-					bar.setProgress(progress);
+					bar.progress(progress);
 				}
 				if (progress <= 0.34) {
-					bar.setColor(BarColor.RED);
+					bar.color(BossBar.Color.RED);
 				} else if (progress <= 0.67) {
-					bar.setColor(BarColor.YELLOW);
+					bar.color(BossBar.Color.YELLOW);
 				}
 				if (mT % 20 == 0) {
-					bar.setTitle(ChatColor.YELLOW + "Soul dissipating in " + mT / 20 + " seconds!");
+					bar.name(Component.text("Soul dissipating in " + mT / 20 + " seconds!", NamedTextColor.YELLOW));
 				}
 				//kill player if time runs out. show that they are dying extremely quickly
 				if (mT <= 0) {
@@ -409,28 +404,25 @@ public class SpellDimensionDoor extends Spell {
 						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r2/lich/death_report");
 					}
 
-					bar.setVisible(false);
-					bar.removeAll();
+					p.hideBossBar(bar);
 					this.cancel();
 					Location leaveLoc = tLoc.clone().add(0, 1.5, 0);
 					mShadowed.removeIf((pref) -> pref.get() == p || pref.get() == null);
+					p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 					if (byPortal) {
-						p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 10));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 1));
 						p.sendMessage(Component.text("Something feels different. The shadows aren't clinging to me anymore.", NamedTextColor.AQUA));
 					} else {
-						p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
 						p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 					}
 				}
 				if (p.getLocation().getY() > Lich.getLichSpawn().getY() - 10 || !Lich.playersInRange(shadowLoc, 60, true).contains(p)) {
 					mShadowed.removeIf((pref) -> pref.get() == p || pref.get() == null);
-					bar.setVisible(false);
-					bar.removeAll();
+					p.hideBossBar(bar);
 					this.cancel();
 				}
 				if (p.getLastDamageCause() != null && p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION && !mTrigger) {
