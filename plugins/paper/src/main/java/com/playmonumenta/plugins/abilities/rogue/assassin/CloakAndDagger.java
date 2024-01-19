@@ -76,7 +76,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	public CloakAndDagger(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamageMultiplier = (isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE);
+		mDamageMultiplier = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER);
 		mMaxStacks = (isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS) + (int) CharmManager.getLevel(player, CHARM_STACKS);
 		mTracker = new KillTriggeredAbilityTracker(player, this, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CloakAndDaggerCS());
