@@ -104,6 +104,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	private SpellBlightedPods mPods;
 	//Defense scaling stuff
 	private int mPlayerCount;
+	private int mStartingPlayerCount;
 	private double mDefenseScaling;
 	private boolean mClose;
 	private static final double SCALING_X = 0.6;
@@ -181,6 +182,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		}
 		makeVisual();
 		mBoss.setVisibleByDefault(false);
+		mStartingPlayerCount = getPlayersInArena(false).size();
 		Bukkit.getScheduler().runTaskLater(plugin, this::startVisual, 10);
 
 		//bossbar and constructing
@@ -2409,7 +2411,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 							if (mClose) {
 								AdvancementUtils.grantAdvancement(player, "monumenta:challenges/r3/sirius/condition");
 							}
-							if (!mPods.mEvolved) {
+							if (!mPods.mEvolved && mStartingPlayerCount >= 10) {
 								AdvancementUtils.grantAdvancement(player, "monumenta:challenges/r3/sirius/blight");
 							}
 						}
