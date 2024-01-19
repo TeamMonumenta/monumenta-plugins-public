@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.cleric.paladin;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
-import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class HolyJavelinCS implements CosmeticSkill {
 
@@ -34,9 +35,27 @@ public class HolyJavelinCS implements CosmeticSkill {
 
 	public void javelinParticle(Player player, Location startLoc, Location endLoc, double size) {
 		Particle.DustOptions color = new Particle.DustOptions(Color.fromRGB(255, 255, 50), (float) size);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, startLoc.clone().add(startLoc.getDirection()), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(player);
-		new PPLine(Particle.EXPLOSION_NORMAL, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0).extra(0.025).spawnAsPlayerActive(player);
-		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(22).delta(0.25 * size).data(color).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.END_ROD, startLoc.clone().add(startLoc.getDirection()), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(player);
+
+		Vector dir = startLoc.getDirection().normalize();
+		Location pLoc = player.getEyeLocation();
+		pLoc.setPitch(pLoc.getPitch() + 90);
+		Vector pVec = new Vector(pLoc.getDirection().getX(), pLoc.getDirection().getY(), pLoc.getDirection().getZ());
+		pVec = pVec.normalize();
+
+		Location currLoc = startLoc.clone();
+		for (int i = 0; i < startLoc.distance(endLoc); i++) {
+			currLoc.add(dir);
+			new PartialParticle(Particle.REDSTONE, currLoc, 15, 0.23, 0.23, 0.23, 0, color).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, currLoc, 2, 0, 0, 0, 0.025).spawnAsPlayerActive(player);
+
+			if (i % 4 == 0) {
+				new PPCircle(Particle.REDSTONE, currLoc, size).data(color).count(15).extra(0.15)
+					.delta(pVec.getX(), pVec.getY(), pVec.getZ()).directionalMode(true).rotateDelta(true)
+					.axes(pVec, pVec.clone().crossProduct(startLoc.getDirection())).ringMode(true).spawnAsPlayerActive(player);
+			}
+		}
+
 	}
 
 	public void javelinSound(World world, Location loc) {
