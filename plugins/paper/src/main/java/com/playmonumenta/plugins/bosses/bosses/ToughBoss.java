@@ -8,8 +8,10 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class ToughBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tough";
@@ -43,11 +45,13 @@ public class ToughBoss extends BossAbilityGroup {
 	}
 
 	@Override
+	public void death(@Nullable EntityDeathEvent event) {
+		mBannerHolder.remove();
+	}
+
+	@Override
 	public void unload() {
 		super.unload();
-		mBannerHolder.remove();
 		EntityUtils.removeAttribute(mBoss, Attribute.GENERIC_MAX_HEALTH, "vengeance_modifier");
 	}
 }
-
-

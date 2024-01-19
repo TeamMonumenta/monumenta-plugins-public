@@ -41,6 +41,9 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		mTransferDamage = p.TRANSFER_DAMAGE;
+		// these bosses break when reloaded (won't be passengers to the correct boss)
+		EntityUtils.setRemoveEntityOnUnload(boss);
+		boss.setRemoveWhenFarAway(true);
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
@@ -95,4 +98,3 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 	}
 
 }
-

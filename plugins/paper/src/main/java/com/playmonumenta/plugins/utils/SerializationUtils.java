@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import de.tr7zw.nbtapi.NBT;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -40,78 +41,16 @@ public class SerializationUtils {
 	}
 
 
-	public static void storeDataOnEntity(LivingEntity entity, String data) throws Exception {
-		boolean placeholderItem = false;
-
-		EntityEquipment equip = entity.getEquipment();
-		if (equip == null) {
-			throw new Exception("Boss equipment is null!");
-		}
-
-		ItemStack item = equip.getItemInOffHand();
-		if (item == null || item.getType() == Material.AIR) {
-			item = new ItemStack(Material.MUSIC_DISC_13);
-			placeholderItem = true;
-		}
-
-		ItemMeta meta = item.getItemMeta();
-		if (meta == null) {
-			throw new Exception("Boss item meta is null!");
-		}
-
-		if (placeholderItem) {
-			meta.setDisplayName(SERIALCONST);
-		}
-
-		List<String> addLore = serializeStringToLore(data);
-		List<String> currentLore = meta.getLore();
-		if (currentLore != null) {
-			/* Remove existing serialization data, if any */
-			currentLore.removeIf(lore -> lore.startsWith(SERIALCONST));
-
-			currentLore.addAll(addLore);
-			meta.setLore(currentLore);
-		} else {
-			meta.setLore(addLore);
-		}
-
-		item.setItemMeta(meta);
-		ItemUtils.setPlainTag(item);
-		equip.setItemInOffHand(item);
+	public static void storeDataOnEntity(LivingEntity entity, String identityTag, String data) throws Exception {
+		NBT.modifyPersistentData(entity, nbt -> {
+			nbt.setString("monumenta:" + identityTag, data);
+		});
 	}
 
-	public static String retrieveDataFromEntity(LivingEntity entity) {
-		EntityEquipment equip = entity.getEquipment();
-		if (equip == null) {
-			return "";
-		}
-
-		ItemStack item = equip.getItemInOffHand();
-		if (item == null || item.getType() == Material.AIR || !item.hasItemMeta()) {
-			return "";
-		}
-
-		ItemMeta meta = item.getItemMeta();
-		if (meta == null || !meta.hasLore()) {
-			return "";
-		}
-
-		List<String> currentLore = meta.getLore();
-		if (currentLore == null) {
-			return "";
-		}
-
-		String data = deserializeStringFromLore(currentLore);
-
-		/* Don't leave any serialization data on the entity */
-		currentLore.removeIf(lore -> lore.startsWith(SERIALCONST));
-
-		/* If this item's only purpose for existing was to hold data, remove it */
-		if (meta.hasDisplayName() && meta.getDisplayName().equals(SERIALCONST)) {
-			equip.setItemInOffHand(null);
-		}
-
-		return data;
+	public static String retrieveDataFromEntity(LivingEntity entity, String identityTag) {
+		return NBT.getPersistentData(entity, nbt -> {
+			return nbt.getString("monumenta:" + identityTag);
+		});
 	}
 
 	public static void stripSerializationDataFromDrops(EntityDeathEvent event) {
@@ -142,7 +81,7 @@ public class SerializationUtils {
 
 	public static @Nullable BossAbilityGroup statefulBossDeserializer(LivingEntity boss, String identityTag,
 	                                                                  BossConstructor constructor) throws Exception {
-		String content = SerializationUtils.retrieveDataFromEntity(boss);
+		String content = SerializationUtils.retrieveDataFromEntity(boss, identityTag);
 
 		if (content == null || content.isEmpty()) {
 			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");

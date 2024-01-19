@@ -440,14 +440,18 @@ public class BossManager implements Listener {
 		}
 	}
 
+	// We want to delay this event by one tick at most: since making world modifications inside this event throws a massive error
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
-		Entity entity = event.getEntity();
-		if (entity instanceof LivingEntity living) {
-			processEntity(living);
-		}
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			Entity entity = event.getEntity();
+			if (entity instanceof LivingEntity living) {
+				processEntity(living);
+			}
+		});
 	}
 
+	// This event cannot be delayed at all, otherwise the chunk will get reloaded
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		Entity entity = event.getEntity();
@@ -1020,6 +1024,8 @@ public class BossManager implements Listener {
 	public void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) {
 		/* Set up boss health / armor / etc */
 		ability.init();
+		/* Save ability data to boss */
+		ability.saveData();
 
 		checkEnablePerformanceEvents(ability);
 

@@ -115,6 +115,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				mHologram.setGravity(false);
 				mHologram.setBasePlate(false);
 				mHologram.setCollidable(false);
+				mHologram.setRemoveWhenFarAway(true);
 				EntityUtils.setRemoveEntityOnUnload(mHologram);
 			}
 
@@ -212,10 +213,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	@Override
 	public void unload() {
 		super.unload();
-		if (mHologram != null) {
-			mHologram.remove();
-			mHologram = null;
-		}
+		mHologram = null;
 		mDPSCounter = -1;
 		mDPSCounter10s = -1;
 		mDPSDisp = -1;

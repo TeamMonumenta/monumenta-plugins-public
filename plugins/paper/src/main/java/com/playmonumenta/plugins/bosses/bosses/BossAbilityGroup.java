@@ -431,6 +431,17 @@ public abstract class BossAbilityGroup {
 		return null;
 	}
 
+	public void saveData() {
+		String content = serialize();
+		if (content != null && !content.isEmpty()) {
+			try {
+				SerializationUtils.storeDataOnEntity(mBoss, mIdentityTag, content);
+			} catch (Exception ex) {
+				MMLog.severe("Failed to save data to entity: ", ex);
+			}
+		}
+	}
+
 	/*
 	 * Called when the chunk the boss is in unloads. Also called after death()
 	 *
@@ -456,15 +467,9 @@ public abstract class BossAbilityGroup {
 				mBossBar.remove();
 			}
 
-			if (mBoss.isValid() && mBoss.getHealth() > 0) {
-				String content = serialize();
-				if (content != null && !content.isEmpty()) {
-					try {
-						SerializationUtils.storeDataOnEntity(mBoss, content);
-					} catch (Exception ex) {
-						MMLog.severe("Failed to save data to entity: ", ex);
-					}
-				}
+			// In a future minecraft version, NBT saving when the entity is unloading and invalid may not work properly
+			if (mBoss.getHealth() > 0) {
+				saveData();
 			}
 		}
 	}
