@@ -125,13 +125,15 @@ public class CharmFactory {
 		ItemStack item = new ItemStack(Material.STONE);
 		if (oldItem != null) {
 			item.setType(oldItem.getType());
-			NBT.modify(item, nbt -> {
-				ReadableNBT infusions = NBT.get(oldItem, rnbt -> {
-					return ItemStatUtils.getInfusions(rnbt);
-				});
-				ReadWriteNBT newInfusions = ItemStatUtils.addPlayerModified(nbt).getOrCreateCompound(InfusionType.KEY);
-				newInfusions.mergeCompound(infusions);
+			ReadableNBT infusions = NBT.get(oldItem, rnbt -> {
+				return ItemStatUtils.getInfusions(rnbt);
 			});
+			if (infusions != null) {
+				NBT.modify(item, nbt -> {
+					ReadWriteNBT newInfusions = ItemStatUtils.addPlayerModified(nbt).getOrCreateCompound(InfusionType.KEY);
+					newInfusions.mergeCompound(infusions);
+				});
+			}
 		}
 
 		// Add seed

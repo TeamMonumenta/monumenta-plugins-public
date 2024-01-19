@@ -80,7 +80,7 @@ public class LootChestsInInventory implements Listener {
 		if (item.isSimilar(event.getCursor())) {
 			return;
 		}
-		if (ItemUtils.isNullOrAir(event.getCursor())) {
+		if (!ItemUtils.isNullOrAir(event.getCursor())) {
 			player.sendMessage(Component.text("You must have an empty cursor to open loot chests!", NamedTextColor.DARK_RED));
 			event.setCancelled(true);
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
