@@ -146,6 +146,10 @@ public class MessagingUtils {
 		return GSON_SERIALIZER.serialize(component);
 	}
 
+	public static String legacyFromComponent(Component component) {
+		return LEGACY_SERIALIZER.serialize(component);
+	}
+
 	public static Component addGradient(String s, String... hex) {
 		StringBuilder hexes = new StringBuilder();
 		for (String h : hex) {

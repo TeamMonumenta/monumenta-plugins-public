@@ -17,8 +17,10 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 import org.bukkit.Bukkit;
@@ -95,28 +97,28 @@ public class ClientModHandler {
 		}
 
 		ClassUpdatePacket.ClientModAbilityInfo[] abilities =
-			INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
-				.filter(ability -> ClientModHandler.shouldHandleAbility(player, ability))
-				.map(ability -> {
-					ClassAbility classAbility = ability.getInfo().getLinkedSpell();
-					int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
-					int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
-					int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
+				INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
+						.filter(ability -> ClientModHandler.shouldHandleAbility(player, ability))
+						.map(ability -> {
+							ClassAbility classAbility = ability.getInfo().getLinkedSpell();
+							int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
+							int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
+							int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 
-					ClassUpdatePacket.ClientModAbilityInfo info = new ClassUpdatePacket.ClientModAbilityInfo();
-					info.name = getAbilityName(ability);
-					info.className = getAbilityClassName(ability);
-					info.remainingCooldown = remainingCooldown;
-					info.initialCooldown = ability.getInfo().getModifiedCooldown(player, ability.getAbilityScore());
-					info.remainingCharges = charges;
-					info.maxCharges = maxCharges;
-					info.mode = ability.getMode();
-					info.initialDuration = ability.getInitialDuration();
-					info.remainingDuration = ability.getRemainingDuration();
-					return info;
-				})
-				.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
-				.toArray(ClassUpdatePacket.ClientModAbilityInfo[]::new);
+							ClassUpdatePacket.ClientModAbilityInfo info = new ClassUpdatePacket.ClientModAbilityInfo();
+							info.name = getAbilityName(ability);
+							info.className = getAbilityClassName(ability);
+							info.remainingCooldown = remainingCooldown;
+							info.initialCooldown = ability.getInfo().getModifiedCooldown(player, ability.getAbilityScore());
+							info.remainingCharges = charges;
+							info.maxCharges = maxCharges;
+							info.mode = ability.getMode();
+							info.initialDuration = ability.getInitialDuration();
+							info.remainingDuration = ability.getRemainingDuration();
+							return info;
+						})
+						.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
+						.toArray(ClassUpdatePacket.ClientModAbilityInfo[]::new);
 
 		ClassUpdatePacket packet = new ClassUpdatePacket();
 		packet.abilities = abilities;
@@ -125,19 +127,19 @@ public class ClientModHandler {
 
 	public static void updateEffects(Entity entity) {
 		if (INSTANCE == null
-			|| !(entity instanceof Player player)
-			|| !playerHasClientMod(player)) {
+				|| !(entity instanceof Player player)
+				|| !playerHasClientMod(player)) {
 			return;
 		}
 		EffectInfo[] effectsList = INSTANCE.mPlugin.mEffectManager.getPriorityEffects(player).entrySet().stream()
-			.filter(effect -> effect != null && effect.getValue().doesDisplay() && effect.getValue().getDisplayWithoutTime() != null)
-			.map(effect -> {
-				EffectInfo info = new EffectInfo();
-				mapEffectToEffectInfo(effect.getValue(), info, effect.getKey(), false);
-				return info;
-			})
-			.sorted((effect1, effect2) -> effect2.displayPriority - effect1.displayPriority)
-			.toArray(EffectInfo[]::new);
+				.filter(effect -> effect != null && effect.getValue().doesDisplay() && effect.getValue().getDisplayedName() != null)
+				.map(effect -> {
+					EffectInfo info = new EffectInfo();
+					mapEffectToEffectInfo(effect.getValue(), info, effect.getKey(), false);
+					return info;
+				})
+				.sorted((effect1, effect2) -> effect2.displayPriority - effect1.displayPriority)
+				.toArray(EffectInfo[]::new);
 
 		MassEffectUpdatePacket packet = new MassEffectUpdatePacket();
 		packet.effects = effectsList;
@@ -146,11 +148,11 @@ public class ClientModHandler {
 
 	public static void updateEffect(Entity entity, Effect effect, String source, boolean remove) {
 		if (INSTANCE == null
-			|| !(entity instanceof Player player)
-			|| !playerHasClientMod(player)
-			|| effect == null
-			|| !effect.doesDisplay()
-			|| effect.getDisplayWithoutTime() == null) {
+				|| !(entity instanceof Player player)
+				|| !playerHasClientMod(player)
+				|| effect == null
+				|| !effect.doesDisplay()
+				|| effect.getDisplayedName() == null) {
 			return;
 		}
 		EffectInfo info = new EffectInfo();
@@ -163,9 +165,14 @@ public class ClientModHandler {
 	public static void mapEffectToEffectInfo(Effect effect, EffectInfo info, String source, boolean remove) {
 		info.UUID = UUID.nameUUIDFromBytes(source.getBytes(StandardCharsets.UTF_8)).toString();
 		info.duration = remove ? 0 : effect.getDuration();
-		info.name = effect.getDisplayWithoutTime() != null ? effect.getDisplayWithoutTime() : "";
-		info.percentage = effect.getDisplay() != null && effect.getDisplay().contains("%");
-		info.power = (int) effect.getMagnitude();
+		info.name = effect.getDisplayedName() != null ? effect.getDisplayedName() : "";
+		info.percentage = effect.getDisplay() != null && MessagingUtils.plainText(effect.getDisplay()).contains("%");
+		if (effect.getSpecificDisplay() != null && Objects.equals(MessagingUtils.plainText(effect.getSpecificDisplay()), info.name)) {
+			info.power = 0;
+		} else {
+			info.power = (info.percentage ? effect.getMagnitude() * 100 : effect.getMagnitude());
+		}
+		info.positive = effect.isBuff() && effect.getMagnitude() >= 0;
 		info.displayPriority = effect.getDisplayPriority();
 	}
 
@@ -197,8 +204,8 @@ public class ClientModHandler {
 	 */
 	private static boolean shouldHandleAbility(Player player, Ability ability) {
 		return ability != null
-			       && (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
-				           || ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
+				&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
+				|| ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
 	}
 
 	private static @Nullable String getAbilityName(Ability ability) {
@@ -225,8 +232,8 @@ public class ClientModHandler {
 		for (PlayerClass playerClass : INSTANCE.mClasses.mClasses) {
 			Predicate<AbilityInfo<?>> sameClass = abi -> abi.getAbilityClass() == ability.getClass();
 			if (playerClass.mAbilities.stream().anyMatch(sameClass)
-				|| playerClass.mSpecOne.mAbilities.stream().anyMatch(sameClass)
-				|| playerClass.mSpecTwo.mAbilities.stream().anyMatch(sameClass)) {
+					|| playerClass.mSpecOne.mAbilities.stream().anyMatch(sameClass)
+					|| playerClass.mSpecTwo.mAbilities.stream().anyMatch(sameClass)) {
 				return playerClass.mClassName;
 			}
 		}

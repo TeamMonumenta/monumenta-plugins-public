@@ -70,16 +70,21 @@ public class TemporalFlux extends Effect {
 				mBossBar.setColor(BarColor.BLUE);
 			}
 			if (getDuration() % (20 * 10) == 0) {
-				entity.sendMessage(ChatColor.RED + "Paradox has " + ChatColor.BOLD + getDuration()/20 + ChatColor.RESET + ChatColor.RED + " seconds remaining!");
+				entity.sendMessage(ChatColor.RED + "Paradox has " + ChatColor.BOLD + getDuration() / 20 + ChatColor.RESET + ChatColor.RED + " seconds remaining!");
 			}
 			new PPCircle(Particle.SOUL_FIRE_FLAME, entity.getLocation(), 1)
-				.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
+					.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
 		}
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return ChatColor.RED + "Paradox \u2620";
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text(getDisplayedName() + " \u2620", NamedTextColor.RED);
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Paradox";
 	}
 
 	@Override
@@ -89,7 +94,7 @@ public class TemporalFlux extends Effect {
 				p.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "" + entity.getName() + ChatColor.RESET + " " + ChatColor.BLUE + "has been given the Paradox effect!");
 			}
 			player.sendMessage(ChatColor.RED + "You have been inflicted with Paradox! Quickly transfer " +
-				"it using the " + ChatColor.GOLD + "Temporal Exchanger" + ChatColor.WHITE + "!");
+					"it using the " + ChatColor.GOLD + "Temporal Exchanger" + ChatColor.WHITE + "!");
 			player.playSound(entity.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 20, 1);
 			mBossBar.addPlayer((Player) entity);
 		}

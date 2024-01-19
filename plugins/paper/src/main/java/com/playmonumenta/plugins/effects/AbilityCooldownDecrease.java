@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class AbilityCooldownDecrease extends SingleArgumentEffect {
@@ -14,8 +15,13 @@ public class AbilityCooldownDecrease extends SingleArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Ability Cooldown Decrease";
+	public @Nullable Component getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(" " + getDisplayedName()));
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Ability Cooldown Decrease";
 	}
 
 	@Override

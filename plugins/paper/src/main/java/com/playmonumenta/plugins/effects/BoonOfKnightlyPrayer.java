@@ -47,7 +47,7 @@ public class BoonOfKnightlyPrayer extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Boon of Knightly Prayer";
 	}
 

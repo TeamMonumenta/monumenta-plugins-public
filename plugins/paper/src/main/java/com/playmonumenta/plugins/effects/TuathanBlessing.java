@@ -46,7 +46,7 @@ public class TuathanBlessing extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Tuathan Blessing";
 	}
 

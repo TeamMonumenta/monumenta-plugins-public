@@ -68,7 +68,7 @@ public class SkySeekersGrace extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Sky Seeker's Grace";
 	}
 }

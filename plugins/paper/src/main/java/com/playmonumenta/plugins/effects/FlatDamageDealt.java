@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,8 +88,13 @@ public class FlatDamageDealt extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return "+" + StringUtils.to2DP(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + " Flat Damage Dealt";
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text("+" + StringUtils.to2DP(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName());
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Flat Damage Dealt";
 	}
 
 	@Override

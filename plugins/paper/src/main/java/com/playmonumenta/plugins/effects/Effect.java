@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.utils.StringUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -191,27 +192,40 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	}
 
 	//Display used by tab list; return null to not display
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable Component getSpecificDisplay() {
+		String displayedName = getDisplayedName();
+		if (displayedName != null) {
+			return Component.text(getDisplayedName());
+		}
+		return null;
+	}
+
+	//Display generally used in getSpecificDisplay and in custom effect packets; return null to not display;
+	public @Nullable String getDisplayedName() {
 		return null;
 	}
 
 	@Override
-	public @Nullable String getDisplay() {
+	public @Nullable Component getDisplay() {
 		if (mDisplay) {
-			String displayWithoutTime = getDisplayWithoutTime();
+			Component displayWithoutTime = getDisplayWithoutTime();
 			if (displayWithoutTime != null) {
-				return displayWithoutTime + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
+				Component display = displayWithoutTime;
+				if (mDisplayTime) {
+					display = display.append(Component.text(" " + StringUtils.intToMinuteAndSeconds(mDuration / 20), NamedTextColor.GRAY));
+				}
+				return display;
 			}
 		}
 		return null;
 	}
 
 	@Override
-	public @Nullable String getDisplayWithoutTime() {
+	public @Nullable Component getDisplayWithoutTime() {
 		if (mDisplay) {
-			String specificDisplay = getSpecificDisplay();
+			Component specificDisplay = getSpecificDisplay();
 			if (specificDisplay != null) {
-				return ChatColor.GREEN + specificDisplay;
+				return specificDisplay.colorIfAbsent(NamedTextColor.GREEN);
 			}
 		}
 		return null;

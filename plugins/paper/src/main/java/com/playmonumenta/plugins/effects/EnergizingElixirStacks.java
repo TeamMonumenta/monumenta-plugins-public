@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class EnergizingElixirStacks extends SingleArgumentEffect {
@@ -26,8 +26,13 @@ public class EnergizingElixirStacks extends SingleArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return ChatColor.GREEN + "" + (int) mAmount + " Energizing Elixir Stacks";
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text((int) mAmount + " " + getDisplayedName());
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Energizing Elixir Stacks";
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 // Over the duration, increases food and saturation values of player every 1 second.
 public class WarmthEffect extends Effect {
@@ -56,7 +57,7 @@ public class WarmthEffect extends Effect {
 	}
 
 	@Override
-	public String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Intoxicating Warmth";
 	}
 

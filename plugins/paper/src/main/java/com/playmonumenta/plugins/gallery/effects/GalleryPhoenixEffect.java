@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -39,13 +40,13 @@ public class GalleryPhoenixEffect extends GalleryEffect {
 	}
 
 	@Override
-	public String getDisplay() {
+	public Component getDisplay() {
 		return getDisplayWithoutTime();
 	}
 
 	@Override
-	public String getDisplayWithoutTime() {
-		return ChatColor.GOLD + mType.getRealName();
+	public Component getDisplayWithoutTime() {
+		return Component.text(mType.getRealName(), NamedTextColor.GOLD);
 	}
 
 	@Override

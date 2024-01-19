@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +34,13 @@ public class PercentExperience extends SingleArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Experience Gain";
+	public @Nullable Component getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(" " + getDisplayedName()));
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Experience Gain";
 	}
 
 	@Override

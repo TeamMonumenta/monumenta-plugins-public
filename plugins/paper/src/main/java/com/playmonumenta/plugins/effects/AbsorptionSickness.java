@@ -3,7 +3,8 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
 public class AbsorptionSickness extends Effect {
@@ -54,8 +55,13 @@ public class AbsorptionSickness extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return ChatColor.RED + StringUtils.to2DP(mAmount * 100) + "% Absorption Sickness";
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text(StringUtils.to2DP(mAmount * 100) + "% " + getDisplayedName(), NamedTextColor.RED);
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Absorption Sickness";
 	}
 
 	@Override

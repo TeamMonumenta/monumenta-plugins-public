@@ -138,7 +138,12 @@ public class RespawnStasis extends Stasis {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable Component getSpecificDisplay() {
+		return null;
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
 		return null;
 	}
 

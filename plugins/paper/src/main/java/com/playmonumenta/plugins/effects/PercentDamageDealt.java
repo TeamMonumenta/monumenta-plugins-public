@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,8 +94,13 @@ public class PercentDamageDealt extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + " Damage Dealt";
+	public @Nullable Component getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Damage Dealt";
 	}
 
 	@Override

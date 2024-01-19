@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -53,7 +52,7 @@ public class AbilitySilence extends ZeroArgumentEffect {
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player player) {
 			Bukkit.getScheduler().runTask(Plugin.getInstance(),
-				() -> AbilityManager.getManager().updateSilence(player, false));
+					() -> AbilityManager.getManager().updateSilence(player, false));
 			ClientModHandler.silenced(player, 0);
 		}
 	}
@@ -78,8 +77,17 @@ public class AbilitySilence extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return ChatColor.RED + "Silence";
+	public @Nullable Component getSpecificDisplay() {
+		String displayedName = getDisplayedName();
+		if (displayedName == null) {
+			return null;
+		}
+		return Component.text(displayedName, NamedTextColor.RED);
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Silence";
 	}
 
 	@Override

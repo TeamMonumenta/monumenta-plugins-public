@@ -41,7 +41,7 @@ public class SilverPrayer extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Boon of Silver Prayer";
 	}
 

@@ -993,7 +993,7 @@ public class GalleryGame {
 				moderator.sendMessage(Component.text("Should teleport to spawn when joining:  " + player.getShouldTeleportWhenJoining(), NamedTextColor.GRAY));
 				moderator.sendMessage(Component.text("Effects:  ", NamedTextColor.GRAY));
 				for (GalleryEffect effect : player.getAllEffects()) {
-					moderator.sendMessage(Component.text(effect.getDisplay() != null ? effect.getDisplay() : "Null display ???? " + effect.getType().name(), NamedTextColor.GRAY));
+					moderator.sendMessage(effect.getDisplay() != null ? effect.getDisplay() : Component.text("Null display ???? " + effect.getType().name()));
 				}
 				moderator.sendMessage(Component.text("-------------------------------", NamedTextColor.GRAY));
 			}

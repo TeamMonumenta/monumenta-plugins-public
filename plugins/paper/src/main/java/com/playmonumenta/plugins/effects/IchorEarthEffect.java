@@ -16,24 +16,24 @@ public class IchorEarthEffect extends Effect {
 	private static final String SOURCE_RESISTANCE = "IchorEarthResistance";
 	private static final String SOURCE_DAMAGE = "IchorEarthDamage";
 	private static final EnumSet<DamageType> VALID_HIT_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.PROJECTILE,
-		DamageType.FIRE,
-		DamageType.BLAST,
-		DamageType.MAGIC
+			DamageType.MELEE,
+			DamageType.PROJECTILE,
+			DamageType.FIRE,
+			DamageType.BLAST,
+			DamageType.MAGIC
 	);
 	private static final EnumSet<DamageType> ALL_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_ENCH,
-		DamageType.MELEE_SKILL,
-		DamageType.PROJECTILE,
-		DamageType.PROJECTILE_SKILL,
-		DamageType.MAGIC
+			DamageType.MELEE,
+			DamageType.MELEE_ENCH,
+			DamageType.MELEE_SKILL,
+			DamageType.PROJECTILE,
+			DamageType.PROJECTILE_SKILL,
+			DamageType.MAGIC
 	);
 	private static final EnumSet<DamageType> MELEE_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_ENCH,
-		DamageType.MELEE_SKILL
+			DamageType.MELEE,
+			DamageType.MELEE_ENCH,
+			DamageType.MELEE_SKILL
 	);
 
 	private boolean mWasHit = false;
@@ -84,7 +84,7 @@ public class IchorEarthEffect extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return IchorListener.ITEM_NAME + " - Earthbound";
 	}
 }

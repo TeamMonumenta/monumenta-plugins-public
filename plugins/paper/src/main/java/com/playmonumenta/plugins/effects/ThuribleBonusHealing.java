@@ -15,7 +15,7 @@ public class ThuribleBonusHealing extends SingleArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Thurible Healing";
 	}
 }

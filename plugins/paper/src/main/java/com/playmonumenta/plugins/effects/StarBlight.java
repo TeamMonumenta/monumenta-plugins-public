@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class StarBlight extends FlatHealthBoost {
@@ -9,9 +9,13 @@ public class StarBlight extends FlatHealthBoost {
 		super(duration, amount, modifierName);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return ChatColor.RED + "Blight Infection Level (" + mAmount + " Max Health)";
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text(getDisplayedName() + " (" + mAmount + " Max Health)");
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Blight Infection Level";
 	}
 }

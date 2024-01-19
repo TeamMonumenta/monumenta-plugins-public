@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.Set;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,13 +14,13 @@ public class BrownPolarityDisplay {
 	public static final String NEGATIVE_TAG = "brown_negative";
 
 	public enum Polarity implements DisplayableEffect {
-		POSITIVE(ChatColor.RED + "Magnetic Polarity: Positive", POSITIVE_TAG),
-		NEGATIVE(ChatColor.BLUE + "Magnetic Polarity: Negative", NEGATIVE_TAG);
+		POSITIVE(Component.text("Magnetic Polarity: Positive", NamedTextColor.RED), POSITIVE_TAG),
+		NEGATIVE(Component.text("Magnetic Polarity: Negative", NamedTextColor.BLUE), NEGATIVE_TAG);
 
-		public final String mDisplay;
+		public final Component mDisplay;
 		public final String mTag;
 
-		Polarity(String display, String tag) {
+		Polarity(Component display, String tag) {
 			mDisplay = display;
 			mTag = tag;
 		}
@@ -30,12 +31,12 @@ public class BrownPolarityDisplay {
 		}
 
 		@Override
-		public String getDisplay() {
+		public @Nullable Component getDisplay() {
 			return mDisplay;
 		}
 
 		@Override
-		public String getDisplayWithoutTime() {
+		public @Nullable Component getDisplayWithoutTime() {
 			return mDisplay;
 		}
 	}

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -90,9 +91,14 @@ public class CustomRegeneration extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text("+" + StringUtils.to2DP(mAmount) + " " + getDisplayedName());
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
 		String time = mInterval == 20 ? "Second" : StringUtils.ticksToSeconds(mInterval) + " Seconds";
-		return "+" + StringUtils.to2DP(mAmount) + " Regeneration Per " + time;
+		return "Regeneration Per " + time;
 	}
 
 	@Override

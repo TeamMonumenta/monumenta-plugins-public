@@ -53,7 +53,7 @@ public class StarCommunion extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Star Communion";
 	}
 

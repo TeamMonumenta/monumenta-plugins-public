@@ -52,7 +52,7 @@ public class BoonOfThePit extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Boon of the Pit";
 	}
 

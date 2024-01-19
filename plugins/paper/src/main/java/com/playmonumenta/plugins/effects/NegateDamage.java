@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -106,11 +107,16 @@ public class NegateDamage extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable Component getSpecificDisplay() {
 		if (mCount <= 0) {
 			return null;
 		}
-		return "+" + mCount + StringUtils.getDamageTypeString(mAffectedTypes) + " Damage Blocked";
+		return Component.text("+" + mCount + StringUtils.getDamageTypeString(mAffectedTypes) + " " + getDisplayedName());
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Damage Blocked";
 	}
 
 	@Override

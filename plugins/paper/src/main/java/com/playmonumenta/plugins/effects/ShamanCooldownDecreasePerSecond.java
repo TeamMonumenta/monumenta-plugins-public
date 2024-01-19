@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -66,8 +67,13 @@ public class ShamanCooldownDecreasePerSecond extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mPercent) + " Cooldown Reduction Per Second";
+	public @Nullable Component getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mPercent).append(Component.text(" " + getDisplayedName()));
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Cooldown Reduction Per Second";
 	}
 
 	@Override

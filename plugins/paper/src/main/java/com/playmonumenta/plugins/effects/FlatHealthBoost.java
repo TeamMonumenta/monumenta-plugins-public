@@ -3,7 +3,8 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
@@ -80,14 +81,18 @@ public class FlatHealthBoost extends Effect {
 		return new FlatHealthBoost(duration, amount, modName);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable Component getSpecificDisplay() {
 		if (mAmount < 0) {
-			return ChatColor.RED + "" + mAmount + " Max Health";
+			return Component.text(mAmount + " " + getDisplayedName(), NamedTextColor.RED);
 		} else {
-			return ChatColor.GREEN + "+" + mAmount + " Max Health";
+			return Component.text("+" + mAmount + " " + getDisplayedName(), NamedTextColor.GREEN);
 		}
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Max Health";
 	}
 
 	@Override

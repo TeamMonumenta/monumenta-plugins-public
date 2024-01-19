@@ -125,7 +125,7 @@ public class VoodooBondsReaper extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Voodoo Bonds";
 	}
 

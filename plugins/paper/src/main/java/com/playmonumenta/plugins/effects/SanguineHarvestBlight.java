@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,8 +40,13 @@ public class SanguineHarvestBlight extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(-mAmount) + " Resistance Per Debuff";
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text(StringUtils.doubleToColoredAndSignedPercentage(-mAmount) + " " + getDisplayedName());
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Resistance Per Debuff";
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class GiftOfTheStars extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Gift of the Stars";
 	}
 }

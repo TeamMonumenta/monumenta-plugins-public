@@ -131,7 +131,7 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		DarkCombos.playSounds(player.getWorld(), player.getLocation());
 		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsEntityActive(player);
 		PotionUtils.applyPotion(player, enemy,
-			new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 0, true, false));
+				new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 0, true, false));
 	}
 
 	public static DeepGodsEndowment deserialize(JsonObject object, Plugin plugin) {
@@ -146,7 +146,7 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Deep God's Endowment";
 	}
 

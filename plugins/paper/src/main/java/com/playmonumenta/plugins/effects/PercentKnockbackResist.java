@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -72,8 +73,13 @@ public class PercentKnockbackResist extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return StringUtils.to2DP(mAmount * 10) + " Knockback Resistance";
+	public @Nullable Component getSpecificDisplay() {
+		return Component.text(StringUtils.to2DP(mAmount * 10) + " " + getDisplayedName());
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Knockback Resistance";
 	}
 
 	@Override

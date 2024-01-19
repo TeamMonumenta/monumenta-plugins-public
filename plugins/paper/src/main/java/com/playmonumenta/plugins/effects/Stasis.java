@@ -70,7 +70,7 @@ public class Stasis extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Stasis";
 	}
 

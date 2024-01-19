@@ -4,7 +4,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import java.text.DecimalFormat;
 import java.util.EnumSet;
 import java.util.TreeMap;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.attribute.Attribute;
 import org.jetbrains.annotations.Nullable;
 
@@ -169,12 +170,12 @@ public class StringUtils {
 		return new DecimalFormat("#.##").format(value);
 	}
 
-	public static String doubleToColoredAndSignedPercentage(double d) {
+	public static Component doubleToColoredAndSignedPercentage(double d) {
 		String percent = multiplierToPercentage(d);
 		if (d < 0) {
-			return ChatColor.RED + percent + "%";
+			return Component.text(percent + "%", NamedTextColor.RED);
 		} else {
-			return ChatColor.GREEN + "+" + percent + "%";
+			return Component.text("+" + percent + "%", NamedTextColor.GREEN);
 		}
 	}
 

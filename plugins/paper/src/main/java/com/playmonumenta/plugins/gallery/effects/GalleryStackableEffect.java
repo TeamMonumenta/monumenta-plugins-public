@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.gallery.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,16 +17,17 @@ public abstract class GalleryStackableEffect extends GalleryEffect {
 	}
 
 	@Override
-	public String getDisplay() {
+	public Component getDisplay() {
 		return getDisplayWithoutTime();
 	}
 
 	@Override
-	public String getDisplayWithoutTime() {
-		return ChatColor.GOLD + mType.getRealName() + " " + StringUtils.toRoman(mStacks);
+	public Component getDisplayWithoutTime() {
+		return Component.text(mType.getRealName() + " " + StringUtils.toRoman(mStacks), NamedTextColor.GOLD);
 	}
 
-	@Override public void playerGainEffect(GalleryPlayer player) {
+	@Override
+	public void playerGainEffect(GalleryPlayer player) {
 		GalleryStackableEffect effect = (GalleryStackableEffect) player.getEffectOfType(mType);
 		if (effect != null) {
 			player.removeEffect(effect);

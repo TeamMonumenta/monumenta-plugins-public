@@ -14,7 +14,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class CrystallineBlessing extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "CrystallineBlessing";
@@ -24,12 +23,12 @@ public class CrystallineBlessing extends ZeroArgumentEffect {
 	private static final double DAMAGE_PERCENT = 0.15;
 	private static final String ATTR_NAME = "CrystallineBlessing";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_ENCH,
-		DamageType.MELEE_SKILL,
-		DamageType.PROJECTILE,
-		DamageType.PROJECTILE_SKILL,
-		DamageType.MAGIC
+			DamageType.MELEE,
+			DamageType.MELEE_ENCH,
+			DamageType.MELEE_SKILL,
+			DamageType.PROJECTILE,
+			DamageType.PROJECTILE_SKILL,
+			DamageType.MAGIC
 	);
 
 	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(131, 63, 171), 1.0f);
@@ -51,11 +50,6 @@ public class CrystallineBlessing extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return "Crystalline Blessing";
-	}
-
-	@Override
 	public String toString() {
 		return String.format("CrystallineBlessing duration:%d", this.getDuration());
 	}
@@ -65,20 +59,20 @@ public class CrystallineBlessing extends ZeroArgumentEffect {
 		if (event.getType() == DamageType.MAGIC || event.getType() == DamageType.PROJECTILE) {
 			Plugin.getInstance().mEffectManager.addEffect(entity, ATTR_NAME, new PercentDamageDealt(DUR, DAMAGE_PERCENT, AFFECTED_DAMAGE_TYPES));
 			Plugin.getInstance().mEffectManager.addEffect(entity, "CrystalParticles", new Aesthetics(DUR,
-					(e, fourHertz, twoHertz, oneHertz) -> {
-						// Tick effect
-						Location loc = entity.getLocation().add(0, 1, 0);
+							(e, fourHertz, twoHertz, oneHertz) -> {
+								// Tick effect
+								Location loc = entity.getLocation().add(0, 1, 0);
+								new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
+								new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
+								new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
+							}, (e) -> {
+						// Lose effect
+						Location loc = entity.getLocation();
+						entity.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 0.85f);
 						new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
 						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
 						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
-					}, (e) -> {
-					// Lose effect
-					Location loc = entity.getLocation();
-					entity.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 0.85f);
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
-				})
+					})
 			);
 
 			// Aesthetics

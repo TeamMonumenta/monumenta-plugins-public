@@ -48,7 +48,7 @@ public class BoonOfTheFracturedTree extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Boon of the Fractured Tree";
 	}
 }

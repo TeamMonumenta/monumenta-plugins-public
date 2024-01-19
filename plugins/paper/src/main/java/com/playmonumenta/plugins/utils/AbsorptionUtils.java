@@ -11,8 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -186,13 +187,17 @@ public class AbsorptionUtils {
 		}
 
 		@Override
-		public String getDisplay() {
-			return getDisplayWithoutTime() + ChatColor.GRAY + "" + StringUtils.intToMinuteAndSeconds(mDuration / 20);
+		public @Nullable Component getDisplay() {
+			Component displayWithoutTime = getDisplayWithoutTime();
+			if (displayWithoutTime != null) {
+				return displayWithoutTime.append(Component.text(StringUtils.intToMinuteAndSeconds(mDuration / 20), NamedTextColor.GRAY));
+			}
+			return null;
 		}
 
 		@Override
-		public String getDisplayWithoutTime() {
-			return ChatColor.YELLOW + "" + StringUtils.to2DP(mAmount) + " Absorption ";
+		public @Nullable Component getDisplayWithoutTime() {
+			return Component.text(StringUtils.to2DP(mAmount) + " Absorption ", NamedTextColor.YELLOW);
 		}
 
 

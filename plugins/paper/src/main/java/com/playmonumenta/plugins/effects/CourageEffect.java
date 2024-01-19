@@ -111,7 +111,7 @@ public class CourageEffect extends Effect {
 	}
 
 	@Override
-	public String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Liquid Courage";
 	}
 

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,11 +49,19 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable Component getSpecificDisplay() {
 		if (mHasDoneDamage) {
 			return null;
 		}
 		return super.getSpecificDisplay();
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		if (mHasDoneDamage) {
+			return null;
+		}
+		return super.getDisplayedName();
 	}
 
 	@Override
@@ -98,7 +107,8 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 		}
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return String.format("PercentDamageDealtSingle duration:%d amount:%f", this.getDuration(), mAmount);
 	}
 }

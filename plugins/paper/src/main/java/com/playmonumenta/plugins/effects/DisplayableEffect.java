@@ -3,12 +3,14 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,9 +23,9 @@ public interface DisplayableEffect {
 
 	int getDisplayPriority();
 
-	@Nullable String getDisplay();
+	@Nullable Component getDisplay();
 
-	@Nullable String getDisplayWithoutTime();
+	@Nullable Component getDisplayWithoutTime();
 
 	static List<DisplayableEffect> getEffects(Plugin plugin, LivingEntity entity) {
 		List<DisplayableEffect> effects = new ArrayList<>(plugin.mEffectManager.getPriorityEffects(entity).values());
@@ -56,9 +58,9 @@ public interface DisplayableEffect {
 
 		List<String> displays = new ArrayList<>();
 		for (DisplayableEffect effect : getSortedEffects(plugin, entity)) {
-			String display = effect.getDisplay();
+			Component display = effect.getDisplay();
 			if (display != null) {
-				displays.add(display);
+				displays.add(MessagingUtils.legacyFromComponent(display));
 			}
 		}
 		CACHED_LIST_MAP.put(entity, displays);

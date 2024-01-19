@@ -81,7 +81,7 @@ public class EnchantedPrayerAoE extends Effect {
 	}
 
 	@Override
-	public @Nullable String getSpecificDisplay() {
+	public @Nullable String getDisplayedName() {
 		return "Enchanted Prayer";
 	}
 

@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.gallery.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class GalleryConsumableEffect extends GalleryEffect {
 
@@ -18,16 +20,17 @@ public abstract class GalleryConsumableEffect extends GalleryEffect {
 	}
 
 	@Override
-	public String getDisplay() {
+	public @Nullable Component getDisplay() {
 		return getDisplayWithoutTime();
 	}
 
 	@Override
-	public String getDisplayWithoutTime() {
-		return ChatColor.GOLD + mType.getRealName() + " " + mRoundsLeft + " remaining";
+	public @Nullable Component getDisplayWithoutTime() {
+		return Component.text(mType.getRealName() + " " + mRoundsLeft + " remaining", NamedTextColor.GOLD);
 	}
 
-	@Override public void onRoundStart(GalleryPlayer player, GalleryGame game) {
+	@Override
+	public void onRoundStart(GalleryPlayer player, GalleryGame game) {
 		super.onRoundStart(player, game);
 		mRoundsLeft--;
 		if (mRoundsLeft <= 0) {
@@ -35,17 +38,20 @@ public abstract class GalleryConsumableEffect extends GalleryEffect {
 		}
 	}
 
-	@Override public boolean canBuy(GalleryPlayer player) {
+	@Override
+	public boolean canBuy(GalleryPlayer player) {
 		return player.getEffectOfType(mType) == null;
 	}
 
-	@Override public JsonObject toJson() {
+	@Override
+	public JsonObject toJson() {
 		JsonObject obj = super.toJson();
 		obj.addProperty("RoundsLeft", mRoundsLeft);
 		return obj;
 	}
 
-	@Override public GalleryConsumableEffect fromJson(JsonObject object) {
+	@Override
+	public GalleryConsumableEffect fromJson(JsonObject object) {
 		GalleryConsumableEffect effect = (GalleryConsumableEffect) super.fromJson(object);
 		effect.mRoundsLeft = object.getAsJsonPrimitive("RoundsLeft").getAsInt();
 		return effect;

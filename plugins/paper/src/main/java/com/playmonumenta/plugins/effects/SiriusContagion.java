@@ -8,7 +8,12 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -36,10 +41,18 @@ public class SiriusContagion extends Effect {
 		return object;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public @Nullable String getSpecificDisplay() {
-		return ChatColor.RED + "Contagion";
+	public @Nullable Component getSpecificDisplay() {
+		String displayedName = getDisplayedName();
+		if (displayedName == null) {
+			return null;
+		}
+		return Component.text(displayedName, NamedTextColor.RED);
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Contagion";
 	}
 
 	@Override
