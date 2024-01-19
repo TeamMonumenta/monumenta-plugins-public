@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -412,12 +413,14 @@ public final class EffectManager implements Listener {
 					while (entityIter.hasNext()) {
 						Effects effects = entityIter.next();
 						Entity entity = effects.mEntity;
+						boolean spectator = false;
 						if (entity instanceof Player player) {
 							// Remove effects from players who are no longer logged in here - those effects will be re-added when they return
 							if (!player.isOnline()) {
 								entityIter.remove();
 								continue;
 							}
+							spectator = player.getGameMode() == GameMode.SPECTATOR;
 						} else if (entity.isDead() || !entity.isValid()) {
 							entityIter.remove();
 							continue;
@@ -451,13 +454,17 @@ public final class EffectManager implements Listener {
 									}
 
 									boolean tickResult;
-									try {
-										tickResult = effect.tick(PERIOD);
-									} catch (Exception ex) {
-										MMLog.severe("Error in effect manager tick: " + ex.getMessage());
-										ex.printStackTrace();
-										/* If ticking throws an exception (e.g. NPE) remove it */
+									if (spectator) {
 										tickResult = false;
+									} else {
+										try {
+											tickResult = effect.tick(PERIOD);
+										} catch (Exception ex) {
+											MMLog.severe("Error in effect manager tick: " + ex.getMessage());
+											ex.printStackTrace();
+											/* If ticking throws an exception (e.g. NPE) remove it */
+											tickResult = false;
+										}
 									}
 
 									if (tickResult) {
