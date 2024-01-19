@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.bosses.spells.SpellTargetVisiblePlayer;
 import org.bukkit.entity.Dolphin;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -45,7 +46,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	/* Only allow mobs with this ability to target players */
 	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
-		if (!(event.getTarget() instanceof Player)) {
+		if (!isTargetable(event.getTarget())) {
 			event.setCancelled(true);
 		}
 	}
@@ -54,6 +55,9 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 		mSpellTargetPlayer.setTarget(target);
 	}
 
+	public static boolean isTargetable(Entity entity) {
+		return entity instanceof Player || entity.getScoreboardTags().contains("playertarget_override");
+	}
 
 }
 

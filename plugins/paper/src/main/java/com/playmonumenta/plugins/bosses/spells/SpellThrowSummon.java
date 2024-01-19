@@ -68,6 +68,11 @@ public class SpellThrowSummon extends Spell {
 
 			@Override
 			public void run() {
+				if (EntityUtils.shouldCancelSpells(mBoss)) {
+					this.cancel();
+					return;
+				}
+
 				mTicks++;
 
 				for (LivingEntity entity : mTargets.getTargetsList(mBoss)) {

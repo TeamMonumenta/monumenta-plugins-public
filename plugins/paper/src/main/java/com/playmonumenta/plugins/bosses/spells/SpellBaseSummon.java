@@ -229,7 +229,6 @@ public class SpellBaseSummon extends Spell {
 				//summoning
 				new BukkitRunnable() {
 					int mTimer = 0;
-					Mob mMob = mob;
 
 					@Override
 					public void run() {
@@ -238,7 +237,7 @@ public class SpellBaseSummon extends Spell {
 							return;
 						}
 
-						if (mCanBeStopped && (EntityUtils.isStunned(mBoss) || mBoss.isDead())) {
+						if (mCanBeStopped && EntityUtils.shouldCancelSpells(mBoss)) {
 							this.cancel();
 							return;
 						}
@@ -260,10 +259,10 @@ public class SpellBaseSummon extends Spell {
 					@Override
 					public synchronized void cancel() {
 						super.cancel();
-						mMob.setGlowing(false);
+						mob.setGlowing(false);
 						//if the cast is not over remove the mob
 						if (mTimer < mSummoningDuration) {
-							mMob.remove();
+							mob.remove();
 						}
 					}
 

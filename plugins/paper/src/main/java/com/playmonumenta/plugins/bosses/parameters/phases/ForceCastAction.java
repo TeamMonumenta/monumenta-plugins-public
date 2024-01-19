@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,12 @@ public class ForceCastAction implements Action {
 	}
 
 
-	@Override public void runAction(LivingEntity boss) {
+	@Override
+	public void runAction(LivingEntity boss) {
+		if (EntityUtils.shouldCancelSpells(boss)) {
+			return;
+		}
+
 		BossManager manager = BossManager.getInstance();
 		if (manager != null) {
 			List<BossAbilityGroup> abilityList = manager.getAbilities(boss);

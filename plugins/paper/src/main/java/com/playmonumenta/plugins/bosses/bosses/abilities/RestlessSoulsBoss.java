@@ -131,7 +131,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		Entity target = event.getTarget();
 		if (target != null) {
 			Set<String> tags = target.getScoreboardTags();
-			if (!EntityUtils.isHostileMob(target) || tags.contains(AbilityUtils.IGNORE_TAG)) {
+			if (!EntityUtils.isHostileMob(target) || tags.contains(AbilityUtils.IGNORE_TAG) || (target instanceof LivingEntity le && DamageUtils.isImmuneToDamage(le, DamageType.MAGIC))) {
 				event.setCancelled(true);
 			}
 		}

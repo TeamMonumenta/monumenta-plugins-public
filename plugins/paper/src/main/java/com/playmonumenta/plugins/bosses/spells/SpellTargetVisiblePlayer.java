@@ -1,10 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -75,8 +76,10 @@ public class SpellTargetVisiblePlayer extends Spell {
 			// Otherwise, if it is NOT a player, change it back to mLastTarget.
 			if (mBoss.getTarget() != mLastTarget) {
 				LivingEntity target = mBoss.getTarget();
-				if (target instanceof Player player) {
-					mLastTarget = player;
+				if (PlayerTargetBoss.isTargetable(target)) {
+					if (target instanceof Player player) {
+						mLastTarget = player;
+					}
 				} else {
 					mBoss.setTarget(mLastTarget);
 				}
@@ -92,8 +95,10 @@ public class SpellTargetVisiblePlayer extends Spell {
 				// Otherwise, continue chasing mLastTarget.
 				if (mLastTarget != null && mBoss.getTarget() != mLastTarget) {
 					LivingEntity target = mBoss.getTarget();
-					if (target instanceof Player player) {
-						mLastTarget = player;
+					if (PlayerTargetBoss.isTargetable(target)) {
+						if (target instanceof Player player) {
+							mLastTarget = player;
+						}
 					} else {
 						mBoss.setTarget(mLastTarget);
 					}
@@ -102,7 +107,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 				// Potentially find a new target
 				Location bossLoc = mBoss.getEyeLocation();
 				List<Player> potentialTargets = PlayerUtils.playersInRange(bossLoc, mDetectionRange, false);
-				Collections.sort(potentialTargets, (a, b) -> Double.compare(a.getLocation().distance(bossLoc), b.getLocation().distance(bossLoc)));
+				potentialTargets.sort(Comparator.comparingDouble(a -> a.getLocation().distance(bossLoc)));
 
 				for (Player player : potentialTargets) {
 					if (LocationUtils.hasLineOfSight(mBoss, player)) {
