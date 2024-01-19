@@ -666,7 +666,8 @@ public class DepthsParty {
 	// For ascension purging, checks if all depths players active have removed an ability this floor
 	public boolean isAscensionPurgeMet() {
 		for (DepthsPlayer p : mPlayersInParty) {
-			if (!p.mUsedAbilityDeletion) {
+			// They can pass without removing only if they have no actives and no unclaimed rewards
+			if (!p.mUsedAbilityDeletion && (!p.mEarnedRewards.isEmpty() || DepthsManager.getInstance().hasActiveAbility(p))) {
 				return false;
 			}
 		}

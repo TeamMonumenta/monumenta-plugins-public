@@ -122,7 +122,7 @@ public class WindsweptCombos extends DepthsAbility {
 			.addPercent(a -> a.mCooldownReduction, COOLDOWN_REDUCTION[rarity - 1], false, true)
 			.add(" cooldown reduction for your abilities (max ")
 			.addDuration(CAP_TICKS)
-			.add("s) and pulls nearby mobs inwards in a ")
+			.add("s) and pull nearby mobs inwards in a ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" block radius.");
 	}

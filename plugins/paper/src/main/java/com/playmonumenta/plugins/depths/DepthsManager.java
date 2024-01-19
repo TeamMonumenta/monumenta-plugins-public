@@ -450,7 +450,11 @@ public class DepthsManager {
 		if (dp != null) {
 			int previousLevel = dp.mAbilities.getOrDefault(name, 0);
 			int displayLevel = level == 0 ? previousLevel : level;
-			dp.mAbilities.put(name, level);
+			if (level > 0) {
+				dp.mAbilities.put(name, level);
+			} else {
+				dp.mAbilities.remove(name);
+			}
 			AbilityManager.getManager().updatePlayerAbilities(p, false);
 
 			//Adjust wand aspect active logic
@@ -795,6 +799,13 @@ public class DepthsManager {
 			}
 		}
 
+		// Prevent getting no ability options due to wand aspect
+		if (offeredItems.isEmpty() && dp.mWandAspectCharges > 0) {
+			dp.mWandAspectCharges = 0;
+			// Recalculate options. Will never call itself more than once
+			return getAbilityUnlocks(p);
+		}
+
 		mAbilityOfferings.put(p.getUniqueId(), offeredItems);
 
 		return offeredItems;
@@ -941,10 +952,10 @@ public class DepthsManager {
 		if (p == null) {
 			return new ArrayList<>();
 		}
+		return getPlayerAbilities(getDepthsPlayer(p));
+	}
 
-		DepthsPlayer dp = getDepthsPlayer(p);
-
-		// Check if they're in the system
+	public List<DepthsAbilityInfo<?>> getPlayerAbilities(@Nullable DepthsPlayer dp) {
 		if (dp == null) {
 			return new ArrayList<>();
 		}
@@ -1955,8 +1966,12 @@ public class DepthsManager {
 	private List<DepthsTree> getActiveAbilityTrees(DepthsPlayer dp) {
 		return dp.mAbilities.keySet().stream()
 			.map(this::getAbility).filter(Objects::nonNull)
-			.filter(info -> info.getDepthsTrigger() != DepthsTrigger.PASSIVE && info.getDepthsTrigger() != DepthsTrigger.WEAPON_ASPECT)
+			.filter(info -> info.getDepthsTrigger().isActive())
 			.map(DepthsAbilityInfo::getDepthsTree).filter(Objects::nonNull)
 			.toList();
+	}
+
+	public boolean hasActiveAbility(DepthsPlayer dp) {
+		return getPlayerAbilities(dp).stream().anyMatch(info -> info.getDepthsTrigger().isActive());
 	}
 }

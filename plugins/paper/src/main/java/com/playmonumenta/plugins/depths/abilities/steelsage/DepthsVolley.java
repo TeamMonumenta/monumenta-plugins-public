@@ -64,7 +64,7 @@ public class DepthsVolley extends DepthsAbility {
 
 	public DepthsVolley(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.VOLLEY_DAMAGE_MULTIPLIER.mEffectName, DAMAGE_MULTIPLIER[mRarity - 1]);
+		mDamageMultiplier = DAMAGE_MULTIPLIER[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.VOLLEY_DAMAGE_MULTIPLIER.mEffectName);
 		mArrows = ARROWS[mRarity - 1] + (int) CharmManager.getLevel(mPlayer, CharmEffects.VOLLEY_ARROWS.mEffectName);
 		mDepthsVolley = new HashSet<>();
 		mDepthsVolleyHitMap = new HashMap<>();

@@ -43,6 +43,10 @@ public enum DepthsTrigger {
 	}
 
 	public ItemStack getNoAbilityItem() {
-		return GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE, "No " + mName + (this == DepthsTrigger.WEAPON_ASPECT ? "!" : " ability!"), NamedTextColor.RED);
+		return GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE, "No " + mName + (this == WEAPON_ASPECT ? "!" : " ability!"), NamedTextColor.RED);
+	}
+
+	public boolean isActive() {
+		return this != PASSIVE && this != WEAPON_ASPECT;
 	}
 }

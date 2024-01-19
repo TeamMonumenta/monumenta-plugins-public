@@ -71,7 +71,7 @@ public class ZenithRoomRepository extends RoomRepository {
 		mF2NormalRooms.add(new DepthsRoom("depths2/f2r25", DepthsRoomType.ABILITY, new Vector(45, 69, 52), new Vector(1.0, -1.0, -26.0), 15, DepthsRoom.RoomDirection.UP));
 		mF2NormalRooms.add(new DepthsRoom("depths2/f2r26", DepthsRoomType.ABILITY, new Vector(50, 47, 48), new Vector(1.0, -14.0, -41.0), 16, DepthsRoom.RoomDirection.UP));
 		mF2NormalRooms.add(new DepthsRoom("depths2/f2r27", DepthsRoomType.ABILITY, new Vector(45, 40, 49), new Vector(1.0, -23.0, -26.0), 14, DepthsRoom.RoomDirection.DOWN));
-		mF2NormalRooms.add(new DepthsRoom("depths2/f2r30", DepthsRoomType.ABILITY, new Vector(67, 29, 36), new Vector(1.0, -10.0, -19.0), 15, DepthsRoom.RoomDirection.DOWN));
+		mF2NormalRooms.add(new DepthsRoom("depths2/f2r30", DepthsRoomType.ABILITY, new Vector(67, 29, 36), new Vector(1.0, -10.0, -19.0), 16, DepthsRoom.RoomDirection.DOWN));
 
 		//F2 elite rooms
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r5", DepthsRoomType.ABILITY, new Vector(56, 21, 66), new Vector(1.0, -3.0, -54.0), 24, DepthsRoom.RoomDirection.EVEN));
@@ -86,7 +86,7 @@ public class ZenithRoomRepository extends RoomRepository {
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r24", DepthsRoomType.ABILITY, new Vector(37, 36, 49), new Vector(1.0, -13.0, -15.0), 15, DepthsRoom.RoomDirection.UP));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r28", DepthsRoomType.ABILITY, new Vector(81, 47, 43), new Vector(1.0, -17.0, -23.0), 22, DepthsRoom.RoomDirection.UP));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r29", DepthsRoomType.ABILITY, new Vector(95, 76, 140), new Vector(1.0, -34.0, -42.0), 25, DepthsRoom.RoomDirection.DOWN));
-		mF2EliteRooms.add(new DepthsRoom("depths2/f2r31", DepthsRoomType.ABILITY, new Vector(73, 71, 72), new Vector(1.0, -4.0, -36.0), 25, DepthsRoom.RoomDirection.UP));
+		mF2EliteRooms.add(new DepthsRoom("depths2/f2r31", DepthsRoomType.ABILITY, new Vector(73, 71, 72), new Vector(1.0, -4.0, -36.0), 27, DepthsRoom.RoomDirection.UP));
 
 		//Boss f2 room
 		mF2BossRoom = new DepthsRoom("depths2/f2r18", DepthsRoomType.BOSS, new Vector(148, 48, 71), new Vector(1.0, -8.0, -33.0), 0, DepthsRoom.RoomDirection.EVEN);

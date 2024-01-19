@@ -153,11 +153,11 @@ public class HowlingWinds extends DepthsAbility {
 			.add(PULL_INTERVAL[rarity - 1] == 20 ? "" : "s")
 			.add(". Enemies within ")
 			.add(a -> a.mVulnRadius, VULN_RADIUS)
-			.add(" are applied ")
+			.add(" blocks are inflicted with ")
 			.addPercent(a -> a.mVuln, VULN_AMPLIFIER[rarity - 1], false, true)
 			.add(" vulnerability for ")
 			.addDuration(a -> a.mDuration, DURATION_TICKS)
-			.add(".")
+			.add(" seconds.")
 			.addCooldown(COOLDOWN);
 	}
 
