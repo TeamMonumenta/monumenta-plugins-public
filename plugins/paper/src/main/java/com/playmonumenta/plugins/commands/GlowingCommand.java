@@ -17,7 +17,6 @@ import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -164,9 +163,9 @@ public class GlowingCommand {
 	}
 
 	private static void showHelp(Player player) {
-		player.sendRawMessage(ChatColor.GOLD + "Use " + ChatColor.WHITE + "/glowing enable/disable <categories...>" + ChatColor.GOLD + " to toggle glowing for the given categories.");
-		player.sendRawMessage(ChatColor.GOLD + "This will prevent entities of that type from glowing (i.e. having an outline) for you only.");
-		player.sendRawMessage(ChatColor.GOLD + "If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.");
+		player.sendMessage(Component.text("Use ", NamedTextColor.GOLD).append(Component.text("/glowing enable/disable <categories...>", NamedTextColor.WHITE)).append(Component.text(" to toggle glowing for the given categories.", NamedTextColor.GOLD)));
+		player.sendMessage(Component.text("This will prevent entities of that type from glowing (i.e. having an outline) for you only.", NamedTextColor.GOLD));
+		player.sendMessage(Component.text("If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", NamedTextColor.GOLD));
 	}
 
 	private static void setOptions(Player player, Object[] optionStrings, String operation) throws WrapperCommandSyntaxException {
@@ -227,10 +226,10 @@ public class GlowingCommand {
 				disabled.add(option.mDescription);
 			}
 		}
-		player.sendRawMessage(ChatColor.GOLD + "Glowing " + ChatColor.BLUE + "enabled" + ChatColor.GOLD + " for: " + ChatColor.RESET
-				                      + (enabled.isEmpty() ? "no entities" : disabled.isEmpty() ? "all entities" : StringUtils.join(enabled, ", ")));
-		player.sendRawMessage(ChatColor.GOLD + "Glowing " + ChatColor.RED + "disabled" + ChatColor.GOLD + " for: " + ChatColor.RESET
-				                      + (disabled.isEmpty() ? "no entities" : enabled.isEmpty() ? "all entities" : StringUtils.join(disabled, ", ")));
+		player.sendMessage(Component.text("Glowing ", NamedTextColor.GOLD).append(Component.text("enabled", NamedTextColor.BLUE)).append(Component.text(" for: ", NamedTextColor.GOLD))
+			.append(Component.text(enabled.isEmpty() ? "no entities" : disabled.isEmpty() ? "all entities" : StringUtils.join(enabled, ", "), NamedTextColor.WHITE)));
+		player.sendMessage(Component.text("Glowing ", NamedTextColor.GOLD).append(Component.text("disabled", NamedTextColor.RED)).append(Component.text(" for: ", NamedTextColor.GOLD))
+			.append(Component.text(disabled.isEmpty() ? "no entities" : enabled.isEmpty() ? "all entities" : StringUtils.join(disabled, ", "), NamedTextColor.WHITE)));
 	}
 
 	private static boolean isOptionEnabled(int scoreboardValue, Option option) {

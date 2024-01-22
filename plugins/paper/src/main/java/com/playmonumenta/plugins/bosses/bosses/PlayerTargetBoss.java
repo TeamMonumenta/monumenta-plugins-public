@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_targetplayer";
@@ -55,8 +56,8 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 		mSpellTargetPlayer.setTarget(target);
 	}
 
-	public static boolean isTargetable(Entity entity) {
-		return entity instanceof Player || entity.getScoreboardTags().contains("playertarget_override");
+	public static boolean isTargetable(@Nullable Entity entity) {
+		return entity == null || entity instanceof Player || entity.getScoreboardTags().contains("playertarget_override");
 	}
 
 }

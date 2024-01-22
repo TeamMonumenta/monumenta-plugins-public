@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -9,7 +11,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -19,7 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class TemporalFlux extends Effect {
+public class TemporalFlux extends ZeroArgumentEffect {
 
 	//private int mCurrentDuration;
 	public static final String GENERIC_NAME = "Paradox";
@@ -57,7 +58,7 @@ public class TemporalFlux extends Effect {
 				mBossBar.color(BossBar.Color.BLUE);
 			}
 			if (getDuration() % (20 * 10) == 0) {
-				entity.sendMessage(ChatColor.RED + "Paradox has " + ChatColor.BOLD + getDuration() / 20 + ChatColor.RESET + ChatColor.RED + " seconds remaining!");
+				entity.sendMessage(Component.text("Paradox has ", NamedTextColor.RED).append(Component.text(getDuration() / 20, NamedTextColor.RED, TextDecoration.BOLD)).append(Component.text(" seconds remaining!")));
 			}
 			new PPCircle(Particle.SOUL_FIRE_FLAME, entity.getLocation(), 1)
 					.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
@@ -102,6 +103,12 @@ public class TemporalFlux extends Effect {
 	public void entityLoseEffect(Entity entity) {
 		entity.hideBossBar(mBossBar);
 		entity.sendMessage(Component.text("You are no longer inflicted with Paradox, you are safe for now.", NamedTextColor.GRAY));
+	}
+
+	public static TemporalFlux deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new TemporalFlux(duration);
 	}
 
 	@Override

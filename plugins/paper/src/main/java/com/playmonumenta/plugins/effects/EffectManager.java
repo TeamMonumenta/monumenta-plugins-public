@@ -363,6 +363,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(CustomTimerEffect.effectID, CustomTimerEffect::deserialize);
 		mEffectDeserializer.put(SiriusContagion.effectID, SiriusContagion::deserialize);
 		mEffectDeserializer.put(SiriusSetTargetEffect.effectID, SiriusSetTargetEffect::deserialize);
+		mEffectDeserializer.put(TemporalFlux.effectID, TemporalFlux::deserialize);
 	}
 
 	private static final int PERIOD = 5;

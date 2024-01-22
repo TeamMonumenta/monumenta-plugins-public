@@ -5,7 +5,8 @@ import com.playmonumenta.plugins.effects.DisplayableEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +23,7 @@ public abstract class GalleryEffect implements DisplayableEffect {
 	//event called after the player obtain this effect but before this object is insert inside the list of player effects
 	//can be used to store info on the player (Scoreboard Tags etc..) or clean up others old effects
 	public void playerGainEffect(GalleryPlayer player) {
-		player.sendMessage("You have obtained " + ChatColor.GOLD + mType.getRealName());
+		player.sendMessage(Component.text("You have obtained ").append(Component.text(mType.getRealName(), NamedTextColor.GOLD)));
 		GalleryEffect effect = player.getEffectOfType(mType);
 		if (effect != null) {
 			player.removeEffect(effect);

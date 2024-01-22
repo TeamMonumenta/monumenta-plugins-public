@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class GalleryStackableEffect extends GalleryEffect {
@@ -34,7 +33,7 @@ public abstract class GalleryStackableEffect extends GalleryEffect {
 			mStacks = effect.mStacks + 1;
 		}
 
-		player.sendMessage("You have obtained " + ChatColor.GOLD + mType.getRealName() + " Lvl. " + mStacks);
+		player.sendMessage(Component.text("You have obtained ").append(Component.text(mType.getRealName() + " Lvl. " + mStacks, NamedTextColor.GOLD)));
 	}
 
 	@Override

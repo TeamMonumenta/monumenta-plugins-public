@@ -914,7 +914,7 @@ public class ItemStatManager implements Listener {
 		return baseScaling;
 	}
 
-	public static double getEffectiveRegionScaling(Player player, ItemStack item, Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+	public static double getEffectiveRegionScaling(Player player, @Nullable ItemStack item, Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
 		Region region;
 		if (item == null || ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)) {
 			region = Region.VALLEY;

@@ -65,7 +65,7 @@ public class CustomTradeGui extends Gui {
 
 	// Final:
 	private final List<TradeWindowOpenEvent.Trade> mTrades;
-	private final Villager mVillager;
+	private final @Nullable Villager mVillager;
 	private final String mTitle;
 	private final String mCustomTagKey = "trade_preview";
 	private final NamespacedKey mCustomTagNamespacedKey = new NamespacedKey(mPlugin, mCustomTagKey);
