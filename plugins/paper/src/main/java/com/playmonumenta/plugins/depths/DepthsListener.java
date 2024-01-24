@@ -432,6 +432,7 @@ public class DepthsListener implements Listener {
 										dp.sendMessage("You have been revived!");
 										party.sendMessage(player.getName() + " has been revived!", d -> d != dp);
 										dp.mDead = false;
+										MMLog.info(player.getName() + " was revived.");
 										cancel();
 										return;
 									}
@@ -674,6 +675,13 @@ public class DepthsListener implements Listener {
 		MMLog.finer("Player " + player.getName() + " logged in. has_depths_player=" + (dp != null));
 		if (dp != null) {
 			boolean shouldOfflineTeleport = true;
+
+			if (dp.mDead) {
+				shouldOfflineTeleport = false;
+				sendPlayerToLootRoom(player, true);
+				MMLog.info(player.getName() + " was sent to the loot room because they logged in while awaiting respawn.");
+			}
+
 			DepthsParty party = manager.getPartyFromId(dp);
 			MMLog.finer("Player " + player.getName() + " has_party=" + (party != null));
 			if (party != null) {
