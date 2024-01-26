@@ -160,6 +160,8 @@ public class ItemStatManager implements Listener {
 
 		private Region mRegion;
 
+		private Set<InfusionType> mArmorRelevationInfusions = new HashSet<>();
+
 		/**
 		 * The mainhand item held when these stats were last updated. Used to check for mainhand modifications by commands or similar.
 		 */
@@ -307,9 +309,11 @@ public class ItemStatManager implements Listener {
 						}
 					});
 				}
+				mArmorRelevationInfusions = new HashSet<>(delveInfusionsWithRevelation);
 			} else {
 				newArmorAddStats = mArmorAddStats;
 				newArmorMultiplyStats = mArmorMultiplyStats;
+				delveInfusionsWithRevelation.addAll(mArmorRelevationInfusions);
 			}
 
 			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand)) {
