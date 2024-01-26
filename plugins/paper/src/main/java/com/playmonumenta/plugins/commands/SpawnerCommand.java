@@ -3,14 +3,17 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
+import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
@@ -24,134 +27,160 @@ public class SpawnerCommand {
 
 	public static void register() {
 		new CommandAPICommand("spawner")
-			.withPermission("monumenta.command.spawner")
-			.withSubcommands(
-				new CommandAPICommand("shields")
-					.withArguments(new IntegerArgument("shields"))
-					.executesPlayer((player, args) -> {
-						ItemStack item = getHeldItemAndSendErrors(player);
-						if (item == null) {
-							return;
-						}
-
-						int shields = (int) args[0];
-						SpawnerUtils.setShields(item, shields);
-					}),
-				new CommandAPICommand("lospool")
-					.withArguments(new GreedyStringArgument("los pool").includeSuggestions(
-						ArgumentSuggestions.stringCollection(info -> LibraryOfSoulsIntegration.getPoolNames())
-					))
-					.executesPlayer((player, args) -> {
-						ItemStack item = getHeldItemAndSendErrors(player);
-						if (item == null) {
-							return;
-						}
-
-						String losPool = (String) args[0];
-						if (!isLosPoolValid(losPool)) {
-							player.sendMessage(Component.text("The selected pool has 0 elements.", NamedTextColor.RED));
-							return;
-						}
-
-						SpawnerUtils.setLosPool(item, losPool);
-					}),
-				new CommandAPICommand("action")
-					.withSubcommands(
-						new CommandAPICommand("add")
-							.withArguments(
-								new StringArgument("name").includeSuggestions(
-									ArgumentSuggestions.strings(SpawnerCommand::getAvailableActionIdentifiersSuggestions)
-								)
-							)
-							.executesPlayer((player, args) -> {
-								ItemStack item = getHeldItemAndSendErrors(player);
-								if (item == null) {
-									return;
-								}
-
-								String action = (String) args[0];
-								if (!SpawnerActionManager.actionExists(action)) {
-									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
-									return;
-								}
-
-								SpawnerUtils.addBreakAction(item, action);
-							}),
-						new CommandAPICommand("remove")
-							.withArguments(
-								new StringArgument("name")
-									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions))
-							)
-							.executesPlayer((player, args) -> {
-								ItemStack item = getHeldItemAndSendErrors(player);
-								if (item == null) {
-									return;
-								}
-
-								String action = (String) args[0];
-								if (!SpawnerActionManager.actionExists(action)) {
-									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
-									return;
-								}
-
-								SpawnerUtils.removeBreakAction(item, action);
-							}),
-						new CommandAPICommand("parameter")
-							.withArguments(
-								new StringArgument("action identifier")
-									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
-								new StringArgument("parameter name")
-									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
-								new LiteralArgument("set"),
-								new TextArgument("value")
-									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getDefaultParameterValueSuggestion))
-							)
-							.executesPlayer((player, args) -> {
-								ItemStack item = getHeldItemAndSendErrors(player);
-								if (item == null) {
-									return;
-								}
-
-								String actionIdentifier = (String) args[0];
-								String parameterName = (String) args[1];
-								String valueString = (String) args[2];
-								if (!SpawnerActionManager.actionExists(actionIdentifier)) {
-									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
-									return;
-								}
-
-								SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, valueString);
-							}),
-							new CommandAPICommand("parameter")
-								.withArguments(
-									new StringArgument("action identifier")
-										.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
-									new StringArgument("parameter name")
-										.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
-									new LiteralArgument("reset")
-								)
+				.withPermission("monumenta.command.spawner")
+				.withSubcommands(
+						new CommandAPICommand("shields")
+								.withArguments(new IntegerArgument("shields"))
 								.executesPlayer((player, args) -> {
 									ItemStack item = getHeldItemAndSendErrors(player);
 									if (item == null) {
 										return;
 									}
 
-									String actionIdentifier = (String) args[0];
-									String parameterName = (String) args[1];
-									if (!SpawnerActionManager.actionExists(actionIdentifier)) {
-										player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+									int shields = (int) args[0];
+									SpawnerUtils.setShields(item, shields);
+								}),
+						new CommandAPICommand("function")
+								.withSubcommands(
+										new CommandAPICommand("set")
+												.withArguments(new FunctionArgument("function"))
+												.executesPlayer((player, args) -> {
+													ItemStack item = getHeldItemAndSendErrors(player);
+													if (item == null) {
+														return;
+													}
+
+													FunctionWrapper[] functions = (FunctionWrapper[]) args[0];
+													if (functions.length == 0) {
+														throw CommandAPI.failWithString("Failed to get function");
+													}
+													SpawnerUtils.setCustomFunction(item, functions[0]);
+												}),
+										new CommandAPICommand("unset")
+												.executesPlayer((player, args) -> {
+													ItemStack item = getHeldItemAndSendErrors(player);
+													if (item == null) {
+														return;
+													}
+
+													SpawnerUtils.unsetCustomFunction(item);
+												})
+								),
+						new CommandAPICommand("lospool")
+								.withArguments(new GreedyStringArgument("los pool").includeSuggestions(
+										ArgumentSuggestions.stringCollection(info -> LibraryOfSoulsIntegration.getPoolNames())
+								))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
 										return;
 									}
 
-									Object value = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
-
-									if (value != null) {
-										SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, value);
+									String losPool = (String) args[0];
+									if (!isLosPoolValid(losPool)) {
+										player.sendMessage(Component.text("The selected pool has 0 elements.", NamedTextColor.RED));
+										return;
 									}
-								})
-					)
-			)
-			.register();
+
+									SpawnerUtils.setLosPool(item, losPool);
+								}),
+						new CommandAPICommand("action")
+								.withSubcommands(
+										new CommandAPICommand("add")
+												.withArguments(
+														new StringArgument("name").includeSuggestions(
+																ArgumentSuggestions.strings(SpawnerCommand::getAvailableActionIdentifiersSuggestions)
+														)
+												)
+												.executesPlayer((player, args) -> {
+													ItemStack item = getHeldItemAndSendErrors(player);
+													if (item == null) {
+														return;
+													}
+
+													String action = (String) args[0];
+													if (!SpawnerActionManager.actionExists(action)) {
+														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+														return;
+													}
+
+													SpawnerUtils.addBreakAction(item, action);
+												}),
+										new CommandAPICommand("remove")
+												.withArguments(
+														new StringArgument("name")
+																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions))
+												)
+												.executesPlayer((player, args) -> {
+													ItemStack item = getHeldItemAndSendErrors(player);
+													if (item == null) {
+														return;
+													}
+
+													String action = (String) args[0];
+													if (!SpawnerActionManager.actionExists(action)) {
+														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+														return;
+													}
+
+													SpawnerUtils.removeBreakAction(item, action);
+												}),
+										new CommandAPICommand("parameter")
+												.withArguments(
+														new StringArgument("action identifier")
+																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
+														new StringArgument("parameter name")
+																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
+														new LiteralArgument("set"),
+														new TextArgument("value")
+																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getDefaultParameterValueSuggestion))
+												)
+												.executesPlayer((player, args) -> {
+													ItemStack item = getHeldItemAndSendErrors(player);
+													if (item == null) {
+														return;
+													}
+
+													String actionIdentifier = (String) args[0];
+													String parameterName = (String) args[1];
+													String valueString = (String) args[2];
+													if (!SpawnerActionManager.actionExists(actionIdentifier)) {
+														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+														return;
+													}
+
+													SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, valueString);
+												}),
+										new CommandAPICommand("parameter")
+												.withArguments(
+														new StringArgument("action identifier")
+																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
+														new StringArgument("parameter name")
+																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
+														new LiteralArgument("reset")
+												)
+												.executesPlayer((player, args) -> {
+													ItemStack item = getHeldItemAndSendErrors(player);
+													if (item == null) {
+														return;
+													}
+
+													String actionIdentifier = (String) args[0];
+													String parameterName = (String) args[1];
+													if (!SpawnerActionManager.actionExists(actionIdentifier)) {
+														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+														return;
+													}
+
+													Object value = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
+
+													if (value != null) {
+														SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, value);
+													}
+												})
+								)
+				)
+				.register();
 	}
 
 	private static boolean isLosPoolValid(String losPool) {

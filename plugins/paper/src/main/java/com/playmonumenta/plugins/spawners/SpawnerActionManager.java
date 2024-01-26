@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.spawners;
 
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.spawners.actions.AlertAction;
+import com.playmonumenta.plugins.spawners.actions.CustomFunctionAction;
 import com.playmonumenta.plugins.spawners.actions.EarthquakeAction;
 import com.playmonumenta.plugins.spawners.actions.FireworksAction;
 import com.playmonumenta.plugins.spawners.actions.HealerAction;
@@ -21,14 +22,15 @@ public class SpawnerActionManager {
 	public static final SpawnerActionManager INSTANCE = new SpawnerActionManager();
 
 	private static final ImmutableMap<String, SpawnerBreakAction> mBreakActions = ImmutableMap.<String, SpawnerBreakAction>builder()
-		.put(AlertAction.IDENTIFIER, new AlertAction())
-		.put(EarthquakeAction.IDENTIFIER, new EarthquakeAction())
-		.put(FireworksAction.IDENTIFIER, new FireworksAction())
-		.put(HealerAction.IDENTIFIER, new HealerAction())
-		.put(MimicAction.IDENTIFIER, new MimicAction())
-		.put(RevengeAction.IDENTIFIER, new RevengeAction())
-		.put(TreasureAction.IDENTIFIER, new TreasureAction())
-		.build();
+			.put(AlertAction.IDENTIFIER, new AlertAction())
+			.put(EarthquakeAction.IDENTIFIER, new EarthquakeAction())
+			.put(FireworksAction.IDENTIFIER, new FireworksAction())
+			.put(HealerAction.IDENTIFIER, new HealerAction())
+			.put(MimicAction.IDENTIFIER, new MimicAction())
+			.put(RevengeAction.IDENTIFIER, new RevengeAction())
+			.put(TreasureAction.IDENTIFIER, new TreasureAction())
+			.put(CustomFunctionAction.IDENTIFIER, new CustomFunctionAction())
+			.build();
 
 	private SpawnerActionManager() {
 

@@ -9,12 +9,14 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
+import com.playmonumenta.plugins.spawners.actions.CustomFunctionAction;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTTileEntity;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -84,7 +86,8 @@ public class SpawnerUtils {
 	/**
 	 * Returns true if the damage is enough to break the spawner.
 	 * Otherwise, removes shields equal to the damage done.
-	 * @param block the spawner block.
+	 *
+	 * @param block  the spawner block.
 	 * @param damage the damage dealt by the pickaxe.
 	 */
 	public static boolean tryBreakSpawner(Block block, int damage) {
@@ -111,7 +114,7 @@ public class SpawnerUtils {
 		new BukkitRunnable() {
 			final Marker mMarker = marker;
 			final PPCircle mHealthyShield = new PPCircle(Particle.SOUL_FIRE_FLAME, mMarker.getLocation(), 1)
-				.countPerMeter(2).distanceFalloff(20).ringMode(true);
+					.countPerMeter(2).distanceFalloff(20).ringMode(true);
 			final boolean mHasLosPool = getLosPool(marker.getLocation().getBlock()) != null;
 
 			@Override
@@ -179,7 +182,7 @@ public class SpawnerUtils {
 		}
 
 		return new NBTItem(spawnerItem).getCompoundList(BREAK_ACTIONS_ATTRIBUTE)
-			.stream().map(compound -> compound.getString("identifier")).toList();
+				.stream().map(compound -> compound.getString("identifier")).toList();
 	}
 
 	public static List<String> getBreakActionIdentifiers(Block spawnerBlock) {
@@ -188,7 +191,7 @@ public class SpawnerUtils {
 		}
 
 		return new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE)
-			.stream().map(compound -> compound.getString("identifier")).toList();
+				.stream().map(compound -> compound.getString("identifier")).toList();
 	}
 
 	public static void transferBreakActionList(ItemStack spawnerItem, Block spawnerBlock) {
@@ -380,6 +383,7 @@ public class SpawnerUtils {
 				if (json == null) {
 					return;
 				}
+
 				parameterMap.replace(key, MessagingUtils.GSON.fromJson(json, value.getClass()));
 			});
 
@@ -483,6 +487,34 @@ public class SpawnerUtils {
 		tileEntity.getPersistentDataContainer().setInteger(SHIELDS_ATTRIBUTE, shields);
 	}
 
+	public static void unsetCustomFunction(ItemStack spawnerItem) {
+		if (!isSpawner(spawnerItem)) {
+			return;
+		}
+
+		boolean shouldClearBreakActionsNBT = getBreakActionIdentifiers(spawnerItem).size() == 1;
+		removeBreakAction(spawnerItem, CustomFunctionAction.IDENTIFIER);
+		if (shouldClearBreakActionsNBT) {
+			//clear it so it doesn't spawn particles when breaking the spawner.
+			NBTItem item = new NBTItem(spawnerItem);
+			item.removeKey(BREAK_ACTIONS_ATTRIBUTE);
+			spawnerItem.setItemMeta(item.getItem().getItemMeta());
+		}
+	}
+
+	public static void setCustomFunction(ItemStack spawnerItem, FunctionWrapper function) {
+		if (!isSpawner(spawnerItem)) {
+			return;
+		}
+
+		if (!SpawnerActionManager.actionExists(CustomFunctionAction.IDENTIFIER)) {
+			MMLog.warning("Custom function break action is missing, could not apply custom function.");
+			return;
+		}
+		addBreakAction(spawnerItem, CustomFunctionAction.IDENTIFIER);
+		setParameterValue(spawnerItem, CustomFunctionAction.IDENTIFIER, CustomFunctionAction.FUNCTION_KEY, function.getKey().asString());
+	}
+
 	public static boolean isSpawner(Block block) {
 		return block.getType().equals(Material.SPAWNER);
 	}
@@ -502,7 +534,7 @@ public class SpawnerUtils {
 	public static void removeEffectsDisplayMarker(Block block) {
 		BlockUtils.getCenterBlockLocation(block).getNearbyEntities(0.1, 0.1, 0.1).forEach(e -> {
 			if (e instanceof Marker marker &&
-				(marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG) || marker.getScoreboardTags().contains(EFFECTS_SPAWNER_MARKER_TAG))) {
+					(marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG) || marker.getScoreboardTags().contains(EFFECTS_SPAWNER_MARKER_TAG))) {
 				marker.remove();
 			}
 		});
@@ -510,9 +542,9 @@ public class SpawnerUtils {
 
 	public static boolean hasEffectsDisplayMarker(Block block) {
 		return BlockUtils.getCenterBlockLocation(block).getNearbyEntities(0.1, 0.1, 0.1)
-			.stream().anyMatch(e -> (e instanceof Marker marker &&
-				(marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG) || marker.getScoreboardTags().contains(EFFECTS_SPAWNER_MARKER_TAG)))
-			);
+				.stream().anyMatch(e -> (e instanceof Marker marker &&
+						(marker.getScoreboardTags().contains(SHIELDED_SPAWNER_MARKER_TAG) || marker.getScoreboardTags().contains(EFFECTS_SPAWNER_MARKER_TAG)))
+				);
 	}
 
 	public static void addTorch(Block block) {
@@ -583,7 +615,7 @@ public class SpawnerUtils {
 		PersistentDataContainer persistentDataContainer = spawner.getPersistentDataContainer();
 		PersistentDataAdapterContext context = persistentDataContainer.getAdapterContext();
 		persistentDataContainer.set(TORCH_LOCATIONS, PersistentDataType.TAG_CONTAINER_ARRAY,
-			torches.stream().map(b -> getContainerFromBlock(b, context)).toArray(PersistentDataContainer[]::new));
+				torches.stream().map(b -> getContainerFromBlock(b, context)).toArray(PersistentDataContainer[]::new));
 	}
 
 	private static Block getBlockFromContainer(PersistentDataContainer c, World world) {
@@ -610,7 +642,7 @@ public class SpawnerUtils {
 		}
 		if (originalMaxDelay <= 0) {
 			MMLog.warning("Non-positive spawner delay detected, setting it to 100. location=" + spawner.getLocation() + ", delay on spawner=" + spawner.getMaxSpawnDelay()
-				              + ", delay in persistent container=" + Objects.requireNonNull(persistentDataContainer.get(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER)));
+					+ ", delay in persistent container=" + Objects.requireNonNull(persistentDataContainer.get(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER)));
 			originalMaxDelay = 100;
 			persistentDataContainer.set(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER, originalMaxDelay);
 		}
