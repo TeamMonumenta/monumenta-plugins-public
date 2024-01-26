@@ -23,11 +23,13 @@ import com.playmonumenta.plugins.particle.PPFlower;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hoglin;
 import org.bukkit.entity.LivingEntity;
@@ -98,6 +101,22 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
 
 		spawnAnimation();
+
+		Collection<ArmorStand> nearbyStands = mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), 30.0);
+		for (ArmorStand stand : nearbyStands) {
+
+			//Set bedrock behind boss room
+			if (stand.getName().contains(Hedera.DOOR_FILL_TAG)) {
+				Location baseLoc = stand.getLocation().getBlock().getLocation();
+				stand.remove();
+				Location p1 = baseLoc.clone().add(0, -6, -6);
+				Location p2 = baseLoc.clone().add(0, 6, 6);
+				LocationUtils.fillBlocks(p1, p2, Material.BEDROCK);
+				p1 = p1.clone().add(1, 0, 0);
+				p2 = p2.clone().add(1, 0, 0);
+				LocationUtils.fillBlocks(p1, p2, Material.BLACK_CONCRETE);
+			}
+		}
 
 		// Garden handles both flower spawning, and adds spawning at Ascension 4+
 		PassiveGardenTwo garden = new PassiveGardenTwo(mBoss, mParty);
