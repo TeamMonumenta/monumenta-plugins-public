@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -39,6 +40,7 @@ public class LastBreath extends DepthsAbility {
 	private static final int[] RESISTANCE_TICKS = {30, 35, 40, 45, 50, 70};
 	private static final int SPEED_DURATION = 6 * 20;
 	private static final String SPEED_EFFECT_NAME = "LastBreathSpeedEffect";
+	private static final String RESIST_EFFECT_NAME = "LastBreathResistanceEffect";
 	public static final int RADIUS = 5;
 	public static final double KNOCKBACK_SPEED = 2;
 
@@ -101,7 +103,7 @@ public class LastBreath extends DepthsAbility {
 		World world = mPlayer.getWorld();
 
 		mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(mSpeedDuration, mSpeed, SPEED_EFFECT_NAME));
-		mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, mResistDuration, 4));
+		mPlugin.mEffectManager.addEffect(mPlayer, RESIST_EFFECT_NAME, new PercentDamageReceived(mResistDuration, -1));
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, mRadius)) {
 			if (!EntityUtils.isCCImmuneMob(e)) {
 				Vector relative = e.getLocation().toVector().subtract(loc.toVector()).normalize();
@@ -140,7 +142,7 @@ public class LastBreath extends DepthsAbility {
 			.addPercent(a -> a.mSpeed, SPEED[rarity - 1], false, true)
 			.add(" speed for ")
 			.addDuration(a -> a.mSpeedDuration, SPEED_DURATION)
-			.add(" seconds and Resistance V for ")
+			.add(" seconds and 100% resistance for ")
 			.addDuration(a -> a.mResistDuration, RESISTANCE_TICKS[rarity - 1], false, true)
 			.add(" seconds. Mobs within ")
 			.add(a -> a.mRadius, RADIUS)

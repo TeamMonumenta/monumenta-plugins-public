@@ -33,7 +33,7 @@ import org.bukkit.potion.PotionEffectType;
 public class SoothingCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Soothing Combos";
-	public static final double[] HEAL = {0.12, 0.14, 0.16, 0.18, 0.20, 0.24};
+	public static final double[] HEAL = {0.06, 0.07, 0.08, 0.09, 0.10, 0.12};
 	public static final double[] SPEED_PERCENT = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
 	public static final String SPEED_EFFECT_NAME = "SoothingCombosPercentSpeedEffect";
 	public static final int DURATION = 6 * 20;
@@ -75,7 +75,12 @@ public class SoothingCombos extends DepthsAbility {
 
 				List<Player> nearPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRange / 2.0, true);
 				for (Player p : nearPlayers) {
-					double healed = PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * mHeal, mPlayer);
+
+					double healAmount = EntityUtils.getMaxHealth(p) * mHeal;
+					if (p != mPlayer) {
+						healAmount *= 1.5;
+					}
+					double healed = PlayerUtils.healPlayer(mPlugin, p, healAmount, mPlayer);
 					if (healed > 0) {
 						new PartialParticle(Particle.HEART, LocationUtils.getHalfHeightLocation(p), 6, 0.5, 1, 0.5, 0).spawnAsPlayerActive(mPlayer);
 					}
@@ -108,7 +113,7 @@ public class SoothingCombos extends DepthsAbility {
 			.add(a -> a.mRange / 2, RANGE / 2.0)
 			.add(" blocks for ")
 			.addPercent(a -> a.mHeal, HEAL[rarity - 1], false, true)
-			.add(" of their max health, and give ")
+			.add(" of their max health. Other players receive 50% more healing. Additionally, give ")
 			.addPercent(a -> a.mSpeed, SPEED_PERCENT[rarity - 1], false, true)
 			.add(" speed and Haste ")
 			.add(haste)
