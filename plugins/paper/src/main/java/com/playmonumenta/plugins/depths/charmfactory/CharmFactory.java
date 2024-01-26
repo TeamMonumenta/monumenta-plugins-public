@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
@@ -47,6 +48,10 @@ public class CharmFactory {
 	public static final double TREE_BUDGET_MODIFIER = 1.35;
 	public static final double WILDCARD_BUDGET_MODIFIER = 1.8;
 	public static final int[] WILDCARD_TREE_CAP_CHANCES = {0, 33, 33, 17, 8, 5, 4};
+
+	public static final Map<String, String> charmConversionMap = Map.ofEntries(
+		Map.entry("Precision Strike Range", "Precision Strike Range Requirement")
+	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
 		if (!item.getType().isAir()) {
@@ -80,8 +85,18 @@ public class CharmFactory {
 			count = 1;
 			while (playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count) != null
 				&& !playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count).isEmpty()) {
-				charmEffectOrder.add(playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count));
-				MMLog.fine("retrieved nbt " + charmEffectOrder.get(count - 1) + " " + count);
+
+				// replace charm effects according to map
+				String effect = playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count);
+				MMLog.fine("retrieved nbt " + effect + " " + count);
+
+				String newEffect = effect;
+				if (charmConversionMap.get(effect) != null) {
+					newEffect = charmConversionMap.get(effect);
+					MMLog.fine("changed charm effect from " + effect + " to " + newEffect + " " + count);
+				}
+
+				charmEffectOrder.add(newEffect);
 				count++;
 			}
 
@@ -107,6 +122,7 @@ public class CharmFactory {
 		List<String> activeEffects = new ArrayList<>();
 		// Keep track of text components to put them in sorted order later
 		List<Component> charmTextLines = new ArrayList<>();
+
 		String chosenAbility = null;
 		DepthsTree chosenTree = null;
 		boolean isTreeLocked = false;

@@ -322,7 +322,7 @@ public enum CharmEffects {
 	METALMANCY_DAMAGE("Metalmancy Damage", Metalmancy.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	METALMANCY_DURATION("Metalmancy Duration", Metalmancy.INFO, true, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
 	PRECISION_STRIKE_DAMAGE("Precision Strike Damage", PrecisionStrike.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	PRECISION_STRIKE_RANGE("Precision Strike Range", PrecisionStrike.INFO, false, true, 10.0, -50, new double[] {-5, -10, -15, -20, -25}),
+	PRECISION_STRIKE_RANGE("Precision Strike Range Requirement", PrecisionStrike.INFO, false, true, 10.0, -50, new double[] {-5, -10, -15, -20, -25}),
 	PRECISION_STRIKE_MAX_STACKS("Precision Strike Max Stacks", PrecisionStrike.INFO, true, false, 0, 3, new double[] {0, 0, 0, 0, 1}),
 	PROJECTILE_MASTERY_DAMAGE_MULTIPLIER("Projectile Mastery Damage Multiplier", ProjectileMastery.INFO, true, true, 2.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
 	RAPID_FIRE_COOLDOWN(RapidFire.CHARM_COOLDOWN, RapidFire.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
