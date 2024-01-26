@@ -9,10 +9,12 @@ import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -371,5 +373,11 @@ public class BossUtils {
 			}
 		}
 		return timeOfDay;
+	}
+
+	public static void hideBossBar(BossBar bar, World world) {
+		for (Player player : world.getPlayers()) {
+			player.hideBossBar(bar);
+		}
 	}
 }

@@ -123,14 +123,12 @@ public class SpellFinalCrystal extends Spell {
 						ScoreboardUtils.addEntityToTeam(e, "crystal");
 					}
 				}
-				List<Player> players = Lich.playersInRange(mCenter, mRange, true);
+
 				//exit function
 				mCrystal.removeIf(en -> !en.isValid());
-				if (mCrystal.size() == 0 || Lich.bossDead()) {
+				int remainingCrystals = mCrystal.size();
+				if (remainingCrystals == 0 || Lich.bossDead()) {
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 4.0f, 0.5f);
-					for (Player player : players) {
-						player.hideBossBar(bar);
-					}
 					this.cancel();
 				}
 				//warning 1
@@ -146,9 +144,6 @@ public class SpellFinalCrystal extends Spell {
 				//execute order 66
 				if (mT >= 20 * 6) {
 					attack();
-					for (Player player : players) {
-						player.hideBossBar(bar);
-					}
 					if (!mRecast) {
 						mTriggered = true;
 					}
@@ -156,22 +151,27 @@ public class SpellFinalCrystal extends Spell {
 				}
 				mT++;
 				//boss bar stuff
-				int remain = mCrystal.size();
-				float progress = Math.min(remain * 1.0f / mCount, 1);
-				bar.name(Component.text(remain + " Death Crystals Remaining!", NamedTextColor.YELLOW));
+				float progress = Math.min(remainingCrystals * 1.0f / mCount, 1);
+				bar.name(Component.text(remainingCrystals + " Death Crystals Remaining!", NamedTextColor.YELLOW));
 				bar.progress(progress);
 				if (progress <= 0.34) {
 					bar.color(BossBar.Color.RED);
 				} else if (progress <= 0.67) {
 					bar.color(BossBar.Color.YELLOW);
 				}
-				for (Player player : players) {
+				for (Player player : mBoss.getWorld().getPlayers()) {
 					if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
 						player.showBossBar(bar);
 					} else {
 						player.hideBossBar(bar);
 					}
 				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				BossUtils.hideBossBar(bar, world);
 			}
 		};
 		runA.runTaskTimer(mPlugin, 20 * 1, 1);
