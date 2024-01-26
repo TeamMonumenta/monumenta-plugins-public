@@ -13,7 +13,17 @@ import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.bukkit.Bukkit;
@@ -25,7 +35,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -582,15 +596,13 @@ public final class EffectManager implements Listener {
 		}
 	}
 
-	public @Nullable List<Effect> getAllEffects(Entity entity) {
+	public List<Effect> getAllEffects(Entity entity) {
 		List<EffectPair> effectPairs = getAllEffectPairs(entity);
+		List<Effect> effects = new ArrayList<>();
 		if (effectPairs != null) {
-			List<Effect> effects = new ArrayList<>();
 			effectPairs.forEach(pair -> effects.add(pair.mEffect));
-			return effects;
-		} else {
-			return null;
 		}
+		return effects;
 	}
 
 	public @Nullable Effect getActiveEffect(Entity entity, String source) {
@@ -1044,26 +1056,24 @@ public final class EffectManager implements Listener {
 	public void applyEffectsOnRespawn(Plugin plugin, Player player) {
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			List<Effect> activeEffects = getAllEffects(player);
-			if (activeEffects != null) {
-				for (Effect effect : activeEffects) {
-					String source = getSource(player, effect);
-					// Recall Effect Gain Function to regain buffs one tick later.
-					effect.entityLoseEffect(player);
-					if (source != null) {
-						ClientModHandler.updateEffect(player, effect, source, true);
-						Bukkit.getScheduler().runTaskLater(plugin, () -> {
-							NavigableSet<Effect> effectsInSource = getEffects(player, source);
-							// Ensure that:
-							// Effect is still top priority
-							// Effect duration has not run out.
-							// Only then do we re-apply the gain effect (things like speed attribute)
-							// Really, it's more insurance to ensure we don't have another bug in our hands due to all the delay stuff.
-							if (effectsInSource != null && effectsInSource.last() == effect && effectsInSource.last().getDuration() == effect.getDuration() && effect.getDuration() > 0) {
-								effect.entityGainEffect(player);
-								ClientModHandler.updateEffect(player, effect, source, false);
-							}
-						}, 1);
-					}
+			for (Effect effect : activeEffects) {
+				String source = getSource(player, effect);
+				// Recall Effect Gain Function to regain buffs one tick later.
+				effect.entityLoseEffect(player);
+				if (source != null) {
+					ClientModHandler.updateEffect(player, effect, source, true);
+					Bukkit.getScheduler().runTaskLater(plugin, () -> {
+						NavigableSet<Effect> effectsInSource = getEffects(player, source);
+						// Ensure that:
+						// Effect is still top priority
+						// Effect duration has not run out.
+						// Only then do we re-apply the gain effect (things like speed attribute)
+						// Really, it's more insurance to ensure we don't have another bug in our hands due to all the delay stuff.
+						if (effectsInSource != null && effectsInSource.last() == effect && effectsInSource.last().getDuration() == effect.getDuration() && effect.getDuration() > 0) {
+							effect.entityGainEffect(player);
+							ClientModHandler.updateEffect(player, effect, source, false);
+						}
+					}, 1);
 				}
 			}
 		}, 1);

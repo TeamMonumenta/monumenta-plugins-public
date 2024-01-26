@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.HeavenlyBoonTracker;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.EffectType;
@@ -255,5 +256,28 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static void heavenlyBoonSound(Player player) {
 		// copied from sacred provisions sound
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
+	}
+
+	public static void cancelExtensions(Player player) {
+		List<Effect> effects = EffectManager.getInstance().getAllEffects(player);
+		for (Effect effect : effects) {
+			if (effect.mHeavenlyBoonExtensions > 0) {
+				effect.setDuration(reduceDuration(effect.getDuration(), effect.mHeavenlyBoonExtensions));
+				effect.mHeavenlyBoonExtensions = 0;
+			}
+		}
+
+		List<PotionUtils.PotionInfo> infos = Plugin.getInstance().mPotionManager.getPotionInfoList(player);
+		for (PotionUtils.PotionInfo info : infos) {
+			if (info.mHeavenlyBoonExtensions > 0) {
+				info.mDuration = reduceDuration(info.mDuration, info.mHeavenlyBoonExtensions);
+				info.mHeavenlyBoonExtensions = 0;
+			}
+		}
+		Plugin.getInstance().mPotionManager.refreshEffects(player);
+	}
+
+	private static int reduceDuration(int duration, int extensions) {
+		return (int) Math.round(duration * Math.pow(1 + ENHANCEMENT_POTION_EFFECT_BONUS, -extensions));
 	}
 }

@@ -154,6 +154,13 @@ public class PotionManager {
 		return infos;
 	}
 
+	public List<PotionInfo> getPotionInfoList(Player player) {
+		Map<PotionID, List<PotionInfo>> map = getAllPotionInfos(player);
+		List<PotionInfo> list = new ArrayList<>();
+		map.values().forEach(list::addAll);
+		return list;
+	}
+
 	public void updatePotionStatus(Player player, int ticks) {
 		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {

@@ -349,9 +349,6 @@ public class PotionUtils {
 			}
 		});
 		List<Effect> effects = EffectManager.getInstance().getAllEffects(player);
-		if (effects == null) {
-			return;
-		}
 		for (Effect effect : effects) {
 			if (effect.isDebuff()) {
 				effect.setDuration((int) (effect.getDuration() * reduction));
