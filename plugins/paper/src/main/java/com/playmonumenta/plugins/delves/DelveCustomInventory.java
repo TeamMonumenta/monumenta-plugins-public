@@ -27,6 +27,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -505,5 +506,12 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 		loadInv();
 
+	}
+
+	@Override
+	public void inventoryClose(InventoryCloseEvent event) {
+		if (mEditableDelvePoint && mPreset != null) {
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> new DelvePresetSelectionGui(mOwner, mDungeonName).open());
+		}
 	}
 }

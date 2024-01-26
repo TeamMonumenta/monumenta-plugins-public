@@ -63,6 +63,15 @@ public class DelvesCommands {
 				new DelveCustomInventory((Player) args[1], (String) args[2], true).openInventory((Player) args[0], plugin);
 			}).register();
 
+		new CommandAPICommand("opendpsgui")
+			.withPermission(perms)
+			.withArguments(
+				new EntitySelectorArgument.OnePlayer("player"),
+				dungeonArg)
+			.executes((sender, args) -> {
+				new DelvePresetSelectionGui((Player) args[0], (String) args[1]).open();
+			}).register();
+
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
