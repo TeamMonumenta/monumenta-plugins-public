@@ -2,13 +2,18 @@ package com.playmonumenta.plugins.bosses.spells.sirius;
 
 import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPSpiral;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -79,9 +84,12 @@ public class SpellCosmicPortals extends Spell {
 				if (mTicks == DURATION - 2 * 20) {
 					mPortalLoc = LocationUtils.fallToGround(mPortalLoc, mSirius.mBoss.getLocation().getY() - 10).add(0, 0.1, 0);
 				}
-				new PPCircle(Particle.REDSTONE, mPortalLoc, finalMRadius).ringMode(true).count(30).data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 2.0f)).spawnAsBoss();
+				if (mTicks < DURATION - 2 * 20) {
+					drawCircle(mPortalLoc, finalMRadius);
+				}
 				if (mTicks >= DURATION - 2 * 20 && mTicks % 10 == 0) {
-					new PPSpiral(Particle.END_ROD, mPortalLoc, finalMRadius).count(10).spawnAsBoss();
+					drawCircle(mPortalLoc, finalMRadius);
+					new PPSpiral(Particle.END_ROD, mPortalLoc, finalMRadius).count(7).spawnAsBoss();
 				}
 
 				if (mTicks > DURATION) {
@@ -118,5 +126,14 @@ public class SpellCosmicPortals extends Spell {
 				mTicks += 5;
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
+	}
+
+	private void drawCircle(Location loc, int radius) {
+		for (double theta = 0; theta < 360; theta += (360 / 30.0)) {
+			Location temp = loc.clone();
+			temp.add(radius * FastUtils.cosDeg(theta), 0, radius * FastUtils.sinDeg(theta));
+			temp = LocationUtils.fallToGround(temp.add(0, radius, 0), loc.getY() - radius);
+			new PartialParticle(Particle.REDSTONE, temp).count(1).data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 2.0f)).spawnAsBoss();
+		}
 	}
 }

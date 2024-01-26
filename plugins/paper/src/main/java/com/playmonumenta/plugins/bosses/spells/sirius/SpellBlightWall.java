@@ -134,11 +134,11 @@ public class SpellBlightWall extends Spell {
 					}
 				}
 				if (mTicks >= DELAY + finalDuration) {
-					mDeclerations.mTpBlocked = false;
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDeclerations.mTpBlocked = false, 5 * 20);
 					this.cancel();
 				}
 				if (mSirius.mDone) {
-					mDeclerations.mTpBlocked = false;
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDeclerations.mTpBlocked = false, 5 * 20);
 					this.cancel();
 					mBar.remove();
 				}

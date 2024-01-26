@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
 public class StarBlight extends FlatHealthBoost {
@@ -11,7 +12,7 @@ public class StarBlight extends FlatHealthBoost {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return Component.text(getDisplayedName() + " (" + mAmount + " Max Health)");
+		return Component.text(getDisplayedName() + " (" + mAmount + " Max Health)", NamedTextColor.RED);
 	}
 
 	@Override

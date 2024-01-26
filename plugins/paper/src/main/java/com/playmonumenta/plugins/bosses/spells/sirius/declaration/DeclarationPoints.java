@@ -41,6 +41,8 @@ public class DeclarationPoints extends Spell {
 			MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("This tomb will be yours. There is no escape from this blight.", NamedTextColor.AQUA, TextDecoration.BOLD));
 		}
 		mConverter.blightArena(List.of(mSirius.mAuroraLocation.getBlock().getLocation(), mSirius.mTuulenLocation.getBlock().getLocation()), RADIUS, 4 * 20, 2 * 20, mPlugin);
+		mConverter.restoreFullCircle(mSirius.mTuulenLocation, (int) RADIUS);
+		mConverter.restoreFullCircle(mSirius.mAuroraLocation, (int) RADIUS);
 		new BukkitRunnable() {
 			int mTicks = 0;
 			final ChargeUpManager mManager = new ChargeUpManager(mSirius.mBoss, DURATION, Component.text("Encroaching Blight", NamedTextColor.AQUA), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 75);
