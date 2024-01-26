@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.FloatArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LootTableArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -18,6 +21,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
@@ -55,11 +59,54 @@ public class SimulateLoot {
 			.withArguments(new MultiLiteralArgument("loot"))
 			.withArguments(new IntegerArgument("rolls", 1))
 			.withArguments(new LootTableArgument("loot table"))
+			.withArguments(new MultiLiteralArgument("withluck"))
+			.withArguments(new FloatArgument("Luck"))
+			.executesNative((nativeSender, args) -> {
+				int numRolls = (int) args[1];
+				LootTable lootTable = (LootTable) args[2];
+				float luck = (float) args[4];
+				LootContext lootContext = new LootContext
+					.Builder(nativeSender.getLocation())
+					.luck(luck)
+					.build();
+				run(plugin, nativeSender, numRolls, lootTable, lootContext);
+			})
+			// Add additional loot context details here, such as luck values, killer/killed mob, etc
+			.register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(new MultiLiteralArgument("loot"))
+			.withArguments(new IntegerArgument("rolls", 1))
+			.withArguments(new LootTableArgument("loot table"))
 			.executesNative((nativeSender, args) -> {
 				int numRolls = (int) args[1];
 				LootTable lootTable = (LootTable) args[2];
 				LootContext lootContext = new LootContext
 					.Builder(nativeSender.getLocation())
+					.build();
+				run(plugin, nativeSender, numRolls, lootTable, lootContext);
+			})
+			// Add additional loot context details here, such as luck values, killer/killed mob, etc
+			.register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(new MultiLiteralArgument("loot"))
+			.withArguments(new IntegerArgument("rolls", 1))
+			.withArguments(new LootTableArgument("loot table"))
+			.withArguments(new MultiLiteralArgument("byplayer"))
+			.executesNative((nativeSender, args) -> {
+				CommandSender sender = CommandUtils.getCallee(nativeSender);
+				if (!(sender instanceof Player player)) {
+					throw CommandAPI.failWithString("This command must be run as a player");
+				}
+
+				int numRolls = (int) args[1];
+				LootTable lootTable = (LootTable) args[2];
+				LootContext lootContext = new LootContext
+					.Builder(nativeSender.getLocation())
+					.killer(player)
 					.build();
 				run(plugin, nativeSender, numRolls, lootTable, lootContext);
 			})
