@@ -187,7 +187,7 @@ public enum CharmEffects {
 	FIREBALL_COOLDOWN(Fireball.CHARM_COOLDOWN, Fireball.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	FIREBALL_DAMAGE("Fireball Damage", Fireball.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	FIREBALL_RADIUS("Fireball Radius", Fireball.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
-	FIREBALL_RANGE("Fireball Range", Fireball.INFO, false, true, 20.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	FIREBALL_VELOCITY("Fireball Velocity", Fireball.INFO, true, true, 10.0, 100.0, new double[] {10.0, 20.0, 30.0, 40.0, 50.0}),
 	FIREBALL_FIRE_DURATION("Fireball Fire Duration", Fireball.INFO, false, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
 	FLAME_SPIRIT_DAMAGE("Flame Spirit Damage", FlameSpirit.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	FLAME_SPIRIT_RADIUS("Flame Spirit Radius", FlameSpirit.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),

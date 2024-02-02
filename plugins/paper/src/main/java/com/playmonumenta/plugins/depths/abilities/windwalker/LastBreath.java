@@ -26,8 +26,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,7 +127,13 @@ public class LastBreath extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 2.0f, 0.4f);
 
 		sendActionBarMessage("Last Breath has been activated!");
+		event.setCancelled(true);
 
+	}
+
+	@Override
+	public void onHurtFatal(DamageEvent event) {
+		onHurt(event, null, null);
 	}
 
 	private static Description<LastBreath> getDescription(int rarity, TextColor color) {
