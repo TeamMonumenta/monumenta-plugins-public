@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
@@ -21,6 +22,7 @@ import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -63,6 +65,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	private static final double EXPLODE_RADIUS = 1.25;
 	private static final double EXPLODE_KNOCKBACK = 0.25;
 	private static final int PIERCING = 0;
+	private static final int R2_CAP = 400;
+	private static final int R3_CAP = 750;
+	private static final int CAP_LEVEL_TWO_MULTIPLIER = 2;
 
 	private static final int DURATION = 20 * 5;
 
@@ -84,11 +89,13 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 											"When you fire a critical projectile, it will instantaneously travel in a straight line " +
 											"for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
 											"This ability deals %s%% of your projectile damage increased by %s%% for every block of distance from you and the target " +
-											"(up to %d blocks, or %s%% total). Cooldown: %ds.",
+											"(up to %d blocks, or %s%% total). Final damage cannot go above %d in Region 2 and %d in Region 3. Cooldown: %ds.",
 									MAX_RANGE, EXPLODE_RADIUS, StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER), StringUtils.multiplierToPercentage(DISTANCE_SCALE_1), MAX_DAMAGE_RANGE,
-									StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_1 + DAMAGE_MULTIPLIER), COOLDOWN_1 / 20),
-							String.format("Damage now increases by %s%% for each block of distance (up to %s%% in total). Cooldown: %ds.", StringUtils.multiplierToPercentage(DISTANCE_SCALE_2),
-									StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER), COOLDOWN_2 / 20))
+									StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_1 + DAMAGE_MULTIPLIER), R2_CAP, R3_CAP, COOLDOWN_1 / 20),
+							String.format("Damage now increases by %s%% for each block of distance (up to %s%% in total). " +
+								              "Final damage cap is increased to %d in Region 2 and %d in Region 3. Cooldown: %ds.",
+									StringUtils.multiplierToPercentage(DISTANCE_SCALE_2), StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER),
+									R2_CAP * CAP_LEVEL_TWO_MULTIPLIER, R3_CAP * CAP_LEVEL_TWO_MULTIPLIER, COOLDOWN_2 / 20))
 					.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
 					.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 					// Put this trigger first so that they can be made the same for convenience
@@ -307,6 +314,18 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.PLAYERS, 0.6f, 0.9f);
 			new PartialParticle(Particle.LAVA, loc, 25, mExplodeRadius, mExplodeRadius, mExplodeRadius).spawnAsPlayerActive(mPlayer);
 		}
+	}
+
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		int regionCap = ServerProperties.getAbilityEnhancementsEnabled(mPlayer) ? R3_CAP : R2_CAP;
+		int damageCap = isLevelOne() ? regionCap : regionCap * CAP_LEVEL_TWO_MULTIPLIER;
+
+		if (event.getAbility() == ClassAbility.PREDATOR_STRIKE && event.getFinalDamage(true) > damageCap) {
+			event.setDamage(damageCap);
+		}
+
+		return false;
 	}
 
 	@Override

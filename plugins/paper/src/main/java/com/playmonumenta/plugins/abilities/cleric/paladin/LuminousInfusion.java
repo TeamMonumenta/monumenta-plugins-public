@@ -62,7 +62,8 @@ public class LuminousInfusion extends Ability {
 					"and knocking other enemies away from it. Cooldown: 12s.",
 				"Your melee attacks now passively deal 15% magic damage to undead enemies, " +
 					"and Divine Justice now passively deals 15% more total damage. " +
-					"Damaging an undead enemy now passively sets it on fire for 3s.")
+					"Damaging an undead enemy now passively sets it on fire for 3s. " +
+					"Applies inferno at 50% efficiency for magic and projectile attacks.")
 			.simpleDescription("Upon activating, the next damage dealt to an Undead enemy causes an explosion.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LuminousInfusion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
