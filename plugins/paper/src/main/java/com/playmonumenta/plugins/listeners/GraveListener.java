@@ -187,6 +187,10 @@ public class GraveListener implements Listener {
 				// If a hoped item isn't put into a grave (because graves are disabled), cancel all non-void damage.
 				event.setCancelled(true);
 				entity.setInvulnerable(true); // also make the item invulnerable to prevent this event from being spammed
+			} else if (GraveManager.isThrownItem(entity)) {
+				// Cancel damage event, remove manually.
+				event.setCancelled(true);
+				entity.remove();
 			}
 		} else if (GraveManager.isGrave(event.getEntity())) {
 			event.setCancelled(true);
