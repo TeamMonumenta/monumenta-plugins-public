@@ -12,13 +12,12 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -36,7 +35,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class KnickKnackSackGui extends Gui {
 	private static final int INV_SIZE = 36;
@@ -76,7 +74,7 @@ public class KnickKnackSackGui extends Gui {
 			0xa3cbe1,
 			AvalanchexCS.NAME),
 		// Steelsage talisman
-		// The unlcok and preference scores for shadow and steel are switched!!
+		// The unlock and preference scores for shadow and steel are switched!!
 		new Talisman(
 			"Steelsage",
 			"epic:r2/depths/utility/steelsage_talisman",
@@ -136,7 +134,7 @@ public class KnickKnackSackGui extends Gui {
 			0xa3cbe1,
 			AvalanchexCS.NAME),
 		// Steelsage talisman
-		// The unlcok and preference scores for shadow and steel are switched!!
+		// The unlock and preference scores for shadow and steel are switched!!
 		new Talisman(
 			"Steelsage",
 			"epic:r3/depths2/steelsage_talisman_zenith",
@@ -167,7 +165,7 @@ public class KnickKnackSackGui extends Gui {
 		DEPTHS_TALISMANS,
 		DEPTHS_REFUNDS(Component.text("Depths Talisman Refunds", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
 		ZENITH_TALISMANS,
-		ZENITH_REFUNDS(Component.text("Celestial Zenith Talisman Refunds", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
+		ZENITH_REFUNDS(Component.text("Zenith Talisman Refunds", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
 		CONTRACT_CONFIRM_DELETE(Component.text("Confirm Deletion", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 
 		public final Component mTitle;
@@ -216,10 +214,7 @@ public class KnickKnackSackGui extends Gui {
 		int zenithTalismanSlot = 24;    // Zenith Trinket
 
 		// Information sign
-		ItemStack info = new ItemStack(Material.OAK_SIGN);
-		ItemMeta meta = info.getItemMeta();
-		meta.displayName(Component.text("Trinkets", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		info.setItemMeta(meta);
+		ItemStack info = GUIUtils.createBasicItem(Material.OAK_SIGN, "Trinkets", NamedTextColor.WHITE, true);
 		setItem(4, info);
 
 		// PEB, free
@@ -231,15 +226,12 @@ public class KnickKnackSackGui extends Gui {
 		// Charm trinket, r3 access
 		ItemStack charm = makeTrinketItemStack("epic:r3/charms/charms_trinket");
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, "R3Access").orElse(0) != 0) {
-			overrideLore(charm,
-				"Click to open the Charms Menu."
-			);
+			GUIUtils.splitLoreLine(charm, "Click to open the Charms Menu.", NamedTextColor.GRAY, true);
 			GuiItem tCharm = new GuiItem(charm).onClick((evt) -> runConsoleCommand("charm gui @S"));
 			setItem(charmSlot, tCharm);
 		} else {
 			charm.setType(Material.BARRIER);
-			overrideLore(charm, NamedTextColor.YELLOW,
-				"Gain access to the Architect's Ring to unlock!");
+			GUIUtils.splitLoreLine(charm, "Gain access to the Architect's Ring to unlock!", NamedTextColor.YELLOW, true);
 			setItem(charmSlot, charm);
 		}
 
@@ -253,7 +245,15 @@ public class KnickKnackSackGui extends Gui {
 				playerFoundDepths = mPlayer.getAdvancementProgress(foundDepthsLobby).isDone();
 			}
 		}
-		if (playerFoundDepths) {
+		NamespacedKey findZenith = NamespacedKey.fromString("monumenta:dungeons/zenith/find");
+		boolean playerFoundZenith = false;
+		if (findZenith != null) {
+			Advancement foundZenithLobby = Bukkit.getAdvancement(findZenith);
+			if (foundZenithLobby != null) {
+				playerFoundZenith = mPlayer.getAdvancementProgress(foundZenithLobby).isDone();
+			}
+		}
+		if (playerFoundDepths || playerFoundZenith) {
 			GuiItem tDepths = new GuiItem(depths)
 				.onRightClick(() -> {
 					runConsoleCommand("opendepthsgui summary @S");
@@ -263,19 +263,14 @@ public class KnickKnackSackGui extends Gui {
 			setItem(depthsSlot, tDepths);
 		} else {
 			depths.setType(Material.BARRIER);
-			overrideLore(depths, NamedTextColor.YELLOW,
-				"Find the Darkest Depths lobby to unlock!");
+			GUIUtils.splitLoreLine(depths, "Find the Darkest Depths lobby to unlock!", NamedTextColor.YELLOW, true);
 			setItem(depthsSlot, depths);
 		}
 
 		// Bestiary, quest completion
 		ItemStack bestiary = makeTrinketItemStack("epic:r1/quests/53_reward");
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, "Quest53").orElse(0) > 10) {
-			overrideLore(bestiary,
-				"Keeps track of all the mobs",
-				"you've killed across the world.",
-				"Click to open."
-			);
+			GUIUtils.splitLoreLine(bestiary, "Keeps track of all the mobs you've killed across the world. Click to open.", NamedTextColor.GRAY, true);
 			GuiItem tBestiary = new GuiItem(bestiary).onClick((evt) -> {
 				// Resolve this event first so the bestiary doesn't use the same click event once opened
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -285,25 +280,21 @@ public class KnickKnackSackGui extends Gui {
 			setItem(bestiarySlot, tBestiary);
 		} else {
 			bestiary.setType(Material.BARRIER);
-			overrideLore(bestiary, NamedTextColor.YELLOW,
-				"Complete the quest",
-				"\"A Beast of a Book\" to unlock!");
+			GUIUtils.splitLoreLine(bestiary, "Complete the quest \"A Beast of a Book\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(bestiarySlot, bestiary);
 		}
 
 		// Pass Trinket, always unlocked
 		GuiItem tPass = makeTrinketGuiItem(
 			"epic:pass/seasonal_pass_trinket",
-			"Click to show active pass and",
-			"weekly mission progress."
+			"Click to show active pass and weekly mission progress."
 		).onClick((evt) -> runConsoleCommand("battlepass gui @S"));
 		setItem(passSlot, tPass);
 
 		// Cosmetics Trinket, always unlocked
 		GuiItem tCosmetics = makeTrinketGuiItem(
 			"epic:pass/personal_cosmetic_interface",
-			"Click to show and equip your",
-			"unlocked cosmetics."
+			"Click to show and equip your unlocked cosmetics."
 		).onClick((evt) -> runConsoleCommand("cosmetics gui @S"));
 		setItem(cosmeticsSlot, tCosmetics);
 
@@ -318,38 +309,28 @@ public class KnickKnackSackGui extends Gui {
 		int recordScore = ScoreboardUtils.getScoreboardValue(mPlayer, "Quest47").orElse(0);
 		ItemStack record = makeTrinketItemStack("epic:r1/items/misc/tlaxan_record_player");
 		if (recordScore > 2) {
-			overrideLore(record,
-				"Click to open the menu",
-				"and select a song to play."
-			);
-
 			// Override with soulsinger, if the player has it unlocked
 			if (recordScore >= 5) {
 				record = makeTrinketItemStack(
-					"epic:r2/depths/loot/soulsinger",
-					"Click to select a song from the menu."
+					"epic:r2/depths/loot/soulsinger"
 				);
 			}
+			GUIUtils.splitLoreLine(record, "Click to open the menu and select a song to play.", NamedTextColor.GRAY, true);
 
 			GuiItem tRecord = new GuiItem(record).onClick((evt) -> runConsoleCommand("sqgui show recordplayer @S"));
 			setItem(recordSlot, tRecord);
 		} else {
 			// Locked item if neither record player nor soulsinger is unlocked
 			record.setType(Material.BARRIER);
-			overrideLore(record, NamedTextColor.YELLOW,
-				"Complete the quest",
-				"\"Halid's Song\" to unlock!");
+			GUIUtils.splitLoreLine(record, "Complete the quest \"Halid's Song\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(recordSlot, record);
 		}
 
 		// Delves Trinket, requires r3 access
 		ItemStack delve = makeTrinketItemStack("epic:r3/delves/items/delves_trinket");
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, "R3Access").orElse(0) != 0) {
-			overrideLore(delve,
-				"Click to view Architect's Ring",
-				"Overworld Delve Modifiers.",
-				"Shift Right Click to clear modifiers."
-			);
+			GUIUtils.splitLoreLine(delve, "Click to view Architect's Ring Overworld Delve Modifiers. Shift Right Click to clear modifiers.", NamedTextColor.GRAY, true);
+
 			GuiItem tDelve = new GuiItem(delve).onClick((evt) -> {
 				// Gotta specify right-click from shift-right-click
 				String showCommand = "delves show mods @S ring";
@@ -363,17 +344,14 @@ public class KnickKnackSackGui extends Gui {
 			setItem(delveSlot, tDelve);
 		} else {
 			delve.setType(Material.BARRIER);
-			overrideLore(delve, NamedTextColor.YELLOW,
-				"Gain access to the Architect's Ring to unlock!"
-			);
+			GUIUtils.splitLoreLine(delve, "Gain access to the Architect's Ring to unlock!", NamedTextColor.YELLOW, true);
 			setItem(delveSlot, delve);
 		}
 
 		// Emotes Trinket, always unlocked
 		GuiItem tEmote = makeTrinketGuiItem(
 			"epic:r1/items/misc/emotes_trinket",
-			"Left click to open the Emotes Menu.",
-			"Right click to display Emote."
+			"Left click to open the Emotes Menu.\nRight click to display Emote."
 		).onLeftClick(() -> runConsoleCommand("emoji @S")
 		).onRightClick(() -> runConsoleCommand("emote @S"));
 		setItem(emoteSlot, tEmote);
@@ -382,11 +360,7 @@ public class KnickKnackSackGui extends Gui {
 		ItemStack contract = makeTrinketItemStack("epic:r1/quests/36_crimson_contract");
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, "Quest36").orElse(0) >= 28) {
 			// Quest is complete
-			overrideLore(contract,
-				"Click to store/swap your experience.",
-				"Shift Left Click to check stored experience.",
-				"Shift Right Click to clear stored experience."
-			);
+			GUIUtils.splitLoreLine(contract, "Click to store/swap your experience.\nShift Left Click to check stored experience.\nShift Right Click to clear stored experience.", NamedTextColor.GRAY, 50, true);
 			GuiItem tContract = new GuiItem(contract).onClick((evt) -> {
 				if (!mPlayer.getGameMode().equals(GameMode.ADVENTURE) && !mPlayer.getGameMode().equals(GameMode.SURVIVAL)) {
 					mPlayer.sendMessage(Component.text("You can only use this item in Survival and Adventure mode.", NamedTextColor.RED));
@@ -395,7 +369,7 @@ public class KnickKnackSackGui extends Gui {
 				// Same mechanism as interactable: run this function, and player's temp score == 1 means contract is enabled
 				runConsoleCommand("execute as @S run function monumenta:mechanisms/check/crimson_contract_enabled");
 				if (ScoreboardUtils.getScoreboardValue(mPlayer, "temp").orElse(0) != 1) {
-					mPlayer.sendMessage(Component.text("The magic of this area prevents you from using your contract.", NamedTextColor.AQUA));
+					mPlayer.sendMessage(Component.text("The magic of this area prevents you from using your contract.", NamedTextColor.RED));
 					return;
 				}
 
@@ -419,23 +393,13 @@ public class KnickKnackSackGui extends Gui {
 		} else {
 			// Quest is not complete
 			contract.setType(Material.BARRIER);
-			overrideLore(contract, NamedTextColor.YELLOW,
-				"Complete the quest",
-				"\"A Study in Crimson: Part One\" to unlock!"
-			);
+			GUIUtils.splitLoreLine(contract, "Complete the quest \"A Study in Crimson: Part One\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(contractSlot, contract);
 		}
 
 		// Depths Talismans, unlocked with Depths access
 		if (playerFoundDepths) {
-			ItemStack dTaliBase = new ItemStack(Material.BLACK_DYE, 1);
-			ItemMeta dTaliMeta = dTaliBase.getItemMeta();
-			dTaliMeta.displayName(Component.text("Depths Talismans", Location.DEPTHS.getColor())
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
-			dTaliBase.setItemMeta(dTaliMeta);
-			overrideLore(dTaliBase, NamedTextColor.YELLOW,
-				"Click to view your Depths talismans.");
+			ItemStack dTaliBase = GUIUtils.createBasicItem(Material.BLACK_DYE, "Depths Talismans", Location.DEPTHS.getColor(), true, "Click to view your Depths talismans.", NamedTextColor.YELLOW);
 			GuiItem depthsTalismans = new GuiItem(dTaliBase)
 				.onLeftClick(() -> {
 					mPage = Page.DEPTHS_TALISMANS;
@@ -443,34 +407,13 @@ public class KnickKnackSackGui extends Gui {
 				});
 			setItem(depthsTalismanSlot, depthsTalismans);
 		} else {
-			ItemStack dTaliBase = new ItemStack(Material.BARRIER, 1);
-			ItemMeta dTaliMeta = dTaliBase.getItemMeta();
-			dTaliMeta.displayName(Component.text("Depths Talismans", Location.DEPTHS.getColor())
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
-			overrideLore(dTaliBase, NamedTextColor.YELLOW,
-				"Click to view your Zenith talismans.");
-			dTaliBase.setItemMeta(dTaliMeta);
-			overrideLore(dTaliBase, NamedTextColor.YELLOW,
-				"Find the Darkest Depths lobby to unlock!");
-			setItem(depthsTalismanSlot, depths);
+			ItemStack dTaliBase = GUIUtils.createBasicItem(Material.BARRIER, "Depths Talismans", Location.DEPTHS.getColor(), true, "Find the Darkest Depths lobby to unlock!", NamedTextColor.YELLOW);
+			setItem(depthsTalismanSlot, dTaliBase);
 		}
 
-		// Zenith Talismans, unlocked with Depths access
-		NamespacedKey findZenith = NamespacedKey.fromString("monumenta:dungeons/zenith/find");
-		boolean playerFoundZenith = false;
-		if (findZenith != null) {
-			Advancement foundZenithLobby = Bukkit.getAdvancement(findZenith);
-			if (foundZenithLobby != null) {
-				playerFoundZenith = mPlayer.getAdvancementProgress(foundZenithLobby).isDone();
-			}
-		}
+		// Zenith Talismans, unlocked with Zenith access
 		if (playerFoundZenith) {
-			ItemStack zTaliBase = new ItemStack(Material.ENDER_EYE, 1);
-			ItemMeta zTaliMeta = zTaliBase.getItemMeta();
-			zTaliMeta.displayName(Component.text("Zenith Talismans", Location.ZENITH.getColor())
-				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			zTaliBase.setItemMeta(zTaliMeta);
+			ItemStack zTaliBase = GUIUtils.createBasicItem(Material.ENDER_EYE, "Zenith Talismans", Location.ZENITH.getColor(), true, "Click to view your Zenith talismans.", NamedTextColor.YELLOW);
 			GuiItem zenithTalismans = new GuiItem(zTaliBase)
 				.onLeftClick(() -> {
 					mPage = Page.ZENITH_TALISMANS;
@@ -478,14 +421,8 @@ public class KnickKnackSackGui extends Gui {
 				});
 			setItem(zenithTalismanSlot, zenithTalismans);
 		} else {
-			ItemStack zenithTalismans = new ItemStack(Material.BARRIER, 1);
-			ItemMeta zTaliMeta = zenithTalismans.getItemMeta();
-			zTaliMeta.displayName(Component.text("Zenith Talismans", Location.ZENITH.getColor())
-				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			zenithTalismans.setItemMeta(zTaliMeta);
-			overrideLore(zenithTalismans, NamedTextColor.YELLOW,
-				"Find the Celestial Zenith lobby to unlock!");
-			setItem(zenithTalismanSlot, zenithTalismans);
+			ItemStack zTaliBase = GUIUtils.createBasicItem(Material.BARRIER, "Zenith Talismans", Location.ZENITH.getColor(), true, "Find the Celestial Zenith lobby to unlock!", NamedTextColor.YELLOW);
+			setItem(zenithTalismanSlot, zTaliBase);
 		}
 	}
 
@@ -514,14 +451,7 @@ public class KnickKnackSackGui extends Gui {
 		}
 
 		// Information sign
-		ItemStack info = new ItemStack(Material.OAK_SIGN);
-		ItemMeta meta = info.getItemMeta();
-		if (celestialZenith) {
-			meta.displayName(Component.text("Zenith Talismans", Location.ZENITH.getColor(), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		} else {
-			meta.displayName(Component.text("Depths Talismans", Location.DEPTHS.getColor(), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		}
-		info.setItemMeta(meta);
+		ItemStack info = GUIUtils.createBasicItem(Material.OAK_SIGN, celestialZenith ? "Zenith Talismans" : "Depths Talismans", (celestialZenith ? Location.ZENITH : Location.DEPTHS).getColor(), true);
 		setItem(4, info);
 
 		setItem(dawnSlot, makeTalismanItem(talismans[0], celestialZenith));
@@ -533,78 +463,33 @@ public class KnickKnackSackGui extends Gui {
 		setItem(windSlot, makeTalismanItem(talismans[6], celestialZenith));
 
 		// Reset button. Ender pearl when no preference is set, ender eye when preference is set
-		ItemStack reset = new ItemStack(Material.ENDER_EYE);
-		if (celestialZenith) {
-			overrideLore(reset,
-				"Click to reset your Zenith tree preference."
-			);
-			meta = reset.getItemMeta();
-			int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, "CZTalisman").orElse(0);
-			Talisman preference = null;
-			for (Talisman t : DEPTHS_TALISMAN_LIST) {
-				if (t.mPreferenceValue == preferenceValue) {
-					preference = t;
-				}
+		String name = celestialZenith ? "Zenith" : "Depths";
+		String objective = celestialZenith ? "CZTalisman" : "DDTalisman";
+
+		int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, objective).orElse(0);
+		Talisman preference = null;
+		for (Talisman t : DEPTHS_TALISMAN_LIST) {
+			if (t.mPreferenceValue == preferenceValue) {
+				preference = t;
 			}
-			if (preference == null) {
-				reset.setType(Material.ENDER_PEARL);
-				meta.displayName(Component.text("No Zenith Preference Set!").decoration(TextDecoration.ITALIC, false));
-			} else {
-				meta.displayName(Component.text("Your zenith tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), TextDecoration.BOLD)
-					.decoration(TextDecoration.ITALIC, false));
-			}
-			reset.setItemMeta(meta);
+		}
+
+		if (preference != null) {
+			ItemStack reset = GUIUtils.createBasicItem(Material.ENDER_EYE, "Your " + name + " tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), true, "Click to reset your " + name + " tree preference.", NamedTextColor.GRAY);
 			setItem(resetSlot, new GuiItem(reset))
 				.onClick((evt) -> {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-					ScoreboardUtils.setScoreboardValue(mPlayer, "CZTalisman", 0);
-					mPlayer.sendMessage(Component.text("Your Zenith tree preference has been reset.", NamedTextColor.LIGHT_PURPLE));
+					ScoreboardUtils.setScoreboardValue(mPlayer, objective, 0);
+					mPlayer.sendMessage(Component.text("Your " + name + " tree preference has been reset.", NamedTextColor.LIGHT_PURPLE));
 					update();
 				});
 		} else {
-			overrideLore(reset,
-				"Click to reset your Depths tree preference."
-			);
-			meta = reset.getItemMeta();
-			int preferenceValue = ScoreboardUtils.getScoreboardValue(mPlayer, "DDTalisman").orElse(0);
-			Talisman preference = null;
-			for (Talisman t : DEPTHS_TALISMAN_LIST) {
-				if (t.mPreferenceValue == preferenceValue) {
-					preference = t;
-				}
-			}
-			if (preference == null) {
-				reset.setType(Material.ENDER_PEARL);
-				meta.displayName(Component.text("No Depths Preference Set!").decoration(TextDecoration.ITALIC, false));
-			} else {
-				meta.displayName(Component.text("Your depths tree preference is: " + preference.mTreeName, TextColor.color(preference.mColor), TextDecoration.BOLD)
-					.decoration(TextDecoration.ITALIC, false));
-			}
-			reset.setItemMeta(meta);
-			setItem(resetSlot, new GuiItem(reset))
-				.onClick((evt) -> {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-					ScoreboardUtils.setScoreboardValue(mPlayer, "DDTalisman", 0);
-					mPlayer.sendMessage(Component.text("Your Depths tree preference has been reset.", NamedTextColor.LIGHT_PURPLE));
-					update();
-				});
+			ItemStack reset = GUIUtils.createBasicItem(Material.ENDER_PEARL, "No " + name + " preference set!", NamedTextColor.WHITE, false);
+			setItem(resetSlot, new GuiItem(reset));
 		}
 
-		if ((canRefund(talismans[0])
-			|| canRefund(talismans[1])
-			|| canRefund(talismans[2])
-			|| canRefund(talismans[3])
-			|| canRefund(talismans[4])
-			|| canRefund(talismans[5])
-			|| canRefund(talismans[6]))
-			&& !celestialZenith
-		) {
-			ItemStack refundButton = new ItemStack(Material.QUARTZ);
-			meta = refundButton.getItemMeta();
-			meta.displayName(Component.text("You are eligible for talisman refunds!").decoration(TextDecoration.ITALIC, false));
-			meta.lore(List.of(Component.text("Click to access and claim your refunds.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-			refundButton.setItemMeta(meta);
-
+		if (!celestialZenith && Arrays.stream(talismans).anyMatch(this::canRefund)) {
+			ItemStack refundButton = GUIUtils.createBasicItem(Material.QUARTZ, "You are eligible for talisman refunds!", NamedTextColor.WHITE, false, "Click to access and claim your refunds.", NamedTextColor.GRAY);
 			setItem(refundSlot, refundButton).onClick((evt) -> {
 				mPage = Page.DEPTHS_REFUNDS;
 				update();
@@ -628,10 +513,7 @@ public class KnickKnackSackGui extends Gui {
 
 		ItemStack talisman = makeTrinketItemStack(t.mPath);
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, t.mUnlockObjective).orElse(0) >= 1) {
-			overrideLore(talisman,
-				"Click to increase " + t.mTreeName + " tree",
-				"odds to 75%. (100% in normal or rigged runs)"
-			);
+			GUIUtils.splitLoreLine(talisman, "Click to increase " + t.mTreeName + " tree odds to 75%. (100% in normal or rigged runs)", NamedTextColor.GRAY, true);
 			return new GuiItem(talisman)
 				.onClick((evt) -> {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
@@ -643,9 +525,7 @@ public class KnickKnackSackGui extends Gui {
 				});
 		} else {
 			talisman.setType(Material.BARRIER);
-			overrideLore(talisman, NamedTextColor.YELLOW,
-				"Purchase the " + t.mTreeName + " " + (celestialZenith ? "Zenith" : "Depths") + " Talisman to unlock!"
-			);
+			GUIUtils.splitLoreLine(talisman, "Purchase the " + t.mTreeName + " " + (celestialZenith ? "Zenith" : "Depths") + " Talisman to unlock!", NamedTextColor.YELLOW, true);
 			return new GuiItem(talisman);
 		}
 	}
@@ -663,25 +543,15 @@ public class KnickKnackSackGui extends Gui {
 			default -> displayItem = Material.BARRIER;
 		}
 
-		if (!canRefund(t)) {
+		boolean canRefund = canRefund(t);
+		if (!canRefund) {
 			displayItem = Material.BARRIER;
 		}
 
-		ItemStack i = new ItemStack(displayItem);
-		ItemMeta m = i.getItemMeta();
-		m.displayName(Component.text("Refund Geodes: " + t.mAssociatedSkill, TextColor.color(0x5D2D87), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		m.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		if (canRefund(t)) {
-			m.lore(List.of(
-				Component.text("Click to claim a refund of 64 Voidstained Geodes.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-				Component.text("This will consume a " + t.mTreeName + " Talisman from your inventory.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-			));
-			i.setItemMeta(m);
-		} else {
-			m.lore(List.of(
-				Component.text("You are not eligible for this refund.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-			));
-			i.setItemMeta(m);
+		ItemStack i = GUIUtils.createBasicItem(displayItem, "Refund Geodes: " + t.mAssociatedSkill, TextColor.color(0x5D2D87), true,
+			canRefund ? "Click to claim a refund of 64 Voidstained Geodes. This will consume a " + t.mTreeName + " Talisman from your inventory." : "You are not eligible for this refund.", NamedTextColor.GRAY);
+
+		if (!canRefund) {
 			return new GuiItem(i);
 		}
 
@@ -716,31 +586,16 @@ public class KnickKnackSackGui extends Gui {
 
 	private void setupContractConfirmDelete() {
 		ItemStack contract = makeTrinketItemStack("epic:r1/quests/36_crimson_contract");
-		overrideLore(contract,
-			NamedTextColor.RED,
-			"Clearing stored levels and xp cannot be undone.",
-			"Do you want to proceed?"
-		);
+		GUIUtils.splitLoreLine(contract, "Clearing stored levels and xp cannot be undone.\nDo you want to proceed?", NamedTextColor.RED, true);
 		setItem(13, contract);
 
-		ItemMeta meta;
-		ItemStack confirm = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-		meta = confirm.getItemMeta();
-		meta.displayName(Component.text("Confirm", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-		meta.lore(List.of(Component.text("Clear stored levels and xp.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-		confirm.setItemMeta(meta);
-		ItemUtils.setPlainTag(confirm);
+		ItemStack confirm = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, "Confirm", NamedTextColor.GREEN, true, "Clear stored levels and xp.", NamedTextColor.GRAY);
 		setItem(20, confirm).onLeftClick(() -> {
 			runFunction("monumenta:mechanisms/contract/clear");
 			close();
 		});
 
-		ItemStack cancel = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
-		meta = cancel.getItemMeta();
-		meta.displayName(Component.text("Cancel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-		meta.lore(List.of(Component.text("Return to trinkets.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-		cancel.setItemMeta(meta);
-		ItemUtils.setPlainTag(cancel);
+		ItemStack cancel = GUIUtils.createBasicItem(Material.ORANGE_STAINED_GLASS_PANE, "Cancel", NamedTextColor.RED, true, "Return to trinkets.", NamedTextColor.GRAY);
 		setItem(24, cancel).onLeftClick(() -> {
 			mPage = Page.TRINKETS1;
 			update();
@@ -748,10 +603,7 @@ public class KnickKnackSackGui extends Gui {
 	}
 
 	private void addPrevButton() {
-		ItemStack arrow = new ItemStack(Material.ARROW);
-		ItemMeta meta = arrow.getItemMeta();
-		meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		arrow.setItemMeta(meta);
+		ItemStack arrow = GUIUtils.createBasicItem(Material.ARROW, "Previous Page", NamedTextColor.WHITE, true);
 		// Add to bottom-left corner
 		setItem(INV_SIZE - 9, new GuiItem(arrow)).onLeftClick(() -> {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
@@ -760,41 +612,20 @@ public class KnickKnackSackGui extends Gui {
 		});
 	}
 
-	private void overrideLore(ItemStack item, String... loreOverride) {
-		overrideLore(item, NamedTextColor.GRAY, loreOverride);
+	private GuiItem makeTrinketGuiItem(String path, String lore) {
+		return new GuiItem(makeTrinketItemStack(path, lore));
 	}
 
-	private void overrideLore(ItemStack item, TextColor color, String... loreOverride) {
-		ItemMeta meta = item.getItemMeta();
-		ArrayList<Component> loreList = new ArrayList<>();
-		for (String line : loreOverride) {
-			loreList.add(Component.text(line, color).decoration(TextDecoration.ITALIC, false));
-		}
-		if (loreList.size() != 0) {
-			meta.lore(loreList);
-		}
-		item.setItemMeta(meta);
+	private ItemStack makeTrinketItemStack(String path) {
+		return makeTrinketItemStack(path, "");
 	}
 
-	private GuiItem makeTrinketGuiItem(String path, String... loreOverride) {
-		return new GuiItem(makeTrinketItemStack(path, loreOverride));
-	}
-
-	private ItemStack makeTrinketItemStack(String path, String... loreOverride) {
+	private ItemStack makeTrinketItemStack(String path, String lore) {
 		ItemStack item = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString(path));
 		if (item == null) {
-			item = new ItemStack(Material.RED_CONCRETE);
-			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("ERROR LOADING ITEM", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-			meta.lore(List.of(
-				Component.text("Item path:"),
-				Component.text(path)
-			));
-			item.setItemMeta(meta);
-		}
-
-		if (loreOverride.length > 0) {
-			overrideLore(item, NamedTextColor.GRAY, loreOverride);
+			item = GUIUtils.createBasicItem(Material.RED_CONCRETE, "ERROR LOADING ITEM", NamedTextColor.RED, true, "Item path:\n" + path);
+		} else if (!lore.isEmpty()) {
+			GUIUtils.splitLoreLine(item, lore, NamedTextColor.GRAY, true);
 		}
 
 		return item;
@@ -803,18 +634,14 @@ public class KnickKnackSackGui extends Gui {
 	private ItemStack getPlayerPEB() {
 		// Currently, PEBs are generated through the /give command, so for now I'm just using a vanilla book.
 		// minecraft:written_book{resolved:1b,Enchantments:[{lvl:1s,id:"minecraft:power"}],Monumenta:{Lore:['{"italic":true,"color":"dark_purple","text":"* Skin : Enchanted Book *"}']},HideFlags:71,title:"PEB",author:"P.E.B.E.",plain:{display:{Name:"Personal Enchanted Book",Lore:["* Skin : Enchanted Book *"]}},AttributeModifiers:[{Name:"Dummy",Amount:1.0d,Operation:2,UUID:[I;-78197774,2127905715,-1380854353,659436837],AttributeName:"minecraft:generic.armor_toughness"}],display:{Name:'{"bold":true,"italic":false,"underlined":false,"color":"dark_purple","text":"Personal Enchanted Book"}',Lore:['{"italic":false,"color":"dark_gray","extra":[{"italic":true,"color":"dark_purple","text":"* Skin : Enchanted Book *"}],"text":""}']}}
-		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+		Component title = Component.text("Personal Enchanted Book", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
+		ItemStack book = GUIUtils.createBasicItem(Material.WRITTEN_BOOK, 1, title, "Click to open your PEB", NamedTextColor.GRAY, 30, true);
 		book.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
 		book.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		BookMeta bookMeta = (BookMeta) book.getItemMeta();
-		Component title = Component.text("Personal Enchanted Book", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
-		bookMeta.title(title);
-		bookMeta.displayName(title);
-		bookMeta.setAuthor("P.E.B.E.");
-		bookMeta.lore(List.of(
-			Component.text("Click to open your PEB", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-		));
 
+		BookMeta bookMeta = (BookMeta) book.getItemMeta();
+		bookMeta.title(title);
+		bookMeta.setAuthor("P.E.B.E.");
 		book.setItemMeta(bookMeta);
 
 		return book;
