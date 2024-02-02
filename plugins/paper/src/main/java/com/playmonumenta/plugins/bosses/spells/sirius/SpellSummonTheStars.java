@@ -229,6 +229,10 @@ public class SpellSummonTheStars extends Spell {
 						}
 						mDead.add(entity);
 					}
+					if (entity.getLocation().getY() < mSirius.mBoss.getLocation().getY() - 10) {
+						mDead.add(entity);
+						entity.remove();
+					}
 				}
 				mActiveMobs.removeAll(mDead);
 				mManager.setTitle(Component.text(mActiveMobs.size() + " Remaining Crowned Blight!", NamedTextColor.AQUA));
