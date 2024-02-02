@@ -190,7 +190,7 @@ public class ChaosDagger extends DepthsAbility {
 			}
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				if (enemy.isDead() || enemy.getHealth() < 0) {
-					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration, null);
+					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
 				}
 			}, 1);
 

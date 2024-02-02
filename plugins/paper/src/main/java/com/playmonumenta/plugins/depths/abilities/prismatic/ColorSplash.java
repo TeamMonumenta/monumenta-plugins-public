@@ -495,7 +495,7 @@ public class ColorSplash extends DepthsAbility {
 			@Override
 			public void run() {
 				if (mTicks % SHADOWDANCER_STEALTH_INTERVAL == 0) {
-					AbilityUtils.applyStealth(Plugin.getInstance(), mPlayer, SHADOWDANCER_STEALTH_INTERVAL, null);
+					AbilityUtils.applyStealth(Plugin.getInstance(), mPlayer, SHADOWDANCER_STEALTH_INTERVAL);
 					drawShadowdancerSymbol();
 				}
 

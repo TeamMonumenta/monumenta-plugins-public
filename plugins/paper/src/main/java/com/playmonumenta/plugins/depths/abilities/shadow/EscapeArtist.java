@@ -108,7 +108,7 @@ public class EscapeArtist extends DepthsAbility {
 		putOnCooldown();
 
 		mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(mStealthDuration, -RESISTANCE));
-		AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration, null);
+		AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
 
 		mTPReady = true;
 		// set to false later if the player did not teleport

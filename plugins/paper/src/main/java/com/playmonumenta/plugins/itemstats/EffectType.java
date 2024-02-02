@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -162,6 +163,8 @@ public enum EffectType {
 	SKY_SEEKERS_GRACE("SkySeekersGrace", "Sky Seeker's Grace", true, false, true),
 
 	CLUCKING("Clucking", "Clucking", false, true, true),
+
+	STEALTH("Stealth", "Stealth", true, true, false),
 	;
 
 
@@ -358,6 +361,10 @@ public enum EffectType {
 					plugin.mItemStatManager.updateStats(player);
 					new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(player);
 				}
+			}
+		} else if (effectType == STEALTH) {
+			if (entity instanceof Player player) {
+				AbilityUtils.applyStealth(plugin, player, duration);
 			}
 		}
 

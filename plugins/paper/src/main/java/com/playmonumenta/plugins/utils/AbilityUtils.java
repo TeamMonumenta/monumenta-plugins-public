@@ -146,6 +146,10 @@ public class AbilityUtils {
 		}
 	}
 
+	public static void applyStealth(Plugin plugin, Player player, int duration) {
+		applyStealth(plugin, player, duration, null);
+	}
+
 	public static void applyStealth(Plugin plugin, Player player, int duration, @Nullable StealthCosmeticSkill cosmetic) {
 		if (cosmetic == null) {
 			defaultStealthApply(player);

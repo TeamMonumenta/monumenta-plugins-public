@@ -78,7 +78,7 @@ public class CloakOfShadows extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
 
 		putOnCooldown();
-		AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration, null);
+		AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
 
 		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, mDamage, EnumSet.of(DamageEvent.DamageType.MELEE)));
 
