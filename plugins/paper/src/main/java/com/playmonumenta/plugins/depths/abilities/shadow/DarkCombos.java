@@ -4,9 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsCombosAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -26,7 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class DarkCombos extends DepthsAbility {
+public class DarkCombos extends DepthsCombosAbility {
 
 	public static final String ABILITY_NAME = "Dark Combos";
 	public static final double[] VULN_AMPLIFIER = {0.15, 0.1875, 0.225, 0.2625, 0.3, 0.375};
@@ -39,35 +38,32 @@ public class DarkCombos extends DepthsAbility {
 			.descriptions(DarkCombos::getDescription)
 			.singleCharm(false);
 
-	private final int mHitRequirement;
 	private final int mDuration;
 	private final double mVuln;
 
-	private int mComboCount = 0;
-
 	public DarkCombos(Plugin plugin, Player player) {
-		super(plugin, player, INFO);
-		mHitRequirement = HIT_REQUIREMENT + (int) CharmManager.getLevel(mPlayer, CharmEffects.DARK_COMBOS_HIT_REQUIREMENT.mEffectName);
+		super(plugin, player, INFO, HIT_REQUIREMENT, CharmEffects.DARK_COMBOS_HIT_REQUIREMENT.mEffectName);
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.DARK_COMBOS_DURATION.mEffectName, DURATION);
 		mVuln = VULN_AMPLIFIER[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.DARK_COMBOS_VULNERABILITY_AMPLIFIER.mEffectName);
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
-			mComboCount++;
-			if (mComboCount >= mHitRequirement) {
-				EntityUtils.applyVulnerability(mPlugin, mDuration, mVuln, enemy);
-				mComboCount = 0;
 
-				playSounds(mPlayer.getWorld(), mPlayer.getLocation());
-				new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
-				PotionUtils.applyPotion(mPlayer, enemy,
-					new PotionEffect(PotionEffectType.GLOWING, mDuration, 0, true, false));
-			}
-			return true;
-		}
-		return false;
+
+
+	@Override
+	public void activate(DamageEvent event, LivingEntity enemy) {
+		activate(enemy, mPlayer, mPlugin, mDuration, mVuln);
+	}
+
+	public static void activate(LivingEntity enemy, Player player) {
+		activate(enemy, player, Plugin.getInstance(), DURATION, VULN_AMPLIFIER[0]);
+	}
+
+	public static void activate(LivingEntity enemy, Player player, Plugin plugin, int duration, double vuln) {
+		EntityUtils.applyVulnerability(plugin, duration, vuln, enemy);
+		playSounds(player.getWorld(), player.getLocation());
+		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(player);
+		PotionUtils.applyPotion(player, enemy, new PotionEffect(PotionEffectType.GLOWING, duration, 0, true, false));
 	}
 
 	public static void playSounds(World world, Location loc) {

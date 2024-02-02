@@ -3,10 +3,11 @@ package com.playmonumenta.plugins.depths.abilities.frostborn;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsCombosAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -28,9 +29,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 
-public class FrigidCombos extends DepthsAbility {
+public class FrigidCombos extends DepthsCombosAbility {
 
 	public static final String ABILITY_NAME = "Frigid Combos";
 	public static final int DURATION = 2 * 20;
@@ -47,7 +49,6 @@ public class FrigidCombos extends DepthsAbility {
 			.descriptions(FrigidCombos::getDescription)
 			.singleCharm(false);
 
-	private final int mHitRequirement;
 	private final double mRadius;
 	private final double mDamage;
 	private final double mShatterRadius;
@@ -55,11 +56,8 @@ public class FrigidCombos extends DepthsAbility {
 	private final double mSlow;
 	private final int mDuration;
 
-	private int mComboCount = 0;
-
 	public FrigidCombos(Plugin plugin, Player player) {
-		super(plugin, player, INFO);
-		mHitRequirement = HIT_REQUIREMENT + (int) CharmManager.getLevel(mPlayer, CharmEffects.FRIGID_COMBOS_HIT_REQUIREMENT.mEffectName);
+		super(plugin, player, INFO, HIT_REQUIREMENT, CharmEffects.FRIGID_COMBOS_HIT_REQUIREMENT.mEffectName);
 		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.FRIGID_COMBOS_RADIUS.mEffectName, RADIUS);
 		mShatterRadius = CharmManager.getRadius(mPlayer, CharmEffects.FRIGID_COMBOS_RADIUS.mEffectName, SHATTER_RADIUS);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FRIGID_COMBOS_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
@@ -69,59 +67,56 @@ public class FrigidCombos extends DepthsAbility {
 	}
 
 	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
-			mComboCount++;
-			if (mComboCount >= mHitRequirement && mRarity > 0) {
-				Location targetLoc = enemy.getLocation();
-				World world = targetLoc.getWorld();
-
-				boolean isOnIce = isOnIce(enemy);
-				double damage = isOnIce ? mShatterDamage : mDamage;
-				double radius = isOnIce ? mShatterRadius : mRadius;
-
-				if (isOnIce) {
-					HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
-					iceToBreak.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != targetLoc.getWorld() || l.distance(targetLoc) > 1.5 || !DepthsUtils.isIce(l.getBlock().getType()));
-					for (Location l : iceToBreak) {
-						Block b = l.getBlock();
-						if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {
-							//If special permafrost ice, set to normal ice instead of destroying
-							b.setType(DepthsUtils.ICE_MATERIAL);
-						} else {
-							b.setBlockData(DepthsUtils.iceActive.get(l));
-							DepthsUtils.iceActive.remove(l);
-						}
-						new PartialParticle(Particle.BLOCK_CRACK, l.add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(mPlayer);
-					}
-
-					Location loc = mPlayer.getLocation().add(0, 1, 0);
-					new PartialParticle(Particle.EXPLOSION_NORMAL, LocationUtils.getHalfHeightLocation(enemy), 40, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
-					world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 1.5f);
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1f, 0.8f);
-					world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.0f);
-					world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 0.1f);
-				}
-
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, radius)) {
-					new PartialParticle(Particle.CRIT_MAGIC, LocationUtils.getHalfHeightLocation(mob), 25, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
-					EntityUtils.applySlow(mPlugin, mDuration, mSlow, mob);
-					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
-				}
-
-				mComboCount = 0;
-
-				//Particles
-				Location playerLoc = mPlayer.getLocation().add(0, 1, 0);
-				playSounds(world, playerLoc);
-				new PartialParticle(Particle.SNOW_SHOVEL, LocationUtils.getHalfHeightLocation(enemy), 25, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
-			}
-			return true;
-		}
-		return false;
+	public void activate(DamageEvent event, LivingEntity enemy) {
+		activate(enemy, mPlayer, mPlugin, mRadius, mShatterRadius, mDamage, mShatterDamage, mSlow, mDuration, mInfo.getLinkedSpell());
 	}
 
-	private boolean isOnIce(LivingEntity entity) {
+	public static void activate(LivingEntity enemy, Player player) {
+		activate(enemy, player, Plugin.getInstance(), RADIUS, SHATTER_RADIUS, DAMAGE[0], SHATTER_DAMAGE[0], SLOW_AMPLIFIER[0], DURATION, null);
+	}
+
+	public static void activate(LivingEntity enemy, Player player, Plugin plugin, double normalRadius, double shatterRadius, double normalDamage, double shatterDamage, double slow, int duration, @Nullable ClassAbility classAbility) {
+		Location targetLoc = enemy.getLocation();
+		World world = targetLoc.getWorld();
+
+		boolean isOnIce = isOnIce(enemy);
+		double damage = isOnIce ? shatterDamage : normalDamage;
+		double radius = isOnIce ? shatterRadius : normalRadius;
+
+		Location playerLoc = player.getLocation().add(0, 1, 0);
+		if (isOnIce) {
+			HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
+			iceToBreak.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != targetLoc.getWorld() || l.distance(targetLoc) > 1.5 || !DepthsUtils.isIce(l.getBlock().getType()));
+			for (Location l : iceToBreak) {
+				Block b = l.getBlock();
+				if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {
+					//If special permafrost ice, set to normal ice instead of destroying
+					b.setType(DepthsUtils.ICE_MATERIAL);
+				} else {
+					b.setBlockData(DepthsUtils.iceActive.get(l));
+					DepthsUtils.iceActive.remove(l);
+				}
+				new PartialParticle(Particle.BLOCK_CRACK, l.add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(player);
+			}
+
+			new PartialParticle(Particle.EXPLOSION_NORMAL, LocationUtils.getHalfHeightLocation(enemy), 40, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(player);
+			world.playSound(playerLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 1.5f);
+			world.playSound(playerLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1f, 0.8f);
+			world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.0f);
+			world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 0.1f);
+		}
+
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, radius)) {
+			new PartialParticle(Particle.CRIT_MAGIC, LocationUtils.getHalfHeightLocation(mob), 25, .5, .2, .5, 0.65).spawnAsPlayerActive(player);
+			EntityUtils.applySlow(plugin, duration, slow, mob);
+			DamageUtils.damage(player, mob, DamageType.MAGIC, damage, classAbility, true);
+		}
+
+		playSounds(world, playerLoc);
+		new PartialParticle(Particle.SNOW_SHOVEL, LocationUtils.getHalfHeightLocation(enemy), 25, .5, .2, .5, 0.65).spawnAsPlayerActive(player);
+	}
+
+	private static boolean isOnIce(LivingEntity entity) {
 		Location loc = entity.getLocation();
 		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}

@@ -4,9 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsCombosAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -24,7 +23,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class EarthenCombos extends DepthsAbility {
+public class EarthenCombos extends DepthsCombosAbility {
 
 	public static final String ABILITY_NAME = "Earthen Combos";
 	public static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "EarthenCombosPercentDamageReceivedEffect";
@@ -39,41 +38,37 @@ public class EarthenCombos extends DepthsAbility {
 			.descriptions(EarthenCombos::getDescription)
 			.singleCharm(false);
 
-	private final int mHitRequirement;
 	private final double mDamageReduction;
 	private final int mEffectDuration;
 	private final int mRootDuration;
 
-	private int mComboCount = 0;
-
 	public EarthenCombos(Plugin plugin, Player player) {
-		super(plugin, player, INFO);
-		mHitRequirement = 3 + (int) CharmManager.getLevel(mPlayer, CharmEffects.EARTHEN_COMBOS_HIT_REQUIREMENT.mEffectName);
+		super(plugin, player, INFO, HIT_REQUIREMENT, CharmEffects.EARTHEN_COMBOS_HIT_REQUIREMENT.mEffectName);
 		mDamageReduction = PERCENT_DAMAGE_RECEIVED[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.EARTHEN_COMBOS_RESISTANCE_AMPLIFIER.mEffectName);
 		mEffectDuration = CharmManager.getDuration(mPlayer, CharmEffects.EARTHEN_COMBOS_EFFECT_DURATION.mEffectName, DURATION);
 		mRootDuration = CharmManager.getDuration(mPlayer, CharmEffects.EARTHEN_COMBOS_ROOT_DURATION.mEffectName, ROOT_DURATION);
 	}
 
 	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
-			mComboCount++;
-			if (mComboCount >= mHitRequirement) {
-				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(mEffectDuration, -mDamageReduction));
-				mComboCount = 0;
-				EntityUtils.applySlow(mPlugin, mRootDuration, .99, enemy);
+	public void activate(DamageEvent event, LivingEntity enemy) {
+		activate(enemy, mPlayer, mPlugin, mDamageReduction, mEffectDuration, mRootDuration);
+	}
 
-				Location loc = mPlayer.getLocation().add(0, 1, 0);
-				World world = mPlayer.getWorld();
-				Location entityLoc = enemy.getLocation();
-				playSounds(world, loc);
-				new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsPlayerActive(mPlayer);
-			}
-			return true;
-		}
-		return false;
+	public static void activate(LivingEntity enemy, Player player) {
+		activate(enemy, player, Plugin.getInstance(), PERCENT_DAMAGE_RECEIVED[0], DURATION, ROOT_DURATION);
+	}
+
+	public static void activate(LivingEntity enemy, Player player, Plugin plugin, double damageReduction, int effectDuration, int rootDuration) {
+		plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(effectDuration, -damageReduction));
+		EntityUtils.applySlow(plugin, rootDuration, .99, enemy);
+
+		Location loc = player.getLocation().add(0, 1, 0);
+		World world = player.getWorld();
+		Location entityLoc = enemy.getLocation();
+		playSounds(world, loc);
+		new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsPlayerActive(player);
 	}
 
 	public static void playSounds(World world, Location loc) {
@@ -95,7 +90,6 @@ public class EarthenCombos extends DepthsAbility {
 			.addDuration(a -> a.mRootDuration, ROOT_DURATION)
 			.add(" seconds.");
 	}
-
 
 }
 
