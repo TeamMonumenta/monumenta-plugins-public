@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.LuminousInfusionCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -42,6 +43,7 @@ public class LuminousInfusion extends Ability {
 	private static final int FIRE_DURATION_2 = 20 * 3;
 	private static final int COOLDOWN = 20 * 12;
 	private static final float KNOCKBACK_SPEED = 0.7f;
+	private static final double INFERNO_SCALE = 0.5;
 
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
 	public static final String CHARM_COOLDOWN = "Luminous Infusion Cooldown";
@@ -133,7 +135,13 @@ public class LuminousInfusion extends Ability {
 		}
 
 		if (mDoMultiplierAndFire && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE_ENCH || (event.getType() == DamageType.MAGIC && event.getAbility() != mInfo.getLinkedSpell())) && enemyTriggersAbilities) {
-			EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, enemy, mPlayer);
+			if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH) {
+				EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, enemy, mPlayer);
+			} else {
+				// nerf magic/proj flame spreader
+				ItemStatManager.PlayerItemStats stats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+				EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, enemy, mPlayer, stats, INFERNO_SCALE);
+			}
 
 			if (event.getType() != DamageType.MAGIC && event.getType() != DamageType.PROJECTILE) {
 				double originalDamage = event.getDamage();
