@@ -58,8 +58,8 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			.descriptions(
 				("Gain a stack of rage for each %s melee damage dealt (%s%% more in Region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
 					 "Passively gain %s%% damage resistance for each stack. " +
-					 "When at %s or more stacks, right click while looking down to consume all stacks and damage mobs " +
-					 "in a %s block radius by %s times the number of stacks consumed. For the next (stacks consumed / 2) seconds, " +
+					 "When at %s or more stacks, right click while looking down to consume all stacks and deal %s times the number of stacks consumed melee damage to " +
+					 "mobs within %s blocks. For the next (stacks consumed / 2) seconds, " +
 					 "heal %s%% of max health per second and keep your passive damage reduction.")
 					.formatted(
 						RAMPAGE_1_DAMAGE_PER_STACK,
@@ -68,7 +68,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 						RAMPAGE_1_STACK_LIMIT,
 						StringUtils.multiplierToPercentage(RAMPAGE_DAMAGE_RESISTANCE_PER_STACK),
 						ACTIVE_MIN_STACKS,
-						RAMPAGE_RADIUS,
+						StringUtils.to2DP(RAMPAGE_RADIUS),
 						RAMPAGE_STACK_PERCENTAGE,
 						StringUtils.multiplierToPercentage(HEAL_PERCENT)
 					),
