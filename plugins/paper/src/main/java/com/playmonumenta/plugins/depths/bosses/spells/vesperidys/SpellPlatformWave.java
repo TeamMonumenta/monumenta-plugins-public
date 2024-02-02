@@ -32,6 +32,7 @@ public class SpellPlatformWave extends Spell {
 	private final int mCastTicks;
 	private final Vesperidys mVesperidys;
 	private static final double DAMAGE = 80;
+	private static final int FIRST_CAST_TICKS = 40;
 
 	private boolean mOnCooldown = false;
 
@@ -84,7 +85,7 @@ public class SpellPlatformWave extends Spell {
 
 				List<Vesperidys.Platform> platforms = platformOrder.get(mWave);
 
-				if (mTicks >= mCastTicks) {
+				if (mTicks >= getCastTicks(mWave)) {
 					mTicks = -15;
 					mWave += 1;
 					List<Player> hitPlayers = new ArrayList<>();
@@ -120,7 +121,7 @@ public class SpellPlatformWave extends Spell {
 							}
 						}
 					}
-				} else if (mTicks >= 0 && mTicks % (mCastTicks / 5) == 0) {
+				} else if (mTicks >= 0 && mTicks % (getCastTicks(mWave) / 5) == 0) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 5f, 0f);
 					for (Vesperidys.Platform platform : platforms) {
 						if (mVesperidys.mPhase >= 4 && (Math.abs(platform.mX) > 1 || Math.abs(platform.mY) > 1)) {
@@ -145,6 +146,14 @@ public class SpellPlatformWave extends Spell {
 
 		runnableA.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(runnableA);
+	}
+
+	private int getCastTicks(int wave) {
+		if (wave == 0) {
+			return FIRST_CAST_TICKS;
+		} else {
+			return mCastTicks;
+		}
 	}
 
 	@Override public int cooldownTicks() {

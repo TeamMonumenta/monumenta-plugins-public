@@ -378,6 +378,13 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 			);
 			event.setCancelled(true);
 		}
+
+		if (event.getDamager() instanceof Player) {
+			double damageCap = 0.25 * EntityUtils.getMaxHealth(mBoss);
+			if (event.getDamage() > damageCap) {
+				event.setDamage(damageCap);
+			}
+		}
 	}
 
 	@Override

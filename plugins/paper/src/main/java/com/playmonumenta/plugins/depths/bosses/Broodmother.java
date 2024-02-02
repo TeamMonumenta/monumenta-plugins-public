@@ -496,6 +496,16 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
+	@Override
+	public void onHurt(DamageEvent event) {
+		if (event.getDamager() instanceof Player) {
+			double damageCap = 0.25 * EntityUtils.getMaxHealth(mBoss);
+			if (event.getDamage() > damageCap) {
+				event.setDamage(damageCap);
+			}
+		}
+	}
+
 	public static double getVulnerabilityAmount(@Nullable DepthsParty party) {
 		double amount = 0;
 		if (party != null) {

@@ -488,7 +488,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		EntityUtils.setMaxHealthAndHealth(mBoss, DepthsParty.getAscensionScaledHealth(BOSS_HEALTH, mParty));
+		int ascension = (mParty != null) ? mParty.getAscension() : 0;
+		EntityUtils.setMaxHealthAndHealth(mBoss, BOSS_HEALTH * (1 + ascension * 0.05));
 
 		mBoss.setInvisible(true);
 		mBoss.setInvulnerable(true);
@@ -935,6 +936,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		mTeleportSpell.teleportPlatform(0, 0);
 
 		List<Player> hitPlayers = new ArrayList<>();
+		mInvincible = true;
 
 		List<Platform> platformHit = new ArrayList<>();
 		if (!finalPhase) {
@@ -1002,6 +1004,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			@Override
 			public synchronized void cancel() {
 				super.cancel();
+				mInvincible = false;
 				resetPhase(0);
 			}
 
