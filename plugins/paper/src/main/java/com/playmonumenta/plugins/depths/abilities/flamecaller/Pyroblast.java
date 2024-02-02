@@ -41,7 +41,7 @@ public class Pyroblast extends DepthsAbility {
 	public static final String ABILITY_NAME = "Pyroblast";
 
 	public static final int COOLDOWN = 12 * 20;
-	public static final int[] DAMAGE = {20, 25, 30, 35, 40, 50};
+	public static final int[] DAMAGE = {20, 24, 28, 32, 36, 44};
 	private static final int RADIUS = 4;
 	private static final int DURATION = 4 * 20;
 

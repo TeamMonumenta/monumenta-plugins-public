@@ -28,10 +28,10 @@ import com.playmonumenta.plugins.depths.abilities.flamecaller.Detonation;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Fireball;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.FlameSpirit;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Flamestrike;
+import com.playmonumenta.plugins.depths.abilities.flamecaller.IgneousRune;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.PrimordialMastery;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Pyroblast;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Pyromania;
-import com.playmonumenta.plugins.depths.abilities.flamecaller.RingOfFlames;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicCombos;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicMeteor;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Avalanche;
@@ -106,16 +106,16 @@ public enum CharmEffects {
 	ETERNAL_SAVIOR_STUN_DURATION("Eternal Savior Stun Duration", EternalSavior.INFO, true, false, 0.25, 2.0, new double[] {0.25, 0.5, 0.75, 1.0, 1.25}),
 	LIGHTNING_BOTTLE_DAMAGE("Lightning Bottle Damage", LightningBottle.INFO, false, true, 5.0, 50.0, new double[] {5.0, 7.5, 10.0, 12.5, 15.0}),
 	LIGHTNING_BOTTLE_RADIUS("Lightning Bottle Radius", LightningBottle.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	LIGHTNING_BOTTLE_SLOW_AMPLIFIER("Lightning Bottle Slowness Amplifier", LightningBottle.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
-	LIGHTNING_BOTTLE_VULN_AMPLIFIER("Lightning Bottle Vulnerability Amplifier", LightningBottle.INFO, false, true, 5, 25, new double[] {5, 6.25, 7.5, 8.75, 10}),
+	LIGHTNING_BOTTLE_SLOW_AMPLIFIER("Lightning Bottle Slowness Amplifier", LightningBottle.INFO, false, true, 2.0, 15.0, new double[] {4.0, 5.0, 6.0, 7.0, 8.0}),
+	LIGHTNING_BOTTLE_VULN_AMPLIFIER("Lightning Bottle Vulnerability Amplifier", LightningBottle.INFO, false, true, 2.0, 15.0, new double[] {4.0, 5.0, 6.0, 7.0, 8.0}),
 	LIGHTNING_BOTTLE_DURATION("Lightning Bottle Debuff Duration", LightningBottle.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
 	LIGHTNING_BOTTLE_MAX_STACKS("Lightning Bottle Max Stacks", LightningBottle.INFO, true, false, 1.0, 10.0, new double[] {0.0, 0.0, 2.0, 4.0, 6.0}),
 	LIGHTNING_BOTTLE_KILLS_PER_BOTTLE("Lightning Bottle Kills Per Bottle", LightningBottle.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
-	RADIANT_BLESSING_COOLDOWN(RadiantBlessing.CHARM_COOLDOWN, RadiantBlessing.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
+	RADIANT_BLESSING_COOLDOWN(RadiantBlessing.CHARM_COOLDOWN, RadiantBlessing.INFO, false, true, 4.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
 	RADIANT_BLESSING_RADIUS("Radiant Blessing Radius", RadiantBlessing.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 	RADIANT_BLESSING_DAMAGE_AMPLIFIER("Radiant Blessing Strength Amplifier", RadiantBlessing.INFO, false, true, 2.0, 20.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	RADIANT_BLESSING_RESISTANCE_AMPLIFIER("Radiant Blessing Resistance Amplifier", RadiantBlessing.INFO, true, true, 2.0, 15.0, new double[] {0.0, 0.0, 2.0, 4.0, 6.0}),
-	RADIANT_BLESSING_BUFF_DURATION("Radiant Blessing Buff Duration", RadiantBlessing.INFO, true, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
+	RADIANT_BLESSING_BUFF_DURATION("Radiant Blessing Buff Duration", RadiantBlessing.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
 	REJUVENATION_HEAL_RADIUS("Rejuvenation Radius", DepthsRejuvenation.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 	REJUVENATION_HEALING("Rejuvenation Healing", DepthsRejuvenation.INFO, true, true, 20, 100, new double[] {0.0, 0.0, 20, 40, 60}),
 	SOOTHING_COMBOS_HIT_REQUIREMENT("Soothing Combos Hit Requirement", SoothingCombos.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
@@ -199,6 +199,13 @@ public enum CharmEffects {
 	FLAMESTRIKE_CONE_ANGLE("Flamestrike Cone Angle", Flamestrike.INFO, true, true, 10.0, 100.0, new double[] {0.0, 0.0, 0.0, 20.0, 40.0}),
 	FLAMESTRIKE_FIRE_DURATION("Flamestrike Fire Duration", Flamestrike.INFO, false, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
 	FLAMESTRIKE_KNOCKBACK("Flamestrike Knockback", Flamestrike.INFO, true, true, 10, 100, new double[] {0.0, 0.0, 0.0, 20, 40}),
+	IGNEOUS_RUNE_COOLDOWN(IgneousRune.CHARM_COOLDOWN, IgneousRune.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
+	IGNEOUS_RUNE_DAMAGE("Igneous Rune Damage", IgneousRune.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
+	IGNEOUS_RUNE_RADIUS("Igneous Rune Radius", IgneousRune.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	IGNEOUS_RUNE_FIRE_DURATION("Igneous Rune Fire Duration", IgneousRune.INFO, false, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
+	IGNEOUS_RUNE_BUFF_AMPLIFIER("Igneous Rune Buff Amplifier", IgneousRune.INFO, true, true, 2.0, 20.0, new double[] {2.0, 4.0, 6.0, 8.0, 10.0}),
+	IGNEOUS_RUNE_BUFF_DURATION("Igneous Rune Buff Duration", IgneousRune.INFO, true, false, 0.5, 6.0, new double[] {1.0, 1.5, 2.0, 2.5, 3.0}),
+	IGNEOUS_RUNE_ARMING_TIME("Igneous Rune Arming Time", IgneousRune.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, -0.5, -1.0}),
 	PRIMORDIAL_MASTERY_DAMAGE_MODIFIER("Primordial Mastery Damage Multiplier", PrimordialMastery.INFO, true, true, 2.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
 	PYROBLAST_COOLDOWN(Pyroblast.CHARM_COOLDOWN, Pyroblast.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	PYROBLAST_DAMAGE("Pyroblast Damage", Pyroblast.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
@@ -206,11 +213,6 @@ public enum CharmEffects {
 	PYROBLAST_FIRE_DURATION("Pyroblast Fire Duration", Pyroblast.INFO, false, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
 	PYROMANIA_DAMAGE_PER_MOB("Pyromania Damage Per Mob", Pyromania.INFO, true, true, 1.0, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
 	PYROMANIA_RADIUS("Pyromania Radius", Pyromania.INFO, false, true, 10.0, 100.0, new double[] {0, 0, 0, 50.0, 60.0}),
-	RING_OF_FLAMES_COOLDOWN(RingOfFlames.CHARM_COOLDOWN, RingOfFlames.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
-	RING_OF_FLAMES_DAMAGE("Ring of Flames Damage", RingOfFlames.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	RING_OF_FLAMES_DURATION("Ring of Flames Duration", RingOfFlames.INFO, true, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
-	RING_OF_FLAMES_FIRE_DURATION("Ring of Flames Fire Duration", RingOfFlames.INFO, false, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
-	RING_OF_FLAMES_BLEED_AMPLIFIER("Ring of Flames Bleed Amplifier", RingOfFlames.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
 	VOLCANIC_COMBOS_HIT_REQUIREMENT("Volcanic Combos Hit Requirement", VolcanicCombos.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
 	VOLCANIC_COMBOS_DAMAGE("Volcanic Combos Damage", VolcanicCombos.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	VOLCANIC_COMBOS_RADIUS("Volcanic Combos Radius", VolcanicCombos.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
@@ -223,7 +225,7 @@ public enum CharmEffects {
 	// Frostborn
 	AVALANCHE_COOLDOWN(Avalanche.CHARM_COOLDOWN, Avalanche.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	AVALANCHE_DAMAGE("Avalanche Damage", Avalanche.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	AVALANCHE_RANGE("Avalanche Range", Avalanche.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	AVALANCHE_RANGE("Avalanche Range", Avalanche.INFO, false, true, 8.0, 80.0, new double[] {16.0, 24.0, 32.0, 40.0, 48.0}),
 	AVALANCHE_ROOT_DURATION("Avalanche Root Duration", Avalanche.INFO, true, false, 0.25, 2.0, new double[] {0.25, 0.5, 0.75, 1.0, 1.25}),
 	CRYOBOX_COOLDOWN(Cryobox.CHARM_COOLDOWN, Cryobox.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	CRYOBOX_ABSORPTION_HEALTH("Cryobox Absorption Health", Cryobox.INFO, true, false, 1.0, 10.0, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}),
@@ -232,7 +234,7 @@ public enum CharmEffects {
 	CRYOBOX_FROZEN_DURATION("Cryobox Frozen Duration", Cryobox.INFO, false, false, 1, 6, new double[] {1, 1.5, 2, 2.5, 3}),
 	FROST_NOVA_COOLDOWN(DepthsFrostNova.CHARM_COOLDOWN, DepthsFrostNova.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	FROST_NOVA_DAMAGE("Frost Nova Damage", DepthsFrostNova.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	FROST_NOVA_RADIUS("Frost Nova Radius", DepthsFrostNova.INFO, false, true, 10.0, 75.0, new double[] {10.0, 20.0, 30.0, 40.0, 50.0}),
+	FROST_NOVA_RADIUS("Frost Nova Radius", DepthsFrostNova.INFO, false, true, 8.0, 60.0, new double[] {8.0, 16.0, 24.0, 32.0, 40.0}),
 	FROST_NOVA_SLOW_AMPLIFIER("Frost Nova Slowness Amplifier", DepthsFrostNova.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
 	FROST_NOVA_SLOW_DURATION("Frost Nova Slow Duration", DepthsFrostNova.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
 	FROST_NOVA_ICE_DURATION("Frost Nova Ice Duration", DepthsFrostNova.INFO, false, false, 2.0, 0.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
@@ -332,9 +334,10 @@ public enum CharmEffects {
 	SCRAPSHOT_DAMAGE("Scrapshot Damage", Scrapshot.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	SCRAPSHOT_RANGE("Scrapshot Range", Scrapshot.INFO, false, true, 20, 100, new double[] {20, 30, 40, 50, 60}),
 	SCRAPSHOT_VELOCITY("Scrapshot Recoil Velocity", Scrapshot.INFO, true, true, 20.0, 100.0, new double[] {0.0, 0.0, 0.0, 30.0, 50.0}),
-	SHARPSHOOTER_DAMAGE_PER_STACK("Sharpshooter Damage Per Stack", DepthsSharpshooter.INFO, false, true, 0.75, 10, new double[] {0.75, 0.875, 1, 1.25, 1.5}),
-	SHARPSHOOTER_DECAY_TIMER("Sharpshooter Decay Timer", DepthsSharpshooter.INFO, true, false, 0.5, 4.0, new double[] {0.0, 0.0, 1.0, 1.5, 2.0}),
-	SHARPSHOOTER_MAX_STACKS("Sharpshooter Max Stacks", DepthsSharpshooter.INFO, true, false, 0.0, 8.0, new double[] {0.0, 0.0, 0.0, 1.0, 2.0}),
+	SCRAPSHOT_SHRAPNEL_CONE_ANGLE("Scrapshot Shrapnel Cone Angle", Scrapshot.INFO, true, true, 10.0, 100.0, new double[] {0.0, 0.0, 0.0, 20.0, 40.0}),
+	SHARPSHOOTER_DAMAGE_PER_STACK("Sharpshooter Damage Per Stack", DepthsSharpshooter.INFO, false, true, 0.25, 3, new double[] {0.5, 0.75, 1, 1.25, 1.5}),
+	SHARPSHOOTER_DECAY_TIMER("Sharpshooter Decay Timer", DepthsSharpshooter.INFO, true, false, 0.25, 2.0, new double[] {0.0, 0.0, 0.5, 0.75, 1.0}),
+	SHARPSHOOTER_MAX_STACKS("Sharpshooter Max Stacks", DepthsSharpshooter.INFO, true, false, 0.0, 4.0, new double[] {0.0, 0.0, 0.0, 1.0, 2.0}),
 	SIDEARM_COOLDOWN(Sidearm.CHARM_COOLDOWN, Sidearm.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	SIDEARM_DAMAGE("Sidearm Damage", Sidearm.INFO, false, true, 10.0, 100.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	SIDEARM_RANGE("Sidearm Range", Sidearm.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),

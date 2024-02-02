@@ -40,10 +40,10 @@ public class Avalanche extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Avalanche";
 	public static final double[] DAMAGE = {30, 35, 40, 45, 50, 60};
-	public static final int COOLDOWN_TICKS = 18 * 20;
+	public static final int COOLDOWN_TICKS = 20 * 20;
 	public static final int SLOW_DURATION = 2 * 20;
 	public static final double SLOW_MODIFIER = 1;
-	public static final int RADIUS = 10;
+	public static final int RADIUS = 8;
 	public static final int NUM_PULSES = 4;
 	private static final Particle.DustOptions ICE_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(200, 225, 255), 1.0f);
 
@@ -101,8 +101,9 @@ public class Avalanche extends DepthsAbility {
 					//Damage and root mobs
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 2, 5.0, 2)) {
 						if (!mHitMobs.contains(mob)) {
+							double damage = mDamage * (mPulses < 3 ? 0.15 : 0.55);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
 							EntityUtils.applySlow(mPlugin, mDuration, SLOW_MODIFIER, mob);
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage / NUM_PULSES, true, false, false);
 							mHitMobs.add(mob);
 						}
 					}
@@ -162,11 +163,11 @@ public class Avalanche extends DepthsAbility {
 
 	private static Description<Avalanche> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Avalanche>(color)
-			.add("Swap hands to shatter all ice blocks within a radius of ")
+			.add("Swap hands to begin shattering all ice blocks within a radius of ")
 			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks, dealing ")
+			.add(" blocks, dealing a total of ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" magic damage spread across 4 pulses over 0.5s to enemies above the shattered ice. Affected enemies are rooted for ")
+			.add(" magic damage in 4 pulses over 0.5s to enemies above the ice. The final pulse deals significantly more damage and removes the ice. Affected enemies are rooted for ")
 			.addDuration(a -> a.mDuration, SLOW_DURATION)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN_TICKS);

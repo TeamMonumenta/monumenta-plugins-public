@@ -184,7 +184,7 @@ public enum ClassAbility {
 	// FLAMECALLER
 	APOCALYPSE("Apocalypse"),
 	FIREBALL("Fireball"),
-	RING_OF_FLAMES("Ring of Flames"),
+	IGNEOUS_RUNE("Igneous Rune"),
 	FLAMESTRIKE("Flamestrike"),
 	VOLCANIC_METEOR("Volcanic Meteor"),
 	PYROBLAST("Pyroblast"),

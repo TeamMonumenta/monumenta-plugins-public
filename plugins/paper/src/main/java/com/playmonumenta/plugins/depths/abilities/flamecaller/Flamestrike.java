@@ -35,7 +35,7 @@ import org.bukkit.util.Vector;
 public class Flamestrike extends DepthsAbility {
 	public static final String ABILITY_NAME = "Flamestrike";
 	public static final int COOLDOWN = 10 * 20;
-	public static final double[] DAMAGE = {14, 17.5, 21, 24.5, 28, 35};
+	public static final double[] DAMAGE = {14, 17, 20, 23, 26, 32};
 	public static final int HEIGHT = 6;
 	public static final int RADIUS = 7;
 	public static final int ANGLE = 70;

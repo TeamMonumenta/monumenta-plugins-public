@@ -24,8 +24,8 @@ import org.bukkit.entity.Player;
 public class Icebreaker extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Icebreaker";
-	public static final double[] ICE_DAMAGE = {0.24, 0.28, 0.32, 0.36, 0.40, 0.48};
-	public static final double[] EFFECT_DAMAGE = {0.12, 0.14, 0.16, 0.18, 0.20, 0.24};
+	public static final double[] ICE_DAMAGE = {0.20, 0.23, 0.26, 0.29, 0.32, 0.40};
+	public static final double[] EFFECT_DAMAGE = {0.10, 0.115, 0.13, 0.145, 0.16, 0.20};
 
 	public static final DepthsAbilityInfo<Icebreaker> INFO =
 		new DepthsAbilityInfo<>(Icebreaker.class, ABILITY_NAME, Icebreaker::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)

@@ -40,10 +40,10 @@ import com.playmonumenta.plugins.depths.abilities.flamecaller.Detonation;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Fireball;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.FlameSpirit;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Flamestrike;
+import com.playmonumenta.plugins.depths.abilities.flamecaller.IgneousRune;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.PrimordialMastery;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Pyroblast;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Pyromania;
-import com.playmonumenta.plugins.depths.abilities.flamecaller.RingOfFlames;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicCombos;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicMeteor;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Avalanche;
@@ -584,9 +584,9 @@ public class DepthsManager {
 			PrimordialMastery.INFO,
 			Pyroblast.INFO,
 			Pyromania.INFO,
-			RingOfFlames.INFO,
 			VolcanicCombos.INFO,
 			VolcanicMeteor.INFO,
+			IgneousRune.INFO,
 
 			// Frostborn abilities
 			Avalanche.INFO,

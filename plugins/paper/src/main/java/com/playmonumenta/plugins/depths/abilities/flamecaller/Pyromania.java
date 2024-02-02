@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -52,6 +53,12 @@ public class Pyromania extends DepthsAbility {
 				fireCount++;
 			}
 		}
+		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
+			if (p.getFireTicks() > 0) {
+				fireCount++;
+			}
+		}
+
 		if (fireCount > 0) {
 			event.setDamage(event.getDamage() * (1 + (mDamagePerMob * fireCount)));
 		}
@@ -60,7 +67,7 @@ public class Pyromania extends DepthsAbility {
 
 	private static Description<Pyromania> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Pyromania>(color)
-			.add("For every mob on fire within ")
+			.add("For every mob and player on fire within ")
 			.add(a -> a.mRadius, rarity == 6 ? TWISTED_RADIUS : RADIUS, false, null, rarity == 6)
 			.add(" blocks of you, gain ")
 			.addPercent(a -> a.mDamagePerMob, DAMAGE[rarity - 1], false, true)

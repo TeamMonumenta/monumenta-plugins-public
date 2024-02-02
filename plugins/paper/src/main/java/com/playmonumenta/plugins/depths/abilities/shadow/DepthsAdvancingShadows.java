@@ -32,7 +32,7 @@ import org.bukkit.util.Vector;
 public class DepthsAdvancingShadows extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Advancing Shadows";
-	public static final double[] DAMAGE = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
+	public static final double[] DAMAGE = {0.16, 0.20, 0.24, 0.28, 0.32, 0.4};
 
 	private static final int ADVANCING_SHADOWS_RANGE = 12;
 	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;

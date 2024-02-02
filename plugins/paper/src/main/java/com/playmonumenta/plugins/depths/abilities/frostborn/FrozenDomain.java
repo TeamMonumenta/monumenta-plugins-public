@@ -56,24 +56,22 @@ public class FrozenDomain extends DepthsAbility {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		boolean isOnIce = isOnIce(mPlayer);
-		if (twoHertz) {
-			if (isOnIce) {
-				new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
-			}
-
-			if (PlayerUtils.isOnGround(mPlayer) && isOnIce) {
-				mWasOnIce = true;
-				mTickWhenIce = mTicks;
-				handleSpeed();
-				handleHeal();
-			} else if (mWasOnIce) {
-				handleHeal();
-			}
-			if (mTicks >= mTickWhenIce + mDuration) {
-				mWasOnIce = false;
-			}
-			mTicks += 10;
+		if (isOnIce) {
+			new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 4, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 		}
+
+		if (PlayerUtils.isOnGround(mPlayer) && isOnIce) {
+			mWasOnIce = true;
+			mTickWhenIce = mTicks;
+			handleSpeed();
+			handleHeal();
+		} else if (mWasOnIce) {
+			handleHeal();
+		}
+		if (mTicks >= mTickWhenIce + mDuration) {
+			mWasOnIce = false;
+		}
+		mTicks += 5;
 
 		if (isOnIce && mPlayer.getFireTicks() > 1) {
 			mPlayer.setFireTicks(1);

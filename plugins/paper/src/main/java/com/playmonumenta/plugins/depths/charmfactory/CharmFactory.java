@@ -50,7 +50,13 @@ public class CharmFactory {
 	public static final int[] WILDCARD_TREE_CAP_CHANCES = {0, 33, 33, 17, 8, 5, 4};
 
 	public static final Map<String, String> charmConversionMap = Map.ofEntries(
-		Map.entry("Precision Strike Range", "Precision Strike Range Requirement")
+		Map.entry("Precision Strike Range", "Precision Strike Range Requirement"),
+		Map.entry("Fireball Range", "Fireball Velocity"),
+		Map.entry("Ring of Flames Cooldown", "Igneous Rune Cooldown"),
+		Map.entry("Ring of Flames Damage", "Igneous Rune Damage"),
+		Map.entry("Ring of Flames Fire Duration", "Igneous Rune Fire Duration"),
+		Map.entry("Ring of Flames Bleed Amplifier", "Igneous Rune Buff Amplifier"),
+		Map.entry("Ring of Flames Duration", "Igneous Rune Buff Duration")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
