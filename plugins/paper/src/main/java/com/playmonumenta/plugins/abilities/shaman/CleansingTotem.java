@@ -6,13 +6,13 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
-import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -25,7 +25,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class CleansingTotem extends TotemAbility {
@@ -42,20 +41,22 @@ public class CleansingTotem extends TotemAbility {
 	private static final int DURATION_1 = 8 * 20;
 	private static final int DURATION_2 = 12 * 20;
 	private static final int CLEANSES = 2;
-	private static final double ENHANCE_HEALING_PERCENT = 0.2;
-	private static final int ENHANCE_RADIUS = 3;
+	private static final double ENHANCE_HEALING_PERCENT = 0.03;
+	private static final int ENHANCE_ABSORB_CAP = 4;
 
 	public static String CHARM_DURATION = "Cleansing Totem Duration";
 	public static String CHARM_RADIUS = "Cleansing Totem Radius";
 	public static String CHARM_COOLDOWN = "Cleansing Totem Cooldown";
 	public static String CHARM_HEALING = "Cleansing Totem Healing";
 	public static String CHARM_CLEANSES = "Cleansing Totem Cleanses";
-	public static String CHARM_ENHANCE_HEALING = "Cleansing Totem Enhance Healing";
+	public static String CHARM_ENHANCE_ABSORB_MAX = "Cleansing Totem Enhance Absorption Maximum";
 	public static String CHARM_PULSE_DELAY = "Cleansing Totem Pulse Delay";
 
 	private final int mDuration;
 	private final double mRadius;
 	private final int mInterval;
+	private final double mHealPercent;
+	private final double mAbsorbCap;
 
 	public static final AbilityInfo<CleansingTotem> INFO =
 		new AbilityInfo<>(CleansingTotem.class, "Cleansing Totem", CleansingTotem::new)
@@ -73,10 +74,9 @@ public class CleansingTotem extends TotemAbility {
 				String.format("Duration is increased to %ss and now cleanses debuffs for players %s times evenly throughout it's duration.",
 					StringUtils.ticksToSeconds(DURATION_2),
 					CLEANSES),
-				String.format("Throwing the totem cleanses the shaman and heals %s%% max health instantly. " +
-					"Players within %s blocks of the landing location receive the same effects on impact.",
+				String.format("Increases healing by %s%% and now overheals into absorption with a maximum of %s hearts.",
 					StringUtils.multiplierToPercentage(ENHANCE_HEALING_PERCENT),
-					ENHANCE_RADIUS
+					ENHANCE_ABSORB_CAP
 				)
 			)
 			.simpleDescription("Summon a totem that heals and cleanses players over its duration.")
@@ -94,6 +94,9 @@ public class CleansingTotem extends TotemAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
+		mHealPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT)
+			+ (isEnhanced() ? ENHANCE_HEALING_PERCENT : 0);
+		mAbsorbCap = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_ABSORB_MAX, ENHANCE_ABSORB_CAP);
 		mChargeUpTicks = 0;
 	}
 
@@ -107,11 +110,6 @@ public class CleansingTotem extends TotemAbility {
 		if (ticks == 0) {
 			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 2.0f, 1.3f);
 			world.playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8f, 2.0f);
-			if (isEnhanced()) {
-				List<Player> players = PlayerUtils.playersInRange(standLocation, ENHANCE_RADIUS, true);
-				players.removeIf(player -> player == mPlayer);
-				triggerEnhancement(players);
-			}
 		}
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
@@ -129,8 +127,7 @@ public class CleansingTotem extends TotemAbility {
 			List<Player> players = PlayerUtils.playersInRange(standLocation, mRadius, true);
 			for (Player p : players) {
 				PlayerUtils.healPlayer(mPlugin, p,
-					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_HEALING,
-						EntityUtils.getMaxHealth(p) * HEAL_PERCENT * ChainLightning.ENHANCE_POSITIVE_EFFICIENCY));
+					EntityUtils.getMaxHealth(p) * mHealPercent * ChainLightning.ENHANCE_POSITIVE_EFFICIENCY);
 			}
 			if (isLevelTwo()) {
 				cleanseTargets(players);
@@ -140,12 +137,14 @@ public class CleansingTotem extends TotemAbility {
 		} else {
 			List<Player> affectedPlayers = PlayerUtils.playersInRange(standLocation, mRadius, true);
 
-			for (LivingEntity p : affectedPlayers) {
+			for (Player p : affectedPlayers) {
 				double maxHealth = EntityUtils.getMaxHealth(p);
-				mPlugin.mEffectManager.clearEffects(p, HEAL_EFFECT_NAME);
-				mPlugin.mEffectManager.addEffect(p, HEAL_EFFECT_NAME, new CustomRegeneration(EFFECT_DURATION,
-					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING,
-						maxHealth * HEAL_PERCENT), mPlayer, mPlugin));
+				double totalHealing = maxHealth * mHealPercent;
+				double healed = PlayerUtils.healPlayer(mPlugin, p, maxHealth * mHealPercent);
+				double remainingHealing = totalHealing - healed;
+				if (remainingHealing > 0) {
+					AbsorptionUtils.addAbsorption(p, remainingHealing, mAbsorbCap, -1);
+				}
 			}
 
 			PPCircle cleansingRing = new PPCircle(Particle.REDSTONE, standLocation, mRadius)
@@ -162,23 +161,6 @@ public class CleansingTotem extends TotemAbility {
 	public void onTotemExpire(World world, Location standLocation) {
 		new PartialParticle(Particle.HEART, standLocation, 45, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK, 0.7f, 0.5f);
-	}
-
-	@Override
-	public void onTotemCast() {
-		if (isEnhanced()) {
-			triggerEnhancement(List.of(mPlayer));
-		}
-	}
-
-	private void triggerEnhancement(List<Player> players) {
-		cleanseTargets(players);
-		for (Player player : players) {
-			PlayerUtils.healPlayer(mPlugin, player, CharmManager.calculateFlatAndPercentValue(mPlayer,
-				CHARM_ENHANCE_HEALING, ENHANCE_HEALING_PERCENT * EntityUtils.getMaxHealth(player)), mPlayer);
-			new PPCircle(Particle.HEART, player.getLocation(), 1).ringMode(true)
-				.countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
-		}
 	}
 
 	private void cleanseTargets(List<Player> cleansePlayers) {

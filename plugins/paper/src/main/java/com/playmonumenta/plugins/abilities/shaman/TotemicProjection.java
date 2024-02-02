@@ -18,11 +18,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.*;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -108,7 +104,8 @@ public class TotemicProjection extends Ability {
 
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE,
+			SoundCategory.PLAYERS, 1.0f, 0.25f);
 		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Totemic Projection Projectile", Particle.CLOUD);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -147,16 +144,18 @@ public class TotemicProjection extends Ability {
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (!(proj instanceof Snowball)) {
+		if (!(proj instanceof Snowball) || event.isCancelled()) {
 			return;
 		}
 		ItemStatManager.PlayerItemStats stats = mProjectiles.remove(proj);
 
 		if (stats != null) {
 			Location dropCenter = proj.getLocation();
-			mPlayer.playSound(dropCenter, Sound.BLOCK_VINE_BREAK, 2.0f, 1.0f);
+			mPlayer.playSound(dropCenter, Sound.BLOCK_VINE_BREAK,
+				SoundCategory.PLAYERS, 2.0f, 1.0f);
 			new PartialParticle(Particle.REVERSE_PORTAL, dropCenter, 20).spawnAsPlayerActive(mPlayer);
-			mPlayer.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.7f);
+			mPlayer.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE,
+				SoundCategory.PLAYERS, 1.0f, 1.7f);
 
 			List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
 			if (totems.size() == 1) {

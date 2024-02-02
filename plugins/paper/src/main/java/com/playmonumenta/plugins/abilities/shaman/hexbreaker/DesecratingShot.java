@@ -14,11 +14,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -84,13 +80,20 @@ public class DesecratingShot extends Ability {
 
 			World world = enemy.getWorld();
 			Location loc = enemy.getLocation();
-			world.playSound(loc, Sound.ENTITY_VEX_DEATH, 2.0f, 0.4f);
-			world.playSound(loc, Sound.ENTITY_ARROW_HIT, 2.0f, 0.6f);
-			world.playSound(loc, Sound.ENTITY_ARROW_HIT, 2.0f, 1.4f);
-			world.playSound(loc, Sound.ENTITY_ARROW_HIT, 2.0f, 1.8f);
-			world.playSound(loc, Sound.ITEM_TRIDENT_THROW, 2.0f, 0.0f);
-			world.playSound(loc, Sound.ENTITY_VEX_HURT, 2.0f, 1.2f);
-			world.playSound(loc, Sound.ENTITY_PHANTOM_DEATH, 0.7f, 0.1f);
+			world.playSound(loc, Sound.ENTITY_VEX_DEATH,
+				SoundCategory.PLAYERS, 2.0f, 0.4f);
+			world.playSound(loc, Sound.ENTITY_ARROW_HIT,
+				SoundCategory.PLAYERS, 2.0f, 0.6f);
+			world.playSound(loc, Sound.ENTITY_ARROW_HIT,
+				SoundCategory.PLAYERS, 2.0f, 1.4f);
+			world.playSound(loc, Sound.ENTITY_ARROW_HIT,
+				SoundCategory.PLAYERS, 2.0f, 1.8f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_THROW,
+				SoundCategory.PLAYERS, 2.0f, 0.0f);
+			world.playSound(loc, Sound.ENTITY_VEX_HURT,
+				SoundCategory.PLAYERS, 2.0f, 1.2f);
+			world.playSound(loc, Sound.ENTITY_PHANTOM_DEATH,
+				SoundCategory.PLAYERS, 0.7f, 0.1f);
 
 			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
 			for (LivingEntity mob : affectedMobs) {

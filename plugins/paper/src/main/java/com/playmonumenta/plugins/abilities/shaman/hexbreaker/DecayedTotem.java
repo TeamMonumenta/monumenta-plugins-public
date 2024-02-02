@@ -23,12 +23,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -123,9 +118,12 @@ public class DecayedTotem extends TotemAbility {
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (ticks == 0) {
 			applyDecayedDamageBoost();
-			stand.getWorld().playSound(stand, Sound.BLOCK_CONDUIT_AMBIENT, 20.0f, 1.2f);
-			stand.getWorld().playSound(stand, Sound.ENTITY_SKELETON_HURT, 0.6f, 0.3f);
-			stand.getWorld().playSound(stand, Sound.ENTITY_PHANTOM_DEATH, 0.5f, 0.2f);
+			stand.getWorld().playSound(stand, Sound.BLOCK_CONDUIT_AMBIENT,
+				SoundCategory.PLAYERS, 20.0f, 1.2f);
+			stand.getWorld().playSound(stand, Sound.ENTITY_SKELETON_HURT,
+				SoundCategory.PLAYERS, 0.6f, 0.3f);
+			stand.getWorld().playSound(stand, Sound.ENTITY_PHANTOM_DEATH,
+				SoundCategory.PLAYERS, 0.5f, 0.2f);
 		}
 		mTargets.removeIf(mob -> !mob.getWorld().equals(standLocation.getWorld()) || standLocation.distance(mob.getLocation()) >= mRadius || mob.isDead());
 		if (mTargets.size() < mTargetCount) {
@@ -167,7 +165,8 @@ public class DecayedTotem extends TotemAbility {
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
 		new PartialParticle(Particle.SQUID_INK, standLocation, 5, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK, 0.7f, 0.5f);
+		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK,
+			SoundCategory.PLAYERS, 0.7f, 0.5f);
 		mTargets.clear();
 		applyDecayedDamageBoost();
 	}

@@ -38,8 +38,8 @@ import org.jetbrains.annotations.Nullable;
 public class ChainLightning extends MultipleChargeAbility {
 	public static final int COOLDOWN = 6 * 20;
 	public static final int CHARGES = 2;
-	public static final int TARGETS_1 = 2;
-	public static final int TARGETS_2 = 4;
+	public static final int TARGETS_1 = 3;
+	public static final int TARGETS_2 = 5;
 	public static final int INITIAL_RANGE = 9;
 	public static final int BOUNCE_RANGE = 6;
 	public static final int DAMAGE_1 = 5;
@@ -62,7 +62,8 @@ public class ChainLightning extends MultipleChargeAbility {
 			.scoreboardId("ChainLightning")
 			.shorthandName("CL")
 			.descriptions(
-				String.format("Right click while holding a melee weapon to cast a splitting beam of lightning, bouncing between up to %s mobs within %s blocks of the last target hit " +
+				String.format("Right click while holding a melee weapon to cast a splitting beam of lightning, bouncing between up to %s mobs"
+					+ " within line of sight of each other and within %s blocks of the last target hit " +
 					"and dealing %s damage to each. Will also bounce to nearby totems without consuming a hit target. %s charges, %ss cooldown.",
 					TARGETS_1,
 					BOUNCE_RANGE,
@@ -117,10 +118,12 @@ public class ChainLightning extends MultipleChargeAbility {
 		mHitTargets.clear();
 		mHitTargets.add(mPlayer);
 
-		Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mInitialRange, Math.toRadians(45))
-			.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), 1.5));
+		Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mInitialRange, Math.toRadians(18))
+			.union(Hitbox.approximateCone(mPlayer.getEyeLocation(), 3, Math.toRadians(30)))
+			.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), 1.25));
 
 		List<LivingEntity> nearbyMobs = hitbox.getHitMobs();
+		nearbyMobs.removeIf(mob -> !(mPlayer.hasLineOfSight(mob.getEyeLocation()) || mPlayer.hasLineOfSight(mob.getLocation())));
 		nearbyMobs.sort(Comparator.comparing(e -> e.getLocation().distance(mPlayer.getLocation())));
 		List<LivingEntity> nearbyTotems = new ArrayList<>(TotemicEmpowerment.getTotemList(mPlayer));
 		nearbyTotems.removeIf(totem -> !hitbox.intersects(totem.getBoundingBox()));
@@ -209,6 +212,7 @@ public class ChainLightning extends MultipleChargeAbility {
 
 	private @Nullable LivingEntity locateMobInRange(Location loc) {
 		List<LivingEntity> possibleMobs = EntityUtils.getNearbyMobsInSphere(loc, mBounceRange, null);
+		possibleMobs.removeIf(mob -> !(mPlayer.hasLineOfSight(mob.getEyeLocation()) || mPlayer.hasLineOfSight(mob.getLocation())));
 		for (LivingEntity entity : mHitTargets) {
 			possibleMobs.removeIf(mob -> entity.getUniqueId().equals(mob.getUniqueId()));
 		}

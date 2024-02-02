@@ -12,16 +12,10 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.*;
 import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -81,10 +75,25 @@ public class Devastation extends Ability {
 		if (totemList.isEmpty()) {
 			return false;
 		}
-		LivingEntity totemToNuke = totemList.get(0);
-		for (LivingEntity totem : totemList) {
-			if (!totemToNuke.equals(totem) && mPlayer.getLocation().distance(totemToNuke.getLocation()) > mPlayer.getLocation().distance(totem.getLocation())) {
-				totemToNuke = totem;
+
+		Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), 20, Math.toRadians(18))
+			.union(Hitbox.approximateCone(mPlayer.getEyeLocation(), 3, Math.toRadians(30)));
+		List<ArmorStand> totemsInHitbox = hitbox.getHitEntitiesByClass(ArmorStand.class);
+		totemsInHitbox.removeIf(totem -> !totemList.contains(totem));
+		LivingEntity totemToNuke;
+		if (!totemsInHitbox.isEmpty()) {
+			totemToNuke = totemsInHitbox.get(0);
+			for (LivingEntity totem : totemsInHitbox) {
+				if (!totemToNuke.equals(totem) && mPlayer.getLocation().distance(totemToNuke.getLocation()) > mPlayer.getLocation().distance(totem.getLocation())) {
+					totemToNuke = totem;
+				}
+			}
+		} else {
+			totemToNuke = totemList.get(0);
+			for (LivingEntity totem : totemList) {
+				if (!totemToNuke.equals(totem) && mPlayer.getLocation().distance(totemToNuke.getLocation()) > mPlayer.getLocation().distance(totem.getLocation())) {
+					totemToNuke = totem;
+				}
 			}
 		}
 		putOnCooldown();
@@ -103,10 +112,14 @@ public class Devastation extends Ability {
 		TotemicEmpowerment.removeTotem(mPlayer, totemToNuke);
 
 		for (Particle particle : List.of(Particle.FLAME, Particle.LAVA)) {
-			ParticleUtils.explodingRingEffect(mPlugin, targetLoc.clone().add(0, 0.1, 0), mRadius, 1.2, 10, 0.2, loc -> new PartialParticle(particle, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer));
+			ParticleUtils.explodingRingEffect(mPlugin, targetLoc.clone().add(0, 0.1, 0), mRadius, 1.2, 5, 0.2, loc -> new PartialParticle(particle, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer));
 		}
-		targetLoc.getWorld().playSound(targetLoc, Sound.BLOCK_END_PORTAL_SPAWN, 0.3f, 2.0f);
-		targetLoc.getWorld().playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 1.0f, 1.0f);
+		targetLoc.getWorld().playSound(targetLoc, Sound.BLOCK_END_PORTAL_SPAWN,
+			SoundCategory.PLAYERS, 0.3f, 2.0f);
+		targetLoc.getWorld().playSound(targetLoc, Sound.BLOCK_ENDER_CHEST_OPEN,
+			SoundCategory.PLAYERS, 0.6f, 0.6f);
+		targetLoc.getWorld().playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT,
+			SoundCategory.PLAYERS, 1.0f, 1.0f);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, mRadius)) {
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());

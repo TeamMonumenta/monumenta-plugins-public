@@ -34,6 +34,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -210,7 +211,8 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 						mCrystalShots = mCrystalStacks;
 					}
 					if (mCrystalStacks >= mCrystalStackThreshold) {
-						mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2, 1.5f);
+						mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE,
+							 SoundCategory.PLAYERS, 2, 1.5f);
 						mDecayTimer = 0;
 						mCrystalStacks = 0;
 						mCrystalShots = mTotalShots;
@@ -293,8 +295,10 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		for (LivingEntity target : targets) {
 			if (!DamageUtils.isImmuneToDamage(target, DamageEvent.DamageType.MAGIC)) {
 				hitSomething = true;
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_HIT, 1.2f, 1.0f);
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 2f, 1.4f);
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_HIT,
+					SoundCategory.PLAYERS, 1.2f, 1.0f);
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK,
+					SoundCategory.PLAYERS, 2f, 1.4f);
 				DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, mCrystalDamage,
 					ClassAbility.CRYSTALLINE_COMBOS, true, false);
 				new PPLine(Particle.REDSTONE,
@@ -323,5 +327,13 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 	public void updateNotify() {
 		showChargesMessage();
 		ClientModHandler.updateAbility(mPlayer, ClassAbility.CRYSTALLINE_COMBOS);
+	}
+
+	@Override
+	public void invalidate() {
+		if (mSystemTask != null) {
+			mSystemTask.cancel();
+			mSystemTask = null;
+		}
 	}
 }

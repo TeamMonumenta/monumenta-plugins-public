@@ -20,11 +20,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
@@ -110,9 +106,12 @@ public class WhirlwindTotem extends TotemAbility {
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (ticks == 0) {
-			world.playSound(standLocation, Sound.ENTITY_ENDER_EYE_LAUNCH, 2.0f, 0.1f);
-			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 2.0f, 0.7f);
-			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 2.0f, 1.3f);
+			world.playSound(standLocation, Sound.ENTITY_ENDER_EYE_LAUNCH,
+				SoundCategory.PLAYERS, 2.0f, 0.1f);
+			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR,
+				SoundCategory.PLAYERS, 2.0f, 0.7f);
+			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS,
+				SoundCategory.PLAYERS, 2.0f, 1.3f);
 			applyWhirlwindDurationBoost();
 		}
 		if (ticks % mInterval == 0) {
@@ -146,7 +145,8 @@ public class WhirlwindTotem extends TotemAbility {
 
 		PPSpiral windSpiral = new PPSpiral(Particle.SPELL_INSTANT, standLocation, mRadius).distancePerParticle(.05).ticks(5).count(1).delta(0);
 		windSpiral.spawnAsPlayerActive(mPlayer);
-		standLocation.getWorld().playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.3f, 0.5f);
+		standLocation.getWorld().playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE,
+			SoundCategory.PLAYERS, 0.3f, 0.5f);
 		dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), INTERVAL + 20);
 		applyWhirlwindDurationBoost();
 	}
@@ -154,7 +154,8 @@ public class WhirlwindTotem extends TotemAbility {
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
 		new PartialParticle(Particle.HEART, standLocation, 45, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK, 0.7f, 0.5f);
+		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK,
+			SoundCategory.PLAYERS, 0.7f, 0.5f);
 	}
 
 	public void applyWhirlwindDurationBoost() {
