@@ -521,8 +521,12 @@ public class DelvesUtils {
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			// All players in the party have the same modifiers
-			Player player = party.get(0);
-			return getPlayerDelvePoints(player);
+			for (Player player : party) {
+				Map<DelvesModifier, Integer> points = getPlayerDelvePoints(player);
+				if (!points.isEmpty()) {
+					return points;
+				}
+			}
 		} else if ("ring".equals(ServerProperties.getShardName())) {
 
 			// Find the structure(s) the party is in
@@ -579,9 +583,8 @@ public class DelvesUtils {
 			Map<DelvesModifier, Integer> highestMap = getHighestDelvePointsWithLast(players, lastMap);
 			LAST_POI_DELVE_POINTS.put(structure, new HashMap<>(highestMap));
 			return highestMap;
-		} else {
-			return Collections.emptyMap();
 		}
+		return Collections.emptyMap();
 	}
 
 	private static Map<DelvesModifier, Integer> getHighestDelvePointsWithLast(List<Player> players, @Nullable Map<DelvesModifier, Integer> last) {
