@@ -29,8 +29,9 @@ public class StatTrackDamage implements Infusion {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (!EntityUtils.isTrainingDummy(enemy)) {
+			int dmgDealt = (int) Math.round(Math.min(event.getFinalDamage(false), enemy.getHealth() + enemy.getAbsorptionAmount()));
 			ItemStack is = player.getInventory().getItemInMainHand();
-			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_DAMAGE, (int) event.getFinalDamage(false));
+			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_DAMAGE, dmgDealt);
 		}
 	}
 }
