@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -12,7 +13,9 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
@@ -145,7 +148,7 @@ public class RestlessSouls extends Ability {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
 				final Vex mBoss = Objects.requireNonNull(vex);
-				double mRadian = 0;
+				double mRadian = FastUtils.randomDoubleInRange(0, Math.PI);
 
 				@Override
 				public void run() {
@@ -175,6 +178,7 @@ public class RestlessSouls extends Ability {
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(pLoc, DETECTION_RANGE, mBoss);
 						if (!nearbyMobs.isEmpty()) {
 							nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+							nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
 							// check mob count again after removal of vexes
 							if (nearbyMobs.size() > 0) {
 								Collections.shuffle(nearbyMobs);
@@ -203,7 +207,7 @@ public class RestlessSouls extends Ability {
 					Location vexLoc = mBoss.getLocation();
 					if (mTarget != null && !mTarget.isDead()) {
 						mBoss.setCharging(true);
-						Vector direction = LocationUtils.getDirectionTo(mTarget.getLocation(), vexLoc);
+						Vector direction = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(mTarget), vexLoc);
 						//0.2x distance for vertical movement for flying mobs
 						double yDiff = (mTarget.getLocation().getY() - mBoss.getLocation().getY()) * 0.2;
 						if (yDiff > direction.getY()) {
