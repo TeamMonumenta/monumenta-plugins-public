@@ -2406,7 +2406,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						mStarBlightConverter.restoreAll();
 						mSpawner.wipeMobs();
 						for (Player player : getPlayersInArena(false)) {
-							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.DARK_AQUA), Component.text("Sirius, The Star Herald", NamedTextColor.AQUA));
+							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.DARK_AQUA), Component.text("Sirius, The Final Herald", NamedTextColor.AQUA));
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							if (mClose) {
 								AdvancementUtils.grantAdvancement(player, "monumenta:challenges/r3/sirius/condition");
