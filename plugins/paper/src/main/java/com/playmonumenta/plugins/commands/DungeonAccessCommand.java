@@ -358,6 +358,27 @@ public class DungeonAccessCommand extends GenericCommand {
 				ScoreboardUtils.setScoreboardValue(player, mapping.getTypeName(), 0);
 			}
 			ScoreboardUtils.setScoreboardValue(player, mapping.getAccessName(), 0);
+
+			// boot them out if they are on this shard
+			String abandonShardName = mapping.getAbandonShardName();
+			if (shardName != null && ServerProperties.getShardName().contains(shardName)) {
+				try {
+					ShardSorterCommand.sortToShard(player, abandonShardName);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			/*
+			 * usb: Strikes call their own teleport function: leaving code here in case it is needed for the future (according to Crondis)
+			else if (shardName == null && ServerProperties.getShardName().contains(abandonShardName)) {
+				try {
+					// this hack needs to be changed whenever we change the primary worldname from Project_Epic-<shardname>
+					NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + player.getUniqueId() + " run world Project_Epic-" + abandonShardName);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			*/
 		}
 	}
 
