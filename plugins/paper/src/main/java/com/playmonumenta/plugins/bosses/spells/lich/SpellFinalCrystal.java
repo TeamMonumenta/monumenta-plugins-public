@@ -130,6 +130,7 @@ public class SpellFinalCrystal extends Spell {
 				if (remainingCrystals == 0 || Lich.bossDead()) {
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 4.0f, 0.5f);
 					this.cancel();
+					return;
 				}
 				//warning 1
 				if (mT == 20 * 2) {
@@ -148,6 +149,7 @@ public class SpellFinalCrystal extends Spell {
 						mTriggered = true;
 					}
 					this.cancel();
+					return;
 				}
 				mT++;
 				//boss bar stuff
