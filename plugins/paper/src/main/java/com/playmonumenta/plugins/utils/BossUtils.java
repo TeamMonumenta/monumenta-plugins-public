@@ -171,7 +171,7 @@ public class BossUtils {
 			if (adjustedHealth <= 0) {
 				// Kill the player, but allow totems to trigger
 				target.setNoDamageTicks(0);
-				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), 1000, false, knockback, false);
+				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), toTake, false, knockback, false);
 				return false;
 			} else {
 				double originalDamage = toTake;
