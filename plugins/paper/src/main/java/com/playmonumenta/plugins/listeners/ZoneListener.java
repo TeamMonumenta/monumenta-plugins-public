@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.scriptedquests.zones.ZonePropertyChangeEvent;
+import io.papermc.paper.event.block.PlayerShearBlockEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -146,4 +147,10 @@ public class ZoneListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerInteractEvent(PlayerShearBlockEvent event) {
+		if (!ZoneUtils.playerCanMineBlock(event.getPlayer(), event.getBlock())) {
+			event.setCancelled(true);
+		}
+	}
 }

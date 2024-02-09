@@ -56,7 +56,8 @@ public class CharmFactory {
 		Map.entry("Ring of Flames Damage", "Igneous Rune Damage"),
 		Map.entry("Ring of Flames Fire Duration", "Igneous Rune Fire Duration"),
 		Map.entry("Ring of Flames Bleed Amplifier", "Igneous Rune Buff Amplifier"),
-		Map.entry("Ring of Flames Duration", "Igneous Rune Buff Duration")
+		Map.entry("Ring of Flames Duration", "Igneous Rune Buff Duration"),
+		Map.entry("Lightning Bottle Kills Per Bottle", "Lightning Bottle Kill Threshold")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {

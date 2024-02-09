@@ -110,7 +110,7 @@ public enum CharmEffects {
 	LIGHTNING_BOTTLE_VULN_AMPLIFIER("Lightning Bottle Vulnerability Amplifier", LightningBottle.INFO, false, true, 2.0, 15.0, new double[] {4.0, 5.0, 6.0, 7.0, 8.0}),
 	LIGHTNING_BOTTLE_DURATION("Lightning Bottle Debuff Duration", LightningBottle.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
 	LIGHTNING_BOTTLE_MAX_STACKS("Lightning Bottle Max Stacks", LightningBottle.INFO, true, false, 1.0, 10.0, new double[] {0.0, 0.0, 2.0, 4.0, 6.0}),
-	LIGHTNING_BOTTLE_KILLS_PER_BOTTLE("Lightning Bottle Kills Per Bottle", LightningBottle.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
+	LIGHTNING_BOTTLE_KILLS_PER_BOTTLE("Lightning Bottle Kill Threshold", LightningBottle.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
 	RADIANT_BLESSING_COOLDOWN(RadiantBlessing.CHARM_COOLDOWN, RadiantBlessing.INFO, false, true, 4.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
 	RADIANT_BLESSING_RADIUS("Radiant Blessing Radius", RadiantBlessing.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 	RADIANT_BLESSING_DAMAGE_AMPLIFIER("Radiant Blessing Strength Amplifier", RadiantBlessing.INFO, false, true, 2.0, 20.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
