@@ -76,7 +76,7 @@ public class CleansingTotem extends TotemAbility {
 					CLEANSES),
 				String.format("Increases healing by %s%% and now overheals into absorption with a maximum of %s hearts.",
 					StringUtils.multiplierToPercentage(ENHANCE_HEALING_PERCENT),
-					ENHANCE_ABSORB_CAP
+					ENHANCE_ABSORB_CAP / 2
 				)
 			)
 			.simpleDescription("Summon a totem that heals and cleanses players over its duration.")
@@ -142,8 +142,8 @@ public class CleansingTotem extends TotemAbility {
 				double totalHealing = maxHealth * mHealPercent;
 				double healed = PlayerUtils.healPlayer(mPlugin, p, maxHealth * mHealPercent);
 				double remainingHealing = totalHealing - healed;
-				if (remainingHealing > 0) {
-					AbsorptionUtils.addAbsorption(p, remainingHealing, mAbsorbCap, -1);
+				if (remainingHealing > 0 && isEnhanced()) {
+					AbsorptionUtils.addAbsorption(p, remainingHealing, mAbsorbCap, 15 * 20);
 				}
 			}
 
