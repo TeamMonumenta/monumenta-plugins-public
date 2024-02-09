@@ -1478,7 +1478,7 @@ public class CharmManager {
 
 	public static double getRadius(Player player, String charmEffectName, double baseRadius) {
 		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
-		return baseRadius * ((level / 100.0) + 1);
+		return Math.max(0.1, baseRadius * ((level / 100.0) + 1));
 	}
 
 	// This is still used in two places which do not handle the conversion to getDuration well, so they have been left for now
