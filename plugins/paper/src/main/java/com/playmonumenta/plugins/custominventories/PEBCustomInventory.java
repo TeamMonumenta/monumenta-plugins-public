@@ -379,7 +379,14 @@ public class PEBCustomInventory extends CustomInventory {
 				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.CONFIRM, oldValue == 0 ? 1 : 0);
 				inventory.setLayout(inventory.mCurrentPage);
 			}),
-			new PebItem(38, gui -> "Upon successful trade: ",
+			new PebItem(38, gui -> "Quick-buy on shift-click: ",
+				gui -> Component.text("Toggles whether to instantly buy 1 when shift-clicking on a trade preview. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.QUICKBUY).orElse(0) == 0 ? "Enabled." : "Disabled."), NamedTextColor.LIGHT_PURPLE),
+				Material.LIGHTNING_ROD, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.QUICKBUY).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.QUICKBUY, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+			new PebItem(39, gui -> "Upon successful trade: ",
 				gui -> Component.text("Toggles between: return to preview page, close GUI, or do nothing. \n\nCurrent: " +
 					                      (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(2) == 0 ? "Return to preview." :
 						                       ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(2) == 1 ? "Close GUI." : "Do nothing."), NamedTextColor.LIGHT_PURPLE),
