@@ -61,6 +61,8 @@ public abstract class RoomRepository {
 	@Nullable DepthsRoom mF3RemoveRoom;
 	@Nullable DepthsRoom mWeaponAspectRoom;
 
+	private boolean mRoomCleanseSpawned = false;
+
 	public RoomRepository() {
 		initRooms();
 	}
@@ -87,6 +89,12 @@ public abstract class RoomRepository {
 		int floor = party.getFloor();
 		// Exception case- ascension 10+ and players must still remove abilities
 		if (party.getRoomNumber() % 10 == 9 && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ABILITY_PURGE && !party.isAscensionPurgeMet()) {
+			if(this.mRoomCleanseSpawned) {
+				// TODO: Find a better way to terminate room spawn
+				throw new IllegalStateException("Each player must remove an ability before moving on!");
+			}
+
+			// Rain: Why are we doing this wrap-around thing here?
 			if (floor % 3 == 1) {
 				room = mF1RemoveRoom;
 			}
@@ -98,10 +106,11 @@ public abstract class RoomRepository {
 			}
 			party.mRoomNumber--;
 			party.sendMessage("Each player must remove an ability before moving on!");
+			this.mRoomCleanseSpawned = true; // Set the flag that we've spawned a forced washroom already
 			party.mNoPassiveRemoveRoomStartX = Math.min(party.mNoPassiveRemoveRoomStartX, spawnPoint.getBlockX());
-
 		} else {
 			//Standard case- call valid room
+			this.mRoomCleanseSpawned = false; // Unset the flag
 			room = getValidRoom(roomType, party, spawnPoint.getY());
 		}
 		if (room == null) {
@@ -297,5 +306,4 @@ public abstract class RoomRepository {
 			}
 		});
 	}
-
 }
