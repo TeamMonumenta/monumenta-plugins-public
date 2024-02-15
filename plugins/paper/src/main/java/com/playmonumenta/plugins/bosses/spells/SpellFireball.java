@@ -15,8 +15,6 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -78,7 +76,6 @@ public class SpellFireball extends Spell {
 			@Override
 			public void run() {
 				mBoss.setAI(false);
-				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
 				PotionUtils.applyColoredGlowing(mBoss.getName(), mBoss, NamedTextColor.RED, 40);
 				for (Player player : mPlayers) {
 					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
