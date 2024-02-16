@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.MonumentaEvent;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +36,12 @@ public class SeasonalEventListener implements Listener {
 				if (mission.mType == WeeklyMissionType.SPAWNERS) {
 					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				}
-				if (mission.mType == WeeklyMissionType.SPAWNERS_POI && isPOIContent()) {
+				if (mission.mType == WeeklyMissionType.SPAWNERS_POI && PlayerUtils.playerIsInPOI(p)) {
 					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				}
 				missionNumber++;
 			}
 		}
-	}
-
-	private static boolean isPOIContent() {
-		String shard = ServerProperties.getShardName();
-		return (shard.contains("valley") || shard.contains("isles") || shard.contains("ring"));
 	}
 
 	/**
