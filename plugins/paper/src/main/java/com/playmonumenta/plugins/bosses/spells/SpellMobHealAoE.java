@@ -142,13 +142,7 @@ public class SpellMobHealAoE extends Spell {
 	}
 
 	private boolean shouldHeal() {
-		int healers = 1;
-		for (LivingEntity e : mGetSpellTargets.getTargets()) {
-			if (e.getScoreboardTags().contains("boss_rejuvenation")) {
-				healers++;
-			}
-		}
-		return !(FastUtils.RANDOM.nextDouble() > 1.0 / Math.pow(healers, 2));
+		return !mGetSpellTargets.getTargets().isEmpty();
 	}
 
 	@FunctionalInterface

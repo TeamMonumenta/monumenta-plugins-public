@@ -19,7 +19,7 @@ public class RejuvenationBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int HEAL = 25;
 		@BossParam(help = "not written")
-		public int RANGE = 14;
+		public int RANGE = 8;
 		@BossParam(help = "not written")
 		public int DURATION = 80;
 		@BossParam(help = "not written")
@@ -30,7 +30,7 @@ public class RejuvenationBoss extends BossAbilityGroup {
 		public int COOLDOWN = 15 * 20;
 
 		@BossParam(help = "not written")
-		public double PARTICLE_RADIUS = 15;
+		public double PARTICLE_RADIUS = 8;
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = true;
 		@BossParam(help = "not written")

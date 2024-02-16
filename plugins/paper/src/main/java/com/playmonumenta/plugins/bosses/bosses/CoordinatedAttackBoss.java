@@ -17,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -52,6 +53,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 	}
 
 	public final String IGNORE_TAG = "boss_coordinatedattack_ignore";
+	public final int COOLDOWN_PER_MOB = 6 * 20;
 
 	public CoordinatedAttackBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -86,14 +88,14 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 					int i = 0;
 					for (LivingEntity le : mobs) {
-						if (le instanceof Mob mob && mob.hasLineOfSight(playerTarget) && !AbilityUtils.isStealthed(playerTarget)) {
+						if (le instanceof Mob mob && mob.hasLineOfSight(playerTarget) && !AbilityUtils.isStealthed(playerTarget) && !mob.isInsideVehicle()) {
 							Set<String> tags = mob.getScoreboardTags();
 							if (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG) && !EntityUtils.isBoss(mob)) {
 								PotionUtils.applyColoredGlowing(identityTag, mob, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.WINDUP);
 
 								// make mob immune to other coordinated attacks for a short time
 								mob.addScoreboardTag(IGNORE_TAG);
-								Bukkit.getScheduler().runTaskLater(mPlugin, () -> mob.removeScoreboardTag(IGNORE_TAG), 30);
+								Bukkit.getScheduler().runTaskLater(mPlugin, () -> mob.removeScoreboardTag(IGNORE_TAG), COOLDOWN_PER_MOB);
 
 								new BukkitRunnable() {
 									@Override
@@ -107,6 +109,11 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 										double distance = loc.distance(locTarget);
 										Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19 * p.DISTANCE_SCALAR);
 										velocity.setY(velocity.getY() * 0.5 + distance * 0.08 * p.HEIGHT_SCALAR);
+
+										if (mob instanceof Creeper) {
+											velocity.multiply(0.66);
+										}
+
 										mob.setVelocity(velocity);
 
 										new PartialParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);

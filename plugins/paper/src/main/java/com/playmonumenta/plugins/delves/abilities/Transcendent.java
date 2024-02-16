@@ -6,12 +6,19 @@ import com.playmonumenta.plugins.bosses.bosses.DodgeBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.WrathBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Evoker;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -45,21 +52,21 @@ public class Transcendent {
 
 		List<String> seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=8,distance=32,speed=0.5,delay=10,cooldown=100,turnradius=0.02,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=8,distance=32,speed=0.5,delay=30,cooldown=100,turnradius=0.02,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R1.add(seekingProjectileBoss);
 		ABILITY_POOL_R1.add(seekingProjectileBoss);
 		seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=16,distance=32,speed=0.7,delay=10,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=16,distance=32,speed=0.7,delay=30,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R2.add(seekingProjectileBoss);
 		ABILITY_POOL_R2.add(seekingProjectileBoss);
 		seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=24,distance=32,speed=0.7,delay=10,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=24,distance=32,speed=0.7,delay=30,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R3.add(seekingProjectileBoss);
@@ -122,6 +129,17 @@ public class Transcendent {
 			for (String abilityTag : ability) {
 				mob.addScoreboardTag(abilityTag);
 			}
+
+			World world = mob.getWorld();
+			Location loc = mob.getLocation();
+
+			world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.HOSTILE, 1f, 1f);
+			world.playSound(loc, Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.HOSTILE, 1f, 0.8f);
+			world.playSound(loc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1f, 0.5f);
+			world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 1f, 0.8f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.HOSTILE, 0.4f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 1f, 0.6f);
+			new PartialParticle(Particle.FIREWORKS_SPARK, LocationUtils.getEntityCenter(mob), 60, 0.5, 0.5, 0.5, 0.18).spawnAsEnemy();
 		}
 	}
 

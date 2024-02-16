@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -25,7 +26,9 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -100,7 +103,7 @@ public class Twisted {
 				spawnSinceLast = MAP_WORLD_SPAWN_COUNT.getOrDefault(mob.getWorld().getUID(), 1);
 			}
 
-			if (shouldSpawn(level, spawnSinceLast)) {
+			if (shouldSpawn(level, spawnSinceLast) && !checkIfUnreachable(mob.getLocation())) {
 				//spawn a twisted mob
 				spawnTwisted(mob, spawnSinceLast < 1000);
 				//a twisted mob is spawned -> resetting the counter
@@ -126,6 +129,25 @@ public class Twisted {
 		BigDecimal randomChance = BigDecimal.valueOf(FastUtils.RANDOM.nextDouble());
 		BigDecimal chance = getSpawnChance(level, spawns).multiply(BigDecimal.valueOf(2));
 		return !(randomChance.subtract(chance).doubleValue() > 0);
+	}
+
+	public static boolean checkIfUnreachable(Location loc) {
+		// if there is bedrock between the spawner and nearby players, don't spawn a Twisted
+
+		for (Player p : PlayerUtils.playersInRange(loc, MAX_DISTANCE_FROM_PLAYERS, true, false)) {
+			Location l = loc.clone();
+			Raycast raycast = new Raycast(l, p.getLocation());
+			raycast.mThroughBlocks = true;
+			List<Block> blocks = raycast.shootRaycast().getBlocks();
+
+			// if there aren't any unbreakable blocks in the way, then it is not unreachable (there is some path)
+			if (blocks.stream().allMatch(BlockUtils::canBeBroken)) {
+				return false;
+			}
+		}
+
+		// otherwise, we iterated through all players and found no reachable path
+		return true;
 	}
 
 
