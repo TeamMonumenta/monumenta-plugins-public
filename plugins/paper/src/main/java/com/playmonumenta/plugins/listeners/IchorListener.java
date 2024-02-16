@@ -72,6 +72,14 @@ public class IchorListener implements Listener {
 				return;
 			}
 
+			//Prevent refunding from more than one item at once
+			if (event.getCurrentItem().getAmount() > 1) {
+				player.sendMessage(Component.text("You cannot remove Ichor from more than one item at once!", NamedTextColor.RED));
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.2f);
+				event.setCancelled(true);
+				return;
+			}
+
 			ItemStatUtils.removeInfusion(item, ichorInfusion);
 			ItemStatUtils.addInfusion(ichorRefund, ichorInfusion, 1, player.getUniqueId());
 			InventoryUtils.giveItem(player, ichorRefund);

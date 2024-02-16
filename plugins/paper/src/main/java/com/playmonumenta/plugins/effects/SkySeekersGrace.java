@@ -52,7 +52,7 @@ public class SkySeekersGrace extends ZeroArgumentEffect {
 		return true;
 	}
 
-	public static SkySeekersGrace deserialize(JsonObject object) {
+	public static SkySeekersGrace deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		return new SkySeekersGrace(duration);
 	}

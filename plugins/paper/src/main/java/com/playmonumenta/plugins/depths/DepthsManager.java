@@ -1221,7 +1221,7 @@ public class DepthsManager {
 
 			// Check that spawner count is zero
 			if (party.mSpawnersToBreak > 0) {
-				dp.sendMessage("There is still " + party.mSpawnersToBreak + " spawner" + (party.mSpawnersToBreak > 1 ? "s" : "") + " left to break!");
+				dp.sendMessage("There " + (party.mSpawnersToBreak > 1 ? "are" : "is") + " still " + party.mSpawnersToBreak + " spawner" + (party.mSpawnersToBreak > 1 ? "s" : "") + " left to break!");
 				return;
 			}
 

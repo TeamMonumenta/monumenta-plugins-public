@@ -75,7 +75,7 @@ public class FlameTotem extends TotemAbility {
 			.shorthandName("FT")
 			.descriptions(
 				String.format("Right click while holding a melee weapon and sneaking to fire a projectile that summons a flame totem. The totem throws explosive fireballs "
-						+ " at a target within range, dealing %s damage in a %s block radius and sets mobs on fire "
+						+ " at a target within range, dealing %s damage in a %s block radius and sets mobs on fire"
 						+ ", without inferno damage, for %s seconds every second. Charge up time: %ss. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE_1,
 					DAMAGE_1,
