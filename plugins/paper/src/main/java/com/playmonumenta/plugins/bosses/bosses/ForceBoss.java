@@ -38,11 +38,11 @@ public class ForceBoss extends BossAbilityGroup {
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
 		@BossParam(help = "Effects applied to the player if he is near the boss (< RADIUS /3) when cast is over")
-		public EffectsList EFFECTS_NEAR = EffectsList.fromString("[(pushforce,3),(SLOW,100,2)]");
+		public EffectsList EFFECTS_NEAR = EffectsList.fromString("[(pushforce,3),(CustomSlow,100,0.5)]");
 		@BossParam(help = "Effects applied to the player if he is near the boss (< Radius * 2/3) when cast is over")
-		public EffectsList EFFECTS_MIDDLE = EffectsList.fromString("[(pushforce,2.1),(SLOW,100,1)]");
+		public EffectsList EFFECTS_MIDDLE = EffectsList.fromString("[(pushforce,2.1),(CustomSlow,100,0.3)]");
 		@BossParam(help = "Effects applied to the player if he is at limit distance to the boss (< Radius) when cast is over")
-		public EffectsList EFFECTS_LIMIT = EffectsList.fromString("[(pushforce,1.2),(SLOW,100,0)]");
+		public EffectsList EFFECTS_LIMIT = EffectsList.fromString("[(pushforce,1.2),(CustomSlow,100,0.1)]");
 
 		//Particles & Sounds!
 		@BossParam(help = "Particle summon in the air while the ability is charging")
