@@ -267,6 +267,8 @@ public class BountyGui extends Gui {
 					                   .append(Component.text(preset.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
 					                   .append(Component.text(" has been automatically selected!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
 			}
+
+			com.playmonumenta.scriptedquests.Plugin.getInstance().mQuestCompassManager.invalidateCache(player);
 		}
 	}
 
