@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import com.playmonumenta.plugins.bosses.bosses.PrimordialElementalKaulBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -26,6 +28,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public class SpellPrimordialBolt extends SpellBaseBolt {
+	private static final String SLOWNESS_TAG = "PrimordialBoltSlowness";
+	private static final String WEAKNESS_TAG = "PrimordialBoltWeakness";
+	private static final int DIRECT_HIT_DEBUFF_DURATION = 20 * 15;
+	private static final int AOE_HIT_DEBUFF_DURATION = 20 * 10;
+	private static final double SLOWNESS_POTENCY = -0.3;
+	private static final double WEAKNESS_POTENCY = -0.1;
 
 	public SpellPrimordialBolt(Plugin plugin, LivingEntity boss) {
 		super(plugin, boss, 20 * 2, 20 * 5, 1.1, PrimordialElementalKaulBoss.detectionRange, 0.5, false, true, 1, 1,
@@ -83,20 +91,24 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				}
 				if (!blocked) {
 					BossUtils.blockableDamage(boss, player, DamageType.BLAST, 37, "Primordial Bolt", prevLoc);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_TAG,
+						new PercentSpeed(DIRECT_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_TAG));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_TAG,
+						new PercentDamageDealt(DIRECT_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY, DamageType.getScalableDamageType()));
 				} else {
 					for (Player p : PlayerUtils.playersInRange(loc, 2.5, true)) {
 						if (p.getLocation().getY() <= 60) {
 							BossUtils.blockableDamage(boss, p, DamageType.BLAST, 16, "Primordial Bolt", prevLoc);
 							MovementUtils.knockAway(loc, p, 0.3f, false);
-							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
-							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_TAG,
+								new PercentSpeed(AOE_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_TAG));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_TAG,
+								new PercentDamageDealt(AOE_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY, DamageType.getScalableDamageType()));
 						}
 					}
 				}
 				World world = boss.getWorld();
-				new PartialParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.9f);
 			},

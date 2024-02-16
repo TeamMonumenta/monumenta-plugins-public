@@ -20,6 +20,9 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -190,7 +193,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if (player.isSleeping()) {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulAntiSleepSlowness",
+							new PercentSpeed(20 * 15, -0.3, "KaulAntiSleepSlowness"));
 						player.sendMessage(Component.text("THE JUNGLE FORBIDS YOU TO DREAM.", NamedTextColor.DARK_GREEN));
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
@@ -541,7 +545,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			sendDialogue("THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.");
 		});
 
-		//Force-cast Kaul's Judgement if it hasn't been casted yet.
+		// Force-cast Kaul's Judgement if it hasn't been cast yet.
 		events.put(40, mBoss -> {
 			forceCastSpell(SpellKaulsJudgement.class);
 		});
@@ -782,7 +786,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulKnockbackSlowness",
+				new PercentSpeed(20 * 5, -0.3, "KaulKnockbackSlowness"));
 		}
 		new BukkitRunnable() {
 			double mRotation = 0;
@@ -930,8 +935,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 		for (Player player : players) {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulWinResistance",
+				new PercentDamageReceived(20 * 40, -1.0, null));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulWinRegeneration",
+				new CustomRegeneration(20 * 10, 1.0, 25, null, com.playmonumenta.plugins.Plugin.getInstance()));
 			SongManager.stopSong(player, true);
 		}
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);

@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -15,15 +17,24 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 public class SpellKnockAway extends Spell {
+	private static final String KNOCK_AWAY_SLOWNESS_SOURCE = "KnockAwaySlownessEffect";
+	private static final String KNOCK_AWAY_WEAKNESS_SOURCE = "KnockAwayWeaknessEffect";
+	private static final String KNOCK_AWAY_SPEEDUP_SOURCE = "KnockAwaySpeedupCasterEffect";
 	private final Plugin mPlugin;
 	private final LivingEntity mLauncher;
+	// These are declared as final until this spell is refactored to be usable with boss params
+	private final double mDamage = 9.0;
 	private final int mRadius;
+	private final int mSlownessDuration = 20 * 4;
+	private final double mSlownessPotency = -0.75;
+	private final int mWeaknessDuration = 20 * 10;
+	private final double mWeaknessPotency = -0.2;
+	private final double mSpeedupPotency = 0.8;
+	private final int mSpeedupDuration = 20 * 10;
 	private final int mTime;
 	private final float mSpeed;
 	private int mWidth;
@@ -52,13 +63,11 @@ public class SpellKnockAway extends Spell {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
 				if (!mLauncher.isDead() || mLauncher.isValid()) {
-					BossUtils.blockableDamage(mLauncher, player, DamageType.MELEE, 9.0f);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1));
-
+					BossUtils.blockableDamage(mLauncher, player, DamageType.MELEE, mDamage);
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, KNOCK_AWAY_SLOWNESS_SOURCE, new PercentSpeed(mSlownessDuration, mSlownessPotency, KNOCK_AWAY_SLOWNESS_SOURCE));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, KNOCK_AWAY_WEAKNESS_SOURCE, new PercentDamageDealt(mWeaknessDuration, mWeaknessPotency, DamageType.getScalableDamageType()));
 					Vector dir = player.getLocation().subtract(mLauncher.getLocation().toVector()).toVector().multiply(mSpeed);
 					dir.setY(0.5f);
-
 					player.setVelocity(dir);
 				}
 			}
@@ -75,9 +84,11 @@ public class SpellKnockAway extends Spell {
 			}
 			Location centerLoc = loc.clone().add(0, 1, 0);
 			EntityUtils.teleportStack(mLauncher, loc);
-			world.playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, (float) mRadius / 7, (float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100));
+			world.playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, (float) mRadius / 7,
+				(float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100.0));
 			new PartialParticle(Particle.CRIT, centerLoc, 10, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
-			mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 3));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mLauncher, KNOCK_AWAY_SPEEDUP_SOURCE,
+				new PercentSpeed(mSpeedupDuration, mSpeedupPotency, KNOCK_AWAY_SPEEDUP_SOURCE));
 		};
 
 		Runnable animLoop2 = () -> {

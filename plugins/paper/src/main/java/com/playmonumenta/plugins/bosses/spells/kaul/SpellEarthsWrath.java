@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -79,7 +80,8 @@ public class SpellEarthsWrath extends Spell {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, SPELL_NAME);
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
-										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
+										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "EarthsWrathSlowness",
+											new PercentSpeed(20 * 10, -0.5, "EarthsWrathSlowness"));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));
 									}
 								}

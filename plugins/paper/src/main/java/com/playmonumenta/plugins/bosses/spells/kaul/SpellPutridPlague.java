@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -174,7 +175,8 @@ public class SpellPutridPlague extends Spell {
 									new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
 										Material.LIME_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
 									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
+									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,
+										"PutridPlagueSlowness", new PercentSpeed(20 * 30, -0.3, "PutridPlagueSlowness"));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
 									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
 								}
@@ -184,7 +186,7 @@ public class SpellPutridPlague extends Spell {
 								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
 								if (!mPhase3) {
 									player.removePotionEffect(PotionEffectType.WITHER);
-									player.removePotionEffect(PotionEffectType.SLOW);
+									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, "PutridPlagueSlowness");
 									player.removePotionEffect(PotionEffectType.POISON);
 									player.removePotionEffect(PotionEffectType.WEAKNESS);
 								} else {
