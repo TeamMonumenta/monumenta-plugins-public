@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -75,8 +76,15 @@ public class BossUtils {
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location) {
-		// One second of cooldown for every 2.5 points of damage
-		return blockableDamage(damager, damagee, type, damage, cause, location, (int) (20 * damage / 2.5));
+		int stunTicks = (int) (20 * damage / 2.5);
+
+		// adjust stun time based on region
+		if (damagee instanceof Player player) {
+			// every 2.5 damage = 1s of stun time in R1, 3.5 damage per 1s in R2, and 4 damage per 1s in R3.
+			double stunRatio = ServerProperties.getClassSpecializationsEnabled(player) ? (ServerProperties.getAbilityEnhancementsEnabled(player) ? 4.0 : 3.5) : 2.5;
+			stunTicks = (int) (20 * damage / stunRatio);
+		}
+		return blockableDamage(damager, damagee, type, damage, cause, location, stunTicks);
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, int stunTicks) {
