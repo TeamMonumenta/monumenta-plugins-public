@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.*;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.IlluminateCS;
@@ -10,7 +13,13 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashSet;
 import java.util.List;
 import org.bukkit.Location;
@@ -18,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -175,7 +185,7 @@ public class Illuminate extends Ability {
 
 					Hitbox hitbox = new Hitbox.SphereHitbox(mLoc, ILLUMINATE_HITBOX_RADIUS);
 					if (!hitbox.getHitMobs().isEmpty() || !mLoc.isChunkLoaded() ||
-						LocationUtils.collidesWithSolid(mLoc) || mLoc.distance(startLoc) > mMaxRange) {
+						LocationUtils.collidesWithBlocks(BoundingBox.of(mLoc.clone().add(ILLUMINATE_HITBOX_RADIUS / 2, ILLUMINATE_HITBOX_RADIUS / 2, ILLUMINATE_HITBOX_RADIUS / 2), mLoc.clone().add(-ILLUMINATE_HITBOX_RADIUS / 2, -ILLUMINATE_HITBOX_RADIUS / 2, -ILLUMINATE_HITBOX_RADIUS / 2)), mLoc.getWorld(), false) || mLoc.distance(startLoc) > mMaxRange) {
 
 						doExplosion(mLoc, mDamage, mRadius, mKnockback);
 						if (isEnhanced()) {
