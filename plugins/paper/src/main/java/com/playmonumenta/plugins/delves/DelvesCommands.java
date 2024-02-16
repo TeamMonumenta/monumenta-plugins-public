@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.delves;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -90,7 +89,8 @@ public class DelvesCommands {
 				new MultiLiteralArgument("hasallpoints"),
 				new EntitySelectorArgument.OnePlayer("player")
 			).executes((commandSender, args) -> {
-				int currentPoint = DelvesUtils.getPlayerTotalDelvePoint(null, (Player) args[2], ServerProperties.getShardName());
+				Player player = (Player) args[2];
+				int currentPoint = DelvesUtils.getPlayerTotalDelvePoint(null, player, DelvesUtils.getDungeonName(player));
 				return currentPoint >= DelvesUtils.MAX_DEPTH_POINTS ? 1 : -1;
 			}).register();
 
@@ -197,7 +197,7 @@ public class DelvesCommands {
 				int count = 0;
 				for (Player target : ((Collection<Player>) args[2])) {
 					count++;
-					DelvesUtils.clearDelvePlayerByShard(commandSender, target, ServerProperties.getShardName());
+					DelvesUtils.clearDelvePlayerByShard(commandSender, target, DelvesUtils.getDungeonName(target));
 				}
 				return count;
 			}).register();
@@ -252,8 +252,10 @@ public class DelvesCommands {
 				new EntitySelectorArgument.OnePlayer("copy player"),
 				new EntitySelectorArgument.ManyPlayers("players to copy")
 			).executes((commandSender, args) -> {
+				Player copyFrom = (Player) args[2];
+				String dungeonName = DelvesUtils.getDungeonName(copyFrom);
 				for (Player target : ((Collection<Player>) args[3])) {
-					DelvesUtils.copyDelvePoint(commandSender, (Player) args[2], target, ServerProperties.getShardName());
+					DelvesUtils.copyDelvePoint(commandSender, copyFrom, target, dungeonName);
 				}
 			}).register();
 

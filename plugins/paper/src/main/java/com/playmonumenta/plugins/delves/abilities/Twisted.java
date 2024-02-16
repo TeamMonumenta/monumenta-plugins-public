@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -80,14 +79,15 @@ public class Twisted {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (PlayerUtils.playersInRange(mob.getLocation(), MAX_DISTANCE_FROM_PLAYERS, true, false).size() == 0) {
+		List<Player> players = PlayerUtils.playersInRange(mob.getLocation(), MAX_DISTANCE_FROM_PLAYERS, true, false);
+		if (players.isEmpty()) {
 			return;
 		}
 
 		if (DelvesUtils.isValidTwistedMob(mob)) {
-			int spawnSinceLast = 1;
+			int spawnSinceLast;
 
-			boolean ring = ServerProperties.getShardName().contains("ring");
+			boolean ring = DelvesUtils.getDungeonName(players.get(0)).contains("ring");
 			String poiName = null;
 			if (ring) {
 				poiName = LocationUtils.getPoiNameFromLocation(mob.getLocation());

@@ -30,6 +30,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
@@ -39,7 +40,6 @@ import org.bukkit.entity.Shulker;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.MetadataValue;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DelvesUtils {
@@ -150,12 +150,12 @@ public class DelvesUtils {
 		return Math.min(point, MODIFIER_RANK_CAPS.get(mod));
 	}
 
-	public static int stampDelveInfo(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier) {
+	public static int stampDelveInfo(@Nullable CommandSender sender, Player target, String dungeonName, @Nullable DelvesModifier modifier) {
 		if (modifier == null) {
 			return 0;
 		}
 
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(target.getUniqueId(), new HashMap<>());
+		Map<String, DelvesManager.DungeonDelveInfo> map = getDelveInfoMap(target);
 
 		if (!map.containsKey(dungeonName)) {
 			if (sender != null && !(sender instanceof ProxiedCommandSender)) {
@@ -173,9 +173,9 @@ public class DelvesUtils {
 		return points;
 	}
 
-	public static void copyDelvePoint(@Nullable CommandSender sender, @NotNull Player sourcePlayer, @NotNull Player targetPlayer, @NotNull String dungeonName) {
-		Map<String, DelvesManager.DungeonDelveInfo> sourceMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(sourcePlayer.getUniqueId(), key -> new HashMap<>());
-		Map<String, DelvesManager.DungeonDelveInfo> targetMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(targetPlayer.getUniqueId(), key -> new HashMap<>());
+	public static void copyDelvePoint(@Nullable CommandSender sender, Player sourcePlayer, Player targetPlayer, String dungeonName) {
+		Map<String, DelvesManager.DungeonDelveInfo> sourceMap = getOrAddDelveInfoMap(sourcePlayer);
+		Map<String, DelvesManager.DungeonDelveInfo> targetMap = getOrAddDelveInfoMap(targetPlayer);
 
 		targetMap.put(dungeonName, sourceMap.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo()).cloneDelveInfo());
 
@@ -186,12 +186,12 @@ public class DelvesUtils {
 		updateDelveScoreBoard(targetPlayer);
 	}
 
-	public static int setDelvePoint(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier, int level) {
+	public static int setDelvePoint(@Nullable CommandSender sender, Player target, String dungeonName, @Nullable DelvesModifier modifier, int level) {
 		if (level < 0 || modifier == null) {
 			return 0;
 		}
 
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
+		Map<String, DelvesManager.DungeonDelveInfo> map = getOrAddDelveInfoMap(target);
 		DelvesManager.DungeonDelveInfo info = map.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo());
 		int oldLevel = info.get(modifier);
 
@@ -231,8 +231,8 @@ public class DelvesUtils {
 		return level;
 	}
 
-	public static void clearDelvePlayerByShard(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName) {
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
+	public static void clearDelvePlayerByShard(@Nullable CommandSender sender, Player target, String dungeonName) {
+		Map<String, DelvesManager.DungeonDelveInfo> map = getOrAddDelveInfoMap(target);
 
 		map.remove(dungeonName);
 
@@ -243,19 +243,18 @@ public class DelvesUtils {
 		updateDelveScoreBoard(target);
 	}
 
-	public static int getDelveModLevel(@NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier) {
+	public static int getDelveModLevel(Player target, String dungeonName, @Nullable DelvesModifier modifier) {
 		if (modifier == null) {
 			return 0;
 		}
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(target.getUniqueId(), new HashMap<>());
+		Map<String, DelvesManager.DungeonDelveInfo> map = getDelveInfoMap(target);
 
 		return map.getOrDefault(dungeonName, new DelvesManager.DungeonDelveInfo()).get(modifier);
 
 	}
 
-	public static int getPlayerTotalDelvePoint(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName) {
-
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(target.getUniqueId(), new HashMap<>());
+	public static int getPlayerTotalDelvePoint(@Nullable CommandSender sender, Player target, String dungeonName) {
+		Map<String, DelvesManager.DungeonDelveInfo> map = getDelveInfoMap(target);
 
 		DelvesManager.DungeonDelveInfo info = map.getOrDefault(dungeonName, new DelvesManager.DungeonDelveInfo());
 
@@ -266,7 +265,7 @@ public class DelvesUtils {
 		return info.mTotalPoint;
 	}
 
-	public static int getTotalDelvePointInRange(@Nullable CommandSender sender, @NotNull Location loc) {
+	public static int getTotalDelvePointInRange(@Nullable CommandSender sender, Location loc) {
 		Map<DelvesModifier, Integer> delvesApplied = new HashMap<>();
 
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
@@ -291,7 +290,7 @@ public class DelvesUtils {
 	}
 
 	public static void assignRandomDelvePoints(Player target, String dungeonName, int pointsToAssign) {
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
+		Map<String, DelvesManager.DungeonDelveInfo> map = getOrAddDelveInfoMap(target);
 		DelvesManager.DungeonDelveInfo info = map.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo());
 
 		if (pointsToAssign > 0) {
@@ -319,14 +318,9 @@ public class DelvesUtils {
 	}
 
 	public static void updateDelveScoreBoard(Player target) {
-		Map<String, DelvesManager.DungeonDelveInfo> dungeonMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.get(target.getUniqueId());
-		int score = 0;
-
-		if (dungeonMap != null) {
-			DelvesManager.DungeonDelveInfo info = dungeonMap.getOrDefault(ServerProperties.getShardName(), new DelvesManager.DungeonDelveInfo());
-			info.recalculateTotalPoint();
-			score = info.mTotalPoint;
-		}
+		DelvesManager.DungeonDelveInfo info = getDelveInfo(target);
+		info.recalculateTotalPoint();
+		int score = info.mTotalPoint;
 
 		ScoreboardUtils.setScoreboardValue(target, "DelvePoint", score);
 	}
@@ -470,9 +464,10 @@ public class DelvesUtils {
 
 	protected static List<Player> playerInRangeForDelves(Location loc) {
 		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
-		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
-		if (isDungeon) {
-			List<Player> players = loc.getWorld().getPlayers();
+		World world = loc.getWorld();
+		boolean isOverworld = getDungeonName(world).startsWith("ring");
+		if (!isOverworld) {
+			List<Player> players = world.getPlayers();
 			if (players.size() > 1) {
 				Player player = players.get(0);
 				players.removeIf(p -> !PlayerUtils.playerCountsForLootScaling(p));
@@ -518,8 +513,8 @@ public class DelvesUtils {
 			return Collections.emptyMap();
 		}
 
-		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
-		if (isDungeon) {
+		boolean isOverworld = getDungeonName(party.get(0)).startsWith("ring");
+		if (!isOverworld) {
 			// All players in the party have the same modifiers
 			for (Player player : party) {
 				Map<DelvesModifier, Integer> points = getPlayerDelvePoints(player);
@@ -527,7 +522,7 @@ public class DelvesUtils {
 					return points;
 				}
 			}
-		} else if ("ring".equals(ServerProperties.getShardName())) {
+		} else {
 
 			// Find the structure(s) the party is in
 			List<RespawningStructure> structures = new ArrayList<>();
@@ -618,12 +613,8 @@ public class DelvesUtils {
 	}
 
 	private static Map<DelvesModifier, Integer> getPlayerDelvePoints(Player player) {
-		Map<String, DelvesManager.DungeonDelveInfo> playerDDInfo = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
-		DelvesManager.DungeonDelveInfo info = playerDDInfo.get(ServerProperties.getShardName());
-		if (info != null) {
-			return Collections.unmodifiableMap(info.getMap());
-		}
-		return Collections.emptyMap();
+		DelvesManager.DungeonDelveInfo info = getDelveInfo(player);
+		return Collections.unmodifiableMap(info.getMap());
 	}
 
 	public static int getTotalPoints(@Nullable Map<DelvesModifier, Integer> map) {
@@ -647,5 +638,58 @@ public class DelvesUtils {
 
 	private static String getStructureName(RespawningStructure structure) {
 		return Objects.requireNonNull((String) structure.getConfig().get("name"));
+	}
+
+	public static Map<String, DelvesManager.DungeonDelveInfo> getDelveInfoMap(Player player) {
+		return DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
+	}
+
+	public static DelvesManager.DungeonDelveInfo getDelveInfo(Player player) {
+		return getDelveInfo(player, getDungeonName(player));
+	}
+
+	public static DelvesManager.DungeonDelveInfo getDelveInfo(Player player, String dungeonName) {
+		Map<String, DelvesManager.DungeonDelveInfo> map = getDelveInfoMap(player);
+		return map.getOrDefault(dungeonName, new DelvesManager.DungeonDelveInfo());
+	}
+
+	public static Map<String, DelvesManager.DungeonDelveInfo> getOrAddDelveInfoMap(Player player) {
+		return DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
+	}
+
+	// Only use this method if there is no already known player
+	public static String getDungeonName(World world) {
+		return getDungeonName(world, null);
+	}
+
+	public static String getDungeonName(Player player) {
+		return getDungeonName(player.getWorld(), player);
+	}
+
+	public static String getDungeonName(World world, @Nullable Player player) {
+		String shardName = ServerProperties.getShardName();
+		if (shardName.startsWith("ring")) {
+			if (player == null) {
+				List<Player> players = world.getPlayers();
+				// There's a chance something goes wrong if it tries to check on an empty world
+				// However, I don't think this is an issue right now because an empty world is either the overworld (which it defaults to) or a strike (which can't be reentered)
+				if (!players.isEmpty()) {
+					player = players.get(0);
+				}
+			}
+			if (player != null) {
+				int type = ScoreboardUtils.getScoreboardValue(player, "R3Type").orElse(0);
+				if (type == 1) {
+					return "portal";
+				} else if (type == 2) {
+					return "ruin";
+				}
+			}
+		}
+		return shardName;
+	}
+
+	public static boolean isInDelvableWorld(World world) {
+		return DelvesManager.DUNGEONS.contains(getDungeonName(world));
 	}
 }

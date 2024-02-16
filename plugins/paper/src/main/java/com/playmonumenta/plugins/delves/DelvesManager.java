@@ -46,7 +46,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -136,14 +135,8 @@ public class DelvesManager implements Listener {
 			return 0;
 		}
 
-		if (PLAYER_DELVE_DUNGEON_MOD_MAP.containsKey(player.getUniqueId())) {
-			Map<String, DungeonDelveInfo> playerDDinfo = PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
-			DungeonDelveInfo info = playerDDinfo.get(ServerProperties.getShardName());
-			if (info != null) {
-				return info.get(modifier);
-			}
-		}
-		return 0;
+		DungeonDelveInfo info = DelvesUtils.getDelveInfo(player);
+		return info.get(modifier);
 	}
 
 	//return all players running this dungeon or in MAX_PARTY_DISTANCE radius
@@ -225,7 +218,7 @@ public class DelvesManager implements Listener {
 					}
 				}
 
-				PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>()).putIfAbsent(name, info);
+				DelvesUtils.getOrAddDelveInfoMap(player).putIfAbsent(name, info);
 				DelvesUtils.updateDelveScoreBoard(player);
 			} catch (Exception e) {
 				MMLog.warning("[DelveManager] error while loading player info. Reason: " + e.getMessage());
@@ -236,7 +229,7 @@ public class DelvesManager implements Listener {
 	}
 
 	public static void savePlayerData(Player player, String dungeon, Map<DelvesModifier, Integer> mods, int presetId) {
-		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
+		Map<String, DungeonDelveInfo> playerDungeonInfo = DelvesUtils.getOrAddDelveInfoMap(player);
 		DungeonDelveInfo ddinfo = playerDungeonInfo.computeIfAbsent(dungeon, key -> new DungeonDelveInfo());
 		ddinfo.mModifierPoint.clear();
 		for (DelvesModifier mod : mods.keySet()) {
@@ -261,11 +254,7 @@ public class DelvesManager implements Listener {
 			return false;
 		}
 
-		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId());
-		if (playerDungeonInfo == null) {
-			return false;
-		}
-
+		Map<String, DungeonDelveInfo> playerDungeonInfo = DelvesUtils.getDelveInfoMap(player);
 		DungeonDelveInfo ddinfo = playerDungeonInfo.getOrDefault(dungeon, new DungeonDelveInfo());
 		return DelvePreset.validatePresetModifiers(ddinfo, delvePreset, false);
 	}
@@ -322,11 +311,11 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
-		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
+		Entity entity = event.getEntity();
+		if (!DelvesUtils.isInDelvableWorld(entity.getWorld())) {
 			setForcedReferenceToSpawner(null);
 			return;
 		}
-		Entity entity = event.getEntity();
 
 		/*
 		 * Since this intercepts the CreatureSpawnEvent and SpawnerSpawnEvent,
@@ -395,7 +384,7 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
+		if (!DelvesUtils.isInDelvableWorld(event.getEntity().getWorld())) {
 			return;
 		}
 		event.blockList().removeIf(b -> (b.getType() == Material.CHEST && b.getState() instanceof Chest chest && chest.isLocked()) || b.hasMetadata("Unbreakable"));
@@ -481,34 +470,34 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerHurt(DamageEvent event) {
-		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
-			return;
-		}
-
 		if (event.getDamagee() instanceof Player player) {
-			Infernal.applyDamageModifiers(event, DelvesUtils.getModifierLevel(player, DelvesModifier.INFERNAL));
-		}
+			if (!DUNGEONS.contains(DelvesUtils.getDungeonName(player))) {
+				return;
+			}
 
-		//hard coded since magma cubes from Chivalrous should not do damage to player
-		if (event.getDamager() != null && Chivalrous.MOUNT_NAMES[1].equals(event.getDamager().getName())) {
-			event.setCancelled(true);
+			Infernal.applyDamageModifiers(event, DelvesUtils.getModifierLevel(player, DelvesModifier.INFERNAL));
+
+			//hard coded since magma cubes from Chivalrous should not do damage to player
+			if (event.getDamager() != null && Chivalrous.MOUNT_NAMES[1].equals(event.getDamager().getName())) {
+				event.setCancelled(true);
+			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBlockBreakEventEarly(BlockBreakEvent event) {
-		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
+		Block block = event.getBlock();
+		if (!DelvesUtils.isInDelvableWorld(block.getWorld())) {
 			return;
 		}
-		if ((event.getBlock().getState() instanceof Chest chest && chest.isLocked()) || event.getBlock().hasMetadata("Unbreakable")) {
+		if ((block.getState() instanceof Chest chest && chest.isLocked()) || block.hasMetadata("Unbreakable")) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreakEventLate(BlockBreakEvent event) {
-		if (!DUNGEONS.contains(ServerProperties.getShardName())
+		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
@@ -518,7 +507,7 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockExplodeEventLate(BlockExplodeEvent event) {
-		if (!DUNGEONS.contains(ServerProperties.getShardName())
+		if (!DelvesUtils.isInDelvableWorld(event.getBlock().getWorld())
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
@@ -530,7 +519,7 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityExplodeEventLate(EntityExplodeEvent event) {
-		if (!DUNGEONS.contains(ServerProperties.getShardName())
+		if (!DelvesUtils.isInDelvableWorld(event.getEntity().getWorld())
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
@@ -594,8 +583,6 @@ public class DelvesManager implements Listener {
 				}
 			}
 		}
-
-		EntityUtils.removeAttributesContaining(player, Attribute.GENERIC_MAX_HEALTH, "Whispers");
 
 		if (!event.getKeepInventory()) {
 			Fragile.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.FRAGILE));

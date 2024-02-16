@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.delves.DelvesManager;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -44,7 +44,7 @@ public class DelveScalingBoss extends BossAbilityGroup {
 		Player player = EntityUtils.getNearestPlayer(mBoss.getLocation(), p.DETECTION);
 
 		if (player != null) {
-			Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
+			Map<String, DelvesManager.DungeonDelveInfo> map = DelvesUtils.getDelveInfoMap(player);
 			DelvesManager.DungeonDelveInfo info = map.get(ServerProperties.getShardName());
 			if (info != null) {
 				mPoints = info.mTotalPoint;

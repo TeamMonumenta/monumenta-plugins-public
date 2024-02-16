@@ -120,6 +120,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -319,6 +320,11 @@ public class PlayerListener implements Listener {
 	public void playerSaveEvent(PlayerSaveEvent event) {
 		Player player = event.getPlayer();
 		mPlugin.mAbilityManager.playerSaveEvent(player, event);
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void playerChangeWorldEvent(PlayerChangedWorldEvent event) {
+		InventoryUtils.removeSpecialItems(event.getPlayer(), false, true, false);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
