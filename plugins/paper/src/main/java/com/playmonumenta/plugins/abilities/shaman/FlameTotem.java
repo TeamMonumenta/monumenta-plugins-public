@@ -75,7 +75,7 @@ public class FlameTotem extends TotemAbility {
 			.shorthandName("FT")
 			.descriptions(
 				String.format("Right click while holding a melee weapon and sneaking to fire a projectile that summons a flame totem. The totem throws explosive fireballs "
-						+ " at a target within range, dealing %s damage in a %s block radius and sets mobs on fire "
+						+ " at a target within range, dealing %s damage in a %s block radius and sets mobs on fire"
 						+ ", without inferno damage, for %s seconds every second. Charge up time: %ss. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE_1,
 					DAMAGE_1,
@@ -114,7 +114,8 @@ public class FlameTotem extends TotemAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? AOE_RANGE_2 : AOE_RANGE_1);
 		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION);
 		mBombRadius = CharmManager.getRadius(mPlayer, CHARM_BOMB_RADIUS, BOMB_RADIUS);
-		mBombCount = BOMB_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_BOMB_COUNT);
+		mBombCount = BOMB_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_BOMB_COUNT)
+			+ (isEnhanced() ? ENHANCE_BOMB_BONUS : 0);
 		mEnhanceInfernoScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_INFERNO_SCALE, ENHANCE_INFERNO_SCALE);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
 	}

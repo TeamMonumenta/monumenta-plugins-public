@@ -266,7 +266,9 @@ public class GraveManager {
 				}
 				if (item.mItem.getAmount() > 0) {
 					item.mManager.mGraves.add(new Grave(item));
-					item.mManager.mPlayer.sendMessage(Component.text("An item you dropped at ", NamedTextColor.RED)
+					item.mManager.mPlayer.sendMessage(Component.text("", NamedTextColor.RED)
+						.append(Component.text("An item").hoverEvent(item.mItem.asHoverEvent()))
+						.append(Component.text(" you dropped at "))
 						.append(Component.text(item.mLocation.getBlockX() + "," + item.mLocation.getBlockY() + "," + item.mLocation.getBlockZ()))
 						.append(Component.text(" was destroyed. A grave will keep it safe for you. "))
 						.append(Component.text("(/help death for more info)")

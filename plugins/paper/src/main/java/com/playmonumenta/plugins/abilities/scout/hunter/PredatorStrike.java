@@ -259,6 +259,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		// go through exploded mobs and use the explosion's location
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
 		List<LivingEntity> mobs = hitbox.getHitMobs();
+		// prevents stacked damage instances
+		mobs.removeIf(piercedMobs::contains);
+
 		if (!mobs.isEmpty()) {
 			double damage = ItemStatUtils.getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
 			damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
@@ -321,7 +324,10 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		int regionCap = ServerProperties.getAbilityEnhancementsEnabled(mPlayer) ? R3_CAP : R2_CAP;
 		int damageCap = isLevelOne() ? regionCap : regionCap * CAP_LEVEL_TWO_MULTIPLIER;
 
-		if (event.getAbility() == ClassAbility.PREDATOR_STRIKE && event.getFinalDamage(true) > damageCap) {
+		// nuke method: 0 dmg then do true damage that doesn't scale with anything
+		if (event.getAbility() == ClassAbility.PREDATOR_STRIKE && event.getType() != DamageType.TRUE &&
+			    event.getFinalDamage(true) > damageCap) {
+			event.setType(DamageType.TRUE);
 			event.setDamage(damageCap);
 		}
 

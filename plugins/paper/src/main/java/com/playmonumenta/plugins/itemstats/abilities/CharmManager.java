@@ -1232,9 +1232,13 @@ public class CharmManager {
 					MMLog.warning("Unknown effect '" + info.mEffect + "' in charm '" + ItemUtils.getPlainName(charm) + "'!");
 					continue;
 				}
-				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, (a, b) -> Math.ceil(getValueOrCap(a + b, info.mEffect) * 1000) / 1000);
+				//Combine all effects
+				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, (a, b) -> Math.ceil((a + b) * 1000) / 1000);
 			}
 		}
+
+		//Then calculate the cap. Just checks the last character for in case an effect has a percent in it
+		allEffects.replaceAll((a, b) -> Math.ceil(getValueOrCap(b, a.charAt(a.length() - 1) == '%' ? a.substring(0, a.length() - 1) : a) * 1000) / 1000);
 
 		//Store to local map
 		mPlayerCharmEffectMap.put(uuid, allEffects);
@@ -1478,7 +1482,7 @@ public class CharmManager {
 
 	public static double getRadius(Player player, String charmEffectName, double baseRadius) {
 		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
-		return baseRadius * ((level / 100.0) + 1);
+		return Math.max(0.1, baseRadius * ((level / 100.0) + 1));
 	}
 
 	// This is still used in two places which do not handle the conversion to getDuration well, so they have been left for now

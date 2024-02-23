@@ -101,12 +101,18 @@ public class CharmsGUI extends Gui {
 		}
 
 		Consumer<ItemStack> onCharmClick = charm -> {
-			if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm, mCharmType)) {
-				InventoryUtils.giveItem(mPlayer, charm);
-				mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
-				update();
+			if (InventoryUtils.canFitInInventory(charm, mTargetPlayer.getInventory())) {
+				if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm, mCharmType)) {
+					InventoryUtils.giveItem(mPlayer, charm);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
+					update();
+				} else {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
+				}
 			} else {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
+				mTargetPlayer.sendMessage(Component.text("You have no free inventory slots available. Please free up an inventory slot before retrieving this charm.", NamedTextColor.RED));
+				mTargetPlayer.playSound(mTargetPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1f, 1f);
+				update();
 			}
 		};
 

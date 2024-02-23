@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.charmfactory;
 
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
 import com.playmonumenta.plugins.itemstats.enums.Region;
@@ -56,7 +55,14 @@ public class CharmFactory {
 		Map.entry("Ring of Flames Damage", "Igneous Rune Damage"),
 		Map.entry("Ring of Flames Fire Duration", "Igneous Rune Fire Duration"),
 		Map.entry("Ring of Flames Bleed Amplifier", "Igneous Rune Buff Amplifier"),
-		Map.entry("Ring of Flames Duration", "Igneous Rune Buff Duration")
+		Map.entry("Ring of Flames Duration", "Igneous Rune Buff Duration"),
+		Map.entry("Lightning Bottle Kills Per Bottle", "Lightning Bottle Kill Threshold"),
+		Map.entry("Slipstream Cooldown", "Aeroblast Cooldown"),
+		Map.entry("Slipstream Jump Boost Amplifier", "Aeroblast Damage"),
+		Map.entry("Slipstream Knockback", "Aeroblast Knockback"),
+		Map.entry("Slipstream Duration", "Aeroblast Speed Duration"),
+		Map.entry("Slipstream Speed Amplifier", "Aeroblast Speed Amplifier"),
+		Map.entry("Slipstream Radius", "Aeroblast Size")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
@@ -485,8 +491,9 @@ public class CharmFactory {
 
 	/**
 	 * Generates a random name to apply to a charm item
-	 * @param r seeded randomizer to ensure same name when regenerating charms
-	 * @param tree the depths tree that the first ability is based in, making it eligible for unique names
+	 *
+	 * @param r     seeded randomizer to ensure same name when regenerating charms
+	 * @param tree  the depths tree that the first ability is based in, making it eligible for unique names
 	 * @param charm the charm item to change the base value of
 	 * @return randomized charm name from three sample selections
 	 */

@@ -193,10 +193,10 @@ public class StatMultiplier {
 			return;
 		}
 
-		double statCompensation = getStatCompensation(ServerProperties.getShardName(), mob.getLocation());
+		Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
+		double statCompensation = getStatCompensation(DelvesUtils.getDungeonName(mob.getWorld(), nearestPlayer), mob.getLocation());
 
 		//stat
-		Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
 		double healthMulti = DelvesUtils.isDelveMob(mob) ?
 			getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? DELVE_MOB_STAT_MULTIPLIER_R3 : DELVE_MOB_STAT_MULTIPLIER_R2) : DELVE_MOB_STAT_MULTIPLIER_R1) :
 			getHealthMultiplier(level) * statCompensation;

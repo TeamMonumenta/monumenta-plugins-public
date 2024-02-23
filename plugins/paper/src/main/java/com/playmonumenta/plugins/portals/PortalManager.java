@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -22,6 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -122,6 +125,10 @@ public class PortalManager implements Listener {
 	}
 
 	public static void spawnPortal(Player player, int portalNum, int gunId) {
+		if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.PORTAL_GUN_ENABLED)) {
+			player.sendMessage(Component.text("The wand sparks and fizzles out. It seems it doesn't work in this area...", NamedTextColor.DARK_RED));
+			return;
+		}
 		boolean success = spawnPortalInternal(player, portalNum, gunId);
 
 		World world = player.getWorld();

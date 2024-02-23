@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -178,6 +179,11 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 			mDPSCounter += damage;
 			mDPSCounter10s += damage;
+
+			if (type == DamageEvent.DamageType.MELEE && player.getInventory().getItemInMainHand().getType() == Material.AIR) {
+				player.sendMessage(Component.text("Your punch clears the training dummy of all its status effects.", NamedTextColor.AQUA));
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss);
+			}
 		}
 
 		if (mRegen && mBoss.isValid() && !mBoss.isDead() && mBoss.getHealth() > 0) {

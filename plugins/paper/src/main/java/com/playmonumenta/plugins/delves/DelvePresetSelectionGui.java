@@ -39,8 +39,9 @@ public class DelvePresetSelectionGui extends Gui {
 		}
 
 		levelMap.forEach((level, list) -> {
+			int start = 4 - list.size() / 2;
 			for (int i = 0; i < list.size(); i++) {
-				setItem(level - 1, i, createItem(list.get(i)));
+				setItem(level - 1, i + start, createItem(list.get(i)));
 			}
 		});
 	}

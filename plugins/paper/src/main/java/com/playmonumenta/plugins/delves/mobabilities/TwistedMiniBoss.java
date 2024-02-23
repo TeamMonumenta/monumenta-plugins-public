@@ -4,9 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.abilities.Twisted;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +29,7 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		boss.addScoreboardTag(Twisted.TWISTED_MINIBOSS_TAG);
 
-		mIsR3Overworld = ServerProperties.getShardName().contains("ring");
+		mIsR3Overworld = DelvesUtils.getDungeonName(boss.getWorld()).contains("ring");
 		if (mIsR3Overworld) {
 			mR3PoiName = LocationUtils.getPoiNameFromLocation(boss.getLocation());
 		} else {

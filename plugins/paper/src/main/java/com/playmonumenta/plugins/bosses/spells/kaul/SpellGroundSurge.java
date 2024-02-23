@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -31,6 +32,7 @@ import org.bukkit.util.Vector;
 
 public class SpellGroundSurge extends Spell {
 	private static final String SPELL_NAME = "Ground Surge";
+	private static final String SLOWNESS_TAG = "GroundSurgeSlowness";
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -138,7 +140,8 @@ public class SpellGroundSurge extends Spell {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										this.cancel();
 										DamageUtils.damage(mBoss, player, DamageType.BLAST, 24, null, false, true, SPELL_NAME);
-										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
+										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,
+											SLOWNESS_TAG, new PercentSpeed(20 * 20, -0.5, SLOWNESS_TAG));
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1f);
 										new PartialParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
 										new PartialParticle(Particle.FLAME, bLoc, 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
@@ -197,7 +200,8 @@ public class SpellGroundSurge extends Spell {
 														    && !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());
 														DamageUtils.damage(mBoss, surgePlayer, DamageType.BLAST, 40, null, false, true, SPELL_NAME);
-														surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
+														com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,
+															SLOWNESS_TAG, new PercentSpeed(20 * 20, -0.5, SLOWNESS_TAG));
 														MovementUtils.knockAway(loc, player, 0.3f, 1f);
 														new PartialParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
 														new PartialParticle(Particle.FLAME, innerBoxLoc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);

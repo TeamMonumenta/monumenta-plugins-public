@@ -203,7 +203,7 @@ public enum ClassAbility {
 	GUARDING_BOLT("Guarding Bolt"),
 	LAST_BREATH("Last Breath"),
 	SKYHOOK("Skyhook"),
-	SLIPSTREAM("Slipstream"),
+	AEROBLAST("Aeroblast"),
 	WHIRLWIND("Whirlwind"),
 	HOWLINGWINDS("Howling Winds"),
 	WIND_WALK_DEPTHS("Wind Walk"),

@@ -14,14 +14,17 @@ import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
@@ -84,6 +87,9 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	                          Ability[] abilities, int duration, double mRange) {
 		if (p != null || playerItemStats != null) {
 			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 1.0f);
+			if (p != null) {
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, LocationUtils.getEntityCenter(damagee), 8, 0, 0, 0, 0.14).spawnAsPlayerActive(p);
+			}
 
 			// tag mob to prevent it from spawning more stuff
 			damagee.addScoreboardTag("TeneGhost");

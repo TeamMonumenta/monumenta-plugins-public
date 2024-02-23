@@ -12,18 +12,23 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Spider;
 
 public class Chivalrous {
 
 	private static final double SPAWN_CHANCE_PER_LEVEL = 0.10;
 	public static final String AVOID_CHIVALROUS = "boss_chivalrousimmune";
 
-	// 50% bee - 25% slime - 25% magmacube
+	// 33% bee - 33% slime - 33% cave spider
 	private static final String[] MOUNTS = {
 		"ChivalrousBeeMount",
-		"ChivalrousBeeMount",
 		"SlimeMount",
-		"MagmaCubeMount"
+		"ChivalrousCaveSpiderMount"
+	};
+
+	private static final String[] MOUNTS_NO_SPIDER = {
+		"ChivalrousBeeMount",
+		"SlimeMount"
 	};
 
 	private static final String[] LAVA_MOUNTS = {
@@ -44,14 +49,15 @@ public class Chivalrous {
 		"Magma Cube Mount",
 		"Chivalrous Strider Mount",
 		"Chivalrous Dolphin Mount",
-		"Chivalrous Pufferfish Mount"
+		"Chivalrous Pufferfish Mount",
+		"Chivalrous Cave Spider Mount"
 	};
 
-	public static final String DESCRIPTION = "Enemies become Knights of slime, bees, dolphins, fish, and striders.";
+	public static final String DESCRIPTION = "Enemies become mounted on slimes, bees, and spiders.";
 
 	public static String[] rankDescription(int level) {
 		return new String[]{
-			"Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to be Chivalrous."
+			"Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to be Chivalrous, riding a mount into battle."
 		};
 	}
 
@@ -74,6 +80,9 @@ public class Chivalrous {
 				possibleMounts = WATER_MOUNTS;
 			} else if (isInLava) {
 				possibleMounts = LAVA_MOUNTS;
+			} else if (mob instanceof Spider) {
+				// kind of redundant if we put a spider on top of a spider, so don't allow it
+				possibleMounts = MOUNTS_NO_SPIDER;
 			}
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), possibleMounts[FastUtils.RANDOM.nextInt(possibleMounts.length)]);
 			if (mount != null) {

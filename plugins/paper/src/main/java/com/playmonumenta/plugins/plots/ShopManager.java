@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.QuestNpc;
+import com.playmonumenta.scriptedquests.utils.DateUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -78,6 +79,7 @@ public class ShopManager implements Listener {
 	private static final String DISABLE_LOCKING_TAG = "DisableLocking";
 	private static final String LOCK_PREFIX = "* Soulbound to ";
 	private static final String LOCK_SUFFIX = " *";
+	private static final String UPKEEP_SCOREBOARD = "DLeft";
 
 	// handles cancelled damage events because we're only interested in the left click interaction (and the event is always cancelled on shop shulkers anyway)
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
@@ -213,7 +215,8 @@ public class ShopManager implements Listener {
 		private final @Nullable String mOwnerGuildName;
 		private final UUID mOwnerUUID;
 		private final Material mOriginalEntityMat;
-		private final boolean mLockingEnabled;
+		private final boolean mUpkeepPaid;
+		private boolean mLockingEnabled;
 
 		private Shop(Location min, Location max, Shulker entity, String ownerName, @Nullable String ownerGuildName, UUID ownerUUID, Material originalEntityMat) {
 			mMin = min;
@@ -224,6 +227,7 @@ public class ShopManager implements Listener {
 			mOwnerUUID = ownerUUID;
 			mOriginalEntityMat = originalEntityMat;
 			mLockingEnabled = !entity.getScoreboardTags().contains(DISABLE_LOCKING_TAG);
+			mUpkeepPaid = (ScoreboardUtils.getScoreboardValue(entity, UPKEEP_SCOREBOARD).orElse(Integer.MAX_VALUE) - DateUtils.getDaysSinceEpoch()) >= 0;
 		}
 
 		protected static Shop fromShopEntity(Entity shopEntity) throws WrapperCommandSyntaxException {
@@ -344,12 +348,17 @@ public class ShopManager implements Listener {
 			return !mLockingEnabled;
 		}
 
+		private boolean isUpkeepPaid() {
+			return mUpkeepPaid;
+		}
+
 		private void setLockingEnabled(boolean enabled) {
 			if (enabled) {
 				mEntity.getScoreboardTags().remove(DISABLE_LOCKING_TAG);
 			} else {
 				mEntity.getScoreboardTags().add(DISABLE_LOCKING_TAG);
 			}
+			mLockingEnabled = enabled;
 		}
 
 		private BoundingBox getExpandedBoundingBox() {
@@ -680,7 +689,8 @@ public class ShopManager implements Listener {
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
 
-		if (shop.isLockingDisabled()) {
+		if (shop.isLockingDisabled() && shop.isUpkeepPaid()) {
+			/* Note - you can not prevent a shop from being locked if it does not have its upkeep paid */
 			if (player != null) {
 				player.sendMessage(Component.text("Locking and unlocking this shop is disabled, change that setting first before trying to lock.", NamedTextColor.WHITE));
 			}
@@ -734,13 +744,6 @@ public class ShopManager implements Listener {
 
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
-
-		if (shop.isLockingDisabled()) {
-			if (player != null) {
-				player.sendMessage(Component.text("Locking and unlocking this shop is disabled, change that setting first before trying to unlock.", NamedTextColor.WHITE));
-			}
-			return;
-		}
 
 		if (player != null) {
 			player.sendMessage(Component.text("Your shop has been unlocked.", NamedTextColor.WHITE));

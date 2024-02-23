@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.Entity;
@@ -36,7 +37,7 @@ public class BoonOfTheFracturedTree extends ZeroArgumentEffect {
 		return String.format("BoonOfTheFracturedTree duration:%d", this.getDuration());
 	}
 
-	public static BoonOfTheFracturedTree deserialize(JsonObject object) {
+	public static BoonOfTheFracturedTree deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 
 		return new BoonOfTheFracturedTree(duration);

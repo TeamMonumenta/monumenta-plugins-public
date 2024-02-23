@@ -23,6 +23,8 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
@@ -104,6 +106,23 @@ public class GraveCommand {
 				.withPermission("monumenta.command.grave.deleteall")
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((CommandExecutor) (sender, args) -> deleteAll((Player) args[0])))
+
+			.withSubcommand(new CommandAPICommand("nuke")
+				.withPermission("monumenta.command.grave.nuke")
+				.withArguments(new LiteralArgument("begin"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> confirmNuke(player, 0)))
+			.withSubcommand(new CommandAPICommand("nuke")
+				.withPermission("monumenta.command.grave.nuke")
+				.withArguments(new LiteralArgument("confirm"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> confirmNuke(player, 1)))
+			.withSubcommand(new CommandAPICommand("nuke")
+				.withPermission("monumenta.command.grave.nuke")
+				.withArguments(new LiteralArgument("doit"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> confirmNuke(player, 2)))
+			.withSubcommand(new CommandAPICommand("nuke")
+				.withPermission("monumenta.command.grave.nuke")
+				.withArguments(new LiteralArgument("cancel"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> confirmNuke(player, -1)))
 			.register();
 	}
 
@@ -117,7 +136,10 @@ public class GraveCommand {
 			List<Component> entries = manager.getGravesList(page);
 			Component message = Component.text("List of ", NamedTextColor.AQUA)
 				.append(player.displayName().hoverEvent(player))
-				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
+				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves " : "'s Graves "))
+				.append(Component.text("[Delete All Graves]", NamedTextColor.DARK_RED)
+					.hoverEvent(HoverEvent.showText(Component.text("Deletes all of your graves. Cannot be undone!", NamedTextColor.RED)))
+					.clickEvent(ClickEvent.runCommand("/grave nuke begin")));
 			for (Component entry : entries) {
 				message = message.append(Component.newline().append(entry));
 			}
@@ -142,7 +164,7 @@ public class GraveCommand {
 			);
 			player.sendMessage(message);
 		} else {
-			throw CommandAPI.failWithString("You don't have any graves");
+			throw CommandAPI.failWithString("You don't have any graves.");
 		}
 	}
 
@@ -379,6 +401,81 @@ public class GraveCommand {
 					.hoverEvent(HoverEvent.showText(Component.text("Cancel deletion of the grave", NamedTextColor.WHITE)))
 					.clickEvent(ClickEvent.runCommand("/grave delete cancel"))));
 		}
+	}
+
+	private static void confirmNuke(Player player, int stage) throws WrapperCommandSyntaxException {
+		GraveManager manager = GraveManager.getInstance(player);
+		if (manager == null) {
+			player.sendMessage(Component.text("You do not have any graves.", NamedTextColor.RED));
+			return;
+		}
+
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_FAIL, SoundCategory.PLAYERS, 1.0f, 0.5f);
+
+		// 0: first time the command is called. ask to confirm.
+		// 1: second time the command is called. remind that moderators are not able to undo this.
+		// 2: nuke the graves!
+		// -1: nuke cancelled
+		switch (stage) {
+			case 0 -> {
+				player.sendMessage(Component.text("Are you sure you want to delete ALL of your graves? This cannot be undone!", NamedTextColor.RED, TextDecoration.BOLD));
+				player.sendMessage(Component.text("Number of graves to be deleted: " + manager.getGraves().size(), NamedTextColor.AQUA));
+				player.sendMessage(Component.text()
+					.append(Component.text("[CONTINUE]", NamedTextColor.RED)
+						.hoverEvent(HoverEvent.showText(Component.text("Continue with mass grave deletion", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.runCommand("/grave nuke confirm")))
+					.append(Component.text("   "))
+					.append(Component.text("[CANCEL]", NamedTextColor.WHITE)
+						.hoverEvent(HoverEvent.showText(Component.text("Cancel mass grave deletion", NamedTextColor.WHITE)))
+						.clickEvent(ClickEvent.runCommand("/grave nuke cancel"))));
+			}
+			case 1 -> {
+				player.sendMessage(Component.text("This process is not refundable by moderators! Please check all of your graves and ensure you have nothing valuable stored in them!", NamedTextColor.DARK_RED, TextDecoration.BOLD));
+
+				Component graveItems = Component.text("Items in graves: ", NamedTextColor.AQUA);
+
+				int i = 0;
+				for (Grave grave : manager.getGraves()) {
+					graveItems = graveItems.append(grave.getItemList(true));
+					i++;
+
+					if (i < 10) {
+						if (i < manager.getGraves().size()) {
+							graveItems = graveItems.append(Component.text(", "));
+						}
+					} else {
+						graveItems = graveItems.append(Component.text(" ... and " + (manager.getGraves().size() - 10) + " more item" + ((manager.getGraves().size() - 10) > 1 ? "s" : "") + "."));
+						break;
+					}
+				}
+
+				player.sendMessage(graveItems);
+				player.sendMessage(Component.text()
+					.append(Component.text("[CANCEL]", NamedTextColor.WHITE)
+						.hoverEvent(HoverEvent.showText(Component.text("Cancel mass grave deletion", NamedTextColor.WHITE)))
+						.clickEvent(ClickEvent.runCommand("/grave nuke cancel")))
+					.append(Component.text("   "))
+					.append(Component.text("[DELETE]", NamedTextColor.DARK_RED)
+						.hoverEvent(HoverEvent.showText(Component.text("Delete all your graves! This cannot be undone!", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.runCommand("/grave nuke doit"))));
+			}
+			case 2 -> {
+				int size = manager.getGraves().size();
+				if (size == 0) {
+					player.sendMessage(Component.text("If I had a nickel for every grave you had, I'd have 0 nickels, because you don't have any.", NamedTextColor.AQUA));
+				} else if (size == 1) {
+					player.sendMessage(Component.text("All this just to delete a single grave? How intriguing. Goodbye!", NamedTextColor.AQUA));
+				} else {
+					player.sendMessage(Component.text("All " + size + " of your graves have been deleted. Goodbye!", NamedTextColor.AQUA));
+				}
+				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 0.5f, 1.0f);
+				deleteAll(player);
+			}
+			case -1 -> player.sendMessage(Component.text("Mass grave deletion cancelled.", NamedTextColor.RED));
+			default -> throw CommandAPI.failWithString("Mass grave deletion process failed due to an unexpected error.");
+		}
+
+
 	}
 
 	private static void deleteAll(Player player) {

@@ -88,6 +88,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
+	public void setAggressive(Creature entity, DamageAction action, double attackRange) {
+
+	}
+
+	@Override
 	public void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange) {
 
 	}

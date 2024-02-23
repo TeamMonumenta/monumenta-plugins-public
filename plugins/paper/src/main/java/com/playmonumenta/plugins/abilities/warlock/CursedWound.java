@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -63,7 +64,7 @@ public class CursedWound extends Ability {
 				"Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
 					"Your melee attacks passively deal 5% more damage per ability on cooldown, capped at 3 abilities.",
 				"Your melee attacks passively deal 10% more damage per ability on cooldown instead.",
-				"When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
+				"When you kill a mob with a melee scythe attack, all debuffs (excluding stuns and silences) on the mob get stored in your scythe. " +
 					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
 					"as well as 3% of your melee attack's damage as magic damage per effect."
 				)
@@ -73,6 +74,7 @@ public class CursedWound extends Ability {
 	private final double mCursedWoundDamage;
 	private @Nullable Collection<PotionEffect> mStoredPotionEffects;
 	private @Nullable HashMap<String, Effect> mStoredCustomEffects;
+	private int mStoredFireTicks;
 
 	private final CursedWoundCS mCosmetic;
 
@@ -88,13 +90,21 @@ public class CursedWound extends Ability {
 			World world = mPlayer.getWorld();
 
 			if (isEnhanced() && mStoredPotionEffects != null && mStoredCustomEffects != null) {
-				double damage = event.getDamage() * DAMAGE_PER_EFFECT_RATIO * (mStoredPotionEffects.size() + mStoredCustomEffects.size());
+				int debuffCount = mStoredPotionEffects.size() + mStoredCustomEffects.size();
+
+				// do not double-count fire ticks and inferno
+				if (mStoredFireTicks > 0 && !mStoredCustomEffects.containsKey(Inferno.INFERNO_EFFECT_NAME)) {
+					debuffCount++;
+				}
+
+				double damage = event.getDamage() * DAMAGE_PER_EFFECT_RATIO * debuffCount;
 				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, CURSED_WOUND_RADIUS);
 				if (damage > 0) {
 					Map<String, JsonObject> serializedEffects = new HashMap<>();
 					mStoredCustomEffects.forEach((source, effect) -> serializedEffects.put(source, effect.serialize()));
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius)) {
 						mStoredPotionEffects.forEach(mob::addPotionEffect);
+						EntityUtils.applyFire(mPlugin, mStoredFireTicks, mob, mPlayer, null);
 						serializedEffects.forEach((source, jsonEffect) -> {
 							try {
 								Effect deserializedEffect = EffectManager.getEffectFromJson(jsonEffect, mPlugin);
@@ -110,7 +120,9 @@ public class CursedWound extends Ability {
 					}
 
 					mStoredPotionEffects = null;
+					mStoredFireTicks = 0;
 					mStoredCustomEffects = null;
+
 
 					mCosmetic.onReleaseStoredEffects(mPlayer, world, mPlayer.getLocation(), enemy, radius);
 				}
@@ -157,6 +169,8 @@ public class CursedWound extends Ability {
 			mStoredPotionEffects.removeIf(effect -> effect.getType().isInstant() || PotionUtils.hasPositiveEffects(effect.getType()));
 			mStoredPotionEffects.removeIf(PotionUtils::isInfinite);
 
+			mStoredFireTicks = entity.getFireTicks();
+
 			mStoredCustomEffects = new HashMap<>();
 			Map<String, Effect> customEffects = mPlugin.mEffectManager.getPriorityEffects(entity);
 			for (Map.Entry<String, Effect> e : customEffects.entrySet()) {
@@ -167,7 +181,7 @@ public class CursedWound extends Ability {
 				}
 			}
 
-			if (!mStoredPotionEffects.isEmpty() || !mStoredCustomEffects.isEmpty()) {
+			if (!mStoredPotionEffects.isEmpty() || mStoredFireTicks > 0 || !mStoredCustomEffects.isEmpty()) {
 				mCosmetic.onStoreEffects(mPlayer, world, loc, entity);
 			}
 		}

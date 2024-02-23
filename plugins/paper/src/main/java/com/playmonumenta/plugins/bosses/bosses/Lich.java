@@ -1643,8 +1643,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						}
 						mBoss.setHealth(100);
 						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 10));
-						this.cancel();
 						finalAnimation(block);
+						this.cancel();
+						return;
 					}
 				}
 				//boss bar stuff, 200s time limit
@@ -1697,6 +1698,12 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						player.hideBossBar(timer);
 					}
 				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				BossUtils.hideBossBar(timer, world);
 			}
 
 		}.runTaskTimer(mPlugin, 20 * 4, 5);

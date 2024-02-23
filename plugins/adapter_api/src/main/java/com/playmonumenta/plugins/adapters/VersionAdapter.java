@@ -84,6 +84,15 @@ public interface VersionAdapter {
 	void setAggressive(Creature entity, DamageAction action);
 
 	/**
+	 * Make entity agro players but now with range
+	 *
+	 * @param entity       The entity who should agro players
+	 * @param action       Damage action when this entity hit a player
+	 * @param attackRange  The range of the attack
+	 */
+	void setAggressive(Creature entity, DamageAction action, double attackRange);
+
+	/**
 	 * Make this entity lose all desire to attack any Entity and make this only attack entities accepted by the predicate
 	 *
 	 * @param entity        The entity

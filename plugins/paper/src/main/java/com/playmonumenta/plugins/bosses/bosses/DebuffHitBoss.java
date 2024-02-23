@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -15,6 +17,11 @@ import org.bukkit.potion.PotionEffectType;
 public final class DebuffHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_debuffhit";
 	public static final int detectionRange = 50;
+	public static final String SLOWNESS_TAG = "BossDebuffhitSlowness";
+	public static final String WEAKNESS_TAG = "BossDebuffhitWeakness";
+	public final int mDebuffDuration = 60;
+	public final double mSlownessPotency = -0.1;
+	public final double mWeaknessPotency = -0.1;
 
 	public DebuffHitBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -29,15 +36,13 @@ public final class DebuffHitBoss extends BossAbilityGroup {
 			}
 		}
 		int rand = FastUtils.RANDOM.nextInt(4);
-		if (rand == 0) {
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0, false, true));
-		} else if (rand == 1) {
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 0, false, true));
-		} else if (rand == 2) {
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 60, 0, false, true));
-		} else {
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 0, false, true));
+		switch (rand) {
+			case 0 -> com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(damagee, SLOWNESS_TAG,
+					new PercentSpeed(mDebuffDuration, mSlownessPotency, SLOWNESS_TAG));
+			case 1 -> com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(damagee, WEAKNESS_TAG,
+				new PercentDamageDealt(mDebuffDuration, mWeaknessPotency, DamageType.getScalableDamageType()));
+			case 2 -> damagee.addPotionEffect(new PotionEffect(PotionEffectType.POISON, mDebuffDuration, 0, false, true));
+			default -> damagee.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, mDebuffDuration, 0, false, true));
 		}
 	}
 }
-

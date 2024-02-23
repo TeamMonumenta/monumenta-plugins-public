@@ -10,9 +10,13 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Map;
+import java.util.WeakHashMap;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +26,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -31,12 +36,13 @@ public class HowlingWinds extends DepthsAbility {
 	public static final int COOLDOWN = 20 * 20;
 	public static final int VULN_RADIUS = 4;
 	public static final int PULL_RADIUS = 16;
-	public static final int DISTANCE = 6;
+	public static final int DISTANCE = 12;
 	public static final int[] PULL_INTERVAL = {20, 18, 16, 14, 12, 8};
 	public static final double[] VULN_AMPLIFIER = {0.075, 0.1, 0.125, 0.15, 0.175, 0.225};
 	public static final int DURATION_TICKS = 5 * 20;
 	public static final double PULL_VELOCITY = 0.9;
 	public static final double BASE_RATIO = 0.15;
+	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 
 	public static final String CHARM_COOLDOWN = "Howling Winds Cooldown";
 
@@ -71,23 +77,48 @@ public class HowlingWinds extends DepthsAbility {
 		}
 		putOnCooldown();
 
-		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 0.8f, 0.25f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1.0f, 1.2f);
-		new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
-		Vector dir = loc.getDirection().normalize();
-		for (int i = 0; i < mDistance; i++) {
-			loc.add(dir);
+		Location loc = mPlayer.getLocation();
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, 1.25, "HowlingWindsProjectile", Particle.CLOUD);
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+		mProjectiles.put(proj, playerItemStats);
+		// Clear out list just in case
+		mProjectiles.keySet().removeIf(p -> p.isDead() || !p.isValid() || p.getTicksLived() >= 100);
+		new BukkitRunnable() {
+			int mT = 0;
+			final Location mPlayerLocation = mPlayer.getLocation();
 
-			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0.1, 0.1, 0.1, 0.1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CLOUD, loc, 5, 0.1, 0.1, 0.1, 0.1).spawnAsPlayerActive(mPlayer);
-			int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-			if (loc.getBlock().getType().isSolid() || i >= mDistance - 1 || size > 0) {
-				explode(loc);
-				break;
+			@Override
+			public void run() {
+				if (mProjectiles.get(proj) != playerItemStats) {
+					mPlugin.mProjectileEffectTimers.removeEntity(proj);
+					this.cancel();
+				}
+
+				if (proj.getLocation().distance(mPlayerLocation) > mDistance) {
+					proj.remove();
+					mPlugin.mProjectileEffectTimers.removeEntity(proj);
+					this.cancel();
+				}
+
+				// max time limit to avoid weird scenarios
+				if (mT > 100) {
+					mPlugin.mProjectileEffectTimers.removeEntity(proj);
+					proj.remove();
+					this.cancel();
+				}
+
+				if (proj.isDead()) {
+					if (mProjectiles.remove(proj) != null) {
+						explode(proj.getLocation());
+					}
+					mPlugin.mProjectileEffectTimers.removeEntity(proj);
+					this.cancel();
+				}
+				mT++;
 			}
-		}
+		}.runTaskTimer(mPlugin, 0, 1);
 
 		return true;
 	}
@@ -141,11 +172,12 @@ public class HowlingWinds extends DepthsAbility {
 
 	private static Description<HowlingWinds> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<HowlingWinds>(color)
-			.add("Swap hands to summon a hurricane that lasts ")
-			.addDuration(a -> a.mDuration, DURATION_TICKS)
-			.add(" seconds at the location you are looking at, up to ")
+
+			.add("Swap hands to throw a projectile that travels up to ")
 			.add(a -> a.mDistance, DISTANCE)
-			.add(" blocks away. The hurricane strongly pulls enemies within ")
+			.add(" blocks away. Upon hitting a mob, block, or reaching its max distance, it explodes and generates a hurricane that lasts ")
+			.addDuration(a -> a.mDuration, DURATION_TICKS)
+			.add(" seconds. The hurricane strongly pulls enemies within ")
 			.add(a -> a.mRadius, PULL_RADIUS)
 			.add(" blocks towards its center on spawn and continues pulling every ")
 			.addDuration(a -> PULL_INTERVAL[rarity - 1], PULL_INTERVAL[rarity - 1], true, true)

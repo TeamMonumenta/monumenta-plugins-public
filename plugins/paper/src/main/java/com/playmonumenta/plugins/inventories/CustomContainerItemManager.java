@@ -4,10 +4,7 @@ import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.QuiverListener;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
@@ -149,9 +146,14 @@ public class CustomContainerItemManager implements Listener {
 					for (int i = 0; i < inventory.getSize(); i++) {
 						ItemStack item = inventory.getItem(i);
 						if (item != null && config.canPutIntoContainer(item)) {
-							deposited += item.getAmount();
-							depositedItems.merge(ItemUtils.getPlainNameOrDefault(item), item.getAmount(), Integer::sum);
-							addToContainer(player, container, config, item, false, false);
+							var originalAmount = item.getAmount();
+							// since item maybe empty after we add to container, we should figure out the name first
+							var name = ItemUtils.getPlainNameOrDefault(item);
+							// we suppress addToContainer dialog since we only want to print once we are done processing all items
+							addToContainer(player, container, config, item, false, true);
+							int depositedAmount = originalAmount - item.getAmount();
+							depositedItems.merge(name, depositedAmount, Integer::sum);
+							deposited += depositedAmount;
 						}
 					}
 					if (deposited > 0) {
@@ -161,6 +163,9 @@ public class CustomContainerItemManager implements Listener {
 								                   depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
 									                   .collect(Collectors.joining("\n")), NamedTextColor.GRAY))));
 						ItemUpdateHelper.generateItemStats(container);
+					} else {
+						player.sendMessage(Component.text("Cannot store any more items in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					}
 				}
 			} else {

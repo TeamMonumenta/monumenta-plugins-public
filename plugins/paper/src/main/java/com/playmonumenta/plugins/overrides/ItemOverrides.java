@@ -421,6 +421,10 @@ public final class ItemOverrides {
 
 		BaseOverride glassBottleOverride = new GlassBottleOverride();
 		mItems.put(Material.GLASS_BOTTLE, glassBottleOverride);
+
+		//Just needs the base cake since you cant put candles on cakes that already have them
+		BaseOverride candleCakeOverride = new CandleCakeOverride();
+		mItems.put(Material.CAKE, candleCakeOverride);
 	}
 
 	public void rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {

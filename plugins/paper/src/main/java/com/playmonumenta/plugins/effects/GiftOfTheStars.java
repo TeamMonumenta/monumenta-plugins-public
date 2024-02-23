@@ -29,7 +29,7 @@ public class GiftOfTheStars extends ZeroArgumentEffect {
 		return String.format("GiftOfTheStars duration:%d", this.getDuration());
 	}
 
-	public static GiftOfTheStars deserialize(JsonObject object) {
+	public static GiftOfTheStars deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		return new GiftOfTheStars(duration);
 	}

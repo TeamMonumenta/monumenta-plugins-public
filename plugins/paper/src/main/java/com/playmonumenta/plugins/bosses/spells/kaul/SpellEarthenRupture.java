@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -69,7 +70,8 @@ public class SpellEarthenRupture extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {
 						DamageUtils.damage(mBoss, player, DamageType.BLAST, 20, null, false, true, SPELL_NAME);
 						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "EarthenRuptureSlowness",
+							new PercentSpeed(20 * 10, -0.5, "EarthenRuptureSlowness"));
 					}
 				}
 			}

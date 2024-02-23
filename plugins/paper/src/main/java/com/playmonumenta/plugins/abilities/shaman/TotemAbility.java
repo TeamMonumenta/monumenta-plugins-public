@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -67,7 +68,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.25f);
 		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mProjectileName, Particle.CLOUD);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);

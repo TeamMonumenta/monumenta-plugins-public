@@ -155,6 +155,7 @@ public class SpellDiesIrae extends Spell {
 				if (mT >= 20 * 6) {
 					attack();
 					this.cancel();
+					return;
 				}
 				mT++;
 				//boss bar stuff

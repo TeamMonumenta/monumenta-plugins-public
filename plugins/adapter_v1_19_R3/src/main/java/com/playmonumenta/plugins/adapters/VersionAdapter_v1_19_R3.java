@@ -283,8 +283,14 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 
 	@Override
 	public void setAggressive(Creature entity, DamageAction action) {
+		//0 is default. Would be like, a negative number but unfortunately -100^2 is a positive number
+		setAggressive(entity, action, 0);
+	}
+
+	@Override
+	public void setAggressive(Creature entity, DamageAction action, double attackRange) {
 		PathfinderMob mob = ((CraftCreature) entity).getHandle();
-		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action, true));
+		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action, true, attackRange));
 		mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(mob, net.minecraft.world.entity.player.Player.class, true));
 	}
 
