@@ -299,7 +299,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 		StatTrackManager.getInstance().updateInventory(player);
 
-		player.sendMessage(Component.text("Equipment Swapped", NamedTextColor.GOLD, TextDecoration.BOLD));
+		player.sendMessage(Component.text("Swapped equipment.", NamedTextColor.GOLD, TextDecoration.BOLD));
 		player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.1f);
 		EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 		Inventory sInv = sbox.getInventory();
@@ -385,7 +385,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 			charmInventory.clear();
 		}
-		player.sendMessage(Component.text("Charms Swapped", NamedTextColor.GOLD, TextDecoration.BOLD));
+		player.sendMessage(Component.text("Swapped charms.", NamedTextColor.GOLD, TextDecoration.BOLD));
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
 
 		for (Map.Entry<Integer, Integer> slot : CHARM_SLOTS.entrySet()) {
