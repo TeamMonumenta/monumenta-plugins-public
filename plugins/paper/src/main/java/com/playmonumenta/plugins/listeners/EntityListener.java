@@ -1021,8 +1021,6 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().setAttackRange(zoglin, 1.8);
 		} else if (event.getEntity() instanceof Hoglin hoglin) {
 			NmsUtils.getVersionAdapter().setAttackRange(hoglin, 1.8);
-		} else if (event.getEntity() instanceof Turtle turtle) {
-			NmsUtils.getVersionAdapter().setAttackRange(turtle, 1.5);
 		} else if (event.getEntity() instanceof FallingBlock fallingBlock) {
 			fallingBlock.setMetadata(FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, new FixedMetadataValue(mPlugin, ZoneUtils.hasZoneProperty(fallingBlock.getLocation(), ZoneProperty.ADVENTURE_MODE)));
 		}

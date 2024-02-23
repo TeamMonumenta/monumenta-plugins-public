@@ -38,6 +38,9 @@ public class HostileBoss extends BossAbilityGroup {
 
 		@BossParam(help = "How long the attack breaks shields for. If 0, attack doesn't break shields")
 		public int SHIELD_BREAK_TICKS = 0;
+
+		@BossParam(help = "Melee Attack Range. I would not recommend using this for anything that is ranged.")
+		public double MELEE_ATTACK_RANGE = 0;
 	}
 
 	public HostileBoss(Plugin plugin, LivingEntity boss) {
@@ -63,7 +66,7 @@ public class HostileBoss extends BossAbilityGroup {
 						p.PARTICLES.spawn(boss, target.getEyeLocation());
 					}
 
-				});
+				}, p.MELEE_ATTACK_RANGE);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
