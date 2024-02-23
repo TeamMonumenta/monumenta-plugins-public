@@ -50,10 +50,10 @@ public class DepthsWindWalk extends DepthsAbility {
 	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
 
 	public static final DepthsAbilityInfo<DepthsWindWalk> INFO =
-		new DepthsAbilityInfo<>(DepthsWindWalk.class, "Wind Walk", DepthsWindWalk::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_RIGHT_CLICK)
+		new DepthsAbilityInfo<>(DepthsWindWalk.class, "Wind Walk", DepthsWindWalk::new, DepthsTree.WINDWALKER, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.WIND_WALK_DEPTHS)
 			.cooldown(CHARM_COOLDOWN, COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast, DepthsTrigger.SHIFT_RIGHT_CLICK))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast, DepthsTrigger.RIGHT_CLICK))
 			.displayItem(Material.WHITE_DYE)
 			.descriptions(DepthsWindWalk::getDescription);
 
@@ -144,8 +144,8 @@ public class DepthsWindWalk extends DepthsAbility {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source != null
-			    && (event.getType() == DamageEvent.DamageType.MELEE)
-			    && mIsWalking) {
+			&& (event.getType() == DamageEvent.DamageType.MELEE)
+			&& mIsWalking) {
 			event.setCancelled(true);
 		}
 	}

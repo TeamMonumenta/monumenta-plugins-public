@@ -93,6 +93,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
+import com.playmonumenta.plugins.depths.abilities.windwalker.Aeroblast;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsWindWalk;
@@ -102,7 +103,6 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.LastBreath;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
-import com.playmonumenta.plugins.depths.abilities.windwalker.Slipstream;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.WindsweptCombos;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
@@ -536,6 +536,7 @@ public class DepthsManager {
 			DepthsVolley.INFO,
 
 			//Windwalker abilities
+			Aeroblast.INFO,
 			Aeromancy.INFO,
 			DepthsDodging.INFO,
 			GuardingBolt.INFO,
@@ -544,7 +545,6 @@ public class DepthsManager {
 			OneWithTheWind.INFO,
 			RestoringDraft.INFO,
 			Skyhook.INFO,
-			Slipstream.INFO,
 			DepthsWindWalk.INFO,
 			Whirlwind.INFO,
 			WindsweptCombos.INFO,

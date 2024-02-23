@@ -67,6 +67,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
+import com.playmonumenta.plugins.depths.abilities.windwalker.Aeroblast;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsWindWalk;
@@ -76,7 +77,6 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.LastBreath;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
-import com.playmonumenta.plugins.depths.abilities.windwalker.Slipstream;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.WindsweptCombos;
 import java.util.Objects;
@@ -356,6 +356,12 @@ public enum CharmEffects {
 	VOLLEY_PIERCING("Volley Piercing", DepthsVolley.INFO, true, false, 0.0, 2.0, new double[] {0.0, 0.0, 0.0, 0.0, 1.0}),
 
 	// Windwalker
+	AEROBLAST_COOLDOWN(Aeroblast.CHARM_COOLDOWN, Aeroblast.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
+	AEROBLAST_DAMAGE("Aeroblast Damage", Aeroblast.INFO, false, true, 10.0, 100, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
+	AEROBLAST_SIZE("Aeroblast Size", Aeroblast.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
+	AEROBLAST_KNOCKBACK("Aeroblast Knockback", Aeroblast.INFO, true, true, 10.0, 100.0, new double[] {20.0, 25.0, 30.0, 35.0, 40.0}),
+	AEROBLAST_SPEED_DURATION("Aeroblast Speed Duration", Aeroblast.INFO, true, false, 0.5, 6.0, new double[] {1.0, 1.5, 2.0, 2.5, 3.0}),
+	AEROBLAST_SPEED_AMPLIFIER("Aeroblast Speed Amplifier", Aeroblast.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
 	AEROMANCY_PLAYER_DAMAGE_AMP("Aeromancy Player Damage Multiplier", Aeromancy.INFO, false, true, 2.0, 20.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	AEROMANCY_MOB_DAMAGE_AMP("Aeromancy Mob Damage Multiplier", Aeromancy.INFO, false, true, 2.0, 20.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	DODGING_COOLDOWN(DepthsDodging.CHARM_COOLDOWN, DepthsDodging.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
@@ -383,12 +389,6 @@ public enum CharmEffects {
 	RESTORING_DRAFT_BLOCK_CAP("Restoring Draft Block Cap", RestoringDraft.INFO, true, false, 2.0, 0.0, new double[] {3.0, 6.0, 9.0, 12.0, 15.0}),
 	SKYHOOK_COOLDOWN(Skyhook.CHARM_COOLDOWN, Skyhook.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
 	SKYHOOK_CDR_PER_BLOCK("Skyhook Cooldown Reduction Per Block", Skyhook.INFO, true, true, 0.0, 1.0, new double[] {0.0, 0.0, 0.0, 0.0, 1.0}),
-	SLIPSTREAM_COOLDOWN(Slipstream.CHARM_COOLDOWN, Slipstream.INFO, false, true, 6.0, -50.0, new double[] {-6.0, -10.0, -14.0, -18.0, -22.0}),
-	SLIPSTREAM_DURATION("Slipstream Duration", Slipstream.INFO, true, false, 0.5, 6.0, new double[] {1.0, 1.5, 2.0, 2.5, 3.0}),
-	SLIPSTREAM_RADIUS("Slipstream Radius", Slipstream.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
-	SLIPSTREAM_KNOCKBACK("Slipstream Knockback", Slipstream.INFO, true, true, 0.0, 40, new double[] {0.0, 0.0, 0.0, 10, 20}),
-	SLIPSTREAM_SPEED_AMPLIFIER("Slipstream Speed Amplifier", Slipstream.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
-	SLIPSTREAM_JUMP_BOOST_AMPLIFIER("Slipstream Jump Boost Amplifier", Slipstream.INFO, true, false, 0.0, 1.0, new double[] {0.0, 0.0, 0.0, 0.0, 1.0}),
 	WHIRLWIND_RADIUS("Whirlwind Radius", Whirlwind.INFO, false, true, 10.0, 100.0, new double[] {20.0, 30.0, 40.0, 50.0, 60.0}),
 	WHIRLWIND_KNOCKBACK("Whirlwind Knockback", Whirlwind.INFO, true, true, 0.0, 40, new double[] {0.0, 0.0, 0.0, 10, 20}),
 	WHIRLWIND_SPEED_AMPLIFIER("Whirlwind Speed Amplifier", Whirlwind.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
