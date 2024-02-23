@@ -384,15 +384,22 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
+		Hanging entity = event.getEntity();
+		Location loc = entity.getLocation();
 
-		if (ZoneUtils.hasZoneProperty(event.getEntity().getLocation(), ZoneProperty.ADVENTURE_MODE)
-			&& !(damager instanceof Player player
-				&& (player.getGameMode() == GameMode.CREATIVE
-					|| (player.getGameMode() == GameMode.SURVIVAL
-						&& ZoneUtils.isInPlot(player)
-						&& ZoneUtils.isInPlot(event.getEntity().getLocation()))))) {
-			event.setCancelled(true);
-			return;
+		if (ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE)) {
+			if (damager instanceof Player && entity instanceof ItemFrame itemFrame && itemFrame.getItem().getType() != Material.AIR && ZoneUtils.hasZoneProperty(loc, ZoneProperty.ITEM_FRAMES_EDITABLE)) {
+				return;
+			}
+
+			if (!(damager instanceof Player player
+				      && (player.getGameMode() == GameMode.CREATIVE
+					          || (player.getGameMode() == GameMode.SURVIVAL
+						              && ZoneUtils.isInPlot(player)
+						              && ZoneUtils.isInPlot(loc))))) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 
 		if (damager instanceof Player player) {

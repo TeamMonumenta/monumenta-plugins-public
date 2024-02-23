@@ -59,7 +59,9 @@ public class ZoneUtils {
 		LOOTING_LIMITER_DISABLED("Looting Limiter Disabled"),
 		RAISE_GRAVE_ABOVE_ZONE("Raise Grave Above Zone"),
 		PORTAL_GUN_ENABLED("Portal Gun Enabled"),
-		PRECIOUS_BLOCK_DROPS_DISABLED("Precious Block Drops Disabled");
+		PRECIOUS_BLOCK_DROPS_DISABLED("Precious Block Drops Disabled"),
+		ITEM_FRAMES_EDITABLE("Item Frames Editable"),
+		;
 
 		private final String mPropertyName;
 
