@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +111,8 @@ public abstract class ExperiencinatorUtils {
 		for (ExperiencinatorConfig.Conversion conversion : mConfig.getConversions()) {
 
 			Map<Region, Integer> totalSellValue = new HashMap<>();
+			Map<Region, List<Component>> soldNames = new HashMap<>();
+			Arrays.asList(Region.values()).forEach(region -> soldNames.put(region, new ArrayList<>()));
 
 			ItemStack[] inventory = player.getInventory().getStorageContents();
 			for (int i = 9; i < inventory.length; i++) {
@@ -151,6 +154,10 @@ public abstract class ExperiencinatorUtils {
 				soldItems += item.getAmount();
 
 				totalSellValue.merge(region, value, Integer::sum);
+				Component display = item.getItemMeta().displayName();
+				if (display != null) {
+					soldNames.getOrDefault(region, new ArrayList<>()).add(display);
+				}
 				item.setAmount(0);
 			}
 
@@ -165,7 +172,7 @@ public abstract class ExperiencinatorUtils {
 				if (sellValue > 0) {
 					soldSomething = true;
 
-					giveResults(sellValue, conversion, player, region, true);
+					giveResults(sellValue, conversion, player, region, true, soldNames.get(region));
 				}
 			}
 		}
@@ -197,7 +204,7 @@ public abstract class ExperiencinatorUtils {
 	/**
 	 * Gives result items to the player, including compressing them if enabled, and sends a chat message of the total amount given if desired.
 	 */
-	private static void giveResults(int sellValue, ExperiencinatorConfig.Conversion conversion, Player player, Region region, boolean chatMessage) {
+	private static void giveResults(int sellValue, ExperiencinatorConfig.Conversion conversion, Player player, Region region, boolean chatMessage, @Nullable List<Component> itemNames) {
 		int totalValue = sellValue;
 		int remainingValue = sellValue;
 		try {
@@ -268,7 +275,18 @@ public abstract class ExperiencinatorUtils {
 				} else { // 3 or more: join with ", ", and the last one with ", and "
 					message = StringUtils.join(givenTexts.subList(0, givenTexts.size() - 1), ", ") + ", and " + givenTexts.get(givenTexts.size() - 1);
 				}
-				player.sendMessage(Component.text("Given " + message + "!", NamedTextColor.AQUA));
+				Component finalMessage = Component.text("Given " + message + "!", NamedTextColor.AQUA);
+				if (itemNames != null && !itemNames.isEmpty()) {
+					Component hover = Component.empty();
+					for (int i = 0; i < itemNames.size(); i++) {
+						if (i > 0) {
+							hover = hover.append(Component.newline());
+						}
+						hover = hover.append(itemNames.get(i));
+					}
+					finalMessage = finalMessage.hoverEvent(hover);
+				}
+				player.sendMessage(finalMessage);
 			}
 		} catch (Throwable t) {
 			player.sendMessage(Component.text("Error while giving you " + remainingValue + " remaining items from a total of " + totalValue + "! Please contact a moderator.", NamedTextColor.RED));
@@ -345,7 +363,7 @@ public abstract class ExperiencinatorUtils {
 			return false;
 		}
 
-		giveResults(value * item.getAmount(), conversion, player, region, false);
+		giveResults(value * item.getAmount(), conversion, player, region, false, null);
 		return true;
 	}
 
