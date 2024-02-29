@@ -2,8 +2,10 @@ package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
+import com.playmonumenta.plugins.particle.PPRectPrism;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,10 +26,12 @@ public class Colossal {
 		};
 	}
 
-	public static void applyModifiers(Location loc, int level) {
+	public static void applyModifiers(Location blockLoc, int level) {
 		if (level == 0 || FastUtils.RANDOM.nextDouble() > SPAWN_CHANCE_PER_LEVEL * level) {
 			return;
 		}
+
+		Location loc = blockLoc.toCenterLocation();
 
 		int airBlocks = 0;
 		int waterBlocks = 0;
@@ -48,7 +52,11 @@ public class Colossal {
 		}
 
 		new PartialParticle(Particle.FLASH, loc).minimumCount(1).spawnAsEnemy();
-		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 100, 0.2, 0.2, 0.2, 0.2).spawnAsEnemy();
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 30, 0.2, 0.2, 0.2, 0.1).spawnAsEnemy();
+
+		new PPRectPrism(Particle.REDSTONE, loc.clone().add(-0.5, -0.5, -0.5), loc.clone().add(0.5, 0.5, 0.5))
+				.countPerMeter(20).edgeMode(true).gradientColor(Color.fromRGB(247, 188, 37), Color.fromRGB(235, 69, 28), 0.75f)
+				.data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1f)).spawnAsEnemy();
 
 		final int mAir = airBlocks;
 		final int mWater = waterBlocks;
