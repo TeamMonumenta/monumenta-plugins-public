@@ -205,7 +205,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 				loc.setX(-1392);
 				loc.setY(0);
 				loc.setZ(-1392);
-				StructuresAPI.loadAndPasteStructure("plots/borders/" + cmd, loc, false).whenComplete((unused, ex) -> {
+				StructuresAPI.loadAndPasteStructure("plots/borders/" + cmd, loc, false, true).whenComplete((unused, ex) -> {
 					if (ex != null) {
 						player.sendMessage("Plot border completed with error: " + ex.getMessage());
 						ex.printStackTrace();

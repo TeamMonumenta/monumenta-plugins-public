@@ -78,7 +78,6 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 
 	private final List<Instance> mActiveInstances = new ArrayList<>();
 
-	@SuppressWarnings("unused") // ErrorProne is prone to errors itself it seems
 	private record Instance(Location mLocation, int mEndTick, PlayerItemStats mStats, ScorchedEarthCS mCosmetic) {
 	}
 

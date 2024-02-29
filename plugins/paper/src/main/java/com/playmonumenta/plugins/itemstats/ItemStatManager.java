@@ -370,7 +370,7 @@ public class ItemStatManager implements Listener {
 				});
 			}
 
-			int understanding = Math.min(delveInfusionsWithRevelation.contains(InfusionType.UNDERSTANDING) ? DelveInfusionUtils.MAX_LEVEL + 1: DelveInfusionUtils.MAX_LEVEL,
+			int understanding = Math.min(delveInfusionsWithRevelation.contains(InfusionType.UNDERSTANDING) ? DelveInfusionUtils.MAX_LEVEL + 1 : DelveInfusionUtils.MAX_LEVEL,
 				(int) (newArmorAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) + newMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat())));
 
 			for (Infusion infusion : baseInfusionsArmor) {

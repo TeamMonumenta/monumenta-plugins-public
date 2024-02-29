@@ -28,10 +28,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
 public class CleansingTotem extends TotemAbility {
-
-	private static final String HEAL_EFFECT_NAME = "CleansingTotemHealing";
-	private static final int EFFECT_DURATION = 2 * 20;
-
 	public static final Particle.DustOptions DUST_CLEANSING_RING = new Particle.DustOptions(Color.fromRGB(0, 87, 255), 1.25f);
 
 	private static final int COOLDOWN = 30 * 20;

@@ -13,7 +13,12 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -65,7 +70,6 @@ public class DeclarationDamage extends Spell {
 			int mTicks = 0;
 			double mXOne = mOrbLocation.getX();
 			double mXTwo = mOrbLocation.getX() - 5;
-			World mWorld = mOrbLocation.getWorld();
 
 			@Override
 			public void run() {

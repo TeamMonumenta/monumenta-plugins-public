@@ -30,7 +30,6 @@ public class SpellConditionalTpBehindPlayer extends Spell {
 					mCooldown = false;
 				}
 			}.runTaskLater(mPlugin, 20 * 10);
-			/* TODO: This needs to be able to load the destination chunk if needed */
 			Spell spell = new SpellTpBehindPlayer(mPlugin, mLauncher, 99999, 110, 50, 10, true);
 			spell.run();
 		}

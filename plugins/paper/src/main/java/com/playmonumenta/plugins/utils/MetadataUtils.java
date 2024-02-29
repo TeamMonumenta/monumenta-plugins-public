@@ -107,6 +107,7 @@ public class MetadataUtils {
 		return getOrSetMetadata(metadatable, key, () -> value);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> T getOrSetMetadata(Metadatable metadatable, String key, Supplier<T> valueSupplier) {
 		MetadataValue metadata = getMetadataValue(metadatable, key);
 		if (metadata != null) {

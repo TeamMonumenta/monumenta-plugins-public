@@ -56,7 +56,6 @@ public class SpellPutridPlague extends Spell {
 		final String mTag;
 		final NamedTextColor mTextColor;
 		final TextColor mDarkTextColor;
-		final TextColor mTitleColor;
 		final BossBar.Color mBarColor;
 		final String mMessage;
 
@@ -64,7 +63,6 @@ public class SpellPutridPlague extends Spell {
 			mTag = tag;
 			mTextColor = textColor;
 			mDarkTextColor = darkTextColor;
-			mTitleColor = titleColor;
 			mBarColor = barColor;
 			mMessage = message;
 		}

@@ -53,7 +53,7 @@ public class SpreadEffectOnDeath extends Effect {
 					if (source != null) {
 						JsonObject serializedSpreadEffect = this.serialize();
 						for (LivingEntity mob : mobs) {
-							Effect deserializedSpreadEffect = manager.getEffectFromJson(serializedSpreadEffect, plugin);
+							Effect deserializedSpreadEffect = EffectManager.getEffectFromJson(serializedSpreadEffect, plugin);
 							if (deserializedSpreadEffect != null) {
 								deserializedSpreadEffect.setDuration(mNewDuration);
 								manager.addEffect(mob, mSource, deserializedSpreadEffect);

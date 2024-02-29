@@ -301,7 +301,7 @@ public class SpawnerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void entityTargetEvent(EntityTargetEvent event) {
 		// Update the mob's last target whenever it targets or untargets a mob
-		if (event.getEntity() instanceof LivingEntity mob) {
+		if (event.getEntity() instanceof LivingEntity) {
 			@Nullable MobInfo mobInfo = mMobInfos.get(event.getEntity().getUniqueId());
 			if (mobInfo != null) {
 				mobInfo.mHasTarget = (event.getTarget() != null);

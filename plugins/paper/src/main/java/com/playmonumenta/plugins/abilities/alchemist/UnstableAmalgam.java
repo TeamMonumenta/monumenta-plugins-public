@@ -201,11 +201,6 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 
 				@Override
 				public void run() {
-					if (mAmalgam == null) {
-						this.cancel();
-						return;
-					}
-
 					if (!mPlayer.isOnline()) {
 						mAmalgam.remove();
 						mAmalgam = null;

@@ -20,7 +20,6 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
@@ -98,8 +97,8 @@ public class JoinGuild {
 							} else {
 								Bukkit.getScheduler().runTask(plugin, () -> {
 									// Success indicators
-									p.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + currentGuildName + "!");
-									founder.sendMessage(ChatColor.WHITE + p.getName() + ChatColor.GOLD + " has joined your guild");
+									p.sendMessage(Component.text("Congratulations! You have joined " + currentGuildName + "!", NamedTextColor.GOLD));
+									founder.sendMessage(Component.text(p.getName(), NamedTextColor.WHITE).append(Component.text(" has joined your guild", NamedTextColor.GOLD)));
 									MonumentaNetworkChatIntegration.refreshPlayer(p);
 									NmsUtils.getVersionAdapter().runConsoleCommandSilently(
 										"execute at " + p.getName()

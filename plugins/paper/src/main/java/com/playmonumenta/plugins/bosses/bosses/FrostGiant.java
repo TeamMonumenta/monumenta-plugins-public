@@ -594,7 +594,6 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		new BukkitRunnable() {
 			double mRadius = 0;
 			Location mLoc = mStartLoc.clone();
-			List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange, true);
 
 			@Override
 			public void run() {
@@ -662,7 +661,6 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 							new BukkitRunnable() {
 								double mR = 0;
 								Location mLoc = mStartLoc.clone();
-								List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange, true);
 
 								@Override
 								public void run() {

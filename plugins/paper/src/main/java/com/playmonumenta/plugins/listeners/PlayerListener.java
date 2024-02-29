@@ -40,6 +40,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -177,7 +178,7 @@ public class PlayerListener implements Listener {
 
 	private final Plugin mPlugin;
 	private @Nullable BukkitTask mContentRunnable = null;
-	private final Set<UUID> mTransferringPlayers = new HashSet();
+	private final Set<UUID> mTransferringPlayers = new HashSet<>();
 
 	public PlayerListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -800,7 +801,7 @@ public class PlayerListener implements Listener {
 		InventoryHolder holder = inventory.getHolder();
 		if (holder instanceof Chest chest) {
 			// Break Halloween creeper chests in safe zones automatically when closed
-			if (ChestUtils.isEmpty(chest) && (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest"))) {
+			if (ChestUtils.isEmpty(chest) && (chest.customName() != null && MessagingUtils.plainText(chest.customName()).contains("Creeperween Chest"))) {
 				chest.getBlock().breakNaturally();
 			}
 		}

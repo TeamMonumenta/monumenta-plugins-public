@@ -46,7 +46,6 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -127,7 +126,6 @@ public class TowerMobAbility {
 								new BukkitRunnable() {
 									int mTimer = 0;
 									final Location mLocation = mBoss.getLocation();
-									final World mWorld = mLocation.getWorld();
 
 									@Override
 									public void run() {

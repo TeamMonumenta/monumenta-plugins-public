@@ -90,7 +90,6 @@ public class DeclarationPoints extends Spell {
 	private void cleanse() {
 		new BukkitRunnable() {
 			int mTicks = 0;
-			int mLastradius = 0;
 
 			// by the end of cleanse duration radius needs to be ~= 75
 			@Override
@@ -99,7 +98,6 @@ public class DeclarationPoints extends Spell {
 				int radii = (int) (50 * (mTicks / (float) CLEANSEDURATION));
 				mConverter.restoreFullCircle(mSirius.mTuulenLocation, radii);
 				mConverter.restoreFullCircle(mSirius.mAuroraLocation, radii);
-				mLastradius = radii;
 				World world = mSirius.mBoss.getWorld();
 				world.playSound(mSirius.mAuroraLocation, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.NEUTRAL, 0.2f, 1.8f);
 				world.playSound(mSirius.mAuroraLocation, Sound.ITEM_TRIDENT_RETURN, SoundCategory.NEUTRAL, 0.4f, 0.8f);

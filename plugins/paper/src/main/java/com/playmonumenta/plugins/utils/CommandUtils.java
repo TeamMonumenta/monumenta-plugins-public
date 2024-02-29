@@ -3,7 +3,8 @@ package com.playmonumenta.plugins.utils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.regex.Pattern;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
@@ -86,7 +87,7 @@ public class CommandUtils {
 	public static void error(CommandSender sender, String msg) {
 		if ((sender instanceof Player)
 			|| ((sender instanceof ProxiedCommandSender) && (((ProxiedCommandSender)sender).getCaller() instanceof Player))) {
-			sender.sendMessage(ChatColor.RED + msg);
+			sender.sendMessage(Component.text(msg, NamedTextColor.RED));
 		} else {
 			sender.sendMessage(msg);
 		}

@@ -43,7 +43,7 @@ public class AbilityTriggersGui extends Gui {
 	}
 
 	@Override
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void setup() {
 		if (mSelectedAbility == null) {
 			// back icon

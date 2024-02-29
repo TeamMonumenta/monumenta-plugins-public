@@ -58,7 +58,6 @@ public class LeafNova extends Spell {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mFinalDuration, 20));
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
-			Location mOldLoc = mBoss.getLocation();
 			double mCurrentRadius = RADIUS;
 
 			@Override
@@ -117,7 +116,6 @@ public class LeafNova extends Spell {
 					this.cancel();
 				}
 				mTicks += 1;
-				mOldLoc = mBoss.getLocation();
 			}
 		};
 		runnable.runTaskTimer(Plugin.getInstance(), 0, 1);

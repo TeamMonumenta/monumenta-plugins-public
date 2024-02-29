@@ -99,7 +99,6 @@ public class ShardSorterCommand {
 				return;
 			}
 			possibleShards = sortShardNames(possibleShards, shard);
-			Calendar now = Calendar.getInstance();
 			long minute = DateUtils.getSecondsSinceEpoch() / 60L;
 			int index = (int) (minute % shardCount);
 			String targetShard = possibleShards.get(index);

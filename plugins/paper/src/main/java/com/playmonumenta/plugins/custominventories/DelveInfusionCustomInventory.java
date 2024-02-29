@@ -74,6 +74,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final List<ItemStack> mInvalidItems;
 	private static final ItemStack mRefundItem;
+	@SuppressWarnings("unused") // We'll want to turn this back on at some point later.
 	private static final ItemStack mFullRefundItem;
 	private static final ItemStack mMaxLevelReachedItem;
 	private static final ItemStack mMaxLevelReachedRevelationItem;

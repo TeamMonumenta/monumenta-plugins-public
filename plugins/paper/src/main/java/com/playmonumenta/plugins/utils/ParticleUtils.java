@@ -138,7 +138,6 @@ public class ParticleUtils {
 		new BukkitRunnable() {
 			double mCurrentRadius = Math.PI / 4;
 			final Location mLoc = entity.getLocation();
-			final World mWorld = mLoc.getWorld();
 			final Vector mDirection = dir.setY(0).normalize();
 
 			@Override

@@ -482,12 +482,6 @@ public class BossManager implements Listener {
 			if (entity.getHealth() <= 0) {
 				unload(boss, false);
 				mBosses.remove(entity.getUniqueId());
-
-				/*
-				 * Remove special serialization data from drops. Should not be
-				 * necessary since loaded bosses already have this data stripped
-				 */
-				SerializationUtils.stripSerializationDataFromDrops(event);
 			}
 		}
 	}

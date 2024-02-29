@@ -76,8 +76,6 @@ public abstract class Ability {
 		return mCustomTriggers;
 	}
 
-	// TODO useless?
-
 	/**
 	 * Checks if the player still has this ability.
 	 */

@@ -5,12 +5,14 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.ChestLockBoss;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -30,17 +32,17 @@ public class Astral {
 
 	private static final NamespacedKey CHEST_CHECKED_PERSISTENT_DATA_KEY = NamespacedKeyUtils.fromString("epic:astral_checked");
 
-	private static final List<String> POSSIBLE_DESCRIPTIONS = Arrays.asList(
-		"Po" + ChatColor.MAGIC + "tesn" + ChatColor.RESET + "e co" + ChatColor.MAGIC + "nsp" + ChatColor.RESET + "icere ira" + ChatColor.MAGIC + "m c" + ChatColor.RESET + "aeli?",
-		"Perc" + ChatColor.MAGIC + "ipi" + ChatColor.RESET + "sne co" + ChatColor.MAGIC + "nple" + ChatColor.RESET + "xu" + ChatColor.MAGIC + "m as" + ChatColor.RESET + "trorum?",
-		"Astra " + ChatColor.MAGIC + "consumu" + ChatColor.RESET + "nt omni" + ChatColor.MAGIC + "a",
-		"Pe" + ChatColor.MAGIC + "r as" + ChatColor.RESET + "pera " + ChatColor.MAGIC + "ad a" + ChatColor.RESET + "stra"
+	private static final List<Component> POSSIBLE_DESCRIPTIONS = Arrays.asList(
+		Component.text("Po").append(Component.text("tesn").decorate(TextDecoration.OBFUSCATED)).append(Component.text("e co")).append(Component.text("nsp").decorate(TextDecoration.OBFUSCATED)).append(Component.text("icere ira")).append(Component.text("m c").decorate(TextDecoration.OBFUSCATED)).append(Component.text("aeli?")),
+		Component.text("Perc").append(Component.text("ipi").decorate(TextDecoration.OBFUSCATED)).append(Component.text("sne co")).append(Component.text("nple").decorate(TextDecoration.OBFUSCATED)).append(Component.text("xu")).append(Component.text("m as").decorate(TextDecoration.OBFUSCATED)).append(Component.text("trorum?")),
+		Component.text("Astra ").append(Component.text("consumu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("nt omni")).append(Component.text("a").decorate(TextDecoration.OBFUSCATED)),
+		Component.text("Pe").append(Component.text("r as").decorate(TextDecoration.OBFUSCATED)).append(Component.text("pera ")).append(Component.text("ad a").decorate(TextDecoration.OBFUSCATED)).append(Component.text("stra"))
 	);
 
 
 	public static String[] rankDescription(int level) {
 		return new String[]{
-			POSSIBLE_DESCRIPTIONS.get(FastUtils.RANDOM.nextInt(POSSIBLE_DESCRIPTIONS.size()))
+			MessagingUtils.legacyFromComponent(POSSIBLE_DESCRIPTIONS.get(FastUtils.RANDOM.nextInt(POSSIBLE_DESCRIPTIONS.size())))
 		};
 	}
 

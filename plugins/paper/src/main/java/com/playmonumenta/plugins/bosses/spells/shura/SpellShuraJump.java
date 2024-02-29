@@ -46,7 +46,6 @@ public class SpellShuraJump extends Spell {
 	public void run() {
 
 		BukkitRunnable a = new BukkitRunnable() {
-			int mT = 0;
 			final List<Player> mTargeted = new ArrayList<>();
 
 			@Override
@@ -58,7 +57,6 @@ public class SpellShuraJump extends Spell {
 					mTrigger = false;
 					jump(players.get(0));
 					mTargeted.add(players.get(0));
-					mT++;
 				}
 				if (players.size() == 0) {
 					this.cancel();

@@ -18,7 +18,13 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -78,7 +84,7 @@ public class DeclarationAurora extends Spell {
 					if (entity.isDead()) {
 						LivingEntity livingEntity = ((LivingEntity) entity).getKiller();
 						if (livingEntity != null) {
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(livingEntity, mSirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(livingEntity, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));
 						}
 						mKilled++;
 						mDead.add(entity);

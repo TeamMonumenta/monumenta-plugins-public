@@ -72,9 +72,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 			if (data.has("potions")) {
 				try {
 					mPlugin.mPotionManager.loadFromJsonObject(player, data.get("potions").getAsJsonObject());
-
-					/* TODO LEVEL */
-					mLogger.info("Loaded potion data for player " + player.getName());
+					mLogger.fine("Loaded potion data for player " + player.getName());
 				} catch (Exception ex) {
 					mLogger.severe("Failed to load potion data for player " + player.getName() + ":" + ex.getMessage());
 					ex.printStackTrace();
@@ -84,9 +82,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 			if (data.has("effects")) {
 				try {
 					mPlugin.mEffectManager.loadFromJsonObject(player, data.get("effects").getAsJsonObject(), mPlugin);
-
-					/* TODO LEVEL */
-					mLogger.info("Loaded effects data for player " + player.getName());
+					mLogger.fine("Loaded effects data for player " + player.getName());
 				} catch (Exception ex) {
 					mLogger.severe("Failed to load effects data for player " + player.getName() + ":" + ex.getMessage());
 					ex.printStackTrace();

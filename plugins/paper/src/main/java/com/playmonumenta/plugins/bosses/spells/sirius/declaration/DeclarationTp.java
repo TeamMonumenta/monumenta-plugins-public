@@ -9,14 +9,25 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DisplayEntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -176,7 +187,7 @@ public class DeclarationTp extends Spell {
 					}
 					//make sure everyone is tagged with participation if they tried also
 					for (Player p : PlayerUtils.playersInRange(mMidPoint, RADIUS + 3, true, true)) {
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, mSirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));
 					}
 					if (passers >= pList.size() / 2.0 + 0.5) {
 						mSirius.changeHp(true, 1);
