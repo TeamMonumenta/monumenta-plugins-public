@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -614,7 +615,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 		if (event.getEvent().getEntity() instanceof Player player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			if (player.isBlocking()) {
 				// set shield cooldown if boss hits player
-				player.setCooldown(Material.SHIELD, 20 * 6);
+				NmsUtils.getVersionAdapter().stunShield(player, 20 * 6);
 			}
 		}
 	}
