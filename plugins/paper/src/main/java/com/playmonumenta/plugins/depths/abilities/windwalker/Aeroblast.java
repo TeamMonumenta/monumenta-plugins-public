@@ -38,7 +38,7 @@ import org.bukkit.util.Vector;
 public class Aeroblast extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Aeroblast";
-	public static final double[] DAMAGE = {6, 7, 8, 9, 10, 12};
+	public static final double[] DAMAGE = {10, 12, 14, 16, 18, 22};
 	public static final int COOLDOWN = 6 * 20;
 	private static final int DURATION = 3 * 20;
 	private static final double SPEED_AMPLIFIER = 0.2;
@@ -88,9 +88,6 @@ public class Aeroblast extends DepthsAbility {
 		world.playSound(slightOffsetLoc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1.25f, 0.5f);
 		world.playSound(slightOffsetLoc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.25f, 0.7f);
 
-		Vector velocity = mPlayer.getLocation().getDirection().multiply(-0.75);
-		mPlayer.setVelocity(velocity.setY(Math.max(0.1, velocity.getY())));
-
 		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, mSize / 2, false).accuracy(0.5).getHitMobs()) {
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
 			if (!EntityUtils.isBoss(mob) && !ScoreboardUtils.checkTag(mob, "callicarpa_flower") && !ScoreboardUtils.checkTag(mob, "hoglin_menace") && mob.hasAI()) {
@@ -108,7 +105,7 @@ public class Aeroblast extends DepthsAbility {
 
 						BoundingBox offsetBox = mob.getBoundingBox().clone();
 						offsetBox.shift(mPlayer.getEyeLocation().getDirection().getX(), 0.15, mPlayer.getEyeLocation().getDirection().getZ());
-						offsetBox.expand(-0.2, -0.4, -0.2);
+						offsetBox.expand(-0.05, -0.4, -0.05);
 
 						if (LocationUtils.collidesWithBlocks(offsetBox, mob.getWorld())) {
 							// handle collision
@@ -156,7 +153,7 @@ public class Aeroblast extends DepthsAbility {
 	}
 
 	private void explode(LivingEntity mob, World world) {
-		DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage * 1.5, mInfo.getLinkedSpell(), true);
+		DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 		new PartialParticle(Particle.CRIT, mob.getLocation().add(0, 1, 0), 100, 0.1, 0.1, 0.1, 1.25).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_LARGE, mob.getLocation().add(0, 1, 0), 1, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
 		world.playSound(mob.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 2f, 1.5f);
@@ -172,9 +169,9 @@ public class Aeroblast extends DepthsAbility {
 			.add(" magic damage to all mobs up to ")
 			.add(a -> a.mSize, SIZE)
 			.add(" blocks away, and knocking back all non-boss enemies. Deal an additional ")
-			.addDepthsDamage(a -> a.mDamage * 1.5, DAMAGE[rarity - 1] * 1.5, true)
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1] * 1.5, true)
 			.add(" magic damage if enemies hit by this ability collide with a wall within 0.75 seconds. " +
-				"Additionally, casting this ability slightly knocks you backwards and grants you ")
+				"Additionally, casting this ability grants you ")
 			.addPercent(a -> a.mSpeed, SPEED_AMPLIFIER)
 			.add(" speed for ")
 			.addDuration(a -> a.mDuration, DURATION)
