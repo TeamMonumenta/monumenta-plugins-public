@@ -86,7 +86,9 @@ public class Reverb implements Enchantment {
 				}
 
 				final Location enemyLocation = enemy.getEyeLocation().clone();
-				LivingEntity hitMob = EntityUtils.getNearestHostile(enemyLocation, CharmManager.getRadius(player, CHARM_RADIUS, DETECTION_RADIUS));
+				LivingEntity hitMob = EntityUtils.getNearestHostileTargetable(enemyLocation, CharmManager.getRadius(player, CHARM_RADIUS, DETECTION_RADIUS));
+
+
 				if (hitMob == null) {
 					return;
 				}

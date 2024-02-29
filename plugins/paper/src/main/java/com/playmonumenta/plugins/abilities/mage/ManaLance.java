@@ -51,7 +51,7 @@ public class ManaLance extends MultipleChargeAbility {
 				String.format("The beam instead deals %s damage. Cooldown: %ss.",
 					(int) DAMAGE_2,
 					COOLDOWN_2 / 20),
-				"Mana lance now has two charges.")
+				"Mana Lance now has two charges.")
 			.simpleDescription("Shoot a beam that damages mobs in its path.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ManaLance::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),

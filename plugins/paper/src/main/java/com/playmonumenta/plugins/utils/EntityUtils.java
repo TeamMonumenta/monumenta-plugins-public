@@ -764,10 +764,10 @@ public class EntityUtils {
 		return 1;
 	}
 
-	public static @Nullable LivingEntity getNearestHostile(Location loc, double range) {
+	public static @Nullable LivingEntity getNearestHostileTargetable(Location loc, double range) {
 		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
 			       .stream()
-			       .filter(e -> e.isValid() && isHostileMob(e))
+			       .filter(e -> e.isValid() && isHostileMob(e) && !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))
 			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
 			       .orElse(null);
 	}

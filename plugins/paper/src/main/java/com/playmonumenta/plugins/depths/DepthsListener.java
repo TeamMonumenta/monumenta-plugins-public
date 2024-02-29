@@ -570,7 +570,7 @@ public class DepthsListener implements Listener {
 
 			MMLog.finer("Player " + player.getName() +
 				" nearZenithBoss=" + nearZenithBoss +
-				" nearHostileMob=" + (EntityUtils.getNearestHostile(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null)
+				" nearHostileMob=" + (EntityUtils.getNearestHostileTargetable(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null)
 			);
 
 			if (nearZenithBoss) {

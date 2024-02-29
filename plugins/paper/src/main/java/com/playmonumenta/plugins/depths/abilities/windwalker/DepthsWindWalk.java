@@ -153,7 +153,7 @@ public class DepthsWindWalk extends DepthsAbility {
 
 	private static Description<DepthsWindWalk> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<DepthsWindWalk>(color)
-			.add("Right click while sneaking to dash in the target direction, applying ")
+			.add("Right click to dash in the target direction, applying ")
 			.addPercent(a -> a.mVuln, VULNERABILITY[rarity - 1], false, true)
 			.add(" vulnerability for ")
 			.addDuration(a -> a.mDuration, VULN_DURATION)
