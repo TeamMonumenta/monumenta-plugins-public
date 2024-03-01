@@ -82,7 +82,7 @@ public abstract class RoomRepository {
 	 * @param roomType the type of the room to select from
 	 * @return the room information for the selected room
 	 */
-	public DepthsRoom summonRoom(Location spawnPoint, DepthsRoomType roomType, DepthsParty party) {
+	public @Nullable DepthsRoom summonRoom(Location spawnPoint, DepthsRoomType roomType, DepthsParty party) {
 		//Get a valid room from the options available to the party
 		DepthsRoom room = null;
 
@@ -90,11 +90,11 @@ public abstract class RoomRepository {
 		// Exception case- ascension 10+ and players must still remove abilities
 		if (party.getRoomNumber() % 10 == 9 && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ABILITY_PURGE && !party.isAscensionPurgeMet()) {
 			if(this.mRoomCleanseSpawned) {
-				// TODO: Find a better way to terminate room spawn
-				throw new IllegalStateException("Each player must remove an ability before moving on!");
+				// Already spawned a washroom but is not yet cleansed, abort
+				party.sendMessage("Each player must remove an ability before moving on!");
+				return null;
 			}
 
-			// Rain: Why are we doing this wrap-around thing here?
 			if (floor % 3 == 1) {
 				room = mF1RemoveRoom;
 			}
@@ -114,7 +114,9 @@ public abstract class RoomRepository {
 			room = getValidRoom(roomType, party, spawnPoint.getY());
 		}
 		if (room == null) {
-			throw new IllegalStateException("No valid room found to spawn!");
+			party.sendMessage("No valid room found to spawn!");
+			return null;
+			// throw new IllegalStateException("No valid room found to spawn!");
 		}
 		room.mRoomType = roomType;
 		//Gets the point in the world to load it and physically summons it

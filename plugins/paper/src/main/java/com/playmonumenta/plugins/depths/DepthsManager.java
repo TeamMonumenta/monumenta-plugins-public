@@ -106,6 +106,7 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.WindsweptCombos;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoom;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.rooms.RoomRepository;
@@ -1149,7 +1150,15 @@ public class DepthsManager {
 
 		// Summon the new room and give it to the party
 		Location l = new Location(world, roomSpawnerLocation.getX(), roomSpawnerLocation.getY(), roomSpawnerLocation.getZ());
-		party.setNewRoom(mRoomRepository.summonRoom(l, roomType, party), wildcard);
+
+		DepthsRoom room = mRoomRepository.summonRoom(l, roomType, party);
+
+		if (room == null) {
+			// found no room or should not spawn one, exiting early
+			return;
+		}
+
+		party.setNewRoom(room, wildcard);
 	}
 
 	private DepthsRoomType getWildcardRoomType() {
