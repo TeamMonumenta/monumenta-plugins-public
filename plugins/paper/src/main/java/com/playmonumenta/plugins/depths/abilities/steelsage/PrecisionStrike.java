@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -11,6 +12,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.PrecisionStrikeDamage;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
@@ -24,13 +26,14 @@ import org.jetbrains.annotations.Nullable;
 public class PrecisionStrike extends DepthsAbility implements AbilityWithChargesOrStacks {
 
 	public static final String ABILITY_NAME = "Precision Strike";
-	public static final double[] DAMAGE = {3.5, 4.0, 4.5, 5, 5.5, 7};
+	public static final double[] DAMAGE = {5, 6, 7, 8, 9, 11};
 	public static final double DISTANCE = 6;
 	public static final int MAX_STACKS = 3;
 	public static final String SOURCE = "PrecisionStrikeDamageEffect";
 
 	public static final DepthsAbilityInfo<PrecisionStrike> INFO =
 		new DepthsAbilityInfo<>(PrecisionStrike.class, ABILITY_NAME, PrecisionStrike::new, DepthsTree.STEELSAGE, DepthsTrigger.SPAWNER)
+			.linkedSpell(ClassAbility.PRECISION_STRIKE)
 			.displayItem(Material.IRON_TRAPDOOR)
 			.descriptions(PrecisionStrike::getDescription)
 			.singleCharm(false);
@@ -68,6 +71,7 @@ public class PrecisionStrike extends DepthsAbility implements AbilityWithCharges
 		}
 		plugin.mEffectManager.addEffect(player, SOURCE, new PrecisionStrikeDamage(72000, stacks, damage, distance * distance));
 		player.playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.6f, 0.5f * (float) Math.pow(1.5, stacks - 1));
+		ClientModHandler.updateAbility(player, ClassAbility.PRECISION_STRIKE);
 	}
 
 	@Override
@@ -78,8 +82,14 @@ public class PrecisionStrike extends DepthsAbility implements AbilityWithCharges
 		Block block = event.getBlock();
 		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
 			onSpawnerBreak(mPlugin, mPlayer, mMaxStacks, mDamage, mDistance);
+			showChargesMessage();
 		}
 		return true;
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		ClientModHandler.updateAbility(mPlayer, ClassAbility.PRECISION_STRIKE);
 	}
 
 	@Override

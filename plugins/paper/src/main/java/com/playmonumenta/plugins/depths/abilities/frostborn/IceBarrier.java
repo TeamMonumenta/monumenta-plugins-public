@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
@@ -121,7 +122,7 @@ public class IceBarrier extends DepthsAbility {
 					}
 				}
 
-			}.runTaskLater(mPlugin, CAST_TIME);
+			}.runTaskLater(mPlugin, Math.min(CAST_TIME, getModifiedCooldown()));
 		} else {
 			//Build the wall
 			mIsPrimed = false;
@@ -152,11 +153,12 @@ public class IceBarrier extends DepthsAbility {
 
 			List<LivingEntity> hitMobs = new ArrayList<>();
 			for (Block b : blocksToIce) {
+				Location blockLocation = BlockUtils.getCenterBlockLocation(b);
 				DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), mIceDuration, mPlayer, Boolean.TRUE);
-				new PartialParticle(Particle.CRIT, b.getLocation(), 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.CRIT_MAGIC, b.getLocation(), 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT, blockLocation, 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT_MAGIC, blockLocation, 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(b.getLocation(), 2, 2, 2)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(blockLocation, 2, 2, 2)) {
 					if (!hitMobs.contains(mob)) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 						hitMobs.add(mob);
