@@ -269,15 +269,15 @@ public abstract class ExperiencinatorUtils {
 				if (givenTexts.size() == 1) { // 1: nothing to do
 					message = givenTexts.get(0);
 				} else if (givenTexts.size() == 2) { // 2: join with " and "
-					message = givenTexts.get(0).append(Component.text(" and ").append(givenTexts.get(1)));
+					message = givenTexts.get(0).append(Component.text(" and ", NamedTextColor.AQUA).append(givenTexts.get(1)));
 				} else { // 3 or more: join with ", ", and the last one with ", and "
 					message = givenTexts.get(0);
 					for (Component addmsg : givenTexts.subList(1, givenTexts.size() - 1)) {
-						message = message.append(Component.text(", ").append(addmsg));
+						message = message.append(Component.text(", ", NamedTextColor.AQUA).append(addmsg));
 					}
-					message = message.append(Component.text(", and ").append(givenTexts.get(givenTexts.size() - 1)));
+					message = message.append(Component.text(", and ", NamedTextColor.AQUA).append(givenTexts.get(givenTexts.size() - 1)));
 				}
-				Component finalMessage = Component.text("Given " + message + "!", NamedTextColor.AQUA);
+				Component finalMessage = Component.text("Given ", NamedTextColor.AQUA).append(message).append(Component.text("!", NamedTextColor.AQUA));
 				if (itemNames != null && !itemNames.isEmpty()) {
 					Component hover = Component.empty();
 					for (int i = 0; i < itemNames.size(); i++) {
