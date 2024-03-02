@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildOrder;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -52,6 +53,7 @@ public class TeleportGuildGui extends Gui {
 	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.teleportgui");
+		String permsOther = "monumenta.command.guild.teleportgui.other";
 
 		new CommandAPICommand("guild")
 			.withArguments(new MultiLiteralArgument("teleportgui"))
@@ -59,6 +61,15 @@ public class TeleportGuildGui extends Gui {
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
 				List<Player> players = (List<Player>) args[args.length - 1];
+
+				if (!sender.hasPermission(permsOther)) {
+					for (Player player : players) {
+						if (!player.equals(sender)) {
+							throw CommandAPI.failWithString("You do not have permission to run this on other players.");
+						}
+					}
+				}
+
 				for (Player player : players) {
 					run(plugin, player);
 				}
