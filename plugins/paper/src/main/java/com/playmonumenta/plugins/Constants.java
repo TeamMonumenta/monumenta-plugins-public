@@ -264,6 +264,16 @@ public class Constants {
 			mValue = value;
 		}
 
+		// 0-indexed to match inventories; index 0 is hotbar slot 1
+		public static Keybind hotbar(int index) {
+			if (index < 0 || index > 8) {
+				throw new RuntimeException("Invalid hotbar keybind index " + index);
+			}
+
+			Keybind[] values = Keybind.values();
+			return values[index + HOTBAR_1.ordinal()];
+		}
+
 		@Override
 		public @NotNull String asKeybind() {
 			return mValue;

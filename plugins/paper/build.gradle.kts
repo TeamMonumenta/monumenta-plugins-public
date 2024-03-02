@@ -35,15 +35,16 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:8.7.0")
-    compileOnly("me.clip:placeholderapi:2.10.4")
+    compileOnly("me.clip:placeholderapi:2.10.9")
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
-    compileOnly("net.luckperms:api:5.3")
+    compileOnly("net.luckperms:api:5.4")
     compileOnly("net.coreprotect:coreprotect:2.15.0") {
         exclude(group = "org.bukkit")
     }
     compileOnly("com.playmonumenta:scripted-quests:7.0")
     compileOnly("com.playmonumenta:redissync:4.1")
-    compileOnly("com.playmonumenta:monumenta-network-relay:1.0")
+    compileOnly("com.playmonumenta:monumenta-network-chat:2.7.4")
+    compileOnly("com.playmonumenta:monumenta-network-relay:1.1")
     compileOnly("com.playmonumenta:structures:10.0")
     compileOnly("com.playmonumenta:worlds:2.0")
     compileOnly("com.playmonumenta:libraryofsouls:4.2")
@@ -89,6 +90,7 @@ bukkit {
         "NBTEditor",
         "LibraryOfSouls",
         "BKCommonLib",
+        "MonumentaNetworkChat",
         "MonumentaNetworkRelay",
         "PremiumVanish",
         "ProtocolLib",

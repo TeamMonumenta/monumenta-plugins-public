@@ -32,11 +32,13 @@ import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
@@ -503,6 +505,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
 		manager.registerEvents(new TorchListener(), this);
 		manager.registerEvents(mPzeroManager, this);
+		manager.registerEvents(new Lockdown(), this);
 		manager.registerEvents(new IchorListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
@@ -615,6 +618,11 @@ public class Plugin extends JavaPlugin {
 		if (Bukkit.getPluginManager().isPluginEnabled("LibraryOfSouls")) {
 			BossTagCommand.register();
 			LibraryOfSoulsIntegration.enable(this.getLogger());
+		}
+
+		// Enable Monumenta Network Chat integration
+		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaNetworkChat")) {
+			MonumentaNetworkChatIntegration.onEnable(this.getLogger());
 		}
 
 		// Provide placeholder API replacements if it is present

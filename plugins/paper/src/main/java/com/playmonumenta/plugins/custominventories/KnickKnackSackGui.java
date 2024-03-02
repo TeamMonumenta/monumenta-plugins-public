@@ -11,13 +11,17 @@ import com.playmonumenta.plugins.cosmetics.skills.warlock.AvalanchexCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -35,6 +39,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class KnickKnackSackGui extends Gui {
 	private static final int INV_SIZE = 36;
@@ -212,6 +217,7 @@ public class KnickKnackSackGui extends Gui {
 		int delveSlot = 22;     // Delves Trinket
 		int depthsTalismanSlot = 23;    // Depths Talisman
 		int zenithTalismanSlot = 24;    // Zenith Trinket
+		int guildSlot = 25;     // Guild GUI
 
 		// Information sign
 		ItemStack info = GUIUtils.createBasicItem(Material.OAK_SIGN, "Trinkets", NamedTextColor.WHITE, true);
@@ -424,6 +430,25 @@ public class KnickKnackSackGui extends Gui {
 			ItemStack zTaliBase = GUIUtils.createBasicItem(Material.BARRIER, "Zenith Talismans", Location.ZENITH.getColor(), true, "Find the Celestial Zenith lobby to unlock!", NamedTextColor.YELLOW);
 			setItem(zenithTalismanSlot, zTaliBase);
 		}
+
+		// Guild GUI
+		ItemStack guildBase = LuckPermsIntegration.getNonNullGuildBanner(mPlayer);
+		ItemMeta meta = guildBase.getItemMeta();
+		meta.displayName(Component.text("Guild GUI", NamedTextColor.GOLD, TextDecoration.BOLD)
+			.decoration(TextDecoration.ITALIC, false));
+		meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+		List<Component> lore = meta.lore();
+		if (lore == null) {
+			lore = new ArrayList<>();
+		} else {
+			lore = new ArrayList<>(lore);
+		}
+		lore.add(0, Component.text("View Monumenta's guilds"));
+		meta.lore(lore);
+		guildBase.setItemMeta(meta);
+		GuiItem guildItem = new GuiItem(guildBase)
+			.onLeftClick(() -> GuildGui.showDefaultView(mPlugin, mPlayer));
+		setItem(guildSlot, guildItem);
 	}
 
 	private void setupTalismansPage(boolean refund, boolean celestialZenith) {

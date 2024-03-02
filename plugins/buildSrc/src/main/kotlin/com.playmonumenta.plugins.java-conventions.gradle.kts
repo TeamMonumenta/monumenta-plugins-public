@@ -57,6 +57,10 @@ repositories {
     }
 
     maven {
+        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-chat/master/mvn-repo/")
+    }
+
+    maven {
         url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-relay/master/mvn-repo/")
     }
 

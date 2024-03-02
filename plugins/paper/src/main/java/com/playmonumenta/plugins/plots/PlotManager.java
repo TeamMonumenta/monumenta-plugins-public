@@ -60,7 +60,7 @@ public class PlotManager {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
 								player.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
-								ex.printStackTrace();
+								MessagingUtils.sendStackTrace(player, ex);
 							} else {
 								plotAccessInfo(player, info);
 							}
@@ -77,7 +77,7 @@ public class PlotManager {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + name + " : " + ex.getMessage());
 								sender.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
-								ex.printStackTrace();
+								MessagingUtils.sendStackTrace(sender, ex);
 							} else {
 								sender.sendMessage(Component.text("Displaying info for player ", NamedTextColor.GOLD).append(Component.text(name, NamedTextColor.AQUA)));
 								plotAccessInfo(sender, info);
@@ -153,7 +153,7 @@ public class PlotManager {
 						} catch (Exception ex) {
 							sender.sendMessage(Component.text("Failed to send player to plot '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
 							sender.sendMessage(Component.text("Failed to send you to plot, please report this: " + ex.getMessage(), NamedTextColor.RED));
-							ex.printStackTrace();
+							MessagingUtils.sendStackTrace(sender, ex);
 						}
 					}
 				}))
@@ -169,7 +169,7 @@ public class PlotManager {
 						} catch (Exception ex) {
 							sender.sendMessage(Component.text("Failed to send player to plot '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
 							sender.sendMessage(Component.text("Failed to send you to plot, please report this: " + ex.getMessage(), NamedTextColor.RED));
-							ex.printStackTrace();
+							MessagingUtils.sendStackTrace(sender, ex);
 						}
 					}
 				}))
@@ -179,11 +179,11 @@ public class PlotManager {
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
-						getPlotInfo(player.getUniqueId()).thenCompose((info) -> info.populateNamesAndHeads()).whenComplete((info, ex) -> {
+						getPlotInfo(player.getUniqueId()).thenCompose(PlotInfo::populateNamesAndHeads).whenComplete((info, ex) -> {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
 								sender.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
-								ex.printStackTrace();
+								MessagingUtils.sendStackTrace(sender, ex);
 							} else {
 								new PlotAccessCustomInventory(player, info).openInventory(player, Plugin.getInstance());
 							}
@@ -225,24 +225,22 @@ public class PlotManager {
 								sender.sendMessage(Component.text("Can't create new plot for player that has nonzero Plot score", NamedTextColor.RED));
 								player.sendMessage(Component.text("Can't create new plot for you because you have a nonzero Plot score. This is a bug, please report it.", NamedTextColor.RED));
 							} else {
-								RBoardAPI.add("$Plot", "Plot", 1).whenComplete((newInstance, ex) -> {
-									Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-										if (ex != null) {
-											sender.sendMessage(Component.text("Failed to get new plot score: " + ex.getMessage(), NamedTextColor.RED));
-											player.sendMessage(Component.text("Failed to get new plot score, please report this: " + ex.getMessage(), NamedTextColor.RED));
-											ex.printStackTrace();
-										} else {
-											ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.OWN_PLOT, newInstance.intValue());
-											ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, newInstance.intValue());
-											sendPlayerToPlot(player);
-										}
-									});
-								});
+								RBoardAPI.add("$Plot", "Plot", 1).whenComplete((newInstance, ex) -> Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+									if (ex != null) {
+										sender.sendMessage(Component.text("Failed to get new plot score: " + ex.getMessage(), NamedTextColor.RED));
+										player.sendMessage(Component.text("Failed to get new plot score, please report this: " + ex.getMessage(), NamedTextColor.RED));
+										MessagingUtils.sendStackTrace(player, ex);
+									} else {
+										ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.OWN_PLOT, newInstance.intValue());
+										ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, newInstance.intValue());
+										sendPlayerToPlot(player);
+									}
+								}));
 							}
 						} catch (Exception ex) {
 							sender.sendMessage(Component.text("Failed to create new plot for player '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
 							sender.sendMessage(Component.text("Failed to create new plot, please report this: " + ex.getMessage(), NamedTextColor.RED));
-							ex.printStackTrace();
+							MessagingUtils.sendStackTrace(sender, ex);
 						}
 					}
 				}))
@@ -263,7 +261,7 @@ public class PlotManager {
 								if (ex != null) {
 									Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
 									player.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
-									ex.printStackTrace();
+									MessagingUtils.sendStackTrace(player, ex);
 								} else {
 									for (UUID otherUUID : info.mOtherAccessToOwnerPlot.keySet()) {
 										plotAccessRemove(player, player.getUniqueId(), otherUUID);
@@ -300,7 +298,7 @@ public class PlotManager {
 	private static void plotAccessInfo(CommandSender sender, PlotInfo info) {
 		sender.sendMessage(Component.text("Your plot number is: ", NamedTextColor.GREEN).append(Component.text("#" + info.mOwnedPlotId, NamedTextColor.GOLD)));
 		sender.sendMessage(Component.text("Your currently selected plot is: ", NamedTextColor.GREEN).append(Component.text("#" + info.mCurrentPlotId, NamedTextColor.GOLD)));
-		if (info.mOtherAccessToOwnerPlot.size() == 0) {
+		if (info.mOtherAccessToOwnerPlot.isEmpty()) {
 			sender.sendMessage(Component.text("There are no players with access to your plot", NamedTextColor.GREEN));
 		} else {
 			sender.sendMessage(Component.text("These players have access to your plot:", NamedTextColor.GREEN));
@@ -317,7 +315,7 @@ public class PlotManager {
 			});
 		}
 
-		if (info.mOwnerAccessToOtherPlots.size() == 0) {
+		if (info.mOwnerAccessToOtherPlots.isEmpty()) {
 			sender.sendMessage(Component.text("You don't have access to any other player's plot", NamedTextColor.GREEN));
 		} else {
 			sender.sendMessage(Component.text("You have access to these other plots:", NamedTextColor.GREEN));
@@ -392,35 +390,33 @@ public class PlotManager {
 
 		CompletableFuture<Boolean> futureOwn = RemoteDataAPI.set(ownerUUID, "myplotaccess|" + otherUUID, Long.toString(expiration));
 		CompletableFuture<Boolean> futureOther = RemoteDataAPI.set(otherUUID, "otherplotaccess|" + ownerUUID, plot + "," + expiration);
-		futureOwn.thenAccept(successOwn -> {
-			futureOther.thenAccept(successOther -> {
+		futureOwn.thenAccept(successOwn -> futureOther.thenAccept(successOther -> {
 
-				String ownerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
-				String otherName = MonumentaRedisSyncIntegration.cachedUuidToName(otherUUID);
-				String plotName = sender instanceof Player player && player.getUniqueId().equals(ownerUUID) ? "your plot" : "the plot of " + ownerName;
+			String ownerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
+			String otherName = MonumentaRedisSyncIntegration.cachedUuidToName(otherUUID);
+			String plotName = sender instanceof Player player && player.getUniqueId().equals(ownerUUID) ? "your plot" : "the plot of " + ownerName;
 
-				if (otherName == null) {
-					return;
-				}
+			if (otherName == null) {
+				return;
+			}
 
-				if (successOwn) {
-					sender.sendMessage(Component.text("Successfully granted ", NamedTextColor.GREEN).append(Component.text(otherName, NamedTextColor.AQUA)).append(Component.text(" access to " + plotName, NamedTextColor.GREEN)));
-				} else {
-					sender.sendMessage(Component.text("Successfully updated the duration of access of ", NamedTextColor.GREEN).append(Component.text(otherName, NamedTextColor.AQUA)).append(Component.text(" to " + plotName, NamedTextColor.GREEN)));
-				}
+			if (successOwn) {
+				sender.sendMessage(Component.text("Successfully granted ", NamedTextColor.GREEN).append(Component.text(otherName, NamedTextColor.AQUA)).append(Component.text(" access to " + plotName, NamedTextColor.GREEN)));
+			} else {
+				sender.sendMessage(Component.text("Successfully updated the duration of access of ", NamedTextColor.GREEN).append(Component.text(otherName, NamedTextColor.AQUA)).append(Component.text(" to " + plotName, NamedTextColor.GREEN)));
+			}
 
-				Player ownerPlayer = Bukkit.getPlayer(ownerUUID);
-				if (ownerPlayer != null && ownerPlayer != sender) {
-					ownerPlayer.sendMessage(Component.text(otherName, NamedTextColor.AQUA).append(Component.text(" has been granted access to your plot by a moderator.", NamedTextColor.GREEN)));
+			Player ownerPlayer = Bukkit.getPlayer(ownerUUID);
+			if (ownerPlayer != null && ownerPlayer != sender) {
+				ownerPlayer.sendMessage(Component.text(otherName, NamedTextColor.AQUA).append(Component.text(" has been granted access to your plot by a moderator.", NamedTextColor.GREEN)));
+			}
+			if (successOther && ownerName != null) {
+				Player addedPlayer = Bukkit.getPlayer(otherUUID);
+				if (addedPlayer != null) {
+					addedPlayer.sendMessage(Component.text("You now have access to ", NamedTextColor.GREEN).append(Component.text(ownerName, NamedTextColor.AQUA)).append(Component.text("'s plot", NamedTextColor.GREEN)));
 				}
-				if (successOther && ownerName != null) {
-					Player addedPlayer = Bukkit.getPlayer(otherUUID);
-					if (addedPlayer != null) {
-						addedPlayer.sendMessage(Component.text("You now have access to ", NamedTextColor.GREEN).append(Component.text(ownerName, NamedTextColor.AQUA)).append(Component.text("'s plot", NamedTextColor.GREEN)));
-					}
-				}
-			});
-		});
+			}
+		}));
 	}
 
 	/* TODO: There needs to be some security mechanism that verifies players still have access to a plot if they last visited it but it expired */
@@ -436,24 +432,22 @@ public class PlotManager {
 		CompletableFuture<Boolean> future1 = RemoteDataAPI.del(ownerUUID, "myplotaccess|" + otherUUID);
 		CompletableFuture<Boolean> future2 = RemoteDataAPI.del(otherUUID, "otherplotaccess|" + ownerUUID);
 		if (sender != null) {
-			future1.thenAccept(success1 -> {
-				future2.thenAccept(success2 -> {
-					String otherName = MonumentaRedisSyncIntegration.cachedUuidToName(otherUUID);
-					if (otherName == null) {
-						otherName = otherUUID.toString();
-					}
-					String ownerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
-					if (ownerName == null) {
-						ownerName = ownerUUID.toString();
-					}
-					String plotName = sender instanceof Player player && player.getUniqueId().equals(ownerUUID) ? "your plot" : "the plot of " + ownerName;
-					if (success1 && success2) {
-						sender.sendMessage(Component.text(otherName + " can no longer access " + plotName + ".", NamedTextColor.GREEN));
-					} else {
-						sender.sendMessage(Component.text(otherName + " did not have access to " + plotName + "!", NamedTextColor.RED));
-					}
-				});
-			});
+			future1.thenAccept(success1 -> future2.thenAccept(success2 -> {
+				String otherName = MonumentaRedisSyncIntegration.cachedUuidToName(otherUUID);
+				if (otherName == null) {
+					otherName = otherUUID.toString();
+				}
+				String ownerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
+				if (ownerName == null) {
+					ownerName = ownerUUID.toString();
+				}
+				String plotName = sender instanceof Player player && player.getUniqueId().equals(ownerUUID) ? "your plot" : "the plot of " + ownerName;
+				if (success1 && success2) {
+					sender.sendMessage(Component.text(otherName + " can no longer access " + plotName + ".", NamedTextColor.GREEN));
+				} else {
+					sender.sendMessage(Component.text(otherName + " did not have access to " + plotName + "!", NamedTextColor.RED));
+				}
+			}));
 		}
 	}
 
@@ -466,7 +460,7 @@ public class PlotManager {
 			}
 		} catch (Exception ex) {
 			player.sendMessage(Component.text("Failed to send you to playerplots, please report this: " + ex.getMessage(), NamedTextColor.RED));
-			ex.printStackTrace();
+			MessagingUtils.sendStackTrace(player, ex);
 		}
 	}
 
@@ -517,7 +511,7 @@ public class PlotManager {
 			}
 
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				/* Complete all of the profiles async */
+				/* Complete all the profiles async */
 				for (Map.Entry<UUID, OtherAccessRecord> entry : mOwnerAccessToOtherPlots.entrySet()) {
 					PlayerProfile profile = entry.getValue().mProfile;
 					if (profile != null) {
@@ -534,7 +528,7 @@ public class PlotManager {
 						SkullMeta meta = (SkullMeta) head.getItemMeta();
 						meta.setPlayerProfile(rec.mProfile);
 						meta.displayName(Component.text(rec.mName + "'s Plot", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
-						List<Component> lore = new ArrayList<Component>();
+						List<Component> lore = new ArrayList<>();
 						lore.add(Component.text("Access expires in:", NamedTextColor.GRAY)
 								.decoration(TextDecoration.ITALIC, false));
 						String timeLeft = (rec.mExpiration == -1) ? "Unlimited" : MessagingUtils.getTimeDifferencePretty(rec.mExpiration);
@@ -625,13 +619,9 @@ public class PlotManager {
 				PlotInfo info = new PlotInfo(ownerUUID, finalPlot, finalCurrentPlot, otherAccessToOwnerPlot, ownerAccessToOtherPlots);
 
 				/* Complete future on main thread for easy use of .whenCompleted() */
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-					future.complete(info);
-				});
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> future.complete(info));
 			} catch (Exception ex) {
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-					future.completeExceptionally(ex);
-				});
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> future.completeExceptionally(ex));
 			}
 		});
 

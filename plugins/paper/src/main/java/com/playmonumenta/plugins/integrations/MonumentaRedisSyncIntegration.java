@@ -9,10 +9,15 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.redissync.LeaderboardAPI;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,6 +34,14 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	private static final String IDENTIFIER = "Monumenta";
 
 	private static boolean mEnabled = false;
+
+	public static final ArgumentSuggestions ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((unused)
+		-> {
+		if (!mEnabled) {
+			return new String[0];
+		}
+		return MonumentaRedisSyncAPI.getAllCachedPlayerNames().toArray(new String[0]);
+	});
 
 	private final Plugin mPlugin;
 	private final Logger mLogger;
@@ -160,6 +173,15 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		} else {
 			return null;
 		}
+	}
+
+	public static CompletableFuture<Map<String, Integer>> getLeaderboard(String objective, long start, long stop, boolean ascending) {
+		if (!mEnabled) {
+			CompletableFuture<Map<String, Integer>> result = new CompletableFuture<>();
+			result.complete(new HashMap<>());
+			return result;
+		}
+		return LeaderboardAPI.get(objective, start, stop, ascending);
 	}
 
 }

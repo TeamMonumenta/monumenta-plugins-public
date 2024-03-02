@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.luckperms.api.model.group.Group;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -572,7 +574,7 @@ public class ShopManager implements Listener {
 		boolean isGuildShop = Math.abs(maxX - minX) >= GUILD_SHOP_WIDTH;
 		final String guildName;
 		if (isGuildShop) {
-			guildName = LuckPermsIntegration.getGuildName(LuckPermsIntegration.getGuild(player));
+			guildName = LuckPermsIntegration.getUnlockedGuildName(LuckPermsIntegration.getGuild(player));
 			if (guildName == null) {
 				throw CommandAPI.failWithString("You must be in a guild to purchase a guild shop");
 			}
@@ -659,7 +661,7 @@ public class ShopManager implements Listener {
 		});
 	}
 
-	private static void setLockable(Entity shopEntity, @Nullable Player player, boolean lockable) throws WrapperCommandSyntaxException {
+	public static void setLockable(Entity shopEntity, @Nullable Player player, boolean lockable) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
 			throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 		}
@@ -679,7 +681,7 @@ public class ShopManager implements Listener {
 		shop.particles();
 	}
 
-	private static void shopLock(Entity shopEntity, @Nullable Player player, boolean fullLock) throws WrapperCommandSyntaxException {
+	public static void shopLock(Entity shopEntity, @Nullable Player player, boolean fullLock) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
 			throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 		}
@@ -841,9 +843,20 @@ public class ShopManager implements Listener {
 
 		/* This command was initiated by a player interacting with the NPC - check permissions */
 		if (shop.isGuildShop()) {
-			String guildName = LuckPermsIntegration.getGuildName(LuckPermsIntegration.getGuild(player));
-			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName) || ScoreboardUtils.getScoreboardValue(player, "Founder").orElse(0) != 1) {
-				String msg = "You must be a *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
+			Group guild = LuckPermsIntegration.getGuild(player);
+			if (guild == null) {
+				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
+				player.sendMessage(Component.text(msg, NamedTextColor.RED));
+				throw CommandAPI.failWithString(msg);
+			}
+			String guildName = LuckPermsIntegration.getUnlockedGuildName(guild);
+			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName)) {
+				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
+				player.sendMessage(Component.text(msg, NamedTextColor.RED));
+				throw CommandAPI.failWithString(msg);
+			}
+			if (GuildAccessLevel.byGroup(guild).compareTo(GuildAccessLevel.MANAGER) > 0) {
+				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
