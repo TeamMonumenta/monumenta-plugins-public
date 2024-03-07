@@ -1,0 +1,175 @@
+package com.playmonumenta.plugins.bosses.bosses;
+
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import net.luckperms.api.model.group.Group;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+
+public class GuildDisplayBoss extends BossAbilityGroup {
+
+	public static final String identityTag = "boss_guild_display";
+	private static final String scoreboardTag = "guild_display";
+	private final List<Pair> mPairs;
+
+
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "Y Offset")
+		public int Y_OFFSET = 0;
+		@BossParam(help = "Width")
+		public double WIDTH = 0.0;
+		@BossParam(help = "Height")
+		public double HEIGHT = 0.0;
+		@BossParam(help = "Rotation in Degrees")
+		public double ROTATION = 0.0;
+	}
+
+	private final List<Group> mAllGuilds = new ArrayList<>();
+	private int mCurrentPos = 0;
+
+	public GuildDisplayBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
+		mPairs = new ArrayList<>();
+		Parameters p = BossParameters.getParameters(boss, identityTag, new GuildDisplayBoss.Parameters());
+		int period = (int) (p.WIDTH * 20) + 2;
+		new BukkitRunnable() {
+			int mTicks = 0;
+			int mLastHeight = 0;
+
+			@Override
+			public void run() {
+				//cycle count
+				if (mTicks % 50000 == 0) {
+					updateGuilds();
+				}
+				if (mTicks % 100 == 0 && !mAllGuilds.isEmpty()) {
+					for (int i = 0; i < p.HEIGHT / 3; i++) {
+						if (mCurrentPos >= mAllGuilds.size()) {
+							mCurrentPos = 0;
+						}
+						int pos = mCurrentPos;
+						mCurrentPos++;
+						//create a little randomized spacing to not make perfect columns
+						int delay = FastUtils.randomIntInRange(0, 2 * 20);
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+							int height = mLastHeight + 3;
+							if (height > p.HEIGHT) {
+								height = 0;
+							}
+							mLastHeight = height;
+							if (!mAllGuilds.isEmpty()) {
+								if (!mBoss.isDead()) {
+									//I HATE DISPLAY ENTITIES
+									ItemDisplay banner = mBoss.getWorld().spawn(mBoss.getLocation().clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), p.Y_OFFSET + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), ItemDisplay.class);
+									AxisAngle4f rotation = new AxisAngle4f((float) -Math.toRadians(90 - p.ROTATION), 0, 1, 0);
+									banner.setTransformation(new Transformation(banner.getTransformation().getTranslation(), rotation, banner.getTransformation().getScale(), new AxisAngle4f()));
+									banner.setInterpolationDuration(-1);
+									banner.setInterpolationDuration(0);
+									banner.addScoreboardTag(scoreboardTag);
+									banner.setItemStack(LuckPermsIntegration.getGuildBanner(mAllGuilds.get(pos)));
+									TextDisplay text = mBoss.getWorld().spawn(mBoss.getLocation().clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), p.Y_OFFSET + 1.5 + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), TextDisplay.class);
+									text.setAlignment(TextDisplay.TextAlignment.CENTER);
+									text.text(LuckPermsIntegration.getGuildFullComponent(mAllGuilds.get(pos)));
+									text.setTransformation(new Transformation(text.getTransformation().getTranslation(), rotation, text.getTransformation().getScale(), new AxisAngle4f()));
+									text.setInterpolationDuration(-1);
+									text.setInterpolationDuration(0);
+									text.addScoreboardTag(scoreboardTag);
+									mPairs.add(new Pair(banner, text));
+								}
+							}
+						}, delay);
+					}
+				}
+				List<Pair> toRemove = new ArrayList<>();
+				for (Pair pa : mPairs) {
+					int result = pa.advance(-(p.WIDTH / period) * FastUtils.sinDeg(p.ROTATION), -(p.WIDTH / period) * FastUtils.cosDeg(p.ROTATION), period);
+					if (result < 0) {
+						toRemove.add(pa);
+					}
+				}
+				mPairs.removeAll(toRemove);
+				if (mBoss.isDead()) {
+					for (Pair pa : mPairs) {
+						pa.delete();
+					}
+					this.cancel();
+				}
+				mTicks++;
+			}
+		}.runTaskTimer(plugin, 0, 1);
+	}
+
+	private static class Pair {
+		private final ItemDisplay mBanner;
+		private final TextDisplay mText;
+		private int mTeleportCount;
+
+		private Pair(ItemDisplay banner, TextDisplay text) {
+			mBanner = banner;
+			mText = text;
+			mTeleportCount = 0;
+		}
+
+		private int advance(double x, double z, int period) {
+			mBanner.teleport(mBanner.getLocation().add(x, 0, z));
+			mText.teleport(mText.getLocation().add(x, 0, z));
+			if (mTeleportCount > period) {
+				delete();
+				return -1;
+			}
+			mTeleportCount++;
+			return 0;
+		}
+
+		private void delete() {
+			mBanner.remove();
+			mText.remove();
+		}
+	}
+
+	private void updateGuilds() {
+		Bukkit.getScheduler().runTaskAsynchronously(mPlugin, () -> {
+			try {
+				TreeMap<String, Group> sortMap = new TreeMap<>();
+				for (Group guild : LuckPermsIntegration.getGuilds(false, false).join()) {
+					String guildName = LuckPermsIntegration.getNonNullGuildName(guild);
+					String sortKey = StringUtils.getNaturalSortKey(guildName);
+					sortMap.put(sortKey, guild);
+				}
+				//set as sortKey seems to have duplicates
+				Set<Group> guilds = new HashSet<>(sortMap.values());
+
+				Bukkit.getScheduler().runTask(mPlugin, () -> {
+					// Handle this list sync so that it can't be modified during reads
+					mAllGuilds.clear();
+					mAllGuilds.addAll(guilds);
+					Collections.shuffle(mAllGuilds);
+				});
+			} catch (Exception ex) {
+				Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.getLogger().log(Level.FINER, "An error occurred fetching all guilds:" + ex));
+			}
+		});
+	}
+
+	@Override
+	public void unload() {
+		for (Pair pa : mPairs) {
+			pa.delete();
+		}
+	}
+}

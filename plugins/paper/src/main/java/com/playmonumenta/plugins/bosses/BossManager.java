@@ -307,6 +307,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(SiriusMeleeBoss.identityTag, SiriusMeleeBoss::new);
 		registerStatelessBoss(SiriusNPCBoss.identityTag, SiriusNPCBoss::construct);
 		registerStatelessBoss(SiriusMob.identityTag, SiriusMob::new);
+		registerStatelessBoss(GuildDisplayBoss.identityTag, GuildDisplayBoss::new, new GuildDisplayBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
