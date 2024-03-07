@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellRush;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSlice;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSteelboreSpread;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellStonemason;
+import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -118,9 +119,9 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			case "Hard" -> {
 				mHealth = 27225;
 				// Hard Mode Abilities
-				mParadox = new SpellLingeringParadox(boss, mSpawnLoc, 30);
-				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc, 30);
-				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc, 30);
+				mParadox = new SpellLingeringParadox(boss, mSpawnLoc);
+				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc);
+				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc);
 				mCrash = new SpellCrash(boss, plugin, mCurrentLoc);
 				mRush = new SpellRush(plugin, boss, mSpawnLoc, 30);
 				mRush2 = new SpellRush(plugin, boss, mSpawnLoc, 30);
@@ -289,9 +290,9 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			case "Normal" -> {
 				mHealth = 19000;
 				// Normal Mode Abilities
-				mParadox = new SpellLingeringParadox(boss, mSpawnLoc, 30);
-				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc, 30);
-				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc, 30);
+				mParadox = new SpellLingeringParadox(boss, mSpawnLoc);
+				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc);
+				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc);
 				mCrash = new SpellCrash(boss, plugin, mCurrentLoc);
 				mRush = new SpellRush(plugin, boss, mSpawnLoc, 30);
 				mRush2 = new SpellRush(plugin, boss, mSpawnLoc, 30);
@@ -566,7 +567,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	}
 
 	private void clearParadox(Player p) {
-		Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
+		Plugin.getInstance().mEffectManager.clearEffects(p, TemporalFlux.GENERIC_NAME);
 	}
 
 	private BossBarManager.BossHealthAction getSteelboreAction(Plugin plugin, boolean savage, boolean phase3) {

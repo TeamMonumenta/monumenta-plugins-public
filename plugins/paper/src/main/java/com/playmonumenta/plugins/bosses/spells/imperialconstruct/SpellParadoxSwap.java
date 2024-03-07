@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -9,6 +10,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Particle;
@@ -23,7 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class SpellParadoxSwap extends Spell {
 
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_TYPES = EnumSet.of(DamageEvent.DamageType.MELEE, DamageEvent.DamageType.MELEE_SKILL, DamageEvent.DamageType.MELEE_ENCH, DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.PROJECTILE_SKILL, DamageEvent.DamageType.MAGIC);
-	private static final int mCoolDown = 20 * 5;
+	private static final int COOLDOWN = 20 * 5;
 	private final int mRange;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -43,19 +45,22 @@ public class SpellParadoxSwap extends Spell {
 
 	@Override
 	public void onHurtByEntity(DamageEvent event, Entity damager) {
-		if (!(damager instanceof Player player) || !AFFECTED_TYPES.contains(event.getType())) {
+		if (mOnCooldown || !(damager instanceof Player player) || !AFFECTED_TYPES.contains(event.getType())) {
 			return;
 		}
 
-		List<Player> nearbyPlayers = EntityUtils.getNearestPlayers(mBoss.getLocation(), mRange);
-		boolean playerWithoutBuff = false;
-		for (Player p : nearbyPlayers) {
-			if (!com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, TemporalFlux.class)) {
-				playerWithoutBuff = true;
-			}
+		List<Player> nearbyPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
+		if (nearbyPlayers.size() <= 1) {
+			return;
 		}
-		if (com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(player, TemporalFlux.class) && !mOnCooldown && nearbyPlayers.size() > 1 && playerWithoutBuff) {
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, "Paradox");
+
+		boolean playerWithoutBuff = nearbyPlayers.stream().anyMatch(p -> !com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, TemporalFlux.class));
+		if (!playerWithoutBuff) {
+			return;
+		}
+
+		Set<Effect> clearedEffects = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, TemporalFlux.GENERIC_NAME);
+		if (clearedEffects != null && !clearedEffects.isEmpty()) {
 			deployEffect(player);
 		}
 	}
@@ -83,7 +88,7 @@ public class SpellParadoxSwap extends Spell {
 
 					@Override
 					public void run() {
-						if (mT >= mCoolDown) {
+						if (mT >= COOLDOWN) {
 							mOnCooldown = false;
 							this.cancel();
 						}

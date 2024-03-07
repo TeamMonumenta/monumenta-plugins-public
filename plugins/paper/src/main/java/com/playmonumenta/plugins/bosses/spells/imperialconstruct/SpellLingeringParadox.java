@@ -18,21 +18,20 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class SpellLingeringParadox extends Spell {
+	private static final int RANGE = 30;
 
 	private final LivingEntity mBoss;
 	private final Location mStartLoc;
-	private final int mRange;
 	private final List<Entity> mSpawnedMobs = new ArrayList<>();
 
-	public SpellLingeringParadox(LivingEntity boss, Location startLoc, int range) {
+	public SpellLingeringParadox(LivingEntity boss, Location startLoc) {
 		mStartLoc = startLoc;
-		mRange = range;
 		mBoss = boss;
 	}
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mStartLoc, mRange, true);
+		List<Player> players = PlayerUtils.playersInRange(mStartLoc, RANGE, true);
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 100, 1.5f);
 		Collections.shuffle(players);
 		for (Player player : players) {

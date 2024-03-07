@@ -80,8 +80,8 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	private final SiriusNPCBoss mAuroraBoss;
 	public int mBlocks;
 	public double mDeclerationScaleAmount;
-	private static final double DAMAGEPERPHASE = 750;
-	public static final int DURATIONOFDAMAGEPHASE = 14 * 20;
+	private static final double DAMAGE_PER_PHASE = 750;
+	public static final int DAMAGE_PHASE_DURATION = 14 * 20;
 	public boolean mDamagePhase;
 	private @Nullable BossBar mDamagePhaseHPBar;
 	public boolean mAnimationLock;
@@ -282,8 +282,8 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	public void startDamagePhase(@Nullable String passNpc, @Nullable Component passMessage, @Nullable String failNpc, @Nullable Component failMessage) {
 		if (!mDamagePhase) {
-			mHp = DAMAGEPERPHASE * mDefenseScaling;
-			mMaxHp = DAMAGEPERPHASE * mDefenseScaling;
+			mHp = DAMAGE_PER_PHASE * mDefenseScaling;
+			mMaxHp = DAMAGE_PER_PHASE * mDefenseScaling;
 			mDamagePhaseHPBar = BossBar.bossBar(Component.text("Core Stability Remaining", NamedTextColor.AQUA), 1, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
 			for (Player p : getPlayersInArena(false)) {
 				p.showBossBar(mDamagePhaseHPBar);
@@ -303,7 +303,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			}
 			new BukkitRunnable() {
 				int mTicks = 0;
-				final ChargeUpManager mBar = new ChargeUpManager(mBoss, DURATIONOFDAMAGEPHASE, Component.text("Core Exposed", NamedTextColor.RED), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 75);
+				final ChargeUpManager mBar = new ChargeUpManager(mBoss, DAMAGE_PHASE_DURATION, Component.text("Core Exposed", NamedTextColor.RED), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 75);
 
 				@Override
 				public void run() {
@@ -326,7 +326,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						this.cancel();
 						return;
 					}
-					if (mTicks > DURATIONOFDAMAGEPHASE) {
+					if (mTicks > DAMAGE_PHASE_DURATION) {
 						mBar.remove();
 						for (Player p : getPlayersInArena(false)) {
 							p.hideBossBar(mDamagePhaseHPBar);
@@ -2312,24 +2312,24 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					mTentacleBox2 = ((LivingEntity) LibraryOfSoulsIntegration.summon(mBoss.getLocation().add(-2, 2, 6), "BlightedPod"));
 					mTentacleBox4 = ((LivingEntity) LibraryOfSoulsIntegration.summon(mBoss.getLocation().add(-3, 2, -4), "BlightedPod"));
 					if (mTentacleBox1 != null) {
-						EntityUtils.setAttributeBase(mTentacleBox1, Attribute.GENERIC_MAX_HEALTH, DAMAGEPERPHASE * mDefenseScaling);
-						mTentacleBox1.setHealth(DAMAGEPERPHASE * mDefenseScaling);
+						EntityUtils.setAttributeBase(mTentacleBox1, Attribute.GENERIC_MAX_HEALTH, DAMAGE_PER_PHASE * mDefenseScaling);
+						mTentacleBox1.setHealth(DAMAGE_PER_PHASE * mDefenseScaling);
 						mTentacleBox1.setInvisible(true);
 						mTentacleBox1.setGlowing(true);
 						mTentacleBox1.setCustomNameVisible(false);
 						mTentacleBox1.customName(Component.text("Sirius Tentacle"));
 					}
 					if (mTentacleBox2 != null) {
-						EntityUtils.setAttributeBase(mTentacleBox2, Attribute.GENERIC_MAX_HEALTH, DAMAGEPERPHASE * mDefenseScaling);
-						mTentacleBox2.setHealth(DAMAGEPERPHASE * mDefenseScaling);
+						EntityUtils.setAttributeBase(mTentacleBox2, Attribute.GENERIC_MAX_HEALTH, DAMAGE_PER_PHASE * mDefenseScaling);
+						mTentacleBox2.setHealth(DAMAGE_PER_PHASE * mDefenseScaling);
 						mTentacleBox2.setInvisible(true);
 						mTentacleBox2.setGlowing(true);
 						mTentacleBox2.setCustomNameVisible(false);
 						mTentacleBox2.customName(Component.text("Sirius Tentacle"));
 					}
 					if (mTentacleBox4 != null) {
-						EntityUtils.setAttributeBase(mTentacleBox4, Attribute.GENERIC_MAX_HEALTH, DAMAGEPERPHASE * mDefenseScaling);
-						mTentacleBox4.setHealth(DAMAGEPERPHASE * mDefenseScaling);
+						EntityUtils.setAttributeBase(mTentacleBox4, Attribute.GENERIC_MAX_HEALTH, DAMAGE_PER_PHASE * mDefenseScaling);
+						mTentacleBox4.setHealth(DAMAGE_PER_PHASE * mDefenseScaling);
 						mTentacleBox4.setInvisible(true);
 						mTentacleBox4.setGlowing(true);
 						mTentacleBox4.setCustomNameVisible(false);

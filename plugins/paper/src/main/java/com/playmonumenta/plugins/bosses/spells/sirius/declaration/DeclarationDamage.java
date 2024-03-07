@@ -108,24 +108,24 @@ public class DeclarationDamage extends Spell {
 						}
 					}
 				}
-				if (mTicks % 40 == 0 && mTicks < Sirius.DURATIONOFDAMAGEPHASE) {
+				if (mTicks % 40 == 0 && mTicks < Sirius.DAMAGE_PHASE_DURATION) {
 					shrinkCircle(mPortalOne, mPortalTwo);
 				}
 				if (!mOldLoc.equals(mSirius.mBoss.getLocation())) {
 					this.cancel();
 					return;
 				}
-				if (mTicks >= Sirius.DURATIONOFDAMAGEPHASE && !mDone) {
+				if (mTicks >= Sirius.DAMAGE_PHASE_DURATION && !mDone) {
 					if (mOldLoc.equals(mSirius.mBoss.getLocation())) {
 						mDone = true;
 					}
 				}
-				if (mTicks >= Sirius.DURATIONOFDAMAGEPHASE) {
+				if (mTicks >= Sirius.DAMAGE_PHASE_DURATION) {
 					mConverter.convertLine(mXOne, mXTwo, mOrbLocation.getZ(), 11, mOrbLocation);
 					mXOne -= 2;
 					mXTwo -= 2;
 				}
-				if (mTicks >= Sirius.DURATIONOFDAMAGEPHASE + ANIMATIONDURATION) {
+				if (mTicks >= Sirius.DAMAGE_PHASE_DURATION + ANIMATIONDURATION) {
 					if (mDone) {
 						mSirius.changeHp(true, -5);
 					}
