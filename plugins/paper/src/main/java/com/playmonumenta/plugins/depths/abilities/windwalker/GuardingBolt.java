@@ -130,9 +130,11 @@ public class GuardingBolt extends DepthsAbility {
 			if (userLoc.distance(targetLoc) > 1) {
 				mPlayer.teleport(targetLoc);
 
-				Vector vec = targetLoc.clone().subtract(userLoc).toVector().normalize().multiply(0.25);
-				vec.setY(0.4);
-				mPlayer.setVelocity(vec);
+				if (!DepthsUtils.isDepthsGrave(target)) {
+					Vector vec = targetLoc.clone().subtract(userLoc).toVector().normalize().multiply(0.25);
+					vec.setY(0.4);
+					mPlayer.setVelocity(vec);
+				}
 			}
 			doDamage(targetLoc);
 

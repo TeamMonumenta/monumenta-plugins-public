@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -89,8 +90,9 @@ public class Aeroblast extends DepthsAbility {
 		world.playSound(slightOffsetLoc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.25f, 0.7f);
 
 		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, mSize / 2, false).accuracy(0.5).getHitMobs()) {
-			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
-			if (!EntityUtils.isBoss(mob) && !ScoreboardUtils.checkTag(mob, "callicarpa_flower") && !ScoreboardUtils.checkTag(mob, "hoglin_menace") && mob.hasAI()) {
+			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
+			if (!EntityUtils.isBoss(mob) && !ScoreboardUtils.checkTag(mob, "callicarpa_flower") && !ScoreboardUtils.checkTag(mob, "hoglin_menace")
+				&& mob.hasAI() && !ScoreboardUtils.checkTag(mob, TrainingDummyBoss.identityTag)) {
 				Vector vel = mPlayer.getEyeLocation().getDirection().setY(0.15).multiply(mKnockbackSpeed);
 				mob.setVelocity(vel);
 
@@ -169,7 +171,7 @@ public class Aeroblast extends DepthsAbility {
 			.add(" magic damage to all mobs up to ")
 			.add(a -> a.mSize, SIZE)
 			.add(" blocks away, and knocking back all non-boss enemies. Deal an additional ")
-			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1] * 1.5, true)
+			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage if enemies hit by this ability collide with a wall within 0.75 seconds. " +
 				"Additionally, casting this ability grants you ")
 			.addPercent(a -> a.mSpeed, SPEED_AMPLIFIER)

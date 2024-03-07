@@ -50,7 +50,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE) {
+		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) {
 			event.setDamage(event.getDamage() * (1 + mStacks * mDamage));
 
 			// Critical arrow and mob is actually going to take damage

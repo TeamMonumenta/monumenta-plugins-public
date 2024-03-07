@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -25,7 +26,9 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
@@ -291,7 +294,9 @@ public class IgneousRune extends DepthsAbility {
 						mPlugin.mPotionManager.addPotion(player, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 5 * 20, 0, true, true));
 					}
 				}
-				if (mTicks > mArmingTime && !hitbox.getHitMobs().isEmpty()) {
+				List<LivingEntity> hitMobs = hitbox.getHitMobs();
+				hitMobs.removeIf(mob -> ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG));
+				if (mTicks > mArmingTime && !hitMobs.isEmpty()) {
 					this.cancel();
 				}
 
