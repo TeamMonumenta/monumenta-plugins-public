@@ -34,8 +34,8 @@ public class ShieldWallCS implements CosmeticSkill {
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 70, 0, 0, 0, 0.3f).spawnAsPlayerActive(player);
 	}
 
-	public void shieldWallDot(Player player, Location l, double degree, double angle, int y, int height) {
-		new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).spawnAsPlayerActive(player);
+	public void shieldWallDot(Player player, Location l, double degree, double angle, double y, int height) {
+		new PartialParticle(Particle.ELECTRIC_SPARK, l, 1, 0.03, 0.05, 0.03, 1000000).spawnAsPlayerActive(player);
 	}
 
 	public void shieldOnBlock(World world, Location eLoc, Player player) {

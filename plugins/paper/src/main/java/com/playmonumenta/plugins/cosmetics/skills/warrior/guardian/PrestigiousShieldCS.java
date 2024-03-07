@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.skills.warrior.guardian;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
 import org.bukkit.Color;
@@ -95,14 +94,11 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void shieldWallDot(Player player, Location l, double degree, double angle, int y, int height) {
-		if (goldCheck(degree / angle, 1.0 * y / height)) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(player);
+	public void shieldWallDot(Player player, Location l, double degree, double angle, double y, int height) {
+		if (goldCheck(degree / angle, y / height)) {
+			new PartialParticle(Particle.FIREWORKS_SPARK, l, 1, 0.03, 0.05, 0.03, 1000000).spawnAsPlayerActive(player);
 		} else {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
-		}
-		if (FastUtils.RANDOM.nextDouble() < 0.3) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.WAX_ON, l, 1, 0.03, 0.05, 0.03, 1000000).spawnAsPlayerActive(player);
 		}
 	}
 
