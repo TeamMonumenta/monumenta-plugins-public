@@ -48,7 +48,7 @@ public class InfernoDamage extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz && entity instanceof LivingEntity le) {
-			double damage = Math.pow(mLevel, 0.9);
+			double damage = Math.pow(mLevel, 0.95);
 			if (mPlayer != null) {
 				damage = CharmManager.calculateFlatAndPercentValue(mPlayer, Inferno.CHARM_DAMAGE, damage);
 			}
