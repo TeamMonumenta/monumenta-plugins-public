@@ -183,9 +183,11 @@ public enum ClassAbility {
 	// [DEPTHS ABILITIES]
 	// FLAMECALLER
 	APOCALYPSE("Apocalypse"),
+	DETONATION("Detonation"),
 	FIREBALL("Fireball"),
-	IGNEOUS_RUNE("Igneous Rune"),
 	FLAMESTRIKE("Flamestrike"),
+	IGNEOUS_RUNE("Igneous Rune"),
+	VOLCANIC_COMBOS("Volcanic Combos"),
 	VOLCANIC_METEOR("Volcanic Meteor"),
 	PYROBLAST("Pyroblast"),
 
@@ -228,6 +230,7 @@ public enum ClassAbility {
 	// FROSTBORN
 	ICE_LANCE("Ice Lance"),
 	ICE_BARRIER("Ice Barrier"),
+	FRIGID_COMBOS("Frigid Combos"),
 	FROST_NOVA_DEPTHS("Frost Nova"),
 	AVALANCHE("Avalanche"),
 	PIERCING_COLD("Piercing Cold"),

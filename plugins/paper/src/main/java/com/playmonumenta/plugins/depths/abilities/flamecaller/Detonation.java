@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -36,6 +37,7 @@ public class Detonation extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Detonation> INFO =
 		new DepthsAbilityInfo<>(Detonation.class, ABILITY_NAME, Detonation::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
+			.linkedSpell(ClassAbility.DETONATION)
 			.displayItem(Material.TNT)
 			.descriptions(Detonation::getDescription)
 			.singleCharm(false);
@@ -59,7 +61,7 @@ public class Detonation extends DepthsAbility {
 		}
 		Location location = entity.getLocation();
 		World world = mPlayer.getWorld();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, mDamage)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, mDamageRadius)) {
 			new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 2).spawnAsPlayerActive(mPlayer);
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
 		}

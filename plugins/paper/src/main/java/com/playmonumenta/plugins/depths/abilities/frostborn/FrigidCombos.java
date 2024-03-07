@@ -45,6 +45,7 @@ public class FrigidCombos extends DepthsCombosAbility {
 
 	public static final DepthsAbilityInfo<FrigidCombos> INFO =
 		new DepthsAbilityInfo<>(FrigidCombos.class, ABILITY_NAME, FrigidCombos::new, DepthsTree.FROSTBORN, DepthsTrigger.COMBO)
+			.linkedSpell(ClassAbility.FRIGID_COMBOS)
 			.displayItem(Material.BLUE_DYE)
 			.descriptions(FrigidCombos::getDescription)
 			.singleCharm(false);
