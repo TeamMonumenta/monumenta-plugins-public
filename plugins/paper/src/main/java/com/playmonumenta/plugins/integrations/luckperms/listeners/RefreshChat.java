@@ -250,6 +250,19 @@ public class RefreshChat {
 		mGuildDataPreSync.clear();
 	}
 
+	public static void refreshChat(Player player) {
+		if (player == null) {
+			return; // Player is not loaded locally - they are most likely in the process of logging in
+		}
+
+		MMLog.fine("[Chat Refresh Listener] Refreshing chat state for " + player.getName());
+		MonumentaNetworkChatIntegration.refreshPlayer(player);
+		LuckPermsIntegration.updatePlayerGuildChat(player);
+		if (Gui.getOpenGui(player) instanceof TeleportGuildGui teleportGuildGui) {
+			teleportGuildGui.refresh();
+		}
+	}
+
 	private static void refreshChat(User user) {
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			Player player = Plugin.getInstance().getPlayer(user.getUniqueId());
@@ -257,12 +270,7 @@ public class RefreshChat {
 				return; // Player is not loaded locally - they are most likely in the process of logging in
 			}
 
-			MMLog.fine("[Chat Refresh Listener] Refreshing chat state for " + player.getName());
-			MonumentaNetworkChatIntegration.refreshPlayer(player);
-			LuckPermsIntegration.updatePlayerGuildChat(player);
-			if (Gui.getOpenGui(player) instanceof TeleportGuildGui teleportGuildGui) {
-				teleportGuildGui.refresh();
-			}
+			refreshChat(player);
 		});
 	}
 
@@ -282,7 +290,7 @@ public class RefreshChat {
 			}
 
 			for (Player player : LuckPermsIntegration.getOnlineGuildMembers(rootGroup, true)) {
-				MonumentaNetworkChatIntegration.refreshPlayer(player);
+				refreshChat(player);
 			}
 		});
 	}

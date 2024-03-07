@@ -8,6 +8,7 @@ import com.playmonumenta.networkchat.RemotePlayerManager;
 import com.playmonumenta.networkchat.channel.Channel;
 import com.playmonumenta.networkchat.channel.ChannelGlobal;
 import com.playmonumenta.networkchat.channel.interfaces.ChannelPermissionNode;
+import com.playmonumenta.networkchat.channel.property.ChannelSettings;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -166,20 +167,6 @@ public class MonumentaNetworkChatIntegration {
 		defaultChannels.setDefaultId(DefaultChannels.GUILD_CHANNEL, channel.getUniqueId());
 	}
 
-	public static void setPlayerDefaultGuildChat(UUID playerId, Channel channel) {
-		if (!ENABLED) {
-			return;
-		}
-
-		PlayerState playerState = PlayerStateManager.getPlayerState(playerId);
-		if (playerState == null) {
-			return;
-		}
-
-		DefaultChannels defaultChannels = playerState.defaultChannels();
-		defaultChannels.setDefaultId(DefaultChannels.GUILD_CHANNEL, channel.getUniqueId());
-	}
-
 	public static void unsetPlayerDefaultGuildChat(Player player) {
 		if (!ENABLED) {
 			return;
@@ -192,5 +179,19 @@ public class MonumentaNetworkChatIntegration {
 
 		DefaultChannels defaultChannels = playerState.defaultChannels();
 		defaultChannels.setDefaultId(DefaultChannels.GUILD_CHANNEL, null);
+	}
+
+	public static void setPlayerChannelNotifications(Player player, Channel channel, boolean notificationsEnabled) {
+		if (!ENABLED) {
+			return;
+		}
+
+		PlayerState playerState = PlayerStateManager.getPlayerState(player);
+		if (playerState == null) {
+			return;
+		}
+
+		ChannelSettings channelSettings = playerState.channelSettings(channel);
+		channelSettings.messagesPlaySound(notificationsEnabled);
 	}
 }

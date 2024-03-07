@@ -141,7 +141,7 @@ public class LuckPermsIntegration implements Listener {
 		}
 	}
 
-	public static void enable(Plugin plugin) {
+	public LuckPermsIntegration(Plugin plugin) {
 		plugin.getLogger().info("Enabling LuckPerms integration");
 		RegisteredServiceProvider<LuckPerms> luckPermsProvider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 		if (luckPermsProvider == null) {
@@ -1507,7 +1507,9 @@ public class LuckPermsIntegration implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		updatePlayerGuildChat(player);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			Player player = event.getPlayer();
+			updatePlayerGuildChat(player);
+		}, 1L);
 	}
 }

@@ -503,7 +503,12 @@ public class GuildGui extends Gui {
 		} else if (LuckPermsIntegration.isLocked(guild)) {
 			lore.add(Component.text("CURRENTLY ON LOCKDOWN", NamedTextColor.DARK_GRAY, TextDecoration.BOLD));
 		} else {
-			if (hasGuildInvite) {
+			if (accessLevel.ordinal() <= GuildAccessLevel.MEMBER.ordinal()) {
+				lore.add(Component.text("", NamedTextColor.GRAY)
+					.decoration(TextDecoration.ITALIC, false)
+					.append(Component.keybind(Constants.Keybind.HOTBAR_9.asKeybind()))
+					.append(Component.text(": Leave guild")));
+			} else if (hasGuildInvite) {
 				lore.add(Component.text("Invite options (hotbar keys to select):", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false));
 				switch (inviteLevel) {
@@ -551,11 +556,6 @@ public class GuildGui extends Gui {
 					.decoration(TextDecoration.ITALIC, false)
 					.append(Component.keybind(Constants.Keybind.HOTBAR_9.asKeybind()))
 					.append(Component.text(": Give up guest access")));
-			} else if (accessLevel.ordinal() <= GuildAccessLevel.MEMBER.ordinal()) {
-				lore.add(Component.text("", NamedTextColor.GRAY)
-					.decoration(TextDecoration.ITALIC, false)
-					.append(Component.keybind(Constants.Keybind.HOTBAR_9.asKeybind()))
-					.append(Component.text(": Leave guild")));
 			}
 		}
 		if (mPlayer.isOp()) {
@@ -586,7 +586,25 @@ public class GuildGui extends Gui {
 				refresh();
 				return;
 			}
-			if (hasGuildInvite) {
+			if (accessLevel.ordinal() <= GuildAccessLevel.MEMBER.ordinal()) {
+				if (event.getHotbarButton() == 8) {
+					GuildAccessLevel currentAccessLevel = LuckPermsIntegration.getAccessLevel(guild, mTargetUser);
+					if (!currentAccessLevel.equals(accessLevel)) {
+						refresh();
+						return;
+					}
+
+					Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
+						GuildAccessLevel.setAccessLevel(mTargetUser, guild, GuildAccessLevel.NONE).join();
+						Bukkit.getScheduler().runTask(mMainPlugin, () -> {
+							mPlayer.sendMessage(Component.text("You left ", NamedTextColor.GOLD)
+								.append(LuckPermsIntegration.getGuildFullComponent(guild))
+								.append(Component.text(".")));
+							refresh();
+						});
+					});
+				}
+			} else if (hasGuildInvite) {
 				Group mainGuild = LuckPermsIntegration.getGuild(mTargetUser);
 				GuildInviteLevel currentInviteLevel = LuckPermsIntegration.getInviteLevel(guild, mTargetUser);
 				switch (event.getHotbarButton()) {
@@ -648,7 +666,8 @@ public class GuildGui extends Gui {
 					default // Do nothing
 						-> mPlayer.playSound(mPlayer, Sound.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1.0f, 0.5f);
 				}
-			} else if (event.getHotbarButton() == 8 && accessLevel.equals(GuildAccessLevel.GUEST)) {
+			} else if (accessLevel.equals(GuildAccessLevel.GUEST)) {
+				if (event.getHotbarButton() == 8) {
 				GuildAccessLevel currentAccessLevel = LuckPermsIntegration.getAccessLevel(guild, mTargetUser);
 				if (!currentAccessLevel.equals(accessLevel)) {
 					refresh();
@@ -664,22 +683,7 @@ public class GuildGui extends Gui {
 						refresh();
 					});
 				});
-			} else if (event.getHotbarButton() == 8 && accessLevel.ordinal() <= GuildAccessLevel.MEMBER.ordinal()) {
-				GuildAccessLevel currentAccessLevel = LuckPermsIntegration.getAccessLevel(guild, mTargetUser);
-				if (!currentAccessLevel.equals(accessLevel)) {
-					refresh();
-					return;
 				}
-
-				Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
-					GuildAccessLevel.setAccessLevel(mTargetUser, guild, GuildAccessLevel.NONE).join();
-					Bukkit.getScheduler().runTask(mMainPlugin, () -> {
-						mPlayer.sendMessage(Component.text("You left ", NamedTextColor.GOLD)
-							.append(LuckPermsIntegration.getGuildFullComponent(guild))
-							.append(Component.text(".")));
-						refresh();
-					});
-				});
 			}
 		});
 	}

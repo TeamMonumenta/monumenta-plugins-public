@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import com.playmonumenta.networkchat.channel.Channel;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.BooleanArgument;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
@@ -36,6 +40,7 @@ public class OffDutyCommand {
 	}
 
 	public static void setOffDuty(Player player, boolean markOffDuty) {
+		// Update tab list
 		PermissionNode onDutyNode = PermissionNode.builder().permission(ON_DUTY_PERM_STRING).build();
 		PermissionNode offDutyNode = onDutyNode.toBuilder().value(false).build();
 
@@ -49,5 +54,13 @@ public class OffDutyCommand {
 			userData.add(offDutyNode);
 		}
 		LuckPermsIntegration.pushUserUpdate(user);
+
+		// Update notification sounds for mh
+		Channel modHelp = MonumentaNetworkChatIntegration.getChannel("mh");
+		if (modHelp == null) {
+			player.sendMessage(Component.text("Could not toggle notifications for mh channel", NamedTextColor.RED));
+		} else {
+			MonumentaNetworkChatIntegration.setPlayerChannelNotifications(player, modHelp, !markOffDuty);
+		}
 	}
 }

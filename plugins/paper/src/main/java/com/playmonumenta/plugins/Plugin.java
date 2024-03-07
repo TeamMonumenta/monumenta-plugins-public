@@ -360,7 +360,7 @@ public class Plugin extends JavaPlugin {
 			obj = scoreboard.registerNewObjective("const", Criteria.DUMMY, Component.text("const"));
 		}
 		obj.getScore("$IsPlay").setScore(IS_PLAY_SERVER ? 1 : 0);
-		getLogger().info("Setting $IsPlay const = " + Integer.toString(IS_PLAY_SERVER ? 1 : 0) + " (" + (IS_PLAY_SERVER ? "play" : "build") + " server)");
+		getLogger().info("Setting $IsPlay const = " + (IS_PLAY_SERVER ? 1 : 0) + " (" + (IS_PLAY_SERVER ? "play" : "build") + " server)");
 
 		PluginManager manager = getServer().getPluginManager();
 
@@ -637,7 +637,7 @@ public class Plugin extends JavaPlugin {
 
 		// Register luckperms commands if LuckPerms is present
 		if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
-			LuckPermsIntegration.enable(this);
+			manager.registerEvents(new LuckPermsIntegration(this), this);
 		}
 
 		// Hook into PremiumVanish if present

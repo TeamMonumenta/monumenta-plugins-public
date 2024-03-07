@@ -443,7 +443,8 @@ public class KnickKnackSackGui extends Gui {
 		} else {
 			lore = new ArrayList<>(lore);
 		}
-		lore.add(0, Component.text("View Monumenta's guilds"));
+		lore.add(0, Component.text("View Monumenta's guilds", NamedTextColor.GRAY)
+			.decoration(TextDecoration.ITALIC, false));
 		meta.lore(lore);
 		guildBase.setItemMeta(meta);
 		GuiItem guildItem = new GuiItem(guildBase)
