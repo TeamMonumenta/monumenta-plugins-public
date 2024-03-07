@@ -249,7 +249,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openclassdisplaygui")
 			.executesPlayer((player, args) -> {
 				if (!AbilityUtils.getClass(player).equals("No Class")) {
-					new ClassDisplayCustomInventory(player).openInventory(player, plugin);
+					new ClassDisplayCustomInventory(player).open();
 				}
 			})
 			.register();
@@ -259,7 +259,7 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				if (!AbilityUtils.getClass(player).equals("No Class")) {
-					new ClassDisplayCustomInventory(player).openInventory(player, plugin);
+					new ClassDisplayCustomInventory(player).open();
 				}
 			})
 			.register();

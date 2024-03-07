@@ -66,7 +66,7 @@ public class AbilityInfo<T extends Ability> {
 	public @Nullable String mCharmCooldown;
 	public @Nullable String mCharmCooldown2;
 
-	private Predicate<Player> mCanUse = player -> mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mScoreboardId).orElse(0) > 0;
+	private Predicate<Player> mCanUse = player -> mScoreboardId != null && getLevelScore(player) > 0;
 
 	private Consumer<Player> mRemove = player -> {
 	};
@@ -353,7 +353,12 @@ public class AbilityInfo<T extends Ability> {
 			       .append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
 	}
 
-	public Component getFormattedDescriptions(@Nullable Player player, int level, boolean isEnhanced, boolean enabled) {
+	public Component getFormattedDescriptions(Player player) {
+		int score = getLevelScore(player);
+		return getFormattedDescriptions(player, ((score - 1) % 2) + 1, score > 2, !Plugin.getInstance().mAbilityManager.getDisabledSpecAbilities().contains(this), ServerProperties.getAbilityEnhancementsEnabled(player));
+	}
+
+	public Component getFormattedDescriptions(@Nullable Player player, int level, boolean isEnhanced, boolean enabled, boolean enhancementEnabled) {
 		List<Component> descriptions = getDescriptions();
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(player, 1, enabled));
@@ -361,7 +366,7 @@ public class AbilityInfo<T extends Ability> {
 			component = component.append(Component.newline()).append(getFormattedDescription(player, 2, enabled));
 		}
 		if (isEnhanced && descriptions.size() > 2) {
-			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled));
+			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled && enhancementEnabled));
 		}
 		return component;
 	}
@@ -397,7 +402,7 @@ public class AbilityInfo<T extends Ability> {
 			hoverableString += "*";
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled));
+			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled, ServerProperties.getAbilityEnhancementsEnabled(player)));
 	}
 
 	public TextColor getActionBarColor() {
@@ -405,11 +410,15 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public void sendDescriptions(CommandSender sender) {
-		sender.sendMessage(getFormattedDescriptions(sender instanceof Player player ? player : null, 2, false, true));
+		sender.sendMessage(getFormattedDescriptions(sender instanceof Player player ? player : null, 2, false, true, true));
 	}
 
 	public @Nullable T getPlayerAbility(Plugin plugin, @Nullable Player player) {
 		return plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, getAbilityClass());
+	}
+
+	public int getLevelScore(Player player) {
+		return mScoreboardId == null ? 0 : ScoreboardUtils.getScoreboardValue(player, mScoreboardId).orElse(0);
 	}
 
 	public JsonObject toJson() {

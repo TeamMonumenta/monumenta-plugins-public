@@ -38,7 +38,7 @@ public abstract class Gui {
 
 	private final List<GuiItem> mItems;
 
-	private final ItemStack mFiller = GUIUtils.FILLER;
+	public ItemStack mFiller = GUIUtils.FILLER;
 
 	public Gui(Player player, int size, Component title) {
 		mPlugin = Plugin.getInstance();

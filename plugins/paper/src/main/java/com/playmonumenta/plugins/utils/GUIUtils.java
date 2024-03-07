@@ -33,12 +33,14 @@ public class GUIUtils {
 	public static final ItemStack FILLER = createFiller();
 
 	private static ItemStack createFiller() {
-		ItemStack filler = new ItemStack(FILLER_MATERIAL, 1);
-		createFiller(filler);
-		return filler;
+		return createFiller(FILLER_MATERIAL);
 	}
 
-	public static void createFiller(ItemStack filler) {
+	public static ItemStack createFiller(Material filler) {
+		return createFiller(new ItemStack(filler));
+	}
+
+	public static ItemStack createFiller(ItemStack filler) {
 		NBT.modify(filler, nbt -> {
 			nbt.modifyMeta((nbtr, meta) -> {
 				meta.displayName(Component.empty());
@@ -46,6 +48,7 @@ public class GUIUtils {
 			setPlaceholder(nbt);
 			setFiller(nbt);
 		});
+		return filler;
 	}
 
 	public static ItemStack createConfirm(@Nullable List<Component> lore) {

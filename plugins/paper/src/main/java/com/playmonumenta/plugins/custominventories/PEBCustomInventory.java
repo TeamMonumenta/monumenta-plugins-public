@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.custominventories;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
@@ -199,7 +198,7 @@ public class PEBCustomInventory extends CustomInventory {
 				"Click to view your class and skills.", NamedTextColor.LIGHT_PURPLE,
 				Material.STONE_SWORD, true).action((peb, event) -> {
 				peb.mInventory.close();
-				new ClassDisplayCustomInventory(peb.mPlayer).openInventory(peb.mPlayer, Plugin.getInstance());
+				new ClassDisplayCustomInventory(peb.mPlayer).open();
 			}),
 			new PebItem(22, "Dailies",
 				"Click to see what daily content you have and haven't done today.", NamedTextColor.LIGHT_PURPLE,

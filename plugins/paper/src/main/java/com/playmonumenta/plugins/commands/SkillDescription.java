@@ -33,7 +33,7 @@ public class SkillDescription extends GenericCommand {
 		CommandSender target = sender;
 		if (sender instanceof ProxiedCommandSender) {
 			if (((ProxiedCommandSender) sender).getCallee() instanceof Player) {
-				target = (CommandSender) ((ProxiedCommandSender) sender).getCallee();
+				target = ((ProxiedCommandSender) sender).getCallee();
 			} else {
 				error(sender, "Command must be run as a player.");
 				return;
