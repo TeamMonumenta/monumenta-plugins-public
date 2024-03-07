@@ -37,7 +37,7 @@ public class PlayerInventoryView implements Listener {
 			}
 			Player clickedPlayer = nearbyPlayers.get(0);
 			if (clickedPlayer != null && clickedPlayer.getScoreboardTags().contains("inventoryPrivacy")
-					&& !requestingPlayer.hasPermission("stealthmod")) {
+					&& !requestingPlayer.hasPermission("group.devops")) {
 				requestingPlayer.sendMessage(Component.text("This player has opted out of inventory viewing.",
 					NamedTextColor.RED));
 				return;

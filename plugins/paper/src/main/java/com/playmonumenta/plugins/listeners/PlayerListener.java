@@ -198,7 +198,7 @@ public class PlayerListener implements Listener {
 				@Override
 				public void run() {
 					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getScoreboardTags().contains("MidTransfer") || player.hasPermission("group.stealthmod")) {
+						if (player.getScoreboardTags().contains("MidTransfer") || player.hasPermission("group.devops")) {
 							continue;
 						}
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1, false, false));
@@ -211,7 +211,7 @@ public class PlayerListener implements Listener {
 							ShardSorterCommand.sortToShard(player, "valley");
 						} catch (Exception e) {
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 15, 1, false, false));
-							e.printStackTrace();
+							MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);
 						}
 					}
 				}

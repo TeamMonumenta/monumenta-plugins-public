@@ -55,6 +55,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_LOCKDOWN_MK;
+import static com.playmonumenta.plugins.integrations.luckperms.OffDutyCommand.ON_DUTY_PERM_STRING;
 
 public class Lockdown implements Listener {
 	// The presence of a map indicates a guild is locked, even if the map is empty (for non-plots shards)
@@ -244,10 +245,11 @@ public class Lockdown implements Listener {
 			});
 		}
 
-		Bukkit.getConsoleSender().sendMessage(getLockdownMessage(guild));
+		Component lockdownMessage = getLockdownMessage(guild);
+		Bukkit.getConsoleSender().sendMessage(lockdownMessage);
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.hasPermission("group.stealthmod")) {
-				player.sendMessage(getLockdownMessage(guild));
+			if (player.hasPermission(ON_DUTY_PERM_STRING)) {
+				player.sendMessage(lockdownMessage);
 				player.playSound(player,
 					Sound.ITEM_TOTEM_USE,
 					SoundCategory.PLAYERS,

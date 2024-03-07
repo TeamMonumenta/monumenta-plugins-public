@@ -149,7 +149,7 @@ public class RefreshChat {
 	public static void anyPostSyncEvent(String eventLabel) {
 		MMLog.fine("[Chat Refresh Listener/" + eventLabel + "] Got event");
 		if (mUserDataPreSync.isEmpty()) {
-			// No user data to compare against (stealthmods have A permission group and should be included if nothing else)
+			// No user data to compare against (devops have A permission group and should be included if nothing else)
 			MMLog.fine("[Chat Refresh Listener/" + eventLabel + "] No user data to compare against");
 			return;
 		}
