@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -176,7 +177,7 @@ public class PortalManager implements Listener {
 		for (int i = 0; i < 50; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
-			if (mCurrentShard.startsWith("portal")) {
+			if (ScoreboardUtils.getScoreboardValue(player, "R3Type").orElse(0) == 1) {
 				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, getDustOptions(portalNum + (2 * gunId)));
 			} else if (portalNum == 1) {
 				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f));
