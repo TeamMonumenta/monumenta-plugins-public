@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -33,6 +35,9 @@ public class SpellFinalParticle extends Spell {
 	private Location mCenter;
 	private double mRange;
 	private LivingEntity mBoss;
+	private static final String WEAKNESS_SRC = "MiasmaWeakness";
+	private static final String SLOWNESS_SRC = "MiasmaSlowness";
+	private final int DEBUFF_DURATION = 20 * 15;
 	private int mCylRadius = 8;
 	private boolean mPTick = true;
 	private List<Player> mWarned = new ArrayList<Player>();
@@ -91,10 +96,13 @@ public class SpellFinalParticle extends Spell {
 				}
 				BossUtils.bossDamagePercent(mBoss, p, 0.05, "Miasma");
 				//death bloom nod >:3
-				p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 15, 2));
-				p.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 15, 2));
-				p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 1));
-				p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 0));
+
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, WEAKNESS_SRC,
+					new PercentDamageDealt(DEBUFF_DURATION, -0.3));
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
+					new PercentSpeed(DEBUFF_DURATION, -0.15, SLOWNESS_SRC));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, DEBUFF_DURATION, 2));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.POISON, DEBUFF_DURATION, 2));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
 			}
 		}

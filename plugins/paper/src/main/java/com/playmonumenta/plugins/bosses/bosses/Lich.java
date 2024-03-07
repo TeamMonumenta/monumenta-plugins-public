@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellShadowRealm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.LichCurseEffect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -873,7 +874,8 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2.0f, 0f);
 		for (Player player : playersInRange(mBoss.getLocation(), radius, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, PercentSpeed.GENERIC_NAME,
+				new PercentSpeed(20 * 5, 0.3, PercentSpeed.GENERIC_NAME));
 		}
 	}
 

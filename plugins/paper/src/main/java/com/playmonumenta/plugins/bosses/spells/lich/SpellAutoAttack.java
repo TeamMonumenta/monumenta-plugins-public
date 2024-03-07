@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -22,8 +23,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -111,8 +110,9 @@ public class SpellAutoAttack extends Spell {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 1.5f, 0);
 						}
 						mPSmoke1.location(mBoss.getLocation()).spawnAsBoss();
-						mBoss.removePotionEffect(PotionEffectType.SLOW);
-						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 1));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentSpeed.GENERIC_NAME);
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentSpeed.GENERIC_NAME,
+							new PercentSpeed(20, 0.3, PercentSpeed.GENERIC_NAME));
 
 						if (mBoss == null || mBoss.isDead()) {
 							this.cancel();
