@@ -59,7 +59,9 @@ public class RestlessSouls extends Ability {
 	public static final String CHARM_RADIUS = "Restless Souls Radius";
 	public static final String CHARM_DURATION = "Restless Souls Duration";
 	public static final String CHARM_CAP = "Restless Souls Vex Cap";
+	public static final String CHARM_SILENCE_DURATION = "Restless Souls Silence Duration";
 	public static final String CHARM_DEBUFF_RANGE = "Restless Souls Debuff Radius";
+	public static final String CHARM_DEBUFF_DURATION = "Restless Souls Debuff Duration";
 	public static final String CHARM_SPEED = "Restless Souls Movement Speed";
 
 	public static final AbilityInfo<RestlessSouls> INFO =
@@ -86,6 +88,7 @@ public class RestlessSouls extends Ability {
 	private final int mSilenceTime;
 	private final int mVexCap;
 	private final double mDebuffRange;
+	private final int mDebuffDuration;
 	private final double mMoveSpeed;
 	private final List<Vex> mVexList = new ArrayList<>();
 
@@ -94,9 +97,10 @@ public class RestlessSouls extends Ability {
 		boolean isLevelOne = isLevelOne();
 		mLevel = isLevelOne;
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne ? DAMAGE_1 : DAMAGE_2);
-		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
+		mSilenceTime = CharmManager.getDuration(player, CHARM_SILENCE_DURATION, isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2);
 		mVexCap = (int) CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne ? VEX_CAP_1 : VEX_CAP_2);
 		mDebuffRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_DEBUFF_RANGE, DEBUFF_RANGE);
+		mDebuffDuration = CharmManager.getDuration(player, CHARM_DEBUFF_DURATION, DEBUFF_DURATION);
 		mMoveSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, MOVESPEED);
 	}
 
@@ -137,7 +141,7 @@ public class RestlessSouls extends Ability {
 				return;
 			}
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-			restlessSoulsBoss.spawn(mPlayer, mDamage, mDebuffRange, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
+			restlessSoulsBoss.spawn(mPlayer, mDamage, mDebuffRange, mSilenceTime, mDebuffDuration, mLevel, playerItemStats);
 
 			PartialParticle particle1 = new PartialParticle(Particle.SOUL, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
 			PartialParticle particle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);

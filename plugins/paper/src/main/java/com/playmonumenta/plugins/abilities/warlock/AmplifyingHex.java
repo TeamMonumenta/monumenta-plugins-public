@@ -59,7 +59,8 @@ public class AmplifyingHex extends Ability {
 	public static final String CHARM_CONE = "Amplifying Hex Cone";
 	public static final String CHARM_POTENCY = "Amplifying Hex Damage per Effect Potency";
 	public static final String CHARM_POTENCY_CAP = "Amplifying Hex Potency Cap";
-	public static final String CHARM_ENHANCED = "Amplifying Hex Health Threshold";
+	public static final String CHARM_ENHANCE_HEALTH = "Amplifying Hex Enhancement Health Threshold";
+	public static final String CHARM_ENHANCE_DAMAGE = "Amplifying Hex Enhancement Damage Bonus";
 
 	public static final AbilityInfo<AmplifyingHex> INFO =
 		new AbilityInfo<>(AmplifyingHex.class, "Amplifying Hex", AmplifyingHex::new)
@@ -84,6 +85,8 @@ public class AmplifyingHex extends Ability {
 	private final float mRadius;
 	private final float mRegionCap;
 	private float mDamage = 0f;
+	private final double mEnhanceHealthThreshold;
+	private final double mEnhanceDamageBonus;
 
 	private final AmplifyingHexCS mCosmetic;
 
@@ -105,6 +108,9 @@ public class AmplifyingHex extends Ability {
 				                 charmPower;
 			mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
 		});
+
+		mEnhanceHealthThreshold = ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_HEALTH);
+		mEnhanceDamageBonus = CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCE_DAMAGE, ENHANCEMENT_DAMAGE_MOD);
 	}
 
 	public boolean cast() {
@@ -154,8 +160,8 @@ public class AmplifyingHex extends Ability {
 
 		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 		double percentBoost = 0;
-		if (isEnhanced() && mPlayer.getHealth() > maxHealth * (ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCED))) {
-			percentBoost = mPlayer.getHealth() / maxHealth - (ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCED));
+		if (isEnhanced() && mPlayer.getHealth() > maxHealth * mEnhanceHealthThreshold) {
+			percentBoost = mPlayer.getHealth() / maxHealth - mEnhanceHealthThreshold;
 			double selfHarm = maxHealth * percentBoost;
 			double absorp = mPlayer.getAbsorptionAmount();
 			double newAbsorp = absorp - selfHarm;
@@ -169,7 +175,7 @@ public class AmplifyingHex extends Ability {
 			DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.OTHER, null, null, null), 0.001, true, false, false);
 
 			//multiply percent boost modifier
-			percentBoost *= ENHANCEMENT_DAMAGE_MOD;
+			percentBoost *= mEnhanceDamageBonus;
 		}
 
 		Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mRadius, 0), 2 * mRadius, mRadius, Math.toRadians(angle));

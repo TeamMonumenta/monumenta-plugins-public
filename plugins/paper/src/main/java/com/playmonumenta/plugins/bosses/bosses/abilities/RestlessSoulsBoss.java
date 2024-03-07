@@ -120,7 +120,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
 								EntityUtils.applyVulnerability(plugin, duration, 0.1, e);
 							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
-								plugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, playerItemStats, null, DamageType.AILMENT));
+								plugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, playerItemStats, ClassAbility.RESTLESS_SOULS, DamageType.AILMENT));
 							}
 						}
 					}

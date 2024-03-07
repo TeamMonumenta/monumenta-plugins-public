@@ -110,7 +110,7 @@ public class AbilityUtils {
 							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false, cosmetic));
 						} else if (ItemUtils.isPickaxe(item) || !(DepthsUtils.isWeaponItem(item) || ItemUtils.isProjectileWeapon(item))) {
 							// Run after this loop is complete to avoid concurrent modification
-							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, true, cosmetic));
+							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false, cosmetic));
 						} else {
 							player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, 0.05f);
 							entry.setValue(entry.getValue() - 1);
