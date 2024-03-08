@@ -413,4 +413,21 @@ public class StringUtils {
 		}
 		return new ArrayList<>(sortedPlayers.values());
 	}
+
+	private static final Set<Character> DIGITS = Set.of('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+
+	// Returns the positive integer that is at the end of s; if there is no integer, returns -1.
+	public static int getEndingInteger(String s) {
+		char[] chars = s.toCharArray();
+		for (int i = chars.length - 1; i > 0; i--) {
+			if (!DIGITS.contains(chars[i])) {
+				if (i == chars.length - 1) {
+					return -1;
+				}
+				return Integer.parseInt(s.substring(i + 1));
+			}
+		}
+		// We only get to this point if every character is an integer
+		return Integer.parseInt(s);
+	}
 }

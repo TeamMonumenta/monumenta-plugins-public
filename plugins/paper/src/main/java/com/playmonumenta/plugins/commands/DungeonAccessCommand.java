@@ -363,7 +363,7 @@ public class DungeonAccessCommand extends GenericCommand {
 			String abandonShardName = mapping.getAbandonShardName();
 			if (shardName != null && ServerProperties.getShardName().contains(shardName)) {
 				try {
-					ShardSorterCommand.sortToShard(player, abandonShardName);
+					ShardSorterCommand.sortToShard(player, abandonShardName, null);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}

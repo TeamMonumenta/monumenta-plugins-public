@@ -208,7 +208,7 @@ public class PlayerListener implements Listener {
 								"The shard is currently closed for maintenance. Please try again later.")
 							.color(NamedTextColor.RED));
 						try {
-							ShardSorterCommand.sortToShard(player, "valley");
+							ShardSorterCommand.sortToShard(player, "valley", null);
 						} catch (Exception e) {
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 15, 1, false, false));
 							MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);

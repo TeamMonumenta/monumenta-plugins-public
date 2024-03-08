@@ -12,7 +12,6 @@ import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import net.kyori.adventure.text.Component;
@@ -225,10 +224,7 @@ public class OrinCustomInventory extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		GUIUtils.refreshOffhand(event);
-		Player player;
-		if (event.getWhoClicked() instanceof Player) {
-			player = (Player) event.getWhoClicked();
-		} else {
+		if (!(event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
 		ItemStack clickedItem = event.getCurrentItem();
@@ -431,12 +427,10 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 		Collections.sort(resultSortedList);
 
-		String shardName;
 		for (Integer shard : resultSortedList) {
-			if (shard == 0) {
-				shardName = searchTerm.substring(0, 1).toUpperCase(Locale.getDefault()) + searchTerm.substring(1);
-			} else {
-				shardName = searchTerm.substring(0, 1).toUpperCase(Locale.getDefault()) + searchTerm.substring(1) + "-" + shard;
+			String shardName = searchTerm;
+			if (shard != 0) {
+				shardName += "-" + shard;
 			}
 			if (index <= instanceLocations.length) {
 				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shardName, "", shard < 1 ? 1 : shard));
