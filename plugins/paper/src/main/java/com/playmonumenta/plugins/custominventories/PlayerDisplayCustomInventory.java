@@ -67,7 +67,7 @@ public class PlayerDisplayCustomInventory extends CustomInventory {
 							&& zenithAdvancement != null
 							&& mTargetPlayer.getAdvancementProgress(zenithAdvancement).isDone()) {
 					mInventory.close();
-					new CharmsGUI(mRequestingPlayer, mTargetPlayer, true, CharmManager.CharmType.ZENITH, true).open();
+					new CharmsGUI(mRequestingPlayer, mTargetPlayer, false, CharmManager.CharmType.ZENITH, true).open();
 				} else {
 					mRequestingPlayer.sendMessage("No valid charms UI to show.");
 					if (zenithAdvancement == null) {
