@@ -25,6 +25,7 @@ public class EliteFinishers {
 			.put(FalseLich.NAME, new FalseLich())
 			.put(FishedUpFinisher.NAME, new FishedUpFinisher())
 			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
+			.put(GongFinisher.NAME, new GongFinisher())
 			.put(ImplosionFinisher.NAME, new ImplosionFinisher())
 			.put(LightningFinisher.NAME, new LightningFinisher())
 			.put(LocustSwarmFinisher.NAME, new LocustSwarmFinisher())
