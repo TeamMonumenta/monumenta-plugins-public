@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.custominventories;
 
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.depths.guis.DepthsAscensionGUI;
 import com.playmonumenta.plugins.depths.guis.ZenithCharmPowerGUI;
@@ -10,10 +14,6 @@ import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.IntegerArgument;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

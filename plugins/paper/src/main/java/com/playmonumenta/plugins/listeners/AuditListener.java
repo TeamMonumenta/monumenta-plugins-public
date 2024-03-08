@@ -281,6 +281,13 @@ public class AuditListener implements Listener {
 		}
 	}
 
+	public static void logMarket(String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendMarketAuditLogMessage(createLocationData() + " " + message);
+		}
+	}
+
 	public static void logDeath(String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + createLocationData() + " " + message);

@@ -184,10 +184,10 @@ public class WalletManager implements Listener {
 
 	private static final Map<UUID, Wallet> mWallets = new HashMap<>();
 
-	private static class CompressionInfo {
-		private final ItemStack mCompressed;
-		private final ItemStack mBase;
-		private final int mAmount;
+	public static class CompressionInfo {
+		public final ItemStack mCompressed;
+		public final ItemStack mBase;
+		public final int mAmount;
 
 		CompressionInfo(ItemStack compressed, ItemStack base, int amount) {
 			mCompressed = compressed;
@@ -917,12 +917,31 @@ public class WalletManager implements Listener {
 		return false;
 	}
 
-	private static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
+	public static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
 		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
 			if (compressionInfo.mCompressed.isSimilar(item)) {
 				return compressionInfo;
 			}
 		}
+		return null;
+	}
+
+	public static @Nullable CompressionInfo getAsMaxUncompressed(ItemStack item) {
+
+		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
+			if (compressionInfo.mCompressed.isSimilar(item)) {
+				WalletManager.CompressionInfo finalInfo = new WalletManager.CompressionInfo(item.asOne(), item.asOne(), item.getAmount());
+
+				WalletManager.CompressionInfo info = WalletManager.getCompressionInfo(item);
+				while (info != null) {
+					finalInfo = new WalletManager.CompressionInfo(item, info.mBase.asOne(), finalInfo.mAmount * info.mAmount);
+					info = WalletManager.getCompressionInfo(info.mBase);
+				}
+
+				return finalInfo;
+			}
+		}
+
 		return null;
 	}
 

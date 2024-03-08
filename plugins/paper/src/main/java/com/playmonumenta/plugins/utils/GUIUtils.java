@@ -67,9 +67,13 @@ public class GUIUtils {
 	}
 
 	public static ItemStack createCancel(@Nullable List<Component> lore) {
+		return createCancel(Component.text("Cancel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true), lore);
+	}
+
+	public static ItemStack createCancel(Component displayName, @Nullable List<Component> lore) {
 		ItemStack cancel = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
 		ItemMeta meta = cancel.getItemMeta();
-		meta.displayName(Component.text("Cancel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		meta.displayName(displayName);
 		if (lore != null) {
 			meta.lore(lore);
 		}

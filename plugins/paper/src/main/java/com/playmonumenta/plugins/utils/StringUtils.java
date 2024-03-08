@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class StringUtils {
@@ -365,6 +366,27 @@ public class StringUtils {
 			default -> {
 				return i + "th";
 			}
+		}
+	}
+
+	// Converts full name of certain currency to its short form
+	// e.g. Hyper Crystalline Shard -> HCS
+	public static String getCurrencyShortForm(@Nullable ItemStack currency) {
+		if (currency == null) {
+			return "TBD";
+		}
+		String fullName = ItemUtils.getPlainName(currency);
+		if (fullName.contains("xperience")) {
+			return fullName.charAt(0) + "XP";
+		} else {
+			StringBuilder result = new StringBuilder();
+			for (int i = 0; i < fullName.length(); i++) {
+				char c = fullName.charAt(i);
+				if (Character.isUpperCase(c)) {
+					result.append(c);
+				}
+			}
+			return result.toString();
 		}
 	}
 

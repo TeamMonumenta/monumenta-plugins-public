@@ -1609,6 +1609,29 @@ public class ItemUtils {
 		return lock;
 	}
 
+	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ItemStack itemStack) {
+		ReadWriteNBT nbtTags = NBT.itemStackToNBT(itemStack).getCompound("tag");
+		if (nbtTags == null) {
+			return null;
+		}
+		return getContainerItems(nbtTags);
+	}
+
+	public static @Nullable ReadableNBTList<String> getPages(ItemStack itemStack) {
+		ReadWriteNBT nbtTags = NBT.itemStackToNBT(itemStack).getCompound("tag");
+
+		if (nbtTags == null) {
+			return null;
+		}
+
+		ReadableNBTList<String> pages = nbtTags.getStringList("pages");
+		if (pages == null) {
+			return null;
+		}
+
+		return pages;
+	}
+
 	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ReadableNBT nbt) {
 		ReadableNBT blockEntityTag = nbt.getCompound("BlockEntityTag");
 		if (blockEntityTag == null) {
