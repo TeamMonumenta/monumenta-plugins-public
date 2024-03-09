@@ -908,7 +908,14 @@ public class MarketGUI extends Gui {
 
 		// confirm button
 		ArrayList<Component> confirmLoreList = new ArrayList<>();
-		if (mPricePerItemAmount > 0 && mAmountToSell > 0 && mItemToSell != null && mCurrencyItem != null) {
+		boolean invalidAmounts = mAmountToSell < 0 || mAmountToSell > 36*64 /*fullInvOfItems*/ || mPricePerItemAmount < 0 || mPricePerItemAmount > 36*64*64*8 /* full inv of HXP */;
+		if (!invalidAmounts) {
+			long total = (long)mAmountToSell * (long)mPricePerItemAmount;
+			if (total < 0 || total > (long)Integer.MAX_VALUE) {
+				invalidAmounts = true;
+			}
+		}
+		if (!invalidAmounts && mPricePerItemAmount > 0 && mAmountToSell > 0 && mItemToSell != null && mCurrencyItem != null) {
 			// amount parameter in MarketManager#calculateTaxDebt must be > 0 or else error occurs
 			WalletUtils.Debt taxDebt = MarketManager.getInstance().calculateTaxDebt(mPlayer, mCurrencyItem, mPricePerItemAmount * mAmountToSell);
 			confirmLoreList.add(Component.text("To create a listing, you will need to pay a tax of:", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
@@ -932,6 +939,9 @@ public class MarketGUI extends Gui {
 				Component.text("Please either select an item, a valid amount,", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false),
 				Component.text("or a valid price per item.", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
 			));
+			if (invalidAmounts) {
+				confirmLoreList.add(Component.text("It seems the amounts of either the item or price leads to an error.", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+			}
 			setItem(1, 7, GUIUtils.createExclamation(confirmLoreList));
 		}
 

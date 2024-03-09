@@ -387,9 +387,13 @@ public class MarketManager {
 		// calculate the debt
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currencyItem.asQuantity((int)famount), player, true);
 
-		player.sendMessage("" + famount);
+		if (famount <= 0) { //overflow security
+			player.sendMessage("The amount is too low. please increase it");
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
+			debt = new WalletUtils.Debt(debt.mItem, debt.mTotalRequiredAmount, Integer.MAX_VALUE, Integer.MAX_VALUE, false, 0, 0);
+		}
 
-		if (famount > Integer.MAX_VALUE) { //overflow security
+		if (famount >= (long)Integer.MAX_VALUE) { //overflow security
 			player.sendMessage("The amount is too much. please reduce it");
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
 			debt = new WalletUtils.Debt(debt.mItem, debt.mTotalRequiredAmount, Integer.MAX_VALUE, Integer.MAX_VALUE, false, 0, 0);
