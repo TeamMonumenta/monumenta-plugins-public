@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.WalletUtils;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -131,6 +132,8 @@ public class MarketGUI extends Gui {
 	boolean mIsOp;
 
 	int mPlayerMaxListings;
+
+	private static final HashSet<String> mMarketOngoingPlayerActions = new HashSet<>();
 
 	public MarketGUI(Player player, MarketGuiTab startingTab) {
 		super(player, 6 * 9, Component.text("Market"));
@@ -320,11 +323,15 @@ public class MarketGUI extends Gui {
 			confirmLore.add(Component.text((mBuyListingMultiplier * mBuyListingFocusedListing.getAmountToBuy()) + " " + ItemUtils.getPlainNameOrDefault(mBuyListingFocusedListing.getItemToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			setItem(4, 5, GUIUtils.createConfirm(confirmLore))
 				.onClick((clickEvent) -> {
+					if (initiatePlayerAction(mPlayer)) {
+						return;
+					}
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 						if (mBuyListingFocusedListing != null) {
 							MarketManager.performPurchase(mPlayer, mBuyListingFocusedListing, mBuyListingMultiplier);
 						}
 						mIsLoadingData = 2;
+						endPlayerAction(mPlayer);
 						update();
 					});
 				});
@@ -413,10 +420,14 @@ public class MarketGUI extends Gui {
 			desc.add(Component.text("The listing won't exist anymore").decoration(TextDecoration.ITALIC, false));
 			setItem(6, GUIUtils.createBasicItem(Material.LAVA_BUCKET, 1, Component.text("Claim and delete the listing", NamedTextColor.GOLD), desc, true))
 				.onClick((clickEvent) -> {
+					if (initiatePlayerAction(mPlayer)) {
+						return;
+					}
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 						if (mBuyListingFocusedListing != null) {
 							MarketManager.claimEverythingAndDeleteListing(mPlayer, mBuyListingFocusedListing);
 						}
+						endPlayerAction(mPlayer);
 					});
 					switchToTab(MarketGuiTab.MAIN_MENU);
 				});
@@ -503,13 +514,19 @@ public class MarketGUI extends Gui {
 					MarketListing listing = listingsIter.next();
 					setItem(i, listing.getListingDisplayItemStack(mPlayer, MarketGuiTab.PLAYER_LISTINGS))
 						.onClick((clickEvent) -> {
+							if (initiatePlayerAction(mPlayer)) {
+								return;
+							}
 							switch (clickEvent.getClick()) {
 								case LEFT:
-									Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-										MarketManager.claimClaimable(mPlayer, listing);
-										mIsLoadingData = 2;
-										update();
-									});
+									if (listing.getAmountToClaim() == 0) {
+										Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+											MarketManager.claimClaimable(mPlayer, listing);
+											mIsLoadingData = 2;
+											endPlayerAction(mPlayer);
+											update();
+										});
+									}
 									break;
 								case RIGHT:
 									Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
@@ -519,6 +536,7 @@ public class MarketGUI extends Gui {
 											MarketManager.lockListing(mPlayer, listing);
 										}
 										mIsLoadingData = 2;
+										endPlayerAction(mPlayer);
 										update();
 									});
 									break;
@@ -526,11 +544,13 @@ public class MarketGUI extends Gui {
 									Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 										MarketManager.claimEverythingAndDeleteListing(mPlayer, listing);
 										mIsLoadingData = 2;
+										endPlayerAction(mPlayer);
 										update();
 									});
 									break;
 								default:
 									// Do nothing
+									endPlayerAction(mPlayer);
 							}
 						});
 				} else {
@@ -926,8 +946,12 @@ public class MarketGUI extends Gui {
 				// Confirmation of adding a new listing
 				setItem(1, 7, GUIUtils.createConfirm(confirmLoreList))
 					.onClick((clickEvent) -> {
+						if (initiatePlayerAction(mPlayer)) {
+							return;
+						}
 						if (mItemToSell != null && mCurrencyItem != null) {
 							MarketManager.getInstance().addNewListing(mPlayer, mItemToSell, mAmountToSell, mPricePerItemAmount, mCurrencyItem, taxDebt);
+							endPlayerAction(mPlayer);
 							switchToTab(MarketGuiTab.PLAYER_LISTINGS);
 						}
 					});
@@ -999,6 +1023,19 @@ public class MarketGUI extends Gui {
 		}
 	}
 
+	private static boolean initiatePlayerAction(Player player) {
+		if (mMarketOngoingPlayerActions.contains(player.getName())) {
+			return true;
+		}
+		mMarketOngoingPlayerActions.add(player.getName());
+		return false;
+	}
+
+	private static void endPlayerAction(Player player) {
+		mMarketOngoingPlayerActions.remove(player.getName());
+	}
+
+
 	private void setupModeratorMenu() {
 		setItem(0, GUIUtils.createBasicItem(Material.BARRIER, "Back to main menu", NamedTextColor.GOLD, true)).onClick((clickEvent) -> switchToTab(MarketGuiTab.MAIN_MENU));
 		setItem(1, GUIUtils.createBasicItem(Material.BOOKSHELF, "Browse ALL listings", NamedTextColor.GOLD, true)).onClick((clickEvent) -> switchToTab(MarketGuiTab.LISTINGS_BROWSER));
@@ -1008,4 +1045,5 @@ public class MarketGUI extends Gui {
 		setItem(8, GUIUtils.createBasicItem(Material.BARRIER, "Close market", NamedTextColor.RED, true)).onClick((clickEvent) -> switchToTab(MarketGuiTab.NOT_IMPLEMENTED));
 	}
 }
+
 //991

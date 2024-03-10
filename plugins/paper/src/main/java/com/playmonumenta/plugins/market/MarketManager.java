@@ -43,6 +43,10 @@ public class MarketManager {
 	public static void claimClaimable(Player player, MarketListing listing) {
 		// WARNING: Call this in an async thread
 		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
+		if (oldListing.getAmountToClaim() == 0) {
+			// nothing to claim
+			return;
+		}
 		MarketListing newListing = new MarketListing(oldListing);
 		int amountToGive = oldListing.getAmountToClaim() * oldListing.getAmountToBuy();
 		newListing.setAmountToClaim(0);
@@ -89,9 +93,9 @@ public class MarketManager {
 			MarketRedisManager.deleteListing(newListing);
 			AuditListener.logMarket(player.getName() + " deleted listing #" + listing.getId());
 			InventoryUtils.giveItem(player, newListing.getItemToBuy().asQuantity(currencyToGive));
-			AuditListener.logMarket(player.getName() + " claimed " + currencyToGive + "*" + ItemUtils.getPlainName(listing.getItemToBuy()) + " from listing #" + listing.getId());
+			AuditListener.logMarket(player.getName() + " claimed item " + currencyToGive + "*" + ItemUtils.getPlainName(listing.getItemToBuy()) + " from listing #" + listing.getId());
 			InventoryUtils.giveItem(player, newListing.getItemToSell().asQuantity(itemsToGive));
-			AuditListener.logMarket(player.getName() + " claimed " + itemsToGive + "*" + ItemUtils.getPlainName(listing.getItemToSell()) + " from listing #" + listing.getId());
+			AuditListener.logMarket(player.getName() + " claimed money " + itemsToGive + "*" + ItemUtils.getPlainName(listing.getItemToSell()) + " from listing #" + listing.getId());
 
 		}
 	}
