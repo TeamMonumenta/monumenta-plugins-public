@@ -54,7 +54,7 @@ public class MarketManager {
 			return;
 		}
 		InventoryUtils.giveItem(player, listing.getItemToBuy().asQuantity(amountToGive));
-		AuditListener.logMarket(player.getName() + " claimed " + amountToGive + "*" + ItemUtils.getPlainName(listing.getItemToBuy()) + " from listing #" + listing.getId());
+		MarketAudit.logClaim(player, listing, amountToGive);
 	}
 
 	public static void unlockListing(Player player, MarketListing listing) {
@@ -63,8 +63,8 @@ public class MarketManager {
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setLocked(false);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
-		MarketListingIndex.ACTIVE_LISTINGS.addListingRaw(listing);
-		AuditListener.logMarket(player.getName() + " unlocked listing #" + listing.getId());
+		MarketListingIndex.ACTIVE_LISTINGS.addListingToIndexIfMatching(listing);
+		MarketAudit.logUnlockAction(player, listing);
 	}
 
 	public static void lockListing(Player player, MarketListing listing) {
@@ -73,8 +73,8 @@ public class MarketManager {
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setLocked(true);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
-		MarketListingIndex.ACTIVE_LISTINGS.removeListing(listing);
-		AuditListener.logMarket(player.getName() + " locked listing #" + listing.getId());
+		MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(listing);
+		MarketAudit.logLockAction(player, listing);
 	}
 
 	public static void claimEverythingAndDeleteListing(Player player, MarketListing listing) {
@@ -91,11 +91,9 @@ public class MarketManager {
 				marketPlayerData.removeListingIDFromPlayer(newListing.getId());
 			}
 			MarketRedisManager.deleteListing(newListing);
-			AuditListener.logMarket(player.getName() + " deleted listing #" + listing.getId());
 			InventoryUtils.giveItem(player, newListing.getItemToBuy().asQuantity(currencyToGive));
-			AuditListener.logMarket(player.getName() + " claimed item " + currencyToGive + "*" + ItemUtils.getPlainName(listing.getItemToBuy()) + " from listing #" + listing.getId());
 			InventoryUtils.giveItem(player, newListing.getItemToSell().asQuantity(itemsToGive));
-			AuditListener.logMarket(player.getName() + " claimed money " + itemsToGive + "*" + ItemUtils.getPlainName(listing.getItemToSell()) + " from listing #" + listing.getId());
+			MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
 
 		}
 	}
@@ -106,7 +104,7 @@ public class MarketManager {
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setExpired(true);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
-		AuditListener.logMarket(player.getName() + " expired listing #" + listing.getId());
+		MarketAudit.logExpire(player, listing);
 	}
 
 	public static void unexpireListing(Player player, MarketListing listing) {
@@ -115,7 +113,7 @@ public class MarketManager {
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setExpired(false);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
-		AuditListener.logMarket(player.getName() + " unexpired listing #" + listing.getId());
+		MarketAudit.logUnexpire(player, listing);
 	}
 
 	public static List<String> itemIsSellable(Player mPlayer, ItemStack currentItem, ItemStack currency) {
@@ -161,10 +159,10 @@ public class MarketManager {
 	public static void openNewMarketGUI(Player player) {
 		OptionalInt score = ScoreboardUtils.getScoreboardValue(player, "MarketPluginBanned");
 		if (score.isPresent() && score.getAsInt() != 0) {
-			player.sendMessage(Component.text("You are currently banned from the player market. Contact a moderator if you belive this is wrong, or for an appeal.", NamedTextColor.RED));
+			player.sendMessage(Component.text("You are currently banned from the player market. Contact a moderator if you believe this is wrong, or for an appeal.", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
 		} else if (!player.hasPermission("monumenta.marketaccess")) {
-			player.sendMessage(Component.text("You do not have market access. maybe the market is closed? try again later, or contact a moderator if you belive this is not normal.", NamedTextColor.RED));
+			player.sendMessage(Component.text("You do not have market access. Maybe the market is closed? Try again later, or contact a moderator if you believe this is not normal.", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
 		} else {
 			new MarketGUI(player, MarketGUI.MarketGuiTab.MAIN_MENU).open();
@@ -194,7 +192,7 @@ public class MarketManager {
 			MarketListingIndex.resyncAllIndexes();
 			player.sendMessage(Component.text("LockAll action finished", NamedTextColor.GREEN));
 			player.sendMessage(amountLocked + " listings locked");
-			AuditListener.logMarket(player.getName() + " expired " + amountLocked + "listings");
+			MarketAudit.logLockAllAction(player, amountLocked);
 			if (amountErrors > 0) {
 				player.sendMessage(Component.text(amountErrors + " listings could not be locked. they were probably being used by other players. see logs above. If that number is too high, re running the LockAll action might fix, if not, contact ray, and if the locking is urgent, close the market.", NamedTextColor.RED));
 			}
@@ -278,7 +276,6 @@ public class MarketManager {
 			player.sendMessage("Something went wrong: you do not have enough money to pay the tax. listing creation cancelled");
 			return;
 		}
-		AuditListener.logMarket(player.getName() + " Paid a tax of " + taxDebt.mTotalRequiredAmount + "*" + ItemUtils.getPlainName(taxDebt.mItem));
 
 		// remove the items from player inventory
 		HashMap<?, ?> failedToRemove = player.getInventory().removeItem(itemToSell.asQuantity(amountToSell));
@@ -291,14 +288,15 @@ public class MarketManager {
 		MarketListing createdListing = MarketRedisManager.createAndAddNewListing(player, itemToSell, amountToSell, pricePerItemAmount, currencyItemStack);
 		if (createdListing == null) {
 			// creation failed on the redis side
-			player.sendMessage("Something went wrong: Server failed to create the listing.");
+			player.sendMessage("Something went wrong: Server failed to create the listing. You need to contact a moderator for tax refund. amount is given in logs");
+			AuditListener.logMarket("!ERROR! Player " + player.getName() + "needs a " + taxDebt.mTotalRequiredAmount + "*" + ItemUtils.getPlainName(taxDebt.mItem) + "tax refund, because the listing failed to be created in redis");
 			return;
 		}
-		AuditListener.logMarket(player.getName() + " Created listing #" + createdListing.getId() + ": " + amountToSell + "*" + ItemUtils.getPlainName(itemToSell) + " for " + pricePerItemAmount + "*" + ItemUtils.getPlainName(currencyItemStack) + " each");
 		MarketManager.getInstance().linkListingToPlayerData(player, createdListing.getId());
+		MarketAudit.logCreate(player, createdListing, taxDebt);
 	}
 
-	public static boolean performPurchase(Player player, MarketListing listing, int amount) {
+	public static void performPurchase(Player player, MarketListing listing, int amount) {
 		// WARNING: Call this in an async thread
 
 		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
@@ -308,16 +306,16 @@ public class MarketManager {
 		MarketListingStatus purchasableStatus = oldListing.getPurchasableStatus(amount);
 		if (purchasableStatus.isError()) {
 			player.sendMessage(purchasableStatus.getFormattedAssociatedMessage());
-			return false;
+			return;
 		}
 
 		ItemStack currency = oldListing.getItemToBuy().clone();
-		currency.setAmount(oldListing.getAmountToBuy());
+		currency.setAmount(oldListing.getAmountToBuy() * amount);
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, player, true);
 
 		if (!debt.mMeetsRequirement) {
 			player.sendMessage(Component.text("You don't have enough currency to purchase this."));
-			return false;
+			return;
 		}
 
 		// update the listing in redis
@@ -325,14 +323,14 @@ public class MarketManager {
 		newListing.setAmountToClaim(oldListing.getAmountToClaim() + amount);
 		if (!MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
 			player.sendMessage(Component.text("Impossible to buy listing: Update failed"));
-			return false;
+			return;
 		}
 
 		if (newListing.getPurchasableStatus(1).isError()) {
 			// the new listing values makes it so the listing is not able to be bought anymore
 			// remove it from the active_listings index, does not need to be instant.
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				MarketListingIndex.ACTIVE_LISTINGS.removeListing(listing);
+				MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(listing);
 			});
 		}
 
@@ -341,10 +339,8 @@ public class MarketManager {
 			WalletUtils.payDebt(debt, player, true);
 			InventoryUtils.giveItem(player, oldListing.getItemToSell().asQuantity(amount));
 			player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.7f);
-			AuditListener.logMarket(player.getName() + " Bought from listing #" + oldListing.getId() + ": " + amount + "*" + ItemUtils.getPlainName(oldListing.getItemToSell()) + " for " + debt.mTotalRequiredAmount + "*" + ItemUtils.getPlainName(debt.mItem));
+			MarketAudit.logBuyAction(player, oldListing, amount, debt.mTotalRequiredAmount, debt.mItem);
 		});
-
-		return true;
 
 	}
 

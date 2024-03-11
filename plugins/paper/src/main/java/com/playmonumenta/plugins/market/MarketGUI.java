@@ -248,7 +248,7 @@ public class MarketGUI extends Gui {
 
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, mPlayer, true);
 
-		long amountAvailable = Math.min(debt.mNumInWallet + debt.mNumInInventory, mBuyListingFocusedListing.getAmountToSellRemaining());
+		long amountAvailable = Math.min(debt.mNumInWallet + debt.mNumInInventory, (long)mBuyListingFocusedListing.getAmountToSellRemaining() * mBuyListingFocusedListing.getAmountToBuy());
 		int maxMultiplier = (int)(amountAvailable / mBuyListingFocusedListing.getAmountToBuy());
 
 		// currency display
@@ -526,6 +526,8 @@ public class MarketGUI extends Gui {
 											endPlayerAction(mPlayer);
 											update();
 										});
+									} else {
+										endPlayerAction(mPlayer);
 									}
 									break;
 								case RIGHT:
@@ -1045,5 +1047,3 @@ public class MarketGUI extends Gui {
 		setItem(8, GUIUtils.createBasicItem(Material.BARRIER, "Close market", NamedTextColor.RED, true)).onClick((clickEvent) -> switchToTab(MarketGuiTab.NOT_IMPLEMENTED));
 	}
 }
-
-//991

@@ -60,7 +60,7 @@ public class MarketRedisManager {
 		// as such, to make the creation/update of listing faster, we do index update later
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			for (MarketListingIndex index : MarketListingIndex.values()) {
-				index.addListingRaw(listing);
+				index.addListingToIndexIfMatching(listing);
 			}
 		});
 
@@ -180,7 +180,7 @@ public class MarketRedisManager {
 		// as such, to make the creation/update of listing faster, we do index update later
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			for (MarketListingIndex index : MarketListingIndex.values()) {
-				index.removeListing(listing);
+				index.removeListingFromIndex(listing);
 			}
 		});
 	}

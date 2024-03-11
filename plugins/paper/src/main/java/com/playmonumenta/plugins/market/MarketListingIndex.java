@@ -47,7 +47,7 @@ public enum MarketListingIndex {
 		this.mMatchMethod = matchMethod;
 	}
 
-	public void removeListing(MarketListing listing) {
+	public void removeListingFromIndex(MarketListing listing) {
 		// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
 		// a simpler, but unique algorithm needs to be used
 		if (this == ACTIVE_LISTINGS) {
@@ -99,30 +99,31 @@ public enum MarketListingIndex {
 	}
 
 
-	public void addListingRaw(MarketListing listing) {
+	public void addListingToIndexIfMatching(MarketListing listing) {
 
 		// only add to listing if said listing matches the index conditions
 		if (this.mMatchMethod.apply(listing)) {
-			String key = this.mGetKeyMethod.apply(listing);
-
-			// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
-			// a simpler, but unique algorithm needs to be used
-			if (this == ACTIVE_LISTINGS) {
-				RedisAPI.getInstance().sync().lpush(mRedisPath, key);
-				return;
-			}
-
-
-			// get the current values of the index, at listing key
-			String listingIdList = RedisAPI.getInstance().sync().hget(mRedisPath, key);
-			// add the new listing ID to the list
-			listingIdList += "," + listing.getId();
-			// push the new value
-			RedisAPI.getInstance().sync().hset(mRedisPath, key, listingIdList);
-
+			this.addListingToIndex(listing);
 		}
 
+	}
 
+	public void addListingToIndex(MarketListing listing) {
+		String key = this.mGetKeyMethod.apply(listing);
+
+		// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
+		// a simpler, but unique algorithm needs to be used
+		if (this == ACTIVE_LISTINGS) {
+			RedisAPI.getInstance().sync().lpush(mRedisPath, key);
+			return;
+		}
+
+		// get the current values of the index, at listing key
+		String listingIdList = RedisAPI.getInstance().sync().hget(mRedisPath, key);
+		// add the new listing ID to the list
+		listingIdList += "," + listing.getId();
+		// push the new value
+		RedisAPI.getInstance().sync().hset(mRedisPath, key, listingIdList);
 	}
 
 
