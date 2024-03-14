@@ -157,7 +157,7 @@ public class StatTrackManager implements Listener {
 			ItemStatUtils.removeInfusion(item, enchant);
 			return;
 		}
-		if (oldStat == 0 || !isPlayersItem(item, player)) {
+		if (oldStat == 0 || !isPlayersItem(item, player) || PlayerData.getPatreonDollars(player) < PATRON_TIER) {
 			return;
 		}
 		List<StatTrackData> dataList = mData.get(player.getUniqueId());
