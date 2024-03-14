@@ -39,7 +39,10 @@ public interface DisplayableEffect {
 	}
 
 	static List<DisplayableEffect> getSortedEffects(Plugin plugin, LivingEntity entity) {
-		List<DisplayableEffect> effects = getEffects(plugin, entity);
+		return sortEffects(getEffects(plugin, entity));
+	}
+
+	static List<DisplayableEffect> sortEffects(List<DisplayableEffect> effects) {
 		effects.sort((effect1, effect2) -> effect2.getDisplayPriority() - effect1.getDisplayPriority());
 		return effects;
 	}

@@ -318,6 +318,7 @@ public class Plugin extends JavaPlugin {
 		BlockDisplayCommand.register();
 		AddSpawnerEffectMarkersCommand.register();
 		SiriusNPCBoss.register();
+		EffectListCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
