@@ -21,7 +21,9 @@ import org.bukkit.Material;
 enum PSGUISecondaryStat {
 	POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
 		Gain (Level*20%%) effective Armor
-		when above %s%% Max Health.""".formatted(StringUtils.multiplierToPercentage(Poise.MIN_HEALTH_PERCENT))),
+		when above %s%% Max Health
+		or (Level*10%%) effective Armor
+		when above %s%% Max Health""".formatted(StringUtils.multiplierToPercentage(Poise.MIN_HEALTH_PERCENT), StringUtils.multiplierToPercentage(Poise.HALF_BONUS_PERCENT))),
 	INURE(2, Material.NETHERITE_SCRAP, EnchantmentType.INURE, true, """
 		Gain (Level*20%) effective Armor
 		when taking the same type of mob damage consecutively
@@ -29,9 +31,8 @@ enum PSGUISecondaryStat {
 		being half as effective in the case of alternating damage types
 		after activation, until a third type of damage is taken."""),
 	STEADFAST(3, Material.LEAD, EnchantmentType.STEADFAST, true, """
-		Scaling with percent health missing,
-		gain up to (Level*20%%) effective Armor
-		(%s%% armor per 1%% health lost, up to 20%% armor).
+		Gain (Level*%s%%) armor for every
+		1%% health lost, up to (Level*20%% armor).
 		Also calculates bonus from Second Wind when enabled.""".formatted(Steadfast.BONUS_SCALING_RATE)),
 	ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
 		Gain (Level*20%%) effective Agility
