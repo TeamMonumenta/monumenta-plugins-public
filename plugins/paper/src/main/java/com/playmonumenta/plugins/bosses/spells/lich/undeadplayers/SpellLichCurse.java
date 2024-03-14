@@ -7,11 +7,11 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
 public class SpellLichCurse extends Spell {
+	private final LivingEntity mBoss;
+	private final PartialParticle mParticle1;
+	private final PartialParticle mParticle2;
 
-	private LivingEntity mBoss;
 	private int mT = 0;
-	private PartialParticle mParticle1;
-	private PartialParticle mParticle2;
 
 	public SpellLichCurse(LivingEntity boss) {
 		mBoss = boss;

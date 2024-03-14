@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -25,13 +26,15 @@ import org.bukkit.scheduler.BukkitRunnable;
  * Cloud is active for 15 seconds, afterwards, explodes and deal 40 damage to all players nearby.
  */
 public class SpellPotionCloud extends Spell {
+	private static final String SPELL_NAME = "Unstable Concoction";
+	private static final String SLOWNESS_SRC = "UnstableConcoctionSlowness";
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PartialParticle mWitch;
-	private PartialParticle mBreath;
-	private PartialParticle mLava;
-	private PartialParticle mExpH;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PartialParticle mWitch;
+	private final PartialParticle mBreath;
+	private final PartialParticle mLava;
+	private final PartialParticle mExpH;
 
 	public SpellPotionCloud(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
@@ -66,8 +69,9 @@ public class SpellPotionCloud extends Spell {
 
 				if (mT % 10 == 0 && mT >= 20 && mT < 20 * 15) {
 					for (Player p : PlayerUtils.playersInRange(loc, 2, true)) {
-						DamageUtils.damage(mBoss, p, DamageType.AILMENT, 2, null, false, true, "Unstable Concoction");
-						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 0));
+						DamageUtils.damage(mBoss, p, DamageType.AILMENT, 2, null, false, true, SPELL_NAME);
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
+							new PercentSpeed(20 * 30, -0.15, SLOWNESS_SRC));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 30, 0));
 						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 30, 0.15, "Lich");
 					}
@@ -83,8 +87,9 @@ public class SpellPotionCloud extends Spell {
 					mExpH.location(loc).spawnAsEnemy();
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 1f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3, true)) {
-						DamageUtils.damage(mBoss, p, DamageType.BLAST, 35, null, false, true, "Unstable Concoction");
-						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
+						DamageUtils.damage(mBoss, p, DamageType.BLAST, 35, null, false, true, SPELL_NAME);
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
+							new PercentSpeed(20 * 10, -0.3, SLOWNESS_SRC));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 10, 2));
 						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 10, 0.25, "Lich");
 						MovementUtils.knockAway(loc, p, 0.7f, false);

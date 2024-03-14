@@ -24,19 +24,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+/*
+ * Lich shoots 4 phantom blades towards the 4 cardinal direction, travel 24 blocks
+ * after the blade expires or reaches the edge of the arena, it summons invisible, invulnerable, 1 damage vexes with particle indication
+ * vexes are active for 20 seconds
+ *
+ * if players are attacked by the blade, does 50% damage, then apply curse
+ * if players bounding box overlaps vex, apply curse, kill vex
+ *
+ * CURSE: the player receive double damage from all sources and -50% healing for 1 minute.
+ */
 public class SpellDarkOmen extends Spell {
-
-	/*
-	 * Lich shoots 4 phantom blades towards the 4 cardinal direction, travel 24 blocks
-	 * after the blade expires or reaches the edge of the arena, it summons invisible, invulnerable, 1 damage vexes with particle indication
-	 * vexes are active for 20 seconds
-	 *
-	 * if players are attacked by the blade, does 50% damage, then apply curse
-	 * if players bounding box overlaps vex, apply curse, kill vex
-	 *
-	 * CURSE: the player receive double damage from all sources and -50% healing for 1 minute.
-	 */
-
 	private static final String SPELL_NAME = "Dark Omen";
 	private static final int TELL = 20 * 2;
 	private static final double MAX_RANGE = 24;
@@ -80,16 +78,16 @@ public class SpellDarkOmen extends Spell {
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT = 0.0;
-			List<Vector> mBasevec = new ArrayList<>();
+			List<Vector> mBaseVec = new ArrayList<>();
 
 			@Override
 			public void run() {
 				mChargeUp.nextTick();
 				if (mT == 0) {
-					mBasevec.add(new Vector(0, 0, 1));
-					mBasevec.add(new Vector(-4, 0, -2).normalize());
-					mBasevec.add(new Vector(4, 0, -2).normalize());
-					launchBlade(mBasevec, world, true);
+					mBaseVec.add(new Vector(0, 0, 1));
+					mBaseVec.add(new Vector(-4, 0, -2).normalize());
+					mBaseVec.add(new Vector(4, 0, -2).normalize());
+					launchBlade(mBaseVec, world, true);
 				}
 				mT++;
 				//4 points swirl into center
@@ -99,9 +97,9 @@ public class SpellDarkOmen extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 5.0f, pitch);
 					for (int i = 0; i < 4; i++) {
 						Vector quad = VectorUtils.rotateYAxis(dir.clone(), 90 * i);
-						Vector qlength = quad.multiply(1 - mT / TELL);
-						Vector qdir = VectorUtils.rotateYAxis(qlength.clone(), 90 / (mT / TELL));
-						Location l = mBoss.getLocation().add(qdir).add(0, 0.5, 0);
+						Vector qLength = quad.multiply(1 - mT / TELL);
+						Vector qDir = VectorUtils.rotateYAxis(qLength.clone(), 90 / (mT / TELL));
+						Location l = mBoss.getLocation().add(qDir).add(0, 0.5, 0);
 						mPSoul.location(l).spawnAsBoss();
 					}
 				}
@@ -115,7 +113,7 @@ public class SpellDarkOmen extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, SoundCategory.HOSTILE, 10.0f, 1.0f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, SoundCategory.HOSTILE, 10.0f, 0.75f);
 
-					launchBlade(mBasevec, world, false);
+					launchBlade(mBaseVec, world, false);
 					this.cancel();
 					mChargeUp.reset();
 				}
@@ -126,10 +124,10 @@ public class SpellDarkOmen extends Spell {
 		mActiveRunnables.add(runA);
 	}
 
-	public void launchBlade(List<Vector> basevec, World world, boolean warning) {
+	public void launchBlade(List<Vector> baseVec, World world, boolean warning) {
 		//loop for each direction, starting +Z, clockwise
 		for (int i = 0; i <= 3; i++) {
-			List<Vector> vec = new ArrayList<>(basevec);
+			List<Vector> vec = new ArrayList<>(baseVec);
 
 			//rotate vectors
 			for (int j = 0; j < vec.size(); j++) {
@@ -148,7 +146,7 @@ public class SpellDarkOmen extends Spell {
 				@Override
 				public void run() {
 					mT++;
-					Location anchor = startLoc.clone();
+					Location anchor;
 					//iterate twice for higher accuracy
 					for (int x = 0; x < 2; x++) {
 						anchor = startLoc.clone().add(dir.clone().multiply(VELOCITY / 20 * (mT + 0.5 * x)));

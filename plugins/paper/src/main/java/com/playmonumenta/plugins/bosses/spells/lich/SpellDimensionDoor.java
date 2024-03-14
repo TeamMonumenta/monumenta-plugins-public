@@ -52,7 +52,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellDimensionDoor extends Spell {
-
 	private static final String SPELL_NAME = "Dimension Door";
 	private static final int COOLDOWN = 20 * 45;
 	private static final int PLAYER_CAP = 15;
@@ -75,9 +74,9 @@ public class SpellDimensionDoor extends Spell {
 	private final List<Location> mPortalLoc = new ArrayList<>();
 	private final List<Location> mReplaceLoc = new ArrayList<>();
 	private final double mRange;
-	private int mT = 20 * 10;
-	private boolean mCanRun = true;
 	private final ChargeUpManager mChargeUp;
+	private boolean mCanRun = true;
+	private int mT = 20 * 10;
 
 	public SpellDimensionDoor(Plugin plugin, LivingEntity boss, Location spawnLoc, double range) {
 		mPlugin = plugin;
@@ -133,7 +132,7 @@ public class SpellDimensionDoor extends Spell {
 		if (players.size() <= 2) {
 			targets = players;
 		} else {
-			int cap = (int) Math.min(PLAYER_CAP, Math.ceil(players.size() / 2));
+			int cap = (int) Math.min(PLAYER_CAP, Math.ceil(players.size() / 2.0));
 			for (int i = 0; i < cap; i++) {
 				Player player = players.get(mRand.nextInt(players.size()));
 				if (targets.contains(player)) {
@@ -415,7 +414,7 @@ public class SpellDimensionDoor extends Spell {
 						p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.GENERIC_NAME,
-							new PercentDamageReceived(20 * 5, 1.0));
+							new PercentDamageReceived(20 * 5, -1.0));
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, CustomRegeneration.effectID,
 							new CustomRegeneration(20 * 5, 1.0, 25, null, com.playmonumenta.plugins.Plugin.getInstance()));
 

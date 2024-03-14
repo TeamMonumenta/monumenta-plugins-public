@@ -23,10 +23,9 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 
 public class SpellVolley extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PartialParticle mSpark;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PartialParticle mSpark;
 
 	public SpellVolley(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;

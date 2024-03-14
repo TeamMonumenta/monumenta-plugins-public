@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.lich.horseman;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -18,8 +19,6 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -30,11 +29,13 @@ targeting the player who has his aggro using the shadows to extend his reach. Ea
  for 5 seconds.
  */
 public class SpellLichSinisterReach extends Spell {
+	private static final String SPELL_NAME = "Sinister Reach";
+	private static final String SLOWNESS_SRC = "SinisterReachSlowness";
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mLoc;
-	private double mRange;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mLoc;
+	private final double mRange;
 
 	public SpellLichSinisterReach(Plugin plugin, LivingEntity entity, Location loc, double range) {
 		mPlugin = plugin;
@@ -45,16 +46,16 @@ public class SpellLichSinisterReach extends Spell {
 
 	@Override
 	public void run() {
+		LivingEntity horse;
 		LivingEntity target = null;
+
 		mBoss.setAI(false);
-		LivingEntity horse = null;
 		if (mBoss.getVehicle() != null) {
 			horse = (LivingEntity) mBoss.getVehicle();
 			horse.setAI(false);
 		}
-		if (mBoss instanceof Creature) {
-			Creature c = (Creature) mBoss;
-			target = c.getTarget();
+		if (mBoss instanceof Creature creature) {
+			target = creature.getTarget();
 		}
 
 		if (target == null) {
@@ -68,14 +69,14 @@ public class SpellLichSinisterReach extends Spell {
 		if (target != null) {
 			World world = mBoss.getWorld();
 			LivingEntity tar = target;
-			double degree = 20 / 2;
+			double degree = 20.0 / 2.0;
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_CAT_HISS, SoundCategory.HOSTILE, 3, 0.5f);
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 3, 0.85f);
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1.25f);
 			BukkitRunnable runA = new BukkitRunnable() {
+				final Vector mDir = LocationUtils.getDirectionTo(tar.getLocation().add(0, 1, 0), mBoss.getLocation());
+				final Location mTLoc = mBoss.getLocation().setDirection(mDir);
 				int mT = 0;
-				Vector mDir = LocationUtils.getDirectionTo(tar.getLocation().add(0, 1, 0), mBoss.getLocation());
-				Location mTloc = mBoss.getLocation().setDirection(mDir);
 
 				@Override
 				public void run() {
@@ -96,13 +97,13 @@ public class SpellLichSinisterReach extends Spell {
 					for (double r = 1; r < 5; r += 0.5) {
 						for (double m = degree * -1; m <= degree; m += 5) {
 							double radian1 = Math.toRadians(m);
-							float yaw = mTloc.getYaw();
+							float yaw = mTLoc.getYaw();
 							float yaw1 = yaw + 90;
 							vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 							vec = VectorUtils.rotateYAxis(vec, yaw1);
-							vec = VectorUtils.rotateXAxis(vec, mTloc.getPitch());
+							vec = VectorUtils.rotateXAxis(vec, mTLoc.getPitch());
 
-							Location l = mTloc.clone().add(vec);
+							Location l = mTLoc.clone().add(vec);
 							new PartialParticle(Particle.CRIT, l, 1, 0.5, 0.5, 0.5, 0.05).spawnAsEntityActive(mBoss);
 						}
 					}
@@ -129,12 +130,12 @@ public class SpellLichSinisterReach extends Spell {
 						for (double r = 1; r < 5; r += 0.5) {
 							for (double n = degree * -1; n <= degree; n += 5) {
 								double radian1 = Math.toRadians(n);
-								float yaw = mTloc.getYaw();
+								float yaw = mTLoc.getYaw();
 								float yaw2 = yaw + 90;
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-								vec = VectorUtils.rotateXAxis(vec, mTloc.getPitch());
+								vec = VectorUtils.rotateXAxis(vec, mTLoc.getPitch());
 								vec = VectorUtils.rotateYAxis(vec, yaw2);
-								Location l = mTloc.clone().add(vec);
+								Location l = mTLoc.clone().add(vec);
 								new PartialParticle(Particle.FLAME, l, 1, 0.1, 0.1, 0.1, 0.065).spawnAsEntityActive(mBoss);
 								if (r >= 4.5) {
 									new PartialParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
@@ -168,9 +169,10 @@ public class SpellLichSinisterReach extends Spell {
 				if (mInc < 24 && mInc % 2 == 0) {
 					p.setNoDamageTicks(0);
 					new PartialParticle(Particle.CRIT_MAGIC, p.getLocation(), 15, 0.1, 0.1, 0.1, 0.75).spawnAsEntityActive(mBoss);
-					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true, "Sinister Reach");
+					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true, SPELL_NAME);
 					// Doesn't matter if the player is blocking, there are 12 hits and only one can be blocked
-					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
+						new PercentSpeed(20, -1.0, SLOWNESS_SRC));
 				}
 				if (mInc >= 24) {
 					mBoss.setAI(true);
