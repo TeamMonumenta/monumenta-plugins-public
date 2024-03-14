@@ -113,7 +113,6 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 	private boolean mRunDamageNextTick = false;
 
 	private @Nullable LivingEntity mTarget = null;
-	private boolean mChainActive = false;
 
 	private final JudgementChainCS mCosmetic;
 
@@ -126,8 +125,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 	}
 
 	public boolean cast() {
-		if (mChainActive) {
-			mChainActive = false;
+		if (mTarget != null) {
 			breakChain(true, true);
 			mTarget = null;
 			ClientModHandler.updateAbility(mPlayer, this);
@@ -135,14 +133,13 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 			if (isOnCooldown()) {
 				return false;
 			}
-			summonChain();
-			mChainActive = true;
+			return summonChain();
 		}
 		return true;
 	}
 
 	public void passDamage(DamageEvent event) {
-		if (mChainActive && mTarget != null && event.getDamagee() == mTarget && event.getType() != DamageType.TRUE) {
+		if (mTarget != null && event.getDamagee() == mTarget && event.getType() != DamageType.TRUE) {
 			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
 			e.remove(mTarget);
 			e.removeIf(entity -> mPlugin.mEffectManager.hasEffect(entity, EFFECT_NAME));
@@ -195,7 +192,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 		}
 	}
 
-	public void summonChain() {
+	public boolean summonChain() {
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
 
@@ -242,13 +239,11 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 					if (mTarget == null || mPlayer.isDead() || (mTarget != null && (mTarget.isDead() || !mTarget.isValid()))) {
 						this.cancel();
 						if (mTarget != null) {
-							mChainActive = false;
 							breakChain(false, false);
 							mTarget = null;
 						}
-					} else if (l.distance(mTarget.getLocation()) > range || mT >= mRunnableDuration) {
+					} else if ((mTarget != null && l.distance(mTarget.getLocation()) > range) || mT >= mRunnableDuration) {
 						this.cancel();
-						mChainActive = false;
 						breakChain(true, false);
 						mTarget = null;
 					}
@@ -264,7 +259,9 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 			}.runTaskTimer(mPlugin, 0, 1));
 
 			putOnCooldown();
+			return true;
 		}
+		return false;
 	}
 
 	public void breakChain(boolean doDamage, boolean doPull) {
@@ -388,9 +385,9 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mChainActive) {
+		if (mTarget != null) {
 			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), 36, false)) {
-				mPlugin.mEffectManager.addEffect(p, "JudgementChainPlayerEffectBy" + mPlayer.getName(), new JudgementChainPlayerEffect(20, mPlayer));
+				mPlugin.mEffectManager.addEffect(p, "JudgementChainPlayerEffectBy" + mPlayer.getName(), new JudgementChainPlayerEffect(20, this));
 			}
 		}
 	}
