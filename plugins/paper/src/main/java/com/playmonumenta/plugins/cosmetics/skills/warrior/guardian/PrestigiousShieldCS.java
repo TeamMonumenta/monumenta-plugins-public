@@ -94,16 +94,13 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void shieldWallDot(Player player, Location l, double degree, double angle, double y, int height) {
-		if (goldCheck(degree / angle, y / height)) {
-			new PartialParticle(Particle.FIREWORKS_SPARK, l, 1, 0.03, 0.05, 0.03, 1000000).spawnAsPlayerActive(player);
-		} else {
-			new PartialParticle(Particle.WAX_ON, l, 1, 0.03, 0.05, 0.03, 1000000).spawnAsPlayerActive(player);
-		}
+	public Particle baseParticle() {
+		return Particle.WAX_ON;
 	}
 
-	private boolean goldCheck(double x, double y) {
-		return Math.abs(1 - (Math.abs(x - 0.5) * 2) - y) <= 0.2;
+	@Override
+	public Particle replaceParticle(double angleRatio, double heightRatio) {
+		return Math.abs(1 - (Math.abs(angleRatio - 0.5) * 2) - heightRatio) <= 0.2 ? Particle.FIREWORKS_SPARK : baseParticle();
 	}
 
 	@Override
@@ -115,11 +112,11 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void shieldOnHit(World world, Location eLoc, Player player) {
-		new PartialParticle(Particle.CLOUD, eLoc, 30, 0.2, 0.2, 0.2, 0.35f).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, eLoc, 15, 0.5, 0.8, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
-		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.8f, 1.4f);
-		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.9f, 1.6f);
-		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.95f, 1.75f);
+	public void shieldOnHit(World world, Location eLoc, Player player, float multiplier) {
+		new PartialParticle(Particle.CLOUD, eLoc, (int) (30 * multiplier), 0.2, 0.2, 0.2, 0.35f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, eLoc, (int) (15 * multiplier), 0.5, 0.8, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
+		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.8f * multiplier, 1.4f);
+		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.9f * multiplier, 1.6f);
+		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.95f * multiplier, 1.75f);
 	}
 }

@@ -16,12 +16,10 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +30,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class ShieldWall extends Ability implements AbilityWithDuration {
 
@@ -130,7 +127,6 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 			@Override
 			public void run() {
 				mCurrDuration++;
-				Vector vec;
 
 				if (!mDeposited) {
 					double lastY = mLoc.getY();
@@ -142,16 +138,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 
 				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, mRadius - 0.4, mRadius + 0.4, Math.toRadians(mAngle) / 2);
 
-				for (double degree = 0; degree < mAngle; degree += 9) {
-					double radian1 = Math.toRadians(degree - 0.5 * mAngle);
-					vec = new Vector(-FastUtils.sin(radian1) * mRadius, -1, FastUtils.cos(radian1) * mRadius);
-					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
-					Location l = mLoc.clone().add(vec);
-					for (double y = 0; y < mHeight + 1; y += 0.75) {
-						l.add(0, 1, 0);
-						mCosmetic.shieldWallDot(mPlayer, l, degree, mAngle, y, mHeight);
-					}
-				}
+				mCosmetic.wallParticles(mPlayer, mLoc, mRadius, mAngle, mHeight);
 
 				List<Projectile> projectiles = hitbox.getHitEntitiesByClass(Projectile.class);
 				for (Projectile proj : projectiles) {
@@ -176,7 +163,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 						if (!enteredWall) {
 							y -= 0.15f;
 						}
-						mCosmetic.shieldOnHit(world, le.getLocation(), mPlayer);
+						mCosmetic.shieldOnHit(world, le.getLocation(), mPlayer, enteredWall ? 1 : 0.5f);
 						MovementUtils.knockAway(mLoc, le, mKnockback, y, true);
 						mPlugin.mEffectManager.addEffect(le, ON_HIT_EFFECT + mPlayer.getName(), new OnHitTimerEffect(5, 0));
 					}
