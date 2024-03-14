@@ -575,11 +575,20 @@ public class DepthsListener implements Listener {
 
 			if (nearZenithBoss) {
 				player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_BOSS_TAG);
+				MMLog.info(player.getName() + " logged out near boss and will have their death counter increased.");
 			} else {
 				List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS);
 				nearbyMobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 				if (!nearbyMobs.isEmpty()) {
 					player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_MOB_TAG);
+					StringBuilder names = new StringBuilder();
+					for (int i = 0; i < 5; i++) {
+						names.append(" ").append(nearbyMobs.get(i));
+						if (i < 4) {
+							names.append(",");
+						}
+					}
+					MMLog.info(player.getName() + " logged out near mobs and will have their death counter increased. Mobs include: " + names);
 				}
 			}
 		}
@@ -708,6 +717,7 @@ public class DepthsListener implements Listener {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
 					shouldOfflineTeleport = false;
+					MMLog.info(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 					AuditListener.logDeath(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 				}
 			}
