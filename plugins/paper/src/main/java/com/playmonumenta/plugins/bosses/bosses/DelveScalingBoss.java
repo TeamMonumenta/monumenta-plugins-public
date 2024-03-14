@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.delves.DelvesManager;
+import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -41,15 +41,11 @@ public class DelveScalingBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		DelveScalingBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new DelveScalingBoss.Parameters());
-		Player player = EntityUtils.getNearestPlayer(mBoss.getLocation(), p.DETECTION);
+		List<Player> playerParty = DelvesManager.getParty(mBoss.getLocation());
 
-		if (player != null) {
-			Map<String, DelvesManager.DungeonDelveInfo> map = DelvesUtils.getDelveInfoMap(player);
-			DelvesManager.DungeonDelveInfo info = map.get(ServerProperties.getShardName());
-			if (info != null) {
-				mPoints = info.mTotalPoint;
-			}
-		}
+		Map<DelvesModifier, Integer> delvesApplied = DelvesUtils.getPartyDelvePointsMap(playerParty);
+		mPoints = DelvesUtils.getTotalPoints(delvesApplied);
+
 		mDamageMult = 1 + Math.min(mPoints * p.DAMAGE_PER_POINT, p.MAX_DAMAGE_SCALE);
 		mResistMult = 1 / (1 + Math.min(mPoints * p.EHP_PER_POINT, p.MAX_EHP_SCALE));
 
