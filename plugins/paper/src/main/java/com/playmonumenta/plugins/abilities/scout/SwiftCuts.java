@@ -73,6 +73,8 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	private final double mDamageAmplifier;
 	private final int mMaxStacks;
 	private final int mDuration;
+	private final double mTacticalManeuverCDR;
+	private final double mPredatorStrikeCDR;
 	private int mStacks;
 
 	private final SwiftCutsCS mCosmetic;
@@ -82,6 +84,8 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 		mMaxStacks = (isLevelOne() ? STACKS_CAP_1 : STACKS_CAP_2) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDamageAmplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EFFECT_DURATION);
+		mTacticalManeuverCDR = TACTICAL_MANEUVER_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE);
+		mPredatorStrikeCDR = PREDATOR_STRIKE_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE);
 		mStacks = 0;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SwiftCutsCS());
 	}
@@ -128,6 +132,14 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 
 	public boolean isEnhancementActive() {
 		return isEnhanced() && mStacks == mMaxStacks && hasEffect();
+	}
+
+	public double getTacticalManeuverCDR() {
+		return mTacticalManeuverCDR;
+	}
+
+	public double getPredatorStrikeCDR() {
+		return mPredatorStrikeCDR;
 	}
 
 	@Override
