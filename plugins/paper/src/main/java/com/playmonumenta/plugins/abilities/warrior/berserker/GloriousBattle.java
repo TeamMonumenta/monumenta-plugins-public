@@ -74,7 +74,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.shorthandName("GB")
 			.descriptions(
 				("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
-					 "Shift and swap hands to consume a stack and charge forwards at %s blocks per second, gaining full knockback resistance until landing. " +
+					 "Shift and swap hands while holding a sword or axe to consume a stack and charge forwards at %s blocks per second, gaining full knockback resistance until landing. " +
 					 "Vertical movement speed is capped at %s blocks per second upwards. " +
 					 "Colliding with enemies while charging deals %s damage and %s extra damage. " +
 					 "When you land without dealing damage, deal %s damage to the nearest mob within %s blocks. " +
