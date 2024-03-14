@@ -65,7 +65,7 @@ public class SpellVesperidysAnticheese extends Spell {
 
 	@Override
 	public void run() {
-		if (mVesperidys.mPhase == 0) {
+		if (mVesperidys.mPhase == 0 || mVesperidys.mDefeated || mVesperidys.mDead) {
 			return;
 		}
 

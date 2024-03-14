@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
@@ -184,6 +185,10 @@ public class VoidCorruption extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
+		if (mBoss.isDead() || !mBoss.isValid() || mVesperidys.mDefeated) {
+			MMLog.severe("Vesperidys attempted entityGainEvent while dead/dying. Method & Line number: " + new Throwable().getStackTrace()[1]);
+			return;
+		}
 		if (entity instanceof Player player) {
 			player.playSound(entity.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 20, 1);
 			player.sendMessage(
