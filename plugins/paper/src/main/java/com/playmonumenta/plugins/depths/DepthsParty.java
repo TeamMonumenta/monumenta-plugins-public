@@ -123,6 +123,8 @@ public class DepthsParty {
 	public DepthsContent mContent;
 	public @Nullable Vector mDeathWaitingRoomPoint;
 	public int mAscension;
+	//Whether or not the party is currently loading a room - used to prevent players from spawning 2 rooms on top of each other
+	public boolean mIsLoadingRoom = false;
 
 	/**
 	 * Creates a new depths party with the given players

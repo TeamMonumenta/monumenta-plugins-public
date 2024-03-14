@@ -32,7 +32,9 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.io.File;
@@ -47,6 +49,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -729,5 +732,13 @@ public class DepthsListener implements Listener {
 		// Make sure to remove anticheese tags
 		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_MOB_TAG);
 		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_BOSS_TAG);
+
+		if (dp == null
+			&& player.getGameMode() == GameMode.SURVIVAL
+			&& !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.LOOTROOM)
+			&& manager.getParty(player.getWorld()) != null
+			&& Plugin.IS_PLAY_SERVER) {
+			PlayerUtils.executeCommandOnPlayer(player, "function monumenta:lobbies/abandon_instance");
+		}
 	}
 }

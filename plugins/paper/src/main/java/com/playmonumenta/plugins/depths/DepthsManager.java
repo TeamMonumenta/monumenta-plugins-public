@@ -1118,7 +1118,7 @@ public class DepthsManager {
 	 */
 	public void playerSelectedRoom(DepthsRoomType roomType, Player player) {
 		DepthsParty party = getDepthsParty(player);
-		if (player == null || party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null) {
+		if (player == null || party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null || party.mIsLoadingRoom) {
 			return;
 		}
 		party.mNextRoomChoices.clear();
@@ -1973,5 +1973,15 @@ public class DepthsManager {
 
 	public boolean hasActiveAbility(DepthsPlayer dp) {
 		return getPlayerAbilities(dp).stream().anyMatch(info -> info.getDepthsTrigger().isActive());
+	}
+
+	public @Nullable DepthsParty getParty(World world) {
+		UUID uuid = world.getUID();
+		for (DepthsParty party : mParties) {
+			if (uuid.equals(party.mWorldUUID)) {
+				return party;
+			}
+		}
+		return null;
 	}
 }

@@ -127,8 +127,12 @@ public abstract class RoomRepository {
 
 		party.setRoomX(spawn.getBlockX());
 
+		party.mIsLoadingRoom = true;
 		MMLog.info("Summoning structure " + room.mLoadPath);
-		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true, true);
+		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true, true)
+			.whenComplete((unused, ex) -> {
+				party.mIsLoadingRoom = false;
+			});
 
 		if (DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH && roomType == DepthsRoomType.BOSS) {
 			List<Player> players = party.getPlayers();
