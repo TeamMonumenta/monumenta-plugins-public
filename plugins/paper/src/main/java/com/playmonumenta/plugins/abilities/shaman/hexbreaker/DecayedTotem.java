@@ -23,7 +23,13 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -85,7 +91,6 @@ public class DecayedTotem extends TotemAbility {
 			.displayItem(Material.WITHER_ROSE);
 
 	private final double mDamage;
-	private final int mDuration;
 	private final double mRadius;
 	private final double mSlowness;
 	private final int mTargetCount;
@@ -107,11 +112,6 @@ public class DecayedTotem extends TotemAbility {
 		mTargetCount = TARGETS + (int) CharmManager.getLevel(mPlayer, CHARM_TARGETS);
 		mFlameTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_FLAME_TOTEM_DAMAGE_BUFF, FLAME_TOTEM_DAMAGE_BUFF);
 		mLightningTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_LIGHTNING_TOTEM_DAMAGE_BUFF, LIGHTNING_TOTEM_DAMAGE_BUFF);
-	}
-
-	@Override
-	public int getInitialAbilityDuration() {
-		return mDuration;
 	}
 
 	@Override

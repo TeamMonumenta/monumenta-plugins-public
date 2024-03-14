@@ -48,7 +48,6 @@ public class CleansingTotem extends TotemAbility {
 	public static String CHARM_ENHANCE_ABSORB_MAX = "Cleansing Totem Enhance Absorption Maximum";
 	public static String CHARM_PULSE_DELAY = "Cleansing Totem Pulse Delay";
 
-	private final int mDuration;
 	private final double mRadius;
 	private final int mInterval;
 	private final double mHealPercent;
@@ -94,11 +93,6 @@ public class CleansingTotem extends TotemAbility {
 			+ (isEnhanced() ? ENHANCE_HEALING_PERCENT : 0);
 		mAbsorbCap = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_ABSORB_MAX, ENHANCE_ABSORB_CAP);
 		mChargeUpTicks = 0;
-	}
-
-	@Override
-	public int getInitialAbilityDuration() {
-		return mDuration;
 	}
 
 	@Override
