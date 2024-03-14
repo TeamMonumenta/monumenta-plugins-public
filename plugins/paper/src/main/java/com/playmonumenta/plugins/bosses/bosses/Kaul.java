@@ -20,13 +20,12 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
-import com.playmonumenta.plugins.effects.CustomRegeneration;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -43,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -193,8 +193,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if (player.isSleeping()) {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulAntiSleepSlowness",
-							new PercentSpeed(20 * 15, -0.3, "KaulAntiSleepSlowness"));
+						EffectType.applyEffect(EffectType.SLOW, player, 15 * 20, 0.3, "KaulAntiSleepSlowness", false);
 						player.sendMessage(Component.text("THE JUNGLE FORBIDS YOU TO DREAM.", NamedTextColor.DARK_GREEN));
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
@@ -213,7 +212,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
 
 		// Needed to prevent potential double instance on phase change
-		SpellKaulsJudgement singleKaulsJudgementInstance = new SpellKaulsJudgement(mBoss);
+		SpellKaulsJudgement singleKaulsJudgementInstance = new SpellKaulsJudgement(mBoss, this);
 
 		SpellManager phase2Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, false),
@@ -722,6 +721,20 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			@Override
 			public void run() {
 				constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 10);
+
+				// Advancements listeners
+
+				mAdvancements.forEach(KaulAdvancementHandler::onBossSpawn);
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						mAdvancements.forEach(KaulAdvancementHandler::onTick);
+						if (mDefeated || mBoss.isDead() || !mBoss.isValid()) {
+							this.cancel();
+						}
+					}
+
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
 
 		}.runTaskLater(mPlugin, (20 * 10) + 1);
@@ -786,8 +799,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulKnockbackSlowness",
-				new PercentSpeed(20 * 5, -0.3, "KaulKnockbackSlowness"));
+			EffectType.applyEffect(EffectType.SLOW, player, 5 * 20, 0.3, "KaulKnockbackSlowness", false);
 		}
 		new BukkitRunnable() {
 			double mRotation = 0;
@@ -872,6 +884,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		mPlayerCount = getArenaParticipants().size();
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
+
+		mAdvancements.forEach(a -> a.onPlayerDeath(event.getPlayer()));
 	}
 
 	private @Nullable LivingEntity spawnPrimordial(Location loc) {
@@ -933,12 +947,11 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		mDefeated = true;
 		knockback(mPlugin, 10);
 
+		mAdvancements.forEach(KaulAdvancementHandler::onBossDeath);
+
 		for (Player player : players) {
-			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulWinResistance",
-				new PercentDamageReceived(20 * 40, -1.0, null));
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "KaulWinRegeneration",
-				new CustomRegeneration(20 * 10, 1.0, 25, null, com.playmonumenta.plugins.Plugin.getInstance()));
+			EffectType.applyEffect(EffectType.DAMAGE_NEGATE, player, 40 * 20, 1, "KaulWinResistance", false);
+			EffectType.applyEffect(EffectType.VANILLA_REGEN, player, 10 * 20, 1, "KaulWinRegeneration", false);
 			SongManager.stopSong(player, true);
 		}
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
@@ -1135,15 +1148,19 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 	}
 
 	public Collection<Player> getArenaParticipants() {
+		return getArenaParticipantsY(0, ARENA_MAX_Y);
+	}
+
+	public Collection<Player> getArenaParticipantsY(int yStart, int yEnd) {
 		if (mShrineMarker == null) {
 			return Collections.emptyList();
 		}
 
 		Location arenaCenter = mShrineMarker.getLocation();
-		arenaCenter.setY(0);
+		arenaCenter.setY(yStart);
 
 		// Cylinder from y 0 to 62
-		Hitbox hb = new Hitbox.UprightCylinderHitbox(arenaCenter, ARENA_MAX_Y, ARENA_WIDTH / 2d);
+		Hitbox hb = new Hitbox.UprightCylinderHitbox(arenaCenter, yEnd, ARENA_WIDTH / 2d);
 
 		return hb.getHitPlayers(true);
 	}
@@ -1160,6 +1177,116 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		Component component = Component.text(message, NamedTextColor.DARK_GREEN);
 		for (Player player : getArenaParticipants()) {
 			player.sendMessage(component);
+		}
+	}
+
+	public void judgementSuccess(Player p) {
+		mAdvancements.forEach(a -> a.onJudgementSuccess(p));
+	}
+
+	private final List<KaulAdvancementHandler> mAdvancements = Arrays.asList(
+		// MLOCI
+		new KaulAdvancementHandler() {
+			final HashSet<UUID> mHs = new HashSet<>();
+			int mTick = 0;
+
+			boolean hasFedora(Player p) {
+				return MessagingUtils.plainText(p.getEquipment().getHelmet().displayName()).equals("Fedora");
+			}
+
+			@Override
+			void onBossSpawn() {
+				getArenaParticipants().forEach(p -> {
+					if (hasFedora(p)) {
+						mHs.add(p.getUniqueId());
+					}
+				});
+			}
+
+			@Override
+			void onTick() {
+				mTick++;
+				if (mTick % 10 != 0) {
+					return;
+				}
+				getArenaParticipants().forEach(p -> {
+					 if (mHs.contains(p.getUniqueId()) && !hasFedora(p)) {
+						mHs.remove(p.getUniqueId());
+					 }
+				});
+			}
+
+			@Override
+			void onBossDeath() {
+				getArenaParticipants().forEach(p -> {
+					if (mHs.contains(p.getUniqueId()) && hasFedora(p)) {
+						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/mloci");
+					}
+				});
+			}
+		},
+
+		// CELEBRITY
+		new KaulAdvancementHandler() {
+			int mTick = 0;
+
+			@Override
+			void onTick() {
+				mTick++;
+				if (mTick % 10 == 0 && getArenaParticipantsY(ARENA_MAX_Y, 256).size() >= 15) {
+					getArenaParticipants().forEach(p -> {
+						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/celebrity");
+					});
+				}
+			}
+		},
+
+		// SO CLOSE
+		new KaulAdvancementHandler() {
+			HashSet<UUID> mHs = new HashSet<>();
+
+			@Override
+			void onBossSpawn() {
+				getArenaParticipants().forEach(p -> mHs.add(p.getUniqueId()));
+			}
+
+			@Override
+			void onPlayerDeath(Player p) {
+				if (mHs.remove(p.getUniqueId()) && mBoss.getHealth() / MAX_HEALTH <= 0.1) {
+					AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/soclose");
+				}
+			}
+		},
+
+		// UNLUCKY
+		new KaulAdvancementHandler() {
+			private final HashSet<UUID> mSucceededPlayersForAdvancement = new HashSet<>();
+
+			@Override
+			void onJudgementSuccess(Player p) {
+				// If this is the player's second success, grant achievement. Otherwise mark that they have succeeded once.
+				if (mSucceededPlayersForAdvancement.remove(p.getUniqueId())) {
+					AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/unlucky");
+				} else {
+					mSucceededPlayersForAdvancement.add(p.getUniqueId());
+				}
+			}
+		});
+
+	private static class KaulAdvancementHandler {
+		void onBossSpawn() {
+		}
+
+		void onBossDeath() {
+		}
+
+		void onPlayerDeath(Player p) {
+		}
+
+		void onTick() {
+		}
+
+		void onJudgementSuccess(Player p) {
 		}
 	}
 }

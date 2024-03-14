@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentHealthBoost;
@@ -75,6 +76,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private final Plugin mPlugin = Plugin.getInstance();
 	private final Location mBossLoc;
 	private final LivingEntity mBoss;
+	private final Kaul mKaul;
 	private @Nullable LivingEntity mTp = null;
 	private boolean mOnCooldown = false;
 
@@ -82,8 +84,9 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 
 	private final ChargeUpManager mChargeUp;
 
-	public SpellKaulsJudgement(LivingEntity boss) {
+	public SpellKaulsJudgement(LivingEntity boss, Kaul kaul) {
 		mBoss = boss;
+		mKaul = kaul;
 		mBossLoc = boss.getLocation();
 		mChargeUp = new ChargeUpManager(boss, KAULS_JUDGEMENT_CHARGE_TIME, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_GREEN, TextDecoration.BOLD)),
 			BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, 75);
@@ -255,6 +258,8 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
 		player.sendMessage(Component.text("You escaped! You feel much more invigorated from your survival!", NamedTextColor.AQUA));
+
+		mKaul.judgementSuccess(player);
 
 		endCommon(player);
 	}
