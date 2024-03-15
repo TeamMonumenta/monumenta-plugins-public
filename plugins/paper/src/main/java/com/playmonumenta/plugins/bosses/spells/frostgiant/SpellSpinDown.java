@@ -165,7 +165,7 @@ public class SpellSpinDown extends Spell {
 			}
 		};
 
-		runnable.runTaskTimer(mPlugin, 0, 1);
+		runnable.runTaskTimer(mPlugin, 1, 1);
 		mActiveRunnables.add(runnable);
 
 		// Damage players standing on frosted ice for the duration

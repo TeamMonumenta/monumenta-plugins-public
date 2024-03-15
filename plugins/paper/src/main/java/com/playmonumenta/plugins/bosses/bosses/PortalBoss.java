@@ -64,6 +64,7 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 	public int mCubesDropped;
 	public int mPhase = 1;
 	public @Nullable BukkitRunnable mHideRunnable = null;
+	public @Nullable BukkitRunnable mRotateRunnable = null;
 	public List<Location> mReplaceBlocks;
 
 	public PortalBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -174,6 +175,16 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 		if (mHideRunnable != null) {
 			mHideRunnable.cancel();
 		}
+		if (mRotateRunnable == null) {
+			mRotateRunnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					Location loc = mBoss.getLocation();
+					mBoss.setRotation(loc.getYaw() + 10, loc.getPitch());
+				}
+			};
+			mRotateRunnable.runTaskTimer(mPlugin, 1, 1);
+		}
 		mHideRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -184,17 +195,23 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void hide() {
-		if (mBoss.isDead() || mIsHidden) {
-			return;
-		}
-
 		// Cancel any existing hide task
 		if (mHideRunnable != null) {
 			mHideRunnable.cancel();
 		}
 
+		if (mRotateRunnable != null) {
+			mRotateRunnable.cancel();
+			mRotateRunnable = null;
+		}
+
+		if (mBoss.isDead() || mIsHidden) {
+			return;
+		}
+
+
 		// Kill any active cubes
-		Bukkit.dispatchCommand(mBoss, CUBE_FUNCTION);
+		Bukkit.dispatchCommand(mBoss, CUBE_FUNCTION); // This code is broken and does nothing at the moment!
 
 		mBoss.setGlowing(false);
 		mBoss.teleport(mSpawnLoc.clone().add(0, -15, 0));
