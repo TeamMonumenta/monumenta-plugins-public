@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.market;
 
+import com.google.gson.GsonBuilder;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -50,6 +51,19 @@ public class MarketCommands {
 			.executesPlayer((player, args) -> {
 				player.sendMessage(MarketManager.getInstance().getListingsOfPlayer(player).toString());
 
+			})
+			.register();
+
+		arguments = new ArrayList<>();
+		arguments.add(new LiteralArgument("reloadConfig"));
+		new CommandAPICommand("market")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				MarketManager.reloadConfig();
+				GsonBuilder gsonBuilder = new GsonBuilder();
+				gsonBuilder.setPrettyPrinting();
+				player.sendMessage(gsonBuilder.create().toJson(MarketManager.getConfig()));
 			})
 			.register();
 

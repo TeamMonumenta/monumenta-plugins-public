@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.market;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -7,8 +8,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.WalletUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -36,8 +40,32 @@ public class MarketManager {
 	private static final String KEY_PLUGIN_DATA = "Market";
 	private static HashMap<Player, MarketPlayerData> mMarketPlayerDataInstances = new HashMap<>();
 
+	public MarketConfig mConfig = new MarketConfig();
+
 	public static MarketManager getInstance() {
 		return INSTANCE;
+	}
+
+	public static void reloadConfig() {
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			MarketManager instance = MarketManager.getInstance();
+			String json = null;
+			try {
+				json = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/market.json");
+			} catch (Exception e) {
+				MMLog.severe("Caught Market plugin exception while loading the config : ", e);
+			}
+			if (json == null) {
+				instance.mConfig = new MarketConfig();
+				instance.mConfig.mIsMarketOpen = false;
+			} else {
+				instance.mConfig = new Gson().fromJson(json, MarketConfig.class);
+			}
+		});
+	}
+
+	public static MarketConfig getConfig() {
+		return MarketManager.getInstance().mConfig;
 	}
 
 	public static void claimClaimable(Player player, MarketListing listing) {
@@ -53,7 +81,9 @@ public class MarketManager {
 		if (!MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
 			return;
 		}
-		InventoryUtils.giveItem(player, listing.getItemToBuy().asQuantity(amountToGive));
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			InventoryUtils.giveItem(player, listing.getItemToBuy().asQuantity(amountToGive));
+		});
 		MarketAudit.logClaim(player, listing, amountToGive);
 	}
 
@@ -63,7 +93,7 @@ public class MarketManager {
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setLocked(false);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
-		MarketListingIndex.ACTIVE_LISTINGS.addListingToIndexIfMatching(listing);
+		MarketListingIndex.ACTIVE_LISTINGS.addListingToIndexIfMatching(newListing);
 		MarketAudit.logUnlockAction(player, listing);
 	}
 
@@ -73,7 +103,7 @@ public class MarketManager {
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setLocked(true);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
-		MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(listing);
+		MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(newListing);
 		MarketAudit.logLockAction(player, listing);
 	}
 
@@ -91,10 +121,11 @@ public class MarketManager {
 				marketPlayerData.removeListingIDFromPlayer(newListing.getId());
 			}
 			MarketRedisManager.deleteListing(newListing);
-			InventoryUtils.giveItem(player, newListing.getItemToBuy().asQuantity(currencyToGive));
-			InventoryUtils.giveItem(player, newListing.getItemToSell().asQuantity(itemsToGive));
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				InventoryUtils.giveItem(player, newListing.getItemToBuy().asQuantity(currencyToGive));
+				InventoryUtils.giveItem(player, newListing.getItemToSell().asQuantity(itemsToGive));
+			});
 			MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
-
 		}
 	}
 
@@ -133,6 +164,16 @@ public class MarketManager {
 			errors.add("You cannot sell a book-like item containing filled pages. Empty it first!");
 		}
 
+		List<Component> signContents = ItemUtils.getSignContents(currentItem);
+		if (signContents != null) {
+			for (Component c : signContents) {
+				if (!MessagingUtils.plainText(c).isEmpty()) {
+					errors.add("You cannot sell a sign that contains text.");
+					break;
+				}
+			}
+		}
+
 		if (ItemUtils.getDamagePercent(currentItem) > 0.0f) {
 			errors.add("You cannot sell damaged items. Repair it first!");
 		}
@@ -157,12 +198,21 @@ public class MarketManager {
 	}
 
 	public static void openNewMarketGUI(Player player) {
-		OptionalInt score = ScoreboardUtils.getScoreboardValue(player, "MarketPluginBanned");
-		if (score.isPresent() && score.getAsInt() != 0) {
-			player.sendMessage(Component.text("You are currently banned from the player market. Contact a moderator if you believe this is wrong, or for an appeal.", NamedTextColor.RED));
-			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
+		OptionalInt bannedScore = ScoreboardUtils.getScoreboardValue(player, "MarketPluginBanned");
+		OptionalInt magentaScore = ScoreboardUtils.getScoreboardValue(player, "Magenta");
+		String error = null;
+		if (magentaScore.isEmpty() || magentaScore.getAsInt() == 0) {
+			error = "You need to have completed the Magenta Wool Dungeon to use the Marketplace. Aim for the 'Roots of the Plague' quest to unlock this Dungeon.";
+		} else if (bannedScore.isPresent() && bannedScore.getAsInt() != 0) {
+			error = "You are currently banned from the player market. Contact a moderator if you believe this is wrong, or for an appeal.";
 		} else if (!player.hasPermission("monumenta.marketaccess")) {
-			player.sendMessage(Component.text("You do not have market access. Maybe the market is closed? Try again later, or contact a moderator if you believe this is not normal.", NamedTextColor.RED));
+			error = "You do not have market access. Try again later, or contact a moderator if you believe this is not normal.";
+		} else if (!MarketManager.getInstance().mConfig.mIsMarketOpen) {
+			error = "Market is currently closed.";
+		}
+
+		if (error != null) {
+			player.sendMessage(Component.text(error, NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
 		} else {
 			new MarketGUI(player, MarketGUI.MarketGuiTab.MAIN_MENU).open();
@@ -337,7 +387,9 @@ public class MarketManager {
 		// give items to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(), () -> {
 			WalletUtils.payDebt(debt, player, true);
-			InventoryUtils.giveItem(player, oldListing.getItemToSell().asQuantity(amount));
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				InventoryUtils.giveItem(player, oldListing.getItemToSell().asQuantity(amount));
+			});
 			player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.7f);
 			MarketAudit.logBuyAction(player, oldListing, amount, debt.mTotalRequiredAmount, debt.mItem);
 		});
@@ -381,8 +433,8 @@ public class MarketManager {
 			compressionInfo = WalletManager.getCompressionInfo(currencyItem);
 		}
 		// at this point, we should have the most decompressed possible currency, with an appropriately scaled amount
-		// apply tax rate : 10%
-		famount = Math.ceil(famount * 0.1);
+		// apply tax rate
+		famount = Math.ceil(famount * MarketManager.getConfig().mBazaarTaxRate);
 
 		// calculate the debt
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currencyItem.asQuantity((int)famount), player, true);

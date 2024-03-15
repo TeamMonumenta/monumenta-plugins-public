@@ -3,7 +3,13 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -33,7 +39,9 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -1630,6 +1638,21 @@ public class ItemUtils {
 		}
 
 		return pages;
+	}
+
+	public static @Nullable List<Component> getSignContents(ItemStack item) {
+		if (item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (!meta.hasDisplayName()) {
+				if (ItemUtils.isSign(item.getType()) && meta instanceof BlockStateMeta blockStateMeta) {
+					BlockState blockState = blockStateMeta.getBlockState();
+					if (blockState instanceof Sign signItem) {
+						return signItem.lines();
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ReadableNBT nbt) {

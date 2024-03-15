@@ -57,6 +57,7 @@ import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.market.MarketCommands;
 import com.playmonumenta.plugins.market.MarketListener;
+import com.playmonumenta.plugins.market.MarketManager;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.minigames.pzero.PzeroManager;
 import com.playmonumenta.plugins.mmquest.commands.MMQuest;
@@ -416,6 +417,8 @@ public class Plugin extends JavaPlugin {
 		//  Load info.
 		reloadMonumentaConfig(null);
 
+		MarketManager.reloadConfig();
+
 		// Chunk loading/unloading helper
 		manager.registerEvents(new ChunkManager(this), this);
 
@@ -512,7 +515,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mPzeroManager, this);
 		manager.registerEvents(new Lockdown(), this);
 		manager.registerEvents(new IchorListener(), this);
-		manager.registerEvents(new MarketListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);

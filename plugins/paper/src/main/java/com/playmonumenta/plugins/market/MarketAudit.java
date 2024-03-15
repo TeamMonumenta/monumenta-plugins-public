@@ -22,8 +22,8 @@ public class MarketAudit {
 			"BUY \n" +
 			"Listing : " + targetListing.getId() + "\n" +
 			"Player : " + player.getName() + "\n" +
-			"Bought : " + amountItemToSell + "*" + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
-			"For : " + amountToPay + "*" + ItemUtils.getPlainName(currencyToPay);
+			"Bought : " + amountItemToSell + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
+			"For : " + amountToPay + " * " + ItemUtils.getPlainName(currencyToPay);
 		AuditListener.logMarket(message);
 	}
 
@@ -55,8 +55,8 @@ public class MarketAudit {
 		String message = "CLAIM AND DELETE\n" +
 			"Player : " + player.getName() + "\n" +
 			"Listing : " + targetListing.getId() + "\n" +
-			"Claimed Items : " + itemsToGive + "*" + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
-			"Claimed Currency" + currencyToGive + "*" + ItemUtils.getPlainName(targetListing.getItemToBuy());
+			"Claimed Items : " + itemsToGive + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
+			"Claimed Currency : " + currencyToGive + " * " + ItemUtils.getPlainName(targetListing.getItemToBuy());
 		AuditListener.logMarket(message);
 	}
 
@@ -64,7 +64,7 @@ public class MarketAudit {
 		String message = "CLAIM\n" +
 			"Player : " + player.getName() + "\n" +
 			"Listing : " + targetListing.getId() + "\n" +
-			"Claimed Currency" + amountToGive + "*" + ItemUtils.getPlainName(targetListing.getItemToBuy());
+			"Claimed Currency : " + amountToGive + " * " + ItemUtils.getPlainName(targetListing.getItemToBuy());
 		AuditListener.logMarket(message);
 	}
 
@@ -72,9 +72,9 @@ public class MarketAudit {
 		String message = "CREATE\n" +
 			"Player : " + player.getName() + "\n" +
 			"Listing : " + targetListing.getId() + "\n" +
-			"To Sell : " + targetListing.getAmountToSellRemaining() + "*" + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
-		    "Price : " + targetListing.getAmountToBuy() + "*" + ItemUtils.getPlainName(targetListing.getItemToBuy()) + "\n" +
-			"Tax paid : " + taxDebt.mTotalRequiredAmount + "*" + ItemUtils.getPlainName(taxDebt.mItem);
+			"To Sell : " + targetListing.getAmountToSellRemaining() + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
+		    "Price : " + targetListing.getAmountToBuy() + " * " + ItemUtils.getPlainName(targetListing.getItemToBuy()) + "\n" +
+			"Tax paid : " + taxDebt.mTotalRequiredAmount + " * " + ItemUtils.getPlainName(taxDebt.mItem);
 		AuditListener.logMarket(message);
 	}
 

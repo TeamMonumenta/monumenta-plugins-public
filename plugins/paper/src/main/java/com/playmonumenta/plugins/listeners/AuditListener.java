@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.Arrays;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Material;

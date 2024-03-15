@@ -140,7 +140,7 @@ public class MarketGUI extends Gui {
 		mCurrentTab = startingTab;
 		mIsOp = player.hasPermission("monumenta.command.market");
 		mPlayerListingsIds = MarketManager.getInstance().getListingsOfPlayer(player);
-		mPlayerMaxListings = 90;
+		mPlayerMaxListings = MarketManager.getConfig().mAmountOfPlayerListingsSlots;
 	}
 
 	@Override
@@ -519,7 +519,7 @@ public class MarketGUI extends Gui {
 							}
 							switch (clickEvent.getClick()) {
 								case LEFT:
-									if (listing.getAmountToClaim() == 0) {
+									if (listing.getAmountToClaim() != 0) {
 										Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 											MarketManager.claimClaimable(mPlayer, listing);
 											mIsLoadingData = 2;
@@ -944,6 +944,7 @@ public class MarketGUI extends Gui {
 			confirmLoreList.add(Component.text(taxDebt.mTotalRequiredAmount + " " + ItemUtils.getPlainName(taxDebt.mItem) + " ", NamedTextColor.WHITE)
 				.append(Component.text(taxDebt.mMeetsRequirement ? "✓" : "✗", (taxDebt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED)))
 				.append(Component.text(taxDebt.mWalletDebt > 0 ? " (" + taxDebt.mNumInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
+			confirmLoreList.add(Component.text(String.format("Tax Rate: %f%%", MarketManager.getConfig().mBazaarTaxRate*100), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			if (taxDebt.mMeetsRequirement) {
 				// Confirmation of adding a new listing
 				setItem(1, 7, GUIUtils.createConfirm(confirmLoreList))
