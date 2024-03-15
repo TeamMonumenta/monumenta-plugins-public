@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.gui.PlayerItemStatsGUI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.PlayerArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -20,23 +20,23 @@ public class PlayerItemStatsGUICommand {
 			}).register();
 
 		new CommandAPICommand("playerstats").withPermission(perms).withAliases("ps")
-			.withArguments(new PlayerArgument("other player"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("other player"))
 			.executesPlayer((sender, args) -> {
 				Player otherPlayer = (Player) args[0];
 				if (!PremiumVanishIntegration.canSee(sender, otherPlayer)) {
-					sender.sendMessage(Component.text("That player does not exist", NamedTextColor.RED));
+					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
 					return;
 				}
 				new PlayerItemStatsGUI(sender, otherPlayer, false).openInventory(sender, plugin);
 			}).register();
 
 		new CommandAPICommand("playerstats").withPermission(perms).withAliases("ps")
-			.withArguments(new PlayerArgument("player1"), new PlayerArgument("player2"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player1"), new EntitySelectorArgument.OnePlayer("player2"))
 			.executesPlayer((sender, args) -> {
 				Player player1 = (Player) args[0];
 				Player player2 = (Player) args[1];
 				if (!PremiumVanishIntegration.canSee(sender, player1) || !PremiumVanishIntegration.canSee(sender, player2)) {
-					sender.sendMessage(Component.text("That player does not exist", NamedTextColor.RED));
+					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
 					return;
 				}
 				new PlayerItemStatsGUI(player1, player2, false).openInventory(sender, plugin);
