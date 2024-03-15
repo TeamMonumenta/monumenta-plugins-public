@@ -15,9 +15,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -52,13 +50,8 @@ public class Icebreaker extends DepthsAbility {
 		return false; // only changes event damage
 	}
 
-	private boolean isOnIce(LivingEntity entity) {
-		Location loc = entity.getLocation();
-		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
-	}
-
 	private double getIceMultiplier(LivingEntity entity) {
-		return isOnIce(entity) ? 1 + mIceMultiplier : 1;
+		return DepthsUtils.isOnIce(entity) ? 1 + mIceMultiplier : 1;
 	}
 
 	private double getDebuffMultiplier(LivingEntity entity) {

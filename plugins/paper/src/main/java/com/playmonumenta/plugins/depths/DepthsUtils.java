@@ -159,15 +159,16 @@ public class DepthsUtils {
 		return colors[rarity - 1];
 	}
 
-	public static void spawnIceTerrain(Location l, int ticks, Player p) {
-		spawnIceTerrain(l, ticks, p, Boolean.FALSE, true);
+	public static void spawnIceTerrain(Block block, int ticks, Player p) {
+		spawnIceTerrain(block, ticks, p, false, true);
 	}
 
-	public static void spawnIceTerrain(Location l, int ticks, Player p, Boolean isBarrier) {
-		spawnIceTerrain(l, ticks, p, isBarrier, true);
+	public static void spawnIceTerrain(Block block, int ticks, Player p, boolean isBarrier) {
+		spawnIceTerrain(block, ticks, p, isBarrier, true);
 	}
 
-	public static void spawnIceTerrain(Location l, int ticks, Player p, Boolean isBarrier, boolean withParticles) {
+	public static void spawnIceTerrain(Block block, int ticks, Player p, boolean isBarrier, boolean withParticles) {
+		Location l = block.getLocation();
 
 		// when placing ice on top of existing ice, deal % damage to mobs
 		if (iceActive.get(l) != null && !isBarrier) {
@@ -339,19 +340,25 @@ public class DepthsUtils {
 		} else {
 			return;
 		}
-		DepthsUtils.spawnIceTerrain(converted.getLocation(), iceTicks, p, Boolean.FALSE, withParticles);
+		DepthsUtils.spawnIceTerrain(converted, iceTicks, p, false, withParticles);
+	}
+
+	public static boolean isOnIce(Entity entity) {
+		Location loc = entity.getLocation();
+		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
 	public static void explodeEvent(EntityExplodeEvent event) {
 		// Check location of blocks to see if they were ice barrier placed
-		if (event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof AbstractHorse || ScoreboardUtils.checkTag(event.getEntity(), AbilityUtils.IGNORE_TAG)) {
+		if (event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity le) || event.getEntity() instanceof AbstractHorse || ScoreboardUtils.checkTag(event.getEntity(), AbilityUtils.IGNORE_TAG)) {
 			return;
 		}
 		List<Block> blocks = event.blockList();
 		for (Block b : blocks) {
-			if (Boolean.TRUE.equals(iceBarrier.get(b.getLocation())) && !ScoreboardUtils.checkTag(event.getEntity(), MetalmancyBoss.identityTag)) {
+			Boolean barrier = iceBarrier.get(b.getLocation());
+			if (barrier != null && barrier && !ScoreboardUtils.checkTag(event.getEntity(), MetalmancyBoss.identityTag)) {
 				// Apply ice barrier stun passive effect to the mob
-				EntityUtils.applyStun(Plugin.getInstance(), 2 * 20, (LivingEntity) event.getEntity());
+				EntityUtils.applyStun(Plugin.getInstance(), 2 * 20, le);
 				return;
 			}
 		}

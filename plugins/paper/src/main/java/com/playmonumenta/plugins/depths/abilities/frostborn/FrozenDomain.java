@@ -15,11 +15,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -55,7 +52,7 @@ public class FrozenDomain extends DepthsAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		boolean isOnIce = isOnIce(mPlayer);
+		boolean isOnIce = DepthsUtils.isOnIce(mPlayer);
 		if (isOnIce) {
 			new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 4, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 		}
@@ -105,12 +102,6 @@ public class FrozenDomain extends DepthsAbility {
 
 	public void handleSpeed() {
 		mPlugin.mEffectManager.addEffect(mPlayer, "FrozenDomainExtraSpeed", new PercentSpeed(mDuration, mSpeedPercent, ATTR_NAME));
-	}
-
-	public boolean isOnIce(LivingEntity entity) {
-		Location loc = entity.getLocation();
-		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) &&
-			DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
 	private static Description<FrozenDomain> getDescription(int rarity, TextColor color) {
