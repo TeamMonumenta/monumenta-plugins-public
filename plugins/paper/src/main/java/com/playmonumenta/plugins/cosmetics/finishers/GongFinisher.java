@@ -137,13 +137,13 @@ public class GongFinisher implements EliteFinisher {
 				} else if (mTicks > 0 && mTicks < 21) {
 					player.teleport(player.getLocation().add(direction.getX() * 0.1, 0, direction.getZ() * 0.1));
 
-					new PPCircle(Particle.REDSTONE, gong, 1.1).ringMode(false).data(YELLOW).countPerMeter(5).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
-					new PPCircle(Particle.REDSTONE, gong, 1.2).data(RED).countPerMeter(3).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
-					new PPLine(Particle.REDSTONE, mStick2, mStick6).data(BROWN).countPerMeter(15).spawnAsPlayerActive(p);
-					new PPLine(Particle.REDSTONE, mStick1, mStick5).data(BROWN).countPerMeter(15).spawnAsPlayerActive(p);
-					new PPLine(Particle.REDSTONE, mStick3, mStick4).data(BROWN).countPerMeter(15).spawnAsPlayerActive(p);
-					new PPLine(Particle.ENCHANTMENT_TABLE, mHang1, mHang3).countPerMeter(10).spawnAsPlayerActive(p);
-					new PPLine(Particle.ENCHANTMENT_TABLE, mHang2, mHang4).countPerMeter(10).spawnAsPlayerActive(p);
+					new PPCircle(Particle.REDSTONE, gong, 1.1).ringMode(false).data(YELLOW).countPerMeter(3).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
+					new PPCircle(Particle.REDSTONE, gong, 1.2).data(RED).countPerMeter(2).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
+					new PPLine(Particle.REDSTONE, mStick2, mStick6).data(BROWN).countPerMeter(12).spawnAsPlayerActive(p);
+					new PPLine(Particle.REDSTONE, mStick1, mStick5).data(BROWN).countPerMeter(12).spawnAsPlayerActive(p);
+					new PPLine(Particle.REDSTONE, mStick3, mStick4).data(BROWN).countPerMeter(12).spawnAsPlayerActive(p);
+					new PPLine(Particle.ENCHANTMENT_TABLE, mHang1, mHang3).countPerMeter(7).spawnAsPlayerActive(p);
+					new PPLine(Particle.ENCHANTMENT_TABLE, mHang2, mHang4).countPerMeter(7).spawnAsPlayerActive(p);
 
 					double angle = Math.sin(Math.toRadians(mTicks * 15)) * Math.PI / 4;
 					EulerAngle rightLegPose = new EulerAngle(angle, 0, 0);
@@ -155,12 +155,12 @@ public class GongFinisher implements EliteFinisher {
 						double angle = Math.toRadians((mTicks - 20) * 15);
 						EulerAngle rightArmPose = new EulerAngle(-angle, 0, 0);
 						player.setRightArmPose(rightArmPose);
-						new PPCircle(Particle.REDSTONE, gong, 1.1).ringMode(false).data(YELLOW).countPerMeter(5).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
-						new PPCircle(Particle.REDSTONE, gong, 1.2).data(RED).countPerMeter(3).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
+						new PPCircle(Particle.REDSTONE, gong, 1.1).ringMode(false).data(YELLOW).countPerMeter(3).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
+						new PPCircle(Particle.REDSTONE, gong, 1.2).data(RED).countPerMeter(2).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).spawnAsPlayerActive(p);
 
-						new PPLine(Particle.REDSTONE, mStick2, mStick6).data(BROWN).countPerMeter(15).spawnAsPlayerActive(p);
-						new PPLine(Particle.REDSTONE, mStick1, mStick5).data(BROWN).countPerMeter(15).spawnAsPlayerActive(p);
-						new PPLine(Particle.REDSTONE, mStick3, mStick4).data(BROWN).countPerMeter(15).spawnAsPlayerActive(p);
+						new PPLine(Particle.REDSTONE, mStick2, mStick6).data(BROWN).countPerMeter(12).spawnAsPlayerActive(p);
+						new PPLine(Particle.REDSTONE, mStick1, mStick5).data(BROWN).countPerMeter(12).spawnAsPlayerActive(p);
+						new PPLine(Particle.REDSTONE, mStick3, mStick4).data(BROWN).countPerMeter(12).spawnAsPlayerActive(p);
 					} else if (mTicks < 41) {
 						double angle = Math.toRadians((40 - mTicks) * 15);
 						EulerAngle rightArmPose = new EulerAngle(-angle, 0, 0);

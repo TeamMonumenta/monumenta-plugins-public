@@ -16,6 +16,7 @@ public class EliteFinishers {
 		ImmutableMap.<String, EliteFinisher>builder()
 			.put(BirthdayThemeFinisher.NAME, new BirthdayThemeFinisher())
 			.put(CakeifyFinisher.NAME, new CakeifyFinisher())
+			.put(ChainedFinisher.NAME, new ChainedFinisher())
 			.put(CoolFireworkFinisher.NAME, new CoolFireworkFinisher())
 			.put(CornucopiaFinisher.NAME, new CornucopiaFinisher())
 			.put(DefaultDanceFinisher.NAME, new DefaultDanceFinisher())
