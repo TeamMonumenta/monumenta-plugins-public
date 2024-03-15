@@ -34,7 +34,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class InfusionCustomInventory extends CustomInventory {
@@ -98,15 +97,8 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack is = player.getEquipment().getItem(equipmentSlot);
 			if (InfusionUtils.isInfusionable(is)) {
 				loadRowNormalInfusionItem(player, equipmentSlot, row);
-				final int mRow = row;
 				//we need to delay the item change so the skins are loaded
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						ItemStack itemStack = GUIUtils.createItemPlaceholder(is);
-						mInventory.setItem((mRow * 9) + 1, itemStack);
-					}
-				}.runTaskLater(Plugin.getInstance(), 2);
+				mInventory.setItem((row * 9) + 1, is);
 
 			} else {
 				ItemStack invalidItem = mInvalidItems.get(row);

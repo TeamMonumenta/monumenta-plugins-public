@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
@@ -9,8 +13,11 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MasterworkUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -97,10 +104,10 @@ public final class MasterworkCustomInventory extends CustomInventory {
 
 		mPatternMap.put(0, new int[] {});
 		mPatternMap.put(1, new int[] {22});
-		mPatternMap.put(2, new int[] {22, 31});
-		mPatternMap.put(3, new int[] {30, 31, 32});
-		mPatternMap.put(4, new int[] {22, 30, 31, 32});
-		mPatternMap.put(5, new int[] {22, 30, 31, 32, 40});
+		mPatternMap.put(2, new int[] {31, 22});
+		mPatternMap.put(3, new int[] {32, 31, 30});
+		mPatternMap.put(4, new int[] {32, 31, 30, 22});
+		mPatternMap.put(5, new int[] {40, 32, 31, 30, 22});
 
 		// Back item
 		mBackItem = GUIUtils.createBasicItem(Material.STRING, "Back", NamedTextColor.RED, true);
@@ -152,9 +159,17 @@ public final class MasterworkCustomInventory extends CustomInventory {
 					NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIB))));
 			ItemStack newItemC = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(),
 					NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIC))));
-			mInventory.setItem(39, newItemA);
-			mInventory.setItem(40, newItemB);
-			mInventory.setItem(41, newItemC);
+
+			ItemStack newItemAButBetter = newItemA.clone();
+			ItemStack newItemBButBetter = newItemB.clone();
+			ItemStack newItemCButBetter = newItemC.clone();
+			newItemAButBetter.lore(getEditedLoreDiff(newItemA, item));
+			newItemBButBetter.lore(getEditedLoreDiff(newItemB, item));
+			newItemCButBetter.lore(getEditedLoreDiff(newItemC, item));
+
+			mInventory.setItem(39, newItemAButBetter);
+			mInventory.setItem(40, newItemBButBetter);
+			mInventory.setItem(41, newItemCButBetter);
 			// Fill in mid material + cost
 			ItemStack upgradeIconA = createCostItem(p, Material.RED_DYE, "Enhance Item (Fortitude)", TextColor.fromHexString("#D02E28"), costA);
 			mInventory.setItem(21, upgradeIconA);
@@ -203,7 +218,10 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			// Generate new item
 			ItemStack newItem = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(),
 					NamespacedKeyUtils.fromString(MasterworkUtils.getNextItemPath(item))));
-			mInventory.setItem(40, newItem);
+			ItemStack newItemButBetter = newItem.clone();
+			List<Component> updatedLore = getEditedLoreDiff(newItemButBetter, item);
+			newItemButBetter.lore(updatedLore);
+			mInventory.setItem(40, newItemButBetter);
 			// Fill in mid material + cost
 			ItemStack upgradeIcon = createCostItem(p, Material.RAW_IRON, "Enhance Item", TextColor.fromHexString("#FFAA00"), cost);
 			mInventory.setItem(22, upgradeIcon);
@@ -251,11 +269,119 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		GUIUtils.fillWithFiller(mInventory);
 		mInventory.setItem(0, mBackItem);
 
-		int j = 0;
+
+		int j = allMasterworks.size() - 1;
 		for (int i : mPatternMap.getOrDefault(tiers, new int[0])) {
-			mInventory.setItem(i, allMasterworks.get(j));
-			j++;
+			ItemStack currentItem = allMasterworks.get(j);
+			if (j != 0) {
+				ItemStack previousItem = allMasterworks.get(j - 1);
+				List<Component> currentLore = getEditedLoreDiff(currentItem, previousItem);
+				currentItem.lore(currentLore);
+			}
+
+			mInventory.setItem(i, currentItem);
+			j--;
 		}
+	}
+
+	private List<Component> getEditedLoreDiff(ItemStack currentItem, ItemStack previousItem) {
+		DecimalFormat decimalFormat = new DecimalFormat("0.#");
+		List<Component> currentLore = new ArrayList<>(currentItem.lore());
+		List<Component> currentLoreDiff = new ArrayList<>(currentItem.lore());
+		currentLoreDiff.removeAll(previousItem.lore());
+		TextColor color = TextColor.color(255, 215, 0);
+
+		//Go through each diffed string. Should only be Enchants, Attributes, Tier and masterwork stars (which will get ignored).
+		for (Component component : currentLoreDiff) {
+			String contentString = MessagingUtils.plainText(component);
+			EnchantmentType enchantmentType = EnchantmentType.getEnchantmentType(contentString);
+			if (enchantmentType != null) {
+				//Enchantment is one level
+				if (ItemStatUtils.hasEnchantment(previousItem, enchantmentType)) {
+					//Previous had it
+					continue;
+				} else {
+					//Not one level -> one level == 1
+					Component appended = Component.text(" (+");
+					appended = appended.append(Component.text("I)"));
+					appended = appended.color(color);
+					appended = component.append(appended);
+					currentLore.set(currentLore.indexOf(component), appended);
+					continue;
+				}
+			} else {
+				//Enchantment is not one level
+				int k = contentString.lastIndexOf(" ");
+				if (k == -1) {
+					//Not an enchant string at all.
+					continue;
+				}
+				String enchant = contentString.substring(0, k);
+				enchantmentType = EnchantmentType.getEnchantmentType(enchant);
+				if (enchantmentType != null) {
+					int beforeLevel = ItemStatUtils.getEnchantmentLevel(previousItem, enchantmentType);
+					int afterLevel = ItemStatUtils.getEnchantmentLevel(currentItem, enchantmentType);
+					int diff = afterLevel - beforeLevel;
+					if (diff != 0) {
+						Component appended = Component.text(" (+");
+						String romanNumeral = StringUtils.toRoman(diff);
+						appended = appended.append(Component.text(romanNumeral + ")"));
+						appended = appended.color(TextColor.color(color));
+						appended = component.append(appended);
+						currentLore.set(currentLore.indexOf(component), appended);
+						continue;
+					}
+				}
+			}
+
+			//All attribute lines have digits in them.
+			if (contentString.replaceAll("[0-9]", "").equals(contentString)) {
+				continue;
+			}
+
+			//Remove everything but the name
+			String attributeString = contentString.replaceAll("[0-9%-+.]", "");
+			Operation operation;
+
+			//Edge cases. This system was not built with this stuff in mind. Attribute names != what is actually on the item
+			if (contentString.contains("%")) {
+				operation = Operation.MULTIPLY;
+				if ((AttributeType.getAttributeType(attributeString) == null)) {
+					attributeString = attributeString.concat("Multiply");
+				}
+			} else {
+				operation = Operation.ADD;
+				if ((AttributeType.getAttributeType(attributeString) == null)) {
+					attributeString = attributeString.concat("Add");
+				}
+			}
+
+			//Check if it is an attribute.
+			AttributeType attributeType = AttributeType.getAttributeType(attributeString);
+			if (attributeType != null) {
+				//I don't know a good way of checking if something has slots or not, so I have to loop over every single one.
+				for (Slot slot : Slot.values()) {
+					double afterValue = ItemStatUtils.getAttributeAmount(currentItem, attributeType, operation, slot);
+					if (afterValue == 0) {
+						continue;
+					}
+					//If its in beforeValue but not afterValue well too bad where am I going to put it anyway??? figure it out
+					double beforeValue = ItemStatUtils.getAttributeAmount(previousItem, attributeType, operation, slot);
+					//Even if it is a new attribute, it not be 0. Essentially it will only be false if they are the same value.
+					if (afterValue - beforeValue != 0) {
+						double diff = afterValue - beforeValue;
+						diff = Math.round(diff * 100) / (operation.equals(Operation.MULTIPLY) ? 1.0 : 100.0);
+						Component appended = Component.text(" (+");
+						appended = appended.append(Component.text(decimalFormat.format(diff) + (operation.equals(Operation.MULTIPLY) ? "%" : "") + ")"));
+						appended = appended.color(color);
+						appended = component.append(appended);
+						currentLore.set(currentLore.indexOf(component), appended);
+					}
+				}
+			}
+		}
+
+		return currentLore;
 	}
 
 	private void attemptUpgrade(Player p, ItemStack item, ItemStack nextItem, MasterworkUtils.MasterworkCostLevel cost) {
@@ -299,14 +425,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 				if (MasterworkUtils.isMasterwork(item)) {
 					final int rowF = row;
 
-					//we need to delay this loading to make the item skin applied
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							ItemStack itemStack = GUIUtils.createItemPlaceholder(item);
-							mInventory.setItem(rowF * 9, itemStack);
-						}
-					}.runTaskLater(Plugin.getInstance(), 2);
+					mInventory.setItem(rowF * 9, item);
 
 					Masterwork m = ItemStatUtils.getMasterwork(item);
 					int currMasterwork = MasterworkUtils.getMasterworkAsInt(m);

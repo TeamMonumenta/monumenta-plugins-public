@@ -362,13 +362,6 @@ public class GUIUtils {
 		}
 	}
 
-	public static ItemStack createItemPlaceholder(ItemStack item) {
-		ItemStack placeholder = item.clone();
-		placeholder.lore(List.of());
-		setPlaceholder(placeholder);
-		return placeholder;
-	}
-
 	public static void setSkullOwner(ItemStack item, OfflinePlayer player) {
 		if (item.getItemMeta() instanceof SkullMeta skullMeta) {
 			skullMeta.setOwningPlayer(player);

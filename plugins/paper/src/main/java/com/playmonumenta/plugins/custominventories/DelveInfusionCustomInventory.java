@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.google.common.collect.ImmutableList;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Ardor;
 import com.playmonumenta.plugins.itemstats.infusions.Aura;
@@ -57,7 +56,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public final class DelveInfusionCustomInventory extends CustomInventory {
@@ -176,14 +174,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 	private void loadDelveInfusionSelection(EquipmentSlot equipmentSlot, Player player) {
 		ItemStack infusedItem = player.getEquipment().getItem(equipmentSlot);
-		//we need to delay this loading to make the item skin applied
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				ItemStack itemStack = GUIUtils.createItemPlaceholder(infusedItem);
-				mInventory.setItem(4, itemStack);
-			}
-		}.runTaskLater(Plugin.getInstance(), 2);
+		mInventory.setItem(4, infusedItem);
 
 		HashMap<DelveInfusionSelection, Integer> itemPlacements = new HashMap<>();
 
@@ -274,16 +265,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			if (InfusionUtils.isInfusionable(item)) {
 				//same tier needed.
 				DelveInfusionSelection infusion = DelveInfusionUtils.getCurrentInfusion(item);
-				final int rowF = row;
-
-				//we need to delay this loading to make the item skin applied
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						ItemStack itemStack = GUIUtils.createItemPlaceholder(item);
-						mInventory.setItem((rowF * 9) + 1, itemStack);
-					}
-				}.runTaskLater(Plugin.getInstance(), 2);
+				mInventory.setItem((row * 9) + 1, item);
 
 				if (infusion != null) {
 					mInventory.setItem((row * 9), mRefundItem);
@@ -341,8 +323,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					}
 					ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Click to select a Delve Infusion.", NamedTextColor.DARK_AQUA, true,
 						"The first Delve Infusion level costs " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[0] + " " + materials + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[0] + " corresponding Delve Materials, and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
-					mInventory.setItem((rowF * 9) + 2 + 4, infuseItem);
-					mMapFunction.put((rowF * 9) + 2 + 4, (p, inventory, slot) -> {
+					mInventory.setItem((row * 9) + 2 + 4, infuseItem);
+					mMapFunction.put((row * 9) + 2 + 4, (p, inventory, slot) -> {
 						mSlotSelected = equipmentSlot;
 					});
 				}
