@@ -82,7 +82,7 @@ public class MarketManager {
 			return;
 		}
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			InventoryUtils.giveItem(player, listing.getItemToBuy().asQuantity(amountToGive));
+			InventoryUtils.giveItemWithStacksizeCheck(player, listing.getItemToBuy().asQuantity(amountToGive));
 		});
 		MarketAudit.logClaim(player, listing, amountToGive);
 	}
@@ -122,8 +122,8 @@ public class MarketManager {
 			}
 			MarketRedisManager.deleteListing(newListing);
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				InventoryUtils.giveItem(player, newListing.getItemToBuy().asQuantity(currencyToGive));
-				InventoryUtils.giveItem(player, newListing.getItemToSell().asQuantity(itemsToGive));
+				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToBuy().asQuantity(currencyToGive));
+				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToSell().asQuantity(itemsToGive));
 			});
 			MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
 		}
@@ -280,6 +280,7 @@ public class MarketManager {
 		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(event.getPlayer());
 		if (marketPlayerData == null) {
 			Plugin.getInstance().getLogger().warning("ERROR FAILED TO SAVE MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
+			AuditListener.logMarket("ERROR FAILED TO SAVE MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
 			return;
 		}
 		JsonObject data = new JsonObject();
@@ -388,7 +389,7 @@ public class MarketManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(), () -> {
 			WalletUtils.payDebt(debt, player, true);
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				InventoryUtils.giveItem(player, oldListing.getItemToSell().asQuantity(amount));
+				InventoryUtils.giveItemWithStacksizeCheck(player, oldListing.getItemToSell().asQuantity(amount));
 			});
 			player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.7f);
 			MarketAudit.logBuyAction(player, oldListing, amount, debt.mTotalRequiredAmount, debt.mItem);

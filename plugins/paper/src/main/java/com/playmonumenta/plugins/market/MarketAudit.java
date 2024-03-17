@@ -93,4 +93,20 @@ public class MarketAudit {
 			"Unexpired by : " + player.getName();
 		AuditListener.logMarket(message);
 	}
+
+	public static void logManualLinking(Player player, long listingId) {
+		String message =
+			"MANUAL LINKING \n" +
+				"Listing : " + listingId + "\n" +
+				"Linked To : " + player.getName();
+		AuditListener.logMarket(message);
+	}
+
+	public static void logManualUnlinking(Player player, long listingId) {
+		String message =
+			"MANUAL UNLINKING \n" +
+				"Listing : " + listingId + "\n" +
+				"Unlinked From : " + player.getName();
+		AuditListener.logMarket(message);
+	}
 }

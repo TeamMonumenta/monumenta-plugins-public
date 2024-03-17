@@ -342,6 +342,22 @@ public class InventoryUtils {
 		}
 	}
 
+	public static void giveItemWithStacksizeCheck(final Player player, @Nullable ItemStack item) {
+		if (item == null) {
+			return;
+		}
+		if (item.getMaxStackSize() == -1) {
+			giveItem(player, item);
+			return;
+		}
+		int remainingToGive = item.getAmount();
+		while (remainingToGive > 0) {
+			int toGive = Math.min(remainingToGive, item.getMaxStackSize());
+			giveItem(player, item.asQuantity(toGive));
+			remainingToGive -= toGive;
+		}
+	}
+
 	public static void giveItem(final Player player, final @Nullable ItemStack item) {
 		giveItem(player, item, false);
 	}

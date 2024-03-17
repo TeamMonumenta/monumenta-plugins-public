@@ -5,9 +5,11 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.ListArgumentBuilder;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LongArgument;
+import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,38 @@ public class MarketCommands {
 				GsonBuilder gsonBuilder = new GsonBuilder();
 				gsonBuilder.setPrettyPrinting();
 				player.sendMessage(gsonBuilder.create().toJson(MarketManager.getConfig()));
+			})
+			.register();
+
+		arguments = new ArrayList<>();
+		arguments.add(new LiteralArgument("linkListingToPlayer"));
+		arguments.add(new PlayerArgument("player"));
+		arguments.add(new IntegerArgument("listingID"));
+		new CommandAPICommand("market")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				Player targetPlayer = (Player)args[0];
+				long listingID = (long)(Integer)args[1];
+				MarketManager.getInstance().linkListingToPlayerData(targetPlayer, listingID);
+				MarketAudit.logManualLinking(targetPlayer, listingID);
+				player.sendMessage("Listing " + listingID + "linked to player " + targetPlayer.getName());
+			})
+			.register();
+
+		arguments = new ArrayList<>();
+		arguments.add(new LiteralArgument("unlinkListingFromPlayer"));
+		arguments.add(new PlayerArgument("player"));
+		arguments.add(new IntegerArgument("listingID"));
+		new CommandAPICommand("market")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				Player targetPlayer = (Player)args[0];
+				long listingID = (long)(Integer)args[1];
+				MarketManager.getInstance().unlinkListingFromPlayerData(targetPlayer, listingID);
+				MarketAudit.logManualUnlinking(targetPlayer, listingID);
+				player.sendMessage("Listing " + listingID + "unlinked from player " + targetPlayer.getName());
 			})
 			.register();
 

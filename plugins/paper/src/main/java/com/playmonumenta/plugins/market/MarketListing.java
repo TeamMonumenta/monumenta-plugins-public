@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.WalletUtils;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -130,7 +129,6 @@ public class MarketListing {
 	}
 
 	public ItemStack getItemToSell() {
-		MMLog.info("GET " + this.mItemToSellID);
 		return MarketItemDatabase.getItemStackFromID(this.mItemToSellID);
 	}
 
