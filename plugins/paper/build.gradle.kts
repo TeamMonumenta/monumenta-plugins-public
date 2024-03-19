@@ -219,9 +219,9 @@ for (i in 1..4) {
 }
 
 createNormalDeploy(basicssh, "futurama", "/home/epic/futurama_shard_plugins")
-createNormalDeploy(basicssh, "mob", "/home/epic/futurama_shard_plugins")
-createSymlinkDeploy(basicssh, "stage", "/home/epic/stage_shard_plugins")
-createSymlinkDeploy(basicssh, "volt", "/home/epic/volt_shard_plugins")
+createNormalDeploy(basicssh, "mob", "/home/epic/mob_shard_plugins")
+createSymlinkDeploy(basicssh, "stage", "/home/epic/stage/m13/server_config/plugins/")
+createSymlinkDeploy(basicssh, "volt", "/home/epic/volt/m12/server_config/plugins")
 
 createSymlinkDeploy(adminssh, "m119", "/home/epic/project_epic/m119/plugins")
 createSymlinkDeploy(adminssh, "build", "/home/epic/project_epic/server_config/plugins")
