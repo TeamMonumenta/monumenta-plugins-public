@@ -13,13 +13,19 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
+
+import static com.playmonumenta.plugins.Constants.Tags.REMOVE_ON_UNLOAD;
 
 public class GuildDisplayBoss extends BossAbilityGroup {
 
@@ -30,7 +36,11 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Y Offset")
-		public int Y_OFFSET = 0;
+		public double Y_OFFSET = 0;
+		@BossParam(help = "X Offset")
+		public double X_OFFSET = 0;
+		@BossParam(help = "Z Offset")
+		public double Z_OFFSET = 0;
 		@BossParam(help = "Width")
 		public double WIDTH = 0.0;
 		@BossParam(help = "Height")
@@ -41,12 +51,20 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 
 	private final List<Group> mAllGuilds = new ArrayList<>();
 	private int mCurrentPos = 0;
+	private static final int EXTRA = 5;
 
 	public GuildDisplayBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mPairs = new ArrayList<>();
 		Parameters p = BossParameters.getParameters(boss, identityTag, new GuildDisplayBoss.Parameters());
 		int period = (int) (p.WIDTH * 20) + 2;
+		for (Entity e : boss.getLocation().getWorld().getNearbyEntities(
+				new BoundingBox(p.X_OFFSET + p.WIDTH + EXTRA, p.Y_OFFSET - EXTRA, p.Z_OFFSET + p.WIDTH + EXTRA,
+						p.X_OFFSET - p.WIDTH - EXTRA, p.Y_OFFSET + p.HEIGHT + EXTRA, p.Z_OFFSET - p.WIDTH - EXTRA))) {
+			if ((e instanceof ItemDisplay || e instanceof TextDisplay) && e.getScoreboardTags().contains(scoreboardTag)) {
+				e.remove();
+			}
+		}
 		new BukkitRunnable() {
 			int mTicks = 0;
 			int mLastHeight = 0;
@@ -75,20 +93,25 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 							if (!mAllGuilds.isEmpty()) {
 								if (!mBoss.isDead()) {
 									//I HATE DISPLAY ENTITIES
-									ItemDisplay banner = mBoss.getWorld().spawn(mBoss.getLocation().clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), p.Y_OFFSET + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), ItemDisplay.class);
+									Location loc = mBoss.getLocation().clone().add(p.X_OFFSET, p.Y_OFFSET, p.Z_OFFSET);
+									ItemDisplay banner = mBoss.getWorld().spawn(loc.clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), ItemDisplay.class);
 									AxisAngle4f rotation = new AxisAngle4f((float) -Math.toRadians(90 - p.ROTATION), 0, 1, 0);
 									banner.setTransformation(new Transformation(banner.getTransformation().getTranslation(), rotation, banner.getTransformation().getScale(), new AxisAngle4f()));
 									banner.setInterpolationDuration(-1);
 									banner.setInterpolationDuration(0);
 									banner.addScoreboardTag(scoreboardTag);
+									banner.addScoreboardTag(REMOVE_ON_UNLOAD);
+									banner.setBrightness(new Display.Brightness(15, 15));
 									banner.setItemStack(LuckPermsIntegration.getGuildBanner(mAllGuilds.get(pos)));
-									TextDisplay text = mBoss.getWorld().spawn(mBoss.getLocation().clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), p.Y_OFFSET + 1.5 + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), TextDisplay.class);
+									TextDisplay text = mBoss.getWorld().spawn(loc.clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), 1.5 + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), TextDisplay.class);
 									text.setAlignment(TextDisplay.TextAlignment.CENTER);
 									text.text(LuckPermsIntegration.getGuildFullComponent(mAllGuilds.get(pos)));
 									text.setTransformation(new Transformation(text.getTransformation().getTranslation(), rotation, text.getTransformation().getScale(), new AxisAngle4f()));
 									text.setInterpolationDuration(-1);
 									text.setInterpolationDuration(0);
+									text.setBrightness(new Display.Brightness(15, 15));
 									text.addScoreboardTag(scoreboardTag);
+									text.addScoreboardTag(REMOVE_ON_UNLOAD);
 									mPairs.add(new Pair(banner, text));
 								}
 							}
