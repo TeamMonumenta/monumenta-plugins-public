@@ -1003,13 +1003,6 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().mobAIChanges(mob);
 		}
 
-		if (event.getEntity().getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD) && event.getEntity().getTicksLived() > 20) {
-			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
-			Entity entity = event.getEntity();
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), entity::remove);
-			return;
-		}
-
 		if (event.getEntity() instanceof IronGolem golem) {
 			NmsUtils.getVersionAdapter().setAttackRange(golem, 2.5);
 		} else if (event.getEntity() instanceof Ravager ravager) {

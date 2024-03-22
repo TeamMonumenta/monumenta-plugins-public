@@ -132,6 +132,10 @@ public class WorldListener implements Listener {
 		}
 
 		for (Entity entity : event.getEntities()) {
+			if (entity.getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD)) {
+				Bukkit.getScheduler().runTask(mPlugin, entity::remove);
+				continue;
+			}
 			MessagingUtils.updatePlainName(entity);
 		}
 	}
