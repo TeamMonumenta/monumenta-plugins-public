@@ -12,10 +12,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -33,10 +31,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -160,33 +156,11 @@ public class DepthsUtils {
 	}
 
 	public static void spawnIceTerrain(Block block, int ticks, Player p) {
-		spawnIceTerrain(block, ticks, p, false, true);
+		spawnIceTerrain(block, ticks, p, false);
 	}
 
 	public static void spawnIceTerrain(Block block, int ticks, Player p, boolean isBarrier) {
-		spawnIceTerrain(block, ticks, p, isBarrier, true);
-	}
-
-	public static void spawnIceTerrain(Block block, int ticks, Player p, boolean isBarrier, boolean withParticles) {
 		Location l = block.getLocation();
-
-		// when placing ice on top of existing ice, deal % damage to mobs
-		if (iceActive.get(l) != null && !isBarrier) {
-			Location aboveLoc = l.clone().add(0.5, 1, 0.5);
-
-			double hpPercentDamage = 0.15;
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.5, 5.0, 1.5)) {
-				if (!(EntityUtils.isBoss(mob) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG))) {
-					DamageUtils.damage(p, mob, DamageType.TRUE, EntityUtils.getMaxHealth(mob) * hpPercentDamage);
-				}
-			}
-
-			if (withParticles) {
-				new PartialParticle(Particle.REDSTONE, aboveLoc.clone().add(0, 0.5, 0), 24, 0.2, 0.7, 0.2, new Particle.DustOptions(Color.fromRGB(200, 225, 255), 1.0f)).spawnAsPlayerActive(p);
-			}
-
-			return;
-		}
 
 		//Check if the block is valid, or if the location is already active in the system
 		if (IGNORED_MATS.contains(l.getWorld().getBlockAt(l).getType()) || iceActive.get(l) != null) {
@@ -340,7 +314,7 @@ public class DepthsUtils {
 		} else {
 			return;
 		}
-		DepthsUtils.spawnIceTerrain(converted, iceTicks, p, false, withParticles);
+		DepthsUtils.spawnIceTerrain(converted, iceTicks, p, false);
 	}
 
 	public static boolean isOnIce(Entity entity) {

@@ -64,7 +64,7 @@ import org.jetbrains.annotations.Nullable;
 public class ColorSplash extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Color Splash";
-	public static final int COOLDOWN = 35 * 20;
+	public static final int COOLDOWN = 30 * 20;
 	public static final int ACTIVATION_DELAY = 20;
 
 	public static final int FROSTBORN_DURATION = 10 * 20;

@@ -110,7 +110,8 @@ public class Rebirth extends DepthsAbility {
 			DepthsManager.getInstance().getRandomAbility(mPlayer, dp, chances, false, false, false);
 		}
 
-		DepthsManager.getInstance().validateOfferings(dp);
+		DepthsManager.getInstance().mUpgradeOfferings.clear();
+		DepthsManager.getInstance().mAbilityOfferings.clear();
 	}
 
 	public void applyResistance() {
