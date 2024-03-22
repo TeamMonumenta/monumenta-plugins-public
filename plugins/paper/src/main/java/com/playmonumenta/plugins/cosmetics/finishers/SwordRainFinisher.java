@@ -416,7 +416,7 @@ public class SwordRainFinisher implements EliteFinisher {
 							mSwordStand.teleport(mSwordStand.getLocation().clone().add(0, -mFallSpeed / 2, 0));
 						}
 					}
-					if (mTicks >= 50 + offset) {
+					if (mTicks >= 70 + offset) {
 						mSwordStand.remove();
 						this.cancel();
 					}

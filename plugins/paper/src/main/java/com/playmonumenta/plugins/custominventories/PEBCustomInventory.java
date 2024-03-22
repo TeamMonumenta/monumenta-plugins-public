@@ -53,6 +53,7 @@ public class PEBCustomInventory extends CustomInventory {
 		SOUND_CATEGORIES,
 		SOUND_OVERWORLD_PLOTS,
 		SOUND_DELAYS,
+		FINISHER_VISIBILTY,
 	}
 
 	private static class PebItem {
@@ -244,7 +245,10 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
 			new PebItem(32, "Rocket Jump",
 				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
-				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP)
+				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
+			new PebItem(33, "Cloned Finisher Elites Visibility",
+				"Click to toggle whether cloned elites in finishers glow and are visible.", NamedTextColor.LIGHT_PURPLE,
+				Material.ZOMBIE_HEAD, false).switchToPage(PebPage.FINISHER_VISIBILTY)
 		);
 
 		definePage(PebPage.TECHNICAL_OPTIONS,
@@ -668,6 +672,25 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(24, "Disable all",
 				"Disable to rocket jump from ANY Unstable Amalgam.", NamedTextColor.LIGHT_PURPLE,
 				Material.SKELETON_SKULL, false).serverCommand("scoreboard players set @S RocketJumper 0")
+		);
+
+		// Elite Finisher Visibility Options
+		definePage(PebPage.FINISHER_VISIBILTY,
+			new PebItem(0, "Back to Toggleable Options",
+				"", NamedTextColor.LIGHT_PURPLE,
+				Material.OBSERVER, false).switchToPage(PebPage.GAMEPLAY_OPTIONS),
+			new PebItem(4, "Elite Finisher Visibility Settings",
+				"Choose how cloned mobs in your elite finishers are visible.", NamedTextColor.LIGHT_PURPLE,
+				Material.ZOMBIE_HEAD, false),
+			new PebItem(20, "Show and Glow",
+				"Cloned Elites from your elite finisher are visible and glow.", NamedTextColor.LIGHT_PURPLE,
+				Material.GLOW_INK_SAC, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_show_glow"),
+			new PebItem(22, "Hide and Glow",
+				"Cloned Elites from your elite finisher are hidden but still glow.", NamedTextColor.LIGHT_PURPLE,
+				Material.GLOWSTONE_DUST, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_glow"),
+			new PebItem(24, "Show and Don't Glow",
+				"Cloned Elites from your elite finisher are visible and do not glow.", NamedTextColor.LIGHT_PURPLE,
+				Material.SKELETON_SKULL, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_show")
 		);
 
 		// Partial particle settings

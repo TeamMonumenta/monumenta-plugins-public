@@ -171,6 +171,6 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 
 	@Override
 	public Team createTeams() {
-		return ScoreboardUtils.getExistingTeamOrCreate("everseeingEyeColor", NamedTextColor.DARK_RED);
+		return ScoreboardUtils.getExistingTeamOrCreate("everseeingEyeColor", NamedTextColor.RED);
 	}
 }

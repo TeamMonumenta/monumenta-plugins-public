@@ -1,11 +1,12 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +28,9 @@ public class FrozenSolidFinisher implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
+		if (!(killedMob instanceof LivingEntity le)) {
+			return;
+		}
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -39,13 +43,9 @@ public class FrozenSolidFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EntityUtils.copyMob((LivingEntity) killedMob);
-					mClonedKilledMob.setHealth(1);
-					mClonedKilledMob.setInvulnerable(true);
-					mClonedKilledMob.setGravity(false);
-					mClonedKilledMob.setCollidable(false);
-					mClonedKilledMob.setAI(false);
-					mClonedKilledMob.addScoreboardTag("SkillImmune");
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "frozenfinisher", NamedTextColor.BLUE);
+
 					// Figure out where and when to generate ice
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					for (double x = box.getMinX(); x <= box.getMaxX(); x += 0.6) {

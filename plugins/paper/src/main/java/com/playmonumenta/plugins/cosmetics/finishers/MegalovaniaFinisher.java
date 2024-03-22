@@ -134,7 +134,7 @@ public class MegalovaniaFinisher implements EliteFinisher {
 				mTicks++;
 			}
 		};
-		if (Math.random() < 0.01) {
+		if (Math.random() < 0.02) {
 			sansRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 		}
 		megalovaniaRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);

@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +26,10 @@ public class EntombFinisher implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
+		if (!(killedMob instanceof LivingEntity le)) {
+			return;
+		}
+
 		new BukkitRunnable() {
 			Location mLoc = killedMob.getLocation().clone();
 			int mLayer = 0;
@@ -47,13 +52,8 @@ public class EntombFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EntityUtils.copyMob((LivingEntity) killedMob);
-					mClonedKilledMob.setHealth(1);
-					mClonedKilledMob.setInvulnerable(true);
-					mClonedKilledMob.setGravity(false);
-					mClonedKilledMob.setCollidable(false);
-					mClonedKilledMob.setAI(false);
-					mClonedKilledMob.addScoreboardTag("SkillImmune");
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "entombfinisher", NamedTextColor.YELLOW);
 				}
 				if (mLayer < LAYERMAX) {
 					mLayer++;

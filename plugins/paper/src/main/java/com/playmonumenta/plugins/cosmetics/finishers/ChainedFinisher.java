@@ -5,7 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,6 +28,10 @@ public class ChainedFinisher implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
+		if (!(killedMob instanceof LivingEntity le)) {
+			return;
+		}
+
 		loc.setYaw(0);
 		loc.setPitch(0);
 		BoundingBox tempBox = killedMob.getBoundingBox();
@@ -59,13 +64,8 @@ public class ChainedFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// summon
 					killedMob.remove();
-					mClonedKilledMob = EntityUtils.copyMob((LivingEntity) killedMob);
-					mClonedKilledMob.setHealth(1);
-					mClonedKilledMob.setInvulnerable(true);
-					mClonedKilledMob.setGravity(false);
-					mClonedKilledMob.setCollidable(false);
-					mClonedKilledMob.setAI(false);
-					mClonedKilledMob.addScoreboardTag("SkillImmune");
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "chainedfinisher", NamedTextColor.DARK_GRAY);
 
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					loc1.add((box.getWidthX() / 2) + 3 + 0.35, 1, 0.6);

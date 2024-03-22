@@ -4,13 +4,12 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.HashMap;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,6 +32,9 @@ public class ExcaliburFinisher implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
+		if (!(killedMob instanceof LivingEntity le)) {
+			return;
+		}
 
 		mMobsKilled.putIfAbsent(p.getUniqueId(), 1);
 		int mobsKilled = mMobsKilled.getOrDefault(p.getUniqueId(), 0);
@@ -59,14 +61,8 @@ public class ExcaliburFinisher implements EliteFinisher {
 				playSong(p.getWorld(), p.getLocation(), mTicks, mobsKilled);
 				if (mTicks == 0) {
 					killedMob.remove();
-					mClonedKilledMob = EntityUtils.copyMob((LivingEntity) killedMob);
-					mClonedKilledMob.setHealth(1);
-					mClonedKilledMob.setInvulnerable(true);
-					mClonedKilledMob.setGravity(false);
-					mClonedKilledMob.setCollidable(false);
-					mClonedKilledMob.setAI(false);
-					mClonedKilledMob.addScoreboardTag("SkillImmune");
-					mClonedKilledMob.setSilent(true);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "excaliburfinisher", NamedTextColor.GRAY);
 				}
 				if (mTicks <= 20) {
 					mExcalibur.setRightArmPose(new EulerAngle(-Math.PI / 2.0 + 0.75 * Math.PI / 20.0 * mTicks, EntityUtils.getCounterclockwiseAngle(mExcalibur, killedMob), mSlashAngle));
