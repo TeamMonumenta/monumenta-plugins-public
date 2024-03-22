@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.market;
 
 import com.google.gson.GsonBuilder;
+import com.playmonumenta.plugins.market.gui.MarketGui;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -23,7 +24,7 @@ public class MarketCommands {
 		new CommandAPICommand("openmarketgui")
 			.withPermission(CommandPermission.fromString("monumenta.command.market"))
 			.executesPlayer((player, args) -> {
-				new MarketGUI(player, MarketGUI.MarketGuiTab.MAIN_MENU).open();
+				new MarketGui(player).open();
 			})
 			.register();
 
@@ -31,7 +32,7 @@ public class MarketCommands {
 		new CommandAPICommand("market")
 			.withPermission(perms)
 			.executesPlayer((player, args) -> {
-				MarketGUI gui = new MarketGUI(player, MarketGUI.MarketGuiTab.MAIN_MENU);
+				MarketGui gui = new MarketGui(player);
 				gui.open();
 			})
 			.register();

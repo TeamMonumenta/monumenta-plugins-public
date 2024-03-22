@@ -260,7 +260,19 @@ public class GUIUtils {
 		return createBasicItem(new ItemStack(mat, amount), amount, name, desc, setPlainTag);
 	}
 
+	public static ItemStack createBasicItem(Material mat, Component name, String displayPlainTagValue) {
+		return createBasicItem(mat, 1, name, new ArrayList<>(), true, displayPlainTagValue);
+	}
+
+	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<Component> desc, boolean setPlainTag, String displayPlainTagValue) {
+		return createBasicItem(new ItemStack(mat, amount), amount, name, desc, setPlainTag, displayPlainTagValue);
+	}
+
 	public static ItemStack createBasicItem(ItemStack base, int amount, Component name, List<Component> desc, boolean setPlainTag) {
+		return createBasicItem(base, amount, name, desc, setPlainTag, null);
+	}
+
+	public static ItemStack createBasicItem(ItemStack base, int amount, Component name, List<Component> desc, boolean setPlainTag, @Nullable String displayPlainTagValue) {
 		ItemStack item = ItemUtils.clone(base);
 		item.setAmount(amount);
 		ItemMeta meta = item.getItemMeta();
@@ -272,10 +284,20 @@ public class GUIUtils {
 			ItemUtils.setPlainTag(item);
 		}
 		setPlaceholder(item);
+		if (displayPlainTagValue != null && !displayPlainTagValue.isEmpty()) {
+			setDisplayPlainTag(item, displayPlainTagValue);
+		}
 		return item;
 	}
 
-	private static Component formatName(String name, TextColor nameColor, boolean nameBold) {
+	private static void setDisplayPlainTag(ItemStack icon, String value) {
+		ItemUtils.setPlainTag(icon);
+		NBT.modify(icon, nbt -> {
+			nbt.getOrCreateCompound("plain").getOrCreateCompound("display").setString("Name", value);
+		});
+	}
+
+	public static Component formatName(String name, TextColor nameColor, boolean nameBold) {
 		return Component.text(name, nameColor)
 			       .decoration(TextDecoration.ITALIC, false)
 			       .decoration(TextDecoration.BOLD, nameBold);
@@ -368,5 +390,4 @@ public class GUIUtils {
 			item.setItemMeta(skullMeta);
 		}
 	}
-
 }

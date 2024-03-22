@@ -6,10 +6,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.inventories.WalletManager;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.managers.LootboxManager;
+import com.playmonumenta.plugins.market.gui.MarketGui;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -17,7 +21,9 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.WalletUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +34,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -121,6 +128,7 @@ public class MarketManager {
 				marketPlayerData.removeListingIDFromPlayer(newListing.getId());
 			}
 			MarketRedisManager.deleteListing(newListing);
+			MarketManager.getInstance().unlinkListingFromPlayerData(player, newListing.getId());
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToBuy().asQuantity(currencyToGive));
 				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToSell().asQuantity(itemsToGive));
@@ -173,6 +181,16 @@ public class MarketManager {
 				}
 			}
 		}
+		if (LootboxManager.isLootbox(currentItem)) {
+			if (LootboxManager.getLootshare(mPlayer, currentItem, false) != null) {
+				errors.add("You cannot sell a Lootbox that contains items.");
+			}
+		}
+		if (currentItem.getType() == Material.WRITTEN_BOOK || currentItem.getType() == Material.WRITABLE_BOOK || currentItem.getType() == Material.BOOK) { // WRITABLE_BOOK is a book and quill.
+			if (ItemStatUtils.getTier(currentItem) == Tier.NONE) {
+				errors.add("You cannot sell player-made books."); // direct the player to the correct place to advertise.
+			} // Otherwise we'd be blocking things like Wolfswood tome. We assume players cannot apply arbitrary tiers to random items.
+		}
 
 		if (ItemUtils.getDamagePercent(currentItem) > 0.0f) {
 			errors.add("You cannot sell damaged items. Repair it first!");
@@ -193,6 +211,13 @@ public class MarketManager {
 				errors.add("You cannot sell items with currency being the same item itself. Change either the used currency, or the item!");
 			}
 		}
+
+		NBT.modify(currentItem, nbt -> {
+			ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
+			if (itemsList != null && !itemsList.isEmpty()) {
+				errors.add("You cannot sell items which contains other items (quiver, lootbox, etc). Empty the item first!");
+			}
+		});
 
 		return errors;
 	}
@@ -215,7 +240,7 @@ public class MarketManager {
 			player.sendMessage(Component.text(error, NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
 		} else {
-			new MarketGUI(player, MarketGUI.MarketGuiTab.MAIN_MENU).open();
+			new MarketGui(player).open();
 		}
 	}
 
@@ -248,6 +273,29 @@ public class MarketManager {
 			}
 
 		});
+	}
+
+	// band-aid method to unlink the listings from a player;
+	// if a 'listingID' is in idArray, but the matching listing is not found in 'listings'
+	// then the listingID will be removed from the player owned listings
+	public static void unlinkListingsFromPlayerIfNotInList(Player player, List<Long> idList, List<MarketListing> listings) {
+		ArrayList<Long> unmetIDs = new ArrayList<>();
+		for (Long id : idList) {
+			boolean found = false;
+			for (MarketListing listing : listings) {
+				if (listing.getId() == id) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				unmetIDs.add(id);
+			}
+		}
+
+		for (Long id : unmetIDs) {
+			MarketManager.getInstance().unlinkListingFromPlayerData(player, id);
+		}
 	}
 
 	public void playerJoinEvent(PlayerJoinEvent event) {

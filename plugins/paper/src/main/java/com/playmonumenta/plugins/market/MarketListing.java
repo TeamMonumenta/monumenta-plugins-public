@@ -6,6 +6,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.market.gui.MarketGuiTab;
+import com.playmonumenta.plugins.market.gui.TabBazaarBrowser;
+import com.playmonumenta.plugins.market.gui.TabModeratorBrowser;
+import com.playmonumenta.plugins.market.gui.TabPlayerListings;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -147,7 +151,7 @@ public class MarketListing {
 			|| mListingCreationDate == null;
 	}
 
-	public ItemStack getListingDisplayItemStack(Player player, MarketGUI.MarketGuiTab environment) {
+	public ItemStack getListingDisplayItemStack(Player player, @Nullable MarketGuiTab environment) {
 
 		if (isNotUsable()) {
 			// fields needed are null, something is wrong.
@@ -174,9 +178,12 @@ public class MarketListing {
 		ItemStack item = getItemToSell();
 		ItemMeta itemMeta = item.getItemMeta();
 
-		List<Component> prevLore = new ArrayList<>();
+		List<Component> prevLore = null;
 		if (itemMeta.hasLore()) {
 			prevLore = itemMeta.lore();
+		}
+		if (prevLore == null) {
+			prevLore = new ArrayList<>();
 		}
 		prevLore.addAll(newLore);
 		itemMeta.lore(prevLore);
@@ -186,22 +193,18 @@ public class MarketListing {
 		return item;
 	}
 
-	private List<Component> getListingDisplayLore(Player player, MarketGUI.MarketGuiTab environment) {
+	private List<Component> getListingDisplayLore(Player player, @Nullable MarketGuiTab environment) {
 
 		List<Component> newLore = new ArrayList<>();
 		newLore.add(Component.empty());
 		newLore.add(Component.text("Market Listing: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + this.getId(), NamedTextColor.DARK_GRAY)));
 
-		switch (environment) {
-			case LISTINGS_BROWSER:
-			case ACTIVE_LISTINGS_BROWSER:
+		if (environment != null) {
+			if (environment instanceof TabBazaarBrowser || environment instanceof TabModeratorBrowser) {
 				newLore.addAll(getListingDisplayLoreListingsBrowser(player));
-				break;
-			case PLAYER_LISTINGS:
+			} else if (environment instanceof TabPlayerListings) {
 				newLore.addAll(getListingDisplayLorePlayerListings());
-				break;
-			default:
-				newLore.add(Component.text("IMPLEMENT GETLISTINGDISPLAYLORE FOR " + environment, NamedTextColor.RED));
+			}
 		}
 
 		return newLore;
@@ -318,11 +321,11 @@ public class MarketListing {
 
 	public Component toPlayerReadableComponent(Player player) {
 
-		ItemStack item = this.getListingDisplayItemStack(player, MarketGUI.MarketGuiTab.LISTINGS_BROWSER);
+		ItemStack item = this.getListingDisplayItemStack(player, null);
 		ItemStack itemToBuy = this.getItemToBuy();
 
 		return Component.text("MarketListing - ID: " + this.mId)
-			.append(Component.text("\n  itemToSell=")).append(item.displayName().hoverEvent(item))
+			.append(Component.text("\n itemToSell=")).append(item.displayName().hoverEvent(item))
 			.append(Component.text("\n amountToSellRemaining=" + mAmountToSellRemaining))
 			.append(Component.text("\n itemToBuy=")).append(itemToBuy.displayName().hoverEvent(itemToBuy))
 			.append(Component.text("\n amountToBuy=" + mAmountToBuy))
