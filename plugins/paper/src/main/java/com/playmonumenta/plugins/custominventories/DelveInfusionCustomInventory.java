@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Ardor;
 import com.playmonumenta.plugins.itemstats.infusions.Aura;
@@ -49,6 +50,7 @@ import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -162,13 +164,15 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mInventory.clear();
 		mMapFunction.clear();
 
-		if (mSlotSelected == null) {
-			loadDelveInfusionPage(player);
-		} else {
-			loadDelveInfusionSelection(mSlotSelected, player);
-		}
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			if (mSlotSelected == null) {
+				loadDelveInfusionPage(player);
+			} else {
+				loadDelveInfusionSelection(mSlotSelected, player);
+			}
+		}, 1);
 
-		fillWithJunk();
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 
@@ -334,10 +338,6 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			}
 			row++;
 		}
-	}
-
-	private void fillWithJunk() {
-		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private static void addItems(DelveInfusionSelection infusion, BiFunction<Integer, String, String> function) {

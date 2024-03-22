@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -38,7 +39,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public final class MasterworkCustomInventory extends CustomInventory {
 
@@ -123,19 +123,22 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private void loadInv(Player player) {
 		mInventory.clear();
 		mMapFunction.clear();
-		PlayerInventory pi = player.getInventory();
-		List<ItemStack> items = new ArrayList<>(Arrays.asList(pi.getArmorContents()));
-		Collections.reverse(items);
-		items.add(pi.getItemInMainHand());
-		items.add(pi.getItemInOffHand());
 
-		if (mIsPreview) {
-			setUpPreview(items.get(mMagicRow < mRowSelected ? mMagicRow : mRowSelected), player);
-		} else if (mRowSelected == 99) {
-			loadMasterworkPage(items, player);
-		} else {
-			loadMasterworkPath(items.get(mRowSelected), player);
-		}
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			PlayerInventory pi = player.getInventory();
+			List<ItemStack> items = new ArrayList<>(Arrays.asList(pi.getArmorContents()));
+			Collections.reverse(items);
+			items.add(pi.getItemInMainHand());
+			items.add(pi.getItemInOffHand());
+
+			if (mIsPreview) {
+				setUpPreview(items.get(Math.min(mMagicRow, mRowSelected)), player);
+			} else if (mRowSelected == 99) {
+				loadMasterworkPage(items, player);
+			} else {
+				loadMasterworkPath(items.get(mRowSelected), player);
+			}
+		}, 1);
 
 		GUIUtils.fillWithFiller(mInventory);
 	}

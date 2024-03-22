@@ -27,6 +27,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -87,8 +88,8 @@ public class InfusionCustomInventory extends CustomInventory {
 	public void loadInv(Player player) {
 		mInventory.clear();
 		mMapFunction.clear();
-		loadInfusionPage(player);
-		fillWithJunk();
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> loadInfusionPage(player), 1);
+		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private void loadInfusionPage(Player player) {
@@ -106,10 +107,6 @@ public class InfusionCustomInventory extends CustomInventory {
 			}
 			row++;
 		}
-	}
-
-	private void fillWithJunk() {
-		GUIUtils.fillWithFiller(mInventory);
 	}
 
 	private static void addItems(InfusionSelection infusion, BiFunction<Integer, String, String> function) {
