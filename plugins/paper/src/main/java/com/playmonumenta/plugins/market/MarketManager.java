@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.inventories.WalletManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.AuditListener;
@@ -157,6 +158,10 @@ public class MarketManager {
 
 	public static List<String> itemIsSellable(Player mPlayer, ItemStack currentItem, ItemStack currency) {
 		ArrayList<String> errors = new ArrayList<>();
+
+		if (CurseOfEphemerality.isEphemeral(currentItem)) {
+			errors.add("You cannot sell items with Curse of Ephemerality.");
+		}
 
 		if (Shattered.isShattered(currentItem)) {
 			errors.add("You cannot sell a shattered item. Repair it first!");
