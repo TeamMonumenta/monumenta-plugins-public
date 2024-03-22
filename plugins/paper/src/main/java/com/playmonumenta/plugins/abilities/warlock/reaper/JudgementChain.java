@@ -293,11 +293,11 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 			}
 
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, CHAIN_BREAK_DAMAGE);
-			DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), false, false);
+			DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
 
 			if (doDamage && isLevelTwo()) {
 				for (LivingEntity m : EntityUtils.getNearbyMobs(loc, damageRadius, mTarget)) {
-					DamageUtils.damage(mPlayer, m, DamageType.MAGIC, damage, mInfo.getLinkedSpell());
+					DamageUtils.damage(mPlayer, m, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 				}
 			}
 		}

@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,8 +17,8 @@ public class IceLanceMark extends Effect {
 	public static final String effectID = "IceLanceMark";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(200, 225, 255), 1.0f);
-	private int mIceTicks;
-	private Player mPlayer;
+	private final int mIceTicks;
+	private final Player mPlayer;
 
 	public IceLanceMark(int iceTicks, int duration, Player player) {
 		super(duration, effectID);
@@ -36,19 +38,25 @@ public class IceLanceMark extends Effect {
 	@Override
 	public void onDeath(EntityDeathEvent event) {
 		Block deathSpot = event.getEntity().getLocation().add(0, -1, 0).getBlock();
-		DepthsUtils.iceExposedBlock(deathSpot, mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(-1, 0, -1), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(-1, 0, 0), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(-1, 0, 1), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(0, 0, -1), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(0, 0, 1), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(1, 0, -1), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(1, 0, 0), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(1, 0, 1), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(-2, 0, 0), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(2, 0, 0), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(0, 0, -2), mIceTicks, mPlayer);
-		DepthsUtils.iceExposedBlock(deathSpot.getRelative(0, 0, 2), mIceTicks, mPlayer);
+
+		List<Block> iceLocations = ImmutableList.of(
+			deathSpot.getRelative(-1, 0, -1),
+			deathSpot.getRelative(-1, 0, 0),
+			deathSpot.getRelative(-1, 0, 1),
+			deathSpot.getRelative(0, 0, -1),
+			deathSpot.getRelative(0, 0, 0),
+			deathSpot.getRelative(0, 0, 1),
+			deathSpot.getRelative(1, 0, -1),
+			deathSpot.getRelative(1, 0, 0),
+			deathSpot.getRelative(1, 0, 1),
+			deathSpot.getRelative(-2, 0, 0),
+			deathSpot.getRelative(2, 0, 0),
+			deathSpot.getRelative(0, 0, -2),
+			deathSpot.getRelative(0, 0, 2)
+		);
+		for (Block b : iceLocations) {
+			DepthsUtils.iceExposedBlock(b, mIceTicks, mPlayer);
+		}
 	}
 
 	@Override

@@ -133,14 +133,12 @@ public class SpellBaseLeapAttack extends Spell {
 		}
 		Player targetPlayer = null;
 		Location loc = mBoss.getLocation();
-		Location locTarget = null;
 		List<Player> players = PlayerUtils.playersInRange(loc, mRange, false);
 		if (!players.isEmpty()) {
 			Collections.shuffle(players);
 			for (Player player : players) {
 				Location locPlayer = player.getLocation();
 				if ((LocationUtils.hasLineOfSight(mBoss, player) || mIgnoreWalls) && loc.distance(locPlayer) > mMinRange) {
-					locTarget = locPlayer;
 					targetPlayer = player;
 					break;
 				}
@@ -149,15 +147,14 @@ public class SpellBaseLeapAttack extends Spell {
 
 		LivingEntity target = ((Mob) mBoss).getTarget();
 		if (mPreferTarget && target instanceof Player) {
-			locTarget = target.getLocation();
 			targetPlayer = (Player) target;
 		}
 
-		if (locTarget == null || targetPlayer == null || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
+		if (targetPlayer == null || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
 			return;
 		}
 
-		launch(locTarget, loc, targetPlayer, !mIgnoreWalls);
+		launch(targetPlayer.getLocation(), loc, targetPlayer, !mIgnoreWalls);
 	}
 
 	public void launch(Location locTarget, Location loc, Player targetPlayer, boolean checkPassable) {

@@ -161,7 +161,7 @@ public class GuardingBolt extends DepthsAbility {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 			EntityUtils.applyStun(mPlugin, mStunDuration, enemy);
 
 			Location enemyParticleLocation = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);

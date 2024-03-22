@@ -154,7 +154,7 @@ public class IceBarrier extends DepthsAbility {
 			List<LivingEntity> hitMobs = new ArrayList<>();
 			for (Block b : blocksToIce) {
 				Location blockLocation = BlockUtils.getCenterBlockLocation(b);
-				DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP), mIceDuration, mPlayer, Boolean.TRUE);
+				DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP), mIceDuration, mPlayer, true);
 				new PartialParticle(Particle.CRIT, blockLocation, 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.CRIT_MAGIC, blockLocation, 10, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 

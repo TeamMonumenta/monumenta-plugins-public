@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,7 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class IchorSteelsage implements Infusion {
@@ -58,10 +58,16 @@ public class IchorSteelsage implements Infusion {
 	public static void ichorSteelsage(Plugin plugin, Player player, double multiplier, boolean isPrismatic) {
 		int adjustedJumpDuration = (int) (Quench.getDurationScaling(plugin, player) * JUMP_DURATION);
 		int adjustedEffectDuration = (int) (Quench.getDurationScaling(plugin, player) * EFFECT_DURATION);
-		PotionEffect playerJumpBoost = player.getPotionEffect(PotionEffectType.JUMP);
-		if (playerJumpBoost != null) {
-			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.JUMP, adjustedJumpDuration, playerJumpBoost.getAmplifier() + JUMP_AMPLIFIER));
-		}
+
+		plugin.mPotionManager.getPotionInfoList(player).stream()
+			.filter(pi -> PotionEffectType.JUMP.equals(pi.mType))
+			.map(pi -> {
+				PotionUtils.PotionInfo pi2 = new PotionUtils.PotionInfo(pi);
+				pi2.mDuration = Math.min(adjustedJumpDuration, pi.mDuration);
+				pi2.mAmplifier += JUMP_AMPLIFIER;
+				return pi2;
+			}).forEach(pi -> plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, pi));
+
 		plugin.mEffectManager.addEffect(player, EFFECT, new IchorSteelEffect(adjustedEffectDuration, DAMAGE * multiplier, isPrismatic));
 
 		player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1f, 2f);

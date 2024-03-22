@@ -104,7 +104,7 @@ public class PhlegmaticResolve extends Ability {
 					// AoE Effect
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
-						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE);
+						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE, mInfo.getLinkedSpell(), true);
 						new PartialParticle(Particle.WAX_OFF, mob.getLocation(), 6, 0.5f, 0.5f, 0.5f).spawnAsPlayerActive(mPlayer);
 					}
 

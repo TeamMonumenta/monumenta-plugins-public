@@ -90,7 +90,7 @@ public class Sidearm extends DepthsAbility {
 		}
 
 		if (result.getHitEntity() instanceof LivingEntity mob) {
-			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, mDamage, mInfo.getLinkedSpell());
+			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 			if (mob.isDead() || mob.getHealth() <= 0) {
 				mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.SIDEARM, getModifiedCooldown((int) (getModifiedCooldown() * (1 - mCDR))));
 			}

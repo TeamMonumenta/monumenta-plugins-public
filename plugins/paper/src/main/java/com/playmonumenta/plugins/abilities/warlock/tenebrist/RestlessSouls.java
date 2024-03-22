@@ -71,7 +71,7 @@ public class RestlessSouls extends Ability {
 			.shorthandName("RS")
 			.descriptions(
 				"Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. " +
-					"The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage to the target and silences all mobs within " + DEBUFF_RANGE + " blocks for " + SILENCE_DURATION_1 / 20 + " seconds. " +
+					"The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " magic damage to the target and silences all mobs within " + DEBUFF_RANGE + " blocks for " + SILENCE_DURATION_1 / 20 + " seconds. " +
 					"Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION / 20 + " seconds. " +
 					"Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.",
 				"Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. " +

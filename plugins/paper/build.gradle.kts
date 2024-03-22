@@ -1,8 +1,8 @@
+import Com_playmonumenta_plugins_ssh_gradle.*
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-import Com_playmonumenta_plugins_ssh_gradle.*;
 
 plugins {
 	id("com.github.johnrengelman.shadow") version "7.1.2"

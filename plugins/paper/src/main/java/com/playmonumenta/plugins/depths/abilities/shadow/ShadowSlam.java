@@ -127,7 +127,7 @@ public final class ShadowSlam extends DepthsAbility {
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * 0.0;
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mRadius)) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.getLinkedSpell());
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.getLinkedSpell(), true);
 		}
 
 		World world = mPlayer.getWorld();

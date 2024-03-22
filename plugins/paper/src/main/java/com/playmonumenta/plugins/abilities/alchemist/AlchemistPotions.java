@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.IndependentIframeTracker;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
@@ -32,11 +33,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
@@ -77,8 +75,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private final int mMaxCharges;
 	private int mCharges;
 	private int mChargeTime;
+	private final IndependentIframeTracker mIframeTracker;
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
-	private final Map<UUID, Integer> mMobsIframeMap;
 
 	private static @Nullable ItemStack GRUESOME_POTION = null;
 	private static @Nullable ItemStack BRUTAL_POTION = null;
@@ -96,12 +94,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
+		mIframeTracker = new IndependentIframeTracker(IFRAME_BETWEEN_POT);
+
 		mChargeTime = POTIONS_TIMER_BASE;
 		mMaxCharges = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CHARGES, MAX_CHARGES);
 		mCharges = Math.min(ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0), mMaxCharges);
 
 		mPlayerItemStatsMap = new WeakHashMap<>();
-		mMobsIframeMap = new HashMap<>();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GruesomeAlchemyCS());
 
@@ -253,20 +252,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE);
 			}
 
-			mMobsIframeMap.values().removeIf(tick -> tick + IFRAME_BETWEEN_POT < Bukkit.getServer().getCurrentTick());
-
-			if (mMobsIframeMap.containsKey(mob.getUniqueId())) {
-				applyEffects(mob, isGruesome, playerItemStats);
-				return;
-			}
-
-			double beforeHealth = mob.getHealth();
-			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
-			double healthDelta = beforeHealth - mob.getHealth();
-			// Only apply iframes if the mob took damage from our potion
-			if (healthDelta > 0) {
-				mMobsIframeMap.put(mob.getUniqueId(), Bukkit.getServer().getCurrentTick());
-			}
+			double finalDamage = damage;
+			mIframeTracker.damage(mob, () -> DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, true, false));
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome, playerItemStats);
