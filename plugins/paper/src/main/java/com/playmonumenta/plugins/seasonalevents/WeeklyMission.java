@@ -36,6 +36,7 @@ public class WeeklyMission {
 	public int mRotatingModifiersAmount;
 	public int mModifierRank;
 	public int mDelvePoints;
+	public int mAscension;
 	//Region of content to clear (includes dungeon, strike, boss)
 	public int mRegion;
 
@@ -161,6 +162,10 @@ public class WeeklyMission {
 						.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 				}
 			}
+		}
+		JsonElement ascensionJson = toParse.get("ascension");
+		if (ascensionJson instanceof JsonPrimitive ascensionPrimitive && ascensionPrimitive.isNumber()) {
+			mAscension = ascensionPrimitive.getAsInt();
 		}
 	}
 

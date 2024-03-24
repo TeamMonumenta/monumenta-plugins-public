@@ -74,14 +74,14 @@ public class SeasonalEventListener implements Listener {
 		for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == WeeklyMissionType.ZENITH_ROOMS) {
 				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, roomNumber);
-			} else if (mission.mType == WeeklyMissionType.REGIONAL_CONTENT && 3 == mission.mRegion) {
+			} else if (mission.mType == WeeklyMissionType.REGIONAL_CONTENT && 3 == mission.mRegion && roomNumber >= 30) {
 				// Region matches up - award points
 				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 			} else if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.ZENITH) && roomNumber >= 30) {
 				// Content matches up - award points
 				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
-			} else if (mission.mType == WeeklyMissionType.ZENITH_ASCENSION && ascension >= mission.mAmount) {
-				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, ascension);
+			} else if (mission.mType == WeeklyMissionType.ZENITH_ASCENSION && roomNumber >= 30 && ascension >= mission.mAscension) {
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 			}
 			missionNumber++;
 		}
