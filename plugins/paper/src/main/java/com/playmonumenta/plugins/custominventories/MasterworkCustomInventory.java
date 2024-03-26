@@ -120,16 +120,21 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		loadInv(owner);
 	}
 
+	private List<ItemStack> getEquippedItems(Player player) {
+		PlayerInventory pi = player.getInventory();
+		List<ItemStack> items = new ArrayList<>(Arrays.asList(pi.getArmorContents()));
+		Collections.reverse(items);
+		items.add(pi.getItemInMainHand());
+		items.add(pi.getItemInOffHand());
+		return items;
+	}
+
 	private void loadInv(Player player) {
 		mInventory.clear();
 		mMapFunction.clear();
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PlayerInventory pi = player.getInventory();
-			List<ItemStack> items = new ArrayList<>(Arrays.asList(pi.getArmorContents()));
-			Collections.reverse(items);
-			items.add(pi.getItemInMainHand());
-			items.add(pi.getItemInOffHand());
+			List<ItemStack> items = getEquippedItems(player);
 
 			if (mIsPreview) {
 				setUpPreview(items.get(Math.min(mMagicRow, mRowSelected)), player);
@@ -576,6 +581,20 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		if (itemClicked == null) {
 			return;
 		}
+
+		if (mRowSelected == 99 && !mIsPreview) {
+			// Verify that items are in the correct location
+			List<ItemStack> equippedItems = getEquippedItems(player);
+			for (int row = 0; row < 6; row++) {
+				ItemStack equippedItem = equippedItems.get(row);
+				ItemStack slotItem = mInventory.getItem(row * 9);
+				if (equippedItem != null && MasterworkUtils.isMasterwork(equippedItem) && !equippedItem.isSimilar(slotItem)) {
+					loadInv(player);
+					return;
+				}
+			}
+		}
+
 		itemClicked.run(player, clickedInventory, slot);
 
 		loadInv(player);
