@@ -24,7 +24,6 @@ import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
-import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -217,8 +216,8 @@ public class MarketManager {
 			}
 		}
 
-		NBT.modify(currentItem, nbt -> {
-			ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
+		NBT.get(currentItem, nbt -> {
+			ReadableNBTList<ReadWriteNBT> itemsList = ItemStatUtils.getItemList(nbt);
 			if (itemsList != null && !itemsList.isEmpty()) {
 				errors.add("You cannot sell items which contains other items (quiver, lootbox, etc). Empty the item first!");
 			}
