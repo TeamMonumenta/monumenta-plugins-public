@@ -33,6 +33,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -569,7 +570,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		event.setCancelled(true);
 		GUIUtils.refreshOffhand(event);
 
-		if (event.isShiftClick()) {
+		if (event.isShiftClick() || event.getClick() == ClickType.SWAP_OFFHAND) {
 			return;
 		}
 
