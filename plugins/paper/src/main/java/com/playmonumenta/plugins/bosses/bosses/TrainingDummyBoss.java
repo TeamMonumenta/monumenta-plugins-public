@@ -4,8 +4,10 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.DisplayableEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.text.DecimalFormat;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -50,7 +52,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		public boolean REGEN = true;
 	}
 
-	private boolean mRegen;
+	private final boolean mRegen;
 
 	public TrainingDummyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -181,7 +183,9 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			mDPSCounter10s += damage;
 
 			if (type == DamageEvent.DamageType.MELEE && player.getInventory().getItemInMainHand().getType() == Material.AIR) {
-				player.sendMessage(Component.text("Your punch clears the training dummy of all its status effects.", NamedTextColor.AQUA));
+				List<Component> effects = DisplayableEffect.getSortedEffectDisplayComponents(com.playmonumenta.plugins.Plugin.getInstance(), mBoss);
+				Component effectHover = MessagingUtils.concatinateComponents(effects);
+				player.sendMessage(Component.text("Your punch clears the training dummy of all its status effects.", NamedTextColor.AQUA).hoverEvent(effectHover));
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss);
 			}
 		}

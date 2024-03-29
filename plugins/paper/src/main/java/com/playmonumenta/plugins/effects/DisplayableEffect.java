@@ -47,6 +47,10 @@ public interface DisplayableEffect {
 		return effects;
 	}
 
+	static List<Component> getSortedEffectDisplayComponents(Plugin plugin, LivingEntity entity) {
+		return getSortedEffects(plugin, entity).stream().map(DisplayableEffect::getDisplay).filter(Objects::nonNull).toList();
+	}
+
 	static List<String> getSortedEffectDisplays(Plugin plugin, LivingEntity entity) {
 		int currentTick = Bukkit.getCurrentTick();
 		if (LAST_TICK.get() != currentTick) {
@@ -59,13 +63,7 @@ public interface DisplayableEffect {
 			}
 		}
 
-		List<String> displays = new ArrayList<>();
-		for (DisplayableEffect effect : getSortedEffects(plugin, entity)) {
-			Component display = effect.getDisplay();
-			if (display != null) {
-				displays.add(MessagingUtils.legacyFromComponent(display));
-			}
-		}
+		List<String> displays = getSortedEffectDisplayComponents(plugin, entity).stream().map(MessagingUtils::legacyFromComponent).toList();
 		CACHED_LIST_MAP.put(entity, displays);
 		return displays;
 	}
