@@ -54,6 +54,7 @@ import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.managers.DataCollectionManager;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
+import com.playmonumenta.plugins.managers.PlayerSkinManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.market.MarketCommands;
 import com.playmonumenta.plugins.market.MarketListener;
@@ -320,6 +321,7 @@ public class Plugin extends JavaPlugin {
 		AddSpawnerEffectMarkersCommand.register();
 		SiriusNPCBoss.register();
 		EffectListCommand.register();
+		PlayerSkinManagerCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -655,6 +657,8 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into ProtocolLib if present
 		if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+			// load skins before this
+			new PlayerSkinManager();
 			mProtocolLibIntegration = new ProtocolLibIntegration(this);
 			if (Bukkit.getPluginManager().isPluginEnabled("PrometheusExporter")) {
 				PacketMonitoringCommand.register(this);

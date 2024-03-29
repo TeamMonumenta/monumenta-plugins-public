@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
+import com.playmonumenta.plugins.protocollib.CursedListener;
 import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
@@ -315,6 +316,9 @@ public class PlayerListener implements Listener {
 		if (playersTeam != null) {
 			playersTeam.removeEntry(player.getName());
 		}
+
+		// Tacked on but where else should this go...
+		CursedListener.removeFakePlayerEntities(player.getUniqueId());
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
