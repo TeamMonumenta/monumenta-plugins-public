@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellDaveyAnticheese
 import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellLinkBeyondLife;
 import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellVoidBlast;
 import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellVoidGrenades;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -59,6 +60,9 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 	public static final int DAVEY_HEALTH = 5250;
 	public static final String VEX_LOS = "AbyssalSpawn";
 	public static final int SWAP_TARGET_SECONDS = 15;
+	private static final String SLOWNESS_SRC = "DaveyOnHitSlowness";
+	private static final int SLOWNESS_DURATION = 60;
+	private static final double SLOWNESS_POTENCY = -0.3;
 
 	public static final String MUSIC_TITLE = "epic:music.davey";
 	private static final int MUSIC_DURATION = 191; //seconds
@@ -251,7 +255,8 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//Slow on hit
 		if (damagee instanceof Player player) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+				new PercentSpeed(SLOWNESS_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
 		}
 	}
 }

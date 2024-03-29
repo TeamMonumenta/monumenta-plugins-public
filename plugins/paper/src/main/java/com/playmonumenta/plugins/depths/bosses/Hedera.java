@@ -54,42 +54,38 @@ import org.jetbrains.annotations.Nullable;
 
 public class Hedera extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_hedera";
+	public static final String DOOR_FILL_TAG = "Door"; // Used by Callicarpa for some reason
 	public static final int detectionRange = 70;
-	public static final String PLANT_STAND_TAG = "Plant";
-	public static final String DOOR_FILL_TAG = "Door";
-	public static final double PLANT_CONSUME_PERCENT = 0.05;
-	public static final int HEDERA_HEALTH = 4000;
-	public static final int SWAP_TARGET_SECONDS = 15;
 
-	public static final String MUSIC_TITLE = "epic:music.hedera";
+	private static final int HEDERA_HEALTH = 4000;
+	private static final int SWAP_TARGET_SECONDS = 15;
+	private static final String PLANT_STAND_TAG = "Plant";
+	private static final double PLANT_CONSUME_PERCENT = 0.05;
+	private static final String MUSIC_TITLE = "epic:music.hedera";
 	private static final int MUSIC_DURATION = 202; //seconds
 
-	public List<Location> mPlantSpawns;
-	public Map<Location, LivingEntity> mPlants;
-	public Map<Location, String> mPlantTypes;
-	public int mCooldownTicks;
-	public int mTimesHealed = 0;
+	private final List<Location> mPlantSpawns = new ArrayList<>();
+	private final Map<Location, LivingEntity> mPlants = new HashMap<>();
+	private final Map<Location, String> mPlantTypes = new HashMap<>();
+
+	private int mTimesHealed = 0;
 
 	public Hedera(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
 
-		mPlantSpawns = new ArrayList<>();
-		mPlants = new HashMap<>();
-		mPlantTypes = new HashMap<>();
-
-
-		//Switch mCooldownTicks depending on floor of party
+		// Switch cooldownTicks depending on floor of party
+		int cooldownTicks;
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		if (party == null || party.getFloor() == 1) {
-			mCooldownTicks = 8 * 20;
+			cooldownTicks = 8 * 20;
 		} else if (party.getFloor() == 4) {
-			mCooldownTicks = 6 * 20;
+			cooldownTicks = 6 * 20;
 		} else if (party.getFloor() % 3 == 1) {
-			mCooldownTicks = 5 * 20;
+			cooldownTicks = 5 * 20;
 		} else {
-			mCooldownTicks = 8 * 20;
+			cooldownTicks = 8 * 20;
 		}
 
 		//Set/remove blocks
@@ -136,18 +132,18 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			//new SpellEarthshake(plugin, mBoss, 5, 80),
-			new SpellLeafNova(plugin, mBoss, mCooldownTicks),
-			new SpellIvyGarden(plugin, mCooldownTicks, mPlants),
-			new SpellEvolutionSeeds(plugin, mCooldownTicks, mPlants, mPlantTypes)
+			new SpellLeafNova(plugin, mBoss, cooldownTicks),
+			new SpellIvyGarden(plugin, cooldownTicks, mPlants),
+			new SpellEvolutionSeeds(plugin, cooldownTicks, mPlants, mPlantTypes)
 		));
 		//Extra summon ability if fighting on f4 or higher
 		if (party != null && party.getFloor() != 1) {
 			activeSpells = new SpellManager(Arrays.asList(
 					//new SpellEarthshake(plugin, mBoss, 5, 80),
-					new SpellLeafNova(plugin, mBoss, mCooldownTicks),
-					new SpellIvyGarden(plugin, mCooldownTicks, mPlants),
-					new SpellEvolutionSeeds(plugin, mCooldownTicks, mPlants, mPlantTypes),
-					new SpellEndlessHederaSummons(mBoss, mCooldownTicks, ((party.getFloor() - 1) / 3) + 1)
+					new SpellLeafNova(plugin, mBoss, cooldownTicks),
+					new SpellIvyGarden(plugin, cooldownTicks, mPlants),
+					new SpellEvolutionSeeds(plugin, cooldownTicks, mPlants, mPlantTypes),
+					new SpellEndlessHederaSummons(mBoss, cooldownTicks, ((party.getFloor() - 1) / 3) + 1)
 			));
 		}
 

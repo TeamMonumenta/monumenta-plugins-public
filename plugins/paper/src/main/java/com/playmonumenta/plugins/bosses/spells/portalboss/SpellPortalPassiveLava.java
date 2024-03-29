@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells.portalboss;
 
 import com.playmonumenta.plugins.bosses.bosses.PortalBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -52,7 +51,7 @@ public class SpellPortalPassiveLava extends Spell {
 		}
 
 		//Anticheese
-		for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), Hedera.detectionRange, true)) {
+		for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), PortalBoss.detectionRange, true)) {
 			if (p.getLocation().getY() < mStartLoc.getY() - 4 && p.isInLava()) {
 				BossUtils.bossDamagePercent(mBoss, p, .35, "Iota's Domain");
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalLava", new PercentHeal(6 * 20, -0.50));
