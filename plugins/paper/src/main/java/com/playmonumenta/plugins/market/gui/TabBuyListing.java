@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.market.MarketListingStatus;
 import com.playmonumenta.plugins.market.MarketManager;
 import com.playmonumenta.plugins.market.MarketRedisManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.WalletUtils;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class TabBuyListing implements MarketGuiTab {
 	@Override
 	public void setup() {
 
-		if (mGui.mBuyListingFocusedListing == null) {
+		if (mGui.mFocusedListing == null) {
 			mGui.mPlayer.sendMessage("Buy listing tab does not have a focused listing. this shouldnt happen, but will not lead to issues. sending viewer back to browser");
 			mGui.switchToTab(mGui.TAB_BAZAAR_BROWSER);
 			return;
@@ -42,8 +43,8 @@ public class TabBuyListing implements MarketGuiTab {
 			// and refresh the gui when listing is loaded
 			mGui.mIsLoadingData = 3;
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				if (mGui.mBuyListingFocusedListing != null) {
-					mGui.mBuyListingFocusedListing = MarketRedisManager.getListing(mGui.mBuyListingFocusedListing.getId());
+				if (mGui.mFocusedListing != null) {
+					mGui.mFocusedListing = MarketRedisManager.getListing(mGui.mFocusedListing.getId());
 					if (mGui.mCurrentTab != mGui.TAB_BUY_LISTING) {
 						// player might have canceled the search, no need to keep going
 						return;
@@ -56,13 +57,13 @@ public class TabBuyListing implements MarketGuiTab {
 			});
 		}
 
-		ItemStack currency = mGui.mBuyListingFocusedListing.getItemToBuy().clone();
-		currency.setAmount(mGui.mBuyListingFocusedListing.getAmountToBuy());
+		ItemStack currency = mGui.mFocusedListing.getItemToBuy().clone();
+		currency.setAmount(mGui.mFocusedListing.getAmountToBuy());
 
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, mGui.mPlayer, true);
 
-		long amountAvailable = Math.min(debt.mNumInWallet + debt.mNumInInventory, (long)mGui.mBuyListingFocusedListing.getAmountToSellRemaining() * mGui.mBuyListingFocusedListing.getAmountToBuy());
-		int maxMultiplier = (int)(amountAvailable / mGui.mBuyListingFocusedListing.getAmountToBuy());
+		long amountAvailable = Math.min(debt.mNumInWallet + debt.mNumInInventory, (long)mGui.mFocusedListing.getAmountToSellRemaining() * mGui.mFocusedListing.getAmountToBuy());
+		int maxMultiplier = (int)(amountAvailable / mGui.mFocusedListing.getAmountToBuy());
 
 		// currency display
 		mGui.setItem(2, 2, currency);
@@ -79,7 +80,7 @@ public class TabBuyListing implements MarketGuiTab {
 			});
 
 		// itemToBeSold display
-		ItemStack listingItemStack = mGui.mBuyListingFocusedListing.getItemToSell();
+		ItemStack listingItemStack = mGui.mFocusedListing.getItemToSell();
 		mGui.setItem(2, 6, listingItemStack);
 
 
@@ -108,16 +109,19 @@ public class TabBuyListing implements MarketGuiTab {
 			errorLoreLines.add(Component.text("Wait for the data to finish loading", NamedTextColor.GOLD));
 		}
 
-		if (mGui.mBuyListingMultiplier <= 0 || mGui.mBuyListingFocusedListing.getAmountToSellRemaining() <= 0) {
+		if (mGui.mBuyListingMultiplier <= 0 || mGui.mFocusedListing.getAmountToSellRemaining() <= 0) {
 			errorLoreLines.add(Component.text("This listing ran out of stock!", NamedTextColor.DARK_RED));
 		}
 
 		if (!debt.mMeetsRequirement) {
 			errorLoreLines.add(Component.text("Not enough Money to buy!", NamedTextColor.DARK_RED));
 		}
+		if (InventoryUtils.isFull(mGui.mPlayer.getInventory())) {
+			errorLoreLines.add(Component.text("Your inventory is full.", NamedTextColor.DARK_RED));
+		}
 
 		if (errorLoreLines.isEmpty()) {
-			MarketListingStatus purchasableStatus = mGui.mBuyListingFocusedListing.getPurchasableStatus(mGui.mBuyListingMultiplier);
+			MarketListingStatus purchasableStatus = mGui.mFocusedListing.getPurchasableStatus(mGui.mBuyListingMultiplier);
 			if (purchasableStatus.isError()) {
 				switch (purchasableStatus) {
 					case LOCKED:
@@ -127,7 +131,7 @@ public class TabBuyListing implements MarketGuiTab {
 						errorLoreLines.add(Component.text("Item is expired, you cannot buy it.", NamedTextColor.DARK_RED));
 						break;
 					case NOT_ENOUGH_REMAINING:
-						errorLoreLines.add(Component.text("Not enough in stock! max: " + mGui.mBuyListingFocusedListing.getAmountToSellRemaining(), NamedTextColor.DARK_RED));
+						errorLoreLines.add(Component.text("Not enough in stock! max: " + mGui.mFocusedListing.getAmountToSellRemaining(), NamedTextColor.DARK_RED));
 						break;
 					default:
 						//other purchasableStatuses aren't used here
@@ -139,15 +143,15 @@ public class TabBuyListing implements MarketGuiTab {
 		if (errorLoreLines.isEmpty()) {
 			List<Component> confirmLore = new ArrayList<>();
 			confirmLore.add(Component.text("Buy " + mGui.mBuyListingMultiplier + " " + ItemUtils.getPlainNameOrDefault(listingItemStack) + " for: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			confirmLore.add(Component.text((mGui.mBuyListingMultiplier * mGui.mBuyListingFocusedListing.getAmountToBuy()) + " " + ItemUtils.getPlainNameOrDefault(mGui.mBuyListingFocusedListing.getItemToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			confirmLore.add(Component.text((mGui.mBuyListingMultiplier * mGui.mFocusedListing.getAmountToBuy()) + " " + ItemUtils.getPlainNameOrDefault(mGui.mFocusedListing.getItemToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			mGui.setItem(4, 5, GUIUtils.createConfirm(confirmLore))
 				.onClick((clickEvent) -> {
 					if (MarketGui.initiatePlayerAction(mGui.mPlayer)) {
 						return;
 					}
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-						if (mGui.mBuyListingFocusedListing != null) {
-							MarketManager.performPurchase(mGui.mPlayer, mGui.mBuyListingFocusedListing, mGui.mBuyListingMultiplier);
+						if (mGui.mFocusedListing != null) {
+							MarketManager.performPurchase(mGui.mPlayer, mGui.mFocusedListing, mGui.mBuyListingMultiplier);
 						}
 						mGui.mIsLoadingData = 2;
 						MarketGui.endPlayerAction(mGui.mPlayer);
@@ -162,7 +166,7 @@ public class TabBuyListing implements MarketGuiTab {
 			// moderation buttons
 			List<Component> desc;
 
-			if (mGui.mBuyListingFocusedListing.isExpired()) {
+			if (mGui.mFocusedListing.isExpired()) {
 
 				desc = new ArrayList<>();
 				desc.add(Component.text("Click this to attempt to de-expire the listing").decoration(TextDecoration.ITALIC, false));
@@ -172,8 +176,8 @@ public class TabBuyListing implements MarketGuiTab {
 				mGui.setItem(4, GUIUtils.createBasicItem(Material.TOTEM_OF_UNDYING, 1, Component.text("Un-expire the listing", NamedTextColor.GOLD), desc, true))
 					.onClick((clickEvent) -> {
 						Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-							if (mGui.mBuyListingFocusedListing != null) {
-								MarketManager.unexpireListing(mGui.mPlayer, mGui.mBuyListingFocusedListing);
+							if (mGui.mFocusedListing != null) {
+								MarketManager.unexpireListing(mGui.mPlayer, mGui.mFocusedListing);
 							}
 							mGui.mIsLoadingData = 2;
 							mGui.update();
@@ -182,15 +186,15 @@ public class TabBuyListing implements MarketGuiTab {
 
 			} else {
 
-				if (mGui.mBuyListingFocusedListing.isLocked()) {
+				if (mGui.mFocusedListing.isLocked()) {
 					desc = new ArrayList<>();
 					desc.add(Component.text("Click this to unlock the listing").decoration(TextDecoration.ITALIC, false));
 					desc.add(Component.text("The listing will once again be visible/tradable").decoration(TextDecoration.ITALIC, false));
 					mGui.setItem(2, GUIUtils.createBasicItem(Material.GLASS, 1, Component.text("Unlock the listing", NamedTextColor.GOLD), desc, true))
 						.onClick((clickEvent) -> {
 							Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-								if (mGui.mBuyListingFocusedListing != null) {
-									MarketManager.unlockListing(mGui.mPlayer, mGui.mBuyListingFocusedListing);
+								if (mGui.mFocusedListing != null) {
+									MarketManager.unlockListing(mGui.mPlayer, mGui.mFocusedListing);
 								}
 								mGui.mIsLoadingData = 2;
 								mGui.update();
@@ -204,8 +208,8 @@ public class TabBuyListing implements MarketGuiTab {
 					mGui.setItem(2, GUIUtils.createBasicItem(Material.IRON_BLOCK, 1, Component.text("Lock the listing", NamedTextColor.GOLD), desc, true))
 						.onClick((clickEvent) -> {
 							Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-								if (mGui.mBuyListingFocusedListing != null) {
-									MarketManager.lockListing(mGui.mPlayer, mGui.mBuyListingFocusedListing);
+								if (mGui.mFocusedListing != null) {
+									MarketManager.lockListing(mGui.mPlayer, mGui.mFocusedListing);
 								}
 								mGui.mIsLoadingData = 2;
 								mGui.update();
@@ -221,8 +225,8 @@ public class TabBuyListing implements MarketGuiTab {
 				mGui.setItem(4, GUIUtils.createBasicItem(Material.WITHER_ROSE, 1, Component.text("Expire the listing", NamedTextColor.GOLD), desc, true))
 					.onClick((clickEvent) -> {
 						Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-							if (mGui.mBuyListingFocusedListing != null) {
-								MarketManager.expireListing(mGui.mPlayer, mGui.mBuyListingFocusedListing);
+							if (mGui.mFocusedListing != null) {
+								MarketManager.expireListing(mGui.mPlayer, mGui.mFocusedListing, "manual expiry");
 							}
 							mGui.mIsLoadingData = 2;
 							mGui.update();
@@ -243,8 +247,8 @@ public class TabBuyListing implements MarketGuiTab {
 						return;
 					}
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-						if (mGui.mBuyListingFocusedListing != null) {
-							MarketManager.claimEverythingAndDeleteListing(mGui.mPlayer, mGui.mBuyListingFocusedListing);
+						if (mGui.mFocusedListing != null) {
+							MarketManager.claimEverythingAndDeleteListing(mGui.mPlayer, mGui.mFocusedListing);
 						}
 						MarketGui.endPlayerAction(mGui.mPlayer);
 					});
@@ -260,5 +264,10 @@ public class TabBuyListing implements MarketGuiTab {
 		mGui.setSize(TAB_SIZE);
 		mGui.mIsLoadingData = 2;
 		mGui.mBuyListingMultiplier = 1;
+	}
+
+	@Override
+	public void onLeave() {
+
 	}
 }

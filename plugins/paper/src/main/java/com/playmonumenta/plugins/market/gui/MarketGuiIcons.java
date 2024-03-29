@@ -17,11 +17,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class MarketGuiIcons {
 
-	static final ItemStack BACK_TO_MAIN_MENU = GUIUtils.createBasicItem(Material.BARRIER, GUIUtils.formatName("Back to main menu", NamedTextColor.GOLD, true), "gui_redReturnArrow");
-	static final ItemStack LOADING = GUIUtils.createBasicItem(Material.SUNFLOWER, GUIUtils.formatName("Loading", NamedTextColor.GOLD, true), "gui_loading");
-	static final ItemStack ADD_LISTING = GUIUtils.createBasicItem(Material.WRITABLE_BOOK, GUIUtils.formatName("Add a listing", NamedTextColor.GOLD, true), "gui_greenPlus");
-	static final ItemStack PLAYER_LISTINGS = GUIUtils.createBasicItem(Material.WRITTEN_BOOK, "Your Listings", NamedTextColor.GOLD, true);
-	static final ItemStack BAZAAR_LISTING_BROWSER = GUIUtils.createBasicItem(Material.BOOKSHELF, "Listings Browser", NamedTextColor.GOLD, true);
+	static final ItemStack BACK_TO_MAIN_MENU = GUIUtils.createBasicItem(Material.BARRIER, GUIUtils.formatName("Return to Main Menu", NamedTextColor.GOLD, true), "gui_redReturnArrow");
+	static final ItemStack LOADING = GUIUtils.createBasicItem(Material.SUNFLOWER, GUIUtils.formatName("Loading...", NamedTextColor.GOLD, true), "gui_loading");
+	static final ItemStack ADD_LISTING = GUIUtils.createBasicItem(Material.WRITABLE_BOOK, 1, GUIUtils.formatName("Add Listing", NamedTextColor.GOLD, true), List.of(Component.text("Click here to sell your item(s)", NamedTextColor.GRAY), Component.text("on the Player Market.", NamedTextColor.GRAY)), true, "gui_greenPlus");
+	static final ItemStack PLAYER_LISTINGS = GUIUtils.createBasicItem(Material.WRITTEN_BOOK, "Active Listings", NamedTextColor.GOLD, true, "Click to view your active Market Listings", NamedTextColor.GRAY);
+	static final ItemStack BAZAAR_LISTING_BROWSER = GUIUtils.createBasicItem(Material.BOOKSHELF, "Browse Market", NamedTextColor.GOLD, true, "Click here to browse the Player Market", NamedTextColor.GRAY);
 	static final ItemStack MODERATOR_MENU = GUIUtils.createBasicItem(Material.REDSTONE_BLOCK, "Moderation global actions", NamedTextColor.GOLD, true);
 	static final ItemStack MISSING_ITEM_SELECTION = GUIUtils.createBasicItem(Material.STRUCTURE_VOID, "Nothing selected", NamedTextColor.RED, true, "Click on an item in your inventory to select the item to be sold!", NamedTextColor.GRAY);
 	static final ItemStack ADDLISTING_MULTIPLIER_MISSING_ITEM = GUIUtils.createBasicItem(Material.DARK_OAK_SIGN, "Put an item first!", NamedTextColor.GOLD, true);
@@ -108,7 +108,7 @@ public class MarketGuiIcons {
 		// always displayed
 		loreList.add(Component.text("To create a listing, you will need to pay a tax of:", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		loreList.add(Component.text(taxDebt.mTotalRequiredAmount + " " + ItemUtils.getPlainName(taxDebt.mItem) + " ", NamedTextColor.WHITE)
-			.append(Component.text(taxDebt.mMeetsRequirement ? "✓" : "✗", (taxDebt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED)))
+			.append(getCheckboxOrXmark(taxDebt.mMeetsRequirement))
 			.append(Component.text(taxDebt.mWalletDebt > 0 ? " (" + taxDebt.mNumInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 		loreList.add(Component.text(String.format("Tax Rate: %.1f%%", MarketManager.getConfig().mBazaarTaxRate*100), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 
@@ -122,4 +122,15 @@ public class MarketGuiIcons {
 				loreList, true, "gui_exclamation_mark");
 		}
 	}
+
+	public static final Component GRAY_ARROW = Component.text(" ➜ ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+	public static final Component GRAY_DASH = Component.text(" - ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+	public static final Component GRAY_MULTIPLY = Component.text(" * ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+	public static final Component GREEN_CHECKBOX = Component.text("✓", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false);
+	public static final Component RED_XMARK = Component.text("✗", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false);
+
+	public static Component getCheckboxOrXmark(boolean checkbox) {
+		return checkbox ? GREEN_CHECKBOX : RED_XMARK;
+	}
+
 }

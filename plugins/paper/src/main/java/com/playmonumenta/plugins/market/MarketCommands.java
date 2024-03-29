@@ -7,7 +7,6 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.ListArgumentBuilder;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LongArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
@@ -115,24 +114,6 @@ public class MarketCommands {
 			.register();
 
 		arguments = new ArrayList<>();
-		arguments.add(new LiteralArgument("getlistings"));
-		Long[] tmpList = new Long[2000];
-		for (int i = 0; i < 2000; i++) {
-			tmpList[i] = (long)i;
-		}
-		arguments.add(new ListArgumentBuilder<Long>("listingsID").allowDuplicates(true).withList(tmpList).withStringMapper().buildGreedy());
-		new CommandAPICommand("market")
-			.withPermission(perms)
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				List<MarketListing> listings = MarketRedisManager.getListings(List.of((Long[]) args[0]));
-				for (MarketListing listing : listings) {
-					player.sendMessage(listing.toPlayerReadableComponent(player));
-				}
-			})
-			.register();
-
-		arguments = new ArrayList<>();
 		arguments.add(new LiteralArgument("getListingsFromIndex"));
 		arguments.add(new StringArgument("indexID"));
 		new CommandAPICommand("market")
@@ -140,7 +121,7 @@ public class MarketCommands {
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
 				MarketListingIndex index = MarketListingIndex.valueOf((String)args[0]);
-				player.sendMessage(index.getListingsFromIndex(null, true).toString());
+				player.sendMessage(index.getListingsFromIndex(true).toString());
 			})
 			.register();
 

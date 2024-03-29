@@ -24,4 +24,9 @@ public class TabNotImplemented implements MarketGuiTab {
 	public void onSwitch() {
 
 	}
+
+	@Override
+	public void onLeave() {
+
+	}
 }

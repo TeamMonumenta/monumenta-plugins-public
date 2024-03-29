@@ -78,11 +78,12 @@ public class MarketAudit {
 		AuditListener.logMarket(message);
 	}
 
-	public static void logExpire(Player player, MarketListing targetListing) {
+	public static void logExpire(Player player, MarketListing targetListing, String reason) {
 		String message =
 			"EXPIRE \n" +
 			"Listing : " + targetListing.getId() + "\n" +
-			"Expired by : " + player.getName();
+			"Expired by : " + player.getName() + "\n" +
+			"Reason : " + reason;
 		AuditListener.logMarket(message);
 	}
 

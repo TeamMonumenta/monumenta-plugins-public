@@ -15,6 +15,10 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.WalletUtils;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +58,11 @@ public class MarketListing {
 	private int mAmountToClaim;
 
 	// date of creation of the listing
-	private @Nullable final String mListingCreationDate;
+	private @Nullable
+	final String mListingCreationDate;
+
+	// date of expected expiration
+	private long mExpirationDate;
 
 	// Display name of the seller
 	private @Nullable String mOwnerName;
@@ -69,10 +77,12 @@ public class MarketListing {
 	private boolean mExpired;
 
 	// the region of the sold item. used for indexes/filters
-	private @Nullable final Region mRegion;
+	private @Nullable
+	final Region mRegion;
 
 	// the location (sub-region, dungeon, etc...) of the sold item. used for indexes/filters
-	private @Nullable final Location mLocation;
+	private @Nullable
+	final Location mLocation;
 
 	private @Nullable String mEditLocked;
 
@@ -83,7 +93,8 @@ public class MarketListing {
 		this.mAmountToBuy = pricePerItemAmount;
 		this.mCurrencyToBuyID = currencyToBuyID;
 		this.mAmountToClaim = 0;
-		this.mListingCreationDate = DateUtils.localDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+		this.mListingCreationDate = DateUtils.trueUtcDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+		this.mExpirationDate = DateUtils.trueUtcDateTime().plusDays(30).toInstant(ZoneOffset.UTC).getEpochSecond();
 		this.mOwnerName = owner.getName();
 		this.mOwnerUUID = owner.getUniqueId().toString();
 		this.mLocked = false;
@@ -103,6 +114,7 @@ public class MarketListing {
 		this.mCurrencyToBuyID = 0;
 		this.mAmountToClaim = 0;
 		this.mListingCreationDate = null;
+		this.mExpirationDate = 0;
 		this.mOwnerName = null;
 		this.mLocked = false;
 		this.mExpired = false;
@@ -119,6 +131,7 @@ public class MarketListing {
 		this.mAmountToBuy = other.mAmountToBuy;
 		this.mAmountToClaim = other.mAmountToClaim;
 		this.mListingCreationDate = other.mListingCreationDate;
+		this.mExpirationDate = other.mExpirationDate;
 		this.mOwnerName = other.mOwnerName;
 		this.mOwnerUUID = other.mOwnerUUID;
 		this.mLocked = other.mLocked;
@@ -196,9 +209,7 @@ public class MarketListing {
 	private List<Component> getListingDisplayLore(Player player, @Nullable MarketGuiTab environment) {
 
 		List<Component> newLore = new ArrayList<>();
-		newLore.add(Component.empty());
-		newLore.add(Component.text("Market Listing: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + this.getId(), NamedTextColor.DARK_GRAY)));
-
+		newLore.add(Component.text("-".repeat(30), NamedTextColor.DARK_GRAY));
 		if (environment != null) {
 			if (environment instanceof TabBazaarBrowser || environment instanceof TabModeratorBrowser) {
 				newLore.addAll(getListingDisplayLoreListingsBrowser(player));
@@ -206,6 +217,7 @@ public class MarketListing {
 				newLore.addAll(getListingDisplayLorePlayerListings());
 			}
 		}
+		newLore.add(Component.text("Market Listing: ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + this.getId(), NamedTextColor.DARK_GRAY)));
 
 		return newLore;
 	}
@@ -213,49 +225,37 @@ public class MarketListing {
 	private Collection<? extends Component> getListingDisplayLorePlayerListings() {
 
 		List<Component> newLore = new ArrayList<>();
-		newLore.add(Component.empty());
 
-		if (this.isExpired()) {
-			newLore.add(Component.text("This listing has expired", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-			newLore.add(Component.text("and will not show up in the browser ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		} else if (this.getAmountToSellRemaining() == 0) {
-			newLore.add(Component.text("This listing ran out of stock", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-			newLore.add(Component.text("and will not show up in the browser ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+
+		if (isExpired()) {
+			newLore.add(Component.text("This listing is ", NamedTextColor.GRAY).append(Component.text("expired", NamedTextColor.RED)).append(Component.text(".", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 		} else {
+			newLore.add(Component.text("This listing is ", NamedTextColor.GRAY).append(
+					isLocked() ? Component.text("invisible", NamedTextColor.RED) : Component.text("visible", NamedTextColor.DARK_GREEN))
+				.append(Component.text(".", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
+			newLore.add(Component.text("Expires in ", NamedTextColor.GRAY).append(Component.text(getTimeUntilExpirationAsDisplayableString(), NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false));
+		}
 
-			if (this.isLocked()) {
-				newLore.add(Component.text("This listing is ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text("LOCKED", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)));
-				newLore.add(Component.text("and will not show up in the browser ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-				newLore.add(Component.text("Right click", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text(" to unlock the listing", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
-			} else {
-				newLore.add(Component.text("This listing is ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text("UNLOCKED", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
-				newLore.add(Component.text("Right click", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text(" to lock the listing", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
-			}
+	    // stock
+		newLore.add(Component.empty());
+		newLore.add(Component.text("Remaining in stock: ", NamedTextColor.GRAY).append(Component.text(this.getAmountToSellRemaining(), (this.getAmountToSellRemaining() > 0 ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
+		// price
+		newLore.add(Component.text("Price per: ", NamedTextColor.GRAY)
+			.append(Component.text(this.getAmountToBuy() + " " + ItemUtils.getPlainName(this.getItemToBuy()), NamedTextColor.WHITE)).decoration(TextDecoration.ITALIC, false));
 
+		if (this.getAmountToClaim() > 0) {
 			newLore.add(Component.empty());
-			newLore.add(Component.text("Remaining in stock: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
-				.append(Component.text(this.getAmountToSellRemaining(), NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
-
-			if (this.getAmountToClaim() > 0) {
-				newLore.add(Component.text("Amount to claim: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text(this.getAmountToClaim(), NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
-				newLore.add(Component.text("Left click", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text(" to claim:", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
-				newLore.add(Component.text("  " + this.getAmountToClaim() * this.getAmountToBuy(), NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text(" " + ItemUtils.getPlainName(this.getItemToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-			}
-
+			newLore.add(Component.text("Right click to claim money!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+			newLore.add(Component.text("Claimable: ", NamedTextColor.GRAY)
+				.append(Component.text(Integer.toString(this.getAmountToClaim() * this.getAmountToBuy()), NamedTextColor.GOLD))
+				.append(Component.text(" " + ItemUtils.getPlainName(this.getItemToBuy()), NamedTextColor.WHITE))
+				.decoration(TextDecoration.ITALIC, false)
+			);
+			newLore.add(Component.text("Stock sold: ", NamedTextColor.GRAY).append(Component.text(Integer.toString(this.getAmountToClaim()), NamedTextColor.GREEN)).decoration(TextDecoration.ITALIC, false));
 		}
 
 		newLore.add(Component.empty());
-		newLore.add(Component.text("Press ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
-			.append(Component.keybind("key.swapOffhand", NamedTextColor.WHITE))
-			.append(Component.text(" To claim everything back").decoration(TextDecoration.ITALIC, false)));
-		newLore.add(Component.text("and remove the listing.", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		newLore.add(Component.text("Left click for more options.", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 
 		return newLore;
 	}
@@ -319,25 +319,6 @@ public class MarketListing {
 		return new GsonBuilder().setPrettyPrinting().create().toJson(this);
 	}
 
-	public Component toPlayerReadableComponent(Player player) {
-
-		ItemStack item = this.getListingDisplayItemStack(player, null);
-		ItemStack itemToBuy = this.getItemToBuy();
-
-		return Component.text("MarketListing - ID: " + this.mId)
-			.append(Component.text("\n itemToSell=")).append(item.displayName().hoverEvent(item))
-			.append(Component.text("\n amountToSellRemaining=" + mAmountToSellRemaining))
-			.append(Component.text("\n itemToBuy=")).append(itemToBuy.displayName().hoverEvent(itemToBuy))
-			.append(Component.text("\n amountToBuy=" + mAmountToBuy))
-			.append(Component.text("\n amountToClaim=" + mAmountToClaim))
-			.append(Component.text("\n listingCreationDate='" + mListingCreationDate + '\''))
-			.append(Component.text("\n ownerName='" + mOwnerName + '\''))
-			.append(Component.text("\n locked='" + mLocked + '\''))
-			.append(Component.text("\n expired='" + mExpired + '\''))
-			.append(Component.text("\n region='" + mRegion + '\''))
-			.append(Component.text("\n location='" + mLocation + '\''));
-	}
-
 	public @Nullable String getOwnerName() {
 		return mOwnerName;
 	}
@@ -398,6 +379,7 @@ public class MarketListing {
 			&& mItemToSellID == listing.mItemToSellID
 			&& mCurrencyToBuyID == listing.mCurrencyToBuyID
 			&& Objects.equals(mListingCreationDate, listing.mListingCreationDate)
+			&& mExpirationDate == listing.mExpirationDate
 			&& Objects.equals(mOwnerName, listing.mOwnerName)
 			&& mRegion == listing.mRegion
 			&& mLocation == listing.mLocation
@@ -419,5 +401,51 @@ public class MarketListing {
 
 	public void setOwnerUUID(String mOwnerUUID) {
 		this.mOwnerUUID = mOwnerUUID;
+	}
+
+	public Component getVisibilityAsDisplayableComponent() {
+		return (this.isLocked() ? Component.text("Invisible", NamedTextColor.RED) : Component.text("Visible", NamedTextColor.GREEN)).decoration(TextDecoration.ITALIC, false);
+	}
+
+	public LocalDateTime getExpirationDateTime() {
+		return LocalDateTime.ofInstant(Instant.ofEpochSecond(getExpirationTimestamp()), ZoneId.of("UTC"));
+	}
+
+	public long getExpirationTimestamp() {
+		if (mExpirationDate == 0) {
+			return 1714521600L;
+			// Default value for listings that are older than the expiration system.
+			// it represents the date of Wednesday, May 1, 2024 12:00:00 AM
+			// which is approximately 30 days after expiration system goes live on play.
+			// this default *should* be able to be removed past that date, as all listings will have a proper expiration date, or be removed
+		}
+		return mExpirationDate;
+	}
+
+	public boolean isExpirationDateInPast() {
+		return getSecondsUntilExpiration() < 0;
+	}
+
+	public long getSecondsUntilExpiration() {
+		return getExpirationTimestamp() - DateUtils.trueUtcDateTime().toInstant(ZoneOffset.UTC).getEpochSecond();
+	}
+
+	public String getTimeUntilExpirationAsDisplayableString() {
+		long allSeconds = getSecondsUntilExpiration();
+		long allMinutes = allSeconds / 60;
+		long minutes = allMinutes % 60;
+		long allHours = allMinutes / 60;
+		long hours = allHours % 24;
+		long days = allHours / 24;
+
+		if (days > 0) {
+			return days + " Days" + (hours != 0 ? ", " + hours + " Hours" : "");
+		} else if (hours > 0) {
+			return hours + " Hours" + (minutes != 0 ? ", " + minutes + " Minutes" : "");
+		} else if (minutes > 0) {
+			return minutes + " Minutes";
+		} else {
+			return "<1 Minute";
+		}
 	}
 }

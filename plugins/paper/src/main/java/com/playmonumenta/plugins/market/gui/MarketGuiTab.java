@@ -4,4 +4,6 @@ public interface MarketGuiTab {
 	void setup();
 
 	void onSwitch();
+
+	void onLeave();
 }

@@ -6,7 +6,13 @@ import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.KeyValue;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -81,8 +87,11 @@ public class MarketRedisManager {
 		return true;
 	}
 
-	public static boolean updateListingSafe(Player player, MarketListing oldListing, MarketListing newListing) {
+	public static boolean updateListingSafe(@Nullable Player player, MarketListing oldListing, MarketListing newListing) {
 		long startTimestamp = System.currentTimeMillis();
+		if (player == null) {
+			return false;
+		}
 		String editLockedString = player.getName() + "-" + startTimestamp;
 		// fetch the listing
 		MarketListing tempListing = getListing(oldListing.getId());
@@ -139,11 +148,6 @@ public class MarketRedisManager {
 		return out == null ? new ArrayList<>() : out;
 	}
 
-	// proxy for getListings(String... ids)
-	public static List<MarketListing> getListings(List<Long> ids) {
-		return getListings(ids.toArray(new Long[0]));
-	}
-
 	public static @Nullable List<MarketListing> getListings(String... ids) {
 		Gson gson = new Gson();
 		List<KeyValue<String, String>> jsons = RedisAPI.getInstance().sync().hmget(pathListingHashMap, ids);
@@ -164,11 +168,14 @@ public class MarketRedisManager {
 		return out;
 	}
 
-	public static List<Long> getAllListingsIds() {
+	public static List<Long> getAllListingsIds(boolean sorted) {
 		List<Long> out = new ArrayList<>();
 		List<String> lst = RedisAPI.getInstance().sync().hkeys(pathListingHashMap);
 		for (String l : lst) {
 			out.add(Long.parseLong(l));
+		}
+		if (sorted) {
+			Collections.sort(out);
 		}
 		return out;
 	}
@@ -183,5 +190,53 @@ public class MarketRedisManager {
 				index.removeListingFromIndex(listing);
 			}
 		});
+	}
+
+	public static List<Long> getAllListingsIdsMatchingFilter(MarketFilter filter) {
+
+		List<Long> out;
+		if (filter.startWithActiveOnly()) {
+			out = MarketListingIndex.ACTIVE_LISTINGS.getListingsFromIndex(true);
+		} else {
+			out = MarketRedisManager.getAllListingsIds(true);
+		}
+
+		Set<MarketListingIndex> usedIndexes = filter.getUsedIndexes();
+		HashMap<MarketListingIndex, Map<String, List<Long>>> indexDatas = new HashMap<>();
+		for (MarketListingIndex index : usedIndexes) {
+			indexDatas.put(index, index.getListingsMapFromIndex(false));
+		}
+
+		for (MarketFilter.FilterComponent comp : filter.getAllOptimisedComponents()) {
+			if (out.isEmpty()) {
+				break;
+			}
+
+			Map<String, List<Long>> indexData = indexDatas.getOrDefault(comp.mIndex, new TreeMap<>());
+			TreeSet<Long> idsToFilter = new TreeSet<>();
+			for (String indexKey : comp.mValues) {
+				idsToFilter.addAll(indexData.getOrDefault(indexKey, Collections.emptyList()));
+			}
+
+			List<Long> newOut = new ArrayList<>();
+
+			if (comp.mType == MarketFilter.Type.BLACKLIST) {
+				for (Long id : out) {
+					if (!idsToFilter.contains(id)) {
+						newOut.add(id);
+					}
+				}
+			} else if (comp.mType == MarketFilter.Type.WHITELIST) {
+				for (Long id : out) {
+					if (idsToFilter.contains(id)) {
+						newOut.add(id);
+					}
+				}
+			}
+
+			out = newOut;
+		}
+
+		return out;
 	}
 }

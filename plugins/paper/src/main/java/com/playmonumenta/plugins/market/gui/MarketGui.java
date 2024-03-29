@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.market.gui;
 
 import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.market.MarketListing;
 import com.playmonumenta.plugins.market.MarketManager;
-import com.playmonumenta.plugins.market.MarketRedisManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -41,10 +41,7 @@ public class MarketGui extends Gui {
 	final MarketGuiTab TAB_BAZAAR_BROWSER = new TabBazaarBrowser(this);
 	final MarketGuiTab TAB_MODERATOR_BROWSER = new TabModeratorBrowser(this);
 	final MarketGuiTab TAB_PLAYER_LISTINGS = new TabPlayerListings(this);
-
-	// represents the current page the player is seeing, inside a given tab
-	// this is used for the tab 'listings' or 'your listings'
-	int mCurrentPage = 0;
+	final MarketGuiTab TAB_EDIT_LISTING = new TabEditListing(this);
 
 	// represents the item that is going to be sold
 	@Nullable ItemStack mItemToSell = null;
@@ -67,12 +64,7 @@ public class MarketGui extends Gui {
 	int mIsLoadingData = 0;
 
 	List<Long> mPlayerListingsIds;
-
-	@Nullable List<Long> mBrowserListingsIDList;
-	@Nullable List<MarketListing> mBrowserListingsForPage;
-
-	// Variables for BUY_LISTING
-	@Nullable MarketListing mBuyListingFocusedListing;
+	@Nullable MarketListing mFocusedListing;
 	int mBuyListingMultiplier;
 
 	boolean mIsOp;
@@ -98,25 +90,34 @@ public class MarketGui extends Gui {
 	}
 
 	void switchToTab(MarketGuiTab tabClass) {
+		mCurrentTab.onLeave();
 		mCurrentTab = tabClass;
 		tabClass.onSwitch();
 		update();
 	}
 
-	private void commonChangePageClickEvent(InventoryClickEvent event, int maxPage) {
-		if (event.getClick() == ClickType.RIGHT) {
-			mCurrentPage++;
-			if (mCurrentPage + 1 > maxPage) {
-				mCurrentPage = 0;
-			}
-		} else if (event.getClick() == ClickType.LEFT) {
-			mCurrentPage--;
-			if (mCurrentPage < 0) {
-				mCurrentPage = maxPage - 1;
-			}
+	int commonMultiplierSelection(InventoryClickEvent event, int current, int max) {
+
+		int offset = 1;
+		if (event.isShiftClick()) {
+			offset = 16;
 		}
-		mIsLoadingData = 2;
-		update();
+
+		if (event.getClick() == ClickType.RIGHT) {
+			current += offset;
+		} else if (event.getClick() == ClickType.LEFT) {
+			current -= offset;
+
+		}
+
+		if (current > max) {
+			current = 1;
+		}
+		if (current < 1) {
+			current = max;
+		}
+
+		return current;
 	}
 
 	int modifyTradeMultiplier(int baseModifier, int offset, int maxMultiplier) {
@@ -167,66 +168,6 @@ public class MarketGui extends Gui {
 		return banner;
 	}
 
-	void setupTopBar(boolean playerListingsVisible, int maxPage) {
-		setItem(0, MarketGuiIcons.BACK_TO_MAIN_MENU).onClick((clickEvent) -> switchToTab(TAB_MAIN_MENU));
-		if (playerListingsVisible) {
-			setItem(1, MarketGuiIcons.PLAYER_LISTINGS).onClick((clickEvent) -> switchToTab(TAB_PLAYER_LISTINGS));
-		}
-		setItem(2, MarketGuiIcons.ADD_LISTING).onClick((clickEvent) -> switchToTab(TAB_ADD_LISTING));
-		ArrayList<String> lore = new ArrayList<>();
-		lore.add("Current page: " + (mCurrentPage + 1) + "/" + (maxPage == 0 ? "?" : maxPage));
-		lore.add("Right click to go to next page");
-		lore.add("Left click to go to previous page");
-		setItem(8, GUIUtils.createBasicItem(Material.ARROW, Component.text("Change page", NamedTextColor.GOLD), lore, NamedTextColor.GRAY)).onClick((clickEvent) -> this.commonChangePageClickEvent(clickEvent, maxPage));
-	}
-
-	void commonLoadListingsInPageFromLoadedListingsIdList(MarketGuiTab tabAtStart) {
-		if (mCurrentTab != tabAtStart) {
-			// player might have canceled the search, no need to keep going
-			return;
-		}
-
-		int searchIndex = mCurrentPage * 45;
-		ArrayList<MarketListing> listingsForPage = new ArrayList<>();
-
-		while (listingsForPage.size() < 45 && mBrowserListingsIDList != null && searchIndex < mBrowserListingsIDList.size()) {
-			int tries = (45 - listingsForPage.size()) + 5;
-			List<Long> browserListingsIDSublist = mBrowserListingsIDList.subList(searchIndex, Math.min(searchIndex + tries, mBrowserListingsIDList.size()));
-			searchIndex += browserListingsIDSublist.size();
-
-			if (!browserListingsIDSublist.isEmpty()) {
-				List<MarketListing> listings = MarketRedisManager.getListings(browserListingsIDSublist.toArray(new Long[0]));
-				MarketManager.unlinkListingsFromPlayerIfNotInList(mPlayer, browserListingsIDSublist, listings);
-				if (mCurrentTab != tabAtStart) {
-					// player might have canceled the search, no need to keep going
-					return;
-				}
-				ArrayList<Long> listingsToRemove = new ArrayList<>();
-				// check the validity of each listing
-				for (MarketListing listing : listings) {
-					if (listing != null) {
-						if (listing.getPurchasableStatus(1).isError() && !(tabAtStart instanceof TabModeratorBrowser) && !(tabAtStart instanceof TabPlayerListings)) {
-							listingsToRemove.add(listing.getId());
-						} else {
-							listingsForPage.add(listing);
-						}
-					}
-				}
-				searchIndex -= listingsToRemove.size();
-				mBrowserListingsIDList.removeAll(listingsToRemove);
-			}
-		}
-
-		if (mCurrentTab != tabAtStart) {
-			// player might have canceled the search, no need to keep going
-			return;
-		}
-
-		mBrowserListingsForPage = listingsForPage.subList(0, Math.min(45, listingsForPage.size()));
-		mIsLoadingData = 4;
-		update();
-	}
-
 	@Override
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
@@ -259,5 +200,30 @@ public class MarketGui extends Gui {
 		mMarketOngoingPlayerActions.remove(player.getName());
 	}
 
+	/*
+	//
+	// COMMON ICONS
+	//
+	*/
 
-} //1050
+	public GuiItem buildChangePageIcon(int mCurrentPage, int maxPage) {
+		ArrayList<Component> lore = new ArrayList<>();
+		lore.add(Component.text("Right Click to go to the next page.", NamedTextColor.GRAY));
+		lore.add(Component.text("Left Click to go to the previous page.", NamedTextColor.GRAY));
+		// made this way to facilitate translations later on
+		String name = "Page %d of %d";
+		String[] nameParts = name.split("%d");
+		Component nameComp = Component.text(nameParts[0], NamedTextColor.GOLD)
+			.append(Component.text(mCurrentPage + 1))
+			.append(Component.text(nameParts[1], NamedTextColor.GOLD))
+			.append(Component.text(maxPage).decoration(TextDecoration.OBFUSCATED, maxPage == 0));
+
+		return new GuiItem(GUIUtils.createBasicItem(Material.ARROW, 1, nameComp, lore, true, "gui_changePage"));
+	}
+
+	/*
+	//
+	// COMMON ACTIONS
+	//
+	*/
+}

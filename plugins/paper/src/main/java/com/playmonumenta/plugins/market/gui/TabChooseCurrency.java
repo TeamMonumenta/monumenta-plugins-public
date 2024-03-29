@@ -45,4 +45,9 @@ public class TabChooseCurrency implements MarketGuiTab {
 		mGui.setTitle(TAB_TITLE);
 		mGui.setSize(TAB_SIZE);
 	}
+
+	@Override
+	public void onLeave() {
+
+	}
 }

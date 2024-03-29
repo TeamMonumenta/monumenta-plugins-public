@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.market;
 
 import com.google.gson.Gson;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.MapScanCursor;
@@ -9,12 +10,13 @@ import io.lettuce.core.ScanCursor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.Nullable;
 
 public enum MarketListingIndex {
 
@@ -65,35 +67,56 @@ public enum MarketListingIndex {
 		RedisAPI.getInstance().sync().hset(mRedisPath, key, listingIdList);
 	}
 
-	public List<Long> getListingsFromIndex(@Nullable String match, boolean descOrder) {
+	public List<Long> getListingsFromIndex(boolean descOrder) {
 		// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
 		// a simpler, but unique algorithm needs to be used
 		if (this == ACTIVE_LISTINGS) {
-			return getActiveListings(match, descOrder);
+			return getActiveListings(descOrder);
 		}
 
 		return new ArrayList<>();
 	}
 
-	private List<Long> getActiveListings(@Nullable String match, boolean descOrder) {
-		List<String> activeUnfilteredListings = RedisAPI.getInstance().sync().lrange(mRedisPath, 0, -1);
-		List<Long> activeFilteredListings = new ArrayList<>();
-		if (match != null) {
-			for (String listingID : activeUnfilteredListings) {
-				if (listingID.equals(match)) {
-					activeFilteredListings.add(Long.parseLong(listingID));
+	public Map<String, List<Long>> getListingsMapFromIndex(boolean descOrder) {
+
+		TreeMap<String, List<Long>> out = new TreeMap<>();
+
+		// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
+		// a simpler, but unique algorithm needs to be used
+		if (this == ACTIVE_LISTINGS) {
+			out.put("ACTIVE_LISTINGS", getActiveListings(descOrder));
+			return out;
+		}
+
+		Map<String, String> indexContents = RedisAPI.getInstance().sync().hgetall(mRedisPath);
+		for (Map.Entry<String, String> entry : indexContents.entrySet()) {
+			List<Long> list = new ArrayList<>();
+			String[] values = entry.getValue().split(",");
+			for (String value : values) {
+				MMLog.info(value);
+				if (value != null && !value.isEmpty() && value.matches("[0-9]*")) {
+					MMLog.info(value + " Added!");
+					list.add(Long.parseLong(value));
 				}
 			}
-		} else {
-			for (String listingID : activeUnfilteredListings) {
-				activeFilteredListings.add(Long.parseLong(listingID));
-			}
+			list.sort(descOrder ? Comparator.reverseOrder() : Comparator.naturalOrder());
+			out.put(entry.getKey(), list);
+		}
+
+		return out;
+	}
+
+	private List<Long> getActiveListings(boolean descOrder) {
+		List<String> activeUnfilteredListings = RedisAPI.getInstance().sync().lrange(mRedisPath, 0, -1);
+		List<Long> activeFilteredListings = new ArrayList<>();
+		for (String listingID : activeUnfilteredListings) {
+			activeFilteredListings.add(Long.parseLong(listingID));
 		}
 		if (mSortedFetch) {
 			Collections.sort(activeFilteredListings);
 		}
 		if (descOrder) {
-			Collections.reverse(activeFilteredListings);
+			Collections.reverse(activeFilteredListings); // not gonna touch this one because idk how the logic of this method works
 		}
 		return activeFilteredListings;
 	}
@@ -211,8 +234,7 @@ public enum MarketListingIndex {
 				if (index == ACTIVE_LISTINGS) {
 					ArrayList<Long> values = indexValues.get("ALL");
 					if (values != null) {
-						Collections.sort(values);
-						Collections.reverse(values);
+						values.sort(Collections.reverseOrder());
 						String[] array = new String[values.size()];
 						for (int i = 0; i < values.size(); i++) {
 							array[i] = String.valueOf(values.get(i));
@@ -225,8 +247,7 @@ public enum MarketListingIndex {
 				for (String key : indexValues.keySet()) {
 					ArrayList<Long> values = indexValues.get(key);
 					if (values != null) {
-						Collections.sort(values);
-						Collections.reverse(values);
+						values.sort(Collections.reverseOrder());
 						String valuesStr = ArrayUtils.toString(values).replace(" ", "");
 						valuesStr = valuesStr.substring(1, valuesStr.length() - 1);
 						RedisAPI.getInstance().sync().hset(index.mRedisPath, key, valuesStr);

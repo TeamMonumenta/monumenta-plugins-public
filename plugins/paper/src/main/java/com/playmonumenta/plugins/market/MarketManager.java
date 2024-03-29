@@ -89,7 +89,7 @@ public class MarketManager {
 			return;
 		}
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			InventoryUtils.giveItemWithStacksizeCheck(player, listing.getItemToBuy().asQuantity(amountToGive));
+			InventoryUtils.giveCurrencyToPlayer(player, listing.getItemToBuy().asQuantity(amountToGive), true);
 		});
 		MarketAudit.logClaim(player, listing, amountToGive);
 	}
@@ -130,20 +130,22 @@ public class MarketManager {
 			MarketRedisManager.deleteListing(newListing);
 			MarketManager.getInstance().unlinkListingFromPlayerData(player, newListing.getId());
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToBuy().asQuantity(currencyToGive));
+
+				InventoryUtils.giveCurrencyToPlayer(player, newListing.getItemToBuy().asQuantity(currencyToGive), true);
 				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToSell().asQuantity(itemsToGive));
 			});
 			MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
 		}
 	}
 
-	public static void expireListing(Player player, MarketListing listing) {
+	public static void expireListing(Player player, MarketListing listing, String reason) {
 		// WARNING: Call this in an async thread
 		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setExpired(true);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
-		MarketAudit.logExpire(player, listing);
+		MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(newListing);
+		MarketAudit.logExpire(player, listing, reason);
 	}
 
 	public static void unexpireListing(Player player, MarketListing listing) {
@@ -152,6 +154,7 @@ public class MarketManager {
 		MarketListing newListing = new MarketListing(oldListing);
 		newListing.setExpired(false);
 		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
+		MarketListingIndex.ACTIVE_LISTINGS.addListingToIndexIfMatching(newListing);
 		MarketAudit.logUnexpire(player, listing);
 	}
 
@@ -253,7 +256,7 @@ public class MarketManager {
 			player.sendMessage("Resyncing all indexes");
 			MarketListingIndex.resyncAllIndexes();
 			player.sendMessage("Fetching listing list");
-			List<Long> listings = MarketListingIndex.ACTIVE_LISTINGS.getListingsFromIndex(null, false);
+			List<Long> listings = MarketListingIndex.ACTIVE_LISTINGS.getListingsFromIndex(false);
 			player.sendMessage("Going through the " + listings.size() + "active listings");
 			int amountLocked = 0;
 			int amountErrors = 0;
@@ -287,7 +290,7 @@ public class MarketManager {
 		for (Long id : idList) {
 			boolean found = false;
 			for (MarketListing listing : listings) {
-				if (listing.getId() == id) {
+				if (listing != null && listing.getId() == id) {
 					found = true;
 					break;
 				}
@@ -302,12 +305,22 @@ public class MarketManager {
 		}
 	}
 
+	public static void handleListingExpiration(Player player, MarketListing listing) {
+		if (!listing.isExpired()) {
+			if (listing.isExpirationDateInPast()) {
+				expireListing(player, listing, "old age");
+				listing.setExpired(true);
+			}
+		}
+	}
+
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		// delay the data fetch by 5 ticks, as variables are not updated until onJoin event is called
+		// delay the data fetch by 20 ticks, as variables are not updated until onJoin event is called
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(event.getPlayer());
 			if (marketPlayerData == null) {
 				Plugin.getInstance().getLogger().warning("ERROR FAILED TO LOAD MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
+				AuditListener.logMarket("ERROR FAILED TO LOAD MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
 				return;
 			}
 			UUID uuid = event.getPlayer().getUniqueId();
@@ -318,7 +331,7 @@ public class MarketManager {
 					marketPlayerData.addListingIDToPlayer(elem.getAsString());
 				}
 			}
-		}, 5L);
+		}, 20L);
 
 		// initialise what we can
 		if (mMarketPlayerDataInstances == null) {
@@ -347,8 +360,8 @@ public class MarketManager {
 	}
 
 	public void onLogout(Player player) {
-		// delay the data removal by 10 ticks, as we need it for the playersave event, launched after logout event
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mMarketPlayerDataInstances.remove(player), 10L);
+		// delay the data removal by 30 ticks, as we need it for the playersave event, launched after logout event
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mMarketPlayerDataInstances.remove(player), 30L);
 	}
 
 	// Verifies that the player has the item that he wants to sell. take it from them.
@@ -505,5 +518,50 @@ public class MarketManager {
 		}
 
 		return debt;
+	}
+
+	public boolean editListing(Player player, boolean delete, MarketListing oldListing, MarketListing newListing) {
+		// WARNING: Call this in an async thread
+
+		if (delete) {
+			claimEverythingAndDeleteListing(player, oldListing);
+			return true;
+		}
+
+		List<String> errors = new ArrayList<>();
+
+		if (oldListing.isSimilar(newListing)) {
+			errors.add("No edits detected! Make some changes!");
+		}
+
+		if (!errors.isEmpty()) {
+
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
+			for (String error : errors) {
+				player.sendMessage(Component.text(error, NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			}
+			return false;
+		} else {
+			// no errors found, proceed with the edit
+			if (!MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
+				player.sendMessage("Listing " + newListing.getId() + " failed to be edited. This shouldn't happen.");
+				MMLog.severe("Listing " + newListing.getId() + " failed to be edited. This shouldn't happen.");
+				AuditListener.logMarket("Listing " + newListing.getId() + " failed to be edited. This shouldn't happen.");
+				return false;
+
+			}
+
+			// redis edit ok
+			for (MarketListingIndex index : MarketListingIndex.values()) {
+				if (index.mMatchMethod.apply(oldListing) && !index.mMatchMethod.apply(newListing)) {
+					index.removeListingFromIndex(newListing);
+				} else if (!index.mMatchMethod.apply(oldListing) && index.mMatchMethod.apply(newListing)) {
+					index.addListingToIndex(newListing);
+				}
+			}
+
+		}
+		return true;
+
 	}
 }
