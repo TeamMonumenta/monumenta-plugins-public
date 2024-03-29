@@ -144,7 +144,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 
 
 	private void loadMasterworkPath(Player p) {
-		ItemStack item = p.getInventory().getItem(SLOT_ORDER.get(mRowSelected));
+		EquipmentSlot equipmentSlot = SLOT_ORDER.get(mRowSelected);
+		ItemStack item = p.getInventory().getItem(equipmentSlot);
 		MasterworkUtils.MasterworkCost masterworkCost = MasterworkUtils.getMasterworkCost(item);
 		Masterwork current = ItemStatUtils.getMasterwork(item);
 		if (current == Masterwork.VI) {
@@ -176,19 +177,19 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			ItemStack upgradeIconA = createCostItem(p, Material.RED_DYE, "Enhance Item (Fortitude)", TextColor.fromHexString("#D02E28"), costA);
 			mInventory.setItem(21, upgradeIconA);
 			mMapFunction.put(21, (player, inventory, slot) -> {
-				attemptUpgrade(p, item, newItemA, costA);
+				attemptUpgrade(p, equipmentSlot, newItemA, costA);
 			});
 
 			ItemStack upgradeIconB = createCostItem(p, Material.LIGHT_BLUE_DYE, "Enhance Item (Potency)", TextColor.fromHexString("#4AC2E5"), costB);
 			mInventory.setItem(22, upgradeIconB);
 			mMapFunction.put(22, (player, inventory, slot) -> {
-				attemptUpgrade(p, item, newItemB, costB);
+				attemptUpgrade(p, equipmentSlot, newItemB, costB);
 			});
 
 			ItemStack upgradeIconC = createCostItem(p, Material.YELLOW_DYE, "Enhance Item (Alacrity)", TextColor.fromHexString("#FFFA75"), costC);
 			mInventory.setItem(23, upgradeIconC);
 			mMapFunction.put(23, (player, inventory, slot) -> {
-				attemptUpgrade(p, item, newItemC, costC);
+				attemptUpgrade(p, equipmentSlot, newItemC, costC);
 			});
 
 			mInventory.setItem(49, mPreviewItem);
@@ -228,7 +229,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			ItemStack upgradeIcon = createCostItem(p, Material.RAW_IRON, "Enhance Item", TextColor.fromHexString("#FFAA00"), cost);
 			mInventory.setItem(22, upgradeIcon);
 			mMapFunction.put(22, (player, inventory, slot) -> {
-				attemptUpgrade(p, item, newItem, cost);
+				attemptUpgrade(p, equipmentSlot, newItem, cost);
 			});
 
 			mInventory.setItem(49, mPreviewItem);
@@ -385,6 +386,10 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 
 		return currentLore;
+	}
+
+	private void attemptUpgrade(Player p, EquipmentSlot equipmentSlot, ItemStack nextItem, MasterworkUtils.MasterworkCostLevel cost) {
+		attemptUpgrade(p, p.getInventory().getItem(equipmentSlot), nextItem, cost);
 	}
 
 	private void attemptUpgrade(Player p, ItemStack item, ItemStack nextItem, MasterworkUtils.MasterworkCostLevel cost) {
@@ -577,21 +582,22 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (mRowSelected == 99 && !mIsPreview) {
-			int row = slot / 9;
-			ItemStack slotItem = mInventory.getItem(row * 9);
-			if (!GUIUtils.isPlaceholder(slotItem)) {
-				return;
-			}
+		if (!mIsPreview) {
+			if (mRowSelected == 99) {
+				int row = slot / 9;
+				ItemStack slotItem = mInventory.getItem(row * 9);
+				if (!GUIUtils.isPlaceholder(slotItem)) {
+					return;
+				}
 
-			// Compare the equipped item to the one in the GUI
-			EquipmentSlot equipmentSlot = SLOT_ORDER.get(row);
-			ItemStack equippedItem = player.getInventory().getItem(equipmentSlot);
-			if (MasterworkUtils.isMasterwork(equippedItem)) {
-				ItemStack clone = equippedItem.clone();
-				GUIUtils.setPlaceholder(clone);
-				if (!clone.isSimilar(slotItem)) {
+				// Compare the equipped item to the one in the GUI
+				if (slotItem == null || !checkSimilar(player, slotItem, row)) {
 					loadInv(player);
+					return;
+				}
+			} else if (mRowSelected < 6) {
+				ItemStack guiItem = mInventory.getItem(4);
+				if (guiItem == null || !checkSimilar(player, guiItem, mRowSelected)) {
 					return;
 				}
 			}
@@ -601,6 +607,16 @@ public final class MasterworkCustomInventory extends CustomInventory {
 
 		loadInv(player);
 
+	}
+
+	private boolean checkSimilar(Player player, ItemStack guiItem, int equipmentSlot) {
+		ItemStack clone1 = guiItem.clone();
+		GUIUtils.setPlaceholder(clone1);
+
+		ItemStack clone2 = player.getInventory().getItem(SLOT_ORDER.get(equipmentSlot)).clone();
+		GUIUtils.setPlaceholder(clone2);
+
+		return clone1.isSimilar(clone2);
 	}
 
 	@Override
