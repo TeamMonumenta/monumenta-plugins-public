@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -43,7 +42,7 @@ public class LightspeedCS extends AdvancingShadowsCS {
 		Vector starCentre = target.getLocation().clone().add(0, target.getEyeHeight(), 0).toVector();
 		double starSize = 4 * target.getHeight() / 5;
 
-		ArrayList<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(5, starSize, 0.5, false, false), 5);
+		List<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(5, starSize, 0.5, false, false), 5);
 
 		Vector direction = player.getLocation().clone().subtract(starCentre.clone()).getDirection();
 		double angle = Math.atan2(direction.getX(), direction.getZ());

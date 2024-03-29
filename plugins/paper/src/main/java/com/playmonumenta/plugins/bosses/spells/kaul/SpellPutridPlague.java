@@ -48,10 +48,10 @@ import org.bukkit.scoreboard.Team;
  */
 public class SpellPutridPlague extends Spell {
 	private enum Pillar {
-		RED("KaulPutridPlagueRed", NamedTextColor.RED, NamedTextColor.DARK_RED, NamedTextColor.RED, BossBar.Color.RED, "Your blood begins to shiver slightly..."),
-		BLUE("KaulPutridPlagueBlue", NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, "The water begins to ripple..."),
-		YELLOW("KaulPutridPlagueYellow", NamedTextColor.YELLOW, NamedTextColor.GOLD, NamedTextColor.YELLOW, BossBar.Color.YELLOW, "You feel the temperature rise significantly..."),
-		GREEN("KaulPutridPlagueGreen", NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, NamedTextColor.DARK_GREEN, BossBar.Color.GREEN, "The ground begins to vibrate...");
+		RED("KaulPutridPlagueRed", NamedTextColor.RED, NamedTextColor.DARK_RED, BossBar.Color.RED, "Your blood begins to shiver slightly..."),
+		BLUE("KaulPutridPlagueBlue", NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, BossBar.Color.BLUE, "The water begins to ripple..."),
+		YELLOW("KaulPutridPlagueYellow", NamedTextColor.YELLOW, NamedTextColor.GOLD, BossBar.Color.YELLOW, "You feel the temperature rise significantly..."),
+		GREEN("KaulPutridPlagueGreen", NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, BossBar.Color.GREEN, "The ground begins to vibrate...");
 
 		final String mTag;
 		final NamedTextColor mTextColor;
@@ -59,7 +59,7 @@ public class SpellPutridPlague extends Spell {
 		final BossBar.Color mBarColor;
 		final String mMessage;
 
-		Pillar(String tag, NamedTextColor textColor, TextColor darkTextColor, TextColor titleColor, BossBar.Color barColor, String message) {
+		Pillar(String tag, NamedTextColor textColor, TextColor darkTextColor, BossBar.Color barColor, String message) {
 			mTag = tag;
 			mTextColor = textColor;
 			mDarkTextColor = darkTextColor;

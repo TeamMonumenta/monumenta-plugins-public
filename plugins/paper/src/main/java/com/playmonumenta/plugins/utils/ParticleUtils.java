@@ -180,7 +180,7 @@ public class ParticleUtils {
 		}.runTaskTimer(plugin, 0, 1);
 	}
 
-	public static void tickBoundingBoxEdge(World world, BoundingBox bb, Color color, int count) {
+	public static void tickBoundingBoxEdge(LivingEntity entity, World world, BoundingBox bb, Color color, int count) {
 		Particle.DustOptions dustOptions = new Particle.DustOptions(color, 0.2f);
 		Vector bbSize = bb.getMax().clone().subtract(bb.getMin());
 		NavigableMap<Double, BoundingBoxEdge> edgeWeights = new TreeMap<>();
@@ -228,7 +228,7 @@ public class ParticleUtils {
 				default -> bb.getMaxZ();
 			};
 
-			world.spawnParticle(Particle.REDSTONE, x, y, z, 1, 0.0, 0.0, 0.0, dustOptions);
+			new PartialParticle(Particle.REDSTONE, new Location(world, x, y, z), 1, 0.0, 0.0, 0.0, dustOptions).spawnAsEntityActive(entity);
 		}
 	}
 
@@ -560,11 +560,11 @@ public class ParticleUtils {
 		if (digitCount % 2 == 0) {
 			// If there is an even number of digits, the leftmost digit's center is offset by
 			// leftMost = (1/2 + digits/2) * digitSpace
-			leftMost = (0.5 + (float) (digitCount / 2)) * digitSpace;
+			leftMost = (0.5 + Math.floor(digitCount / 2.0)) * digitSpace;
 		} else {
 			// If there is an odd number of digits, the leftmost digit's center is offset by
 			// leftMost = (digits / 2 + 1) * digitSpace
-			leftMost = ((float) (digitCount / 2) + 1) * digitSpace;
+			leftMost = (Math.floor(digitCount / 2.0) + 1) * digitSpace;
 		}
 		// The number has to be facing the specified player. The digits are placed along the perpendicular vector.
 		Vector front = LocationUtils.getDirectionTo(player.getLocation(), center).setY(0).normalize();

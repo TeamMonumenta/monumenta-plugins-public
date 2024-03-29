@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.mmquest.config;
 
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
@@ -14,12 +14,12 @@ public class Quest {
 	public String mQuestDescription = "";
 	public Integer[] mQuestCompleteScores;
 	public String[] mQuestReqs;
-	public LinkedHashMap<String, String> mQuestValues;
+	public Map<String, String> mQuestValues;
 
 
 	//Constructor:
 	public Quest(String questName, String questNumber, String questDescription,
-	             Integer[] questCompleteScores, String[] questReqs, LinkedHashMap<String, String> questValues) {
+	             Integer[] questCompleteScores, String[] questReqs, Map<String, String> questValues) {
 		this.mQuestName = questName;
 		this.mQuestNumber = questNumber;
 		this.mQuestDescription = questDescription;

@@ -213,12 +213,13 @@ public class DepthsListener implements Listener {
 
 			// Extra damage taken at higher floors
 			int floor = party.getFloor();
+			int scalingFactor = (floor - 1) / 3;
 			if (floor > 15) {
-				double multiplier = 1 + (0.1 * (((floor - 1) / 3) - 4));
+				double multiplier = 1 + (0.1 * (scalingFactor - 4));
 			    event.setDamage(event.getDamage() * multiplier);
 			}
 			if (source != null && EntityUtils.isBoss(source) && floor > 3) {
-				double multiplier = 1 + (0.05 * ((floor - 1) / 3));
+				double multiplier = 1 + (0.05 * scalingFactor);
 			    event.setDamage(event.getDamage() * multiplier);
 			}
 		}

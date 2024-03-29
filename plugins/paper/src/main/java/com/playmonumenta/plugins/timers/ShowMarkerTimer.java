@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.timers;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.EnumSet;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -34,13 +35,13 @@ public class ShowMarkerTimer {
 				int rgb = 0x00ffffff & HSBtoRGB(hue, saturation, value);
 				Color color = Color.fromRGB(rgb);
 
-				player.spawnParticle(Particle.REDSTONE,
+				new PartialParticle(Particle.REDSTONE,
 					markerLoc,
 					1,
 					0.0,
 					0.0,
 					0.0,
-					new Particle.DustOptions(color, 0.3f));
+					new Particle.DustOptions(color, 0.3f)).spawnAsPlayerActive(player);
 			}
 		}
 	}

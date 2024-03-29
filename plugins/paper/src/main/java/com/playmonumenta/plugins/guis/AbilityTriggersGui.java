@@ -35,7 +35,7 @@ public class AbilityTriggersGui extends Gui {
 	private @Nullable AbilityTrigger mNewTrigger;
 	private int mKeyOptionsStartIndex = 0;
 	// true for class GUI, false for depths summary GUI
-	private boolean mPreviousGUI;
+	private final boolean mPreviousGUI;
 
 	public AbilityTriggersGui(Player player, boolean previousGUI) {
 		super(player, 6 * 9, MAIN_PAGE_TITLE);
@@ -59,11 +59,11 @@ public class AbilityTriggersGui extends Gui {
 
 			// help icon
 			setItem(4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Help", NamedTextColor.WHITE, false,
-				"Click on a trigger to change it.\n" +
-					"Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. " +
-					"If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.\n" +
-					"Eagle Eye is an exception: it allows other abilities to trigger after it.\n" +
-					"Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).", NamedTextColor.GRAY, 40));
+				"""
+					Click on a trigger to change it.
+					Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.
+					Eagle Eye is an exception: it allows other abilities to trigger after it.
+					Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).""", NamedTextColor.GRAY, 40));
 
 			// trigger icons
 			int i = 0;

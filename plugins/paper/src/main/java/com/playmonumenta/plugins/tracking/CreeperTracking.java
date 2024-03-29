@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.tracking;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,8 +30,9 @@ public class CreeperTracking implements EntityTracking {
 			Creeper creeper = creeperIter.next();
 			if (creeper != null && creeper.isValid() && creeper.getLocation().isChunkLoaded()) {
 				Set<String> tags = creeper.getScoreboardTags();
-				if (tags != null && tags.contains("Snuggles")) {
-					creeper.getWorld().spawnParticle(Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);
+				if (tags.contains("Snuggles")) {
+					new PartialParticle(Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0)
+						.spawnAsEntityActive(creeper);
 				}
 
 				// Very infrequently check if the creeper is still actually there

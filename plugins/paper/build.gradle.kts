@@ -30,6 +30,7 @@ dependencies {
 	implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
 	implementation("com.opencsv:opencsv:5.5") // generateitems
 	implementation("dev.jaqobb:namemcapi:2.0.7")
+	implementation("net.kyori:adventure-text-serializer-bungeecord:4.3.2")
 
 	// Note this version should match what's in the Paper jar
 	compileOnly("net.kyori:adventure-api:4.11.0")

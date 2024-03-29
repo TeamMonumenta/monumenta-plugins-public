@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -40,7 +39,7 @@ public class StarstruckCS extends ByMyBladeCS {
 	public void bmbDamage(World world, Player player, LivingEntity enemy, int level) {
 		Vector starCentre = enemy.getLocation().clone().add(0, enemy.getHeight() + 0.8, 0).toVector();
 
-		ArrayList<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(4, 0.5, 0.3, false, false), 3);
+		List<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(4, 0.5, 0.3, false, false), 3);
 
 		Vector direction = player.getLocation().clone().subtract(starCentre.clone()).getDirection();
 		double angle = Math.atan2(direction.getX(), direction.getZ());

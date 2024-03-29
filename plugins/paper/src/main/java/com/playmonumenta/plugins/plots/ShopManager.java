@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.plots;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -313,7 +314,7 @@ public class ShopManager implements Listener {
 		private void particles() {
 			iterArea((Location plat) -> {
 				plat.add(0, 1, 0);
-				plat.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1);
+				new PartialParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1).spawnFull();
 			});
 		}
 

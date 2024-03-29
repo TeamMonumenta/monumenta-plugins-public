@@ -17,12 +17,13 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -57,7 +58,7 @@ public class VoteContext {
 	 *
 	 * Will block for a single round trip to redis
 	 */
-	private VoteContext(Plugin plugin, UUID uuid, HashMap<String, Long> offCooldownTimes) {
+	private VoteContext(Plugin plugin, UUID uuid, Map<String, Long> offCooldownTimes) {
 		mPlugin = plugin;
 		mUUID = uuid;
 		mOffCooldownTimes = offCooldownTimes;
@@ -135,10 +136,10 @@ public class VoteContext {
 	/* Pattern to extract the domain name from the full URL */
 	private static final Pattern pattern = Pattern.compile("https*://([^/]*)/");
 
-	protected BaseComponent[] getSiteInfo(boolean withClickEvents) {
+	protected Component getSiteInfo(boolean withClickEvents) {
 		mLock.readLock().lock();
 
-		ComponentBuilder builder = new ComponentBuilder("Sites:").color(ChatColor.GOLD);
+		TextComponent.Builder builder = Component.text().append(Component.text("Sites:", NamedTextColor.GOLD));
 		for (String site : VoteManager.getSiteTimers().keySet()) {
 			/* If there are no click events, don't display the full site url, just the domain name */
 			final String displaySite;
@@ -153,28 +154,28 @@ public class VoteContext {
 				}
 			}
 
-			builder.append("\n");
+			builder.append(Component.text("\n"));
 
 			Long offCooldownTime = mOffCooldownTimes.get(site);
 			if (offCooldownTime == null) {
 				/* Off cooldown */
-				builder.append(displaySite).color(ChatColor.GREEN);
+				builder.append(Component.text(displaySite, NamedTextColor.GREEN));
 			} else {
 				/* Still on cooldown */
 				long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
 				long totalSecondsLeft = offCooldownTime - currentTime;
 
-				builder.append(displaySite + ": " + timeDeltaStr(totalSecondsLeft)).color(ChatColor.RED);
+				builder.append(Component.text(displaySite + ": " + timeDeltaStr(totalSecondsLeft), NamedTextColor.RED));
 			}
 
 			if (withClickEvents) {
-				builder.event(new ClickEvent(ClickEvent.Action.OPEN_URL, site));
+				builder.clickEvent(ClickEvent.openUrl(site));
 			}
 		}
 
 		mLock.readLock().unlock();
 
-		return builder.create();
+		return builder.build();
 	}
 
 	protected void sendVoteInfoShort(ProxiedPlayer player) {
@@ -182,13 +183,15 @@ public class VoteContext {
 		int numSites = VoteManager.getSiteTimers().size() - mOffCooldownTimes.size();
 		mLock.readLock().unlock();
 
-		ComponentBuilder builder = new ComponentBuilder("You are eligible to ").color(ChatColor.GOLD)
-		.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, getSiteInfo(false)))
-		.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/vote"))
-		.append("/vote ").color(ChatColor.AQUA)
-		.append("on " + numSites + " sites!").color(ChatColor.GOLD);
+		Component builder = Component.text()
+			.append(Component.text("You are eligible to ", NamedTextColor.GOLD))
+			.hoverEvent(HoverEvent.showText(getSiteInfo(false)))
+			.clickEvent(ClickEvent.runCommand("/vote"))
+			.append(Component.text("/vote ", NamedTextColor.AQUA))
+			.append(Component.text("on " + numSites + " sites!", NamedTextColor.GOLD))
+			.build();
 
-		player.sendMessage(builder.create());
+		player.sendMessage(BungeeComponentSerializer.get().serialize(builder));
 	}
 
 	protected void sendVoteInfoLong(ProxiedPlayer player) {
@@ -200,23 +203,24 @@ public class VoteContext {
 
 			int unclaimedRaffleWins = Integer.parseInt(data.getOrDefault(RAFFLE_WINS_UNCLAIMED, "0"));
 
-			ComponentBuilder builder = new ComponentBuilder(
-				"Vote for Monumenta\n"
-			).color(ChatColor.WHITE).bold(true)
-			.append("Voting helps other people find Monumenta!\nClaim rewards at Pollmaster Tennenbaum in Sierhaven\n\n", ComponentBuilder.FormatRetention.NONE).color(ChatColor.GOLD)
-			.append("Voting status:\n").color(ChatColor.GOLD)
-			.append("Total votes: " + data.getOrDefault(VOTES_TOTAL, "0") + "\n").color(ChatColor.WHITE)
-			.append("Votes this week: " + data.getOrDefault(VOTES_THIS_WEEK, "0") + "\n")
-			.append("Unclaimed rewards: " + data.getOrDefault(VOTES_UNCLAIMED, "0") + "\n")
-			.append("Raffle Entries: " + data.getOrDefault(RAFFLE_ENTRIES, "0") + "\n")
-			.append("Raffle wins: " + data.getOrDefault(RAFFLE_WINS_TOTAL, "0") + "\n")
-			.append("Unclaimed raffle rewards: " + unclaimedRaffleWins + "\n").bold(unclaimedRaffleWins > 0);
+			TextComponent.Builder builder = Component.text()
+				.append(Component.text("Vote for Monumenta\n", NamedTextColor.WHITE, TextDecoration.BOLD))
+				.append(Component.text("Voting helps other people find Monumenta!\nClaim rewards at Pollmaster Tennenbaum in Sierhaven\n\n", NamedTextColor.GOLD))
+				.append(Component.text("Voting status:\n", NamedTextColor.GOLD))
+				.append(Component.text("Total votes: " + data.getOrDefault(VOTES_TOTAL, "0") + "\n", NamedTextColor.WHITE))
+				.append(Component.text("Votes this week: " + data.getOrDefault(VOTES_THIS_WEEK, "0") + "\n", NamedTextColor.WHITE))
+				.append(Component.text("Unclaimed rewards: " + data.getOrDefault(VOTES_UNCLAIMED, "0") + "\n", NamedTextColor.WHITE))
+				.append(Component.text("Raffle Entries: " + data.getOrDefault(RAFFLE_ENTRIES, "0") + "\n", NamedTextColor.WHITE))
+				.append(Component.text("Raffle wins: " + data.getOrDefault(RAFFLE_WINS_TOTAL, "0") + "\n", NamedTextColor.WHITE));
 			if (unclaimedRaffleWins > 0) {
-				builder = builder.append("To claim your raffle reward, run /claimraffle");
+				builder.append(Component.text("Unclaimed raffle rewards: " + unclaimedRaffleWins + "\n", NamedTextColor.WHITE, TextDecoration.BOLD));
+				builder.append(Component.text("To claim your raffle reward, run /claimraffle", NamedTextColor.WHITE));
+			} else {
+				builder.append(Component.text("Unclaimed raffle rewards: " + unclaimedRaffleWins + "\n", NamedTextColor.WHITE));
 			}
-			player.sendMessage(builder.create());
+			player.sendMessage(BungeeComponentSerializer.get().serialize(builder.build()));
 
-			player.sendMessage(getSiteInfo(true));
+			player.sendMessage(BungeeComponentSerializer.get().serialize(getSiteInfo(true)));
 		});
 	}
 

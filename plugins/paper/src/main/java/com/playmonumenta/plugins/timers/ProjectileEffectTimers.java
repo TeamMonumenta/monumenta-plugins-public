@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.timers;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -54,7 +55,7 @@ public class ProjectileEffectTimers {
 			}
 
 			Location entityLoc = entity.getLocation();
-			entityLoc.getWorld().spawnParticle(particle, entityLoc, numParticles, 0.1, 0.1, 0.1, 0);
+			new PartialParticle(particle, entityLoc, numParticles, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(entity);
 
 			/* Every so often check if this entity is actually still there */
 			if (mDeadTicks > 100) {

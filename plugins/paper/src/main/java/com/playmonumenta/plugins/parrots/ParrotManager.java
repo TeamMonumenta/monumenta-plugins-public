@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.plots.AnimalLimits;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
@@ -343,7 +344,7 @@ public class ParrotManager implements Listener {
 		for (Parrot parrot : player.getWorld().getEntitiesByClass(Parrot.class)) {
 			if (parrot.getVariant() == variant.getVariant()
 				    && parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)
-				    && variant.getName().equals(parrot.getCustomName())) {
+				    && variant.getName().equals(MessagingUtils.plainText(parrot.customName()))) {
 				parrot.remove();
 			}
 		}
@@ -383,7 +384,7 @@ public class ParrotManager implements Listener {
 
 			// parrot spawned with an old version will not have the tag, so we need to check the name
 			for (ParrotVariant variant : ParrotVariant.values()) {
-				if (parrot.getCustomName() != null && parrot.getCustomName().contains(variant.mName)) {
+				if (MessagingUtils.plainText(parrot.customName()).contains(variant.mName)) {
 					event.setCancelled(true);
 					return;
 				}

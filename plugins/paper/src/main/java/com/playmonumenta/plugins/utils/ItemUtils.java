@@ -1617,14 +1617,6 @@ public class ItemUtils {
 		return lock;
 	}
 
-	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ItemStack itemStack) {
-		ReadWriteNBT nbtTags = NBT.itemStackToNBT(itemStack).getCompound("tag");
-		if (nbtTags == null) {
-			return null;
-		}
-		return getContainerItems(nbtTags);
-	}
-
 	public static @Nullable ReadableNBTList<String> getPages(ItemStack itemStack) {
 		ReadWriteNBT nbtTags = NBT.itemStackToNBT(itemStack).getCompound("tag");
 
@@ -1653,6 +1645,14 @@ public class ItemUtils {
 			}
 		}
 		return null;
+	}
+
+	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ItemStack itemStack) {
+		ReadWriteNBT nbtTags = NBT.itemStackToNBT(itemStack).getCompound("tag");
+		if (nbtTags == null) {
+			return null;
+		}
+		return getContainerItems(nbtTags);
 	}
 
 	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ReadableNBT nbt) {

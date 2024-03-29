@@ -41,7 +41,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				if (entity.getLocation().getY() > 60) {
 					return;
 				}
-				float t = tick / 15;
+				float t = tick / 15f;
 				World world = boss.getWorld();
 				if (tick == 1) {
 					PotionUtils.applyColoredGlowing(PrimordialElementalKaulBoss.identityTag, boss, NamedTextColor.RED, 20 * 2);

@@ -65,7 +65,7 @@ public class SpellAirGolemStrike extends Spell {
 		} else if (players.size() <= 10) {
 			count = players.size() / 2;
 		} else {
-			count = (int) ((players.size() / 3) + 1.5);
+			count = (int) ((players.size() / 3.0) + 1.5);
 		}
 
 		count = Math.min(12, count);

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.Arrays;
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -121,8 +121,7 @@ public class AuditListener implements Listener {
 	public void death(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
-		// TODO Update MessageUtils.plain() to accept a language file to translate with
-		logDeath("<" + player.getWorld().getName() + ">" + " Death: " + player.getName() + " " + event.getDeathMessage());
+		logDeath("<" + player.getWorld().getName() + ">" + " Death: " + player.getName() + " " + MessagingUtils.plainText(event.deathMessage()));
 
 		checkDestroy(player);
 	}
@@ -143,7 +142,6 @@ public class AuditListener implements Listener {
 	public void creative(InventoryCreativeEvent event) {
 		HumanEntity player = event.getWhoClicked();
 
-		event.getCursor();
 		if (!event.getCursor().getType().equals(Material.AIR)) {
 			ItemStack lastItem = mLastCreativeDestroy.get(player);
 			ItemStack newItem = event.getCursor();

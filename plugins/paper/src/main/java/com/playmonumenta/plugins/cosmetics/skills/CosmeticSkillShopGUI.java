@@ -720,7 +720,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		}
 		meta.lore(lore);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 		item.setItemMeta(meta);
 		return item;
 	}

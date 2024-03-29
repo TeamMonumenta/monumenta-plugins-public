@@ -45,7 +45,7 @@ public class TemporalFlux extends ZeroArgumentEffect {
 			mBossBar.progress(progress);
 			mBossBar.name(Component.text("Paradox expires in " + (getDuration() / 20) + " seconds!", NamedTextColor.BLUE));
 			if (progress <= 0.01) {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, Stasis.GENERIC_NAME);
+				Plugin.getInstance().mEffectManager.clearEffects(entity, Stasis.GENERIC_NAME);
 				if (entity instanceof Player) {
 					entity.setInvulnerable(false);
 				}

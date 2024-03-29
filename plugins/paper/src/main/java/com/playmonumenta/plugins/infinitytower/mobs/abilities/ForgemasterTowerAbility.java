@@ -71,10 +71,10 @@ public class ForgemasterTowerAbility extends TowerAbility {
 			},
 			// Attack hit a player
 			(LivingEntity player) -> {
-				player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4,
-					0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
-				player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4,
-					0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
+				new PartialParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4,
+					0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4,
+					0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData()).spawnAsEntityActive(mBoss);
 				DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE);
 			},
 			// Attack particles

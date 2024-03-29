@@ -63,7 +63,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 			new SpellWindWalk(plugin, mBoss),
 			new SpellBaseBolt(plugin, mBoss, (int) (20 * 2.5), 30, 1.4, 20, 0.5, false, false, 1, 1,
 				(Entity entity, int tick) -> {
-					float t = tick / 10;
+					float t = tick / 10f;
 					if (tick == 1) {
 						PotionUtils.applyColoredGlowing(identityTag, mBoss, NamedTextColor.RED, (int) (20 * 2.5));
 					}
@@ -168,7 +168,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 								new PartialParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0).spawnAsEntityActive(boss);
 							}
 						} else {
-							float pitch = mT / 20;
+							float pitch = mT / 20f;
 							double offset = 2.5 - pitch;
 							for (Player player : players) {
 								Location loc = player.getLocation().add(0, 1, 0);
@@ -255,7 +255,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 						LibraryOfSoulsIntegration.summon(mLoc, mobdata);
 					}
 				}
-			}.runTaskTimer(plugin, t * 10, 1);
+			}.runTaskTimer(plugin, t * 10L, 1);
 		}
 	}
 

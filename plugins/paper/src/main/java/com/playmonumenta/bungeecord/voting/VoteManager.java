@@ -1,5 +1,6 @@
 package com.playmonumenta.bungeecord.voting;
 
+import com.google.common.base.Ascii;
 import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -115,7 +116,7 @@ public class VoteManager implements Listener {
 
 		/* Match against URLs first (preferred) */
 		for (Map.Entry<String, Long> site : SITE_TIMERS.entrySet()) {
-			if (site.getKey().toLowerCase().contains(vote.getServiceName().toLowerCase())) {
+			if (Ascii.toLowerCase(site.getKey()).contains(Ascii.toLowerCase(vote.getServiceName()))) {
 				matchingSite = site.getKey();
 				cooldown = site.getValue();
 				break;
@@ -123,7 +124,7 @@ public class VoteManager implements Listener {
 		}
 		/* Match alternate names in case URL matching failed */
 		for (Map.Entry<String, String> alternate : mAlternateNames.entrySet()) {
-			if (alternate.getKey().toLowerCase().contains(vote.getServiceName().toLowerCase())) {
+			if (Ascii.toLowerCase(alternate.getKey()).contains(Ascii.toLowerCase(vote.getServiceName()))) {
 				matchingSite = alternate.getValue();
 				cooldown = Objects.requireNonNull(SITE_TIMERS.get(matchingSite));
 				break;
