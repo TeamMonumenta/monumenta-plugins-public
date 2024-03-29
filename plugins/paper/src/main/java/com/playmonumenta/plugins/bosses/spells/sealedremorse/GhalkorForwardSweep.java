@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
 import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,17 +22,17 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class GhalkorForwardSweep extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Ghalkor mBossClass;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Ghalkor mBossClass;
+	private static final String SLOWNESS_SRC = "ForwardSweepSlowness";
+	private static final int SLOW_DURATION = 20 * 8;
+	private static final double SLOW_POTENCY = -0.3;
 
 	public GhalkorForwardSweep(Plugin plugin, LivingEntity boss, Ghalkor bossClass) {
 		mPlugin = plugin;
@@ -41,10 +43,9 @@ public class GhalkorForwardSweep extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-
 		Vector dir = mBoss.getLocation().getDirection();
-
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+			new BaseMovementSpeedModifyEffect(20, -0.15));
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
@@ -56,7 +57,7 @@ public class GhalkorForwardSweep extends Spell {
 
 				if (mTicks >= 20) {
 					Vector vec;
-					List<BoundingBox> boxes = new ArrayList<BoundingBox>();
+					List<BoundingBox> boxes = new ArrayList<>();
 
 					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3, 0.5f);
 					world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.HOSTILE, 3, 0.2f);
@@ -82,7 +83,8 @@ public class GhalkorForwardSweep extends Spell {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
 								DamageUtils.damage(mBoss, player, DamageType.MELEE, 26, null, false, true, "Forward Sweep");
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 8, 1));
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+									new PercentSpeed(SLOW_DURATION, SLOW_POTENCY, SLOWNESS_SRC));
 							}
 						}
 					}

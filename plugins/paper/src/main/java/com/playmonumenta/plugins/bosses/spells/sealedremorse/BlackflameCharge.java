@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
 import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -19,13 +20,10 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
 public class BlackflameCharge extends SpellBaseCharge {
-
 	private static final int DAMAGE = 25;
 	private static final int GROUND_DAMAGE = 22;
 	private static final int FIRE_DURATION = 20 * 4;
@@ -37,15 +35,14 @@ public class BlackflameCharge extends SpellBaseCharge {
 			// Warning sound/particles at boss location and slow boss
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
-				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+					new BaseMovementSpeedModifyEffect(40, -0.75));
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.75f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1.15f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 1f, 0.85f);
 			},
 			// Warning particles
-			(Location loc) -> {
-				new PartialParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0).spawnAsEntityActive(boss);
-			},
+			(Location loc) -> new PartialParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0).spawnAsEntityActive(boss),
 			// Charge attack sound/particles at boss location
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation(), 125, 0.4, 0.4, 0.4, 0.25).spawnAsEntityActive(boss);
@@ -74,8 +71,8 @@ public class BlackflameCharge extends SpellBaseCharge {
 				//Damaging trail left behind
 				new BukkitRunnable() {
 					private int mT = 0;
-					private BoundingBox mHitbox = new BoundingBox().shift(loc).expand(1);
-					private Location mParticleLoc = loc.clone().subtract(0, 1, 0);
+					private final BoundingBox mHitbox = new BoundingBox().shift(loc).expand(1);
+					private final Location mParticleLoc = loc.clone().subtract(0, 1, 0);
 
 					@Override
 					public void run() {
