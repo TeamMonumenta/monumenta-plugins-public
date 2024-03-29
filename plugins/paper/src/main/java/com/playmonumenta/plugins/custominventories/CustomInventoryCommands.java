@@ -43,7 +43,11 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openteleportergui")
 			.withPermission("monumenta.command.openteleportergui")
 			.executesPlayer((player, args) -> {
-				new OrinCustomInventory(player, -1).openInventory(player, plugin);
+				if (Math.random() < 0.1) {
+					player.showDemoScreen();
+				} else {
+					new OrinCustomInventory(player, -1).openInventory(player, plugin);
+				}
 			})
 			.register();
 		new CommandAPICommand("openteleportergui")
@@ -51,7 +55,11 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				new OrinCustomInventory(player, -1).openInventory(player, plugin);
+				if (Math.random() < 0.1) {
+					player.showDemoScreen();
+				} else {
+					new OrinCustomInventory(player, -1).openInventory(player, plugin);
+				}
 			})
 			.register();
 
@@ -72,7 +80,11 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openpeb")
 			.withPermission("monumenta.command.openpeb")
 			.executesPlayer((player, args) -> {
-				new PEBCustomInventory(player).openInventory(player, plugin);
+				if (Math.random() < 0.1) {
+					player.showDemoScreen();
+				} else {
+					new PEBCustomInventory(player).openInventory(player, plugin);
+				}
 			})
 			.register();
 		new CommandAPICommand("openpeb")
@@ -80,7 +92,11 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				new PEBCustomInventory(player).openInventory(player, plugin);
+				if (Math.random() < 0.1) {
+					player.showDemoScreen();
+				} else {
+					new PEBCustomInventory(player).openInventory(player, plugin);
+				}
 			})
 			.register();
 
