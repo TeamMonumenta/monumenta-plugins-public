@@ -323,6 +323,9 @@ public class Samwell extends BossAbilityGroup {
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
+		Player player = event.getPlayer();
+		player.hideBossBar(mGatheringBar);
+		player.hideBossBar(mCraftingBar);
 	}
 
 	@Override
