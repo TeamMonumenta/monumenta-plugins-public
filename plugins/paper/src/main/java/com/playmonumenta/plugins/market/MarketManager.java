@@ -193,7 +193,7 @@ public class MarketManager {
 				errors.add("You cannot sell a Lootbox that contains items.");
 			}
 		}
-		if (currentItem.getType() == Material.WRITTEN_BOOK || currentItem.getType() == Material.WRITABLE_BOOK || currentItem.getType() == Material.BOOK) { // WRITABLE_BOOK is a book and quill.
+		if (currentItem.getType() == Material.WRITTEN_BOOK || currentItem.getType() == Material.WRITABLE_BOOK) { // WRITABLE_BOOK is a book and quill.
 			if (ItemStatUtils.getTier(currentItem) == Tier.NONE) {
 				errors.add("You cannot sell player-made books."); // direct the player to the correct place to advertise.
 			} // Otherwise we'd be blocking things like Wolfswood tome. We assume players cannot apply arbitrary tiers to random items.
