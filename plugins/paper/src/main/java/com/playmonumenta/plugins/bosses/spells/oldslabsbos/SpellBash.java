@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -18,13 +19,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellBash extends Spell {
-
+	private static final String SPELL_NAME = "Bash";
+	private static final String SELF_SLOWNESS_SRC = "SelfBashSlowness";
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
@@ -42,7 +42,8 @@ public class SpellBash extends Spell {
 			if (target == null) {
 				return;
 			}
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 25, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, SELF_SLOWNESS_SRC,
+				new BaseMovementSpeedModifyEffect(25, -0.3));
 			mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0.7f);
 			mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1.5f, 1.75f);
 			new BukkitRunnable() {
@@ -92,7 +93,7 @@ public class SpellBash extends Spell {
 						for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 							Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
 							if (direction.dot(toPlayerVector) > 0.33f) {
-								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 6, "Bash", mBoss.getLocation());
+								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 6, SPELL_NAME, mBoss.getLocation());
 								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f, false);
 							}
 						}
