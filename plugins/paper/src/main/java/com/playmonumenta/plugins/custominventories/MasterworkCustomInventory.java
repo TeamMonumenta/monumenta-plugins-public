@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
-import com.playmonumenta.plugins.Plugin;
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
@@ -19,8 +19,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +26,15 @@ import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public final class MasterworkCustomInventory extends CustomInventory {
@@ -65,6 +61,11 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final ItemStack mBalanceRefundItem;
 	private static final ItemStack mBackItem;
 	private static final ItemStack mPreviewItem;
+
+	private static final ImmutableList<EquipmentSlot> SLOT_ORDER = ImmutableList.of(
+		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
+
+	private static final String PERMISSSION = "monumenta.masterwork";
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 	private int mRowSelected;
@@ -118,43 +119,35 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		super(owner, 54, "Masterwork");
 		mMapFunction = new HashMap<>();
 		mRowSelected = 99;
+		if (!owner.hasPermission(PERMISSSION)) {
+			owner.sendMessage(Component.text("Masterworking is currently unavailable.", NamedTextColor.RED));
+			close();
+			return;
+		}
 		loadInv(owner);
-	}
-
-	private List<ItemStack> getEquippedItems(Player player) {
-		PlayerInventory pi = player.getInventory();
-		List<ItemStack> items = new ArrayList<>(Arrays.asList(pi.getArmorContents()));
-		Collections.reverse(items);
-		items.add(pi.getItemInMainHand());
-		items.add(pi.getItemInOffHand());
-		return items;
 	}
 
 	private void loadInv(Player player) {
 		mInventory.clear();
 		mMapFunction.clear();
 
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			List<ItemStack> items = getEquippedItems(player);
-
-			if (mIsPreview) {
-				setUpPreview(items.get(Math.min(mMagicRow, mRowSelected)), player);
-			} else if (mRowSelected == 99) {
-				loadMasterworkPage(items, player);
-			} else {
-				loadMasterworkPath(items.get(mRowSelected), player);
-			}
-		}, 1);
+		if (mIsPreview) {
+			setUpPreview(player);
+		} else if (mRowSelected == 99) {
+			loadMasterworkPage(player);
+		} else {
+			loadMasterworkPath(player);
+		}
 
 		GUIUtils.fillWithFiller(mInventory);
 	}
 
 
-	private void loadMasterworkPath(ItemStack item, Player p) {
+	private void loadMasterworkPath(Player p) {
+		ItemStack item = p.getInventory().getItem(SLOT_ORDER.get(mRowSelected));
 		MasterworkUtils.MasterworkCost masterworkCost = MasterworkUtils.getMasterworkCost(item);
 		Masterwork current = ItemStatUtils.getMasterwork(item);
 		if (current == Masterwork.VI) {
-			// Generate base item
 			mInventory.setItem(4, item);
 
 			MasterworkUtils.MasterworkCostLevel costA = masterworkCost.get(Masterwork.VIIA);
@@ -259,7 +252,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 	}
 
-	private void setUpPreview(ItemStack item, Player p) {
+	private void setUpPreview(Player p) {
+		ItemStack item = p.getInventory().getItem(SLOT_ORDER.get(Math.min(mMagicRow, mRowSelected)));
 		mMapFunction.put(0, (player, inventory, slot) -> {
 			mIsPreview = false;
 			mMagicRow = Integer.MAX_VALUE;
@@ -426,122 +420,122 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 	}
 
-	private void loadMasterworkPage(List<ItemStack> items, Player ply) {
-		int row = 0;
-		for (ItemStack item : items) {
-			if (item != null) {
-				//check valid item
-				if (MasterworkUtils.isMasterwork(item)) {
-					final int rowF = row;
+	private void loadMasterworkPage(Player ply) {
+		for (int row = 0; row < 6; row++) {
+			EquipmentSlot equipmentSlot = SLOT_ORDER.get(row);
+			ItemStack item = ply.getInventory().getItem(equipmentSlot);
+			if (MasterworkUtils.isMasterwork(item)) {
+				final int rowF = row;
 
-					mInventory.setItem(rowF * 9, item);
+				ItemStack clone = item.clone();
+				GUIUtils.setPlaceholder(clone);
+				mInventory.setItem(rowF * 9, clone);
 
-					Masterwork m = ItemStatUtils.getMasterwork(item);
-					int currMasterwork = MasterworkUtils.getMasterworkAsInt(m);
+				Masterwork m = ItemStatUtils.getMasterwork(item);
+				int currMasterwork = MasterworkUtils.getMasterworkAsInt(m);
 
-					// Case where upgrade possible
-					if (currMasterwork >= 0 && currMasterwork < Masterwork.CURRENT_MAX_MASTERWORK && currMasterwork != 6) {
-						mInventory.setItem((row * 9) + currMasterwork + 2, mUpgradeItem);
-						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
-							mRowSelected = rowF;
-						});
-						for (int i = (row * 9) + 1; i < (row * 9) + currMasterwork + 2; i++) {
-							fillWithColoredJunk(i, ORANGE_FILLER);
-						}
-						// Case where upgrade locked
-					} else if (currMasterwork >= Masterwork.CURRENT_MAX_MASTERWORK && currMasterwork != 7) {
-						mInventory.setItem((row * 9) + currMasterwork + 2, mNoPossibleUpgradeItem);
-						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
-							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 1.f, 1.f);
-							mIsPreview = true;
-							mMagicRow = rowF;
-						});
-						for (int i = (row * 9) + 1; i < (row * 9) + currMasterwork + 2; i++) {
-							fillWithColoredJunk(i, PURPLE_FILLER);
-						}
-						// Case where at M6
-					} else if (currMasterwork == 6 && Masterwork.CURRENT_MAX_MASTERWORK == 7) {
-						mInventory.setItem((row * 9) + currMasterwork + 2, mUpgradeItemSeven);
-						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
-							mRowSelected = rowF;
-						});
-						for (int i = (row * 9) + 1; i < (row * 9) + currMasterwork + 2; i++) {
-							fillWithColoredJunk(i, ORANGE_FILLER);
-						}
+				// Case where upgrade possible
+				if (currMasterwork >= 0 && currMasterwork < Masterwork.CURRENT_MAX_MASTERWORK && currMasterwork != 6) {
+					mInventory.setItem((row * 9) + currMasterwork + 2, mUpgradeItem);
+					mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
+						mRowSelected = rowF;
+					});
+					for (int i = (row * 9) + 1; i < (row * 9) + currMasterwork + 2; i++) {
+						fillWithColoredJunk(i, ORANGE_FILLER);
+					}
+					// Case where upgrade locked
+				} else if (currMasterwork >= Masterwork.CURRENT_MAX_MASTERWORK && currMasterwork != 7) {
+					mInventory.setItem((row * 9) + currMasterwork + 2, mNoPossibleUpgradeItem);
+					mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
+						p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 1.f, 1.f);
+						mIsPreview = true;
+						mMagicRow = rowF;
+					});
+					for (int i = (row * 9) + 1; i < (row * 9) + currMasterwork + 2; i++) {
+						fillWithColoredJunk(i, PURPLE_FILLER);
+					}
+					// Case where at M6
+				} else if (currMasterwork == 6 && Masterwork.CURRENT_MAX_MASTERWORK == 7) {
+					mInventory.setItem((row * 9) + currMasterwork + 2, mUpgradeItemSeven);
+					mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
+						mRowSelected = rowF;
+					});
+					for (int i = (row * 9) + 1; i < (row * 9) + currMasterwork + 2; i++) {
+						fillWithColoredJunk(i, ORANGE_FILLER);
+					}
 					// Case where complete
-					} else if (currMasterwork == 7) {
-						MasterworkUtils.MasterworkCost masterworkCost = MasterworkUtils.getMasterworkCost(item);
-						MasterworkUtils.MasterworkCostLevel costA = masterworkCost.get(Masterwork.VIIA);
-						MasterworkUtils.MasterworkCostLevel costB = masterworkCost.get(Masterwork.VIIB);
-						MasterworkUtils.MasterworkCostLevel costC = masterworkCost.get(Masterwork.VIIC);
+				} else if (currMasterwork == 7) {
+					MasterworkUtils.MasterworkCost masterworkCost = MasterworkUtils.getMasterworkCost(item);
+					MasterworkUtils.MasterworkCostLevel costA = masterworkCost.get(Masterwork.VIIA);
+					MasterworkUtils.MasterworkCostLevel costB = masterworkCost.get(Masterwork.VIIB);
+					MasterworkUtils.MasterworkCostLevel costC = masterworkCost.get(Masterwork.VIIC);
 
-						if (m == Masterwork.VIIA) {
-							mInventory.setItem((row * 9) + 8, mFullUpgradeA);
-							if (!ServerProperties.getMasterworkRefundEnabled()) {
-								mInventory.setItem((row * 9) + 1, mRefundItem);
-							}
-							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
-								ItemStack newItem = MasterworkUtils.preserveModified(item,
-										InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
-												NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
-								attemptUpgrade(player, item, newItem, costA);
-							});
-							for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
-								fillWithColoredJunk(i, A_FILLER);
-							}
-						} else if (m == Masterwork.VIIB) {
-							mInventory.setItem((row * 9) + 8, mFullUpgradeB);
-							if (!ServerProperties.getMasterworkRefundEnabled()) {
-								mInventory.setItem((row * 9) + 1, mRefundItem);
-							}
-							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
-								ItemStack newItem = MasterworkUtils.preserveModified(item,
-										InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
-												NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
-								attemptUpgrade(player, item, newItem, costB);
-							});
-							for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
-								fillWithColoredJunk(i, B_FILLER);
-							}
-						} else {
-							mInventory.setItem((row * 9) + 8, mFullUpgradeC);
-							if (!ServerProperties.getMasterworkRefundEnabled()) {
-								mInventory.setItem((row * 9) + 1, mRefundItem);
-							}
-							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
-								ItemStack newItem = MasterworkUtils.preserveModified(item,
-									InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
-										NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
-								attemptUpgrade(player, item, newItem, costC);
-							});
-							for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
-								fillWithColoredJunk(i, C_FILLER);
-							}
+					if (m == Masterwork.VIIA) {
+						mInventory.setItem((row * 9) + 8, mFullUpgradeA);
+						if (!ServerProperties.getMasterworkRefundEnabled()) {
+							mInventory.setItem((row * 9) + 1, mRefundItem);
+						}
+						mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
+							ItemStack equippedItem = ply.getInventory().getItem(equipmentSlot);
+							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
+								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+									NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(equippedItem))));
+							attemptUpgrade(player, equippedItem, newItem, costA);
+						});
+						for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
+							fillWithColoredJunk(i, A_FILLER);
+						}
+					} else if (m == Masterwork.VIIB) {
+						mInventory.setItem((row * 9) + 8, mFullUpgradeB);
+						if (!ServerProperties.getMasterworkRefundEnabled()) {
+							mInventory.setItem((row * 9) + 1, mRefundItem);
+						}
+						mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
+							ItemStack equippedItem = ply.getInventory().getItem(equipmentSlot);
+							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
+								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+									NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(equippedItem))));
+							attemptUpgrade(player, equippedItem, newItem, costB);
+						});
+						for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
+							fillWithColoredJunk(i, B_FILLER);
+						}
+					} else {
+						mInventory.setItem((row * 9) + 8, mFullUpgradeC);
+						if (!ServerProperties.getMasterworkRefundEnabled()) {
+							mInventory.setItem((row * 9) + 1, mRefundItem);
+						}
+						mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
+							ItemStack equippedItem = ply.getInventory().getItem(equipmentSlot);
+							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
+								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+									NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(equippedItem))));
+							attemptUpgrade(player, equippedItem, newItem, costC);
+						});
+						for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
+							fillWithColoredJunk(i, C_FILLER);
 						}
 					}
-
-					if (ServerProperties.getMasterworkRefundEnabled()) {
-						ItemStack baseMasterwork = MasterworkUtils.getBaseMasterwork(item, ply);
-						if (baseMasterwork != null && ItemStatUtils.getMasterwork(item) != ItemStatUtils.getMasterwork(baseMasterwork)) {
-							mInventory.setItem((row * 9) + 1, mBalanceRefundItem);
-							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
-								ItemStack newItem = MasterworkUtils.preserveModified(item,
-									InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
-										NamespacedKeyUtils.fromString(MasterworkUtils.getPrevItemPath(item))));
-								attemptUpgrade(player, item, newItem, MasterworkUtils.getMasterworkCost(item).get(ItemStatUtils.getMasterwork(item)));
-							});
-						}
-					}
-
-				} else {
-					ItemStack invalidItem = mInvalidItems.get(row);
-					mInventory.setItem((row * 9), invalidItem);
 				}
+
+				if (ServerProperties.getMasterworkRefundEnabled()) {
+					ItemStack baseMasterwork = MasterworkUtils.getBaseMasterwork(item, ply);
+					if (baseMasterwork != null && ItemStatUtils.getMasterwork(item) != ItemStatUtils.getMasterwork(baseMasterwork)) {
+						mInventory.setItem((row * 9) + 1, mBalanceRefundItem);
+						mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
+							ItemStack equippedItem = ply.getInventory().getItem(equipmentSlot);
+							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
+								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+									NamespacedKeyUtils.fromString(MasterworkUtils.getPrevItemPath(equippedItem))));
+							attemptUpgrade(player, equippedItem, newItem, MasterworkUtils.getMasterworkCost(equippedItem).get(ItemStatUtils.getMasterwork(equippedItem)));
+						});
+					}
+				}
+
 			} else {
 				ItemStack invalidItem = mInvalidItems.get(row);
 				mInventory.setItem((row * 9), invalidItem);
 			}
-			row++;
 		}
 	}
 
@@ -570,7 +564,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		event.setCancelled(true);
 		GUIUtils.refreshOffhand(event);
 
-		if (event.isShiftClick() || event.getClick() == ClickType.SWAP_OFFHAND) {
+		if (event.isShiftClick()) {
 			return;
 		}
 
@@ -584,12 +578,19 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 
 		if (mRowSelected == 99 && !mIsPreview) {
-			// Verify that items are in the correct location
-			List<ItemStack> equippedItems = getEquippedItems(player);
-			for (int row = 0; row < 6; row++) {
-				ItemStack equippedItem = equippedItems.get(row);
-				ItemStack slotItem = mInventory.getItem(row * 9);
-				if (equippedItem != null && MasterworkUtils.isMasterwork(equippedItem) && !equippedItem.isSimilar(slotItem)) {
+			int row = slot / 9;
+			ItemStack slotItem = mInventory.getItem(row * 9);
+			if (!GUIUtils.isPlaceholder(slotItem)) {
+				return;
+			}
+
+			// Compare the equipped item to the one in the GUI
+			EquipmentSlot equipmentSlot = SLOT_ORDER.get(row);
+			ItemStack equippedItem = player.getInventory().getItem(equipmentSlot);
+			if (MasterworkUtils.isMasterwork(equippedItem)) {
+				ItemStack clone = equippedItem.clone();
+				GUIUtils.setPlaceholder(clone);
+				if (!clone.isSimilar(slotItem)) {
 					loadInv(player);
 					return;
 				}
