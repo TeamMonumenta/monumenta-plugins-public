@@ -69,7 +69,11 @@ public class ScoreboardUtils {
 	}
 
 	public static boolean toggleBinaryScoreboard(Player player, String scoreboard) {
-		boolean trueBefore = getScoreboardValue(player, scoreboard).orElse(0) == 1;
+		return toggleBinaryScoreboard(player, scoreboard, 0);
+	}
+
+	public static boolean toggleBinaryScoreboard(Player player, String scoreboard, int defaultValue) {
+		boolean trueBefore = getScoreboardValue(player, scoreboard).orElse(defaultValue) == 1;
 		if (trueBefore) {
 			setScoreboardValue(player, scoreboard, 0);
 		} else {

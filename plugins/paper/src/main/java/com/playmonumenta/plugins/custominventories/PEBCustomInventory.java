@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.protocollib.EntityEquipmentReplacer;
+import com.playmonumenta.plugins.protocollib.RecipeBookGUIOpener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -256,35 +257,31 @@ public class PEBCustomInventory extends CustomInventory {
 				"", NamedTextColor.LIGHT_PURPLE,
 				Material.COMPARATOR, false),
 			new PebItem(20, gui -> "Toggle display other players' gear (" +
-				(ScoreboardUtils.getScoreboardValue(gui.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1) == 1 ? "Enabled)" : "Disabled)"),
+				(ScoreboardUtils.getScoreboardValue(gui.mPlayer, EntityEquipmentReplacer.SCOREBOARD).orElse(1) == 1 ? "Enabled)" : "Disabled)"),
 				gui -> Component.text("Toggles if you want to see the gear on other players, which may improve performance ", NamedTextColor.LIGHT_PURPLE),
 				Material.LEATHER_HELMET, false).action((peb, action) -> {
-				int oldValue = ScoreboardUtils.getScoreboardValue(peb.mPlayer, EntityEquipmentReplacer.SCOREBOARD).orElse(1);
-				int newValue = oldValue == 0 ? 1 : 0;
-				ScoreboardUtils.setScoreboardValue(peb.mPlayer, EntityEquipmentReplacer.SCOREBOARD, newValue);
-				peb.mPlayer.sendMessage(Component.text("Displaying other players' gear has been " + (oldValue == 1 ? "enabled." : "disabled."), NamedTextColor.GOLD));
-			}),
-			new PebItem(21, "Compass Particles",
+					if (ScoreboardUtils.toggleBinaryScoreboard(peb.mPlayer, EntityEquipmentReplacer.SCOREBOARD, 1)) {
+						peb.mPlayer.sendMessage(Component.text("Displaying other players' gear has been enabled.", NamedTextColor.GOLD));
+					} else {
+						peb.mPlayer.sendMessage(Component.text("Displaying other players' gear has been disabled.", NamedTextColor.GOLD));
+					}
+					peb.refresh();
+				}),
+			new PebItem(21, "Spawner Equipment",
+				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", NamedTextColor.LIGHT_PURPLE,
+				Material.SPAWNER, false).playerCommand("clickable peb_spawnerequipment"),
+			new PebItem(22, "Trading GUI Options",
+				"Click to choose your NPC trading preferences.", NamedTextColor.LIGHT_PURPLE,
+				Material.DEEPSLATE_EMERALD_ORE, false).switchToPage(PebPage.TRADE_GUI),
+			new PebItem(23, "Compass Particles",
 				"Click to toggle a trail of guiding particles when following the quest compass.", NamedTextColor.LIGHT_PURPLE,
 				Material.COMPASS, false).playerCommand("clickable peb_comp_particles"),
-			new PebItem(22, "Show name on patron buff announcement.",
-				Component.text("Toggles whether the player has their IGN in the buff announcement when they activate ", NamedTextColor.LIGHT_PURPLE)
+			new PebItem(24, "Show name on patron buff announcement",
+				Component.text("Toggles whether your IGN is in the announcement when they activate ", NamedTextColor.LIGHT_PURPLE)
 					.append(Component.text("Patreon ", NamedTextColor.GOLD))
 					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
 				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
-			new PebItem(23, "Auto-abandon completed dungeons",
-				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", NamedTextColor.LIGHT_PURPLE,
-				Material.DAYLIGHT_DETECTOR, false).serverCommand("execute as @S run function monumenta:mechanisms/auto_dungeon_abandon_toggle"),
-			new PebItem(24, "Spawner Equipment",
-				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", NamedTextColor.LIGHT_PURPLE,
-				Material.SPAWNER, false).playerCommand("clickable peb_spawnerequipment"),
-			new PebItem(29, "Virtual Firmament",
-				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", NamedTextColor.LIGHT_PURPLE,
-				Material.PRISMARINE, false).playerCommand("virtualfirmament"),
-			new PebItem(30, "Spoof World Names",
-				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", NamedTextColor.LIGHT_PURPLE,
-				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
-			new PebItem(31, "Shattered and Region Scaling Messages", "Click to toggle whether you receive actionbar messages when you have equipment that is shattered or debuffed based on region scaling.", NamedTextColor.LIGHT_PURPLE,
+			new PebItem(29, "Shattered and Region Scaling Messages", "Click to toggle whether you receive actionbar messages when you have equipment that is shattered or debuffed based on region scaling.", NamedTextColor.LIGHT_PURPLE,
 				Material.DAMAGED_ANVIL, false)
 				.action((peb, event) -> {
 					if (ScoreboardUtils.toggleTag(peb.mPlayer, Shattered.MESSAGE_DISABLE_TAG)) {
@@ -293,10 +290,36 @@ public class PEBCustomInventory extends CustomInventory {
 						peb.mPlayer.sendMessage(Component.text("Shattered and Region Scaling actionbar messages have been enabled!", NamedTextColor.GOLD));
 					}
 				}),
-			new PebItem(32, "Trading GUI Options",
-				"Click to choose your NPC trading preferences.", NamedTextColor.LIGHT_PURPLE,
-				Material.DEEPSLATE_EMERALD_ORE, false).switchToPage(PebPage.TRADE_GUI),
-			new PebItem(33, "Simplified Tab List",
+			new PebItem(30, "Show Overworld POI Titles", "Click to enable or disable seeing " +
+				                                             "titles appear upon entering certain " +
+				                                             "Overworld Points of Interest.", NamedTextColor.LIGHT_PURPLE,
+				Material.BIRCH_SIGN, false)
+				.action((peb, event) -> {
+					if (ScoreboardUtils.toggleBinaryScoreboard(peb.mPlayer, "POITitles")) {
+						peb.mPlayer.sendMessage(Component.text("Overworld POI Titles have been disabled!", NamedTextColor.GOLD));
+					} else {
+						peb.mPlayer.sendMessage(Component.text("Overworld POI Titles have been enabled!", NamedTextColor.GOLD));
+					}
+				}),
+			new PebItem(31, "Auto-Abandon Completed Dungeons",
+				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", NamedTextColor.LIGHT_PURPLE,
+				Material.DAYLIGHT_DETECTOR, false).serverCommand("execute as @S run function monumenta:mechanisms/auto_dungeon_abandon_toggle"),
+			new PebItem(32, "Recipe Book Opening Player Details",
+				"Click here to disable or enable clicking on the recipe book opening the Player Details GUI", NamedTextColor.LIGHT_PURPLE,
+				Material.KNOWLEDGE_BOOK, false).action((peb, event) -> {
+					if (ScoreboardUtils.toggleTag(peb.mPlayer, RecipeBookGUIOpener.DISABLE_TAG)) {
+						peb.mPlayer.sendMessage(Component.text("The recipe book will now open the vanilla recipes menu.", NamedTextColor.GOLD));
+					} else {
+						peb.mPlayer.sendMessage(Component.text("The recipe book will now open the Player Details GUI.", NamedTextColor.GOLD));
+					}
+			}),
+			new PebItem(33, "Virtual Firmament",
+				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", NamedTextColor.LIGHT_PURPLE,
+				Material.PRISMARINE, false).playerCommand("virtualfirmament"),
+			new PebItem(39, "Spoof World Names",
+				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", NamedTextColor.LIGHT_PURPLE,
+				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
+			new PebItem(41, "Simplified Tab List",
 				"Click to enable or disable the simplified tab list, removing custom effects from the tab list."
 				+ " Recommended if using an up-to-date version of the Unofficial Monumenta Mod (1.9.8+).", NamedTextColor.LIGHT_PURPLE,
 				Material.FLOWER_BANNER_PATTERN, false)
@@ -307,17 +330,6 @@ public class PEBCustomInventory extends CustomInventory {
 					} else {
 						LuckPermsIntegration.setPermission(peb.mPlayer, "monumenta.tablist.simplified", true);
 						peb.mPlayer.sendMessage(Component.text("Simplified Tab List has been enabled!", NamedTextColor.GOLD));
-					}
-				}),
-			new PebItem(40, "Show Overworld POI Titles", "Click to enable or disable seeing " +
-				"titles appear upon entering certain " +
-				"Overworld Points of Interest.", NamedTextColor.LIGHT_PURPLE,
-				Material.BIRCH_SIGN, false)
-				.action((peb, event) -> {
-					if (ScoreboardUtils.toggleBinaryScoreboard(peb.mPlayer, "POITitles")) {
-						peb.mPlayer.sendMessage(Component.text("Overworld POI Titles have been disabled!", NamedTextColor.GOLD));
-					} else {
-						peb.mPlayer.sendMessage(Component.text("Overworld POI Titles have been enabled!", NamedTextColor.GOLD));
 					}
 				})
 		);
@@ -1027,5 +1039,9 @@ public class PEBCustomInventory extends CustomInventory {
 		if (page.equals(PebPage.MAIN)) {
 			mInventory.setItem(0, GUIUtils.FILLER);
 		}
+	}
+
+	public void refresh() {
+		setLayout(mCurrentPage);
 	}
 }

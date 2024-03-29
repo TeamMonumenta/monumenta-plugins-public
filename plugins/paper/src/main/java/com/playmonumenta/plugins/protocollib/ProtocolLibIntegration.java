@@ -24,7 +24,7 @@ public class ProtocolLibIntegration {
 
 		ProtocolManager syncManager = ProtocolLibrary.getProtocolManager();
 
-		syncManager.addPacketListener(new PlayerItemStatsGUIOpener(plugin));
+		syncManager.addPacketListener(new RecipeBookGUIOpener(plugin));
 
 		if (ServerProperties.getReplaceSpawnerEntities()) {
 			logger.info("Enabling replacement of spawner entities");
