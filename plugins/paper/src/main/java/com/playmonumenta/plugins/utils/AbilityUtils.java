@@ -670,7 +670,14 @@ public class AbilityUtils {
 		if (particle != null) {
 			plugin.mProjectileEffectTimers.addEntity(proj, particle);
 		}
-		proj.customName(Component.text(name));
+		Component nameComponent = Component.text(name);
+		proj.customName(nameComponent);
+		ItemStack item = proj.getItem();
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(nameComponent);
+		item.setItemMeta(meta);
+		ItemUtils.setPlainName(item);
+		proj.setItem(item);
 		return proj;
 	}
 

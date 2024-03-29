@@ -157,7 +157,7 @@ public class EscapeArtist extends DepthsAbility {
 
 		new PartialParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "EscapeArtistProjectile", Particle.SMOKE_NORMAL);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "Escape Artist Projectile", Particle.SMOKE_NORMAL);
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		mPlayerItemStatsMap.put(proj, playerItemStats);
 

@@ -27,6 +27,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -136,6 +137,8 @@ public class Volley extends Ability {
 						if (tArrowData != null) {
 							((Arrow) proj).setBasePotionData(tArrowData);
 						}
+					} else if (proj instanceof ThrowableProjectile throwable && projectile instanceof ThrowableProjectile oldThrowable) {
+						throwable.setItem(oldThrowable.getItem());
 					}
 
 					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
