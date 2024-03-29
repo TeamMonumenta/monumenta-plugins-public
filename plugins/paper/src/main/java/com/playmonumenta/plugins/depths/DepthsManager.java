@@ -1121,6 +1121,10 @@ public class DepthsManager {
 		if (player == null || party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null || party.mIsLoadingRoom) {
 			return;
 		}
+		if (party.mSpawnedForcedCleansingRoom && !party.isAscensionPurgeMet()) {
+			party.sendMessage("Each player must remove an ability before moving on!");
+			return;
+		}
 		party.mNextRoomChoices.clear();
 
 		// Summon the boss room if they are on a boss room interval, regardless of whatever
@@ -1487,6 +1491,7 @@ public class DepthsManager {
 			DepthsUtils.sendFormattedMessage(p, DepthsContent.DARKEST_DEPTHS, "Player not in depths system!");
 			return;
 		}
+		party.mSpawnedForcedCleansingRoom = false; // reset this.
 		if (dp.mGraveRunnable != null) {
 			dp.mDead = false;
 			dp.mGraveRunnable.cancel();

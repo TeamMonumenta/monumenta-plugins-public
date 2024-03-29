@@ -78,7 +78,7 @@ public abstract class RoomRepository {
 	 * Spawns the next room in the physical world
 	 * @param spawnPoint the coordinates to load the room
 	 * @param roomType the type of the room to select from
-	 * @return the room information for the selected room
+	 * @return the room information for the selected room.
 	 */
 	public DepthsRoom summonRoom(Location spawnPoint, DepthsRoomType roomType, DepthsParty party) {
 		//Get a valid room from the options available to the party
@@ -100,6 +100,7 @@ public abstract class RoomRepository {
 			party.sendMessage("Each player must remove an ability before moving on!");
 			party.mNoPassiveRemoveRoomStartX = Math.min(party.mNoPassiveRemoveRoomStartX, spawnPoint.getBlockX());
 
+			party.mSpawnedForcedCleansingRoom = true;
 		} else {
 			//Standard case- call valid room
 			room = getValidRoom(roomType, party, spawnPoint.getY());
