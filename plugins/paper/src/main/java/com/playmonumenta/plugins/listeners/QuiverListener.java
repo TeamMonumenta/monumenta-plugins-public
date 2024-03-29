@@ -100,7 +100,8 @@ public class QuiverListener implements Listener {
 				return ItemUtils.isArrow(item)
 					       && !ItemStatUtils.hasPlayerModified(item)
 					       && !ItemStatUtils.isQuiver(item)
-					       && !InventoryUtils.containsSpecialLore(item);
+					       && !InventoryUtils.containsSpecialLore(item)
+						   && !ItemUtils.isQuestItem(item);
 			}
 
 			@Override

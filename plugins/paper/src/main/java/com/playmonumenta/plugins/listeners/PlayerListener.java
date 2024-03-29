@@ -1058,7 +1058,11 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
 
-		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+		ItemStatUtils.applyCustomEffects(mPlugin, player, item);
+
+		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
+
+		if (!event.isCancelled() && item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			// Stat tracker for consuming infinity items
 			// Needs to update the player's active item, not the event item, as that is a copy.
 			ItemStack activeItem = player.getActiveItem();
@@ -1067,10 +1071,6 @@ public class PlayerListener implements Listener {
 			// Set replacement to a copy of the original, so it is not consumed (must be a copy as the internal code checks for reference equality)
 			event.setReplacement(ItemUtils.clone(activeItem));
 		}
-
-		ItemStatUtils.applyCustomEffects(mPlugin, player, item);
-
-		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
 
 		for (PotionEffect effect : PotionUtils.getEffects(item)) {
 			// Kill the player if they drink a potion with instant damage 10+
