@@ -72,9 +72,10 @@ public class CursedListener extends PacketAdapter {
 		// piglins
 		EntityType.PIGLIN,
 		EntityType.PIGLIN_BRUTE,
-		EntityType.ZOMBIFIED_PIGLIN,
+		EntityType.ZOMBIFIED_PIGLIN
 		// creeper c:
-		EntityType.CREEPER
+		// Spy says: No creepers allowed because invis charged creepers become completely invis
+		// EntityType.CREEPER
 		// netural/passive
 		// EntityType.VILLAGER,
 		// EntityType.WANDERING_TRADER
