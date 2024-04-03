@@ -40,7 +40,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	private static final int P1_RESET_CLASS_LOC = 47;
 	private static final int P1_RESET_SPEC_LOC = 49;
 	private static final int P1_CHANGE_TRIGGERS_LOC = 51;
-	public static final ArrayList<Integer> P2_ABILITY_LOCS = new ArrayList<>(Arrays.asList(10, 14, 19, 23, 28, 32, 37, 41));
+	public static final ArrayList<Integer> P2_ABILITY_LOCS = new ArrayList<>(Arrays.asList(9, 14, 18, 23, 27, 32, 36, 41));
 	public static final ArrayList<Integer> SKILL_PAGE_SPEC_LOCS = new ArrayList<>(Arrays.asList(47, 51));
 	private static final int SKILL_PAGE_RESET_SPEC_LOC = 49;
 
@@ -247,11 +247,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		ItemStack summaryItem = GUIUtils.createBasicItem(Material.SCUTE, "Main Menu", NamedTextColor.WHITE, false,
 			"Pick a class to view abilities within that class. You can reset your class at any time, with no consequences.", NamedTextColor.LIGHT_PURPLE);
+		GUIUtils.setGuiNbtTag(summaryItem, "Gui", "class_select_main_menu");
 		mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 
 		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != 0) {
 			ItemStack resetItem = GUIUtils.createBasicItem(Material.CYAN_BED, "Reset Your Class", NamedTextColor.WHITE, false,
 				"Click here to reset your class, allowing access to other choices.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(resetItem, "Gui", "class_select_reset_class");
 			if (playerClass != null) {
 				GUIUtils.setGuiNbtTag(resetItem, "Class", playerClass.mClassName);
 			}
@@ -263,6 +265,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization, allowing access to choose either specialization.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(specItem, "Gui", "cross_gui_reset_spec");
 			if (playerClass != null) {
 				GUIUtils.setGuiNbtTag(specItem, "Spec",
 					(spec == playerClass.mSpecOne.mSpecialization ? playerClass.mSpecOne : playerClass.mSpecTwo).mSpecName);
@@ -272,6 +275,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		ItemStack triggersItem = GUIUtils.createBasicItem(Material.JIGSAW, "Change Ability Triggers", NamedTextColor.WHITE, false,
 			"Click here to change which key combinations are used to cast abilities.", NamedTextColor.LIGHT_PURPLE);
+		GUIUtils.setGuiNbtTag(triggersItem, "Gui", "class_select_trigger");
 		mInventory.setItem(P1_CHANGE_TRIGGERS_LOC, triggersItem);
 
 		makeRemainingCountItems(player);
