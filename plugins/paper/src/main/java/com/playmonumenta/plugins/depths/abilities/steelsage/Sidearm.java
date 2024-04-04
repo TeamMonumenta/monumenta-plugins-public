@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -93,6 +94,8 @@ public class Sidearm extends DepthsAbility {
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 			if (mob.isDead() || mob.getHealth() <= 0) {
 				mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.SIDEARM, getModifiedCooldown((int) (getModifiedCooldown() * (1 - mCDR))));
+				new PPExplosion(Particle.LAVA, endLoc).spawnAsPlayerActive(mPlayer).speed(1).count(6);
+				endLoc.getWorld().playSound(endLoc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 2);
 			}
 			mob.setVelocity(new Vector(0, 0, 0));
 		}
