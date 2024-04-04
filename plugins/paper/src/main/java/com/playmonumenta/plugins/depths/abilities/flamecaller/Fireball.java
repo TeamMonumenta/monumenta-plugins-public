@@ -180,6 +180,7 @@ public class Fireball extends DepthsAbility {
 
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, true);
+			EntityUtils.applyFire(mPlugin, mFireDuration, mob, mPlayer);
 		}
 	}
 

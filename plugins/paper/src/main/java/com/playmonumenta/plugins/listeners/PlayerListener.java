@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -891,7 +890,7 @@ public class PlayerListener implements Listener {
 
 		InventoryUtils.removeSpecialItems(player, true, false);
 
-		//Debuff mobs around player in dungeon if running solo
+		// Debuff mobs around player in dungeon if running solo
 		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
 			if (PlayerUtils.otherPlayersInRange(player, 64, true).size() == 0) {
 				// Delay by a tick to allow the entity that killed the player (if any) to still be valid until all damage/death events resolve
@@ -899,7 +898,7 @@ public class PlayerListener implements Listener {
 					List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(player.getLocation(), 20);
 					for (LivingEntity entity : nearbyEntities) {
 						EntityUtils.applySlow(mPlugin, 5 * 60 * 20, .1, entity, SOLO_DEATH_MOB_SLOW_EFFECT_NAME);
-						EntityUtils.applyWeaken(mPlugin, 5 * 60 * 20, -.25, entity, DamageEvent.DamageType.getEnumSet(), SOLO_DEATH_MOB_WEAKEN_EFFECT_NAME);
+						EntityUtils.applyWeaken(mPlugin, 5 * 60 * 20, .25, entity, null, SOLO_DEATH_MOB_WEAKEN_EFFECT_NAME);
 					}
 				});
 			}
