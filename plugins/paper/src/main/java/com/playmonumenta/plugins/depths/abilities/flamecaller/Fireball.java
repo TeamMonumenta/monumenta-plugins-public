@@ -192,9 +192,7 @@ public class Fireball extends DepthsAbility {
 			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
 			.add(" seconds in a ")
 			.add(a -> a.mRadius, RADIUS)
-			.add(" radius.")
+			.add(" block radius.")
 			.addCooldown(COOLDOWN);
-
-
 	}
 }

@@ -146,7 +146,7 @@ public class VolcanicMeteor extends DepthsAbility {
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage in a ")
 			.add(a -> a.mRadius, SIZE)
-			.add(" block radius and apply fire for ")
+			.add(" block radius and applies fire for ")
 			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
 			.add(" seconds. The damage is reduced depending on the distance from the center.")
 			.addCooldown(COOLDOWN_TICKS);
