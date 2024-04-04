@@ -1,0 +1,13 @@
+############################################
+#
+# Code owners, used to identify good reviewers for files,
+# not required reviewers. For the purposes of pre-update
+# reviews.
+#
+############################################
+
+paper/src/main/java/com/playmonumenta/plugins/abilities/shaman/* @dmdinnc
+paper/src/main/java/com/playmonumenta/plugins/classes/Shaman.java @dmdinnc
+paper/src/main/java/com/playmonumenta/plugins/classes/MonumentaClasses.java @dmdinnc
+paper/src/main/java/com/playmonumenta/plugins/commands/PlayerCommand.java @dmdinnc
+paper/src/main/java/com/playmonumenta/plugins/custominventories/* @dmdinnc

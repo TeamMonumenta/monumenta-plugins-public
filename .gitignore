@@ -23,3 +23,6 @@ release.properties
 
 # MacOS
 .DS_Store
+
+# Git
+.patches/
