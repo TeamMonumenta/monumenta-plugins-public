@@ -37,13 +37,9 @@ public class PlayerCommand {
 			)
 			.withSubcommand(new CommandAPICommand("settings")
 				.withPermission("monumenta.command.player.settings")
-				.executesPlayer((player, args) -> {
-					if (Math.random() < 0.1) {
-						player.showDemoScreen();
-					} else {
-						new PEBCustomInventory(player).openInventory(player, plugin);
-					}
-				})
+				.executesPlayer((PlayerCommandExecutor) (player, args) ->
+					new PEBCustomInventory(player).openInventory(player, plugin)
+				)
 				.withSubcommand(new CommandAPICommand("sound")
 					.withPermission("monumenta.command.player.settings.sound")
 					.executesPlayer((PlayerCommandExecutor) (player, args) ->
