@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -71,7 +72,14 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 		SpellManager normalSpells = new SpellManager(Arrays.asList(
 			new BlackflameCharge(plugin, boss, this),
 			new BlackflameBurst(boss, plugin, this),
-			new BlackflameOrb(boss, plugin, this),
+			new BlackflameOrb(boss, plugin, true, this),
+			new BlackflameGolemNecromancy(mPlugin, mBoss, 10, detectionRange, 90, 20 * 6, mSpawnLoc.getY(), mSpawnLoc, this)
+		));
+
+		SpellManager lowHealthSpells = new SpellManager(Arrays.asList(
+			new BlackflameCharge(plugin, boss, this),
+			new BlackflameBurst(boss, plugin, this),
+			new BlackflameOrb(boss, plugin, false, this),
 			new BlackflameGolemNecromancy(mPlugin, mBoss, 10, detectionRange, 90, 20 * 6, mSpawnLoc.getY(), mSpawnLoc, this)
 		));
 
@@ -92,17 +100,17 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 
 		events.put(90, mBoss -> {
 			forceCastSpell(BlackflameGolemNecromancy.class);
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"RISE, REMNANTS OF THE BLACKFLAME.\",\"color\":\"dark_red\"}]");
+			sendMessage("RISE, REMNANTS OF THE BLACKFLAME.");
 		});
 
 		events.put(50, mBoss -> {
-			changePhase(normalSpells, lowHealthPassives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE STRENGTH OF THE VOID WILL DRAG YOU DOWN!\",\"color\":\"dark_red\"}]");
+			changePhase(lowHealthSpells, lowHealthPassives, null);
+			sendMessage("THE STRENGTH OF THE VOID WILL DRAG YOU DOWN!");
 		});
 
 		events.put(40, mBoss -> {
 			forceCastSpell(BlackflameGolemNecromancy.class);
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"RISE ONCE MORE, REMNANTS.\",\"color\":\"dark_red\"}]");
+			sendMessage("RISE ONCE MORE, REMNANTS.");
 		});
 
 
@@ -119,7 +127,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 				}
 
 				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
-				for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+				for (Player p : getPlayers()) {
 					if ((mSpawnLoc.distance(p.getLocation()) > 22
 						     || mSpawnLoc.getY() - p.getLocation().getY() >= 3
 						     || (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
@@ -142,12 +150,9 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 
 		world.playSound(mSpawnLoc, Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 6, 0);
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"SPEAKERS OF REMORSE, I ANSWER THE CALL.\",\"color\":\"dark_red\"}]");
-			}
-		}.runTaskLater(mPlugin, 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			sendMessage("SPEAKERS OF REMORSE, I ANSWER THE CALL.");
+		}, 20);
 
 		new BukkitRunnable() {
 			int mCount = 1;
@@ -168,7 +173,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 					BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
 					constructBoss(normalSpells, passiveNormalSpells, detectionRange, bossBar, 20 * 10);
 
-					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+					for (Player player : getPlayers()) {
 						MessagingUtils.sendBoldTitle(player, Component.text("???", NamedTextColor.DARK_RED), Component.text("Beast of the Blackflame", NamedTextColor.RED));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 					}
@@ -188,9 +193,9 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 				}
 
 				if (mTicks == 20 * 2) {
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"FROM BEYOND I SERVE MY ETERNAL PURPOSE.\",\"color\":\"dark_red\"}]");
+					sendMessage("FROM BEYOND I SERVE MY ETERNAL PURPOSE.");
 				} else if (mTicks == 20 * 4) {
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE SEAL SHALL REMAIN.\",\"color\":\"dark_red\"}]");
+					sendMessage("THE SEAL SHALL REMAIN.");
 				}
 
 				mTicks++;
@@ -212,7 +217,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 					return;
 				}
 
-				PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VOID DRAWS CLOSER BY THE MINUTE. SO TOO, DOES MY POWER.\",\"color\":\"dark_red\"}]");
+				sendMessage("THE VOID DRAWS CLOSER BY THE MINUTE. SO TOO, DOES MY POWER.");
 
 				World world = mBoss.getWorld();
 				Location loc = mBoss.getLocation();
@@ -244,7 +249,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 			event.setReviveHealth(100);
 		}
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"FORGIVE ME SILVER ONES... I HAVE FAILED YOU...\",\"color\":\"dark_red\"}]");
+		sendMessage("FORGIVE ME SILVER ONES... I HAVE FAILED YOU...");
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -257,15 +262,12 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 					this.cancel();
 					mBoss.remove();
 
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-								MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GRAY), Component.text("Ghalkor, Svalgot, and The Beast", NamedTextColor.DARK_GRAY));
-								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
-							}
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+						for (Player player : getPlayers()) {
+							MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GRAY), Component.text("Ghalkor, Svalgot, and The Beast", NamedTextColor.DARK_GRAY));
+							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 						}
-					}.runTaskLater(mPlugin, 20 * 3);
+					}, 20 * 3);
 				}
 
 				if (mTicks % 10 == 0) {
@@ -282,7 +284,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 
 	@Override
 	public void init() {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		List<Player> players = getPlayers();
 		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 		int playerCount = players.size();
 		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
@@ -307,5 +309,16 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
+	}
+
+	public List<Player> getPlayers() {
+		return PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+	}
+
+	public void sendMessage(String message) {
+		Component component = Component.text(message, NamedTextColor.DARK_RED);
+		for (Player player : getPlayers()) {
+			player.sendMessage(component);
+		}
 	}
 }
