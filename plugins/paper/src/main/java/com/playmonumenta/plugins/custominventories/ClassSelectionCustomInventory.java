@@ -397,9 +397,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		for (AbilityInfo<?> ability : spec.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P4_SPEC_LOCS.get(iterator), item);
-			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
+			ItemStack levelOne = createLevelItem(userClass, ability, 1, player, true);
 			mInventory.setItem(P4_SPEC_LOCS.get(iterator) + 1, levelOne);
-			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
+			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player, true);
 			mInventory.setItem(P4_SPEC_LOCS.get(iterator++) + 2, levelTwo);
 		}
 
@@ -411,6 +411,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		//back button
 		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, "Back",
 			NamedTextColor.GRAY, false, "Return to the skill selection page.", NamedTextColor.GRAY);
+		GUIUtils.setGuiNbtTag(backButton, "Gui", "spec_select_back");
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
