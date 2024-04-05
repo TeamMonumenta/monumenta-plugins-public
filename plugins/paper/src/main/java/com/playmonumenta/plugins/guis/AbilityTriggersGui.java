@@ -46,6 +46,7 @@ public class AbilityTriggersGui extends Gui {
 	@SuppressWarnings("unused")
 	protected void setup() {
 		ItemStack tempItem;
+		String guiTag;
 		if (mSelectedAbility == null) {
 			// back icon
 			if (mPreviousGUI) {
@@ -188,8 +189,10 @@ public class AbilityTriggersGui extends Gui {
 				}
 				update();
 			});
-			makeOptionIcons(1, 3, GUIUtils.createBasicItem(Material.SHEARS, "Double click: " + (mNewTrigger.isDoubleClick() ? "yes" : "no"), mNewTrigger.isDoubleClick() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
-					"Click to toggle requiring a double click", NamedTextColor.GRAY, 40), mNewTrigger.isDoubleClick() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
+			tempItem = GUIUtils.createBasicItem(Material.SHEARS, "Double click: " + (mNewTrigger.isDoubleClick() ? "yes" : "no"), mNewTrigger.isDoubleClick() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
+				"Click to toggle requiring a double click", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_dclick_" + (mNewTrigger.isDoubleClick() ? "true" : "false"));
+			makeOptionIcons(1, 3, tempItem, mNewTrigger.isDoubleClick() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setDoubleClick(!mNewTrigger.isDoubleClick());
 				update();
 			});
@@ -199,8 +202,19 @@ public class AbilityTriggersGui extends Gui {
 
 			String looking = "Looking " + (mNewTrigger.getLookDirections().size() == 3 ? "anywhere"
 					: mNewTrigger.getLookDirections().stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or ")));
-			makeOptionIcons(1, 7, GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.GRAY, false,
-					"Click to cycle through look directions", NamedTextColor.GRAY, 40), mNewTrigger.getLookDirections().size() == 3 ? Material.GRAY_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
+			guiTag = "trigger_detail_look_" + (switch (looking) {
+				case "Looking anywhere" -> "all";
+				case "Looking up" -> "up";
+				case "Looking level" -> "mid";
+				case "Looking down" -> "down";
+				case "Looking level or up" -> "up_mid";
+				case "Looking down or up" -> "up_down";
+				case "Looking down or level" -> "mid_down";
+			});
+			tempItem = GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.GRAY, false,
+				"Click to cycle through look directions", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", guiTag);
+			makeOptionIcons(1, 7, tempItem, mNewTrigger.getLookDirections().size() == 3 ? Material.GRAY_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				EnumSet<AbilityTrigger.LookDirection> lookDirections = mNewTrigger.getLookDirections();
 				AbilityTrigger.LookDirection[] values = AbilityTrigger.LookDirection.values();
 				if (lookDirections.size() == 3) {
@@ -226,8 +240,10 @@ public class AbilityTriggersGui extends Gui {
 				update();
 			});
 
-			makeOptionIcons(1, 8, GUIUtils.createBasicItem(Material.POINTED_DRIPSTONE, "Allow fall-through: " + (mNewTrigger.isFallThrough() ? "yes" : "no"), mNewTrigger.isFallThrough() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
-				"Click to toggle whether another ability with an overlapping trigger will be triggered if this ability fails or is on cooldown.", NamedTextColor.GRAY, 40), mNewTrigger.isFallThrough() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
+			tempItem = GUIUtils.createBasicItem(Material.POINTED_DRIPSTONE, "Allow fall-through: " + (mNewTrigger.isFallThrough() ? "yes" : "no"), mNewTrigger.isFallThrough() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
+				"Click to toggle whether another ability with an overlapping trigger will be triggered if this ability fails or is on cooldown.", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_fall_through_" + (mNewTrigger.isFallThrough() ? "true" : "false"));
+			makeOptionIcons(1, 8, tempItem, mNewTrigger.isFallThrough() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setFallThrough(!mNewTrigger.isFallThrough());
 				update();
 			});
@@ -360,8 +376,20 @@ public class AbilityTriggersGui extends Gui {
 		NamedTextColor color = value == AbilityTrigger.BinaryOption.TRUE ? NamedTextColor.GREEN
 				: value == AbilityTrigger.BinaryOption.FALSE ? NamedTextColor.RED
 				: NamedTextColor.GRAY;
-		makeOptionIcons(row, column, GUIUtils.createBasicItem(material, displayName, color, false,
-				"Click to cycle through options", NamedTextColor.GRAY, 40), value, () -> {
+
+		String guiTag = switch (name) {
+			case "sneaking" -> "sneak";
+			case "sprinting" -> "sprint";
+			case "on ground" -> "ground";
+		}
+		guiTag = "trigger_detail_" + guiTag + (value == AbilityTrigger.BinaryOption.TRUE ?  "_true"
+			: value == AbilityTrigger.BinaryOption.FALSE ? "_false"
+			: "_both");
+		ItemStack tempItem = GUIUtils.createBasicItem(material, displayName, color, false,
+			"Click to cycle through options", NamedTextColor.GRAY, 40);
+		GUIUtils.setGuiNbtTag(tempItem, "Gui", guiTag);
+
+		makeOptionIcons(row, column, tempItem, value, () -> {
 			setter.accept(AbilityTrigger.BinaryOption.values()[(value.ordinal() + 1) % AbilityTrigger.BinaryOption.values().length]);
 			update();
 		});
