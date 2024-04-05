@@ -298,9 +298,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		for (AbilityInfo<?> ability : userClass.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator), item);
-			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
+
+			// level one item
+			ItemStack levelOne = createSkillLevelItem(userClass, ability, 1, player);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator) + 1, levelOne);
-			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
+
+			// level two item
+			ItemStack levelTwo = createSkillLevelItem(userClass, ability, 2, player);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator++) + 2, levelTwo);
 		}
 		//specs
@@ -342,12 +346,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		for (AbilityInfo<?> ability : userClass.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator), item);
-			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
+
+			ItemStack levelOne = createSkillLevelItem(userClass, ability, 1, player);
 			GUIUtils.setGuiNbtTag(levelOne, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 1, levelOne);
-			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
+
+			ItemStack levelTwo = createSkillLevelItem(userClass, ability, 2, player);
 			GUIUtils.setGuiNbtTag(levelTwo, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 2, levelTwo);
+
 			ItemStack enhanceItem = createEnhanceItem(userClass, ability, player);
 			GUIUtils.setGuiNbtTag(enhanceItem, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator++) + 3, enhanceItem);
@@ -596,6 +603,26 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 	}
 
+	public ItemStack createSkillLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player) {
+		ItemStack levelItem;
+		int getScore;
+		String scoreboard = ability.getScoreboard();
+		if (scoreboard == null) {
+			getScore = 0;
+		} else {
+			getScore = ScoreboardUtils.getScoreboardValue(player, scoreboard);
+			if (getScore > 2) {
+				getScore -= 2;
+			}
+		}
+		Material newMat = getScore >= level ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+		levelItem = GUIUtils.createBasicItem(newMat, 1,
+			"Level " + level, theClass.mClassColor, true,
+			ability.getDescription(level).color(NamedTextColor.WHITE), 30, true);
+		GUIUtils.setGuiNbtTag(levelItem, "Gui", "skill_select_" + getScore >= level ? "sp_lit" : "sp_unlit");
+		return levelItem;
+	}
+
 	public ItemStack createLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player) {
 		int getScore;
 		String scoreboard = ability.getScoreboard();
@@ -616,6 +643,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	public ItemStack createEnhanceItem(PlayerClass theClass, AbilityInfo<?> ability, Player player) {
 		if (ability.getDescriptions().size() == 3) {
 			Material newMat;
+			ItemStack newItem;
 			String scoreboard = ability.getScoreboard();
 			boolean selectedEn = false;
 			switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(player, scoreboard)) {
