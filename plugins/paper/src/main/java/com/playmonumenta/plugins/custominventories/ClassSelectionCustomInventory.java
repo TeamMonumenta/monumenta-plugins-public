@@ -300,11 +300,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator), item);
 
 			// level one item
-			ItemStack levelOne = createSkillLevelItem(userClass, ability, 1, player);
+			ItemStack levelOne = createLevelItem(userClass, ability, 1, player, false);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator) + 1, levelOne);
 
 			// level two item
-			ItemStack levelTwo = createSkillLevelItem(userClass, ability, 2, player);
+			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player, false);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator++) + 2, levelTwo);
 		}
 		//specs
@@ -347,11 +347,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator), item);
 
-			ItemStack levelOne = createSkillLevelItem(userClass, ability, 1, player);
+			ItemStack levelOne = createLevelItem(userClass, ability, 1, player, false);
 			GUIUtils.setGuiNbtTag(levelOne, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 1, levelOne);
 
-			ItemStack levelTwo = createSkillLevelItem(userClass, ability, 2, player);
+			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player, false);
 			GUIUtils.setGuiNbtTag(levelTwo, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 2, levelTwo);
 
@@ -603,7 +603,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 	}
 
-	public ItemStack createSkillLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player) {
+	public ItemStack createLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player, boolean isSpec) {
 		ItemStack levelItem;
 		int getScore;
 		String scoreboard = ability.getScoreboard();
@@ -619,7 +619,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		levelItem = GUIUtils.createBasicItem(newMat, 1,
 			"Level " + level, theClass.mClassColor, true,
 			ability.getDescription(level).color(NamedTextColor.WHITE), 30, true);
-		GUIUtils.setGuiNbtTag(levelItem, "Gui", "skill_select_" + getScore >= level ? "sp_lit" : "sp_unlit");
+		if (isSpec) {
+			GUIUtils.setGuiNbtTag(levelItem, "Gui", "spec_select_" + (getScore >= level ? "spec_lit" : "spec_unlit"));
+		} else {
+			GUIUtils.setGuiNbtTag(levelItem, "Gui", "skill_select_" + (getScore >= level ? "sp_lit" : "sp_unlit"));
+		}
 		return levelItem;
 	}
 
