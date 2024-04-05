@@ -428,6 +428,9 @@ public final class ItemOverrides {
 
 		BaseOverride goatHornOverride = new GoatHornOverride();
 		mItems.put(Material.GOAT_HORN, goatHornOverride);
+
+		BaseOverride snowballOverride = new SnowballOverride();
+		mItems.put(Material.SNOWBALL, snowballOverride);
 	}
 
 	public void rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
