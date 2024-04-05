@@ -156,13 +156,22 @@ public class AbilityTriggersGui extends Gui {
 				summary, true));
 
 			// options
-			makeOptionIcons(1, 0, GUIUtils.createBasicItem(Material.BARRIER, mNewTrigger.isEnabled() ? "Trigger enabled" : "Trigger disabled", mNewTrigger.isEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED, false,
-					"Click to " + (mNewTrigger.isEnabled() ? "disable" : "enable") + " the trigger", NamedTextColor.GRAY, 40), mNewTrigger.isEnabled() ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
+			tempItem = GUIUtils.createBasicItem(Material.BARRIER, mNewTrigger.isEnabled() ? "Trigger enabled" : "Trigger disabled", mNewTrigger.isEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED, false,
+				"Click to " + (mNewTrigger.isEnabled() ? "disable" : "enable") + " the trigger", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_" + (mNewTrigger.isEnabled() ? "enabled" : "disabled"));
+			makeOptionIcons(1, 0, tempItem, mNewTrigger.isEnabled() ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setEnabled(!mNewTrigger.isEnabled());
 				update();
 			});
-			makeOptionIcons(1, 1, GUIUtils.createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
-					"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", NamedTextColor.GRAY, 40), switch (mNewTrigger.getKey()) {
+			tempItem = GUIUtils.createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
+				"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_" + (switch (mNewTrigger.getKey()) {
+				case LEFT_CLICK -> "left";
+				case RIGHT_CLICK -> "right";
+				case SWAP -> "swap";
+				case DROP -> "drop";
+			}));
+			makeOptionIcons(1, 1, tempItem, switch (mNewTrigger.getKey()) {
 				case LEFT_CLICK -> Material.IRON_SWORD;
 				case RIGHT_CLICK -> Material.BOW;
 				case SWAP -> Material.TORCH;
