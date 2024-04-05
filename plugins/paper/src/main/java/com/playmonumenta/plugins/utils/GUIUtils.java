@@ -313,6 +313,15 @@ public class GUIUtils {
 		});
 	}
 
+	/**
+	 * Creates a gui identifier item. This is for the rp to apply gui texture. Other than that it works like a filler.
+	 */
+	public static ItemStack createGuiIdentifierItem(String tag) {
+		ItemStack idItem = createFiller();
+		setGuiNbtTag(idItem, "Gui", tag);
+		return idItem;
+	}
+
 	public static boolean isPlaceholder(final @Nullable ItemStack item) {
 		if (ItemUtils.isNullOrAir(item)) {
 			return false;

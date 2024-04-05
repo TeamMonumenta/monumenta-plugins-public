@@ -46,6 +46,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	private static final ArrayList<Integer> P3_ABILITY_LOCS = new ArrayList<>(Arrays.asList(9, 14, 18, 23, 27, 32, 36, 41));
 
+	/**
+	 *  gui identifiers are used for rp to put a texture to a gui. they would be unique to each gui and work
+	 *  pretty much like a filler.
+	 */
+	private static final int P1_GUI_IDENTIFIER_LOC = 45;
+	private static final int P2_GUI_IDENTIFIER_LOC = 45;
+	private static final int P3_GUI_IDENTIFIER_LOC = 45;
+	private static final int P4_GUI_IDENTIFIER_LOC = 45;
+
 	public static final ArrayList<Integer> P4_SPEC_LOCS = new ArrayList<>(Arrays.asList(20, 30, 40));
 	private static final MonumentaClasses mClasses = new MonumentaClasses();
 	public static final String R3_UNLOCK_SCOREBOARD = "R3Access";
@@ -278,6 +287,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		GUIUtils.setGuiNbtTag(triggersItem, "Gui", "class_select_trigger");
 		mInventory.setItem(P1_CHANGE_TRIGGERS_LOC, triggersItem);
 
+		// set gui identifier
+		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_1"));
+
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
 	}
@@ -334,6 +346,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
 
+		// set gui identifier
+		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
+
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
 	}
@@ -386,6 +401,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
 
+		// set gui identifier
+		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
+
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
 	}
@@ -413,6 +431,10 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			NamedTextColor.GRAY, false, "Return to the skill selection page.", NamedTextColor.GRAY);
 		GUIUtils.setGuiNbtTag(backButton, "Gui", "spec_select_back");
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
+
+		// set gui identifier
+		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_3"));
+
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
 	}
