@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.particle.PPFlower;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -110,8 +111,9 @@ public class Rebirth extends DepthsAbility {
 			DepthsManager.getInstance().getRandomAbility(mPlayer, dp, chances, false, false, false);
 		}
 
-		DepthsManager.getInstance().mUpgradeOfferings.clear();
-		DepthsManager.getInstance().mAbilityOfferings.clear();
+		UUID uuid = mPlayer.getUniqueId();
+		DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
+		DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
 	}
 
 	public void applyResistance() {
