@@ -58,6 +58,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 			.linkedSpell(ClassAbility.WHIRLING_BLADE)
 			.scoreboardId("WhirlingBlade")
 			.shorthandName("WB")
+			.hotbarName("Whrl")
 			.descriptions(
 				"Use the swap key while holding a weapon to throw a whirling blade that circles around you, " +
 					"knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits and inflicts " + (int) (100 * BLADE_WEAKEN) + "% weakness and " + (int) (100 * BLADE_SLOWNESS) + "% slowness for " + BLADE_1_DURATION / 20 + "s. " +

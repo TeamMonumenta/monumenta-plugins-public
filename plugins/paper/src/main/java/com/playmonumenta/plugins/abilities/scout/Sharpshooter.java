@@ -12,12 +12,16 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.jetbrains.annotations.Nullable;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.25;
@@ -143,4 +147,26 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		return ChargeType.STACKS;
 	}
 
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		if (isLevelTwo()) {
+			TextColor color = INFO.getActionBarColor();
+			String name = INFO.getHotbarName();
+
+			int charges = getCharges();
+			int maxCharges = getMaxCharges();
+
+			// String output.
+			Component output = Component.text("[", NamedTextColor.YELLOW)
+				.append(Component.text(name != null ? name : "Error", color))
+				.append(Component.text("]", NamedTextColor.YELLOW))
+				.append(Component.text(": ", NamedTextColor.WHITE));
+
+			output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+			return output;
+		} else {
+			return Component.text("");
+		}
+	}
 }

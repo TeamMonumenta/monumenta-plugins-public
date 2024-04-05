@@ -45,6 +45,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 			.linkedSpell(ClassAbility.ELEMENTAL_SPIRIT_FIRE)
 			.scoreboardId("ElementalSpirit")
 			.shorthandName("ES")
+			.hotbarName("EsF")
 			.descriptions(
 				String.format(
 					"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, " +

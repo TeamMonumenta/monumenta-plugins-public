@@ -27,6 +27,10 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -241,5 +245,32 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	@Override
 	public int getMaxCharges() {
 		return mStackLimit;
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		if (charges >= 1 && maxCharges > 1) {
+			output = output.append(Component.text(charges + "/" + maxCharges, charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW));
+		} else {
+			if (charges >= 1) {
+				output = output.append(Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD));
+			} else {
+				output = output.append(Component.text("✘", NamedTextColor.RED, TextDecoration.BOLD));
+			}
+		}
+
+		return output;
 	}
 }

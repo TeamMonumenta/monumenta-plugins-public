@@ -378,6 +378,13 @@ public abstract class Ability {
 		return null;
 	}
 
+	/**
+	 * Return special hotbar message, or null if default hotbar message should be used.
+	 */
+	public @Nullable Component getHotbarMessage() {
+		return null;
+	}
+
 	public void showOffCooldownMessage() {
 		sendActionBarMessage(getLinkedSpellName() + " is now off cooldown!");
 	}

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins;
 
+import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
@@ -406,6 +407,7 @@ public class Plugin extends JavaPlugin {
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
+		new AbilityHotbar(this);
 
 		PlayerSaturationTracker.startTracking(this);
 

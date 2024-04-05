@@ -42,6 +42,8 @@ public class AbilityInfo<T extends Ability> {
 	private final @Nullable String mDisplayName;
 	// Ability name shorthand (for statistic purposes; no use in-game. Should be the fewest characters that identifies this)
 	private @Nullable String mShorthandName;
+	// Ability Abbreviated Name for AbilityHotbar
+	private @Nullable String mHotbarName;
 	// Description provider
 	private List<Description<T>> mDescriptions = List.of(t -> Component.empty());
 	// Simplified description
@@ -100,6 +102,11 @@ public class AbilityInfo<T extends Ability> {
 
 	public AbilityInfo<T> shorthandName(String shorthandName) {
 		mShorthandName = shorthandName;
+		return this;
+	}
+
+	public AbilityInfo<T> hotbarName(String hotbarName) {
+		mHotbarName = hotbarName;
 		return this;
 	}
 
@@ -275,6 +282,16 @@ public class AbilityInfo<T extends Ability> {
 
 	public @Nullable String getDisplayName() {
 		return mDisplayName;
+	}
+
+	public @Nullable String getHotbarName() {
+		if (mHotbarName != null) {
+			return mHotbarName;
+		} else if (mShorthandName != null) {
+			return mShorthandName;
+		} else {
+			return mDisplayName;
+		}
 	}
 
 	@Nullable

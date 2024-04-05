@@ -18,7 +18,10 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +34,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class AdvancingShadows extends Ability {
 
@@ -115,7 +119,7 @@ public class AdvancingShadows extends Ability {
 		}
 
 		if (isEnhanced() && (mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION < Bukkit.getCurrentTick())) {
-			// Lose Kill chain if last kill tick was over 60 ticks ago.
+			// Lose Kill chain if last kill tick was over 80 ticks ago.
 			mEnhancementChain = 0;
 		}
 
@@ -248,5 +252,28 @@ public class AdvancingShadows extends Ability {
 			putOnCooldown();
 		}
 		return true;
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		ClassAbility classAbility = INFO.getLinkedSpell();
+		int remainingCooldown = classAbility == null ? 0 : mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), classAbility);
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		if (isEnhanced() && mCanRecast && mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION >= Bukkit.getCurrentTick()) {
+			output = output.append(Component.text("✓", NamedTextColor.GOLD, TextDecoration.BOLD));
+		} else if (remainingCooldown > 0) {
+			output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GRAY));
+		} else {
+			output = output.append(Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD));
+		}
+		return output;
 	}
 }

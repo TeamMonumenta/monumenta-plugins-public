@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
@@ -238,6 +239,12 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(24, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, false).playerCommand("clickable peb_tid"),
+			new PebItem(29, "Ability Hotbar",
+				"Click to toggle ability HUD.", NamedTextColor.LIGHT_PURPLE,
+				Material.PAPER, false).action((pebCustomInventory, event) -> {
+				boolean enabled = ScoreboardUtils.toggleTag((Player) event.getWhoClicked(), AbilityHotbar.ABILITY_HOTBAR_TAG);
+				event.getWhoClicked().sendMessage(Component.text("Ability Hotbar is now " + (enabled ? "enabled" : "disabled"), NamedTextColor.GOLD, TextDecoration.BOLD));
+			}),
 			new PebItem(30, "Toggle Darksight",
 				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
 				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),

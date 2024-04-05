@@ -22,6 +22,10 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -270,5 +274,32 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		ClassAbility classAbility = INFO.getLinkedSpell();
+		int remainingCooldown = classAbility == null ? 0 : mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), classAbility);
+		TextColor color = INFO.getActionBarColor();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text("Tb", mCurrentState == TabooState.INACTIVE ? NamedTextColor.GRAY : color))
+			.append(Component.text("]", NamedTextColor.YELLOW));
+
+		if (isLevelTwo()) {
+			output = output.append(Component.text(": ", NamedTextColor.WHITE));
+
+			if (mCurrentState == TabooState.BURST) {
+				// Apparently getRemainingAbilityDuration() doesn't actually work
+				output = output.append(Component.text(((int) Math.ceil(mBurstTimer)) + "s", NamedTextColor.GOLD));
+			} else if (remainingCooldown > 0) {
+				output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GRAY));
+			} else {
+				output = output.append(Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD));
+			}
+		}
+
+		return output;
 	}
 }

@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -83,8 +86,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
 			new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
-					.linkedSpell(ClassAbility.ALCHEMIST_POTION)
-					.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
+				.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
+				.linkedSpell(ClassAbility.ALCHEMIST_POTION)
+				.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
 
 	public final GruesomeAlchemyCS mCosmetic;
 	private boolean mHasGruesomeAlchemy = false;
@@ -457,5 +461,21 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	public boolean isAlchemistPotion(ThrownPotion potion) {
 		return BRUTAL_POTION != null && ItemUtils.getPlainNameIfExists(BRUTAL_POTION).equals(ItemUtils.getPlainNameIfExists(potion.getItem()));
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text("AP", isGruesomeMode() ? NamedTextColor.RED : TextColor.color(0, 255, 0)))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+		return output;
 	}
 }
