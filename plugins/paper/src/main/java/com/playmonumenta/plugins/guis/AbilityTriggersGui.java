@@ -45,25 +45,32 @@ public class AbilityTriggersGui extends Gui {
 	@Override
 	@SuppressWarnings("unused")
 	protected void setup() {
+		ItemStack tempItem;
 		if (mSelectedAbility == null) {
 			// back icon
 			if (mPreviousGUI) {
-				setItem(0, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
-					"Return to the class selection page.", NamedTextColor.GRAY, 40))
+				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
+					"Return to the class selection page.", NamedTextColor.GRAY, 40);
+				GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_main_back");
+				setItem(0, tempItem)
 					.onLeftClick(() -> new ClassSelectionCustomInventory(mPlayer).openInventory(mPlayer, mPlugin));
 			} else {
-				setItem(0, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
-					"Return to the ability summary page.", NamedTextColor.GRAY, 40))
+				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
+					"Return to the ability summary page.", NamedTextColor.GRAY, 40);
+				GUIUtils.setGuiNbtTag(tempItem, "Gui", "depth_trigger_main_back");
+				setItem(0, tempItem)
 					.onLeftClick(() -> new DepthsSummaryGUI(mPlayer).openInventory(mPlayer, mPlugin));
 			}
 
 			// help icon
-			setItem(4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Help", NamedTextColor.WHITE, false,
+			tempItem = GUIUtils.createBasicItem(Material.OAK_SIGN, "Help", NamedTextColor.WHITE, false,
 				"Click on a trigger to change it.\n" +
 					"Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. " +
 					"If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.\n" +
 					"Eagle Eye is an exception: it allows other abilities to trigger after it.\n" +
-					"Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).", NamedTextColor.GRAY, 40));
+					"Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "depth_main_help");
+			setItem(4, tempItem);
 
 			// trigger icons
 			int i = 0;
@@ -105,10 +112,12 @@ public class AbilityTriggersGui extends Gui {
 			// "revert all" button - top right to hopefully prevent accidental presses
 			int numberOfCustomTriggers = mPlugin.mAbilityManager.getNumberOfCustomTriggers(mPlayer);
 			if (numberOfCustomTriggers > 0) {
-				setItem(8, GUIUtils.createBasicItem(Material.BARRIER, 1, "Revert all triggers to defaults", NamedTextColor.DARK_RED, false,
+				tempItem = GUIUtils.createBasicItem(Material.BARRIER, 1, "Revert all triggers to defaults", NamedTextColor.DARK_RED, false,
 					Component.text("This resets all triggers of all abilities of all classes back to defaults!\nYou currently have ", NamedTextColor.RED)
 						.append(Component.text(numberOfCustomTriggers, NamedTextColor.GOLD))
-						.append(Component.text(" custom trigger" + (numberOfCustomTriggers == 1 ? "" : "s") + " defined.", NamedTextColor.RED)), 40, true))
+						.append(Component.text(" custom trigger" + (numberOfCustomTriggers == 1 ? "" : "s") + " defined.", NamedTextColor.RED)), 40, true);
+				GUIUtils.setGuiNbtTag(tempItem, "Gui", "depth_main_reset_trigger");
+				setItem(8, tempItem)
 					.onLeftClick(() -> {
 						mPlugin.mAbilityManager.clearCustomTriggers(mPlayer);
 						for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilitiesInTriggerOrder()) {
@@ -121,8 +130,10 @@ public class AbilityTriggersGui extends Gui {
 			}
 		} else {
 			// back icon
-			setItem(0, 0, GUIUtils.createBasicItem(Material.ARROW, "Back",
-					NamedTextColor.GRAY, false, "Return to the trigger selection page.", NamedTextColor.GRAY, 40))
+			tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back",
+				NamedTextColor.GRAY, false, "Return to the trigger selection page.", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_back");
+			setItem(0, 0, tempItem)
 					.onLeftClick(() -> {
 						mSelectedAbility = null;
 						mKeyOptionsStartIndex = 0;
@@ -213,9 +224,11 @@ public class AbilityTriggersGui extends Gui {
 			});
 
 			// extras aka key options
-			setItem(3, 0, GUIUtils.createBasicItem(Material.CHAIN_COMMAND_BLOCK, "Extras", NamedTextColor.WHITE, false,
-					"Extra options for held items.\n"
-							+ "When the main key is changed these are set to defaults, unless the trigger has an unchangeable item restriction.", NamedTextColor.GRAY, 40));
+			tempItem = GUIUtils.createBasicItem(Material.CHAIN_COMMAND_BLOCK, "Extras", NamedTextColor.WHITE, false,
+				"Extra options for held items.\n"
+					+ "When the main key is changed these are set to defaults, unless the trigger has an unchangeable item restriction.", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_extras");
+			setItem(3, 0, tempItem);
 
 			int colStart = 1;
 			int colEnd = 8;
@@ -224,14 +237,18 @@ public class AbilityTriggersGui extends Gui {
 				mKeyOptionsStartIndex = 0;
 			} else if (mKeyOptionsStartIndex > 1) {
 				colStart = 2;
-				setItem(3, 1, GUIUtils.createBasicItem(Material.ARROW, "Scroll back for more options", NamedTextColor.GRAY)).onLeftClick(() -> {
+				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Scroll back for more options", NamedTextColor.GRAY);
+				GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_scroll_back");
+				setItem(3, 1, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex -= 6;
 					update();
 				});
 			}
 			if (mKeyOptionsStartIndex + 7 < AbilityTrigger.KeyOptions.values().length) {
 				colEnd = 7;
-				setItem(3, 8, GUIUtils.createBasicItem(Material.ARROW, "Scroll forward for more options", NamedTextColor.GRAY)).onLeftClick(() -> {
+				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Scroll forward for more options", NamedTextColor.GRAY);
+				GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_scroll_forward");
+				setItem(3, 8, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex += mKeyOptionsStartIndex == 0 ? 7 : 6;
 					update();
 				});
@@ -265,6 +282,7 @@ public class AbilityTriggersGui extends Gui {
 					meta.lore(List.of(Component.text("Accept trigger changes", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 					confirm.setItemMeta(meta);
 					ItemUtils.setPlainTag(confirm);
+					GUIUtils.setGuiNbtTag(confirm, "Gui", "trigger_detail_confirm");
 					setItem(5, 2, confirm).onLeftClick(() -> {
 						mSelectedTrigger.setTrigger(mNewTrigger);
 						mPlugin.mAbilityManager.setCustomTrigger(mPlayer, mSelectedAbility, mSelectedTrigger.getId(), mNewTrigger);
@@ -281,6 +299,7 @@ public class AbilityTriggersGui extends Gui {
 					meta.lore(List.of(Component.text("Discard current trigger changes", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 					cancel.setItemMeta(meta);
 					ItemUtils.setPlainTag(cancel);
+					GUIUtils.setGuiNbtTag(cancel, "Gui", "trigger_detail_cancel");
 					setItem(5, 6, cancel).onLeftClick(() -> {
 						mNewTrigger = new AbilityTrigger(mSelectedTrigger.getTrigger());
 						mSelectedAbility = null;
@@ -291,9 +310,11 @@ public class AbilityTriggersGui extends Gui {
 			}
 
 			// revert button
+			tempItem = GUIUtils.createBasicItem(Material.BARRIER, "Revert to default", NamedTextColor.DARK_RED, false,
+				"Revert any custom trigger changes", NamedTextColor.GRAY, 40);
+			GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_revert");
 			if (!mSelectedTrigger.getTrigger().equals(mSelectedAbility.getTrigger(mSelectedTrigger.getId()).getTrigger())) {
-				setItem(5, 4, GUIUtils.createBasicItem(Material.BARRIER, "Revert to default", NamedTextColor.DARK_RED, false,
-						"Revert any custom trigger changes", NamedTextColor.GRAY, 40)).onLeftClick(() -> {
+				setItem(5, 4, tempItem).onLeftClick(() -> {
 					mNewTrigger = new AbilityTrigger(mSelectedAbility.getTrigger(mSelectedTrigger.getId()).getTrigger());
 					mSelectedTrigger.setTrigger(mNewTrigger);
 					mPlugin.mAbilityManager.setCustomTrigger(mPlayer, mSelectedAbility, mSelectedTrigger.getId(), null);
