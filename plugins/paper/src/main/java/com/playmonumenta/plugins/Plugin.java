@@ -281,6 +281,7 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this);
 		RefreshClass.register(this);
 		RegisterTorch.register();
+		RepairItemCommand.register();
 		RemoveTags.register();
 		RenameItemCommand.register();
 		ResetClass.register(this);
