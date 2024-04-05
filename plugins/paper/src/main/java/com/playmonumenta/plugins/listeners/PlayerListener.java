@@ -315,9 +315,6 @@ public class PlayerListener implements Listener {
 		if (playersTeam != null) {
 			playersTeam.removeEntry(player.getName());
 		}
-
-		// Tacked on but where else should this go...
-		CursedListener.removeFakePlayerEntities(player.getUniqueId());
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
