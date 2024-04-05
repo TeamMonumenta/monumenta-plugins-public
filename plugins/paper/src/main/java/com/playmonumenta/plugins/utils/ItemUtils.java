@@ -46,6 +46,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -1669,6 +1670,19 @@ public class ItemUtils {
 		}
 
 		return itemStacks;
+	}
+
+	public static void addPlainLoreLine(ItemStack item, String line) {
+		List<String> lore = getPlainLore(item);
+		lore.add(line);
+		setPlainLore(item, lore);
+	}
+
+	public static void setSnowballItem(ThrowableProjectile snowball, ItemStack oldItem) {
+		ItemStack newItem = oldItem.clone();
+		setPlainTag(newItem);
+		addPlainLoreLine(newItem, "ThrownSnowball");
+		snowball.setItem(newItem);
 	}
 
 	public static void setMapId(MapMeta meta, int id) {

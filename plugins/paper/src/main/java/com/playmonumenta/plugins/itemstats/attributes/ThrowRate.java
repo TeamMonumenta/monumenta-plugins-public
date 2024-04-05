@@ -113,9 +113,7 @@ public class ThrowRate implements Attribute {
 				snowball.setShooter(player);
 				snowball.setVelocity(proj.getVelocity());
 				DamageListener.addProjectileItemStats(snowball, player);
-				ItemStack item = oldSnowball.getItem();
-				ItemUtils.setPlainName(item);
-				snowball.setItem(item);
+				ItemUtils.setSnowballItem(snowball, oldSnowball.getItem());
 				player.playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.5f, 0.5f);
 				AbilityManager.getManager().playerShotProjectileEvent(player, snowball);
 

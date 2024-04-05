@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -125,7 +126,7 @@ public class DepthsVolley extends DepthsAbility {
 							((Arrow) proj).setBasePotionData(tArrowData);
 						}
 					} else if (proj instanceof ThrowableProjectile throwable && projectile instanceof ThrowableProjectile oldThrowable) {
-						throwable.setItem(oldThrowable.getItem());
+						ItemUtils.setSnowballItem(throwable, oldThrowable.getItem());
 					}
 
 					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
