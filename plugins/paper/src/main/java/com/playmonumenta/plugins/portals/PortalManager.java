@@ -346,8 +346,7 @@ public class PortalManager implements Listener {
 		Location location2 = portalBlock2.getLocation();
 		ItemStack mapItem = new ItemStack(Material.FILLED_MAP, 1);
 		mapItem.editMeta(MapMeta.class, mapMeta -> {
-			// The Bukkit team can learn to deal with this. There's no other way to set an existing map ID.
-			mapMeta.setMapId(mapNum);
+			ItemUtils.setMapId(mapMeta, mapNum);
 		});
 		Entity map1 = world.spawn(location1, GlowItemFrame.class, itemFrame -> {
 			itemFrame.setFacingDirection(targetFace);

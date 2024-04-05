@@ -1135,7 +1135,7 @@ public class DepthsManager {
 
 		boolean wildcard = roomType == DepthsRoomType.WILDCARD;
 		if (wildcard) {
-			incrementTreasure(player.getLocation(), player, 1);
+			incrementTreasure(null, player, 1);
 			roomType = getWildcardRoomType();
 		}
 

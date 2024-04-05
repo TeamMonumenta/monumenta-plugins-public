@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
@@ -269,7 +270,9 @@ public class VanityManager implements Listener {
 		meta.addItemFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(meta);
 		ItemUtils.setPlainTag(item);
-		new NBTItem(item, true).addCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(INVISIBLE_NBT_KEY, true);
+		NBT.modify(item, nbt -> {
+			nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(INVISIBLE_NBT_KEY, true);
+		});
 		return item;
 	}
 
@@ -342,11 +345,13 @@ public class VanityManager implements Listener {
 			}
 			boolean invisible = VanityManager.isInvisibleVanityItem(vanityItem);
 			if (invisible && equipmentSlot != EquipmentSlot.OFF_HAND) { // invisible armor: only add tag for RP and add lore line
-				NBTItem nbt = new NBTItem(itemStack, true);
-				nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+				NBT.modify(itemStack, nbt -> {
+					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+				});
 				ItemMeta meta = itemStack.getItemMeta();
 				if (meta != null) {
-					List<Component> lore = meta.lore() == null ? new ArrayList<>() : new ArrayList<>(meta.lore());
+					List<Component> lore = meta.lore();
+					lore = lore == null ? new ArrayList<>() : new ArrayList<>(lore);
 					lore.add(0, Component.text("Invisibility vanity skin applied", NamedTextColor.GOLD));
 					meta.lore(lore);
 					itemStack.setItemMeta(meta);
@@ -431,8 +436,9 @@ public class VanityManager implements Listener {
 			VirtualItemsReplacer.markVirtual(itemStack);
 
 			if (invisible) {
-				NBTItem nbt = new NBTItem(itemStack, true);
-				nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+				NBT.modify(itemStack, nbt -> {
+					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+				});
 			}
 		}
 	}

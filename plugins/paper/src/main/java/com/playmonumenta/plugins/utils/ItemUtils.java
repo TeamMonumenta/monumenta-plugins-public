@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -52,6 +53,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
@@ -1667,6 +1669,10 @@ public class ItemUtils {
 		}
 
 		return itemStacks;
+	}
+
+	public static void setMapId(MapMeta meta, int id) {
+		meta.setMapView(Bukkit.getMap(id));
 	}
 
 }

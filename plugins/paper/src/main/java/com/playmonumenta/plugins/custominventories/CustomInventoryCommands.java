@@ -170,7 +170,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openparrotgui")
 			.executesPlayer((player, args) -> {
 				try {
-					new ParrotCustomInventory(player).openInventory(player, plugin);
+					new ParrotCustomInventory(player).open();
 				} catch (Exception ex) {
 					String msg = "Failed to open Parrot GUI: " + ex.getMessage();
 					player.sendMessage(msg);
@@ -184,7 +184,7 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				try {
-					new ParrotCustomInventory(player).openInventory(player, plugin);
+					new ParrotCustomInventory(player).open();
 				} catch (Exception ex) {
 					String msg = "Failed to open Parrot GUI: " + ex.getMessage();
 					sender.sendMessage(msg);

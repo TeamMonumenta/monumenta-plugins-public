@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -281,9 +282,9 @@ public class ChessInterface {
 		MapMeta meta = (MapMeta) map.getItemMeta();
 		//no other methods for pick the right id.
 		if (ServerProperties.getShardName().contains("valley")) {
-			meta.setMapId(id + MAP_ID_OFFSET);
+			ItemUtils.setMapId(meta, id + MAP_ID_OFFSET);
 		} else {
-			meta.setMapId(id);
+			ItemUtils.setMapId(meta, id);
 		}
 		map.setItemMeta(meta);
 		return map;

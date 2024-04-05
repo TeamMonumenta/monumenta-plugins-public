@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -108,8 +109,12 @@ public class ParrotManager implements Listener {
 			return null;
 		}
 
+		public String getScoreboard() {
+			return "ParrotBought" + mNumber;
+		}
+
 		public boolean hasUnlocked(Player player) {
-			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought" + mNumber).orElse(0) > 0;
+			return ScoreboardUtils.getScoreboardValue(player, getScoreboard()).orElse(0) > 0;
 		}
 	}
 
@@ -382,9 +387,15 @@ public class ParrotManager implements Listener {
 				return;
 			}
 
+			Component customName = parrot.customName();
+			if (customName == null) {
+				return;
+			}
+			String name = MessagingUtils.plainText(customName);
+
 			// parrot spawned with an old version will not have the tag, so we need to check the name
 			for (ParrotVariant variant : ParrotVariant.values()) {
-				if (MessagingUtils.plainText(parrot.customName()).contains(variant.mName)) {
+				if (name.contains(variant.mName)) {
 					event.setCancelled(true);
 					return;
 				}

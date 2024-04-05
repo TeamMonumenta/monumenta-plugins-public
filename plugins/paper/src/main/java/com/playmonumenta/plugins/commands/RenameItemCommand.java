@@ -166,7 +166,9 @@ public class RenameItemCommand {
 			});
 			setItem(0, new GuiItem(resetIcon, false))
 				.onLeftClick(() -> {
-					ItemStatUtils.addPlayerModified(new NBTItem(mItemStack, true)).removeKey(ItemStatUtils.CUSTOM_SKIN_KEY);
+					NBT.modify(mItemStack, nbt -> {
+						ItemStatUtils.addPlayerModified(nbt).removeKey(ItemStatUtils.CUSTOM_SKIN_KEY);
+					});
 					mPlayer.updateInventory();
 				});
 
@@ -177,10 +179,14 @@ public class RenameItemCommand {
 				ItemUtils.modifyMeta(icon, meta -> {
 					meta.displayName(Component.text(skin, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 				});
-				ItemStatUtils.addPlayerModified(new NBTItem(icon, true)).setString(ItemStatUtils.CUSTOM_SKIN_KEY, skin);
+				NBT.modify(icon, nbt -> {
+					ItemStatUtils.addPlayerModified(nbt).setString(ItemStatUtils.CUSTOM_SKIN_KEY, skin);
+				});
 				setItem(i + 1, new GuiItem(icon, false))
 					.onLeftClick(() -> {
-						ItemStatUtils.addPlayerModified(new NBTItem(mItemStack, true)).setString(ItemStatUtils.CUSTOM_SKIN_KEY, skin);
+						NBT.modify(mItemStack, nbt -> {
+							ItemStatUtils.addPlayerModified(nbt).setString(ItemStatUtils.CUSTOM_SKIN_KEY, skin);
+						});
 						mPlayer.updateInventory();
 					});
 			}

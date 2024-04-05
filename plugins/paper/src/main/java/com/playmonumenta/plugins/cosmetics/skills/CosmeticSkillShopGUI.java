@@ -31,7 +31,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
 
 public class CosmeticSkillShopGUI extends CustomInventory {
 	//Price constants
@@ -102,39 +101,23 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final int GALLERY_ENTRY_LOC = 23;
 
 	private final Plugin mPlugin;
-	private CSGUIPage mCurrentPage = CSGUIPage.Home;
+	private CSGUIPage mCurrentPage = CSGUIPage.HOME;
 	private int mPageNumber = 1;
 	private boolean mCosmeticSkillChanged = false;
 
 	private enum CSGUIPage {
-		Home(0),
-		Depth(1),
-		Delve(2),
-		Prestige(3),
-		Gallery(4),
-		Other(114);
-
-		private final int mNum;
-
-		CSGUIPage(int num) {
-			mNum = num;
-		}
-
-		public static @Nullable
-		CosmeticSkillShopGUI.CSGUIPage valueOfPage(int num) {
-			for (CosmeticSkillShopGUI.CSGUIPage page : CosmeticSkillShopGUI.CSGUIPage.values()) {
-				if (page.mNum == num) {
-					return page;
-				}
-			}
-			return null;
-		}
+		HOME,
+		DEPTHS,
+		DELVE,
+		PRESTIGE,
+		SANGUINE,
+		OTHER
 	}
 
 	public CosmeticSkillShopGUI(Plugin plugin, Player player) {
 		super(player, 9*LINE, Component.text("Cosmetic Skill Shop", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		mPlugin = plugin;
-		loadPage(CSGUIPage.Home, player);
+		loadPage(CSGUIPage.HOME, player);
 	}
 
 	@Override
@@ -161,8 +144,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 			// General: if not home page, back to shop home
 			if (slot == BACK_LOC) {
-				if (mCurrentPage != CSGUIPage.Home) {
-					loadPage(CSGUIPage.Home, player);
+				if (mCurrentPage != CSGUIPage.HOME) {
+					loadPage(CSGUIPage.HOME, player);
 					return;
 				} else {
 					close();
@@ -171,7 +154,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				}
 			}
 			switch (mCurrentPage) {
-				case Depth: {
+				case DEPTHS: {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -236,7 +219,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					}
 				}
 				break;
-				case Delve: {
+				case DELVE: {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -289,7 +272,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					}
 				}
 				break;
-				case Prestige: {
+				case PRESTIGE: {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -337,7 +320,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					}
 				}
 				break;
-				case Gallery: {
+				case SANGUINE: {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -399,19 +382,19 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					//Home page, choose skin set
 					if (slot == DEPTH_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Depth, player);
+						loadPage(CSGUIPage.DEPTHS, player);
 						return;
 					} else if (slot == DELVE_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Delve, player);
+						loadPage(CSGUIPage.DELVE, player);
 						return;
 					} else if (slot == PRESTIGE_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Prestige, player);
+						loadPage(CSGUIPage.PRESTIGE, player);
 						return;
 					} else if (slot == GALLERY_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Gallery, player);
+						loadPage(CSGUIPage.SANGUINE, player);
 						return;
 					}
 				}
@@ -446,16 +429,16 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		GUIUtils.fillWithFiller(mInventory, true);
 
 		switch (mCurrentPage) {
-			case Depth:
+			case DEPTHS:
 				loadDepthPage(player);
 				break;
-			case Delve:
+			case DELVE:
 				loadDelvePage(player);
 				break;
-			case Prestige:
+			case PRESTIGE:
 				loadPrestigePage(player);
 				break;
-			case Gallery:
+			case SANGUINE:
 				loadGalleryPage(player);
 				break;
 			default:

@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -499,7 +499,9 @@ public class PotionBarrelListener implements Listener {
 							ItemStack chest = new ItemStack(Material.CHEST);
 							String name = shulkerBox.getLock();
 							if (!name.isEmpty()) {
-								new NBTItem(chest, true).addCompound("display").setString("Name", name);
+								NBT.modify(chest, nbt -> {
+									nbt.getOrCreateCompound("display").setString("Name", name);
+								});
 								ItemUtils.setPlainName(chest);
 							}
 							InventoryUtils.giveItem(player, chest);

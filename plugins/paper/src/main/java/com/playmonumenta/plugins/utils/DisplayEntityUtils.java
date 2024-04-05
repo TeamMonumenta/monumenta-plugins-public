@@ -323,8 +323,9 @@ public class DisplayEntityUtils {
 		private final ArrayList<Integer> mDurations = new ArrayList<>();
 		private ArrayList<Display> mDisplays = new ArrayList<>();
 		private @Nullable Matrix4f mCancelFrame;
-		private @Nullable Integer mCancelDuration;
-		private @Nullable Integer mCancelDelay;
+		// Safe to set these to 0 - if they are ever used they will be specified
+		private int mCancelDuration = 0;
+		private int mCancelDelay = 0;
 		private boolean mRemoveDisplaysAfterwards = false;
 		private boolean mCancel = false;
 
