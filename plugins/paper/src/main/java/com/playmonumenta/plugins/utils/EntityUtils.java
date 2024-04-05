@@ -62,6 +62,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -1693,5 +1694,24 @@ public class EntityUtils {
 		lineOfSight.rotateAroundY(Math.toRadians(-entity.getLocation().getYaw()));
 		Vector mobToPlayer = entityInSight.getLocation().toVector().subtract(entity.getLocation().toVector());
 		return !(lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0));
+	}
+
+	// returns change in mob's health
+	public static double healMob(LivingEntity mob, double healAmount) {
+		if (healAmount <= 0 || mob.isDead()) {
+			return 0;
+		}
+
+		EntityRegainHealthEvent event = new EntityRegainHealthEvent(mob, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+		Bukkit.getPluginManager().callEvent(event);
+		if (!event.isCancelled()) {
+			double oldHealth = mob.getHealth();
+			double newHealth = Math.min(oldHealth + event.getAmount(), EntityUtils.getMaxHealth(mob));
+			mob.setHealth(newHealth);
+
+			return newHealth - oldHealth;
+		}
+
+		return 0;
 	}
 }

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,6 +12,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class SanguineHarvestCS implements CosmeticSkill {
@@ -54,5 +57,33 @@ public class SanguineHarvestCS implements CosmeticSkill {
 
 	public void atMarkedLocation(Player player, Location loc) {
 		new PartialParticle(Particle.REDSTONE, loc, 3, 0.25, 0, 0.25, 0.1, COLOR).spawnAsPlayerActive(player);
+	}
+
+	public void entityGainEffect(Entity entity) {
+		Location loc = LocationUtils.getEntityCenter(entity);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 30, 0.25, 0.5, 0.25, 0.02).spawnAsEnemyBuff();
+		new PartialParticle(Particle.REDSTONE, loc, 30, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsEnemyBuff();
+	}
+
+	public void entityTickEffect(Entity mob) {
+		Location loc = LocationUtils.getEntityCenter(mob);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02).spawnAsEnemyBuff();
+		new PartialParticle(Particle.CRIMSON_SPORE, loc, 4, 0.25, 0.5, 0.25, 0).spawnAsEnemyBuff();
+		new PartialParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsEnemyBuff();
+	}
+
+	public void onHurt(LivingEntity mob, Player player) {
+		Location loc = LocationUtils.getEntityCenter(mob);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 60, 0.45, 0.7, 0.45, 0.02).spawnAsEnemyBuff();
+		new PartialParticle(Particle.CRIMSON_SPORE, loc, 60, 0.45, 0.7, 0.45, 0).spawnAsEnemyBuff();
+		new PartialParticle(Particle.REDSTONE, loc, 60, 0.4, 0.4, 0.4, 0.1, COLOR).spawnAsEnemyBuff();
+
+		new PartialParticle(Particle.HEART, player.getLocation().add(0, 1, 0), 6, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, SoundCategory.PLAYERS, 1.0f, 0.8f);
+	}
+
+	public void onDeath(LivingEntity mob, Player player) {
+		new PartialParticle(Particle.HEART, player.getLocation().add(0, 1, 0), 3, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, SoundCategory.PLAYERS, 1.0f, 0.8f);
 	}
 }

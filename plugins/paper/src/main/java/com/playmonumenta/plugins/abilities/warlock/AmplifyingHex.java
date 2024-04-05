@@ -17,21 +17,16 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 public class AmplifyingHex extends Ability {
@@ -83,6 +78,7 @@ public class AmplifyingHex extends Ability {
 	private final float mAmplifierDamage;
 	private final int mAmplifierCap;
 	private final float mRadius;
+	private final double mConeAngle;
 	private final float mRegionCap;
 	private float mDamage = 0f;
 	private final double mEnhanceHealthThreshold;
@@ -95,6 +91,7 @@ public class AmplifyingHex extends Ability {
 		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
 		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY_CAP, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
 		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
+		mConeAngle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
 		mRegionCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(player) ? R2_CAP : R1_CAP;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS());
@@ -118,45 +115,7 @@ public class AmplifyingHex extends Ability {
 			return false;
 		}
 
-		double angle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
-
-		new BukkitRunnable() {
-			final Location mLoc = mPlayer.getLocation();
-			double mRadiusIncrement = 0.5;
-
-			@Override
-			public void run() {
-				if (mRadiusIncrement == 0.5) {
-					mLoc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
-				}
-				Vector vec;
-				mRadiusIncrement += 1.25;
-				double degree = 90 - angle;
-				// particles about every 10 degrees
-				int degreeSteps = ((int) (2 * angle)) / 10;
-				double degreeStep = 2 * angle / degreeSteps;
-				for (int step = 0; step < degreeSteps; step++, degree += degreeStep) {
-					double radian1 = Math.toRadians(degree + mCosmetic.amplifyingAngle(degree, mRadiusIncrement));
-					vec = new Vector(FastUtils.cos(radian1) * mRadiusIncrement,
-						0.15 + mCosmetic.amplifyingHeight(mRadiusIncrement, mRadius + 1),
-						FastUtils.sin(radian1) * mRadiusIncrement);
-					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
-					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
-
-					Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
-					mCosmetic.amplifyingParticle(mPlayer, l);
-				}
-
-				if (mRadiusIncrement >= mRadius) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-
-
-		final Location soundLoc = mPlayer.getLocation();
-		mCosmetic.amplifyingEffects(mPlayer, mPlayer.getWorld(), soundLoc);
+		mCosmetic.onCast(mPlayer, mRadius, mConeAngle);
 
 		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 		double percentBoost = 0;
@@ -178,7 +137,7 @@ public class AmplifyingHex extends Ability {
 			percentBoost *= mEnhanceDamageBonus;
 		}
 
-		Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mRadius, 0), 2 * mRadius, mRadius, Math.toRadians(angle));
+		Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mRadius, 0), 2 * mRadius, mRadius, Math.toRadians(mConeAngle));
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			int debuffCount = 0;
 			int amplifierCount = 0;
@@ -243,7 +202,14 @@ public class AmplifyingHex extends Ability {
 				amplifierCount += Math.min(mAmplifierCap, dotLevel - 1);
 			}
 
+			// Custom choleric flames antiheal interaction
+			if (mPlugin.mEffectManager.getActiveEffect(mob, CholericFlames.ANTIHEAL_EFFECT) != null) {
+				debuffCount++;
+			}
+
 			if (debuffCount > 0) {
+				mCosmetic.onHit(mPlayer, mob);
+
 				double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
 				finalDamage *= (1 + percentBoost);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);

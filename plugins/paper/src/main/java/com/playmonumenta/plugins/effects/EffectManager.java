@@ -378,6 +378,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(SiriusContagion.effectID, SiriusContagion::deserialize);
 		mEffectDeserializer.put(SiriusSetTargetEffect.effectID, SiriusSetTargetEffect::deserialize);
 		mEffectDeserializer.put(TemporalFlux.effectID, TemporalFlux::deserialize);
+		mEffectDeserializer.put(CholericFlamesAntiHeal.effectID, CholericFlamesAntiHeal::deserialize);
+		mEffectDeserializer.put(SoulRendLifeSteal.effectID, SoulRendLifeSteal::deserialize);
 	}
 
 	private static final int PERIOD = 5;

@@ -90,17 +90,11 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	}
 
 	@Override
-	public void rendHitParticle1(Player player, Location loc) {
+	public void rendHitParticle(Player player, Location loc) {
 		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.0, BLOODY_COLOR1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.BLOCK_CRACK, loc.clone().add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.0, BLOOD_BLOCK).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 4, 0.75, 0.5, 0.75, 0.0).spawnAsPlayerActive(player);
-
 		new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).count(16).data(BLOODY_COLOR1).spawnAsPlayerActive(player);
-	}
-
-	@Override
-	public void rendHitParticle2(Player player, Location loc, double radius) {
-		rendHitParticle1(player, loc);
 
 		PPCircle ring1 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).data(BLOODY_COLOR1);
 		PPCircle ring2 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.55, 0), 1.25).data(BLOODY_COLOR1);
@@ -113,14 +107,14 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 				if (mTicks++ >= RING_FRAMES) {
 					this.cancel();
 				}
-				double mRadius = FastUtils.sin(0.5 * 3.1416 * mTicks / RING_FRAMES) * radius;
+				double mRadius = FastUtils.sin(0.5 * 3.1416 * mTicks / RING_FRAMES) * 7;
 				ring1.radius(mRadius).count((int) Math.ceil(mRadius * 4)).spawnAsPlayerActive(player);
 				ring2.radius(mRadius * 0.8).count((int) Math.ceil(mRadius * 3.2)).spawnAsPlayerActive(player);
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
 		for (int i = 0; i < 13; i++) {
-			double r = Math.sqrt(FastUtils.RANDOM.nextDouble()) * radius * 0.8;
+			double r = Math.sqrt(FastUtils.RANDOM.nextDouble()) * 7 * 0.8;
 			double theta = FastUtils.RANDOM.nextDouble() * 3.1416 * 2;
 			double h = FastUtils.RANDOM.nextDouble() + 0.25;
 
@@ -139,7 +133,42 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 						(l, t) -> new PartialParticle(Particle.DAMAGE_INDICATOR, l, 4, 0.75, 0.5, 0.75, 0.6).spawnAsPlayerActive(player)
 					);
 				}
-			}.runTaskLater(Plugin.getInstance(), Math.round(r / radius * RING_FRAMES));
+			}.runTaskLater(Plugin.getInstance(), Math.round(r / 7 * RING_FRAMES));
+		}
+	}
+
+	@Override
+	public void rendMarkTick(Player player, LivingEntity enemy, int marks) {
+		for (int i = 1; i <= marks; i++) {
+			Location loc = getMarkLocation(player, enemy, i);
+			new PartialParticle(Particle.REDSTONE, loc, 3, 0.05, 0.1, 0.05, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0, -1, 0, 1).directionalMode(true).spawnAsPlayerActive(player);
+		}
+	}
+
+	@Override
+	public void rendLoseMark(Player player, LivingEntity enemy, int marks) {
+		World world = player.getWorld();
+		Location loc = player.getLocation();
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.5f, 0.55f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.5f, 0.6f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.35f, 0.65f);
+		world.playSound(loc, Sound.ENTITY_BAT_AMBIENT, SoundCategory.PLAYERS, 0.25f, 0.5f + FastUtils.RANDOM.nextFloat() * 0.25f);
+		world.playSound(loc, Sound.ENTITY_BAT_TAKEOFF, SoundCategory.PLAYERS, 0.35f, 0.5f + FastUtils.RANDOM.nextFloat() * 0.25f);
+
+		loc = getMarkLocation(player, enemy, marks);
+		new PartialParticle(Particle.REDSTONE, loc, 6, 0.07, 0.13, 0.07, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.DAMAGE_INDICATOR, loc.clone().add(0, -0.1, 0), 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.DAMAGE_INDICATOR, loc.clone().add(0, 0.1, 0).add(loc.getDirection().multiply(0.12)), 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.DAMAGE_INDICATOR, loc.clone().add(0, 0.1, 0).add(loc.getDirection().multiply(-0.12)), 1).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void rendMarkDied(Player player, LivingEntity enemy, int marks) {
+		for (int i = 1; i <= marks; i++) {
+			Location loc = getMarkLocation(player, enemy, i);
+			new PartialParticle(Particle.REDSTONE, loc, 6, 0.07, 0.13, 0.07, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
+			rendLoseMark(player, enemy, i);
 		}
 	}
 

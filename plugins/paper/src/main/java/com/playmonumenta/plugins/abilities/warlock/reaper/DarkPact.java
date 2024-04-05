@@ -66,7 +66,7 @@ public class DarkPact extends Ability {
 						ABSORPTION_ON_KILL, MAX_ABSORPTION, StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(EXTENDED_ANTIHEAL), StringUtils.ticksToSeconds(COOLDOWN)),
 				("Attacks with a scythe deal +%s%% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +%s/+%s HP, depending on the level of Soul Rend. " +
 					 "Nearby players are still healed as normal.")
-					.formatted(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_2), SoulRend.HEAL_1, SoulRend.HEAL_2))
+					.formatted(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_2), SoulRend.DARK_PACT_HEAL_1, SoulRend.DARK_PACT_HEAL_2))
 			.simpleDescription("Deal extra melee damage and gain absorption per kill at the cost of not being able to heal for a short period of time.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DarkPact::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),

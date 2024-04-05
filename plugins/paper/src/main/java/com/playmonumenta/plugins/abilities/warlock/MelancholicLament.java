@@ -14,10 +14,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,6 +36,9 @@ public class MelancholicLament extends Ability {
 	private static final int DURATION = 20 * 8;
 	private static final double WEAKEN_EFFECT_1 = 0.2;
 	private static final double WEAKEN_EFFECT_2 = 0.3;
+	private static final int SILENCE_WINDOW = 4 * 20;
+	private static final int SILENCE_RADIUS = 3;
+	private static final int SILENCE_DURATION = 3 * 20;
 	private static final int COOLDOWN = 20 * 16;
 	private static final int RADIUS = 8;
 	private static final int CLEANSE_REDUCTION = 20 * 10;
@@ -47,6 +52,8 @@ public class MelancholicLament extends Ability {
 	public static final String CHARM_RADIUS = "Melancholic Lament Radius";
 	public static final String CHARM_COOLDOWN = "Melancholic Lament Cooldown";
 	public static final String CHARM_WEAKNESS = "Melancholic Lament Weakness Amplifier";
+	public static final String CHARM_SILENCE_RADIUS = "Melancholic Lament Silence Radius";
+	public static final String CHARM_SILENCE_DURATION = "Melancholic Lament Silence Duration";
 	public static final String CHARM_RECOVERY = "Melancholic Lament Negative Effect Recovery";
 	public static final String CHARM_ENHANCE_DAMAGE = "Melancholic Lament Enhancement Damage Modifier";
 	public static final String CHARM_ENHANCE_DURATION = "Melancholic Lament Enhancement Duration";
@@ -61,8 +68,9 @@ public class MelancholicLament extends Ability {
 				("Press the swap key while sneaking and holding a scythe to recite a haunting song, " +
 					"causing all mobs within %s blocks to target the user and afflicting them with %s%% Weaken for %s seconds. Cooldown: %ss.")
 					.formatted(RADIUS, StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1), StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
-				"Increase the Weaken to %s%% and decrease the duration of all negative potion effects on players in the radius by %ss."
-					.formatted(StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2), StringUtils.ticksToSeconds(CLEANSE_REDUCTION)),
+				("Increase the Weaken to %s%% and decrease the duration of all negative potion effects on players in the radius by %ss. " +
+					"Your next melee scythe attack within the next %s seconds will silence all mobs in a %s block radius for %ss.")
+					.formatted(StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2), StringUtils.ticksToSeconds(CLEANSE_REDUCTION), StringUtils.ticksToSeconds(SILENCE_WINDOW), SILENCE_RADIUS, StringUtils.ticksToSeconds(SILENCE_DURATION)),
 				"For %ss after casting this ability, you and your allies in a %s block radius gain +%s%% melee damage for each mob in that same radius targeting you (capped at %s mobs)."
 					.formatted(StringUtils.ticksToSeconds(DURATION), ENHANCE_RADIUS, StringUtils.multiplierToPercentage(ENHANCE_DAMAGE), ENHANCE_MAX_MOBS))
 			.simpleDescription("Weaken nearby mobs and force them to target you.")
@@ -72,15 +80,21 @@ public class MelancholicLament extends Ability {
 			.displayItem(Material.GHAST_TEAR);
 
 	private final double mWeakenEffect;
+	private final double mSilenceRadius;
+	private final int mSilenceDuration;
 
-	private int mEnhancementBonusDamage;
+	private @Nullable BukkitRunnable mSilenceRunnable;
 
 	private final MelancholicLamentCS mCosmetic;
 
 	public MelancholicLament(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
+		mSilenceRadius = CharmManager.getRadius(player, CHARM_SILENCE_RADIUS, SILENCE_RADIUS);
+		mSilenceDuration = CharmManager.getDuration(player, CHARM_SILENCE_DURATION, SILENCE_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MelancholicLamentCS());
+
+		mSilenceRunnable = null;
 	}
 
 	public boolean cast() {
@@ -97,6 +111,29 @@ public class MelancholicLament extends Ability {
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
 			EntityUtils.applyTaunt(mob, mPlayer);
+			mPlugin.mEffectManager.addEffect(mob, "MelancholicLamentParticles", new Aesthetics(DURATION,
+				(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.debuffTick(mob),
+				(entity) -> { })
+			);
+		}
+
+		if (isLevelTwo()) {
+			if (mSilenceRunnable != null) {
+				mSilenceRunnable.cancel();
+			}
+			mSilenceRunnable = new BukkitRunnable() {
+				int mTicks = 0;
+				@Override
+				public void run() {
+					mCosmetic.silenceReadyTick(mPlayer);
+
+					mTicks += 5;
+					if (mTicks >= SILENCE_WINDOW) {
+						this.cancel();
+					}
+				}
+			};
+			mSilenceRunnable.runTaskTimer(mPlugin, 0, 5);
 		}
 
 		if (isEnhanced()) {
@@ -121,9 +158,7 @@ public class MelancholicLament extends Ability {
 					for (Player player : enhanceHitbox.getHitPlayers(true)) {
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, (ENHANCE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)) * numTargeting, AFFECTED_DAMAGE_TYPES));
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
-								(entity, fourHertz, twoHertz, oneHertz) -> {
-									mCosmetic.enhancementTick(player, mPlayer);
-								}, (entity) -> {
+								(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.enhancementTick(player, mPlayer), (entity) -> {
 							})
 						);
 					}
@@ -160,12 +195,18 @@ public class MelancholicLament extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageEvent.DamageType.AILMENT
-			&& mEnhancementBonusDamage > 0) {
-			event.setDamage(event.getDamage() + mEnhancementBonusDamage);
-			mEnhancementBonusDamage = 0;
-		}
+		if (event.getType() == DamageEvent.DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) && mSilenceRunnable != null) {
+			mSilenceRunnable.cancel();
+			mSilenceRunnable = null;
 
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), mSilenceRadius)) {
+				EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
+			}
+
+			mCosmetic.onSilenceHit(mPlayer, enemy, mSilenceRadius);
+		}
 		return false;
 	}
+
+
 }

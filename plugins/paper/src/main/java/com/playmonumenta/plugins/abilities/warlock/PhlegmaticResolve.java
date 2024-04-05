@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,36 +31,55 @@ public class PhlegmaticResolve extends Ability {
 
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "PhlegmaticPercentKnockbackResistEffect";
-	private static final double PERCENT_DAMAGE_RESIST_1 = -0.015;
-	private static final double PERCENT_DAMAGE_RESIST_2 = -0.025;
-	private static final double PERCENT_KNOCKBACK_RESIST = 0.05;
+	private static final double PERCENT_DAMAGE_RESIST_1 = -0.03;
+	private static final double PERCENT_DAMAGE_RESIST_2 = -0.05;
+	private static final double PERCENT_KNOCKBACK_RESIST = 0.1;
+	private static final int ABILITY_CAP = 3;
 	private static final int RADIUS = 7;
 	private static final double ALLY_MODIFIER = 0.33;
 	private static final double ENHANCEMENT_DAMAGE = 0.05;
 	private static final int ENHANCE_RADIUS = 3;
 
 	private final double mPercentDamageResist;
+	private final double mKBR;
+	private final int mAbilityCap;
+	private final double mAllyModifier;
+	private final double mRadius;
+	private final double mEnhanceRadius;
 	private final double[] mEnhancementDamageSpread = {0, 0, 0};
 	private double mLastMaxDamage = 0;
 	private double mLastPreMitigationDamage = 0;
 	private int mLastPlayedSoundTick = 0;
-	private final double mKBR;
 	private boolean mDamagedLastWindow = false;
 
 	public static final String CHARM_RESIST = "Phlegmatic Resolve Resistance";
 	public static final String CHARM_KBR = "Phlegmatic Resolve Knockback Resistance";
+	public static final String CHARM_ABILITY_CAP = "Phlegmatic Resolve Ability Cap";
 	public static final String CHARM_ALLY = "Phlegmatic Resolve Ally Modifier";
 	public static final String CHARM_RANGE = "Phlegmatic Resolve Radius";
+	public static final String CHARM_ENHANCE_DAMAGE = "Phlegmatic Resolve Enhancement Damage";
+	public static final String CHARM_ENHANCE_RADIUS = "Phlegmatic Resolve Enhancement Radius";
 
 	public static final AbilityInfo<PhlegmaticResolve> INFO =
 		new AbilityInfo<>(PhlegmaticResolve.class, "Phlegmatic Resolve", PhlegmaticResolve::new)
 			.scoreboardId("Phlegmatic")
 			.shorthandName("PR")
 			.descriptions(
-				"For each spell on cooldown, gain +1.5% Damage Reduction and +0.5 Knockback Resistance.",
-				"Increase to +2.5% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)",
-				"All non-ailment damage taken is instead converted into a short Damage-over-Time effect. " +
-					"A third of the damage stored is dealt every second for 3s. Each time this stored damage is dealt, deal 5% of the initial damage to all mobs in a 3 block radius.")
+				String.format("For each ability on cooldown, gain +%s%% Resistance and +%s Knockback Resistance, capped at %s abilities.",
+					StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RESIST_1),
+					StringUtils.formatDecimal(PERCENT_KNOCKBACK_RESIST * 10),
+					StringUtils.formatDecimal(ABILITY_CAP)
+				),
+				String.format("Increase to +%s%% Resistance per ability on cooldown, and players within %s blocks are given %s%% of your bonuses. (Does not stack with multiple Warlocks.)",
+					StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RESIST_2),
+					StringUtils.formatDecimal(RADIUS),
+					StringUtils.multiplierToPercentage(ALLY_MODIFIER)
+				),
+				String.format("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. " +
+						"A third of the damage stored is dealt every second for 3s. Each time this stored damage is dealt, deal %s%% of the initial damage to all mobs in a %s block radius.",
+					StringUtils.multiplierToPercentage(ENHANCEMENT_DAMAGE),
+					StringUtils.formatDecimal(ENHANCE_RADIUS)
+				))
 			.simpleDescription("Gain resistance and knockback resistance for each ability on cooldown.")
 			.displayItem(Material.SHIELD);
 
@@ -67,6 +87,10 @@ public class PhlegmaticResolve extends Ability {
 		super(plugin, player, INFO);
 		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
 		mKBR = CharmManager.getLevel(player, CHARM_KBR) / 10 + PERCENT_KNOCKBACK_RESIST;
+		mAbilityCap = ABILITY_CAP + (int) CharmManager.getLevel(player, CHARM_ABILITY_CAP);
+		mAllyModifier = ALLY_MODIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY);
+		mRadius = CharmManager.getRadius(player, CHARM_RANGE, RADIUS);
+		mEnhanceRadius = CharmManager.getRadius(player, CHARM_ENHANCE_RADIUS, ENHANCE_RADIUS);
 	}
 
 	@Override
@@ -102,9 +126,10 @@ public class PhlegmaticResolve extends Ability {
 					}
 
 					// AoE Effect
-					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
+					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE);
+					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mEnhanceRadius);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
-						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE, mInfo.getLinkedSpell(), true);
+						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, damage, mInfo.getLinkedSpell(), true);
 						new PartialParticle(Particle.WAX_OFF, mob.getLocation(), 6, 0.5f, 0.5f, 0.5f).spawnAsPlayerActive(mPlayer);
 					}
 
@@ -134,14 +159,15 @@ public class PhlegmaticResolve extends Ability {
 		if (cooldowns == 0) {
 			return;
 		}
+		cooldowns = Math.min(cooldowns, mAbilityCap);
 
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns).displaysTime(false));
 		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
 
 		if (isLevelTwo()) {
-			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS), false)) {
-				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER)).displaysTime(false));
-				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER), KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
+			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
+				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * mAllyModifier).displaysTime(false));
+				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * mAllyModifier, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
 			}
 		}
 	}

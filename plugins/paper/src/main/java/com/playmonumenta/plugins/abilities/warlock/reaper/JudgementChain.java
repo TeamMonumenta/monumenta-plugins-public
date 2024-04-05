@@ -6,9 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.JudgementChainCS;
+import com.playmonumenta.plugins.effects.CholericFlamesAntiHeal;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
@@ -330,7 +332,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 		effects.add(effect(isWeak || isBleed,
 				mob -> {
 					if (isWeak) {
-						EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
+						EntityUtils.applyWeaken(mPlugin, duration, mAmplifier, mob);
 					}
 					// We've already applied bleed
 				},
@@ -360,8 +362,8 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 				mPlugin.mEffectManager.addEffect(player, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlayer, mPlugin));
 			}));
 
-		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.HUNGER),
-				mob -> PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true)),
+		effects.add(effect(mPlugin.mEffectManager.hasEffect(mTarget, CholericFlames.ANTIHEAL_EFFECT),
+				mob -> mPlugin.mEffectManager.addEffect(mob, CholericFlames.ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(duration)),
 				player -> mPlugin.mEffectManager.addEffect(player, HEAL_RATE_NAME, new PercentHeal(duration, mAmplifier))));
 
 		effects.forEach(effect -> effect.accept(hostiles, players));

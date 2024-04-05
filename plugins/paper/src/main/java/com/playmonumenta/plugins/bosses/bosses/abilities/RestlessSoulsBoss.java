@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CholericFlamesAntiHeal;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -19,7 +20,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -32,8 +32,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public class RestlessSoulsBoss extends BossAbilityGroup {
@@ -111,7 +109,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 							if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {
 								EntityUtils.applyFire(plugin, duration, e, p, playerItemStats);
 								if (ability.isLevelTwo()) {
-									PotionUtils.applyPotion(p, e, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
+									plugin.mEffectManager.addEffect(e, CholericFlames.ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(duration));
 								}
 							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.GRASPING_CLAWS) {
 								EntityUtils.applySlow(plugin, duration, 0.1, e);

@@ -77,8 +77,8 @@ public class RestlessSouls extends Ability {
 				"Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. " +
 					"Maximum vex count increased to " + VEX_CAP_2 + ". " +
 					"Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION / 20 + " seconds. " +
-					"Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > Hunger. " +
-					"Melancholic Lament > 10% Weaken. Withering Gaze > Wither. Haunting Shades > 10% Vulnerability.")
+					"Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > -100% Healing. " +
+					"Melancholic Lament > 10% Weaken. Withering Gaze > Decay 1. Haunting Shades > 10% Vulnerability.")
 			.simpleDescription("Mobs that die near you spawn a vex that targets enemies, dealing damage and silencing them.")
 			.displayItem(Material.VEX_SPAWN_EGG);
 

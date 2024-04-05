@@ -94,17 +94,14 @@ public class RejuvenationBoss extends BossAbilityGroup {
 				p.PARTICLE_OUTBURST_CIRCLE.spawn(boss, loc);
 			},
 			(LivingEntity target) -> {
-				p.PARTICLE_HEAL.spawn(boss, target.getEyeLocation());
-				double hp = target.getHealth() + p.HEAL;
-				double max = EntityUtils.getMaxHealth(target);
-				if (hp >= max) {
-					target.setHealth(max);
-					if (p.OVERHEAL) {
-						int missing = (int) (hp - max);
-						AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
-					}
-				} else {
-					target.setHealth(hp);
+				double healed = EntityUtils.healMob(target, p.HEAL);
+				if (p.OVERHEAL && healed < p.HEAL) {
+					double missing = p.HEAL - healed;
+					AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
+				}
+
+				if (healed > 0) {
+					p.PARTICLE_HEAL.spawn(boss, target.getEyeLocation());
 				}
 			}
 		);
