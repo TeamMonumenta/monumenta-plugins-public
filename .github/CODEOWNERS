@@ -11,3 +11,11 @@ paper/src/main/java/com/playmonumenta/plugins/classes/Shaman.java @dmdinnc
 paper/src/main/java/com/playmonumenta/plugins/classes/MonumentaClasses.java @dmdinnc
 paper/src/main/java/com/playmonumenta/plugins/commands/PlayerCommand.java @dmdinnc
 paper/src/main/java/com/playmonumenta/plugins/custominventories/* @dmdinnc
+
+paper/src/main/java/com/playmonumenta/plugins/abilities/AbilityHotbar.java @PikaTheLeg
+paper/src/main/java/com/playmonumenta/plugins/bosses/bosses/bluestrike/* @PikaTheLeg
+paper/src/main/java/com/playmonumenta/plugins/bosses/spells/bluestrike/* @PikaTheLeg
+paper/src/main/java/com/playmonumenta/plugins/depths/bosses/Vesperidys.java @PikaTheLeg
+paper/src/main/java/com/playmonumenta/plugins/depths/bosses/vesperidys/* @PikaTheLeg
+paper/src/main/java/com/playmonumenta/plugins/depths/spells/vesperidys/* @PikaTheLeg
+
