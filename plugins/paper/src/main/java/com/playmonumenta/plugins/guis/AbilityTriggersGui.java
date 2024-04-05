@@ -257,8 +257,10 @@ public class AbilityTriggersGui extends Gui {
 			for (int col = colStart; col <= colEnd; col++) {
 				AbilityTrigger.KeyOptions keyOption = AbilityTrigger.KeyOptions.values()[mKeyOptionsStartIndex + col - colStart];
 				boolean enabled = mNewTrigger.getKeyOptions().contains(keyOption);
-				makeOptionIcons(3, col, GUIUtils.createBasicItem(keyOption.getMaterial(), capitalize(keyOption.getDisplay(enabled)), enabled ? NamedTextColor.RED : NamedTextColor.GRAY, false,
-						"Click to toggle", NamedTextColor.GRAY, 40), enabled ? Material.RED_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
+				tempItem = GUIUtils.createBasicItem(keyOption.getMaterial(), capitalize(keyOption.getDisplay(enabled)), enabled ? NamedTextColor.RED : NamedTextColor.GRAY, false,
+					"Click to toggle", NamedTextColor.GRAY, 40);
+				GUIUtils.setGuiNbtTag(tempItem, "Gui", "trigger_detail_" + keyOption.getGuiTag(enabled));
+				makeOptionIcons(3, col, tempItem, enabled ? Material.RED_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 					EnumSet<AbilityTrigger.KeyOptions> keyOptions = mNewTrigger.getKeyOptions();
 					if (!keyOptions.remove(keyOption)) {
 						keyOptions.add(keyOption);
@@ -338,6 +340,7 @@ public class AbilityTriggersGui extends Gui {
 		setItem(row, column, display).onLeftClick(onClick);
 		ItemStack indicator = display.clone();
 		indicator.setType(indicatorMaterial);
+		GUIUtils.setGuiNbtTag(indicator, "Gui", "trigger_detail_empty");
 		setItem(row + 1, column, indicator).onLeftClick(onClick);
 	}
 

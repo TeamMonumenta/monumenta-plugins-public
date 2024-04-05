@@ -63,35 +63,37 @@ public class AbilityTrigger {
 
 	public enum KeyOptions {
 		NO_POTION("not holding a potion", "may be holding a potion", Material.POTION,
-			player -> !ItemUtils.isSomePotion(player.getInventory().getItemInMainHand())),
+			player -> !ItemUtils.isSomePotion(player.getInventory().getItemInMainHand()), "hold_potion"),
 		NO_FOOD("not holding food", "may be holding food", Material.COOKED_BEEF,
-			player -> !player.getInventory().getItemInMainHand().getType().isEdible()),
+			player -> !player.getInventory().getItemInMainHand().getType().isEdible(), "hold_food"),
 		NO_PROJECTILE_WEAPON("not holding a projectile weapon", "may be holding a projectile weapon", Material.CROSSBOW,
-			player -> !ItemUtils.isShootableItem(player.getInventory().getItemInMainHand())),
+			player -> !ItemUtils.isShootableItem(player.getInventory().getItemInMainHand()), "hold_proj"),
 		NO_SHIELD("not holding a shield", "may be holding a shield", Material.SHIELD,
-			player -> player.getInventory().getItemInMainHand().getType() != Material.SHIELD),
+			player -> player.getInventory().getItemInMainHand().getType() != Material.SHIELD, "hold_shield"),
 		NO_BLOCKS("not holding blocks", "may be holding blocks", Material.COBBLESTONE,
 			player -> {
 				ItemStack mainhand = player.getInventory().getItemInMainHand();
 				return !mainhand.getType().isBlock() || ItemUtils.isWand(mainhand);
-			}),
+			},
+			"hold_block"),
 		NO_MISC("not holding a compass, a multitool, or a riptide trident while swimming", "may be holding a compass, a multitool, or a riptide trident while swimming", Material.COMPASS,
 			player -> {
 				ItemStack mainhand = player.getInventory().getItemInMainHand();
 				return !(mainhand.getType() == Material.COMPASS
 					|| ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.MULTITOOL)
 					|| PlayerUtils.canRiptide(player, mainhand));
-			}),
+			},
+			"hold_util"),
 		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe", Material.IRON_PICKAXE,
-			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
+			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand()), "hold_pickaxe"),
 		NO_SHOVEL("not holding a shovel", "may be holding a shovel", Material.IRON_SHOVEL,
-			player -> !ItemUtils.isShovel(player.getInventory().getItemInMainHand())),
+			player -> !ItemUtils.isShovel(player.getInventory().getItemInMainHand()), "hold_shovel"),
 		NO_AXE("not holding an axe", "may be holding an axe", Material.IRON_AXE,
-			player -> !ItemUtils.isAxe(player.getInventory().getItemInMainHand())),
+			player -> !ItemUtils.isAxe(player.getInventory().getItemInMainHand()), "hold_axe"),
 		REQUIRE_PROJECTILE_WEAPON("holding a projectile weapon", "may be not holding a projectile weapon", Material.CROSSBOW,
-			player -> ItemUtils.isShootableItem(player.getInventory().getItemInMainHand())),
+			player -> ItemUtils.isShootableItem(player.getInventory().getItemInMainHand()), "hold_proj_force"),
 		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield", Material.SHIELD,
-			player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)),
+			player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD), "sneak_shield"),
 		;
 
 		public static final KeyOptions[] NO_USABLE_ITEMS = {
@@ -115,6 +117,8 @@ public class AbilityTrigger {
 		private final String mDisabledDisplay;
 		private final Material mMaterial;
 		private final Predicate<Player> mPredicate;
+		// tag used for rp support
+		private final String mGuiTag;
 
 		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate) {
 			mEnabledDisplay = enabledDisplay;
@@ -123,12 +127,24 @@ public class AbilityTrigger {
 			mPredicate = predicate;
 		}
 
+		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate, String guiTag) {
+			mEnabledDisplay = enabledDisplay;
+			mDisabledDisplay = disabledDisplay;
+			mMaterial = material;
+			mPredicate = predicate;
+			mGuiTag = guiTag;
+		}
+
 		public String getDisplay(boolean enabled) {
 			return enabled ? mEnabledDisplay : mDisabledDisplay;
 		}
 
 		public Material getMaterial() {
 			return mMaterial;
+		}
+
+		public String getGuiTag(boolean enabled) {
+			return mGuiTag + (enabled ? "_true" : "_false");
 		}
 
 		@Override
