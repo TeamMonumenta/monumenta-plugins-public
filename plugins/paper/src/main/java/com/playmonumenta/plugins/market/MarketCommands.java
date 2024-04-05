@@ -102,6 +102,18 @@ public class MarketCommands {
 			.register();
 
 		arguments = new ArrayList<>();
+		arguments.add(new LiteralArgument("resyncOwnership"));
+		arguments.add(new PlayerArgument("player"));
+		new CommandAPICommand("market")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				Player targetPlayer = (Player)args[0];
+				MarketManager.getInstance().resyncOwnership(targetPlayer);
+			})
+			.register();
+
+		arguments = new ArrayList<>();
 		arguments.add(new LiteralArgument("getlisting"));
 		arguments.add(new LongArgument("listingID"));
 		new CommandAPICommand("market")

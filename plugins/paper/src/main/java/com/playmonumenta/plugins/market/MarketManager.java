@@ -315,34 +315,31 @@ public class MarketManager {
 	}
 
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		// delay the data fetch by 20 ticks, as variables are not updated until onJoin event is called
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(event.getPlayer());
-			if (marketPlayerData == null) {
-				Plugin.getInstance().getLogger().warning("ERROR FAILED TO LOAD MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
-				AuditListener.logMarket("ERROR FAILED TO LOAD MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
-				return;
-			}
-			UUID uuid = event.getPlayer().getUniqueId();
-			JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
-			if (data != null) {
-				// load the owned player listings
-				for (JsonElement elem : data.getAsJsonArray("playerListings")) {
-					marketPlayerData.addListingIDToPlayer(elem.getAsString());
-				}
-			}
-		}, 20L);
 
 		// initialise what we can
 		if (mMarketPlayerDataInstances == null) {
 			mMarketPlayerDataInstances = new HashMap<>();
 		}
-		MarketPlayerData marketPlayerData = new MarketPlayerData();
-		mMarketPlayerDataInstances.put(event.getPlayer(), marketPlayerData);
+
+		// delay the data fetch by 20 ticks, as variables are not updated until onJoin event is called
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.getOrDefault(event.getPlayer(), new MarketPlayerData());
+			UUID uuid = event.getPlayer().getUniqueId();
+			JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
+			if (data != null) {
+				// load the owned player listings
+				JsonArray dataArray = data.getAsJsonArray("playerListings");
+				MMLog.info("MARKET DEBUG: Player " + event.getPlayer().getName() + " Joined shard with owned listings: " + new Gson().toJson(dataArray));
+				for (JsonElement elem : dataArray) {
+					marketPlayerData.addListingIDToPlayer(elem.getAsString());
+				}
+			}
+			mMarketPlayerDataInstances.put(event.getPlayer(), marketPlayerData);
+		}, 20L);
 	}
 
 	public void playerSaveEvent(PlayerSaveEvent event) {
-		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(event.getPlayer());
+		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.getOrDefault(event.getPlayer(), new MarketPlayerData());
 		if (marketPlayerData == null) {
 			Plugin.getInstance().getLogger().warning("ERROR FAILED TO SAVE MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
 			AuditListener.logMarket("ERROR FAILED TO SAVE MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
@@ -355,13 +352,17 @@ public class MarketManager {
 				array.add(String.valueOf(id));
 			}
 		}
+		MMLog.info("MARKET DEBUG: Player " + event.getPlayer().getName() + " saved with owned listings: " + new Gson().toJson(array));
 		data.add("playerListings", array);
 		event.setPluginData(KEY_PLUGIN_DATA, data);
 	}
 
 	public void onLogout(Player player) {
-		// delay the data removal by 30 ticks, as we need it for the playersave event, launched after logout event
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mMarketPlayerDataInstances.remove(player), 30L);
+		// delay the data removal by 20 ticks, as we need it for the playersave event, launched after logout event
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			MMLog.info("MARKET DEBUG: Player " + player + " logged out. local listing data wiped");
+			mMarketPlayerDataInstances.remove(player);
+		}, 20L);
 	}
 
 	// Verifies that the player has the item that he wants to sell. take it from them.
@@ -562,6 +563,41 @@ public class MarketManager {
 
 		}
 		return true;
+
+	}
+
+	public void resyncOwnership(Player player) {
+		// go through all listings, and check if the creator is the player
+		// if so, it is expected that the owner is the player, thus, relink ownership
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			// reset current ownership
+			mMarketPlayerDataInstances.put(player, new MarketPlayerData());
+
+			// get all listings
+			List<Long> ids = MarketRedisManager.getAllListingsIds(true);
+
+			List<Long> batch = new ArrayList<>();
+			for (Long id : ids) {
+				batch.add(id);
+				if (batch.size() >= 100) {
+					resyncListingOwnership(player, batch);
+					batch = new ArrayList<>();
+				}
+			}
+			resyncListingOwnership(player, batch);
+		});
+
+	}
+
+	private void resyncListingOwnership(Player player, List<Long> batch) {
+		List<MarketListing> listings = MarketRedisManager.getListings(batch.toArray(new Long[0]));
+
+		for (MarketListing listing : listings) {
+			if (player.getUniqueId().toString().equals(listing.getOwnerUUID())) {
+				MarketAudit.logManualLinking(player, listing.getId());
+				MarketManager.getInstance().linkListingToPlayerData(player, listing.getId());
+			}
+		}
 
 	}
 }
