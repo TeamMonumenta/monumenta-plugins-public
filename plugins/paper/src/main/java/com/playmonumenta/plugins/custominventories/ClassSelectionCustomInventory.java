@@ -762,7 +762,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			int currentEnhanceCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
 			ItemStack summaryItem = GUIUtils.createBasicItem(currentEnhanceCount == 0 ? Material.BARRIER : Material.ENCHANTING_TABLE, "Enhancement Points", NamedTextColor.WHITE, false,
 				"You have " + currentEnhanceCount + " enhancement point" + (currentEnhanceCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
-			GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_en" + currentEnhanceCount == 0 ? "_none" : "");
+			GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_en" + (currentEnhanceCount == 0 ? "_none" : ""));
 			summaryItem.setAmount(currentEnhanceCount > 0 ? currentEnhanceCount : 1);
 			mInventory.setItem(COMMON_REMAINING_ENHANCEMENTS_LOC, summaryItem);
 		}
@@ -770,14 +770,14 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			int currentSpecCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC);
 			ItemStack summaryItem = GUIUtils.createBasicItem(currentSpecCount == 0 ? Material.BARRIER : Material.SAND, "Specialization Points", NamedTextColor.WHITE, false,
 				"You have " + currentSpecCount + " specialization point" + (currentSpecCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
-			GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_spec" + currentSpecCount == 0 ? "_none" : "");
+			GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_spec" + (currentSpecCount == 0 ? "_none" : ""));
 			summaryItem.setAmount(currentSpecCount > 0 ? currentSpecCount : 1);
 			mInventory.setItem(COMMON_REMAINING_SPEC_LOC, summaryItem);
 		}
 		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
 		ItemStack summaryItem = GUIUtils.createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.ROOTED_DIRT, "Skill Points", NamedTextColor.WHITE, false,
 			"You have " + currentSkillCount + " skill point" + (currentSkillCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
-		GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_sp" + currentSkillCount == 0 ? "_none" : "");
+		GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_sp" + (currentSkillCount == 0 ? "_none" : ""));
 		summaryItem.setAmount(currentSkillCount > 0 ? currentSkillCount : 1);
 		mInventory.setItem(COMMON_REMAINING_SKILL_LOC, summaryItem);
 	}

@@ -218,6 +218,7 @@ public class AbilityTriggersGui extends Gui {
 				case "Looking level or up" -> "up_mid";
 				case "Looking down or up" -> "up_down";
 				case "Looking down or level" -> "mid_down";
+				default -> "unsupported";
 			});
 			tempItem = GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.GRAY, false,
 				"Click to cycle through look directions", NamedTextColor.GRAY, 40);
@@ -392,7 +393,8 @@ public class AbilityTriggersGui extends Gui {
 			case "sneaking" -> "sneak";
 			case "sprinting" -> "sprint";
 			case "on ground" -> "ground";
-		}
+			default -> "unsupported";
+		};
 		guiTag = "trigger_detail_" + guiTag + (value == AbilityTrigger.BinaryOption.TRUE ?  "_true"
 			: value == AbilityTrigger.BinaryOption.FALSE ? "_false"
 			: "_both");

@@ -125,6 +125,7 @@ public class AbilityTrigger {
 			mDisabledDisplay = disabledDisplay;
 			mMaterial = material;
 			mPredicate = predicate;
+			mGuiTag = "unassigned";
 		}
 
 		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate, String guiTag) {
