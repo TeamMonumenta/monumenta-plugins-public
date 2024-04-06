@@ -110,6 +110,9 @@ public class AbilityTriggersGui extends Gui {
 				}
 			}
 
+			// gui identifier - filler with tag for rp gui support (bottom left corner)
+			setItem(8, GUIUtils.createGuiIdentifierItem("gui_class_4"));
+
 			// "revert all" button - top right to hopefully prevent accidental presses
 			int numberOfCustomTriggers = mPlugin.mAbilityManager.getNumberOfCustomTriggers(mPlayer);
 			if (numberOfCustomTriggers > 0) {
@@ -299,6 +302,9 @@ public class AbilityTriggersGui extends Gui {
 					update();
 				});
 			}
+
+			// gui identifier - filler with tag for rp gui support (bottom left)
+			setItem(8, GUIUtils.createGuiIdentifierItem("gui_class_5"));
 
 			// accept/cancel buttons
 			if (!mNewTrigger.equals(mSelectedTrigger.getTrigger())) {
