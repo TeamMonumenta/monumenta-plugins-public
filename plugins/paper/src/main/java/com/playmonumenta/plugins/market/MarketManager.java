@@ -321,21 +321,19 @@ public class MarketManager {
 			mMarketPlayerDataInstances = new HashMap<>();
 		}
 
-		// delay the data fetch by 20 ticks, as variables are not updated until onJoin event is called
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.getOrDefault(event.getPlayer(), new MarketPlayerData());
-			UUID uuid = event.getPlayer().getUniqueId();
-			JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
-			if (data != null) {
-				// load the owned player listings
-				JsonArray dataArray = data.getAsJsonArray("playerListings");
-				MMLog.info("MARKET DEBUG: Player " + event.getPlayer().getName() + " Joined shard with owned listings: " + new Gson().toJson(dataArray));
-				for (JsonElement elem : dataArray) {
-					marketPlayerData.addListingIDToPlayer(elem.getAsString());
-				}
+		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.getOrDefault(event.getPlayer(), new MarketPlayerData());
+		UUID uuid = event.getPlayer().getUniqueId();
+		JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
+		if (data != null) {
+			// load the owned player listings
+			JsonArray dataArray = data.getAsJsonArray("playerListings");
+			MMLog.info("MARKET DEBUG: Player " + event.getPlayer().getName() + " Joined shard with owned listings: " + new Gson().toJson(dataArray));
+			for (JsonElement elem : dataArray) {
+				marketPlayerData.addListingIDToPlayer(elem.getAsString());
 			}
-			mMarketPlayerDataInstances.put(event.getPlayer(), marketPlayerData);
-		}, 20L);
+		}
+
+		mMarketPlayerDataInstances.put(event.getPlayer(), marketPlayerData);
 	}
 
 	public void playerSaveEvent(PlayerSaveEvent event) {
