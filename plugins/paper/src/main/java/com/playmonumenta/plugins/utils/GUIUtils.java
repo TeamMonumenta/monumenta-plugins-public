@@ -318,7 +318,7 @@ public class GUIUtils {
 	 */
 	public static ItemStack createGuiIdentifierItem(String tag) {
 		ItemStack idItem = createFiller();
-		setGuiNbtTag(idItem, "Gui", tag);
+		setGuiNbtTag(idItem, "texture", tag);
 		return idItem;
 	}
 
