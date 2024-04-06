@@ -111,7 +111,12 @@ public class AbilityTriggersGui extends Gui {
 			}
 
 			// gui identifier - filler with tag for rp gui support (bottom left corner)
-			setItem(8, GUIUtils.createGuiIdentifierItem("gui_class_4"));
+			if (mPreviousGUI) {
+				setItem(8, GUIUtils.createGuiIdentifierItem("gui_class_4"));
+			} else {
+				setItem(8, GUIUtils.createGuiIdentifierItem("gui_depth_4"));
+			}
+
 
 			// "revert all" button - top right to hopefully prevent accidental presses
 			int numberOfCustomTriggers = mPlugin.mAbilityManager.getNumberOfCustomTriggers(mPlayer);
