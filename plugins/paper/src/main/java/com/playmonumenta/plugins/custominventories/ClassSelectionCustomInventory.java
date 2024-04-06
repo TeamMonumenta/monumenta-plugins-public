@@ -775,7 +775,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			mInventory.setItem(COMMON_REMAINING_SPEC_LOC, summaryItem);
 		}
 		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
-		ItemStack summaryItem = GUIUtils.createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.GRASS_BLOCK, "Skill Points", NamedTextColor.WHITE, false,
+		ItemStack summaryItem = GUIUtils.createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.ROOTED_DIRT, "Skill Points", NamedTextColor.WHITE, false,
 			"You have " + currentSkillCount + " skill point" + (currentSkillCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
 		GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_sp" + currentSkillCount == 0 ? "_none" : "");
 		summaryItem.setAmount(currentSkillCount > 0 ? currentSkillCount : 1);
