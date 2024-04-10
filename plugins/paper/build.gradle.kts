@@ -29,7 +29,6 @@ dependencies {
 	implementation("org.openjdk.jmh:jmh-core:1.19")
 	implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
 	implementation("com.opencsv:opencsv:5.5") // generateitems
-	implementation("dev.jaqobb:namemcapi:2.0.7")
 	implementation("net.kyori:adventure-text-serializer-bungeecord:4.3.2")
 
 	// Note this version should match what's in the Paper jar
@@ -135,8 +134,6 @@ tasks.withType<JavaCompile>().configureEach {
 tasks {
 	shadowJar {
 		relocate("com.opencsv", "com.playmonumenta.plugins.internal.com.opencsv") // /generateitems
-		relocate("dev.jaqobb", "com.playmonumenta.plugins.internal.dev.jaqobb") // NameMC API
-		relocate("org.json", "com.playmonumenta.plugins.internal.org.json") // NameMC API dependency
 		relocate("org.openjdk.jmh", "com.playmonumenta.plugins.internal.org.openjdk.jmh") // Benchmarking Sin/Cos
 		relocate("joptsimple", "com.playmonumenta.plugins.internal.joptsimple") // Dependency of jmh
 		relocate(
