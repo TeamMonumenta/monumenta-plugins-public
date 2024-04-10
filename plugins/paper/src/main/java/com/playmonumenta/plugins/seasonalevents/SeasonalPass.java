@@ -202,6 +202,20 @@ public class SeasonalPass {
 	}
 
 	/**
+	 * Returns true if the pass started, even if it has since ended
+	 */
+	public boolean hasStarted() {
+		return 1 <= getWeekOfPass();
+	}
+
+	/**
+	 * Returns true if the pass ended
+	 */
+	public boolean hasEnded() {
+		return getWeekOfPass() > mNumberOfWeeks;
+	}
+
+	/**
 	 * Returns all missions for the current week number of the pass
 	 */
 	public List<WeeklyMission> getActiveMissions() {
