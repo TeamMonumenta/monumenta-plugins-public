@@ -57,8 +57,8 @@ public class LuminousInfusion extends Ability {
 			.shorthandName("LI")
 			.descriptions(
 				"While sneaking, pressing the swap key charges your hands with holy light. " +
-					"The next time you damage an undead enemy, your attack is infused with explosive power, " +
-					"dealing 25 magic damage to it and all undead enemies in a 4 block radius around it, or 12 against non-undead, " +
+					"The next attack or ability you perform against an undead enemy is infused with explosive power, " +
+					"dealing 25 magic damage to it and all other undead enemies in a 4 block radius around it, or 12 against non-undead, " +
 					"and knocking other enemies away from it. Cooldown: 12s.",
 				"Your melee attacks now passively deal 15% magic damage to undead enemies, " +
 					"and Divine Justice now passively deals 15% more total damage. " +
@@ -135,7 +135,7 @@ public class LuminousInfusion extends Ability {
 			execute(enemy);
 		}
 
-		if ((mDoMultiplierAndFire && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE_ENCH || (event.getType() == DamageType.MAGIC && event.getAbility() != mInfo.getLinkedSpell())) && enemyTriggersAbilities) || event.getType() == DamageType.OTHER) {
+		if (mDoMultiplierAndFire && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE_ENCH || (event.getType() == DamageType.MAGIC && event.getAbility() != mInfo.getLinkedSpell())) && enemyTriggersAbilities) {
 			if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH) {
 				EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, enemy, mPlayer);
 			} else {
