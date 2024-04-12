@@ -1689,4 +1689,12 @@ public class ItemUtils {
 		meta.setMapView(Bukkit.getMap(id));
 	}
 
+	public static List<Component> getNonNullLoreCopy(ItemStack item) {
+		List<Component> lore = item.lore();
+		if (lore == null) {
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(lore);
+	}
+
 }

@@ -12,13 +12,12 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MasterworkUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -289,10 +288,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	}
 
 	private List<Component> getEditedLoreDiff(ItemStack currentItem, ItemStack previousItem) {
-		DecimalFormat decimalFormat = new DecimalFormat("0.#");
-		List<Component> currentLore = new ArrayList<>(currentItem.lore());
-		List<Component> currentLoreDiff = new ArrayList<>(currentItem.lore());
-		currentLoreDiff.removeAll(previousItem.lore());
+		List<Component> currentLore = ItemUtils.getNonNullLoreCopy(currentItem);
+		List<Component> currentLoreDiff = ItemUtils.getNonNullLoreCopy(currentItem);
+		currentLoreDiff.removeAll(ItemUtils.getNonNullLoreCopy(previousItem));
 		TextColor color = TextColor.color(255, 215, 0);
 
 		//Go through each diffed string. Should only be Enchants, Attributes, Tier and masterwork stars (which will get ignored).
@@ -301,18 +299,15 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			EnchantmentType enchantmentType = EnchantmentType.getEnchantmentType(contentString);
 			if (enchantmentType != null) {
 				//Enchantment is one level
-				if (ItemStatUtils.hasEnchantment(previousItem, enchantmentType)) {
-					//Previous had it
-					continue;
-				} else {
+				if (!ItemStatUtils.hasEnchantment(previousItem, enchantmentType)) {
 					//Not one level -> one level == 1
 					Component appended = Component.text(" (+");
 					appended = appended.append(Component.text("I)"));
 					appended = appended.color(color);
 					appended = component.append(appended);
 					currentLore.set(currentLore.indexOf(component), appended);
-					continue;
 				}
+				continue;
 			} else {
 				//Enchantment is not one level
 				int k = contentString.lastIndexOf(" ");
@@ -348,35 +343,36 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			Operation operation;
 
 			//Edge cases. This system was not built with this stuff in mind. Attribute names != what is actually on the item
+			AttributeType attributeType = AttributeType.getAttributeType(attributeString);
 			if (contentString.contains("%")) {
 				operation = Operation.MULTIPLY;
-				if ((AttributeType.getAttributeType(attributeString) == null)) {
-					attributeString = attributeString.concat("Multiply");
+				if (attributeType == null) {
+					attributeType = AttributeType.getAttributeType(attributeString.concat("Multiply"));
 				}
 			} else {
 				operation = Operation.ADD;
-				if ((AttributeType.getAttributeType(attributeString) == null)) {
-					attributeString = attributeString.concat("Add");
+				if (attributeType == null) {
+					attributeType = AttributeType.getAttributeType(attributeString.concat("Add"));
 				}
 			}
 
 			//Check if it is an attribute.
-			AttributeType attributeType = AttributeType.getAttributeType(attributeString);
 			if (attributeType != null) {
 				//I don't know a good way of checking if something has slots or not, so I have to loop over every single one.
 				for (Slot slot : Slot.values()) {
-					double afterValue = ItemStatUtils.getAttributeAmount(currentItem, attributeType, operation, slot);
+					Operation realOperation = slot == Slot.MAINHAND && attributeType == AttributeType.PROJECTILE_SPEED ? Operation.MULTIPLY : operation;
+					double afterValue = ItemStatUtils.getAttributeAmount(currentItem, attributeType, realOperation, slot);
 					if (afterValue == 0) {
 						continue;
 					}
 					//If its in beforeValue but not afterValue well too bad where am I going to put it anyway??? figure it out
-					double beforeValue = ItemStatUtils.getAttributeAmount(previousItem, attributeType, operation, slot);
+					double beforeValue = ItemStatUtils.getAttributeAmount(previousItem, attributeType, realOperation, slot);
 					//Even if it is a new attribute, it not be 0. Essentially it will only be false if they are the same value.
 					if (afterValue - beforeValue != 0) {
 						double diff = afterValue - beforeValue;
 						diff = Math.round(diff * 100) / (operation.equals(Operation.MULTIPLY) ? 1.0 : 100.0);
 						Component appended = Component.text(" (+");
-						appended = appended.append(Component.text(decimalFormat.format(diff) + (operation.equals(Operation.MULTIPLY) ? "%" : "") + ")"));
+						appended = appended.append(Component.text(StringUtils.to2DP(diff) + (operation.equals(Operation.MULTIPLY) ? "%" : "") + ")"));
 						appended = appended.color(color);
 						appended = component.append(appended);
 						currentLore.set(currentLore.indexOf(component), appended);
