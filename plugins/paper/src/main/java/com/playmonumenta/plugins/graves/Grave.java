@@ -430,8 +430,10 @@ public final class Grave {
 					int unshattered = 0;
 					boolean hasEnderChest = ItemUtils.hasPortableEnder(player);
 					equipmentLoop:
-					for (ItemStack graveEquipment : mEquipment.values()) {
-						if (ItemStatUtils.getInfusionLevel(graveEquipment, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL) {
+					for (Map.Entry<String, ItemStack> entry : mEquipment.entrySet()) {
+						String key = entry.getKey();
+						ItemStack graveEquipment = entry.getValue();
+						if (KEY_EQUIPMENT_HAND.equals(key) || ItemStatUtils.getInfusionLevel(graveEquipment, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL) {
 							continue;
 						}
 						ItemUtils.ItemIdentifier identifier = ItemUtils.getIdentifier(graveEquipment, true);
@@ -439,7 +441,9 @@ public final class Grave {
 							ItemStack[] contents = inv.getContents();
 							for (int i = contents.length - 1; i >= 0; i--) { // loop from high to low to check equipment first
 								ItemStack playerItem = contents[i];
-								if (identifier.isIdentifierFor(playerItem, true)
+								if (playerItem != null
+										&& playerItem.getAmount() == 1
+										&& identifier.isIdentifierFor(playerItem, true)
 									    && Shattered.unshatterOneLevel(playerItem)) {
 									unshattered++;
 									continue equipmentLoop;
@@ -452,7 +456,9 @@ public final class Grave {
 									    && item.getItemMeta() instanceof BlockStateMeta meta
 									    && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
 									for (ItemStack shulkerItem : shulkerBox.getInventory().getContents()) {
-										if (identifier.isIdentifierFor(shulkerItem, true)
+										if (shulkerItem != null
+												&& shulkerItem.getAmount() == 1
+												&& identifier.isIdentifierFor(shulkerItem, true)
 											    && Shattered.unshatterOneLevel(shulkerItem)) {
 											unshattered++;
 											meta.setBlockState(shulkerBox);

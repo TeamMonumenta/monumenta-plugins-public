@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -223,7 +224,9 @@ public class GraveManager {
 			player.sendMessage(Component.text("You died and left a grave! Return to it to repair your equipped items! ", NamedTextColor.RED)
 				.append(Component.text("(/help death for more info)", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/help death"))));
 		} else {
-			player.sendMessage(Component.text("You died but already had a grave, so no new grave was created. Your items have shattered further! ", NamedTextColor.RED)
+			manager.mGraves.stream().filter(grave -> grave.mGhostGrave && shard.equals(grave.mShardName)).collect(Collectors.toSet()).forEach(Grave::delete);
+			manager.mGraves.add(new Grave(manager, player, equipment));
+			player.sendMessage(Component.text("You died and left a grave! Return to it to repair your equipped items! Your previous grave has been destroyed. ", NamedTextColor.RED)
 				.append(Component.text("(/help death for more info)", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/help death"))));
 		}
 	}
