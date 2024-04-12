@@ -24,6 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import static com.playmonumenta.plugins.Constants.Tags.REMOVE_ON_UNLOAD;
 
@@ -47,6 +48,8 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 		public double HEIGHT = 0.0;
 		@BossParam(help = "Rotation in Degrees")
 		public double ROTATION = 0.0;
+		@BossParam(help = "Ticks Before Reaching Full Size")
+		public int SCALE_TICKS = 0;
 	}
 
 	private final List<Group> mAllGuilds = new ArrayList<>();
@@ -96,7 +99,7 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 									Location loc = mBoss.getLocation().clone().add(p.X_OFFSET, p.Y_OFFSET, p.Z_OFFSET);
 									ItemDisplay banner = mBoss.getWorld().spawn(loc.clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), ItemDisplay.class);
 									AxisAngle4f rotation = new AxisAngle4f((float) -Math.toRadians(90 - p.ROTATION), 0, 1, 0);
-									banner.setTransformation(new Transformation(banner.getTransformation().getTranslation(), rotation, banner.getTransformation().getScale(), new AxisAngle4f()));
+									banner.setTransformation(new Transformation(banner.getTransformation().getTranslation(), rotation, new Vector3f(), new AxisAngle4f()));
 									banner.setInterpolationDuration(-1);
 									banner.setInterpolationDuration(0);
 									banner.addScoreboardTag(scoreboardTag);
@@ -106,7 +109,7 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 									TextDisplay text = mBoss.getWorld().spawn(loc.clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), 1.5 + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), TextDisplay.class);
 									text.setAlignment(TextDisplay.TextAlignment.CENTER);
 									text.text(LuckPermsIntegration.getGuildFullComponent(mAllGuilds.get(pos)));
-									text.setTransformation(new Transformation(text.getTransformation().getTranslation(), rotation, text.getTransformation().getScale(), new AxisAngle4f()));
+									text.setTransformation(new Transformation(text.getTransformation().getTranslation(), rotation, new Vector3f(), new AxisAngle4f()));
 									text.setInterpolationDuration(-1);
 									text.setInterpolationDuration(0);
 									text.setBrightness(new Display.Brightness(15, 15));
@@ -120,7 +123,10 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 				}
 				List<Pair> toRemove = new ArrayList<>();
 				for (Pair pa : mPairs) {
-					int result = pa.advance(-(p.WIDTH / period) * FastUtils.sinDeg(p.ROTATION), -(p.WIDTH / period) * FastUtils.cosDeg(p.ROTATION), period);
+					int result = pa.advance(-(p.WIDTH / period) * FastUtils.sinDeg(p.ROTATION),
+						-(p.WIDTH / period) * FastUtils.cosDeg(p.ROTATION),
+						period,
+						p.SCALE_TICKS);
 					if (result < 0) {
 						toRemove.add(pa);
 					}
@@ -148,9 +154,30 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 			mTeleportCount = 0;
 		}
 
-		private int advance(double x, double z, int period) {
+		private int advance(double x, double z, int period, int scaleTicks) {
+			float size;
+			if (scaleTicks <= 0) {
+				size = 1.0f;
+			} else {
+				size = Integer.min(Integer.min(mTeleportCount, period - mTeleportCount), scaleTicks) / (float) scaleTicks;
+			}
+			Vector3f scale = new Vector3f(size, size, size);
+			Transformation transformation;
+
+			transformation = mBanner.getTransformation();
+			mBanner.setTransformation(new Transformation(transformation.getTranslation(),
+				transformation.getLeftRotation(),
+				scale,
+				transformation.getRightRotation()));
 			mBanner.teleport(mBanner.getLocation().add(x, 0, z));
+
+			transformation = mText.getTransformation();
+			mText.setTransformation(new Transformation(transformation.getTranslation(),
+				transformation.getLeftRotation(),
+				scale,
+				transformation.getRightRotation()));
 			mText.teleport(mText.getLocation().add(x, 0, z));
+
 			if (mTeleportCount > period) {
 				delete();
 				return -1;

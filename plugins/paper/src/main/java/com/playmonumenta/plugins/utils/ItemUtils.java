@@ -463,15 +463,42 @@ public class ItemUtils {
 
 	private static final EnumSet<Material> DEFAULT_ATTRIBUTE_MATERIALS = EnumSet.of(Material.TRIDENT); // tridents also count since they have melee attack damage
 
+	private static final Map<Material, Material> BANNER_TO_FLOOR_BANNER = new HashMap<>();
+	private static final Map<Material, Material> BANNER_TO_WALL_BANNER = new HashMap<>();
+
 	static {
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.ARMOR);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.AXES);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.BOWS); // technically doesn't apply to bows since it's melee attack damage
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.HOES);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.PICKAXES);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SHOVELS);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SWORDS);
-			// ! for future minecraft versions: add more items with base vanilla attributes
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.ARMOR);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.AXES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.BOWS); // technically doesn't apply to bows since it's melee attack damage
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.HOES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.PICKAXES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SHOVELS);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SWORDS);
+		// ! for future minecraft versions: add more items with base vanilla attributes
+
+		registerBannerType(Material.WHITE_BANNER, Material.WHITE_WALL_BANNER);
+		registerBannerType(Material.ORANGE_BANNER, Material.ORANGE_WALL_BANNER);
+		registerBannerType(Material.MAGENTA_BANNER, Material.MAGENTA_WALL_BANNER);
+		registerBannerType(Material.LIGHT_BLUE_BANNER, Material.LIGHT_BLUE_WALL_BANNER);
+		registerBannerType(Material.YELLOW_BANNER, Material.YELLOW_WALL_BANNER);
+		registerBannerType(Material.LIME_BANNER, Material.LIME_WALL_BANNER);
+		registerBannerType(Material.PINK_BANNER, Material.PINK_WALL_BANNER);
+		registerBannerType(Material.GRAY_BANNER, Material.GRAY_WALL_BANNER);
+		registerBannerType(Material.LIGHT_GRAY_BANNER, Material.LIGHT_GRAY_WALL_BANNER);
+		registerBannerType(Material.CYAN_BANNER, Material.CYAN_WALL_BANNER);
+		registerBannerType(Material.PURPLE_BANNER, Material.PURPLE_WALL_BANNER);
+		registerBannerType(Material.BLUE_BANNER, Material.BLUE_WALL_BANNER);
+		registerBannerType(Material.BROWN_BANNER, Material.BROWN_WALL_BANNER);
+		registerBannerType(Material.GREEN_BANNER, Material.GREEN_WALL_BANNER);
+		registerBannerType(Material.RED_BANNER, Material.RED_WALL_BANNER);
+		registerBannerType(Material.BLACK_BANNER, Material.BLACK_WALL_BANNER);
+	}
+
+	private static void registerBannerType(Material floorBanner, Material wallBanner) {
+		BANNER_TO_FLOOR_BANNER.put(floorBanner, floorBanner);
+		BANNER_TO_FLOOR_BANNER.put(wallBanner, floorBanner);
+		BANNER_TO_WALL_BANNER.put(wallBanner, wallBanner);
+		BANNER_TO_WALL_BANNER.put(floorBanner, wallBanner);
 	}
 
 	// Return the quest ID string, which is assumed to start with "#Q", or null
@@ -1270,6 +1297,14 @@ public class ItemUtils {
 				true;
 			default -> false;
 		};
+	}
+
+	public static @Nullable Material toFloorBanner(Material banner) {
+		return BANNER_TO_FLOOR_BANNER.get(banner);
+	}
+
+	public static @Nullable Material toWallBanner(Material banner) {
+		return BANNER_TO_WALL_BANNER.get(banner);
 	}
 
 	public static boolean hasLore(ItemStack item) {
