@@ -146,10 +146,15 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 						if (block.isSolid()) {
 							// Success, add this location as cursed.
 							marker.setY(1.1 + (int) marker.getY());
-							mMarkedLocations.add(marker);
+
+							// don't add mark locations too close together when they would cover the same space anyways
+							if (mMarkedLocations.stream().allMatch(markLoc -> markLoc.distance(marker) > HITBOX_LENGTH)) {
+								mMarkedLocations.add(marker);
+							}
+
 							break;
 						} else {
-							marker.add(0, -1, 0);
+							marker.add(0, -0.5, 0);
 						}
 					}
 

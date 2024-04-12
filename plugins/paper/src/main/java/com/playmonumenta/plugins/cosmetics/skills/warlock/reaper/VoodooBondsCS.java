@@ -12,6 +12,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -62,8 +63,8 @@ public class VoodooBondsCS implements CosmeticSkill {
 		new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(mPlayer);
 	}
 
-	public void bondsSpreadParticle(Player mPlayer, Location mLoc, Location eLoc) {
-		new PartialParticle(Particle.SPELL_WITCH, mLoc, 30, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, mLoc, 30, 0.5, 0.5, 0.5, 0, COLOR).spawnAsPlayerActive(mPlayer);
+	public void bondsSpreadParticle(Player player, LivingEntity toMob, LivingEntity sourceMob) {
+		new PartialParticle(Particle.SPELL_WITCH, toMob.getLocation(), 30, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, toMob.getLocation(), 30, 0.5, 0.5, 0.5, 0, COLOR).spawnAsPlayerActive(player);
 	}
 }

@@ -37,12 +37,12 @@ public class SanguineMark extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		mCosmetic.entityTickEffect(entity);
+		mCosmetic.entityTickEffect(entity, fourHertz, twoHertz, oneHertz);
 	}
 
 	@Override
 	public void onHurt(LivingEntity livingEntity, DamageEvent event) {
-		if (mLevelTwo && event.getDamager() instanceof Player player && event.getType() == DamageEvent.DamageType.MELEE) {
+		if (mLevelTwo && event.getDamager() instanceof Player player && event.getType() == DamageEvent.DamageType.MELEE && mDuration != 0) {
 			mCosmetic.onHurt(livingEntity, player);
 
 			event.setDamage(event.getDamage() * (1 + mDamageBoost));

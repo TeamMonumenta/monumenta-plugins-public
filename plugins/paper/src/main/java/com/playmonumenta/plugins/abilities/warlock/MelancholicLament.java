@@ -79,6 +79,7 @@ public class MelancholicLament extends Ability {
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
 			.displayItem(Material.GHAST_TEAR);
 
+	private final double mRadius;
 	private final double mWeakenEffect;
 	private final double mSilenceRadius;
 	private final int mSilenceDuration;
@@ -89,6 +90,7 @@ public class MelancholicLament extends Ability {
 
 	public MelancholicLament(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
 		mSilenceRadius = CharmManager.getRadius(player, CHARM_SILENCE_RADIUS, SILENCE_RADIUS);
 		mSilenceDuration = CharmManager.getDuration(player, CHARM_SILENCE_DURATION, SILENCE_DURATION);
@@ -104,10 +106,9 @@ public class MelancholicLament extends Ability {
 
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-		mCosmetic.onCast(mPlayer, world, loc);
+		mCosmetic.onCast(mPlayer, world, loc, mRadius);
 
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
+		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mRadius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
 			EntityUtils.applyTaunt(mob, mPlayer);
@@ -115,6 +116,8 @@ public class MelancholicLament extends Ability {
 				(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.debuffTick(mob),
 				(entity) -> { })
 			);
+
+			mCosmetic.onWeakenApply(mPlayer, mob);
 		}
 
 		if (isLevelTwo()) {
@@ -159,8 +162,8 @@ public class MelancholicLament extends Ability {
 					for (Player player : enhanceHitbox.getHitPlayers(true)) {
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, (ENHANCE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)) * numTargeting, AFFECTED_DAMAGE_TYPES));
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
-								(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.enhancementTick(player, mPlayer), (entity) -> {
-							})
+							(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.enhancementTick(player, mPlayer, fourHertz, twoHertz, oneHertz),
+							(entity) -> { })
 						);
 					}
 

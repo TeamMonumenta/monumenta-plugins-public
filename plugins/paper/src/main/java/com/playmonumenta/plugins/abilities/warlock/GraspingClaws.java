@@ -17,13 +17,11 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +37,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class GraspingClaws extends Ability implements AbilityWithDuration {
 
@@ -98,6 +95,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 
 	private final double mAmplifier;
 	private final double mPullDamage;
+	private final double mPullRadius;
 	private final double mCleaveDamageFlat;
 	private final double mCleaveDamagePercent;
 	private final double mCleaveRadius;
@@ -114,6 +112,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 		super(plugin, player, INFO);
 		mAmplifier = CharmManager.getLevelPercentDecimal(player, CHARM_SLOW) + (isLevelOne() ? AMPLIFIER_1 : AMPLIFIER_2);
 		mPullDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_PULL_DAMAGE, PULL_DAMAGE);
+		mPullRadius = CharmManager.getRadius(mPlayer, CHARM_PULL_RADIUS, PULL_RADIUS);
 		mCleaveDamageFlat = CLEAVE_FLAT_DAMAGE;
 		mCleaveDamagePercent = CLEAVE_PERCENT_DAMAGE;
 		mCleaveRadius = CharmManager.getRadius(player, CHARM_CLEAVE_RADIUS, CLEAVE_RADIUS);
@@ -142,10 +141,10 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 		if (playerItemStats != null) {
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
-			mCosmetic.onLand(mPlayer, world, loc);
+			mCosmetic.onLand(mPlayer, world, loc, mPullRadius);
 
 			int duration = CharmManager.getDuration(mPlayer, CHARM_SLOW_DURATION, DURATION);
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_PULL_RADIUS, PULL_RADIUS), mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mPullRadius, mPlayer)) {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mPullDamage, true, true, false);
 				MovementUtils.pullTowards(proj, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL_STRENGTH, PULL_SPEED));
 				EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
@@ -208,28 +207,12 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 			final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(loc, 5, mCageRadius - 0.6, mCageRadius + 0.6, Math.PI);
 			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
 
-			List<Integer> mDegrees1 = new ArrayList<>();
-			List<Integer> mDegrees2 = new ArrayList<>();
-			List<Integer> mDegrees3 = new ArrayList<>();
-
 			@Override
 			public void run() {
 				mT++;
 				mCurrDuration++;
 
-				// Wall Portion (Particles + Hitbox Definition)
-				if (mT % 4 == 0) {
-					for (double degree = 0; degree < 360; degree += 20) {
-						double radian1 = Math.toRadians(degree);
-						Vector vec = new Vector(FastUtils.cos(radian1) * mCageRadius, 0, FastUtils.sin(radian1) * mCageRadius);
-						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
-						Location l = loc.clone().add(vec);
-						for (int y = 0; y < 5; y++) {
-							l.add(0, 1, 0);
-							mCosmetic.cageParticle(mPlayer, l);
-						}
-					}
-				}
+				mCosmetic.cageTick(mPlayer, loc, mCageRadius, mT);
 
 				List<LivingEntity> entities = mHitbox.getHitMobs();
 				for (LivingEntity le : entities) {
@@ -265,7 +248,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 					this.cancel();
 				}
 
-				// Player Effect + Outline Particles
+				// Player Effect
 				if (mT % 5 == 0) {
 					if (mT % 20 == 0) {
 						List<Player> affectedPlayers = new Hitbox.UprightCylinderHitbox(loc, 5, mCageRadius).getHitPlayers(true);
@@ -273,12 +256,6 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 							PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * mCageHeal, mPlayer);
 						}
 					}
-
-					List<Integer> degreesToKeep = mCosmetic.cageTick(mPlayer, loc, mCageRadius, mDegrees1, mDegrees2, mDegrees3);
-
-					mDegrees3 = new ArrayList<>(mDegrees2);
-					mDegrees2 = new ArrayList<>(mDegrees1);
-					mDegrees1 = new ArrayList<>(degreesToKeep);
 				}
 			}
 

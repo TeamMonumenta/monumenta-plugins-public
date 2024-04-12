@@ -3,13 +3,15 @@ package com.playmonumenta.plugins.abilities.warlock;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.PhlegmaticResolveCS;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -18,9 +20,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -51,6 +50,7 @@ public class PhlegmaticResolve extends Ability {
 	private double mLastPreMitigationDamage = 0;
 	private int mLastPlayedSoundTick = 0;
 	private boolean mDamagedLastWindow = false;
+	private final PhlegmaticResolveCS mCosmetic;
 
 	public static final String CHARM_RESIST = "Phlegmatic Resolve Resistance";
 	public static final String CHARM_KBR = "Phlegmatic Resolve Knockback Resistance";
@@ -81,6 +81,7 @@ public class PhlegmaticResolve extends Ability {
 					StringUtils.formatDecimal(ENHANCE_RADIUS)
 				))
 			.simpleDescription("Gain resistance and knockback resistance for each ability on cooldown.")
+			.linkedSpell(ClassAbility.PHLEGMATIC_RESOLVE)
 			.displayItem(Material.SHIELD);
 
 	public PhlegmaticResolve(Plugin plugin, Player player) {
@@ -91,6 +92,7 @@ public class PhlegmaticResolve extends Ability {
 		mAllyModifier = ALLY_MODIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY);
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, RADIUS);
 		mEnhanceRadius = CharmManager.getRadius(player, CHARM_ENHANCE_RADIUS, ENHANCE_RADIUS);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PhlegmaticResolveCS());
 	}
 
 	@Override
@@ -125,12 +127,14 @@ public class PhlegmaticResolve extends Ability {
 						mDamagedLastWindow = true;
 					}
 
+					mCosmetic.enhanceDamageTick(mPlayer, mEnhanceRadius, mEnhancementDamageSpread);
+
 					// AoE Effect
 					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE);
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mEnhanceRadius);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, damage, mInfo.getLinkedSpell(), true);
-						new PartialParticle(Particle.WAX_OFF, mob.getLocation(), 6, 0.5f, 0.5f, 0.5f).spawnAsPlayerActive(mPlayer);
+						mCosmetic.enhanceDamageMob(mPlayer, mob);
 					}
 
 					// Shift the array forward
@@ -161,11 +165,12 @@ public class PhlegmaticResolve extends Ability {
 		}
 		cooldowns = Math.min(cooldowns, mAbilityCap);
 
+		mCosmetic.periodicTrigger(mPlayer, mPlayer, cooldowns);
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns).displaysTime(false));
 		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
-
 		if (isLevelTwo()) {
 			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
+				mCosmetic.periodicTrigger(mPlayer, p, cooldowns);
 				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * mAllyModifier).displaysTime(false));
 				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * mAllyModifier, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
 			}
@@ -210,7 +215,7 @@ public class PhlegmaticResolve extends Ability {
 				// Only play sound to player once per second.
 				if ((mLastPlayedSoundTick - Bukkit.getServer().getCurrentTick()) > 20) {
 					mLastPlayedSoundTick = Bukkit.getServer().getCurrentTick();
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1, 1);
+					mCosmetic.enhanceHurtSound(mPlayer);
 				}
 
 				if (damageSplit > 0) {

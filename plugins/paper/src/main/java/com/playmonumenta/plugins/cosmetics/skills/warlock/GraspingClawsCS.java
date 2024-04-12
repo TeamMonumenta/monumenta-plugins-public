@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
@@ -17,10 +18,15 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GraspingClawsCS implements CosmeticSkill {
 	private static final BlockData CHAIN_PARTICLE = Material.CHAIN.createBlockData();
+
+	private List<Integer> mDegrees1 = new ArrayList<>();
+	private List<Integer> mDegrees2 = new ArrayList<>();
+	private List<Integer> mDegrees3 = new ArrayList<>();
 
 	@Override
 	public ClassAbility getAbility() {
@@ -32,7 +38,7 @@ public class GraspingClawsCS implements CosmeticSkill {
 		return Material.BOW;
 	}
 
-	public void onLand(Player player, World world, Location loc) {
+	public void onLand(Player player, World world, Location loc, double radius) {
 		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.6f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.8f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 1.0f, 0.1f);
@@ -48,10 +54,10 @@ public class GraspingClawsCS implements CosmeticSkill {
 
 	public void onCageCreation(World world, Location loc) {
 		world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.8f, 0.9f);
-	}
 
-	public void cageParticle(Player player, Location loc) {
-		new PartialParticle(Particle.FALLING_DUST, loc, 1, 0.1, 0.2, 0.1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
+		mDegrees1.clear();
+		mDegrees2.clear();
+		mDegrees3.clear();
 	}
 
 	public void onCagedMob(Player player, World world, Location loc, LivingEntity mob) {
@@ -64,36 +70,53 @@ public class GraspingClawsCS implements CosmeticSkill {
 	}
 
 	// Modifies the lists provided!
-	public List<Integer> cageTick(Player player, Location loc, double radius, List<Integer> degrees1, List<Integer> degrees2, List<Integer> degrees3) {
-		List<Integer> degreesToKeep = new ArrayList<>();
-		for (int d = 0; d < 360; d += 3) {
-			new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 0, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
-			new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 5, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
-
-			if (degrees1.contains(d)) {
-				new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 5.5, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
-				if (FastUtils.RANDOM.nextBoolean()) {
-					degrees1.remove((Integer) d);
+	public void cageTick(Player player, Location loc, double radius, int ticks) {
+		if (ticks % 4 == 0) {
+			for (double degree = 0; degree < 360; degree += 20) {
+				double radian1 = Math.toRadians(degree);
+				Vector vec = new Vector(FastUtils.cos(radian1) * radius, 0, FastUtils.sin(radian1) * radius);
+				vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+				Location l = loc.clone().add(vec);
+				for (int y = 0; y < 5; y++) {
+					l.add(0, 1, 0);
+					new PartialParticle(Particle.FALLING_DUST, l, 1, 0.1, 0.2, 0.1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
 				}
-			}
-
-			if (degrees2.contains(d)) {
-				new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 6, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
-				if (FastUtils.RANDOM.nextBoolean()) {
-					degrees2.remove((Integer) d);
-				}
-			}
-
-			if (degrees3.contains(d)) {
-				new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 6.75, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
-			}
-
-			if (FastUtils.randomDoubleInRange(0, 1) < 0.25) {
-				degreesToKeep.add(d);
 			}
 		}
 
-		return degreesToKeep;
+		if (ticks % 5 == 0) {
+			List<Integer> degreesToKeep = new ArrayList<>();
+			for (int d = 0; d < 360; d += 3) {
+				new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 0, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 5, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
+
+				if (mDegrees1.contains(d)) {
+					new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 5.5, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
+					if (FastUtils.RANDOM.nextBoolean()) {
+						mDegrees1.remove((Integer) d);
+					}
+				}
+
+				if (mDegrees2.contains(d)) {
+					new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 6, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
+					if (FastUtils.RANDOM.nextBoolean()) {
+						mDegrees2.remove((Integer) d);
+					}
+				}
+
+				if (mDegrees3.contains(d)) {
+					new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 6.75, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
+				}
+
+				if (FastUtils.randomDoubleInRange(0, 1) < 0.25) {
+					degreesToKeep.add(d);
+				}
+			}
+
+			mDegrees3 = new ArrayList<>(mDegrees2);
+			mDegrees2 = new ArrayList<>(mDegrees1);
+			mDegrees1 = new ArrayList<>(degreesToKeep);
+		}
 	}
 
 	public void cleaveReadyTick(Player player) {

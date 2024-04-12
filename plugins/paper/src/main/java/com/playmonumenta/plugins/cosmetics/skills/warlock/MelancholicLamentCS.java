@@ -28,7 +28,7 @@ public class MelancholicLamentCS implements CosmeticSkill {
 		return Material.GHAST_TEAR;
 	}
 
-	public void onCast(Player player, World world, Location loc) {
+	public void onCast(Player player, World world, Location loc, double radius) {
 		world.playSound(loc, Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 1.9f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_STRAY_AMBIENT, SoundCategory.PLAYERS, 2.0f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_ZOMBIE_HORSE_DEATH, SoundCategory.PLAYERS, 0.3f, 1.2f);
@@ -40,7 +40,11 @@ public class MelancholicLamentCS implements CosmeticSkill {
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 300, 8, 8, 8, 0.125).spawnAsPlayerActive(player);
 	}
 
-	public void enhancementTick(Player otherPlayer, Player user) {
+	public void onWeakenApply(Player player, LivingEntity mob) {
+
+	}
+
+	public void enhancementTick(Player otherPlayer, Player user, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		Location loc = otherPlayer.getLocation().add(0, 1, 0);
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0.5, 0, 0.5, 0.125).spawnAsPlayerActive(user);
 	}

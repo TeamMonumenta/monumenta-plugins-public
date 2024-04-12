@@ -98,7 +98,7 @@ public class DarkPact extends Ability {
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL));
 		mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(duration,
-			(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.tick(mPlayer),
+			(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.tick(mPlayer, fourHertz, twoHertz, oneHertz),
 			(entity) -> mCosmetic.loseEffect(mPlayer)));
 
 		putOnCooldown();
@@ -119,6 +119,7 @@ public class DarkPact extends Ability {
 			for (Effect effect : aestheticsEffects) {
 				effect.setDuration(effect.getDuration() + duration);
 			}
+			mCosmetic.onKill(mPlayer, event.getEntity());
 		}
 		NavigableSet<Effect> percentDamageEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME);
 		if (percentDamageEffects != null) {

@@ -114,7 +114,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 	private final HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();
 	private boolean mRunDamageNextTick = false;
 
-	private @Nullable LivingEntity mTarget = null;
+	private @Nullable LivingEntity mTarget;
 
 	private final JudgementChainCS mCosmetic;
 
@@ -122,6 +122,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mTarget = null;
 		mAmplifier = BUFF_AMOUNT;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new JudgementChainCS());
 	}
@@ -189,7 +190,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 						});
 					}
 				}
-				mCosmetic.onPassDamage(mPlayer, selectedEnemy.getLocation());
+				mCosmetic.onPassDamage(mPlayer, mTarget, selectedEnemy);
 			}
 		}
 	}
@@ -203,7 +204,7 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 
 		if (e != null) {
 			mTarget = e;
-			mPlugin.mEffectManager.addEffect(mTarget, EFFECT_NAME, new JudgementChainMobEffect(DURATION, mPlayer, EFFECT_NAME));
+			mPlugin.mEffectManager.addEffect(mTarget, EFFECT_NAME, new JudgementChainMobEffect(DURATION, mPlayer, EFFECT_NAME, mCosmetic.createTeam()));
 			EntityUtils.applyTaunt(mTarget, mPlayer);
 			mCosmetic.onSummonChain(world, loc);
 
@@ -271,13 +272,11 @@ public class JudgementChain extends Ability implements AbilityWithDuration {
 			mPlugin.mEffectManager.clearEffects(mTarget, EFFECT_NAME);
 
 			Location loc = mPlayer.getEyeLocation();
-			Location targetLoc = mTarget.getLocation();
-			World world = mPlayer.getWorld();
 
 			double effectRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_EFFECT_RANGE);
 			double damageRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_DAMAGE_RANGE);
 
-			mCosmetic.onBreakChain(mPlayer, world, loc, targetLoc, effectRadius, damageRadius);
+			mCosmetic.onBreakChain(mPlayer, mTarget, isLevelTwo(), effectRadius, damageRadius);
 
 			List<LivingEntity> hostiles = new ArrayList<>();
 			List<Player> players = new ArrayList<>();

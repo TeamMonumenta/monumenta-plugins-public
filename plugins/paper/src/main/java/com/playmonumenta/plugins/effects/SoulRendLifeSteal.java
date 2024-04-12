@@ -60,12 +60,12 @@ public class SoulRendLifeSteal extends Effect {
 			// the same crit that adds the effect will also deduct a mark, so prevent this
 			// also visually display a fake "third mark" getting depleted as part of the 3-part rend
 			if (mIsFirstCrit) {
-				mCosmetic.rendLoseMark(mPlayer, entity, mMarks + 1);
+				mCosmetic.rendLoseMark(mPlayer, entity, mMarks + 1, false);
 				mIsFirstCrit = false;
 				return;
 			}
 
-			mCosmetic.rendLoseMark(mPlayer, entity, mMarks);
+			mCosmetic.rendLoseMark(mPlayer, entity, mMarks, true);
 
 			mCosmetic.rendHealEffect(mPlayer, mPlayer, entity);
 			double heal = Math.min(event.getDamage() * mHealPercent, mHealCap);

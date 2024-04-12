@@ -147,14 +147,17 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	}
 
 	@Override
-	public void rendLoseMark(Player player, LivingEntity enemy, int marks) {
+	public void rendLoseMark(Player player, LivingEntity enemy, int marks, boolean doSound) {
 		World world = player.getWorld();
 		Location loc = player.getLocation();
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.5f, 0.55f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.5f, 0.6f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.35f, 0.65f);
-		world.playSound(loc, Sound.ENTITY_BAT_AMBIENT, SoundCategory.PLAYERS, 0.25f, 0.5f + FastUtils.RANDOM.nextFloat() * 0.25f);
-		world.playSound(loc, Sound.ENTITY_BAT_TAKEOFF, SoundCategory.PLAYERS, 0.35f, 0.5f + FastUtils.RANDOM.nextFloat() * 0.25f);
+
+		if (doSound) {
+			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.5f, 0.55f);
+			world.playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.5f, 0.6f);
+			world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.35f, 0.65f);
+			world.playSound(loc, Sound.ENTITY_BAT_AMBIENT, SoundCategory.PLAYERS, 0.25f, 0.5f + FastUtils.RANDOM.nextFloat() * 0.25f);
+			world.playSound(loc, Sound.ENTITY_BAT_TAKEOFF, SoundCategory.PLAYERS, 0.35f, 0.5f + FastUtils.RANDOM.nextFloat() * 0.25f);
+		}
 
 		loc = getMarkLocation(player, enemy, marks);
 		new PartialParticle(Particle.REDSTONE, loc, 6, 0.07, 0.13, 0.07, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
@@ -168,7 +171,7 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 		for (int i = 1; i <= marks; i++) {
 			Location loc = getMarkLocation(player, enemy, i);
 			new PartialParticle(Particle.REDSTONE, loc, 6, 0.07, 0.13, 0.07, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
-			rendLoseMark(player, enemy, i);
+			rendLoseMark(player, enemy, i, false);
 		}
 	}
 

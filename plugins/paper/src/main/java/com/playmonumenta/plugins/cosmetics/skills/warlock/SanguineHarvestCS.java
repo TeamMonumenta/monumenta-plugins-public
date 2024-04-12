@@ -65,7 +65,7 @@ public class SanguineHarvestCS implements CosmeticSkill {
 		new PartialParticle(Particle.REDSTONE, loc, 30, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsEnemyBuff();
 	}
 
-	public void entityTickEffect(Entity mob) {
+	public void entityTickEffect(Entity mob, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		Location loc = LocationUtils.getEntityCenter(mob);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02).spawnAsEnemyBuff();
 		new PartialParticle(Particle.CRIMSON_SPORE, loc, 4, 0.25, 0.5, 0.25, 0).spawnAsEnemyBuff();

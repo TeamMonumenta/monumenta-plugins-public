@@ -10,23 +10,19 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.RestlessSoulsCS;
 import com.playmonumenta.plugins.effects.CholericFlamesAntiHeal;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,6 +45,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 
 	private Ability[] mAbilities = {};
 	private static final String DOT_EFFECT_NAME = "RestlessSoulsDamageOverTimeEffect";
+	private RestlessSoulsCS mCosmetic;
 
 	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -56,7 +53,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, double range, int silenceTime, int duration, boolean levelone, ItemStatManager.PlayerItemStats playerItemStats) {
+	public void spawn(Player player, double damage, double range, int silenceTime, int duration, boolean levelone, ItemStatManager.PlayerItemStats playerItemStats, RestlessSoulsCS cosmetic) {
 		mPlayer = player;
 		mDamage = damage;
 		mRange = range;
@@ -64,6 +61,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		mDuration = duration;
 		mLevelOne = levelone;
 		mPlayerItemStats = playerItemStats;
+		mCosmetic = cosmetic;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(mMonPlugin, () -> {
@@ -80,14 +78,12 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		attack(mMonPlugin, mPlayer, mPlayerItemStats, mBoss, damagee, mLevelOne, mDamage, mSilenceTime, mAbilities, mDuration, mRange);
 	}
 
-	public static void attack(com.playmonumenta.plugins.Plugin plugin, @Nullable Player p, @Nullable ItemStatManager.PlayerItemStats playerItemStats,
+	public void attack(com.playmonumenta.plugins.Plugin plugin, @Nullable Player p, @Nullable ItemStatManager.PlayerItemStats playerItemStats,
 	                          LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
 	                          Ability[] abilities, int duration, double mRange) {
 		if (p != null || playerItemStats != null) {
-			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 1.0f);
-			if (p != null) {
-				new PartialParticle(Particle.SOUL_FIRE_FLAME, LocationUtils.getEntityCenter(damagee), 8, 0, 0, 0, 0.14).spawnAsPlayerActive(p);
-			}
+
+			mCosmetic.vexAttack(p, boss, damagee, mRange);
 
 			// tag mob to prevent it from spawning more stuff
 			damagee.addScoreboardTag("TeneGhost");

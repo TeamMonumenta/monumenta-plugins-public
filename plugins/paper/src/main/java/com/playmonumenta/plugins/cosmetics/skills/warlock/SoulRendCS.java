@@ -49,13 +49,16 @@ public class SoulRendCS implements CosmeticSkill {
 		}
 	}
 
-	public void rendLoseMark(Player player, LivingEntity enemy, int marks) {
+	public void rendLoseMark(Player player, LivingEntity enemy, int marks, boolean doSound) {
 		World world = player.getWorld();
 		Location loc = player.getLocation();
-		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.5f, 0.3f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.6f, 1.4f);
-		world.playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 0.5f, 2.0f);
-		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 0.3f, 2.0f);
+
+		if (doSound) {
+			world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.5f, 0.3f);
+			world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.6f, 1.4f);
+			world.playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 0.5f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 0.3f, 2.0f);
+		}
 
 		loc = getMarkLocation(player, enemy, marks);
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc.clone().add(0, 0.2, 0), 1).spawnAsPlayerActive(player);
@@ -70,7 +73,7 @@ public class SoulRendCS implements CosmeticSkill {
 			Location loc = getMarkLocation(player, enemy, i);
 			new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0, 0, 0, 0).spawnAsPlayerActive(player);
 			new PartialParticle(Particle.SMOKE_NORMAL, loc, 6, 0.05, 0.05, 0.05, 0.015).spawnAsPlayerActive(player);
-			rendLoseMark(player, enemy, i);
+			rendLoseMark(player, enemy, i, false);
 		}
 	}
 

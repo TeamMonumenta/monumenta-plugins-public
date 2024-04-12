@@ -15,6 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -145,14 +146,16 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	}
 
 	@Override
-	public void bondsSpreadParticle(Player mPlayer, Location mLoc, Location eLoc) {
-		new PartialParticle(Particle.REDSTONE, mLoc, 30, 0.4, 0.7, 0.4, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, mLoc, 40, 0.5, 0.5, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
+	public void bondsSpreadParticle(Player player, LivingEntity toMob, LivingEntity sourceMob) {
+		Location mLoc = toMob.getLocation();
+		Location eLoc = sourceMob.getLocation();
+		new PartialParticle(Particle.REDSTONE, mLoc, 30, 0.4, 0.7, 0.4, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, mLoc, 40, 0.5, 0.5, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
 		Vector mFront = mLoc.toVector().subtract(eLoc.toVector());
 		ParticleUtils.drawCurve(eLoc.clone().add(0, 0.75, 0), 1, 36, mFront,
 			t -> 0.5 + 0.5 * FastUtils.sinDeg(t * 10),
 				t -> 0, t -> 0.125 * FastUtils.cosDeg(t * 10),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 		);
 	}
 }

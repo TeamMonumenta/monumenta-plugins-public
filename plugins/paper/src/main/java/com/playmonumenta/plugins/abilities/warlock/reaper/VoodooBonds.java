@@ -118,9 +118,8 @@ public class VoodooBonds extends Ability {
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(eLoc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, PASSIVE_RADIUS), mPlayer)) {
 				if (mob.getType().equals(type) && mob != enemy) {
-					Location mLoc = mob.getLocation();
 					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage * CLEAVE_DAMAGE), mInfo.getLinkedSpell(), true);
-					mCosmetic.bondsSpreadParticle(mPlayer, mLoc, eLoc);
+					mCosmetic.bondsSpreadParticle(mPlayer, mob, enemy);
 				}
 			}
 			return true;

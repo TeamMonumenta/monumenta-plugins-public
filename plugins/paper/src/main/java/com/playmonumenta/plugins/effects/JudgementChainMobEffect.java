@@ -4,9 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
@@ -27,11 +25,11 @@ public class JudgementChainMobEffect extends Effect {
 	private final String mModifierName;
 	private final Team mChainTeam;
 
-	public JudgementChainMobEffect(int duration, Player player, String source) {
+	public JudgementChainMobEffect(int duration, Player player, String source, Team team) {
 		super(duration, effectID);
 		mPlayer = player;
 		mModifierName = source;
-		mChainTeam = ScoreboardUtils.getExistingTeamOrCreate("chainColor", NamedTextColor.DARK_GRAY);
+		mChainTeam = team;
 	}
 
 	@Override
