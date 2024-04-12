@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.sirius.*;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.StarBlight;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -51,7 +52,6 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -460,7 +460,8 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		for (Player p : getPlayersInArena(false)) {
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, SpellBlightedBolts.BLIGHTEDBOLTTAG);
-			p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 5 * 20, 5));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.GENERIC_NAME,
+				new PercentDamageReceived(5 * 20, -1.0));
 		}
 		for (BlockDisplay dis : mDisplays) {
 			dis.remove();

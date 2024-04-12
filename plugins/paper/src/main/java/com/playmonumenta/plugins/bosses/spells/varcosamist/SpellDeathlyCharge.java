@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -26,14 +27,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellDeathlyCharge extends Spell {
-
 	private static final int DAMAGE = 20;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mDuration;
+	private final String mDio;
+
 	private boolean mActive;
-	private int mDuration;
-	private String mDio;
 
 	private static final Particle.DustOptions HUNT_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.33f);
 
@@ -53,7 +54,8 @@ public class SpellDeathlyCharge extends Spell {
 		if (target != null) {
 			target.sendMessage(Component.text(mDio, NamedTextColor.RED));
 		}
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 30, 1));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+			new BaseMovementSpeedModifyEffect(20 * 30, 0.4));
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3, 1.25f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 3, 0.5f);
 		new BukkitRunnable() {
@@ -92,7 +94,6 @@ public class SpellDeathlyCharge extends Spell {
 							}
 							new PartialParticle(Particle.REDSTONE, mBoss.getLocation().add(0, 1, 0), 5, 0.4, 0.44, 0.4, HUNT_COLOR).spawnAsEntityActive(mBoss);
 							if (!mActive) {
-								mActive = false;
 								this.cancel();
 								new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 65, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
@@ -112,7 +113,7 @@ public class SpellDeathlyCharge extends Spell {
 								new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
 								world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 3, 0.8f);
 								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 3, 0.75f);
-								mBoss.removePotionEffect(PotionEffectType.SPEED);
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
 							}
 						}
 

@@ -70,6 +70,8 @@ public class SpellPutridPlague extends Spell {
 
 	private static final String SPELL_NAME = "Putrid Plague";
 	private static final int DAMAGE = 30;
+	private static final String SLOWNESS_SRC = "PutridPlagueSlowness";
+	private static final int DEBUFF_DURATION = 20 * 30;
 
 	private static boolean mPlagueActive;
 
@@ -172,10 +174,10 @@ public class SpellPutridPlague extends Spell {
 									new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
 										Material.LIME_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
-									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, DEBUFF_DURATION, 1));
 									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,
-										"PutridPlagueSlowness", new PercentSpeed(20 * 30, -0.3, "PutridPlagueSlowness"));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
+										SLOWNESS_SRC, new PercentSpeed(DEBUFF_DURATION, -0.3, SLOWNESS_SRC));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, DEBUFF_DURATION, 1));
 									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
 								}
 							} else {
@@ -184,7 +186,7 @@ public class SpellPutridPlague extends Spell {
 								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
 								if (!mPhase3) {
 									player.removePotionEffect(PotionEffectType.WITHER);
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, "PutridPlagueSlowness");
+									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, SLOWNESS_SRC);
 									player.removePotionEffect(PotionEffectType.POISON);
 									player.removePotionEffect(PotionEffectType.WEAKNESS);
 								} else {

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
@@ -19,13 +20,10 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
 public class ForgemasterTowerAbility extends TowerAbility {
-
 	private static final int DAMAGE = 8;
 	private static final int GROUND_DAMAGE = 2;
 	private static final int FIRE_DURATION = 20 * 4;
@@ -52,15 +50,14 @@ public class ForgemasterTowerAbility extends TowerAbility {
 			},
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(mBoss);
-				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
+				Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+					new BaseMovementSpeedModifyEffect(40, -0.75));
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.75f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1.15f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 1f, 0.85f);
 			},
 			// Warning particles
-			(Location loc) -> {
-				new PartialParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0).spawnAsEntityActive(mBoss);
-			},
+			(Location loc) -> new PartialParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0).spawnAsEntityActive(mBoss),
 			// Charge attack sound/particles at boss location
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation(), 125, 0.4, 0.4, 0.4, 0.25).spawnAsEntityActive(mBoss);
@@ -88,8 +85,8 @@ public class ForgemasterTowerAbility extends TowerAbility {
 				//Damaging trail left behind
 				new BukkitRunnable() {
 					private int mT = 0;
-					private BoundingBox mHitbox = new BoundingBox().shift(loc).expand(0.5);
-					private Location mParticleLoc = loc.clone().subtract(0, 1, 0);
+					private final BoundingBox mHitbox = new BoundingBox().shift(loc).expand(0.5);
+					private final Location mParticleLoc = loc.clone().subtract(0, 1, 0);
 
 					@Override
 					public void run() {

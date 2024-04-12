@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.shura;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -18,18 +20,18 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellShuraSmoke extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private double mRange;
-	private int mRadius = 3;
+	private static final String SLOWNESS_SRC = "ShuraSmokeSlowness";
+	private static final String WEAKNESS_SRC = "ShuraSmokeWeakness";
+	private static final int DEBUFF_DURATION = 20 * 3;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final double mRange;
+	private final int mRadius = 3;
 
 	public SpellShuraSmoke(Plugin plugin, LivingEntity boss, Location center, double range) {
 		mPlugin = plugin;
@@ -92,8 +94,10 @@ public class SpellShuraSmoke extends Spell {
 
 							if (mTicks % 20 == 0) {
 								for (Player player : PlayerUtils.playersInRange(loc, mRadius, true)) {
-									player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 4));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 3));
+									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
+										new PercentDamageDealt(DEBUFF_DURATION, -0.5));
+									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+										new PercentSpeed(DEBUFF_DURATION, -0.6, SLOWNESS_SRC));
 								}
 							}
 

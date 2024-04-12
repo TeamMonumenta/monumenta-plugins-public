@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -19,8 +20,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -31,6 +30,8 @@ import org.bukkit.util.Vector;
  */
 
 public class RingOfFrost extends Spell {
+	private static final String SPELL_NAME = "Ring of Frost";
+	private static final String SLOWNESS_SRC = "RingOfFrostSlowness";
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -107,10 +108,11 @@ public class RingOfFrost extends Spell {
 					Vector vec = loc.toVector();
 					for (Player player : PlayerUtils.playersInRange(loc, 50, true)) {
 						if (!player.getLocation().toVector().isInSphere(vec, mRadius) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
-							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 40, null, false, true, "Ring of Frost");
+							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 40, null, false, true, SPELL_NAME);
 							new PartialParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.25, 0.45, 0.25, 0.2).spawnAsEntityActive(mBoss);
 							MovementUtils.knockAway(loc, player, -2.75f, 0.5f, false);
-							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 3));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+								new PercentSpeed(20 * 10, -0.6, SLOWNESS_SRC));
 						}
 					}
 				}
