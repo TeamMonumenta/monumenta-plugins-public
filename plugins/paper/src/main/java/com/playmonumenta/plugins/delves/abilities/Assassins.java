@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 
 public class Assassins {
@@ -14,11 +15,11 @@ public class Assassins {
 
 	public static final String DESCRIPTION = "Enemies become stealthy assassins.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"Mobs deal 40% extra damage when not in the player",
-			"field of view, and have a 30% chance to become",
-			"\"stealthed,\" gaining new abilities."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("Mobs deal 40% extra damage when not in the player's"),
+			Component.text("field of view, and have a 30% chance to become"),
+			Component.text("\"stealthed,\" gaining new abilities.")
 		};
 	}
 

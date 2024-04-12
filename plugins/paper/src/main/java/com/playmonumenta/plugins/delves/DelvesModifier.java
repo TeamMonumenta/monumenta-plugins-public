@@ -69,11 +69,11 @@ public enum DelvesModifier {
 	private final int mIndex;
 	private final @Nullable BiConsumer<LivingEntity, Integer> mApplyFunc;
 	private final ItemStack mIcon;
-	private final Function<Integer, String[]> mRankDescriptions;
+	private final Function<Integer, Component[]> mRankDescriptions;
 	private final int mOldColumn;
 	private final int mPointsPerLevel;
 
-	DelvesModifier(int index, @Nullable BiConsumer<LivingEntity, Integer> applying, ItemStack stack, Function<Integer, String[]> rankDescriptions, int column, int pointsPerLevel) {
+	DelvesModifier(int index, BiConsumer<LivingEntity, Integer> applying, ItemStack stack, Function<Integer, Component[]> rankDescriptions, int column, int pointsPerLevel) {
 		mIndex = index;
 		mApplyFunc = applying;
 		ItemMeta meta = stack.getItemMeta();
@@ -93,7 +93,7 @@ public enum DelvesModifier {
 		return mIcon;
 	}
 
-	public Function<Integer, String[]> getRankDescriptions() {
+	public Function<Integer, Component[]> getRankDescriptions() {
 		return mRankDescriptions;
 	}
 

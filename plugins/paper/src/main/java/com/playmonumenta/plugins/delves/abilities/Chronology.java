@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -9,9 +10,9 @@ public class Chronology {
 
 	public static final String DESCRIPTION = "Spawners spawn faster.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"All spawners spawn twice as fast."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("All spawners spawn twice as fast.")
 		};
 	}
 

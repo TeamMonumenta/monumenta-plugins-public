@@ -13,13 +13,15 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -48,31 +50,24 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	//Theme constants
 	//Depths
-	private static final List<String> DEPTH_INTRO = List.of(
-		"Attuned with powers from",
-		"Darkest Depths trees."
-	);
+	private static final List<TextComponent> DEPTH_INTRO;
+
 	private static final ImmutableList<String> DEPTH_THEME = CosmeticSkills.getDepthsNames();
 	private static final ImmutableList<DepthsCS> DEPTHS_CS = CosmeticSkills.getDepthsSkins();
 	//Delves
-	private static final List<String> DELVE_INTRO = List.of(
-		"Essences of the twisted contingency,",
-		"rewards for heroic adventurers."
-	);
+	private static final List<TextComponent> DELVE_INTRO;
+
 	private static final ImmutableList<String> DELVE_THEME = CosmeticSkills.getDelvesNames();
 	//Prestige
-	private static final List<String> PRESTIGE_INTRO = List.of(
-		"Every single step here is",
-		"a witness of your prestige and glory."
-	);
+	private static final List<TextComponent> PRESTIGE_INTRO;
+
+
 	private static final ImmutableList<String> PRESTIGE_THEME = CosmeticSkills.getPrestigeNames();
 	private static final ImmutableList<PrestigeCS> PRESTIGE_CS = CosmeticSkills.getPrestigeSkins();
 	//Sanguine
-	private static final List<String> GALLERY_INTRO = List.of(
-		"The nightmare was never meant for life.",
-		"Banish the dream.",
-		"End this nightmare!"
-	);
+	private static final List<TextComponent> GALLERY_INTRO;
+
+
 	private static final ImmutableList<String> GALLERY_THEME = CosmeticSkills.getGalleryNames();
 	private static final ImmutableList<GalleryCS> GALLERY_CS = CosmeticSkills.getGallerySkins();
 
@@ -85,7 +80,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final int ENTRY_PER_LINE = 7;
 	private static final int ENTRY_PER_PAGE = ENTRY_PER_LINE * (LINE - 2);
 	private static final int BACK_LOC = (LINE - 1) * 9 + 4;
-	private static final int PREV_PAGE_LOC = (LINE - 1) * 9 + 0;
+	private static final int PREV_PAGE_LOC = (LINE - 1) * 9;
 	private static final int NEXT_PAGE_LOC = (LINE - 1) * 9 + 8;
 
 	private static final String R1MONUMENT_SCB = "R1Complete";
@@ -115,7 +110,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	}
 
 	public CosmeticSkillShopGUI(Plugin plugin, Player player) {
-		super(player, 9*LINE, Component.text("Cosmetic Skill Shop", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		super(player, 9 * LINE, Component.text("Cosmetic Skill Shop", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		mPlugin = plugin;
 		loadPage(CSGUIPage.HOME, player);
 	}
@@ -146,15 +141,14 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			if (slot == BACK_LOC) {
 				if (mCurrentPage != CSGUIPage.HOME) {
 					loadPage(CSGUIPage.HOME, player);
-					return;
 				} else {
 					close();
 					new CosmeticsGUI(mPlugin, player).openInventory(player, mPlugin);
-					return;
 				}
+				return;
 			}
 			switch (mCurrentPage) {
-				case DEPTHS: {
+				case DEPTHS -> {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -181,8 +175,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
 							ItemStack mTalisman = InventoryUtils.getItemFromLootTable(player, talismanLoot);
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
-								!player.getInventory().containsAtLeast(mTalisman, TALISMAN_PER_DEPTH_SKIN) ||
-								!player.getInventory().containsAtLeast(mGeode, GEODE_PER_DEPTH_SKIN)) {
+									!player.getInventory().containsAtLeast(mTalisman, TALISMAN_PER_DEPTH_SKIN) ||
+									!player.getInventory().containsAtLeast(mGeode, GEODE_PER_DEPTH_SKIN)) {
 								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
@@ -210,16 +204,13 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 						mPageNumber--;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
-						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
-						return;
 					}
 				}
-				break;
-				case DELVE: {
+				case DELVE -> {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -237,7 +228,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							ItemStack mStrand = InventoryUtils.getItemFromLootTable(player, STRAND_LOOTTABLE);
 							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
-								!player.getInventory().containsAtLeast(mStrand, STRAND_PER_DELVE_SKIN)) {
+									!player.getInventory().containsAtLeast(mStrand, STRAND_PER_DELVE_SKIN)) {
 								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
@@ -263,16 +254,13 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 						mPageNumber--;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
-						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
-						return;
 					}
 				}
-				break;
-				case PRESTIGE: {
+				case PRESTIGE -> {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -311,16 +299,13 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 						mPageNumber--;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
-						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
-						return;
 					}
 				}
-				break;
-				case SANGUINE: {
+				case SANGUINE -> {
 					int entry = slotToEntryNum(slot);
 
 					// Clicked on a cosmetic. Check for buying
@@ -338,7 +323,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
 							ItemStack mCanvas = InventoryUtils.getItemFromLootTable(player, CANVAS_LOOTTABLE);
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
-								!player.getInventory().containsAtLeast(mCanvas, CANVAS_PER_GALLERY_SKIN)) {
+									!player.getInventory().containsAtLeast(mCanvas, CANVAS_PER_GALLERY_SKIN)) {
 								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
@@ -364,16 +349,13 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 						mPageNumber--;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadGalleryPage(player);
-						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
 						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadGalleryPage(player);
-						return;
 					}
 				}
-				break;
-				default: {
+				default -> {
 					//Reject: related content not discovered
 					if (item.getType() == LOCKED) {
 						return;
@@ -383,19 +365,15 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					if (slot == DEPTH_ENTRY_LOC) {
 						mPageNumber = 1;
 						loadPage(CSGUIPage.DEPTHS, player);
-						return;
 					} else if (slot == DELVE_ENTRY_LOC) {
 						mPageNumber = 1;
 						loadPage(CSGUIPage.DELVE, player);
-						return;
 					} else if (slot == PRESTIGE_ENTRY_LOC) {
 						mPageNumber = 1;
 						loadPage(CSGUIPage.PRESTIGE, player);
-						return;
 					} else if (slot == GALLERY_ENTRY_LOC) {
 						mPageNumber = 1;
 						loadPage(CSGUIPage.SANGUINE, player);
-						return;
 					}
 				}
 			}
@@ -429,55 +407,37 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		GUIUtils.fillWithFiller(mInventory, true);
 
 		switch (mCurrentPage) {
-			case DEPTHS:
-				loadDepthPage(player);
-				break;
-			case DELVE:
-				loadDelvePage(player);
-				break;
-			case PRESTIGE:
-				loadPrestigePage(player);
-				break;
-			case SANGUINE:
-				loadGalleryPage(player);
-				break;
-			default:
+			case DEPTHS -> loadDepthPage(player);
+			case DELVE -> loadDelvePage(player);
+			case PRESTIGE -> loadPrestigePage(player);
+			case SANGUINE -> loadGalleryPage(player);
+			default -> {
 				// Intro item
-				ItemStack introItem = createPageIcon(Material.RED_GLAZED_TERRACOTTA, "Theme Selection", NamedTextColor.RED, List.of("Select a theme to buy", "cosmetic skills!"));
+				ItemStack introItem = createPageIcon(Material.RED_GLAZED_TERRACOTTA, Component.text("Theme Selection", NamedTextColor.RED), List.of(Component.text("Select a theme to buy", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false), Component.text("cosmetic skills!", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
 				mInventory.setItem(INTRO_LOC, introItem);
 
 				// Depth theme entry
-				setPageIcon(DEPTH_ENTRY_LOC, Material.BLACKSTONE, "Darkest Depths", "Da" + ChatColor.MAGIC + "rkest Dep" + ChatColor.RESET + "ths", DEPTH_COLOR, DEPTH_INTRO,
-					List.of("Complete " + ChatColor.MAGIC + "Darke" + ChatColor.RESET + "st D" + ChatColor.MAGIC + "epth" + ChatColor.RESET + "s",
-						"to unlock this theme!"),
-					DEPTHS_SCB, player);
+				setPageIcon(DEPTH_ENTRY_LOC, Material.BLACKSTONE, Component.text("Darkest Depths", DEPTH_COLOR), Component.text("Da").append(Component.text("rkest Dep").decorate(TextDecoration.OBFUSCATED)).append(Component.text("ths")), DEPTH_INTRO, List.of(Component.text("Complete ").append(Component.text("Darke").decorate(TextDecoration.OBFUSCATED)).append(Component.text("st D").append(Component.text("epth").decorate(TextDecoration.OBFUSCATED).append(Component.text("s")))), Component.text("to unlock this theme!")), DEPTHS_SCB, player);
 
 				// Delve theme entry
-				setPageIcon(DELVE_ENTRY_LOC, Material.NETHERITE_BLOCK, "Dungeon Delves", ChatColor.MAGIC + "Dungeon D" + ChatColor.RESET + "elves", DELVE_COLOR, DELVE_INTRO,
-					List.of("Complete Monument of King's Valley",
-						"to unlock this theme!"),
-					R1MONUMENT_SCB, player);
+				setPageIcon(DELVE_ENTRY_LOC, Material.NETHERITE_BLOCK, Component.text("Dungeon Delves", DELVE_COLOR), Component.text("Dungeon D", DELVE_COLOR).decorate(TextDecoration.OBFUSCATED).append(Component.text("elves", DELVE_COLOR)), DELVE_INTRO, List.of(Component.text("Complete Monument of King's Valley"), Component.text("to unlock this theme!")), R1MONUMENT_SCB, player);
 
 				// Prestige theme entry
-				setPageIcon(PRESTIGE_ENTRY_LOC, Material.GOLD_BLOCK, "Challenge Delves", ChatColor.MAGIC + "Chall" + ChatColor.RESET + "enge Delves", PRESTIGE_COLOR, PRESTIGE_INTRO,
-					List.of("Complete Monument of King's Valley",
-						"to unlock this theme!"),
-					R1MONUMENT_SCB, player);
+				setPageIcon(PRESTIGE_ENTRY_LOC, Material.GOLD_BLOCK, Component.text("Challenge Delves", PRESTIGE_COLOR), Component.text("Chall", PRESTIGE_COLOR).decorate(TextDecoration.OBFUSCATED).append(Component.text("enge Delves", PRESTIGE_COLOR)), PRESTIGE_INTRO, List.of(Component.text("Complete Monument of King's Valley"), Component.text("to unlock this theme!")), R1MONUMENT_SCB, player);
 
 				// Gallery theme entry
-				setPageIcon(GALLERY_ENTRY_LOC, Material.WAXED_OXIDIZED_COPPER, "Gallery of Fear", ChatColor.MAGIC + "MzkCaerulaArbor" + ChatColor.RESET, GALLERY_COLOR, GALLERY_INTRO,
-					List.of("Reveal the secret b" + ChatColor.MAGIC + "eneth the ocean" + ChatColor.RESET + "s",
-						"to unlock this theme!"),
-					GALLERY_SCB, player);
+				setPageIcon(GALLERY_ENTRY_LOC, Material.WAXED_OXIDIZED_COPPER, Component.text("Gallery of Fear", GALLERY_COLOR), Component.text("MzkCaerulaArbor", GALLERY_COLOR).decorate(TextDecoration.OBFUSCATED), GALLERY_INTRO, List.of(Component.text("Reveal the secret b").append(Component.text("eneth the ocean").decorate(TextDecoration.OBFUSCATED)).append(Component.text("s")), Component.text("to unlock this theme!")), GALLERY_SCB, player);
 
 				// Back item
 				setBackItem("Back to Cosmetic Manager");
+			}
 		}
 	}
 
 	private void loadDepthPage(Player player) {
 		// Intro item
-		ItemStack introItem = createPageIcon(Material.BLACKSTONE, "Darkest Depths", DEPTH_COLOR, DEPTH_INTRO);
+		ItemStack introItem = createPageIcon(Material.BLACKSTONE,
+				Component.text("Darkest Depths", DEPTH_COLOR), DEPTH_INTRO);
 		mInventory.setItem(INTRO_LOC, introItem);
 
 		// Skin items
@@ -489,9 +449,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			String skin = DEPTH_THEME.get(i);
 			String tokenName = StringUtils.capitalizeWords(DEPTHS_CS.get(i).getToken().replace('_', ' '));
 			List<String> price = List.of(
-				PIGMENT_PER_SKIN + " Twisted Pigments,",
-				TALISMAN_PER_DEPTH_SKIN + " " + tokenName + " and",
-				GEODE_PER_DEPTH_SKIN + " Voidstained Geodes");
+					PIGMENT_PER_SKIN + " Twisted Pigments,",
+					TALISMAN_PER_DEPTH_SKIN + " " + tokenName + " and",
+					GEODE_PER_DEPTH_SKIN + " Voidstained Geodes");
 			ItemStack item = createSkillIcon(skin, DEPTH_COLOR, player, price);
 			mInventory.setItem(currentSlot, item);
 			if (slotToEntryNum(++currentSlot) < 0) {
@@ -513,7 +473,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	private void loadDelvePage(Player player) {
 		// Intro item
-		ItemStack introItem = createPageIcon(Material.NETHERITE_BLOCK, "Dungeon Delves", DELVE_COLOR, DELVE_INTRO);
+		ItemStack introItem = createPageIcon(Material.NETHERITE_BLOCK,
+				Component.text("Dungeon Delves", DELVE_COLOR), DELVE_INTRO);
 		mInventory.setItem(INTRO_LOC, introItem);
 
 		// Skin items
@@ -522,9 +483,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		int currentSlot = ENTRY_START;
 		// Paging
 		List<String> price = List.of(
-			PIGMENT_PER_SKIN + " Twisted Pigments and",
-			STRAND_PER_DELVE_SKIN + " Twisted Strands");
-		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < DELVE_THEME.size();) {
+				PIGMENT_PER_SKIN + " Twisted Pigments and",
+				STRAND_PER_DELVE_SKIN + " Twisted Strands");
+		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < DELVE_THEME.size(); ) {
 			String skin = DELVE_THEME.get(i);
 			ItemStack item = createSkillIcon(skin, DELVE_COLOR, player, price);
 			mInventory.setItem(currentSlot, item);
@@ -547,9 +508,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	private void loadPrestigePage(Player player) {
 		// Intro item
-		List<String> desc = new ArrayList<>(PRESTIGE_INTRO);
-		desc.add("Challenge Points: " + ScoreboardUtils.getScoreboardValue(player, CHALLENGE_POINTS_SCOREBOARD).orElse(0));
-		ItemStack introItem = createPageIcon(Material.GOLD_BLOCK, "Prestige Hall", PRESTIGE_COLOR, desc);
+		List<TextComponent> desc = new ArrayList<>(PRESTIGE_INTRO);
+		desc.add(Component.text("Challenge Points: " + ScoreboardUtils.getScoreboardValue(player, CHALLENGE_POINTS_SCOREBOARD).orElse(0)));
+		ItemStack introItem = createPageIcon(Material.GOLD_BLOCK, Component.text("Prestige Hall", PRESTIGE_COLOR), desc);
 		mInventory.setItem(INTRO_LOC, introItem);
 
 		// Skin items
@@ -582,7 +543,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	private void loadGalleryPage(Player player) {
 		// Intro item
-		ItemStack introItem = createPageIcon(Material.WAXED_OXIDIZED_COPPER, "Gallery of Fear", GALLERY_COLOR, GALLERY_INTRO);
+		ItemStack introItem = createPageIcon(Material.WAXED_OXIDIZED_COPPER,
+				Component.text("Gallery of Fear", GALLERY_COLOR), GALLERY_INTRO);
 		mInventory.setItem(INTRO_LOC, introItem);
 
 		// Skin items
@@ -591,9 +553,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		int currentSlot = ENTRY_START;
 		// Paging
 		List<String> price = List.of(
-			PIGMENT_PER_SKIN + " Twisted Pigments and",
-			CANVAS_PER_GALLERY_SKIN + " Torn Canvases");
-		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < GALLERY_THEME.size();) {
+				PIGMENT_PER_SKIN + " Twisted Pigments and",
+				CANVAS_PER_GALLERY_SKIN + " Torn Canvases");
+		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < GALLERY_THEME.size(); ) {
 			String skin = GALLERY_THEME.get(i);
 			ItemStack item = createSkillIcon(skin, GALLERY_CS.get(i).getMap().mColor, player, price);
 			mInventory.setItem(currentSlot, item);
@@ -641,18 +603,18 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		mInventory.setItem(BACK_LOC, item);
 	}
 
-	private void setPageIcon(int location, Material unlockedIcon, String unlockedName, String lockedName, TextColor color, List<String> unlockedLore, List<String> lockedLore, String scoreboard, Player player) {
+	private void setPageIcon(int location, Material unlockedIcon, Component unlockedName, Component lockedName, List<TextComponent> unlockedLore, List<TextComponent> lockedLore, String scoreboard, Player player) {
 		ItemStack item;
 		if (ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
-			item = createPageIcon(unlockedIcon, unlockedName, color, unlockedLore);
+			item = createPageIcon(unlockedIcon, unlockedName, unlockedLore);
 		} else {
-			item = createPageIcon(LOCKED, lockedName, color, lockedLore);
+			item = createPageIcon(LOCKED, lockedName, lockedLore);
 		}
 		mInventory.setItem(location, item);
 	}
 
-	private ItemStack createPageIcon(Material icon, String name, TextColor color, List<String> desc) {
-		return createBasicItem(icon, name, color, desc);
+	private ItemStack createPageIcon(Material icon, Component name, List<TextComponent> desc) {
+		return createBasicItem(icon, name, desc);
 	}
 
 	private ItemStack createSkillIcon(String skin, TextColor color, Player player, List<String> price) {
@@ -689,18 +651,23 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	}
 
 	private ItemStack createBasicItem(Material mat, String name, TextColor nameColor, List<String> desc, TextColor extraColor, String... extraLore) {
+		return createBasicItem(mat, Component.text(name, nameColor), desc, extraColor, extraLore);
+	}
+
+	private ItemStack createBasicItem(Material mat, Component name, List<String> desc, TextColor extraColor, String... extraLore) {
+		return createBasicItem(mat, name,
+				desc.stream().map(s -> Component.text(s, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)).toList(),
+				Arrays.stream(extraLore).map(s -> Component.text(s, extraColor).decoration(TextDecoration.ITALIC, false)).toList().toArray(new TextComponent[0]));
+	}
+
+	private ItemStack createBasicItem(Material mat, Component name, List<TextComponent> desc, Component... extraLore) {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text(name, nameColor)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, true));
-		List<Component> lore = new ArrayList<>();
-		for (String s : desc) {
-			lore.add(Component.text(s, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		}
-		for (String s : extraLore) {
-			lore.add(Component.text(s, extraColor).decoration(TextDecoration.ITALIC, false));
-		}
+		meta.displayName(name
+				.decoration(TextDecoration.ITALIC, false)
+				.decoration(TextDecoration.BOLD, true));
+		List<Component> lore = new ArrayList<>(desc);
+		lore.addAll(List.of(extraLore));
 		meta.lore(lore);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
@@ -731,4 +698,43 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			}, 2);
 		}
 	}
+
+	private static final Style INTRO_STYLE = Style.style(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false);
+
+	/**
+	 * "Styles" a list of components for use in the intros.
+	 *
+	 * @param components The list of components.
+	 * @return The styled components.
+	 */
+	private static List<TextComponent> applyIntroStyle(String... components) {
+		List<TextComponent> comps = new ArrayList<>();
+		for (String s : components) {
+			comps.add(Component.text(s, INTRO_STYLE));
+		}
+		return ImmutableList.copyOf(comps);
+	}
+
+	static {
+		DEPTH_INTRO = applyIntroStyle(
+				"Attuned with powers from",
+				"Darkest Depths trees."
+		);
+		DELVE_INTRO = applyIntroStyle(
+				"Essences of the twisted contingency,",
+				"rewards for heroic adventurers."
+		);
+		PRESTIGE_INTRO = applyIntroStyle(
+				"Every single step here is",
+				"a witness of your prestige and glory."
+		);
+		GALLERY_INTRO = applyIntroStyle(
+				"The nightmare was never meant for life.",
+				"Banish the dream.",
+				"End this nightmare!"
+		);
+
+	}
+
+
 }

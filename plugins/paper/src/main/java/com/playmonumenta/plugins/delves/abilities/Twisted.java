@@ -18,7 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -49,33 +50,17 @@ public class Twisted {
 
 	public static final String DESCRIPTION = "Something, everything is wrong...";
 
-	public static final String[] rankDescription(int level) {
-		switch (level) {
-			case 1:
-				return new String[]{
-					ChatColor.MAGIC + "M" + ChatColor.RESET + "or" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "i non mo" + ChatColor.MAGIC + "rd" + ChatColor.RESET + "ent",
-				};
-			case 2:
-				return new String[]{
-					ChatColor.MAGIC + "Mors" + ChatColor.RESET + " non a" + ChatColor.MAGIC + "ccip" + ChatColor.RESET + "it excusatio" + ChatColor.MAGIC + "nes"
-				};
-			case 3:
-				return new String[]{
-					"Quid" + ChatColor.MAGIC + "quid in" + ChatColor.RESET + " altum " + ChatColor.MAGIC + "for" + ChatColor.RESET + "tuna " + ChatColor.MAGIC + "tulit" + ChatColor.RESET + ", ruitura " + ChatColor.MAGIC + "levat."
-				};
-			case 4:
-				return new String[]{
-					ChatColor.MAGIC + "Nec" + ChatColor.RESET + " vita " + ChatColor.MAGIC + "nec" + ChatColor.RESET + " fortuna " + ChatColor.MAGIC + "hominibus " + ChatColor.RESET + " perpes " + ChatColor.MAGIC + "est"
-				};
-			case 5:
-				return new String[]{
-					"For" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "na " + ChatColor.MAGIC + "fav" + ChatColor.RESET + "et fo" + ChatColor.MAGIC + "rtib" + ChatColor.RESET + "u" + ChatColor.MAGIC + "s"
-				};
-			default:
-				return new String[]{
-					ChatColor.MAGIC + "Lorem ipsum dolor sit amet"
-				};
-		}
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+				switch (level) {
+					case 1 -> Component.text("M").decorate(TextDecoration.OBFUSCATED).append(Component.text("or")).append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("i non mo")).append(Component.text("rd").decorate(TextDecoration.OBFUSCATED)).append(Component.text("ent"));
+					case 2 -> Component.text("Mors").decorate(TextDecoration.OBFUSCATED).append(Component.text(" non a")).append(Component.text("ccip").decorate(TextDecoration.OBFUSCATED)).append(Component.text("it excusatio")).append(Component.text("nes").decorate(TextDecoration.OBFUSCATED));
+					case 3 -> Component.text("Quid").append(Component.text("quid in").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" altum ")).append(Component.text("for").decorate(TextDecoration.OBFUSCATED)).append(Component.text("tuna ")).append(Component.text("tulit").decorate(TextDecoration.OBFUSCATED)).append(Component.text(", ruitura ")).append(Component.text("levat.").decorate(TextDecoration.OBFUSCATED));
+					case 4 -> Component.text("Nec").decorate(TextDecoration.OBFUSCATED).append(Component.text(" vita ")).append(Component.text("nec").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" fortuna ")).append(Component.text("hominibus ").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" perpes ")).append(Component.text("est").decorate(TextDecoration.OBFUSCATED));
+					case 5 -> Component.text("For").append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("na ")).append(Component.text("fav").decorate(TextDecoration.OBFUSCATED)).append(Component.text("et fo")).append(Component.text("rtib").decorate(TextDecoration.OBFUSCATED)).append(Component.text("u")).append(Component.text("s").decorate(TextDecoration.OBFUSCATED));
+					default -> Component.text("Lorem ipsum dolor sit amet");
+				}
+		};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {

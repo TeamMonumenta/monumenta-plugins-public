@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -99,8 +100,8 @@ public class Arcanic {
 
 	public static final String DESCRIPTION = "Enemies gain magical abilities.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{"Enemies have a " + Math.round(100 * ABILITY_CHANCE_PER_LEVEL * level) + "% chance to be Arcanic."};
+	public static Component[] rankDescription(int level) {
+		return new Component[]{Component.text("Enemies have a " + Math.round(100 * ABILITY_CHANCE_PER_LEVEL * level) + "% chance to be Arcanic.")};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {

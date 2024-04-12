@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.EnumSet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -55,9 +56,9 @@ public class Chivalrous {
 
 	public static final String DESCRIPTION = "Enemies become mounted on slimes, bees, and spiders.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to be Chivalrous, riding a mount into battle."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to be Chivalrous, riding a mount into battle.")
 		};
 	}
 

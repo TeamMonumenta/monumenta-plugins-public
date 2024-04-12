@@ -134,8 +134,8 @@ public class DelvesUtils {
 		meta.displayName(Component.text("Rank " + rank, (level >= rank ? NamedTextColor.GOLD : NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false));
 
 		List<Component> lore = new ArrayList<>();
-		for (String loreString : mod.getRankDescriptions().apply(rank)) {
-			lore.add(Component.text(loreString, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		for (Component loreString : mod.getRankDescriptions().apply(rank)) {
+			lore.add(loreString.color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 
 		meta.lore(lore);

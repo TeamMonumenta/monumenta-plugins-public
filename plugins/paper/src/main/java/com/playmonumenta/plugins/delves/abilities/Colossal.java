@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.particle.PPRectPrism;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,10 +20,10 @@ public class Colossal {
 
 	public static final String DESCRIPTION = "Broken spawners unleash enemies.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"Broken Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance",
-			"to spawn Colossi."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("Broken Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
+			Component.text("to spawn Colossi.")
 		};
 	}
 

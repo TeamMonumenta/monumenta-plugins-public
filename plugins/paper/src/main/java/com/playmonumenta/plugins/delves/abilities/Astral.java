@@ -40,9 +40,9 @@ public class Astral {
 	);
 
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			MessagingUtils.legacyFromComponent(POSSIBLE_DESCRIPTIONS.get(FastUtils.RANDOM.nextInt(POSSIBLE_DESCRIPTIONS.size())))
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			POSSIBLE_DESCRIPTIONS.get(FastUtils.RANDOM.nextInt(POSSIBLE_DESCRIPTIONS.size()))
 		};
 	}
 

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.delves.abilities;
 import com.playmonumenta.plugins.bosses.bosses.CoordinatedAttackBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 
 public class Bloodthirsty {
@@ -11,9 +12,9 @@ public class Bloodthirsty {
 
 	public static final String DESCRIPTION = "Enemies can coordinate attacks on players.";
 
-	public static String[] rankDescription(int level) {
-			return new String[] {
-				"Enemies have a " + Math.round(100 * BLOODTHIRSTY_CHANCE_PER_LEVEL * level) + "% chance to be Bloodthirsty."
+	public static Component[] rankDescription(int level) {
+			return new Component[] {
+				Component.text("Enemies have a " + Math.round(100 * BLOODTHIRSTY_CHANCE_PER_LEVEL * level) + "% chance to be Bloodthirsty.")
 			};
 	}
 

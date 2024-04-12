@@ -23,13 +23,13 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -65,31 +65,31 @@ public class ShulkerEquipmentListener implements Listener {
 	public static final String PORTAL_EPIC_STRING = "PortalEpicBox";
 
 	private static final ImmutableMap<Integer, Integer> SWAP_SLOTS = ImmutableMap.<Integer, Integer>builder()
-		.put(0, 0)
-		.put(1, 1)
-		.put(2, 2)
-		.put(3, 3)
-		.put(4, 4)
-		.put(5, 5)
-		.put(6, 6)
-		.put(7, 7)
-		.put(8, 8)
-		.put(36, 9)
-		.put(37, 10)
-		.put(38, 11)
-		.put(39, 12)
-		.put(40, 13)
-		.build();
+			.put(0, 0)
+			.put(1, 1)
+			.put(2, 2)
+			.put(3, 3)
+			.put(4, 4)
+			.put(5, 5)
+			.put(6, 6)
+			.put(7, 7)
+			.put(8, 8)
+			.put(36, 9)
+			.put(37, 10)
+			.put(38, 11)
+			.put(39, 12)
+			.put(40, 13)
+			.build();
 
 	private static final ImmutableMap<Integer, Integer> CHARM_SLOTS = ImmutableMap.<Integer, Integer>builder()
-		                                                                  .put(0, 18)
-		                                                                  .put(1, 19)
-		                                                                  .put(2, 20)
-		                                                                  .put(3, 21)
-		                                                                  .put(4, 22)
-		                                                                  .put(5, 23)
-		                                                                  .put(6, 24)
-		                                                                  .build();
+			.put(0, 18)
+			.put(1, 19)
+			.put(2, 20)
+			.put(3, 21)
+			.put(4, 22)
+			.put(5, 23)
+			.put(6, 24)
+			.build();
 
 
 	private final Plugin mPlugin;
@@ -126,23 +126,23 @@ public class ShulkerEquipmentListener implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (
 			// Must be a right click
-			!event.getClick().equals(ClickType.RIGHT) ||
-				// Must be placing a single block
-				!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
-				// Must be a player interacting with their main inventory
-				!(event.getWhoClicked() instanceof Player player) ||
-				event.getClickedInventory() == null ||
-				// If it's a player inventory, must be in main inventory
-				// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
-				(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
-				// Must be a player inventory, ender chest, or regular chest
-				!(event.getClickedInventory() instanceof PlayerInventory ||
-					event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
-					event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
-				// Must be a click on a shulker box with an empty hand
-				(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
-				event.getCurrentItem() == null ||
-				!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
+				!event.getClick().equals(ClickType.RIGHT) ||
+						// Must be placing a single block
+						!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
+						// Must be a player interacting with their main inventory
+						!(event.getWhoClicked() instanceof Player player) ||
+						event.getClickedInventory() == null ||
+						// If it's a player inventory, must be in main inventory
+						// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
+						(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
+						// Must be a player inventory, ender chest, or regular chest
+						!(event.getClickedInventory() instanceof PlayerInventory ||
+								event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
+								event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
+						// Must be a click on a shulker box with an empty hand
+						(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
+						event.getCurrentItem() == null ||
+						!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
 		) {
 			// Nope!
 			return;
@@ -216,9 +216,9 @@ public class ShulkerEquipmentListener implements Listener {
 					// If the CD hasn't hit 0, tell the player and silence them.
 					if (yellowCooldown != 0) {
 						player.sendMessage(Component.text("Swapping skills is still on cooldown. You have been silenced for 30s.", NamedTextColor.RED)
-							.append(Component.text(" (Skill CD: ", NamedTextColor.AQUA))
-							.append(Component.text(yellowCooldown, NamedTextColor.YELLOW))
-							.append(Component.text(" mins)", NamedTextColor.AQUA)));
+								.append(Component.text(" (Skill CD: ", NamedTextColor.AQUA))
+								.append(Component.text(yellowCooldown, NamedTextColor.YELLOW))
+								.append(Component.text(" mins)", NamedTextColor.AQUA)));
 						mPlugin.mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 					} else if (!safeZone) {
 						YellowTesseractOverride.setCooldown(player, 3);
@@ -308,8 +308,8 @@ public class ShulkerEquipmentListener implements Listener {
 			ItemStack item = pInv.getItem(slot.getKey());
 			if (item != null && (
 					(slot.getKey() >= 36 && slot.getKey() <= 39 && ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_BINDING)) ||
-					ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_EPHEMERALITY) ||
-					ItemStatUtils.hasInfusion(item, InfusionType.LOCKED))) {
+							ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_EPHEMERALITY) ||
+							ItemStatUtils.hasInfusion(item, InfusionType.LOCKED))) {
 				continue;
 			}
 			swapItem(pInv, sInv, slot.getKey(), slot.getValue());
@@ -332,8 +332,7 @@ public class ShulkerEquipmentListener implements Listener {
 		if (!vanityData.mLockboxSwapEnabled) {
 			return;
 		}
-		NBTItem nbt = new NBTItem(shulkerBox, true);
-		NBTCompound vanityItems = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).getOrCreateCompound(ItemStatUtils.VANITY_ITEMS_KEY);
+		ReadWriteNBT vanityItems = NBT.itemStackToNBT(shulkerBox).getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).getOrCreateCompound(ItemStatUtils.VANITY_ITEMS_KEY);
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			if (slot == EquipmentSlot.HAND) {
 				continue;
@@ -365,15 +364,17 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 		int playerLeft = ScoreboardUtils.getScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_LEFT).orElse(0);
 		int playerRight = ScoreboardUtils.getScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT).orElse(0);
-		NBTItem nbt = new NBTItem(shulkerBox, true);
-		NBTCompound playerModified = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-		Integer lockboxLeft = playerModified.getInteger(ParrotManager.SCOREBOARD_PARROT_LEFT);
-		Integer lockboxRight = playerModified.getInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT);
-		playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_LEFT, playerLeft);
-		playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT, playerRight);
-		ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_LEFT, lockboxLeft == null ? 0 : lockboxLeft);
-		ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT, lockboxRight == null ? 0 : lockboxRight);
-		ParrotManager.updateParrots(player);
+		NBT.modify(shulkerBox, nbt -> {
+			ReadWriteNBT playerModified = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			Integer lockboxLeft = Optional.ofNullable(playerModified.getInteger(ParrotManager.SCOREBOARD_PARROT_LEFT)).orElse(0);
+			Integer lockboxRight = Optional.ofNullable(playerModified.getInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT)).orElse(0);
+			ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_LEFT, lockboxLeft);
+			ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT, lockboxRight);
+			ParrotManager.updateParrots(player);
+			playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_LEFT, playerLeft);
+			playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT, playerRight);
+			return playerModified;
+		});
 	}
 
 	private void swapCharms(Player player, ShulkerBox shulkerBox) {
@@ -468,17 +469,20 @@ public class ShulkerEquipmentListener implements Listener {
 		mLockBoxCooldowns.put(player.getUniqueId(), runnable);
 	}
 
-	//Returns true if cooldown is up right now
-	//False if no cooldowns and the lockbox is activatable now
+	/** Returns whether the lockbox is on cooldown or not.
+	 *
+	 * @param player The player to check for.
+	 * @return <code>true</code> if the lockbox is not on cooldown; otherwise <code>false</code>.
+	 */
 	private boolean checkLockboxSwapCooldown(Player player) {
 		return mLockBoxCooldowns.containsKey(player.getUniqueId()) && !mLockBoxCooldowns.get(player.getUniqueId()).isCancelled();
 	}
 
 	public static boolean isPotionInjectorItem(ItemStack item) {
 		return item != null &&
-			       ItemUtils.isShulkerBox(item.getType()) &&
-			       item.hasItemMeta() &&
-			       item.getItemMeta().hasLore() &&
-			       (InventoryUtils.testForItemWithName(item, "Potion Injector", true) || InventoryUtils.testForItemWithName(item, "Iridium Injector", true));
+				ItemUtils.isShulkerBox(item.getType()) &&
+				item.hasItemMeta() &&
+				item.getItemMeta().hasLore() &&
+				(InventoryUtils.testForItemWithName(item, "Potion Injector", true) || InventoryUtils.testForItemWithName(item, "Iridium Injector", true));
 	}
 }
