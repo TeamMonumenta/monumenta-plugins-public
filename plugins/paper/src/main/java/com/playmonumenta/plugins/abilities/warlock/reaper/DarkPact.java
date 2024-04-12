@@ -61,9 +61,9 @@ public class DarkPact extends Ability {
 				("Pressing the drop key while not sneaking and holding a scythe causes a dark aura to form around you. " +
 					 "For the next %s seconds, your scythe attacks deal +%s%% melee damage. " +
 					 "Each kill during this time increases the duration of your aura by %s second and gives %s absorption health (capped at %s) for the duration of the aura. " +
-					 "However, the player cannot heal for %s seconds, and reduced healing by %s%% until the aura ends. Cooldown: %ss.")
+					 "However, the player cannot heal for %s seconds, and healing is reduced by %s%% until the aura ends. Cooldown: %ss.")
 					.formatted(StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_1), StringUtils.ticksToSeconds(DURATION_INCREASE_ON_KILL),
-						ABSORPTION_ON_KILL, MAX_ABSORPTION, StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(EXTENDED_ANTIHEAL), StringUtils.ticksToSeconds(COOLDOWN)),
+						ABSORPTION_ON_KILL, MAX_ABSORPTION, StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(-EXTENDED_ANTIHEAL), StringUtils.ticksToSeconds(COOLDOWN)),
 				("Attacks with a scythe deal +%s%% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +%s/+%s HP, depending on the level of Soul Rend. " +
 					 "Nearby players are still healed as normal.")
 					.formatted(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_2), SoulRend.DARK_PACT_HEAL_1, SoulRend.DARK_PACT_HEAL_2))

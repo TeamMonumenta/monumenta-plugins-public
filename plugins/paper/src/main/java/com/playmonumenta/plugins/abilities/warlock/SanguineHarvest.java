@@ -74,7 +74,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 									"Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
 									"Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
 									"This projectile travels up to %s blocks and upon contact with a block or enemy or reaching max range, it explodes, " +
-									"knocking back all mobs within %s blocks and applying a blood mark to them for %s. " +
+									"knocking back all mobs within %s blocks and applying a blood mark to them for %ss. " +
 									"Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
 									.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS, StringUtils.ticksToSeconds(MARK_DURATION), StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
 							("Increase the mark's healing to %s%% of max health. " +
