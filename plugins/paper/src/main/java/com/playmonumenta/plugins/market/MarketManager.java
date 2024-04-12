@@ -28,7 +28,6 @@ import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.OptionalInt;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -230,12 +229,13 @@ public class MarketManager {
 	}
 
 	public static void openNewMarketGUI(Player player) {
-		OptionalInt bannedScore = ScoreboardUtils.getScoreboardValue(player, "MarketPluginBanned");
-		OptionalInt magentaScore = ScoreboardUtils.getScoreboardValue(player, "Magenta");
 		String error = null;
-		if (magentaScore.isEmpty() || magentaScore.getAsInt() == 0) {
-			error = "You need to have completed the Magenta Wool Dungeon to use the Marketplace. Aim for the 'Roots of the Plague' quest to unlock this Dungeon.";
-		} else if (bannedScore.isPresent() && bannedScore.getAsInt() != 0) {
+		if (ScoreboardUtils.getScoreboardValue(player, "White").orElse(0) == 0
+			|| ScoreboardUtils.getScoreboardValue(player, "Orange").orElse(0) == 0
+			|| ScoreboardUtils.getScoreboardValue(player, "Magenta").orElse(0) == 0
+		) {
+			error = "You need to have completed the White, Orange, and Magenta Wool Dungeons to access the Marketplace.";
+		} else if (ScoreboardUtils.getScoreboardValue(player, "MarketPluginBanned").orElse(0) != 0) {
 			error = "You are currently banned from the player market. Contact a moderator if you believe this is wrong, or for an appeal.";
 		} else if (!player.hasPermission("monumenta.marketaccess")) {
 			error = "You do not have market access. Try again later, or contact a moderator if you believe this is not normal.";
