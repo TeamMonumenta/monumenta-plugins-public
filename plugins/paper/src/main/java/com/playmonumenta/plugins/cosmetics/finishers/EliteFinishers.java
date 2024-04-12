@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.google.common.collect.ImmutableMap;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Set;
 import org.bukkit.Location;
@@ -40,6 +39,7 @@ public class EliteFinishers {
 			.put(Promenade.NAME, new Promenade())
 			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
 			.put(SwordRainFinisher.NAME, new SwordRainFinisher())
+			//.put(TwinkleTwinkleLittleStar.NAME, new TwinkleTwinkleLittleStar()) // TODO Uncomment for the next season pass
 			.put(USAFireworkFinisher.NAME, new USAFireworkFinisher())
 			.put(VictoryThemeFinisher.NAME, new VictoryThemeFinisher())
 			.put(WarmFireworkFinisher.NAME, new WarmFireworkFinisher())
@@ -92,7 +92,7 @@ public class EliteFinishers {
 
 
 	public static String[] getNames() {
-		return FINISHERS.keySet().stream().map(CommandUtils::quoteIfNeeded).toArray(String[]::new);
+		return FINISHERS.keySet().toArray(String[]::new);
 	}
 
 	public static Set<String> getNameSet() {

@@ -3,11 +3,13 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Color;
@@ -20,15 +22,17 @@ import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.Nullable;
 
 public class PoultryficationFinisher implements EliteFinisher {
 	public static final String NAME = "Poultryfication";
+	public static final int TICKS_PER_HALF_BEAT = 3;
+	public static final int HALF_BEATS_PER_BAR = 8;
+	public static final int TICKS_PER_BAR = TICKS_PER_HALF_BEAT * HALF_BEATS_PER_BAR;
+	public static final int BARS_PER_KILL = 4;
+	public static final int KILLS_TO_RESTART = 4;
 	public static final Particle.DustOptions WHITE = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 7);
 
-	private static final HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
-
-	private enum Instrument {
+	public enum Instrument {
 		TREBLE(Sound.BLOCK_NOTE_BLOCK_BANJO),
 		BASE(Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO);
 
@@ -41,377 +45,414 @@ public class PoultryficationFinisher implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
-		int mobsKilled = mMobsKilled.getOrDefault(p.getUniqueId(), 1);
-		int barOffset = 4 * (mobsKilled - 1) + 1;
+		new PlayingPoultryfication(p, killedMob, loc);
+	}
 
-		new BukkitRunnable() {
-			int mTicks = 0;
-			@Nullable Chicken mChicken;
-			Location mLastNoteLocation = loc;
+	public static class PlayingPoultryfication extends BukkitRunnable implements PlayingFinisher {
+		Player mPlayer;
+		int mTicks = 0;
+		List<Chicken> mChickens = new ArrayList<>();
 
-			@Override public void run() {
-				if (mTicks == 0) {
-					new PartialParticle(Particle.REDSTONE, loc, 50, 0.5, 1, 0.5, WHITE).spawnAsPlayerActive(p);
-					mChicken = (Chicken) LibraryOfSoulsIntegration.summon(loc, "Poultry");
-					Objects.requireNonNull(mChicken).addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
-					hurtChicken();
-				}
+		public PlayingPoultryfication(Player p, Entity killedMob, Location loc) {
+			mPlayer = p;
+			registerKill(killedMob, loc);
+			CosmeticsManager.getInstance().registerPlayingFinisher(this);
+			this.runTaskTimer(Plugin.getInstance(), 0, 1);
+		}
 
-				if (mTicks >= 0 && mTicks % 3 == 0) {
-					if (mChicken != null && mChicken.isValid()) {
-						mLastNoteLocation = mChicken.getEyeLocation();
-					}
+		@Override
+		public UUID playerUuid() {
+			return mPlayer.getUniqueId();
+		}
 
-					int bar = mTicks / 24 + barOffset;
-					int halfBeatInBar = (mTicks % 24) / 3;
+		@Override
+		public void registerKill(Entity killedMob, Location loc) {
+			new PartialParticle(Particle.REDSTONE, loc, 50, 0.5, 1, 0.5, WHITE).spawnAsPlayerActive(mPlayer);
+			Chicken chicken = (Chicken) LibraryOfSoulsIntegration.summon(loc, "Poultry");
+			Objects.requireNonNull(chicken).addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+			hurtChicken(chicken);
+			mChickens.add(chicken);
+		}
 
-					switch (bar) {
-						case 1, 9 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 1 -> playNote(Instrument.TREBLE, Note.G4);
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.A4);
-									playNote(Instrument.BASE, Note.A3);
-								}
-								case 3 -> playNote(Instrument.TREBLE, Note.A4);
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.C4);
-									playNote(Instrument.BASE, Note.B4);
-									playNote(Instrument.BASE, Note.B3);
-								}
-								case 5 -> playNote(Instrument.TREBLE, Note.E4);
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.C5);
-									playNote(Instrument.BASE, Note.C4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 2, 10 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E5);
-								}
-								case 1 -> playNote(Instrument.TREBLE, Note.G4);
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 3 -> playNote(Instrument.TREBLE, Note.A4);
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.C4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E5);
-								}
-								case 5 -> playNote(Instrument.TREBLE, Note.E4);
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.C5);
-									playNote(Instrument.BASE, Note.C4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 3, 11 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E5);
-								}
-								case 1 -> playNote(Instrument.TREBLE, Note.G4);
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 3 -> playNote(Instrument.TREBLE, Note.A4);
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.C5);
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E5);
-								}
-								case 5 -> playNote(Instrument.TREBLE, Note.C5);
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.B4);
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.BASE, Note.D5);
-									playNote(Instrument.BASE, Note.D4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 4, 12 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.B4);
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.F5);
-								}
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.F5);
-								}
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.BASE, Note.D5);
-									playNote(Instrument.BASE, Note.D4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 5, 6, 13, 14 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.F5);
-								}
-								case 1 -> playNote(Instrument.TREBLE, Note.F4);
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 3 -> playNote(Instrument.TREBLE, Note.G4);
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.TREBLE, Note.B3);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.F5);
-								}
-								case 5 -> playNote(Instrument.TREBLE, Note.D4);
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.BASE, Note.D5);
-									playNote(Instrument.BASE, Note.D4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 7 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.F5);
-								}
-								case 1 -> playNote(Instrument.TREBLE, Note.F4);
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 3 -> playNote(Instrument.TREBLE, Note.G4);
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.B4);
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.F5);
-								}
-								case 5 -> playNote(Instrument.TREBLE, Note.B4);
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.C5);
-									playNote(Instrument.BASE, Note.C4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 8 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E5);
-								}
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.TREBLE, Note.D4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E5);
-								}
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.C4);
-									playNote(Instrument.BASE, Note.C5);
-									playNote(Instrument.BASE, Note.C4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 15 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 1 -> playNote(Instrument.TREBLE, Note.G4);
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.BASE, Note.A4);
-									playNote(Instrument.BASE, Note.A3);
-								}
-								case 3 -> playNote(Instrument.TREBLE, Note.A4);
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.B4);
-									playNote(Instrument.TREBLE, Note.F4);
-									playNote(Instrument.BASE, Note.B4);
-									playNote(Instrument.BASE, Note.B3);
-								}
-								case 5 -> playNote(Instrument.TREBLE, Note.B4);
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.C5);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.C5);
-									playNote(Instrument.BASE, Note.C4);
-								}
-								default -> {
-								}
-							}
-						}
-						case 16 -> {
-							switch (halfBeatInBar) {
-								case 0 -> {
-									playNote(Instrument.TREBLE, Note.B4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E5);
-								}
-								case 1 -> playNote(Instrument.TREBLE, Note.A4);
-								case 2 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.BASE, Note.C5);
-									playNote(Instrument.BASE, Note.G4);
-								}
-								case 4 -> {
-									playNote(Instrument.TREBLE, Note.E4);
-									playNote(Instrument.TREBLE, Note.C4);
-									playNote(Instrument.BASE, Note.G4);
-									playNote(Instrument.BASE, Note.G3);
-								}
-								case 6 -> {
-									playNote(Instrument.TREBLE, Note.C4);
-									playNote(Instrument.TREBLE, Note.G3);
-									playNote(Instrument.BASE, Note.E4);
-									playNote(Instrument.BASE, Note.C4);
-								}
-								default -> {
-								}
-							}
-						}
-						default -> {
-						}
-					}
-				}
-
-				int chickenTicks = mTicks + 2;
-				if (chickenTicks >= 0 && chickenTicks % 3 == 0) {
-					if (mChicken != null && mChicken.isValid()) {
-						mLastNoteLocation = mChicken.getEyeLocation();
-					}
-
-					int bar = chickenTicks / 24 + 1;
-					int halfBeatInBar = (chickenTicks % 24) / 3;
-
-					switch (bar) {
-						case 4, 8, 12, 16 -> {
-							switch (halfBeatInBar) {
-								case 0, 2, 4, 6 -> hurtChicken();
-								default -> {
-								}
-							}
-						}
-						default -> {
-						}
-					}
-				}
-
-				if (mTicks > 24 * 4 - 3) {
-					if (mChicken != null) {
-						new PartialParticle(Particle.REDSTONE, mChicken.getLocation(), 50,
-							0.5, 1, 0.5, WHITE).spawnAsPlayerActive(p);
-						mChicken.remove();
-						mChicken = null;
-					}
-					if (mobsKilled >= 4) {
-						mMobsKilled.put(p.getUniqueId(), 1);
-					} else {
-						mMobsKilled.put(p.getUniqueId(), mobsKilled + 1);
-					}
-					this.cancel();
-				}
-
-				mTicks++;
+		@Override
+		public void run() {
+			if (mChickens.isEmpty()) {
+				return;
 			}
+			if (mTicks % TICKS_PER_HALF_BEAT == 0) {
+				int bar = mTicks / TICKS_PER_BAR + 1;
+				int halfBeatInBar = (mTicks % TICKS_PER_BAR) / TICKS_PER_HALF_BEAT;
 
-			public void hurtChicken() {
-				if (mChicken != null && mChicken.isValid()) {
-					mChicken.setInvulnerable(false);
-					DamageUtils.damage(p, mChicken, DamageEvent.DamageType.TRUE, 0, null, true);
-					mChicken.setInvulnerable(true);
-					mChicken.getWorld().playSound(mLastNoteLocation, Sound.ENTITY_CHICKEN_HURT, SoundCategory.PLAYERS, 1F, 1F);
+				switch (bar) {
+					case 1, 9 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 1 -> playNote(Instrument.TREBLE, Note.G4);
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.A4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.A4);
+								playNote(Instrument.BASE, Note.A3);
+							}
+							case 3 -> playNote(Instrument.TREBLE, Note.A4);
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.C4);
+								playNote(Instrument.BASE, Note.B4);
+								playNote(Instrument.BASE, Note.B3);
+							}
+							case 5 -> playNote(Instrument.TREBLE, Note.E4);
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.C5);
+								playNote(Instrument.BASE, Note.C4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 2, 10 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E5);
+							}
+							case 1 -> playNote(Instrument.TREBLE, Note.G4);
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.A4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 3 -> playNote(Instrument.TREBLE, Note.A4);
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.C4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E5);
+							}
+							case 5 -> playNote(Instrument.TREBLE, Note.E4);
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.C5);
+								playNote(Instrument.BASE, Note.C4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 3, 11 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E5);
+							}
+							case 1 -> playNote(Instrument.TREBLE, Note.G4);
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.A4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 3 -> playNote(Instrument.TREBLE, Note.A4);
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.C5);
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E5);
+							}
+							case 5 -> playNote(Instrument.TREBLE, Note.C5);
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.B4);
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.BASE, Note.D5);
+								playNote(Instrument.BASE, Note.D4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 4, 12 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.B4);
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.F5);
+							}
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.A4);
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.F5);
+							}
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.BASE, Note.D5);
+								playNote(Instrument.BASE, Note.D4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 5, 6, 13, 14 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.F5);
+							}
+							case 1 -> playNote(Instrument.TREBLE, Note.F4);
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 3 -> playNote(Instrument.TREBLE, Note.G4);
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.TREBLE, Note.B3);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.F5);
+							}
+							case 5 -> playNote(Instrument.TREBLE, Note.D4);
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.BASE, Note.D5);
+								playNote(Instrument.BASE, Note.D4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 7 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.F5);
+							}
+							case 1 -> playNote(Instrument.TREBLE, Note.F4);
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 3 -> playNote(Instrument.TREBLE, Note.G4);
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.B4);
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.F5);
+							}
+							case 5 -> playNote(Instrument.TREBLE, Note.B4);
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.A4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.C5);
+								playNote(Instrument.BASE, Note.C4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 8 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.A4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E5);
+							}
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.TREBLE, Note.D4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E5);
+							}
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.C4);
+								playNote(Instrument.BASE, Note.C5);
+								playNote(Instrument.BASE, Note.C4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 15 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 1 -> playNote(Instrument.TREBLE, Note.G4);
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.A4);
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.BASE, Note.A4);
+								playNote(Instrument.BASE, Note.A3);
+							}
+							case 3 -> playNote(Instrument.TREBLE, Note.A4);
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.B4);
+								playNote(Instrument.TREBLE, Note.F4);
+								playNote(Instrument.BASE, Note.B4);
+								playNote(Instrument.BASE, Note.B3);
+							}
+							case 5 -> playNote(Instrument.TREBLE, Note.B4);
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.C5);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.C5);
+								playNote(Instrument.BASE, Note.C4);
+							}
+							default -> {
+							}
+						}
+					}
+					case 16 -> {
+						switch (halfBeatInBar) {
+							case 0 -> {
+								playNote(Instrument.TREBLE, Note.B4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E5);
+							}
+							case 1 -> playNote(Instrument.TREBLE, Note.A4);
+							case 2 -> {
+								playNote(Instrument.TREBLE, Note.G4);
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.BASE, Note.C5);
+								playNote(Instrument.BASE, Note.G4);
+							}
+							case 4 -> {
+								playNote(Instrument.TREBLE, Note.E4);
+								playNote(Instrument.TREBLE, Note.C4);
+								playNote(Instrument.BASE, Note.G4);
+								playNote(Instrument.BASE, Note.G3);
+							}
+							case 6 -> {
+								playNote(Instrument.TREBLE, Note.C4);
+								playNote(Instrument.TREBLE, Note.G3);
+								playNote(Instrument.BASE, Note.E4);
+								playNote(Instrument.BASE, Note.C4);
+							}
+							default -> {
+							}
+						}
+					}
+					default -> {
+					}
 				}
 			}
 
-			public void playNote(Instrument instrument, Note note) {
-				mLastNoteLocation.getWorld().playSound(mLastNoteLocation, instrument.mSound, SoundCategory.PLAYERS, 1F, note.mPitch);
-				Location particleLoc = mLastNoteLocation.clone();
+			int chickenTicks = mTicks + 2;
+			if (chickenTicks >= 0 && chickenTicks % TICKS_PER_HALF_BEAT == 0) {
+				int bar = chickenTicks / TICKS_PER_BAR + 1;
+				int halfBeatInBar = (chickenTicks % TICKS_PER_BAR) / TICKS_PER_HALF_BEAT;
+
+				switch (bar) {
+					case 4, 8, 12, 16 -> {
+						switch (halfBeatInBar) {
+							case 0, 2, 4, 6 -> hurtChickens();
+							default -> {
+							}
+						}
+					}
+					default -> {
+					}
+				}
+			}
+
+			mTicks++;
+
+			if (mTicks % (TICKS_PER_BAR * BARS_PER_KILL) == 0) {
+				pause();
+				if (mTicks == TICKS_PER_BAR * BARS_PER_KILL * KILLS_TO_RESTART) {
+					CosmeticsManager.getInstance().cancelPlayingFinisher(mPlayer);
+				}
+			}
+		}
+
+		public void pause() {
+			for (Chicken chicken : mChickens) {
+				if (chicken != null) {
+					new PartialParticle(Particle.REDSTONE, chicken.getLocation(), 50,
+						0.5, 1, 0.5, WHITE).spawnAsPlayerActive(mPlayer);
+					chicken.remove();
+				}
+			}
+			mChickens.clear();
+		}
+
+		@Override
+		public synchronized void cancel() throws IllegalStateException {
+			super.cancel();
+			pause();
+		}
+
+		public void hurtChickens() {
+			for (Chicken chicken : mChickens) {
+				hurtChicken(chicken);
+			}
+		}
+
+		public void hurtChicken(Chicken chicken) {
+			if (chicken != null && chicken.isValid()) {
+				chicken.setInvulnerable(false);
+				DamageUtils.damage(mPlayer, chicken, DamageEvent.DamageType.TRUE, 0, null, true);
+				chicken.setInvulnerable(true);
+				chicken.getWorld().playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_HURT, SoundCategory.PLAYERS, 1F, 1F);
+			}
+		}
+
+		public void playNote(Instrument instrument, Note note) {
+			List<Location> locs = new ArrayList<>();
+			if (mChickens.isEmpty()) {
+				locs.add(mPlayer.getLocation());
+			} else {
+				for (int i = 0; i < mChickens.size(); i++) {
+					if (i % mChickens.size() == instrument.ordinal() % mChickens.size()) {
+						locs.add(mChickens.get(i).getLocation());
+					}
+				}
+			}
+
+			for (Location loc : locs) {
+				loc.getWorld().playSound(loc, instrument.mSound, SoundCategory.PLAYERS, 1F, note.mPitch);
+				Location particleLoc = loc.clone();
 				particleLoc.setPitch(0);
 				particleLoc.setYaw(particleLoc.getYaw() + 90.0F);
 				particleLoc.add(particleLoc.getDirection().clone().multiply(0.7 * (note.mNoteParticleValue - 0.5)));
@@ -423,9 +464,9 @@ public class PoultryficationFinisher implements EliteFinisher {
 					0.0,
 					1.0,
 					null,
-					true).minimumCount(1).spawnAsPlayerActive(p);
+					true).minimumCount(1).spawnAsPlayerActive(mPlayer);
 			}
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+		}
 	}
 
 	@Override public Material getDisplayItem() {

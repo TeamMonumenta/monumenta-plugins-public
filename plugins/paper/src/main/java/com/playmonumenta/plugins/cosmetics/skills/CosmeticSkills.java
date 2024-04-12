@@ -78,7 +78,6 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.ColossalBruteCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloryExecutionCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.PrestigiousSlamCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.PrestigiousShieldCS;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.bukkit.Material;
@@ -254,7 +253,7 @@ public class CosmeticSkills {
 	}
 
 	public static String[] getNames() {
-		return COSMETIC_SKILLS_BY_NAME.keySet().stream().map(CommandUtils::quoteIfNeeded).toArray(String[]::new);
+		return COSMETIC_SKILLS_BY_NAME.keySet().toArray(String[]::new);
 	}
 
 	public static ImmutableList<DepthsCS> getDepthsSkins() {

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.plots;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -257,7 +256,6 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	public static String[] getCosmeticNames() {
 		return BORDER_ITEMS.stream()
 			.map(item -> item.mCosmeticString)
-			.map(CommandUtils::quoteIfNeeded)
 			.filter(Objects::nonNull)
 			.toArray(String[]::new);
 	}
