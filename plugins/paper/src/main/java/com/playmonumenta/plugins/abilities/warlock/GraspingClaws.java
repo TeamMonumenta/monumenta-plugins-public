@@ -164,6 +164,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 						mTicks += 5;
 						if (mTicks >= CLEAVE_WINDOW) {
 							this.cancel();
+							mCleaveRunnable = null;
 						}
 					}
 				};
@@ -180,7 +181,8 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) && mCleaveRunnable != null) {
+		if (event.getType() == DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())
+			&& mCleaveRunnable != null && !mCleaveRunnable.isCancelled()) {
 			mCleaveRunnable.cancel();
 			mCleaveRunnable = null;
 

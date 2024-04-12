@@ -130,6 +130,7 @@ public class MelancholicLament extends Ability {
 					mTicks += 5;
 					if (mTicks >= SILENCE_WINDOW) {
 						this.cancel();
+						mSilenceRunnable = null;
 					}
 				}
 			};
@@ -195,7 +196,8 @@ public class MelancholicLament extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) && mSilenceRunnable != null) {
+		if (event.getType() == DamageEvent.DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())
+			&& mSilenceRunnable != null && !mSilenceRunnable.isCancelled()) {
 			mSilenceRunnable.cancel();
 			mSilenceRunnable = null;
 

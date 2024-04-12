@@ -63,13 +63,13 @@ public class AmplifyingHex extends Ability {
 			.scoreboardId("AmplifyingHex")
 			.shorthandName("AH")
 			.descriptions(
-				"Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, " +
-					"dealing 2 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) magic damage " +
-					"to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, " +
-					"and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.",
-				"The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.",
+				"Left click while sneaking with a scythe to unleash a magic cone up to 8 blocks in front of you, " +
+					"dealing magic damage equal to 2 + (0.5 * Player Level, capped based on region: R1 Level 7 / R2 Level 14 / R3 Level 21) " +
+					"to each enemy for each debuff it has. Debuffs include, but are not limited to, Fire, Slowness, Weaken, Decay, Bleed, and more. " +
+					"Deal an additional +1 damage for each extra level of debuff above 1, capped at 2 extra levels per debuff. 20% Slowness, Decay 2, etc. count as level 2 debuffs. Cooldown: 10s.",
+				"Range increased to 10 blocks. The extra debuff level damage is increased to +2 per extra level, and the extra debuff level cap is increased to 3 extra levels.",
 				"For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1.25% more damage to enemies and deal 1% max health damage to yourself.")
-			.simpleDescription("Deal damage to mobs in front of you for each debuff they have.")
+			.simpleDescription("Deal damage to mobs in front of you for each debuff they currently have.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AmplifyingHex::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
