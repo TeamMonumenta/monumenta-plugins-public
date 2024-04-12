@@ -25,7 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
@@ -96,9 +96,9 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		EntityEquipment equip = mPlayer.getEquipment();
+		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		if (event.getType() == DamageType.MELEE && mPlayer.getCooledAttackStrength(0.5f) > 0.9 &&
-			    ItemStatUtils.getAttributeAmount(equip.getItemInMainHand(), AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0) {
+			    (ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0) || (ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_SPEED, Operation.ADD, Slot.MAINHAND) != 0)) {
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			mCosmetic.onHit(mPlayer, loc, world);

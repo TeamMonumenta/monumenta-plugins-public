@@ -450,15 +450,23 @@ public class ItemUpdateHelper {
 						}
 						attributeMap.put(type, operationMap);
 					}
-					// show default attack speed if an item has attack damage, but no attack speed attribute (wands)
-					if (attributeMap.containsKey(AttributeType.ATTACK_DAMAGE_ADD) && !attributeMap.containsKey(AttributeType.ATTACK_SPEED)) {
-						EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class); // placeholder
-						operationMap.put(Operation.ADD, AttributeType.getDisplay(AttributeType.ATTACK_SPEED, 0, slot, Operation.ADD));
-						attributeMap.put(AttributeType.ATTACK_SPEED, operationMap);
-					}
+
 					// add results together
 					// Mainhand slots have attack and projectile related attributes higher than other attributes
 					if (slot == Slot.MAINHAND) {
+						boolean attackDamage = attributeMap.containsKey(AttributeType.ATTACK_DAMAGE_ADD);
+						boolean attackSpeed = attributeMap.containsKey(AttributeType.ATTACK_SPEED);
+						// show default attack speed if an item has attack damage, but no attack speed attribute (wands)
+						if (attackDamage && !attackSpeed) {
+							EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class); // placeholder
+							operationMap.put(Operation.ADD, AttributeType.getDisplay(AttributeType.ATTACK_SPEED, 0, slot, Operation.ADD));
+							attributeMap.put(AttributeType.ATTACK_SPEED, operationMap);
+						} else if (!attackDamage && attackSpeed) {
+							EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class); // placeholder
+							operationMap.put(Operation.ADD, AttributeType.getDisplay(AttributeType.ATTACK_DAMAGE_ADD, 0, slot, Operation.ADD));
+							attributeMap.put(AttributeType.ATTACK_DAMAGE_ADD, operationMap);
+						}
+
 						List<Component> regularList = new ArrayList<>();
 						List<Component> mainhandPriorityList = new ArrayList<>();
 						for (Map.Entry<AttributeType, EnumMap<Operation, Component>> entry : attributeMap.entrySet()) {
