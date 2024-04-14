@@ -98,7 +98,7 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		if (event.getType() == DamageType.MELEE && mPlayer.getCooledAttackStrength(0.5f) > 0.9 &&
-			    (ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0) || (ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_SPEED, Operation.ADD, Slot.MAINHAND) != 0)) {
+			    (ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_SPEED, Operation.ADD, Slot.MAINHAND) != 0)) {
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			mCosmetic.onHit(mPlayer, loc, world);
