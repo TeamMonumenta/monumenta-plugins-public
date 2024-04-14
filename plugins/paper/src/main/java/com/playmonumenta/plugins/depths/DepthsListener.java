@@ -530,6 +530,8 @@ public class DepthsListener implements Listener {
 			rebirth.rerollAbilities(dp);
 			rebirth.applyResistance();
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(teleportTo));
+			dp.mDead = false;
+			dp.mCurrentlyReviving = false;
 			dp.mNumDeaths--;
 			dp.sendMessage("You have been reborn!");
 			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
@@ -585,14 +587,7 @@ public class DepthsListener implements Listener {
 				nearbyMobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 				if (!nearbyMobs.isEmpty()) {
 					player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_MOB_TAG);
-					StringBuilder names = new StringBuilder();
-					for (int i = 0; i < 5; i++) {
-						names.append(" ").append(nearbyMobs.get(i));
-						if (i < 4) {
-							names.append(",");
-						}
-					}
-					MMLog.info(player.getName() + " logged out near mobs and will have their death counter increased. Mobs include: " + names);
+					MMLog.info(player.getName() + " logged out near mobs and will have their death counter increased. Number of mobs: " + nearbyMobs.size());
 				}
 			}
 		}
