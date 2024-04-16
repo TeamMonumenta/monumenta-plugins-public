@@ -42,7 +42,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class KnickKnackSackGui extends Gui {
-	private static final int INV_SIZE = 36;
+	private static final int INV_SIZE = 45;
 	private static final Component BASE_TITLE = Component.text("Knick-Knack Sack");
 
 	private static final Talisman[] DEPTHS_TALISMAN_LIST = {
@@ -218,6 +218,7 @@ public class KnickKnackSackGui extends Gui {
 		int depthsTalismanSlot = 23;    // Depths Talisman
 		int zenithTalismanSlot = 24;    // Zenith Trinket
 		int guildSlot = 25;     // Guild GUI
+		int questSlot = 31;     // Quest guide; Centered for now, may want to un-center if/when more trinkets get added
 
 		// Information sign
 		ItemStack info = GUIUtils.createBasicItem(Material.OAK_SIGN, "Trinkets", NamedTextColor.WHITE, true);
@@ -450,6 +451,18 @@ public class KnickKnackSackGui extends Gui {
 		GuiItem guildItem = new GuiItem(guildBase)
 			.onLeftClick(() -> GuildGui.showDefaultView(mPlugin, mPlayer));
 		setItem(guildSlot, guildItem);
+
+		// Quest Guide
+		GuiItem questItem = new GuiItem(
+			GUIUtils.createBasicItem(
+				Material.SCUTE,
+				"Quest Guide",
+				NamedTextColor.GOLD,
+				true,
+				"Click to see available quests across Monumenta by region and town.",
+				NamedTextColor.GRAY)
+		).onClick(evt -> runConsoleCommand("sqgui show regionqg @S"));
+		setItem(questSlot, questItem);
 	}
 
 	private void setupTalismansPage(boolean refund, boolean celestialZenith) {
