@@ -61,8 +61,8 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 	private static final int SWAP_TARGET_SECONDS = 15;
 	private static final String PLANT_STAND_TAG = "Plant";
 	private static final double PLANT_CONSUME_PERCENT = 0.05;
-	private static final String MUSIC_TITLE = "epic:music.hedera";
-	private static final int MUSIC_DURATION = 202; //seconds
+	public static final String MUSIC_TITLE = "epic:music.hedera";
+	public static final int MUSIC_DURATION = 202; //seconds
 
 	private final List<Location> mPlantSpawns = new ArrayList<>();
 	private final Map<Location, LivingEntity> mPlants = new HashMap<>();

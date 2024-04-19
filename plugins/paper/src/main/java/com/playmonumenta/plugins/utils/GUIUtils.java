@@ -260,11 +260,15 @@ public class GUIUtils {
 		return createBasicItem(new ItemStack(mat, amount), amount, name, desc, setPlainTag);
 	}
 
-	public static ItemStack createBasicItem(Material mat, Component name, String displayPlainTagValue) {
+	public static ItemStack createBasicItem(Material mat, Component name) {
+		return createBasicItem(mat, name, null);
+	}
+
+	public static ItemStack createBasicItem(Material mat, Component name, @Nullable String displayPlainTagValue) {
 		return createBasicItem(mat, 1, name, new ArrayList<>(), true, displayPlainTagValue);
 	}
 
-	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<Component> desc, boolean setPlainTag, String displayPlainTagValue) {
+	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<Component> desc, boolean setPlainTag, @Nullable String displayPlainTagValue) {
 		return createBasicItem(new ItemStack(mat, amount), amount, name, desc, setPlainTag, displayPlainTagValue);
 	}
 

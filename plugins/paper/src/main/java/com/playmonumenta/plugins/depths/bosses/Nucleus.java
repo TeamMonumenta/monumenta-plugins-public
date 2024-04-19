@@ -65,7 +65,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 	public static final int EYE_KILL_COUNT = 4;
 
 	public static final String MUSIC_TITLE = "epic:music.nucleus";
-	private static final int MUSIC_DURATION = 152; //seconds
+	public static final int MUSIC_DURATION = 152; //seconds
 
 	public int mCooldownTicks;
 	public List<Location> mEyeSpawns;

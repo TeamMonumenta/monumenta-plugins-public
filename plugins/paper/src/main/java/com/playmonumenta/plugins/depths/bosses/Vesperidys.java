@@ -82,10 +82,13 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	public static final String mobTag = "DD2BossFight3";
 
 	public static final String bossName = "Vesperidys";
+
+	public static final String MUSIC_TITLE_AMBIENT = "epid:music.vesperidys_ambient";
+	public static final int MUSIC_DURATION_AMBIENT = 1 * 60 + 27;
 	public static final String MUSIC_TITLE = "epic:music.vesperidys_phase1";
-	public static final double MUSIC_DURATION = 6 * 60 + 4; // seconds
+	public static final int MUSIC_DURATION = 6 * 60 + 4; // seconds
 	public static final String MUSIC_TITLE_2 = "epic:music.vesperidys_phase2";
-	public static final double MUSIC_DURATION_2 = 5 * 60 + 56; // seconds
+	public static final int MUSIC_DURATION_2 = 5 * 60 + 56; // seconds
 
 	public static final int detectionRange = 100;
 	public static final int REALITY_DISTORTION_TICKS = 3 * 20;

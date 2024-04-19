@@ -147,6 +147,11 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	private static final double SCALING_X = 0.7;
 	private static final double SCALING_Y = 0.575;
 
+	public static final String MUSIC_TITLE = "epic:music.hekawt";
+	public static final int MUSIC_DURATION = 355;
+	public static final String MUSIC_TITLE_P4 = "epic:music.hekawtp4";
+	public static final int MUSIC_DURATION_P4 = 239;
+
 	private final double mPhylactHealth;
 
 	public Lich(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -1436,7 +1441,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
-			SongManager.playBossSong(players, new SongManager.Song("epic:music.hekawtp4", SoundCategory.RECORDS, 239, true, 1, 1, true), true, mBoss, true, 0, 5);
+			SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE_P4, SoundCategory.RECORDS, MUSIC_DURATION_P4, true, 1, 1, true), true, mBoss, true, 0, 5);
 		}, 20 * 3 + 15);
 
 		// haha surprise fuck you I'm not dead dialogues
@@ -2014,7 +2019,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(MAX_HEALTH);
 		mBoss.setPersistent(true);
 
-		SongManager.playBossSong(playersInRange(mStart.getLocation(), detectionRange, true), new SongManager.Song("epic:music.hekawt", SoundCategory.RECORDS, 355, true, 1, 1, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(playersInRange(mStart.getLocation(), detectionRange, true), new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 1, 1, true), true, mBoss, true, 0, 5);
 	}
 
 	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String text) {

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.depths.guis.DepthsAscensionGUI;
 import com.playmonumenta.plugins.depths.guis.ZenithCharmPowerGUI;
 import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
+import com.playmonumenta.plugins.guis.MusicGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -12,8 +13,10 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -374,6 +377,25 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player p = (Player) args[0];
 				new DepthsAscensionGUI(p).open();
+			}).register();
+
+		new CommandAPICommand("openmusicgui")
+			.withPermission("monumenta.command.openmusicgui")
+			.withArguments(
+				new EntitySelectorArgument.OnePlayer("player"),
+				new MultiLiteralArgument(Arrays.stream(MusicGui.MusicPage.values()).map(page -> page.mLabel).toArray(String[]::new)),
+				new BooleanArgument("fromRecordPlayer"),
+				new BooleanArgument("playToOthers")
+			)
+			.executes((sender, args) -> {
+				Player p = (Player) args[0];
+				String label = (String) args[1];
+				MusicGui.MusicPage musicPage = Arrays.stream(MusicGui.MusicPage.values()).filter(page -> page.mLabel.equals(label)).findAny().orElse(null);
+				boolean fromRecordPlayer = (boolean) args[2];
+				boolean playToOthers = (boolean) args[3];
+				if (musicPage != null) {
+					new MusicGui(p, musicPage, fromRecordPlayer, playToOthers).open();
+				}
 			}).register();
 	}
 

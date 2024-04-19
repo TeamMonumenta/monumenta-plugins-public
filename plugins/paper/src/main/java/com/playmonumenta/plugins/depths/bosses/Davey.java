@@ -65,7 +65,7 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 	private static final double SLOWNESS_POTENCY = -0.3;
 
 	public static final String MUSIC_TITLE = "epic:music.davey";
-	private static final int MUSIC_DURATION = 191; //seconds
+	public static final int MUSIC_DURATION = 191; //seconds
 
 	//Two vexes Davey controls
 	private final List<LivingEntity> mVexes = new ArrayList<>();

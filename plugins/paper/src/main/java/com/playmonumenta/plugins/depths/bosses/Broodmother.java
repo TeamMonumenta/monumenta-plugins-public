@@ -79,10 +79,12 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	public static final double VULNERABILITY_A8_INCREASE = 0.15;
 	public static final double VULNERABILITY_A15_INCREASE = 0.2;
 
+	public static final String MUSIC_TITLE_AMBIENT = "epic:music.broodmother_ambient";
+	public static final int MUSIC_DURATION_AMBIENT = 2 * 60;
 	public static final String MUSIC_TITLE = "epic:music.broodmother_phase1";
-	public static final double MUSIC_DURATION = 2 * 60 + 53; // seconds
+	public static final int MUSIC_DURATION = 2 * 60 + 53; // seconds
 	public static final String MUSIC_TITLE_2 = "epic:music.broodmother_phase2";
-	public static final double MUSIC_DURATION_2 = 3 * 60 + 21; // seconds
+	public static final int MUSIC_DURATION_2 = 3 * 60 + 21; // seconds
 
 	private final BukkitRunnable mLimbsRunnable;
 	private final Slime[] mLimbs = new Slime[4];

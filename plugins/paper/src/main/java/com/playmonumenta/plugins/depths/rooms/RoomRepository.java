@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.depths.DepthsEndlessDifficulty;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.bosses.Broodmother;
+import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoom.RoomDirection;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -138,9 +140,9 @@ public abstract class RoomRepository {
 		if (DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH && roomType == DepthsRoomType.BOSS) {
 			List<Player> players = party.getPlayers();
 			if (floor == 2) {
-				SongManager.playSong(players, new SongManager.Song("epic:music.broodmother_ambient", SoundCategory.RECORDS, 2 * 60, true, 1.0f, 1.0f, true), true);
+				SongManager.playSong(players, new SongManager.Song(Broodmother.MUSIC_TITLE_AMBIENT, SoundCategory.RECORDS, Broodmother.MUSIC_DURATION_AMBIENT, true, 1.0f, 1.0f, true), true);
 			} else if (floor == 3) {
-				SongManager.playSong(players, new SongManager.Song("epic:music.vesperidys_ambient", SoundCategory.RECORDS, 1 * 60 + 27, true, 1.0f, 1.0f, true), true);
+				SongManager.playSong(players, new SongManager.Song(Vesperidys.MUSIC_TITLE_AMBIENT, SoundCategory.RECORDS, Vesperidys.MUSIC_DURATION_AMBIENT, true, 1.0f, 1.0f, true), true);
 			}
 		}
 
