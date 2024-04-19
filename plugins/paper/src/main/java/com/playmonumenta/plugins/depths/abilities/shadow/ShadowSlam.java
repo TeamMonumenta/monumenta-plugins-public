@@ -162,7 +162,7 @@ public final class ShadowSlam extends DepthsAbility {
 			.add(a -> a.mRadius, SIZE)
 			.add(" block radius. Falling more than ")
 			.add(MANUAL_THRESHOLD)
-			.add(" blocks and damaging an enemy also generates a slam and cancels fall damage.");
+			.add(" blocks and dealing a melee hit to an enemy also generates a slam and cancels fall damage.");
 	}
 }
 
