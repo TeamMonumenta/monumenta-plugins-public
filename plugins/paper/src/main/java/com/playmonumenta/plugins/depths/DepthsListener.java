@@ -325,7 +325,7 @@ public class DepthsListener implements Listener {
 
 						ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class);
 						grave.setInvulnerable(true);
-						//grave.setDisabledSlots(EquipmentSlot.values());
+						grave.setDisabledSlots(EquipmentSlot.values());
 						grave.setCollidable(false);
 						grave.setBasePlate(false);
 						grave.customName(Component.text(player.getName() + "'s Grave", NamedTextColor.RED));
@@ -334,13 +334,6 @@ public class DepthsListener implements Listener {
 						grave.setArms(true);
 						grave.setGravity(true);
 						ScoreboardUtils.addEntityToTeam(grave, "GraveGreen", NamedTextColor.GREEN);
-						grave.addDisabledSlots(EquipmentSlot.values());
-						grave.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.CHEST, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.LEGS, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.FEET, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.OFF_HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
 						grave.addScoreboardTag(GRAVE_TAG);
 
 						VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);

@@ -171,13 +171,7 @@ public class GalleryGrave {
 		grave.setItem(EquipmentSlot.FEET, playerInventory.getItem(EquipmentSlot.FEET));
 		grave.setItem(EquipmentSlot.HAND, playerInventory.getItem(EquipmentSlot.HAND));
 		grave.setItem(EquipmentSlot.OFF_HAND, playerInventory.getItem(EquipmentSlot.OFF_HAND));
-		grave.addDisabledSlots(EquipmentSlot.values());
-		grave.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.REMOVING_OR_CHANGING);
-		grave.addEquipmentLock(EquipmentSlot.CHEST, ArmorStand.LockType.REMOVING_OR_CHANGING);
-		grave.addEquipmentLock(EquipmentSlot.LEGS, ArmorStand.LockType.REMOVING_OR_CHANGING);
-		grave.addEquipmentLock(EquipmentSlot.FEET, ArmorStand.LockType.REMOVING_OR_CHANGING);
-		grave.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
-		grave.addEquipmentLock(EquipmentSlot.OFF_HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
+		grave.setDisabledSlots(EquipmentSlot.values());
 		//TODO - set grave position like it is all on the floor
 		grave.setCustomNameVisible(true);
 		grave.customName(Component.text(bukkitPlayer.getName() + "'s grave"));
