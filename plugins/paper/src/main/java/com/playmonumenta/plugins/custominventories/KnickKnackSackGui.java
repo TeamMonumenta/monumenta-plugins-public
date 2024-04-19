@@ -218,7 +218,8 @@ public class KnickKnackSackGui extends Gui {
 		int depthsTalismanSlot = 23;    // Depths Talisman
 		int zenithTalismanSlot = 24;    // Zenith Trinket
 		int guildSlot = 25;     // Guild GUI
-		int questSlot = 31;     // Quest guide; Centered for now, may want to un-center if/when more trinkets get added
+		int questSlot = 28;     // Quest guide
+		int enchantSlot = 29;   // Enchantopedia
 
 		// Information sign
 		ItemStack info = GUIUtils.createBasicItem(Material.OAK_SIGN, "Trinkets", NamedTextColor.WHITE, true);
@@ -463,6 +464,22 @@ public class KnickKnackSackGui extends Gui {
 				NamedTextColor.GRAY)
 		).onClick(evt -> runConsoleCommand("sqgui show regionqg @S"));
 		setItem(questSlot, questItem);
+
+		// Enchantopedia
+		GuiItem enchantopedia = new GuiItem(
+			GUIUtils.createBasicItem(
+				Material.ENCHANTED_BOOK,
+				"Enchantopedia",
+				NamedTextColor.AQUA,
+				true,
+				"Click to view enchantments and their descriptions.",
+				NamedTextColor.GRAY)
+		).onClick(evt -> {
+			if (mPlayer.hasPermission("monumenta.command.openenchantexplanations")) {
+				runConsoleCommand("openenchantexplanations @S");
+			}
+		});
+		setItem(enchantSlot, enchantopedia);
 	}
 
 	private void setupTalismansPage(boolean refund, boolean celestialZenith) {

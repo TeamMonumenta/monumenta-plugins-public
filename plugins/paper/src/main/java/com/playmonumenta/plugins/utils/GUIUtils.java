@@ -4,6 +4,7 @@ import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -146,11 +147,15 @@ public class GUIUtils {
 				if (currentLine.length() > 0 && currentLine.charAt(currentLine.length() - 1) == ' ') {
 					currentLine.setLength(currentLine.length() - 1);
 				}
-				String lastColor = findLastColor(currentLine.toString());
-				finalMinis.add(currentLine.toString());
+				String lineToAdd = currentLine.toString();
+				finalMinis.add(lineToAdd);
 				currentLine.setLength(0);
-				if (lastColor != null) {
-					currentLine.append(lastColor);
+
+				// Add any unclosed minimessage formatting to the start of the next line, in the same order
+				List<String> lingeringFormatting = findOpenFormatting(lineToAdd);
+				Collections.reverse(lingeringFormatting);
+				for (String format : lingeringFormatting) {
+					currentLine.insert(0, format);
 				}
 			}
 			if (newline) {
@@ -171,17 +176,20 @@ public class GUIUtils {
 			.toList();
 	}
 
-	private static @Nullable String findLastColor(String mini) {
+	private static List<String> findOpenFormatting(String mini) {
 		String pattern = "<.+?>";
 		Matcher matcher = Pattern.compile(pattern).matcher(mini);
-		String match = null;
+		List<String> formats = new ArrayList<>();
 		while (matcher.find()) {
-			match = matcher.group();
+			String match = matcher.group();
+			if (!match.contains("/")) {
+				formats.add(match);
+			} else {
+				String openMatch = match.replace("/", "");
+				formats.removeIf(openMatch::equals);
+			}
 		}
-		if (match == null || match.contains("/")) {
-			return null;
-		}
-		return match;
+		return formats;
 	}
 
 	private static Component fixLoreFormatting(Component c) {

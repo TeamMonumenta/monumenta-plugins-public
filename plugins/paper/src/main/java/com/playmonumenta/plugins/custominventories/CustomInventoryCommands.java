@@ -397,6 +397,21 @@ public class CustomInventoryCommands {
 					new MusicGui(p, musicPage, fromRecordPlayer, playToOthers).open();
 				}
 			}).register();
+
+		new CommandAPICommand("openenchantexplanations")
+			.withPermission("monumenta.command.openenchantexplanations")
+			.executesPlayer((player, args) -> {
+				new EnchantopediaGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("openenchantexplanations")
+			.withPermission("monumenta.command.openenchantexplanations")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new EnchantopediaGui(player).open();
+			})
+			.register();
 	}
 
 	private static void emote(Player player) {
