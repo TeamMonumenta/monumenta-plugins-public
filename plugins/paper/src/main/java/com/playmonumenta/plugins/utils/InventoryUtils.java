@@ -17,14 +17,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -344,57 +341,6 @@ public class InventoryUtils {
 			ar[index] = ar[i];
 			ar[i] = a;
 		}
-	}
-
-	/**
-	 * Give a player a currency itemstack without notifying them.
-	 * If the player has a wallet, add it to the wallet. If not, add it to the inventory.
-	 * If the inventory is full, we drop it on the ground.
-	 * @see InventoryUtils#playerHasWalletItem(Player)
-	 * @see InventoryUtils#giveItemWithStacksizeCheck(Player, ItemStack)
-	 * @see InventoryUtils#giveCurrencyToPlayer(Player, ItemStack, boolean)
-	 *
-	 * @param player The player to give the currency to.
-	 * @param item The currency item.
-	 */
-	public static void giveCurrencyToPlayer(final Player player, ItemStack item) {
-		giveCurrencyToPlayer(player, item, false);
-	}
-
-	/**
-	 * Give a player a currency ItemStack, with an option to notify them.
-	 * If the player has a wallet, add it to the wallet. If not, add it to the inventory.
-	 * If the inventory is full, we drop it on the ground.
-	 * If <code>notify</code> is <code>true</code>, the player will receive a message informing them of the addition.
-	 * @see InventoryUtils#playerHasWalletItem(Player)
-	 * @see InventoryUtils#giveItemWithStacksizeCheck(Player, ItemStack)
-	 *
-	 * @param player The player to give the currency to.
-	 * @param item The currency item.
-	 * @param notify Whether to send the player a message about it aswell.
-	 */
-	public static void giveCurrencyToPlayer(final Player player, ItemStack item, boolean notify) {
-		if (!WalletManager.isCurrency(item)) {
-			MMLog.warning("Attempted to give non-currency item " + item + " to player " + player.getName());
-			return;
-		}
-		int amount = item.getAmount();
-		if (notify) {
-			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		}
-		if (playerHasWalletItem(player)) {
-			if (notify) {
-				player.sendMessage(Component.text(item.getAmount() + " item" + (amount == 1 ? "" : "s") + " deposited into your wallet.", NamedTextColor.GOLD)
-					.hoverEvent(HoverEvent.showText(Component.text(amount + " " + ItemUtils.getPlainNameOrDefault(item), NamedTextColor.GRAY))));
-			}
-			WalletManager.getWallet(player).add(player, item); // this method sets the count of the item to 0, so we need to do it after notifying.
-			return;
-		}
-		giveItemWithStacksizeCheck(player, item);
-		if (notify) {
-			player.sendMessage(Component.text("Given ", NamedTextColor.GREEN).append(Component.text(amount + " " + ItemUtils.getPlainNameOrDefault(item) + ".", NamedTextColor.WHITE)));
-		}
-
 	}
 
 	/**

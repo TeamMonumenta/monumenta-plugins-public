@@ -88,7 +88,7 @@ public class MarketManager {
 			return;
 		}
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			InventoryUtils.giveCurrencyToPlayer(player, listing.getItemToBuy().asQuantity(amountToGive), true);
+			WalletManager.giveCurrencyToPlayer(player, listing.getItemToBuy().asQuantity(amountToGive), true);
 		});
 		MarketAudit.logClaim(player, listing, amountToGive);
 	}
@@ -129,8 +129,7 @@ public class MarketManager {
 			MarketRedisManager.deleteListing(newListing);
 			MarketManager.getInstance().unlinkListingFromPlayerData(player, newListing.getId());
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-
-				InventoryUtils.giveCurrencyToPlayer(player, newListing.getItemToBuy().asQuantity(currencyToGive), true);
+				WalletManager.giveCurrencyToPlayer(player, newListing.getItemToBuy().asQuantity(currencyToGive), true);
 				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToSell().asQuantity(itemsToGive));
 			});
 			MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
