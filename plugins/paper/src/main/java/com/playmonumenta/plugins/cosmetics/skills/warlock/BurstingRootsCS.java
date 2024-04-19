@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPParametric;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -60,8 +61,15 @@ public class BurstingRootsCS extends GraspingClawsCS {
 
 		// draw lines to each mob
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius);
+		mobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+		int mobCount = 0;
 		for (LivingEntity mob : mobs) {
 			drawSpike(player, loc, LocationUtils.getEntityCenter(mob));
+
+			mobCount++;
+			if (mobCount >= 8) { // cap max mob lines at 8 to prevent issues with tons of mobs
+				break;
+			}
 		}
 
 		// draw random lines as well

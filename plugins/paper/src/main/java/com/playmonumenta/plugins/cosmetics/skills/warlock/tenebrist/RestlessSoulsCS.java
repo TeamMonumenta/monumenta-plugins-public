@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,6 +15,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class RestlessSoulsCS implements CosmeticSkill {
@@ -60,5 +63,9 @@ public class RestlessSoulsCS implements CosmeticSkill {
 
 		world.playSound(loc, Sound.ENTITY_VEX_DEATH, SoundCategory.PLAYERS, 1.5f, 1.0f);
 		new PartialParticle(Particle.SOUL, loc, 20, 0.2, 0.2, 0.2).spawnAsPlayerActive(player);
+	}
+
+	public Team createTeam() {
+		return ScoreboardUtils.getExistingTeamOrCreate("restlessSoulsColor", NamedTextColor.WHITE);
 	}
 }

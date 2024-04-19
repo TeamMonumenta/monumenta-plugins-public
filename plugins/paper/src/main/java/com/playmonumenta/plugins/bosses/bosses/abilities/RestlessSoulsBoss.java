@@ -70,6 +70,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 					             .map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
 			});
 		}
+		mCosmetic.createTeam().addEntity(mBoss);
 	}
 
 	@Override

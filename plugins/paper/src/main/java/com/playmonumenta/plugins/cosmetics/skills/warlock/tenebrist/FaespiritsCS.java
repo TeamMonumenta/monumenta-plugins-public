@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +18,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -114,5 +117,10 @@ public class FaespiritsCS extends RestlessSoulsCS {
 			() -> new PartialParticle(Particle.BUBBLE_POP, loc, 25, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(player), 2);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(),
 			() -> new PartialParticle(Particle.BUBBLE_POP, loc, 25, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(player), 4);
+	}
+
+	@Override
+	public Team createTeam() {
+		return ScoreboardUtils.getExistingTeamOrCreate("faespiritsColor", NamedTextColor.DARK_AQUA);
 	}
 }
