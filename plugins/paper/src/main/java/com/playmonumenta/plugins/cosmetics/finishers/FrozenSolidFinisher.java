@@ -19,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +45,8 @@ public class FrozenSolidFinisher implements EliteFinisher {
 					// Let's let the mob freeze
 					killedMob.remove();
 					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "frozenfinisher", NamedTextColor.BLUE);
-
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "frozenfinisher", NamedTextColor.BLUE)
+						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 					// Figure out where and when to generate ice
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					for (double x = box.getMinX(); x <= box.getMaxX(); x += 0.6) {

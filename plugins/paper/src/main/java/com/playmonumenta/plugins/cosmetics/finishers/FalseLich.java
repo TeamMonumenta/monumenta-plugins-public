@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.Lootable;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class FalseLich implements EliteFinisher {
@@ -271,7 +272,8 @@ public class FalseLich implements EliteFinisher {
 							switch (quarterNote) {
 								case 0 -> {
 									mMob = EliteFinishers.createClonedMob(le, p);
-									ScoreboardUtils.addEntityToTeam(mMob, "lichfinisher", NamedTextColor.LIGHT_PURPLE);
+									ScoreboardUtils.addEntityToTeam(mMob, "lichfinisher", NamedTextColor.LIGHT_PURPLE)
+									.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 									if (mMob instanceof Lootable lootable) {
 										lootable.setLootTable(Bukkit.getLootTable(EMPTY_LOOTTABLE));
 									}

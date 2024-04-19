@@ -18,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
@@ -65,7 +66,8 @@ public class ChainedFinisher implements EliteFinisher {
 					// summon
 					killedMob.remove();
 					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "chainedfinisher", NamedTextColor.DARK_GRAY);
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "chainedfinisher", NamedTextColor.DARK_AQUA)
+						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					loc1.add((box.getWidthX() / 2) + 3 + 0.35, 1, 0.6);

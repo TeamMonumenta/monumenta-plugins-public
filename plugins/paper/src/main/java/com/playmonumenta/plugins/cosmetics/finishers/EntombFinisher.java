@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
@@ -53,7 +54,8 @@ public class EntombFinisher implements EliteFinisher {
 					// Let's let the mob freeze
 					killedMob.remove();
 					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "entombfinisher", NamedTextColor.YELLOW);
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "chainedfinisher", NamedTextColor.DARK_AQUA)
+						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 				}
 				if (mLayer < LAYERMAX) {
 					mLayer++;
