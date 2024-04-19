@@ -42,6 +42,7 @@ public class MarketGui extends Gui {
 	final MarketGuiTab TAB_MODERATOR_BROWSER = new TabModeratorBrowser(this);
 	final MarketGuiTab TAB_PLAYER_LISTINGS = new TabPlayerListings(this);
 	final MarketGuiTab TAB_EDIT_LISTING = new TabEditListing(this);
+	final MarketGuiTab TAB_EDIT_FILTERS = new TabEditFilters(this);
 
 	// represents the item that is going to be sold
 	@Nullable ItemStack mItemToSell = null;

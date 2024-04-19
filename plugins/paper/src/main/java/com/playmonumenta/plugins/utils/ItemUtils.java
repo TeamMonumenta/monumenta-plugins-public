@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.ItemType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -1438,6 +1439,10 @@ public class ItemUtils {
 			case ZOMBIFIED_PIGLIN_SPAWN_EGG -> EntityType.ZOMBIFIED_PIGLIN;
 			default -> EntityType.UNKNOWN;
 		};
+	}
+
+	public static ItemType getItemType(ItemStack item) {
+		return ItemType.of(item);
 	}
 
 	/**

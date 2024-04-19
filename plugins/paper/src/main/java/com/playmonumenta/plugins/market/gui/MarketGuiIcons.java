@@ -20,6 +20,7 @@ public class MarketGuiIcons {
 	static final ItemStack BACK_TO_MAIN_MENU = GUIUtils.createBasicItem(Material.BARRIER, GUIUtils.formatName("Return to Main Menu", NamedTextColor.GOLD, true), "gui_redReturnArrow");
 	static final ItemStack LOADING = GUIUtils.createBasicItem(Material.SUNFLOWER, GUIUtils.formatName("Loading...", NamedTextColor.GOLD, true), "gui_loading");
 	static final ItemStack ADD_LISTING = GUIUtils.createBasicItem(Material.WRITABLE_BOOK, 1, GUIUtils.formatName("Add Listing", NamedTextColor.GOLD, true), List.of(Component.text("Click here to sell your item(s)", NamedTextColor.GRAY), Component.text("on the Player Market.", NamedTextColor.GRAY)), true, "gui_greenPlus");
+	static final ItemStack REFRESH = GUIUtils.createBasicItem(Material.ENDER_EYE, GUIUtils.formatName("Refresh", NamedTextColor.GOLD, true), "gui_refresh");
 	static final ItemStack PLAYER_LISTINGS = GUIUtils.createBasicItem(Material.WRITTEN_BOOK, "Active Listings", NamedTextColor.GOLD, true, "Click to view your active Market Listings", NamedTextColor.GRAY);
 	static final ItemStack BAZAAR_LISTING_BROWSER = GUIUtils.createBasicItem(Material.BOOKSHELF, "Browse Market", NamedTextColor.GOLD, true, "Click here to browse the Player Market", NamedTextColor.GRAY);
 	static final ItemStack MODERATOR_MENU = GUIUtils.createBasicItem(Material.REDSTONE_BLOCK, "Moderation global actions", NamedTextColor.GOLD, true);

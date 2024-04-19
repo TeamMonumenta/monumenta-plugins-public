@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.market;
 
 import com.google.gson.Gson;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.MapScanCursor;
@@ -17,36 +16,91 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
+import org.bukkit.Material;
 
 public enum MarketListingIndex {
 
 	// use this class if we ever want to add filters or sorting
 
-	ACTIVE_LISTINGS("ActiveListings", true,
+	ACTIVE_LISTINGS("ActiveListings",
+		true,
 		(MarketListing l) -> String.valueOf(l.getId()),
-		(MarketListing l) -> !l.getPurchasableStatus(1).isError()
+		(MarketListing l) -> !l.getPurchasableStatus(1).isError(),
+		false,
+		Material.BLAZE_POWDER
 	),
 
-	REGION("Region", false,
+	LISTING_TYPE("ListingType",
+		false,
+		(MarketListing l) -> String.valueOf(l.getListingType()),
+		(MarketListing l) -> l.getListingType() != null,
+		false,
+		Material.BOOK
+	),
+
+	REGION("Region",
+		false,
 		(MarketListing l) -> String.valueOf(l.getRegion()),
-		(MarketListing l) -> l.getRegion() != null
+		(MarketListing l) -> l.getRegion() != null,
+		true,
+		Material.GRASS_BLOCK
 	),
 
-	LOCATION("Location", false,
+	LOCATION("Location",
+		false,
 		(MarketListing l) -> String.valueOf(l.getLocation()),
-		(MarketListing l) -> l.getLocation() != null
-	);
+		(MarketListing l) -> l.getLocation() != null,
+		true,
+		Material.COMPASS
+	),
 
+	NAME("Name",
+		false,
+		(MarketListing l) -> l.getItemName(),
+		(MarketListing l) -> l.getItemName() != null,
+		true,
+		Material.OAK_SIGN
+	),
+
+	CURRENCY("Currency",
+		false,
+		(MarketListing l) -> l.getCurrencyName(),
+		(MarketListing l) -> !l.getCurrencyName().equals("ERROR"),
+		true,
+		Material.EXPERIENCE_BOTTLE
+	),
+
+	TYPE("Type",
+		false,
+		(MarketListing l) -> String.valueOf(l.getItemType()),
+		(MarketListing l) -> l.getItemType() != null,
+		true,
+		Material.FLOWER_BANNER_PATTERN
+	),
+
+	TIER("Tier",
+		false,
+		(MarketListing l) -> String.valueOf(l.getItemTier()),
+		(MarketListing l) -> l.getItemTier() != null,
+		true,
+		Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE
+	),
+
+	;
 	final String mRedisPath;
 	final boolean mSortedFetch;
 	final Function<MarketListing, String> mGetKeyMethod;
 	final Function<MarketListing, Boolean> mMatchMethod;
+	final boolean mPlayerSelectable;
+	final Material mDisplayIconBaseMaterial;
 
-	MarketListingIndex(String redisID, boolean sortedFetch, Function<MarketListing, String> getKeyMethod, Function<MarketListing, Boolean> matchMethod) {
+	MarketListingIndex(String redisID, boolean sortedFetch, Function<MarketListing, String> getKeyMethod, Function<MarketListing, Boolean> matchMethod, boolean playerSelectable, Material displayIconBaseMaterial) {
 		this.mRedisPath = ConfigAPI.getServerDomain() + ":market:index:" + redisID;
 		this.mSortedFetch = sortedFetch;
 		this.mGetKeyMethod = getKeyMethod;
 		this.mMatchMethod = matchMethod;
+		this.mPlayerSelectable = playerSelectable;
+		this.mDisplayIconBaseMaterial = displayIconBaseMaterial;
 	}
 
 	public void removeListingFromIndex(MarketListing listing) {
@@ -93,9 +147,7 @@ public enum MarketListingIndex {
 			List<Long> list = new ArrayList<>();
 			String[] values = entry.getValue().split(",");
 			for (String value : values) {
-				MMLog.info(value);
 				if (value != null && !value.isEmpty() && value.matches("[0-9]*")) {
-					MMLog.info(value + " Added!");
 					list.add(Long.parseLong(value));
 				}
 			}
@@ -144,7 +196,11 @@ public enum MarketListingIndex {
 		// get the current values of the index, at listing key
 		String listingIdList = RedisAPI.getInstance().sync().hget(mRedisPath, key);
 		// add the new listing ID to the list
-		listingIdList += "," + listing.getId();
+		if (listingIdList != null && !listingIdList.isEmpty()) {
+			listingIdList += "," + listing.getId();
+		} else {
+			listingIdList = "" + listing.getId();
+		}
 		// push the new value
 		RedisAPI.getInstance().sync().hset(mRedisPath, key, listingIdList);
 	}
@@ -259,4 +315,11 @@ public enum MarketListingIndex {
 		}
 	}
 
+	public Material getDisplayIconMaterial() {
+		return this.mDisplayIconBaseMaterial;
+	}
+
+	public boolean isPlayerSelectable() {
+		return mPlayerSelectable;
+	}
 }

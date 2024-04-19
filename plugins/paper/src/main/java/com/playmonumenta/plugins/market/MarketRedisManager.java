@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.market;
 
 import com.google.gson.Gson;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.market.filters.Comparator;
+import com.playmonumenta.plugins.market.filters.FilterComponent;
+import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.KeyValue;
@@ -45,7 +48,7 @@ public class MarketRedisManager {
 		long currencyDatabaseID = MarketItemDatabase.getIDFromItemStack(currencyItemStack);
 
 		// build the listing
-		MarketListing listing = new MarketListing(listingID, itemToSellDatabaseID, amountToSell, pricePerItemAmount, currencyDatabaseID, player);
+		MarketListing listing = new MarketListing(listingID, MarketListingType.BAZAAR, itemToSellDatabaseID, amountToSell, pricePerItemAmount, currencyDatabaseID, player);
 
 		// push the listing in redis
 		boolean updateOk = createListing(listing);
@@ -207,26 +210,26 @@ public class MarketRedisManager {
 			indexDatas.put(index, index.getListingsMapFromIndex(false));
 		}
 
-		for (MarketFilter.FilterComponent comp : filter.getAllOptimisedComponents()) {
+		for (FilterComponent comp : filter.getAllOptimisedComponents()) {
 			if (out.isEmpty()) {
 				break;
 			}
 
-			Map<String, List<Long>> indexData = indexDatas.getOrDefault(comp.mIndex, new TreeMap<>());
+			Map<String, List<Long>> indexData = indexDatas.getOrDefault(comp.getTargetIndex(), new TreeMap<>());
 			TreeSet<Long> idsToFilter = new TreeSet<>();
-			for (String indexKey : comp.mValues) {
+			for (String indexKey : comp.mValuesList) {
 				idsToFilter.addAll(indexData.getOrDefault(indexKey, Collections.emptyList()));
 			}
 
 			List<Long> newOut = new ArrayList<>();
 
-			if (comp.mType == MarketFilter.Type.BLACKLIST) {
+			if (comp.mComparator.equals(Comparator.BLACKLIST)) {
 				for (Long id : out) {
 					if (!idsToFilter.contains(id)) {
 						newOut.add(id);
 					}
 				}
-			} else if (comp.mType == MarketFilter.Type.WHITELIST) {
+			} else if (comp.mComparator.equals(Comparator.WHITELIST)) {
 				for (Long id : out) {
 					if (idsToFilter.contains(id)) {
 						newOut.add(id);

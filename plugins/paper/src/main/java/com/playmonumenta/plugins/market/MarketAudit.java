@@ -20,7 +20,7 @@ public class MarketAudit {
 	public static void logBuyAction(Player player, MarketListing targetListing, int amountItemToSell, int amountToPay, ItemStack currencyToPay) {
 		String message =
 			"BUY \n" +
-			"Listing : " + targetListing.getId() + "\n" +
+			"Listing : " + targetListing.getDisplayId() + "\n" +
 			"Player : " + player.getName() + "\n" +
 			"Bought : " + amountItemToSell + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
 			"For : " + amountToPay + " * " + ItemUtils.getPlainName(currencyToPay);
@@ -30,7 +30,7 @@ public class MarketAudit {
 	public static void logUnlockAction(Player player, MarketListing targetListing) {
 		String message =
 			"UNLOCK \n" +
-			"Listing : " + targetListing.getId() + "\n" +
+			"Listing : " + targetListing.getDisplayId() + "\n" +
 			"Unlocked by : " + player.getName();
 		AuditListener.logMarket(message);
 	}
@@ -38,7 +38,7 @@ public class MarketAudit {
 	public static void logLockAction(Player player, MarketListing targetListing) {
 		String message =
 			"LOCK \n" +
-			"Listing : " + targetListing.getId() + "\n" +
+			"Listing : " + targetListing.getDisplayId() + "\n" +
 			"Locked by : " + player.getName();
 		AuditListener.logMarket(message);
 	}
@@ -54,26 +54,26 @@ public class MarketAudit {
 	public static void logClaimAndDelete(Player player, MarketListing targetListing, int itemsToGive, int currencyToGive) {
 		String message = "CLAIM AND DELETE\n" +
 			"Player : " + player.getName() + "\n" +
-			"Listing : " + targetListing.getId() + "\n" +
+			"Listing : " + targetListing.getDisplayId() + "\n" +
 			"Claimed Items : " + itemsToGive + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
-			"Claimed Currency : " + currencyToGive + " * " + ItemUtils.getPlainName(targetListing.getItemToBuy());
+			"Claimed Currency : " + currencyToGive + " * " + ItemUtils.getPlainName(targetListing.getCurrencyToBuy());
 		AuditListener.logMarket(message);
 	}
 
 	public static void logClaim(Player player, MarketListing targetListing, int amountToGive) {
 		String message = "CLAIM\n" +
 			"Player : " + player.getName() + "\n" +
-			"Listing : " + targetListing.getId() + "\n" +
-			"Claimed Currency : " + amountToGive + " * " + ItemUtils.getPlainName(targetListing.getItemToBuy());
+			"Listing : " + targetListing.getDisplayId() + "\n" +
+			"Claimed Currency : " + amountToGive + " * " + ItemUtils.getPlainName(targetListing.getCurrencyToBuy());
 		AuditListener.logMarket(message);
 	}
 
 	public static void logCreate(Player player, MarketListing targetListing, WalletUtils.Debt taxDebt) {
 		String message = "CREATE\n" +
 			"Player : " + player.getName() + "\n" +
-			"Listing : " + targetListing.getId() + "\n" +
+			"Listing : " + targetListing.getDisplayId() + "\n" +
 			"To Sell : " + targetListing.getAmountToSellRemaining() + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
-		    "Price : " + targetListing.getAmountToBuy() + " * " + ItemUtils.getPlainName(targetListing.getItemToBuy()) + "\n" +
+		    "Price : " + targetListing.getAmountToBuy() + " * " + ItemUtils.getPlainName(targetListing.getCurrencyToBuy()) + "\n" +
 			"Tax paid : " + taxDebt.mTotalRequiredAmount + " * " + ItemUtils.getPlainName(taxDebt.mItem);
 		AuditListener.logMarket(message);
 	}
@@ -81,7 +81,7 @@ public class MarketAudit {
 	public static void logExpire(Player player, MarketListing targetListing, String reason) {
 		String message =
 			"EXPIRE \n" +
-			"Listing : " + targetListing.getId() + "\n" +
+			"Listing : " + targetListing.getDisplayId() + "\n" +
 			"Expired by : " + player.getName() + "\n" +
 			"Reason : " + reason;
 		AuditListener.logMarket(message);
@@ -90,7 +90,7 @@ public class MarketAudit {
 	public static void logUnexpire(Player player, MarketListing targetListing) {
 		String message =
 			"UNEXPIRE \n" +
-			"Listing : " + targetListing.getId() + "\n" +
+			"Listing : " + targetListing.getDisplayId() + "\n" +
 			"Unexpired by : " + player.getName();
 		AuditListener.logMarket(message);
 	}

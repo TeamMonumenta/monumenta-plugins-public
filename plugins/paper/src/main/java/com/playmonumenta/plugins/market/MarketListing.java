@@ -4,8 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.playmonumenta.plugins.inventories.WalletManager;
+import com.playmonumenta.plugins.itemstats.enums.ItemType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.market.gui.MarketGuiTab;
 import com.playmonumenta.plugins.market.gui.TabBazaarBrowser;
 import com.playmonumenta.plugins.market.gui.TabModeratorBrowser;
@@ -39,6 +42,8 @@ public class MarketListing {
 	// to ensure that, it is more than advised to use the redis incremListingId method,
 	// if you do not know the id of your listing
 	private final long mId;
+
+	private final MarketListingType mListingType;
 
 	// the item to be sold
 	private final long mItemToSellID;
@@ -84,10 +89,23 @@ public class MarketListing {
 	private @Nullable
 	final Location mLocation;
 
+	private @Nullable
+	final String mItemName;
+
+	private @Nullable
+	final String mCurrencyName;
+
+	private @Nullable
+	final ItemType mItemType;
+
+	private @Nullable
+	final Tier mItemTier;
+
 	private @Nullable String mEditLocked;
 
-	public MarketListing(long listingID, long itemToSellID, int amountToSell, int pricePerItemAmount, long currencyToBuyID, Player owner) {
+	public MarketListing(long listingID, MarketListingType type, long itemToSellID, int amountToSell, int pricePerItemAmount, long currencyToBuyID, Player owner) {
 		this.mId = listingID;
+		this.mListingType = type;
 		this.mItemToSellID = itemToSellID;
 		this.mAmountToSellRemaining = amountToSell;
 		this.mAmountToBuy = pricePerItemAmount;
@@ -104,11 +122,19 @@ public class MarketListing {
 		ItemStack itemToSell = MarketItemDatabase.getItemStackFromID(itemToSellID);
 		this.mRegion = ItemStatUtils.getRegion(itemToSell);
 		this.mLocation = ItemStatUtils.getLocation(itemToSell);
+		this.mItemName = ItemUtils.getPlainNameOrDefault(itemToSell);
+		this.mItemType = ItemUtils.getItemType(itemToSell);
+		this.mItemTier = ItemStatUtils.getTier(itemToSell);
+
+		ItemStack currencyToBuy = MarketItemDatabase.getItemStackFromID(currencyToBuyID);
+		this.mCurrencyName = convertCurrencyItemStackToSmallestCurrencyName(currencyToBuy);
 	}
 
 	public MarketListing(Long listingID) {
 		this.mId = listingID;
+		this.mListingType = MarketListingType.BAZAAR;
 		this.mItemToSellID = 0;
+		this.mItemName = "";
 		this.mAmountToSellRemaining = 0;
 		this.mAmountToBuy = 0;
 		this.mCurrencyToBuyID = 0;
@@ -121,11 +147,16 @@ public class MarketListing {
 		this.mRegion = null;
 		this.mLocation = null;
 		this.mEditLocked = null;
+		this.mCurrencyName = null;
+		this.mItemType = null;
+		this.mItemTier = null;
 	}
 
 	public MarketListing(MarketListing other) {
 		this.mId = other.mId;
+		this.mListingType = other.mListingType;
 		this.mItemToSellID = other.mItemToSellID;
+		this.mItemName = other.mItemName;
 		this.mAmountToSellRemaining = other.mAmountToSellRemaining;
 		this.mCurrencyToBuyID = other.mCurrencyToBuyID;
 		this.mAmountToBuy = other.mAmountToBuy;
@@ -139,6 +170,9 @@ public class MarketListing {
 		this.mRegion = other.mRegion;
 		this.mLocation = other.mLocation;
 		this.mEditLocked = other.mEditLocked;
+		this.mCurrencyName = other.mCurrencyName;
+		this.mItemType = other.mItemType;
+		this.mItemTier = other.mItemTier;
 	}
 
 	public long getId() {
@@ -175,11 +209,11 @@ public class MarketListing {
 			String prettyJson = gson.toJson(json);
 			List<Component> compList = new ArrayList<>();
 			compList.add(Component.text("THIS LISTING IS BROKEN. CONTACT A MODERATOR FOR A REFUND", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			compList.add(Component.text("Market Listing: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + this.getId(), NamedTextColor.DARK_GRAY)));
+			compList.add(this.getDisplayComponentId());
 			for (String str : prettyJson.split("\n")) {
 				compList.add(Component.text(str, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			}
-			compList.add(Component.text("Market Listing: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + this.getId(), NamedTextColor.DARK_GRAY)));
+			compList.add(this.getDisplayComponentId());
 			compList.add(Component.text("THIS LISTING IS BROKEN. CONTACT A MODERATOR FOR A REFUND", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			return GUIUtils.createExclamation(compList);
 		}
@@ -217,7 +251,7 @@ public class MarketListing {
 				newLore.addAll(getListingDisplayLorePlayerListings());
 			}
 		}
-		newLore.add(Component.text("Market Listing: ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + this.getId(), NamedTextColor.DARK_GRAY)));
+		newLore.add(this.getDisplayComponentId());
 
 		return newLore;
 	}
@@ -225,7 +259,6 @@ public class MarketListing {
 	private Collection<? extends Component> getListingDisplayLorePlayerListings() {
 
 		List<Component> newLore = new ArrayList<>();
-
 
 		if (isExpired()) {
 			newLore.add(Component.text("This listing is ", NamedTextColor.GRAY).append(Component.text("expired", NamedTextColor.RED)).append(Component.text(".", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
@@ -241,14 +274,14 @@ public class MarketListing {
 		newLore.add(Component.text("Remaining in stock: ", NamedTextColor.GRAY).append(Component.text(this.getAmountToSellRemaining(), (this.getAmountToSellRemaining() > 0 ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
 		// price
 		newLore.add(Component.text("Price per: ", NamedTextColor.GRAY)
-			.append(Component.text(this.getAmountToBuy() + " " + ItemUtils.getPlainName(this.getItemToBuy()), NamedTextColor.WHITE)).decoration(TextDecoration.ITALIC, false));
+			.append(Component.text(this.getAmountToBuy() + " " + ItemUtils.getPlainName(this.getCurrencyToBuy()), NamedTextColor.WHITE)).decoration(TextDecoration.ITALIC, false));
 
 		if (this.getAmountToClaim() > 0) {
 			newLore.add(Component.empty());
 			newLore.add(Component.text("Right click to claim money!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 			newLore.add(Component.text("Claimable: ", NamedTextColor.GRAY)
 				.append(Component.text(Integer.toString(this.getAmountToClaim() * this.getAmountToBuy()), NamedTextColor.GOLD))
-				.append(Component.text(" " + ItemUtils.getPlainName(this.getItemToBuy()), NamedTextColor.WHITE))
+				.append(Component.text(" " + ItemUtils.getPlainName(this.getCurrencyToBuy()), NamedTextColor.WHITE))
 				.decoration(TextDecoration.ITALIC, false)
 			);
 			newLore.add(Component.text("Stock sold: ", NamedTextColor.GRAY).append(Component.text(Integer.toString(this.getAmountToClaim()), NamedTextColor.GREEN)).decoration(TextDecoration.ITALIC, false));
@@ -264,11 +297,11 @@ public class MarketListing {
 		List<Component> newLore = new ArrayList<>();
 
 		// requirement (itemToBuy)
-		ItemStack currency = this.getItemToBuy().clone();
+		ItemStack currency = this.getCurrencyToBuy().clone();
 		currency.setAmount(this.getAmountToBuy());
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, player, true);
 		newLore.add(Component.text(this.getAmountToBuy() + " " + ItemUtils.getPlainName(currency) + " ", NamedTextColor.WHITE)
-			.append(Component.text(debt.mMeetsRequirement ? "\u2713" : "\u2717", (debt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED)))
+			.append(Component.text(debt.mMeetsRequirement ? "✓" : "✗", (debt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED)))
 			.append(Component.text(debt.mWalletDebt > 0 ? " (" + debt.mNumInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 
 		// listing locked
@@ -291,7 +324,7 @@ public class MarketListing {
 		return newLore;
 	}
 
-	public ItemStack getItemToBuy() {
+	public ItemStack getCurrencyToBuy() {
 		return MarketItemDatabase.getItemStackFromID(mCurrencyToBuyID);
 	}
 
@@ -371,6 +404,7 @@ public class MarketListing {
 
 	public boolean isSimilar(MarketListing listing) {
 		return mId == listing.mId
+			&& mListingType == listing.mListingType
 			&& mAmountToSellRemaining == listing.mAmountToSellRemaining
 			&& mAmountToBuy == listing.mAmountToBuy
 			&& mAmountToClaim == listing.mAmountToClaim
@@ -384,6 +418,10 @@ public class MarketListing {
 			&& mRegion == listing.mRegion
 			&& mLocation == listing.mLocation
 			&& Objects.equals(mEditLocked, listing.mEditLocked)
+			&& Objects.equals(mItemName, listing.mItemName)
+			&& Objects.equals(mCurrencyName, listing.mCurrencyName)
+			&& mItemType == listing.mItemType
+			&& mItemTier == listing.mItemTier
 			;
 	}
 
@@ -447,5 +485,57 @@ public class MarketListing {
 		} else {
 			return "<1 Minute";
 		}
+	}
+
+	public Component getDisplayComponentId() {
+		return Component.text("Market Listing: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+			.append(Component.text("#" + this.getDisplayId(), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+	}
+
+	public String getDisplayId() {
+		return this.getListingType().toString().substring(0, 1) + this.getId();
+	}
+
+	public MarketListingType getListingType() {
+		if (this.mListingType == null) {
+			return MarketListingType.BAZAAR;
+		}
+		return mListingType;
+	}
+
+	public String getItemName() {
+		if (this.mItemName == null) {
+			return ItemUtils.getPlainNameOrDefault(getItemToSell());
+		}
+		return mItemName;
+	}
+
+	private String convertCurrencyItemStackToSmallestCurrencyName(ItemStack currencyToBuy) {
+		WalletManager.CompressionInfo info = WalletManager.getAsMaxUncompressed(currencyToBuy);
+		if (info != null) {
+			return ItemUtils.getPlainNameOrDefault(info.mBase);
+		}
+		return "ERROR";
+	}
+
+	public String getCurrencyName() {
+		if (mCurrencyName == null) {
+			return convertCurrencyItemStackToSmallestCurrencyName(this.getCurrencyToBuy());
+		}
+		return mCurrencyName;
+	}
+
+	public ItemType getItemType() {
+		if (mItemType == null) {
+			return ItemUtils.getItemType(this.getItemToSell());
+		}
+		return mItemType;
+	}
+
+	public Tier getItemTier() {
+		if (mItemTier == null) {
+			return ItemStatUtils.getTier(this.getItemToSell());
+		}
+		return mItemTier;
 	}
 }

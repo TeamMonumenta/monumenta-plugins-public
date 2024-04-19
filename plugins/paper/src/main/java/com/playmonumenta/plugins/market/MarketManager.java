@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.market;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.managers.LootboxManager;
+import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.plugins.market.gui.MarketGui;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -88,7 +90,7 @@ public class MarketManager {
 			return;
 		}
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			WalletManager.giveCurrencyToPlayer(player, listing.getItemToBuy().asQuantity(amountToGive), true);
+			WalletManager.giveCurrencyToPlayer(player, listing.getCurrencyToBuy().asQuantity(amountToGive), true);
 		});
 		MarketAudit.logClaim(player, listing, amountToGive);
 	}
@@ -129,7 +131,7 @@ public class MarketManager {
 			MarketRedisManager.deleteListing(newListing);
 			MarketManager.getInstance().unlinkListingFromPlayerData(player, newListing.getId());
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				WalletManager.giveCurrencyToPlayer(player, newListing.getItemToBuy().asQuantity(currencyToGive), true);
+				WalletManager.giveCurrencyToPlayer(player, newListing.getCurrencyToBuy().asQuantity(currencyToGive), true);
 				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToSell().asQuantity(itemsToGive));
 			});
 			MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
@@ -313,6 +315,25 @@ public class MarketManager {
 		}
 	}
 
+	public static List<MarketFilter> getPlayerMarketFilters(Player player) {
+		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(player);
+		if (marketPlayerData == null) {
+			Plugin.getInstance().getLogger().warning("ERROR: FAILED TO GET MARKET DATA OF " + player.getName() + ": NO MARKET INSTANCE. CONTACT A MODERATOR IMMEDIATELY, SOMETHING IS WRONG WITH YOUR PLUGIN DATA");
+			return new ArrayList<>();
+		}
+		return marketPlayerData.getPlayerFiltersList();
+
+	}
+
+	public static void setPlayerMarketFilters(Player player, List<MarketFilter> playerFilters) {
+		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(player);
+		if (marketPlayerData == null) {
+			Plugin.getInstance().getLogger().warning("ERROR: FAILED TO GET MARKET DATA OF " + player.getName() + ": NO MARKET INSTANCE. CONTACT A MODERATOR IMMEDIATELY, SOMETHING IS WRONG WITH YOUR PLUGIN DATA");
+			return;
+		}
+		marketPlayerData.setPlayerFiltersList(playerFilters);
+	}
+
 	public void playerJoinEvent(PlayerJoinEvent event) {
 
 		// initialise what we can
@@ -423,7 +444,7 @@ public class MarketManager {
 			return;
 		}
 
-		ItemStack currency = oldListing.getItemToBuy().clone();
+		ItemStack currency = oldListing.getCurrencyToBuy().clone();
 		currency.setAmount(oldListing.getAmountToBuy() * amount);
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, player, true);
 
@@ -596,5 +617,35 @@ public class MarketManager {
 			}
 		}
 
+	}
+
+	public void getAllFiltersData(Player targetPlayer) {
+
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+		MarketFilter forced = getForcedFiltersOfPlayer(targetPlayer);
+		List<MarketFilter> filters = getPlayerMarketFilters(targetPlayer);
+
+		targetPlayer.sendMessage("Forced Filter:");
+		targetPlayer.sendMessage(gson.toJson(forced));
+
+		targetPlayer.sendMessage("Player Filters:");
+		for (MarketFilter filter : filters) {
+			targetPlayer.sendMessage(gson.toJson(filter));
+		}
+
+	}
+
+	public MarketFilter getForcedFiltersOfPlayer(Player player) {
+		return new MarketFilter().startWithActiveOnly(true);
+	}
+
+	public void resetPlayerFilters(Player player) {
+		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(player);
+		if (marketPlayerData == null) {
+			Plugin.getInstance().getLogger().warning("ERROR: FAILED TO GET MARKET DATA OF " + player.getName() + ": NO MARKET INSTANCE. CONTACT A MODERATOR IMMEDIATELY, SOMETHING IS WRONG WITH YOUR PLUGIN DATA");
+			return;
+		}
+		marketPlayerData.resetPlayerFiltersList();
 	}
 }

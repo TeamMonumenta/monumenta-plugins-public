@@ -153,7 +153,7 @@ public class TabEditListing implements MarketGuiTab {
 				lore.add(MarketGuiIcons.GRAY_DASH
 					.append(Component.text(mOldListing.getAmountToClaim(), NamedTextColor.WHITE))
 					.append(MarketGuiIcons.GRAY_MULTIPLY)
-					.append(Component.text(ItemUtils.getPlainName(mOldListing.getItemToBuy()), NamedTextColor.WHITE))
+					.append(Component.text(ItemUtils.getPlainName(mOldListing.getCurrencyToBuy()), NamedTextColor.WHITE))
 					.decoration(TextDecoration.ITALIC, false));
 			}
 		} else {

@@ -57,7 +57,7 @@ public class TabBuyListing implements MarketGuiTab {
 			});
 		}
 
-		ItemStack currency = mGui.mFocusedListing.getItemToBuy().clone();
+		ItemStack currency = mGui.mFocusedListing.getCurrencyToBuy().clone();
 		currency.setAmount(mGui.mFocusedListing.getAmountToBuy());
 
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, mGui.mPlayer, true);
@@ -94,7 +94,7 @@ public class TabBuyListing implements MarketGuiTab {
 		if (mGui.mIsLoadingData <= 3) {
 			mGui.setItem(4, 4, MarketGuiIcons.LOADING);
 		} else {
-			mGui.setItem(4, 4, GUIUtils.createBasicItem(Material.YELLOW_STAINED_GLASS_PANE, "Refresh", NamedTextColor.GOLD, true))
+			mGui.setItem(4, 4, MarketGuiIcons.REFRESH)
 				.onClick((clickEvent) -> {
 					mGui.mIsLoadingData = 2;
 					mGui.update();
@@ -143,7 +143,7 @@ public class TabBuyListing implements MarketGuiTab {
 		if (errorLoreLines.isEmpty()) {
 			List<Component> confirmLore = new ArrayList<>();
 			confirmLore.add(Component.text("Buy " + mGui.mBuyListingMultiplier + " " + ItemUtils.getPlainNameOrDefault(listingItemStack) + " for: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			confirmLore.add(Component.text((mGui.mBuyListingMultiplier * mGui.mFocusedListing.getAmountToBuy()) + " " + ItemUtils.getPlainNameOrDefault(mGui.mFocusedListing.getItemToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			confirmLore.add(Component.text((mGui.mBuyListingMultiplier * mGui.mFocusedListing.getAmountToBuy()) + " " + ItemUtils.getPlainNameOrDefault(mGui.mFocusedListing.getCurrencyToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			mGui.setItem(4, 5, GUIUtils.createConfirm(confirmLore))
 				.onClick((clickEvent) -> {
 					if (MarketGui.initiatePlayerAction(mGui.mPlayer)) {

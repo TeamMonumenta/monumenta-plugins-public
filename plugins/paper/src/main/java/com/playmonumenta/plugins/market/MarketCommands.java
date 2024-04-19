@@ -113,6 +113,24 @@ public class MarketCommands {
 			})
 			.register();
 
+		new CommandAPICommand("market")
+			.withPermission(perms)
+			.withArguments(List.of(new LiteralArgument("filters"), new LiteralArgument("get"), new PlayerArgument("player")))
+			.executesPlayer((player, args) -> {
+				Player targetPlayer = (Player)args[0];
+				MarketManager.getInstance().getAllFiltersData(targetPlayer);
+			})
+			.register();
+
+		new CommandAPICommand("market")
+			.withPermission(perms)
+			.withArguments(List.of(new LiteralArgument("filters"), new LiteralArgument("reset"), new PlayerArgument("player")))
+			.executesPlayer((player, args) -> {
+				Player targetPlayer = (Player)args[0];
+				MarketManager.getInstance().resetPlayerFilters(targetPlayer);
+			})
+			.register();
+
 		arguments = new ArrayList<>();
 		arguments.add(new LiteralArgument("getlisting"));
 		arguments.add(new LongArgument("listingID"));
