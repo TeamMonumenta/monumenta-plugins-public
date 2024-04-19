@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -112,7 +113,8 @@ public class AdvancingShadows extends Ability {
 			return false;
 		}
 
-		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mActivationRange);
+		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mActivationRange,
+			(Entity e) -> mPlayer.getLocation().getDirection().dot(e.getLocation().subtract(mPlayer.getLocation()).toVector()) > 0);
 
 		if (entity == null) {
 			return false;

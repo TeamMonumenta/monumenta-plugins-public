@@ -62,7 +62,7 @@ public class SoulRend extends Ability {
 					"Killing the enemy heals you for %s health for each remaining mark on the mob. " +
 					"Healing from this ability now applies to all players within %s blocks of you.")
 					.formatted(StringUtils.ticksToSeconds(MARK_DURATION), MARK_COUNT, StringUtils.multiplierToPercentage(MARK_HEAL_PERCENT), MARK_HEAL_CAP, REMAINING_MARK_HEAL, RADIUS),
-				"Healing above max health, as well as any healing from this skill that remains negated by Dark Pact, is converted into Absorption, up to %s absorption health, for %ss."
+				"Healing from the initial attack that is above max health or negated by Dark Pact is converted into up to %s absorption health, for %ss."
 					.formatted(ABSORPTION_CAP, StringUtils.ticksToSeconds(ABSORPTION_DURATION)))
 			.simpleDescription("Critical strikes heal you.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
@@ -77,6 +77,7 @@ public class SoulRend extends Ability {
 	private final double mRadius;
 	private final double mAbsorptionCap;
 	private final int mAbsorptionDuration;
+	private final double mAllyHealMultiplier;
 
 	private final double mDarkPactHeal;
 	private @Nullable DarkPact mDarkPact;
@@ -94,6 +95,7 @@ public class SoulRend extends Ability {
 		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
 		mAbsorptionCap = ABSORPTION_CAP;
 		mAbsorptionDuration = ABSORPTION_DURATION;
+		mAllyHealMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, 1);
 
 		mDarkPactHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? DARK_PACT_HEAL_1 : DARK_PACT_HEAL_2);
 		Bukkit.getScheduler().runTask(plugin, () -> mDarkPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class));
@@ -118,31 +120,23 @@ public class SoulRend extends Ability {
 				if (mDarkPact != null && mDarkPact.isLevelTwo()) {
 					int currPactDuration = darkPactEffects.last().getDuration();
 					mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
-					mCosmetic.rendHealEffect(mPlayer, mPlayer, enemy);
-					double healed = PlayerUtils.healPlayer(mPlugin, mPlayer, mDarkPactHeal);
+					healPlayer(mPlayer, mHeal, enemy, mDarkPactHeal);
 					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(currPactDuration, -1));
 
-					if (isEnhanced()) {
-						// All healing, minus the 2/4 healed through dark pact, converted to absorption
-						double absorption = mDarkPactHeal - healed;
-						absorptionPlayer(mPlayer, absorption, enemy);
-					}
 				} else if (isEnhanced()) {
 					// All healing converted to absorption
-					absorptionPlayer(mPlayer, mDarkPactHeal, enemy);
+					absorptionPlayer(mPlayer, mHeal, enemy);
 				}
+
 			} else {
 				healPlayer(mPlayer, mHeal, enemy);
+			}
 
-				if (isLevelTwo()) {
-					mPlugin.mEffectManager.addEffect(enemy, "SoulRendLifeSteal",
-						new SoulRendLifeSteal(mPlugin, mPlayer, mMarkDuration, mMarks, mHealPercent, mHealCap, mRemainingHeal, mRadius, isEnhanced(), mAbsorptionCap, mAbsorptionDuration, mCosmetic));
+			if (isLevelTwo()) {
+				mPlugin.mEffectManager.addEffect(enemy, "SoulRendLifeSteal." + mPlayer.getUniqueId(),
+					new SoulRendLifeSteal(mPlayer, mMarkDuration, mMarks, mHealPercent, mHealCap, mRemainingHeal, this, mCosmetic));
 
-					double allyHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, mHeal);
-					for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true)) {
-						healPlayer(p, allyHeal, enemy);
-					}
-				}
+				healOthers(mHeal, enemy);
 			}
 
 			putOnCooldown();
@@ -150,10 +144,33 @@ public class SoulRend extends Ability {
 		return false;
 	}
 
+	public void markHeal(double heal, LivingEntity enemy) {
+		healPlayer(mPlayer, heal, enemy, heal, false);
+		healOthers(heal, enemy, false);
+	}
+
+	private void healOthers(double heal, LivingEntity enemy) {
+		healOthers(heal, enemy, isEnhanced());
+	}
+
+	private void healOthers(double heal, LivingEntity enemy, boolean grantAbsorption) {
+		for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true)) {
+			healPlayer(p, heal * mAllyHealMultiplier, enemy, heal * mAllyHealMultiplier, grantAbsorption);
+		}
+	}
+
 	private void healPlayer(Player player, double heal, LivingEntity enemy) {
+		healPlayer(player, heal, enemy, heal, isEnhanced());
+	}
+
+	private void healPlayer(Player player, double heal, LivingEntity enemy, double healCap) {
+		healPlayer(player, heal, enemy, healCap, isEnhanced());
+	}
+
+	private void healPlayer(Player player, double heal, LivingEntity enemy, double healCap, boolean grantAbsorption) {
 		mCosmetic.rendHealEffect(mPlayer, player, enemy);
-		double healed = PlayerUtils.healPlayer(mPlugin, player, heal, mPlayer);
-		if (isEnhanced()) {
+		double healed = PlayerUtils.healPlayer(mPlugin, player, healCap, mPlayer);
+		if (grantAbsorption) {
 			absorptionPlayer(player, heal - healed, enemy);
 		}
 	}

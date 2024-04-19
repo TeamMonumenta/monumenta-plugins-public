@@ -169,7 +169,7 @@ public class PhlegmaticResolve extends Ability {
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns).displaysTime(false));
 		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
 		if (isLevelTwo()) {
-			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
+			for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true)) {
 				mCosmetic.periodicTrigger(mPlayer, p, cooldowns);
 				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * mAllyModifier).displaysTime(false));
 				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * mAllyModifier, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
