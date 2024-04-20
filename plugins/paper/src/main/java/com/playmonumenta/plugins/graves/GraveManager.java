@@ -46,6 +46,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class GraveManager {
+	// used for grave-related armorstands
+	public static final String GRAVE_TAG = "Grave";
+	// used for armorstands to disable interactions on
+	public static final String DISABLE_INTERACTION_TAG = "DisabledSlots";
 	private static final String KEY_PLUGIN_DATA = "MonumentaGravesV2";
 	private static final String KEY_GRAVES = "graves";
 	private static final String KEY_THROWN_ITEMS = "thrown_items";
@@ -172,7 +176,7 @@ public class GraveManager {
 		 * These graves should be removed, as they're also saved on the player and will be respawned.
 		 * Note that while this event is called for newly created graves as well, those graves don't have the Grave tag when they spawn so this won't remove them.
 		 */
-		if (event.getEntity() instanceof ArmorStand armorStand && armorStand.getScoreboardTags().contains("Grave") && !GRAVES.containsKey(armorStand.getUniqueId())) {
+		if (event.getEntity() instanceof ArmorStand armorStand && armorStand.getScoreboardTags().contains(GRAVE_TAG) && !GRAVES.containsKey(armorStand.getUniqueId())) {
 			// delayed to not run in the EntityAddToWorldEvent which is finicky
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), armorStand::remove);
 		}
@@ -284,7 +288,7 @@ public class GraveManager {
 	}
 
 	public static boolean isGrave(Entity entity) {
-		return entity instanceof ArmorStand && (entity.getScoreboardTags().contains("Grave") || GRAVES.containsKey(entity.getUniqueId()));
+		return entity instanceof ArmorStand && (entity.getScoreboardTags().contains(GRAVE_TAG) || GRAVES.containsKey(entity.getUniqueId()));
 	}
 
 	public static boolean isThrownItem(Entity entity) {

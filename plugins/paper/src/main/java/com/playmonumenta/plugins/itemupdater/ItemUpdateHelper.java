@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.QuiverListener;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -628,6 +629,22 @@ public class ItemUpdateHelper {
 						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
 				});
 			}
+		});
+	}
+
+	public static void removeStats(ItemStack item) {
+		NBT.modify(item, nbt -> {
+			nbt.removeKey(ItemStatUtils.MONUMENTA_KEY);
+			nbt.removeKey("CustomPotionEffects");
+			nbt.removeKey("AttributeModifiers");
+			nbt.removeKey("Enchantments");
+			// readd placeholder attribute if needed
+			if (ItemUtils.hasDefaultAttributes(item)) {
+				nbt.modifyMeta((nbtr, meta) -> {
+						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+				});
+			}
+			GUIUtils.setPlaceholder(nbt);
 		});
 	}
 

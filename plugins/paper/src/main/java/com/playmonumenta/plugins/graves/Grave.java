@@ -215,29 +215,33 @@ public final class Grave {
 
 	private void spawn() {
 		if (canSpawn()) {
-			mEntity = (ArmorStand) mPlayer.getWorld().spawnEntity(mLocation, EntityType.ARMOR_STAND);
-			mEntity.setSmall(mSmall);
-			mEntity.setArms(true);
-			mEntity.setHeadPose(mPose.get(KEY_POSE_HEAD));
-			mEntity.setBodyPose(mPose.get(KEY_POSE_BODY));
-			mEntity.setLeftArmPose(mPose.get(KEY_POSE_LEFT_ARM));
-			mEntity.setRightArmPose(mPose.get(KEY_POSE_RIGHT_ARM));
-			mEntity.setLeftLegPose(mPose.get(KEY_POSE_LEFT_LEG));
-			mEntity.setRightLegPose(mPose.get(KEY_POSE_RIGHT_LEG));
-			mEntity.setItem(EquipmentSlot.HEAD, mEquipment.get(KEY_EQUIPMENT_HEAD));
-			mEntity.setItem(EquipmentSlot.CHEST, mEquipment.get(KEY_EQUIPMENT_BODY));
-			mEntity.setItem(EquipmentSlot.LEGS, mEquipment.get(KEY_EQUIPMENT_LEGS));
-			mEntity.setItem(EquipmentSlot.FEET, mEquipment.get(KEY_EQUIPMENT_FEET));
-			mEntity.setItem(EquipmentSlot.HAND, mEquipment.get(KEY_EQUIPMENT_HAND));
-			mEntity.setItem(EquipmentSlot.OFF_HAND, mEquipment.get(KEY_EQUIPMENT_OFF_HAND));
-			mEntity.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
-			mEntity.setGravity(false);
-			mEntity.setCanMove(false);
-			mEntity.setSilent(true);
-			mEntity.customName(Component.text(mPlayer.getName() + (mPlayer.getName().endsWith("s") ? "' Grave" : "'s Grave")));
-			mEntity.setCustomNameVisible(!mSmall);
-			mEntity.addScoreboardTag("Grave");
-			mManager.addGrave(mEntity, this);
+			mEntity = mPlayer.getWorld().spawn(mLocation, ArmorStand.class, stand -> {
+				stand.setSmall(mSmall);
+				stand.setArms(true);
+				stand.setHeadPose(mPose.get(KEY_POSE_HEAD));
+				stand.setBodyPose(mPose.get(KEY_POSE_BODY));
+				stand.setLeftArmPose(mPose.get(KEY_POSE_LEFT_ARM));
+				stand.setRightArmPose(mPose.get(KEY_POSE_RIGHT_ARM));
+				stand.setLeftLegPose(mPose.get(KEY_POSE_LEFT_LEG));
+				stand.setRightLegPose(mPose.get(KEY_POSE_RIGHT_LEG));
+				// TODO: remove stats of equipment here or earlier - usb
+				stand.setItem(EquipmentSlot.HEAD, mEquipment.get(KEY_EQUIPMENT_HEAD));
+				stand.setItem(EquipmentSlot.CHEST, mEquipment.get(KEY_EQUIPMENT_BODY));
+				stand.setItem(EquipmentSlot.LEGS, mEquipment.get(KEY_EQUIPMENT_LEGS));
+				stand.setItem(EquipmentSlot.FEET, mEquipment.get(KEY_EQUIPMENT_FEET));
+				stand.setItem(EquipmentSlot.HAND, mEquipment.get(KEY_EQUIPMENT_HAND));
+				stand.setItem(EquipmentSlot.OFF_HAND, mEquipment.get(KEY_EQUIPMENT_OFF_HAND));
+				// TODO: ssetDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
+				// PlayerArmorStandManipulateEvent is used here
+				stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
+				stand.setGravity(false);
+				stand.setCanMove(false);
+				stand.setSilent(true);
+				stand.customName(Component.text(mPlayer.getName() + (mPlayer.getName().endsWith("s") ? "' Grave" : "'s Grave")));
+				stand.setCustomNameVisible(!mSmall);
+				stand.addScoreboardTag(GraveManager.GRAVE_TAG);
+				mManager.addGrave(stand, this);
+			});
 			mManager.removeUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 			startTracking();
 			if (!mAlertedSpawned) {

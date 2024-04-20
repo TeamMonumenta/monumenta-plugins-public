@@ -2,13 +2,13 @@ package com.playmonumenta.plugins.gallery;
 
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
 import com.playmonumenta.plugins.gallery.effects.GalleryReviveTimeEffect;
+import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -145,38 +145,44 @@ public class GalleryGrave {
 	}
 
 	public static GalleryGrave createGrave(GalleryPlayer player, Player bukkitPlayer, Location location, GalleryGame game) {
-		ArmorStand grave = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
-		grave.setGravity(false);
-		grave.setInvulnerable(true);
-		ArmorStand indicator = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
-		indicator.setGravity(false);
-		indicator.teleport(location.clone().add(0, 0.5, 0));
-		indicator.setInvulnerable(true);
-		indicator.setCustomNameVisible(true);
-		indicator.setInvisible(true);
-		indicator.addDisabledSlots(EquipmentSlot.values());
+		ArmorStand lIndicator = location.getWorld().spawn(location.clone().add(0, 0.5, 0), ArmorStand.class, indicator -> {
+			indicator.setMarker(true);
+			indicator.setGravity(false);
+			indicator.setInvulnerable(true);
+			indicator.setCustomNameVisible(true);
+			indicator.setInvisible(true);
+			// TODO: setDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
+			indicator.addDisabledSlots(EquipmentSlot.values());
+			indicator.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
+		});
 
 		PlayerInventory playerInventory = bukkitPlayer.getInventory();
-
 		ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta meta = (SkullMeta) skull.getItemMeta();
 		meta.setPlayerProfile(bukkitPlayer.getPlayerProfile());
 		skull.setItemMeta(meta);
 
-		grave.setArms(true);
-		grave.setBasePlate(false);
-		grave.setItem(EquipmentSlot.HEAD, skull);
-		grave.setItem(EquipmentSlot.CHEST, playerInventory.getItem(EquipmentSlot.CHEST));
-		grave.setItem(EquipmentSlot.LEGS, playerInventory.getItem(EquipmentSlot.LEGS));
-		grave.setItem(EquipmentSlot.FEET, playerInventory.getItem(EquipmentSlot.FEET));
-		grave.setItem(EquipmentSlot.HAND, playerInventory.getItem(EquipmentSlot.HAND));
-		grave.setItem(EquipmentSlot.OFF_HAND, playerInventory.getItem(EquipmentSlot.OFF_HAND));
-		grave.setDisabledSlots(EquipmentSlot.values());
-		//TODO - set grave position like it is all on the floor
-		grave.setCustomNameVisible(true);
-		grave.customName(Component.text(bukkitPlayer.getName() + "'s grave"));
+		ArmorStand lGrave = location.getWorld().spawn(location, ArmorStand.class, grave -> {
+			grave.setGravity(false);
+			grave.setInvulnerable(true);
+			grave.setArms(true);
+			grave.setBasePlate(false);
+			grave.setItem(EquipmentSlot.HEAD, skull);
+			// TODO: remove stats of equipment here - usb
+			grave.setItem(EquipmentSlot.CHEST, playerInventory.getItem(EquipmentSlot.CHEST));
+			grave.setItem(EquipmentSlot.LEGS, playerInventory.getItem(EquipmentSlot.LEGS));
+			grave.setItem(EquipmentSlot.FEET, playerInventory.getItem(EquipmentSlot.FEET));
+			grave.setItem(EquipmentSlot.HAND, playerInventory.getItem(EquipmentSlot.HAND));
+			grave.setItem(EquipmentSlot.OFF_HAND, playerInventory.getItem(EquipmentSlot.OFF_HAND));
+			// TODO: setDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
+			grave.setDisabledSlots(EquipmentSlot.values());
+			grave.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
+			//TODO - set grave position like it is all on the floor
+			grave.setCustomNameVisible(true);
+			grave.customName(Component.text(bukkitPlayer.getName() + "'s grave"));
+		});
 
-		return new GalleryGrave(grave, indicator, player, game);
+		return new GalleryGrave(lGrave, lIndicator, player, game);
 
 	}
 }

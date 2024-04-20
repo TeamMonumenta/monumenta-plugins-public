@@ -21,7 +21,9 @@ import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -323,37 +325,44 @@ public class DepthsListener implements Listener {
 						MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED),
 							Component.text("Please wait to be revived!", NamedTextColor.RED));
 
-						ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class);
-						grave.setInvulnerable(true);
-						grave.setDisabledSlots(EquipmentSlot.values());
-						grave.setCollidable(false);
-						grave.setBasePlate(false);
-						grave.customName(Component.text(player.getName() + "'s Grave", NamedTextColor.RED));
-						grave.setCustomNameVisible(true);
-						grave.setGlowing(true);
-						grave.setArms(true);
-						grave.setGravity(true);
-						ScoreboardUtils.addEntityToTeam(grave, "GraveGreen", NamedTextColor.GREEN);
-						grave.addScoreboardTag(GRAVE_TAG);
+						ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class, g -> {
+							g.setInvulnerable(true);
+							// TODO: setDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
+							g.setDisabledSlots(EquipmentSlot.values());
+							g.setCollidable(false);
+							g.setBasePlate(false);
+							g.customName(Component.text(player.getName() + "'s Grave", NamedTextColor.RED));
+							g.setCustomNameVisible(true);
+							g.setGlowing(true);
+							g.setArms(true);
+							g.setGravity(true);
+							ScoreboardUtils.addEntityToTeam(g, "GraveGreen", NamedTextColor.GREEN);
+							g.addScoreboardTag(GRAVE_TAG);
+							g.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
 
-						VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
-						for (EquipmentSlot slot : EquipmentSlot.values()) {
-							ItemStack item;
-							if (slot != EquipmentSlot.HEAD) {
-								item = ItemUtils.clone(player.getEquipment().getItem(slot));
-								if (ItemUtils.isNullOrAir(item)) {
-									continue;
+							// TODO: steal this code to be used in other graves or standardize graves across content - usb
+							VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
+							for (EquipmentSlot slot : EquipmentSlot.values()) {
+								ItemStack item;
+								if (slot != EquipmentSlot.HEAD) {
+									item = ItemUtils.clone(player.getInventory().getItem(slot).clone());
+									if (ItemUtils.isNullOrAir(item)) {
+										continue;
+									}
+									VanityManager.applyVanity(item, vanityData, slot, false);
+									// usb: remove stats from item before adding to armorstand in case of dupe
+									// this should happen after applying vanity
+									ItemUpdateHelper.removeStats(item);
+								} else {
+									item = new ItemStack(Material.PLAYER_HEAD);
+									if (item.getItemMeta() instanceof SkullMeta skullMeta) {
+										skullMeta.setOwningPlayer(player);
+										item.setItemMeta(skullMeta);
+									}
 								}
-								VanityManager.applyVanity(item, vanityData, slot, false);
-							} else {
-								item = new ItemStack(Material.PLAYER_HEAD);
-								if (item.getItemMeta() instanceof SkullMeta skullMeta) {
-									skullMeta.setOwningPlayer(player);
-									item.setItemMeta(skullMeta);
-								}
+								g.setItem(slot, item);
 							}
-							grave.setItem(slot, item);
-						}
+						});
 
 						BossBar graveBar = BossBar.bossBar(Component.text(player.getName() + "'s Grave", NamedTextColor.RED),
 							1, BossBar.Color.RED, BossBar.Overlay.PROGRESS, Set.of());
