@@ -475,8 +475,8 @@ public class KnickKnackSackGui extends Gui {
 				"Click to view enchantments and their descriptions.",
 				NamedTextColor.GRAY)
 		).onClick(evt -> {
-			if (mPlayer.hasPermission("monumenta.command.openenchantexplanations")) {
-				runConsoleCommand("openenchantexplanations @S");
+			if (mPlayer.hasPermission("monumenta.command.openenchantexplanations.gui")) {
+				runConsoleCommand("openenchantexplanationsfor @S");
 			}
 		});
 		setItem(enchantSlot, enchantopedia);

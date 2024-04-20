@@ -399,13 +399,13 @@ public class CustomInventoryCommands {
 			}).register();
 
 		new CommandAPICommand("openenchantexplanations")
-			.withPermission("monumenta.command.openenchantexplanations")
+			.withPermission("monumenta.command.openenchantexplanations.self")
 			.executesPlayer((player, args) -> {
 				new EnchantopediaGui(player).open();
 			})
 			.register();
-		new CommandAPICommand("openenchantexplanations")
-			.withPermission("monumenta.command.openenchantexplanations")
+		new CommandAPICommand("openenchantexplanationsfor")
+			.withPermission("monumenta.command.openenchantexplanations.others")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
