@@ -6,8 +6,9 @@ include(":Monumenta")
 project(":Monumenta").projectDir = file("paper")
 
 pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    maven("https://repo.papermc.io/repository/maven-public/")
-  }
+	repositories {
+		gradlePluginPortal()
+		maven("https://repo.papermc.io/repository/maven-public/")
+		maven("https://maven.floweytf.com/releases")
+	}
 }

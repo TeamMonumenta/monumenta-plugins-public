@@ -1,4 +1,3 @@
-import Com_playmonumenta_plugins_ssh_gradle.*
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
@@ -7,7 +6,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
 	id("com.github.johnrengelman.shadow") version "7.1.2"
 	id("com.playmonumenta.plugins.java-conventions")
-	id("com.playmonumenta.plugins.ssh")
+	id("com.playmonumenta.deployment") version "1.0"
 	id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
 	id("net.minecrell.plugin-yml.bungee") version "0.5.1" // Generates bungee.yml
 	id("java")
@@ -152,80 +151,4 @@ tasks {
 	}
 }
 
-val shadowJarTask by tasks.named<ShadowJar>("shadowJar")
-
-fun createRemote(name: String, p: Int): RemoteConfig {
-	return remotes.create(name) {
-		host = "admin-eu.playmonumenta.com"
-		port = p
-		user = "epic"
-		knownHosts = allowAnyHosts
-		auth = arrayOf(
-			EnvKeyProvider(),
-			SSHAgentKeyProvider(),
-			OpenSSHProvider("id_ed25519"),
-			OpenSSHProvider("id_rsa"),
-			PageantKeyProvider()
-		)
-	}
-}
-
-fun configureDeployTask(name: String, config: Action<RunHandler>) {
-	tasks.create(name) {
-		group = "Deploy"
-		dependsOn(shadowJarTask)
-		doLast {
-			ssh.run(config)
-		}
-	}
-}
-
-fun createNormalDeploy(ssh: RemoteConfig, name: String, vararg paths: String) {
-	if (paths.isEmpty())
-		throw IllegalArgumentException("paths must be non-empty")
-
-
-	configureDeployTask("$name-deploy") {
-		session(ssh) {
-			for (path in paths)
-				execute("cd $path && rm -f Monumenta*.jar")
-			for (path in paths)
-				put(shadowJarTask.archiveFile.get().asFile, path)
-		}
-	}
-}
-
-fun createSymlinkDeploy(ssh: RemoteConfig, name: String, vararg paths: String) {
-	if (paths.isEmpty())
-		throw IllegalArgumentException("paths must be non-empty")
-
-	configureDeployTask("$name-deploy") {
-		session(ssh) {
-			for (path in paths)
-				put(shadowJarTask.archiveFile.get().asFile, path);
-			for (path in paths)
-				execute("cd $path && rm -f Monumenta.jar && ln -s " + shadowJarTask.archiveFileName.get() + " Monumenta.jar")
-		}
-	}
-}
-
-val basicssh = createRemote("basicssh", 8822)
-val adminssh = createRemote("adminssh", 9922)
-
-for (i in 1..4) {
-	createNormalDeploy(basicssh, "dev$i", "/home/epic/dev${i}_shard_plugins")
-}
-
-createNormalDeploy(basicssh, "futurama", "/home/epic/futurama_shard_plugins")
-createNormalDeploy(basicssh, "mob", "/home/epic/mob_shard_plugins")
-createSymlinkDeploy(basicssh, "stage", "/home/epic/stage/m13/server_config/plugins/")
-createSymlinkDeploy(basicssh, "volt", "/home/epic/volt/m12/server_config/plugins")
-
-createSymlinkDeploy(adminssh, "m119", "/home/epic/project_epic/m119/plugins")
-createSymlinkDeploy(adminssh, "build", "/home/epic/project_epic/server_config/plugins")
-createSymlinkDeploy(
-	adminssh, "play",
-	"/home/epic/play/m12/server_config/plugins",
-	"/home/epic/play/m13/server_config/plugins",
-	"/home/epic/play/m17/server_config/plugins"
-)
+ssh.easySetup(tasks.named<ShadowJar>("shadowJar").get(), "Monumenta")
