@@ -174,11 +174,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 
 	private void clickFilterAction(InventoryClickEvent clickEvent) {
 		if (clickEvent.getClick().equals(ClickType.SWAP_OFFHAND)) {
-			if (mGui.mIsOp) {
-				mGui.switchToTab(mGui.TAB_EDIT_FILTERS);
-			} else {
-				mGui.mPlayer.sendMessage("This feature is not yet available.");
-			}
+			mGui.switchToTab(mGui.TAB_EDIT_FILTERS);
 			return;
 		}
 		int hotbarInt = clickEvent.getHotbarButton();
