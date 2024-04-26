@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
+import com.playmonumenta.plugins.discoveries.DiscoveryManager;
 import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.explosions.ExplosionManager;
@@ -231,6 +232,7 @@ public class Plugin extends JavaPlugin {
 		DeathMsg.register();
 		DebugInfo.register(this);
 		DelvesCommands.register(this);
+		DiscoveryCommand.register();
 		DungeonAccessCommand.register();
 		EffectFromPotionCommand.register(this);
 		Effect.register(this);
@@ -522,6 +524,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mPzeroManager, this);
 		manager.registerEvents(new Lockdown(), this);
 		manager.registerEvents(new IchorListener(), this);
+		manager.registerEvents(new DiscoveryManager(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);
@@ -601,6 +604,13 @@ public class Plugin extends JavaPlugin {
 				// Update everything related to the PZero Minigame
 				try {
 					mPzeroManager.update(oneHertz, twoHertz, fourHertz);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				// Updates related to discoveries
+				try {
+					DiscoveryManager.update();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
