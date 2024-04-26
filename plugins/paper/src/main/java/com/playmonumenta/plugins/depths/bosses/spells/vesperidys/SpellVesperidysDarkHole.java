@@ -212,6 +212,7 @@ public class SpellVesperidysDarkHole extends Spell {
 							super.cancel();
 							darkHoleChargeUp.reset();
 							mVesperidys.mInvincible = false;
+							mVesperidys.mDamageCap = 0.03;
 							mBoss.setGravity(true);
 
 							// Remove Dark Hole Cores.

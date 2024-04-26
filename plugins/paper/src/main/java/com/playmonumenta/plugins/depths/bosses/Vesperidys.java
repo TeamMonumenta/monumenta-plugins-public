@@ -139,6 +139,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 	public int mSpellCooldowns = 15 * 20;
 
+	public double mDamageCap = 0.03; // "Vulnerable" health DPS Cap.
+	public double mDamageCapGain = 0.0025; // Passive Gain per 0.25 seconds
+
 	public Vesperidys(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBossTwo = boss;
@@ -185,7 +188,19 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		mBasePassives = Arrays.asList(
 			mAnticheese,
 			mTeleportSpell,
-			new SpellVesperidysSummonAdds(plugin, boss, this, 30 * 4, 60 * 4, numCrystals)
+			new SpellVesperidysSummonAdds(plugin, boss, this, 30 * 4, 60 * 4, numCrystals),
+			new Spell() {
+				@Override
+				public void run() {
+					// If Damage Cap is lower than 1% max hp, increases it to 1% max hp.
+					mDamageCap = Math.min(0.1, Math.max(0.01, mDamageCap + ((mDamageCap < 0.03) ? 2 * mDamageCapGain : mDamageCapGain)));
+				}
+
+				@Override
+				public int cooldownTicks() {
+					return 0;
+				}
+			}
 		);
 
 		mDarkHoleActive = new SpellManager(Arrays.asList(
@@ -563,6 +578,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						mPhase = 1;
 
+						mDamageCap = 0.03;
+
 						mBoss.setInvulnerable(false);
 						mBoss.setCollidable(true);
 						mBoss.setAI(true);
@@ -636,6 +653,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}.runTaskTimer(mMonuPlugin, 0, 1);
 	}
 
+
+
 	@Override
 	public void onHurt(DamageEvent event) {
 		super.onHurt(event);
@@ -654,10 +673,15 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			}
 		} else {
 			if (event.getSource() instanceof Player player) {
-				// Ridiculous burst prevention (Maximum of 3% of Vesperidys' Max HP)
+				// Ridiculous burst prevention (DPS is "effectively" capped at 1% max hp per second).
 				double maxHealth = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, BOSS_HEALTH);
-				if (event.getDamage() > maxHealth * 0.03) {
-					event.setDamage(maxHealth * 0.03);
+				double damage = event.getDamage();
+				if (damage > maxHealth * mDamageCap) {
+					event.setDamage(maxHealth * mDamageCap);
+					mDamageCap = 0.01;
+				} else {
+					double damageCapReduction = Math.max(0, damage / maxHealth - 0.01);
+					mDamageCap = Math.max(0.01, mDamageCap - damageCapReduction);
 				}
 
 				event.setDamage(event.getDamage() * crystalResistanceMultiplier());
@@ -1008,6 +1032,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			public synchronized void cancel() {
 				super.cancel();
 				mInvincible = false;
+				mDamageCap = 0.03;
 				resetPhase(0);
 			}
 
