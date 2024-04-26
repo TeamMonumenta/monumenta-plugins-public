@@ -128,6 +128,7 @@ public class DepthsParty {
 
 	//A flag for if the forced cleansing room has already been spawned in A10+. This is to prevent players from just spamming cleanse rooms (they do nothing, but still).
 	public boolean mSpawnedForcedCleansingRoom = false;
+
 	/**
 	 * Creates a new depths party with the given players
 	 */

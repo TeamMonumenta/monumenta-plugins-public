@@ -21,7 +21,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
 // Mobs with this tag move towards closest DaggerCraftingBoss, and disrupts crafting if not killed.
@@ -31,8 +30,7 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 
 	public BlueStrikeTargetNPCBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		Team redTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
-		redTeam.addEntry(boss.getUniqueId().toString());
+		ScoreboardUtils.addEntityToTeam(boss, "Red", NamedTextColor.RED);
 		mBoss.setGlowing(true);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.VILLAGER));

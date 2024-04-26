@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -10,15 +10,17 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.*;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
-
-
 
 public class EntombFinisher implements EliteFinisher {
 	public static final String NAME = "Entomb";
@@ -32,15 +34,15 @@ public class EntombFinisher implements EliteFinisher {
 		}
 
 		new BukkitRunnable() {
-			Location mLoc = killedMob.getLocation().clone();
+			final Location mLoc = killedMob.getLocation().clone();
 			int mLayer = 0;
 			final double mLayerHeight = killedMob.getHeight() / LAYERMAX;
 			int mTicks = 0;
 			@Nullable LivingEntity mClonedKilledMob;
 
-			List<BlockDisplay> mDisplays = new ArrayList<>();
+			final List<BlockDisplay> mDisplays = new ArrayList<>();
 			//(float) -(killedMob.getWidth() / 2), (float) 0, (float) -(killedMob.getWidth() / 2)
-			BlockDisplay mMain = createBlockDisplay(Bukkit.createBlockData(Material.SAND), new Transformation(
+			final BlockDisplay mMain = createBlockDisplay(Bukkit.createBlockData(Material.SAND), new Transformation(
 					new Vector3f(0, 0, 0),
 					new AxisAngle4f(0, 0, 0, 0),
 					new Vector3f((float) killedMob.getWidth() * 2, 0, (float) killedMob.getWidth() * 2),
@@ -71,7 +73,7 @@ public class EntombFinisher implements EliteFinisher {
 					mDisplays.add(b);
 					new BukkitRunnable() {
 						int mT = 0;
-						BlockDisplay mCurrentDisplay = b;
+						final BlockDisplay mCurrentDisplay = b;
 						final double mDecreaseHeight = ((5 + killedMob.getHeight()) - mLayer * mLayerHeight) / 10;
 
 						@Override

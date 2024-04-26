@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.kyori.adventure.text.format.NamedTextColor;

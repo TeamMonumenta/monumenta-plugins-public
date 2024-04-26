@@ -127,7 +127,7 @@ public class PersistentDataCommand {
 	private static void set(CommandSender sender, World world, NamespacedKey key, String dataType, String valueString) throws WrapperCommandSyntaxException {
 		Constants.SupportedPersistentDataType type;
 		try {
-			type = Constants.SupportedPersistentDataType.valueOf(((String) dataType).toUpperCase(Locale.ROOT));
+			type = Constants.SupportedPersistentDataType.valueOf(dataType.toUpperCase(Locale.ROOT));
 		} catch (IllegalArgumentException e) {
 			throw CommandAPI.failWithString("Invalid data type " + dataType);
 		}

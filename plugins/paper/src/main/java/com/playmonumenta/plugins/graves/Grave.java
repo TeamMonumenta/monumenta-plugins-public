@@ -35,7 +35,6 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;

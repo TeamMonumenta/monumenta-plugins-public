@@ -694,10 +694,10 @@ public class ItemUtils {
 			return null;
 		}
 		ItemMeta itemMeta = book.getItemMeta();
-		if (itemMeta == null || !(itemMeta instanceof BookMeta)) {
-			return null;
+		if (itemMeta instanceof BookMeta bookMeta) {
+			return bookMeta.getAuthor();
 		}
-		return ((BookMeta) itemMeta).getAuthor();
+		return null;
 	}
 
 	public static @Nullable LootTable getLootTable(@Nullable ItemStack itemStack) {
@@ -988,10 +988,11 @@ public class ItemUtils {
 		if (plainLore.isEmpty() && itemStack.hasItemMeta()) {
 			ItemMeta itemMeta = itemStack.getItemMeta();
 			if (itemMeta.hasLore()) {
-				if (itemMeta.lore() == null) {
+				List<Component> lore = itemMeta.lore();
+				if (lore == null) {
 					return plainLore;
 				}
-				for (Component loreLine : itemMeta.lore()) {
+				for (Component loreLine : lore) {
 					plainLore.add(toPlainTagText(loreLine));
 				}
 			}
@@ -1441,10 +1442,6 @@ public class ItemUtils {
 		};
 	}
 
-	public static ItemType getItemType(ItemStack item) {
-		return ItemType.of(item);
-	}
-
 	/**
 	 * Gets the entity type of a spawn egg. THis is more accurate than the {@link #getSpawnEggType(Material) material-only check},
 	 * as a spawn egg can spawn mobs of a different type if the NBT tag {@code EntityTag.id} is set.
@@ -1474,6 +1471,10 @@ public class ItemUtils {
 			}
 			return getSpawnEggType(item.getType());
 		});
+	}
+
+	public static ItemType getItemType(ItemStack item) {
+		return ItemType.of(item);
 	}
 
 	public static String getGiveCommand(ItemStack item) {
@@ -1705,10 +1706,6 @@ public class ItemUtils {
 		}
 
 		ReadableNBTList<ReadWriteNBT> itemStacks = blockEntityTag.getCompoundList("Items");
-		if (itemStacks == null) {
-			return null;
-		}
-
 		return itemStacks;
 	}
 
