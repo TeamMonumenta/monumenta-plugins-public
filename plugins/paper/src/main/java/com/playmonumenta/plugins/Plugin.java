@@ -248,6 +248,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatCommands.registerCharmCommand();
 		ItemStatCommands.registerColorCommand();
 		ItemStatCommands.registerConsumeCommand();
+		ItemStatCommands.registerDelveInfusionTypeCommand();
 		ItemStatCommands.registerEnchCommand();
 		ItemStatCommands.registerFishCommand();
 		ItemStatCommands.registerInfoCommand();

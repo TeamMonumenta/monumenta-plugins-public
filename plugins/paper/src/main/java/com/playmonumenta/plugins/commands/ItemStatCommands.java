@@ -5,8 +5,17 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -26,6 +35,7 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TimeArgument;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -789,6 +799,34 @@ public class ItemStatCommands {
 				message = message.append(Component.text(" "));
 			}
 			sender.sendMessage(message);
+		}).register();
+	}
+
+	public static void registerDelveInfusionTypeCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.delveinfusiontype");
+
+		new CommandAPICommand("delveinfusiontype").withPermission(perms).withArguments(new LiteralArgument("get")).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			DelveInfusionUtils.DelveInfusionMaterial type = DelveInfusionUtils.getDelveInfusionMaterial(item);
+			player.sendMessage(type.mItemNamePlural);
+		}).register();
+
+		new CommandAPICommand("delveinfusiontype").withPermission(perms).withArguments(new LiteralArgument("set"), new MultiLiteralArgument(Arrays.stream(DelveInfusionUtils.DelveInfusionMaterial.values()).map(m -> m.mLabel).toArray(String[]::new))).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			String label = (String) args[0];
+			for (DelveInfusionUtils.DelveInfusionMaterial m : DelveInfusionUtils.DelveInfusionMaterial.values()) {
+				if (m.mLabel.equals(label)) {
+					DelveInfusionUtils.setDelveInfusionMaterial(item, m);
+					return;
+				}
+			}
+			player.sendMessage(Component.text("Failed to find Delve Infusion Material " + label, NamedTextColor.RED));
 		}).register();
 	}
 
