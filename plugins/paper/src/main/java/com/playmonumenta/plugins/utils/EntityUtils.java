@@ -455,7 +455,10 @@ public class EntityUtils {
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter, double hitboxSize) {
 		World world = player.getWorld();
 		Location eyeLoc = player.getEyeLocation();
-		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, hitboxSize, filter);
+		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, hitboxSize,
+			e -> (filter == null || filter.test(e))
+				// verify that the entity is actually ahead of the player (in case a large hitbox overlaps from behind)
+				&& player.getLocation().getDirection().dot(e.getLocation().subtract(player.getLocation()).toVector()) > 0);
 		// the raySize parameter changes the size of entity bounding boxes, so the entity may actually be outside the max range, hence the range check here
 		if (result != null && result.getHitEntity() instanceof LivingEntity le && le.getLocation().distance(player.getLocation()) < range) {
 			return le;

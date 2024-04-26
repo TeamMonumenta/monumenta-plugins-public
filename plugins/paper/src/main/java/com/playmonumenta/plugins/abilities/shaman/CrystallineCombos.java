@@ -169,8 +169,8 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 				if (event.getSource() != null
 					&& event.getSource().getUniqueId().equals(mPlayer.getUniqueId())
 					&& enemy.isDead()
-					&& (event.getAbility() == null
-						|| !event.getAbility().equals(ClassAbility.CRYSTALLINE_COMBOS))) {
+					&& event.getAbility() != ClassAbility.CRYSTALLINE_COMBOS) {
+
 					mCrystalStacks++;
 					mDecayTimer = 0;
 					updateNotify();
