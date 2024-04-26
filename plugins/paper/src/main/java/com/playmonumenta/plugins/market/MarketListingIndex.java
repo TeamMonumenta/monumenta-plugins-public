@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.market;
 
 import com.google.gson.Gson;
+import com.playmonumenta.plugins.market.filters.ComponentConfig;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.MapScanCursor;
@@ -17,6 +18,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Nullable;
 
 public enum MarketListingIndex {
 
@@ -27,7 +29,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> String.valueOf(l.getId()),
 		(MarketListing l) -> !l.getPurchasableStatus(1).isError(),
 		false,
-		Material.BLAZE_POWDER
+		Material.BLAZE_POWDER,
+		null
 	),
 
 	LISTING_TYPE("ListingType",
@@ -35,7 +38,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> String.valueOf(l.getListingType()),
 		(MarketListing l) -> l.getListingType() != null,
 		false,
-		Material.BOOK
+		Material.BOOK,
+		null
 	),
 
 	REGION("Region",
@@ -43,7 +47,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> String.valueOf(l.getRegion()),
 		(MarketListing l) -> l.getRegion() != null,
 		true,
-		Material.GRASS_BLOCK
+		Material.GRASS_BLOCK,
+		ComponentConfig.REGION_CONFIG
 	),
 
 	LOCATION("Location",
@@ -51,7 +56,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> String.valueOf(l.getLocation()),
 		(MarketListing l) -> l.getLocation() != null,
 		true,
-		Material.COMPASS
+		Material.COMPASS,
+		null
 	),
 
 	NAME("Name",
@@ -59,7 +65,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> l.getItemName(),
 		(MarketListing l) -> l.getItemName() != null,
 		true,
-		Material.OAK_SIGN
+		Material.OAK_SIGN,
+		null
 	),
 
 	CURRENCY("Currency",
@@ -67,7 +74,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> l.getCurrencyName(),
 		(MarketListing l) -> !l.getCurrencyName().equals("ERROR"),
 		true,
-		Material.EXPERIENCE_BOTTLE
+		Material.EXPERIENCE_BOTTLE,
+		null
 	),
 
 	TYPE("Type",
@@ -75,7 +83,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> String.valueOf(l.getItemType()),
 		(MarketListing l) -> l.getItemType() != null,
 		true,
-		Material.FLOWER_BANNER_PATTERN
+		Material.FLOWER_BANNER_PATTERN,
+		null
 	),
 
 	TIER("Tier",
@@ -83,7 +92,8 @@ public enum MarketListingIndex {
 		(MarketListing l) -> String.valueOf(l.getItemTier()),
 		(MarketListing l) -> l.getItemTier() != null,
 		true,
-		Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE
+		Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE,
+		null
 	),
 
 	;
@@ -93,14 +103,16 @@ public enum MarketListingIndex {
 	final Function<MarketListing, Boolean> mMatchMethod;
 	final boolean mPlayerSelectable;
 	final Material mDisplayIconBaseMaterial;
+	final @Nullable Map<String, ComponentConfig.ComponentConfigObject> mComponentConfig;
 
-	MarketListingIndex(String redisID, boolean sortedFetch, Function<MarketListing, String> getKeyMethod, Function<MarketListing, Boolean> matchMethod, boolean playerSelectable, Material displayIconBaseMaterial) {
+	MarketListingIndex(String redisID, boolean sortedFetch, Function<MarketListing, String> getKeyMethod, Function<MarketListing, Boolean> matchMethod, boolean playerSelectable, Material displayIconBaseMaterial, @Nullable Map<String, ComponentConfig.ComponentConfigObject> componentConfig) {
 		this.mRedisPath = ConfigAPI.getServerDomain() + ":market:index:" + redisID;
 		this.mSortedFetch = sortedFetch;
 		this.mGetKeyMethod = getKeyMethod;
 		this.mMatchMethod = matchMethod;
 		this.mPlayerSelectable = playerSelectable;
 		this.mDisplayIconBaseMaterial = displayIconBaseMaterial;
+		this.mComponentConfig = componentConfig;
 	}
 
 	public void removeListingFromIndex(MarketListing listing) {
@@ -155,6 +167,21 @@ public enum MarketListingIndex {
 			out.put(entry.getKey(), list);
 		}
 
+		return out;
+	}
+
+	public List<String> getListingsKeysFromIndex(boolean descOrder) {
+		List<String> out = new ArrayList<>();
+
+		// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
+		// a simpler, but unique algorithm needs to be used
+		if (this == ACTIVE_LISTINGS) {
+			out.add("ACTIVE_LISTINGS");
+			return out;
+		}
+
+		out = RedisAPI.getInstance().sync().hkeys(mRedisPath);
+		out.sort(descOrder ? Comparator.reverseOrder() : Comparator.naturalOrder());
 		return out;
 	}
 
@@ -321,5 +348,29 @@ public enum MarketListingIndex {
 
 	public boolean isPlayerSelectable() {
 		return mPlayerSelectable;
+	}
+
+	public static List<MarketListingIndex> getAllPlayerSelectable() {
+		List<MarketListingIndex> out = new ArrayList<>();
+
+		for (MarketListingIndex idx : MarketListingIndex.values()) {
+			if (idx.isPlayerSelectable()) {
+				out.add(idx);
+			}
+		}
+
+		return out;
+	}
+
+
+	public static List<MarketListingIndex> getAllPlayerSortable() {
+		List<MarketListingIndex> out = new ArrayList<>();
+		out.add(ACTIVE_LISTINGS);
+		out.addAll(getAllPlayerSelectable());
+		return out;
+	}
+
+	public @Nullable Map<String, ComponentConfig.ComponentConfigObject> getComponentConfig() {
+		return mComponentConfig;
 	}
 }

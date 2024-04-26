@@ -35,6 +35,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
@@ -49,8 +50,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
@@ -1530,6 +1533,39 @@ public class ItemUtils {
 	 */
 	public static Component getDisplayName(ItemStack item) {
 		return NmsUtils.getVersionAdapter().getDisplayName(item);
+	}
+
+	public static ItemStack createBanner(Material material, org.bukkit.block.banner.Pattern... patterns) {
+		return createBanner(material, null, patterns);
+	}
+
+	public static ItemStack createBanner(Material material, @Nullable List<Component> lore, org.bukkit.block.banner.Pattern... patterns) {
+		ItemStack banner = new ItemStack(material);
+		ItemMeta itemMeta = banner.getItemMeta();
+		if (itemMeta instanceof BannerMeta bannerMeta) {
+			for (org.bukkit.block.banner.Pattern pattern : patterns) {
+				bannerMeta.addPattern(pattern);
+			}
+			// Change lore:
+			bannerMeta.lore(lore);
+			// Hide patterns:
+			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // banner patterns are actually the same 'data' as potion effects, lmao
+			// Finalize:
+			banner.setItemMeta(bannerMeta);
+		}
+		return banner;
+	}
+
+	public static void setName(ItemStack item, TextComponent name) {
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(name);
+		item.setItemMeta(meta);
+	}
+
+	public static void setLore(ItemStack item, List<Component> lore) {
+		ItemMeta meta = item.getItemMeta();
+		meta.lore(lore);
+		item.setItemMeta(meta);
 	}
 
 	/**

@@ -28,29 +28,48 @@ public class MarketFilter {
 
 	public static MarketFilter PREMADE_UNTIERED = new MarketFilter("Premade: Untiered only", List.of(new FilterComponent(MarketListingIndex.TIER, Comparator.WHITELIST, List.of(Tier.NONE.toString()))));
 
-	public static MarketFilter PREMADE_EQUIPABLE = new MarketFilter("Premade: Equipable (armor+offhand)", List.of(new FilterComponent(MarketListingIndex.TYPE, Comparator.WHITELIST, List.of(ItemType.HELMET.toString(), ItemType.CHESTPLATE.toString(), ItemType.LEGGINGS.toString(), ItemType.BOOTS.toString(), ItemType.OFFHAND.toString()))));
+	public static MarketFilter PREMADE_EQUIPABLE = new MarketFilter("Premade: Equipable (armor+offhand)", List.of(new FilterComponent(MarketListingIndex.TYPE, Comparator.WHITELIST, List.of(ItemType.HELMET.toString(), ItemType.CHESTPLATE.toString(), ItemType.LEGGINGS.toString(), ItemType.BOOTS.toString(), ItemType.OFFHAND.toString(), ItemType.SHIELD.toString()))));
 
-	public static MarketFilter PREMADE_NOTEQUIPABLE = new MarketFilter("Premade: Not Equipable", List.of(new FilterComponent(MarketListingIndex.TYPE, Comparator.BLACKLIST, List.of(ItemType.HELMET.toString(), ItemType.CHESTPLATE.toString(), ItemType.LEGGINGS.toString(), ItemType.BOOTS.toString(), ItemType.OFFHAND.toString()))));
+	public static MarketFilter PREMADE_NOTEQUIPABLE = new MarketFilter("Premade: Not Equipable", List.of(new FilterComponent(MarketListingIndex.TYPE, Comparator.BLACKLIST, List.of(ItemType.HELMET.toString(), ItemType.CHESTPLATE.toString(), ItemType.LEGGINGS.toString(), ItemType.BOOTS.toString(), ItemType.OFFHAND.toString(), ItemType.SHIELD.toString()))));
 
 	public MarketFilter() {
 		mComponents = new ArrayList<>();
 	}
 
 	public MarketFilter(@Nullable String displayName, @Nullable List<FilterComponent> components) {
-		mComponents = components;
+		if (components != null) {
+			mComponents = new ArrayList<>(components);
+		}
 		mDisplayName = displayName;
+		mSorter = Sorter.DEFAULT_SORTER;
+	}
+
+	public MarketFilter(@Nullable String displayName, @Nullable List<FilterComponent> components, @Nullable Sorter sorter) {
+		if (components != null) {
+			mComponents = new ArrayList<>(components);
+		}
+		mDisplayName = displayName;
+		if (sorter == null) {
+			mSorter = Sorter.DEFAULT_SORTER;
+		} else {
+			mSorter = sorter;
+		}
+
 	}
 
 	boolean mStartWithActiveOnly = false;
 	@Nullable List<FilterComponent> mComponents;
 	@Nullable String mDisplayName;
 
+	Sorter mSorter;
+
 	public static MarketFilter mergeOf(MarketFilter filterA, MarketFilter filterB) {
 		return new MarketFilter()
 			.startWithActiveOnly(filterA.startWithActiveOnly() || filterB.startWithActiveOnly())
 			.setDisplayName(filterB.getDisplayName())
 			.addComponents(filterA.getComponents())
-			.addComponents(filterB.getComponents());
+			.addComponents(filterB.getComponents())
+			.setSorter(filterB.getSorter());
 	}
 
 	public MarketFilter startWithActiveOnly(boolean b) {
@@ -69,6 +88,7 @@ public class MarketFilter {
 				out.add(comp.mField);
 			}
 		}
+		out.add(this.getSorter().mIndexField);
 		return out;
 	}
 
@@ -95,7 +115,9 @@ public class MarketFilter {
 			for (FilterComponent comp : mComponents) {
 				HashMap<Comparator, ArrayList<String>> indexData = groupedComponents.getOrDefault(comp.mField, new HashMap<>());
 				ArrayList<String> comparatorData = indexData.getOrDefault(comp.mComparator, new ArrayList<>());
-				comparatorData.addAll(comp.mValuesList);
+				if (comp.mValuesList != null && !comp.mValuesList.isEmpty()) {
+					comparatorData.addAll(comp.mValuesList);
+				}
 				indexData.put(comp.mComparator, comparatorData);
 				groupedComponents.put(comp.mField, indexData);
 			}
@@ -138,9 +160,24 @@ public class MarketFilter {
 		return mDisplayName;
 	}
 
-	private MarketFilter setDisplayName(@Nullable String displayName) {
+	public MarketFilter setDisplayName(@Nullable String displayName) {
 		this.mDisplayName = displayName;
 		return this;
 	}
 
+	public void addComponent(FilterComponent comp) {
+		if (mComponents == null) {
+			mComponents = new ArrayList<>();
+		}
+		this.mComponents.add(comp);
+	}
+
+	public Sorter getSorter() {
+		return mSorter;
+	}
+
+	public MarketFilter setSorter(Sorter mSorter) {
+		this.mSorter = mSorter;
+		return this;
+	}
 }

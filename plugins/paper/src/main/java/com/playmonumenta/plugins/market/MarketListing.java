@@ -515,11 +515,15 @@ public class MarketListing {
 		if (info != null) {
 			return ItemUtils.getPlainNameOrDefault(info.mBase);
 		}
+		// at this point, we expect the item to be a currency.
+		if (WalletManager.isCurrency(currencyToBuy)) {
+			return ItemUtils.getPlainNameOrDefault(currencyToBuy);
+		}
 		return "ERROR";
 	}
 
 	public String getCurrencyName() {
-		if (mCurrencyName == null) {
+		if (mCurrencyName == null || mCurrencyName.equals("ERROR")) {
 			return convertCurrencyItemStackToSmallestCurrencyName(this.getCurrencyToBuy());
 		}
 		return mCurrencyName;

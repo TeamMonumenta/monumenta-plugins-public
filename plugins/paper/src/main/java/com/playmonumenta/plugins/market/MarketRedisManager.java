@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -215,14 +216,29 @@ public class MarketRedisManager {
 				break;
 			}
 
+			// find ids matching components
 			Map<String, List<Long>> indexData = indexDatas.getOrDefault(comp.getTargetIndex(), new TreeMap<>());
 			TreeSet<Long> idsToFilter = new TreeSet<>();
-			for (String indexKey : comp.mValuesList) {
-				idsToFilter.addAll(indexData.getOrDefault(indexKey, Collections.emptyList()));
+			for (String value : comp.mValuesList) {
+				if (value.contains("*")) {
+					String regex = value.toLowerCase(Locale.ROOT).replace("*", ".*");
+					List<String> matchingValues = new ArrayList<>();
+					for (String indexValue : indexData.keySet()) {
+						if (indexValue.toLowerCase(Locale.ROOT).matches(regex)) {
+							matchingValues.add(indexValue);
+						}
+					}
+					for (String matchingValue : matchingValues) {
+						idsToFilter.addAll(indexData.getOrDefault(matchingValue, Collections.emptyList()));
+					}
+				} else {
+					idsToFilter.addAll(indexData.getOrDefault(value, Collections.emptyList()));
+				}
 			}
 
 			List<Long> newOut = new ArrayList<>();
 
+			// do the actual filtering
 			if (comp.mComparator.equals(Comparator.BLACKLIST)) {
 				for (Long id : out) {
 					if (!idsToFilter.contains(id)) {
@@ -238,6 +254,35 @@ public class MarketRedisManager {
 			}
 
 			out = newOut;
+		}
+
+		// order by
+
+		// special faster algorithm for ACTIVE_LISTING index
+		if (filter.getSorter().getIndexField() == MarketListingIndex.ACTIVE_LISTINGS) {
+			Collections.sort(out);
+			if (filter.getSorter().isdescendingOrder()) {
+				Collections.reverse(out);
+			}
+		} else {
+			// get the ordering index values
+			Map<String, List<Long>> idxValues = indexDatas.getOrDefault(filter.getSorter().getIndexField(), new HashMap<>());
+			// build an id->idxvalue map
+			Map<Long, String> idValues = new HashMap<>();
+			for (Map.Entry<String, List<Long>> entry : idxValues.entrySet()) {
+				String key = entry.getKey();
+				for (Long id : entry.getValue()) {
+					idValues.put(id, key);
+				}
+			}
+			// sort 'out' according to the id->idxvalue map, and the order
+			if (filter.getSorter().isdescendingOrder()) {
+				out.sort((id1, id2) -> {
+					return idValues.getOrDefault(id1, "").compareTo(idValues.getOrDefault(id2, "")) * -1;
+				});
+			} else {
+				out.sort(java.util.Comparator.comparing(id -> idValues.getOrDefault(id, "")));
+			}
 		}
 
 		return out;

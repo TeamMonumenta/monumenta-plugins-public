@@ -4,9 +4,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.market.MarketListing;
+import com.playmonumenta.plugins.market.MarketListingIndex;
 import com.playmonumenta.plugins.market.MarketManager;
 import com.playmonumenta.plugins.market.MarketRedisManager;
+import com.playmonumenta.plugins.market.filters.Comparator;
+import com.playmonumenta.plugins.market.filters.FilterComponent;
 import com.playmonumenta.plugins.market.filters.MarketFilter;
+import com.playmonumenta.plugins.market.filters.Sorter;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 public class TabBazaarBrowser implements MarketGuiTab {
@@ -43,13 +48,17 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	@Nullable List<MarketListing> mListingsForPageList;
 
 	int mSelectedFilter;
-	int mNewSelectedFilter;
 	List<MarketFilter> mLoadedMarketFilters;
+	@Nullable String mQuicksearchValue;
 
 	// filter that is forced onto the player every time for the basic non-op browsers.
 	// this part of the filter is not saved in the player data
 	// later, fill this one for the anti-progskip filter
 	MarketFilter mForcedPlayerFilter;
+
+	List<MarketListingIndex> mLoadedSortbyIndexes;
+	int mSelectedSortByIndex;
+	boolean mSortByDesc;
 
 	@Override
 	public void setup() {
@@ -57,8 +66,9 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		mGui.setItem(0, MarketGuiIcons.BACK_TO_MAIN_MENU).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_MAIN_MENU));
 		mGui.setItem(1, MarketGuiIcons.PLAYER_LISTINGS).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_PLAYER_LISTINGS));
 		mGui.setItem(2, MarketGuiIcons.ADD_LISTING).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_ADD_LISTING));
-		mGui.setItem(4, MarketGuiIcons.REFRESH).onClick((clickEvent) -> refresh());
-		mGui.setItem(5, buildFilterSelectionIcon()).onClick((clickEvent) -> clickFilterAction(clickEvent));
+		mGui.setItem(3, buildQuickSearchIcon()).onClick((clickEvent) -> quickSearchAction());
+		mGui.setItem(4, buildFilterSelectionIcon()).onClick((clickEvent) -> clickFilterAction(clickEvent));
+		mGui.setItem(5, buildSortbySelectionIcon()).onClick((clickEvent) -> clickSortbyAction(clickEvent));
 		mGui.setItem(8, mGui.buildChangePageIcon(mCurrentPage, getMaxPageDisplayable())).onClick((clickEvent) -> changePageAction(clickEvent));
 
 		if (mLoadingStatus == 4) {
@@ -72,6 +82,96 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		loadItems();
 	}
 
+	private GuiItem buildSortbySelectionIcon() {
+		ArrayList<Component> lore = new ArrayList<>();
+		lore.add(Component.text("Left click, Right click", NamedTextColor.WHITE).append(Component.text(" or any", NamedTextColor.GRAY)));
+		lore.add(Component.text("of your ", NamedTextColor.GRAY).append(Component.text("Hotbar keys", NamedTextColor.WHITE).append(Component.text(" to", NamedTextColor.GRAY))));
+		lore.add(Component.text("cycle though sortable fields.", NamedTextColor.GRAY));
+		if (mSortByDesc) {
+			lore.add(Component.text("Current order: ", NamedTextColor.GRAY).append(Component.text("▼ Descending ▼", NamedTextColor.WHITE)));
+			lore.add(Component.keybind("key.swapOffhand", NamedTextColor.WHITE).append(Component.text(" to switch to Ascending", NamedTextColor.GRAY)));
+		} else {
+			lore.add(Component.text("Current order: ", NamedTextColor.GRAY).append(Component.text("▲ Ascending ▲", NamedTextColor.WHITE)));
+			lore.add(Component.keybind("key.swapOffhand", NamedTextColor.WHITE).append(Component.text(" to switch to Descending", NamedTextColor.GRAY)));
+		}
+		lore.add(Component.empty());
+		lore.add(Component.text("Current selection:"));
+
+		for (int i = 0; i < mLoadedSortbyIndexes.size(); i++) {
+			NamedTextColor color = NamedTextColor.GRAY;
+			String header = " ";
+			if (mSelectedSortByIndex == i) {
+				color = NamedTextColor.GREEN;
+				header = "⌲";
+			}
+
+			lore.add(Component.text(header + "[" + mLoadedSortbyIndexes.get(i).toString() + "]", color));
+		}
+
+		ItemStack icon = GUIUtils.createBasicItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1, Component.text("Sort By", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true), lore, false);
+
+		return new GuiItem(icon, false);
+	}
+
+	private void clickSortbyAction(InventoryClickEvent clickEvent) {
+		if (clickEvent.getClick().equals(ClickType.SWAP_OFFHAND)) {
+			mSortByDesc = !mSortByDesc;
+			mLoadingStatus = 0;
+			mGui.update();
+			return;
+		}
+		int hotbarInt = clickEvent.getHotbarButton();
+		if (hotbarInt >= 0 && hotbarInt < mLoadedSortbyIndexes.size()) {
+			mSelectedSortByIndex = hotbarInt;
+		} else {
+			mSelectedSortByIndex = mGui.commonMultiplierSelection(clickEvent, mSelectedSortByIndex + 1, mLoadedSortbyIndexes.size()) - 1;
+		}
+		mLoadingStatus = 0;
+		mGui.update();
+	}
+
+	private void quickSearchAction() {
+		mQuicksearchValue = null;
+		mGui.close();
+		SignUtils.newMenu(List.of("", "~~~~~~~~~~~", "Enter an item name", "'*' for any letters"))
+			.reopenIfFail(false)
+			.response((player, lines) -> {
+				if (!StringUtils.isEmpty(lines[0])) {
+					mQuicksearchValue = lines[0];
+				}
+				mLoadingStatus = 0;
+				mGui.open();
+				return true;
+			})
+			.open(mPlayer);
+	}
+
+	private GuiItem buildQuickSearchIcon() {
+		ArrayList<Component> lore = new ArrayList<>();
+		if (mQuicksearchValue != null) {
+			lore.add(Component.text("Current search:", NamedTextColor.WHITE));
+			lore.add(Component.text(mQuicksearchValue, NamedTextColor.WHITE));
+			lore.add(Component.empty());
+		}
+		lore.add(Component.text("click this to quickly", NamedTextColor.GRAY));
+		lore.add(Component.text("search by item name", NamedTextColor.GRAY));
+		lore.add(Component.empty());
+		lore.add(Component.text("this quicksearch will be added", NamedTextColor.GRAY));
+		lore.add(Component.text("to the selected filter", NamedTextColor.GRAY));
+		lore.add(Component.empty());
+		lore.add(Component.text("If you do not know the exact", NamedTextColor.GRAY));
+		lore.add(Component.text("item name you are looking for,", NamedTextColor.GRAY));
+		lore.add(Component.text("you can replace unknown ", NamedTextColor.GRAY));
+		lore.add(Component.text("characters with '*' ", NamedTextColor.GRAY));
+		lore.add(Component.text("exemple: '*corrupted*'", NamedTextColor.GRAY));
+		lore.add(Component.text("will search for all items with", NamedTextColor.GRAY));
+		lore.add(Component.text("its name having 'corrupted' in it.", NamedTextColor.GRAY));
+
+		ItemStack icon = GUIUtils.createBasicItem(Material.SPYGLASS, 1, Component.text("Quicksearch Item Name", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true), lore, false);
+
+		return new GuiItem(icon, false);
+	}
+
 	private void clickFilterAction(InventoryClickEvent clickEvent) {
 		if (clickEvent.getClick().equals(ClickType.SWAP_OFFHAND)) {
 			if (mGui.mIsOp) {
@@ -83,10 +183,11 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		}
 		int hotbarInt = clickEvent.getHotbarButton();
 		if (hotbarInt >= 0 && hotbarInt < mLoadedMarketFilters.size()) {
-			mNewSelectedFilter = hotbarInt;
+			mSelectedFilter = hotbarInt;
 		} else {
-			mNewSelectedFilter = mGui.commonMultiplierSelection(clickEvent, mNewSelectedFilter + 1, mLoadedMarketFilters.size()) - 1;
+			mSelectedFilter = mGui.commonMultiplierSelection(clickEvent, mSelectedFilter + 1, mLoadedMarketFilters.size()) - 1;
 		}
+		mLoadingStatus = 0;
 		mGui.update();
 	}
 
@@ -104,9 +205,6 @@ public class TabBazaarBrowser implements MarketGuiTab {
 			NamedTextColor color = NamedTextColor.GRAY;
 			String header = " ";
 			if (mSelectedFilter == i) {
-				color = NamedTextColor.GOLD;
-				header = "☉";
-			} else if (mNewSelectedFilter == i) {
 				color = NamedTextColor.GREEN;
 				header = "⌲";
 			}
@@ -114,26 +212,9 @@ public class TabBazaarBrowser implements MarketGuiTab {
 			lore.add(Component.text(header + "[" + mLoadedMarketFilters.get(i).getDisplayName() + "]", color));
 		}
 
-		if (mNewSelectedFilter != mSelectedFilter) {
-			lore.add(Component.text("Your selection has changed.", NamedTextColor.GOLD));
-			lore.add(Component.text("Press the refresh button", NamedTextColor.GOLD));
-			lore.add(Component.text("to view the changes.", NamedTextColor.GOLD));
-		}
-
-		ItemStack icon = GUIUtils.createBasicItem(Material.SPYGLASS, 1, Component.text("Select a Filter", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true), lore, false);
+		ItemStack icon = GUIUtils.createBasicItem(Material.BRUSH, 1, Component.text("Select a Filter", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true), lore, false);
 
 		return new GuiItem(icon, false);
-	}
-
-	private void refresh() {
-		mLoadingStatus = 0;
-		mCurrentPage = 0;
-		mListingsIDList = null;
-		mListingsForPageList = null;
-
-		mSelectedFilter = mNewSelectedFilter;
-
-		mGui.update();
 	}
 
 	private void loadItems() {
@@ -143,6 +224,11 @@ public class TabBazaarBrowser implements MarketGuiTab {
 			mLoadingStatus = 1;
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 				MarketFilter filter = MarketFilter.mergeOf(mForcedPlayerFilter, mLoadedMarketFilters.get(mSelectedFilter));
+				if (mQuicksearchValue != null) {
+					MarketFilter quicksearch = new MarketFilter("Quick Search : " + mQuicksearchValue, List.of(new FilterComponent(MarketListingIndex.NAME, Comparator.WHITELIST, List.of(mQuicksearchValue))));
+					filter = MarketFilter.mergeOf(filter, quicksearch);
+				}
+				filter.setSorter(new Sorter(mLoadedSortbyIndexes.get(mSelectedSortByIndex), mSortByDesc));
 
 				mListingsIDList = MarketRedisManager.getAllListingsIdsMatchingFilter(filter);
 				mLoadingStatus = 2;
@@ -262,15 +348,24 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		mGui.setSize(TAB_SIZE);
 
 		mPlayer = mGui.mPlayer;
-		mNewSelectedFilter = 0;
 
 		mLoadedMarketFilters = new ArrayList<>();
 		mLoadedMarketFilters.add(MarketFilter.EMPTY_FILTER); // default filter
 		mLoadedMarketFilters.addAll(MarketManager.getPlayerMarketFilters(mPlayer));
 
-		refresh();
+		mSelectedFilter = 0;
 
 		mListingsOwnedIDList = MarketManager.getInstance().getListingsOfPlayer(mPlayer);
+
+		mQuicksearchValue = null;
+
+		mLoadedSortbyIndexes = MarketListingIndex.getAllPlayerSortable();
+		mSortByDesc = true;
+
+		mLoadingStatus = 0;
+		mCurrentPage = 0;
+		mListingsIDList = null;
+		mListingsForPageList = null;
 	}
 
 	@Override

@@ -345,11 +345,23 @@ public class MarketManager {
 		UUID uuid = event.getPlayer().getUniqueId();
 		JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
 		if (data != null) {
-			// load the owned player listings
-			JsonArray dataArray = data.getAsJsonArray("playerListings");
-			MMLog.info("MARKET DEBUG: Player " + event.getPlayer().getName() + " Joined shard with owned listings: " + new Gson().toJson(dataArray));
-			for (JsonElement elem : dataArray) {
+			// OWNERSHIP
+			JsonArray ownershipArray = data.getAsJsonArray("playerListings");
+			for (JsonElement elem : ownershipArray) {
 				marketPlayerData.addListingIDToPlayer(elem.getAsString());
+			}
+
+			// FILTERS
+			JsonArray filtersArray = data.getAsJsonArray("playerFilters");
+			if (filtersArray == null) {
+				marketPlayerData.resetPlayerFiltersList();
+			} else {
+				ArrayList<MarketFilter> filters = new ArrayList<>();
+				for (JsonElement filterObj : filtersArray.asList()) {
+					MarketFilter filter = new Gson().fromJson(filterObj, MarketFilter.class);
+					filters.add(filter);
+				}
+				marketPlayerData.setPlayerFiltersList(filters);
 			}
 		}
 
@@ -364,21 +376,30 @@ public class MarketManager {
 			return;
 		}
 		JsonObject data = new JsonObject();
-		JsonArray array = new JsonArray();
+
+		// OWNERSHIP
+		JsonArray ownershipArray = new JsonArray();
 		for (Long id : marketPlayerData.getOwnedListingsIDList()) {
 			if (id != null) {
-				array.add(String.valueOf(id));
+				ownershipArray.add(String.valueOf(id));
 			}
 		}
-		MMLog.info("MARKET DEBUG: Player " + event.getPlayer().getName() + " saved with owned listings: " + new Gson().toJson(array));
-		data.add("playerListings", array);
+		data.add("playerListings", ownershipArray);
+
+		// FILTERS
+		JsonArray filtersArray = new JsonArray();
+		for (MarketFilter filter : marketPlayerData.getPlayerFiltersList()) {
+			JsonElement elem = new Gson().toJsonTree(filter);
+			filtersArray.add(elem);
+		}
+		data.add("playerFilters", filtersArray);
+
 		event.setPluginData(KEY_PLUGIN_DATA, data);
 	}
 
 	public void onLogout(Player player) {
 		// delay the data removal by 20 ticks, as we need it for the playersave event, launched after logout event
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			MMLog.info("MARKET DEBUG: Player " + player + " logged out. local listing data wiped");
 			mMarketPlayerDataInstances.remove(player);
 		}, 20L);
 	}
