@@ -325,6 +325,7 @@ public class Plugin extends JavaPlugin {
 		SiriusNPCBoss.register();
 		EffectListCommand.register();
 		PlayerSkinManagerCommand.register();
+		ScanMobsCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

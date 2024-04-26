@@ -1,0 +1,248 @@
+package com.playmonumenta.plugins.commands;
+
+import com.goncalomb.bukkit.nbteditor.bos.BookOfSouls;
+import com.goncalomb.bukkit.nbteditor.nbt.EntityNBT;
+import com.goncalomb.bukkit.nbteditor.nbt.MobNBT;
+import com.goncalomb.bukkit.nbteditor.nbt.attributes.Attribute;
+import com.goncalomb.bukkit.nbteditor.nbt.attributes.AttributeContainer;
+import com.goncalomb.bukkit.nbteditor.nbt.attributes.AttributeType;
+import com.goncalomb.bukkit.nbteditor.nbt.variables.ItemsVariable;
+import com.goncalomb.bukkit.nbteditor.nbt.variables.NBTVariable;
+import com.google.common.collect.Multimap;
+import com.playmonumenta.libraryofsouls.Soul;
+import com.playmonumenta.libraryofsouls.SoulEntry;
+import com.playmonumenta.libraryofsouls.SoulsDatabase;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
+
+public class ScanMobsCommand {
+	public static Iterator<Soul> ARMOR_SOULS = Collections.emptyIterator();
+	public static Iterator<Soul> EQUIPMENT_SOULS = Collections.emptyIterator();
+
+	public static EnumSet<EntityType> BASE_ARMOR_TYPES = EnumSet.of(
+		EntityType.ZOMBIE,
+		EntityType.ZOMBIFIED_PIGLIN,
+		EntityType.ZOMBIE_VILLAGER,
+		EntityType.HUSK,
+		EntityType.DROWNED,
+		EntityType.MAGMA_CUBE
+	);
+
+	public static Set<Enchantment> BAD_ENCHANTMENTS = Set.of(
+		Enchantment.PROTECTION_ENVIRONMENTAL,
+		Enchantment.PROTECTION_FIRE,
+		Enchantment.PROTECTION_FALL,
+		Enchantment.PROTECTION_EXPLOSIONS,
+		Enchantment.PROTECTION_PROJECTILE,
+		Enchantment.DAMAGE_ALL
+	);
+
+	public static void register() {
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("armor"), new LiteralArgument("refresh"))
+			.executesPlayer((player, args) -> {
+				refreshArmor(player);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("armor"), new LiteralArgument("get"))
+			.executesPlayer((player, args) -> {
+				getArmor(player, 1);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("armor"), new LiteralArgument("get"), new IntegerArgument("count"))
+			.executesPlayer((player, args) -> {
+				getArmor(player, (int) args[0]);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("refresh"))
+			.executesPlayer((player, args) -> {
+				refreshEquipment(player);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("get"))
+			.executesPlayer((player, args) -> {
+				getEquipment(player, 1);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("get"), new IntegerArgument("count"))
+			.executesPlayer((player, args) -> {
+				getEquipment(player, (int) args[0]);
+			}).register();
+	}
+
+	private static void getArmor(Player player, int count) {
+		int i = 0;
+		while (ARMOR_SOULS.hasNext() && i < count) {
+			Soul soul = ARMOR_SOULS.next();
+			i++;
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(soul.getBoS());
+			if (!(entityNBT instanceof MobNBT mobNBT)) {
+				return;
+			}
+			AttributeContainer container = mobNBT.getAttributes();
+			Attribute armor = container.getAttribute(AttributeType.ARMOR);
+			boolean updateManually = armor != null && armor.getBase() > 2;
+
+			String mobName = MessagingUtils.plainText(soul.getDisplayName());
+
+			container.setAttribute(new Attribute(AttributeType.ARMOR, 0));
+			mobNBT.setAttributes(container);
+			BookOfSouls bos = new BookOfSouls(mobNBT);
+
+			if (updateManually) {
+				ItemStack bosItem = bos.getBook();
+				ItemUtils.modifyMeta(bosItem, meta -> meta.displayName(soul.getDisplayName()));
+				InventoryUtils.giveItem(player, bosItem);
+				player.sendMessage(mobName + " has more than 2 armor; gave BoS with no armor. Must be manually updated.");
+			} else {
+				SoulsDatabase.getInstance().update(player, bos);
+				player.sendMessage("Updated " + mobName + " automatically.");
+			}
+		}
+	}
+
+	private static void refreshArmor(Player player) {
+		List<Soul> souls = new ArrayList<>();
+		List<SoulEntry> originalSouls = SoulsDatabase.getInstance().getSouls();
+		for (SoulEntry soul : originalSouls) {
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(soul.getBoS());
+			if (!(entityNBT instanceof MobNBT mobNBT)) {
+				continue;
+			}
+			AttributeContainer container = mobNBT.getAttributes();
+			Attribute armor = container.getAttribute(AttributeType.ARMOR);
+			if (armor == null) {
+				if (BASE_ARMOR_TYPES.contains(mobNBT.getEntityType())) {
+					souls.add(soul);
+				}
+			} else {
+				if (armor.getBase() > 0) {
+					souls.add(soul);
+				}
+			}
+		}
+		ARMOR_SOULS = souls.iterator();
+		player.sendMessage("Refreshed. Found " + souls.size() + " mobs with armor.");
+	}
+
+	private static void getEquipment(Player player, int count) {
+		int i = 0;
+		while (EQUIPMENT_SOULS.hasNext() && i < count) {
+			Soul soul = EQUIPMENT_SOULS.next();
+			i++;
+			ItemStack bosItem = soul.getBoS();
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(bosItem);
+			List<ItemStack> items = getEquippedItems(entityNBT);
+			items.removeIf(item -> !isBadEquipment(item));
+
+			String mobName = MessagingUtils.plainText(soul.getDisplayName());
+
+			ItemUtils.modifyMeta(bosItem, meta -> meta.displayName(soul.getDisplayName()));
+			InventoryUtils.giveItem(player, bosItem);
+			Component msg = Component.text(mobName + " has items with stats: ");
+			for (ItemStack item : items) {
+				msg = msg.append(item.displayName()).append(Component.text(" "));
+			}
+			player.sendMessage(msg);
+		}
+	}
+
+	private static void refreshEquipment(Player player) {
+		List<Soul> souls = new ArrayList<>();
+		List<SoulEntry> originalSouls = SoulsDatabase.getInstance().getSouls();
+		for (SoulEntry soul : originalSouls) {
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(soul.getBoS());
+			if (getEquippedItems(entityNBT).stream().anyMatch(ScanMobsCommand::isBadEquipment)) {
+				souls.add(soul);
+			}
+		}
+		EQUIPMENT_SOULS = souls.iterator();
+		player.sendMessage("Refreshed. Found " + souls.size() + " mobs with bad equipment.");
+	}
+
+	private static List<ItemStack> getEquippedItems(EntityNBT entityNBT) {
+		NBTVariable armorNBT = entityNBT.getVariable("ArmorItems");
+		NBTVariable handNBT = entityNBT.getVariable("HandItems");
+		List<ItemStack> items = new ArrayList<>();
+		if (armorNBT instanceof ItemsVariable armorItems) {
+			items.addAll(Arrays.asList(armorItems.getItems()));
+		}
+		if (handNBT instanceof ItemsVariable handItems) {
+			items.addAll(Arrays.asList(handItems.getItems()));
+		}
+		return items;
+	}
+
+	private static boolean isBadEquipment(@Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return false;
+		}
+
+		for (Enchantment ench : BAD_ENCHANTMENTS) {
+			if (item.getEnchantmentLevel(ench) > 0) {
+				return true;
+			}
+		}
+
+		ItemMeta meta = item.getItemMeta();
+		Multimap<org.bukkit.attribute.Attribute, AttributeModifier> attributes = meta.getAttributeModifiers();
+		if (attributes != null) {
+			for (Map.Entry<org.bukkit.attribute.Attribute, AttributeModifier> entry : attributes.entries()) {
+				org.bukkit.attribute.Attribute attr = entry.getKey();
+				AttributeModifier mod = entry.getValue();
+				if (attr == org.bukkit.attribute.Attribute.GENERIC_ARMOR_TOUGHNESS || attr == org.bukkit.attribute.Attribute.HORSE_JUMP_STRENGTH) {
+					continue;
+				}
+				if (mod.getSlot() == EquipmentSlot.HAND && (attr == org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE || attr == org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED)) {
+					continue;
+				}
+				if (!isIdentity(mod)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private static boolean isIdentity(AttributeModifier modifier) {
+		if (modifier.getOperation() == AttributeModifier.Operation.MULTIPLY_SCALAR_1) {
+			return modifier.getAmount() == 1;
+		} else {
+			return modifier.getAmount() == 0;
+		}
+	}
+}
