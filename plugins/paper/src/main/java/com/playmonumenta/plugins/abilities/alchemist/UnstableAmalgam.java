@@ -97,7 +97,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 									),
 							("Enemies hit by the Amalgam's explosion become unstable for %s seconds, and they are knocked straight up. " +
 									"When an unstable mob is killed, a potion that deals %s%% of your potion damage is dropped at its location. " +
-									"These potions apply both Brutal and Gruesome effects, and bypass both normal and Alchemist Potion iframes.")
+									"These potions apply both Brutal and Gruesome effects (if equipped), and bypass both normal and Alchemist Potion iframes.")
 									.formatted(
 											StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION),
 											StringUtils.multiplierToPercentage(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE)

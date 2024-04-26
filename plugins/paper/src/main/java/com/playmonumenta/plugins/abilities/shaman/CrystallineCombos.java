@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.AbstractMap;
@@ -77,10 +78,9 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 			.scoreboardId("CrystalCombos")
 			.shorthandName("CC")
 			.descriptions(
-				String.format("Every kill not caused by this skill grants you 1 stack of crystals, and after %s stacks " +
-					"the crystals lash out at any mobs within %s blocks of you at a rate of 1 shot per %ss, " +
-					"dealing %s damage to each for a total " +
-					"of %s shots. Stacks decay at a rate of 1 stack per %ss.",
+				String.format("Gain a stack of crystals each time you kill a mob not with this ability. When you get %s stacks, " +
+					"they reset, and the crystals lash out at mobs within %s blocks. Every %ss, a random mob is shot, dealing %s magic damage, up to a total of %s shots. " +
+					" The first shot will wait to be fired if there are no mobs in range, but subsequent shots will do nothing if there are no mobs to shoot. Stacks decay at a rate of 1 stack per %ss.",
 					CRYSTAL_STACK_THRESHOLD, CRYSTAL_RANGE,
 					StringUtils.ticksToSeconds(SHOT_DELAY), CRYSTAL_DAMAGE_1,
 					SHOT_COUNT_1, STACK_DECAY_TIME_1),
@@ -166,17 +166,13 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (event.getSource() != null
-					&& event.getSource().getUniqueId().equals(mPlayer.getUniqueId())
-					&& enemy.isDead()
-					&& event.getAbility() != ClassAbility.CRYSTALLINE_COMBOS) {
-
+				if (enemy.isDead() && event.getAbility() != mInfo.getLinkedSpell() && MetadataUtils.checkOnceThisTick(mPlugin, enemy, "CrytallineCombosStack")) {
 					mCrystalStacks++;
 					mDecayTimer = 0;
 					updateNotify();
 				}
 			}
-		}.runTaskLater(mPlugin, 3);
+		}.runTaskLater(mPlugin, 1);
 		return false;
 	}
 
