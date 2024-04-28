@@ -44,16 +44,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	public static final ArrayList<Integer> SKILL_PAGE_SPEC_LOCS = new ArrayList<>(Arrays.asList(47, 51));
 	private static final int SKILL_PAGE_RESET_SPEC_LOC = 49;
 
-	private static final ArrayList<Integer> P3_ABILITY_LOCS = new ArrayList<>(Arrays.asList(9, 14, 18, 23, 27, 32, 36, 41));
+	private static final ArrayList<Integer> P3_ABILITY_LOCS = new ArrayList<>(Arrays.asList(10, 14, 19, 23, 28, 32, 37, 41));
 
 	/**
 	 *  gui identifiers are used for rp to put a texture to a gui. they would be unique to each gui and work
 	 *  pretty much like a filler.
 	 */
-	private static final int P1_GUI_IDENTIFIER_LOC = 45;
-	private static final int P2_GUI_IDENTIFIER_LOC = 45;
-	private static final int P3_GUI_IDENTIFIER_LOC = 45;
-	private static final int P4_GUI_IDENTIFIER_LOC = 45;
+	private static final int GUI_IDENTIFIER_LOC = 45;
 
 	public static final ArrayList<Integer> P4_SPEC_LOCS = new ArrayList<>(Arrays.asList(20, 30, 40));
 	private static final MonumentaClasses mClasses = new MonumentaClasses();
@@ -288,7 +285,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(P1_CHANGE_TRIGGERS_LOC, triggersItem);
 
 		// set gui identifier
-		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_1"));
+		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_1"));
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -347,7 +344,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		// set gui identifier
-		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
+		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -402,7 +399,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		// set gui identifier
-		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
+		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -433,7 +430,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		// set gui identifier
-		mInventory.setItem(P1_GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_3"));
+		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_3"));
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -650,29 +647,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		return levelItem;
 	}
 
-	public ItemStack createLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player) {
-		int getScore;
-		String scoreboard = ability.getScoreboard();
-		if (scoreboard == null) {
-			getScore = 0;
-		} else {
-			getScore = ScoreboardUtils.getScoreboardValue(player, scoreboard);
-			if (getScore > 2) {
-				getScore -= 2;
-			}
-		}
-		Material newMat = getScore >= level ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
-		return GUIUtils.createBasicItem(newMat, 1,
-			"Level " + level, theClass.mClassColor, true,
-			ability.getDescription(level).color(NamedTextColor.WHITE), 30, true);
-	}
-
 	public ItemStack createEnhanceItem(PlayerClass theClass, AbilityInfo<?> ability, Player player) {
 		if (ability.getDescriptions().size() == 3) {
 			Material newMat;
 			ItemStack newItem;
 			String scoreboard = ability.getScoreboard();
-			boolean selectedEn = false;
 			switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(player, scoreboard)) {
 				case 0 -> {
 					newMat = Material.BARRIER;
@@ -685,11 +664,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				}
 				case 1, 2 -> {
 					newMat = Material.ORANGE_STAINED_GLASS_PANE;
-					selectedEn = false;
 				}
 				case 3, 4 -> {
 					newMat = Material.YELLOW_STAINED_GLASS_PANE;
-					selectedEn = true;
 				}
 				default -> {
 					newMat = Material.BARRIER;
@@ -700,11 +677,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			newItem = GUIUtils.createBasicItem(newMat, 1,
 				"Enhancement", theClass.mClassColor, true,
 				ability.getDescription(3), 30, true);
-			if (selectedEn) {
-				GUIUtils.setGuiNbtTag(newItem, "texture", "skill_select_en_lit");
-			} else {
-				GUIUtils.setGuiNbtTag(newItem, "texture", "skill_select_en_unlit");
-			}
+				GUIUtils.setGuiNbtTag(newItem, "texture", (newMat == Material.YELLOW_STAINED_GLASS_PANE) ? "skill_select_en_lit" : "skill_select_en_unlit");
 			return newItem;
 		}
 
@@ -775,7 +748,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			mInventory.setItem(COMMON_REMAINING_SPEC_LOC, summaryItem);
 		}
 		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
-		ItemStack summaryItem = GUIUtils.createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.ROOTED_DIRT, "Skill Points", NamedTextColor.WHITE, false,
+		ItemStack summaryItem = GUIUtils.createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.GREEN_CONCRETE, "Skill Points", NamedTextColor.WHITE, false,
 			"You have " + currentSkillCount + " skill point" + (currentSkillCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
 		GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_sp" + (currentSkillCount == 0 ? "_none" : ""));
 		summaryItem.setAmount(currentSkillCount > 0 ? currentSkillCount : 1);
