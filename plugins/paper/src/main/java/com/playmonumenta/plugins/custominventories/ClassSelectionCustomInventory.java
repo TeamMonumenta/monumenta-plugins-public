@@ -344,7 +344,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		// set gui identifier
-		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_1");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -389,17 +393,22 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
-		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
+		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", NamedTextColor.LIGHT_PURPLE);
 			GUIUtils.setGuiNbtTag(specItem, "texture", "cross_gui_reset_spec");
 			GUIUtils.setGuiNbtTag(specItem, "Spec",
-				(ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+				(spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
 
 		// set gui identifier
-		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_2"));
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_2");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -430,7 +439,10 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		// set gui identifier
-		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_3"));
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_3");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec", spec.mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -644,6 +656,8 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		} else {
 			GUIUtils.setGuiNbtTag(levelItem, "texture", "skill_select_" + (getScore >= level ? "sp_lit" : "sp_unlit"));
 		}
+		GUIUtils.setGuiNbtTag(levelItem, "skill", ability.getDisplayName());
+		GUIUtils.setGuiNbtTag(levelItem, "level",  "" + level);
 		return levelItem;
 	}
 
