@@ -132,7 +132,7 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 					}
 				}
 				mPairs.removeAll(toRemove);
-				if (mBoss.isDead()) {
+				if (!mBoss.isValid()) {
 					for (Pair pa : mPairs) {
 						pa.delete();
 					}
