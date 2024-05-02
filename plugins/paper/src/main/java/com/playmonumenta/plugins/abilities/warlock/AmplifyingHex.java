@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -21,6 +23,9 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -131,7 +136,7 @@ public class AmplifyingHex extends Ability {
 				mPlayer.setHealth(maxHealth + newAbsorp);
 			}
 			//dummy damage
-			DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.OTHER, null, null, null), 0.001, true, false, false);
+			DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.TRUE, null, null, null), 0.001, true, false, false);
 
 			//multiply percent boost modifier
 			percentBoost *= mEnhanceDamageBonus;
@@ -141,25 +146,41 @@ public class AmplifyingHex extends Ability {
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			int debuffCount = 0;
 			int amplifierCount = 0;
-			for (PotionEffectType effectType : AbilityUtils.DEBUFFS) {
-				PotionEffect effect = mob.getPotionEffect(effectType);
-				if (effect != null) {
+
+			// Potion effect debuffs. We avoid stream for speed (hopefully)
+			for (PotionEffect e: mob.getActivePotionEffects()) {
+				if (AbilityUtils.DEBUFFS.contains(e.getType())) {
 					debuffCount++;
-					amplifierCount += Math.min(mAmplifierCap, effect.getAmplifier());
+					amplifierCount += Math.min(mAmplifierCap, e.getAmplifier());
 				}
 			}
 
-			int inferno = Inferno.getInfernoLevel(mPlugin, mob);
-			if (mob.getFireTicks() > 0 || inferno > 0) {
+			// Other debuffs
+			List<EffectManager.EffectPair> unfilteredEffectPairList = EffectManager.getInstance().getEffectPairs(mob);
+			Map<String, Double> effectPairList = new HashMap<>();
+			Map<String, Double> effectList = new HashMap<>();
+
+			if (unfilteredEffectPairList != null) {
+				for (EffectManager.EffectPair e : unfilteredEffectPairList) {
+					effectPairList.put(e.mSource, e.mEffect.getMagnitude());
+					effectList.put(e.mEffect.mEffectID, Math.max(e.mEffect.getMagnitude(),
+						effectList.getOrDefault(e.mEffect.mEffectID, 0.0)));
+				}
+			}
+
+			Double inferno = effectPairList.get(Inferno.INFERNO_EFFECT_NAME);
+			if (inferno != null) {
 				debuffCount++;
-				amplifierCount += Math.min(mAmplifierCap, inferno);
+				amplifierCount += (int) Math.min(mAmplifierCap, inferno);
+			} else if (mob.getFireTicks() > 0) {
+				debuffCount++;
 			}
 
 			if (EntityUtils.isStunned(mob)) {
 				debuffCount++;
 			}
 
-			if (EntityUtils.isParalyzed(mPlugin, mob)) {
+			if (effectPairList.containsKey(EntityUtils.PARALYZE_EFFECT_NAME)) {
 				debuffCount++;
 			}
 
@@ -167,43 +188,46 @@ public class AmplifyingHex extends Ability {
 				debuffCount++;
 			}
 
-			if (EntityUtils.isBleeding(mPlugin, mob)) {
+			Double bleed = effectPairList.get(EntityUtils.BLEED_EFFECT_NAME);
+			if (bleed != null) {
 				debuffCount++;
-				amplifierCount += Math.min(mAmplifierCap, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
+				amplifierCount += (int) Math.min(mAmplifierCap, bleed - 1);
 			}
 
 			//Custom slow effect interaction
-			if (EntityUtils.isSlowed(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.SLOW) == null) {
+			Double slow = effectPairList.get(EntityUtils.SLOW_EFFECT_NAME);
+			if (slow != null && mob.getPotionEffect(PotionEffectType.SLOW) == null) {
 				debuffCount++;
-				double slowAmp = EntityUtils.getSlowAmount(mPlugin, mob);
-				int slowLevel = (int) Math.floor(slowAmp * 10);
-				amplifierCount += Math.min((int) mAmplifierCap, Math.max(slowLevel - 1, 0));
+				int slowLevel = (int) Math.floor(slow * 10);
+				amplifierCount += Math.min(mAmplifierCap, Math.max(slowLevel - 1, 0));
 			}
 
 			//Custom weaken interaction
-			if (EntityUtils.isWeakened(mPlugin, mob)) {
+			Double weaken = effectPairList.get(EntityUtils.WEAKEN_EFFECT_NAME);
+			if (weaken != null) {
 				debuffCount++;
-				double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
-				int weakLevel = (int) Math.floor(weakAmp * 10);
+				int weakLevel = (int) Math.floor(weaken * 10);
 				amplifierCount += Math.min(mAmplifierCap, Math.max(weakLevel - 1, 0));
 			}
 
 			//Custom vuln interaction
-			if (EntityUtils.isVulnerable(mPlugin, mob)) {
+			Double vulnerable = effectPairList.get(EntityUtils.VULNERABILITY_EFFECT_NAME);
+			if (vulnerable != null) {
 				debuffCount++;
-				double vulnAmp = EntityUtils.getVulnAmount(mPlugin, mob);
-				amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
+				int vulnLevel = (int) Math.floor(vulnerable * 10);
+				amplifierCount += Math.min(mAmplifierCap, Math.max(vulnLevel - 1, 0));
 			}
 
 			//Custom DoT interaction
-			if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
+			Double dot = effectList.get(CustomDamageOverTime.effectID);
+			if (dot != null) {
 				debuffCount++;
-				int dotLevel = (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob);
-				amplifierCount += Math.min(mAmplifierCap, dotLevel - 1);
+				amplifierCount += (int) Math.min(mAmplifierCap, dot - 1);
 			}
 
 			// Custom choleric flames antiheal interaction
-			if (mPlugin.mEffectManager.getActiveEffect(mob, CholericFlames.ANTIHEAL_EFFECT) != null) {
+			Double cholericFlames = effectPairList.get(CholericFlames.ANTIHEAL_EFFECT);
+			if (cholericFlames != null) {
 				debuffCount++;
 			}
 

@@ -197,7 +197,7 @@ public class PhlegmaticResolve extends Ability {
 
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageReceived.class)) {
 				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
-					if (priorityEffects.getEffectID().equals(PercentDamageReceived.effectID)) {
+					if (priorityEffects.mEffectID.equals(PercentDamageReceived.effectID)) {
 						priorityEffects.onHurt(mPlayer, event);
 					}
 				}

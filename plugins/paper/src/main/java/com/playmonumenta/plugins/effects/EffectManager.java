@@ -163,6 +163,17 @@ public final class EffectManager implements Listener {
 			return effects;
 		}
 
+		// Gets ONLY active effects, but in EffectPair format.
+		public List<EffectPair> getEffectPairs() {
+			List<EffectPair> effects = new ArrayList<>();
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (Map.Entry<String, NavigableSet<Effect>> entry : priorityEffects.entrySet()) {
+					effects.add(new EffectPair(entry.getKey(), entry.getValue().last()));
+				}
+			}
+			return effects;
+		}
+
 		// Gets ALL effects, including non-active, hidden ones.
 		public List<EffectPair> getAllEffectPairs() {
 			List<EffectPair> effects = new ArrayList<>();
@@ -581,6 +592,15 @@ public final class EffectManager implements Listener {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects();
+		} else {
+			return null;
+		}
+	}
+
+	public @Nullable List<EffectPair> getEffectPairs(Entity entity) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getEffectPairs();
 		} else {
 			return null;
 		}

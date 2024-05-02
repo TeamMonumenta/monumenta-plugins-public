@@ -36,7 +36,7 @@ public class EffectListCommand {
 			return null;
 		}
 		Component hover = Component.text("Source: " + source).append(Component.newline())
-			.append(Component.text("ID: " + effect.getEffectID())).append(Component.newline())
+			.append(Component.text("ID: " + effect.mEffectID)).append(Component.newline())
 			.append(Component.text("Duration: " + effect.getDuration())).append(Component.newline())
 			.append(Component.text("Magnitude: " + StringUtils.to2DP(effect.getMagnitude())));
 		return display.hoverEvent(hover);

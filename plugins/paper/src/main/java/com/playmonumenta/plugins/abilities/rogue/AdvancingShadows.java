@@ -87,6 +87,7 @@ public class AdvancingShadows extends Ability {
 	private final double mPercentDamageDealt;
 	private final double mActivationRange;
 	private final int mRecastTimer;
+	private final float mKnockback;
 	private final Team mColorTeam;
 
 	private int mEnhancementKillTick = -999;
@@ -100,6 +101,7 @@ public class AdvancingShadows extends Ability {
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2);
 		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));
 		mRecastTimer = CharmManager.getDuration(player, CHARM_ENHANCE_TIMER, ENHANCEMENT_KILL_REQUIREMENT_TIME);
+		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS());
 		mColorTeam = ScoreboardUtils.getExistingTeamOrCreate("advancingShadowsColor", NamedTextColor.BLACK);
@@ -203,7 +205,7 @@ public class AdvancingShadows extends Ability {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
 				ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
 				if (mob != entity) {
-					MovementUtils.knockAway(entity, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED), true);
+					MovementUtils.knockAway(entity, mob, mKnockback, true);
 				}
 			}
 		}

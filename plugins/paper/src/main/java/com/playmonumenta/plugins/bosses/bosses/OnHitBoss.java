@@ -11,6 +11,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class OnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_onhit";
@@ -63,8 +64,18 @@ public class OnHitBoss extends BossAbilityGroup {
 			return;
 		}
 
-		Location loc = damagee.getLocation().add(0, 1, 0);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (!event.isCancelled()) {
+					execute(damagee);
+				}
+			}
+		}.runTask(mPlugin);
+	}
 
+	private void execute(LivingEntity damagee) {
+		Location loc = damagee.getLocation().add(0, 1, 0);
 		mParams.EFFECTS.apply(damagee, mBoss);
 		if (!mParams.COMMAND_AS_BOSS.equals("")) {
 			try {
@@ -87,7 +98,5 @@ public class OnHitBoss extends BossAbilityGroup {
 		//Particle & Sound
 		mParams.SOUND.play(loc);
 		mParams.PARTICLE.spawn(mBoss, loc, 0d, 0d, 0d);
-
 	}
-
 }
