@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warrior.guardian;
 
+import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPParametric;
@@ -49,7 +50,7 @@ public class ShieldWallCS implements CosmeticSkill {
 				packagedValues.location(l);
 				packagedValues.particle(replaceParticle(parameter, y2 / height));
 			})
-				.count((int) (20 * angle / 180))
+				.count((int) (15 * angle * radius / (ShieldWall.SHIELD_WALL_ANGLE * ShieldWall.SHIELD_WALL_RADIUS)))
 				.delta(0.03, 0.05, 0.03)
 				.extra(1000000)
 				.includeEnd(angle < 360)

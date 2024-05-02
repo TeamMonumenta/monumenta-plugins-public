@@ -38,9 +38,9 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	private static final int SHIELD_WALL_DAMAGE = 3;
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 25;
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 18;
-	private static final int SHIELD_WALL_ANGLE = 180;
+	public static final int SHIELD_WALL_ANGLE = 180;
 	private static final float SHIELD_WALL_KNOCKBACK = 0.3f;
-	private static final double SHIELD_WALL_RADIUS = 4.0;
+	public static final double SHIELD_WALL_RADIUS = 2.75;
 	private static final int SHIELD_WALL_HEIGHT = 5;
 	private static final String ON_HIT_EFFECT = "ShieldWallHitCooldownEffect";
 
@@ -62,7 +62,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 											"Enemies that pass through the wall are dealt %s melee damage and knocked back. The wall also blocks all enemy projectiles such as arrows or fireballs. The wall lasts %s seconds. The wall moves along with the user. Triggering again while active keeps the wall at the location where it is for the remainder of the duration. Cooldown: %ss.",
 									SHIELD_WALL_ANGLE,
 									SHIELD_WALL_HEIGHT,
-									(int) SHIELD_WALL_RADIUS,
+									SHIELD_WALL_RADIUS,
 									SHIELD_WALL_DAMAGE,
 									StringUtils.ticksToSeconds(SHIELD_WALL_1_DURATION),
 									StringUtils.ticksToSeconds(SHIELD_WALL_1_COOLDOWN)
