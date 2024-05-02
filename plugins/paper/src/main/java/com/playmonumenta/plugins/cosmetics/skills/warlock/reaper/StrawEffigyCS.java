@@ -44,39 +44,30 @@ public class StrawEffigyCS extends JudgementChainCS {
 	}
 
 	@Override
-	public void onPassDamage(Player player, LivingEntity chainedMob, LivingEntity selectedMob) {
+	public void onSummonChain(Player player, LivingEntity target, Location oldLoc) {
 		World world = player.getWorld();
-		Location chainLoc = LocationUtils.getHalfHeightLocation(chainedMob);
-		Location targetLoc = LocationUtils.getHalfHeightLocation(selectedMob);
+		Location playerLoc = player.getLocation();
+		Location targetLoc = LocationUtils.getEntityCenter(target);
 
-		new PartialParticle(Particle.TOTEM, chainLoc, 6, 0.5, 0.5, 0.5, 0.3).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, chainLoc, 6, 0.5, 0.5, 0.5, 0).data(STRAW).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.TOTEM, targetLoc, 8).delta(0.25).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, targetLoc, 8).delta(0.25).spawnAsPlayerActive(player);
+		new PPLine(Particle.TOTEM, oldLoc, targetLoc).countPerMeter(2).spawnAsPlayerActive(player);
 
-		new PartialParticle(Particle.TOTEM, targetLoc, 8, 0.5, 0.5, 0.5, 0.3).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.FALLING_DUST, targetLoc, 4, 0.75, 0.75, 0.75, 0)
-			.data(Material.SAND.createBlockData()).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, targetLoc, 8, 0.5, 0.5, 0.5, 0).data(STRAW).spawnAsPlayerActive(player);
-
-		new PPLine(Particle.CRIT, chainLoc, targetLoc).countPerMeter(4).spawnAsPlayerActive(player);
-
-		world.playSound(targetLoc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1.0f, 0.8f);
-		world.playSound(targetLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 1.2f);
-		world.playSound(targetLoc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.8f, 0.67f);
+		world.playSound(playerLoc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1.0f, 0.5f);
+		world.playSound(playerLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 0.5f);
+		world.playSound(playerLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.7f, 0.63f);
+		world.playSound(playerLoc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 1.0f, 0.6f);
+		world.playSound(playerLoc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1.0f, 1.75f);
+		world.playSound(playerLoc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 1.0f, 2.0f);
+		world.playSound(playerLoc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 0.65f);
 	}
 
 	@Override
-	public void onSummonChain(World world, Location loc) {
-		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1.0f, 0.5f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.7f, 0.63f);
-		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 1.0f, 0.6f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1.0f, 1.75f);
-		world.playSound(loc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 1.0f, 2.0f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 0.65f);
-	}
+	public void chain(Player player, LivingEntity target, int ticks) {
+		Location playerLoc = LocationUtils.getEntityCenter(player);
+		Location targetLoc = LocationUtils.getEntityCenter(target);
+		double delta = target.getWidth() / 2;
 
-	@Override
-	public void chain(Player player, Location playerLoc, Location targetLoc, double delta, int ticks) {
 		new PartialParticle(Particle.CRIT, targetLoc, 1).delta(delta * 1.5).spawnAsPlayerActive(player);
 		if (ticks % 2 == 0) {
 			new PartialParticle(Particle.FALLING_DUST, targetLoc.clone().add(0, 0.5, 0), 1).data(Material.SAND.createBlockData())
@@ -92,7 +83,7 @@ public class StrawEffigyCS extends JudgementChainCS {
 	}
 
 	@Override
-	public void onBreakChain(Player player, LivingEntity target, boolean isLevelTwo, double effectRadius, double damageRadius) {
+	public void onBreakChain(Player player, LivingEntity target) {
 		World world = player.getWorld();
 		Location playerLoc = LocationUtils.getHalfHeightLocation(player);
 		Location targetLoc = LocationUtils.getHalfHeightLocation(target);
@@ -101,9 +92,8 @@ public class StrawEffigyCS extends JudgementChainCS {
 
 		new PartialParticle(Particle.SWEEP_ATTACK, target.getEyeLocation(), 1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, targetLoc, 30, 0.75, 0.75, 0.75, 0.125).spawnAsPlayerActive(player);
-		if (isLevelTwo) {
-			new PartialParticle(Particle.CRIT, playerLoc, 30, damageRadius, damageRadius, damageRadius, 0.125).spawnAsPlayerActive(player);
-		}
+		new PPLine(Particle.BLOCK_CRACK, LocationUtils.getEntityCenter(player), LocationUtils.getEntityCenter(target))
+				.data(Material.HAY_BLOCK.createBlockData()).countPerMeter(8).delta(0.03).spawnAsPlayerActive(player);
 
 		world.playSound(playerLoc, Sound.ENTITY_GUARDIAN_DEATH, SoundCategory.PLAYERS, 1.0f, 0.6f);
 		world.playSound(playerLoc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.6f, 0.6f);
@@ -118,7 +108,7 @@ public class StrawEffigyCS extends JudgementChainCS {
 		return ScoreboardUtils.getExistingTeamOrCreate("strawEffigy", NamedTextColor.YELLOW);
 	}
 
-	public void drawChain(Player player, Location playerLoc, Location targetLoc, boolean isBreak) {
+	private void drawChain(Player player, Location playerLoc, Location targetLoc, boolean isBreak) {
 		// we drawing a real chain out here!!
 		Vector direction = LocationUtils.getDirectionTo(playerLoc, targetLoc);
 		Location chainLoc = targetLoc.clone();

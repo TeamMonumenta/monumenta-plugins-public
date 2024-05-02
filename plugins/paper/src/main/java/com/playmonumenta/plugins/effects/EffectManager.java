@@ -321,7 +321,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
 		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);
 		mEffectDeserializer.put(JudgementChainMobEffect.effectID, JudgementChainMobEffect::deserialize);
-		mEffectDeserializer.put(JudgementChainPlayerEffect.effectID, JudgementChainPlayerEffect::deserialize);
 		mEffectDeserializer.put(LichCurseEffect.effectId, LichCurseEffect::deserialize);
 		mEffectDeserializer.put(NegateDamage.effectID, NegateDamage::deserialize);
 		mEffectDeserializer.put(OnHitTimerEffect.effectID, OnHitTimerEffect::deserialize);
@@ -356,8 +355,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
 		mEffectDeserializer.put(UnstableAmalgamDisable.effectID, UnstableAmalgamDisable::deserialize);
 		mEffectDeserializer.put(VengefulTag.effectID, VengefulTag::deserialize);
+		mEffectDeserializer.put(VoodooBondsCurse.effectID, VoodooBondsCurse::deserialize);
 		mEffectDeserializer.put(VoodooBondsOtherPlayer.effectID, VoodooBondsOtherPlayer::deserialize);
-		mEffectDeserializer.put(VoodooBondsReaper.effectID, VoodooBondsReaper::deserialize);
 		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
 		mEffectDeserializer.put(ColoredGlowingEffect.effectID, ColoredGlowingEffect::deserialize);
 		mEffectDeserializer.put(FishQualityIncrease.effectID, FishQualityIncrease::deserialize);

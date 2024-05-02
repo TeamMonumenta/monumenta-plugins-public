@@ -5,401 +5,207 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.AbilityWithDuration;
-import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.JudgementChainCS;
-import com.playmonumenta.plugins.effects.CholericFlamesAntiHeal;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
-import com.playmonumenta.plugins.effects.JudgementChainPlayerEffect;
-import com.playmonumenta.plugins.effects.Paralyze;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.effects.PercentKnockbackResist;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
-public class JudgementChain extends Ability implements AbilityWithDuration {
-	private static final int COOLDOWN = 25 * 20;
-	private static final int DURATION = 20 * 20;
-	private static final int BUFF_DURATION = 10 * 20;
-	private static final double CHAIN_BREAK_DAMAGE = 20;
-	private static final int CHAIN_BREAK_DAMAGE_RANGE = 4;
-	private static final int CHAIN_BREAK_EFFECT_RANGE = 8;
-	private static final double BUFF_AMOUNT = 0.1;
-	private static final int RANGE = 16;
-	private static final double HITBOX_LENGTH = 0.5;
-	private static final double L2_RESIST_AMOUNT = -0.1;
-
-	private static final String EFFECT_NAME = "JudgementChainEffectName";
-	private static final String SPEED_NAME = "JudgementChainSpeedEffect";
-	private static final String STRENGTH_NAME = "JudgementChainStrengthEffect";
-	private static final String PARA_NAME = "JudgementChainParalyzeEffect";
-	private static final String KBR_NAME = "JudgementChainKBREffect";
-	private static final String DEF_NAME = "JudgementChainDefenseEffect";
-	private static final String HEAL_NAME = "JudgementChainRegenEffect";
-	private static final String DOT_NAME = "JudgementChainDOTEffect";
-	private static final String HEAL_RATE_NAME = "JudgementChainPercentHealEffect";
-	private static final String L2_RESIST_NAME = "JudgementChainL2DefenseEffect";
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.MELEE_ENCH,
-			DamageType.MELEE_SKILL,
-			DamageType.PROJECTILE,
-			DamageType.PROJECTILE_SKILL,
-			DamageType.MAGIC
-	);
+public class JudgementChain extends Ability {
+	private static final int COOLDOWN = 15 * 20;
+	private static final int RANGE = 20;
+	private static final int CHAIN_DURATION = 10 * 20;
+	private static final double SLOWNESS_AMOUNT = 0.4;
+	private static final double WEAKNESS_AMOUNT = 0.4;
+	private static final int DEBUFF_DURATION = 2 * 20;
+	private static final int EXTRA_TARGETS = 2;
+	private static final double EXTRA_TARGET_RADIUS = 3;
+	private static final double STRENGTH_AMOUNT = 0.03;
+	private static final double RESISTANCE_AMOUNT = 0.03;
+	private static final int MAX_MOBS_FOR_BUFF = 5;
+	private static final int BONUS_DARK_PACT_EXTENSION = 20;
+	public static final String EFFECT_NAME = "JudgementChainEffect";
+	private static final String STRENGTH_EFFECT_NAME = "JudgementChainStrength";
+	private static final String RESISTANCE_EFFECT_NAME = "JudgementChainResistance";
 
 	public static final String CHARM_COOLDOWN = "Judgement Chain Cooldown";
-	public static final String CHARM_DAMAGE = "Judgement Chain Damage";
 	public static final String CHARM_RANGE = "Judgement Chain Range";
-	public static final String CHARM_DURATION = "Judgement Chain Buff Duration";
+	public static final String CHARM_CHAIN_DURATION = "Judgement Chain Chain Duration";
+	public static final String CHARM_SLOWNESS = "Judgement Chain Slowness Amplifier";
+	public static final String CHARM_WEAKNESS = "Judgement Chain Weakness Amplifier";
+	public static final String CHARM_DEBUFF_DURATION = "Judgement Chain Debuff Duration";
+	public static final String CHARM_EXTRA_TARGETS = "Judgement Chain Extra Targets";
+	public static final String CHARM_EXTRA_TARGET_RADIUS = "Judgement Chain Extra Target Radius";
+	public static final String CHARM_STRENGTH = "Judgement Chain Strength Amplifier";
+	public static final String CHARM_RESISTANCE = "Judgement Chain Resistance Amplifier";
+	public static final String CHARM_DARK_PACT_EXTENSION = "Judgement Chain Dark Pact Extension";
 
 	public static final AbilityInfo<JudgementChain> INFO =
-			new AbilityInfo<>(JudgementChain.class, "Judgement Chain", JudgementChain::new)
-					.linkedSpell(ClassAbility.JUDGEMENT_CHAIN)
-					.scoreboardId("JudgementChain")
-					.shorthandName("JC")
-					.actionBarColor(TextColor.color(115, 115, 115))
-					.descriptions(
-							"Swap hands while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. " +
-									"For the next 20s, as long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. " +
-									"All damage taken by the chained mob is passed to the nearest mob within 8 blocks. " +
-									"All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. " +
-									"Swap hands while a mob is already chained to pull it towards you, dealing 20 magic damage and breaking the chain. " +
-									"Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.",
-							"While a mob is chained, the reaper gains 10% damage resistance. " +
-									"When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. " +
-									"Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.")
-					.simpleDescription("Chain a target mob, weakening it and redirecting damage it takes to other nearby mobs. Gain buffs for debuffing the chained mob.")
-					.cooldown(COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", JudgementChain::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
-							AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-					.displayItem(Material.CHAIN);
+		new AbilityInfo<>(JudgementChain.class, "Judgement Chain", JudgementChain::new)
+			.linkedSpell(ClassAbility.JUDGEMENT_CHAIN)
+			.scoreboardId("JudgementChain")
+			.shorthandName("JC")
+			.actionBarColor(TextColor.color(115, 115, 115))
+			.descriptions(
+				("Swap hands while looking at an unchained mob within %s blocks to teleport them in front of you and chain them to you for %ss, " +
+					"taunting them and afflicting them with %s%% Slowness and %s%% Weakness for %ss. " +
+					"Bosses and crowd control immune mobs cannot be teleported, but will be chained and debuffed. Cooldown: %ss.")
+				.formatted(RANGE, StringUtils.ticksToSeconds(CHAIN_DURATION), StringUtils.multiplierToPercentage(SLOWNESS_AMOUNT),
+					StringUtils.multiplierToPercentage(WEAKNESS_AMOUNT), StringUtils.ticksToSeconds(DEBUFF_DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
+				("Judgement Chain now additionally teleports and chains the %s closest mobs within %s blocks of the targeted mob. " +
+					"Passively gain %s%% Strength and %s%% Resistance for each mob currently chained to you, capped at %s mobs. " +
+					"Killing a chained mob extends your Dark Pact by an additional %ss if you have one currently active.")
+				.formatted(EXTRA_TARGETS, StringUtils.to2DP(EXTRA_TARGET_RADIUS), StringUtils.multiplierToPercentage(STRENGTH_AMOUNT),
+					StringUtils.multiplierToPercentage(RESISTANCE_AMOUNT), MAX_MOBS_FOR_BUFF, StringUtils.ticksToSeconds(BONUS_DARK_PACT_EXTENSION)))
+			.simpleDescription("Teleport a mob to you and debuff it.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", JudgementChain::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(Material.CHAIN);
 
-	private final double mAmplifier;
-	private final HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();
-	private boolean mRunDamageNextTick = false;
-
-	private @Nullable LivingEntity mTarget;
-
+	private final double mRange;
+	private final int mChainDuration;
+	private final double mSlowAmount;
+	private final double mWeakenAmount;
+	private final int mDebuffDuration;
+	private final int mExtraTargets;
+	private final double mExtraTargetRadius;
+	private final double mStrengthAmount;
+	private final double mResistanceAmount;
+	private final int mBonusDarkPactExtension;
+	private final List<LivingEntity> mAffectedEntities = new ArrayList<>();
+	private @Nullable VoodooBonds mVoodooBonds;
 	private final JudgementChainCS mCosmetic;
-
-	private int mCurrDuration = -1;
 
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mTarget = null;
-		mAmplifier = BUFF_AMOUNT;
+		mRange = CharmManager.getRadius(player, CHARM_RANGE, RANGE);
+		mChainDuration = CharmManager.getDuration(player, CHARM_CHAIN_DURATION, CHAIN_DURATION);
+		mSlowAmount = SLOWNESS_AMOUNT + CharmManager.getLevelPercentDecimal(player, CHARM_SLOWNESS);
+		mWeakenAmount = WEAKNESS_AMOUNT + CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS);
+		mDebuffDuration = CharmManager.getDuration(player, CHARM_DEBUFF_DURATION, DEBUFF_DURATION);
+		mExtraTargets = EXTRA_TARGETS + (int) CharmManager.getLevel(player, CHARM_EXTRA_TARGETS);
+		mExtraTargetRadius = CharmManager.getRadius(player, CHARM_EXTRA_TARGET_RADIUS, EXTRA_TARGET_RADIUS);
+		mStrengthAmount = STRENGTH_AMOUNT + CharmManager.getLevelPercentDecimal(player, CHARM_STRENGTH);
+		mResistanceAmount = RESISTANCE_AMOUNT + CharmManager.getLevelPercentDecimal(player, CHARM_RESISTANCE);
+		mBonusDarkPactExtension = BONUS_DARK_PACT_EXTENSION + (int) CharmManager.getLevel(player, CHARM_DARK_PACT_EXTENSION);
+		Bukkit.getScheduler().runTask(plugin, () -> mVoodooBonds = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, VoodooBonds.class));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new JudgementChainCS());
 	}
 
 	public boolean cast() {
-		if (mTarget != null) {
-			breakChain(true, true);
-			mTarget = null;
-			ClientModHandler.updateAbility(mPlayer, this);
-		} else {
-			if (isOnCooldown()) {
-				return false;
-			}
-			return summonChain();
+		if (isOnCooldown()) {
+			return false;
 		}
+
+		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange, e -> !mPlugin.mEffectManager.hasEffect(e, EFFECT_NAME));
+
+		if (entity == null) {
+			return false;
+		}
+
+		putOnCooldown();
+
+		Location entityLoc = entity.getLocation();
+
+		summonChain(entity, new Vector(0, 1, 3));
+
+		if (isLevelTwo()) {
+			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(entityLoc, mExtraTargetRadius, entity);
+			nearbyMobs.removeIf(e -> mPlugin.mEffectManager.hasEffect(e, EFFECT_NAME));
+			for (int i = 0; i < mExtraTargets; i++) {
+				LivingEntity nearestMob = EntityUtils.getNearestMob(entityLoc, nearbyMobs);
+				if (nearestMob != null) {
+					double angle = Math.floorDiv(i + 2, 2) * 30 * (i % 2 == 0 ? 1 : -1);
+					summonChain(nearestMob, VectorUtils.rotateYAxis(new Vector(0, 1, 3), angle));
+					nearbyMobs.remove(nearestMob);
+					if (nearbyMobs.isEmpty()) {
+						break;
+					}
+				}
+			}
+		}
+
 		return true;
 	}
 
-	public void passDamage(DamageEvent event) {
-		if (mTarget != null && event.getDamagee() == mTarget && event.getType() != DamageType.TRUE) {
-			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
-			e.remove(mTarget);
-			e.removeIf(entity -> mPlugin.mEffectManager.hasEffect(entity, EFFECT_NAME));
-			e.removeIf(entity -> ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG));
-			LivingEntity selectedEnemy = EntityUtils.getNearestMob(mTarget.getLocation(), e);
-			double damage = event.getDamage();
+	public void summonChain(LivingEntity entity, Vector offset) {
+		Location loc = mPlayer.getLocation();
+		Location oldLocation = entity.getLocation();
 
-			if (selectedEnemy != null && damage > 0) {
-				event.setDamage(0);
-				if (event.getAbility() != null && event.getSource() instanceof Player p) {
-					mDamageInTick.computeIfAbsent(p, key -> new HashMap<>()).computeIfAbsent(event.getAbility(), key -> new ArrayList<>()).add(event);
-					if (!mRunDamageNextTick) {
-						mRunDamageNextTick = true;
-						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-							mDamageInTick.forEach((player, map) -> {
-								map.forEach((ability, eventList) -> {
-									boolean damagedChainMob = false;
-									boolean damagedNearMob = false;
-									for (DamageEvent damageEvent : eventList) {
-										if (damageEvent.getDamagee() == mTarget) {
-											damagedChainMob = true;
-										}
-										if (damageEvent.getDamagee() == selectedEnemy) {
-											damagedNearMob = true;
-										}
-									}
-									if (damagedChainMob && !damagedNearMob && event.getDamagee() == mTarget) {
-										DamageUtils.damage(mPlayer, selectedEnemy, DamageEvent.DamageType.OTHER, damage, null, true);
-									}
-								});
-							});
-							mDamageInTick.clear();
-							mRunDamageNextTick = false;
-						});
-					}
-				} else {
-					if (!mRunDamageNextTick) {
-						mRunDamageNextTick = true;
-						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-							if (event.getDamagee() == mTarget) {
-								DamageUtils.damage(mPlayer, selectedEnemy, DamageEvent.DamageType.OTHER, damage, null, true);
-							}
-							mDamageInTick.clear();
-							mRunDamageNextTick = false;
-						});
-					}
-				}
-				mCosmetic.onPassDamage(mPlayer, mTarget, selectedEnemy);
-			}
-		}
-	}
+		if (!EntityUtils.isBoss(entity) && !EntityUtils.isCCImmuneMob(entity)) {
+			Location destination = loc.clone().add(VectorUtils.rotateTargetDirection(offset, loc.getYaw(), loc.getPitch()));
 
-	public boolean summonChain() {
-		Location loc = mPlayer.getEyeLocation();
-		World world = mPlayer.getWorld();
-
-		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		LivingEntity e = EntityUtils.getHostileEntityAtCursor(mPlayer, range, entity -> !EntityUtils.isBoss(entity));
-
-		if (e != null) {
-			mTarget = e;
-			mPlugin.mEffectManager.addEffect(mTarget, EFFECT_NAME, new JudgementChainMobEffect(DURATION, mPlayer, EFFECT_NAME, mCosmetic.createTeam()));
-			EntityUtils.applyTaunt(mTarget, mPlayer);
-			mCosmetic.onSummonChain(world, loc);
-
-			mCurrDuration = 0;
-			cancelOnDeath(new BukkitRunnable() {
-				final int mRunnableDuration = DURATION;
-				final double mWidth = e.getWidth() / 2;
-				int mT = 0;
-
-				@Override
-				public void run() {
-					Location l = LocationUtils.getHalfHeightLocation(mPlayer);
-					mT++;
-					mCurrDuration++;
-					if (mTarget != null) {
-						Location targetLoc = mTarget.getLocation().add(0, mTarget.getHeight() / 2, 0);
-						mCosmetic.chain(mPlayer, l, targetLoc, mWidth, mT);
-
-						List<LivingEntity> hostiles = new ArrayList<>();
-						List<Player> players = new ArrayList<>();
-						if (isLevelTwo()) {
-							mPlugin.mEffectManager.addEffect(mPlayer, L2_RESIST_NAME, new PercentDamageReceived(20, L2_RESIST_AMOUNT));
-
-							Vector chainVector = LocationUtils.getDirectionTo(targetLoc, l).multiply(0.5);
-							double dist = l.distance(targetLoc);
-							hostiles = EntityUtils.getMobsInLine(l, chainVector, dist, HITBOX_LENGTH);
-							hostiles.remove(mTarget);
-							players = EntityUtils.getPlayersInLine(l, chainVector, dist, HITBOX_LENGTH, mPlayer);
-
-						}
-						players.add(mPlayer);
-
-						applyEffects(hostiles, players);
-					}
-					if (mTarget == null || mPlayer.isDead() || (mTarget != null && (mTarget.isDead() || !mTarget.isValid()))) {
-						this.cancel();
-						if (mTarget != null) {
-							breakChain(false, false);
-							mTarget = null;
-						}
-					} else if ((mTarget != null && l.distance(mTarget.getLocation()) > range) || mT >= mRunnableDuration) {
-						this.cancel();
-						breakChain(true, false);
-						mTarget = null;
-					}
-				}
-
-				@Override
-				public synchronized void cancel() {
-					super.cancel();
-					mCurrDuration = -1;
-					ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1));
-
-			putOnCooldown();
-			return true;
-		}
-		return false;
-	}
-
-	public void breakChain(boolean doDamage, boolean doPull) {
-		if (mTarget != null) {
-			mPlugin.mEffectManager.clearEffects(mTarget, EFFECT_NAME);
-
-			Location loc = mPlayer.getEyeLocation();
-
-			double effectRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_EFFECT_RANGE);
-			double damageRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_DAMAGE_RANGE);
-
-			mCosmetic.onBreakChain(mPlayer, mTarget, isLevelTwo(), effectRadius, damageRadius);
-
-			List<LivingEntity> hostiles = new ArrayList<>();
-			List<Player> players = new ArrayList<>();
-			if (isLevelTwo()) {
-				hostiles = EntityUtils.getNearbyMobs(loc, effectRadius, mTarget);
-				players = PlayerUtils.playersInRange(loc, effectRadius, false);
-			}
-			players.add(mPlayer);
-
-			applyEffects(hostiles, players);
-
-			if (doPull) {
-				MovementUtils.pullTowardsStop(mPlayer, mTarget);
-				EntityUtils.applyWeaken(mPlugin, 20, 1, mTarget);
+			// don't teleport into the ground
+			if (destination.getY() < loc.getY() && destination.getBlock().isSolid()) {
+				destination = LocationUtils.fallToGround(destination.add(0, 1.5, 0), loc.getY());
 			}
 
-			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, CHAIN_BREAK_DAMAGE);
-			DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
+			EntityUtils.selfRoot(entity, 5); // tiny root to prevent weird movement after TP
+			EntityUtils.teleportStack(entity, destination);
+		}
 
-			if (doDamage && isLevelTwo()) {
-				for (LivingEntity m : EntityUtils.getNearbyMobs(loc, damageRadius, mTarget)) {
-					DamageUtils.damage(mPlayer, m, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
+		mCosmetic.onSummonChain(mPlayer, entity, oldLocation);
+
+		EntityUtils.applyTaunt(entity, mPlayer);
+		EntityUtils.applySlow(mPlugin, mDebuffDuration, mSlowAmount, entity);
+		EntityUtils.applyWeaken(mPlugin, mDebuffDuration, mWeakenAmount, entity);
+		mPlugin.mEffectManager.addEffect(entity, EFFECT_NAME, new JudgementChainMobEffect(mChainDuration, mPlayer, mCosmetic.createTeam()));
+		mAffectedEntities.add(entity);
+
+		cancelOnDeath(new BukkitRunnable() {
+			int mT = 0;
+			final LivingEntity mTarget = entity;
+
+			@Override
+			public void run() {
+				mCosmetic.chain(mPlayer, mTarget, mT);
+
+				if (mPlayer.isDead() || mTarget.isDead() || !mTarget.isValid() || mPlayer.getLocation().distance(mTarget.getLocation()) > 30 || mT > mChainDuration) {
+					mCosmetic.onBreakChain(mPlayer, mTarget);
+					mPlugin.mEffectManager.clearEffects(entity, EFFECT_NAME);
+					mAffectedEntities.remove(mTarget);
+					this.cancel();
 				}
+				mT++;
 			}
+		}.runTaskTimer(mPlugin, 0, 1));
+
+		if (mVoodooBonds != null && mVoodooBonds.isLevelTwo()) {
+			Location startLoc = LocationUtils.getEntityCenter(mPlayer);
+			Vector direction = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(entity), LocationUtils.getEntityCenter(mPlayer));
+			mVoodooBonds.launchPin(startLoc, direction, false, false);
 		}
-	}
-
-	private void applyEffects(List<LivingEntity> hostiles, List<Player> players) {
-		if (mTarget == null) {
-			return;
-		}
-
-		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, BUFF_DURATION);
-
-		List<BiConsumer<List<LivingEntity>, List<Player>>> effects = new ArrayList<>();
-
-		boolean isSlow = EntityUtils.isSlowed(mPlugin, mTarget);
-		boolean isWeak = EntityUtils.isWeakened(mPlugin, mTarget);
-		boolean isBleed = EntityUtils.isBleeding(mPlugin, mTarget);
-
-		effects.add(effect(isSlow || isBleed,
-				mob -> {
-					if (isSlow) {
-						EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
-					}
-					if (isBleed) {
-						EntityUtils.applyBleed(mPlugin, duration, mAmplifier, mob);
-					}
-				},
-				player -> mPlugin.mEffectManager.addEffect(player, SPEED_NAME, new PercentSpeed(duration, mAmplifier, SPEED_NAME))));
-
-		effects.add(effect(isWeak || isBleed,
-				mob -> {
-					if (isWeak) {
-						EntityUtils.applyWeaken(mPlugin, duration, mAmplifier, mob);
-					}
-					// We've already applied bleed
-				},
-				player -> mPlugin.mEffectManager.addEffect(player, STRENGTH_NAME, new PercentDamageDealt(duration, mAmplifier, AFFECTED_DAMAGE_TYPES))));
-
-		effects.add(effect(mTarget.getFireTicks() > 0,
-				mob -> EntityUtils.setFireTicksIfLower(duration, mob),
-				player -> PotionUtils.applyPotion(mPlayer, player, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, 0, false, true))));
-
-		effects.add(effect(EntityUtils.isParalyzed(mPlugin, mTarget),
-				mob -> mPlugin.mEffectManager.addEffect(mob, PARA_NAME, new Paralyze(duration, mPlugin)),
-				player -> mPlugin.mEffectManager.addEffect(player, KBR_NAME, new PercentKnockbackResist(duration, mAmplifier, KBR_NAME))));
-
-		effects.add(effect(EntityUtils.isVulnerable(mPlugin, mTarget),
-				mob -> EntityUtils.applyVulnerability(mPlugin, duration, mAmplifier, mob),
-				player -> mPlugin.mEffectManager.addEffect(player, DEF_NAME, new PercentDamageReceived(duration, -mAmplifier))));
-
-		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.POISON) || mTarget.hasPotionEffect(PotionEffectType.WITHER) || EntityUtils.hasDamageOverTime(mPlugin, mTarget),
-			mob -> mPlugin.mEffectManager.addEffect(mob, DOT_NAME,
-				new CustomDamageOverTime(duration, 1, 20, mPlayer, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), null, DamageType.AILMENT)),
-			player -> {
-				if (player == mPlayer) {
-					// 1 / 60 = 1/60th HP every tick, 60 ticks in 3 second interval
-					// We do this because constant re-application doesn't actually do anything
-					PlayerUtils.healPlayer(mPlugin, player, 1.0d / 60.0d, player);
-				}
-				mPlugin.mEffectManager.addEffect(player, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlayer, mPlugin));
-			}));
-
-		effects.add(effect(mPlugin.mEffectManager.hasEffect(mTarget, CholericFlames.ANTIHEAL_EFFECT),
-				mob -> mPlugin.mEffectManager.addEffect(mob, CholericFlames.ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(duration)),
-				player -> mPlugin.mEffectManager.addEffect(player, HEAL_RATE_NAME, new PercentHeal(duration, mAmplifier))));
-
-		effects.forEach(effect -> effect.accept(hostiles, players));
-	}
-
-	private BiConsumer<List<LivingEntity>, List<Player>> effect(boolean test, Consumer<LivingEntity> hostileAction, Consumer<Player> playerAction) {
-		if (test) {
-			return (hostiles, players) -> {
-				hostiles.forEach(hostileAction);
-				players.forEach(playerAction);
-			};
-		}
-		return (hostiles, players) -> {
-		};
-	}
-
-	@Override
-	public @Nullable String getMode() {
-		return mTarget != null ? "active" : null;
 	}
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mTarget != null) {
-			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), 36, false)) {
-				mPlugin.mEffectManager.addEffect(p, "JudgementChainPlayerEffectBy" + mPlayer.getName(), new JudgementChainPlayerEffect(20, this));
-			}
+		mAffectedEntities.removeIf(e -> mPlugin.mEffectManager.getEffects(e, EFFECT_NAME) == null);
+		if (!mAffectedEntities.isEmpty()) {
+			int chainedMobs = Math.min(MAX_MOBS_FOR_BUFF, mAffectedEntities.size());
+			mPlugin.mEffectManager.addEffect(mPlayer, STRENGTH_EFFECT_NAME, new PercentDamageDealt(20, mStrengthAmount * chainedMobs).displaysTime(false));
+			mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(20, -mResistanceAmount * chainedMobs).displaysTime(false));
 		}
 	}
 
-	@Override
-	public int getInitialAbilityDuration() {
-		return DURATION;
-	}
-
-	@Override
-	public int getRemainingAbilityDuration() {
-		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	public int getBonusDarkPactExtension() {
+		return mBonusDarkPactExtension;
 	}
 }

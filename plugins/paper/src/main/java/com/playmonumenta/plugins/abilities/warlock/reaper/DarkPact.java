@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -77,12 +78,14 @@ public class DarkPact extends Ability {
 
 	private final double mPercentDamageDealt;
 	private boolean mActive = false;
+	private @Nullable JudgementChain mJudgementChain;
 
 	private final DarkPactCS mCosmetic;
 
 	public DarkPact(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2);
+		Bukkit.getScheduler().runTask(plugin, () -> mJudgementChain = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, JudgementChain.class));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DarkPactCS());
 	}
 
@@ -112,6 +115,9 @@ public class DarkPact extends Ability {
 		}
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_REFRESH, DURATION_INCREASE_ON_KILL);
+		if (mJudgementChain != null && mJudgementChain.isLevelTwo() && mPlugin.mEffectManager.hasEffect(event.getEntity(), JudgementChain.EFFECT_NAME)) {
+			duration += mJudgementChain.getBonusDarkPactExtension();
+		}
 
 		NavigableSet<Effect> aestheticsEffects = mPlugin.mEffectManager.getEffects(mPlayer, AESTHETICS_EFFECT_NAME);
 		if (aestheticsEffects != null) {

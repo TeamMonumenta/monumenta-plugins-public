@@ -245,7 +245,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			loseAnimation();
 			for (Player p : getPlayersInArena(false)) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
 				if (p.isInvulnerable()) {
 					p.setInvulnerable(false);
 				}
@@ -813,7 +813,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						double ratio = Math.max(0, (12 - vec.length()) / (5 * vec.length()));
 						if (ratio >= 0.5) {
 							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
 							if (p.isInvulnerable()) {
 								p.setInvulnerable(false);
 							}
@@ -2455,7 +2455,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					for (Player p : getPlayersInArena(false)) {
 						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r3/sirius/fault");
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
 						if (p.isInvulnerable()) {
 							p.setInvulnerable(false);
 						}

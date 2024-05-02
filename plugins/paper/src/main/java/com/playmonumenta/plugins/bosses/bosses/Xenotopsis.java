@@ -411,7 +411,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 				// kill the player
 				sendDialogueMessageToPlayer(player, "LET YER SOUL BE CONSUMED BY THE ETERNAL MARCH OF DEATH");
 				mMonumentaPlugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
-				mMonumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.EFFECT_NAME);
+				mMonumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
 				PotionEffect resist = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 				if (resist != null && resist.getAmplifier() >= 4) {
 					player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);

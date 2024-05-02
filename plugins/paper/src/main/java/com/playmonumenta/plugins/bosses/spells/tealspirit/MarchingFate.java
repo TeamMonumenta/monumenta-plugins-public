@@ -109,7 +109,7 @@ public class MarchingFate extends Spell {
 				Plugin plugin = Plugin.getInstance();
 				for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {
 					plugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
-					plugin.mEffectManager.clearEffects(player, VoodooBonds.EFFECT_NAME);
+					plugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
 					PotionEffect resist = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 					if (resist != null && resist.getAmplifier() >= 4) {
 						player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);

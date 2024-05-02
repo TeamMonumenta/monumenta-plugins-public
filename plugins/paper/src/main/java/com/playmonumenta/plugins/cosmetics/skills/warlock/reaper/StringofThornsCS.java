@@ -18,17 +18,18 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class StringofThornsCS extends VoodooBondsCS {
-	private static final Color TRANSITION_RED_1 = Color.fromRGB(140, 0, 0);
-	private static final Color TRANSITION_RED_2 = Color.fromRGB(200, 0, 0);
 	private static final Particle.DustOptions RED_SMALL = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 0.6f);
-	private static final Particle.DustOptions DARK_GREEN = new Particle.DustOptions(Color.fromRGB(20, 80, 0), 1f);
-	private static final Particle.DustOptions DARK_GREEN_SMALL = new Particle.DustOptions(Color.fromRGB(20, 80, 0), 0.8f);
+	private static final Particle.DustOptions DARK_GREEN = new Particle.DustOptions(Color.fromRGB(0, 80, 20), 1f);
+	private static final Particle.DustOptions DARK_GREEN_SMALL = new Particle.DustOptions(Color.fromRGB(0, 80, 20), 0.8f);
+	private static final Particle.DustOptions TRANSITION_GREEN_1 = new Particle.DustOptions(Color.fromRGB(0, 85, 35), 1f);
+	private static final Particle.DustOptions TRANSITION_GREEN_2 = new Particle.DustOptions(Color.fromRGB(110, 175, 0), 1f);
 	private boolean mTriggeredThisTick = false;
 
 	@Override
@@ -50,90 +51,78 @@ public class StringofThornsCS extends VoodooBondsCS {
 	}
 
 	@Override
-	public void bondsStartEffect(World world, Player player, double radius) {
-		Location loc = player.getLocation();
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.75f, 0.63f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1f, 2f);
-		world.playSound(loc, Sound.ENTITY_CREEPER_DEATH, SoundCategory.PLAYERS, 1f, 0.7f);
-		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1f, 0.6f);
-		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1f, 0.75f);
-		new BukkitRunnable() {
-			final Location mLoc = LocationUtils.fallToGround(player.getLocation(), player.getLocation().getY() - 1);
-			double mRadius = 1.75;
-			double mRotation = 0;
+	public void launchPin(Player player, Location startLoc, Location endLoc, boolean doSound) {
+		World world = player.getWorld();
+		if (doSound) {
+			world.playSound(startLoc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 0.8f, 1.7f);
+			world.playSound(startLoc, Sound.ENTITY_CREEPER_DEATH, SoundCategory.PLAYERS, 1f, 0.7f);
+			world.playSound(startLoc, Sound.BLOCK_GRASS_STEP, SoundCategory.PLAYERS, 1f, 0.6f);
+			world.playSound(startLoc, Sound.BLOCK_VINE_STEP, SoundCategory.PLAYERS, 1f, 0.8f);
+			world.playSound(startLoc, Sound.BLOCK_LANTERN_BREAK, SoundCategory.PLAYERS, 1f, 0.5f);
+		}
 
+		Vector direction = LocationUtils.getDirectionTo(endLoc, startLoc);
+		new BukkitRunnable() {
+			int mTicks = 0;
+			final Location mLoc = startLoc.clone();
+			final Vector mDir = direction.clone();
 			@Override
 			public void run() {
-				for (int i = 0; i < 12; i++) {
-					new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius + 0.75).extra(0.03).countPerMeter(0.15).spawnAsPlayerActive(player);
-
-					Vector offset = VectorUtils.rotateYAxis(new Vector(mRadius, 0.075, 0), 90 + mRotation);
+				for (int i = 0; i < 8; i++) {
+					Vector offset = VectorUtils.rotateTargetDirection(mDir, 90 * (i % 2 == 0 ? 1 : -1), 0).multiply(0.45);
 					Location pLoc = mLoc.clone().add(offset);
+					pLoc = LocationUtils.fallToGround(pLoc, pLoc.getY() - 4);
+					pLoc.add(0, 0.1, 0);
+					double angle = startLoc.getYaw() + 135 + 60 * (i % 2 == 0 ? 1 : -1);
+					Location loc1 = pLoc.clone().add(VectorUtils.rotateYAxis(new Vector(0.2, 0, 0.2), angle));
+					Location loc2 = pLoc.clone().add(VectorUtils.rotateYAxis(new Vector(-0.35, 0, 0.35), angle));
+					Location loc3 = pLoc.clone().add(VectorUtils.rotateYAxis(new Vector(-0.2, 0, -0.2), angle));
+					Location loc4 = pLoc.clone().add(VectorUtils.rotateYAxis(new Vector(0.55, 0, -0.55), angle));
 
-					Vector direction = LocationUtils.getDirectionTo(pLoc, mLoc);
-					Location loc1 = pLoc.clone().add(VectorUtils.rotateYAxis(direction, 55).multiply(0.7));
-					Location loc2 = pLoc.clone().add(VectorUtils.rotateYAxis(direction, -55).multiply(0.7));
-					Location loc3 = pLoc.clone().add(direction.clone().multiply(0.7 * 2 * FastUtils.cosDeg(55)));
+					Particle.DustOptions color = ParticleUtils.getTransition(TRANSITION_GREEN_2, TRANSITION_GREEN_1, mLoc.distance(endLoc) / startLoc.distance(endLoc) * 1.1);
+					new PPLine(Particle.REDSTONE, loc1, loc2).data(color)
+						.countPerMeter(10).groupingDistance(0).spawnAsPlayerActive(player);
+					new PPLine(Particle.REDSTONE, loc2, loc3).data(color)
+						.countPerMeter(10).groupingDistance(0).spawnAsPlayerActive(player);
+					new PPLine(Particle.REDSTONE, loc3, loc4).data(color)
+						.countPerMeter(10).groupingDistance(0).spawnAsPlayerActive(player);
+					new PPLine(Particle.REDSTONE, loc4, loc1).data(color)
+						.countPerMeter(10).groupingDistance(0).spawnAsPlayerActive(player);
+					new PartialParticle(Particle.BLOCK_CRACK, pLoc, 4, 0.1, 0.1, 0.1).data(Material.JUNGLE_LEAVES.createBlockData()).spawnAsPlayerActive(player);
 
-					new PPLine(Particle.REDSTONE, pLoc, loc1).data(DARK_GREEN)
-						.countPerMeter(5).spawnAsPlayerActive(player);
-					new PPLine(Particle.REDSTONE, pLoc, loc2).data(DARK_GREEN)
-						.countPerMeter(5).spawnAsPlayerActive(player);
-					new PPLine(Particle.REDSTONE, loc1, loc3).data(DARK_GREEN)
-						.countPerMeter(5).spawnAsPlayerActive(player);
-					new PPLine(Particle.REDSTONE, loc2, loc3).data(DARK_GREEN)
-						.countPerMeter(5).spawnAsPlayerActive(player);
 
-					mRadius += 0.03;
-					mRotation += 360 * 2 / (1 + Math.sqrt(5)) % 360; // sunflower-esque golden ratio-ish
-
-					if (mRadius >= radius - 0.5) {
+					mLoc.add(mDir.clone().multiply(0.5));
+					if (mLoc.distance(endLoc) < 0.55) {
 						this.cancel();
 					}
+				}
+
+				mTicks++;
+				if (mTicks >= 10) {
+					this.cancel();
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
-		new BukkitRunnable() {
-			final Location mLoc = LocationUtils.fallToGround(player.getLocation(), player.getLocation().getY() - 1);
-			double mRadius = 2.5;
-			double mRotation = 0;
-
-			@Override
-			public void run() {
-
-				for (int i = 0; i < 8; i++) {
-					Vector offset = VectorUtils.rotateYAxis(new Vector(mRadius, 0.15, 0), 45 + mRotation);
-					Location pLoc = mLoc.clone().add(offset);
-
-					Vector direction = LocationUtils.getDirectionTo(pLoc, mLoc);
-					Location loc1 = pLoc.clone().add(VectorUtils.rotateYAxis(direction, 33).multiply(0.5));
-					Location loc2 = pLoc.clone().add(VectorUtils.rotateYAxis(direction, -33).multiply(0.5));
-					Location loc3 = pLoc.clone().add(direction.clone().multiply(0.5 * 2 * FastUtils.cosDeg(33)));
-
-					Particle.DustOptions color = new Particle.DustOptions(ParticleUtils.getTransition(TRANSITION_RED_1, TRANSITION_RED_2, mRadius / radius), 1f);
-					new PPLine(Particle.REDSTONE, pLoc, loc1).data(color)
-						.countPerMeter(5).spawnAsPlayerActive(player);
-					new PPLine(Particle.REDSTONE, pLoc, loc2).data(color)
-						.countPerMeter(5).spawnAsPlayerActive(player);
-					new PPLine(Particle.REDSTONE, loc1, loc3).data(color)
-						.countPerMeter(5).spawnAsPlayerActive(player);
-					new PPLine(Particle.REDSTONE, loc2, loc3).data(color)
-						.countPerMeter(5).spawnAsPlayerActive(player);
-
-					mRadius += 0.045;
-					mRotation -= 360 * 2 / (1 + Math.sqrt(5)) % 360; // sunflower-esque golden ratio-ish
-
-					if (mRadius >= radius - 1) {
-						this.cancel();
-					}
-				}
-			}
-		}.runTaskTimer(Plugin.getInstance(), 2, 1);
 	}
 
 	@Override
-	public void bondsApplyEffect(Player reaper, Player target) {
+	public void hitMob(Player player, LivingEntity mob, boolean doSound) {
+		World world = player.getWorld();
+		Location loc = LocationUtils.getEntityCenter(mob);
+
+		if (doSound) {
+			world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_PLACE, SoundCategory.PLAYERS, 1.0f, 0.9f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 1.0f, 0.85f);
+			world.playSound(loc, Sound.BLOCK_CHAIN_STEP, SoundCategory.PLAYERS, 1.0f, 0.66f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.6f, 1.5f);
+		}
+
+		new PartialParticle(Particle.GLOW_SQUID_INK, loc, 8, 0.25, 0.5, 0.25, 0.05).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FALLING_DUST, loc, 25, 0.35, 0.6, 0.35, 0).data(Material.LIME_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void hitPlayer(Player reaper, Player target) {
 		if (reaper != target) {
 			new PPLine(Particle.REDSTONE, LocationUtils.getHalfHeightLocation(reaper), LocationUtils.getHalfHeightLocation(target)).data(DARK_GREEN)
 				.countPerMeter(18).delta(0.04).groupingDistance(0).spawnAsPlayerActive(reaper);
@@ -150,7 +139,16 @@ public class StringofThornsCS extends VoodooBondsCS {
 	}
 
 	@Override
-	public void bondsSpreadParticle(Player player, LivingEntity toMob, LivingEntity sourceMob) {
+	public void curseTick(Player player, Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
+		if (entity instanceof LivingEntity mob) {
+			Location loc = mob.getEyeLocation();
+			new PartialParticle(Particle.SNEEZE, loc, 5)
+				.directionalMode(true).delta(0, 1, 0).extraRange(0.10, 0.20).spawnAsPlayerActive(player);
+		}
+	}
+
+	@Override
+	public void curseSpread(Player player, LivingEntity toMob, LivingEntity sourceMob) {
 		World world = player.getWorld();
 		Location sourceMobLoc = LocationUtils.getHalfHeightLocation(sourceMob);
 		Location toMobLoc = LocationUtils.getHalfHeightLocation(toMob);
@@ -192,5 +190,10 @@ public class StringofThornsCS extends VoodooBondsCS {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void curseDeath(Player player, LivingEntity toMob, LivingEntity sourceMob) {
+
 	}
 }
