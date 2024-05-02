@@ -908,6 +908,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 
+		mPlugin.mAbilityManager.playerDeathEvent(player, event);
 		mPlugin.mItemStatManager.onDeath(mPlugin, player, event);
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
