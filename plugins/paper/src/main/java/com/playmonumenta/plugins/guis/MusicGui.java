@@ -148,14 +148,14 @@ public class MusicGui extends Gui {
 				addMusicItem(4, 6, Material.MUSIC_DISC_STRAD, "Silver Prayer", Location.VIGIL, "Vigil", "Caecillius", "epic:music.vigil", 128, checkAdvance("monumenta:challenges/r2/sr/vigil"));
 
 				addMusicItem(5, 3, Material.MUSIC_DISC_CAT, "Herbal Charmer", Location.DEPTHS, "Hedera", "Casiel368", Hedera.MUSIC_TITLE, Hedera.MUSIC_DURATION, checkScore("DepthsEndless", 11));
-				addMusicItem(5, 4, Material.MUSIC_DISC_MALL, "Duel in the Depths", Location.DEPTHS, "Davey", "Mareridt", Davey.MUSIC_TITLE, Davey.MUSIC_DURATION, checkScore("DepthsEndless", 21));
+				addMusicItem(5, 4, Material.MUSIC_DISC_MALL, "Duel in the Depths", Location.DEPTHS, "Davey", "Xernial", Davey.MUSIC_TITLE, Davey.MUSIC_DURATION, checkScore("DepthsEndless", 21));
 				addMusicItem(5, 5, Material.MUSIC_DISC_STAL, "Core Tenebris", Location.DEPTHS, "Gyrhaeddant", "Whitebeard_OP", Nucleus.MUSIC_TITLE, Nucleus.MUSIC_DURATION, checkScore("Depths"));
 			}
 
 			case RING -> {
 				addMusicItem(1, 1, Material.MUSIC_DISC_FAR, "Those Who Survived", Location.FOREST, "Galengarde", "Whitebeard_OP", "epic:music.galengarde", 189, checkAdvance("monumenta:quests/r3/galengarde"));
 				addMusicItem(1, 2, Material.MUSIC_DISC_STAL, "Argentum Lament", Location.KEEP, "New Antium", "Whitebeard_OP", "epic:music.newantium", 205, checkAdvance("monumenta:quests/r3/newantium"));
-				addMusicItem(1, 3, Material.MUSIC_DISC_MALL, "Resting Among the Stars", Location.STARPOINT, "Chantry of Repentance", "Mareridt", "epic:music.chantry", 159, checkAdvance("monumenta:quests/r3/chantryofrepentance"));
+				addMusicItem(1, 3, Material.MUSIC_DISC_MALL, "Resting Among the Stars", Location.STARPOINT, "Chantry of Repentance", "Xernial", "epic:music.chantry", 159, checkAdvance("monumenta:quests/r3/chantryofrepentance"));
 
 				addMusicItem(1, 5, Material.MUSIC_DISC_BLOCKS, "The Architect's Ring", TextColor.fromHexString("ff8f26"), "The Architect's Ring", "Corpe_", "epic:music.ring", 187, checkScore("R3Access"));
 				addMusicItem(1, 6, Material.MUSIC_DISC_MALL, "Into the Star Verse", Location.STARPOINT, "Star Point", "CmdrGod", "epic:music.starpoint", 215, checkScore("R3Access"));
@@ -243,7 +243,8 @@ public class MusicGui extends Gui {
 
 			case BROWN -> {
 				addMusicItem(1, 3, Material.MUSIC_DISC_BLOCKS, "Pelias' Echo", Location.BROWN, "Okaye", "epic:music.brownfactory", 210);
-				addMusicItem(1, 5, Material.MUSIC_DISC_MALL, "The Empty Cradle", Location.BROWN, "Okaye x Whitebeard_OP", "epic:music.brownmall", 157);
+				addMusicItem(1, 4, Material.MUSIC_DISC_MALL, "The Empty Cradle", Location.BROWN, "Okaye x Whitebeard_OP", "epic:music.brownmall", 157);
+				addMusicItem(1, 5, Material.MUSIC_DISC_PIGSTEP, "Advanced Annihilation Mechanism", Location.BROWN, "Xernial x CmdrGod", "epic:music.mechapelias", 151);
 			}
 
 			case PLOTS -> {
