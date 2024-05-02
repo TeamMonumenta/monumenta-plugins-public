@@ -6,6 +6,7 @@ import com.goncalomb.bukkit.nbteditor.nbt.MobNBT;
 import com.goncalomb.bukkit.nbteditor.nbt.attributes.Attribute;
 import com.goncalomb.bukkit.nbteditor.nbt.attributes.AttributeContainer;
 import com.goncalomb.bukkit.nbteditor.nbt.attributes.AttributeType;
+import com.goncalomb.bukkit.nbteditor.nbt.variables.FloatVariable;
 import com.goncalomb.bukkit.nbteditor.nbt.variables.ItemsVariable;
 import com.goncalomb.bukkit.nbteditor.nbt.variables.NBTVariable;
 import com.google.common.collect.Multimap;
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 public class ScanMobsCommand {
 	public static Iterator<Soul> ARMOR_SOULS = Collections.emptyIterator();
 	public static Iterator<Soul> EQUIPMENT_SOULS = Collections.emptyIterator();
+	public static Iterator<Soul> HEALTH_SOULS = Collections.emptyIterator();
 
 	public static EnumSet<EntityType> BASE_ARMOR_TYPES = EnumSet.of(
 		EntityType.ZOMBIE,
@@ -100,6 +102,27 @@ public class ScanMobsCommand {
 			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("get"), new IntegerArgument("count"))
 			.executesPlayer((player, args) -> {
 				getEquipment(player, (int) args[0]);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("health"), new LiteralArgument("refresh"))
+			.executesPlayer((player, args) -> {
+				refreshHealth(player);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("health"), new LiteralArgument("get"))
+			.executesPlayer((player, args) -> {
+				getHealth(player, 1);
+			}).register();
+
+		new CommandAPICommand("scanmobs")
+			.withPermission("monumenta.command.scanmobs")
+			.withArguments(new LiteralArgument("health"), new LiteralArgument("get"), new IntegerArgument("count"))
+			.executesPlayer((player, args) -> {
+				getHealth(player, (int) args[0]);
 			}).register();
 	}
 
@@ -233,6 +256,13 @@ public class ScanMobsCommand {
 					return true;
 				}
 			}
+		} else if (ItemUtils.isArmor(item) && item.getType() != Material.ELYTRA) {
+			return true;
+		}
+
+		List<Component> lore = item.lore();
+		if (lore != null && !lore.isEmpty()) {
+			return true;
 		}
 
 		return false;
@@ -244,5 +274,76 @@ public class ScanMobsCommand {
 		} else {
 			return modifier.getAmount() == 0;
 		}
+	}
+
+	private static void getHealth(Player player, int count) {
+		int i = 0;
+		while (HEALTH_SOULS.hasNext() && i < count) {
+			Soul soul = HEALTH_SOULS.next();
+			i++;
+			ItemStack bosItem = soul.getBoS();
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(bosItem);
+			if (!(entityNBT instanceof MobNBT mobNBT)) {
+				continue;
+			}
+
+			AttributeContainer container = mobNBT.getAttributes();
+			Attribute maxHealthAttr = container.getAttribute(AttributeType.MAX_HEALTH);
+			if (maxHealthAttr == null) {
+				continue;
+			}
+			double maxHealth = maxHealthAttr.getBase();
+			NBTVariable healthVar = mobNBT.getVariable("Health");
+			if (!(healthVar instanceof FloatVariable floatVar)) {
+				continue;
+			}
+
+			String floatString = floatVar.get();
+			if (floatString == null) {
+				continue;
+			}
+			float health = Float.parseFloat(floatString);
+			healthVar.set(Float.toString((float) maxHealth), player);
+			BookOfSouls newBos = new BookOfSouls(mobNBT);
+
+			String mobName = MessagingUtils.plainText(soul.getDisplayName());
+
+			ItemStack newBosItem = newBos.getBook();
+			ItemUtils.modifyMeta(bosItem, meta -> meta.displayName(soul.getDisplayName()));
+			InventoryUtils.giveItem(player, newBosItem);
+			player.sendMessage(mobName + " has " + health + " out of " + maxHealth + " health; gave BoS with max health. Must be manually updated.");
+		}
+	}
+
+	private static void refreshHealth(Player player) {
+		List<Soul> souls = new ArrayList<>();
+		List<SoulEntry> originalSouls = SoulsDatabase.getInstance().getSouls();
+		for (SoulEntry soul : originalSouls) {
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(soul.getBoS());
+			if (!(entityNBT instanceof MobNBT mobNBT)) {
+				continue;
+			}
+
+			AttributeContainer container = mobNBT.getAttributes();
+			Attribute maxHealthAttr = container.getAttribute(AttributeType.MAX_HEALTH);
+			if (maxHealthAttr == null) {
+				continue;
+			}
+			double maxHealth = maxHealthAttr.getBase();
+
+			NBTVariable healthVar = mobNBT.getVariable("Health");
+			if (healthVar instanceof FloatVariable floatVar) {
+				String floatString = floatVar.get();
+				if (floatString == null) {
+					continue;
+				}
+				float health = Float.parseFloat(floatString);
+				if (Math.abs(maxHealth - health) > 0.001) {
+					souls.add(soul);
+				}
+			}
+		}
+		HEALTH_SOULS = souls.iterator();
+		player.sendMessage("Refreshed. Found " + souls.size() + " mobs with non-max health.");
 	}
 }

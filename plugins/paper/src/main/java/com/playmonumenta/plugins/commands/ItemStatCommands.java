@@ -816,6 +816,7 @@ public class ItemStatCommands {
 
 			// Copied from nbti command to set the attributes to an empty list instead of removing them entirely
 			ItemModifier.setItemStackModifiers(item, new ArrayList<>());
+			ItemUpdateHelper.addDummyAttributeIfNeeded(item);
 
 			ItemUtils.setPlainLore(item);
 

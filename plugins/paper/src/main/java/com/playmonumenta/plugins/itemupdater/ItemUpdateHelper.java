@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemupdater;
 
+import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
@@ -50,6 +51,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -521,22 +523,11 @@ public class ItemUpdateHelper {
 				return;
 			}
 
+
+			// placeholder attributes (for items with default attributes)
+			addDummyAttributeIfNeeded(item);
+
 			nbt.modifyMeta((nbtr, meta) -> {
-				// placeholder attributes (for items with default attributes)
-				boolean hasDummyAttribute = false;
-				boolean needsDummyAttribute = true;
-				if (meta.hasAttributeModifiers()) {
-					Collection<AttributeModifier> toughnessAttributes = meta.getAttributeModifiers(Attribute.GENERIC_ARMOR_TOUGHNESS);
-					hasDummyAttribute = toughnessAttributes != null && toughnessAttributes.size() == 1 && ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME.equals(toughnessAttributes.iterator().next().getName());
-					needsDummyAttribute = !(meta.getAttributeModifiers().size() >= (hasDummyAttribute ? 2 : 1));
-				}
-				boolean hasDefaultAttributes = ItemUtils.hasDefaultAttributes(item);
-				if (hasDefaultAttributes && needsDummyAttribute) {
-					meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
-					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
-				} else {
-					meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
-				}
 
 				// placeholder enchantment
 				Enchantment placeholder = ItemUtils.isSomeBow(item) ? Enchantment.WATER_WORKER : Enchantment.ARROW_DAMAGE;
@@ -595,6 +586,23 @@ public class ItemUpdateHelper {
 			ItemUtils.setDisplayLore(nbt, lore);
 			ItemUtils.setPlainComponentLore(nbt, lore);
 		});
+	}
+
+	public static void addDummyAttributeIfNeeded(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		boolean needsDummyAttribute = true;
+		Multimap<Attribute, AttributeModifier> attributeModifiers = meta.getAttributeModifiers();
+		if (attributeModifiers != null && !attributeModifiers.isEmpty()) {
+			Collection<AttributeModifier> toughnessAttributes = attributeModifiers.get(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			boolean hasDummyAttribute = toughnessAttributes.size() == 1 && ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME.equals(toughnessAttributes.iterator().next().getName());
+			needsDummyAttribute = !(attributeModifiers.size() >= (hasDummyAttribute ? 2 : 1));
+		}
+		boolean hasDefaultAttributes = ItemUtils.hasDefaultAttributes(item);
+		meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+		if (hasDefaultAttributes && needsDummyAttribute) {
+			meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+		}
+		item.setItemMeta(meta);
 	}
 
 	public static void fixLegacies(ItemStack item) {
