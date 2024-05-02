@@ -72,9 +72,7 @@ public class TealQuestBoss extends SerializedLocationBossAbilityGroup {
 				}, (World world, Location loc) -> {
 				world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
 				new PartialParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
-			}, (World world, Location loc) -> {
-				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss);
-			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
+			}, (World world, Location loc) -> new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss), (World world, @Nullable Player player, Location loc, Vector dir) -> {
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 					List.of(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
@@ -132,9 +130,7 @@ public class TealQuestBoss extends SerializedLocationBossAbilityGroup {
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);
-			}, (Location loc) -> {
-			new PartialParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, REDSTONE_COLOR_BARRIER).spawnAsEntityActive(boss);
-		}, (Location loc) -> {
+			}, (Location loc) -> new PartialParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, REDSTONE_COLOR_BARRIER).spawnAsEntityActive(boss), (Location loc) -> {
 			World world = loc.getWorld();
 			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
 		}), new SpellCrowdControlClear(boss, CLEAR_TIME)));

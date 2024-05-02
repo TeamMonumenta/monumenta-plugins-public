@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPrimordialBolt;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -60,7 +61,8 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 			new SpellBaseCharge(plugin, mBoss, 20, 20, 160, true,
 				(LivingEntity target) -> {
 					new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
-					boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+						new BaseMovementSpeedModifyEffect(40, -0.75));
 					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 1f, 1.5f);
 				},
 				// Warning particles

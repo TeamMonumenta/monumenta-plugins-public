@@ -329,7 +329,10 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+		for (Player player : players) {
 			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
 			player.sendMessage(Component.text("", NamedTextColor.RED)
 					.append(Component.text("[Iota]", NamedTextColor.GOLD))
@@ -340,8 +343,6 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 					.append(Component.text("DER..."))
 					.append(Component.text("65789").decoration(TextDecoration.OBFUSCATED, true))
 					.append(Component.text(" Thank… you… tell Bermuda… that thing… it broke me… I didn't mean to…", NamedTextColor.BLUE)));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}
 
 		// Fix misplaced blocks

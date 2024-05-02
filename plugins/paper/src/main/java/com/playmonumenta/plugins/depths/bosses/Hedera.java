@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellLeafNova;
 import com.playmonumenta.plugins.depths.bosses.spells.hedera.SpellPassiveGarden;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -179,12 +180,13 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
+		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+		for (Player player : players) {
 			player.sendMessage(Component.text("", NamedTextColor.DARK_GREEN)
 				.append(Component.text("[Hedera]", NamedTextColor.GOLD))
 				.append(Component.text(" No! No! This cannot be! The Broken Beyond must let me flee!")));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 			PotionEffect poisonEffect = player.getPotionEffect(PotionEffectType.POISON);
 			if (poisonEffect != null) {
 				player.removePotionEffect(PotionEffectType.POISON);

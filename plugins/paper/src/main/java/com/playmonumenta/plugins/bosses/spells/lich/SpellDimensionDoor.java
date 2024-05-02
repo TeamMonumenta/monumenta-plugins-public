@@ -357,7 +357,7 @@ public class SpellDimensionDoor extends Spell {
 			DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
 			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 			AbilityUtils.increaseDamageDealtPlayer(p, 20 * 30, -0.2, "Lich");
-			Lich.cursePlayer(plugin, p);
+			Lich.cursePlayer(p);
 		}
 		int tick = t;
 

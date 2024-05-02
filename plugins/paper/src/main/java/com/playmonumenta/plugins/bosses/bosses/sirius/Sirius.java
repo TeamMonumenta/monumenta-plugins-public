@@ -454,14 +454,15 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		List<Player> players = getPlayersInArena(false);
+
+		BossUtils.endBossFightEffects(players);
 		mStarBlightConverter.restoreAll();
 		mSpawner.wipeMobs();
 		removeCollisionBox();
-		for (Player p : getPlayersInArena(false)) {
+		for (Player p : players) {
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, SpellBlightedBolts.BLIGHTEDBOLTTAG);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.GENERIC_NAME,
-				new PercentDamageReceived(5 * 20, -1.0));
 		}
 		for (BlockDisplay dis : mDisplays) {
 			dis.remove();

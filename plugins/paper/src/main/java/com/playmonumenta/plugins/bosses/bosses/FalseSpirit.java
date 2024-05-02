@@ -6,14 +6,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.DamageBlocker;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.GatesOfHell;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.LapseOfReality;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.NothingnessSeeker;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellFlamethrower;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.*;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -23,6 +16,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.worlds.common.MMLog;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,8 +48,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -64,40 +56,47 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_falsespirit";
 	public static final int detectionRange = 75;
 	public static final int meleeRange = 10;
-
-	//If delves is enabled in instance, turn on delves mode
-	private boolean mDelve = false;
-
-	private static final int HEALTH_HEALED = 100;
-	private double mCoef;
-
-	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
-
-	private final LapseOfReality mMania;
-	private final GatesOfHell mHell;
-	private final GatesOfHell mCeilingHell;
-
-	private static final String PORTAL_TAG = "PortalOfHell";
-	//WARNING: Ceiling Portal should only have PORTAL_CEILING_TAG as a tag
+	// WARNING: Ceiling Portal should only have PORTAL_CEILING_TAG as a tag
 	public static final String PORTAL_CEILING_TAG = "CeilingPoH";
 
-	//The material that the g round that should damage you is made out of
+	private static final int HEALTH_HEALED = 100;
+	private static final String PORTAL_TAG = "PortalOfHell";
+	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
+	// The material that the ground that should damage you is made out of
 	private static final EnumSet<Material> mGroundMats = EnumSet.of(
 		Material.BLACK_CONCRETE_POWDER,
 		Material.GRAY_CONCRETE_POWDER,
 		Material.BLACKSTONE,
 		Material.BASALT
 	);
+	private static final Component bhairaviBackseating = Component.text("[Bhairavi]", NamedTextColor.GOLD)
+		.append(Component.text(" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!", NamedTextColor.WHITE));
+	private static final Component[] fightDialogue = new Component[] {
+		Component.text("I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.", NamedTextColor.DARK_RED),
+		Component.text("The Gates open! Come forth, nithlings!", NamedTextColor.DARK_RED),
+		Component.text("The Gates open once more! Come forth, nithlings!", NamedTextColor.DARK_RED),
+		Component.text("I am more than the nithlings from my gates. The magic of Hallud flows through me. Battle me and perish.", NamedTextColor.DARK_RED),
+		Component.text("Despite your efforts, nothingness is what you will return to. The magic of Midat is with me.", NamedTextColor.DARK_RED),
+		Component.text("The Gates are opened! Come forth, nithlings!", NamedTextColor.DARK_RED),
+		Component.text("The Final Gate opens. Meet your demise.", NamedTextColor.DARK_RED),
+		Component.text("The Tree of Life calls. I only wish to answer...", NamedTextColor.DARK_RED)
+	};
+
+	private final LapseOfReality mMania;
+	private final GatesOfHell mHell;
+
+	private GatesOfHell mCeilingHell;
+	private double mScalingCoefficient;
 
 	public FalseSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
-		//Look to see if delves is enabled
+		// If delves is enabled in instance, turn on delves mode
+		boolean isDelve = false;
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 100, true);
 		for (Player player : players) {
 			if (DelvesUtils.getPlayerTotalDelvePoint(null, player, ServerProperties.getShardName()) > 0) {
-				mDelve = true;
-
+				isDelve = true;
 				break;
 			}
 		}
@@ -110,29 +109,28 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-					case PORTAL_TAG:
-						portals.add(e);
-						break;
-					case PORTAL_CEILING_TAG:
-						ceilingPortal = e;
-						break;
-					default:
-						break;
+					case PORTAL_TAG -> portals.add(e);
+					case PORTAL_CEILING_TAG -> ceilingPortal = e;
 				}
 			}
 		}
 
+		// Theoretically ceilingPortal should never be null after the above block runs because the armor stands are
+		// spawned via mechs, but I'm adding a log here in case it does happen
 		mHell = new GatesOfHell(plugin, boss, portals, 1);
-		mCeilingHell = new GatesOfHell(plugin, boss, new ArrayList<>(List.of(ceilingPortal)), 5);
+		try {
+			mCeilingHell = new GatesOfHell(plugin, boss, new ArrayList<>(List.of(ceilingPortal)), 5);
+		} catch (NullPointerException exception) {
+			exception.printStackTrace();
+			MMLog.warning("[False Spirit] mCeilingHell in FalseSpirit.java failed to initialize!");
+		}
 
 		int multiEarthshakeDuration = 50;
-
 		int passiveCooldown = 20 * 8;
 		double passiveSpeed = .25;
 
-		if (mDelve) {
+		if (isDelve) {
 			multiEarthshakeDuration = 30;
-
 			passiveCooldown = 20 * 6;
 			passiveSpeed = .3;
 		}
@@ -145,8 +143,8 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellForceTwo(plugin, boss, 5, 20 * 2),
 			new TriplicateSlash(plugin, boss),
-			new SpellMultiEarthshake(plugin, boss, 1, multiEarthshakeDuration, mDelve, mSpawnLoc),
-			new SpellFlamethrower(plugin, boss, mDelve)
+			new SpellMultiEarthshake(plugin, boss, 1, multiEarthshakeDuration, isDelve, mSpawnLoc),
+			new SpellFlamethrower(plugin, boss, isDelve)
 		));
 
 
@@ -154,21 +152,19 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 			new SpellPurgeNegatives(boss, 20 * 5),
 			new DamageBlocker(plugin, boss, mHell, mCeilingHell),
 			new SpellBlockBreak(boss, 2, 3, 2),
-			new NothingnessSeeker(plugin, boss, passiveCooldown, passiveSpeed, mDelve)
+			new NothingnessSeeker(plugin, boss, passiveCooldown, passiveSpeed, isDelve)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(85, mBoss -> {
 			mHell.run();
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The Gates open! Come forth, nithlings!\",\"color\":\"dark_red\"}]");
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!\",\"color\":\"white\"}]");
+			sendDialogue(1, true);
 		});
 
 		events.put(70, mBoss -> {
 			mHell.run();
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The Gates open once more! Come forth, nithlings!\",\"color\":\"dark_red\"}]");
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!\",\"color\":\"white\"}]");
+			sendDialogue(2, true);
 		});
 
 		events.put(66, mBoss -> {
@@ -184,7 +180,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 				}
 			}.runTaskLater(mPlugin, mMania.cooldownTicks());
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I am more than the nithlings from my gates. The magic of Hallud flows through me. Battle me and perish.\",\"color\":\"dark_red\"}]");
+			sendDialogue(3, false);
 		});
 
 		events.put(33, mBoss -> {
@@ -200,13 +196,12 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 				}
 			}.runTaskLater(mPlugin, mMania.cooldownTicks());
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"Despite your efforts, nothingness is what you will return to. The magic of Midat is with me.\",\"color\":\"dark_red\"}]");
+			sendDialogue(4, false);
 		});
 
 		events.put(30, mBoss -> {
 			mHell.run();
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The Gates are opened! Come forth, nithlings!\",\"color\":\"dark_red\"}]");
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!\",\"color\":\"white\"}]");
+			sendDialogue(5, true);
 		});
 
 		//Last one is the ceiling one
@@ -223,8 +218,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 				}
 			}.runTaskLater(mPlugin, mMania.cooldownTicks());
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The Final Gate opens. Meet your demise.\",\"color\":\"dark_red\"}]");
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!\",\"color\":\"white\"}]");
+			sendDialogue(6, true);
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
@@ -272,12 +266,12 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 					}
 				}
 				int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-				mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
+				mScalingCoefficient = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
 			}
 		}.runTaskTimer(mPlugin, 0, 20);
 
+		sendDialogue(0, false);
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-			player.sendMessage(Component.text("I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.", NamedTextColor.DARK_RED));
 			MessagingUtils.sendBoldTitle(player, Component.text("False Spirit", NamedTextColor.RED), Component.text("Remnant of Olive", NamedTextColor.DARK_RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 		}
@@ -295,7 +289,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void onHurtByEntity(DamageEvent event, Entity damager) {
-		//Do not take damage to the gate closer trident
+		// Do not take damage to the gate closer trident
 		if (damager instanceof Trident trident) {
 			ItemStack item = trident.getItemStack();
 
@@ -306,10 +300,10 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 
 	}
 
-	//Reduce damage taken for each player by a percent
+	// Reduce damage taken for each player by a percent
 	@Override
 	public void onHurt(DamageEvent event) {
-		event.setDamage(event.getDamage() / mCoef);
+		event.setDamage(event.getDamage() / mScalingCoefficient);
 	}
 
 	@Override
@@ -331,8 +325,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 		return true;
 	}
 
-
-	//Teleport with special effects
+	// Teleport with special effects
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
@@ -348,31 +341,26 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 10, true, false);
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-		mBoss.setHealth(100);
-		mBoss.setInvulnerable(true);
-		mBoss.setAI(false);
-		mBoss.setGravity(false);
-		mBoss.setPersistent(true);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
 		teleport(mSpawnLoc);
-		World world = mBoss.getWorld();
+		sendDialogue(7, false);
 
 		if (event != null) {
 			event.setCancelled(true);
 			event.setReviveHealth(100);
 		}
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The Tree of Life calls. I only wish to answer...\",\"color\":\"dark_red\"}]");
-
+		World world = mBoss.getWorld();
 		new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
 			public void run() {
 				if (mTicks >= 20 * 5) {
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 10, 0);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 10, 0);
 
 					this.cancel();
 					mBoss.remove();
@@ -405,13 +393,21 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 	public void init() {
 		int hpDel = 3000;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
+		mScalingCoefficient = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hpDel);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(hpDel);
 
 		mBoss.setPersistent(true);
+	}
 
+	private void sendDialogue(int dialogueIndex, boolean bhairaviTalkingPrivileges) {
+		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+			player.sendMessage(fightDialogue[dialogueIndex]);
+			if (bhairaviTalkingPrivileges) {
+				player.sendMessage(bhairaviBackseating);
+			}
+		}
 	}
 }

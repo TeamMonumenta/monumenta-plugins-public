@@ -34,7 +34,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -155,56 +154,56 @@ the Frost Giant explodes dealing 60 damage in an 8 block radius. High CD, High D
 
  */
 
-
 public class FrostGiant extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_frostgiant";
 	public static final int detectionRange = 80;
 	public static final int hailstormRadius = 16;
 	public static final int frostedIceDuration = 30;
-	public static Boolean castStomp = true;
-
 	//Range of those who are actively in the fight from the center of the arena
 	public static final int fighterRange = 36;
-
 	public static @Nullable FrostGiant mInstance = null;
-
-	private static final String START_TAG = "FrostGiantStart";
-	private final Location mStartLoc;
-	private boolean mCutsceneDone = false;
-
+	public static Boolean castStomp = true;
 	//If the immune armor is active
 	public boolean mFrostArmorActive = true;
-
-	//If true, Frost GIant will stop trying to force target someone
+	//If true, Frost Giant will stop trying to force target someone
 	public boolean mPreventTargetting = false;
 
+	private static final int MAX_HEALTH = 5012;
+	private static final double SCALING_X = 0.6;
+	private static final double SCALING_Y = 0.35;
+	private static final String START_TAG = "FrostGiantStart";
 	//Directions for Seismic Ruin skill
 	private static final String NORTH = "FrostGiantNorth";
 	private static final String EAST = "FrostGiantEast";
 	private static final String SOUTH = "FrostGiantSouth";
 	private static final String WEST = "FrostGiantWest";
-
+	private static final String GOLEM_FREEZE_EFFECT_NAME = "FrostGiantGolemPercentSpeedEffect";
+	private static final String PLAYER_ANTICHEESE_SLOWNESS_SRC = "FrostGiantAnticheeseSlowness";
+	private static final Component[] fightDialogue = new Component[] {
+		Component.text("WHAT CHILDREN OF ALRIC DARE ENTER THIS PLACE...", NamedTextColor.DARK_AQUA),
+		Component.text("YOU... SHOULD HAVE NOT COME HERE... PERISH...", NamedTextColor.DARK_AQUA),
+		Component.text("An armor forms around the boss that blocks all damage.", NamedTextColor.AQUA),
+		Component.text("THE FROST WILL CONSUME YOU...", NamedTextColor.DARK_AQUA),
+		Component.text("The permafrost shield reforms around the giant, blocking damage dealt once more.", NamedTextColor.AQUA),
+		Component.text("THE SONG WILL PREVAIL... ALL WILL SUCCUMB TO THE BITTER COLD...", NamedTextColor.DARK_AQUA),
+		Component.text("The permafrost shield reforms again.", NamedTextColor.AQUA),
+		Component.text("I... WILL NOT... BE THE END... OF THE SONG!", NamedTextColor.DARK_AQUA),
+		Component.text("THIS EARTH... WAS OURS ONCE... WE SHAPED IT...", NamedTextColor.DARK_AQUA),
+		Component.text("DO NOT LET IT... PERISH WITH ME... THE SONG MUST NOT GO... UNSUNG...", NamedTextColor.DARK_AQUA)
+	};
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
 	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
-
+	private final UltimateSeismicRuin mRuin;
+	private final Location mStartLoc;
+	private boolean mCutsceneDone = false;
 	private @Nullable LivingEntity mNorthStand;
 	private @Nullable LivingEntity mEastStand;
 	private @Nullable LivingEntity mSouthStand;
 	private @Nullable LivingEntity mWestStand;
-
 	private @Nullable LivingEntity mTargeted;
 	private @Nullable Location mStuckLoc;
-
-
-	private final UltimateSeismicRuin mRuin;
-
 	private int mPlayerCount;
 	private double mDefenseScaling;
-
-	private static final int MAX_HEALTH = 5012;
-	private static final double SCALING_X = 0.6;
-	private static final double SCALING_Y = 0.35;
-
 	public @Nullable ItemStack[] mArmor = null;
 	private @Nullable ItemStack mMainhand = null;
 	private @Nullable ItemStack mOffhand = null;
@@ -237,7 +236,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		}
 
 		if (mNorthStand == null || mEastStand == null || mSouthStand == null || mWestStand == null) {
-			MMLog.warning("[Eldrask] Failed to find at least one directional armor stand when spawning");
+			MMLog.warning("[Eldrask] Failed to find at least one directional armor stand when spawning!");
 		}
 
 		mStartLoc = start != null ? start.getLocation() : boss.getLocation();
@@ -284,12 +283,11 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 					this.cancel();
 				}
 
-
-				if (mT >= 20 * 6 && mBoss.getLocation().distance(mStuckLoc) < 0.5 && ((Creature) mBoss).getTarget() != null) {
-					teleport(mStartLoc);
-					mT = 0;
-				} else if (mStuckLoc == null || mBoss.getLocation().distance(mStuckLoc) > 0.5) {
+				if (mStuckLoc == null || mBoss.getLocation().distance(mStuckLoc) > 0.5) {
 					mStuckLoc = mBoss.getLocation().clone();
+					mT = 0;
+				} else if (mT >= 20 * 6 && mBoss.getLocation().distance(mStuckLoc) < 0.5 && ((Creature) mBoss).getTarget() != null) {
+					teleport(mStartLoc);
 					mT = 0;
 				}
 				mT += 5;
@@ -362,7 +360,8 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 				for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange, true)) {
 					if (player.isSleeping() && player.getGameMode() != GameMode.ADVENTURE) {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, PLAYER_ANTICHEESE_SLOWNESS_SRC,
+							new PercentSpeed(20 * 15, -0.3, PLAYER_ANTICHEESE_SLOWNESS_SRC));
 						player.sendMessage(Component.text("YOU DARE MOCK OUR BATTLE?", NamedTextColor.DARK_AQUA));
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
@@ -446,15 +445,15 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			new SpellRemoveLevitation(mBoss)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU... SHOULD HAVE NOT COME HERE... PERISH...\",\"color\":\"dark_aqua\"}]");
 			mPreventTargetting = false;
-			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"An armor forms around the boss that blocks all damage.\",\"color\":\"aqua\"}]");
+			sendDialogue(1);
+			sendDialogue(2);
 
 			//Changes held weapon to bone wand
 			ItemStack wand = new ItemStack(Material.BONE);
-			if (mBoss.getEquipment().getItemInMainHand() != null && mBoss.getEquipment().getItemInMainHand().getType() != Material.AIR) {
+			if (mBoss.getEquipment().getItemInMainHand().getType() != Material.AIR) {
 				wand = mBoss.getEquipment().getItemInMainHand();
 			} else {
 				wand = modifyItemName(wand, "Frost Giant's Staff", NamedTextColor.AQUA, true);
@@ -466,7 +465,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		});
 
 		events.put(66, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE FROST WILL CONSUME YOU...\",\"color\":\"dark_aqua\"}]");
+			sendDialogue(3);
 			//Manually cancel Armor of Frost's cooldown mechanic
 			for (Spell sp : phase1PassiveSpells) {
 				if (sp instanceof ArmorOfFrost) {
@@ -481,7 +480,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			mBoss.setAI(true);
 			mRuin.run();
 			teleport(mStartLoc);
-			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The permafrost shield reforms around the giant, blocking damage dealt once more.\",\"color\":\"aqua\"}]");
+			sendDialogue(4);
 
 			//Changes held weapon to iron sword
 			ItemStack sword = modifyItemName(new ItemStack(Material.IRON_SWORD), "Frost Giant's Greatsword", NamedTextColor.AQUA, true);
@@ -493,7 +492,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 
 		//Phase 3
 		events.put(33, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE SONG WILL PREVAIL... ALL WILL SUCCUMB TO THE BITTER COLD...\",\"color\":\"dark_aqua\"}]");
+			sendDialogue(5);
 			//Manually cancel Armor of Frost's cooldown mechanic
 			for (Spell sp : phase2PassiveSpells) {
 				if (sp instanceof ArmorOfFrost) {
@@ -508,7 +507,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			mBoss.setAI(true);
 			mRuin.run();
 			teleport(mStartLoc);
-			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The permafrost shield once more reforms.\",\"color\":\"aqua\"}]");
+			sendDialogue(6);
 
 			//Changes held weapon to iron axe
 			ItemStack axe = modifyItemName(new ItemStack(Material.IRON_AXE), "Frost Giant's Crusher", NamedTextColor.AQUA, true);
@@ -520,8 +519,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 
 		//Third and fourth seismic ruin
 		events.put(15, mBoss -> {
-
-			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I... WILL NOT... BE THE END... OF THE SONG!\",\"color\":\"dark_aqua\"}]");
+			sendDialogue(7);
 			mFrostArmorActive = true;
 			changeArmorPhase(mBoss.getEquipment(), false);
 			changePhase(phase4Spells, phase4PassiveSpells, null);
@@ -546,7 +544,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 
 		//Show hailstorm before fight starts
 		new BukkitRunnable() {
-			Creature mC = (Creature) mBoss;
+			final Creature mC = (Creature) mBoss;
 
 			@Override
 			public void run() {
@@ -587,13 +585,12 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		mBoss.setInvulnerable(true);
 		world.playSound(mStartLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 6, 0.5f);
 		world.playSound(mStartLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 6, 0.5f);
-		PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"WHAT CHILDREN OF ALRIC DARE ENTER THIS PLACE...\",\"color\":\"dark_aqua\"}]");
+		sendDialogue(0);
 		mBoss.setInvisible(true);
 
-
 		new BukkitRunnable() {
+			final Location mLoc = mStartLoc.clone();
 			double mRadius = 0;
-			Location mLoc = mStartLoc.clone();
 
 			@Override
 			public void run() {
@@ -659,8 +656,8 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 
 
 							new BukkitRunnable() {
+								final Location mLoc = mStartLoc.clone();
 								double mR = 0;
-								Location mLoc = mStartLoc.clone();
 
 								@Override
 								public void run() {
@@ -723,10 +720,10 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() <= 0) {
+		if (players.size() == 0) {
 			return;
 		}
-		PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THIS EARTH... WAS OURS ONCE... WE SHAPED IT...\",\"color\":\"dark_aqua\"}]");
+		sendDialogue(8);
 
 		List<Spell> passives = getPassives();
 		if (passives != null) {
@@ -737,26 +734,13 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			}
 		}
 
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 40, true, false);
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-		mBoss.setHealth(100);
-		mBoss.setInvulnerable(true);
-		mBoss.setAI(false);
-		mBoss.setGravity(false);
-		mBoss.setPersistent(true);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
 		teleport(mStartLoc);
-		World world = mBoss.getWorld();
 
 		if (event != null) {
 			event.setCancelled(true);
 			event.setReviveHealth(100);
-		}
-
-		for (Player player : players) {
-			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
-			SongManager.stopSong(player, true);
 		}
 
 		Location loc = mBoss.getLocation().clone();
@@ -767,6 +751,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			loc.subtract(FastUtils.cos(radian), 1, FastUtils.sin(radian));
 		}
 
+		World world = mBoss.getWorld();
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -778,8 +763,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
-				PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"DO NOT LET IT... PERISH WITH ME... THE SONG MUST NOT GO... UNSUNG...\",\"color\":\"dark_aqua\"}]");
+				sendDialogue(9);
 				world.playSound(mStartLoc, Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 3, 0);
 
 				//Initiate the growable "melt" which converts the blocks of the giant into barriers
@@ -792,13 +776,13 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 							e.printStackTrace();
 						}
 					}
-				}.runTaskLater(mPlugin, 20 * 1);
+				}.runTaskLater(mPlugin, 20);
 			}
 		}.runTaskLater(mPlugin, 20 * 3);
 
 		new BukkitRunnable() {
+			final Location mLoc = mStartLoc.clone();
 			double mRadius = 0;
-			Location mLoc = mStartLoc.clone();
 
 			@Override
 			public void run() {
@@ -888,10 +872,6 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 					}
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
-					for (Player player : players) {
-						player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-						player.removePotionEffect(PotionEffectType.REGENERATION);
-					}
 				}
 				mTicks += 1;
 			}
@@ -983,11 +963,8 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			}.runTaskTimer(mPlugin, 0, 1);
 
 			//Check if arrow shot came from arena
-			if (proj.getShooter() instanceof Player) {
-				Player player = (Player) proj.getShooter();
-				if (player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
-					event.setCancelled(true);
-				}
+			if (proj.getShooter() instanceof Player player && player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
+				event.setCancelled(true);
 			}
 		}
 	}
@@ -1047,7 +1024,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		delayHailstormDamage();
 	}
 
-	public static boolean delayHailstormDamage() {
+	public static void delayHailstormDamage() {
 		//Delays damage for hailstorm
 		if (mInstance != null) {
 			List<Spell> passives = mInstance.getPassives();
@@ -1055,12 +1032,10 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 				for (Spell sp : passives) {
 					if (sp instanceof SpellHailstorm) {
 						((SpellHailstorm) sp).delayDamage();
-						return true;
 					}
 				}
 			}
 		}
-		return false;
 	}
 
 	@Override
@@ -1086,7 +1061,6 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 				player.removePotionEffect(PotionEffectType.GLOWING);
 			}
 		}
-
 	}
 
 	//Punch Resist
@@ -1094,8 +1068,6 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		mBoss.setVelocity(new Vector(0, 0, 0));
 	}
-
-	private static final String GOLEM_FREEZE_EFFECT_NAME = "FrostGiantGolemPercentSpeedEffect";
 
 	//Golem Stun on certain ability casts from boss.
 	public static void freezeGolems(LivingEntity mBoss) {
@@ -1120,6 +1092,12 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mob, GOLEM_FREEZE_EFFECT_NAME);
 				mob.removePotionEffect(PotionEffectType.GLOWING);
 			}
+		}
+	}
+
+	private void sendDialogue(int dialogueIndex) {
+		for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange, true)) {
+			player.sendMessage(fightDialogue[dialogueIndex]);
 		}
 	}
 }

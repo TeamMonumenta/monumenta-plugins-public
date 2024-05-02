@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellFireball;
 import com.playmonumenta.plugins.bosses.spells.SpellKnockAway;
 import com.playmonumenta.plugins.bosses.spells.SpellMinionResist;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -202,11 +201,12 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+		for (Player player : players) {
 			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 5.0f, 0.8f);
 			player.sendMessage(Component.text("No... it's not possible... I was promised...", NamedTextColor.DARK_RED));
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "AzacorWinResistance",
-				new PercentDamageReceived(20 * 10, -1.0, null));
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}

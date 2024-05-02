@@ -35,19 +35,23 @@ the shield is up. Players can break the shield
 by positioning the boss underneath an icicle above and knocking it down to hit him.
  */
 public class ArmorOfFrost extends Spell {
-
+	private static final Component[] armorStatusMessage = new Component[] {
+		Component.text("The icicle pierces the armor, shattering it.", NamedTextColor.AQUA),
+		Component.text("The armor cracks from the icicle.", NamedTextColor.AQUA),
+		Component.text("The armor begins to falter from the icicle barrage.", NamedTextColor.AQUA),
+		Component.text("The armor reforms once again.", NamedTextColor.AQUA)
+	};
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final List<Player> mWarned = new ArrayList<>();
 	//Gets frostArmorActive, which determines if the permafrost armor is up
 	private final FrostGiant mBossClass;
-	private @Nullable
-	BukkitRunnable mCooldown;
+	private @Nullable BukkitRunnable mCooldown;
 	private final int mMaxLevel;
-	private int mLevel;
 	//Whether or not the immune armor regenerates after 45 seconds
 	//ONLY FALSE IF FINAL 10% PHASE
 	private final boolean mRegen;
+	private int mLevel;
 
 	public ArmorOfFrost(Plugin plugin, LivingEntity boss, FrostGiant giantClass, int max, boolean regen) {
 		mPlugin = plugin;
@@ -90,9 +94,7 @@ public class ArmorOfFrost extends Spell {
 				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 3, 0);
 				if (!mWarned.contains(player)) {
 					player.sendMessage(Component.text("The armor absorbs the damage you dealt.", NamedTextColor.GOLD));
-					mWarned.add(player);
 				}
-
 				mWarned.add(player);
 			}
 			event.setDamage(0.0001);
@@ -128,16 +130,19 @@ public class ArmorOfFrost extends Spell {
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 4, 0), 50, 0.5, 0.5, 0.5, 0.3).spawnAsEntityActive(mBoss);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 3, 2);
 				world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 3, 2);
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"The icicle pierces the armor, shattering it.\",\"color\":\"aqua\"}]");
+				// Armor 0
+				sendArmorStatusMessage(0);
 				mBossClass.mFrostArmorActive = false;
 				if (mRegen) {
 					runCooldown();
 				}
 				mLevel = mMaxLevel;
 			} else if (mLevel == 1) {
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"The armor begins to falter from the icicle barrage.\",\"color\":\"aqua\"}]");
+				// Armor 2
+				sendArmorStatusMessage(2);
 			} else {
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"The armor cracks from the icicle.\",\"color\":\"aqua\"}]");
+				// Armor 1
+				sendArmorStatusMessage(1);
 			}
 		} else {
 			//If permafrost shield already down, do normal damage and reset countdown for permafrost armor
@@ -161,7 +166,7 @@ public class ArmorOfFrost extends Spell {
 				}
 
 				mBossClass.mFrostArmorActive = true;
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"The armor reforms once again.\",\"color\":\"aqua\"}]");
+				sendArmorStatusMessage(3);
 				mWarned.clear();
 				FrostGiant.changeArmorPhase(mBoss.getEquipment(), false);
 			}
@@ -191,6 +196,12 @@ public class ArmorOfFrost extends Spell {
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 6, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 				}
 			}
+		}
+	}
+
+	private void sendArmorStatusMessage(int statusIndex) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange, true)) {
+			player.sendMessage(armorStatusMessage[statusIndex]);
 		}
 	}
 }

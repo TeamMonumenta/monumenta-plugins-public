@@ -41,14 +41,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGroup {
-
 	public static final String identityTag = "boss_beast_blackflame";
 	public static final int detectionRange = 75;
 	public static final String losName = "BeastOfTheBlackFlame";
@@ -150,9 +147,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 
 		world.playSound(mSpawnLoc, Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 6, 0);
 
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			sendMessage("SPEAKERS OF REMORSE, I ANSWER THE CALL.");
-		}, 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> sendMessage("SPEAKERS OF REMORSE, I ANSWER THE CALL."), 20);
 
 		new BukkitRunnable() {
 			int mCount = 1;
@@ -231,16 +226,13 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		List<Player> players = getPlayers();
+
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 10, true, false);
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-		mBoss.setHealth(100);
-		mBoss.setInvulnerable(true);
-		mBoss.setAI(false);
-		mBoss.setGravity(false);
-		mBoss.setPersistent(true);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
 		teleport(mSpawnLoc);
 		World world = mBoss.getWorld();
 
@@ -294,7 +286,6 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 
 		mBoss.setPersistent(true);
-
 	}
 
 	//Teleport with special effects

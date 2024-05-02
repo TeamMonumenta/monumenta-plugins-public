@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.broodmother.SpellWebCarpet
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -298,10 +299,8 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			mLaserCores.removeAllCores();
 		}
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
-		}
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		BossUtils.endBossFightEffects(players);
 
 		mLegSweep.stopLegTasks();
 		mTantrum.stopTantrumTasks();

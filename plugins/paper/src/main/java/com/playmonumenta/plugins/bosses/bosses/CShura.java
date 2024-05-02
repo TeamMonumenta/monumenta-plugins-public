@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraDagger;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraJump;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraPassiveSummon;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraSmoke;
+import com.playmonumenta.plugins.effects.FlatDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -19,7 +20,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,8 +51,8 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_cshura";
 	public static final int detectionRange = 50;
 	private static final String START_TAG = "shuraCenter";
-	private static final int DODGE_CD = 5;
-	static final Component CSHURA_PREFIX = Component.text("[", NamedTextColor.GOLD).append(Component.text("C'Shura", NamedTextColor.DARK_RED, TextDecoration.BOLD)).append(Component.text("] ", NamedTextColor.GOLD));
+	private static final int DODGE_CD = 20 * 5;
+	private static final Component CSHURA_PREFIX = Component.text("[", NamedTextColor.GOLD).append(Component.text("C'Shura", NamedTextColor.DARK_RED, TextDecoration.BOLD)).append(Component.text("] ", NamedTextColor.GOLD));
 
 	private LivingEntity mStart;
 	private boolean mDodge = false;
@@ -113,12 +113,13 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 		});
 
 		events.put(25, mBoss -> {
+			// cshurawool.gif
 			Component dio2 = Component.text("CUN! DIE ALREADY!", NamedTextColor.RED);
 			for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
 				p.sendMessage(CSHURA_PREFIX.append(dio2));
 			}
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 0));
-
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, FlatDamageDealt.effectID,
+				new FlatDamageDealt(12000, 3));
 		});
 
 		Component[] dio = new Component[] {
@@ -171,9 +172,7 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 		if (!mDodge && !mCutscene) {
 			mDodge = true;
 			dodge(event);
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mDodge = false;
-			}, DODGE_CD * 20);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDodge = false, DODGE_CD);
 		}
 	}
 
@@ -207,11 +206,10 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		// win resistance
-		for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.REGENERATION, 12 * 20, 2));
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12 * 20, 10));
-		}
+		List<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+
 		// win mob kill
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange)) {
 			mob.setHealth(0);
@@ -227,7 +225,6 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-				List<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
 				if (mT < ded.length) {
 					for (Player p : players) {
 						p.sendMessage(CSHURA_PREFIX.append(ded[mT]));

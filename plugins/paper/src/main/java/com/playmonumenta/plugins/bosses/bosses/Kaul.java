@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -36,7 +37,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -265,34 +265,30 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
-			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
-			}),
+			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0),
+				8, 0.35, 0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss()),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, this),
 			new SpellShieldStun(30 * 20),
-			new SpellConditionalTeleport(mBoss, spawnLoc,
-				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().getBlock().getType() == Material.LAVA
-					     || b.getLocation().getBlock().getType() == Material.WATER), action
+			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().getBlock().getType() == Material.LAVA
+				|| b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
-			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
-			}),
+			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0),
+					8, 0.35, 0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss()),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, this),
 			new SpellShieldStun(30 * 20),
-			new SpellConditionalTeleport(mBoss, spawnLoc,
-				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().getBlock().getType() == Material.LAVA
-					     || b.getLocation().getBlock().getType() == Material.WATER), action
+			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().getBlock().getType() == Material.LAVA
+				|| b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
@@ -352,9 +348,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			players.forEach(p -> p.sendMessage(message));
 		});
 
-		events.put(75, mBoss -> {
-			forceCastSpell(SpellArachnopocolypse.class);
-		});
+		events.put(75, mBoss -> forceCastSpell(SpellArachnopocolypse.class));
 
 		// Phase 2
 		events.put(66, mBoss -> {
@@ -363,7 +357,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
 			mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 12));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+				new PercentDamageReceived(20 * 9999, -1.0));
 
 			new BukkitRunnable() {
 				@Override
@@ -444,7 +440,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										mBoss.setInvulnerable(false);
 										mBoss.setAI(true);
 										teleport(mSpawnLoc);
-										mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 										new BukkitRunnable() {
 
 											@Override
@@ -467,9 +463,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		});
 
 		// Forcecast Raise Jungle
-		events.put(60, mBoss -> {
-			super.forceCastSpell(SpellRaiseJungle.class);
-		});
+		events.put(60, mBoss -> super.forceCastSpell(SpellRaiseJungle.class));
 
 		// Phase 2.5
 		events.put(50, mBoss -> {
@@ -477,7 +471,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 12));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+				new PercentDamageReceived(20 * 9999, -1.0));
 			teleport(mSpawnLoc.clone().add(0, 5, 0));
 			mPrimordialPhase = true;
 			new BukkitRunnable() {
@@ -516,7 +512,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 									mBoss.setInvulnerable(false);
 									mBoss.setAI(true);
 									teleport(mSpawnLoc);
-									mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 									mPrimordialPhase = false;
 									new BukkitRunnable() {
 
@@ -545,9 +541,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		});
 
 		// Force-cast Kaul's Judgement if it hasn't been cast yet.
-		events.put(40, mBoss -> {
-			forceCastSpell(SpellKaulsJudgement.class);
-		});
+		events.put(40, mBoss -> forceCastSpell(SpellKaulsJudgement.class));
 
 		// Phase 3
 		events.put(33, mBoss -> {
@@ -555,7 +549,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 12));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+				new PercentDamageReceived(20 * 9999, -1.0));
 			new BukkitRunnable() {
 
 				@Override
@@ -622,7 +618,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1).spawnAsBoss();
 										new PartialParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1).spawnAsBoss();
 										EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.02 + EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0));
-										mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 9999, 0));
+										EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 3.0 + EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 3));
 										changePhase(SpellManager.EMPTY, phase3PassiveSpells, null);
 										new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175).spawnAsBoss();
 										new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
@@ -670,7 +666,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 												mBoss.setInvulnerable(false);
 												mBoss.setAI(true);
 												teleport(mSpawnLoc);
-												mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+												com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 												new BukkitRunnable() {
 
 													@Override
@@ -704,9 +700,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
-		events.put(25, mBoss -> {
-			forceCastSpell(SpellKaulsJudgement.class);
-		});
+		events.put(25, mBoss -> forceCastSpell(SpellKaulsJudgement.class));
 
 		events.put(10, mBoss -> {
 			changePhase(phase4Spells, phase4PassiveSpells, null);
@@ -901,7 +895,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		Spell spell = event.getSpell();
 		if (spell != null && spell.castTicks() > 0) {
 			mBoss.setInvulnerable(true);
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 12));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+				new PercentDamageReceived(20 * 9999, -1.0));
 			mBoss.setAI(false);
 			new BukkitRunnable() {
 
@@ -916,7 +912,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							if (!mPrimordialPhase) {
 								mBoss.setInvulnerable(false);
 								mBoss.setAI(true);
-								mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 								teleport(mSpawnLoc);
 								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 								if (players.size() > 0) {
@@ -936,31 +932,21 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() <= 0) {
+		if (players.size() == 0) {
 			return;
 		}
+		mDefeated = true;
 		String[] dio = new String[] {
 			"AS ALL RETURNS TO ROT, SO TOO HAS THIS ECHO FALLEN.",
 			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
 			"NOW... THE JUNGLE... MUST SLEEP..."
 		};
-		mDefeated = true;
 		knockback(mPlugin, 10);
-
 		mAdvancements.forEach(KaulAdvancementHandler::onBossDeath);
-
-		for (Player player : players) {
-			EffectType.applyEffect(EffectType.DAMAGE_NEGATE, player, 40 * 20, 1, "KaulWinResistance", false);
-			EffectType.applyEffect(EffectType.VANILLA_REGEN, player, 10 * 20, 1, "KaulWinRegeneration", false);
-			SongManager.stopSong(player, true);
-		}
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-		mBoss.setHealth(100);
-		mBoss.setInvulnerable(true);
-		mBoss.setAI(false);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 20, true, true);
+
 		World world = mBoss.getWorld();
-		mBoss.removePotionEffect(PotionEffectType.GLOWING);
 		for (Entity ent : mSpawnLoc.getNearbyLivingEntities(detectionRange)) {
 			if (!ent.getUniqueId().equals(mBoss.getUniqueId()) && ent instanceof WitherSkeleton && !ent.isDead()) {
 				ent.remove();
@@ -1085,7 +1071,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				mBoss.setAI(false);
 				mBoss.setSilent(true);
 				mBoss.setInvulnerable(true);
-				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 100, 10));
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+					new PercentDamageReceived(20 * 9999, -1.0));
 				World world = mBoss.getWorld();
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3, 0f);
 				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
@@ -1121,9 +1108,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							mBoss.setInvulnerable(false);
 							ScoreboardUtils.modifyTeamColor("kaul", NamedTextColor.WHITE);
 							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
-							mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999, 0));
-							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 9999, 0));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+								new PercentDamageReceived(20 * 9999, -0.2));
+							EffectType.applyEffect(EffectType.VANILLA_GLOW, mBoss, 20 * 9999, 0, EffectType.VANILLA_GLOW.getName(), false);
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3, 0f);
 							new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 							new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
@@ -1234,16 +1222,14 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			void onTick() {
 				mTick++;
 				if (mTick % 10 == 0 && getArenaParticipantsY(ARENA_MAX_Y, 256).size() >= 15) {
-					getArenaParticipants().forEach(p -> {
-						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/celebrity");
-					});
+					getArenaParticipants().forEach(p -> AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/celebrity"));
 				}
 			}
 		},
 
 		// SO CLOSE
 		new KaulAdvancementHandler() {
-			HashSet<UUID> mHs = new HashSet<>();
+			final HashSet<UUID> mHs = new HashSet<>();
 
 			@Override
 			void onBossSpawn() {

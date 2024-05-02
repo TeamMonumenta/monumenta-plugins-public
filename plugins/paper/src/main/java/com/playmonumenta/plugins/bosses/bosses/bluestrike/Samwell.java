@@ -517,6 +517,8 @@ public class Samwell extends BossAbilityGroup {
 			return;
 		}
 
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 25, true, true);
+
 		String[] dio = new String[] {
 			"I... I shouldn't have ever left the Valley...",
 			"None of this was worth it... None of it...",
@@ -528,9 +530,6 @@ public class Samwell extends BossAbilityGroup {
 			player.hideBossBar(mCraftingBar);
 			player.hideBossBar(mGatheringBar);
 
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 25, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 25, 1));
-
 			if (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
 				|| player.getLocation().distance(mSpawnLoc) > 30) {
 				// Feeling nice today?
@@ -539,12 +538,6 @@ public class Samwell extends BossAbilityGroup {
 		}
 
 		changePhase(SpellManager.EMPTY, mInactivePassives, null);
-		mBoss.setHealth(100);
-		mBoss.setInvulnerable(true);
-		mBoss.setAI(false);
-		mBoss.setGravity(false);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
-		mBoss.removePotionEffect(PotionEffectType.GLOWING);
 		mBoss.teleport(mSpawnLoc.clone().add(0, 3, 0));
 		if (event != null) {
 			event.setCancelled(true);

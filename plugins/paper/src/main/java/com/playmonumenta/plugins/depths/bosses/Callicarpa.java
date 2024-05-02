@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPFlower;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -305,6 +306,11 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		Location loc = mBoss.getLocation();
+		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+
 		// Kill off the Menace
 		if (mMenace != null) {
 			mMenace.setHealth(0);
@@ -312,17 +318,14 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		}
 
 		// Kill off all the Flowers
-		Location loc = mBoss.getLocation();
 		loc.getNearbyEntities(200, 30, 200).stream()
 			.filter(e -> e.getScoreboardTags().contains(FLOWER_TAG)).forEach(Entity::remove);
 
-		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
+		for (Player player : players) {
 			player.sendMessage(
 				Component.text("[Callicarpa] ", NamedTextColor.GOLD)
 					.append(Component.text("Oh yes, at last, the voice recedes... with final breath... I am now freed...", NamedTextColor.DARK_GREEN))
 			);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
 		}
 
 		new BukkitRunnable() {

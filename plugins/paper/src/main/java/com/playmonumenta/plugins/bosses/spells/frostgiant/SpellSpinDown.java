@@ -31,14 +31,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellSpinDown extends Spell {
-
 	private static final Material ICE_TYPE = Material.FROSTED_ICE;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final Location mStartLoc;
+	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	private boolean mCooldown = false;
-	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	public SpellSpinDown(Plugin plugin, LivingEntity boss, Location loc) {
 		mPlugin = plugin;

@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.davey.SpellVoidGrenades;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -227,12 +228,13 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
+		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+		for (Player player : players) {
 			player.sendMessage(Component.text("", NamedTextColor.BLUE)
 				.append(Component.text("[Davey]", NamedTextColor.GOLD))
 				.append(Component.text(" Nay... I'll sink to ye, God of the Deep. I become a great part of ye ferever...")));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}
 		for (LivingEntity vex : mVexes) {
 			if (vex != null && !vex.isDead()) {

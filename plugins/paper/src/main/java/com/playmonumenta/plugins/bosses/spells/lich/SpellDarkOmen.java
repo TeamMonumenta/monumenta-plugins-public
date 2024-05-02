@@ -77,8 +77,8 @@ public class SpellDarkOmen extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1.0f, 1.0f);
 
 		BukkitRunnable runA = new BukkitRunnable() {
+			final List<Vector> mBaseVec = new ArrayList<>();
 			double mT = 0.0;
-			List<Vector> mBaseVec = new ArrayList<>();
 
 			@Override
 			public void run() {
@@ -212,7 +212,7 @@ public class SpellDarkOmen extends Spell {
 					world.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1.0f, 1.5f);
 					world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.HOSTILE, 1.0f, 2.0f);
 					BossUtils.bossDamagePercent(mBoss, p, 0.75, SPELL_NAME);
-					Lich.cursePlayer(mPlugin, p, 120);
+					Lich.cursePlayer(p, 120);
 				}
 			}
 		}

@@ -30,11 +30,10 @@ import org.bukkit.util.Vector;
  3 for 10 seconds and weakness 2 for 10 seconds.
  */
 public class SpellGlacialPrison extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
-	private Location mStartLoc;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRange;
+	private final Location mStartLoc;
 
 	private boolean mCooldown = false;
 
@@ -49,7 +48,7 @@ public class SpellGlacialPrison extends Spell {
 	public void run() {
 		FrostGiant.freezeGolems(mBoss);
 		FrostGiant.delayHailstormDamage();
-		//Glacial Prison can not be cast whithin 60 seconds of the previous cast of it
+		//Glacial Prison can not be cast within 60 seconds of the previous cast of it
 		mCooldown = true;
 		new BukkitRunnable() {
 
