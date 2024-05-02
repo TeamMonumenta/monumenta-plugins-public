@@ -265,8 +265,8 @@ public class GuildAccessCommand {
 			LuckPermsIntegration.pushUserUpdate(target);
 			AuditListener.log(
 				String.format("Changed guild %s access for %s from %s to %s\nTask executed by %s",
-					guildRoot.getDisplayName(),
-					target.getUsername(),
+					guildRoot.getDisplayName() != null ? guildRoot.getDisplayName() : guildRoot.getName(), // needed because getDisplayName returns null if it is the same as getName
+					target.getUsername() != null ? target.getUsername() : target.getUniqueId().toString(), // usb: this can return null if luckperms doesn't have a username associated with this uuid
 					targetCurrentAccess.name(),
 					targetAccess.name(),
 					isOperator ? player.getName() + " (Operator)" : player.getName())
