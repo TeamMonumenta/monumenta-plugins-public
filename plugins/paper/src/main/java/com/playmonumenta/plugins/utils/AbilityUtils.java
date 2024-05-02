@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.cosmetics.skills.StealthCosmeticSkill;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
@@ -208,6 +209,22 @@ public class AbilityUtils {
 
 	public static void unsilencePlayer(Player player) {
 		Plugin.getInstance().mEffectManager.clearEffects(player, ABILITY_SILENCE_EFFECT_NAME);
+	}
+
+	public static boolean isSilenced(Player player) {
+		if (player == null) {
+			return false;
+		}
+		return Plugin.getInstance().mEffectManager.hasEffect(player, ABILITY_SILENCE_EFFECT_NAME);
+	}
+
+	public static int getSilenceDuration(Player player) {
+		Effect effect = Plugin.getInstance().mEffectManager.getActiveEffect(player, ABILITY_SILENCE_EFFECT_NAME);
+		if (effect != null) {
+			return effect.getDuration();
+		} else {
+			return 0;
+		}
 	}
 
 	public static void increaseHealingPlayer(Player player, int duration, double healBoost, String cause) {
