@@ -23,10 +23,10 @@ public class IchorEarthbound implements Infusion {
 	private static final int EFFECT_DURATION = 6 * 20;
 	private static final int BUFF_DURATION = 8 * 20;
 	private static final String EFFECT = "IchorEarthEffect";
-	public static final String DESCRIPTION = String.format("Gain %s%% resistance for %s seconds to the next type of damage you take within %s seconds. If you take none then gain %s%% melee damage for %s seconds instead. Cooldown: %s seconds.",
+	public static final String DESCRIPTION = String.format("The first hit of either melee, projectile, magic, fire or blast damage taken within %s seconds grants %s%% resistance to that type of damage for %s seconds. If you take none, gain %s%% melee damage for %s seconds instead. Cooldown: %s seconds.",
+		StringUtils.ticksToSeconds(EFFECT_DURATION),
 		StringUtils.multiplierToPercentage(RESISTANCE * -1),
 		StringUtils.ticksToSeconds(BUFF_DURATION),
-		StringUtils.ticksToSeconds(EFFECT_DURATION),
 		StringUtils.multiplierToPercentage(DAMAGE),
 		StringUtils.ticksToSeconds(BUFF_DURATION),
 		StringUtils.ticksToSeconds(COOLDOWN)
