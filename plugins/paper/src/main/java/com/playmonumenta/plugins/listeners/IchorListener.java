@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.Nullable;
 
 public class IchorListener implements Listener {
@@ -48,6 +49,10 @@ public class IchorListener implements Listener {
 			return;
 		}
 		if (!(event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SWAP_OFFHAND)) {
+			return;
+		}
+		// only run if the item is in the player's inventory
+		if (!(event.getClickedInventory() instanceof PlayerInventory)) {
 			return;
 		}
 		if (!isInfiniteConsumable(item)) {
