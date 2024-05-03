@@ -41,6 +41,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	public static final int SHIELD_WALL_ANGLE = 180;
 	private static final float SHIELD_WALL_KNOCKBACK = 0.3f;
 	public static final double SHIELD_WALL_RADIUS = 2.75;
+	public static final double SHIELD_WALL_RADIUS_STATIONARY = 4;
 	private static final int SHIELD_WALL_HEIGHT = 5;
 	private static final String ON_HIT_EFFECT = "ShieldWallHitCooldownEffect";
 
@@ -59,12 +60,13 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 					.shorthandName("SW")
 					.descriptions(
 							String.format("Press the swap key while holding a shield in either hand to create a %s degree arc of particles from 1 block below to %s blocks above the user's location and with a %s block radius in front of the user. " +
-											"Enemies that pass through the wall are dealt %s melee damage and knocked back. The wall also blocks all enemy projectiles such as arrows or fireballs. The wall lasts %s seconds. The wall moves along with the user. Triggering again while active keeps the wall at the location where it is for the remainder of the duration. Cooldown: %ss.",
+											"Enemies that pass through the wall are dealt %s melee damage and knocked back. The wall also blocks all enemy projectiles such as arrows or fireballs. The wall lasts %s seconds. The wall moves along with the user. Triggering again while active makes the wall stationary at the same location for the remainder of the duration, with radius increased to %s blocks. Cooldown: %ss.",
 									SHIELD_WALL_ANGLE,
 									SHIELD_WALL_HEIGHT,
 									SHIELD_WALL_RADIUS,
 									SHIELD_WALL_DAMAGE,
 									StringUtils.ticksToSeconds(SHIELD_WALL_1_DURATION),
+									SHIELD_WALL_RADIUS_STATIONARY,
 									StringUtils.ticksToSeconds(SHIELD_WALL_1_COOLDOWN)
 							),
 							String.format("The shield lasts %s seconds instead. Cooldown: %ss.",
@@ -88,6 +90,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	private final double mDamage;
 	private final double mAngle;
 	private final double mRadius;
+	private final double mRadiusStationary;
 	private final ShieldWallCS mCosmetic;
 
 	private int mCurrDuration = -1;
@@ -102,6 +105,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_WALL_DAMAGE);
 		mAngle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SHIELD_WALL_RADIUS);
+		mRadiusStationary = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SHIELD_WALL_RADIUS_STATIONARY);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS());
 	}
 
@@ -136,9 +140,11 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 					}
 				}
 
-				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, mRadius - 0.4, mRadius + 0.4, Math.toRadians(mAngle) / 2);
+				double radius = mDeposited ? mRadiusStationary : mRadius;
 
-				mCosmetic.wallParticles(mPlayer, mLoc, mRadius, mAngle, mHeight);
+				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, radius - 0.4, radius + 0.4, Math.toRadians(mAngle) / 2);
+
+				mCosmetic.wallParticles(mPlayer, mLoc, radius, mAngle, mHeight);
 
 				List<Projectile> projectiles = hitbox.getHitEntitiesByClass(Projectile.class);
 				for (Projectile proj : projectiles) {
