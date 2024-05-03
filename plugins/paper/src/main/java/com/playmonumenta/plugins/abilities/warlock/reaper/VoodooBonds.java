@@ -63,11 +63,11 @@ public class VoodooBonds extends MultipleChargeAbility {
 			.scoreboardId("VoodooBonds")
 			.shorthandName("VB")
 			.descriptions(
-				("Left click while holding a projectile weapon to fire a pin that travels forwards for %s blocks and hits the first %s mobs and all players in its path. " +
-					"Mobs hit take %s melee damage and are cursed for %ss. When a cursed mob takes non-ailment damage (except from this effect), all other mobs of the same type in a %s block radius take %s%% of the suffered damage. " +
+				("Left click while holding a projectile weapon to fire a pin that travels forwards for %s blocks and hits the first %s mobs or players in its path. " +
+					"Mobs hit take %s melee damage and are cursed for %ss. When a cursed mob takes non-ailment damage (except from this ability), all other mobs of the same type in a %s block radius take %s%% of the suffered damage. " +
 					"Players hit are bonded to you instead; the next hit they take within the next %ss will be redirected to you based on the percentage of health that player would have lost, but cannot reduce your health below 1. " +
-					"Charges: %s. Charge Cooldown: %s.")
-				.formatted(RANGE, MAX_TARGETS, StringUtils.to2DP(PIN_DAMAGE), StringUtils.ticksToSeconds(CURSE_DURATION),
+					"Charges: %s. Charge Cooldown: %ss.")
+				.formatted(StringUtils.to2DP(RANGE), MAX_TARGETS, StringUtils.to2DP(PIN_DAMAGE), StringUtils.ticksToSeconds(CURSE_DURATION),
 					StringUtils.to2DP(CURSE_SPREAD_RADIUS), StringUtils.multiplierToPercentage(CURSE_SPREAD_DAMAGE),
 					StringUtils.ticksToSeconds(PROTECTION_DURATION), MAX_CHARGES, StringUtils.ticksToSeconds(COOLDOWN)),
 				("Pins now pierce all mobs and players in their path instead of stopping at %s. " +
