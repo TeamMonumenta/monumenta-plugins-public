@@ -57,7 +57,7 @@ public enum MarketListingIndex {
 		(MarketListing l) -> l.getLocation() != null,
 		true,
 		Material.COMPASS,
-		null
+		ComponentConfig.LOCATION_CONFIG
 	),
 
 	NAME("Name",
@@ -75,7 +75,7 @@ public enum MarketListingIndex {
 		(MarketListing l) -> !l.getCurrencyName().equals("ERROR"),
 		true,
 		Material.EXPERIENCE_BOTTLE,
-		null
+		ComponentConfig.CURRENCY_CONFIG
 	),
 
 	TYPE("Type",

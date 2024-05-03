@@ -220,19 +220,15 @@ public class MarketRedisManager {
 			Map<String, List<Long>> indexData = indexDatas.getOrDefault(comp.getTargetIndex(), new TreeMap<>());
 			TreeSet<Long> idsToFilter = new TreeSet<>();
 			for (String value : comp.mValuesList) {
-				if (value.contains("*")) {
-					String regex = value.toLowerCase(Locale.ROOT).replace("*", ".*");
-					List<String> matchingValues = new ArrayList<>();
-					for (String indexValue : indexData.keySet()) {
-						if (indexValue.toLowerCase(Locale.ROOT).matches(regex)) {
-							matchingValues.add(indexValue);
-						}
+				String regex = value.toLowerCase(Locale.ROOT).replace("*", ".*");
+				List<String> matchingValues = new ArrayList<>();
+				for (String indexValue : indexData.keySet()) {
+					if (indexValue.toLowerCase(Locale.ROOT).matches(regex)) {
+						matchingValues.add(indexValue);
 					}
-					for (String matchingValue : matchingValues) {
-						idsToFilter.addAll(indexData.getOrDefault(matchingValue, Collections.emptyList()));
-					}
-				} else {
-					idsToFilter.addAll(indexData.getOrDefault(value, Collections.emptyList()));
+				}
+				for (String matchingValue : matchingValues) {
+					idsToFilter.addAll(indexData.getOrDefault(matchingValue, Collections.emptyList()));
 				}
 			}
 

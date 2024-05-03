@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.managers.LootboxManager;
+import com.playmonumenta.plugins.market.filters.ComponentConfig;
 import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.plugins.market.gui.MarketGui;
 import com.playmonumenta.plugins.utils.FileUtils;
@@ -658,7 +659,7 @@ public class MarketManager {
 	}
 
 	public MarketFilter getForcedFiltersOfPlayer(Player player) {
-		return new MarketFilter().startWithActiveOnly(true);
+		return ComponentConfig.buildForcedBlacklistFilterForPlayer(player);
 	}
 
 	public void resetPlayerFilters(Player player) {

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.market.MarketListing;
 import com.playmonumenta.plugins.market.MarketManager;
+import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -72,6 +73,8 @@ public class MarketGui extends Gui {
 
 	int mPlayerMaxListings;
 
+	MarketFilter mForcedBlacklistFilter;
+
 	private static final HashSet<String> mMarketOngoingPlayerActions = new HashSet<>();
 
 	public MarketGui(Player player) {
@@ -80,6 +83,7 @@ public class MarketGui extends Gui {
 		mCurrentTab = TAB_MAIN_MENU;
 		mPlayerListingsIds = MarketManager.getInstance().getListingsOfPlayer(player);
 		mPlayerMaxListings = MarketManager.getConfig().mAmountOfPlayerListingsSlots;
+		mForcedBlacklistFilter = MarketManager.getInstance().getForcedFiltersOfPlayer(mPlayer);
 		endPlayerAction(mPlayer);
 	}
 

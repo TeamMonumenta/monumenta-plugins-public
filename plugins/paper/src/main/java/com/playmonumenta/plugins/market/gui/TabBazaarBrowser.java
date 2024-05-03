@@ -37,7 +37,6 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	public TabBazaarBrowser(MarketGui marketGUI) {
 		this.mGui = marketGUI;
 		this.mPlayer = mGui.mPlayer;
-		this.mForcedPlayerFilter = MarketManager.getInstance().getForcedFiltersOfPlayer(mPlayer);
 	}
 
 	Player mPlayer;
@@ -50,11 +49,6 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	int mSelectedFilter;
 	List<MarketFilter> mLoadedMarketFilters;
 	@Nullable String mQuicksearchValue;
-
-	// filter that is forced onto the player every time for the basic non-op browsers.
-	// this part of the filter is not saved in the player data
-	// later, fill this one for the anti-progskip filter
-	MarketFilter mForcedPlayerFilter;
 
 	List<MarketListingIndex> mLoadedSortbyIndexes;
 	int mSelectedSortByIndex;
@@ -219,7 +213,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 			// and refresh the page when list is loaded
 			mLoadingStatus = 1;
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				MarketFilter filter = MarketFilter.mergeOf(mForcedPlayerFilter, mLoadedMarketFilters.get(mSelectedFilter));
+				MarketFilter filter = MarketFilter.mergeOf(mGui.mForcedBlacklistFilter, mLoadedMarketFilters.get(mSelectedFilter));
 				if (mQuicksearchValue != null) {
 					MarketFilter quicksearch = new MarketFilter("Quick Search : " + mQuicksearchValue, List.of(new FilterComponent(MarketListingIndex.NAME, Comparator.WHITELIST, List.of(mQuicksearchValue))));
 					filter = MarketFilter.mergeOf(filter, quicksearch);

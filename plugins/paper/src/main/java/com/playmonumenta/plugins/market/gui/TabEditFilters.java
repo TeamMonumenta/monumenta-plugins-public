@@ -207,23 +207,17 @@ public class TabEditFilters implements MarketGuiTab {
 
 		ItemStack icon;
 
-		if (isUsed) {
-			if (config != null && config.getDisplayItemStack() != null && config.getDisplayName() != null) {
-				icon = config.getDisplayItemStack();
-				ItemUtils.setName(icon, Component.text(config.getDisplayName(), NamedTextColor.GREEN));
-				ItemUtils.setLore(icon, lore);
-			} else {
-				icon = GUIUtils.createBasicItem(Material.GREEN_CONCRETE, 1, Component.text(value, NamedTextColor.GREEN).decoration(TextDecoration.BOLD, true), lore, false);
-			}
+		if (config != null && config.getDisplayItemStack() != null) {
+			icon = config.getDisplayItemStack();
 		} else {
-			if (config != null && config.getDisplayItemStack() != null && config.getDisplayName() != null) {
-				icon = config.getDisplayItemStack();
-				ItemUtils.setName(icon, Component.text(config.getDisplayName(), NamedTextColor.GRAY));
-				ItemUtils.setLore(icon, lore);
-			} else {
-				icon = GUIUtils.createBasicItem(Material.GRAY_CONCRETE, 1, Component.text(value, NamedTextColor.GRAY).decoration(TextDecoration.BOLD, true), lore, false);
-			}
+			icon = new ItemStack(isUsed ? Material.LIME_CONCRETE : Material.GRAY_CONCRETE, 1);
 		}
+
+		if (config != null && config.getDisplayName() != null) {
+			ItemUtils.setName(icon, Component.text(config.getDisplayName(), isUsed ? NamedTextColor.GREEN : NamedTextColor.GRAY));
+		}
+
+		ItemUtils.setLore(icon, lore);
 
 		return new GuiItem(icon, false);
 	}
@@ -322,6 +316,7 @@ public class TabEditFilters implements MarketGuiTab {
 		mGui.setItem(0, buildBackToListingBrowserIcon()).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_BAZAAR_BROWSER));
 		mGui.setItem(2, buildBackToChooseFilterButton()).onClick((clickEvent) -> {
 			mSelectedFilter = null;
+			mIsChoosingNewComponent = false;
 			mGui.update();
 		});
 		mGui.setItem(8, buildSaveIcon()).onClick((clickEvent) -> saveAction());
