@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -631,6 +632,8 @@ public class ShopManager implements Listener {
 			tags.add("shop_ownerUUID=" + player.getUniqueId());
 			tags.add("shop_origMat=" + originalEntityMat);
 			tags.add("shop_shulker");
+			tags.add("SkillImmune");
+			tags.add(AbilityUtils.IGNORE_TAG);
 			if (isGuildShop) {
 				tags.add("guild_shop");
 				tags.add("shop_ownerGuildName=" + guildName);

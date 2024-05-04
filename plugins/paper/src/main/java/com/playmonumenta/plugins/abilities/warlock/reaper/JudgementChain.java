@@ -23,6 +23,7 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -66,7 +67,7 @@ public class JudgementChain extends Ability {
 			.descriptions(
 				("Swap hands while looking at an unchained mob within %s blocks to teleport them in front of you and chain them to you for %ss, " +
 					"taunting them and afflicting them with %s%% Slowness and %s%% Weakness for %ss. " +
-					"Bosses and crowd control immune mobs cannot be teleported, but will be chained and debuffed. Cooldown: %ss.")
+					"Bosses and crowd control/knockback immune mobs cannot be teleported, but will be chained and debuffed. Cooldown: %ss.")
 				.formatted(RANGE, StringUtils.ticksToSeconds(CHAIN_DURATION), StringUtils.multiplierToPercentage(SLOWNESS_AMOUNT),
 					StringUtils.multiplierToPercentage(WEAKNESS_AMOUNT), StringUtils.ticksToSeconds(DEBUFF_DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
 				("Judgement Chain now additionally teleports and chains the %s closest mobs within %s blocks of the targeted mob. " +
@@ -150,7 +151,7 @@ public class JudgementChain extends Ability {
 		Location loc = mPlayer.getLocation();
 		Location oldLocation = entity.getLocation();
 
-		if (!EntityUtils.isBoss(entity) && !EntityUtils.isCCImmuneMob(entity)) {
+		if (!(EntityUtils.isBoss(entity) || EntityUtils.isCCImmuneMob(entity) || EntityUtils.getAttributeOrDefault(entity, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0) >= 1)) {
 			Location destination = loc.clone().add(VectorUtils.rotateTargetDirection(offset, loc.getYaw(), loc.getPitch()));
 
 			// don't teleport into the ground
