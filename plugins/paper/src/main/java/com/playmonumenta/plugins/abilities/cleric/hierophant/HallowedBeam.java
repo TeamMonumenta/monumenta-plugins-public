@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
@@ -222,6 +223,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 				Crusade.addCrusadeTag(targetedEntity, mCrusade);
 			}
 			applyRecoil();
+			applyGrappling(targetedEntity);
 		});
 
 		return true;
@@ -235,6 +237,21 @@ public class HallowedBeam extends MultipleChargeAbility {
 			&& !mPlayer.isSneaking()
 			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			Recoil.applyRecoil(mPlayer, recoil);
+			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);
+		}
+	}
+
+	public void applyGrappling(LivingEntity target) {
+		ItemStack item = mPlayer.getInventory().getItemInMainHand();
+		double grappling = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.GRAPPLING);
+		if (grappling > 0
+			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)
+			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			if (getPlayer().isSneaking()) {
+				Grappling.pullMob(mPlayer, target, Grappling.MOB_HORIZONTAL_SPEED);
+			} else {
+				Grappling.pullMob(target, mPlayer, Grappling.PLAYER_HORIZONTAL_SPEED);
+			}
 			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);
 		}
 	}

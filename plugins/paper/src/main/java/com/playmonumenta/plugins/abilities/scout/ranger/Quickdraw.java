@@ -33,6 +33,7 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +53,7 @@ public class Quickdraw extends Ability {
 			.shorthandName("Qd")
 			.descriptions(
 				String.format("Left-clicking with a projectile weapon instantly fires that projectile, fully charged. " +
-					              "This skill can only apply Recoil once before touching the ground. Cooldown: %ds.", QUICKDRAW_1_COOLDOWN / 20),
+					"This skill can only apply Recoil once before touching the ground. Cooldown: %ds.", QUICKDRAW_1_COOLDOWN / 20),
 				String.format("Arrows shot with this skill are given +1 piercing. Cooldown: %ds.", QUICKDRAW_2_COOLDOWN / 20))
 			.simpleDescription("Instantly fire the held projectile weapon.")
 			.cooldown(QUICKDRAW_1_COOLDOWN, QUICKDRAW_2_COOLDOWN, CHARM_COOLDOWN)
@@ -130,6 +131,19 @@ public class Quickdraw extends Ability {
 				proj.addScoreboardTag("NoRecoil");
 			}
 			EntityUtils.applyRecoilDisable(mPlugin, 9999, 1, mPlayer);
+		}
+		if (!mPlayer.isSneaking() && ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.GRAPPLING) > 0) {
+			if (EntityUtils.isRecoilDisable(mPlugin, mPlayer, 1)) {
+				proj.addScoreboardTag("NoGrapple");
+			}
+			EntityUtils.applyRecoilDisable(mPlugin, 9999, 1, mPlayer);
+			proj.addScoreboardTag("SourceQuickDraw");
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mPlayer.updateInventory();
+				}
+			}.runTaskLater(mPlugin, 1);
 		}
 
 		proj.setShooter(mPlayer);

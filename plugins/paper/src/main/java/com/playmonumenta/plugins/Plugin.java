@@ -182,6 +182,7 @@ public class Plugin extends JavaPlugin {
 	public PzeroManager mPzeroManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
 	public PlayerListener mPlayerListener;
+	public GrapplingListener mGrapplingListener;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -409,6 +410,7 @@ public class Plugin extends JavaPlugin {
 		mPzeroManager = new PzeroManager();
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
 		mPlayerListener = new PlayerListener(this);
+		mGrapplingListener = new GrapplingListener();
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
@@ -525,6 +527,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new Lockdown(), this);
 		manager.registerEvents(new IchorListener(), this);
 		manager.registerEvents(new DiscoveryManager(), this);
+		manager.registerEvents(mGrapplingListener, this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);

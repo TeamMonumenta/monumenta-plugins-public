@@ -87,6 +87,7 @@ public enum EnchantmentType {
 	FIRST_STRIKE(new FirstStrike(), true, false, false, true),
 	FRACTAL(new Fractal(), true, false, false, true),
 	GILLS(new Gills(), false, false, false, false),
+	GRAPPLING(new Grappling(), true, false, false, false),
 	HEX_EATER(new HexEater(), true, false, false, true),
 	INFERNO(new Inferno(), true, false, false, true),
 	INTOXICATING_WARMTH(new IntoxicatingWarmth(), false, false, false, false),

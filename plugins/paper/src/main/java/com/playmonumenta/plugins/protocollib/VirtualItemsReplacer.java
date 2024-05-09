@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.commands.VirtualFirmament;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
 import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
@@ -58,6 +59,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		.put(EnchantmentType.TEMPORAL_BENDER, TemporalBender.COOLDOWN_ITEM)
 		.put(EnchantmentType.INTOXICATING_WARMTH, IntoxicatingWarmth.COOLDOWN_ITEM)
 		.put(EnchantmentType.LIQUID_COURAGE, LiquidCourage.COOLDOWN_ITEM)
+		.put(EnchantmentType.GRAPPLING, Grappling.COOLDOWN_ITEM)
 		.build();
 
 	private final Plugin mPlugin;
