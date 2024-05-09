@@ -128,9 +128,10 @@ public class Rebirth extends DepthsAbility {
 			.add(" When this happens, all of your abilities are replaced with random new abilities in the same slot from any tree, including Prismatic.")
 			.add(" These abilities are upgraded by " + UPGRADE_LEVELS + " levels.");
 		if (rarity > 1) {
+			String abilities = rarity == 2 ? "ability" : "abilities";
 			desc = desc.add(" In addition, gain ")
 				.add(a -> EXTRA_ABILITIES[rarity - 1], EXTRA_ABILITIES[rarity - 1], false, null, true)
-				.add(" more random abilities.");
+				.add(" more random " + abilities + ".");
 		}
 		return desc;
 	}
