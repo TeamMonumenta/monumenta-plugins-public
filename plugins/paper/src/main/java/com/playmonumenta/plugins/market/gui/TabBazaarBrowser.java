@@ -156,8 +156,8 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		lore.add(Component.text("If you do not know the exact", NamedTextColor.GRAY));
 		lore.add(Component.text("item name you are looking for,", NamedTextColor.GRAY));
 		lore.add(Component.text("you can replace unknown ", NamedTextColor.GRAY));
-		lore.add(Component.text("characters with '*' ", NamedTextColor.GRAY));
-		lore.add(Component.text("exemple: '*corrupted*'", NamedTextColor.GRAY));
+		lore.add(Component.text("characters with '*'. ", NamedTextColor.GRAY));
+		lore.add(Component.text("Example: '*corrupted*'", NamedTextColor.GRAY));
 		lore.add(Component.text("will search for all items with", NamedTextColor.GRAY));
 		lore.add(Component.text("its name having 'corrupted' in it.", NamedTextColor.GRAY));
 
