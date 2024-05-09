@@ -78,18 +78,20 @@ public class SteelStallion extends DepthsAbility {
 			if (effect == null || effect.isDebuff() || (effect.isBuff() && effect.getMagnitude() < 1.0)) {
 				// Only hurt horse if the player doesn't have +100% resistance
 				double damage = event.getFinalDamage(false);
-				if (mHorse.getNoDamageTicks() > 0 && mHorse.getLastDamage() >= damage) {
-					return;
-				}
 				if (mHorse.getNoDamageTicks() > 0) {
-					damage -= mHorse.getLastDamage();
-				} else if (mHorse.getNoDamageTicks() == 0) {
+					double lastDamage = mHorse.getLastDamage();
+					if (damage > lastDamage) {
+						mHorse.setLastDamage(damage);
+					}
+					damage -= lastDamage;
+				} else {
 					mHorse.setNoDamageTicks(20);
 					mHorse.setLastDamage(damage);
 				}
-				mHorse.setHealth(Math.max(0, mHorse.getHealth() - damage));
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, SoundCategory.NEUTRAL, 0.8f, 1.0f);
-
+				if (damage > 0) {
+					mHorse.setHealth(Math.max(0, mHorse.getHealth() - damage));
+					mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, SoundCategory.NEUTRAL, 0.8f, 1.0f);
+				}
 			}
 			event.setDamage(0);
 			event.setCancelled(true);
