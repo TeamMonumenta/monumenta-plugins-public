@@ -1637,21 +1637,14 @@ public class DepthsManager {
 		}
 		//Teleport all players in party to the player activating the fight
 		for (DepthsPlayer dpInParty : depthsParty.mPlayersInParty) {
-			try {
-				if (dpInParty != dp) {
-					Player playerToTp = Bukkit.getPlayer(dpInParty.mPlayerId);
-					if (playerToTp == null) {
-						dpInParty.offlineTeleport(p.getLocation());
-					} else if (playerToTp.getLocation().distance(l) > 20) {
-						playerToTp.teleport(p);
-					}
+			if (dpInParty != dp) {
+				Player playerToTp = Bukkit.getPlayer(dpInParty.mPlayerId);
+				if (playerToTp == null || dpInParty.mDead) {
+					dpInParty.offlineTeleport(p.getLocation());
+				} else if (playerToTp.getLocation().distance(l) > 20) {
+					playerToTp.teleport(p);
 				}
-			} catch (Exception e) {
-				//Don't crash if we can't find a player
-				MMLog.warning("Missing depths player at bossfight");
-				e.printStackTrace();
 			}
-
 		}
 
 		DepthsBoss boss = depthsParty.getContent().getBoss(depthsParty.getFloor());

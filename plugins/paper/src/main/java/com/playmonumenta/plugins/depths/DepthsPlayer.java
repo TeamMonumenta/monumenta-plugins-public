@@ -229,14 +229,14 @@ public class DepthsPlayer {
 		mOfflineTeleportPitch = location.getPitch();
 	}
 
-	public void doOfflineTeleport() {
+	public boolean doOfflineTeleport() {
 		if (mOfflineTeleportLoc == null) {
-			return;
+			return false;
 		}
 
 		Player player = Bukkit.getPlayer(mPlayerId);
 		if (player == null) {
-			return;
+			return false;
 		}
 
 		World world = Bukkit.getWorld(mOfflineTeleportWorld);
@@ -263,6 +263,7 @@ public class DepthsPlayer {
 		mOfflineTeleportLoc = null;
 		mOfflineTeleportYaw = null;
 		mOfflineTeleportPitch = null;
+		return true;
 	}
 
 	public List<String> getSolarRayUniqueMobNames() {

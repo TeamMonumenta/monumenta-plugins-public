@@ -287,7 +287,7 @@ public abstract class RoomRepository {
 				//Tp all the players to it
 				for (DepthsPlayer dp : party.mPlayersInParty) {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
-					if (p == null) {
+					if (p == null || dp.mDead) {
 						dp.offlineTeleport(l);
 					} else {
 						p.teleport(l, PlayerTeleportEvent.TeleportCause.UNKNOWN);
