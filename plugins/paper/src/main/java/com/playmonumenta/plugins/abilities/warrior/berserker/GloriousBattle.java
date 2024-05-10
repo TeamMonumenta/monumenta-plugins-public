@@ -154,6 +154,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		mCosmetic.gloryStart(world, mPlayer, location, mSpellDelay);
+		mCharged.clear();
 
 		if (mRunnable != null) {
 			mRunnable.cancel();
