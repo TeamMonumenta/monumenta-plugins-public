@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.NavigableSet;
 import org.bukkit.entity.Entity;
@@ -26,6 +27,14 @@ public class VoodooBondsCurse extends Effect {
 	private final double mDeathDamage;
 	private final int mCurseExtension;
 	private final VoodooBondsCS mCosmetic;
+	private final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.MELEE_SKILL,
+		DamageType.MELEE_ENCH,
+		DamageType.PROJECTILE,
+		DamageType.PROJECTILE_SKILL,
+		DamageType.MAGIC
+	);
 
 	public VoodooBondsCurse(Player player, int duration, double damage, double radius, boolean isLevelTwo, double deathDamage, int curseExtension, VoodooBondsCS cosmetic) {
 		super(duration, effectID);
@@ -40,16 +49,14 @@ public class VoodooBondsCurse extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
-		if (event.getType() == DamageType.TRUE || event.getType() == DamageType.AILMENT || event.getAbility() == ClassAbility.VOODOO_BONDS) {
-			return;
-		}
-
-		EntityType type = entity.getType();
-		double damage = event.getDamage() * mDamage;
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(), mRadius, entity)) {
-			if (mob.getType().equals(type)) {
-				mCosmetic.curseSpread(mPlayer, mob, entity);
-				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damage, ClassAbility.VOODOO_BONDS, true, false);
+		if (AFFECTED_DAMAGE_TYPES.contains(event.getType()) && event.getAbility() != ClassAbility.VOODOO_BONDS) {
+			EntityType type = entity.getType();
+			double damage = event.getDamage() * mDamage;
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(), mRadius, entity)) {
+				if (mob.getType().equals(type)) {
+					mCosmetic.curseSpread(mPlayer, mob, entity);
+					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damage, ClassAbility.VOODOO_BONDS, true, false);
+				}
 			}
 		}
 	}
@@ -91,11 +98,6 @@ public class VoodooBondsCurse extends Effect {
 	@Override
 	public double getMagnitude() {
 		return mDamage;
-	}
-
-	@Override
-	public boolean isDebuff() {
-		return true;
 	}
 
 	@Override

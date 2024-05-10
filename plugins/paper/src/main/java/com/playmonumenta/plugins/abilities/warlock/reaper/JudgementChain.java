@@ -158,6 +158,9 @@ public class JudgementChain extends Ability {
 			if (destination.getY() < loc.getY() && destination.getBlock().isSolid()) {
 				destination = LocationUtils.fallToGround(destination.add(0, 1.5, 0), loc.getY());
 			}
+			if (destination.getY() < loc.getY() && !mPlayer.hasLineOfSight(destination)) {
+				destination.setY(loc.getY());
+			}
 
 			EntityUtils.selfRoot(entity, 5); // tiny root to prevent weird movement after TP
 			EntityUtils.teleportStack(entity, destination);
