@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.plots.AnimalLimits;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,12 +32,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class ParrotManager implements Listener {
-
 	public static final String PARROT_LOCKBOX_SWAP_TAG = "ParrotLockboxSwap";
-
-	protected static final String SHOULDER_PARROT_TAG = "ParrotPet";
-	protected static final String PLACED_PARROT_TAG = "PlacedParrotPet";
-
+	// store info about which parrot is on the left shoulder
+	public static final String SCOREBOARD_PARROT_LEFT = "ParrotLeft";
+	// store info about which parrot is on the right shoulder
+	public static final String SCOREBOARD_PARROT_RIGHT = "ParrotRight";
+	public enum PlayerShoulder {
+		LEFT,
+		RIGHT,
+		NONE
+	}
 	public enum ParrotVariant {
 		//minecraft default
 		RED("Scarlet Macaw", 1, Parrot.Variant.RED, Material.RED_WOOL),
@@ -118,33 +123,20 @@ public class ParrotManager implements Listener {
 		}
 	}
 
-	public enum PlayerShoulder {
-		LEFT,
-		RIGHT,
-		NONE;
-	}
+	protected static final String SHOULDER_PARROT_TAG = "ParrotPet";
+	protected static final String PLACED_PARROT_TAG = "PlacedParrotPet";
 
-
-	private static @Nullable Plugin mPlugin;
-
-	private static final String SCOREBOARD_PARROT_VISIBLE = "ParrotVisible";
+	// The parrot manager is the least of our worries if it somehow gets initialized with a null reference to The Plugin
+	@SuppressWarnings({"NullAway.Init"})
+	private static Plugin mPlugin;
 	// 0 if invisible, 1 if visible.
-
-	private static final String SCOREBOARD_PARROT_BOTH = "ParrotBoth";
+	private static final String SCOREBOARD_PARROT_VISIBLE = "ParrotVisible";
 	// 0 if player can hold only one parrot
-
-	public static final String SCOREBOARD_PARROT_LEFT = "ParrotLeft";
-	// store the info about which parrot is on the left shoulder
-
-	public static final String SCOREBOARD_PARROT_RIGHT = "ParrotRight";
-	// store the info about which parrot is on the right shoulder
-
+	private static final String SCOREBOARD_PARROT_BOTH = "ParrotBoth";
 	private static final Set<Player> mPrideRight = new HashSet<>();
 	private static final Set<Player> mPrideLeft = new HashSet<>();
-
 	private static final Map<Player, ParrotVariant> mLeftShoulders = new HashMap<>();
 	private static final Map<Player, ParrotVariant> mRightShoulders = new HashMap<>();
-
 	private static final int PRIDE_FREQUENCY = 3;
 
 	private static @Nullable BukkitRunnable mPrideRunnable;
@@ -152,20 +144,16 @@ public class ParrotManager implements Listener {
 	public ParrotManager(Plugin plugin) {
 		mPlugin = plugin;
 		mPrideRunnable = null;
-
-		// Periodically updates all players' parrots.
+	}
+		/* Periodically updates all players' parrots.
 		// Workaround for an Optifine bug that only shows custom parrot textures if the parrot has been a standalone entity before it was put on a shoulder.
 		// Updates only a few players at a time to spread out server load, as this causes noticeable lag when done for many players at once.
 		// TODO temporarily disabled because Optifine is no longer displaying shoulder parrot textures even with this hack
 		// Since it worked with 1.18 client and 1.16 server, somehow it must still be possible, so this is left in as a base to work off of.
-		/*
-				new BukkitRunnable() {
-					Iterator<? extends Player> mPlayers = Collections.emptyIterator();
+			new BukkitRunnable() {
+				Iterator<? extends Player> mPlayers = Collections.emptyIterator();
 
-					@Override
-		*/
-	}
-	/*
+				@Override
 				public void run() {
 					if (!mPlayers.hasNext()) {
 						mPlayers = ImmutableList.copyOf(Bukkit.getOnlinePlayers()).iterator();
@@ -189,7 +177,7 @@ public class ParrotManager implements Listener {
 			Parrot parrot = new ParrotPet(leftParrot, player).spawnParrot(spawnLocation);
 			parrot.addScoreboardTag(ParrotManager.SHOULDER_PARROT_TAG);
 			parrot.setInvisible(true);
-			player.setShoulderEntityLeft(parrot);
+			PlayerUtils.setPlayerShoulderEntity(player, parrot, false);
 		}
 
 		ParrotVariant rightParrot = mRightShoulders.get(player);
@@ -197,7 +185,7 @@ public class ParrotManager implements Listener {
 			Parrot parrot = new ParrotPet(rightParrot, player).spawnParrot(spawnLocation);
 			parrot.addScoreboardTag(ParrotManager.SHOULDER_PARROT_TAG);
 			parrot.setInvisible(true);
-			player.setShoulderEntityRight(parrot);
+			PlayerUtils.setPlayerShoulderEntity(player, parrot, true);
 		}
 	}
 
@@ -255,8 +243,8 @@ public class ParrotManager implements Listener {
 			mPrideRight.remove(player);
 		}
 
-		player.setShoulderEntityLeft(null);
-		player.setShoulderEntityRight(null);
+		PlayerUtils.setPlayerShoulderEntity(player, null, true);
+		PlayerUtils.setPlayerShoulderEntity(player, null, false);
 		respawnParrots(player);
 
 		if (mPrideRunnable == null && (!mPrideLeft.isEmpty() || !mPrideRight.isEmpty())) {
@@ -281,16 +269,16 @@ public class ParrotManager implements Listener {
 					mVariant = (mVariant + 1) % VARIANTS.length;
 					Parrot.Variant variant = VARIANTS[mVariant];
 					for (Player player : mPrideRight) {
-						if (player.getShoulderEntityRight() instanceof Parrot parrot) {
+						if (PlayerUtils.getPlayerShoulderEntity(player, true) instanceof Parrot parrot) {
 							parrot.setVariant(variant);
-							player.setShoulderEntityRight(parrot);
+							PlayerUtils.setPlayerShoulderEntity(player, parrot, true);
 						}
 					}
 
 					for (Player player : mPrideLeft) {
-						if (player.getShoulderEntityLeft() instanceof Parrot parrot) {
+						if (PlayerUtils.getPlayerShoulderEntity(player, false) instanceof Parrot parrot) {
 							parrot.setVariant(variant);
-							player.setShoulderEntityLeft(parrot);
+							PlayerUtils.setPlayerShoulderEntity(player, parrot, false);
 						}
 					}
 				}

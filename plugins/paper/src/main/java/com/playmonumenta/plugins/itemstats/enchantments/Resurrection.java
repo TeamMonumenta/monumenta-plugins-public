@@ -52,8 +52,8 @@ public class Resurrection implements Enchantment {
 
 	public static boolean execute(Plugin plugin, Player player, DamageEvent event, @Nullable EnchantmentType resurrectionEnchantment) {
 
-		// Simulate resurrecting the player
-		EntityResurrectEvent resEvent = new EntityResurrectEvent(player);
+		// Simulate resurrecting the player. Ignore hand items for now since we don't know where the enchant is yet
+		EntityResurrectEvent resEvent = new EntityResurrectEvent(player, null);
 		Bukkit.getPluginManager().callEvent(resEvent);
 		if (resEvent.isCancelled()) {
 			return false;

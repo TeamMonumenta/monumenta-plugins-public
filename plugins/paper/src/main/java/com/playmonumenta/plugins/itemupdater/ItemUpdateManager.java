@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
@@ -89,7 +90,7 @@ public class ItemUpdateManager implements Listener {
 		subPath = new ArrayList<>(path);
 		subPath.add("the following is on the player's left shoulder: ");
 		try {
-			updateNested(subPath, player.getShoulderEntityLeft());
+			updateNested(subPath, PlayerUtils.getPlayerShoulderEntity(player, false));
 		} catch (Exception e) {
 			logNestedException(subPath, e);
 		}
@@ -97,7 +98,7 @@ public class ItemUpdateManager implements Listener {
 		subPath = new ArrayList<>(path);
 		subPath.add("the following is on the player's right shoulder: ");
 		try {
-			updateNested(subPath, player.getShoulderEntityRight());
+			updateNested(subPath, PlayerUtils.getPlayerShoulderEntity(player, true));
 		} catch (Exception e) {
 			logNestedException(subPath, e);
 		}

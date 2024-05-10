@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.depths.rooms;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
 
 public enum DepthsRoomType {
@@ -13,7 +15,8 @@ public enum DepthsRoomType {
 	UTILITY(null, "", "Utility"),
 	WILDCARD(null, "", "Wildcard"),
 	BOSS(null, "", "Boss"),
-	TWISTED(DepthsRewardType.TWISTED, ChatColor.MAGIC + "XXXXXX" + ChatColor.LIGHT_PURPLE, ChatColor.MAGIC + "XXXXXX" + ChatColor.LIGHT_PURPLE);
+	// This line is awful but at least it gets rid of deprecation warnings from ChatColor
+	TWISTED(DepthsRewardType.TWISTED, Component.text("XXXXXX", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.OBFUSCATED).toString(), Component.text("XXXXXX", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.OBFUSCATED).toString());
 
 	private final @Nullable DepthsRewardType mRewardType;
 	private final String mRewardString;
@@ -38,7 +41,7 @@ public enum DepthsRoomType {
 	}
 
 	public enum DepthsRewardType {
-		ABILITY, ABILITY_ELITE, UPGRADE, UPGRADE_ELITE, TWISTED, PRISMATIC, GENEROSITY;
+		ABILITY, ABILITY_ELITE, UPGRADE, UPGRADE_ELITE, TWISTED, PRISMATIC, GENEROSITY
 	}
 }
 

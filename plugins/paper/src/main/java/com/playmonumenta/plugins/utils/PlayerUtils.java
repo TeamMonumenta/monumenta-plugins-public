@@ -536,6 +536,26 @@ public class PlayerUtils {
 		return player.isOnGround();
 	}
 
+	/**
+	 * Same ^
+	 * @param shoulder True for right shoulder, false for left shoulder
+	 */
+	public static Entity getPlayerShoulderEntity(Player player, boolean shoulder) {
+		return shoulder ? player.getShoulderEntityRight() : player.getShoulderEntityLeft();
+	}
+
+	/**
+	 * Same ^
+	 * @param shoulder True for right shoulder, false for left shoulder
+	 */
+	public static void setPlayerShoulderEntity(Player player, @Nullable Entity shoulderEntity, boolean shoulder) {
+		if (shoulder) {
+			player.setShoulderEntityRight(shoulderEntity);
+		} else {
+			player.setShoulderEntityLeft(shoulderEntity);
+		}
+	}
+
 	public static boolean canRiptide(Player player) {
 		return canRiptide(player, player.getInventory().getItemInMainHand());
 	}
