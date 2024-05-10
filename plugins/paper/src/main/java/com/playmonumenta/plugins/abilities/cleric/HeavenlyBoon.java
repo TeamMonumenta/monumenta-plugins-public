@@ -241,7 +241,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 							if (e.isBuff()
 								    && (e.getDuration() < ENHANCEMENT_POTION_EFFECT_MAX_DURATION
 									        && e.getDuration() != PotionEffect.INFINITE_DURATION)
-								    && EffectType.isEffectTypeAppliedEffect(mPlugin.mEffectManager.getSource(mPlayer, e))
+								    && EffectType.isEffectTypeAppliedEffect(mPlugin.mEffectManager.getSource(p, e))
 								    && e.getHeavenlyBoonExtensions() < MAX_EXTENSIONS) {
 								e.incrementHeavenlyBoonExtensions();
 								e.setDuration(Math.min(e.getDuration() + (int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
