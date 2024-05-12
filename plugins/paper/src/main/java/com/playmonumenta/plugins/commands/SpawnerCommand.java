@@ -19,6 +19,7 @@ import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -37,7 +38,7 @@ public class SpawnerCommand {
 										return;
 									}
 
-									int shields = (int) args[0];
+									int shields = args.getUnchecked("shields");
 									SpawnerUtils.setShields(item, shields);
 								}),
 						new CommandAPICommand("function")
@@ -50,7 +51,7 @@ public class SpawnerCommand {
 														return;
 													}
 
-													FunctionWrapper[] functions = (FunctionWrapper[]) args[0];
+													FunctionWrapper[] functions = args.getUnchecked("function");
 													if (functions.length == 0) {
 														throw CommandAPI.failWithString("Failed to get function");
 													}
@@ -76,7 +77,7 @@ public class SpawnerCommand {
 										return;
 									}
 
-									String losPool = (String) args[0];
+									String losPool = args.getUnchecked("los pool");
 									if (!isLosPoolValid(losPool)) {
 										player.sendMessage(Component.text("The selected pool has 0 elements.", NamedTextColor.RED));
 										return;
@@ -98,7 +99,7 @@ public class SpawnerCommand {
 														return;
 													}
 
-													String action = (String) args[0];
+													String action = args.getUnchecked("name");
 													if (!SpawnerActionManager.actionExists(action)) {
 														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
 														return;
@@ -117,7 +118,7 @@ public class SpawnerCommand {
 														return;
 													}
 
-													String action = (String) args[0];
+													String action = args.getUnchecked("name");
 													if (!SpawnerActionManager.actionExists(action)) {
 														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
 														return;
@@ -141,9 +142,9 @@ public class SpawnerCommand {
 														return;
 													}
 
-													String actionIdentifier = (String) args[0];
-													String parameterName = (String) args[1];
-													String valueString = (String) args[2];
+													String actionIdentifier = args.getUnchecked("action identifier");
+													String parameterName = args.getUnchecked("parameter name");
+													String valueString = args.getUnchecked("value");
 													if (!SpawnerActionManager.actionExists(actionIdentifier)) {
 														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
 														return;
@@ -165,8 +166,8 @@ public class SpawnerCommand {
 														return;
 													}
 
-													String actionIdentifier = (String) args[0];
-													String parameterName = (String) args[1];
+													String actionIdentifier = args.getUnchecked("action identifier");
+													String parameterName = args.getUnchecked("parameter name");
 													if (!SpawnerActionManager.actionExists(actionIdentifier)) {
 														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
 														return;
@@ -203,7 +204,7 @@ public class SpawnerCommand {
 	// ----- Suggestions ----- //
 
 	// Returns all break action identifiers that are set on the item.
-	private static String[] getActionIdentifierSuggestions(SuggestionInfo info) {
+	private static String[] getActionIdentifierSuggestions(SuggestionInfo<CommandSender> info) {
 		if (info.sender() instanceof Player player) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (SpawnerUtils.isSpawner(item)) {
@@ -215,7 +216,7 @@ public class SpawnerCommand {
 	}
 
 	// Only returns the break action identifiers that are not already set on the item.
-	private static String[] getAvailableActionIdentifiersSuggestions(SuggestionInfo info) {
+	private static String[] getAvailableActionIdentifiersSuggestions(SuggestionInfo<CommandSender> info) {
 		if (info.sender() instanceof Player player) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (SpawnerUtils.isSpawner(item)) {
@@ -229,17 +230,18 @@ public class SpawnerCommand {
 	}
 
 	// Returns the names of the parameters available for the specified break action identifier
-	private static String[] getParameterNameSuggestions(SuggestionInfo info) {
-		if (SpawnerActionManager.actionExists((String) info.previousArgs()[0])) {
-			return SpawnerActionManager.getActionParameters((String) info.previousArgs()[0]).keySet().toArray(new String[0]);
+	private static String[] getParameterNameSuggestions(SuggestionInfo<CommandSender> info) {
+		String previousAction = info.previousArgs().getUnchecked(0);
+		if (SpawnerActionManager.actionExists(previousAction)) {
+			return SpawnerActionManager.getActionParameters(previousAction).keySet().toArray(new String[0]);
 		}
 		return new String[0];
 	}
 
 	// Returns the default value for the specified break action parameter
-	private static String[] getDefaultParameterValueSuggestion(SuggestionInfo info) {
-		String actionIdentifier = (String) info.previousArgs()[0];
-		String parameterName = (String) info.previousArgs()[1];
+	private static String[] getDefaultParameterValueSuggestion(SuggestionInfo<CommandSender> info) {
+		String actionIdentifier = info.previousArgs().getUnchecked(0);
+		String parameterName = info.previousArgs().getUnchecked(1);
 		if (SpawnerActionManager.actionExists(actionIdentifier)) {
 			Object value = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
 			if (value != null) {

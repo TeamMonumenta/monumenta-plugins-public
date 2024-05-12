@@ -17,6 +17,7 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.MetaNode;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_NAME_MK;
@@ -33,7 +34,7 @@ public class GuildArguments {
 	private static final ConcurrentHashMap<String, String> mNameById = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, String> mTagById = new ConcurrentHashMap<>();
 
-	public static final ArgumentSuggestions NAME_SUGGESTIONS = ArgumentSuggestions
+	public static final ArgumentSuggestions<CommandSender> NAME_SUGGESTIONS = ArgumentSuggestions
 		.stringCollection(suggestionInfo -> {
 			List<String> guildNames = getGuildNames();
 			if (guildNames.isEmpty()) {
@@ -41,7 +42,7 @@ public class GuildArguments {
 			}
 			return CommandUtils.alwaysQuote(guildNames);
 		});
-	public static final ArgumentSuggestions TAG_SUGGESTIONS = ArgumentSuggestions
+	public static final ArgumentSuggestions<CommandSender> TAG_SUGGESTIONS = ArgumentSuggestions
 		.stringCollection(suggestionInfo -> {
 			List<String> guildTags = getGuildTags();
 			if (guildTags.isEmpty()) {

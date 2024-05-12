@@ -29,7 +29,7 @@ public class DeleteGuildCommand {
 					return;
 				}
 
-				String guildName = (String) args[args.length - 1];
+				String guildName = args.getByArgument(GuildCommand.GUILD_NAME_ARG);
 
 				deleteGuild(plugin, sender, guildName);
 			});

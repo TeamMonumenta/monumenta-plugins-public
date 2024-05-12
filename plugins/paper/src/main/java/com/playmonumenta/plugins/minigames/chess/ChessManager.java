@@ -18,6 +18,7 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -54,7 +55,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("NullAway")
 public class ChessManager implements Listener {
@@ -68,7 +68,7 @@ public class ChessManager implements Listener {
 		PVAI
 	}
 
-	private static @Nullable Plugin mPlugin;
+	private static Plugin mPlugin;
 	private static final Map<String, ChessBoard> mBoards = new HashMap<>();
 	private static final Map<ChessBoard, List<ChessInterface>> mBoardsInterfaces = new HashMap<>();
 
@@ -85,64 +85,58 @@ public class ChessManager implements Listener {
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name"));
-			arguments.add(new MultiLiteralArgument("create"));
-			arguments.add(new MultiLiteralArgument(
+			arguments.add(new LiteralArgument("create"));
+			arguments.add(new MultiLiteralArgument("type",
 					ChessBoardType.PVP.name(),
 					ChessBoardType.PVAI.name()));
 
 			new CommandAPICommand(command)
 					.withPermission(perms)
 					.withArguments(arguments)
+				.withOptionalArguments(new GreedyStringArgument("fen String"))
 					.executes((sender, args) -> {
-						createBoard((String)args[0], ChessBoardType.valueOf((String) args[2]), FEN_DEFAULT_BOARD_STRING);
+						createBoard(args.getUnchecked("Board Name"), ChessBoardType.valueOf(args.getUnchecked("type")), args.getOrDefaultUnchecked("fen String", FEN_DEFAULT_BOARD_STRING));
 					}).register();
 
+			arguments.clear();
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
+			arguments.add(new LiteralArgument("get"));
+			arguments.add(new LiteralArgument("fen"));
+			new CommandAPICommand(command)
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						printCurrentChessBoardFenString(sender, args.getUnchecked("Board Name"));
+					}).register();
+
+			arguments.clear();
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
+			arguments.add(new LiteralArgument("restart"));
+			new CommandAPICommand(command)
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						restartBoard(args.getUnchecked("Board Name"));
+					}).register();
+
+			arguments.clear();
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
+			arguments.add(new LiteralArgument("set"));
+			arguments.add(new LiteralArgument("fen"));
 			arguments.add(new GreedyStringArgument("fen String"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
 					.withArguments(arguments)
 					.executes((sender, args) -> {
-						createBoard((String)args[0], ChessBoardType.valueOf((String) args[2]), (String) args[3]);
-					}).register();
-
-			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
-				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("get"));
-			arguments.add(new MultiLiteralArgument("fen"));
-			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						printCurrentChessBoardFenString(sender, (String)args[0]);
-					}).register();
-
-			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
-				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("restart"));
-			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						restartBoard((String) args[0]);
-					}).register();
-
-			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
-				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("set"));
-			arguments.add(new MultiLiteralArgument("fen"));
-			arguments.add(new GreedyStringArgument("fen String"));
-			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						if (!mBoards.containsKey((String)args[0])) {
-							throw CommandAPI.failWithString("Invalid name, Board: " + (String)args[0] + " doesn't exists");
+						String boardName = args.getUnchecked("Board Name");
+						ChessBoard board = mBoards.get(boardName);
+						if (board == null) {
+							throw CommandAPI.failWithString("Invalid name, Board: " + boardName + " doesn't exists");
 						}
-						ChessBoard board = mBoards.get((String)args[0]);
-						board.buildBoardFromString((String)args[3]);
+						board.buildBoardFromString(args.getUnchecked("fen String"));
 
 						for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
 							chessInterface.refresh();
@@ -152,38 +146,40 @@ public class ChessManager implements Listener {
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("delete"));
+			arguments.add(new LiteralArgument("delete"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
 					.withArguments(arguments)
 					.executes((sender, args) -> {
-						deleteBoard((String)args[0]);
+						deleteBoard(args.getUnchecked("Board Name"));
 					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("refresh"));
+			arguments.add(new LiteralArgument("refresh"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
 					.withArguments(arguments)
 					.executes((sender, args) -> {
-						refreshGuis((String)args[0]);
+						refreshGuis(args.getUnchecked("Board Name"));
 					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("set"));
-			arguments.add(new MultiLiteralArgument("piece"));
-			arguments.add(new MultiLiteralArgument(ChessPieceType.BISHOPS.name(),
+			arguments.add(new LiteralArgument("set"));
+			arguments.add(new LiteralArgument("piece"));
+			arguments.add(new MultiLiteralArgument("piecetype",
+					ChessPieceType.BISHOPS.name(),
 					ChessPieceType.KING.name(),
 					ChessPieceType.KNIGHTS.name(),
 					ChessPieceType.PAWNS.name(),
 					ChessPieceType.QUEEN.name(),
 					ChessPieceType.ROOKS.name()));
 
-			arguments.add(new MultiLiteralArgument(ChessTeam.BLACK.name(),
+			arguments.add(new MultiLiteralArgument("team",
+					ChessTeam.BLACK.name(),
 					ChessTeam.WHITE.name()));
 			arguments.add(new IntegerArgument("Position", 0, 63));
 
@@ -191,65 +187,53 @@ public class ChessManager implements Listener {
 					.withPermission(perms)
 					.withArguments(arguments)
 					.executes((sender, args) -> {
-						setPiece((String)args[0], (String)args[3], (String)args[4], (int)args[5]);
+						setPiece(args.getUnchecked("Board Name"), args.getUnchecked("piecetype"), args.getUnchecked("team"), args.getUnchecked("Position"));
 					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("set"));
-			arguments.add(new MultiLiteralArgument("player"));
-			arguments.add(new MultiLiteralArgument("white"));
+			arguments.add(new LiteralArgument("set"));
+			arguments.add(new LiteralArgument("player"));
+			arguments.add(new MultiLiteralArgument("team", "white", "black"));
 			arguments.add(new PlayerArgument("player"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
 					.withArguments(arguments)
 					.executes((sender, args) -> {
-						setPlayer((String)args[0], (Player)args[4], "white");
+						setPlayer(args.getUnchecked("Board Name"), args.getUnchecked("player"), args.getUnchecked("team"));
 					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("set"));
-			arguments.add(new MultiLiteralArgument("player"));
-			arguments.add(new MultiLiteralArgument("black"));
-			arguments.add(new PlayerArgument("player"));
-			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						setPlayer((String)args[0], (Player)args[4], "black");
-					}).register();
-
-			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
-				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("set"));
-			arguments.add(new MultiLiteralArgument("gui"));
-			arguments.add(new MultiLiteralArgument(ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(Locale.getDefault()),
+			arguments.add(new LiteralArgument("set"));
+			arguments.add(new LiteralArgument("gui"));
+			arguments.add(new MultiLiteralArgument("interfacetype",
+					ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(Locale.getDefault()),
 					ChessInterface.InterfaceType.BLACKPLAYER.name().toLowerCase(Locale.getDefault()),
 					ChessInterface.InterfaceType.SPECTATOR.name().toLowerCase(Locale.getDefault())));
 			arguments.add(new LocationArgument("starting positions", LocationType.BLOCK_POSITION));
-			arguments.add(new MultiLiteralArgument(ChessInterface.FacingPosition.NORTH.getLabel(),
+			arguments.add(new MultiLiteralArgument("facing",
+					ChessInterface.FacingPosition.NORTH.getLabel(),
 					ChessInterface.FacingPosition.SOUTH.getLabel()));
 			new CommandAPICommand(command)
 					.withPermission(perms)
 					.withArguments(arguments)
 					.executes((sender, args) -> {
-						createGui((String)args[0], (String)args[3], (Location)args[4], (String) args[5]);
+						createGui(args.getUnchecked("Board Name"), args.getUnchecked("interfacetype"), args.getUnchecked("starting positions"), args.getUnchecked("facing"));
 					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
-			arguments.add(new MultiLiteralArgument("surrend"));
+			arguments.add(new LiteralArgument("surrend"));
 			arguments.add(new PlayerArgument("Surrender"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
 					.withArguments(arguments)
 					.executes((sender, args) -> {
-						surrender((String)args[0], (Player)args[2]);
+						surrender(args.getUnchecked("Board Name"), args.getUnchecked("Surrender"));
 					}).register();
 		}
 	}
@@ -377,7 +361,7 @@ public class ChessManager implements Listener {
 
 		ChessPieceType type = ChessPieceType.valueOf(piece.toUpperCase(Locale.getDefault()));
 		ChessTeam team = ChessTeam.valueOf(teamString.toUpperCase(Locale.getDefault()));
-		if (type == null || team == null || pos < 0 || pos > 63) {
+		if (type == null || pos < 0 || pos > 63) {
 			throw CommandAPI.failWithString("Error. type: " + type + " team: " + team + " pos: " + pos);
 		}
 
@@ -424,27 +408,25 @@ public class ChessManager implements Listener {
 			return;
 		}
 		Player player = event.getPlayer();
-		if (player != null) {
-			if (ChessPlayer.isChessPlayer(player) && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
-				Entity entity = player.getTargetEntity(20);
-				if (entity instanceof ItemFrame) {
-					ChessBoard board = null;
-					Set<String> tags = entity.getScoreboardTags();
-					for (String boardName : mBoards.keySet()) {
-						if (tags.contains(boardName)) {
-							board = mBoards.get(boardName);
-							break;
-						}
+		if (ChessPlayer.isChessPlayer(player) && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
+			Entity entity = player.getTargetEntity(20);
+			if (entity instanceof ItemFrame) {
+				ChessBoard board = null;
+				Set<String> tags = entity.getScoreboardTags();
+				for (String boardName : mBoards.keySet()) {
+					if (tags.contains(boardName)) {
+						board = mBoards.get(boardName);
+						break;
 					}
+				}
 
-					if (board == null) {
-						return;
-					}
+				if (board == null) {
+					return;
+				}
 
-					for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
-						if (chessInterface.playerInteract((ItemFrame)entity, (Player)player)) {
-							break;
-						}
+				for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
+					if (chessInterface.playerInteract((ItemFrame)entity, (Player)player)) {
+						break;
 					}
 				}
 			}
@@ -525,15 +507,15 @@ public class ChessManager implements Listener {
 	public static void onChunkUnload(ChunkUnloadEvent event) {
 		boolean shouldCheckInterfaces = false;
 		for (Entity entity : event.getChunk().getEntities()) {
-			if ((entity instanceof ItemFrame) && entity.getScoreboardTags().contains(ChessInterface.ITEM_FRAME_TAG)) {
-				Bukkit.getScheduler().runTask(mPlugin, () -> entity.remove());
+			if (entity instanceof ItemFrame && entity.getScoreboardTags().contains(ChessInterface.ITEM_FRAME_TAG)) {
+				Bukkit.getScheduler().runTask(mPlugin, entity::remove);
 				shouldCheckInterfaces = true;
 			}
 		}
 
 		if (shouldCheckInterfaces) {
 			for (ChessBoard board : mBoards.values()) {
-				for (ChessInterface chessInterface : new HashSet<ChessInterface>(mBoardsInterfaces.get(board))) {
+				for (ChessInterface chessInterface : new HashSet<>(mBoardsInterfaces.get(board))) {
 					if (chessInterface.shouldDestroy()) {
 						chessInterface.destroy();
 						mBoardsInterfaces.get(board).remove(chessInterface);

@@ -24,12 +24,11 @@ public class AdminNotify {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				String message = (String)args[0];
-				Player player = null;
-				if (sender instanceof Player) {
-					player = (Player)sender;
+				String message = args.getUnchecked("message");
+				String textWithReplacedText = message;
+				if (sender instanceof Player player) {
+					textWithReplacedText = PlaceholderAPI.setPlaceholders(player, message);
 				}
-				String textWithReplacedText = PlaceholderAPI.setPlaceholders(player, message);
 
 				Plugin.getInstance().getLogger().info("Sent admin notify message for: " + textWithReplacedText);
 

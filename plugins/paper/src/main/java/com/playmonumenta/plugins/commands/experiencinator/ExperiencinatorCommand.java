@@ -48,7 +48,7 @@ public class ExperiencinatorCommand {
 			.withPermission(PERMISSION_OTHERS)
 			.withArguments(new LiteralArgument("menu"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>) args[0]) {
+				for (Player player : (Collection<Player>) args.get("players")) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorMainGui.show(player, Plugin.getInstance(), experiencinator, item));
 				}
 			})
@@ -67,7 +67,7 @@ public class ExperiencinatorCommand {
 			.withPermission(PERMISSION_OTHERS)
 			.withArguments(new LiteralArgument("convert"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>) args[0]) {
+				for (Player player : (Collection<Player>) args.get("players")) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorUtils.useExperiencinator(experiencinator, item, player));
 				}
 			})
@@ -86,7 +86,7 @@ public class ExperiencinatorCommand {
 			.withPermission(PERMISSION_OTHERS)
 			.withArguments(new LiteralArgument("configure"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>) args[0]) {
+				for (Player player : (Collection<Player>) args.get("players")) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorSettingsGui.showConfig(player, Plugin.getInstance(), experiencinator, item));
 				}
 			})
@@ -105,7 +105,7 @@ public class ExperiencinatorCommand {
 				               })),
 			               new StringArgument("conversionResultName")
 				               .replaceSuggestions(ArgumentSuggestions.strings(info -> {
-					               String conversionName = info.previousArgs() != null ? (String) info.previousArgs()[2] : null;
+					               String conversionName = info.previousArgs() != null ? (String) info.previousArgs().get("conversionName") : null;
 					               if (conversionName == null) {
 						               return new String[0];
 					               }
@@ -119,8 +119,8 @@ public class ExperiencinatorCommand {
 				               })),
 			               new BooleanArgument("giveToPlayerOnFail"))
 			.executes((sender, args) -> {
-				for (Entity entity : (Collection<Entity>) args[1]) {
-					ExperiencinatorUtils.convertItemEntity((Player) args[0], entity, (String) args[2], (String) args[3], (Boolean) args[4]);
+				for (Entity entity : (Collection<Entity>) args.get("items")) {
+					ExperiencinatorUtils.convertItemEntity(args.getUnchecked("player"), entity, args.getUnchecked("conversionName"), args.getUnchecked("conversionResultName"), args.getUnchecked("giveToPlayerOnFail"));
 				}
 			})
 			.register();

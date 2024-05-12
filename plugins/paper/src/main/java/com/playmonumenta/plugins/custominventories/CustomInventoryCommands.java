@@ -38,7 +38,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openexamplecustominvgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new ExampleCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
@@ -53,7 +53,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openteleportergui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new OrinCustomInventory(player, -1).openInventory(player, plugin);
 			})
 			.register();
@@ -65,9 +65,9 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openinstancebot")
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
-				new OrinCustomInventory(player, (10 + (int) args[1])).openInventory(player, plugin);
+				new OrinCustomInventory(player, (10 + (int) args.get("region #"))).openInventory(player, plugin);
 			})
 			.register();
 
@@ -82,7 +82,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openpeb")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new PEBCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
@@ -97,7 +97,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openzenithcharmpowergui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new ZenithCharmPowerGUI(player).openInventory(player, plugin);
 			})
 			.register();
@@ -117,7 +117,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openinfusiongui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				if (!player.hasPermission("monumenta.infusions")) {
 					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 					return;
@@ -143,7 +143,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.opendelveinfusiongui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				if (!player.hasPermission("monumenta.infusions")) {
 					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 					return;
@@ -169,7 +169,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openparrotgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				try {
 					new ParrotCustomInventory(player).open();
 				} catch (Exception ex) {
@@ -192,7 +192,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openblitzmobgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new TowerGuiShowMobs(player).openInventory(player, plugin);
 			})
 			.register();
@@ -206,7 +206,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openfishingdifficultygui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new FishingDifficultyGui(player).open();
 			})
 			.register();
@@ -223,7 +223,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openichorinfusiongui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				ItemStack mainhand = player.getInventory().getItemInMainHand();
 				if (IchorListener.isIchor(mainhand)) {
 					new IchorSelectionGUI(player).open();
@@ -240,7 +240,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openclassgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Player viewer = player;
 				if (sender instanceof Player playerSender) {
 					viewer = playerSender;
@@ -260,7 +260,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openclassdisplaygui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				if (!AbilityUtils.getClass(player).equals("No Class")) {
 					new ClassDisplayCustomInventory(player).open();
 				}
@@ -276,7 +276,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.playerdetails")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Player viewer = player;
 				if (sender instanceof Player playerSender) {
 					viewer = playerSender;
@@ -296,7 +296,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openmasterworkgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Bukkit.getScheduler().runTaskLater(plugin, () ->
 					new MasterworkCustomInventory(player).openInventory(player, plugin), 1);
 			})
@@ -315,9 +315,9 @@ public class CustomInventoryCommands {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				try {
-					Player player = (Player) args[0];
-					int region = (int) args[1];
-					int level = (int) args[2];
+					Player player = args.getUnchecked("player");
+					int region = args.getUnchecked("region #");
+					int level = args.getUnchecked("level");
 					if (ScoreboardUtils.getScoreboardValue(player, questScore.get(region - 1)).orElse(0) == 0 &&
 						ScoreboardUtils.getScoreboardValue(player, rewardScore.get(region - 1)).orElse(0) == 0) {
 						new BountyGui(player, region, level).open();
@@ -338,7 +338,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.emoji.others")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new EmojiCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
@@ -352,7 +352,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.emote.others")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				emote(player);
 			})
 			.register();
@@ -367,7 +367,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.opentrinketgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new KnickKnackSackGui(player).open();
 			})
 			.register();
@@ -375,7 +375,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openascensiongui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player p = (Player) args[0];
+				Player p = args.getUnchecked("player");
 				new DepthsAscensionGUI(p).open();
 			}).register();
 
@@ -383,16 +383,18 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openmusicgui")
 			.withArguments(
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(Arrays.stream(MusicGui.MusicPage.values()).map(page -> page.mLabel).toArray(String[]::new)),
+				new MultiLiteralArgument("page", Arrays.stream(MusicGui.MusicPage.values()).map(page -> page.mLabel).toArray(String[]::new))
+			)
+			.withOptionalArguments(
 				new BooleanArgument("fromRecordPlayer"),
 				new BooleanArgument("playToOthers")
 			)
 			.executes((sender, args) -> {
-				Player p = (Player) args[0];
-				String label = (String) args[1];
+				Player p = args.getUnchecked("player");
+				String label = args.getUnchecked("page");
 				MusicGui.MusicPage musicPage = Arrays.stream(MusicGui.MusicPage.values()).filter(page -> page.mLabel.equals(label)).findAny().orElse(null);
-				boolean fromRecordPlayer = (boolean) args[2];
-				boolean playToOthers = (boolean) args[3];
+				boolean fromRecordPlayer = args.getOrDefaultUnchecked("fromRecordPlayer", false);
+				boolean playToOthers = args.getOrDefaultUnchecked("playToOthers", false);
 				if (musicPage != null) {
 					new MusicGui(p, musicPage, fromRecordPlayer, playToOthers).open();
 				}
@@ -408,7 +410,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openenchantexplanations.others")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new EnchantopediaGui(player).open();
 			})
 			.register();

@@ -27,7 +27,6 @@ public class SiriusNPCBoss extends BossAbilityGroup {
 	private static final String PERMISSION = "monumenta.commands.siriustalknpc";
 	private static final String NPC_TAG = "siriusNPC";
 
-
 	public static void register() {
 		new CommandAPICommand(COMMAND)
 			// Syntax:
@@ -36,12 +35,12 @@ public class SiriusNPCBoss extends BossAbilityGroup {
 			// @N is the UUID of the npc entity
 			.withPermission(CommandPermission.fromString(PERMISSION))
 			.withArguments(
-				new EntitySelectorArgument.OnePlayer("players"),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new EntitySelectorArgument.OneEntity("npc")
 			)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				Entity npc = (Entity) args[1];
+				Player player = args.getUnchecked("player");
+				Entity npc = args.getUnchecked("npc");
 				SiriusNPCBoss talkNPC = BossUtils.getBossOfClass(npc, SiriusNPCBoss.class);
 				if (talkNPC != null) {
 					talkNPC.onInteract(player);
@@ -65,18 +64,15 @@ public class SiriusNPCBoss extends BossAbilityGroup {
 			MMLog.warning("SiriusNPCBoss: Sirius wasn't found! (This is a bug)");
 			return null;
 		}
-		return new SiriusNPCBoss(plugin, boss, sirius);
+		return new SiriusNPCBoss(plugin, boss);
 	}
 
 	public static String identityTag = "boss_siriusnpc";
-	@SuppressWarnings("unused")
-	private final Sirius mSirius;
 
-	public SiriusNPCBoss(Plugin plugin, LivingEntity boss, Sirius sirius) {
+	public SiriusNPCBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		boss.addScoreboardTag(NPC_TAG);
 		//Sirius is here in case we want to add mid fight npc talk.
-		mSirius = sirius;
 		super.constructBoss(SpellManager.EMPTY, List.of(), 100, null);
 
 	}

@@ -17,8 +17,8 @@ public class BlockDisplayCommand {
 						new LocationArgument("corner2", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {
-						Location corner1 = (Location) args[0];
-						Location corner2 = (Location) args[1];
+						Location corner1 = args.getUnchecked("corner1");
+						Location corner2 = args.getUnchecked("corner2");
 						DisplayEntityUtils.turnBlockCuboidIntoBlockDisplays(corner1, corner2);
 					}),
 				new CommandAPICommand("displaysToBlocks")
@@ -27,8 +27,8 @@ public class BlockDisplayCommand {
 						new LocationArgument("corner2", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {
-						Location corner1 = (Location) args[0];
-						Location corner2 = (Location) args[1];
+						Location corner1 = args.getUnchecked("corner1");
+						Location corner2 = args.getUnchecked("corner2");
 						DisplayEntityUtils.turnBlockDisplayCuboidIntoBlocks(corner1, corner2);
 					})
 		).register();

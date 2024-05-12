@@ -30,7 +30,7 @@ public class TestGuild {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
-				run((String) args[1], (Player) args[0]);
+				run(args.getUnchecked("guild name"), args.getUnchecked("player"));
 			})
 			.register();
 	}

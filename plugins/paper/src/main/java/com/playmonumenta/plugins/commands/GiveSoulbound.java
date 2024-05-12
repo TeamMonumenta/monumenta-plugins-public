@@ -32,8 +32,8 @@ public class GiveSoulbound extends GenericCommand {
 			.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 			.withArguments(new ItemStackArgument("item"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>)args[0]) {
-					give(player, (ItemStack)args[1]);
+				for (Player player : (Collection<Player>) args.get("players")) {
+					give(player, args.getUnchecked("item"));
 				}
 			})
 			.register();
@@ -43,8 +43,8 @@ public class GiveSoulbound extends GenericCommand {
 			.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 			.withArguments(new LootTableArgument("item_loot_table"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>)args[0]) {
-					LootTable table = (LootTable)args[1];
+				for (Player player : (Collection<Player>) args.get("players")) {
+					LootTable table = args.getUnchecked("item_loot_table");
 					if (table != null) {
 						Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, new LootContext.Builder(player.getLocation()).build());
 						if (!loot.isEmpty()) {

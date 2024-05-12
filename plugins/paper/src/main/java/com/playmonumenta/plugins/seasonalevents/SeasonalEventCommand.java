@@ -8,7 +8,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		// Add battlepass reload command
 		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new MultiLiteralArgument("reload"));
+		arguments.add(new LiteralArgument("reload"));
 
 		new CommandAPICommand("battlepass")
 			.withPermission(perms)
@@ -38,31 +38,29 @@ public class SeasonalEventCommand extends GenericCommand {
 		// Get current xp of player
 
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("getxp"));
+		arguments.add(new LiteralArgument("getxp"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("battlepass")
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[1];
-				if (sender instanceof Player senderPlayer) {
-					senderPlayer.sendMessage(Component.text(SeasonalEventManager.getMP(player)));
-				}
+				Player player = args.getUnchecked("player");
+				sender.sendMessage(Component.text(SeasonalEventManager.getMP(player)));
 			})
 			.register();
 
 		//Battlepass GUI command
 
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("gui"));
+		arguments.add(new LiteralArgument("gui"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("battlepass")
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[1];
+				Player player = args.getUnchecked("player");
 				LocalDateTime now = DateUtils.localDateTime();
 				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
 				if (seasonalPass == null) {
@@ -72,15 +70,15 @@ public class SeasonalEventCommand extends GenericCommand {
 				new PassGui(seasonalPass, player, player, now, false).open();
 			}).register();
 
-		arguments.add(new MultiLiteralArgument("view"));
+		arguments.add(new LiteralArgument("view"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("other"));
 
 		new CommandAPICommand("battlepass")
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[1];
-				Player otherPlayer = (Player) args[3];
+				Player player = args.getUnchecked("player");
+				Player otherPlayer = args.getUnchecked("other");
 				LocalDateTime now = DateUtils.localDateTime();
 				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
 				if (seasonalPass == null) {
@@ -92,17 +90,17 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		//GUI command with specific week
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("gui"));
+		arguments.add(new LiteralArgument("gui"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new MultiLiteralArgument("week"));
+		arguments.add(new LiteralArgument("week"));
 		arguments.add(new IntegerArgument("week"));
 
 		new CommandAPICommand("battlepass")
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[1];
-				int week = (int) args[3];
+				Player player = args.getUnchecked("player");
+				int week = args.getUnchecked("week");
 				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
 				if (seasonalPass == null) {
 					player.sendMessage(Component.text("Could not load a season pass", NamedTextColor.RED));
@@ -114,9 +112,9 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		//GUI command with specific date
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("gui"));
+		arguments.add(new LiteralArgument("gui"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new MultiLiteralArgument("date"));
+		arguments.add(new LiteralArgument("date"));
 		arguments.add(new IntegerArgument("year", 2022));
 		arguments.add(new IntegerArgument("month", 1, 12));
 		arguments.add(new IntegerArgument("day", 1, 31));
@@ -125,10 +123,10 @@ public class SeasonalEventCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[1];
-				int year = (Integer) args[3];
-				int month = (Integer) args[4];
-				int dayOfMonth = (Integer) args[5];
+				Player player = args.getUnchecked("player");
+				int year = args.getUnchecked("year");
+				int month = args.getUnchecked("month");
+				int dayOfMonth = args.getUnchecked("day");
 				LocalDateTime dateTime = LocalDateTime.of(year, month, dayOfMonth, 0, 0);
 
 				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
@@ -140,7 +138,7 @@ public class SeasonalEventCommand extends GenericCommand {
 			}).register();
 
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("modgui"));
+		arguments.add(new LiteralArgument("modgui"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("other"));
 
@@ -148,8 +146,8 @@ public class SeasonalEventCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[1];
-				Player otherPlayer = (Player) args[2];
+				Player player = args.getUnchecked("player");
+				Player otherPlayer = args.getUnchecked("other");
 				LocalDateTime now = DateUtils.localDateTime();
 				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
 				if (seasonalPass == null) {

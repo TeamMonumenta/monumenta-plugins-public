@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.StringUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.DoubleArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,18 +27,18 @@ public class PartialParticleCommand {
 		new CommandAPICommand("partialparticle")
 			.withPermission("monumenta.command.partialparticle")
 			.withSubcommand(new CommandAPICommand("logging")
-				                .withArguments(new MultiLiteralArgument("start"))
+				                .withArguments(new LiteralArgument("start"))
 				                .executes((sender, args) -> {
 					                start(sender, 20);
 				                }))
 			.withSubcommand(new CommandAPICommand("logging")
-				                .withArguments(new MultiLiteralArgument("start"),
+				                .withArguments(new LiteralArgument("start"),
 					                new DoubleArgument("period in seconds", 0.05, 60))
 				                .executes((sender, args) -> {
-					                start(sender, Math.max(1, (int) (20 * (double) args[0])));
+					                start(sender, Math.max(1, (int) (20 * (double) args.get("period in seconds"))));
 				                }))
 			.withSubcommand(new CommandAPICommand("logging")
-				                .withArguments(new MultiLiteralArgument("stop"))
+				                .withArguments(new LiteralArgument("stop"))
 				                .executes((sender, args) -> {
 					                UUID uuid = sender instanceof Player player ? player.getUniqueId() : CONSOLE_UUID;
 					                BukkitTask task = mPlayerLoggingTasks.remove(uuid);

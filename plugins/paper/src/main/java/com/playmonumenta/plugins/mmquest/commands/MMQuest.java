@@ -59,8 +59,8 @@ public class MMQuest {
 			.withAliases("mmq")       // Command aliases
 			.withPermission(CommandPermission.OP)
 			.executes((sender, args) -> {
-				Player target = (Player) args[0];
-				String questArgument = (String) args[1];
+				Player target = args.getUnchecked("target");
+				String questArgument = args.getUnchecked("quest_name");
 				Quest quest = getQuestInstance(questArgument);
 				// NOTE: 'player' is the player who ran the command, while 'target' is the player to grab quest scores from.
 				//          we want to run functions on 'target', but send the final message component to 'player'.
@@ -137,14 +137,14 @@ public class MMQuest {
 			.withAliases("mmq")       // Command aliases
 			.withPermission(CommandPermission.OP)
 			.executes((sender, args) -> {
-				Player target = (Player) args[0];
-				String questArgument = (String) args[1];
+				Player target = args.getUnchecked("target");
+				String questArgument = args.getUnchecked("quest_name");
 				Quest quest = getQuestInstance(questArgument);
 				if (quest == null) {
 					throw CommandAPI.failWithString("The alias for this quest does not exist!");
 				}
 				// VALUE ARGUMENT CODE:
-				int valueArgumentInt = (int) args[2];
+				int valueArgumentInt = args.getUnchecked("value");
 
 				// Set the player score to that value.
 				//  NOTE: this code is similar to our getPlayerScore() method of the Quest class.

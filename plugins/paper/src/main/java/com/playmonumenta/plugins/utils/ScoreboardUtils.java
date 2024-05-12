@@ -15,24 +15,37 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
 public class ScoreboardUtils {
+	public static OptionalInt getScoreboardValue(String scoreHolder, Objective objective) {
+		Score score = objective.getScore(scoreHolder);
+		if (score.isScoreSet()) {
+			return OptionalInt.of(score.getScore());
+		}
+		return OptionalInt.empty();
+	}
+
 	public static OptionalInt getScoreboardValue(String scoreHolder, String objectiveName) {
 		OptionalInt scoreValue = OptionalInt.empty();
 		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
 		if (objective != null) {
-			Score score = objective.getScore(scoreHolder);
-			if (score.isScoreSet()) {
-				scoreValue = OptionalInt.of(score.getScore());
-			}
+			return getScoreboardValue(scoreHolder, objective);
 		}
 
 		return scoreValue;
 	}
 
+	public static OptionalInt getScoreboardValue(Entity entity, Objective objective) {
+		return getScoreboardValue(getScoreHolderName(entity), objective);
+	}
+
 	public static OptionalInt getScoreboardValue(Entity entity, String objectiveName) {
+		return getScoreboardValue(getScoreHolderName(entity), objectiveName);
+	}
+
+	public static String getScoreHolderName(Entity entity) {
 		if (entity instanceof Player) {
-			return getScoreboardValue(entity.getName(), objectiveName);
+			return entity.getName();
 		} else {
-			return getScoreboardValue(entity.getUniqueId().toString(), objectiveName);
+			return entity.getUniqueId().toString();
 		}
 	}
 

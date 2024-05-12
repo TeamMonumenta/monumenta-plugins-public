@@ -25,31 +25,31 @@ public class DepthsGUICommands {
 			.withSubcommand(new CommandAPICommand("summary")
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((sender, args) -> {
-					Player player = (Player) args[0];
+					Player player = args.getUnchecked("player");
 					summary(plugin, player);
 				}))
 			.withSubcommand(new CommandAPICommand("roomchoice")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 						roomChoice(plugin, player);
 					}))
 			.withSubcommand(new CommandAPICommand("upgrade")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 						upgrade(plugin, player, false);
 					}))
 			.withSubcommand(new CommandAPICommand("ability")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 						ability(plugin, player, false);
 					}))
 			.withSubcommand(new CommandAPICommand("weaponaspect")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 						//If the player is not in the system or they already have selected a weapon aspect, return
 						DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
 						if (depthsPlayer == null || depthsPlayer.mHasWeaponAspect) {
@@ -67,9 +67,9 @@ public class DepthsGUICommands {
 			.withSubcommand(new CommandAPICommand("removeability")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 
-						DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+						DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
 						if (depthsPlayer == null || depthsPlayer.mUsedAbilityDeletion) {
 							MessagingUtils.sendActionBarMessage(player, "You've already removed your ability for this floor!");
 							return;
@@ -84,9 +84,9 @@ public class DepthsGUICommands {
 			.withSubcommand(new CommandAPICommand("mutateability")
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((sender, args) -> {
-					Player player = (Player) args[0];
+					Player player = args.getUnchecked("player");
 
-					DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+					DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
 					if (depthsPlayer == null || depthsPlayer.mUsedAbilityMutation) {
 						MessagingUtils.sendActionBarMessage(player, "You've already mutated an ability on this floor!");
 						return;

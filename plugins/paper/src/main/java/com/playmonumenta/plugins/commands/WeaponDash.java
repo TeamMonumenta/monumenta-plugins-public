@@ -31,14 +31,14 @@ public class WeaponDash extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Location playerLoc = player.getLocation();
 				playerLoc.setPitch(0);
 				Vector v = playerLoc.getDirection();
-				v.multiply((double) args[1]);
-				v.setY((double) args[2]);
+				v.multiply(args.getUnchecked("horizontal"));
+				v.setY(args.getUnchecked("vertical"));
 				player.setVelocity(v);
-				player.setNoDamageTicks((int) args[3]);
+				player.setNoDamageTicks(args.getUnchecked("duration"));
 				player.getNoDamageTicks();
 
 

@@ -40,7 +40,7 @@ public class PickLevelAfterAnvils extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run((Player)args[0]);
+				run(args.getUnchecked("player"));
 			})
 			.register();
 	}

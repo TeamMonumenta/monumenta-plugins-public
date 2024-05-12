@@ -18,7 +18,7 @@ public class RegisterTorch {
 			.withPermission(PERM)
 			.withArguments(new LocationArgument("location"))
 			.executes((sender, args) -> {
-				Location loc = (Location) args[0];
+				Location loc = args.getUnchecked("location");
 				Block block = loc.getBlock();
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 					if (BlockUtils.isTorch(block)) {

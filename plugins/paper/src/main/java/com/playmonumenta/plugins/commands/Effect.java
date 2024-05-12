@@ -12,7 +12,6 @@ import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.PotionEffectArgument;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,88 +38,45 @@ public class Effect {
 
 		/* Add effects (/effect give) */
 		List<Argument<?>> arguments = new ArrayList<>();
-
-		arguments.add(new MultiLiteralArgument("give"));
+		arguments.add(new LiteralArgument("give"));
 		arguments.add(new EntitySelectorArgument.ManyEntities("entity"));
 		arguments.add(new PotionEffectArgument("effect"));
-		new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					giveEffect(plugin, sender, (Collection<Entity>) args[1],
-							(PotionEffectType) args[2], 30, 0, false);
-				})
-				.register();
 
-		arguments.add(new IntegerArgument("seconds", 1));
 		new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					giveEffect(plugin, sender, (Collection<Entity>) args[1],
-							(PotionEffectType) args[2], (Integer) args[3],
-							0, false);
-				})
-				.register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.withOptionalArguments(
+				new IntegerArgument("seconds", 1),
+				new IntegerArgument("amplifier", 0),
+				new BooleanArgument("hideParticles")
+			)
+			.executes((sender, args) -> {
+				giveEffect(plugin, sender, (Collection<Entity>) args.get("entity"), args.getUnchecked("effect"), args.getOrDefaultUnchecked("seconds", 30), args.getOrDefaultUnchecked("amplifier", 0), args.getOrDefaultUnchecked("hideParticles", false));
+			}).register();
 
-		registerPostSecondsArguments(plugin, arguments, perms);
-		arguments = arguments.subList(0, arguments.size() - 3);
 		arguments.add(new LiteralArgument("infinite"));
 		new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					giveEffect(plugin, sender, (Collection<Entity>) args[1],
-							(PotionEffectType) args[2], -1, 0, false);
-				})
-				.register();
-		registerPostSecondsArguments(plugin, arguments, perms);
+			.withPermission(perms)
+			.withArguments(arguments)
+			.withOptionalArguments(
+				new IntegerArgument("amplifier", 0),
+				new BooleanArgument("hideParticles")
+			)
+			.executes((sender, args) -> {
+				giveEffect(plugin, sender, (Collection<Entity>) args.get("entity"), args.getUnchecked("effect"), -1, args.getOrDefaultUnchecked("amplifier", 0), args.getOrDefaultUnchecked("hideParticles", false));
+			}).register();
+
 
 		/* Clear effects (/effect clear) */
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("clear"));
+		arguments.add(new LiteralArgument("clear"));
 		arguments.add(new EntitySelectorArgument.ManyEntities("entity"));
 		new CommandAPICommand(COMMAND)
 				.withPermission(perms)
 				.withArguments(arguments)
+				.withOptionalArguments(new PotionEffectArgument("effect"))
 				.executes((sender, args) -> {
-					clearEffect(plugin, sender, (Collection<Entity>) args[1], null);
-				})
-				.register();
-
-		arguments.add(new PotionEffectArgument("effect"));
-		new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					clearEffect(plugin, sender, (Collection<Entity>) args[1], (PotionEffectType) args[2]);
-				})
-				.register();
-	}
-
-	@SuppressWarnings("unchecked")
-	private static void registerPostSecondsArguments(Plugin plugin, List<Argument<?>> arguments, CommandPermission perms) {
-		arguments.add(new IntegerArgument("amplifier", 0));
-		new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					boolean isInfinite = args.length == 4;
-					giveEffect(plugin, sender, (Collection<Entity>) args[1],
-							(PotionEffectType) args[2], !isInfinite ? (Integer) args[3] : -1,
-							(Integer) args[!isInfinite ? 4 : 3], false);
-				})
-				.register();
-
-		arguments.add(new BooleanArgument("hideParticles"));
-		new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					boolean isInfinite = args.length == 5;
-					giveEffect(plugin, sender, (Collection<Entity>) args[1],
-							(PotionEffectType) args[2], !isInfinite ? (Integer) args[3] : -1,
-							(Integer) args[!isInfinite ? 4 : 3], (Boolean) args[!isInfinite ? 5 : 4]);
+					clearEffect(plugin, sender, (Collection<Entity>) args.get("entity"), args.getUnchecked("effect"));
 				})
 				.register();
 	}

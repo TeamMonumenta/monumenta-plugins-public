@@ -62,6 +62,8 @@ public class ScanMobsCommand {
 	);
 
 	public static void register() {
+		IntegerArgument countArg = new IntegerArgument("count");
+
 		new CommandAPICommand("scanmobs")
 			.withPermission("monumenta.command.scanmobs")
 			.withArguments(new LiteralArgument("armor"), new LiteralArgument("refresh"))
@@ -72,15 +74,9 @@ public class ScanMobsCommand {
 		new CommandAPICommand("scanmobs")
 			.withPermission("monumenta.command.scanmobs")
 			.withArguments(new LiteralArgument("armor"), new LiteralArgument("get"))
+			.withOptionalArguments(countArg)
 			.executesPlayer((player, args) -> {
-				getArmor(player, 1);
-			}).register();
-
-		new CommandAPICommand("scanmobs")
-			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("armor"), new LiteralArgument("get"), new IntegerArgument("count"))
-			.executesPlayer((player, args) -> {
-				getArmor(player, (int) args[0]);
+				getArmor(player, args.getByArgumentOrDefault(countArg, 1));
 			}).register();
 
 		new CommandAPICommand("scanmobs")
@@ -93,15 +89,9 @@ public class ScanMobsCommand {
 		new CommandAPICommand("scanmobs")
 			.withPermission("monumenta.command.scanmobs")
 			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("get"))
+			.withOptionalArguments(countArg)
 			.executesPlayer((player, args) -> {
-				getEquipment(player, 1);
-			}).register();
-
-		new CommandAPICommand("scanmobs")
-			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("get"), new IntegerArgument("count"))
-			.executesPlayer((player, args) -> {
-				getEquipment(player, (int) args[0]);
+				getEquipment(player, args.getByArgumentOrDefault(countArg, 1));
 			}).register();
 
 		new CommandAPICommand("scanmobs")
@@ -114,15 +104,9 @@ public class ScanMobsCommand {
 		new CommandAPICommand("scanmobs")
 			.withPermission("monumenta.command.scanmobs")
 			.withArguments(new LiteralArgument("health"), new LiteralArgument("get"))
+			.withOptionalArguments(countArg)
 			.executesPlayer((player, args) -> {
-				getHealth(player, 1);
-			}).register();
-
-		new CommandAPICommand("scanmobs")
-			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("health"), new LiteralArgument("get"), new IntegerArgument("count"))
-			.executesPlayer((player, args) -> {
-				getHealth(player, (int) args[0]);
+				getHealth(player, args.getByArgumentOrDefault(countArg, 1));
 			}).register();
 	}
 

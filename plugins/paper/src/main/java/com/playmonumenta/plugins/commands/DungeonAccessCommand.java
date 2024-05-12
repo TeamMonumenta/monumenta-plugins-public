@@ -61,43 +61,12 @@ public class DungeonAccessCommand extends GenericCommand {
 				new AngleArgument("return yaw"),
 				new FloatArgument("return pitch")
 			)
-			.executes((sender, args) -> {
-				startNew((Player) args[0], (Collection<Player>) args[1], getMapping((String) args[2]), (Location) args[3], (Float) args[4], (Float) args[5], 0, false);
-			})
-			.register();
-
-		new CommandAPICommand("dungeonaccess")
-			.withPermission(perms)
-			.withArguments(
-				new LiteralArgument("new"),
-				new EntitySelectorArgument.OnePlayer("key player"),
-				new EntitySelectorArgument.ManyPlayers("other players"),
-				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
-				new LocationArgument("return location"),
-				new AngleArgument("return yaw"),
-				new FloatArgument("return pitch"),
-				new IntegerArgument("type")
-			)
-			.executes((sender, args) -> {
-				startNew((Player) args[0], (Collection<Player>) args[1], getMapping((String) args[2]), (Location) args[3], (Float) args[4], (Float) args[5], (Integer) args[6], false);
-			})
-			.register();
-
-		new CommandAPICommand("dungeonaccess")
-			.withPermission(perms)
-			.withArguments(
-				new LiteralArgument("new"),
-				new EntitySelectorArgument.OnePlayer("key player"),
-				new EntitySelectorArgument.ManyPlayers("other players"),
-				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
-				new LocationArgument("return location"),
-				new AngleArgument("return yaw"),
-				new FloatArgument("return pitch"),
+			.withOptionalArguments(
 				new IntegerArgument("type"),
 				new BooleanArgument("useDelvePreset")
 			)
 			.executes((sender, args) -> {
-				startNew((Player) args[0], (Collection<Player>) args[1], getMapping((String) args[2]), (Location) args[3], (Float) args[4], (Float) args[5], (Integer) args[6], (Boolean) args[7]);
+				startNew(args.getUnchecked("key player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"), args.getOrDefaultUnchecked("type", 0), args.getOrDefaultUnchecked("type", false));
 			})
 			.register();
 
@@ -113,7 +82,7 @@ public class DungeonAccessCommand extends GenericCommand {
 				new FloatArgument("return pitch")
 			)
 			.executes((sender, args) -> {
-				invite((Player) args[0], (Collection<Player>) args[1], getMapping((String) args[2]), (Location) args[3], (Float) args[4], (Float) args[5]);
+				invite(args.getUnchecked("inviting player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
 			})
 			.register();
 
@@ -128,7 +97,7 @@ public class DungeonAccessCommand extends GenericCommand {
 				new FloatArgument("return pitch")
 			)
 			.executes((sender, args) -> {
-				send((Collection<Player>) args[0], getMapping((String) args[1]), (Location) args[2], (Float) args[3], (Float) args[4]);
+				send((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
 			})
 			.register();
 
@@ -140,7 +109,7 @@ public class DungeonAccessCommand extends GenericCommand {
 				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons))
 			)
 			.executes((sender, args) -> {
-				abandon((Collection<Player>) args[0], getMapping((String) args[1]));
+				abandon((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")));
 			})
 			.register();
 	}

@@ -39,7 +39,11 @@ public enum Slot {
 		return mDisplay;
 	}
 
-	public static @Nullable Slot getSlot(String name) {
+	public static @Nullable Slot getSlot(@Nullable String name) {
+		if (name == null) {
+			return null;
+		}
+
 		for (Slot slot : Slot.values()) {
 			if (slot.getName().replace(" ", "").equals(name.replace(" ", ""))) {
 				return slot;

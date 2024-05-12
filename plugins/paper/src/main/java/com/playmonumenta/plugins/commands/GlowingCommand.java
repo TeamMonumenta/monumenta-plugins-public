@@ -131,8 +131,8 @@ public class GlowingCommand {
 		// enable/disable option can take a variable amount of options as arguments
 		String[] optionLiterals = Arrays.stream(Option.values()).map(o -> o.name().toLowerCase(Locale.ROOT)).toArray(String[]::new);
 		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new MultiLiteralArgument("enable", "disable", "toggle"));
-		arguments.add(new MultiLiteralArgument(optionLiterals));
+		arguments.add(new MultiLiteralArgument("action", "enable", "disable", "toggle"));
+		arguments.add(new MultiLiteralArgument("option", optionLiterals));
 		for (int i = 0; i < optionLiterals.length - 2; i++) { // -1 for "all", and another -1 because listing every single option makes no sense
 			if (i != 0) {
 				arguments.add(new StringArgument("option" + (i + 1)).replaceSuggestions(ArgumentSuggestions.strings(info -> Arrays.stream(optionLiterals)
@@ -144,7 +144,7 @@ public class GlowingCommand {
 					.withPermission(PERMISSION)
 					.withArguments(arguments)
 					.executesPlayer((player, args) -> {
-						setOptions(player, (Object[]) Arrays.copyOfRange(args, 1, args.length), (String) args[0]);
+						setOptions(player, Arrays.copyOfRange(args.args(), 1, args.count()), args.getUnchecked("action"));
 					})
 					.register();
 

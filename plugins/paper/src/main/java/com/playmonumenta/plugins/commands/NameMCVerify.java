@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -27,7 +28,7 @@ public class NameMCVerify extends GenericCommand {
 			.withArguments(new FunctionArgument("function"))
 			.executes((sender, args) -> {
 				Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-					Player player = (Player)args[0];
+					Player player = args.getUnchecked("player");
 					try {
 						URL url = new URL("https://api.namemc.com/server/server.playmonumenta.com/likes?profile=" + player.getUniqueId());
 
@@ -40,18 +41,19 @@ public class NameMCVerify extends GenericCommand {
 						if (responsecode != HttpURLConnection.HTTP_OK) {
 							throw new Exception("NameMC Request failed : HTTP error code : " + responsecode);
 						} else {
-							try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+							try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
 								StringBuilder response = new StringBuilder();
 								String responseLine = null;
 								while ((responseLine = br.readLine()) != null) {
 									response.append(responseLine.trim());
 								}
-								MMLog.fine("Got request from NameMC API for player " + player.getName() + ": " + response.toString());
+								MMLog.fine("Got request from NameMC API for player " + player.getName() + ": " + response);
 
 								Bukkit.getScheduler().runTask(plugin, () -> {
 									int val = response.toString().equals("true") ? 1 : 0;
-									ScoreboardUtils.setScoreboardValue(player, (String)args[1], val);
-									for (FunctionWrapper func : (FunctionWrapper[])args[2]) {
+									ScoreboardUtils.setScoreboardValue(player, args.getUnchecked("objective"), val);
+									FunctionWrapper[] functions = args.getUnchecked("function");
+									for (FunctionWrapper func : functions) {
 										func.run();
 									}
 								});

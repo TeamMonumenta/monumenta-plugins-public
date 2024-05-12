@@ -9,9 +9,9 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.LocationType;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,9 +45,9 @@ public class BulkGuildBanners {
 
 	public static void register(Plugin plugin) {
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("bulkbanners"))
-			.withArguments(new MultiLiteralArgument("get"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("bulkbanners"))
+			.withArguments(new LiteralArgument("get"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, PERMISSION);
 				runGet(plugin, sender);
@@ -55,15 +55,15 @@ public class BulkGuildBanners {
 			.register();
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("bulkbanners"))
-			.withArguments(new MultiLiteralArgument("load"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("bulkbanners"))
+			.withArguments(new LiteralArgument("load"))
 			.withArguments(new LocationArgument("from", LocationType.BLOCK_POSITION))
 			.withArguments(new LocationArgument("to", LocationType.BLOCK_POSITION))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, PERMISSION);
-				Location from = (Location) args[args.length - 2];
-				Location to = (Location) args[args.length - 1];
+				Location from = args.getUnchecked("from");
+				Location to = args.getUnchecked("to");
 				runLoad(plugin, sender, from, to);
 			})
 			.register();

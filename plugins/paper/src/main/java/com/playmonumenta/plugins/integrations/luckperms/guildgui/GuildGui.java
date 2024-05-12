@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class GuildGui extends Gui {
 		CommandPermission permsMod = CommandPermission.fromString("monumenta.command.guild.mod.gui");
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("gui"))
+			.withArguments(new LiteralArgument("gui"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
 				run(plugin, sender, null, null, null);
@@ -84,8 +84,8 @@ public class GuildGui extends Gui {
 
 		for (Map.Entry<String, Consumer<GuildGui>> viewEntry : VIEW_ARGUMENTS.entrySet()) {
 			new CommandAPICommand("guild")
-				.withArguments(new MultiLiteralArgument("gui"))
-				.withArguments(new MultiLiteralArgument(viewEntry.getKey()))
+				.withArguments(new LiteralArgument("gui"))
+				.withArguments(new LiteralArgument(viewEntry.getKey()))
 				.executes((sender, args) -> {
 					CommandUtils.checkPerm(sender, perms);
 					run(plugin, sender, null, null, viewEntry.getValue());
@@ -94,24 +94,24 @@ public class GuildGui extends Gui {
 		}
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("gui"))
-			.withArguments(new MultiLiteralArgument("player"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("gui"))
+			.withArguments(new LiteralArgument("player"))
 			.withArguments(new TextArgument("player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, permsMod);
-				run(plugin, sender, (String) args[args.length - 1], null, null);
+				run(plugin, sender, args.getUnchecked("player"), null, null);
 			})
 			.register();
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("gui"))
-			.withArguments(new MultiLiteralArgument("guild"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("gui"))
+			.withArguments(new LiteralArgument("guild"))
 			.withArguments(new TextArgument("guild name").replaceSuggestions(GuildArguments.NAME_SUGGESTIONS))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, permsMod);
-				run(plugin, sender, null, (String) args[args.length - 1], null);
+				run(plugin, sender, null, args.getUnchecked("guild name"), null);
 			})
 			.register();
 	}

@@ -34,9 +34,9 @@ public class TransferLPPermissions {
 	private static final int MAX_REMOVAL_TIME = Constants.FIVE_MINUTES * 50; //5 minutes in milliseconds.
 
 	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.transferpermissions");
-	private static final Argument<String> FROM_ARG = new StringArgument("from")
+	private static final Argument<?> FROM_ARG = new StringArgument("from")
 		.replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS);
-	private static final Argument<Player> TARGET_ARG = new EntitySelectorArgument.OnePlayer("target");
+	private static final Argument<?> TARGET_ARG = new EntitySelectorArgument.OnePlayer("target");
 
 	private static final ConcurrentMap<UUID, TransferPermissionContext> awaitingConfirmations = new ConcurrentHashMap<>();
 
@@ -55,8 +55,8 @@ public class TransferLPPermissions {
 						return;
 					}
 
-					String fromUser = (String) args[0];
-					Player targetPlayer = (Player) args[1];
+					String fromUser = args.getUnchecked("from");
+					Player targetPlayer = args.getUnchecked("target");
 
 					UUID fromUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(fromUser);
 					if (fromUUID == null) {
@@ -76,7 +76,7 @@ public class TransferLPPermissions {
 										return;
 									}
 
-									UUID confirmationUUID = (UUID) args[0];
+									UUID confirmationUUID = args.getUnchecked("uuid");
 
 									if (!awaitingConfirmations.containsKey(confirmationUUID)) {
 										throw CommandAPI.failWithString("Could not get context for given UUID");
@@ -92,7 +92,7 @@ public class TransferLPPermissions {
 										return;
 									}
 
-									UUID confirmationUUID = (UUID) args[0];
+									UUID confirmationUUID = args.getUnchecked("uuid");
 
 									if (!awaitingConfirmations.containsKey(confirmationUUID)) {
 										throw CommandAPI.failWithString("Could not get context for given UUID");

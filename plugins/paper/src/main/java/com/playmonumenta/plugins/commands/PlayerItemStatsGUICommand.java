@@ -22,7 +22,7 @@ public class PlayerItemStatsGUICommand {
 		new CommandAPICommand("playerstats").withPermission(perms).withAliases("ps")
 			.withArguments(new EntitySelectorArgument.OnePlayer("other player"))
 			.executesPlayer((sender, args) -> {
-				Player otherPlayer = (Player) args[0];
+				Player otherPlayer = args.getUnchecked("other player");
 				if (!PremiumVanishIntegration.canSee(sender, otherPlayer)) {
 					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
 					return;
@@ -33,8 +33,8 @@ public class PlayerItemStatsGUICommand {
 		new CommandAPICommand("playerstats").withPermission(perms).withAliases("ps")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player1"), new EntitySelectorArgument.OnePlayer("player2"))
 			.executesPlayer((sender, args) -> {
-				Player player1 = (Player) args[0];
-				Player player2 = (Player) args[1];
+				Player player1 = args.getUnchecked("player1");
+				Player player2 = args.getUnchecked("player2");
 				if (!PremiumVanishIntegration.canSee(sender, player1) || !PremiumVanishIntegration.canSee(sender, player2)) {
 					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
 					return;

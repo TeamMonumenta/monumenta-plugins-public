@@ -67,45 +67,19 @@ public class ParticleUtilsCommand {
 						distanceFalloffArgument,
 						extraDataArgument
 					)
+					.withOptionalArguments(new EntitySelectorArgument.ManyPlayers("allowed viewers"))
 					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[3]);
-						double distanceFalloff = (double) args[4];
-
+						Particle particle = Particle.valueOf(args.getUnchecked("particle"));
+						double distanceFalloff = args.getUnchecked("distance falloff");
 						doLine(
 							getFinalCallee(sender, distanceFalloff),
-							(Location) args[0],
-							(Location) args[1],
-							(double) args[2],
+							args.getUnchecked("start"),
+							args.getUnchecked("end"),
+							args.getUnchecked("count per meter"),
 							particle,
 							distanceFalloff,
-							parseExtraData((String) args[5], particle),
-							null
-						);
-					}),
-				// Line - optional player selector argument
-				new CommandAPICommand("line")
-					.withPermission("monumenta.particleutils.line")
-					.withArguments(
-						new LocationArgument("start"),
-						new LocationArgument("end"),
-						new DoubleArgument("count per meter"),
-						particleArgument,
-						distanceFalloffArgument,
-						extraDataArgument,
-						new EntitySelectorArgument.ManyPlayers("allowed viewers")
-					)
-					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[3]);
-						double distanceFalloff = (double) args[4];
-						doLine(
-							getFinalCallee(sender, distanceFalloff),
-							(Location) args[0],
-							(Location) args[1],
-							(double) args[2],
-							particle,
-							distanceFalloff,
-							parseExtraData((String) args[5], particle),
-							(List<Player>) args[6]
+							parseExtraData(args.getUnchecked("extra data"), particle),
+							(List<Player>) args.get("allowed viewers")
 						);
 					}),
 				// Rectangle
@@ -120,51 +94,22 @@ public class ParticleUtilsCommand {
 						distanceFalloffArgument,
 						extraDataArgument
 					)
+					.withOptionalArguments(new EntitySelectorArgument.ManyPlayers("allowed viewers"))
 					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[4]);
-						double distanceFalloff = (double) args[5];
-						String extraData = (String) args[6];
+						Particle particle = Particle.valueOf(args.getUnchecked("particle"));
+						double distanceFalloff = args.getUnchecked("distance falloff");
+						String extraData = args.getUnchecked("extra data");
 
 						doRectangle(
 							getFinalCallee(sender, distanceFalloff),
-							(Location) args[0],
-							(double) args[1],
-							(double) args[2],
-							(double) args[3],
+							args.getUnchecked("start"),
+							args.getUnchecked("dx"),
+							args.getUnchecked("dz"),
+							args.getUnchecked("count per meter"),
 							particle,
 							distanceFalloff,
 							parseExtraData(extraData, particle),
-							null
-						);
-					}),
-				// Rectangle - optional player selector argument
-				new CommandAPICommand("rectangle")
-					.withPermission("monumenta.particleutils.rectangle")
-					.withArguments(
-						new LocationArgument("start"),
-						new DoubleArgument("dx"),
-						new DoubleArgument("dz"),
-						new DoubleArgument("count per meter"),
-						particleArgument,
-						distanceFalloffArgument,
-						extraDataArgument,
-						new EntitySelectorArgument.ManyPlayers("allowed viewers")
-					)
-					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[4]);
-						double distanceFalloff = (double) args[5];
-						String extraData = (String) args[6];
-
-						doRectangle(
-							getFinalCallee(sender, distanceFalloff),
-							(Location) args[0],
-							(double) args[1],
-							(double) args[2],
-							(double) args[3],
-							particle,
-							distanceFalloff,
-							parseExtraData(extraData, particle),
-							(List<Player>) args[7]
+							(List<Player>) args.get("allowed viewers")
 						);
 					}),
 				// Circle
@@ -179,22 +124,23 @@ public class ParticleUtilsCommand {
 						distanceFalloffArgument,
 						extraDataArgument
 					)
+					.withOptionalArguments(new LocationArgument("normal"))
 					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[4]);
-						double distanceFalloff = (double) args[5];
-						String extraData = (String) args[6];
+						Particle particle = Particle.valueOf(args.getUnchecked("particle"));
+						double distanceFalloff = args.getUnchecked("distance falloff");
+						String extraData = args.getUnchecked("extra data");
 
 						doCircle(
 							getFinalCallee(sender, distanceFalloff),
-							(boolean) args[0],
-							(Location) args[1],
-							(double) args[2],
-							(double) args[3],
+							args.getUnchecked("ring mode"),
+							args.getUnchecked("center"),
+							args.getUnchecked("radius"),
+							args.getUnchecked("count per meter"),
 							particle,
 							distanceFalloff,
 							parseExtraData(extraData, particle),
 							null,
-							null
+							args.getUnchecked("normal")
 						);
 					}),
 				// Circle - optional player selector argument
@@ -210,85 +156,23 @@ public class ParticleUtilsCommand {
 						extraDataArgument,
 						new EntitySelectorArgument.ManyPlayers("allowed viewers")
 					)
+					.withOptionalArguments(new LocationArgument("normal"))
 					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[4]);
-						double distanceFalloff = (double) args[5];
-						String extraData = (String) args[6];
+						Particle particle = Particle.valueOf(args.getUnchecked("particle"));
+						double distanceFalloff = args.getUnchecked("distance falloff");
+						String extraData = args.getUnchecked("extra data");
 
 						doCircle(
 							getFinalCallee(sender, distanceFalloff),
-							(boolean) args[0],
-							(Location) args[1],
-							(double) args[2],
-							(double) args[3],
+							args.getUnchecked("ring mode"),
+							args.getUnchecked("center"),
+							args.getUnchecked("radius"),
+							args.getUnchecked("count per meter"),
 							particle,
 							distanceFalloff,
 							parseExtraData(extraData, particle),
-							(List<Player>) args[7],
-							null
-						);
-					}),
-				// Circle - optional normal argument
-				new CommandAPICommand("circle")
-					.withPermission("monumenta.particleutils.circle")
-					.withArguments(
-						new BooleanArgument("ring mode"),
-						new LocationArgument("center"),
-						new DoubleArgument("radius"),
-						new DoubleArgument("count per meter"),
-						particleArgument,
-						distanceFalloffArgument,
-						extraDataArgument,
-						new LocationArgument("normal")
-					)
-					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[4]);
-						double distanceFalloff = (double) args[5];
-						String extraData = (String) args[6];
-
-						doCircle(
-							getFinalCallee(sender, distanceFalloff),
-							(boolean) args[0],
-							(Location) args[1],
-							(double) args[2],
-							(double) args[3],
-							particle,
-							distanceFalloff,
-							parseExtraData(extraData, particle),
-							null,
-							(Location) args[7]
-						);
-					}),
-				// Circle - player selector argument + normal argument
-				new CommandAPICommand("circle")
-					.withPermission("monumenta.particleutils.circle")
-					.withArguments(
-						new BooleanArgument("ring mode"),
-						new LocationArgument("center"),
-						new DoubleArgument("radius"),
-						new DoubleArgument("count per meter"),
-						particleArgument,
-						distanceFalloffArgument,
-						extraDataArgument,
-						new EntitySelectorArgument.ManyPlayers("allowed viewers"),
-						new LocationArgument("normal")
-					)
-					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[4]);
-						double distanceFalloff = (double) args[5];
-						String extraData = (String) args[6];
-
-						doCircle(
-							getFinalCallee(sender, distanceFalloff),
-							(boolean) args[0],
-							(Location) args[1],
-							(double) args[2],
-							(double) args[3],
-							particle,
-							distanceFalloff,
-							parseExtraData(extraData, particle),
-							(List<Player>) args[7],
-							(Location) args[8]
+							(List<Player>) args.get("allowed viewers"),
+							args.getUnchecked("normal")
 						);
 					}),
 				// Circle Telegraph
@@ -306,60 +190,25 @@ public class ParticleUtilsCommand {
 						new IntegerArgument("pulse start offset"),
 						extraDataArgument
 					)
+					.withOptionalArguments(new EntitySelectorArgument.ManyPlayers("allowed viewers"))
 					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[3]);
-						double distanceFalloff = (double) args[4];
-						String extraData = (String) args[9];
+						Particle particle = Particle.valueOf(args.getUnchecked("particle"));
+						double distanceFalloff = args.getUnchecked("distance falloff");
+						String extraData = args.getUnchecked("extra data");
 
 						doCircleTelegraph(
 							getFinalCallee(sender, distanceFalloff),
-							(Location) args[0],
-							(double) args[1],
-							(int) args[2],
+							args.getUnchecked("center"),
+							args.getUnchecked("radius"),
+							args.getUnchecked("count per meter"),
 							particle,
 							distanceFalloff,
-							(double) args[5],
-							(int) args[6],
-							(int) args[7],
-							(int) args[8],
+							args.getUnchecked("particle speed"),
+							args.getUnchecked("pulses"),
+							args.getUnchecked("telegraph duration"),
+							args.getUnchecked("pulse start offset"),
 							parseExtraData(extraData, particle),
-							null
-						);
-					}),
-				// Circle Telegraph - optional player selector argument
-				new CommandAPICommand("circletelegraph")
-					.withPermission("monumenta.particleutils.circletelegraph")
-					.withArguments(
-						new LocationArgument("center"),
-						new DoubleArgument("radius"),
-						new IntegerArgument("count per meter"),
-						particleArgument,
-						distanceFalloffArgument,
-						new DoubleArgument("particle speed"),
-						new IntegerArgument("pulses"),
-						new IntegerArgument("telegraph duration"),
-						new IntegerArgument("pulse start offset"),
-						extraDataArgument,
-						new EntitySelectorArgument.ManyPlayers("allowed viewers")
-					)
-					.executes((sender, args) -> {
-						Particle particle = Particle.valueOf((String) args[3]);
-						double distanceFalloff = (double) args[4];
-						String extraData = (String) args[9];
-
-						doCircleTelegraph(
-							getFinalCallee(sender, distanceFalloff),
-							(Location) args[0],
-							(double) args[1],
-							(int) args[2],
-							particle,
-							distanceFalloff,
-							(double) args[5],
-							(int) args[6],
-							(int) args[7],
-							(int) args[8],
-							parseExtraData(extraData, particle),
-							(List<Player>) args[10]
+							(List<Player>) args.get("allowed viewers")
 						);
 					}),
 				// Number
@@ -375,13 +224,13 @@ public class ParticleUtilsCommand {
 							extraDataArgument
 						)
 						.executes((sender, args) -> {
-							int number = (int) args[0];
-							Location location = (Location) args[1];
-							double scale = (double) args[2];
-							double spacing = (double) args[3];
-							Player player = (Player) args[4];
-							Particle particle = Particle.valueOf((String) args[5]);
-							String extraData = (String) args[6];
+							int number = args.getUnchecked("number");
+							Location location = args.getUnchecked("location");
+							double scale = args.getUnchecked("scale");
+							double spacing = args.getUnchecked("spacing");
+							Player player = args.getUnchecked("facing player");
+							Particle particle = Particle.valueOf(args.getUnchecked("particle"));
+							String extraData = args.getUnchecked("extra data");
 
 							ParticleUtils.drawSevenSegmentNumber(number, location, player, scale, spacing, particle, parseExtraData(extraData, particle));
 						})

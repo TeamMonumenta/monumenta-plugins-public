@@ -30,7 +30,7 @@ public class RedeemVoteRewards extends GenericCommand {
 			.withPermission(CommandPermission.fromString("monumenta.command.redeemvoterewards"))
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, (Player)args[0], (String)args[1], (FunctionWrapper[])args[2]);
+				run(plugin, args.getUnchecked("player"), args.getUnchecked("scoreboard"), args.getUnchecked("function"));
 			})
 			.register();
 	}

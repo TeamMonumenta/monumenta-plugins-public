@@ -10,8 +10,8 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.FloatArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.io.File;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class NodePlanner implements Listener {
 		CommandPermission perms = CommandPermission.fromString("monumenta.nodeplanner");
 
 		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new MultiLiteralArgument("summon_plan"));
+		arguments.add(new LiteralArgument("summon_plan"));
 		arguments.add(new LocationArgument("Location"));
 		arguments.add(new FloatArgument("GB Per Block", 1.0f, 100.0f));
 
@@ -70,8 +70,8 @@ public class NodePlanner implements Listener {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Location loc = (Location) args[1];
-				float gigabytesPerBlock = (float) args[2];
+				Location loc = args.getUnchecked("Location");
+				float gigabytesPerBlock = args.getUnchecked("GB Per Block");
 				runSummonPlan(sender, loc, gigabytesPerBlock);
 			})
 			.register();

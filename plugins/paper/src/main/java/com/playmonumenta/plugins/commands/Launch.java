@@ -24,10 +24,10 @@ public class Launch extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Vector v = player.getEyeLocation().getDirection();
-				v.multiply((double) args[1]);
-				v.setY((double) args[2]);
+				v.multiply(args.getUnchecked("horizontal"));
+				v.setY(args.getUnchecked("vertical"));
 				player.setVelocity(v);
 			})
 			.register();
@@ -42,11 +42,11 @@ public class Launch extends GenericCommand {
 		.withPermission(perms)
 		.withArguments(arguments)
 		.executes((sender, args) -> {
-			Player player = (Player) args[0];
+			Player player = args.getUnchecked("player");
 			Vector v = player.getEyeLocation().getDirection();
-			v.setX((double) args[1]);
-			v.setY((double) args[2]);
-			v.setZ((double) args[3]);
+			v.setX(args.getUnchecked("x"));
+			v.setY(args.getUnchecked("y"));
+			v.setZ(args.getUnchecked("z"));
 			player.setVelocity(v);
 		})
 		.register();

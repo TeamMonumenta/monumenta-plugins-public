@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,7 +95,7 @@ public final class SpectateBot extends GenericCommand implements Listener {
 		return cameraLoc;
 	}
 
-	private void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
+	private void run(Plugin plugin, Player player) {
 		if (mSpectators.containsKey(player.getUniqueId())) {
 			player.sendMessage(Component.text("You are no longer spectate botting", NamedTextColor.RED));
 			mSpectators.remove(player.getUniqueId());

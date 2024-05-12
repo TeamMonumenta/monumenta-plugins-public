@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,7 +22,7 @@ public class LpGroupDeleteCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.lpgroup.delete");
 
 		new CommandAPICommand("lpgroup")
-			.withArguments(new MultiLiteralArgument("delete"))
+			.withArguments(new LiteralArgument("delete"))
 			.withArguments(new TextArgument("permission group")
 				.replaceSuggestions(LPArguments.GROUP_SUGGESTIONS))
 			.executes((sender, args) -> {
@@ -31,23 +31,23 @@ public class LpGroupDeleteCommand {
 					throw CommandAPI.failWithString("This command cannot be run on the build shard.");
 				}
 
-				String permissionGroup = (String) args[1];
+				String permissionGroup = args.getUnchecked("permission group");
 				deleteGroup(plugin, sender, permissionGroup, false);
 			})
 			.register();
 
 		new CommandAPICommand("lpgroup")
-			.withArguments(new MultiLiteralArgument("delete"))
+			.withArguments(new LiteralArgument("delete"))
 			.withArguments(new TextArgument("permission group")
 				.replaceSuggestions(LPArguments.GROUP_SUGGESTIONS))
-			.withArguments(new MultiLiteralArgument("recursive"))
+			.withArguments(new LiteralArgument("recursive"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
 				if (ServerProperties.getShardName().contains("build")) {
 					throw CommandAPI.failWithString("This command cannot be run on the build shard.");
 				}
 
-				String permissionGroup = (String) args[1];
+				String permissionGroup = args.getUnchecked("permission group");
 				deleteGroup(plugin, sender, permissionGroup, true);
 			})
 			.register();

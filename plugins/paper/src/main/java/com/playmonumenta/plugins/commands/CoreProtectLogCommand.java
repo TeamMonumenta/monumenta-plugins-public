@@ -6,7 +6,6 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.LocationType;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 public class CoreProtectLogCommand {
 
@@ -20,7 +19,7 @@ public class CoreProtectLogCommand {
 						new LocationArgument("block", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {
-						CoreProtectIntegration.logPlacement((Player) args[0], ((Location) args[1]).getBlock());
+						CoreProtectIntegration.logPlacement(args.getUnchecked("player"), ((Location) args.getUnchecked("block")).getBlock());
 					})
 			)
 			.withSubcommand(
@@ -30,7 +29,7 @@ public class CoreProtectLogCommand {
 						new LocationArgument("block", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {
-						CoreProtectIntegration.logRemoval((Player) args[0], ((Location) args[1]).getBlock());
+						CoreProtectIntegration.logRemoval(args.getUnchecked("player"), ((Location) args.getUnchecked("block")).getBlock());
 					})
 			)
 			.withSubcommand(
@@ -40,7 +39,7 @@ public class CoreProtectLogCommand {
 						new LocationArgument("block", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {
-						CoreProtectIntegration.logContainerTransaction((Player) args[0], (Location) args[1]);
+						CoreProtectIntegration.logContainerTransaction(args.getUnchecked("player"), (Location) args.getUnchecked("block"));
 					})
 			)
 			.register();

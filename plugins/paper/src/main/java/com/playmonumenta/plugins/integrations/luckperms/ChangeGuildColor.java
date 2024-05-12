@@ -41,8 +41,8 @@ public class ChangeGuildColor {
 					return;
 				}
 
-				String guildName = (String) args[args.length - 2];
-				TextColor color = MessagingUtils.colorFromString((String) args[args.length - 1]);
+				String guildName = args.getByArgument(GuildCommand.GUILD_NAME_ARG);
+				TextColor color = MessagingUtils.colorFromString(args.getByArgument(COLOR_ARG));
 
 				if (color == null) {
 					throw CommandAPI.failWithString("Color should either be the color's name or in the hex format '#RRGGBB'");

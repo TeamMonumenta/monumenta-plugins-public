@@ -26,9 +26,9 @@ public class AbsorptionCommand {
 				new DoubleArgument("max"),
 				new IntegerArgument("ticks"))
 			.executes((sender, args) -> {
-				for (Entity e : (Collection<Entity>) args[0]) {
+				for (Entity e : (Collection<Entity>) args.get("entities")) {
 					if (e instanceof LivingEntity le) {
-						AbsorptionUtils.addAbsorption(le, (double) args[1], (double) args[2], (int) args[3]);
+						AbsorptionUtils.addAbsorption(le, args.getUnchecked("absorption"), args.getUnchecked("max"), args.getUnchecked("ticks"));
 					}
 				}
 			}).register();
@@ -42,10 +42,10 @@ public class AbsorptionCommand {
 				new DoubleArgument("maxpercent"),
 				new IntegerArgument("ticks"))
 			.executes((sender, args) -> {
-				for (Entity e : (Collection<Entity>) args[0]) {
+				for (Entity e : (Collection<Entity>) args.get("entities")) {
 					if (e instanceof LivingEntity le) {
 						double maxHealth = EntityUtils.getMaxHealth(le);
-						AbsorptionUtils.addAbsorption(le, (double) args[1] * maxHealth, (double) args[2] * maxHealth, (int) args[3]);
+						AbsorptionUtils.addAbsorption(le, (double) args.get("absorptionpercent") * maxHealth, (double) args.get("maxpercent") * maxHealth, args.getUnchecked("ticks"));
 					}
 				}
 			}).register();
@@ -56,7 +56,7 @@ public class AbsorptionCommand {
 				new LiteralArgument("clear"),
 				new EntitySelectorArgument.ManyEntities("entities")
 			).executes((sender, args) -> {
-				for (Entity e : (Collection<Entity>) args[0]) {
+				for (Entity e : (Collection<Entity>) args.get("entities")) {
 					if (e instanceof LivingEntity le) {
 						AbsorptionUtils.clearAbsorption(le);
 					}

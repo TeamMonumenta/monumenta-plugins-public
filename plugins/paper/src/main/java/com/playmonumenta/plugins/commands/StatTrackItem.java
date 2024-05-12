@@ -13,7 +13,6 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +53,7 @@ public class StatTrackItem extends GenericCommand {
 		options.put("healdone", InfusionType.STAT_TRACK_HEALING_DONE);
 		options.put("fish", InfusionType.STAT_TRACK_FISH_CAUGHT);
 
-		Argument<?> selectionArg = new MultiLiteralArgument(options.keySet().toArray(new String[options.size()]));
+		Argument<?> selectionArg = new MultiLiteralArgument("selection", options.keySet().toArray(new String[options.size()]));
 
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
@@ -63,11 +62,11 @@ public class StatTrackItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				InfusionType selection = options.get((String) args[1]);
+				InfusionType selection = options.get(args.getUnchecked("selection"));
 				if (selection == null) {
 					throw CommandAPI.failWithString("Invalid stat selection; how did we get here?");
 				}
-				run((Player) args[0], selection);
+				run(args.getUnchecked("player"), selection);
 			})
 			.register();
 
@@ -80,7 +79,7 @@ public class StatTrackItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				runMod((Player) args[0], (int) args[1]);
+				runMod(args.getUnchecked("player"), args.getUnchecked("number"));
 			})
 			.register();
 
@@ -93,7 +92,7 @@ public class StatTrackItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				runRemove((Player) args[0]);
+				runRemove(args.getUnchecked("player"));
 			})
 			.register();
 	}
@@ -104,7 +103,7 @@ public class StatTrackItem extends GenericCommand {
 	 * @param player the player who is stat tracking their gear
 	 * @param option the stat track enchant option to infuse with
 	 */
-	private static void run(Player player, InfusionType option) throws WrapperCommandSyntaxException {
+	private static void run(Player player, InfusionType option) {
 
 		//Check to see if the player is a patron
 		if (

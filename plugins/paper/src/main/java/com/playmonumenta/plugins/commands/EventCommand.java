@@ -12,7 +12,6 @@ import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 public class EventCommand extends GenericCommand {
 	public static final String COMMAND = "event";
@@ -34,7 +33,7 @@ public class EventCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Bukkit.getPluginManager().callEvent(new MonumentaEvent((Player) args[0], (String) args[1]));
+				Bukkit.getPluginManager().callEvent(new MonumentaEvent(args.getUnchecked("player"), args.getUnchecked("event")));
 			})
 			.register();
 	}

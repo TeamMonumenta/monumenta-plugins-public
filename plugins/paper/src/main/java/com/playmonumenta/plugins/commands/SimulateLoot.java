@@ -8,8 +8,8 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.FloatArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LootTableArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.wrappers.NativeProxyCommandSender;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -56,15 +56,15 @@ public class SimulateLoot {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
-			.withArguments(new MultiLiteralArgument("loot"))
+			.withArguments(new LiteralArgument("loot"))
 			.withArguments(new IntegerArgument("rolls", 1))
 			.withArguments(new LootTableArgument("loot table"))
-			.withArguments(new MultiLiteralArgument("withluck"))
+			.withArguments(new LiteralArgument("withluck"))
 			.withArguments(new FloatArgument("Luck"))
 			.executesNative((nativeSender, args) -> {
-				int numRolls = (int) args[1];
-				LootTable lootTable = (LootTable) args[2];
-				float luck = (float) args[4];
+				int numRolls = args.getUnchecked("rolls");
+				LootTable lootTable = args.getUnchecked("loot table");
+				float luck = args.getUnchecked("Luck");
 				LootContext lootContext = new LootContext
 					.Builder(nativeSender.getLocation())
 					.luck(luck)
@@ -76,12 +76,12 @@ public class SimulateLoot {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
-			.withArguments(new MultiLiteralArgument("loot"))
+			.withArguments(new LiteralArgument("loot"))
 			.withArguments(new IntegerArgument("rolls", 1))
 			.withArguments(new LootTableArgument("loot table"))
 			.executesNative((nativeSender, args) -> {
-				int numRolls = (int) args[1];
-				LootTable lootTable = (LootTable) args[2];
+				int numRolls = args.getUnchecked("rolls");
+				LootTable lootTable = args.getUnchecked("loot table");
 				LootContext lootContext = new LootContext
 					.Builder(nativeSender.getLocation())
 					.build();
@@ -92,18 +92,18 @@ public class SimulateLoot {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
-			.withArguments(new MultiLiteralArgument("loot"))
+			.withArguments(new LiteralArgument("loot"))
 			.withArguments(new IntegerArgument("rolls", 1))
 			.withArguments(new LootTableArgument("loot table"))
-			.withArguments(new MultiLiteralArgument("byplayer"))
+			.withArguments(new LiteralArgument("byplayer"))
 			.executesNative((nativeSender, args) -> {
 				CommandSender sender = CommandUtils.getCallee(nativeSender);
 				if (!(sender instanceof Player player)) {
 					throw CommandAPI.failWithString("This command must be run as a player");
 				}
 
-				int numRolls = (int) args[1];
-				LootTable lootTable = (LootTable) args[2];
+				int numRolls = args.getUnchecked("rolls");
+				LootTable lootTable = args.getUnchecked("loot table");
 				LootContext lootContext = new LootContext
 					.Builder(nativeSender.getLocation())
 					.killer(player)

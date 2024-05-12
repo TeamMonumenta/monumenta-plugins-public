@@ -15,7 +15,7 @@ public class SetActivity {
 			.withPermission(PERM)
 			.withArguments(new PlayerArgument("player"), new IntegerArgument("int"))
 			.executes((sender, args) -> {
-				plugin.mActivityManager.mActivity.put(((Player) args[0]).getUniqueId(), (int) args[1]);
+				plugin.mActivityManager.mActivity.put(((Player) args.getUnchecked("player")).getUniqueId(), args.getUnchecked("int"));
 			}).register();
 	}
 }

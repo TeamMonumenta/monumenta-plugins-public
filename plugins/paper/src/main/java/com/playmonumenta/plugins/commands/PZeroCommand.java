@@ -30,8 +30,8 @@ public class PZeroCommand {
 						)
 					)
 					.executes((sender, args) -> {
-						for (Player player : (Collection<Player>) args[0]) {
-							String result = Plugin.getInstance().mPzeroManager.signUp(player, (String) args[1]);
+						for (Player player : (Collection<Player>) args.get("player")) {
+							String result = Plugin.getInstance().mPzeroManager.signUp(player, args.getUnchecked("map name"));
 							if (result != null) {
 								player.sendMessage(MessagingUtils.fromMiniMessage("<red>" + result + "</red>"));
 							}
@@ -42,7 +42,7 @@ public class PZeroCommand {
 						new EntitySelectorArgument.ManyPlayers("player")
 					)
 					.executes((sender, args) -> {
-						for (Player player : (Collection<Player>) args[0]) {
+						for (Player player : (Collection<Player>) args.get("player")) {
 							Plugin.getInstance().mPzeroManager.leave(player);
 						}
 					}),
@@ -51,7 +51,7 @@ public class PZeroCommand {
 						new EntitySelectorArgument.ManyPlayers("player")
 					)
 					.executes((sender, args) -> {
-						for (Player player : (Collection<Player>) args[0]) {
+						for (Player player : (Collection<Player>) args.get("player")) {
 							Plugin.getInstance().mPzeroManager.boost(player);
 						}
 					}),
@@ -61,8 +61,8 @@ public class PZeroCommand {
 						new IntegerArgument("amount")
 					)
 					.executes((sender, args) -> {
-						for (Player player : (Collection<Player>) args[0]) {
-							Plugin.getInstance().mPzeroManager.restoreEnergy(player, (int) args[1], true);
+						for (Player player : (Collection<Player>) args.get("playesr")) {
+							Plugin.getInstance().mPzeroManager.restoreEnergy(player, args.getUnchecked("amount"), true);
 						}
 					}),
 				new CommandAPICommand("launch")
@@ -73,23 +73,10 @@ public class PZeroCommand {
 						new DoubleArgument("z"),
 						new IntegerArgument("duration ticks")
 					)
+					.withOptionalArguments(new IntegerArgument("grace period on landing"))
 					.executes((sender, args) -> {
-						for (Player player : (Collection<Player>) args[0]) {
-							Plugin.getInstance().mPzeroManager.launch(player, (double) args[1], (double) args[2], (double) args[3], (int) args[4], 0);
-						}
-					}),
-				new CommandAPICommand("launch")
-					.withArguments(
-						new EntitySelectorArgument.ManyPlayers("players"),
-						new DoubleArgument("x"),
-						new DoubleArgument("y"),
-						new DoubleArgument("z"),
-						new IntegerArgument("duration ticks"),
-						new IntegerArgument("grace period on landing")
-					)
-					.executes((sender, args) -> {
-						for (Player player : (Collection<Player>) args[0]) {
-							Plugin.getInstance().mPzeroManager.launch(player, (double) args[1], (double) args[2], (double) args[3], (int) args[4], (int) args[5]);
+						for (Player player : (Collection<Player>) args.get("players")) {
+							Plugin.getInstance().mPzeroManager.launch(player, args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z"), args.getUnchecked("duration ticks"), args.getOrDefaultUnchecked("grace period on landing", 0));
 						}
 					})
 			)

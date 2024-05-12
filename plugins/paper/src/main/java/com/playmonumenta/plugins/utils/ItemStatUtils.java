@@ -985,8 +985,8 @@ public class ItemStatUtils {
 		removeInfusion(item, type, true);
 	}
 
-	public static void removeInfusion(final ItemStack item, final InfusionType type, boolean updateItem) {
-		if (item.getType() == Material.AIR || type == null) {
+	public static void removeInfusion(final @Nullable ItemStack item, final InfusionType type, boolean updateItem) {
+		if (item == null || item.getType() == Material.AIR || type == null) {
 			return;
 		}
 		boolean success = NBT.modify(item, nbt -> {

@@ -4,18 +4,18 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Objective;
 
 /**
  * EffectFromPotionCommand (Last written by PikaLegend_ 31.03.2022)
@@ -36,52 +36,26 @@ public class EffectFromPotionCommand {
 	public static void register(Plugin plugin) {
 		new CommandAPICommand(COMMAND)
 			// Syntax:
-			// /effectfrompotion <Selector> <slotObjective>
+			// /effectfrompotion <Player> <slotObjective> [subSlotObjective]
 			// Consume potion in slot based on scoreboard value.
 			.withPermission(CommandPermission.fromString(PERMISSION))
 			.withArguments(
-				new EntitySelectorArgument.OnePlayer("players"),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new ObjectiveArgument("slotScoreboard")
 			)
+			.withOptionalArguments(new ObjectiveArgument("subSlotScoreboard"))
 			.executes((sender, args) -> {
 				// Obtain Player, SlotScore, and SubSlot Score
-				Player player = (Player) args[0];
-				String slotScore = (String) args[1];
+				Player player = args.getUnchecked("player");
+				Objective slotObjective = args.getUnchecked("slotScoreboard");
+				Objective subSlotObjective = args.getUnchecked("subSlotScoreboard");
 
-				Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-				int slot = scoreboard.getObjective(slotScore).getScore(player.getName()).getScore();
-
-				potionLookUp(plugin, player, slot);
-			})
-			.register();
-
-		new CommandAPICommand(COMMAND)
-			// Syntax:
-			// /effectfrompotion <Player> <slotObjective> <subSlotObjective>
-			// Consume potion in slot based on scoreboard value.
-			.withPermission(CommandPermission.fromString(PERMISSION))
-			.withArguments(
-				new EntitySelectorArgument.OnePlayer("players"),
-				new ObjectiveArgument("slotScoreboard"),
-				new ObjectiveArgument("subSlotScoreboard")
-			)
-			.executes((sender, args) -> {
-				// Obtain Player, SlotScore, and SubSlot Score
-				Player player = (Player) args[0];
-				String slotScore = (String) args[1];
-				String subSlotScore = (String) args[2];
-
-				Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-				int slot = scoreboard.getObjective(slotScore).getScore(player.getName()).getScore();
-				int subSlot = scoreboard.getObjective(subSlotScore).getScore(player.getName()).getScore();
+				int slot = ScoreboardUtils.getScoreboardValue(player, slotObjective).orElse(0);
+				int subSlot = subSlotObjective == null ? -1 : ScoreboardUtils.getScoreboardValue(player, subSlotObjective).orElse(0);
 
 				potionLookUp(plugin, player, slot, subSlot);
 			})
 			.register();
-	}
-
-	private static void potionLookUp(Plugin plugin, Player player, int slot) {
-		potionLookUp(plugin, player, slot, -1);
 	}
 
 	private static void potionLookUp(Plugin plugin, Player player, int slot, int subSlot) {

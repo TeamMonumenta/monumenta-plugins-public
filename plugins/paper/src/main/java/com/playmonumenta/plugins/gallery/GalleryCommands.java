@@ -8,7 +8,9 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -36,12 +38,12 @@ public class GalleryCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withArguments(
-				new MultiLiteralArgument("init"),
+				new LiteralArgument("init"),
 				new EntitySelectorArgument.ManyPlayers("players"),
-				new MultiLiteralArgument(Arrays.stream(GalleryMap.values()).map(Enum::name).toList().toArray(new String[0])))
+				new MultiLiteralArgument("map", Arrays.stream(GalleryMap.values()).map(Enum::name).toList().toArray(new String[0])))
 			.executes((sender, args) -> {
-				GalleryMap map = GalleryMap.fromName((String) args[2]);
-				List<Player> players = new ArrayList<>((Collection<Player>) args[1]);
+				GalleryMap map = GalleryMap.fromName(args.getUnchecked("map"));
+				List<Player> players = new ArrayList<>(args.getUnchecked("players"));
 				if (!players.isEmpty() && map != null) {
 					GalleryGame game = new GalleryGame(players.get(0).getWorld().getUID(), map, players);
 					GalleryManager.addGame(game);
@@ -54,11 +56,11 @@ public class GalleryCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withArguments(
-				new MultiLiteralArgument("player"),
-				new MultiLiteralArgument("info"),
+				new LiteralArgument("player"),
+				new LiteralArgument("info"),
 				new EntitySelectorArgument.OnePlayer("players"))
 			.executes((sender, args) -> {
-				Player target = (Player) args[2];
+				Player target = args.getUnchecked("players");
 				GalleryGame game = GalleryManager.GAMES.get(target.getWorld().getUID());
 
 				if (!MetadataUtils.checkOnceThisTick(GalleryManager.mPlugin, target, "GalleryCommandOneTick")) {
@@ -76,11 +78,11 @@ public class GalleryCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withArguments(
-				new MultiLiteralArgument("player"),
-				new MultiLiteralArgument("leave"),
+				new LiteralArgument("player"),
+				new LiteralArgument("leave"),
 				new EntitySelectorArgument.OnePlayer("players"))
 			.executes((sender, args) -> {
-				Player target = (Player) args[2];
+				Player target = args.getUnchecked("players");
 				GalleryGame game = GalleryManager.GAMES.get(target.getWorld().getUID());
 				if (game != null) {
 					game.playerLeave(target);
@@ -90,15 +92,15 @@ public class GalleryCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withArguments(
-				new MultiLiteralArgument("player"),
+				new LiteralArgument("player"),
 				new EntitySelectorArgument.ManyPlayers("players"),
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("alive"),
+				new LiteralArgument("set"),
+				new LiteralArgument("alive"),
 				new BooleanArgument("true/false"))
 			.executes((sender, args) -> {
-				boolean alive = (boolean) args[4];
+				boolean alive = args.getUnchecked("true/false");
 				GalleryGame game = null;
-				for (Player player : new ArrayList<>((Collection<Player>) args[1])) {
+				for (Player player : (Collection<Player>) args.get("players")) {
 					if (game == null) {
 						game = getGameFromEntity(player);
 					}
@@ -116,16 +118,15 @@ public class GalleryCommands {
 
 	@SuppressWarnings("unchecked")
 	private static void registerUtils() {
-		Argument<?> util = new MultiLiteralArgument("utils");
-
+		Argument<?> util = new LiteralArgument("utils");
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("moderation"),
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("info"))
+				new LiteralArgument("moderation"),
+				new LiteralArgument("get"),
+				new LiteralArgument("info"))
 			.executesPlayer((moderator, args) -> {
 				GalleryGame game = getGameFromSender(moderator);
 				if (game != null) {
@@ -138,14 +139,14 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("moderation"),
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("info"),
+				new LiteralArgument("moderation"),
+				new LiteralArgument("get"),
+				new LiteralArgument("info"),
 				new EntitySelectorArgument.OnePlayer("target"))
 			.executesPlayer((moderator, args) -> {
 				GalleryGame game = getGameFromSender(moderator);
 				if (game != null) {
-					game.printModerationInfo(moderator, (Player) args[4]);
+					game.printModerationInfo(moderator, args.getUnchecked("target"));
 				}
 				return 1;
 			}).register();
@@ -154,11 +155,11 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("give"),
-				new MultiLiteralArgument("coin"),
+				new LiteralArgument("give"),
+				new LiteralArgument("coin"),
 				new IntegerArgument("coins"))
 			.executes((sender, args) -> {
-				int coins = (int) args[3];
+				int coins = args.getUnchecked("coins");
 				GalleryGame game = getGameFromSender(sender);
 
 				if (game != null) {
@@ -172,12 +173,12 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("give"),
-				new MultiLiteralArgument("effect"),
+				new LiteralArgument("give"),
+				new LiteralArgument("effect"),
 				new EntitySelectorArgument.ManyPlayers("players"),
-				new MultiLiteralArgument(Arrays.stream(GalleryEffectType.values()).map(Enum::name).toList().toArray(new String[0])))
+				new MultiLiteralArgument("type", Arrays.stream(GalleryEffectType.values()).map(Enum::name).toList().toArray(new String[0])))
 			.executes((sender, args) -> {
-				GalleryEffectType type = GalleryEffectType.fromName((String) args[4]);
+				GalleryEffectType type = GalleryEffectType.fromName(args.getUnchecked("type"));
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
@@ -185,7 +186,7 @@ public class GalleryCommands {
 				if (type == null) {
 					throw CommandAPI.failWithString("Invalid gallery effect type");
 				}
-				for (Player entity : (Collection<Player>) args[3]) {
+				for (Player entity : (Collection<Player>) args.get("players")) {
 					game.getGalleryPlayer(entity.getUniqueId()).giveEffect(type.newEffect());
 				}
 
@@ -196,8 +197,8 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("round"))
+				new LiteralArgument("get"),
+				new LiteralArgument("round"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
@@ -210,8 +211,8 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("coin"))
+				new LiteralArgument("get"),
+				new LiteralArgument("coin"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
@@ -224,9 +225,9 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("box"),
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("locations"))
+				new LiteralArgument("box"),
+				new LiteralArgument("get"),
+				new LiteralArgument("locations"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
@@ -248,9 +249,9 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("box"),
-				new MultiLiteralArgument("move"),
-				new MultiLiteralArgument("random"))
+				new LiteralArgument("box"),
+				new LiteralArgument("move"),
+				new LiteralArgument("random"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
@@ -264,18 +265,19 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("interactable"),
-				new MultiLiteralArgument("position"),
+				new LiteralArgument("get"),
+				new LiteralArgument("interactable"),
+				new LiteralArgument("position"),
 				new StringArgument("name"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				BaseInteractable interactable = game.getInteractable((String) args[4]);
+				String name = args.getUnchecked("name");
+				BaseInteractable interactable = game.getInteractable(name);
 				if (interactable == null) {
-					throw CommandAPI.failWithString("Interactable null!!! no match for name: " + args[4]);
+					throw CommandAPI.failWithString("Interactable null!!! no match for name: " + name);
 				}
 				sender.sendMessage("Interactable " + interactable.getName() + " at Pos: " + interactable.getLocation());
 				return 1;
@@ -285,8 +287,8 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("spawner"),
-				new MultiLiteralArgument("activate"),
+				new LiteralArgument("spawner"),
+				new LiteralArgument("activate"),
 				new StringArgument("spawnerName"),
 				new BooleanArgument("active"))
 			.executes((sender, args) -> {
@@ -294,8 +296,8 @@ public class GalleryCommands {
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				boolean active = (boolean) args[4];
-				game.setActiveSpawner((String) args[3], active);
+				boolean active = args.getUnchecked("active");
+				game.setActiveSpawner(args.getUnchecked("spawnerName"), active);
 				return 1;
 			}).register();
 
@@ -303,35 +305,40 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("interactable"),
+				new LiteralArgument("interactable"),
 				new StringArgument("name"),
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("interactable"),
+				new LiteralArgument("set"),
+				new LiteralArgument("interactable"),
 				new BooleanArgument("isInteractableOrNot"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				game.setInteractable((String) args[2], (Boolean) args[5]);
+				game.setInteractable(args.getUnchecked("name"), args.getUnchecked("isInteractableOrNot"));
 				return 1;
 			}).register();
 
+		// According to nicknon this command is never used. As written it didn't make sense, so I modified it to what I think it should be, but I honestly have no idea
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("interactable"),
+				new LiteralArgument("interactable"),
 				new StringArgument("name"),
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("interactable"),
-				new MultiLiteralArgument("showingText"))
+				new LiteralArgument("set"),
+				new LiteralArgument("interactable"),
+				new GreedyStringArgument("showingText"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				game.setInteractableText((String) args[2], ((String) args[5]).isEmpty() ? null : (String) args[5]);
+				String text = args.getUnchecked("showingText");
+				if (text != null && text.isEmpty()) {
+					text = null;
+				}
+				game.setInteractableText(args.getUnchecked("name"), text);
 				return 1;
 			}).register();
 
@@ -339,15 +346,15 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("despawn"),
-				new MultiLiteralArgument("mobs"),
+				new LiteralArgument("despawn"),
+				new LiteralArgument("mobs"),
 				new EntitySelectorArgument.ManyEntities("mobs"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				for (Entity entity : (Collection<Entity>) args[3]) {
+				for (Entity entity : (Collection<Entity>) args.get("mobs")) {
 					if (entity instanceof LivingEntity livingEntity) {
 						game.despawnMob(livingEntity);
 					}
@@ -359,15 +366,15 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("interactable"),
+				new LiteralArgument("interactable"),
 				new StringArgument("name"),
-				new MultiLiteralArgument("remove"))
+				new LiteralArgument("remove"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				game.removeInteractable((String) args[2]);
+				game.removeInteractable(args.getUnchecked("name"));
 				return 1;
 			}).register();
 
@@ -375,16 +382,16 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("mobs"),
-				new MultiLiteralArgument("spawning"),
+				new LiteralArgument("set"),
+				new LiteralArgument("mobs"),
+				new LiteralArgument("spawning"),
 				new BooleanArgument("True/False"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				game.setCanMobsSpawn((Boolean)args[4]);
+				game.setCanMobsSpawn(args.getUnchecked("True/False"));
 				return 1;
 			}).register();
 
@@ -392,8 +399,8 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("reload"),
-				new MultiLiteralArgument("all"))
+				new LiteralArgument("reload"),
+				new LiteralArgument("all"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
@@ -407,14 +414,14 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("load"),
+				new LiteralArgument("load"),
 				new EntitySelectorArgument.ManyEntities("targets"))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				for (Entity entity : (Collection<Entity>) args[2]) {
+				for (Entity entity : (Collection<Entity>) args.get("targets")) {
 					game.load(entity);
 				}
 				return -1;
@@ -424,15 +431,15 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("round"),
+				new LiteralArgument("set"),
+				new LiteralArgument("round"),
 				new IntegerArgument("round", 0))
 			.executes((sender, args) -> {
 				GalleryGame game = getGameFromSender(sender);
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
-				game.setRound((int) args[3]);
+				game.setRound(args.getUnchecked("round"));
 				return 1;
 			}).register();
 
@@ -440,21 +447,18 @@ public class GalleryCommands {
 				.withPermission(PERMISSION)
 				.withArguments(
 						util,
-						new MultiLiteralArgument("set"),
-						new MultiLiteralArgument("spawnlocation"),
+						new LiteralArgument("set"),
+						new LiteralArgument("spawnlocation"),
 						new LocationArgument("location", LocationType.BLOCK_POSITION))
 				.executes((sender, args) -> {
 					GalleryGame game = getGameFromSender(sender);
 					if (game == null) {
 						throw CommandAPI.failWithString("Could not detect game");
 					}
-					game.setSpawnLocation((Location) args[3]);
+					game.setSpawnLocation(args.getUnchecked("location"));
 					return 1;
 				}).register();
 	}
-
-
-
 
 	private static @Nullable GalleryGame getGameFromSender(CommandSender sender) {
 		if (sender instanceof Entity entity) {

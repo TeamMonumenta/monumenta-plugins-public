@@ -1393,7 +1393,7 @@ public class EntityUtils {
 	}
 
 
-	public static double getMaxHealth(LivingEntity entity) {
+	public static double getMaxHealth(Attributable entity) {
 		AttributeInstance maxHealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		return maxHealth == null ? 0 : maxHealth.getValue();
 	}
@@ -1401,7 +1401,7 @@ public class EntityUtils {
 	/**
 	 * Returns {@code entity.getAttribute(attribute).getValue(value)} if the attribute exists, or {@code def} if not.
 	 */
-	public static double getAttributeOrDefault(LivingEntity entity, Attribute attribute, double def) {
+	public static double getAttributeOrDefault(Attributable entity, Attribute attribute, double def) {
 		AttributeInstance attr = entity.getAttribute(attribute);
 		return attr == null ? def : attr.getValue();
 	}
@@ -1409,7 +1409,7 @@ public class EntityUtils {
 	/**
 	 * Returns {@code entity.getAttribute(attribute).getBaseValue(value)} if the attribute exists, or {@code def} if not.
 	 */
-	public static double getAttributeBaseOrDefault(LivingEntity entity, Attribute attribute, double def) {
+	public static double getAttributeBaseOrDefault(Attributable entity, Attribute attribute, double def) {
 		AttributeInstance attr = entity.getAttribute(attribute);
 		return attr == null ? def : attr.getBaseValue();
 	}
@@ -1417,7 +1417,7 @@ public class EntityUtils {
 	/**
 	 * Null-safe version of {@code entity.getAttribute(attribute).setBaseValue(value)}
 	 */
-	public static void setAttributeBase(LivingEntity entity, Attribute attribute, double value) {
+	public static void setAttributeBase(Attributable entity, Attribute attribute, double value) {
 		AttributeInstance attr = entity.getAttribute(attribute);
 		if (attr != null) {
 			attr.setBaseValue(value);

@@ -30,10 +30,11 @@ public class CosmeticsCommand extends GenericCommand {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.cosmetics");
 		String[] types = Arrays.stream(CosmeticType.values()).map(CosmeticType::getType).toArray(String[]::new);
+		Argument<?> typeArgument = new MultiLiteralArgument("type", types);
 
 		Argument<?> allCosmeticsArgument = new GreedyStringArgument("name")
 			.replaceSuggestions(ArgumentSuggestions.strings(info -> {
-				CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT));
+				CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs().getUnchecked("type")).toUpperCase(Locale.ROOT));
 				if (type == CosmeticType.ELITE_FINISHER) {
 					return EliteFinishers.getNames();
 				} else if (type == CosmeticType.PLOT_BORDER) {
@@ -54,8 +55,8 @@ public class CosmeticsCommand extends GenericCommand {
 		Argument<?> ownedCosmeticsArgument = new GreedyStringArgument("name")
 			.replaceSuggestions(ArgumentSuggestions.strings(info ->
 				CosmeticsManager.getInstance()
-					.getCosmeticsOfTypeAlphabetical((Player) info.previousArgs()[0],
-						CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT))).stream()
+					.getCosmeticsOfTypeAlphabetical(info.previousArgs().getUnchecked("player"),
+						CosmeticType.valueOf(((String) info.previousArgs().getUnchecked("type")).toUpperCase(Locale.ROOT))).stream()
 					.map(Cosmetic::getName)
 					.filter(n -> n.startsWith(info.currentArg()))
 					.toArray(String[]::new)));
@@ -66,19 +67,17 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(
 				new LiteralArgument("add"),
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(types),
+				typeArgument,
 				allCosmeticsArgument)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
-				String name = (String) args[2];
+				Player player = args.getUnchecked("player");
+				CosmeticType type = CosmeticType.valueOf(((String) args.getUnchecked("type")).toUpperCase(Locale.ROOT));
+				String name = args.getUnchecked("name");
 				boolean added = CosmeticsManager.getInstance().addCosmetic(player, type, name);
-				if (sender instanceof Player) {
-					if (added) {
-						sender.sendMessage(Component.text("Added " + type.getDisplayName() + " '" + name + "' to " + player.getName(), NamedTextColor.WHITE));
-					} else {
-						sender.sendMessage(Component.text(player.getName() + " already has " + type.getDisplayName() + " '" + name + "', or the cosmetic is invalid.", NamedTextColor.RED));
-					}
+				if (added) {
+					sender.sendMessage(Component.text("Added " + type.getDisplayName() + " '" + name + "' to " + player.getName(), NamedTextColor.WHITE));
+				} else {
+					sender.sendMessage(Component.text(player.getName() + " already has " + type.getDisplayName() + " '" + name + "', or the cosmetic is invalid.", NamedTextColor.RED));
 				}
 			})
 			.register();
@@ -89,19 +88,17 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(
 				new LiteralArgument("equip"),
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(types),
+				typeArgument,
 				ownedCosmeticsArgument)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
-				String name = (String) args[2];
+				Player player = args.getUnchecked("player");
+				CosmeticType type = CosmeticType.valueOf(((String) args.getUnchecked("type")).toUpperCase(Locale.ROOT));
+				String name = args.getUnchecked("name");
 				boolean equipped = CosmeticsManager.getInstance().equipCosmetic(player, type, name, true);
-				if (sender instanceof Player) {
-					if (equipped) {
-						sender.sendMessage(Component.text("Equipped " + type.getDisplayName() + " '" + name + "' on " + player.getName(), NamedTextColor.WHITE));
-					} else {
-						sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
-					}
+				if (equipped) {
+					sender.sendMessage(Component.text("Equipped " + type.getDisplayName() + " '" + name + "' on " + player.getName(), NamedTextColor.WHITE));
+				} else {
+					sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
 				}
 			})
 			.register();
@@ -112,19 +109,17 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(
 				new LiteralArgument("remove"),
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(types),
+				typeArgument,
 				ownedCosmeticsArgument)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
-				String name = (String) args[2];
+				Player player = args.getUnchecked("player");
+				CosmeticType type = CosmeticType.valueOf(((String) args.getUnchecked("type")).toUpperCase(Locale.ROOT));
+				String name = args.getUnchecked("name");
 				boolean removed = CosmeticsManager.getInstance().removeCosmetic(player, type, name);
-				if (sender instanceof Player) {
-					if (removed) {
-						sender.sendMessage(Component.text("Removed " + type.getDisplayName() + " '" + name + "' from " + player.getName(), NamedTextColor.WHITE));
-					} else {
-						sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
-					}
+				if (removed) {
+					sender.sendMessage(Component.text("Removed " + type.getDisplayName() + " '" + name + "' from " + player.getName(), NamedTextColor.WHITE));
+				} else {
+					sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
 				}
 			})
 			.register();
@@ -135,15 +130,13 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(
 				new LiteralArgument("clear"),
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(types))
+				typeArgument)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
+				Player player = args.getUnchecked("player");
+				CosmeticType type = CosmeticType.valueOf(((String) args.getUnchecked("type")).toUpperCase(Locale.ROOT));
 
 				CosmeticsManager.getInstance().clearCosmetics(player, type);
-				if (sender instanceof Player) {
-					sender.sendMessage(Component.text("Removed all " + type.getDisplayName() + "s from " + player.getName(), NamedTextColor.RED));
-				}
+				sender.sendMessage(Component.text("Removed all " + type.getDisplayName() + "s from " + player.getName(), NamedTextColor.RED));
 			}).register();
 
 		// GET COSMETICS COMMAND
@@ -153,7 +146,7 @@ public class CosmeticsCommand extends GenericCommand {
 				new LiteralArgument("get"),
 				new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				for (CosmeticType type : CosmeticType.values()) {
 					listCosmetics(player, type, sender);
 				}
@@ -163,10 +156,10 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(
 				new LiteralArgument("get"),
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(types))
+				typeArgument)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
+				Player player = args.getUnchecked("player");
+				CosmeticType type = CosmeticType.valueOf(((String) args.getUnchecked("type")).toUpperCase(Locale.ROOT));
 				listCosmetics(player, type, sender);
 			}).register();
 
@@ -176,19 +169,17 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(
 				new LiteralArgument("test"),
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(types),
+				typeArgument,
 				allCosmeticsArgument)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
-				String name = (String) args[2];
+				Player player = args.getUnchecked("player");
+				CosmeticType type = CosmeticType.valueOf(((String) args.getUnchecked("type")).toUpperCase(Locale.ROOT));
+				String name = args.getUnchecked("name");
 				boolean hasCosmetic = CosmeticsManager.getInstance().playerHasCosmetic(player, type, name);
-				if (sender instanceof Player) {
-					if (hasCosmetic) {
-						sender.sendMessage(Component.text(player.getName() + " has " + type.getDisplayName() + " '" + name + "'", NamedTextColor.GREEN));
-					} else {
-						sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
-					}
+				if (hasCosmetic) {
+					sender.sendMessage(Component.text(player.getName() + " has " + type.getDisplayName() + " '" + name + "'", NamedTextColor.GREEN));
+				} else {
+					sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
 				}
 				return hasCosmetic ? 1 : 0;
 			})
@@ -201,7 +192,7 @@ public class CosmeticsCommand extends GenericCommand {
 				new LiteralArgument("gui"),
 				new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				new CosmeticsGUI(plugin, player).openInventory(player, plugin);
 			}).register();
 		new CommandAPICommand("cosmetics")

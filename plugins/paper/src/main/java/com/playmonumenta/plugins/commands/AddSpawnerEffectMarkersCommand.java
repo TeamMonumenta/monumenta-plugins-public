@@ -16,8 +16,8 @@ public class AddSpawnerEffectMarkersCommand {
 				new LocationArgument("corner2", LocationType.BLOCK_POSITION)
 			)
 			.executes((sender, args) -> {
-				Location corner1 = (Location) args[0];
-				Location corner2 = (Location) args[1];
+				Location corner1 = args.getUnchecked("corner1");
+				Location corner2 = args.getUnchecked("corner2");
 				SpawnerUtils.addSpawnerEffectMarkers(corner1, corner2);
 				sender.sendMessage(Component.text("Spawners in the specified area have been updated!"));
 			}

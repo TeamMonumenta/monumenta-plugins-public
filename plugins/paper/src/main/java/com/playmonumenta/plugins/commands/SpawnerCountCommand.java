@@ -50,26 +50,15 @@ public class SpawnerCountCommand {
 			.withSubcommand(
 				new CommandAPICommand("count")
 					.withArguments(new StringArgument("world")
-						               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
+						.replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
+					.withOptionalArguments(new IntegerArgument("chunk radius"))
 					.executes((sender, args) -> {
-						World world = Bukkit.getWorld((String) args[0]);
+						String worldName = args.getUnchecked("world");
+						World world = Bukkit.getWorld(worldName);
 						if (world == null) {
-							throw CommandAPI.failWithString("Unknown world " + args[0]);
+							throw CommandAPI.failWithString("Unknown world " + worldName);
 						}
-						count(sender, world, DEFAULT_CHUNK_SCAN_RADIUS, false);
-					})
-			)
-			.withSubcommand(
-				new CommandAPICommand("count")
-					.withArguments(new StringArgument("world")
-						               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
-					.withArguments(new IntegerArgument("chunk radius"))
-					.executes((sender, args) -> {
-						World world = Bukkit.getWorld((String) args[0]);
-						if (world == null) {
-							throw CommandAPI.failWithString("Unknown world " + args[0]);
-						}
-						count(sender, world, (Integer) args[1], false);
+						count(sender, world, args.getOrDefaultUnchecked("chunk radius", DEFAULT_CHUNK_SCAN_RADIUS), false);
 					})
 			)
 			.withSubcommand(
@@ -80,28 +69,17 @@ public class SpawnerCountCommand {
 					})
 			)
 			.withSubcommand(
-				new CommandAPICommand("countAndUpdate")
+				new CommandAPICommand("count")
 					.withArguments(new StringArgument("world")
-						               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
+						.replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
+					.withOptionalArguments(new IntegerArgument("chunk radius"))
 					.executes((sender, args) -> {
-						World world = Bukkit.getWorld((String) args[0]);
+						String worldName = args.getUnchecked("world");
+						World world = Bukkit.getWorld(worldName);
 						if (world == null) {
-							throw CommandAPI.failWithString("Unknown world " + args[0]);
+							throw CommandAPI.failWithString("Unknown world " + worldName);
 						}
-						count(sender, world, DEFAULT_CHUNK_SCAN_RADIUS, true);
-					})
-			)
-			.withSubcommand(
-				new CommandAPICommand("countAndUpdate")
-					.withArguments(new StringArgument("world")
-						               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
-					.withArguments(new IntegerArgument("chunk radius"))
-					.executes((sender, args) -> {
-						World world = Bukkit.getWorld((String) args[0]);
-						if (world == null) {
-							throw CommandAPI.failWithString("Unknown world " + args[0]);
-						}
-						count(sender, world, (Integer) args[1], true);
+						count(sender, world, args.getOrDefaultUnchecked("chunk radius", DEFAULT_CHUNK_SCAN_RADIUS), true);
 					})
 			)
 			.register();

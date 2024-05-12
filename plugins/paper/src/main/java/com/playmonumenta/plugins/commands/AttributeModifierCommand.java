@@ -23,13 +23,13 @@ public class AttributeModifierCommand {
 			.withArguments(
 				new LiteralArgument("remove"),
 				new EntitySelectorArgument.ManyEntities("entities"),
-				new MultiLiteralArgument(Arrays.stream(Attribute.values()).map(a -> a.getKey().getKey()).toArray(String[]::new)),
+				new MultiLiteralArgument("attribute", Arrays.stream(Attribute.values()).map(a -> a.getKey().getKey()).toArray(String[]::new)),
 				new GreedyStringArgument("modifiername")
 			)
 			.executes((sender, args) -> {
-				Collection<Entity> entities = (Collection<Entity>) args[0];
-				String attr = (String) args[1];
-				String modifierName = (String) args[2];
+				Collection<Entity> entities = (Collection<Entity>) args.get("entities");
+				String attr = args.getUnchecked("attribute");
+				String modifierName = args.getUnchecked("modifiername");
 				for (Attribute attribute : Attribute.values()) {
 					if (attribute.getKey().getKey().equals(attr)) {
 						for (Entity entity : entities) {

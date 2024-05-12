@@ -58,7 +58,7 @@ public class GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>)args[0]) {
+				for (Player player : (Collection<Player>) args.get("players")) {
 					exec.run(sender, player);
 				}
 			})
@@ -75,7 +75,7 @@ public class GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				for (Entity entity : (Collection<Entity>)args[0]) {
+				for (Entity entity : (Collection<Entity>) args.get("entities")) {
 					exec.run(sender, entity);
 				}
 			})

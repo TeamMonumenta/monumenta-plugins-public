@@ -18,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Objective;
 import org.jetbrains.annotations.Nullable;
 
 public class GetScoreCommand {
@@ -44,20 +45,20 @@ public class GetScoreCommand {
 		})))
 		.withArguments(new ObjectiveArgument("objective"))
 		.executes((sender, args) -> {
-			String objective = (String)args[1];
-			for (String scoreHolder : (Collection<String>)args[0]) {
+			Objective objective = args.getUnchecked("objective");
+			for (String scoreHolder : (Collection<String>) args.get("targets")) {
 				run(sender, scoreHolder, objective);
 			}
 		})
 		.register();
 	}
 
-	private static void run(CommandSender sender, String name, String objectiveName) {
-		OptionalInt scoreValue = ScoreboardUtils.getScoreboardValue(name, objectiveName);
+	private static void run(CommandSender sender, String name, Objective objective) {
+		OptionalInt scoreValue = ScoreboardUtils.getScoreboardValue(name, objective);
 		if (scoreValue.isPresent()) {
-			sender.sendMessage(Component.text("Score for ", NamedTextColor.AQUA).append(Component.text(name, NamedTextColor.GOLD)).append(Component.text(" in ", NamedTextColor.AQUA)).append(Component.text(objectiveName, NamedTextColor.GOLD)).append(Component.text(": ", NamedTextColor.AQUA)).append(Component.text(scoreValue.getAsInt(), NamedTextColor.GOLD)));
+			sender.sendMessage(Component.text("Score for ", NamedTextColor.AQUA).append(Component.text(name, NamedTextColor.GOLD)).append(Component.text(" in ", NamedTextColor.AQUA)).append(Component.text(objective.getName(), NamedTextColor.GOLD)).append(Component.text(": ", NamedTextColor.AQUA)).append(Component.text(scoreValue.getAsInt(), NamedTextColor.GOLD)));
 		} else {
-			sender.sendMessage(Component.text("Score for ", NamedTextColor.AQUA).append(Component.text(name, NamedTextColor.GOLD)).append(Component.text(" in ", NamedTextColor.AQUA)).append(Component.text(objectiveName, NamedTextColor.GOLD)).append(Component.text(": ", NamedTextColor.AQUA)).append(Component.text("not set", NamedTextColor.GOLD)));
+			sender.sendMessage(Component.text("Score for ", NamedTextColor.AQUA).append(Component.text(name, NamedTextColor.GOLD)).append(Component.text(" in ", NamedTextColor.AQUA)).append(Component.text(objective.getName(), NamedTextColor.GOLD)).append(Component.text(": ", NamedTextColor.AQUA)).append(Component.text("not set", NamedTextColor.GOLD)));
 		}
 	}
 

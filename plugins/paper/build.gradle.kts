@@ -17,6 +17,7 @@ plugins {
 repositories {
 	mavenCentral()
 	maven("https://libraries.minecraft.net/")
+	maven("https://repo.codemc.org/repository/maven-public/")
 }
 
 dependencies {
@@ -35,7 +36,7 @@ dependencies {
 	compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
 	compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
-	compileOnly("dev.jorel.CommandAPI:commandapi-core:8.7.0")
+	compileOnly("dev.jorel:commandapi-bukkit-core:9.4.1")
 	compileOnly("me.clip:placeholderapi:2.10.9")
 	compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
 	compileOnly("net.luckperms:api:5.4")

@@ -8,11 +8,8 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
@@ -26,18 +23,9 @@ public class SkillSummary extends GenericCommand {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
+			.withOptionalArguments(new BooleanArgument("shorthand"))
 			.executes((sender, args) -> {
-				tell(plugin, sender, false);
-			})
-			.register();
-
-		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new BooleanArgument("shorthand"));
-		new CommandAPICommand(COMMAND)
-			.withPermission(perms)
-			.withArguments(arguments)
-			.executes((sender, args) -> {
-				tell(plugin, sender, (Boolean) args[0]);
+				tell(plugin, sender, args.getOrDefaultUnchecked("shorthand", false));
 			})
 			.register();
 	}

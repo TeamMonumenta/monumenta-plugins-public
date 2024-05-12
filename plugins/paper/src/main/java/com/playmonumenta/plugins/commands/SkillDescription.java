@@ -11,6 +11,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Objective;
 
 public class SkillDescription extends GenericCommand {
 	private static final String COMMAND = "skilldescription";
@@ -24,15 +25,15 @@ public class SkillDescription extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				tell(plugin, sender, (String)args[0]);
+				tell(plugin, sender, ((Objective) args.getUnchecked("objective")).getName());
 			})
 			.register();
 	}
 
 	private static void tell(Plugin plugin, CommandSender sender, String scoreboardId) {
 		CommandSender target = sender;
-		if (sender instanceof ProxiedCommandSender) {
-			if (((ProxiedCommandSender) sender).getCallee() instanceof Player) {
+		if (sender instanceof ProxiedCommandSender proxiedSender) {
+			if (proxiedSender.getCallee() instanceof Player) {
 				target = ((ProxiedCommandSender) sender).getCallee();
 			} else {
 				error(sender, "Command must be run as a player.");

@@ -9,6 +9,7 @@ import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.executors.CommandArguments;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -24,9 +25,8 @@ public class BossFight {
 
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.bossfight");
-		/* First one has just the boss name (stateless) */
-		List<Argument<?>> arguments = new ArrayList<>();
 
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new EntitySelectorArgument.OneEntity("entity"));
 		arguments.add(new StringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.strings(
 			(info) -> BossManager.getInstance().listBosses()
@@ -34,41 +34,25 @@ public class BossFight {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executes((sender, args) -> {
-				createBossStateless(sender, (Entity)args[0], (String)args[1]);
-			})
-			.register();
-
-		/* Second one of these includes coordinate arguments */
-		arguments.add(new LocationArgument("redstone_pos"));
-		new CommandAPICommand(COMMAND)
-			.withPermission(perms)
-			.withArguments(arguments)
-			.executes((sender, args) -> {
-				createBossStateful(sender, (Entity)args[0], (String)args[1], (Location)args[2]);
-			})
+			.withOptionalArguments(new LocationArgument("redstone_pos"))
+			.executes(BossFight::execute)
 			.register();
 	}
 
-	private static void createBossStateless(CommandSender sender, Entity entity, String requestedTag) {
-		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
+	private static void execute(CommandSender sender, CommandArguments args) {
+		Entity entity = args.getUnchecked("entity");
+		if (entity instanceof LivingEntity le && !(entity instanceof Player)) {
+			String tag = args.getUnchecked("boss_tag");
+			Location loc = args.getUnchecked("redstone_pos");
 			try {
-				BossManager.createBoss(sender, (LivingEntity)entity, requestedTag);
+				if (loc != null) {
+					BossManager.createBoss(sender, le, tag, loc);
+				} else {
+					BossManager.createBoss(sender, le, tag);
+				}
 			} catch (Exception ex) {
 				MessagingUtils.sendStackTrace(sender, ex);
 			}
-		} else {
-			sender.sendMessage(Component.text("This command must be on a LivingEntity!", NamedTextColor.RED));
-		}
-	}
-
-	private static void createBossStateful(CommandSender sender, Entity entity, String requestedTag, Location endLoc) {
-		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-				try {
-					BossManager.createBoss(sender, (LivingEntity)entity, requestedTag, endLoc);
-				} catch (Exception ex) {
-					MessagingUtils.sendStackTrace(sender, ex);
-				}
 		} else {
 			sender.sendMessage(Component.text("This command must be on a LivingEntity!", NamedTextColor.RED));
 		}

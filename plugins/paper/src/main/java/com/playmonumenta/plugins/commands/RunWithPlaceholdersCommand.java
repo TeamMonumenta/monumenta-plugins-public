@@ -22,7 +22,7 @@ public class RunWithPlaceholdersCommand {
 				new LiteralArgument("no-player"),
 				new GreedyStringArgument("command"))
 			.executes((sender, args) -> {
-				String command = (String) args[0];
+				String command = args.getUnchecked("command");
 
 				run(null, command, sender);
 			})
@@ -34,8 +34,8 @@ public class RunWithPlaceholdersCommand {
 				new EntitySelectorArgument.OnePlayer("player"),
 				new GreedyStringArgument("command"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				String command = (String) args[1];
+				Player player = args.getUnchecked("player");
+				String command = args.getUnchecked("command");
 
 				run(player, command, sender);
 			})

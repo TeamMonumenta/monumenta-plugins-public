@@ -29,8 +29,8 @@ public class Stuck {
 						.decoration(TextDecoration.ITALIC, false));
 				new BukkitRunnable() {
 					int mTime = 10;
-					Player mTarget = player;
-					Location mStartLoc = player.getLocation();
+					final Player mTarget = player;
+					final Location mStartLoc = player.getLocation();
 
 					@Override
 					public void run() {

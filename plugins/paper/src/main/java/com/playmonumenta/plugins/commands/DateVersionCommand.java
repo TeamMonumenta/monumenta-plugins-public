@@ -15,6 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.scoreboard.Objective;
 
 public class DateVersionCommand {
 	private enum VersionField {
@@ -68,9 +69,9 @@ public class DateVersionCommand {
 							.withArguments(new IntegerArgument("Month", 1, 12))
 							.withArguments(new IntegerArgument("DayOfMonth", 1, 31))
 							.executes((sender, args) -> {
-								int year = (Integer) args[0];
-								int month = (Integer) args[1];
-								int dayOfMonth = (Integer) args[2];
+								int year = args.getUnchecked("Year");
+								int month = args.getUnchecked("Month");
+								int dayOfMonth = args.getUnchecked("DayOfMonth");
 								LocalDateTime localDateTime = DateUtils.localDateTime(year, month, dayOfMonth);
 
 								return getDateVersionResult(sender, localDateTime, versionField);
@@ -80,7 +81,7 @@ public class DateVersionCommand {
 							.executes((sender, args) -> {
 								CommandSender callee = CommandUtils.getCallee(sender);
 								if (callee instanceof Entity entity) {
-									String objective = (String) args[0];
+									Objective objective = args.getUnchecked("DailyVersionScore");
 									int dailyVersion = ScoreboardUtils.getScoreboardValue(entity, objective).orElse(0);
 									LocalDateTime localDateTime = DateUtils.localDateTime(dailyVersion);
 
@@ -92,7 +93,7 @@ public class DateVersionCommand {
 						.withSubcommand(new CommandAPICommand("DailyVersionConst")
 							.withArguments(new IntegerArgument("DailyVersionConst"))
 							.executes((sender, args) -> {
-								int dailyVersion = (Integer) args[0];
+								int dailyVersion = args.getUnchecked("DailyVersionConst");
 								LocalDateTime localDateTime = DateUtils.localDateTime(dailyVersion);
 
 								return getDateVersionResult(sender, localDateTime, versionField);

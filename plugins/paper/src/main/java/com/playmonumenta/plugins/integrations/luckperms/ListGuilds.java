@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.List;
 import java.util.TreeMap;
@@ -29,8 +29,8 @@ public class ListGuilds {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.mod.list");
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("list"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("list"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
 				run(plugin, sender, false);
@@ -38,9 +38,9 @@ public class ListGuilds {
 			.register();
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("list"))
-			.withArguments(new MultiLiteralArgument("legacy"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("list"))
+			.withArguments(new LiteralArgument("legacy"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
 				run(plugin, sender, true);

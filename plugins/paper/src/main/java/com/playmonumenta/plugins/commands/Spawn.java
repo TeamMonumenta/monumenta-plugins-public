@@ -24,7 +24,7 @@ public class Spawn {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Collection<Entity> targets = (Collection<Entity>)args[0];
+				Collection<Entity> targets = (Collection<Entity>) args.get("Targets");
 				run(targets);
 			})
 			.register();

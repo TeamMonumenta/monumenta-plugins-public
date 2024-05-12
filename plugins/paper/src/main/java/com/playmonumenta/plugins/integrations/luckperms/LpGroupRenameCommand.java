@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,7 +21,7 @@ public class LpGroupRenameCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.lpgroup.rename");
 
 		new CommandAPICommand("lpgroup")
-			.withArguments(new MultiLiteralArgument("rename"))
+			.withArguments(new LiteralArgument("rename"))
 			.withArguments(new TextArgument("old group ID")
 				.replaceSuggestions(LPArguments.GROUP_SUGGESTIONS))
 			.withArguments(new TextArgument("new group ID")
@@ -32,8 +32,8 @@ public class LpGroupRenameCommand {
 					throw CommandAPI.failWithString("This command cannot be run on the build shard.");
 				}
 
-				String oldId = (String) args[1];
-				String newId = (String) args[2];
+				String oldId = args.getUnchecked("old group ID");
+				String newId = args.getUnchecked("new group ID");
 				renameGroup(plugin, sender, oldId, newId);
 			})
 			.register();

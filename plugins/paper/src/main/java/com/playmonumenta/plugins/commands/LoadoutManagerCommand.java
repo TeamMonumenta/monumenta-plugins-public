@@ -23,7 +23,7 @@ public class LoadoutManagerCommand {
 				new CommandAPICommand("gui")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 						if (!player.hasPermission("monumenta.feature.loadoutmanager")) {
 							player.sendMessage(LoadoutManager.LOADOUT_MANAGER_NAME + " is currently disabled.");
 							return;
@@ -40,9 +40,8 @@ public class LoadoutManagerCommand {
 			.withSubcommand(
 				new CommandAPICommand("gui_other")
 					.withArguments(new EntitySelectorArgument.OnePlayer("other player"))
-					.executes((sender, args) -> {
-						Player caller = CommandUtils.getPlayerFromSender(sender);
-						Player target = (Player) args[0];
+					.executesPlayer((caller, args) -> {
+						Player target = args.getUnchecked("player");
 						new LoadoutManagerGui(caller, target).open();
 					})
 			)
@@ -50,7 +49,7 @@ public class LoadoutManagerCommand {
 				new CommandAPICommand("quickswap")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 						if (!player.hasPermission("monumenta.feature.loadoutmanager")) {
 							player.sendMessage(LoadoutManager.LOADOUT_MANAGER_NAME + " is currently disabled.");
 							return;
@@ -63,8 +62,8 @@ public class LoadoutManagerCommand {
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.withArguments(new IntegerArgument("delta"))
 					.executes((sender, args) -> {
-						Player player = (Player) args[0];
-						int delta = (int) args[1];
+						Player player = args.getUnchecked("player");
+						int delta = args.getUnchecked("delta");
 
 						LoadoutManager.LoadoutData data = Plugin.getInstance().mLoadoutManager.getData(player);
 						data.mMaxLoadouts += delta;

@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
 public class UpdateChestItems extends GenericCommand {
@@ -21,13 +20,13 @@ public class UpdateChestItems extends GenericCommand {
 				new LocationArgument("pos", LocationType.BLOCK_POSITION)
 			)
 			.executes((sender, args) -> {
-				run(sender, (Location) args[0]);
+				run(args.getUnchecked("pos"));
 			})
 			.register();
 
 	}
 
-	public static void run(CommandSender sender, Location loc) {
+	public static void run(Location loc) {
 		Block b = loc.getBlock();
 		if (b.getType() == Material.CHEST) {
 			Chest chest = (Chest) b.getState();

@@ -46,8 +46,8 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 				new EntitySelectorArgument.OneEntity("npc")
 			)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				Entity npc = (Entity) args[1];
+				Player player = args.getUnchecked("players");
+				Entity npc = args.getUnchecked("npc");
 
 				BlueStrikeDaggerCraftingBoss daggerCraftingBoss = BossUtils.getBossOfClass(npc, BlueStrikeDaggerCraftingBoss.class);
 				if (daggerCraftingBoss != null) {

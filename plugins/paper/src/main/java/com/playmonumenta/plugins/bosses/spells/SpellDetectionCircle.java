@@ -6,8 +6,8 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.GameMode;
@@ -28,7 +28,7 @@ public class SpellDetectionCircle extends Spell {
 	public static void registerCommand(Plugin plugin) {
 		List<Argument<?>> arguments = new ArrayList<>();
 
-		arguments.add(new MultiLiteralArgument("detection_circle"));
+		arguments.add(new LiteralArgument("detection_circle"));
 		arguments.add(new LocationArgument("center_pos"));
 		arguments.add(new IntegerArgument("radius", 1, 2000));
 		arguments.add(new IntegerArgument("duration", 1, Integer.MAX_VALUE));
@@ -38,8 +38,8 @@ public class SpellDetectionCircle extends Spell {
 			.withPermission(CommandPermission.fromString("mobspell.detectioncircle"))
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				new SpellDetectionCircle(plugin, (Location) args[1], (Integer) args[2],
-					(Integer) args[3], (Location) args[4]).run();
+				new SpellDetectionCircle(plugin, args.getUnchecked("center_pos"), args.getUnchecked("radius"),
+					args.getUnchecked("duration"), args.getUnchecked("redstone_pos")).run();
 			})
 			.register();
 	}
@@ -59,8 +59,7 @@ public class SpellDetectionCircle extends Spell {
 
 			@Override
 			public void run() {
-				int n = FastUtils.RANDOM.nextInt(40) + 50 + (int) (mRadius * 4);
-				double precision = n;
+				int precision = FastUtils.RANDOM.nextInt(40) + 50 + (int) (mRadius * 4);
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(mCenter.getWorld(), 0, mCenter.getY() + 5, 0);
 				double angle = 0;

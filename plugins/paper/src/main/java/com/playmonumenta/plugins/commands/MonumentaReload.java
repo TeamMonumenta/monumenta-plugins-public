@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.mmquest.commands.MMQuest;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.command.CommandSender;
 
 public class MonumentaReload {
@@ -17,7 +16,7 @@ public class MonumentaReload {
 			.register();
 	}
 
-	private static void run(Plugin plugin, CommandSender sender) throws WrapperCommandSyntaxException {
+	private static void run(Plugin plugin, CommandSender sender) {
 		plugin.reloadMonumentaConfig(sender);
 		MMQuest.setupQuests(Plugin.getInstance());
 	}

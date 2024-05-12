@@ -18,7 +18,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
@@ -72,8 +72,8 @@ public class CreateGuildCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.mod.create");
 
 		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new MultiLiteralArgument("mod"));
-		arguments.add(new MultiLiteralArgument("create"));
+		arguments.add(new LiteralArgument("mod"));
+		arguments.add(new LiteralArgument("create"));
 		arguments.add(new TextArgument("guild name")
 			.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS));
 		arguments.add(new TextArgument("guild color")
@@ -91,10 +91,10 @@ public class CreateGuildCommand {
 					throw CommandAPI.failWithString("This command cannot be run on the build shard.");
 				}
 
-				String guildName = (String) args[args.length - 4];
-				String guildColor = (String) args[args.length - 3];
-				String guildTag = (String) args[args.length - 2];
-				Collection<Player> guildFounders = (Collection<Player>) args[args.length - 1];
+				String guildName = args.getUnchecked("guild name");
+				String guildColor = args.getUnchecked("guild color");
+				String guildTag = args.getUnchecked("guild tag");
+				Collection<Player> guildFounders = args.getUnchecked("founders");
 				run(plugin, sender, guildName, guildColor, guildTag, guildFounders);
 			})
 			.register();

@@ -19,23 +19,24 @@ public class ParticlesCommand {
 
 		new CommandAPICommand("particles")
 			.withArguments(
-				new MultiLiteralArgument(Arrays.stream(ParticleCategory.values())
+				new MultiLiteralArgument("category", Arrays.stream(ParticleCategory.values())
 					                         .filter(cat -> cat.mObjectiveName != null)
 					                         .map(cat -> cat.name().toLowerCase(Locale.ROOT))
 					                         .toArray(String[]::new)),
 				new IntegerArgument("multiplier")
 			)
 			.executesPlayer((player, args) -> {
+				String categoryString = args.getUnchecked("category");
 				ParticleCategory category;
 				try {
-					category = ParticleCategory.valueOf(((String) args[0]).toUpperCase(Locale.ROOT));
+					category = ParticleCategory.valueOf(categoryString.toUpperCase(Locale.ROOT));
 				} catch (IllegalArgumentException e) {
-					throw CommandAPI.failWithString("Invalid particle category " + args[0]);
+					throw CommandAPI.failWithString("Invalid particle category " + categoryString);
 				}
 				if (category.mObjectiveName == null) {
-					throw CommandAPI.failWithString("Invalid particle category " + args[0]);
+					throw CommandAPI.failWithString("Invalid particle category " + categoryString);
 				}
-				int multiplier = (int) args[1];
+				int multiplier = args.getUnchecked("multiplier");
 
 				multiplier = Math.max(0, Math.min(multiplier, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
 				ScoreboardUtils.setScoreboardValue(player, category.mObjectiveName, multiplier);

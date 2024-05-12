@@ -101,7 +101,7 @@ public class GuildCommand {
 					return;
 				}
 
-				String guildName = (String) args[args.length - 1];
+				String guildName = args.getByArgument(GUILD_NAME_ARG);
 				String rootId = GuildArguments.getIdFromName(guildName);
 				if (rootId == null) {
 					throw CommandAPI.failWithString("Could not identify guild by name: " + guildName);

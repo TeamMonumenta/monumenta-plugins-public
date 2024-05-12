@@ -12,8 +12,9 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;
@@ -50,17 +51,16 @@ public class TeleportGuildGui extends Gui {
 	private List<PlayerGuildInfo> mAccessibleGuilds = new ArrayList<>();
 	private GuildOrder mOrder = GuildOrder.DEFAULT;
 
-	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.teleportgui");
 		String permsOther = "monumenta.command.guild.teleportgui.other";
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("teleportgui"))
+			.withArguments(new LiteralArgument("teleportgui"))
 			.withArguments(new EntitySelectorArgument.ManyPlayers("Players"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
-				List<Player> players = (List<Player>) args[args.length - 1];
+				Collection<Player> players = args.getUnchecked("Players");
 
 				if (!sender.hasPermission(permsOther)) {
 					for (Player player : players) {

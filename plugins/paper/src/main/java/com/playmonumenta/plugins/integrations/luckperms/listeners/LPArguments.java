@@ -16,11 +16,12 @@ import net.luckperms.api.event.group.GroupDeleteEvent;
 import net.luckperms.api.event.sync.PostSyncEvent;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 
 public class LPArguments {
 	private static final ConcurrentSkipListSet<String> mGroupIds = new ConcurrentSkipListSet<>();
 
-	public static final ArgumentSuggestions GROUP_SUGGESTIONS = ArgumentSuggestions
+	public static final ArgumentSuggestions<CommandSender> GROUP_SUGGESTIONS = ArgumentSuggestions
 		.stringCollection(suggestionInfo -> CommandUtils.quoteIfNeeded(new ArrayList<>(mGroupIds)));
 
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {

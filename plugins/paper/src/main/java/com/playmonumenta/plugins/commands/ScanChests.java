@@ -51,12 +51,11 @@ public class ScanChests {
 			// scan
 			.withSubcommand(
 				new CommandAPICommand("scan")
-					.executesPlayer((PlayerCommandExecutor) (sender, args) -> scan(sender, false, false)))
-			.withSubcommand(
-				new CommandAPICommand("scan")
-					.withArguments(new BooleanArgument("include empty non-chests"),
-						new BooleanArgument("include filled non-chests"))
-					.executesPlayer((PlayerCommandExecutor) (sender, args) -> scan(sender, (boolean) args[0], (boolean) args[1])))
+					.withOptionalArguments(
+						new BooleanArgument("include empty non-chests"),
+						new BooleanArgument("include filled non-chests")
+					)
+					.executesPlayer((PlayerCommandExecutor) (sender, args) -> scan(sender, args.getOrDefaultUnchecked("include empty non-chests", false), args.getOrDefaultUnchecked("include filled non-chests", false))))
 
 			// clear seeds
 			.withSubcommand(
@@ -71,7 +70,7 @@ public class ScanChests {
 			.withSubcommand(
 				new CommandAPICommand("clearnames")
 					.withArguments(new GreedyStringArgument("name match"))
-					.executesPlayer((PlayerCommandExecutor) (sender, args) -> clearNames(sender, (String) args[0])))
+					.executesPlayer((PlayerCommandExecutor) (sender, args) -> clearNames(sender, args.getUnchecked("name match"))))
 
 			// scan loot tables
 			.withSubcommand(
@@ -80,14 +79,14 @@ public class ScanChests {
 			.withSubcommand(
 				new CommandAPICommand("scanLootTables")
 					.withArguments(new LootTableArgument("loot table"))
-					.executesPlayer((PlayerCommandExecutor) (sender, args) -> scanLootTables(sender, (LootTable) args[0])))
+					.executesPlayer((PlayerCommandExecutor) (sender, args) -> scanLootTables(sender, args.getUnchecked("loot table"))))
 
 			// replace loot tables
 			.withSubcommand(
 				new CommandAPICommand("replaceLootTables")
 					.withArguments(new LootTableArgument("from"),
 						new LootTableArgument("to"))
-					.executesPlayer((PlayerCommandExecutor) (sender, args) -> replaceLootTables(sender, (LootTable) args[0], (LootTable) args[1])))
+					.executesPlayer((PlayerCommandExecutor) (sender, args) -> replaceLootTables(sender, args.getUnchecked("from"), args.getUnchecked("to"))))
 
 			.register();
 

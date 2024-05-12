@@ -56,8 +56,8 @@ public class RenameGuild {
 					return;
 				}
 
-				String guildName = (String) args[args.length - 2];
-				String newTag = (String) args[args.length - 1];
+				String guildName = args.getByArgument(GuildCommand.GUILD_NAME_ARG);
+				String newTag = args.getByArgument(NEW_TAG_ARG);
 
 				if (newTag.length() > LuckPermsIntegration.MAX_TAG_LENGTH) {
 					throw CommandAPI.failWithString("Guild tag cannot exceed " + LuckPermsIntegration.MAX_TAG_LENGTH + " characters");
@@ -77,8 +77,8 @@ public class RenameGuild {
 					return;
 				}
 
-				String guildName = (String) args[args.length - 2];
-				String newGuildName = (String) args[args.length - 1];
+				String guildName = args.getByArgument(GuildCommand.GUILD_NAME_ARG);
+				String newGuildName = args.getByArgument(NEW_NAME_ARG);
 
 				runRenameGuild(plugin, sender, guildName, newGuildName);
 			});
@@ -96,9 +96,9 @@ public class RenameGuild {
 					return;
 				}
 
-				String guildName = (String) args[args.length - 3];
-				String newGuildName = (String) args[args.length - 2];
-				String newTag = (String) args[args.length - 1];
+				String guildName = args.getByArgument(GuildCommand.GUILD_NAME_ARG);
+				String newGuildName = args.getByArgument(NEW_NAME_ARG);
+				String newTag = args.getByArgument(NEW_TAG_ARG);
 
 				if (newTag.length() > LuckPermsIntegration.MAX_TAG_LENGTH) {
 					throw CommandAPI.failWithString("Guild tag cannot exceed " + LuckPermsIntegration.MAX_TAG_LENGTH + " characters");

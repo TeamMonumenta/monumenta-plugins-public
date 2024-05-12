@@ -25,7 +25,11 @@ public enum Operation {
 		return mName;
 	}
 
-	public static @Nullable Operation getOperation(String name) {
+	public static @Nullable Operation getOperation(@Nullable String name) {
+		if (name == null) {
+			return null;
+		}
+
 		for (Operation operation : Operation.values()) {
 			if (operation.getName().replace(" ", "").equals(name.replace(" ", ""))) {
 				return operation;

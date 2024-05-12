@@ -29,8 +29,8 @@ public class Eggify {
 				new EntitySelectorArgument.OnePlayer("player"),
 				new EntitySelectorArgument.ManyEntities("entities"))
 			.executes((sender, args) -> {
-				for (Entity entity : (Collection<Entity>) args[1]) {
-					eggify((Player) args[0], entity);
+				for (Entity entity : (Collection<Entity>) args.get("entities")) {
+					eggify(args.getUnchecked("player"), entity);
 				}
 			})
 			.register();

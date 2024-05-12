@@ -65,7 +65,7 @@ public class ShardSorterCommand {
 					})))
 			.withArguments(new PlayerArgument("target"))
 			.executes((sender, args) -> {
-				sortToShard((Player) args[1], (String) args[0], sender);
+				sortToShard(args.getUnchecked("player"), args.getUnchecked("shard"), sender);
 			})
 			.register();
 	}

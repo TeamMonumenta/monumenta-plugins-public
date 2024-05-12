@@ -27,7 +27,7 @@ public class MonumentaTrigger {
 				if (!metadata.isEmpty()) {
 					Map<Integer, Consumer<Player>> triggers = (Map<Integer, Consumer<Player>>) metadata.get(0).value();
 					player.removeMetadata(METADATA_KEY, Plugin.getInstance());
-					Consumer<Player> callback = triggers.get((Integer) args[0]);
+					Consumer<Player> callback = triggers.get(args.getUnchecked("id"));
 					if (callback != null) {
 						callback.accept(player);
 					}

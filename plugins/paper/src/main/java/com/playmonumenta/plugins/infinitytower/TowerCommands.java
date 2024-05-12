@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobStats;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -25,6 +26,7 @@ import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -34,6 +36,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -52,7 +55,7 @@ public class TowerCommands {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
-			.withArguments(new MultiLiteralArgument("reload"))
+			.withArguments(new LiteralArgument("reload"))
 			.executesPlayer((player, args) -> {
 				TowerGameUtils.sendMessage(player, "Reloading...");
 				TowerConstants.SHOULD_GAME_START = true;
@@ -70,10 +73,10 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("create"),
+				new LiteralArgument("create"),
 				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
-				Player player = (Player) args[1];
+				Player player = args.getUnchecked("player");
 				UUID playerUUID = player.getUniqueId();
 
 				if (!TowerConstants.SHOULD_GAME_START) {
@@ -104,11 +107,11 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("buy"),
-				new MultiLiteralArgument("mobs"),
+				new LiteralArgument("buy"),
+				new LiteralArgument("mobs"),
 				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
-				Player player = (Player) args[2];
+				Player player = args.getUnchecked("player");
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
 					throw CommandAPI.failWithString("No game in progress!");
@@ -120,11 +123,11 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("open"),
-				new MultiLiteralArgument("team"),
+				new LiteralArgument("open"),
+				new LiteralArgument("team"),
 				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
-				Player player = (Player) args[2];
+				Player player = args.getUnchecked("player");
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
 					throw CommandAPI.failWithString("No game in progress!");
@@ -137,11 +140,11 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("start"),
-				new MultiLiteralArgument("turn"),
+				new LiteralArgument("start"),
+				new LiteralArgument("turn"),
 				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
-				Player player = (Player) args[2];
+				Player player = args.getUnchecked("player");
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
 					throw CommandAPI.failWithString("No game in progress!");
@@ -153,11 +156,11 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("game"),
-				new MultiLiteralArgument("stop"),
+				new LiteralArgument("game"),
+				new LiteralArgument("stop"),
 				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
-				Player player = (Player) args[2];
+				Player player = args.getUnchecked("player");
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game != null) {
 					game.stop();
@@ -172,13 +175,14 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("add"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("add"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument
 			).executesPlayer((player, args) -> {
-				TowerMobInfo info = TowerFileUtils.getMobInfo((String) args[2]);
+				String losName = args.getUnchecked("los name");
+				TowerMobInfo info = TowerFileUtils.getMobInfo(losName);
 				if (info == null) {
-					throw CommandAPI.failWithString("Can't find a match for this bos: " + (String)args[2]);
+					throw CommandAPI.failWithString("Can't find a match for this bos: " + losName);
 				}
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
@@ -192,8 +196,8 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("redis"),
-				new MultiLiteralArgument("importplayers")
+				new LiteralArgument("redis"),
+				new LiteralArgument("importplayers")
 			).executesPlayer((player, args) -> {
 				JsonObject data = TowerFileUtils.readFile("InfinityTowerPlayer.json");
 				if (data == null) {
@@ -206,8 +210,8 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("redis"),
-				new MultiLiteralArgument("exportplayers")
+				new LiteralArgument("redis"),
+				new LiteralArgument("exportplayers")
 			).executesPlayer((player, args) -> {
 				JsonObject data = TowerFileUtils.readFileRedis("InfinityTowerPlayer.json");
 				if (data == null) {
@@ -227,8 +231,8 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("stats"),
-				new MultiLiteralArgument("round")
+				new LiteralArgument("stats"),
+				new LiteralArgument("round")
 			).executesPlayer((player, args) -> {
 
 				JsonObject obj = new JsonObject();
@@ -283,8 +287,8 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("save"),
-				new MultiLiteralArgument("all")
+				new LiteralArgument("save"),
+				new LiteralArgument("all")
 			).executesPlayer((player, args) -> {
 				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 					TowerFileUtils.saveDefaultTower();
@@ -296,8 +300,8 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("auto"),
-				new MultiLiteralArgument("update")
+				new LiteralArgument("auto"),
+				new LiteralArgument("update")
 			).executesPlayer((player, args) -> {
 				updateMobs(player);
 			}).register();
@@ -305,8 +309,8 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("show"),
-				new MultiLiteralArgument("mobs")
+				new LiteralArgument("show"),
+				new LiteralArgument("mobs")
 			).executesPlayer((player, args) -> {
 				new TowerGuiShowMobs(player).openInventory(player, plugin);
 			}).register();
@@ -314,37 +318,37 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("floor"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("floor"),
 				new IntegerArgument("floor")
 			).executesPlayer((player, args) -> {
-				new TowerGuiFloorDesign(player, (Integer) args[2] - 1).openInventory(player, plugin);
+				new TowerGuiFloorDesign(player, (Integer) args.get("floor") - 1).openInventory(player, plugin);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("new"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("new"),
+				new LiteralArgument("mob"),
 				new StringArgument("los name").includeSuggestions(ArgumentSuggestions.strings(
 					(sug) -> LibraryOfSoulsIntegration.getSoulNames().toArray(new String[0])))
 			).executesPlayer((player, args) -> {
-				createNewTowerMob(player, (String)args[3]);
+				createNewTowerMob(player, args.getUnchecked("los name"));
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("remove"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("remove"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument
 			).executesPlayer((player, args) -> {
-
-				TowerMobInfo info = TowerFileUtils.getMobInfo((String) args[3]);
+				String losName = args.getUnchecked("los name");
+				TowerMobInfo info = TowerFileUtils.getMobInfo(losName);
 				if (info == null) {
-					throw CommandAPI.failWithString("No mob with: " + ((String) args[3]));
+					throw CommandAPI.failWithString("No mob with: " + losName);
 				}
 				TowerGameUtils.setMainHandItem(player, info);
 
@@ -362,20 +366,21 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("purchasable"),
+				new LiteralArgument("set"),
+				new LiteralArgument("purchasable"),
 				new BooleanArgument("purchasable")
 			).executesPlayer((player, args) -> {
-				TowerMobInfo info = TowerFileUtils.getMobInfo((String) args[3]);
+				String losName = args.getUnchecked("los name");
+				TowerMobInfo info = TowerFileUtils.getMobInfo(losName);
 				if (info == null) {
-					throw CommandAPI.failWithString("No mob with: " + ((String) args[3]));
+					throw CommandAPI.failWithString("No mob with: " + losName);
 				}
 				TowerGameUtils.setMainHandItem(player, info);
 
-				info.mBuyable = (Boolean) args[5];
+				info.mBuyable = args.getUnchecked("purchasable");
 
 				if (info.mBuyable) {
 					TowerFileUtils.getMobsByRarity(info.mMobRarity).add(info);
@@ -391,15 +396,15 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("health"),
+				new LiteralArgument("set"),
+				new LiteralArgument("health"),
 				new DoubleArgument("health")
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				double hp = (double)args[5];
+				String mob = args.getUnchecked("los name");
+				double hp = args.getUnchecked("health");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -420,15 +425,15 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("atk"),
+				new LiteralArgument("set"),
+				new LiteralArgument("atk"),
 				new DoubleArgument("atk")
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				double atk = (double)args[5];
+				String mob = args.getUnchecked("los name");
+				double atk = args.getUnchecked("atk");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -449,11 +454,11 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("ability"),
-				new MultiLiteralArgument("add"),
+				new LiteralArgument("ability"),
+				new LiteralArgument("add"),
 				new GreedyStringArgument("Mob Ability").replaceSuggestions(ArgumentSuggestions.strings((info) -> {
 					String[] abilities = new String[TowerMobAbility.ABILITIES.size()];
 					int i = 0;
@@ -463,8 +468,8 @@ public class TowerCommands {
 					return abilities;
 				}))
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				String ability = (String)args[5];
+				String mob = args.getUnchecked("los name");
+				String ability = args.getUnchecked("Mob Ability");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -484,11 +489,11 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("ability"),
-				new MultiLiteralArgument("remove"),
+				new LiteralArgument("ability"),
+				new LiteralArgument("remove"),
 				new GreedyStringArgument("Mob Ability").replaceSuggestions(ArgumentSuggestions.strings((info) -> {
 					String[] abilities = new String[TowerMobAbility.ABILITIES.size()];
 					int i = 0;
@@ -498,8 +503,8 @@ public class TowerCommands {
 					return abilities;
 				}))
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				String ability = (String)args[5];
+				String mob = args.getUnchecked("los name");
+				String ability = args.getUnchecked("Mob Ability");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -519,15 +524,15 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("price"),
+				new LiteralArgument("set"),
+				new LiteralArgument("price"),
 				new IntegerArgument("price")
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				int cost = (int)args[5];
+				String mob = args.getUnchecked("los name");
+				int cost = args.getUnchecked("price");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -546,15 +551,15 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("weight"),
+				new LiteralArgument("set"),
+				new LiteralArgument("weight"),
 				new IntegerArgument("weight")
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				int weight = (int)args[5];
+				String mob = args.getUnchecked("los name");
+				int weight = args.getUnchecked("weight");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -573,15 +578,15 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("limit"),
+				new LiteralArgument("set"),
+				new LiteralArgument("limit"),
 				new IntegerArgument("limit", 0, 10)
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				int limit = (int)args[5];
+				String mob = args.getUnchecked("los name");
+				int limit = args.getUnchecked("limit");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -601,15 +606,15 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("lore"),
+				new LiteralArgument("set"),
+				new LiteralArgument("lore"),
 				new GreedyStringArgument("lore")
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				String lore = (String)args[5];
+				String mob = args.getUnchecked("los name");
+				String lore = args.getUnchecked("lore");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -628,15 +633,15 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("name"),
+				new LiteralArgument("set"),
+				new LiteralArgument("name"),
 				new StringArgument("name")
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				String name = (String)args[5];
+				String mob = args.getUnchecked("los name");
+				String name = args.getUnchecked("name");
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -655,13 +660,13 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("item")
+				new LiteralArgument("set"),
+				new LiteralArgument("item")
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
+				String mob = args.getUnchecked("los name");
 				ItemStack stack = player.getInventory().getItemInMainHand();
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
@@ -685,20 +690,20 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("rarity"),
-				new MultiLiteralArgument(
+				new LiteralArgument("set"),
+				new LiteralArgument("rarity"),
+				new MultiLiteralArgument("rarity",
 					TowerMobRarity.COMMON.name(),
 					TowerMobRarity.RARE.name(),
 					TowerMobRarity.EPIC.name(),
 					TowerMobRarity.LEGENDARY.name()
 				)
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
-				TowerMobRarity rarity = TowerMobRarity.valueOf((String)args[5]);
+				String mob = args.getUnchecked("los name");
+				TowerMobRarity rarity = TowerMobRarity.valueOf(args.getUnchecked("rarity"));
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -719,21 +724,21 @@ public class TowerCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("modify"),
-				new MultiLiteralArgument("mob"),
+				new LiteralArgument("modify"),
+				new LiteralArgument("mob"),
 				mobLosNameArgument,
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("class"),
-				new MultiLiteralArgument(
+				new LiteralArgument("set"),
+				new LiteralArgument("class"),
+				new MultiLiteralArgument("class",
 					TowerMobClass.CASTER.getName(),
 					TowerMobClass.PROTECTOR.getName(),
 					TowerMobClass.FIGHTER.getName(),
 					TowerMobClass.SPECIAL.getName()
 				)
 			).executesPlayer((player, args) -> {
-				String mob = (String)args[2];
+				String mob = args.getUnchecked("los name");
 
-				TowerMobClass mobClass = TowerMobClass.getFromName((String)args[5]);
+				TowerMobClass mobClass = TowerMobClass.getFromName(args.getUnchecked("class"));
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
@@ -752,11 +757,9 @@ public class TowerCommands {
 			String losName = info.mLosName;
 			SoulEntry soul = SoulsDatabase.getInstance().getSoul(losName);
 
-			LivingEntity entity = (LivingEntity) soul.summon(player.getLocation().add(0, -100, 0));
-			double hp = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-			double atk = entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getValue();
-			info.mMobStats.mAtk = atk;
-			info.mMobStats.mHP = hp;
+			Attributable entity = (Attributable) soul.summon(player.getLocation().add(0, -100, 0));
+			info.mMobStats.mHP = EntityUtils.getMaxHealth(entity);
+			info.mMobStats.mAtk = EntityUtils.getAttributeOrDefault(entity, Attribute.GENERIC_ATTACK_DAMAGE, 0);
 			TowerFileUtils.updateItem(info);
 		}
 
@@ -788,8 +791,8 @@ public class TowerCommands {
 		if (mobName.startsWith("IT")) {
 			mobName = mobName.replace("IT", "");
 		}
-		double hp = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		double atk = entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getValue();
+		double hp = EntityUtils.getMaxHealth(entity);
+		double atk = EntityUtils.getAttributeOrDefault(entity, Attribute.GENERIC_ATTACK_DAMAGE, 0);
 
 		TowerMobInfo newMob = new TowerMobInfo(mob, new TowerMobStats(atk, hp));
 		entity.remove();

@@ -91,7 +91,7 @@ public final class JunkItemListener implements Listener {
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("threshold"), new IntegerArgument("count"))
 			.executesPlayer((sender, args) -> {
-				playerSetMin(sender, (int) args[0]);
+				playerSetMin(sender, args.getUnchecked("count"));
 			})
 			.register();
 

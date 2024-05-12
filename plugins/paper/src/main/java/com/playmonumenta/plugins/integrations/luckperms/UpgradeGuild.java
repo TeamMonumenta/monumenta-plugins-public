@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.redissync.RBoardAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.HashSet;
@@ -61,13 +61,13 @@ public class UpgradeGuild {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.upgradeguild");
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("upgrade"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("upgrade"))
 			.withArguments(new TextArgument("guild id")
 				.replaceSuggestions(LPArguments.GROUP_SUGGESTIONS))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
-				String guildName = (String) args[args.length - 1];
+				String guildName = args.getUnchecked("guild id");
 				run(plugin, sender, guildName);
 			})
 			.register();

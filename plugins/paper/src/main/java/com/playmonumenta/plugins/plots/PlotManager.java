@@ -71,7 +71,7 @@ public class PlotManager {
 					.withPermission(CommandPermission.fromString("monumenta.plot.info"))
 					.withArguments(new StringArgument("name"))
 					.executes((sender, args) -> {
-						String name = (String) args[0];
+						String name = args.getUnchecked("name");
 						UUID uuid = resolveUUID(name);
 						getPlotInfo(uuid).whenComplete((info, ex) -> {
 							if (ex != null) {
@@ -89,46 +89,29 @@ public class PlotManager {
 					.withArguments(new StringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
 						(info) -> Bukkit.getOnlinePlayers().stream()
 							.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-							.map((player) -> player.getName()).toArray(String[]::new))))
+							.map(Player::getName).toArray(String[]::new))))
+					.withOptionalArguments(new StringArgument("duration"))
 					.executesPlayer((player, args) -> {
-						plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), null);
-					}))
-				.withSubcommand(new CommandAPICommand("add")
-						.withArguments(new StringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
-							(info) -> Bukkit.getOnlinePlayers().stream()
-								.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-								.map((player) -> player.getName()).toArray(String[]::new))))
-						.withArguments(new StringArgument("duration"))
-						.executesPlayer((player, args) -> {
-							plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), (String) args[1]);
+						plotAccessAdd(player, player.getUniqueId(), resolveUUID(args.getUnchecked("name")), args.getUnchecked("duration"));
 					}))
 				/* MODERATOR ADD */
 				.withSubcommand(new CommandAPICommand("add_other")
 					.withPermission("monumenta.command.plot.add.others")
 					.withArguments(
 						new StringArgument("plot owner"),
-						new StringArgument("other player"))
+						new StringArgument("other player")
+					)
+					.withOptionalArguments(new StringArgument("duration"))
 					.executes((sender, args) -> {
-						UUID ownerUUID = resolveUUID((String) args[0]);
-						UUID otherPlayerUUID = resolveUUID((String) args[1]);
-						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, null);
+						UUID ownerUUID = resolveUUID(args.getUnchecked("plot owner"));
+						UUID otherPlayerUUID = resolveUUID(args.getUnchecked("other player"));
+						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, args.getUnchecked("duration"));
 					}))
-				.withSubcommand(new CommandAPICommand("add_other")
-					.withPermission("monumenta.command.plot.add.others")
-					.withArguments(
-						new StringArgument("plot owner"),
-						new StringArgument("other player"),
-						new StringArgument("duration"))
-					.executes((sender, args) -> {
-						UUID ownerUUID = resolveUUID((String) args[0]);
-						UUID otherPlayerUUID = resolveUUID((String) args[1]);
-						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, (String) args[2]);
-						}))
 					/* REMOVE */
 					.withSubcommand(new CommandAPICommand("remove")
 							.withArguments(new StringArgument("name")) // TODO: Suggestions? Annoying to do
 							.executesPlayer((player, args) -> {
-								plotAccessRemove(player, (String) args[0]);
+								plotAccessRemove(player, args.getUnchecked("name"));
 							}))
 					/* MODERATOR REMOVE */
 					.withSubcommand(new CommandAPICommand("remove_other")
@@ -137,8 +120,8 @@ public class PlotManager {
 									new StringArgument("plot owner"),
 									new StringArgument("other player"))
 							.executes((sender, args) -> {
-								UUID ownerUUID = resolveUUID((String) args[0]);
-								UUID otherPlayerUUID = resolveUUID((String) args[1]);
+								UUID ownerUUID = resolveUUID(args.getUnchecked("plot owner"));
+								UUID otherPlayerUUID = resolveUUID(args.getUnchecked("other player"));
 								plotAccessRemove(sender, ownerUUID, otherPlayerUUID);
 							}))
 			)
@@ -146,25 +129,14 @@ public class PlotManager {
 			.withSubcommand(new CommandAPICommand("send")
 				.withPermission(CommandPermission.fromString("monumenta.plot.send"))
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
+				.withOptionalArguments(new IntegerArgument("instance", 1))
 				.executes((sender, args) -> {
-					for (Player player : (List<Player>)args[0]) {
+					Integer instance = args.getUnchecked("instance");
+					for (Player player : (List<Player>) args.get("players")) {
 						try {
-							sendPlayerToPlot(player);
-						} catch (Exception ex) {
-							sender.sendMessage(Component.text("Failed to send player to plot '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
-							sender.sendMessage(Component.text("Failed to send you to plot, please report this: " + ex.getMessage(), NamedTextColor.RED));
-							MessagingUtils.sendStackTrace(sender, ex);
-						}
-					}
-				}))
-			.withSubcommand(new CommandAPICommand("send")
-				.withPermission(CommandPermission.fromString("monumenta.plot.send"))
-				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
-				.withArguments(new IntegerArgument("instance", 1))
-				.executes((sender, args) -> {
-					for (Player player : (List<Player>)args[0]) {
-						try {
-							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, (Integer) args[1]);
+							if (instance != null) {
+								ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, instance);
+							}
 							sendPlayerToPlot(player);
 						} catch (Exception ex) {
 							sender.sendMessage(Component.text("Failed to send player to plot '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
@@ -178,7 +150,7 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.gui"))
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
-					for (Player player : (List<Player>)args[0]) {
+					for (Player player : (List<Player>) args.get("players")) {
 						getPlotInfo(player.getUniqueId()).thenCompose(PlotInfo::populateNamesAndHeads).whenComplete((info, ex) -> {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
@@ -198,7 +170,7 @@ public class PlotManager {
 						!ServerProperties.getShardName().startsWith("dev")) {
 						throw CommandAPI.failWithString("This command is only available on the playerplots world. Current shard: " + ServerProperties.getShardName());
 					}
-					for (Player player : (List<Player>)args[0]) {
+					for (Player player : (List<Player>) args.get("players")) {
 						int plot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 						int currentplot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(0);
 						if (plot != currentplot) {
@@ -218,7 +190,7 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.new"))
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
-					for (Player player : (List<Player>)args[0]) {
+					for (Player player : (List<Player>) args.get("players")) {
 						try {
 							int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 							if (score > 0) {
@@ -249,7 +221,7 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.reset"))
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
-					for (Player player : (List<Player>)args[0]) {
+					for (Player player : (List<Player>) args.get("players")) {
 						int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 						if (score == 0) {
 							sender.sendMessage(Component.text("Can't reset plot for player that has a Plot score of zero", NamedTextColor.RED));

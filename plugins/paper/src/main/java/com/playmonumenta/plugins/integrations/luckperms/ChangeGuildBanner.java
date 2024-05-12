@@ -30,7 +30,7 @@ public class ChangeGuildBanner {
 					return;
 				}
 
-				String guildName = (String) args[args.length - 1];
+				String guildName = args.getByArgument(GuildCommand.GUILD_NAME_ARG);
 				String guildRootGroupId = GuildArguments.getIdFromName(guildName);
 				if (guildRootGroupId == null) {
 					sender.sendMessage(Component.text("Could not identify a guild by that name", NamedTextColor.RED));

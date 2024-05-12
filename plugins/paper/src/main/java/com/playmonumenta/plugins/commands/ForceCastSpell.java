@@ -20,10 +20,10 @@ public class ForceCastSpell {
 			.withArguments(
 				new EntitySelectorArgument.OneEntity("boss"),
 				new StringArgument("spell class")
-					.replaceSuggestions(ArgumentSuggestions.strings(info -> getSpellClasses((Entity) info.previousArgs()[0])))
+					.replaceSuggestions(ArgumentSuggestions.strings(info -> getSpellClasses(info.previousArgs().getUnchecked("boss"))))
 			)
 			.executes((sender, args) -> {
-				execute((Entity) args[0], (String) args[1]);
+				execute(args.getUnchecked("boss"), args.getUnchecked("spell class"));
 			})
 			.register();
 	}

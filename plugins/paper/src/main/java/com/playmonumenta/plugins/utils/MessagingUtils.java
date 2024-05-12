@@ -60,9 +60,9 @@ public class MessagingUtils {
 		NamedTextColor.WHITE
 	);
 	// Use with greedy string arguments
-	public static final ArgumentSuggestions TEXT_COLOR_SUGGESTIONS;
+	public static final ArgumentSuggestions<CommandSender> TEXT_COLOR_SUGGESTIONS;
 	// Use with string arguments that do not accept '#' without quotes
-	public static final ArgumentSuggestions ESCAPED_TEXT_COLOR_SUGGESTIONS;
+	public static final ArgumentSuggestions<CommandSender> ESCAPED_TEXT_COLOR_SUGGESTIONS;
 
 	static {
 		List<String> textColorSuggestions = new ArrayList<>(NamedTextColor.NAMES.keys());

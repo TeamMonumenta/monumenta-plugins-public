@@ -13,6 +13,7 @@ import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TimeArgument;
+import dev.jorel.commandapi.executors.CommandArguments;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +22,7 @@ import java.util.Locale;
 import java.util.function.Function;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.scoreboard.Objective;
 
 public class CustomEffect {
 	private static final String COMMAND = "customeffect";
@@ -30,79 +31,52 @@ public class CustomEffect {
 	@SuppressWarnings("unchecked")
 	public static void register() {
 		Argument<?> entitiesArgument = new EntitySelectorArgument.ManyEntities("entities");
-		Argument<?> effectArgument = new MultiLiteralArgument(Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase(Locale.getDefault())).toArray(String[]::new));
-		Argument<?> durationArgument = new TimeArgument("duration");
-		Argument<?> objectiveArgument = new ObjectiveArgument("objective").replaceSuggestions(ArgumentSuggestions.strings("objective", "amount"));
-		Argument<?> scoreholderArgument = new ScoreHolderArgument.Single("scoreholder").replaceSuggestions(ArgumentSuggestions.strings("scoreholder", "amount"));
-		Argument<?> amountArgument = new DoubleArgument("amount");
 		Argument<?> sourceArgument = new StringArgument("source");
 
-		List<List<Argument<?>>> withoutObjective = new ArrayList<>();
-		List<List<Argument<?>>> withObjective = new ArrayList<>();
-		List<List<Argument<?>>> withObjectiveAndScoreholder = new ArrayList<>();
+		List<Argument<?>> optionalArguments = new ArrayList<>();
+		optionalArguments.add(new DoubleArgument("amount"));
+		optionalArguments.add(sourceArgument);
 
-		List<Argument<?>> defaultArgs = Arrays.asList(entitiesArgument, effectArgument, durationArgument);
-		List<Argument<?>> defaultObjectiveArgs = new ArrayList<>(defaultArgs);
-		defaultObjectiveArgs.add(objectiveArgument);
-		List<Argument<?>> defaultObjectiveScoreholderArgs = new ArrayList<>(defaultObjectiveArgs);
-		defaultObjectiveScoreholderArgs.add(scoreholderArgument);
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(entitiesArgument);
+		arguments.add(new MultiLiteralArgument("effect", Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase(Locale.getDefault())).toArray(String[]::new)));
+		arguments.add(new TimeArgument("duration"));
 
-		withoutObjective.add(defaultArgs);
-		withObjective.add(defaultObjectiveArgs);
-		withObjectiveAndScoreholder.add(defaultObjectiveScoreholderArgs);
-
-		for (List<List<Argument<?>>> setting : Arrays.asList(withoutObjective, withObjective, withObjectiveAndScoreholder)) {
-			List<Argument<?>> withAmount = new ArrayList<>(setting.get(0));
-			withAmount.add(amountArgument);
-			setting.add(withAmount);
-			List<Argument<?>> withSource = new ArrayList<>(withAmount);
-			withSource.add(sourceArgument);
-			setting.add(withSource);
-		}
-
-		for (List<Argument<?>> arguments : withoutObjective) {
-			new CommandAPICommand(COMMAND).withPermission(PERMISSION).withArguments(arguments).executes((sender, args) -> {
-				Collection<Entity> entities = (Collection<Entity>) args[0];
-				String effect = (String) args[1];
-				int duration = (int) args[2];
-				double amount = args.length > 3 ? (double) args[3] : 0;
-				String source = args.length > 4 ? (String) args[4] : null;
-				applyEffect(entities, effect, duration, null, null, amount, source);
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(arguments)
+			.withOptionalArguments(optionalArguments)
+			.executes((sender, args) -> {
+				execute(args);
 			}).register();
-		}
 
-		for (List<Argument<?>> arguments : withObjective) {
-			new CommandAPICommand(COMMAND).withPermission(PERMISSION).withArguments(arguments).executes((sender, args) -> {
-				Collection<Entity> entities = (Collection<Entity>) args[0];
-				String effect = (String) args[1];
-				int duration = (int) args[2];
-				String objective = (String) args[3];
-				double amount = args.length > 4 ? (double) args[4] : 0;
-				String source = args.length > 5 ? (String) args[5] : null;
-				applyEffect(entities, effect, duration, objective, null, amount, source);
+		arguments.add(new ObjectiveArgument("objective").replaceSuggestions(ArgumentSuggestions.strings("objective", "amount")));
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(arguments)
+			.withOptionalArguments(optionalArguments)
+			.executes((sender, args) -> {
+				execute(args);
 			}).register();
-		}
 
-		for (List<Argument<?>> arguments : withObjectiveAndScoreholder) {
-			new CommandAPICommand(COMMAND).withPermission(PERMISSION).withArguments(arguments).executes((sender, args) -> {
-				Collection<Entity> entities = (Collection<Entity>) args[0];
-				String effect = (String) args[1];
-				int duration = (int) args[2];
-				String objective = (String) args[3];
-				String scoreholder = (String) args[4];
-				double amount = args.length > 5 ? (double) args[5] : 0;
-				String source = args.length > 6 ? (String) args[6] : null;
-				applyEffect(entities, effect, duration, objective, scoreholder, amount, source);
+		arguments.add(new ScoreHolderArgument.Single("scoreholder").replaceSuggestions(ArgumentSuggestions.strings("scoreholder", "amount")));
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(arguments)
+			.withOptionalArguments(optionalArguments)
+			.executes((sender, args) -> {
+				execute(args);
 			}).register();
-		}
 
-		Argument<?> subcommands = new MultiLiteralArgument("haseffect", "clear");
+		Argument<?> subcommands = new MultiLiteralArgument("subcommand", "haseffect", "clear");
 		List<Argument<?>> hasEffectAndClearArguments = Arrays.asList(entitiesArgument, subcommands, sourceArgument);
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION).withArguments(hasEffectAndClearArguments).executes((sender, args) -> {
-			Collection<Entity> entities = (Collection<Entity>) args[0];
-			String subcommand = (String) args[1];
-			String source = (String) args[2];
+			Collection<Entity> entities = (Collection<Entity>) args.get("entities");
+			String subcommand = args.getUnchecked("subcommand");
+			String source = args.getUnchecked("source");
 
 			Function<Entity, Boolean> function;
 			if (subcommand.equals("clear")) {
@@ -114,7 +88,15 @@ public class CustomEffect {
 		}).register();
 	}
 
-	private static void applyEffect(Collection<Entity> entities, String effect, int duration, @Nullable String objective, @Nullable String scoreholder, double amount, @Nullable String source) {
+	private static void execute(CommandArguments args) {
+		Collection<Entity> entities = (Collection<Entity>) args.get("entities");
+		String effect = args.getUnchecked("effect");
+		int duration = args.getUnchecked("duration");
+		Objective objective = args.getUnchecked("objective");
+		String scoreholder = args.getUnchecked("scoreholder");
+		double amount = args.getOrDefaultUnchecked("amount", 0);
+		String source = args.getUnchecked("source");
+
 		EffectType effectType = EffectType.fromTypeIgnoreCase(effect);
 		if (effectType == null) {
 			return;

@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,7 +24,7 @@ public class GetGuildBanner {
 
 	public static void register(Plugin plugin) {
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("getbanner"))
+			.withArguments(new LiteralArgument("getbanner"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, PERMISSION);
 				run(sender);
@@ -32,12 +32,12 @@ public class GetGuildBanner {
 			.register();
 
 		new CommandAPICommand("guild")
-			.withArguments(new MultiLiteralArgument("mod"))
-			.withArguments(new MultiLiteralArgument("getbanner"))
+			.withArguments(new LiteralArgument("mod"))
+			.withArguments(new LiteralArgument("getbanner"))
 			.withArguments(GuildCommand.GUILD_NAME_ARG)
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, MOD_PERMISSION);
-				String guildName = (String) args[args.length - 1];
+				String guildName = args.getUnchecked("guild name");
 				run(plugin, sender, guildName);
 			})
 			.register();

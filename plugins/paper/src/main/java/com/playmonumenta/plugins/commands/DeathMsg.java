@@ -5,11 +5,8 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -45,9 +42,9 @@ public class DeathMsg {
 			}
 		}
 
-		public static DeathMessageState getDeathMessageState(String cmdLiteral) {
+		public static @Nullable DeathMessageState getDeathMessageState(@Nullable String cmdLiteral) {
 			if (cmdLiteral == null) {
-				return DeathMessageState.VISIBLE;
+				return null;
 			} else if (cmdLiteral.equals(DeathMessageState.HIDDEN.getCmdLiteral())) {
 				return DeathMessageState.HIDDEN;
 			} else {
@@ -71,21 +68,11 @@ public class DeathMsg {
 	public static void register() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.deathmsg");
 
-		List<Argument<?>> arguments = new ArrayList<>();
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
+			.withOptionalArguments(new MultiLiteralArgument("state", DeathMessageState.VISIBLE.getCmdLiteral(), DeathMessageState.HIDDEN.getCmdLiteral()))
 			.executes((sender, args) -> {
-				run(sender, null);
-			})
-			.register();
-
-		arguments.add(new MultiLiteralArgument(DeathMessageState.VISIBLE.getCmdLiteral(),
-		                                       DeathMessageState.HIDDEN.getCmdLiteral()));
-		new CommandAPICommand(COMMAND)
-			.withPermission(perms)
-			.withArguments(arguments)
-			.executes((sender, args) -> {
-				run(sender, DeathMessageState.getDeathMessageState((String)args[0]));
+				run(sender, DeathMessageState.getDeathMessageState((String) args.get("state")));
 			})
 			.register();
 	}

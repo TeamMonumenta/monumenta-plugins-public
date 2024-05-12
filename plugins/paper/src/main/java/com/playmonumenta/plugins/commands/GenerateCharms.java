@@ -27,11 +27,11 @@ public class GenerateCharms extends GenericCommand {
 		if (((Player) sender).getGameMode() != GameMode.CREATIVE) {
 			return;
 		}
-		List<List<String>> records = new ArrayList<List<String>>();
+		List<List<String>> records = new ArrayList<>();
 
 		String path = Plugin.getInstance().getDataFolder() + File.separator + "charms.csv";
 		try (CSVReader csvReader = new CSVReader(Files.newBufferedReader(Paths.get(path), StandardCharsets.UTF_8))) {
-			String[] values = null;
+			String[] values;
 			while ((values = csvReader.readNext()) != null) {
 				records.add(Arrays.asList(values));
 			}

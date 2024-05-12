@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,7 +36,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 	private static boolean mEnabled = false;
 
-	public static final ArgumentSuggestions ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((unused)
+	public static final ArgumentSuggestions<CommandSender> ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((unused)
 		-> {
 		if (!mEnabled) {
 			return new String[0];

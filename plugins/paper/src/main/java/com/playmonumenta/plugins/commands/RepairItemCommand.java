@@ -4,10 +4,12 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * RepairItemCommand (Last written by PikaLegend_ 2.04.2024)
@@ -31,10 +33,11 @@ public class RepairItemCommand {
 			)
 			.executes((sender, args) -> {
 				try {
-					if (args[0] instanceof Item itemEntity) {
+					Entity entity = args.getUnchecked("entity");
+					if (entity instanceof Item itemEntity) {
 						ItemStack itemStack = itemEntity.getItemStack();
 						repairItem(itemStack);
-					} else if (args[0] instanceof Player player) {
+					} else if (entity instanceof Player player) {
 						ItemStack itemStack = player.getInventory().getItemInMainHand();
 						repairItem(itemStack);
 					}
@@ -59,7 +62,7 @@ public class RepairItemCommand {
 			.register();
 	}
 
-	public static void repairItem(ItemStack item) {
+	public static void repairItem(@Nullable ItemStack item) {
 		if (item != null) {
 			boolean unshattered = Shattered.unshatterOneLevel(item);
 

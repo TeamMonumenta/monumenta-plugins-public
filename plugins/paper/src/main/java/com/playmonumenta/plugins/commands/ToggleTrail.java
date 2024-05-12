@@ -5,11 +5,8 @@ import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -30,28 +27,11 @@ public class ToggleTrail extends GenericCommand implements Listener {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.toggletrail");
 
-		List<Argument<?>> arguments = new ArrayList<>();
-
 		new CommandAPICommand("toggletrail")
 			.withPermission(perms)
-			.withArguments(arguments)
-			.executes((sender, args) -> {
-				if (sender instanceof Player) {
-					run((Player) sender, null);
-				}
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new StringArgument("material"));
-
-		new CommandAPICommand("toggletrail")
-			.withPermission(perms)
-			.withArguments(arguments)
-			.executes((sender, args) -> {
-				if (sender instanceof Player) {
-					run((Player) sender, (String) args[0]);
-				}
+			.withOptionalArguments(new StringArgument("material"))
+			.executesPlayer((player, args) -> {
+				run(player, args.getUnchecked("material"));
 			})
 			.register();
 	}

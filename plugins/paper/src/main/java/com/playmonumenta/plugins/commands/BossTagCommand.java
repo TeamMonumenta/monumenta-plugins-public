@@ -55,6 +55,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -80,7 +81,7 @@ public class BossTagCommand {
 				new CommandAPICommand("add")
 					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossTagCommand::suggestionsBossTag)))
 					.executesPlayer((player, args) -> {
-						addNewBossTag(player, (String) args[0]);
+						addNewBossTag(player, args.getUnchecked("boss_tag"));
 					})
 			)
 
@@ -89,7 +90,7 @@ public class BossTagCommand {
 					.withArguments(new StringArgument("boss_tag").includeSuggestions(ArgumentSuggestions.strings(t -> getPossibleBosses(t.currentArg()))))
 					.executesPlayer((player, args) -> {
 						try {
-							infoBossTag(player, (String) args[1]);
+							infoBossTag(player, args.getUnchecked("boss_tag"));
 						} catch (Exception e) {
 							throw CommandAPI.failWithString(e.getMessage());
 						}
@@ -106,7 +107,7 @@ public class BossTagCommand {
 				new CommandAPICommand("show")
 					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionBossTagBasedonBoS)))
 					.executesPlayer((player, args) -> {
-						showBossTag(player, (String) args[0]);
+						showBossTag(player, args.getUnchecked("boss_tag"));
 					})
 			)
 
@@ -114,7 +115,7 @@ public class BossTagCommand {
 				new CommandAPICommand("search")
 					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossTagCommand::suggestionsBossTag)))
 					.executesPlayer((player, args) -> {
-						searchTag(player, (String) args[0]);
+						searchTag(player, args.getUnchecked("boss_tag"));
 					})
 			)
 
@@ -122,7 +123,7 @@ public class BossTagCommand {
 				new CommandAPICommand("get")
 					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.suggest(SEARCH_OUTCOME_MAP.keySet())))
 					.executesPlayer((player, args) -> {
-						getBosSearched(player, (String) args[0]);
+						getBosSearched(player, args.getUnchecked("boss_tag"));
 					})
 			)
 
@@ -130,7 +131,7 @@ public class BossTagCommand {
 				new CommandAPICommand("remove")
 					.withArguments(new GreedyStringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.stringsWithTooltipsCollection(BossTagCommand::suggestionBossTagBasedonBoSAndParams)))
 					.executesPlayer((player, args) -> {
-						removeBossTag(player, (String) args[0]);
+						removeBossTag(player, args.getUnchecked("boss_tag"));
 					})
 			)
 
@@ -146,14 +147,14 @@ public class BossTagCommand {
 						new IntegerArgument("index"),
 						new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossTagCommand::suggestionsBossTag)))
 					.executesPlayer((player, args) -> {
-						editBossTag(player, (int) args[0], (String) args[1]);
+						editBossTag(player, args.getUnchecked("index"), args.getUnchecked("boss_tag"));
 					})
 			)
 			.withSubcommand(
 				new CommandAPICommand("delete")
 					.withArguments(new IntegerArgument("index"))
 					.executesPlayer((player, args) -> {
-						deleteBossTag(player, (int) args[0]);
+						deleteBossTag(player, args.getUnchecked("index"));
 					})
 			)
 
@@ -174,7 +175,7 @@ public class BossTagCommand {
 				new CommandAPICommand("los_errors")
 					.withArguments(new BooleanArgument("spawn chest"))
 					.executesPlayer((player, args) -> {
-						checkAllLos(player, (boolean) args[0]);
+						checkAllLos(player, args.getUnchecked("spawn chest"));
 					})
 			)
 
@@ -194,9 +195,9 @@ public class BossTagCommand {
 								new BooleanArgument("reusable"),
 								new GreedyStringArgument("PhaseExpression").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossPhasesList::suggestionPhases)))
 							.executesPlayer((player, args) -> {
-								String phaseName = (String) args[0];
-								boolean reusable = (boolean) args[1];
-								String phaseString = (String) args[2];
+								String phaseName = args.getUnchecked("PhaseName");
+								boolean reusable = args.getUnchecked("reusable");
+								String phaseString = args.getUnchecked("PhaseExpression");
 
 								BookOfSouls bos = getBos(player);
 								ListVariable tags = (ListVariable) bos.getEntityNBT().getVariable("Tags");
@@ -233,10 +234,10 @@ public class BossTagCommand {
 								new EntitySelectorArgument.ManyEntities("bosses"),
 								new GreedyStringArgument("triggerKey"))
 							.executesPlayer((player, args) -> {
-								String triggerKey = (String) args[3];
+								String triggerKey = args.getUnchecked("triggerKey");
 								BossManager bossManager = BossManager.getInstance();
 								PhasesManagerBoss boss;
-								for (Entity entity : (Collection<Entity>) args[2]) {
+								for (Entity entity : (Collection<Entity>) args.get("bosses")) {
 									boss = bossManager.getBoss(entity, PhasesManagerBoss.class);
 									if (boss != null) {
 										boss.onCustomTrigger(triggerKey);
@@ -250,7 +251,7 @@ public class BossTagCommand {
 
 	}
 
-	private static List<Tooltip<String>> suggestionsBossTag(SuggestionInfo info) {
+	private static List<Tooltip<String>> suggestionsBossTag(SuggestionInfo<CommandSender> info) {
 		String currentArg = info.currentArg();
 
 		String[] bossTags = getPossibleBosses(currentArg);
@@ -852,7 +853,7 @@ public class BossTagCommand {
 	}
 
 
-	private static Tooltip<String>[] suggestionBossTagBasedonBoS(SuggestionInfo info) {
+	private static Tooltip<String>[] suggestionBossTagBasedonBoS(SuggestionInfo<CommandSender> info) {
 		try {
 			BookOfSouls bos = getBos((Player) info.sender());
 			NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
@@ -878,7 +879,7 @@ public class BossTagCommand {
 
 	}
 
-	private static Collection<IStringTooltip> suggestionBossTagBasedonBoSAndParams(SuggestionInfo info) {
+	private static Collection<IStringTooltip> suggestionBossTagBasedonBoSAndParams(SuggestionInfo<CommandSender> info) {
 		try {
 			BookOfSouls bos = getBos((Player) info.sender());
 			NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");

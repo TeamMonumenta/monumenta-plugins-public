@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.jetbrains.annotations.Nullable;
 
 public enum Masterwork {
 	NONE("none", ItemStatUtils.DUMMY_LORE_TO_REMOVE),
@@ -54,7 +55,11 @@ public enum Masterwork {
 		return mPlainDisplay;
 	}
 
-	public static Masterwork getMasterwork(String name) {
+	public static Masterwork getMasterwork(@Nullable String name) {
+		if (name == null) {
+			return Masterwork.NONE;
+		}
+
 		for (Masterwork m : Masterwork.values()) {
 			if (m.getName().equals(name)) {
 				return m;

@@ -16,9 +16,9 @@ public class PacketMonitoringCommand {
 
 		new CommandAPICommand("packetmonitoring")
 			.withPermission("monumenta.command.packetmonitoring")
-			.withArguments(new MultiLiteralArgument("off", "simple", "full"))
+			.withArguments(new MultiLiteralArgument("state", "off", "simple", "full"))
 			.executes((sender, args) -> {
-				String reporting = (String) args[0];
+				String reporting = args.getUnchecked("state");
 				protocolLibIntegration.enablePacketMonitor(sender, !reporting.equals("off"), reporting.equals("full"));
 			})
 			.register();

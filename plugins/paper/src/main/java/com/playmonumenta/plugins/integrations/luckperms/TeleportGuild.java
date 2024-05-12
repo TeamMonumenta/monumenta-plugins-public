@@ -34,22 +34,12 @@ public class TeleportGuild {
 		arguments.add(new EntitySelectorArgument.ManyPlayers("player"));
 		new CommandAPICommand(COMMAND)
 			.withArguments(arguments)
+			.withOptionalArguments(new TextArgument("guild name")
+				.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
-				for (Player player : (List<Player>)args[0]) {
-					run(player, null);
-				}
-			})
-			.register();
-
-		arguments.add(new TextArgument("guild name")
-			.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS));
-		new CommandAPICommand(COMMAND)
-			.withArguments(arguments)
-			.executes((sender, args) -> {
-				CommandUtils.checkPerm(sender, perms);
-				for (Player player : (List<Player>)args[0]) {
-					run(player, (String)args[1]);
+				for (Player player : (List<Player>) args.get("player")) {
+					run(player, args.getUnchecked("guild name"));
 				}
 			})
 			.register();

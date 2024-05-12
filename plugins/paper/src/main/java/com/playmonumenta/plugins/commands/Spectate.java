@@ -23,7 +23,7 @@ public class Spectate implements Listener {
 	public static final String SPECTATE_METAKEY = "MonumentaSpectateMetakey";
 	public static final int MOB_CANCEL_RADIUS = 20;
 
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 
 	protected static class SpectateContext {
 		private final Plugin mPlugin;

@@ -89,7 +89,7 @@ public class BroadcastedEvents implements Listener {
 		root.withSubcommands(
 				new CommandAPICommand("clear")
 						.withPermission(perms)
-						.withArguments(List.of(EVENT_NAME_ARGUMENT))
+						.withArguments(EVENT_NAME_ARGUMENT)
 						.executes((sender, args) -> {
 							boolean isPlayerSender = sender instanceof Player;
 							if (isPlayerSender && Objects.equals(ServerProperties.getShardName(), "build")) {
@@ -103,7 +103,7 @@ public class BroadcastedEvents implements Listener {
 								shard = ServerProperties.getShardName();
 							}
 
-							String eventName = (String) args[0];
+							String eventName = args.getUnchecked("Event Name");
 							Integer timeLeft = -1;
 
 							runCommandLogic(sender, shard, eventName, timeLeft, isPlayerSender);
@@ -117,8 +117,8 @@ public class BroadcastedEvents implements Listener {
 								throw CommandAPI.failWithString("You cannot use this command on the build shard");
 							}
 
-							String shard = (String) args[0];
-							String eventName = (String) args[1];
+							String shard = args.getUnchecked("shard");
+							String eventName = args.getUnchecked("Event Name");
 							Integer timeLeft = -1;
 
 							runCommandLogic(sender, shard, eventName, timeLeft, isPlayerSender);
@@ -142,8 +142,8 @@ public class BroadcastedEvents implements Listener {
 								shard = ServerProperties.getShardName();
 							}
 
-							String eventName = (String) args[0];
-							Integer timeLeft = (Integer) args[1];
+							String eventName = args.getUnchecked("Event Name");
+							Integer timeLeft = args.getUnchecked("Time Left");
 
 							runCommandLogic(sender, shard, eventName, timeLeft, isPlayerSender);
 						})

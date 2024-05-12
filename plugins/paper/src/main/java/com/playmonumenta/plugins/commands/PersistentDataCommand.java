@@ -44,7 +44,7 @@ public class PersistentDataCommand {
 										               }
 									               })))
 							.executesPlayer((player, args) -> {
-								NamespacedKey key = (NamespacedKey) args[0];
+								NamespacedKey key = args.getUnchecked("key");
 								get(player, player.getWorld(), key);
 							}))
 					.withSubcommand(
@@ -53,13 +53,14 @@ public class PersistentDataCommand {
 								               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
 							.withArguments(new NamespacedKeyArgument("key")
 								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
-									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs()[0])))))
+									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs().getUnchecked("world"))))))
 							.executes((sender, args) -> {
-								World world = Bukkit.getWorld((String) args[0]);
+								String worldName = args.getUnchecked("world");
+								World world = Bukkit.getWorld(worldName);
 								if (world == null) {
-									throw CommandAPI.failWithString("Unknown world " + args[0]);
+									throw CommandAPI.failWithString("Unknown world " + worldName);
 								}
-								NamespacedKey key = (NamespacedKey) args[1];
+								NamespacedKey key = args.getUnchecked("key");
 								get(sender, world, key);
 							}))
 
@@ -67,14 +68,20 @@ public class PersistentDataCommand {
 						new CommandAPICommand("set")
 							.withArguments(new LiteralArgument("current-world"))
 							.withArguments(new NamespacedKeyArgument("key")
-								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
-									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs()[0])))))
-							.withArguments(new MultiLiteralArgument(Arrays.stream(Constants.SupportedPersistentDataType.values()).map(e -> e.name().toLowerCase(Locale.ROOT)).toArray(String[]::new)))
+								.replaceSuggestions(ArgumentSuggestions.stringCollection(
+									info -> {
+										if (info.sender() instanceof Player player) {
+											return suggestions(player.getWorld());
+										} else {
+											return Collections.emptyList();
+										}
+									})))
+							.withArguments(new MultiLiteralArgument("type", Arrays.stream(Constants.SupportedPersistentDataType.values()).map(e -> e.name().toLowerCase(Locale.ROOT)).toArray(String[]::new)))
 							.withArguments(new GreedyStringArgument("value"))
 							.executesPlayer((player, args) -> {
-								NamespacedKey key = (NamespacedKey) args[0];
-								String dataType = (String) args[1];
-								String valueString = (String) args[2];
+								NamespacedKey key = args.getUnchecked("key");
+								String dataType = args.getUnchecked("type");
+								String valueString = args.getUnchecked("value");
 
 								set(player, player.getWorld(), key, dataType, valueString);
 							}))
@@ -84,17 +91,18 @@ public class PersistentDataCommand {
 								               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
 							.withArguments(new NamespacedKeyArgument("key")
 								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
-									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs()[0])))))
-							.withArguments(new MultiLiteralArgument(Constants.SupportedPersistentDataType.getLowerCaseNames()))
+									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs().getUnchecked("world"))))))
+							.withArguments(new MultiLiteralArgument("type", Constants.SupportedPersistentDataType.getLowerCaseNames()))
 							.withArguments(new GreedyStringArgument("value"))
 							.executes((sender, args) -> {
-								World world = Bukkit.getWorld((String) args[0]);
+								String worldName = args.getUnchecked("world");
+								World world = Bukkit.getWorld(worldName);
 								if (world == null) {
-									throw CommandAPI.failWithString("Unknown world " + args[0]);
+									throw CommandAPI.failWithString("Unknown world " + worldName);
 								}
-								NamespacedKey key = (NamespacedKey) args[1];
-								String dataType = (String) args[2];
-								String valueString = (String) args[3];
+								NamespacedKey key = args.getUnchecked("key");
+								String dataType = args.getUnchecked("type");
+								String valueString = args.getUnchecked("value");
 								set(sender, world, key, dataType, valueString);
 							}))
 			)

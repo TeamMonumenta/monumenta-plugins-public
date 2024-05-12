@@ -31,7 +31,7 @@ public class BoatUtilsCommand {
 						new PlayerArgument("player")
 					)
 					.executes((executor, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 
 						mount(player);
 					}),
@@ -40,7 +40,7 @@ public class BoatUtilsCommand {
 						new PlayerArgument("player")
 					)
 					.executes((executor, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 
 						dismount(player);
 					}),
@@ -53,13 +53,13 @@ public class BoatUtilsCommand {
 						new IntegerArgument("ticks before remount")
 					)
 					.executes((executor, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 						Vector velocity = new Vector(
-								(double) args[1],
-								(double) args[2],
-								(double) args[3]
+							args.getUnchecked("x velocity"),
+							args.getUnchecked("y velocity"),
+							args.getUnchecked("z velocity")
 						);
-						int remountTicks = (int) args[4];
+						int remountTicks = args.getUnchecked("ticks before remount");
 
 						launch(player, velocity, remountTicks);
 					}),
@@ -69,8 +69,8 @@ public class BoatUtilsCommand {
 						new IntegerArgument("ticks")
 					)
 					.executes((executor, args) -> {
-						Player player = (Player) args[0];
-						int ticks = (int) args[1];
+						Player player = args.getUnchecked("player");
+						int ticks = args.getUnchecked("ticks");
 
 						scheduleMount(player, ticks);
 					}),
@@ -81,9 +81,9 @@ public class BoatUtilsCommand {
 						new LocationArgument("location")
 					)
 					.executes((executor, args) -> {
-						Player player = (Player) args[0];
-						int ticks = (int) args[1];
-						Location location = (Location) args[2];
+						Player player = args.getUnchecked("player");
+						int ticks = args.getUnchecked("ticks");
+						Location location = args.getUnchecked("location");
 
 						schedulePositionedMount(player, ticks, location);
 					}),
@@ -92,7 +92,7 @@ public class BoatUtilsCommand {
 						new PlayerArgument("player")
 					)
 					.executes((executor, args) -> {
-						Player player = (Player) args[0];
+						Player player = args.getUnchecked("player");
 
 						unscheduleMount(player);
 					})

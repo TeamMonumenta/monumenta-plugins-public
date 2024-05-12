@@ -288,7 +288,7 @@ public class Plugin extends JavaPlugin {
 		RepairItemCommand.register();
 		RemoveTags.register();
 		RenameItemCommand.register();
-		ResetClass.register(this);
+		ResetClass.register();
 		RestartEmptyCommand.register(this);
 		RocketJump.register();
 		RunWithPlaceholdersCommand.register();

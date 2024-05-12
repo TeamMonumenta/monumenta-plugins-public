@@ -21,8 +21,10 @@ import java.util.Collection;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.World;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Objective;
 
 public class DelvesCommands {
 
@@ -38,9 +40,11 @@ public class DelvesCommands {
 			delveModNames[i++] = mod.name();
 		}
 
-		Argument<?> dungeonArg = new StringArgument("dungeon").includeSuggestions(
+		Argument<String> dungeonArg = new StringArgument("dungeon").includeSuggestions(
 			ArgumentSuggestions.strings(info -> DelvesManager.DUNGEONS.toArray(new String[0])));
-		Argument<?> delveModArg = new MultiLiteralArgument(delveModNames);
+		Argument<String> dungeonArgOptional = new StringArgument("dungeon").includeSuggestions(
+			ArgumentSuggestions.strings(info -> DelvesManager.DUNGEONS.toArray(new String[0])));
+		Argument<?> delveModArg = new MultiLiteralArgument("mod", delveModNames);
 
 		//this command is the old used to open Delve GUI
 		new CommandAPICommand("opendmsgui")
@@ -49,7 +53,8 @@ public class DelvesCommands {
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg)
 			.executes((sender, args) -> {
-				new DelveCustomInventory((Player) args[0], (String) args[1], true).openInventory((Player) args[0], plugin);
+				Player player = args.getUnchecked("player");
+				new DelveCustomInventory(player, args.getUnchecked("dungeon"), true).openInventory(player, plugin);
 			}).register();
 
 		new CommandAPICommand("openmoderatordmsgui")
@@ -59,7 +64,7 @@ public class DelvesCommands {
 				new EntitySelectorArgument.OnePlayer("playerToDebug"),
 				dungeonArg)
 			.executes((sender, args) -> {
-				new DelveCustomInventory((Player) args[1], (String) args[2], true).openInventory((Player) args[0], plugin);
+				new DelveCustomInventory(args.getUnchecked("playerToDebug"), args.getUnchecked("dungeon"), true).openInventory(args.getUnchecked("moderator"), plugin);
 			}).register();
 
 		new CommandAPICommand("opendpsgui")
@@ -68,28 +73,29 @@ public class DelvesCommands {
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg)
 			.executes((sender, args) -> {
-				new DelvePresetSelectionGui((Player) args[0], (String) args[1]).open();
+				new DelvePresetSelectionGui(args.getUnchecked("player"), args.getUnchecked("dungeon")).open();
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("show"),
-				new MultiLiteralArgument("mods"),
+				new LiteralArgument("show"),
+				new LiteralArgument("mods"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg)
 			.executes((sender, args) -> {
-				new DelveCustomInventory((Player) args[2], (String) args[3], false).openInventory((Player) args[2], plugin);
+				Player player = args.getUnchecked("player");
+				new DelveCustomInventory(player, args.getUnchecked("dungeon"), false).openInventory(player, plugin);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("utils"),
-				new MultiLiteralArgument("hasallpoints"),
+				new LiteralArgument("utils"),
+				new LiteralArgument("hasallpoints"),
 				new EntitySelectorArgument.OnePlayer("player")
 			).executes((commandSender, args) -> {
-				Player player = (Player) args[2];
+				Player player = args.getUnchecked("player");
 				int currentPoint = DelvesUtils.getPlayerTotalDelvePoint(null, player, DelvesUtils.getDungeonName(player));
 				return currentPoint >= DelvesUtils.MAX_DEPTH_POINTS ? 1 : -1;
 			}).register();
@@ -97,34 +103,34 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("mod"),
+				new LiteralArgument("get"),
+				new LiteralArgument("mod"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg,
 				delveModArg
 			).executes((commandSender, args) -> {
-				return DelvesUtils.stampDelveInfo(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]));
+				return DelvesUtils.stampDelveInfo(commandSender, args.getUnchecked("player"), args.getUnchecked("dungeon"), DelvesModifier.fromName(args.getUnchecked("mod")));
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("total"),
-				new MultiLiteralArgument("points"),
+				new LiteralArgument("get"),
+				new LiteralArgument("total"),
+				new LiteralArgument("points"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg
 			).executes((commandSender, args) -> {
-				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, (Player) args[3], (String) args[4]);
+				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, args.getUnchecked("player"), args.getUnchecked("dungeon"));
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("get"),
-				new MultiLiteralArgument("total"),
-				new MultiLiteralArgument("points"),
-				new MultiLiteralArgument("range")
+				new LiteralArgument("get"),
+				new LiteralArgument("total"),
+				new LiteralArgument("points"),
+				new LiteralArgument("range")
 			).executesPlayer((player, args) -> {
 				return DelvesUtils.getTotalDelvePointInRange(player, player.getLocation());
 			}).register();
@@ -132,16 +138,18 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("mod"),
+				new LiteralArgument("set"),
+				new LiteralArgument("mod"),
 				new EntitySelectorArgument.ManyPlayers("entity"),
 				dungeonArg,
 				delveModArg,
 				new IntegerArgument("rank", 0, 10)
 			).executes((commandSender, args) -> {
-				int rank = (Integer) args[5];
-				for (Player target : ((Collection<Player>) args[2])) {
-					DelvesUtils.setDelvePoint(commandSender, target, (String) args[3], DelvesModifier.fromName((String) args[4]), rank);
+				int rank = args.getUnchecked("rank");
+				String dungeon = args.getUnchecked("dungeon");
+				DelvesModifier mod = DelvesModifier.fromName(args.getUnchecked("mod"));
+				for (Player target : (Collection<Player>) args.get("entity")) {
+					DelvesUtils.setDelvePoint(commandSender, target, dungeon, mod, rank);
 				}
 				return rank;
 			}).register();
@@ -149,22 +157,23 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("mod"),
+				new LiteralArgument("set"),
+				new LiteralArgument("mod"),
 				new EntitySelectorArgument.ManyPlayers("player"),
 				dungeonArg,
 				delveModArg,
-				new MultiLiteralArgument("score"),
+				new LiteralArgument("score"),
 				new ScoreHolderArgument.Single("score holder"),
 				new ObjectiveArgument("objective")
 			).executes((commandSender, args) -> {
-				DelvesModifier mod = DelvesModifier.fromName((String) args[4]);
-				String scoreHolder = (String) args[6];
-				String objective = (String) args[7];
+				String dungeon = args.getUnchecked("dungeon");
+				DelvesModifier mod = DelvesModifier.fromName(args.getUnchecked("mod"));
+				String scoreHolder = args.getUnchecked("score holder");
+				Objective objective = args.getUnchecked("objective");
 				int rank = ScoreboardUtils.getScoreboardValue(scoreHolder, objective).orElse(0);
 				rank = DelvesUtils.getMaxPointAssignable(mod, rank);
-				for (Player target : ((Collection<Player>) args[2])) {
-					DelvesUtils.setDelvePoint(commandSender, target, (String) args[3], mod, rank);
+				for (Player target : ((Collection<Player>) args.get("player"))) {
+					DelvesUtils.setDelvePoint(commandSender, target, dungeon, mod, rank);
 				}
 				return rank;
 			}).register();
@@ -172,32 +181,35 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("random"),
-				new MultiLiteralArgument("mods"),
+				new LiteralArgument("random"),
+				new LiteralArgument("mods"),
 				new EntitySelectorArgument.ManyPlayers("player"),
 				dungeonArg,
 				new IntegerArgument("pointsToAssign", 0)
 			).executes((commandSender, args) -> {
-				List<Player> otherPlayers = new ArrayList<>((Collection<Player>) args[2]);
+				List<Player> otherPlayers = new ArrayList<>(args.getUnchecked("player"));
 				Player firstPlayer = otherPlayers.remove(0);
-				DelvesUtils.assignRandomDelvePoints(firstPlayer, (String) args[3], (Integer) args[4]);
+				String dungeon = args.getUnchecked("dungeon");
+				DelvesUtils.assignRandomDelvePoints(firstPlayer, dungeon, args.getUnchecked("pointsToAssign"));
 				for (Player target : otherPlayers) {
-					DelvesUtils.copyDelvePoint(commandSender, firstPlayer, target, (String) args[3]);
+					DelvesUtils.copyDelvePoint(commandSender, firstPlayer, target, dungeon);
 				}
-				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, firstPlayer, (String) args[3]);
+				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, firstPlayer, dungeon);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("clear"),
-				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument.ManyPlayers("entity")
-			).executes((commandSender, args) -> {
+				new LiteralArgument("clear"),
+				new LiteralArgument("mods"),
+				new EntitySelectorArgument.ManyPlayers("player")
+			)
+			.withOptionalArguments(dungeonArgOptional)
+			.executes((commandSender, args) -> {
 				int count = 0;
-				for (Player target : ((Collection<Player>) args[2])) {
+				for (Player target : ((Collection<Player>) args.get("entity"))) {
 					count++;
-					DelvesUtils.clearDelvePlayerByShard(commandSender, target, DelvesUtils.getDungeonName(target));
+					DelvesUtils.clearDelvePlayerByShard(commandSender, target, args.getOrDefaultUnchecked("dungeon", DelvesUtils.getDungeonName(target)));
 				}
 				return count;
 			}).register();
@@ -205,27 +217,11 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("clear"),
-				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument.ManyPlayers("player"),
-				dungeonArg
-			).executes((commandSender, args) -> {
-				int count = 0;
-				for (Player target : ((Collection<Player>) args[2])) {
-					count++;
-					DelvesUtils.clearDelvePlayerByShard(commandSender, target, (String) args[3]);
-				}
-				return count;
-			}).register();
-
-		new CommandAPICommand(COMMAND)
-			.withPermission(perms)
-			.withArguments(
-				new MultiLiteralArgument("update"),
-				new MultiLiteralArgument("scoreboard"),
+				new LiteralArgument("update"),
+				new LiteralArgument("scoreboard"),
 				new EntitySelectorArgument.ManyEntities("player")
 			).executes((commandSender, args) -> {
-				for (Player target : ((Collection<Player>) args[2])) {
+				for (Player target : (Collection<Player>) args.get("player")) {
 					DelvesUtils.updateDelveScoreBoard(target);
 				}
 			}).register();
@@ -233,28 +229,30 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("copy"),
-				new MultiLiteralArgument("mods"),
+				new LiteralArgument("copy"),
+				new LiteralArgument("mods"),
 				new EntitySelectorArgument.OnePlayer("copy player"),
 				dungeonArg,
 				new EntitySelectorArgument.ManyPlayers("players to copy")
 			).executes((commandSender, args) -> {
-				for (Player target : ((Collection<Player>) args[4])) {
-					DelvesUtils.copyDelvePoint(commandSender, (Player) args[2], target, (String) args[3]);
+				Player copyPlayer = args.getUnchecked("copy player");
+				String dungeon = args.getUnchecked("dungeon");
+				for (Player target : (Collection<Player>) args.get("players to copy")) {
+					DelvesUtils.copyDelvePoint(commandSender, copyPlayer, target, dungeon);
 				}
 			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("copy"),
-				new MultiLiteralArgument("mods"),
+				new LiteralArgument("copy"),
+				new LiteralArgument("mods"),
 				new EntitySelectorArgument.OnePlayer("copy player"),
 				new EntitySelectorArgument.ManyPlayers("players to copy")
 			).executes((commandSender, args) -> {
-				Player copyFrom = (Player) args[2];
+				Player copyFrom = args.getUnchecked("copy player");
 				String dungeonName = DelvesUtils.getDungeonName(copyFrom);
-				for (Player target : ((Collection<Player>) args[3])) {
+				for (Player target : (Collection<Player>) args.get("players to copy")) {
 					DelvesUtils.copyDelvePoint(commandSender, copyFrom, target, dungeonName);
 				}
 			}).register();
@@ -262,12 +260,12 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("validate"),
+				new LiteralArgument("validate"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg
 			).executes((commandSender, args) -> {
-				Player player = (Player) args[1];
-				String dungeon = (String) args[2];
+				Player player = args.getUnchecked("player");
+				String dungeon = args.getUnchecked("dungeon");
 				return DelvesManager.validateDelvePreset(player, dungeon) ? 1 : 0;
 			}).register();
 
@@ -280,11 +278,12 @@ public class DelvesCommands {
 				dungeonArg,
 				new GreedyStringArgument("preset").replaceSuggestions(ArgumentSuggestions.strings(Arrays.stream(DelvePreset.values()).map(p -> p.mName).toArray(String[]::new)))
 			).executes((commandSender, args) -> {
-				Player player = (Player) args[0];
-				String dungeon = (String) args[1];
-				DelvePreset preset = DelvePreset.getDelvePreset((String) args[2]);
+				Player player = args.getUnchecked("player");
+				String dungeon = args.getUnchecked("dungeon");
+				String presetString = args.getUnchecked("preset");
+				DelvePreset preset = DelvePreset.getDelvePreset(presetString);
 				if (preset == null) {
-					throw CommandAPI.failWithString("Unknown preset '" + args[2] + "'");
+					throw CommandAPI.failWithString("Unknown preset '" + presetString + "'");
 				}
 				DelvesManager.savePlayerData(player, dungeon, preset.mModifiers, preset.mId);
 				if (commandSender != null && !(commandSender instanceof ProxiedCommandSender)) {
@@ -295,14 +294,15 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("spawnercheck"),
+				new LiteralArgument("spawnercheck"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				new FloatArgument("percentage", 0, 100)
 			).executes((commandSender, args) -> {
-				Player player = (Player) args[1];
-				float percentage = (Float) args[2];
-				int broken = DelvesManager.getSpawnersBroken(player.getWorld());
-				int total = DelvesManager.getSpawnersTotal(player.getWorld());
+				Player player = args.getUnchecked("player");
+				float percentage = args.getUnchecked("percentage");
+				World world = player.getWorld();
+				int broken = DelvesManager.getSpawnersBroken(world);
+				int total = DelvesManager.getSpawnersTotal(world);
 				if (broken < 0 || total < 0) {
 					return 0;
 				} else if (broken >= (percentage / 100.0) * total) {
@@ -315,12 +315,12 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("setbrokenspawners"),
+				new LiteralArgument("setbrokenspawners"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				new IntegerArgument("broken", 0)
 			).executes((commandSender, args) -> {
-				Player player = (Player) args[1];
-				int broken = (int) args[2];
+				Player player = args.getUnchecked("player");
+				int broken = args.getUnchecked("broken");
 				DelvesManager.setSpawnersBroken(player.getWorld(), broken);
 				commandSender.sendMessage(Component.text("Set broken spawner count to " + broken, NamedTextColor.GOLD));
 			}).register();
@@ -328,10 +328,10 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("nextrotation"),
+				new LiteralArgument("nextrotation"),
 				new IntegerArgument("week", 0)
 			).executes((commandSender, args) -> {
-				for (DelvesModifier mod : DelvesUtils.getWeeklyRotatingModifier((int)args[1])) {
+				for (DelvesModifier mod : DelvesUtils.getWeeklyRotatingModifier(args.getUnchecked("week"))) {
 					commandSender.sendMessage(Component.text(mod.name(), NamedTextColor.RED));
 				}
 			}).register();
@@ -339,14 +339,15 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("debugchallenge"),
+				new LiteralArgument("debugchallenge"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg
 			).executes((commandSender, args) -> {
-				Player player = (Player) args[1];
-				String dungeon = (String) args[2];
-				int broken = DelvesManager.getSpawnersBroken(player.getWorld());
-				int total = DelvesManager.getSpawnersTotal(player.getWorld());
+				Player player = args.getUnchecked("player");
+				String dungeon = args.getUnchecked("dungeon");
+				World world = player.getWorld();
+				int broken = DelvesManager.getSpawnersBroken(world);
+				int total = DelvesManager.getSpawnersTotal(world);
 				boolean isChallenge = DelvesManager.validateDelvePreset(player, dungeon);
 				if (!isChallenge) {
 					commandSender.sendMessage(Component.text("Instance is not a challenge delve", NamedTextColor.RED));

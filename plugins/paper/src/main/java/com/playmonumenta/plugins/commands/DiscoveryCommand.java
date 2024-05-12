@@ -35,6 +35,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.LootTable;
@@ -51,32 +52,21 @@ public class DiscoveryCommand {
 				.withArguments(
 					new LocationArgument("location"),
 					new LootTableArgument("loot path"),
-					new MultiLiteralArgument(Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
+					new MultiLiteralArgument("tier", Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
 				)
+				.withOptionalArguments(new FunctionArgument("executes"))
 				.executesPlayer((player, args) -> {
-					Location location = (Location) args[0];
-					@Nullable ItemDiscovery discovery = DiscoveryManager.createDiscovery(location, ((LootTable) args[1]).getKey(), ItemDiscovery.ItemDiscoveryTier.valueOf((String) args[2]), null);
-					if (discovery == null) {
-						player.sendMessage(Component.text("Failed to create discovery", MESSAGE_COLOR));
-					} else {
-						player.sendMessage(Component.text("Created discovery with id " + discovery.mId, MESSAGE_COLOR));
+					Location location = args.getUnchecked("location");
+					FunctionWrapper[] functionArr = args.getUnchecked("executes");
+					NamespacedKey key = null;
+					if (functionArr != null) {
+						if (functionArr.length == 0) {
+							player.sendMessage(Component.text("Failed to get provided function"));
+						} else {
+							key = functionArr[0].getKey();
+						}
 					}
-				}),
-			new CommandAPICommand("create")
-				.withArguments(
-					new LocationArgument("location"),
-					new LootTableArgument("loot path"),
-					new MultiLiteralArgument(Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new)),
-					new FunctionArgument("executes")
-				)
-				.executesPlayer((player, args) -> {
-					FunctionWrapper[] function = (FunctionWrapper[]) args[3];
-					if (function.length == 0) {
-						player.sendMessage(Component.text("Failed to get provided function"));
-					}
-
-					Location location = (Location) args[0];
-					@Nullable ItemDiscovery discovery = DiscoveryManager.createDiscovery(location, ((LootTable) args[1]).getKey(), ItemDiscovery.ItemDiscoveryTier.valueOf((String) args[2]), function[0].getKey());
+					@Nullable ItemDiscovery discovery = DiscoveryManager.createDiscovery(location, ((LootTable) args.get("loot path")).getKey(), ItemDiscovery.ItemDiscoveryTier.valueOf(args.getUnchecked("tier")), key);
 					if (discovery == null) {
 						player.sendMessage(Component.text("Failed to create discovery", MESSAGE_COLOR));
 					} else {
@@ -109,7 +99,7 @@ public class DiscoveryCommand {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 									if (discovery != null) {
-										DiscoveryManager.setNewId(discovery, (int) args[0]);
+										DiscoveryManager.setNewId(discovery, args.getUnchecked("new id"));
 										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 									} else {
 										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -124,7 +114,7 @@ public class DiscoveryCommand {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 									if (discovery != null) {
-										DiscoveryManager.setNewLoot(discovery, ((LootTable) args[0]).getKey());
+										DiscoveryManager.setNewLoot(discovery, ((LootTable) args.get("new loot path")).getKey());
 										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 									} else {
 										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -133,13 +123,13 @@ public class DiscoveryCommand {
 							}),
 						new CommandAPICommand("tier")
 							.withArguments(
-								new MultiLiteralArgument(Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
+								new MultiLiteralArgument("tier", Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
 							)
 							.executesPlayer((player, args) -> {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 									if (discovery != null) {
-										DiscoveryManager.setNewTier(discovery, ItemDiscovery.ItemDiscoveryTier.valueOf((String) args[0]));
+										DiscoveryManager.setNewTier(discovery, ItemDiscovery.ItemDiscoveryTier.valueOf(args.getUnchecked("tier")));
 										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 									} else {
 										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -147,30 +137,23 @@ public class DiscoveryCommand {
 								});
 							}),
 						new CommandAPICommand("function")
-							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
-									if (discovery != null) {
-										DiscoveryManager.setNewFunction(discovery, null);
-										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
-									} else {
-										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
-									}
-								});
-							}),
-						new CommandAPICommand("function")
-							.withArguments(
+							.withOptionalArguments(
 								new FunctionArgument("new function path")
 							)
 							.executesPlayer((player, args) -> {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 									if (discovery != null) {
-										FunctionWrapper[] function = (FunctionWrapper[]) args[0];
-										if (function.length == 0) {
-											player.sendMessage(Component.text("Failed to get provided function"));
+										FunctionWrapper[] functionArr = args.getUnchecked("new function path");
+										NamespacedKey key = null;
+										if (functionArr != null) {
+											if (functionArr.length == 0) {
+												player.sendMessage(Component.text("Failed to get provided function"));
+											} else {
+												key = functionArr[0].getKey();
+											}
 										}
-										DiscoveryManager.setNewFunction(discovery, function[0].getKey());
+										DiscoveryManager.setNewFunction(discovery, key);
 										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 									} else {
 										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -184,7 +167,7 @@ public class DiscoveryCommand {
 							.executesPlayer((player, args) -> {
 								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 								if (discovery != null) {
-									discovery.mMarkerEntity.teleport((Location) args[0]);
+									discovery.mMarkerEntity.teleport((Location) args.getUnchecked("new location"));
 									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 								} else {
 									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -199,7 +182,7 @@ public class DiscoveryCommand {
 							.executesPlayer((player, args) -> {
 								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 								if (discovery != null) {
-									discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add((double) args[0], (double) args[1], (double) args[2]));
+									discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z")));
 									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 								} else {
 									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -215,7 +198,7 @@ public class DiscoveryCommand {
 							)
 							.executesPlayer((player, args) -> {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									int successes = DiscoveryManager.setNewId((int) args[0], (int) args[1]);
+									int successes = DiscoveryManager.setNewId((int) args.getUnchecked("id"), args.getUnchecked("new id"));
 
 									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 								});
@@ -227,7 +210,7 @@ public class DiscoveryCommand {
 							)
 							.executesPlayer((player, args) -> {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									int successes = DiscoveryManager.setNewLoot((int) args[0], ((LootTable) args[1]).getKey());
+									int successes = DiscoveryManager.setNewLoot((int) args.getUnchecked("id"), ((LootTable) args.get("new loot path")).getKey());
 
 									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 								});
@@ -235,11 +218,11 @@ public class DiscoveryCommand {
 						new CommandAPICommand("tier")
 							.withArguments(
 								new IntegerArgument("id"),
-								new MultiLiteralArgument(Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
+								new MultiLiteralArgument("tier", Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
 							)
 							.executesPlayer((player, args) -> {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									int successes = DiscoveryManager.setNewTier((int) args[0], ItemDiscovery.ItemDiscoveryTier.valueOf((String) args[1]));
+									int successes = DiscoveryManager.setNewTier((int) args.getUnchecked("id"), ItemDiscovery.ItemDiscoveryTier.valueOf(args.getUnchecked("tier")));
 
 									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 								});
@@ -248,26 +231,20 @@ public class DiscoveryCommand {
 							.withArguments(
 								new IntegerArgument("id")
 							)
+							.withOptionalArguments(new FunctionArgument("new function path"))
 							.executesPlayer((player, args) -> {
 								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									int successes = DiscoveryManager.setNewFunction((int) args[0], null);
-
-									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
-								});
-							}),
-						new CommandAPICommand("function")
-							.withArguments(
-								new IntegerArgument("id"),
-								new FunctionArgument("new function path")
-							)
-							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									FunctionWrapper[] function = (FunctionWrapper[]) args[1];
-									if (function.length == 0) {
-										player.sendMessage(Component.text("Failed to get provided function"));
+									FunctionWrapper[] functionArr = args.getUnchecked("new function path");
+									NamespacedKey key = null;
+									if (functionArr != null) {
+										if (functionArr.length == 0) {
+											player.sendMessage(Component.text("Failed to get provided function"));
+										} else {
+											key = functionArr[0].getKey();
+										}
 									}
 
-									int successes = DiscoveryManager.setNewFunction((int) args[0], function[0].getKey());
+									int successes = DiscoveryManager.setNewFunction((int) args.getUnchecked("id"), key);
 
 									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 								});
@@ -278,14 +255,14 @@ public class DiscoveryCommand {
 								new LocationArgument("new location")
 							)
 							.executesPlayer((player, args) -> {
-								List<ItemDiscovery> discoveries = DiscoveryManager.getById((int) args[0]);
+								List<ItemDiscovery> discoveries = DiscoveryManager.getById(args.getUnchecked("id"));
 
-								if (discoveries.size() == 0) {
+								if (discoveries.isEmpty()) {
 									player.sendMessage(Component.text("Could not find any discoveries", MESSAGE_COLOR));
 									return;
 								}
 
-								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport((Location) args[1]));
+								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport((Location) args.getUnchecked("new location")));
 
 								player.sendMessage(Component.text(String.format("Updated %s %s", discoveries.size(), discoveries.size() == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							}),
@@ -297,14 +274,14 @@ public class DiscoveryCommand {
 								new DoubleArgument("z")
 							)
 							.executesPlayer((player, args) -> {
-								List<ItemDiscovery> discoveries = DiscoveryManager.getById((int) args[0]);
+								List<ItemDiscovery> discoveries = DiscoveryManager.getById(args.getUnchecked("id"));
 
-								if (discoveries.size() == 0) {
+								if (discoveries.isEmpty()) {
 									player.sendMessage(Component.text("Could not find any discoveries", MESSAGE_COLOR));
 									return;
 								}
 
-								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add((double) args[1], (double) args[2], (double) args[3])));
+								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z"))));
 
 								player.sendMessage(Component.text(String.format("Updated %s %s", discoveries.size(), discoveries.size() == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							})
@@ -326,7 +303,7 @@ public class DiscoveryCommand {
 						new IntegerArgument("id")
 					)
 					.executesPlayer((player, args) -> {
-						int successes = DiscoveryManager.removeDiscovery((int) args[0]);
+						int successes = DiscoveryManager.removeDiscovery((int) args.getUnchecked("id"));
 
 						player.sendMessage(Component.text(String.format("Removed %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 					})
@@ -363,35 +340,21 @@ public class DiscoveryCommand {
 							new IntegerArgument("page")
 						)
 						.executesPlayer((player, args) -> {
-							showAllDiscoveryInfo(player, (int) args[0], true, true);
+							showAllDiscoveryInfo(player, args.getUnchecked("page"), true, true);
 						}),
 					new CommandAPICommand("all")
 						.withArguments(
-							new MultiLiteralArgument("existing", "deleted")
+							new MultiLiteralArgument("show", "existing", "deleted")
 						)
+						.withOptionalArguments(new IntegerArgument("page"))
 						.executesPlayer((player, args) -> {
-							String show = (String) args[0];
-							showAllDiscoveryInfo(player, 1, show.equals("existing"), show.equals("deleted"));
-						}),
-					new CommandAPICommand("all")
-						.withArguments(
-							new MultiLiteralArgument("existing", "deleted"),
-							new IntegerArgument("page")
-						)
-						.executesPlayer((player, args) -> {
-							String show = (String) args[0];
-							showAllDiscoveryInfo(player, (int) args[1], show.equals("existing"), show.equals("deleted"));
+							String show = args.getUnchecked("show");
+							showAllDiscoveryInfo(player, args.getOrDefaultUnchecked("page", 1), show.equals("existing"), show.equals("deleted"));
 						}),
 					new CommandAPICommand("loaded")
+						.withOptionalArguments(new IntegerArgument("page"))
 						.executesPlayer((player, args) -> {
-							showLoadedDiscoveryInfo(player, 1);
-						}),
-					new CommandAPICommand("loaded")
-						.withArguments(
-							new IntegerArgument("page")
-						)
-						.executesPlayer((player, args) -> {
-							showLoadedDiscoveryInfo(player, (int) args[0]);
+							showLoadedDiscoveryInfo(player, args.getOrDefaultUnchecked("page", 1));
 						})
 				),
 				new CommandAPICommand("removedeleted")
@@ -400,7 +363,7 @@ public class DiscoveryCommand {
 					)
 					.executesPlayer((player, args) -> {
 						Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-							if (DiscoveryManager.removeDeleted((String) args[0])) {
+							if (DiscoveryManager.removeDeleted(args.getUnchecked("deleted uuid"))) {
 								player.sendMessage(Component.text("Successfully removed", MESSAGE_COLOR));
 							} else {
 								player.sendMessage(Component.text("Failed to remove", MESSAGE_COLOR));
@@ -413,7 +376,7 @@ public class DiscoveryCommand {
 					)
 					.executesPlayer((player, args) -> {
 						Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-							int nextId = (int) args[0];
+							int nextId = args.getUnchecked("value");
 							if (DiscoveryManager.setNextId(nextId)) {
 								player.sendMessage(Component.text("Updated next id to " + nextId, MESSAGE_COLOR));
 							} else {
@@ -432,8 +395,8 @@ public class DiscoveryCommand {
 					new BooleanArgument("collected")
 				)
 				.executes((sender, args) -> {
-					Player player = (Player) args[0];
-					if (DiscoveryManager.setPlayerCollected(player, (int) args[1], (boolean) args[2])) {
+					Player player = args.getUnchecked("player");
+					if (DiscoveryManager.setPlayerCollected(player, args.getUnchecked("id"), args.getUnchecked("collected"))) {
 						sender.sendMessage(Component.text("Updated discovery for " + player.getName(), MESSAGE_COLOR));
 					} else {
 						sender.sendMessage(Component.text("Failed for update discovery for " + player.getName(), MESSAGE_COLOR));
@@ -453,8 +416,8 @@ public class DiscoveryCommand {
 						return;
 					}
 
-					Player targetPlayer = (Player) args[0];
-					if (DiscoveryManager.setPlayerCollected(targetPlayer, nearest.mId, (boolean) args[1])) {
+					Player targetPlayer = args.getUnchecked("player");
+					if (DiscoveryManager.setPlayerCollected(targetPlayer, nearest.mId, args.getUnchecked("collected"))) {
 						player.sendMessage(Component.text("Updated discovery for " + targetPlayer.getName(), MESSAGE_COLOR));
 					} else {
 						player.sendMessage(Component.text("Failed to update discovery for " + targetPlayer.getName(), MESSAGE_COLOR));
@@ -465,14 +428,14 @@ public class DiscoveryCommand {
 					new PlayerArgument("player")
 				)
 				.executesPlayer((player, args) -> {
-					Player targetPlayer = (Player) args[0];
+					Player targetPlayer = args.getUnchecked("player");
 
 					List<Integer> collected = DiscoveryManager.getPlayerCollected(targetPlayer);
 					if (collected == null) {
 						player.sendMessage(Component.text("Could not get data", MESSAGE_COLOR));
 						return;
 					}
-					if (collected.size() == 0) {
+					if (collected.isEmpty()) {
 						player.sendMessage(Component.text(targetPlayer.getName() + " has not collected anything", MESSAGE_COLOR));
 						return;
 					}
@@ -498,7 +461,7 @@ public class DiscoveryCommand {
 					new IntegerArgument("id")
 				)
 				.executes((sender, args) -> {
-					Player player = (Player) args[0];
+					Player player = args.getUnchecked("player");
 
 					@Nullable List<Integer> collected = DiscoveryManager.getPlayerCollected(player);
 					if (collected == null) {
@@ -506,7 +469,7 @@ public class DiscoveryCommand {
 						return -1;
 					}
 
-					int id = (int) args[1];
+					int id = args.getUnchecked("id");
 					boolean isCollected = collected.contains(id);
 
 					sender.sendMessage(Component.text(String.format("%s %s collected %s", player.getName(), isCollected ? "has" : "has not", id), MESSAGE_COLOR));
@@ -529,7 +492,7 @@ public class DiscoveryCommand {
 						new IntegerArgument("id")
 					)
 					.executesPlayer((player, args) -> {
-						List<ItemDiscovery> discoveries = DiscoveryManager.getById((int) args[0]);
+						List<ItemDiscovery> discoveries = DiscoveryManager.getById(args.getUnchecked("id"));
 
 						if (discoveries.size() == 0) {
 							player.sendMessage(Component.text("Could not find any loaded discoveries", MESSAGE_COLOR));

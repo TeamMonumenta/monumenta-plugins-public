@@ -14,8 +14,8 @@ public class RemoveTags extends GenericCommand {
 	private static void run(CommandSender sender, Entity entity) {
 		entity.getScoreboardTags().clear();
 
-		if (entity instanceof Player) {
-			sender.sendMessage(Component.text("Cleared all tags from player '" + ((Player)entity).getName() + "'", NamedTextColor.GOLD));
+		if (entity instanceof Player player) {
+			sender.sendMessage(Component.text("Cleared all tags from player '" + player.getName() + "'", NamedTextColor.GOLD));
 		} else {
 			sender.sendMessage(Component.text("Cleared all tags from entity '" + entity.getUniqueId() + "'", NamedTextColor.GOLD));
 		}

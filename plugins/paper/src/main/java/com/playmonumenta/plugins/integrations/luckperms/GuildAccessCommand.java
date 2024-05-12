@@ -12,7 +12,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 public class GuildAccessCommand {
-	private static final Argument<String> USER_ARG = new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS);
+	private static final Argument<?> USER_ARG = new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS);
 
 	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.guild.access");
 	private static final CommandPermission PERMISSION_MOD = CommandPermission.fromString("monumenta.command.guild.mod.access");
@@ -44,7 +44,7 @@ public class GuildAccessCommand {
 		//<playername> <new access>
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(USER_ARG);
-		arguments.add(new MultiLiteralArgument(accessLevel.mArgument));
+		arguments.add(new LiteralArgument(accessLevel.mArgument));
 
 		return root
 			.withArguments(arguments)
@@ -59,7 +59,7 @@ public class GuildAccessCommand {
 					callee = proxied.getCallee();
 				}
 				if (callee instanceof Player player) {
-					String stringUser = (String) args[args.length - 2];
+					String stringUser = args.getUnchecked("player");
 
 					UUID targetUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(stringUser);
 					if (targetUUID == null) {
@@ -115,7 +115,7 @@ public class GuildAccessCommand {
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(GuildCommand.GUILD_NAME_ARG);
 		arguments.add(USER_ARG);
-		arguments.add(new MultiLiteralArgument(accessLevel.mArgument));
+		arguments.add(new LiteralArgument(accessLevel.mArgument));
 
 		return root
 			.withArguments(arguments)
@@ -133,9 +133,9 @@ public class GuildAccessCommand {
 					throw CommandAPI.failWithString("This command may only be run by a player");
 				}
 
-				String guildName = (String) args[args.length - 3];
+				String guildName = args.getUnchecked("guild name");
 
-				String stringUser = (String) args[args.length - 2];
+				String stringUser = args.getUnchecked("player");
 
 				UUID targetUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(stringUser);
 				if (targetUUID == null) {

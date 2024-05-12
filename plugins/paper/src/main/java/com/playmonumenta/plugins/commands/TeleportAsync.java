@@ -7,8 +7,8 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.FunctionArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.RotationArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 // Designed to be 1:1 with the vanilla teleport command, but loads chunks async before teleporting.
 public class TeleportAsync extends GenericCommand {
 	private static final String COMMAND = "teleportasync";
-	private static ConcurrentSkipListSet<UUID> entitiesTeleportingAsync = new ConcurrentSkipListSet<>();
+	private static final ConcurrentSkipListSet<UUID> entitiesTeleportingAsync = new ConcurrentSkipListSet<>();
 
 	@SuppressWarnings("unchecked")
 	public static void register() {
@@ -43,7 +43,7 @@ public class TeleportAsync extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleport(sender, (FunctionWrapper[])args[0], (Entity)args[1]);
+				return teleport(sender, args.getUnchecked("function"), (Entity) args.getUnchecked("destination"));
 			})
 			.register();
 
@@ -54,7 +54,7 @@ public class TeleportAsync extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleport(sender, (FunctionWrapper[])args[0], (Location)args[1]);
+				return teleport(sender, args.getUnchecked("function"), (Location) args.getUnchecked("location"));
 			})
 			.register();
 
@@ -66,8 +66,8 @@ public class TeleportAsync extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Entity dst = (Entity)args[2];
-				return teleport(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], dst.getLocation(), getEntityRotation(dst));
+				Entity dst = args.getUnchecked("destination");
+				return teleport(sender, args.getUnchecked("function"), (Collection<Entity>) args.get("targets"), dst.getLocation(), getEntityRotation(dst));
 			})
 			.register();
 
@@ -79,7 +79,7 @@ public class TeleportAsync extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleport(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Rotation)null);
+				return teleport(sender, args.getUnchecked("function"), (Collection<Entity>) args.get("targets"), args.getUnchecked("location"), null);
 			})
 			.register();
 
@@ -87,14 +87,14 @@ public class TeleportAsync extends GenericCommand {
 		arguments.add(new FunctionArgument("function"));
 		arguments.add(new EntitySelectorArgument.ManyEntities("targets"));
 		arguments.add(new LocationArgument("location"));
-		arguments.add(new MultiLiteralArgument("facing"));
-		arguments.add(new MultiLiteralArgument("entity"));
+		arguments.add(new LiteralArgument("facing"));
+		arguments.add(new LiteralArgument("entity"));
 		arguments.add(new EntitySelectorArgument.OneEntity("facingEntity"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleportFacing(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Entity)args[5]);
+				return teleportFacing(sender, args.getUnchecked("function"), (Collection<Entity>) args.get("targets"), args.getUnchecked("location"), (Entity) args.getUnchecked("facingEntity"));
 			})
 			.register();
 		// TODO facing anchors not currently supported by CommandAPI, no support here.
@@ -103,13 +103,13 @@ public class TeleportAsync extends GenericCommand {
 		arguments.add(new FunctionArgument("function"));
 		arguments.add(new EntitySelectorArgument.ManyEntities("targets"));
 		arguments.add(new LocationArgument("location"));
-		arguments.add(new MultiLiteralArgument("facing"));
+		arguments.add(new LiteralArgument("facing"));
 		arguments.add(new LocationArgument("facingLocation"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleportFacing(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Location)args[4]);
+				return teleportFacing(sender, args.getUnchecked("function"), (Collection<Entity>) args.get("targets"), args.getUnchecked("location"), (Location) args.getUnchecked("facingLocation"));
 			})
 			.register();
 
@@ -122,7 +122,7 @@ public class TeleportAsync extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleport(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Rotation)args[3]);
+				return teleport(sender, args.getUnchecked("function"), (Collection<Entity>) args.get("targets"), args.getUnchecked("location"), args.getUnchecked("Rotation"));
 			})
 			.register();
 	}
@@ -131,11 +131,10 @@ public class TeleportAsync extends GenericCommand {
 	private static int teleport(CommandSender sender, FunctionWrapper[] functions, Entity dst) throws WrapperCommandSyntaxException {
 		CommandSender srcSender = CommandUtils.getCallee(sender);
 
-		if (!(srcSender instanceof Entity)) {
+		if (!(srcSender instanceof Entity src)) {
 			throw CommandAPI.failWithString("An entity is required to run this command here");
 		}
 
-		Entity src = (Entity) srcSender;
 		return teleport(sender, functions, src, dst.getLocation(), getEntityRotation(dst));
 	}
 
@@ -143,11 +142,10 @@ public class TeleportAsync extends GenericCommand {
 	private static int teleport(CommandSender sender, FunctionWrapper[] functions, Location dst) throws WrapperCommandSyntaxException {
 		CommandSender srcSender = CommandUtils.getCallee(sender);
 
-		if (!(srcSender instanceof Entity)) {
+		if (!(srcSender instanceof Entity src)) {
 			throw CommandAPI.failWithString("An entity is required to run this command here");
 		}
 
-		Entity src = (Entity) srcSender;
 		return teleport(sender, functions, src, dst, null);
 	}
 
@@ -165,8 +163,8 @@ public class TeleportAsync extends GenericCommand {
 			return 0;
 		}
 
-		if (entity instanceof Mob) {
-			((Mob) entity).setVelocity(new Vector(0, 0.1, 0));
+		if (entity instanceof Mob mob) {
+			mob.setVelocity(new Vector(0, 0.1, 0));
 		}
 
 		Location srcLocation = entity.getLocation();
@@ -203,7 +201,7 @@ public class TeleportAsync extends GenericCommand {
 			return false;
 		});
 
-		sender.sendMessage("Teleporting " + entity.getName() + " to " + Double.toString(adjustedDst.getX()) + " " + Double.toString(adjustedDst.getY()) + " " + Double.toString(adjustedDst.getZ()) + ", yaw/pitch " + Float.toString(adjustedDst.getYaw()) + " " + Float.toString(adjustedDst.getPitch()));
+		sender.sendMessage("Teleporting " + entity.getName() + " to " + adjustedDst.getX() + " " + adjustedDst.getY() + " " + adjustedDst.getZ() + ", yaw/pitch " + Float.toString(adjustedDst.getYaw()) + " " + Float.toString(adjustedDst.getPitch()));
 		return 1;
 	}
 

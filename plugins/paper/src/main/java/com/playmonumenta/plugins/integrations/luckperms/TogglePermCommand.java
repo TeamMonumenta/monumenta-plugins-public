@@ -46,11 +46,13 @@ public abstract class TogglePermCommand {
 			})
 			.register();
 
+		BooleanArgument booleanArg = new BooleanArgument(getSetToDescription());
+
 		new CommandAPICommand(getCommandName().replace(" ", ""))
 			.withPermission(modPerms)
-			.withArguments(new BooleanArgument(getSetToDescription()))
+			.withArguments(booleanArg)
 			.executesPlayer((player, args) -> {
-				setPerm(player, argIsInverted() ^ (boolean) args[0]);
+				setPerm(player, argIsInverted() ^ args.getByArgument(booleanArg));
 			})
 			.register();
 	}

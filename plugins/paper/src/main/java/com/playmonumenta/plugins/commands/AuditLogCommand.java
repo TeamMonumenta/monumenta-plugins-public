@@ -13,7 +13,7 @@ public class AuditLogCommand {
 			.withPermission(CommandPermission.fromString("monumenta.command.auditlog"))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.log(((String)args[0]));
+				AuditListener.log(args.getUnchecked("message"));
 			})
 			.register();
 		new CommandAPICommand("auditlogplayer")
@@ -21,14 +21,14 @@ public class AuditLogCommand {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.log(((String)args[1]).replaceAll("@S", ((Player)args[0]).getName()));
+				AuditListener.log(((String) args.getUnchecked("message")).replaceAll("@S", ((Player) args.getUnchecked("player")).getName()));
 			})
 			.register();
 		new CommandAPICommand("auditlogsevere")
 			.withPermission(CommandPermission.fromString("monumenta.command.auditlog"))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.logSevere(((String)args[0]));
+				AuditListener.logSevere(args.getUnchecked("message"));
 			})
 			.register();
 		new CommandAPICommand("auditlogsevereplayer")
@@ -36,7 +36,7 @@ public class AuditLogCommand {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.logSevere(((String)args[1]).replaceAll("@S", ((Player)args[0]).getName()));
+				AuditListener.logSevere(((String) args.getUnchecked("message")).replaceAll("@S", ((Player) args.getUnchecked("player")).getName()));
 			})
 			.register();
 	}

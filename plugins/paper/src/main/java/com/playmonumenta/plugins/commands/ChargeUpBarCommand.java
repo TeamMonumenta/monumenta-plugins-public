@@ -8,6 +8,7 @@ import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import java.util.Objects;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
@@ -36,19 +37,19 @@ public class ChargeUpBarCommand {
 				new AdventureChatComponentArgument("title")
 			)
 			.executes((sender, args) -> {
-				Entity entity = (Entity) args[0];
-				int startValue = (int) args[1];
-				int maxValue = (int) args[2];
-				String direction = (String) args[3];
-				String style = (String) args[4];
-				String color = (String) args[5];
-				int range = (int) args[6];
-				Component title = (Component) args[7];
+				Entity entity = args.getUnchecked("entity");
+				int startValue = args.getUnchecked("startValue");
+				int maxValue = args.getUnchecked("maxValue");
+				String direction = args.getUnchecked("direction");
+				String style = args.getUnchecked("style");
+				String color = args.getUnchecked("color");
+				int range = args.getUnchecked("range");
+				Component title = args.getUnchecked("title");
 
 				ChargeUpManager chargeUp = new ChargeUpManager(entity, maxValue, title,
 					BossBar.Color.valueOf(color), BossBar.Overlay.valueOf(style), range);
 
-				boolean descending = direction.equals("descending");
+				boolean descending = Objects.equals(direction, "descending");
 				chargeUp.setTime(startValue);
 				new BukkitRunnable() {
 					final boolean mDescending = descending;

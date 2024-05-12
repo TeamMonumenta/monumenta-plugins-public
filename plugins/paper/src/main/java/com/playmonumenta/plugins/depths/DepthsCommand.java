@@ -42,7 +42,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
 				DepthsManager.getInstance().init(player);
 			})
@@ -61,9 +61,9 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
-				DepthsManager.getInstance().setPlayerLevelInAbility((String) args[1], player, (int) args[2]);
+				DepthsManager.getInstance().setPlayerLevelInAbility(args.getUnchecked("Ability Name"), player, args.getUnchecked("Rarity"));
 			}).register();
 
 		//DELETE COMMAND - removes a player from the depths system and clears their data
@@ -76,7 +76,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				DepthsManager.getInstance().deletePlayer(player);
 				player.sendMessage("Removed you from depths system");
 			}).register();
@@ -91,7 +91,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
 				player.sendMessage(DepthsManager.getInstance().getPartySummary(player));
 			}).register();
@@ -107,8 +107,8 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				DepthsManager.getInstance().gotRoomEndpoint(player, (Location) args[1]);
+				Player player = args.getUnchecked("player");
+				DepthsManager.getInstance().gotRoomEndpoint(player, args.getUnchecked("loc"));
 			}).register();
 
 		//WEAPON COMMAND - run once by each player to select their weapon aspect
@@ -121,7 +121,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui weaponaspect " + player.getName());
 			}).register();
 
@@ -136,9 +136,9 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
-				DepthsManager.getInstance().incrementTreasure(null, player, (int) args[1]);
+				DepthsManager.getInstance().incrementTreasure(null, player, args.getUnchecked("amount"));
 
 			}).register();
 
@@ -152,7 +152,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
 				DepthsManager.getInstance().chaos(player);
 
@@ -163,15 +163,15 @@ public class DepthsCommand extends GenericCommand {
 		arguments.clear();
 		arguments.add(new LiteralArgument("wheel"));
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new IntegerArgument("result"));
+		arguments.add(new IntegerArgument("result", 1, 6));
 
 		new CommandAPICommand("depths")
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
-				DepthsManager.getInstance().wheel(player, (int) args[1]);
+				DepthsManager.getInstance().wheel(player, args.getUnchecked("result"));
 
 			}).register();
 
@@ -185,7 +185,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
 				DepthsManager.getInstance().goToNextFloor(player);
 
@@ -202,8 +202,8 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				DepthsManager.getInstance().startBossFight(player, (Location) args[1]);
+				Player player = args.getUnchecked("player");
+				DepthsManager.getInstance().startBossFight(player, args.getUnchecked("loc"));
 			}).register();
 
 		//ROOM COMMAND - debug command to manually set the party's room number to specified value
@@ -216,9 +216,9 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
-				DepthsManager.getInstance().setRoomDebug(player, (int) args[1]);
+				DepthsManager.getInstance().setRoomDebug(player, args.getUnchecked("amount"));
 
 			}).register();
 
@@ -232,8 +232,8 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player requestingPlayer = (Player) args[0];
-				Player targetPlayer = (Player) args[1];
+				Player requestingPlayer = args.getUnchecked("moderator");
+				Player targetPlayer = args.getUnchecked("target player");
 
 				new DepthsDebugGUI(requestingPlayer, targetPlayer, plugin).openInventory(requestingPlayer, plugin);
 
@@ -250,10 +250,10 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Location loc = player.getLocation();
 				int power = new Random().nextInt(5) + 1;
-				ItemStack charm = CharmFactory.generateCharm((int) args[1], power, 0, null, null, null, null, null);
+				ItemStack charm = CharmFactory.generateCharm(args.getUnchecked("rarity"), power, 0, null, null, null, null, null);
 				player.sendMessage("DEBUG SEED " + Objects.requireNonNull(ItemStatUtils.getPlayerModified(new NBTItem(charm))).getLong(CharmFactory.CHARM_UUID_KEY));
 				loc.getWorld().dropItem(loc, charm);
 			}).register();
@@ -268,7 +268,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				ItemStack item = player.getInventory().getItemInMainHand();
 
 				ItemStack newCharm = CharmFactory.updateCharm(item);
@@ -291,7 +291,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 
 				return DepthsManager.getInstance().getIsEndless(player) ? 1 : 0;
 			}).register();
@@ -305,7 +305,7 @@ public class DepthsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				DepthsParty party = DepthsManager.getInstance().getDepthsParty(player);
 				if (party != null) {
 					party.mIsLoadingRoom = false;

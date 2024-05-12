@@ -26,13 +26,13 @@ public class PlayerCommand {
 			.withSubcommand(new CommandAPICommand("details")
 				.withPermission("monumenta.command.player.details.other")
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
-				.executes((sender, args) -> {
-					Player player = (Player) args[0];
-					if (!PremiumVanishIntegration.canSee((Player) sender, player)) {
-						sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+				.executesPlayer((caller, args) -> {
+					Player player = args.getUnchecked("player");
+					if (!PremiumVanishIntegration.canSee(caller, player)) {
+						caller.sendMessage(Component.text("No player was found", NamedTextColor.RED));
 						return;
 					}
-					new PlayerDisplayCustomInventory((Player) sender, player).openInventory((Player) sender, plugin);
+					new PlayerDisplayCustomInventory(caller, player).openInventory(caller, plugin);
 				})
 			)
 			.withSubcommand(new CommandAPICommand("settings")

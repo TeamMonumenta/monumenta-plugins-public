@@ -24,10 +24,10 @@ public class POICommands {
 			.withArguments(
 				new LiteralArgument("conquer"),
 				new EntitySelectorArgument.OnePlayer("player"),
-				new MultiLiteralArgument(poiNames))
+				new MultiLiteralArgument("poi", poiNames))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				String poiName = (String) args[1];
+				Player player = args.getUnchecked("player");
+				String poiName = args.getUnchecked("poi");
 				POI poi = POI.getPOI(poiName);
 				if (poi == null || poi == POI.NONE) {
 					throw CommandAPI.failWithString("Invalid POI name " + poiName);
@@ -46,7 +46,7 @@ public class POICommands {
 				new LiteralArgument("list"),
 				new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				Player player = args.getUnchecked("player");
 				Set<POI> pois = POIManager.getInstance().mPlayerPOI.get(player.getUniqueId());
 				player.sendMessage(Component.text("Uncleared Points of Interest are displayed below in red. Your first clear of each this week will earn you bonus loot!", NamedTextColor.GOLD));
 				for (POI poi : POI.values()) {

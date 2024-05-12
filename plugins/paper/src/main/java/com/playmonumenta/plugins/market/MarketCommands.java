@@ -6,7 +6,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LongArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
@@ -72,13 +71,13 @@ public class MarketCommands {
 		arguments = new ArrayList<>();
 		arguments.add(new LiteralArgument("linkListingToPlayer"));
 		arguments.add(new PlayerArgument("player"));
-		arguments.add(new IntegerArgument("listingID"));
+		arguments.add(new LongArgument("listingID"));
 		new CommandAPICommand("market")
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				Player targetPlayer = (Player)args[0];
-				long listingID = (long)(Integer)args[1];
+				Player targetPlayer = args.getUnchecked("player");
+				long listingID = args.getUnchecked("listingID");
 				MarketManager.getInstance().linkListingToPlayerData(targetPlayer, listingID);
 				MarketAudit.logManualLinking(targetPlayer, listingID);
 				player.sendMessage("Listing " + listingID + "linked to player " + targetPlayer.getName());
@@ -88,13 +87,13 @@ public class MarketCommands {
 		arguments = new ArrayList<>();
 		arguments.add(new LiteralArgument("unlinkListingFromPlayer"));
 		arguments.add(new PlayerArgument("player"));
-		arguments.add(new IntegerArgument("listingID"));
+		arguments.add(new LongArgument("listingID"));
 		new CommandAPICommand("market")
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				Player targetPlayer = (Player)args[0];
-				long listingID = (long)(Integer)args[1];
+				Player targetPlayer = args.getUnchecked("player");
+				long listingID = args.getUnchecked("listingID");
 				MarketManager.getInstance().unlinkListingFromPlayerData(targetPlayer, listingID);
 				MarketAudit.logManualUnlinking(targetPlayer, listingID);
 				player.sendMessage("Listing " + listingID + "unlinked from player " + targetPlayer.getName());
@@ -108,7 +107,7 @@ public class MarketCommands {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				Player targetPlayer = (Player)args[0];
+				Player targetPlayer = args.getUnchecked("player");
 				MarketManager.getInstance().resyncOwnership(targetPlayer);
 			})
 			.register();
@@ -117,7 +116,7 @@ public class MarketCommands {
 			.withPermission(perms)
 			.withArguments(List.of(new LiteralArgument("filters"), new LiteralArgument("get"), new PlayerArgument("player")))
 			.executesPlayer((player, args) -> {
-				Player targetPlayer = (Player)args[0];
+				Player targetPlayer = args.getUnchecked("player");
 				MarketManager.getInstance().getAllFiltersData(targetPlayer);
 			})
 			.register();
@@ -126,7 +125,7 @@ public class MarketCommands {
 			.withPermission(perms)
 			.withArguments(List.of(new LiteralArgument("filters"), new LiteralArgument("reset"), new PlayerArgument("player")))
 			.executesPlayer((player, args) -> {
-				Player targetPlayer = (Player)args[0];
+				Player targetPlayer = args.getUnchecked("player");
 				MarketManager.getInstance().resetPlayerFilters(targetPlayer);
 			})
 			.register();
@@ -138,7 +137,7 @@ public class MarketCommands {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				player.sendMessage(MarketRedisManager.getListing((long)args[0]).toBeautifiedJsonString());
+				player.sendMessage(MarketRedisManager.getListing(args.getUnchecked("listingID")).toBeautifiedJsonString());
 
 			})
 			.register();
@@ -150,7 +149,7 @@ public class MarketCommands {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				MarketListingIndex index = MarketListingIndex.valueOf((String)args[0]);
+				MarketListingIndex index = MarketListingIndex.valueOf(args.getUnchecked("indexID"));
 				player.sendMessage(index.getListingsFromIndex(true).toString());
 			})
 			.register();
@@ -198,8 +197,7 @@ public class MarketCommands {
 			.withPermission("monumenta.command.openmarketgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
-				Player viewer = player;
+				Player viewer = args.getUnchecked("player");
 				if (sender instanceof Player playerSender) {
 					viewer = playerSender;
 				}

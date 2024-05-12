@@ -63,7 +63,7 @@ public class RenameItemCommand {
 				                .executes((sender, args) -> {
 					                Player player = CommandUtils.getPlayerFromSender(sender);
 					                checkItem(player);
-					                String name = ((String) args[0]).trim();
+					                String name = ((String) args.get("name")).trim();
 					                rename(player, name);
 				                }))
 			.withSubcommand(new CommandAPICommand("sign")

@@ -140,8 +140,8 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mTuulen.customName(Component.text("Silver Knight Tuulen"));
 		mAurora = mBoss.getWorld().spawn(mAuroraLocation, Villager.class);
 		mAurora.customName(Component.text("Aurora"));
-		mTuulenBoss = new SiriusNPCBoss(mPlugin, mTuulen, this);
-		mAuroraBoss = new SiriusNPCBoss(mPlugin, mAurora, this);
+		mTuulenBoss = new SiriusNPCBoss(mPlugin, mTuulen);
+		mAuroraBoss = new SiriusNPCBoss(mPlugin, mAurora);
 		BossManager.getInstance().manuallyRegisterBoss(mAurora, mAuroraBoss);
 		BossManager.getInstance().manuallyRegisterBoss(mTuulen, mTuulenBoss);
 		mStarBlightConverter = new PassiveStarBlightConversion(this);

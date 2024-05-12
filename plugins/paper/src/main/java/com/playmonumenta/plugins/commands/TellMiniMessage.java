@@ -18,8 +18,8 @@ public class TellMiniMessage {
 				new GreedyStringArgument("message")
 			).executes((sender, args) -> {
 				@SuppressWarnings("unchecked")
-				Collection<Player> recipients = (Collection<Player>) args[0];
-				String message = (String) args[1];
+				Collection<Player> recipients = (Collection<Player>) args.get("recipients");
+				String message = args.getUnchecked("message");
 
 				Component parsedMessage = MessagingUtils.fromMiniMessage(message);
 				for (Player recipient : recipients) {

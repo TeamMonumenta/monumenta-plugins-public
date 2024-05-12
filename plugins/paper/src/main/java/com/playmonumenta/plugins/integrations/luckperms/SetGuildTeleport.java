@@ -37,7 +37,7 @@ public class SetGuildTeleport {
 					throw CommandAPI.failWithString("This command cannot be run on the build shard.");
 				}
 
-				run(plugin, sender, (String) args[0]);
+				run(plugin, sender, args.getUnchecked("guild name"));
 			})
 			.register();
 	}

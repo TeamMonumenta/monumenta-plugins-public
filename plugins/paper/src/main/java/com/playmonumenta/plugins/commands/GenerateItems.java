@@ -27,7 +27,7 @@ public class GenerateItems extends GenericCommand {
 		if (((Player) sender).getGameMode() != GameMode.CREATIVE) {
 			return;
 		}
-		List<List<String>> records = new ArrayList<List<String>>();
+		List<List<String>> records = new ArrayList<>();
 
 		String path = Plugin.getInstance().getDataFolder() + File.separator + "item_rework_stats.csv";
 		try (CSVReader csvReader = new CSVReader(Files.newBufferedReader(Paths.get(path), StandardCharsets.UTF_8))) {

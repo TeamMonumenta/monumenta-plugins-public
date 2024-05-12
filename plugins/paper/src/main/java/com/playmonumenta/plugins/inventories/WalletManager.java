@@ -961,7 +961,7 @@ public class WalletManager implements Listener {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player viewer = CommandUtils.getPlayerFromSender(sender);
-				Player viewee = (Player) args[0];
+				Player viewee = args.getUnchecked("player");
 				new WalletGui(viewer, getWallet(viewee), MAX_SETTINGS,
 					Component.text("Wallet of ", NamedTextColor.GOLD).append(viewee.displayName())).open();
 			})

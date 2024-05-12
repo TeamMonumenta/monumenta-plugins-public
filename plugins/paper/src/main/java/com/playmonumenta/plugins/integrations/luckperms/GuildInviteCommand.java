@@ -11,7 +11,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -33,7 +33,7 @@ public class GuildInviteCommand {
 
 		return root
 			.withArguments(USER_ARG)
-			.withArguments(new MultiLiteralArgument(inviteLevel.mArgument))
+			.withArguments(new LiteralArgument(inviteLevel.mArgument))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, PERMISSION);
 				CommandSender callee = sender;
@@ -48,7 +48,7 @@ public class GuildInviteCommand {
 					throw CommandAPI.failWithString("This command may only be run by a player");
 				}
 
-				String stringUser = (String) args[args.length - 2];
+				String stringUser = args.getUnchecked("player");
 				runAsPlayer(plugin, inviter, stringUser, inviteLevel);
 			});
 	}
@@ -59,7 +59,7 @@ public class GuildInviteCommand {
 		return root
 			.withArguments(GuildCommand.GUILD_NAME_ARG)
 			.withArguments(USER_ARG)
-			.withArguments(new MultiLiteralArgument(inviteLevel.mArgument))
+			.withArguments(new LiteralArgument(inviteLevel.mArgument))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, PERMISSION_MOD);
 				CommandSender callee = sender;
@@ -74,8 +74,8 @@ public class GuildInviteCommand {
 					throw CommandAPI.failWithString("This command may only be run by a player");
 				}
 
-				String guildName = (String) args[args.length - 3];
-				String stringUser = (String) args[args.length - 2];
+				String guildName = args.getUnchecked("guild name");
+				String stringUser = args.getUnchecked("player");
 				runAsMod(plugin, inviter, guildName, stringUser, inviteLevel);
 			});
 	}

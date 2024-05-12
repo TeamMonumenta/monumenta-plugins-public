@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -16,7 +16,7 @@ public class MonumentaDebug {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.monumentadebug");
 
 		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new MultiLiteralArgument("INFO"));
+		arguments.add(new LiteralArgument("INFO"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -26,7 +26,7 @@ public class MonumentaDebug {
 			.register();
 
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("FINE"));
+		arguments.add(new LiteralArgument("FINE"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -36,7 +36,7 @@ public class MonumentaDebug {
 			.register();
 
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("FINER"));
+		arguments.add(new LiteralArgument("FINER"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -46,7 +46,7 @@ public class MonumentaDebug {
 			.register();
 
 		arguments.clear();
-		arguments.add(new MultiLiteralArgument("FINEST"));
+		arguments.add(new LiteralArgument("FINEST"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
