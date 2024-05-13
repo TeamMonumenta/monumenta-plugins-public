@@ -3,9 +3,9 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.DoubleArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
-import dev.jorel.commandapi.arguments.PlayerArgument;
 import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,76 +23,78 @@ public class BoatUtilsCommand {
 	public static final String ONE_PLAYER_BOAT_TAG = "OnePlayerBoat";
 
 	public static void register() {
+		EntitySelectorArgument.OnePlayer playerArg = new EntitySelectorArgument.OnePlayer("player");
+		DoubleArgument xArg = new DoubleArgument("x velocity");
+		DoubleArgument yArg = new DoubleArgument("y velocity");
+		DoubleArgument zArg = new DoubleArgument("z velocity");
+		IntegerArgument ticksBeforeRemountArg = new IntegerArgument("ticks before remount", 0);
+		IntegerArgument ticksArg = new IntegerArgument("ticks", 0);
+		LocationArgument locationArg = new LocationArgument("location");
+
 		new CommandAPICommand("boatutils")
 			.withPermission("monumenta.command.boatutils")
 			.withSubcommands(
 				new CommandAPICommand("mount")
-					.withArguments(
-						new PlayerArgument("player")
-					)
+					.withArguments(playerArg)
 					.executes((executor, args) -> {
-						Player player = args.getUnchecked("player");
+						Player player = args.getByArgument(playerArg);
 
 						mount(player);
 					}),
 				new CommandAPICommand("dismount")
-					.withArguments(
-						new PlayerArgument("player")
-					)
+					.withArguments(playerArg)
 					.executes((executor, args) -> {
-						Player player = args.getUnchecked("player");
+						Player player = args.getByArgument(playerArg);
 
 						dismount(player);
 					}),
 				new CommandAPICommand("launch")
 					.withArguments(
-						new PlayerArgument("player"),
-						new DoubleArgument("x velocity"),
-						new DoubleArgument("y velocity"),
-						new DoubleArgument("z velocity"),
-						new IntegerArgument("ticks before remount")
+						playerArg,
+						xArg,
+						yArg,
+						zArg,
+						ticksBeforeRemountArg
 					)
 					.executes((executor, args) -> {
 						Player player = args.getUnchecked("player");
 						Vector velocity = new Vector(
-							args.getUnchecked("x velocity"),
-							args.getUnchecked("y velocity"),
-							args.getUnchecked("z velocity")
+							args.getByArgument(xArg),
+							args.getByArgument(yArg),
+							args.getByArgument(zArg)
 						);
-						int remountTicks = args.getUnchecked("ticks before remount");
+						int remountTicks = args.getByArgument(ticksBeforeRemountArg);
 
 						launch(player, velocity, remountTicks);
 					}),
 				new CommandAPICommand("schedule_mount")
 					.withArguments(
-						new PlayerArgument("player"),
-						new IntegerArgument("ticks")
+						playerArg,
+						ticksArg
 					)
 					.executes((executor, args) -> {
-						Player player = args.getUnchecked("player");
-						int ticks = args.getUnchecked("ticks");
+						Player player = args.getByArgument(playerArg);
+						int ticks = args.getByArgument(ticksArg);
 
 						scheduleMount(player, ticks);
 					}),
 				new CommandAPICommand("schedule_positioned_mount")
 					.withArguments(
-						new PlayerArgument("player"),
-						new IntegerArgument("ticks"),
-						new LocationArgument("location")
+						playerArg,
+						ticksArg,
+						locationArg
 					)
 					.executes((executor, args) -> {
-						Player player = args.getUnchecked("player");
-						int ticks = args.getUnchecked("ticks");
-						Location location = args.getUnchecked("location");
+						Player player = args.getByArgument(playerArg);
+						int ticks = args.getByArgument(ticksArg);
+						Location location = args.getByArgument(locationArg);
 
 						schedulePositionedMount(player, ticks, location);
 					}),
 				new CommandAPICommand("unschedule_mount")
-					.withArguments(
-						new PlayerArgument("player")
-					)
+					.withArguments(playerArg)
 					.executes((executor, args) -> {
-						Player player = args.getUnchecked("player");
+						Player player = args.getByArgument(playerArg);
 
 						unscheduleMount(player);
 					})

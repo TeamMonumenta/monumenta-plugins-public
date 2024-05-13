@@ -678,7 +678,7 @@ public class ItemStatCommands {
 		Argument<String> attributeArg = new StringArgument("attribute").replaceSuggestions(ArgumentSuggestions.strings(info -> attributes));
 		DoubleArgument amountArg = new DoubleArgument("amount");
 		MultiLiteralArgument operationArg = new MultiLiteralArgument("operation", Operation.ADD.getName(), Operation.MULTIPLY.getName());
-		MultiLiteralArgument slotArg = new MultiLiteralArgument(Slot.MAINHAND.getName(), Slot.OFFHAND.getName(), Slot.HEAD.getName(), Slot.CHEST.getName(), Slot.LEGS.getName(), Slot.FEET.getName(), Slot.PROJECTILE.getName());
+		MultiLiteralArgument slotArg = new MultiLiteralArgument("slot", Slot.MAINHAND.getName(), Slot.OFFHAND.getName(), Slot.HEAD.getName(), Slot.CHEST.getName(), Slot.LEGS.getName(), Slot.FEET.getName(), Slot.PROJECTILE.getName());
 
 		new CommandAPICommand("editattr")
 			.withPermission(perms)

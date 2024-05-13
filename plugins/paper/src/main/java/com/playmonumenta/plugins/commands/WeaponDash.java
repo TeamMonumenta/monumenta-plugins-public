@@ -3,12 +3,9 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import java.util.ArrayList;
-import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,27 +15,28 @@ import org.bukkit.util.Vector;
 
 public class WeaponDash extends GenericCommand {
 	public static void register() {
-
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.weapondash");
 
-		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new DoubleArgument("horizontal"));
-		arguments.add(new DoubleArgument("vertical"));
-		arguments.add(new IntegerArgument("duration"));
+		EntitySelectorArgument.OnePlayer playerArg = new EntitySelectorArgument.OnePlayer("player");
+		DoubleArgument horizontalArg = new DoubleArgument("horizontal");
+		DoubleArgument verticalArg = new DoubleArgument("vertical");
+		IntegerArgument durationArg = new IntegerArgument("duration", 0);
 
 		new CommandAPICommand("weapondash")
 			.withPermission(perms)
-			.withArguments(arguments)
+			.withArguments(playerArg)
+			.withArguments(horizontalArg)
+			.withArguments(verticalArg)
+			.withArguments(durationArg)
 			.executes((sender, args) -> {
-				Player player = args.getUnchecked("player");
+				Player player = args.getByArgument(playerArg);
 				Location playerLoc = player.getLocation();
 				playerLoc.setPitch(0);
 				Vector v = playerLoc.getDirection();
-				v.multiply(args.getUnchecked("horizontal"));
-				v.setY(args.getUnchecked("vertical"));
+				v.multiply(args.getByArgument(horizontalArg));
+				v.setY(args.getByArgument(verticalArg));
 				player.setVelocity(v);
-				player.setNoDamageTicks(args.getUnchecked("duration"));
+				player.setNoDamageTicks(args.getByArgument(durationArg));
 				player.getNoDamageTicks();
 
 

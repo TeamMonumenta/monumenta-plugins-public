@@ -2,53 +2,50 @@ package com.playmonumenta.plugins.commands;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import java.util.ArrayList;
-import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class Launch extends GenericCommand {
 	public static void register() {
-
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.launch");
 
-		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new DoubleArgument("horizontal"));
-		arguments.add(new DoubleArgument("vertical"));
+		EntitySelectorArgument.OnePlayer playerArg = new EntitySelectorArgument.OnePlayer("player");
+		DoubleArgument horizontalArg = new DoubleArgument("horizontal");
+		DoubleArgument verticalArg = new DoubleArgument("vertical");
+		DoubleArgument xArg = new DoubleArgument("x");
+		DoubleArgument yArg = new DoubleArgument("y");
+		DoubleArgument zArg = new DoubleArgument("z");
 
 		new CommandAPICommand("launch")
 			.withPermission(perms)
-			.withArguments(arguments)
+			.withArguments(playerArg)
+			.withArguments(horizontalArg)
+			.withArguments(verticalArg)
 			.executes((sender, args) -> {
-				Player player = args.getUnchecked("player");
+				Player player = args.getByArgument(playerArg);
 				Vector v = player.getEyeLocation().getDirection();
-				v.multiply(args.getUnchecked("horizontal"));
-				v.setY(args.getUnchecked("vertical"));
+				v.multiply(args.getByArgument(horizontalArg));
+				v.setY(args.getByArgument(verticalArg));
 				player.setVelocity(v);
 			})
 			.register();
 
-		arguments.clear();
-		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new DoubleArgument("x"));
-		arguments.add(new DoubleArgument("y"));
-		arguments.add(new DoubleArgument("z"));
-
 		new CommandAPICommand("launch")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = args.getUnchecked("player");
-			Vector v = player.getEyeLocation().getDirection();
-			v.setX(args.getUnchecked("x"));
-			v.setY(args.getUnchecked("y"));
-			v.setZ(args.getUnchecked("z"));
-			player.setVelocity(v);
-		})
-		.register();
+			.withPermission(perms)
+			.withArguments(playerArg)
+			.withArguments(xArg)
+			.withArguments(yArg)
+			.withArguments(zArg)
+			.executes((sender, args) -> {
+				Player player = args.getByArgument(playerArg);
+				Vector v = player.getEyeLocation().getDirection();
+				v.setX(args.getByArgument(xArg));
+				v.setY(args.getByArgument(yArg));
+				v.setZ(args.getByArgument(zArg));
+				player.setVelocity(v);
+			})
+			.register();
 	}
 }

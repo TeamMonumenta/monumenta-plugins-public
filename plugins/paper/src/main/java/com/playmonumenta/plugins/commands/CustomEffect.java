@@ -28,19 +28,26 @@ public class CustomEffect {
 	private static final String COMMAND = "customeffect";
 	private static final String PERMISSION = "monumenta.commands.customeffect";
 
+	private static final EntitySelectorArgument.ManyEntities entitiesArgument = new EntitySelectorArgument.ManyEntities("entities");
+	private static final StringArgument sourceArgument = new StringArgument("source");
+	private static final StringArgument sourceArgumentOptional = new StringArgument("source");
+	private static final DoubleArgument amountArg = new DoubleArgument("amount");
+	private static final MultiLiteralArgument effectArg = new MultiLiteralArgument("effect", Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase(Locale.getDefault())).toArray(String[]::new));
+	private static final TimeArgument durationArg = new TimeArgument("duration");
+	private static final Argument<Objective> objectiveArg = new ObjectiveArgument("objective").replaceSuggestions(ArgumentSuggestions.strings("objective", "amount"));
+	private static final Argument<String> scoreholderArg = new ScoreHolderArgument.Single("scoreholder").replaceSuggestions(ArgumentSuggestions.strings("scoreholder", "amount"));
+	private static final MultiLiteralArgument subcommandArg = new MultiLiteralArgument("subcommand", "haseffect", "clear");
+
 	@SuppressWarnings("unchecked")
 	public static void register() {
-		Argument<?> entitiesArgument = new EntitySelectorArgument.ManyEntities("entities");
-		Argument<?> sourceArgument = new StringArgument("source");
-
 		List<Argument<?>> optionalArguments = new ArrayList<>();
-		optionalArguments.add(new DoubleArgument("amount"));
-		optionalArguments.add(sourceArgument);
+		optionalArguments.add(amountArg);
+		optionalArguments.add(sourceArgumentOptional);
 
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(entitiesArgument);
-		arguments.add(new MultiLiteralArgument("effect", Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase(Locale.getDefault())).toArray(String[]::new)));
-		arguments.add(new TimeArgument("duration"));
+		arguments.add(effectArg);
+		arguments.add(durationArg);
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
@@ -50,7 +57,7 @@ public class CustomEffect {
 				execute(args);
 			}).register();
 
-		arguments.add(new ObjectiveArgument("objective").replaceSuggestions(ArgumentSuggestions.strings("objective", "amount")));
+		arguments.add(objectiveArg);
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
@@ -60,7 +67,7 @@ public class CustomEffect {
 				execute(args);
 			}).register();
 
-		arguments.add(new ScoreHolderArgument.Single("scoreholder").replaceSuggestions(ArgumentSuggestions.strings("scoreholder", "amount")));
+		arguments.add(scoreholderArg);
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
@@ -70,13 +77,12 @@ public class CustomEffect {
 				execute(args);
 			}).register();
 
-		Argument<?> subcommands = new MultiLiteralArgument("subcommand", "haseffect", "clear");
-		List<Argument<?>> hasEffectAndClearArguments = Arrays.asList(entitiesArgument, subcommands, sourceArgument);
+		List<Argument<?>> hasEffectAndClearArguments = Arrays.asList(entitiesArgument, subcommandArg, sourceArgument);
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION).withArguments(hasEffectAndClearArguments).executes((sender, args) -> {
-			Collection<Entity> entities = (Collection<Entity>) args.get("entities");
-			String subcommand = args.getUnchecked("subcommand");
-			String source = args.getUnchecked("source");
+			Collection<Entity> entities = args.getByArgument(entitiesArgument);
+			String subcommand = args.getByArgument(subcommandArg);
+			String source = args.getByArgument(sourceArgument);
 
 			Function<Entity, Boolean> function;
 			if (subcommand.equals("clear")) {
@@ -89,13 +95,13 @@ public class CustomEffect {
 	}
 
 	private static void execute(CommandArguments args) {
-		Collection<Entity> entities = (Collection<Entity>) args.get("entities");
-		String effect = args.getUnchecked("effect");
-		int duration = args.getUnchecked("duration");
-		Objective objective = args.getUnchecked("objective");
-		String scoreholder = args.getUnchecked("scoreholder");
-		double amount = args.getOrDefaultUnchecked("amount", 0);
-		String source = args.getUnchecked("source");
+		Collection<Entity> entities = args.getByArgument(entitiesArgument);
+		String effect = args.getByArgument(effectArg);
+		int duration = args.getByArgument(durationArg);
+		Objective objective = args.getByArgument(objectiveArg);
+		String scoreholder = args.getByArgument(scoreholderArg);
+		double amount = args.getByArgumentOrDefault(amountArg, 0d);
+		String source = args.getByArgument(sourceArgumentOptional);
 
 		EffectType effectType = EffectType.fromTypeIgnoreCase(effect);
 		if (effectType == null) {
