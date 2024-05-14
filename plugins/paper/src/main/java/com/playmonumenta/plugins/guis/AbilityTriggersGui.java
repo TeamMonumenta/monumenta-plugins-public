@@ -174,11 +174,13 @@ public class AbilityTriggersGui extends Gui {
 			});
 			tempItem = GUIUtils.createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
 				"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", NamedTextColor.GRAY, 40);
+
 			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_" + (switch (mNewTrigger.getKey()) {
 				case LEFT_CLICK -> "left";
 				case RIGHT_CLICK -> "right";
 				case SWAP -> "swap";
 				case DROP -> "drop";
+				default -> "";
 			}));
 			makeOptionIcons(1, 1, tempItem, switch (mNewTrigger.getKey()) {
 				case LEFT_CLICK -> Material.IRON_SWORD;
@@ -395,8 +397,8 @@ public class AbilityTriggersGui extends Gui {
 			case "on ground" -> "ground";
 			default -> "unsupported";
 		};
-		guiTag = "trigger_detail_" + guiTag + (value == AbilityTrigger.BinaryOption.TRUE ?  "_true"
-			: value == AbilityTrigger.BinaryOption.FALSE ? "_false"
+		guiTag = "trigger_detail_" + guiTag + ((value == AbilityTrigger.BinaryOption.TRUE) ?  "_true"
+			: (value == AbilityTrigger.BinaryOption.FALSE) ? "_false"
 			: "_both");
 		ItemStack tempItem = GUIUtils.createBasicItem(material, displayName, color, false,
 			"Click to cycle through options", NamedTextColor.GRAY, 40);

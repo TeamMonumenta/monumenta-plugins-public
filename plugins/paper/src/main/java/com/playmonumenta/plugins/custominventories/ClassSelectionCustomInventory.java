@@ -657,7 +657,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			GUIUtils.setGuiNbtTag(levelItem, "texture", "skill_select_" + (getScore >= level ? "sp_lit" : "sp_unlit"));
 		}
 		GUIUtils.setGuiNbtTag(levelItem, "skill", ability.getDisplayName());
-		GUIUtils.setGuiNbtTag(levelItem, "level",  "" + level);
+		GUIUtils.setGuiNbtTag(levelItem, "level", "" + level);
 		return levelItem;
 	}
 
