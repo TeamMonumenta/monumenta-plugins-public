@@ -258,6 +258,10 @@ public class CharmsCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executesPlayer((sender, args) -> {
 				Player player = (Player) args[0];
+				if (!PremiumVanishIntegration.canSee(sender, player)) {
+					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+					return;
+				}
 				new CharmsGUI(sender, player, CharmManager.CharmType.ZENITH).open();
 			}).register();
 

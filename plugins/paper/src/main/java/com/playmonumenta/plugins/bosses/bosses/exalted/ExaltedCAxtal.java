@@ -414,8 +414,12 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+
+		for (Player player : players) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 10.0f, 0.8f);
 			player.sendMessage(Component.text("She can't protect you forever, hero... Be warned...", NamedTextColor.DARK_RED));
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

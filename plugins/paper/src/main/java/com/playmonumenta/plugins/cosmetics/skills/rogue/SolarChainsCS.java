@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -50,7 +49,7 @@ public class SolarChainsCS extends SkirmisherCS {
 			double starSize = halfWidth * 4;
 			int starVertices = FastUtils.randomIntInRange(3, 7);
 
-			ArrayList<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(starVertices, starSize, 0.35, true, true), 2);
+			List<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(starVertices, starSize, 0.35, true, true), 2);
 
 			for (Vector v : starFull) {
 				new PartialParticle(Particle.CRIT, loc.clone().add(v), 3).delta(0.02).spawnAsPlayerActive(mPlayer);

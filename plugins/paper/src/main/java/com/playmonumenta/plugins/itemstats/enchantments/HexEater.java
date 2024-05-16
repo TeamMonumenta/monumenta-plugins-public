@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -90,6 +91,11 @@ public class HexEater implements Enchantment {
 		}
 
 		if (EntityUtils.hasDamageOverTime(plugin, target)) {
+			effects++;
+		}
+
+		// interaction with choleric flames 2
+		if (Plugin.getInstance().mEffectManager.hasEffect(target, CholericFlames.ANTIHEAL_EFFECT)) {
 			effects++;
 		}
 

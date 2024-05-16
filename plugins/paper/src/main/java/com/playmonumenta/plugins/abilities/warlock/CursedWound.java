@@ -124,7 +124,7 @@ public class CursedWound extends Ability {
 					mStoredCustomEffects = null;
 
 
-					mCosmetic.onReleaseStoredEffects(mPlayer, world, mPlayer.getLocation(), enemy, radius);
+					mCosmetic.onReleaseStoredEffects(mPlayer, enemy, radius);
 				}
 			}
 
@@ -140,7 +140,7 @@ public class CursedWound extends Ability {
 			event.setDamage(event.getDamage() * (1 + (Math.min(cooldowns, CURSED_WOUND_CAP + CharmManager.getLevel(mPlayer, CHARM_CAP)) * (mCursedWoundDamage + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)))));
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
-				mCosmetic.onCriticalAttack(world, mPlayer.getLocation());
+				mCosmetic.onCriticalAttack(world, mPlayer, enemy, cooldowns);
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 				for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CURSED_WOUND_RADIUS).getHitMobs()) {
 					mCosmetic.onEffectApplication(mPlayer, mob);

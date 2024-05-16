@@ -126,7 +126,7 @@ public class Blizzard extends Ability {
 
 				if (mTicks % DAMAGE_INTERVAL == 0) {
 					for (LivingEntity mob : mobs) {
-						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), spellDamage, false, false, false);
+						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), spellDamage, true, false, false);
 					}
 				}
 

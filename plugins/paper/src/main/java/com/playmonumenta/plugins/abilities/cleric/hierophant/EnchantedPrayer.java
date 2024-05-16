@@ -55,7 +55,7 @@ public class EnchantedPrayer extends Ability {
 			.shorthandName("EP")
 			.descriptions(
 				"Swapping while sneaking enchants the weapons of all players in a 15 block radius with holy magic. " +
-					"Their next melee or projectile attack deals an additional 12 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.",
+					"Their next melee or projectile attack deals an additional 12 magic damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.",
 				"Damage is increased to 20. Healing is increased to 20% of max health.")
 			.simpleDescription("The next attack by you and nearby players causes an explosion and heals the player.")
 			.cooldown(ENCHANTED_PRAYER_COOLDOWN, CHARM_COOLDOWN)

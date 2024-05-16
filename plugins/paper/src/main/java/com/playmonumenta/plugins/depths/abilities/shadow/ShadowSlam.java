@@ -127,7 +127,7 @@ public final class ShadowSlam extends DepthsAbility {
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * 0.0;
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mRadius)) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.getLinkedSpell());
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.getLinkedSpell(), true);
 		}
 
 		World world = mPlayer.getWorld();
@@ -162,7 +162,7 @@ public final class ShadowSlam extends DepthsAbility {
 			.add(a -> a.mRadius, SIZE)
 			.add(" block radius. Falling more than ")
 			.add(MANUAL_THRESHOLD)
-			.add(" blocks and damaging an enemy also generates a slam and cancels fall damage.");
+			.add(" blocks and dealing a melee hit to an enemy also generates a slam and cancels fall damage.");
 	}
 }
 

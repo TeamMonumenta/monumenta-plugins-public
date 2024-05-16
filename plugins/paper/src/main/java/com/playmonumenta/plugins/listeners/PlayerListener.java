@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -40,6 +39,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -177,7 +177,7 @@ public class PlayerListener implements Listener {
 
 	private final Plugin mPlugin;
 	private @Nullable BukkitTask mContentRunnable = null;
-	private final Set<UUID> mTransferringPlayers = new HashSet();
+	private final Set<UUID> mTransferringPlayers = new HashSet<>();
 
 	public PlayerListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -197,7 +197,7 @@ public class PlayerListener implements Listener {
 				@Override
 				public void run() {
 					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getScoreboardTags().contains("MidTransfer") || player.hasPermission("group.stealthmod")) {
+						if (player.getScoreboardTags().contains("MidTransfer") || player.hasPermission("group.devops")) {
 							continue;
 						}
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1, false, false));
@@ -207,10 +207,10 @@ public class PlayerListener implements Listener {
 								"The shard is currently closed for maintenance. Please try again later.")
 							.color(NamedTextColor.RED));
 						try {
-							ShardSorterCommand.sortToShard(player, "valley");
+							ShardSorterCommand.sortToShard(player, "valley", null);
 						} catch (Exception e) {
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 15, 1, false, false));
-							e.printStackTrace();
+							MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);
 						}
 					}
 				}
@@ -800,7 +800,7 @@ public class PlayerListener implements Listener {
 		InventoryHolder holder = inventory.getHolder();
 		if (holder instanceof Chest chest) {
 			// Break Halloween creeper chests in safe zones automatically when closed
-			if (ChestUtils.isEmpty(chest) && (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest"))) {
+			if (ChestUtils.isEmpty(chest) && (chest.customName() != null && MessagingUtils.plainText(chest.customName()).contains("Creeperween Chest"))) {
 				chest.getBlock().breakNaturally();
 			}
 		}
@@ -886,7 +886,7 @@ public class PlayerListener implements Listener {
 
 		InventoryUtils.removeSpecialItems(player, true, false);
 
-		//Debuff mobs around player in dungeon if running solo
+		// Debuff mobs around player in dungeon if running solo
 		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
 			if (PlayerUtils.otherPlayersInRange(player, 64, true).size() == 0) {
 				// Delay by a tick to allow the entity that killed the player (if any) to still be valid until all damage/death events resolve
@@ -894,7 +894,7 @@ public class PlayerListener implements Listener {
 					List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(player.getLocation(), 20);
 					for (LivingEntity entity : nearbyEntities) {
 						EntityUtils.applySlow(mPlugin, 5 * 60 * 20, .1, entity, SOLO_DEATH_MOB_SLOW_EFFECT_NAME);
-						EntityUtils.applyWeaken(mPlugin, 5 * 60 * 20, -.25, entity, DamageEvent.DamageType.getEnumSet(), SOLO_DEATH_MOB_WEAKEN_EFFECT_NAME);
+						EntityUtils.applyWeaken(mPlugin, 5 * 60 * 20, .25, entity, null, SOLO_DEATH_MOB_WEAKEN_EFFECT_NAME);
 					}
 				});
 			}
@@ -908,6 +908,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 
+		mPlugin.mAbilityManager.playerDeathEvent(player, event);
 		mPlugin.mItemStatManager.onDeath(mPlugin, player, event);
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
@@ -1057,7 +1058,11 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
 
-		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+		ItemStatUtils.applyCustomEffects(mPlugin, player, item);
+
+		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
+
+		if (!event.isCancelled() && item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			// Stat tracker for consuming infinity items
 			// Needs to update the player's active item, not the event item, as that is a copy.
 			ItemStack activeItem = player.getActiveItem();
@@ -1066,10 +1071,6 @@ public class PlayerListener implements Listener {
 			// Set replacement to a copy of the original, so it is not consumed (must be a copy as the internal code checks for reference equality)
 			event.setReplacement(ItemUtils.clone(activeItem));
 		}
-
-		ItemStatUtils.applyCustomEffects(mPlugin, player, item);
-
-		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
 
 		for (PotionEffect effect : PotionUtils.getEffects(item)) {
 			// Kill the player if they drink a potion with instant damage 10+

@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.bosses.spells.oldslabsbos.SpellBash;
 import com.playmonumenta.plugins.bosses.spells.oldslabsbos.SpellWhirlwind;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -31,21 +33,21 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
-	public static final String identityTag = "boss_oldlabs";
 	public static final int detectionRange = 32;
+	public static final String identityTag = "boss_oldlabs";
 
+	private static final String SUMMON_SLOWNESS_SRC = "SummonOldLabsBossSlowness";
+	private static final int SUMMON_SLOWNESS_DURATION = 20 * 2;
+	private static final double SUMMON_SLOWNESS_POTENCY = -0.75;
 	private static final String[] mDialog = new String[] {
 		"Well, this is very peculiar...",
-		"The rats causing such a ruckus down here are mere commoners? How feeble are those bandits?",
-		"Now as a noble, I'm supposed to take pity on you. Where's the fun in that when I can cut you down instead?",
-		"Your intrusion on my plans ends here! Have at ye, commoners!"
+		"The rats causing a ruckus down here are mere commoners? How feeble are those bandits?",
+		"The aristocratic code of ethics demands I take pity on you, but why shouldn't I prune you here where no one will know?",
+		"Your heroics end here! Have at ye, commoners!"
 	};
 
 	public OldLabsBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -69,7 +71,7 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 			mBoss.teleport(tempLoc);
 
 			for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-				player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 10.0f, 0.6f);
+				player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 5.0f, 0.6f);
 			}
 			new BukkitRunnable() {
 				int mIdx = 0;
@@ -148,20 +150,22 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 			PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
 				.sendMessage(Component.text("", NamedTextColor.WHITE)
 					.append(Component.text("[Elcard the Ignoble] ", NamedTextColor.GOLD))
-					.append(Component.text("Ugh, looks like I might need help from those bandits after all...")));
+					.append(Component.text("Useless sluggards! Kill these commoners where they stand or we all face the gallows!")));
 			Location spawnLoc = mSpawnLoc.clone().add(-1, -1, 13);
 			try {
 				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				Entity mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSoldier");
-				if (mob instanceof LivingEntity le) {
-					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
+				if (mob instanceof LivingEntity) {
+					Plugin.getInstance().mEffectManager.addEffect(mob, SUMMON_SLOWNESS_SRC,
+						new PercentSpeed(SUMMON_SLOWNESS_DURATION, SUMMON_SLOWNESS_POTENCY, SUMMON_SLOWNESS_SRC));
 				}
 
 				spawnLoc = spawnLoc.add(2, 0, 0);
 				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSlinger");
-				if (mob instanceof LivingEntity le) {
-					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
+				if (mob instanceof LivingEntity) {
+					Plugin.getInstance().mEffectManager.addEffect(mob, SUMMON_SLOWNESS_SRC,
+						new PercentSpeed(SUMMON_SLOWNESS_DURATION, SUMMON_SLOWNESS_POTENCY, SUMMON_SLOWNESS_SRC));
 				}
 			} catch (Exception ex) {
 				MMLog.warning("Failed to spawn labs boss summons");
@@ -179,7 +183,7 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
 			player.sendMessage(Component.text("", NamedTextColor.WHITE)
 				.append(Component.text("[Elcard The Ignoble] ", NamedTextColor.GOLD))
-				.append(Component.text("You are no commoner... Who... Are you...?")));
+				.append(Component.text("You are no commoner... Who... are you...?")));
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}

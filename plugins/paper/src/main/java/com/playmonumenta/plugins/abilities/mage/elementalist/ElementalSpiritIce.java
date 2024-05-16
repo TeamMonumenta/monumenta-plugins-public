@@ -38,6 +38,7 @@ public class ElementalSpiritIce extends BaseElementalSpirit {
 		new AbilityInfo<>(ElementalSpiritIce.class, null, ElementalSpiritIce::new)
 			.linkedSpell(ClassAbility.ELEMENTAL_SPIRIT_ICE)
 			.scoreboardId("ElementalSpirit")
+			.hotbarName("EsI")
 			.cooldown(COOLDOWN_TICKS, ElementalSpiritFire.CHARM_COOLDOWN, CHARM_COOLDOWN2);
 
 

@@ -46,7 +46,6 @@ public class SpellShuraJump extends Spell {
 	public void run() {
 
 		BukkitRunnable a = new BukkitRunnable() {
-			int mT = 0;
 			final List<Player> mTargeted = new ArrayList<>();
 
 			@Override
@@ -54,11 +53,14 @@ public class SpellShuraJump extends Spell {
 				//List is the farthest players in the beginning, and nearest players at the end
 				List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), mRange);
 				players.removeAll(mTargeted);
+				// Remove farthest player until list is 4 or less
+				while (players.size() > 4) {
+					players.remove(0);
+				}
 				if (mTrigger && players.size() > 0) {
 					mTrigger = false;
 					jump(players.get(0));
 					mTargeted.add(players.get(0));
-					mT++;
 				}
 				if (players.size() == 0) {
 					this.cancel();

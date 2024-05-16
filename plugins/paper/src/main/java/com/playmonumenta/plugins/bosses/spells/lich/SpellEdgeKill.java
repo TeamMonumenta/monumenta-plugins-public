@@ -17,13 +17,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class SpellEdgeKill extends Spell {
-
-	private final int mInArena = 69;
-	private final double mMaxDistance = 40.5;
-	private LivingEntity mBoss;
-	private Location mCenter;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
 	private boolean mTrigger = false;
-	private List<Player> mWarned = new ArrayList<Player>();
+	private List<Player> mWarned = new ArrayList<>();
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 		Material.AIR,
@@ -39,6 +36,8 @@ public class SpellEdgeKill extends Spell {
 
 	@Override
 	public void run() {
+		final int mInArena = 69;
+		final double mMaxDistance = 40.5;
 		//run every half second
 		if (mTrigger) {
 			mTrigger = false;

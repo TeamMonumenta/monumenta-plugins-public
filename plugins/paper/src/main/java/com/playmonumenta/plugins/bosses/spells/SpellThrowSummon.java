@@ -7,13 +7,18 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellThrowSummon extends Spell {
 
@@ -32,13 +37,16 @@ public class SpellThrowSummon extends Spell {
 	private final double mThrowVariance;
 	private final double mThrowYVariance;
 	private final double mDistanceScalar;
+	private final boolean mRemoveOnDeath;
 	private final ParticlesList mThrowParticle;
 	private final SoundsList mThrowSound;
+
+	private final List<UUID> mSummonedEntities = new ArrayList<>();
 
 	public SpellThrowSummon(Plugin plugin, LivingEntity boss, EntityTargets targets, int lobs, int cooldownTicks,
 							String summonName, boolean fromPool, int lobDelay, double heightOffset, float yVelocity,
 							double variance, double yVariance, double distanceScalar,
-							int mobCapRange, int mobCap,
+							int mobCapRange, int mobCap, boolean removeOnDeath,
 							ParticlesList particles, SoundsList sounds) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -56,6 +64,7 @@ public class SpellThrowSummon extends Spell {
 		mDistanceScalar = distanceScalar;
 		mMobCapRange = mobCapRange;
 		mMobCap = mobCap;
+		mRemoveOnDeath = removeOnDeath;
 
 		mThrowParticle = particles;
 		mThrowSound = sounds;
@@ -116,6 +125,10 @@ public class SpellThrowSummon extends Spell {
 				return;
 			}
 
+			if (mRemoveOnDeath) {
+				mSummonedEntities.add(e.getUniqueId());
+			}
+
 			Location pLoc = target.getLocation();
 			Location tLoc = e.getLocation();
 
@@ -146,6 +159,18 @@ public class SpellThrowSummon extends Spell {
 		} catch (Exception e) {
 			mPlugin.getLogger().warning("Failed to summon entity for throw summon: " + e.getMessage());
 			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void onDeath(@Nullable EntityDeathEvent event) {
+		if (mRemoveOnDeath) {
+			for (UUID uuid : mSummonedEntities) {
+				Entity entity = Bukkit.getEntity(uuid);
+				if (entity != null && entity.isValid()) {
+					entity.remove();
+				}
+			}
 		}
 	}
 

@@ -51,6 +51,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	public static final int COOLDOWN_TICKS = 25 * 20;
 	public static final int DISTANCE = 50;
 	public static final int DURATION = 5 * 20;
+	public static final int MAX_DURATION = 15 * 20;
 	public static final int EFFECT_DURATION = 3 * 20;
 	public static final int BUFF_DURATION = 10 * 20;
 	public static final int DURATION_ON_KILL = 20;
@@ -304,7 +305,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 			return;
 		}
 		int oldDuration = mDuration;
-		mDuration = Math.min(mDuration + DURATION_ON_KILL, 10 * 20);
+		mDuration = Math.min(mDuration + DURATION_ON_KILL, MAX_DURATION);
 		int addedDuration = mDuration - oldDuration;
 		if (addedDuration <= 0) {
 			return;
@@ -312,7 +313,6 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 		for (Effect effect : slowEffects) {
 			effect.setDuration(effect.getDuration() + addedDuration);
 		}
-		mDuration = Math.min(mDuration + DURATION_ON_KILL, 10 * 20);
 
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1f, 1.3f);
@@ -335,7 +335,9 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 			.addDepthsDamage(a -> DAMAGE[rarity - 1] * 4, DAMAGE[rarity - 1] * 4, true)
 			.add(" magic damage per second for ")
 			.addDuration(a -> DURATION, DURATION)
-			.add(" seconds. Each mob killed increases the duration by 1 second, up to a max of 10 seconds. You are slowed by 50% for the entire duration of this ability and must continue to hold a weapon throughout. Additionally, every hit by the beam will apply status effects to allies and enemies depending on your available trees.")
+			.add(" seconds. Each mob killed increases the duration by 1 second, up to a max of ")
+			.addDuration(a -> MAX_DURATION, MAX_DURATION)
+			.add(" seconds. You are slowed by 50% for the entire duration of this ability and must continue to hold a weapon throughout. Additionally, every hit by the beam will apply status effects to allies and enemies depending on your available trees.")
 			.addCooldown(COOLDOWN_TICKS)
 			.addConditionalTree(DepthsTree.FROSTBORN, getFrostbornDescription(color))
 			.addConditionalTree(DepthsTree.FLAMECALLER, getFlamecallerDescription(color))

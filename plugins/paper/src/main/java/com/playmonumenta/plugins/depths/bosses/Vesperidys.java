@@ -82,10 +82,13 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	public static final String mobTag = "DD2BossFight3";
 
 	public static final String bossName = "Vesperidys";
+
+	public static final String MUSIC_TITLE_AMBIENT = "epid:music.vesperidys_ambient";
+	public static final int MUSIC_DURATION_AMBIENT = 1 * 60 + 27;
 	public static final String MUSIC_TITLE = "epic:music.vesperidys_phase1";
-	public static final double MUSIC_DURATION = 6 * 60 + 4; // seconds
+	public static final int MUSIC_DURATION = 6 * 60 + 4; // seconds
 	public static final String MUSIC_TITLE_2 = "epic:music.vesperidys_phase2";
-	public static final double MUSIC_DURATION_2 = 5 * 60 + 56; // seconds
+	public static final int MUSIC_DURATION_2 = 5 * 60 + 56; // seconds
 
 	public static final int detectionRange = 100;
 	public static final int REALITY_DISTORTION_TICKS = 3 * 20;
@@ -136,6 +139,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 	public int mSpellCooldowns = 15 * 20;
 
+	public double mDamageCap = 0.03; // "Vulnerable" health DPS Cap.
+	public double mDamageCapGain = 0.0025; // Passive Gain per 0.25 seconds
+
 	public Vesperidys(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBossTwo = boss;
@@ -182,14 +188,26 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		mBasePassives = Arrays.asList(
 			mAnticheese,
 			mTeleportSpell,
-			new SpellVesperidysSummonAdds(plugin, boss, this, 30 * 4, 60 * 4, numCrystals)
+			new SpellVesperidysSummonAdds(plugin, boss, this, 30 * 4, 60 * 4, numCrystals),
+			new Spell() {
+				@Override
+				public void run() {
+					// If Damage Cap is lower than 1% max hp, increases it to 1% max hp.
+					mDamageCap = Math.min(0.1, Math.max(0.01, mDamageCap + ((mDamageCap < 0.03) ? 2 * mDamageCapGain : mDamageCapGain)));
+				}
+
+				@Override
+				public int cooldownTicks() {
+					return 0;
+				}
+			}
 		);
 
-		mDarkHoleActive = new SpellManager(Arrays.asList(
+		mDarkHoleActive = new SpellManager(Collections.singletonList(
 			mDarkHole
 		));
 
-		mPhase1Passives = new ArrayList<>(Arrays.asList(
+		mPhase1Passives = new ArrayList<>(Collections.singletonList(
 			mAutoAttack
 		));
 
@@ -198,7 +216,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			new SpellStarProjectiles(plugin, boss, this)
 		));
 
-		mPhase2Passives = new ArrayList<>(Arrays.asList(
+		mPhase2Passives = new ArrayList<>(Collections.singletonList(
 			mAutoAttack
 		));
 
@@ -207,7 +225,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			new SpellStarProjectiles(plugin, boss, this)
 		));
 
-		mPhase3Passives = new ArrayList<>(Arrays.asList(
+		mPhase3Passives = new ArrayList<>(Collections.singletonList(
 			mAutoAttack
 		));
 
@@ -217,7 +235,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			new SpellSeekingEyes(plugin, boss, this)
 		));
 
-		mPhase4Passives = new ArrayList<>(Arrays.asList(
+		mPhase4Passives = new ArrayList<>(Collections.singletonList(
 			mAutoAttack
 		));
 
@@ -227,7 +245,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			new SpellSeekingEyes(plugin, boss, this)
 		));
 
-		mPhase5Passives = new ArrayList<>(Arrays.asList(
+		mPhase5Passives = new ArrayList<>(Collections.singletonList(
 			mAutoAttack
 		));
 
@@ -324,24 +342,24 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 
 		if (mParty != null && mParty.getAscension() >= 4) {
-			phase1ActivesList.addAll(List.of(
+			phase1ActivesList.add(
 				new SpellSeekingEyes(plugin, boss, this)
-			));
-			phase2ActivesList.addAll(List.of(
+			);
+			phase2ActivesList.add(
 				new SpellSeekingEyes(plugin, boss, this)
-			));
+			);
 		}
 
 		if (mParty != null && mParty.getAscension() >= 12) {
-			phase3ActivesList.addAll(List.of(
+			phase3ActivesList.add(
 				new SpellSoulLink(plugin, boss, this)
-			));
-			phase4ActivesList.addAll(List.of(
+			);
+			phase4ActivesList.add(
 				new SpellSoulLink(plugin, boss, this)
-			));
-			phase5ActivesList.addAll(List.of(
+			);
+			phase5ActivesList.add(
 				new SpellSoulLink(plugin, boss, this)
-			));
+			);
 		}
 
 		mPhase1Actives = new SpellManager(phase1ActivesList);
@@ -560,6 +578,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						mPhase = 1;
 
+						mDamageCap = 0.03;
+
 						mBoss.setInvulnerable(false);
 						mBoss.setCollidable(true);
 						mBoss.setAI(true);
@@ -633,6 +653,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}.runTaskTimer(mMonuPlugin, 0, 1);
 	}
 
+
+
 	@Override
 	public void onHurt(DamageEvent event) {
 		super.onHurt(event);
@@ -651,10 +673,15 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			}
 		} else {
 			if (event.getSource() instanceof Player player) {
-				// Ridiculous burst prevention (Maximum of 3% of Vesperidys' Max HP)
+				// Ridiculous burst prevention (DPS is "effectively" capped at 1% max hp per second).
 				double maxHealth = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, BOSS_HEALTH);
-				if (event.getDamage() > maxHealth * 0.03) {
-					event.setDamage(maxHealth * 0.03);
+				double damage = event.getDamage();
+				if (damage > maxHealth * mDamageCap) {
+					event.setDamage(maxHealth * mDamageCap);
+					mDamageCap = 0.01;
+				} else {
+					double damageCapReduction = Math.max(0, damage / maxHealth - 0.01);
+					mDamageCap = Math.max(0.01, mDamageCap - damageCapReduction);
 				}
 
 				event.setDamage(event.getDamage() * crystalResistanceMultiplier());
@@ -721,9 +748,11 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		mDefeated = true;
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() <= 0) {
+		if (players.size() == 0) {
 			return;
 		}
+
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 40, true, true);
 
 		TextComponent[] dio = new TextComponent[] {
 			obfuscate("You will be devoured by the vessels still above.", 0, NamedTextColor.DARK_AQUA),
@@ -735,11 +764,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		};
 		int[] sounds = {0, 1, 2, 3, 6, 7};
 
-		for (Player player : players) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
-		}
-
 		for (Platform platform : mPlatformList.getAllPlatforms()) {
 			platform.generateInstantFull();
 		}
@@ -747,12 +771,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		clearAllAdds();
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
-		mBoss.setHealth(100);
-		mBoss.setInvulnerable(true);
-		mBoss.setAI(false);
-		mBoss.setGravity(false);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
-		mBoss.removePotionEffect(PotionEffectType.GLOWING);
 		mBoss.teleport(mSpawnLoc.clone().add(0, 3, 0));
 		if (event != null) {
 			event.setCancelled(true);
@@ -864,7 +882,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					mBoss.setHealth(0);
 
 					Bukkit.getScheduler().runTaskLater(mMonuPlugin, () -> {
-						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+						for (Player player : players) {
 							MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text(bossName + ", the Abyssal Overmind", NamedTextColor.DARK_RED));
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 15, 0));
@@ -889,44 +907,42 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			mInvincible = false;
 
 			switch (mPhase) {
-				case 1:
+				case 1 -> {
 					changePhase(mPhase1Actives, mPhase1Passives, null);
 					if (mParty != null && mParty.getAscension() >= 15) {
 						forceCastSpell(SpellStarStorm.class);
 					}
-					break;
-				case 2:
+				}
+				case 2 -> {
 					changePhase(mPhase2Actives, mPhase2Passives, null);
 					if (mParty != null && mParty.getAscension() >= 4) {
 						forceCastSpell(SpellSeekingEyes.class);
 					}
-					break;
-				case 3:
+				}
+				case 3 -> {
 					changePhase(mPhase3Actives, mPhase3Passives, null);
 					if (mParty != null && mParty.getAscension() >= 12) {
 						forceCastSpell(SpellSoulLink.class);
 					} else {
 						forceCastSpell(SpellSeekingEyes.class);
 					}
-					break;
-				case 4:
+				}
+				case 4 -> {
 					changePhase(mPhase4Actives, mPhase4Passives, null);
 					if (mParty != null && mParty.getAscension() >= 12) {
 						forceCastSpell(SpellSoulLink.class);
 					} else {
 						forceCastSpell(SpellSeekingEyes.class);
 					}
-					break;
-				case 5:
+				}
+				case 5 -> {
 					changePhase(mPhase5Actives, mPhase5Passives, null);
 					if (mParty != null && mParty.getAscension() >= 12) {
 						forceCastSpell(SpellBreakPlatform.class);
 					} else {
 						forceCastSpell(SpellSeekingEyes.class);
 					}
-					break;
-				default:
-					break;
+				}
 			}
 		}, delay);
 	}
@@ -1005,6 +1021,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			public synchronized void cancel() {
 				super.cancel();
 				mInvincible = false;
+				mDamageCap = 0.03;
 				resetPhase(0);
 			}
 
@@ -1121,7 +1138,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 			for (int i = -3; i <= 3; i++) {
 				for (int j = -3; j <= 3; j++) {
-					if (Math.abs(i) >= 3 || Math.abs(j) >= 3) {
+					if (Math.abs(i) == 3 || Math.abs(j) == 3) {
 						BoundingBox box = BoundingBox.of(getCenter().add(i, 0, j), 0.5, 30, 0.5);
 						for (Player player : nearPlayers) {
 							if (!output.contains(player) && player.getBoundingBox().overlaps(box)) {
@@ -1140,7 +1157,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			for (int i = -3; i <= 3; i++) {
 				for (int j = -3; j <= 3; j++) {
 					for (int k = -2; k <= 0; k++) {
-						if (Math.abs(i) >= 3 || Math.abs(j) >= 3) {
+						if (Math.abs(i) == 3 || Math.abs(j) == 3) {
 							Location loc = mCenter.clone().add(i, k, j);
 							Block block = loc.getBlock();
 
@@ -1321,7 +1338,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 	/**
 	 * Data of Platforms is stored as a XY grid, for easy selection.
-	 *
 	 * Platforms are stored 23 blocks under. Each platform is 5 x 5 in size.
 	 */
 	public static class PlatformList {
@@ -1491,9 +1507,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		for (int i = 0; i < 6; i += 1) {
 			double summonAngle = EYE_ORDER[i];
 			int finalI = i;
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				summonEyes(summonAngle, false, finalI + 1);
-			}, i * 5L);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> summonEyes(summonAngle, false, finalI + 1), i * 5L);
 		}
 	}
 
@@ -1640,43 +1654,35 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
 		switch (voiceID) {
-			case 0:
+			case 0 ->
 				// Roar
 				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0.5f);
-				break;
-			case 1:
-			case 5:
+			case 1, 5 ->
 				// Vex
 				world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 2, 1f);
-				break;
-			case 2:
+			case 2 ->
 				// Creeper
 				world.playSound(loc, Sound.ENTITY_CREEPER_HURT, 2, 0.75f);
-				break;
-			case 3:
+			case 3 ->
 				// Blaze
 				world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 2, 2f);
-				break;
-			case 4:
+			case 4 ->
 				// Ghast Scream
 				world.playSound(loc, Sound.ENTITY_GHAST_AMBIENT, 2, 1.5f);
-				break;
-			case 6:
+			case 6 -> {
 				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0.5f);
 				world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 2, 1f);
 				world.playSound(loc, Sound.ENTITY_CREEPER_HURT, 2, 0.75f);
 				world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 2, 2f);
 				world.playSound(loc, Sound.ENTITY_GHAST_AMBIENT, 2, 1.5f);
-				break;
-			case 7:
+			}
+			case 7 -> {
 				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0.5f);
 				world.playSound(loc, Sound.ENTITY_WITHER_DEATH, 2, 1f);
 				world.playSound(loc, Sound.ENTITY_CREEPER_DEATH, 2, 0.75f);
 				world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, 2, 2f);
 				world.playSound(loc, Sound.ENTITY_GHAST_DEATH, 2, 1.5f);
-				break;
-			default:
-				break;
+			}
 		}
 	}
 }

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.plots;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -205,7 +204,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 				loc.setX(-1392);
 				loc.setY(0);
 				loc.setZ(-1392);
-				StructuresAPI.loadAndPasteStructure("plots/borders/" + cmd, loc, false).whenComplete((unused, ex) -> {
+				StructuresAPI.loadAndPasteStructure("plots/borders/" + cmd, loc, false, true).whenComplete((unused, ex) -> {
 					if (ex != null) {
 						player.sendMessage("Plot border completed with error: " + ex.getMessage());
 						ex.printStackTrace();
@@ -257,7 +256,6 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	public static String[] getCosmeticNames() {
 		return BORDER_ITEMS.stream()
 			.map(item -> item.mCosmeticString)
-			.map(CommandUtils::quoteIfNeeded)
 			.filter(Objects::nonNull)
 			.toArray(String[]::new);
 	}

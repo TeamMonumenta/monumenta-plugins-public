@@ -28,10 +28,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
 public class CleansingTotem extends TotemAbility {
-
-	private static final String HEAL_EFFECT_NAME = "CleansingTotemHealing";
-	private static final int EFFECT_DURATION = 2 * 20;
-
 	public static final Particle.DustOptions DUST_CLEANSING_RING = new Particle.DustOptions(Color.fromRGB(0, 87, 255), 1.25f);
 
 	private static final int COOLDOWN = 30 * 20;
@@ -52,7 +48,6 @@ public class CleansingTotem extends TotemAbility {
 	public static String CHARM_ENHANCE_ABSORB_MAX = "Cleansing Totem Enhance Absorption Maximum";
 	public static String CHARM_PULSE_DELAY = "Cleansing Totem Pulse Delay";
 
-	private final int mDuration;
 	private final double mRadius;
 	private final int mInterval;
 	private final double mHealPercent;
@@ -98,11 +93,6 @@ public class CleansingTotem extends TotemAbility {
 			+ (isEnhanced() ? ENHANCE_HEALING_PERCENT : 0);
 		mAbsorbCap = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_ABSORB_MAX, ENHANCE_ABSORB_CAP);
 		mChargeUpTicks = 0;
-	}
-
-	@Override
-	public int getInitialAbilityDuration() {
-		return mDuration;
 	}
 
 	@Override

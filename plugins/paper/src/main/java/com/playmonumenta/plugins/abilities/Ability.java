@@ -76,8 +76,6 @@ public abstract class Ability {
 		return mCustomTriggers;
 	}
 
-	// TODO useless?
-
 	/**
 	 * Checks if the player still has this ability.
 	 */
@@ -377,6 +375,13 @@ public abstract class Ability {
 	 * Return the current mode of this ability, or null for default mode or no modes. This is used by the client mod to display different icons for different modes.
 	 */
 	public @Nullable String getMode() {
+		return null;
+	}
+
+	/**
+	 * Return special hotbar message, or null if default hotbar message should be used.
+	 */
+	public @Nullable Component getHotbarMessage() {
 		return null;
 	}
 

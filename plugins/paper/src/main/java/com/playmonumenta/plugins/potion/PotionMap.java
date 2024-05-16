@@ -247,8 +247,7 @@ public class PotionMap {
 			PotionID id = PotionID.getFromString(entry.getKey());
 			if (id != null) {
 				for (JsonElement element : entry.getValue().getAsJsonArray()) {
-					PotionInfo info = new PotionInfo();
-					info.loadFromJsonObject(element.getAsJsonObject());
+					PotionInfo info = new PotionInfo(element.getAsJsonObject());
 
 					addPotion(id, info);
 				}

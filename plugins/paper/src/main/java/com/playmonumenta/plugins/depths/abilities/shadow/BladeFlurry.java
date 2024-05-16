@@ -75,7 +75,7 @@ public class BladeFlurry extends DepthsAbility {
 		loc.setPitch(0);
 		for (LivingEntity mob : Hitbox.approximateCylinder(loc.clone().add(0, 0.05, 0), loc.clone().subtract(0, 0.1, 0), mRadius, true).accuracy(0.5).getHitMobs()) {
 			EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
-			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell());
+			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 			MovementUtils.knockAway(mPlayer, mob, 0.8f, true);
 		}
 		ParticleUtils.drawCleaveArc(loc, mRadius * 0.7, 160, -80, 260, 6, 0, 0, 0.2, 60,

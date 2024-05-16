@@ -13,7 +13,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class WalletUtils {
 	public static class Debt {
+		// Item that is required
 		public final ItemStack mItem;
+		// Amount of items required
+		public final int mTotalRequiredAmount;
 		// Amount of items to take from the player's inventory
 		public final int mInventoryDebt;
 		// Amount of items to take from the player's wallet
@@ -22,13 +25,17 @@ public class WalletUtils {
 		public final boolean mMeetsRequirement;
 		// Amount of items of the required currency present in the player's wallet before the trade
 		public final long mNumInWallet;
+		// Amount of items of the required currency present in the player's inventory before the trade
+		public final long mNumInInventory;
 
-		public Debt(ItemStack item, int inventoryDebt, int walletDebt, boolean meetsRequirement, long numInWallet) {
+		public Debt(ItemStack item, int totalRequiredAmount, int inventoryDebt, int walletDebt, boolean meetsRequirement, long numInWallet, long numInInventory) {
 			mItem = item;
+			mTotalRequiredAmount = totalRequiredAmount;
 			mInventoryDebt = inventoryDebt;
 			mWalletDebt = walletDebt;
 			mMeetsRequirement = meetsRequirement;
 			mNumInWallet = numInWallet;
+			mNumInInventory = numInInventory;
 		}
 	}
 
@@ -62,7 +69,11 @@ public class WalletUtils {
 			inventoryDebt = Math.min(reqAmount - walletDebt, numInInventory);
 		}
 
-		return new Debt(requirement, inventoryDebt, walletDebt, meetsRequirement, numInWallet);
+		return new Debt(requirement, reqAmount, inventoryDebt, walletDebt, meetsRequirement, numInWallet, numInInventory);
+	}
+
+	public static Debt calculateInventoryAndWalletDebt(ItemStack requirement, Player player, boolean prioritizeWallet) {
+		return calculateInventoryAndWalletDebt(requirement, player.getInventory().getStorageContents(), WalletManager.getWallet(player), prioritizeWallet);
 	}
 
 	public static void payDebt(Debt debt, Player player, boolean notify) {
@@ -112,6 +123,17 @@ public class WalletUtils {
 		for (Debt debt : debts) {
 			payDebt(debt, player, notify);
 		}
+		return true;
+	}
+
+	public static boolean tryToPayFromInventoryAndWallet(Player player, ItemStack cost, boolean prioritizeWallet, boolean notify) {
+		PlayerInventory playerInventory = player.getInventory();
+		WalletManager.Wallet wallet = WalletManager.getWallet(player);
+		Debt debt = calculateInventoryAndWalletDebt(cost, playerInventory.getStorageContents(), wallet, prioritizeWallet);
+		if (!debt.mMeetsRequirement) {
+			return false;
+		}
+		payDebt(debt, player, notify);
 		return true;
 	}
 

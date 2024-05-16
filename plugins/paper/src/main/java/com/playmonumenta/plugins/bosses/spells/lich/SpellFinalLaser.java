@@ -29,24 +29,18 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellFinalLaser extends Spell {
-
-	private Plugin mPlugin;
-	private double mT = 20 * 4;
-	private int mSoloCooldown = 20 * 15;
-	private double mCooldown;
-	private double mMaxFactor = 1.35;
-	private Location mCenter;
-	private double mRange;
-	private LivingEntity mBoss;
-	private boolean mTrigger = false;
-	private List<Player> mPlayers = new ArrayList<Player>();
-	private PartialParticle mMob;
-	private PartialParticle mSmoke;
-	private PartialParticle mExpL;
-
 	private static final double BOX_SIZE = 0.4;
 	private static final double CHECK_INCREMENT = 0.75;
+	private static final int SOLO_COOLDOWN = 20 * 15;
+	private static final double MAX_FACTOR = 1.35;
 
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final double mRange;
+	private final PartialParticle mMob;
+	private final PartialParticle mSmoke;
+	private final PartialParticle mExpL;
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 		Material.AIR,
 		Material.CAVE_AIR,
@@ -61,6 +55,11 @@ public class SpellFinalLaser extends Spell {
 		Material.LAVA,
 		Material.END_PORTAL
 	);
+
+	private double mT = 20 * 4;
+	private double mCooldown;
+	private boolean mTrigger = false;
+	private List<Player> mPlayers = new ArrayList<>();
 
 	public SpellFinalLaser(Plugin plugin, LivingEntity boss, Location loc, double range) {
 		mPlugin = plugin;
@@ -88,8 +87,8 @@ public class SpellFinalLaser extends Spell {
 			}.runTaskLater(mPlugin, 20 * 5);
 		}
 		//cooldown
-		double cooldownFactor = Math.min(mMaxFactor, (Math.sqrt(mPlayers.size()) / 5 + 0.8) / 4 * 3);
-		mCooldown = mSoloCooldown / cooldownFactor;
+		double cooldownFactor = Math.min(MAX_FACTOR, (Math.sqrt(mPlayers.size()) / 5 + 0.8) / 4 * 3);
+		mCooldown = SOLO_COOLDOWN / cooldownFactor;
 		mT -= 5;
 		if (mT <= 0) {
 			mT += mCooldown;
@@ -99,7 +98,7 @@ public class SpellFinalLaser extends Spell {
 
 	private void laser() {
 		List<Player> potentialTargets = Lich.playersInRange(mBoss.getLocation(), mRange, true);
-		List<Player> toRemove = new ArrayList<Player>();
+		List<Player> toRemove = new ArrayList<>();
 		for (Player target : potentialTargets) {
 			if (target.getLocation().getY() > mCenter.getY() + 3) {
 				launch(target);
@@ -163,7 +162,7 @@ public class SpellFinalLaser extends Spell {
 					if (movingLaserBox.overlaps(target.getBoundingBox())) {
 						DamageUtils.damage(mBoss, target, DamageType.MAGIC, 50, null, false, true, "Death Laser");
 						MovementUtils.knockAway(mCenter, target, 3.2f, false);
-						Lich.cursePlayer(mPlugin, target);
+						Lich.cursePlayer(target);
 					}
 					this.cancel();
 				}
@@ -178,7 +177,7 @@ public class SpellFinalLaser extends Spell {
 	}
 
 	private void breakBlocks(Location l) {
-		List<Block> badBlockList = new ArrayList<Block>();
+		List<Block> badBlockList = new ArrayList<>();
 		Location testloc = l.clone();
 		for (int x = -1; x <= 1; x++) {
 			testloc.setX(l.getX() + x);

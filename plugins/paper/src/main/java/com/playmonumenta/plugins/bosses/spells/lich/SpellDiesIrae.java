@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,8 +26,6 @@ import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -35,7 +34,8 @@ import org.bukkit.util.Vector;
  */
 
 public class SpellDiesIrae extends Spell {
-
+	private static final String SLOWNESS_SRC = "DiesIraeSlowness";
+	private static final String WEAKNESS_SRC = "DiesIraeWeakness";
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final LivingEntity mKey;
@@ -182,7 +182,7 @@ public class SpellDiesIrae extends Spell {
 				BossUtils.hideBossBar(bar, world);
 			}
 		};
-		runA.runTaskTimer(mPlugin, 20 * 1, 1);
+		runA.runTaskTimer(mPlugin, 20, 1);
 		mActiveRunnables.add(runA);
 	}
 
@@ -261,8 +261,10 @@ public class SpellDiesIrae extends Spell {
 					for (Player p : players) {
 						BossUtils.bossDamagePercent(mBoss, p, mCrystalDmg, "Dies Irae");
 						AbilityUtils.increaseHealingPlayer(p, debuffTicks, -1.0, "Lich");
-						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.SLOW, debuffTicks, 0));
-						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.WEAKNESS, debuffTicks, 1));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
+							new PercentSpeed(debuffTicks, -0.15, SLOWNESS_SRC));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, WEAKNESS_SRC,
+							new PercentDamageDealt(debuffTicks, -0.3));
 						world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.0f, 0.5f);
 
 						// If the attack was larger than 5, mark the player with a scoreboard tag for DayOfWrath

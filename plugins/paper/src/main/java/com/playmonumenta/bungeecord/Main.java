@@ -1,5 +1,6 @@
 package com.playmonumenta.bungeecord;
 
+import com.google.common.base.Ascii;
 import com.playmonumenta.bungeecord.commands.Proxy;
 import com.playmonumenta.bungeecord.commands.Vote;
 import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
@@ -88,7 +89,7 @@ public class Main extends Plugin {
 			mJoinMessagesEnabled = mConfig.getBoolean("join_messages_enabled", mJoinMessagesEnabled);
 
 			// Load default server
-			String level = mConfig.getString("log_level", "INFO").toLowerCase();
+			String level = Ascii.toLowerCase(mConfig.getString("log_level", "INFO"));
 			switch (level) {
 				case "finest":
 					mLogLevel = Level.FINEST;

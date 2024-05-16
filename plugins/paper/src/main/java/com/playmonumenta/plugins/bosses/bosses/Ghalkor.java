@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -88,7 +89,7 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 			new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" This pain... My blood boils!\",\"color\":\"dark_gray\"}]");
+			sendMessage("This pain... My blood boils!");
 		});
 
 
@@ -121,7 +122,7 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0) * 1.05);
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 0) * 1.25);
 
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Broer, for you and for the Blackflame, I will devour them!\",\"color\":\"dark_gray\"}]");
+					sendMessage("Broer, for you and for the Blackflame, I will devour them!");
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_DEATH, SoundCategory.HOSTILE, 3, 0);
 
 					World world = mBoss.getWorld();
@@ -149,7 +150,7 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 				}
 
 				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
-				for (Player p : PlayerUtils.playersInRange(mMiddleLoc, detectionRange, true)) {
+				for (Player p : getPlayers()) {
 					if ((mMiddleLoc.distance(p.getLocation()) > 22
 						     || mMiddleLoc.getY() - p.getLocation().getY() >= 3
 						     || (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
@@ -169,7 +170,7 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 		mBoss.setGravity(false);
 		mBoss.setInvulnerable(true);
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Hael Broer, the invaders approach.\",\"color\":\"dark_gray\"}]");
+		sendMessage("Hael Broer, the invaders approach.");
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 5, 0.8f);
 
 		new BukkitRunnable() {
@@ -178,12 +179,12 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 			@Override
 			public void run() {
 				if (mTicks == 20 * 2) {
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Svalgot]\",\"color\":\"gold\"},{\"text\":\" Yes Ghalkor! Fear not. The power of the Blackflame is absolute.\",\"color\":\"dark_gray\"}]");
+					sendMessage("Yes Ghalkor! Fear not. The power of the Blackflame is absolute.", "Svalgot");
 					if (mSvalgot != null) {
 						mBoss.getWorld().playSound(mSvalgot.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 5, 1f);
 					}
 				} else if (mTicks == 20 * 4) {
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Yah Broer, the nonbelievers draw close.\",\"color\":\"dark_gray\"}]");
+					sendMessage("Yah Broer, the nonbelievers draw close.");
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 5, 0.8f);
 				} else if (mTicks == 20 * 6) {
 					new PartialParticle(Particle.FLAME, mBoss.getLocation(), 200, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(boss);
@@ -198,14 +199,14 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 					BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 					constructBoss(normalSpells, passiveNormalSpells, detectionRange, bossBar, 20 * 10);
 
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor and Svalgot]\",\"color\":\"gold\"},{\"text\":\" BY THE BLACKFLAME, YOU WILL FALL.\",\"color\":\"dark_gray\",\"bold\":true}]");
+					sendMessage("BY THE BLACKFLAME, YOU WILL FALL.", "Ghalkor and Svalgot", true);
 
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, SoundCategory.HOSTILE, 5, 0.8f);
 					if (mSvalgot != null) {
 						mBoss.getWorld().playSound(mSvalgot.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, SoundCategory.HOSTILE, 5, 1f);
 					}
 
-					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+					for (Player player : getPlayers()) {
 						MessagingUtils.sendBoldTitle(player, Component.text("Ghalkor & Svalgot", NamedTextColor.DARK_GRAY), Component.text("Speakers of Remorse", NamedTextColor.GRAY));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 					}
@@ -221,7 +222,7 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 		if ((mSvalgot == null || mSvalgot.isDead() || !mSvalgot.isValid()) && (mSvalgotBoss == null || !mSvalgotBoss.mSummonedFinalBoss)) {
 			mSummonedFinalBoss = true;
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!\",\"color\":\"dark_gray\"}]");
+			sendMessage("With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!");
 
 			Entity beast = LibraryOfSoulsIntegration.summon(mSpawnLoc.add(-2, -3, 0), BeastOfTheBlackFlame.losName);
 			if (beast instanceof LivingEntity leBeast) {
@@ -239,7 +240,7 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		int playerCount = getPlayers().size();
 		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
@@ -263,5 +264,24 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
+	}
+
+	public List<Player> getPlayers() {
+		return PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+	}
+
+	public void sendMessage(String message) {
+		sendMessage(message, "Ghalkor");
+	}
+
+	public void sendMessage(String message, String name) {
+		sendMessage(message, name, false);
+	}
+
+	public void sendMessage(String message, String name, boolean bold) {
+		Component component = Component.text("[" + name + "] ", NamedTextColor.GOLD).append(Component.text(message, NamedTextColor.DARK_GRAY).decoration(TextDecoration.BOLD, bold));
+		for (Player player : getPlayers()) {
+			player.sendMessage(component);
+		}
 	}
 }

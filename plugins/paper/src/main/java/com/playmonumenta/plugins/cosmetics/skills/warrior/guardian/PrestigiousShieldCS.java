@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.skills.warrior.guardian;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
 import org.bukkit.Color;
@@ -95,19 +94,13 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void shieldWallDot(Player player, Location l, double degree, double angle, int y, int height) {
-		if (goldCheck(degree / angle, 1.0 * y / height)) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(player);
-		} else {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
-		}
-		if (FastUtils.RANDOM.nextDouble() < 0.3) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
-		}
+	public Particle baseParticle() {
+		return Particle.WAX_ON;
 	}
 
-	private boolean goldCheck(double x, double y) {
-		return Math.abs(1 - (Math.abs(x - 0.5) * 2) - y) <= 0.2;
+	@Override
+	public Particle replaceParticle(double angleRatio, double heightRatio) {
+		return Math.abs(1 - (Math.abs(angleRatio - 0.5) * 2) - heightRatio) <= 0.2 ? Particle.FIREWORKS_SPARK : baseParticle();
 	}
 
 	@Override
@@ -119,11 +112,11 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void shieldOnHit(World world, Location eLoc, Player player) {
-		new PartialParticle(Particle.CLOUD, eLoc, 30, 0.2, 0.2, 0.2, 0.35f).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, eLoc, 15, 0.5, 0.8, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
-		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.8f, 1.4f);
-		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.9f, 1.6f);
-		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.95f, 1.75f);
+	public void shieldOnHit(World world, Location eLoc, Player player, float multiplier) {
+		new PartialParticle(Particle.CLOUD, eLoc, (int) (30 * multiplier), 0.2, 0.2, 0.2, 0.35f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, eLoc, (int) (15 * multiplier), 0.5, 0.8, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
+		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.8f * multiplier, 1.4f);
+		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.9f * multiplier, 1.6f);
+		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.95f * multiplier, 1.75f);
 	}
 }

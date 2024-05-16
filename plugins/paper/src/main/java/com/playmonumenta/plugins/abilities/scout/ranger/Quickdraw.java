@@ -113,7 +113,9 @@ public class Quickdraw extends Ability {
 			case BOW, CROSSBOW -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);
 			case TRIDENT -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Trident.class);
 			case SNOWBALL -> {
-				proj = world.spawn(eyeLoc, Snowball.class);
+				Snowball snowball = world.spawn(eyeLoc, Snowball.class);
+				ItemUtils.setSnowballItem(snowball, inMainHand);
+				proj = snowball;
 				proj.setVelocity(direction.normalize().multiply(3.0f));
 			}
 			default -> {

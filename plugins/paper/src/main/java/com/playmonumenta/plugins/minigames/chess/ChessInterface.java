@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -238,15 +240,11 @@ public class ChessInterface {
 
 		Location fromLoc = mFrames.get(from).getLocation();
 		Location toLoc = mFrames.get(to).getLocation();
-		World world = mFrames.get(to).getWorld();
-
-
 		mParticleRunnable = new BukkitRunnable() {
-			Location mFrom = fromLoc.clone();
-			Location mTo = toLoc.clone();
-			World mWorld = world;
-			Vector mDistance = mTo.clone().toVector().subtract(mFrom.clone().toVector());
-			Vector mDirection = mDistance.clone().normalize();
+			final Location mFrom = fromLoc.clone();
+			final Location mTo = toLoc.clone();
+			final Vector mDistance = mTo.clone().toVector().subtract(mFrom.clone().toVector());
+			final Vector mDirection = mDistance.clone().normalize();
 			int mTimer = 0;
 
 			@Override
@@ -267,7 +265,8 @@ public class ChessInterface {
 
 
 				for (double i = 0.05; i < mDistance.length(); i += 0.05) {
-					mWorld.spawnParticle(Particle.REDSTONE, mFrom.clone().add(mDirection.clone().multiply(i)), 25, 0.05, 0.05, 0.05, 0, new DustOptions(Color.ORANGE, 0.3f));
+					new PartialParticle(Particle.REDSTONE, mFrom.clone().add(mDirection.clone().multiply(i)), 25, 0.05, 0.05, 0.05, 0, new DustOptions(Color.ORANGE, 0.3f))
+						.spawnFull();
 
 				}
 				mTimer += 3;
@@ -283,9 +282,9 @@ public class ChessInterface {
 		MapMeta meta = (MapMeta) map.getItemMeta();
 		//no other methods for pick the right id.
 		if (ServerProperties.getShardName().contains("valley")) {
-			meta.setMapId(id + MAP_ID_OFFSET);
+			ItemUtils.setMapId(meta, id + MAP_ID_OFFSET);
 		} else {
-			meta.setMapId(id);
+			ItemUtils.setMapId(meta, id);
 		}
 		map.setItemMeta(meta);
 		return map;

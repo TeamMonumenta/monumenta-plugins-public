@@ -23,7 +23,6 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -166,9 +165,6 @@ public class TeleportAsync extends GenericCommand {
 			return 0;
 		}
 
-		if (entity instanceof Player) {
-			((Player) entity).setSwimming(false);
-		}
 		if (entity instanceof Mob) {
 			((Mob) entity).setVelocity(new Vector(0, 0.1, 0));
 		}

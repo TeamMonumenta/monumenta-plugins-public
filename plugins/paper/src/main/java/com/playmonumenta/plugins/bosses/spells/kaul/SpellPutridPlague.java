@@ -48,23 +48,21 @@ import org.bukkit.scoreboard.Team;
  */
 public class SpellPutridPlague extends Spell {
 	private enum Pillar {
-		RED("KaulPutridPlagueRed", NamedTextColor.RED, NamedTextColor.DARK_RED, NamedTextColor.RED, BossBar.Color.RED, "Your blood begins to shiver slightly..."),
-		BLUE("KaulPutridPlagueBlue", NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, "The water begins to ripple..."),
-		YELLOW("KaulPutridPlagueYellow", NamedTextColor.YELLOW, NamedTextColor.GOLD, NamedTextColor.YELLOW, BossBar.Color.YELLOW, "You feel the temperature rise significantly..."),
-		GREEN("KaulPutridPlagueGreen", NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, NamedTextColor.DARK_GREEN, BossBar.Color.GREEN, "The ground begins to vibrate...");
+		RED("KaulPutridPlagueRed", NamedTextColor.RED, NamedTextColor.DARK_RED, BossBar.Color.RED, "Your blood begins to shiver slightly..."),
+		BLUE("KaulPutridPlagueBlue", NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, BossBar.Color.BLUE, "The water begins to ripple..."),
+		YELLOW("KaulPutridPlagueYellow", NamedTextColor.YELLOW, NamedTextColor.GOLD, BossBar.Color.YELLOW, "You feel the temperature rise significantly..."),
+		GREEN("KaulPutridPlagueGreen", NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, BossBar.Color.GREEN, "The ground begins to vibrate...");
 
 		final String mTag;
 		final NamedTextColor mTextColor;
 		final TextColor mDarkTextColor;
-		final TextColor mTitleColor;
 		final BossBar.Color mBarColor;
 		final String mMessage;
 
-		Pillar(String tag, NamedTextColor textColor, TextColor darkTextColor, TextColor titleColor, BossBar.Color barColor, String message) {
+		Pillar(String tag, NamedTextColor textColor, TextColor darkTextColor, BossBar.Color barColor, String message) {
 			mTag = tag;
 			mTextColor = textColor;
 			mDarkTextColor = darkTextColor;
-			mTitleColor = titleColor;
 			mBarColor = barColor;
 			mMessage = message;
 		}
@@ -72,6 +70,8 @@ public class SpellPutridPlague extends Spell {
 
 	private static final String SPELL_NAME = "Putrid Plague";
 	private static final int DAMAGE = 30;
+	private static final String SLOWNESS_SRC = "PutridPlagueSlowness";
+	private static final int DEBUFF_DURATION = 20 * 30;
 
 	private static boolean mPlagueActive;
 
@@ -174,10 +174,10 @@ public class SpellPutridPlague extends Spell {
 									new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
 										Material.LIME_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
-									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, DEBUFF_DURATION, 1));
 									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,
-										"PutridPlagueSlowness", new PercentSpeed(20 * 30, -0.3, "PutridPlagueSlowness"));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
+										SLOWNESS_SRC, new PercentSpeed(DEBUFF_DURATION, -0.3, SLOWNESS_SRC));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, DEBUFF_DURATION, 1));
 									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
 								}
 							} else {
@@ -186,7 +186,7 @@ public class SpellPutridPlague extends Spell {
 								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
 								if (!mPhase3) {
 									player.removePotionEffect(PotionEffectType.WITHER);
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, "PutridPlagueSlowness");
+									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, SLOWNESS_SRC);
 									player.removePotionEffect(PotionEffectType.POISON);
 									player.removePotionEffect(PotionEffectType.WEAKNESS);
 								} else {

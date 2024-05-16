@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellSurroundingDe
 import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellTectonicDevastation;
 import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellVolcanicDeepmise;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -65,7 +66,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 	public static final int EYE_KILL_COUNT = 4;
 
 	public static final String MUSIC_TITLE = "epic:music.nucleus";
-	private static final int MUSIC_DURATION = 152; //seconds
+	public static final int MUSIC_DURATION = 152; //seconds
 
 	public int mCooldownTicks;
 	public List<Location> mEyeSpawns;
@@ -360,7 +361,10 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
+		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+		for (Player player : players) {
 			player.sendMessage(Component.text("", NamedTextColor.RED)
 					.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
 					.append(Component.text(" B"))
@@ -372,8 +376,6 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 					.append(Component.text("K!!! AWAY!!! This world... "))
 					.append(Component.text("hhgg").decoration(TextDecoration.OBFUSCATED, true))
 					.append(Component.text("is poison...")));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

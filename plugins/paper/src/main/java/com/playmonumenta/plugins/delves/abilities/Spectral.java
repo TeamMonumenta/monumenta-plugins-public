@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 
 public class Spectral {
@@ -10,10 +11,10 @@ public class Spectral {
 
 	public static final String DESCRIPTION = "Dying enemies transform into new enemies.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"Dying Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance",
-				"to spawn Specters."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("Dying Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
+				Component.text("to spawn Specters.")
 		};
 	}
 

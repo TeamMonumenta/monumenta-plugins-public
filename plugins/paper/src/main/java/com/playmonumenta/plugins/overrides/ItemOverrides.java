@@ -28,7 +28,6 @@ import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-
 public final class ItemOverrides {
 	/*
 	 * Exceptions for materials that players in survival can place,
@@ -96,12 +95,11 @@ public final class ItemOverrides {
 		Material.CHERRY_SIGN,
 		Material.CHERRY_WALL_SIGN
 	);
+	Map<Material, BaseOverride> mItems = new EnumMap<Material, BaseOverride>(Material.class);
 
 	public ItemOverrides() {
 		registerOverrides();
 	}
-
-	Map<Material, BaseOverride> mItems = new EnumMap<Material, BaseOverride>(Material.class);
 
 	public void registerOverrides() {
 		BaseOverride monsterEggOverride = new MonsterEggOverride();
@@ -176,7 +174,6 @@ public final class ItemOverrides {
 		mItems.put(Material.ZOMBIE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ZOMBIE_VILLAGER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ZOMBIFIED_PIGLIN_SPAWN_EGG, monsterEggOverride);
-
 
 		BaseOverride bedOverride = new BedOverride();
 		mItems.put(Material.WHITE_BED, bedOverride);
@@ -425,6 +422,15 @@ public final class ItemOverrides {
 		//Just needs the base cake since you cant put candles on cakes that already have them
 		BaseOverride candleCakeOverride = new CandleCakeOverride();
 		mItems.put(Material.CAKE, candleCakeOverride);
+
+		BaseOverride alchPotionOverride = new AlchPotionOverride();
+		mItems.put(Material.SPLASH_POTION, alchPotionOverride);
+
+		BaseOverride goatHornOverride = new GoatHornOverride();
+		mItems.put(Material.GOAT_HORN, goatHornOverride);
+
+		BaseOverride snowballOverride = new SnowballOverride();
+		mItems.put(Material.SNOWBALL, snowballOverride);
 	}
 
 	public void rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
@@ -447,7 +453,7 @@ public final class ItemOverrides {
 	}
 
 	public void leftClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item,
-	                                 @Nullable Block block, PlayerInteractEvent event) {
+									 @Nullable Block block, PlayerInteractEvent event) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
@@ -467,7 +473,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
-	                                           ItemStack itemInHand) {
+											   ItemStack itemInHand) {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		BaseOverride override = mItems.get(itemType);
 
@@ -477,7 +483,7 @@ public final class ItemOverrides {
 	public boolean inventoryClickInteraction(Plugin plugin, Player player, InventoryClickEvent event) {
 		ItemStack cursorItem = event.getCursor();
 		if ((event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.LEFT)
-			    || (cursorItem != null && cursorItem.getType() != Material.AIR)) {
+			|| (cursorItem != null && cursorItem.getType() != Material.AIR)) {
 			return true;
 		}
 		ItemStack item = event.getCurrentItem();
@@ -516,7 +522,7 @@ public final class ItemOverrides {
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
 			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
-				    !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+				!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				// Allow breaking if the player would be in survival mode at that spot
 				if (!ZoneUtils.isInPlot(block.getLocation())) {
 					eventCancelled = true;
@@ -528,7 +534,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,
-	                                     BlockPlaceEvent event) {
+										 BlockPlaceEvent event) {
 		boolean eventCancelled = false;
 
 		//  If it's not a certain lore item go ahead and run the normal override place interaction.
@@ -539,12 +545,12 @@ public final class ItemOverrides {
 
 		//  Don't allow placing of certain items with Lore.
 		if (item.hasItemMeta()
-			    && item.getItemMeta().hasLore()
-			    && player.getGameMode() != GameMode.CREATIVE
-			    && !EXCEPTION_LORED_MATERIALS.contains(item.getType())
-			    && !ItemUtils.isNullOrAir(item)
-			    && !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
-			eventCancelled |= true;
+			&& item.getItemMeta().hasLore()
+			&& player.getGameMode() != GameMode.CREATIVE
+			&& !EXCEPTION_LORED_MATERIALS.contains(item.getType())
+			&& !ItemUtils.isNullOrAir(item)
+			&& !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
+			eventCancelled = true;
 		}
 
 		// Don't allow placing blocks on top of barriers for plots
@@ -557,9 +563,9 @@ public final class ItemOverrides {
 			// Don't allow players to place rail on bedrock because of a dumb mojang bug
 			Material blockPlacedMat = event.getBlockPlaced().getType();
 			if (belowMat.equals(Material.BEDROCK) &&
-				    (blockPlacedMat.equals(Material.RAIL) ||
-					     blockPlacedMat.equals(Material.POWERED_RAIL) ||
-					     blockPlacedMat.equals(Material.DETECTOR_RAIL))) {
+				(blockPlacedMat.equals(Material.RAIL) ||
+					blockPlacedMat.equals(Material.POWERED_RAIL) ||
+					blockPlacedMat.equals(Material.DETECTOR_RAIL))) {
 				eventCancelled = true;
 			}
 		}
@@ -580,7 +586,7 @@ public final class ItemOverrides {
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
-			    ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
+			ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
 			eventCancelled = true;
 		}
 

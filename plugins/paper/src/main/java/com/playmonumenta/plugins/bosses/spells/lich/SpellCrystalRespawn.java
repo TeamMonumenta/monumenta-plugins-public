@@ -11,34 +11,35 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellCrystalRespawn extends Spell {
-
-	private Plugin mPlugin;
-	private Lich mLich;
+	private final Plugin mPlugin;
+	private final Lich mLich;
 	private int mT;
-	private double mInc;
-	private int mMinCooldown = 20 * 10;
-	private int mMaxCooldown = 20 * 30;
-	private int mCooldown;
-	private Location mCenter;
-	private double mRange;
-	private List<Location> mLoc;
-	private String mCrystalNBT;
+	private final Location mCenter;
+	private final double mRange;
+	private final List<Location> mLoc;
+	private final String mCrystalNBT;
 	private boolean mTrigger = false;
-	private List<Player> mPlayers = new ArrayList<Player>();
+	private List<Player> mPlayers = new ArrayList<>();
 	private static boolean mSpawned = false;
 
-	public SpellCrystalRespawn(Plugin plugin, Lich lich, Location loc, double range, List<Location> crystalLoc, String crystalnbt) {
+	public SpellCrystalRespawn(Plugin plugin, Lich lich, Location loc, double range, List<Location> crystalLoc, String crystalNBT) {
 		mPlugin = plugin;
 		mLich = lich;
 		mCenter = loc;
 		mRange = range;
 		mLoc = crystalLoc;
-		mCrystalNBT = crystalnbt;
+		mCrystalNBT = crystalNBT;
 	}
 
 	@Override
 	public void run() {
-		//update player count every 5 seconds
+		// Calculate cooldown
+		final int minCooldown = 20 * 10;
+		final int maxCooldown = 20 * 30;
+		double factor = Math.log(mPlayers.size());
+		int spellCooldown = (int) Math.max(minCooldown, Math.round(maxCooldown / factor));
+
+		// Update player count every 5 seconds
 		if (!mTrigger) {
 			mPlayers = Lich.playersInRange(mCenter, mRange, true);
 			mTrigger = true;
@@ -52,19 +53,13 @@ public class SpellCrystalRespawn extends Spell {
 			}.runTaskLater(mPlugin, 20 * 5);
 		}
 
-		//cooldown
-		double factor = Math.log(mPlayers.size());
-		mCooldown = (int) Math.max(mMinCooldown, Math.round(mMaxCooldown / factor));
+		// If off cooldown and not running Dies Irae, spawn crystals
 		mT -= 5;
 		if (mT <= 0 && !mLich.hasRunningSpellOfType(SpellDiesIrae.class)) {
-			mT = mCooldown;
-			mInc = Math.min(5, mPlayers.size() / 5);
-			Lich.spawnCrystal(mLoc, mInc, mCrystalNBT);
-
+			mT = spellCooldown;
+			Lich.spawnCrystal(mLoc, Math.min(5, mPlayers.size() / 5), mCrystalNBT);
 			mSpawned = true;
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mSpawned = false;
-			}, 2 * 20);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mSpawned = false, 2 * 20);
 		}
 	}
 

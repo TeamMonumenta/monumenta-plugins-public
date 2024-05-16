@@ -307,6 +307,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(SiriusMeleeBoss.identityTag, SiriusMeleeBoss::new);
 		registerStatelessBoss(SiriusNPCBoss.identityTag, SiriusNPCBoss::construct);
 		registerStatelessBoss(SiriusMob.identityTag, SiriusMob::new);
+		registerStatelessBoss(GuildDisplayBoss.identityTag, GuildDisplayBoss::new, new GuildDisplayBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
@@ -482,12 +483,6 @@ public class BossManager implements Listener {
 			if (entity.getHealth() <= 0) {
 				unload(boss, false);
 				mBosses.remove(entity.getUniqueId());
-
-				/*
-				 * Remove special serialization data from drops. Should not be
-				 * necessary since loaded bosses already have this data stripped
-				 */
-				SerializationUtils.stripSerializationDataFromDrops(event);
 			}
 		}
 	}

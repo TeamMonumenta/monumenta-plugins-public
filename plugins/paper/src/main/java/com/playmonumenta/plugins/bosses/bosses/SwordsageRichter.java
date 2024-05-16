@@ -10,6 +10,9 @@ import com.playmonumenta.plugins.bosses.spells.SpellBladeDance;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileDeflection;
 import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -42,8 +45,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,6 +52,10 @@ import org.jetbrains.annotations.Nullable;
 public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_swordsagerichter";
 	public static final int detectionRange = 60;
+
+	private static final String SLOWNESS_SRC = "SwordsageRichterSlowness";
+	private static final String WEAKNESS_SRC = "SwordsageRichterWeakness";
+	private static final int DEBUFF_DURATION = 20 * 6;
 	private static final Particle.DustOptions BOLT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
 	public SwordsageRichter(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -63,15 +68,16 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 			new SpellWindWalk(plugin, mBoss),
 			new SpellBaseBolt(plugin, mBoss, (int) (20 * 2.5), 30, 1.4, 20, 0.5, false, false, 1, 1,
 				(Entity entity, int tick) -> {
-					float t = tick / 10;
+					float t = tick / 10f;
 					if (tick == 1) {
 						PotionUtils.applyColoredGlowing(identityTag, mBoss, NamedTextColor.RED, (int) (20 * 2.5));
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, t);
-					mBoss.removePotionEffect(PotionEffectType.SLOW);
-					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 1));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+						new BaseMovementSpeedModifyEffect(20 * 2, -0.3));
 				},
 
 				(Entity entity) -> {
@@ -89,8 +95,10 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (!blocked && player != null) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15, prevLoc);
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 1));
-						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 0));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+							new PercentSpeed(DEBUFF_DURATION, -0.3, SLOWNESS_SRC));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
+							new PercentDamageDealt(DEBUFF_DURATION, -0.1));
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
 				},
@@ -109,38 +117,46 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"This is the challenger you speak of, master? Very well, let's get this over with quickly.\",\"color\":\"white\"}]");
+			for (Player player : PlayerUtils.playersInRange(spawnLoc, detectionRange, true)) {
+				com.playmonumenta.scriptedquests.utils.MessagingUtils.sendNPCMessage(player, "Richter", "This is the challenger you speak of, master? Very well, let's get this over with quickly.");
+			}
 		});
 
 		events.put(75, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Not bad so far, but at this rate you shouldn't even bother learning my path.\",\"color\":\"white\"}]");
+			for (Player player : PlayerUtils.playersInRange(spawnLoc, detectionRange, true)) {
+				com.playmonumenta.scriptedquests.utils.MessagingUtils.sendNPCMessage(player, "Richter", "Not bad so far, but at this rate you shouldn't even bother learning my path.");
+			}
 		});
 
 		events.put(50, mBoss -> {
 			// Spawn adds
 			summonLivingBlades(plugin, mBoss);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Let's make this more interesting shall we? Living Blades, cut down this infidel!\",\"color\":\"white\"}]");
+			for (Player player : PlayerUtils.playersInRange(spawnLoc, detectionRange, true)) {
+				com.playmonumenta.scriptedquests.utils.MessagingUtils.sendNPCMessage(player, "Richter", "Let's make this more interesting shall we? Living Blades, cut down this outsider!");
+			}
 		});
 
 		events.put(30, mBoss -> {
-			super.changePhase(phase2Spells, passiveSpells,
-				(LivingEntity entity) -> {
-					knockback(plugin, 7);
-				});
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Agh! I won't lose to a weakling like you!\",\"color\":\"white\"}]");
+			super.changePhase(phase2Spells, passiveSpells, (LivingEntity entity) -> knockback(plugin, 7));
+			for (Player player : PlayerUtils.playersInRange(spawnLoc, detectionRange, true)) {
+				com.playmonumenta.scriptedquests.utils.MessagingUtils.sendNPCMessage(player, "Richter", "Agh! I won't lose to a weakling like you!");
+			}
 		});
 
 		events.put(15, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"This is impossible! How are you still standing!?\",\"color\":\"white\"}]");
+			for (Player player : PlayerUtils.playersInRange(spawnLoc, detectionRange, true)) {
+				com.playmonumenta.scriptedquests.utils.MessagingUtils.sendNPCMessage(player, "Richter", "This is impossible! How are you still standing!?");
+			}
 		});
 
 		events.put(8, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"DAMN YOU! This match ends here! I won't allow myself to be beaten like this! NEVER!\",\"color\":\"white\"}]");
-			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+			final List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+
+			for (Player player : players) {
+				com.playmonumenta.scriptedquests.utils.MessagingUtils.sendNPCMessage(player, "Richter", "DAMN YOU! This match ends here! I won't allow myself to be beaten like this! NEVER!");
+			}
 			mBoss.setAI(false);
 			mBoss.setInvulnerable(true);
-
-
 			knockback(plugin, 10);
 
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -148,7 +164,6 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 2, 1);
 				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(boss);
-
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(boss);
 
 				new BukkitRunnable() {
@@ -168,7 +183,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 								new PartialParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0).spawnAsEntityActive(boss);
 							}
 						} else {
-							float pitch = mT / 20;
+							float pitch = mT / 20f;
 							double offset = 2.5 - pitch;
 							for (Player player : players) {
 								Location loc = player.getLocation().add(0, 1, 0);
@@ -210,24 +225,14 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 		for (int t = 0; t < 3; t++) {
 			int summonRadius = 5;
 
-			final String mobdata;
-			switch (t) {
-				case 3:
-					// Swift Living Sword
-					mobdata = "SwiftLivingBlade";
-					break;
-				case 2:
-					// Fiery Living Sword
-					mobdata = "FieryLivingBlade";
-					break;
-				default:
-					// Heavy Living Sword
-					mobdata = "HeavyLivingBlade";
-					break;
-			}
+			final String mobdata = switch (t) {
+				case 2 -> "SwiftLivingBlade";
+				case 1 -> "FieryLivingBlade";
+				default -> "HeavyLivingBlade";
+			};
 
 			new BukkitRunnable() {
-				Location mLoc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(summonRadius), 1.5, FastUtils.RANDOM.nextInt(summonRadius));
+				final Location mLoc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(summonRadius), 1.5, FastUtils.RANDOM.nextInt(summonRadius));
 				double mRotation = 0;
 				double mRadius = 4;
 
@@ -255,7 +260,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 						LibraryOfSoulsIntegration.summon(mLoc, mobdata);
 					}
 				}
-			}.runTaskTimer(plugin, t * 10, 1);
+			}.runTaskTimer(plugin, t * 10L, 1);
 		}
 	}
 
@@ -267,8 +272,8 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f, false);
 		}
 		new BukkitRunnable() {
+			final Location mLoc = mBoss.getLocation();
 			double mRotation = 0;
-			Location mLoc = mBoss.getLocation();
 			double mRadius = 0;
 			double mY = 2.5;
 			double mDelta = 0.35;
@@ -294,9 +299,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 				if (mRadius >= r) {
 					this.cancel();
 				}
-
 			}
-
 		}.runTaskTimer(plugin, 0, 1);
 	}
 
@@ -319,5 +322,4 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
 	}
-
 }

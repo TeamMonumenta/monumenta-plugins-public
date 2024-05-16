@@ -93,15 +93,15 @@ public class Avalanche extends DepthsAbility {
 			@Override
 			public void run() {
 				// re-obtain nearby ice every pulse in case ice disappears in the middle of casting
-				mIceToBreak = getNearbyIce(loc, mRadius);
+				mIceToBreak = getNearbyIce(loc, mRadius * (mPulses + 1) / NUM_PULSES);
 				mHitMobs.clear();
 				for (Location l : mIceToBreak) {
 					Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 
 					//Damage and root mobs
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 2, 5.0, 2)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.5, 5.0, 1.5)) {
 						if (!mHitMobs.contains(mob)) {
-							double damage = mDamage * (mPulses < 3 ? 0.15 : 0.55);
+							double damage = mDamage / NUM_PULSES;
 							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
 							EntityUtils.applySlow(mPlugin, mDuration, SLOW_MODIFIER, mob);
 							mHitMobs.add(mob);
@@ -167,7 +167,7 @@ public class Avalanche extends DepthsAbility {
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks, dealing a total of ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" magic damage in 4 pulses over 0.5s to enemies above the ice. The final pulse deals significantly more damage and removes the ice. Affected enemies are rooted for ")
+			.add(" magic damage in 4 pulses over 0.5s to enemies above the ice. The radius starts at 25% of the max value and grows with each pulse until it reaches 100%. Affected enemies are rooted for ")
 			.addDuration(a -> a.mDuration, SLOW_DURATION)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN_TICKS);

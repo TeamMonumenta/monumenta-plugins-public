@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.broodmother.SpellWebCarpet
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -79,10 +80,12 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	public static final double VULNERABILITY_A8_INCREASE = 0.15;
 	public static final double VULNERABILITY_A15_INCREASE = 0.2;
 
+	public static final String MUSIC_TITLE_AMBIENT = "epic:music.broodmother_ambient";
+	public static final int MUSIC_DURATION_AMBIENT = 2 * 60;
 	public static final String MUSIC_TITLE = "epic:music.broodmother_phase1";
-	public static final double MUSIC_DURATION = 2 * 60 + 53; // seconds
+	public static final int MUSIC_DURATION = 2 * 60 + 53; // seconds
 	public static final String MUSIC_TITLE_2 = "epic:music.broodmother_phase2";
-	public static final double MUSIC_DURATION_2 = 3 * 60 + 21; // seconds
+	public static final int MUSIC_DURATION_2 = 3 * 60 + 21; // seconds
 
 	private final BukkitRunnable mLimbsRunnable;
 	private final Slime[] mLimbs = new Slime[4];
@@ -296,10 +299,8 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			mLaserCores.removeAllCores();
 		}
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
-		}
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		BossUtils.endBossFightEffects(players);
 
 		mLegSweep.stopLegTasks();
 		mTantrum.stopTantrumTasks();

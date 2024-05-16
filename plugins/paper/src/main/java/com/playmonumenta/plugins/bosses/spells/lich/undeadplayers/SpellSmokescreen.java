@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
@@ -20,15 +22,17 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 
 public class SpellSmokescreen extends Spell {
+	private static final String SLOWNESS_SRC = "RogueRevenantSlowness";
+	private static final String WEAKNESS_SRC = "RogueRevenantWeakness";
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int DELAY = (int) (20 * 1.25);
-	private int DURATION = 20 * 10;
-	private PartialParticle mSmokeN1;
-	private PartialParticle mSmokeN2;
-	private PartialParticle mSmokeL1;
-	private PartialParticle mSmokeL2;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int DELAY = (int) (20 * 1.25);
+	private final int DURATION = 20 * 10;
+	private final PartialParticle mSmokeN1;
+	private final PartialParticle mSmokeN2;
+	private final PartialParticle mSmokeL1;
+	private final PartialParticle mSmokeL2;
 
 	public SpellSmokescreen(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
@@ -65,8 +69,10 @@ public class SpellSmokescreen extends Spell {
 					mSmokeL2.location(loc.clone().add(0, 1, 0)).spawnAsEnemy();
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 0.7f);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
-						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 1));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+							new PercentSpeed(20 * 6, -0.5, SLOWNESS_SRC));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
+							new PercentDamageDealt(20 * 6, -0.3));
 					}
 				}
 				if (mT >= DELAY + DURATION) {

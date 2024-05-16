@@ -335,7 +335,7 @@ public class EternalSavior extends DepthsAbility {
 			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
 			.add(" seconds and stun nearby mobs for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" and knock them away.")
+			.add(" seconds and knock them away.")
 			.addCooldown(COOLDOWN);
 	}
 

@@ -18,7 +18,6 @@ public class SpellConditionalTeleport extends Spell {
 	@Override
 	public void run() {
 		if (mPredicate.test(mLauncher)) {
-			/* TODO: This needs to be able to load the destination chunk if needed */
 			mLauncher.teleport(mDest);
 		}
 	}

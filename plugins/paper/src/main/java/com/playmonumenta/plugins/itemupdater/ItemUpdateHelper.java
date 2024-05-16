@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemupdater;
 
+import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
@@ -16,6 +17,7 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.QuiverListener;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -49,6 +51,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -450,15 +453,23 @@ public class ItemUpdateHelper {
 						}
 						attributeMap.put(type, operationMap);
 					}
-					// show default attack speed if an item has attack damage, but no attack speed attribute (wands)
-					if (attributeMap.containsKey(AttributeType.ATTACK_DAMAGE_ADD) && !attributeMap.containsKey(AttributeType.ATTACK_SPEED)) {
-						EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class); // placeholder
-						operationMap.put(Operation.ADD, AttributeType.getDisplay(AttributeType.ATTACK_SPEED, 0, slot, Operation.ADD));
-						attributeMap.put(AttributeType.ATTACK_SPEED, operationMap);
-					}
+
 					// add results together
 					// Mainhand slots have attack and projectile related attributes higher than other attributes
 					if (slot == Slot.MAINHAND) {
+						boolean attackDamage = attributeMap.containsKey(AttributeType.ATTACK_DAMAGE_ADD);
+						boolean attackSpeed = attributeMap.containsKey(AttributeType.ATTACK_SPEED);
+						// show default attack speed if an item has attack damage, but no attack speed attribute (wands)
+						if (attackDamage && !attackSpeed) {
+							EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class); // placeholder
+							operationMap.put(Operation.ADD, AttributeType.getDisplay(AttributeType.ATTACK_SPEED, 0, slot, Operation.ADD));
+							attributeMap.put(AttributeType.ATTACK_SPEED, operationMap);
+						} else if (!attackDamage && attackSpeed) {
+							EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class); // placeholder
+							operationMap.put(Operation.ADD, AttributeType.getDisplay(AttributeType.ATTACK_DAMAGE_ADD, 0, slot, Operation.ADD));
+							attributeMap.put(AttributeType.ATTACK_DAMAGE_ADD, operationMap);
+						}
+
 						List<Component> regularList = new ArrayList<>();
 						List<Component> mainhandPriorityList = new ArrayList<>();
 						for (Map.Entry<AttributeType, EnumMap<Operation, Component>> entry : attributeMap.entrySet()) {
@@ -512,22 +523,11 @@ public class ItemUpdateHelper {
 				return;
 			}
 
+
+			// placeholder attributes (for items with default attributes)
+			addDummyAttributeIfNeeded(item);
+
 			nbt.modifyMeta((nbtr, meta) -> {
-				// placeholder attributes (for items with default attributes)
-				boolean hasDummyAttribute = false;
-				boolean needsDummyAttribute = true;
-				if (meta.hasAttributeModifiers()) {
-					Collection<AttributeModifier> toughnessAttributes = meta.getAttributeModifiers(Attribute.GENERIC_ARMOR_TOUGHNESS);
-					hasDummyAttribute = toughnessAttributes != null && toughnessAttributes.size() == 1 && ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME.equals(toughnessAttributes.iterator().next().getName());
-					needsDummyAttribute = !(meta.getAttributeModifiers().size() >= (hasDummyAttribute ? 2 : 1));
-				}
-				boolean hasDefaultAttributes = ItemUtils.hasDefaultAttributes(item);
-				if (hasDefaultAttributes && needsDummyAttribute) {
-					meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
-					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
-				} else {
-					meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
-				}
 
 				// placeholder enchantment
 				Enchantment placeholder = ItemUtils.isSomeBow(item) ? Enchantment.WATER_WORKER : Enchantment.ARROW_DAMAGE;
@@ -588,6 +588,23 @@ public class ItemUpdateHelper {
 		});
 	}
 
+	public static void addDummyAttributeIfNeeded(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		boolean needsDummyAttribute = true;
+		Multimap<Attribute, AttributeModifier> attributeModifiers = meta.getAttributeModifiers();
+		if (attributeModifiers != null && !attributeModifiers.isEmpty()) {
+			Collection<AttributeModifier> toughnessAttributes = attributeModifiers.get(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			boolean hasDummyAttribute = toughnessAttributes.size() == 1 && ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME.equals(toughnessAttributes.iterator().next().getName());
+			needsDummyAttribute = !(attributeModifiers.size() >= (hasDummyAttribute ? 2 : 1));
+		}
+		boolean hasDefaultAttributes = ItemUtils.hasDefaultAttributes(item);
+		meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+		if (hasDefaultAttributes && needsDummyAttribute) {
+			meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+		}
+		item.setItemMeta(meta);
+	}
+
 	public static void fixLegacies(ItemStack item) {
 		boolean purgeLegacy = NBT.get(item, nbt -> {
 			ReadableNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
@@ -620,6 +637,22 @@ public class ItemUpdateHelper {
 						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
 				});
 			}
+		});
+	}
+
+	public static void removeStats(ItemStack item) {
+		NBT.modify(item, nbt -> {
+			nbt.removeKey(ItemStatUtils.MONUMENTA_KEY);
+			nbt.removeKey("CustomPotionEffects");
+			nbt.removeKey("AttributeModifiers");
+			nbt.removeKey("Enchantments");
+			// readd placeholder attribute if needed
+			if (ItemUtils.hasDefaultAttributes(item)) {
+				nbt.modifyMeta((nbtr, meta) -> {
+						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+				});
+			}
+			GUIUtils.setPlaceholder(nbt);
 		});
 	}
 

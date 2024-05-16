@@ -39,15 +39,14 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 	private static final int LIFETIME_TICKS = 20 * 6;
 	private static final double HITBOX_LENGTH = 2;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
-	private static final boolean LINGERS = true;
 	private static final double DAMAGE = 48;
 	private static final NamedTextColor COLOR = NamedTextColor.RED;
 
 	private boolean mOnCooldown = false;
 
-	public BlackflameOrb(LivingEntity boss, Plugin plugin, BeastOfTheBlackFlame bossClass) {
+	public BlackflameOrb(LivingEntity boss, Plugin plugin, boolean lingers, BeastOfTheBlackFlame bossClass) {
 		super(plugin, boss, Svalgot.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS, 20, true,
+				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, lingers, 20, true,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
 					PotionUtils.applyColoredGlowing(BeastOfTheBlackFlame.identityTag, boss, COLOR, DELAY);

@@ -16,13 +16,17 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import java.util.EnumSet;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	private static final int EFFECT_DURATION = 5 * 20;
@@ -73,6 +77,8 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	private final double mDamageAmplifier;
 	private final int mMaxStacks;
 	private final int mDuration;
+	private final double mTacticalManeuverCDR;
+	private final double mPredatorStrikeCDR;
 	private int mStacks;
 
 	private final SwiftCutsCS mCosmetic;
@@ -82,15 +88,17 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 		mMaxStacks = (isLevelOne() ? STACKS_CAP_1 : STACKS_CAP_2) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDamageAmplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EFFECT_DURATION);
+		mTacticalManeuverCDR = TACTICAL_MANEUVER_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE);
+		mPredatorStrikeCDR = PREDATOR_STRIKE_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE);
 		mStacks = 0;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SwiftCutsCS());
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		EntityEquipment equip = mPlayer.getEquipment();
+		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		if (event.getType() == DamageType.MELEE && mPlayer.getCooledAttackStrength(0.5f) > 0.9 &&
-			    ItemStatUtils.getAttributeAmount(equip.getItemInMainHand(), AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0) {
+			    (ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_SPEED, Operation.ADD, Slot.MAINHAND) != 0)) {
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			mCosmetic.onHit(mPlayer, loc, world);
@@ -130,6 +138,14 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 		return isEnhanced() && mStacks == mMaxStacks && hasEffect();
 	}
 
+	public double getTacticalManeuverCDR() {
+		return mTacticalManeuverCDR;
+	}
+
+	public double getPredatorStrikeCDR() {
+		return mPredatorStrikeCDR;
+	}
+
 	@Override
 	public int getCharges() {
 		return mStacks;
@@ -138,5 +154,24 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	@Override
 	public int getMaxCharges() {
 		return mMaxStacks;
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+		return output;
 	}
 }

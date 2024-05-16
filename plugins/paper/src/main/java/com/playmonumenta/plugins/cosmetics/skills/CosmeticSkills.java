@@ -55,16 +55,29 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PrestigiousPinningShotCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.PrestigiousManeuverCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AvalanchexCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.BountifulHarvestCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.BurstingRootsCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.DruidicHexCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.FloralFlurryCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.InfernalFlamesCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.NaturesGiftCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.ProwlersRoarCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.ScorchingSigilCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.UntamedResilienceCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.VampiricDrainCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.BadMojoCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.PrestigiousBondsCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.StrawEffigyCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.StringofThornsCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.FaespiritsCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.MudandMireCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.PrestigiousShadesCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.VerdantApparitionCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.ColossalBruteCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloryExecutionCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.PrestigiousSlamCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.PrestigiousShieldCS;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.bukkit.Material;
@@ -140,6 +153,21 @@ public class CosmeticSkills {
 		VampiricDrainCS::new,
 		PrestigiousBondsCS::new,
 		PrestigiousShadesCS::new,
+
+		DruidicHexCS::new,
+		ScorchingSigilCS::new,
+		BurstingRootsCS::new,
+		ProwlersRoarCS::new,
+		BountifulHarvestCS::new,
+		FloralFlurryCS::new,
+		UntamedResilienceCS::new,
+		NaturesGiftCS::new,
+		BadMojoCS::new,
+		StrawEffigyCS::new,
+		StringofThornsCS::new,
+		VerdantApparitionCS::new,
+		FaespiritsCS::new,
+		MudandMireCS::new,
 
 		//Warrior
 		BrambleShellCS::new,
@@ -225,7 +253,7 @@ public class CosmeticSkills {
 	}
 
 	public static String[] getNames() {
-		return COSMETIC_SKILLS_BY_NAME.keySet().stream().map(CommandUtils::quoteIfNeeded).toArray(String[]::new);
+		return COSMETIC_SKILLS_BY_NAME.keySet().toArray(String[]::new);
 	}
 
 	public static ImmutableList<DepthsCS> getDepthsSkins() {

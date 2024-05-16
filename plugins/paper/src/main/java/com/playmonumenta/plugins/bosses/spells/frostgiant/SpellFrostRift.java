@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -37,8 +38,12 @@ import org.bukkit.util.Vector;
  the Blizzard/Hailstorm.
  */
 public class SpellFrostRift extends Spell {
-
+	private static final String SPELL_NAME = "Frost Rift";
+	private static final String SLOWNESS_SRC = "FrostRiftSlowness";
+	private static final int DEBUFF_DURATION = 20 * 6;
 	private static final int DURATION = 20 * 18;
+	private static final Particle.DustOptions BLACK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
+
 	public static final Material RIFT_BLOCK_TYPE = Material.BLACKSTONE;
 
 	private final Plugin mPlugin;
@@ -47,8 +52,6 @@ public class SpellFrostRift extends Spell {
 	private boolean mCooldown = false;
 
 	private final List<Block> mChangedBlocks = new ArrayList<>();
-
-	private static final Particle.DustOptions BLACK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
 	public SpellFrostRift(Plugin plugin, LivingEntity boss, Location loc) {
 		mPlugin = plugin;
@@ -177,7 +180,7 @@ public class SpellFrostRift extends Spell {
 
 				for (Player player : players) {
 					if (player.getBoundingBox().overlaps(mBox)) {
-						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Frost Rift");
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, SPELL_NAME);
 					}
 				}
 				if (bLoc.distance(mOgLoc) >= 50) {
@@ -206,9 +209,10 @@ public class SpellFrostRift extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 0.85, 1.2, 0.85);
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(box)) {
-							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, "Frost Rift");
-							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
-							player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 49));
+							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, SPELL_NAME);
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+								new PercentSpeed(DEBUFF_DURATION, -0.5, SLOWNESS_SRC));
+							player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, DEBUFF_DURATION, 49));
 						}
 					}
 				}

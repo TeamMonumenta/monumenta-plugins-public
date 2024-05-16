@@ -295,5 +295,21 @@ public class DepthsCommand extends GenericCommand {
 
 				return DepthsManager.getInstance().getIsEndless(player) ? 1 : 0;
 			}).register();
+
+		// UNSTUCK COMMAND - moderator command to be used if a party somehow gets stuck in the state of loading a room and can't choose a new one
+		arguments.clear();
+		arguments.add(new LiteralArgument("unstuck"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+
+		new CommandAPICommand("depths")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				DepthsParty party = DepthsManager.getInstance().getDepthsParty(player);
+				if (party != null) {
+					party.mIsLoadingRoom = false;
+				}
+			}).register();
 	}
 }

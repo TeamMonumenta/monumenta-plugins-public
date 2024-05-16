@@ -52,7 +52,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
@@ -69,7 +68,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
 public class Samwell extends BossAbilityGroup {
@@ -79,6 +77,7 @@ public class Samwell extends BossAbilityGroup {
 	public static final String OBJECTIVE_FAILS_NAME = "TempA";
 	private static final int CRAFT_DURATION = 25 * 20; // Ticks taken to craft dagger (25 secs)
 	private static final int DAGGER_DURATION = 30 * 20; // Time limit to hit with dagger (30 secs)
+	private static final int HEALTH = 8000;
 
 	private static final int detectionRange = 100;
 	public final Location mSpawnLoc;
@@ -115,15 +114,9 @@ public class Samwell extends BossAbilityGroup {
 	private int mPlayerCount;
 	private double mDefenseScaling;
 
-	private final Location mBhrahaviLoc;
-	private final Location mIzzyLoc;
-	private final Location mLevynLoc;
-	private Villager mBhairavi;
-	private Villager mIzzy;
-	private Villager mLevyn;
-	private BlueStrikeDaggerCraftingBoss mBhairaviAbility;
-	private BlueStrikeDaggerCraftingBoss mIzzyAbility;
-	private BlueStrikeDaggerCraftingBoss mLevynAbility;
+	private final BlueStrikeDaggerCraftingBoss mBhairaviAbility;
+	private final BlueStrikeDaggerCraftingBoss mIzzyAbility;
+	private final BlueStrikeDaggerCraftingBoss mLevynAbility;
 
 	public Samwell(Plugin plugin, LivingEntity boss, Location startLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
@@ -133,9 +126,9 @@ public class Samwell extends BossAbilityGroup {
 		weights.put(0.15, LoSPool.fromString("~BlueMaskedElite"));
 		weights.put(0.85, LoSPool.fromString("~BlueMaskedNormal"));
 
-		mBhrahaviLoc = mSpawnLoc.clone().add(15, 1, 0);
-		mIzzyLoc = mSpawnLoc.clone().add(-8, 1, 12);
-		mLevynLoc = mSpawnLoc.clone().add(-8, 1, -12);
+		Location bhairaviLoc = mSpawnLoc.clone().add(15, 1, 0);
+		Location izzyLoc = mSpawnLoc.clone().add(-8, 1, 12);
+		Location levynLoc = mSpawnLoc.clone().add(-8, 1, -12);
 		mDaggerLoc = mSpawnLoc.clone().add(0, 8, 0);
 
 		mDagger = InventoryUtils.getItemFromLootTableOrThrow(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_dagger"));
@@ -144,6 +137,22 @@ public class Samwell extends BossAbilityGroup {
 		mCraftingBar = BossBar.bossBar(Component.text("Crafting...", NamedTextColor.YELLOW, TextDecoration.BOLD), 0, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_6);
 		mGatheringBar = BossBar.bossBar(Component.empty(), 0, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_6);
 		// Title of mGatheringBar is properly set in init()
+
+		mSpawnLoc.getNearbyEntitiesByType(Villager.class, 30).forEach(Entity::remove);
+		Villager bhairavi = mSpawnLoc.getWorld().spawn(bhairaviLoc, Villager.class);
+		bhairavi.customName(Component.text("Bhairavi"));
+		Villager izzy = mSpawnLoc.getWorld().spawn(izzyLoc, Villager.class);
+		izzy.customName(Component.text("Izzy"));
+		Villager levyn = mSpawnLoc.getWorld().spawn(levynLoc, Villager.class);
+		levyn.customName(Component.text("Levyn"));
+
+		mBhairaviAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, bhairavi, this);
+		mIzzyAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, izzy, this);
+		mLevynAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, levyn, this);
+
+		BossManager.getInstance().manuallyRegisterBoss(bhairavi, mBhairaviAbility);
+		BossManager.getInstance().manuallyRegisterBoss(izzy, mIzzyAbility);
+		BossManager.getInstance().manuallyRegisterBoss(levyn, mLevynAbility);
 
 		mInactivePassives = List.of(
 			new SpellDominion(plugin, boss, mSpawnLoc, false)
@@ -260,53 +269,30 @@ public class Samwell extends BossAbilityGroup {
 		resetScoreboard();
 
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 8000;
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hpDelta);
-		mBoss.setHealth(hpDelta);
+		EntityUtils.setMaxHealthAndHealth(mBoss, HEALTH);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
 
-		Team team = ScoreboardUtils.getExistingTeamOrCreate("Blue", NamedTextColor.BLUE);
-		team.addEntity(mBoss);
+		ScoreboardUtils.addEntityToTeam(mBoss, "Blue", NamedTextColor.BLUE);
 		mBoss.setGlowing(true);
 
 		mShardsReq = (int) (3 + Math.floor(getPlayers().size() / 2.0));
 		refreshGatheringBar();
 
-		// Need to Delay this a bit, as BlueStrikeDaggerCraftingBoss will search for a nearby WitherSkeleton.
-		// (IK it is quite scuffed)
+		sendMessage("Well, I wasn't sure if you guys would make it this far. How do you like my new place?");
+
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			mSpawnLoc.getNearbyEntitiesByType(Villager.class, 30).forEach(Entity::remove);
-			mBhairavi = mSpawnLoc.getWorld().spawn(mBhrahaviLoc, Villager.class);
-			mBhairavi.customName(Component.text("Bhairavi"));
-			mIzzy = mSpawnLoc.getWorld().spawn(mIzzyLoc, Villager.class);
-			mIzzy.customName(Component.text("Izzy"));
-			mLevyn = mSpawnLoc.getWorld().spawn(mLevynLoc, Villager.class);
-			mLevyn.customName(Component.text("Levyn"));
-
-			mBhairaviAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mBhairavi, this);
-			mIzzyAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mIzzy, this);
-			mLevynAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mLevyn, this);
-
-			BossManager.getInstance().manuallyRegisterBoss(mBhairavi, mBhairaviAbility);
-			BossManager.getInstance().manuallyRegisterBoss(mIzzy, mIzzyAbility);
-			BossManager.getInstance().manuallyRegisterBoss(mLevyn, mLevynAbility);
-
-			mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("Well, I wasn't sure if you guys would make it this far. How do you like my new place?", NamedTextColor.RED)));
+			sendMessage("It'll be the last thing you see... I've got the Blue Wool on my side!");
 
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("It'll be the last thing you see... I've got the Blue Wool on my side!", NamedTextColor.RED)));
-
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					mBoss.setAI(true);
-					changePhaseNormal();
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> {
-						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Samwell", NamedTextColor.DARK_RED), Component.text("Usurper Of Life", NamedTextColor.RED));
-						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
-					});
-					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5, 0.7f);
-				}, 10);
-			}, 70);
-		}, 10);
+				mBoss.setAI(true);
+				changePhaseNormal();
+				getPlayers().forEach(p -> {
+					com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Samwell", NamedTextColor.DARK_RED), Component.text("Usurper Of Life", NamedTextColor.RED));
+					p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
+				});
+				mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5, 0.7f);
+			}, 10);
+		}, 70);
 	}
 
 	@Override
@@ -323,16 +309,19 @@ public class Samwell extends BossAbilityGroup {
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
+		Player player = event.getPlayer();
+		player.hideBossBar(mGatheringBar);
+		player.hideBossBar(mCraftingBar);
 	}
 
 	@Override
 	public void onHurtByEntity(DamageEvent event, Entity damager) {
-		if (damager instanceof Player player && event.getType() == DamageEvent.DamageType.MELEE) {
-			if (((Plugin) mPlugin).mEffectManager.hasEffect(player, DAGGER_EFFECT_SOURCE) && mPhase <= 3) {
+		if (mPhase < 4) {
+			if (damager instanceof Player player && event.getType() == DamageEvent.DamageType.MELEE && Plugin.getInstance().mEffectManager.hasEffect(player, DAGGER_EFFECT_SOURCE)) {
 				switch (mPhase) {
 					case 1 -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (3.0 / 4.0));
-						mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("Ugh, what! How did you do that? It... burns!", NamedTextColor.RED)));
+						sendMessage("Ugh, what! How did you do that? It... burns!");
 						mPhase = 2;
 						changePhaseNormal();
 						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -341,17 +330,16 @@ public class Samwell extends BossAbilityGroup {
 					}
 					case 2 -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (2.0 / 4.0));
-						mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("No, what?! Why can't it heal? What are you using?", NamedTextColor.RED)));
+						sendMessage("No, what?! Why can't it heal? What are you using?");
 						mPhase = 3;
 						changePhaseNormal();
 						forceCastSpell(SpellSummonLavaTitan.class);
 					}
 					default -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (1.0 / 4.0));
-						mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("I'm done with you! That dagger is too much. I don't get why Blue can't heal from it? Is it another wool?!", NamedTextColor.RED)));
+						sendMessage("I'm done with you! That dagger is too much. I don't get why Blue can't heal from it? Is it another wool?!");
 						mPhase = 4;
-						Team blackTeam = ScoreboardUtils.getExistingTeamOrCreate("Black", NamedTextColor.BLACK);
-						blackTeam.addEntry(mBoss.getUniqueId().toString());
+						ScoreboardUtils.addEntityToTeam(mBoss, "Black", NamedTextColor.BLACK);
 						changePhaseNormal();
 					}
 				}
@@ -360,17 +348,19 @@ public class Samwell extends BossAbilityGroup {
 				clearDaggerAndShards();
 				return;
 			}
-		}
 
-		if (mPhase != 4) {
 			// Lower damage so game breaking builds can't realistically ruin this
 			event.setDamage(event.getDamage() * 0.1);
 		} else if (!mPhase4Damaged) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("It can't be... I can't feel the Blue Wool anymore... Has it run out? Or... has it turned its back on me??", NamedTextColor.RED)));
+				sendMessage("It can't be... I can't feel the Blue Wool anymore... Has it run out? Or... has it turned its back on me??");
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", "&c&oPlease&c! &4&lHarrakfar&c! Heal me!"));
+					sendMessage(Component.empty()
+						.append(Component.text("Please", NamedTextColor.RED, TextDecoration.ITALIC))
+						.append(Component.text("! ", NamedTextColor.RED))
+						.append(Component.text("Harrakfar", NamedTextColor.DARK_RED, TextDecoration.BOLD))
+						.append(Component.text("! Heal me!", NamedTextColor.RED)));
 					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 1.2f);
 				}, 70);
 			}, 20);
@@ -502,8 +492,7 @@ public class Samwell extends BossAbilityGroup {
 				}
 
 				if (mTimer > DAGGER_DURATION) {
-					List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), 100);
-					players.forEach(p -> p.sendMessage(Component.text("As the dagger loses its magic, it vaporizes into thin air...", NamedTextColor.AQUA, TextDecoration.ITALIC)));
+					getPlayers().forEach(p -> p.sendMessage(Component.text("As the dagger loses its magic, it vaporizes into thin air...", NamedTextColor.AQUA, TextDecoration.ITALIC)));
 					clearDagger();
 					changePhaseNormal();
 					this.cancel();
@@ -528,6 +517,8 @@ public class Samwell extends BossAbilityGroup {
 			return;
 		}
 
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 25, true, true);
+
 		String[] dio = new String[] {
 			"I... I shouldn't have ever left the Valley...",
 			"None of this was worth it... None of it...",
@@ -539,9 +530,6 @@ public class Samwell extends BossAbilityGroup {
 			player.hideBossBar(mCraftingBar);
 			player.hideBossBar(mGatheringBar);
 
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 25, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 25, 1));
-
 			if (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
 				|| player.getLocation().distance(mSpawnLoc) > 30) {
 				// Feeling nice today?
@@ -550,12 +538,6 @@ public class Samwell extends BossAbilityGroup {
 		}
 
 		changePhase(SpellManager.EMPTY, mInactivePassives, null);
-		mBoss.setHealth(100);
-		mBoss.setInvulnerable(true);
-		mBoss.setAI(false);
-		mBoss.setGravity(false);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
-		mBoss.removePotionEffect(PotionEffectType.GLOWING);
 		mBoss.teleport(mSpawnLoc.clone().add(0, 3, 0));
 		if (event != null) {
 			event.setCancelled(true);
@@ -604,11 +586,7 @@ public class Samwell extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				if (mT < 3) {
-					players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text(dio[mT], NamedTextColor.RED)));
-				} else {
-					players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text(dio[mT], NamedTextColor.RED, TextDecoration.ITALIC)));
-				}
+				sendMessage(Component.text(dio[mT], NamedTextColor.RED).decoration(TextDecoration.ITALIC, mT >= 3));
 				mT++;
 				if (mT == dio.length) {
 					this.cancel();
@@ -670,7 +648,7 @@ public class Samwell extends BossAbilityGroup {
 			}
 		}
 
-		List<Player> playerList = EntityUtils.getNearestPlayers(mBoss.getLocation(), 100);
+		List<Player> playerList = getPlayers();
 		playerList.forEach(p -> Plugin.getInstance().mEffectManager.clearEffects(p, DAGGER_EFFECT_SOURCE));
 		for (Player player : playerList) {
 			for (ItemStack itemStack : player.getInventory()) {
@@ -693,7 +671,7 @@ public class Samwell extends BossAbilityGroup {
 			}
 		}
 
-		List<Player> playerList = EntityUtils.getNearestPlayers(mBoss.getLocation(), 100);
+		List<Player> playerList = getPlayers();
 		playerList.forEach(p -> Plugin.getInstance().mEffectManager.clearEffects(p, DAGGER_EFFECT_SOURCE));
 		for (Player player : playerList) {
 			for (ItemStack itemStack : player.getInventory()) {
@@ -789,7 +767,17 @@ public class Samwell extends BossAbilityGroup {
 		ScoreboardUtils.setScoreboardValue(mBoss, OBJECTIVE_FAILS_NAME, 0);
 	}
 
-	private List<Player> getPlayers() {
+	public List<Player> getPlayers() {
 		return PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+	}
+
+	private void sendMessage(String msg) {
+		sendMessage(Component.text(msg, NamedTextColor.RED));
+	}
+
+	private void sendMessage(Component msg) {
+		for (Player player : getPlayers()) {
+			MessagingUtils.sendNPCMessage(player, "Samwell", msg);
+		}
 	}
 }

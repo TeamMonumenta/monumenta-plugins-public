@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.depths.DepthsEndlessDifficulty;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.bosses.Broodmother;
+import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoom.RoomDirection;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -80,7 +82,7 @@ public abstract class RoomRepository {
 	 * Spawns the next room in the physical world
 	 * @param spawnPoint the coordinates to load the room
 	 * @param roomType the type of the room to select from
-	 * @return the room information for the selected room
+	 * @return the room information for the selected room.
 	 */
 	public @Nullable DepthsRoom summonRoom(Location spawnPoint, DepthsRoomType roomType, DepthsParty party) {
 		//Get a valid room from the options available to the party
@@ -108,6 +110,11 @@ public abstract class RoomRepository {
 			party.sendMessage("Each player must remove an ability before moving on!");
 			this.mRoomCleanseSpawned = true; // Set the flag that we've spawned a forced washroom already
 			party.mNoPassiveRemoveRoomStartX = Math.min(party.mNoPassiveRemoveRoomStartX, spawnPoint.getBlockX());
+<<<<<<< master
+=======
+
+			party.mSpawnedForcedCleansingRoom = true;
+>>>>>>> master
 		} else {
 			//Standard case- call valid room
 			this.mRoomCleanseSpawned = false; // Unset the flag
@@ -138,15 +145,19 @@ public abstract class RoomRepository {
 
 		party.setRoomX(spawn.getBlockX());
 
+		party.mIsLoadingRoom = true;
 		MMLog.info("Summoning structure " + room.mLoadPath);
-		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true, true);
+		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true, true)
+			.whenComplete((unused, ex) -> {
+				party.mIsLoadingRoom = false;
+			});
 
 		if (DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH && roomType == DepthsRoomType.BOSS) {
 			List<Player> players = party.getPlayers();
 			if (floor == 2) {
-				SongManager.playSong(players, new SongManager.Song("epic:music.broodmother_ambient", SoundCategory.RECORDS, 2 * 60, true, 1.0f, 1.0f, true), true);
+				SongManager.playSong(players, new SongManager.Song(Broodmother.MUSIC_TITLE_AMBIENT, SoundCategory.RECORDS, Broodmother.MUSIC_DURATION_AMBIENT, true, 1.0f, 1.0f, true), true);
 			} else if (floor == 3) {
-				SongManager.playSong(players, new SongManager.Song("epic:music.vesperidys_ambient", SoundCategory.RECORDS, 1 * 60 + 27, true, 1.0f, 1.0f, true), true);
+				SongManager.playSong(players, new SongManager.Song(Vesperidys.MUSIC_TITLE_AMBIENT, SoundCategory.RECORDS, Vesperidys.MUSIC_DURATION_AMBIENT, true, 1.0f, 1.0f, true), true);
 			}
 		}
 

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -17,12 +18,12 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellWhirlwind extends Spell {
-
+	private static final String SPELL_NAME = "Whirlwind";
+	private static final String SELF_SLOWNESS_SRC = "SelfWhirlwindSlowness";
+	private static final double RADIUS = 4;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
@@ -37,11 +38,11 @@ public class SpellWhirlwind extends Spell {
 	public void run() {
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0.8f);
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.5f, 1.5f);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 4));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, SELF_SLOWNESS_SRC,
+			new BaseMovementSpeedModifyEffect(60, -0.75));
+
 		new BukkitRunnable() {
 			int mTicks = 0;
-			double mRadius = 4;
-			double mBladeDamageRadius = 4;
 
 			@Override
 			public void run() {
@@ -54,10 +55,10 @@ public class SpellWhirlwind extends Spell {
 
 					for (int i = 0; i < 15; i += 1) {
 						double radian1 = Math.toRadians(24 * i);
-						loc.add(FastUtils.cos(radian1) * mRadius, 0.1, FastUtils.sin(radian1) * mRadius);
+						loc.add(FastUtils.cos(radian1) * RADIUS, 0.1, FastUtils.sin(radian1) * RADIUS);
 						new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.025).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
-						loc.subtract(FastUtils.cos(radian1) * mRadius, 0.1, FastUtils.sin(radian1) * mRadius);
+						loc.subtract(FastUtils.cos(radian1) * RADIUS, 0.1, FastUtils.sin(radian1) * RADIUS);
 
 					}
 				}
@@ -85,11 +86,11 @@ public class SpellWhirlwind extends Spell {
 								mSin += 0.1;
 								mY = 1 + FastUtils.sin(mSin);
 								double radian1 = Math.toRadians(mRotation);
-								loc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
+								loc.add(FastUtils.cos(radian1) * RADIUS, mY, FastUtils.sin(radian1) * RADIUS);
 								new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0.025).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.025).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.CRIT, loc, 4, 0.1, 0.1, 0.1, 0.2).spawnAsEntityActive(mBoss);
-								loc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
+								loc.subtract(FastUtils.cos(radian1) * RADIUS, mY, FastUtils.sin(radian1) * RADIUS);
 
 								/*
 								 * Check if this hits a player
@@ -99,8 +100,8 @@ public class SpellWhirlwind extends Spell {
 								while (iter.hasNext()) {
 									Player player = iter.next();
 
-									if (player.getLocation().distance(loc) < mBladeDamageRadius) {
-										BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 6, "Whirlwind", mBoss.getLocation());
+									if (player.getLocation().distance(loc) < RADIUS) {
+										BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 6, SPELL_NAME, mBoss.getLocation());
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f, false);
 										iter.remove();
 									}
@@ -108,7 +109,7 @@ public class SpellWhirlwind extends Spell {
 							}
 
 							if (mRotation >= 360) {
-								mBoss.removePotionEffect(PotionEffectType.SLOW);
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, SELF_SLOWNESS_SRC);
 								this.cancel();
 							}
 						}

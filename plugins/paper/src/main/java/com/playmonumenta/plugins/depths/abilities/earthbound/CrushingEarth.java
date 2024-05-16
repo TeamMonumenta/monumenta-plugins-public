@@ -74,7 +74,7 @@ public class CrushingEarth extends DepthsAbility {
 		world.playSound(eyeLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.5f, 1.0f);
 
 		EntityUtils.applyStun(mPlugin, mStunDuration, mob);
-		DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell());
+		DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 
 		putOnCooldown();
 		return true;

@@ -28,6 +28,8 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellShadowRealm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.LichCurseEffect;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -43,7 +45,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import com.playmonumenta.scriptedquests.managers.SongManager;
@@ -123,7 +124,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	private static final double mL = 26.5;
 	private static final double mY = 14.5;
 	private static final double mS = 8.5;
-	private int mPhase;
 	private final Collection<EnderCrystal> mCrystal = new ArrayList<>();
 	private final List<Location> mCrystalLoc = new ArrayList<>();
 	private final List<Location> mPassive2Loc = new ArrayList<>();
@@ -146,6 +146,11 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	private static final int PHYLACT_HP = 1250;
 	private static final double SCALING_X = 0.7;
 	private static final double SCALING_Y = 0.575;
+
+	public static final String MUSIC_TITLE = "epic:music.hekawt";
+	public static final int MUSIC_DURATION = 355;
+	public static final String MUSIC_TITLE_P4 = "epic:music.hekawtp4";
+	public static final int MUSIC_DURATION_P4 = 239;
 
 	private final double mPhylactHealth;
 
@@ -426,7 +431,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						mDio++;
 					}
 					mT++;
-					if (mT == 20 * 1) {
+					if (mT == 20) {
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone().add(0, 14, 0));
@@ -513,7 +518,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					if (mT >= 20 * 9) {
 						this.cancel();
 						mCutscene = false;
-						mPhase = 2;
+						// Phase 2 starts here
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone());
@@ -542,7 +547,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		events.put(50, mBoss -> {
 			forceCastSpell(SpellDiesIrae.class);
 			//prevent overkilling before ability is cast
-			mPhase = 3;
+			// Phase 3 starts here
 		});
 
 		events.put(33, mBoss -> {
@@ -671,7 +676,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
-						mPhase = 4;
+						// Phase 4 starts here
 						changePhase(phase3Spells, phase3PassiveSpells, null);
 						mCutscene = false;
 						this.cancel();
@@ -831,7 +836,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 										mBoss.removePotionEffect(PotionEffectType.WEAKNESS);
 										mBoss.setGravity(true);
 										mBoss.setInvulnerable(false);
-										mPhase = 1;
+										// Phase 1 starts here
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											MessagingUtils.sendBoldTitle(p, Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY), Component.text("Inheritor of Eternity", NamedTextColor.GRAY));
 											p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
@@ -849,7 +854,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						}
 					}
 
-				}.runTaskTimer(mPlugin, 20 * 1, 20 * 1);
+				}.runTaskTimer(mPlugin, 20, 20);
 			}
 		}.runTaskLater(mPlugin, 1);
 	}
@@ -874,7 +879,8 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2.0f, 0f);
 		for (Player player : playersInRange(mBoss.getLocation(), radius, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, PercentSpeed.GENERIC_NAME,
+				new PercentSpeed(20 * 5, 0.3, PercentSpeed.GENERIC_NAME));
 		}
 	}
 
@@ -994,7 +1000,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 				} else {
 					mActivated = true;
-					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 10));
 					die();
 					return;
 				}
@@ -1212,11 +1217,11 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
-	public static void cursePlayer(Plugin plugin, Player p) {
-		cursePlayer(plugin, p, 30);
+	public static void cursePlayer(Player player) {
+		cursePlayer(player, 30);
 	}
 
-	public static void cursePlayer(Plugin plugin, Player p, int time) {
+	public static void cursePlayer(Player p, int time) {
 		// Add to scoreboard for AccursedOne scoreboard.
 		int score = ScoreboardUtils.getScoreboardValue(p, "LichAccursedOne").orElse(0);
 		ScoreboardUtils.setScoreboardValue(p, "LichAccursedOne", score + 1);
@@ -1236,6 +1241,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	}
 
 	private void die() {
+		List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
 		mDefeated = true;
 
 		//force leave shadow realm
@@ -1245,16 +1251,12 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			p.teleport(loc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 		}
 
-		List<Player> players = playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.isEmpty()) {
 			return;
 		}
 
-		for (Player player : players) {
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 17, 10));
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 17, 1));
-			SongManager.stopSong(player, true);
-		}
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 17, true, true);
+
 		String[] dio1 = new String[]{
 			"I... WILL... NOT... BE... DESTROYED...",
 			"NO! I MUST... SPEAK... THE PARTING VEIL..."
@@ -1265,7 +1267,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			@Override
 			public void run() {
 				if (mT < dio1.length) {
-					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+					for (Player p : players) {
 						p.sendMessage(Component.text(dio1[mT].toUpperCase(Locale.getDefault()), NamedTextColor.LIGHT_PURPLE));
 					}
 					mT++;
@@ -1276,11 +1278,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 		}.runTaskTimer(mPlugin, 0, 3 * 20);
 
-		mBoss.removePotionEffect(PotionEffectType.GLOWING);
-		mBoss.setHealth(0.1);
-		mBoss.setInvulnerable(true);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 60, 10));
-		mBoss.setAI(false);
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 1);
@@ -1315,11 +1312,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				Location loc = mBoss.getLocation();
 				// Lich BEGONE
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 1000, 0));
-				mBoss.removePotionEffect(PotionEffectType.GLOWING);
-				mBoss.setGlowing(false);
-				mBoss.setAI(false);
-				mBoss.setSilent(true);
-				mBoss.setInvulnerable(true);
 				mBoss.teleport(mStart.getLocation().subtract(0, detectionRange + 5, 0));
 				List<LivingEntity> en = EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange);
 				en.removeIf(e -> e.getType() == EntityType.ARMOR_STAND);
@@ -1386,7 +1378,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					//prevent players above the barrier ceiling from seeing title
-					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+					for (Player p : players) {
 						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
 						MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
 							Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
@@ -1435,7 +1427,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
-			SongManager.playBossSong(players, new SongManager.Song("epic:music.hekawtp4", SoundCategory.RECORDS, 239, true, 1, 1, true), true, mBoss, true, 0, 5);
+			SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE_P4, SoundCategory.RECORDS, MUSIC_DURATION_P4, true, 1, 1, true), true, mBoss, true, 0, 5);
 		}, 20 * 3 + 15);
 
 		// haha surprise fuck you I'm not dead dialogues
@@ -1499,6 +1491,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 	// Phase 4
 	private void p4(World world) {
+		List<Player> remaining = playersInRange(mStart.getLocation(), detectionRange, true);
 		mDead = false;
 		mCounter = 0;
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3.0f, 1.0f);
@@ -1506,7 +1499,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		FallingBlock block = world.spawnFallingBlock(mBoss.getLocation().add(0, 3.5, 0), Bukkit.createBlockData(Material.OBSIDIAN));
 		block.setGravity(false);
 		block.setTicksLived(1);
-		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+		for (Player p : remaining) {
 			p.sendMessage(Component.text("AND I HAVE NO TIME FOR YOU AND YOUR MEDDLING!", NamedTextColor.LIGHT_PURPLE));
 		}
 
@@ -1570,7 +1563,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		mTowerGroup.add(mTower1);
 		mTowerGroup.add(mTower2);
 		mTowerGroup.add(mTower3);
-		List<Player> remaining = playersInRange(mStart.getLocation(), detectionRange, true);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -1642,7 +1634,8 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 							player.hideBossBar(timer);
 						}
 						mBoss.setHealth(100);
-						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 10));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+							new PercentDamageReceived(100, -1.0));
 						finalAnimation(block);
 						this.cancel();
 						return;
@@ -1794,10 +1787,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	private void finalAnimation(FallingBlock block) {
 		// invulnerable players
 		List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
-		for (Player player : players) {
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
-		}
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 40, true, true);
 
 		new BukkitRunnable() {
 
@@ -1858,11 +1848,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 							// Lich BEGONE
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 1000, 0));
-							mBoss.setAI(false);
-							mBoss.setSilent(true);
-							mBoss.setInvulnerable(true);
 							Objects.requireNonNull(mBoss.getEquipment()).clear();
-							mBoss.setGlowing(false);
 							// kill mobs
 							List<LivingEntity> en = EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange);
 							en.removeIf(e -> e.getType() == EntityType.ARMOR_STAND);
@@ -1966,8 +1952,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 										for (Player player : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-											player.removePotionEffect(PotionEffectType.REGENERATION);
 											if (player.getGameMode() != GameMode.CREATIVE) {
 												player.setGameMode(GameMode.SURVIVAL);
 											}
@@ -2013,7 +1997,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(MAX_HEALTH);
 		mBoss.setPersistent(true);
 
-		SongManager.playBossSong(playersInRange(mStart.getLocation(), detectionRange, true), new SongManager.Song("epic:music.hekawt", SoundCategory.RECORDS, 355, true, 1, 1, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(playersInRange(mStart.getLocation(), detectionRange, true), new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 1, 1, true), true, mBoss, true, 0, 5);
 	}
 
 	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String text) {

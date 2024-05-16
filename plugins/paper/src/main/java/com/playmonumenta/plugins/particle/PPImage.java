@@ -192,10 +192,6 @@ public class PPImage extends AbstractPartialParticle<PPImage> {
 			return mDustOptions;
 		}
 
-		public Vector getRelativePosition() {
-			return mRelativePosition;
-		}
-
 		public int getAlpha() {
 			return mDustOptions.getColor().getAlpha();
 		}

@@ -18,14 +18,13 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 
 public class SpellHealUndead extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PartialParticle mSpell1;
-	private PartialParticle mSpell2;
-	private PartialParticle mSpell3;
-	private PartialParticle mSpell4;
-	private PartialParticle mSpark;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PartialParticle mSpell1;
+	private final PartialParticle mSpell2;
+	private final PartialParticle mSpell3;
+	private final PartialParticle mSpell4;
+	private final PartialParticle mSpark;
 
 	public SpellHealUndead(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;

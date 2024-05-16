@@ -10,6 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class DarkPactCS implements CosmeticSkill {
@@ -33,8 +34,12 @@ public class DarkPactCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_STRAY_HURT, SoundCategory.PLAYERS, 0.8f, 0.1f);
 	}
 
-	public void tick(Player player) {
+	public void tick(Player player, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		new PartialParticle(Particle.SPELL_WITCH, player.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(player);
+	}
+
+	public void onKill(Player player, LivingEntity mob) {
+
 	}
 
 	public void loseEffect(Player player) {

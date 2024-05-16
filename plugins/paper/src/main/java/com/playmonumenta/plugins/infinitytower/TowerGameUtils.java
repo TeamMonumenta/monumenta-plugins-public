@@ -325,7 +325,8 @@ public class TowerGameUtils {
 		if (floor > 50) {
 			floor = 50;
 		}
-		int loot = (int) Math.pow(2, (floor / 10)) - 1;
+		int scalingFactor = floor / 10;
+		int loot = (int) Math.pow(2, scalingFactor) - 1;
 
 		ItemStack stack = InventoryUtils.getItemFromLootTable(game.mPlayer.mPlayer, TowerConstants.COIN_LOOT_TABLE_KEY);
 		if (stack == null) {

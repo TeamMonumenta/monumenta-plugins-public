@@ -64,6 +64,7 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 	public int mCubesDropped;
 	public int mPhase = 1;
 	public @Nullable BukkitRunnable mHideRunnable = null;
+	public @Nullable BukkitRunnable mRotateRunnable = null;
 	public List<Location> mReplaceBlocks;
 
 	public PortalBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -174,6 +175,16 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 		if (mHideRunnable != null) {
 			mHideRunnable.cancel();
 		}
+		if (mRotateRunnable == null) {
+			mRotateRunnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					Location loc = mBoss.getLocation();
+					mBoss.setRotation(loc.getYaw() + 10, loc.getPitch());
+				}
+			};
+			mRotateRunnable.runTaskTimer(mPlugin, 1, 1);
+		}
 		mHideRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -184,17 +195,23 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void hide() {
-		if (mBoss.isDead() || mIsHidden) {
-			return;
-		}
-
 		// Cancel any existing hide task
 		if (mHideRunnable != null) {
 			mHideRunnable.cancel();
 		}
 
+		if (mRotateRunnable != null) {
+			mRotateRunnable.cancel();
+			mRotateRunnable = null;
+		}
+
+		if (mBoss.isDead() || mIsHidden) {
+			return;
+		}
+
+
 		// Kill any active cubes
-		Bukkit.dispatchCommand(mBoss, CUBE_FUNCTION);
+		Bukkit.dispatchCommand(mBoss, CUBE_FUNCTION); // This code is broken and does nothing at the moment!
 
 		mBoss.setGlowing(false);
 		mBoss.teleport(mSpawnLoc.clone().add(0, -15, 0));
@@ -312,7 +329,10 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+		for (Player player : players) {
 			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
 			player.sendMessage(Component.text("", NamedTextColor.RED)
 					.append(Component.text("[Iota]", NamedTextColor.GOLD))
@@ -323,8 +343,6 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 					.append(Component.text("DER..."))
 					.append(Component.text("65789").decoration(TextDecoration.OBFUSCATED, true))
 					.append(Component.text(" Thank… you… tell Bermuda… that thing… it broke me… I didn't mean to…", NamedTextColor.BLUE)));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}
 
 		// Fix misplaced blocks

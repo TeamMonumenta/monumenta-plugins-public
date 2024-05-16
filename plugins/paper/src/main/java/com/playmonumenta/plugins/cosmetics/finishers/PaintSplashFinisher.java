@@ -7,10 +7,7 @@ import java.util.Collection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -78,6 +75,10 @@ public class PaintSplashFinisher implements EliteFinisher {
 
 			@Override
 			public void run() {
+				if (mTicks == 0) {
+					loc.getWorld().playSound(loc, Sound.ENTITY_DOLPHIN_SPLASH, SoundCategory.PLAYERS, 1f, 1f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_SLIME_JUMP, SoundCategory.PLAYERS, 1f, 1f);
+				}
 				if (mRand == 0) {
 					new PartialParticle(Particle.REDSTONE, mConcretes[0].getLocation(), 15, 0.5, 0.5, 0.5, PARTICLE_SETS[0][0]).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.REDSTONE, mConcretes[1].getLocation(), 15, 0.5, 0.5, 0.5, PARTICLE_SETS[0][1]).spawnAsPlayerActive(mPlayer);

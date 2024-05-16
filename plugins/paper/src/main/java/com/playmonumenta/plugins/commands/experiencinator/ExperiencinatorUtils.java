@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang3.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -257,25 +255,29 @@ public abstract class ExperiencinatorUtils {
 			if (chatMessage) {
 				// Build a nice message detailing how much the player got from the conversion and send it to them
 				// The loop here is almost the same as the one for giving items, but we start at sellValue instead of totalValue
-				List<String> givenTexts = new ArrayList<>();
+				List<Component> givenTexts = new ArrayList<>();
 				remainingValue = sellValue;
 				for (int i = conversionResults.size() - 1; i >= 0; i--) {
 					ExperiencinatorConfig.ConversionResult conversionResult = conversionResults.get(i);
 					int given = remainingValue / conversionResult.getValue();
 					if (given > 0) {
 						remainingValue -= given * conversionResult.getValue();
-						givenTexts.add("" + ChatColor.RESET + given + ChatColor.AQUA + " " + (given == 1 ? conversionResult.getNameSingular() : conversionResult.getName()));
+						givenTexts.add(Component.text(given + " ", NamedTextColor.WHITE).append(Component.text(given == 1 ? conversionResult.getNameSingular() : conversionResult.getName(), NamedTextColor.AQUA)));
 					}
 				}
-				String message;
+				Component message;
 				if (givenTexts.size() == 1) { // 1: nothing to do
 					message = givenTexts.get(0);
 				} else if (givenTexts.size() == 2) { // 2: join with " and "
-					message = StringUtils.join(givenTexts, " and ");
+					message = givenTexts.get(0).append(Component.text(" and ", NamedTextColor.AQUA).append(givenTexts.get(1)));
 				} else { // 3 or more: join with ", ", and the last one with ", and "
-					message = StringUtils.join(givenTexts.subList(0, givenTexts.size() - 1), ", ") + ", and " + givenTexts.get(givenTexts.size() - 1);
+					message = givenTexts.get(0);
+					for (Component addmsg : givenTexts.subList(1, givenTexts.size() - 1)) {
+						message = message.append(Component.text(", ", NamedTextColor.AQUA).append(addmsg));
+					}
+					message = message.append(Component.text(", and ", NamedTextColor.AQUA).append(givenTexts.get(givenTexts.size() - 1)));
 				}
-				Component finalMessage = Component.text("Given " + message + "!", NamedTextColor.AQUA);
+				Component finalMessage = Component.text("Given ", NamedTextColor.AQUA).append(message).append(Component.text("!", NamedTextColor.AQUA));
 				if (itemNames != null && !itemNames.isEmpty()) {
 					Component hover = Component.empty();
 					for (int i = 0; i < itemNames.size(); i++) {

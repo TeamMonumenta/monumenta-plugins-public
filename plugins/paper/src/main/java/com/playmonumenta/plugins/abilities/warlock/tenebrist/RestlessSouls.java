@@ -5,12 +5,12 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.RestlessSoulsCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -26,10 +26,6 @@ import java.util.Set;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
@@ -59,7 +55,9 @@ public class RestlessSouls extends Ability {
 	public static final String CHARM_RADIUS = "Restless Souls Radius";
 	public static final String CHARM_DURATION = "Restless Souls Duration";
 	public static final String CHARM_CAP = "Restless Souls Vex Cap";
+	public static final String CHARM_SILENCE_DURATION = "Restless Souls Silence Duration";
 	public static final String CHARM_DEBUFF_RANGE = "Restless Souls Debuff Radius";
+	public static final String CHARM_DEBUFF_DURATION = "Restless Souls Debuff Duration";
 	public static final String CHARM_SPEED = "Restless Souls Movement Speed";
 
 	public static final AbilityInfo<RestlessSouls> INFO =
@@ -69,14 +67,14 @@ public class RestlessSouls extends Ability {
 			.shorthandName("RS")
 			.descriptions(
 				"Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. " +
-					"The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage to the target and silences all mobs within " + DEBUFF_RANGE + " blocks for " + SILENCE_DURATION_1 / 20 + " seconds. " +
+					"The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " magic damage to the target and silences all mobs within " + DEBUFF_RANGE + " blocks for " + SILENCE_DURATION_1 / 20 + " seconds. " +
 					"Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION / 20 + " seconds. " +
 					"Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.",
 				"Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. " +
 					"Maximum vex count increased to " + VEX_CAP_2 + ". " +
 					"Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION / 20 + " seconds. " +
-					"Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > Hunger. " +
-					"Melancholic Lament > 10% Weaken. Withering Gaze > Wither. Haunting Shades > 10% Vulnerability.")
+					"Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > -100% Healing. " +
+					"Melancholic Lament > 10% Weaken. Withering Gaze > Decay 1. Haunting Shades > 10% Vulnerability.")
 			.simpleDescription("Mobs that die near you spawn a vex that targets enemies, dealing damage and silencing them.")
 			.displayItem(Material.VEX_SPAWN_EGG);
 
@@ -86,18 +84,22 @@ public class RestlessSouls extends Ability {
 	private final int mSilenceTime;
 	private final int mVexCap;
 	private final double mDebuffRange;
+	private final int mDebuffDuration;
 	private final double mMoveSpeed;
 	private final List<Vex> mVexList = new ArrayList<>();
+	private final RestlessSoulsCS mCosmetic;
 
 	public RestlessSouls(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		boolean isLevelOne = isLevelOne();
 		mLevel = isLevelOne;
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne ? DAMAGE_1 : DAMAGE_2);
-		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
+		mSilenceTime = CharmManager.getDuration(player, CHARM_SILENCE_DURATION, isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2);
 		mVexCap = (int) CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne ? VEX_CAP_1 : VEX_CAP_2);
 		mDebuffRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_DEBUFF_RANGE, DEBUFF_RANGE);
+		mDebuffDuration = CharmManager.getDuration(player, CHARM_DEBUFF_DURATION, DEBUFF_DURATION);
 		mMoveSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, MOVESPEED);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new RestlessSoulsCS());
 	}
 
 	@Override
@@ -107,9 +109,7 @@ public class RestlessSouls extends Ability {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		World world = mPlayer.getWorld();
 		Location summonLoc = event.getEntity().getLocation();
-
 
 		if (!summonLoc.isChunkLoaded()) {
 			// mob is standing somewhere that's not loaded, abort
@@ -137,10 +137,7 @@ public class RestlessSouls extends Ability {
 				return;
 			}
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-			restlessSoulsBoss.spawn(mPlayer, mDamage, mDebuffRange, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
-
-			PartialParticle particle1 = new PartialParticle(Particle.SOUL, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
-			PartialParticle particle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
+			restlessSoulsBoss.spawn(mPlayer, mDamage, mDebuffRange, mSilenceTime, mDebuffDuration, mLevel, playerItemStats, mCosmetic);
 
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VEX_DURATION);
 
@@ -152,17 +149,12 @@ public class RestlessSouls extends Ability {
 
 				@Override
 				public void run() {
-					Location loc = mBoss.getLocation().add(0, 0.25, 0);
-					particle1.location(loc).spawnAsPlayerActive(mPlayer);
-					particle2.location(loc).spawnAsPlayerActive(mPlayer);
+					mCosmetic.vexTick(mPlayer, mBoss, mTicksElapsed);
 
 					boolean isOutOfTime = mTicksElapsed >= duration;
 					if (isOutOfTime || !mBoss.isValid()) {
-						if (isOutOfTime && mBoss.isValid()) {
-							Location vexLoc = mBoss.getLocation();
-
-							world.playSound(vexLoc, Sound.ENTITY_VEX_DEATH, SoundCategory.PLAYERS, 1.5f, 1.0f);
-							new PartialParticle(Particle.SOUL, vexLoc, 20, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
+						if (mBoss.isValid()) {
+							mCosmetic.vexDespawn(mPlayer, mBoss);
 						}
 						mVexList.remove(mBoss);
 						mBoss.remove();
@@ -186,17 +178,8 @@ public class RestlessSouls extends Ability {
 								if (randomMob != null) {
 									mBoss.setTarget(randomMob);
 									mTarget = randomMob;
-									world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.0f);
 
-									Vector dir = LocationUtils.getHalfHeightLocation(randomMob).subtract(mBoss.getLocation()).toVector().normalize();
-									new PPLine(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), LocationUtils.getEntityCenter(randomMob))
-										.countPerMeter(1.5)
-										.directionalMode(true)
-										.delta(dir.getX(), dir.getY(), dir.getZ())
-										.extra(0.12)
-										.includeEnd(false)
-										.spawnAsPlayerActive(mPlayer);
-									new PartialParticle(Particle.SOUL, randomMob.getLocation().add(0, randomMob.getEyeHeight() + 1, 0), 8).extra(0.02).spawnAsPlayerActive(mPlayer);
+									mCosmetic.vexTarget(mPlayer, mBoss, randomMob);
 								}
 							}
 						}

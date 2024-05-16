@@ -3,9 +3,10 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Objects;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.Lootable;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class FalseLich implements EliteFinisher {
@@ -55,6 +57,10 @@ public class FalseLich implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
+		if (!(killedMob instanceof LivingEntity le)) {
+			return;
+		}
+
 		World world = killedMob.getWorld();
 		Vector killedLookDir = killedMob.getLocation().getDirection();
 		final Vector panDir = VectorUtils.rotateYAxis(killedLookDir, 90);
@@ -265,15 +271,9 @@ public class FalseLich implements EliteFinisher {
 						case 8 -> {
 							switch (quarterNote) {
 								case 0 -> {
-									mMob = EntityUtils.copyMob((LivingEntity) killedMob);
-									mMob.setHealth(EntityUtils.getMaxHealth(mMob));
-									mMob.setGlowing(true);
-									mMob.setInvulnerable(true);
-									mMob.setGravity(false);
-									mMob.setSilent(true);
-									mMob.setCollidable(false);
-									mMob.setAI(false);
-									mMob.addScoreboardTag("SkillImmune");
+									mMob = EliteFinishers.createClonedMob(le, p);
+									ScoreboardUtils.addEntityToTeam(mMob, "lichfinisher", NamedTextColor.LIGHT_PURPLE)
+									.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 									if (mMob instanceof Lootable lootable) {
 										lootable.setLootTable(Bukkit.getLootTable(EMPTY_LOOTTABLE));
 									}

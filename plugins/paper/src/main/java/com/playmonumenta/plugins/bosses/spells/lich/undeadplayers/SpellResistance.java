@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
@@ -19,13 +20,13 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 
 public class SpellResistance extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PartialParticle mSpell1;
-	private PartialParticle mSpell2;
-	private PartialParticle mSpell3;
-	private PartialParticle mCrit;
+	private static final String RESISTANCE_SRC = "WarriorRevenantResistance";
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PartialParticle mSpell1;
+	private final PartialParticle mSpell2;
+	private final PartialParticle mSpell3;
+	private final PartialParticle mCrit;
 
 	public SpellResistance(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
@@ -55,7 +56,8 @@ public class SpellResistance extends Spell {
 					if (e == mBoss) {
 						continue;
 					}
-					e.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 15, 1));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(e, RESISTANCE_SRC,
+						new PercentDamageReceived(20 * 15, -0.4));
 					mCrit.location(e.getLocation()).spawnAsEnemy();
 					mSpell3.location(e.getLocation()).spawnAsEnemy();
 				}

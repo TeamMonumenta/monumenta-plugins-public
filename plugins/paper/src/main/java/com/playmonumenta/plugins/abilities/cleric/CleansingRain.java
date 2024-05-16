@@ -58,8 +58,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 					.formatted(CLEANSING_RADIUS_ENHANCED))
 			.simpleDescription("Summon a rain cloud that cleanses debuffs and grants resistance to players below it.")
 			.cooldown(CLEANSING_1_COOLDOWN, CLEANSING_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CleansingRain::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP),
-				AbilityTriggerInfo.NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CleansingRain::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP).keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON)))
 			.displayItem(Material.NETHER_STAR);
 
 	private final double mRadius;

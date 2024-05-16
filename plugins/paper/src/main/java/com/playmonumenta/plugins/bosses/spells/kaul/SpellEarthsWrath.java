@@ -27,6 +27,9 @@ import org.bukkit.util.Vector;
 
 public class SpellEarthsWrath extends Spell {
 	private static final String SPELL_NAME = "Earth's Wrath";
+	private static final String SLOWNESS_SRC = "EarthsWrathSlowness";
+	private static final double SLOWNESS_POTENCY = -0.5;
+	private static final int DEBUFF_DURATION = 20 * 10;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -80,9 +83,9 @@ public class SpellEarthsWrath extends Spell {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, SPELL_NAME);
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
-										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "EarthsWrathSlowness",
-											new PercentSpeed(20 * 10, -0.5, "EarthsWrathSlowness"));
-										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));
+										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+											new PercentSpeed(DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
+										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, DEBUFF_DURATION, -4));
 									}
 								}
 								if (mTicks >= 20 * 3) {

@@ -62,6 +62,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -454,7 +455,10 @@ public class EntityUtils {
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter, double hitboxSize) {
 		World world = player.getWorld();
 		Location eyeLoc = player.getEyeLocation();
-		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, hitboxSize, filter);
+		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, hitboxSize,
+			e -> (filter == null || filter.test(e))
+				// verify that the entity is actually ahead of the player (in case a large hitbox overlaps from behind)
+				&& player.getLocation().getDirection().dot(e.getLocation().subtract(player.getLocation()).toVector()) > 0);
 		// the raySize parameter changes the size of entity bounding boxes, so the entity may actually be outside the max range, hence the range check here
 		if (result != null && result.getHitEntity() instanceof LivingEntity le && le.getLocation().distance(player.getLocation()) < range) {
 			return le;
@@ -764,10 +768,10 @@ public class EntityUtils {
 		return 1;
 	}
 
-	public static @Nullable LivingEntity getNearestHostile(Location loc, double range) {
+	public static @Nullable LivingEntity getNearestHostileTargetable(Location loc, double range) {
 		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
 			       .stream()
-			       .filter(e -> e.isValid() && isHostileMob(e))
+			       .filter(e -> e.isValid() && isHostileMob(e) && !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))
 			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
 			       .orElse(null);
 	}
@@ -784,7 +788,7 @@ public class EntityUtils {
 		}
 	}
 
-	private static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
+	public static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
 
 	public static void applyVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new PercentDamageReceived(ticks, amount));
@@ -838,7 +842,7 @@ public class EntityUtils {
 		return false;
 	}
 
-	private static final String BLEED_EFFECT_NAME = "BleedEffect";
+	public static final String BLEED_EFFECT_NAME = "BleedEffect";
 
 	public static void applyBleed(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, BLEED_EFFECT_NAME, new Bleed(ticks, amount, plugin));
@@ -960,7 +964,7 @@ public class EntityUtils {
 		Plugin.getInstance().mEffectManager.clearEffects(mob, "SelfRoot");
 	}
 
-	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
+	public static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
 	private static final String WEAKEN_EFFECT_AESTHETICS_NAME = "WeakenEffectAesthetics";
 
 	private static final EnumSet<DamageType> WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES = EnumSet.of(
@@ -1434,7 +1438,7 @@ public class EntityUtils {
 		return entityType == EntityType.ARROW || entityType == EntityType.SPECTRAL_ARROW;
 	}
 
-	private static final String PARALYZE_EFFECT_NAME = "ParalyzeEffect";
+	public static final String PARALYZE_EFFECT_NAME = "ParalyzeEffect";
 
 	public static void paralyze(Plugin plugin, int ticks, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, PARALYZE_EFFECT_NAME, new Paralyze(ticks, plugin));
@@ -1693,5 +1697,24 @@ public class EntityUtils {
 		lineOfSight.rotateAroundY(Math.toRadians(-entity.getLocation().getYaw()));
 		Vector mobToPlayer = entityInSight.getLocation().toVector().subtract(entity.getLocation().toVector());
 		return !(lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0));
+	}
+
+	// returns change in mob's health
+	public static double healMob(LivingEntity mob, double healAmount) {
+		if (healAmount <= 0 || mob.isDead()) {
+			return 0;
+		}
+
+		EntityRegainHealthEvent event = new EntityRegainHealthEvent(mob, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+		Bukkit.getPluginManager().callEvent(event);
+		if (!event.isCancelled()) {
+			double oldHealth = mob.getHealth();
+			double newHealth = Math.min(oldHealth + event.getAmount(), EntityUtils.getMaxHealth(mob));
+			mob.setHealth(newHealth);
+
+			return newHealth - oldHealth;
+		}
+
+		return 0;
 	}
 }

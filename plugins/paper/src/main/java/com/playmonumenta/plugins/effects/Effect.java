@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	protected int mDuration;
-	public String mEffectID;
+	public final String mEffectID;
 	private boolean mDisplay = true;
 	private boolean mDisplayTime = true;
 	private boolean mDeleteOnLogout = false;
@@ -55,10 +55,6 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	public double getMagnitude() {
 		return 0;
-	}
-
-	public String getEffectID() {
-		return mEffectID;
 	}
 
 	public void clearEffect() {

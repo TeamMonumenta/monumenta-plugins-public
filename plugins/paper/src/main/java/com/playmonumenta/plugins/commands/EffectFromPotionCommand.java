@@ -92,7 +92,7 @@ public class EffectFromPotionCommand {
 			ItemStack potion = player.getInventory().getItem(slot);
 
 			// If item is a potion, apply effects
-			if (potion.getItemMeta() instanceof PotionMeta potionMeta || ItemStatUtils.isConsumable(potion)) {
+			if (potion.getItemMeta() instanceof PotionMeta || ItemStatUtils.isConsumable(potion)) {
 				ItemStack updatedPotion = consumePotion(plugin, player, potion);
 
 				player.getInventory().setItem(slot, updatedPotion);

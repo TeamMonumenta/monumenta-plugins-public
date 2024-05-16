@@ -20,10 +20,12 @@ import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellRush;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSlice;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSteelboreSpread;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellStonemason;
+import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -117,9 +119,9 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			case "Hard" -> {
 				mHealth = 27225;
 				// Hard Mode Abilities
-				mParadox = new SpellLingeringParadox(boss, mSpawnLoc, 30);
-				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc, 30);
-				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc, 30);
+				mParadox = new SpellLingeringParadox(boss, mSpawnLoc);
+				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc);
+				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc);
 				mCrash = new SpellCrash(boss, plugin, mCurrentLoc);
 				mRush = new SpellRush(plugin, boss, mSpawnLoc, 30);
 				mRush2 = new SpellRush(plugin, boss, mSpawnLoc, 30);
@@ -288,9 +290,9 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			case "Normal" -> {
 				mHealth = 19000;
 				// Normal Mode Abilities
-				mParadox = new SpellLingeringParadox(boss, mSpawnLoc, 30);
-				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc, 30);
-				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc, 30);
+				mParadox = new SpellLingeringParadox(boss, mSpawnLoc);
+				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc);
+				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc);
 				mCrash = new SpellCrash(boss, plugin, mCurrentLoc);
 				mRush = new SpellRush(plugin, boss, mSpawnLoc, 30);
 				mRush2 = new SpellRush(plugin, boss, mSpawnLoc, 30);
@@ -565,7 +567,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	}
 
 	private void clearParadox(Player p) {
-		Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
+		Plugin.getInstance().mEffectManager.clearEffects(p, TemporalFlux.GENERIC_NAME);
 	}
 
 	private BossBarManager.BossHealthAction getSteelboreAction(Plugin plugin, boolean savage, boolean phase3) {
@@ -614,7 +616,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 		if (event.getEvent().getEntity() instanceof Player player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			if (player.isBlocking()) {
 				// set shield cooldown if boss hits player
-				player.setCooldown(Material.SHIELD, 20 * 6);
+				NmsUtils.getVersionAdapter().stunShield(player, 20 * 6);
 			}
 		}
 	}

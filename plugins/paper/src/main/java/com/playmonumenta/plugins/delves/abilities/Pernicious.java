@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.delves.abilities;
 import com.playmonumenta.plugins.bosses.bosses.BlockBreakBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Vex;
 
@@ -13,9 +14,9 @@ public class Pernicious {
 
 	public static final String DESCRIPTION = "Enemies can destroy terrain.";
 
-	public static String[] rankDescription(int level) {
-			return new String[]{
-				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE_PER_LEVEL * level * 100) + "% chance to have Block Break."
+	public static Component[] rankDescription(int level) {
+			return new Component[]{
+				Component.text("Enemies have a " + Math.round(BLOCK_BREAK_CHANCE_PER_LEVEL * level * 100) + "% chance to have Block Break.")
 			};
 	}
 

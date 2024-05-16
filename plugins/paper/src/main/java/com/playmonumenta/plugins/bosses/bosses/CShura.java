@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraDagger;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraJump;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraPassiveSummon;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraSmoke;
+import com.playmonumenta.plugins.effects.FlatDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -19,7 +20,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +28,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -52,7 +51,8 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_cshura";
 	public static final int detectionRange = 50;
 	private static final String START_TAG = "shuraCenter";
-	private static final int DODGE_CD = 5;
+	private static final int DODGE_CD = 20 * 5;
+	private static final Component CSHURA_PREFIX = Component.text("[", NamedTextColor.GOLD).append(Component.text("C'Shura", NamedTextColor.DARK_RED, TextDecoration.BOLD)).append(Component.text("] ", NamedTextColor.GOLD));
 
 	private LivingEntity mStart;
 	private boolean mDodge = false;
@@ -87,13 +87,12 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 			new SpellShieldStun(6 * 20),
 			new SpellBlightCheese(mBoss, detectionRange, mStart.getLocation())
 		);
-		String suffix = ChatColor.GOLD + "[" + ChatColor.DARK_RED + ChatColor.BOLD + "C'Shura" + ChatColor.GOLD + "] ";
 
 		Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
 		events.put(50, mBoss -> {
-			String[] dio1 = new String[] {
-				ChatColor.GREEN + "Enough! My " + ChatColor.RED + "purpose " + ChatColor.GREEN + "here is too great for you to interrupt!",
-				ChatColor.GREEN + "You will die now, like your worthless king did!"
+			Component[] dio1 = new Component[] {
+				Component.text("Enough! My ", NamedTextColor.GREEN).append(Component.text("purpose ", NamedTextColor.RED)).append(Component.text("here is too great for you to interrupt!", NamedTextColor.GREEN)),
+				Component.text("You will die now, like your worthless king did!", NamedTextColor.GREEN),
 			};
 			new BukkitRunnable() {
 				int mT = 0;
@@ -102,7 +101,7 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 				public void run() {
 					if (mT < dio1.length) {
 						for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-							p.sendMessage(suffix + dio1[mT]);
+							p.sendMessage(CSHURA_PREFIX.append(dio1[mT]));
 						}
 						mT++;
 					} else {
@@ -114,20 +113,21 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 		});
 
 		events.put(25, mBoss -> {
-			String dio2 = ChatColor.RED + "CUN! DIE ALREADY!";
+			// cshurawool.gif
+			Component dio2 = Component.text("CUN! DIE ALREADY!", NamedTextColor.RED);
 			for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-				p.sendMessage(suffix + dio2);
+				p.sendMessage(CSHURA_PREFIX.append(dio2));
 			}
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 0));
-
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, FlatDamageDealt.effectID,
+				new FlatDamageDealt(12000, 3));
 		});
 
-		String[] dio = new String[] {
-			ChatColor.RED + "Kaul!",
-			ChatColor.GREEN + "Please...",
-			ChatColor.GREEN + "It was the " + ChatColor.RED + "Soulspeaker! He wanted to save us!",
-			ChatColor.GREEN + "You there. How did you get in here? " + ChatColor.RED + "I'm glad you have... your sacrifice will draw Kaul back to me. He will speak to me.",
-			ChatColor.GREEN + "I'm giving you a chance to run " + ChatColor.RED + "before I cut you down.",
+		Component[] dio = new Component[] {
+			Component.text("Kaul!", NamedTextColor.RED),
+			Component.text("Please...", NamedTextColor.GREEN),
+			Component.text("It was the ", NamedTextColor.GREEN).append(Component.text("Soulspeaker! He wanted to save us!", NamedTextColor.RED)),
+			Component.text("You there. How did you get in here? ", NamedTextColor.GREEN).append(Component.text("I'm glad you have... your sacrifice will draw Kaul back to me. He will speak to me.", NamedTextColor.RED)),
+			Component.text("I'm giving you a chance to run ", NamedTextColor.GREEN).append(Component.text("before I cut you down.", NamedTextColor.RED)),
 			};
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);
@@ -139,13 +139,13 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				if (mT < dio.length) {
 					for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(suffix + dio[mT]);
+						p.sendMessage(CSHURA_PREFIX.append(dio[mT]));
 					}
 					mT++;
 				} else {
 					this.cancel();
 					for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-						MessagingUtils.sendBoldTitle(p, ChatColor.GREEN + "C'Shura", ChatColor.DARK_GREEN + "The Soulbinder");
+						MessagingUtils.sendBoldTitle(p, Component.text("C'Shura", NamedTextColor.GREEN), Component.text("The Soulbinder", NamedTextColor.DARK_GREEN));
 						p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
 						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 					}
@@ -172,9 +172,7 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 		if (!mDodge && !mCutscene) {
 			mDodge = true;
 			dodge(event);
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mDodge = false;
-			}, DODGE_CD * 20);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDodge = false, DODGE_CD);
 		}
 	}
 
@@ -208,31 +206,28 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		// win resistance
-		for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.REGENERATION, 12 * 20, 2));
-			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12 * 20, 10));
-		}
+		List<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+
 		// win mob kill
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange)) {
 			mob.setHealth(0);
 		}
 
 		mBoss.teleport(mBoss.getLocation().add(0, -300, 0));
-		String suffix = ChatColor.GOLD + "[" + ChatColor.DARK_RED + ChatColor.BOLD + "C'Shura" + ChatColor.GOLD + "] ";
-		String[] ded = new String[] {
-			ChatColor.GREEN + "I feel... different. This place is a blight. it nearly took me. It could take you too.",
-			ChatColor.GREEN + "This place has magic even I could not handle. I must find my people. They need to know I am still here."
+		Component[] ded = new Component[] {
+			Component.text("I feel... different. This place is a blight. it nearly took me. It could take you too.", NamedTextColor.GREEN),
+			Component.text("This place has magic even I could not handle. I must find my people. They need to know I am still here.", NamedTextColor.GREEN),
 		};
 		new BukkitRunnable() {
 			int mT = 0;
 
 			@Override
 			public void run() {
-				List<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
 				if (mT < ded.length) {
 					for (Player p : players) {
-						p.sendMessage(suffix + ded[mT]);
+						p.sendMessage(CSHURA_PREFIX.append(ded[mT]));
 					}
 					mT++;
 				} else {

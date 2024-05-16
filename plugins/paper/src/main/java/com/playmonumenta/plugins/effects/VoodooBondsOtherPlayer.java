@@ -1,13 +1,15 @@
 package com.playmonumenta.plugins.effects;
 
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -21,23 +23,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class VoodooBondsOtherPlayer extends Effect {
 	public static final String effectID = "VoodooBondsOtherPlayer";
-
-	private static final String SEND_EFFECT_NAME = "VoodooBondsDamageTaken";
-
 	private final Player mReaper;
-	private final Plugin mPlugin;
 
 	int mRotation = 0;
-	private final int mTransferDuration;
 	private boolean mTriggerTickParticle = false;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
-	public VoodooBondsOtherPlayer(int duration, int transferDuration, Player reaper, Plugin plugin) {
+	public VoodooBondsOtherPlayer(int duration, Player reaper) {
 		super(duration, effectID);
 		mReaper = reaper;
-		mPlugin = plugin;
-		mTransferDuration = transferDuration;
 	}
 
 	@Override
@@ -46,28 +41,18 @@ public class VoodooBondsOtherPlayer extends Effect {
 			return;
 		}
 
-		int duration = mTransferDuration;
-		double damage = Math.min(event.getFinalDamage(true), entity.getHealth());
-		double maxHealth = EntityUtils.getMaxHealth(entity);
-		double percentDamage = damage / maxHealth;
-
 		LivingEntity source = event.getSource();
 		if (source != null) {
-			if (EntityUtils.isBoss(source)) {
-				event.setDamage(event.getDamage() / 2);
-			} else {
-				event.setDamage(0);
-				if (event.getDamager() instanceof LivingEntity le) {
-					MovementUtils.knockAway(mReaper.getLocation(), le, 0.3f, 0.15f, true);
-				}
-				event.setCancelled(true);
+			if (event.getDamager() instanceof LivingEntity le) {
+				MovementUtils.knockAway(mReaper.getLocation(), le, 0.3f, 0.15f, true);
 			}
+			event.setDamage(0);
+			event.setCancelled(true);
 		} else {
 			// Ignore DoT damage
 			if (event.getType() == DamageType.FIRE || event.getType() == DamageType.AILMENT) {
 				return;
 			}
-
 			entity.setLastDamage(event.getDamage());
 			entity.setNoDamageTicks(20);
 			event.setDamage(0);
@@ -75,15 +60,36 @@ public class VoodooBondsOtherPlayer extends Effect {
 		}
 
 		mTriggerTickParticle = true;
-		// Add this effect immediately afterwards to avoid causing a ConcurrentModificationException
-		Bukkit.getScheduler().runTask(mPlugin,
-				() -> mPlugin.mEffectManager.addEffect(mReaper, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mReaper, damage, percentDamage, mPlugin)));
+
+		// send damage to reaper
+		double percentDamage = Math.min(event.getFinalDamage(true), entity.getHealth()) / EntityUtils.getMaxHealth(entity);
+		double receivedDamageModifier = 1 + CharmManager.getLevelPercentDecimal(mReaper, VoodooBonds.CHARM_RECEIVED_DAMAGE);
+		double damageToDeal = EntityUtils.getMaxHealth(mReaper) * (percentDamage * receivedDamageModifier);
+		double absorbHealth = AbsorptionUtils.getAbsorption(mReaper);
+		if (absorbHealth <= 0) {
+			mReaper.setHealth(Math.max(Math.min(mReaper.getHealth() - damageToDeal, EntityUtils.getMaxHealth(mReaper)), 1));
+		} else {
+			if (damageToDeal >= absorbHealth) {
+				double leftoverHealth = mReaper.getHealth() + absorbHealth - damageToDeal;
+				AbsorptionUtils.subtractAbsorption(mReaper, absorbHealth);
+				mReaper.setHealth(Math.max(leftoverHealth, 1));
+			} else {
+				AbsorptionUtils.subtractAbsorption(mReaper, absorbHealth);
+			}
+		}
 
 		Location loc = entity.getLocation();
 		World world = loc.getWorld();
-		new PartialParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001).spawnAsPlayerActive(mReaper);
-		new PartialParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR).spawnAsPlayerActive(mReaper);
+		world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1, 2);
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 2f, 0.75f);
+		new PPLine(Particle.SPELL_WITCH, loc, mReaper.getLocation()).countPerMeter(6).spawnAsPlayerActive(mReaper);
+		new PPLine(Particle.REDSTONE, loc, mReaper.getLocation()).data(COLOR).countPerMeter(6).spawnAsPlayerActive(mReaper);
+
+		Location reaperLoc = mReaper.getLocation();
+		new PartialParticle(Particle.SPELL_WITCH, reaperLoc, 40, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(mReaper);
+		new PartialParticle(Particle.REDSTONE, reaperLoc, 40, 0.5, 0.5, 0.5, 0, COLOR).spawnAsPlayerActive(mReaper);
+		world.playSound(reaperLoc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 1f, 0.75f);
+		world.playSound(reaperLoc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 1f, 0.5f);
 	}
 
 	@Override

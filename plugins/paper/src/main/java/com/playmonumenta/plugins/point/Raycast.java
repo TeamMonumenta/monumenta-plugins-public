@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.point;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import org.bukkit.Location;
@@ -75,7 +76,7 @@ public class Raycast {
 
 			// spawn particles along the ray if desired.
 			if (mParticle != null) {
-				mStart.getWorld().spawnParticle(mParticle, mStart, 1, 0, 0, 0, 0.0001);
+				new PartialParticle(mParticle, mStart, 1, 0, 0, 0, 0.0001).spawnFull();
 			}
 
 			mStart.add(mDir.clone().multiply(mDirMultiplier));

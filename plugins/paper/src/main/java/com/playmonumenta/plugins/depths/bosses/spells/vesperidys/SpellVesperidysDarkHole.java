@@ -212,6 +212,7 @@ public class SpellVesperidysDarkHole extends Spell {
 							super.cancel();
 							darkHoleChargeUp.reset();
 							mVesperidys.mInvincible = false;
+							mVesperidys.mDamageCap = 0.03;
 							mBoss.setGravity(true);
 
 							// Remove Dark Hole Cores.
@@ -372,7 +373,7 @@ public class SpellVesperidysDarkHole extends Spell {
 								mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3f, 1.5f);
 								new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0, 0, 0, 0.5, null, true).spawnAsEntityActive(mBoss);
 
-								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mVesperidys.detectionRange, true)) {
+								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true)) {
 									// MovementUtils.pullTowardsNormalized(mDarkHoleCenter, player, 0.2f * blackHoleRadius);
 
 									for (int i = 0; i < DARK_HOLE_PROJECTILES_PER_PLAYER; i++) {

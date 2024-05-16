@@ -40,7 +40,7 @@ public class DepthsFrostNova extends DepthsAbility {
 	public static final int SIZE = 6;
 	public static final double[] SLOW_MULTIPLIER = {0.25, 0.3, 0.35, 0.4, 0.45, 0.55};
 	public static final int DURATION_TICKS = 4 * 20;
-	public static final int COOLDOWN_TICKS = 15 * 20;
+	public static final int COOLDOWN_TICKS = 16 * 20;
 	public static final int ICE_TICKS = 8 * 20;
 
 	public static final String CHARM_COOLDOWN = "Frost Nova Cooldown";

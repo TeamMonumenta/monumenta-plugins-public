@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -10,6 +11,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
@@ -52,42 +54,34 @@ import org.jetbrains.annotations.Nullable;
 
 public class FalseSpiritPortal extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespiritportal";
+	public static final String SUMMON_CEILING_TAG = "CeilingGoHSummon";
 
 	private static final List<String> mobs = Arrays.asList("IncompleteSpirit", "ImperfectKeterCore", "HalludHornet", "BarklessEnt", "PiercingEnt", "SpiritoftheValley");
 	private static final List<String> ceilingMobs = Arrays.asList("IncompleteSpirit", "ImperfectKeterCore", "BarklessEnt", "PiercingEnt", "SpiritoftheValley");
 	private static final String delveMiniboss = "IncompleteAberration";
-
-	private int mMobsKilled = 0;
-
 	private static final String TRIDENT_TAG = "GoHTrident";
-	private List<LivingEntity> mTridentStands = new ArrayList<>();
-
+	private static final String SUMMON_TAG = "GoHSummon";
+	private final List<LivingEntity> mTridentStands = new ArrayList<>();
+	private final List<ArmorStand> mGates = new ArrayList<>(2);
+	private final List<Player> mWarned = new ArrayList<>();
+	private int mMobsKilled = 0;
 	private int mPlayerCount;
-
 	private @Nullable ItemStack mTrident = null;
 	private @Nullable String mTridentName = null;
-
-	private static final String SUMMON_TAG = "GoHSummon";
-	private List<ArmorStand> mGates = new ArrayList<>(2);
-
 	//WARNING: Ceiling Gate also requires normal SUMMON_TAG as well as SUMMON_CEILING_TAG
-	public static final String SUMMON_CEILING_TAG = "CeilingGoHSummon";
 	private @Nullable LivingEntity mCeilingGate = null;
-
 	private String mPortalNumTag = "";
-
 	//If delves is enabled in the instance
 	private boolean mDelve = false;
-
-	private final List<Player> mWarned = new ArrayList<>();
 
 	public FalseSpiritPortal(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		World world = mBoss.getWorld();
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 60 * 27, 3));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+			new PercentDamageReceived(20 * 60 * 27, -0.8));
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 75, true);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true);
 		mPlayerCount = players.size();
 		if (mPlayerCount < 1) {
 			mPlayerCount = 1;
@@ -105,40 +99,33 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 			NamespacedKey key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo");
 			switch (mPortalNumTag) {
-				case "PortalNum1":
-					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_hallud");
-					break;
-				case "PortalNum2":
-					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_chasom");
-					break;
-				case "PortalNum3":
-					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
-					break;
-				case "PortalNum4":
-					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
-					break;
-				case "PortalNum5":
-					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
-					break;
-				default:
-					break;
+				case "PortalNum1" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_hallud");
+				case "PortalNum2" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_chasom");
+				case "PortalNum3" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
+				case "PortalNum4" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
+				case "PortalNum5" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
 			}
 
-			if (mTrident == null) {
+			try {
 				mTrident = InventoryUtils.getItemFromLootTable(mBoss, key);
 				if (mTrident == null) {
-					com.playmonumenta.plugins.Plugin.getInstance().getLogger().severe("Failed to get trident from loot table! False Spirit will be impossible to defeat");
-					return;
+					throw new Exception("[False Spirit] Failed to get trident from loot table! False Spirit will be impossible to defeat.");
 				}
-			}
-
-			if (mTridentName == null) {
 				mTridentName = MessagingUtils.plainText(mTrident.displayName());
-			}
+				if (mTridentName == null) {
+					throw new Exception("[False Spirit] Failed to set trident display name! False Spirit will be impossible to defeat.");
+				}
 
-			Damageable dm = (Damageable) mTrident.getItemMeta();
-			dm.setDamage(248);
-			mTrident.setItemMeta(dm);
+				Damageable dm = (Damageable) mTrident.getItemMeta();
+				dm.setDamage(248);
+				mTrident.setItemMeta(dm);
+			} catch (Exception exception) {
+				// Thank you Java for not having a default message for NPEs
+				if (exception.getMessage() != null) {
+					MMLog.warning(exception.getMessage());
+				}
+				exception.printStackTrace();
+			}
 		}, 1);
 
 		Collection<ArmorStand> stands = mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), 20);
@@ -146,27 +133,17 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			Set<String> tags = as.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-					case SUMMON_TAG:
-						mGates.add(as);
-						break;
-					case SUMMON_CEILING_TAG:
-						mCeilingGate = as;
-						break;
-					default:
-						break;
+					case SUMMON_TAG -> mGates.add(as);
+					case SUMMON_CEILING_TAG -> mCeilingGate = as;
 				}
 			}
 		}
 
-		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 75, EnumSet.of(EntityType.ARMOR_STAND))) {
+		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), FalseSpirit.detectionRange, EnumSet.of(EntityType.ARMOR_STAND))) {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
-				switch (tag) {
-					case TRIDENT_TAG:
-						mTridentStands.add(e);
-						break;
-					default:
-						break;
+				if (tag.equals(TRIDENT_TAG)) {
+					mTridentStands.add(e);
 				}
 			}
 		}
@@ -256,12 +233,12 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}.runTaskLater(mPlugin, 20 * 60);
 				}
 
-				if ((!mDelve && mMobsKilled >= 5 * mPlayerCount) || (mDelve && mMobsKilled >= 6 * mPlayerCount)) {
-					//Spawns trident and resets kills (to spawn trident again)
-
+				// Spawns trident and resets kills (to spawn trident again)
+				// If mTrident is null, the try/catch block at the top of this constructor complains about it
+				if (mTrident != null && ((!mDelve && mMobsKilled >= 5 * mPlayerCount) || (mDelve && mMobsKilled >= 6 * mPlayerCount))) {
+					mMobsKilled = 0;
 
 					Location tridentLoc = mTridentStands.get(FastUtils.RANDOM.nextInt(mTridentStands.size())).getLocation();
-
 					Item item = world.dropItem(tridentLoc, mTrident);
 					item.setTicksLived(1);
 					item.setPickupDelay(0);
@@ -272,9 +249,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					world.playSound(item.getLocation(), Sound.ITEM_TOTEM_USE, SoundCategory.HOSTILE, 15, 0);
 					new PartialParticle(Particle.CRIT, item.getLocation(), 20, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
 
-					PlayerUtils.executeCommandOnNearbyPlayers(item.getLocation(), 75, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! On the hanging bookshelves! The Spear has formed! Take it and throw it at the gate!\",\"color\":\"white\"}]");
-
-					mMobsKilled = 0;
+					for (Player player : PlayerUtils.playersInRange(item.getLocation(), FalseSpirit.detectionRange, true)) {
+						MessagingUtils.sendNPCMessage(player, "Bhairavi", "Quickly! On the hanging bookshelves! The Spear has formed! Take it and throw it at the gate!");
+						}
 
 					Location beaconLoc = tridentLoc.clone().add(0, 3, 0);
 
@@ -346,13 +323,10 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 	@Override
 	public void bossHitByProjectile(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof Trident trident) {
-
-			if (equalsTrident(trident.getItemStack())) {
-				closePortal();
-				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-				deleteTridents();
-			}
+		if (event.getEntity() instanceof Trident trident && equalsTrident(trident.getItemStack())) {
+			closePortal();
+			trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			deleteTridents();
 		}
 	}
 
@@ -411,7 +385,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			}
 		}
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), 75, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" That's it! Head back to the fight!\",\"color\":\"white\"}]");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true)) {
+			MessagingUtils.sendNPCMessage(player, "Bhairavi", "That's it! Head back to the fight!");
+		}
 
 		mBoss.remove();
 	}

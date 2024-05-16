@@ -42,6 +42,8 @@ public class AbilityInfo<T extends Ability> {
 	private final @Nullable String mDisplayName;
 	// Ability name shorthand (for statistic purposes; no use in-game. Should be the fewest characters that identifies this)
 	private @Nullable String mShorthandName;
+	// Ability Abbreviated Name for AbilityHotbar
+	private @Nullable String mHotbarName;
 	// Description provider
 	private List<Description<T>> mDescriptions = List.of(t -> Component.empty());
 	// Simplified description
@@ -66,7 +68,7 @@ public class AbilityInfo<T extends Ability> {
 	public @Nullable String mCharmCooldown;
 	public @Nullable String mCharmCooldown2;
 
-	private Predicate<Player> mCanUse = player -> mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mScoreboardId).orElse(0) > 0;
+	private Predicate<Player> mCanUse = player -> mScoreboardId != null && getLevelScore(player) > 0;
 
 	private Consumer<Player> mRemove = player -> {
 	};
@@ -100,6 +102,11 @@ public class AbilityInfo<T extends Ability> {
 
 	public AbilityInfo<T> shorthandName(String shorthandName) {
 		mShorthandName = shorthandName;
+		return this;
+	}
+
+	public AbilityInfo<T> hotbarName(String hotbarName) {
+		mHotbarName = hotbarName;
 		return this;
 	}
 
@@ -277,6 +284,16 @@ public class AbilityInfo<T extends Ability> {
 		return mDisplayName;
 	}
 
+	public @Nullable String getHotbarName() {
+		if (mHotbarName != null) {
+			return mHotbarName;
+		} else if (mShorthandName != null) {
+			return mShorthandName;
+		} else {
+			return mDisplayName;
+		}
+	}
+
 	@Nullable
 	public ClassAbility getLinkedSpell() {
 		return mLinkedSpell;
@@ -353,7 +370,12 @@ public class AbilityInfo<T extends Ability> {
 			       .append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
 	}
 
-	public Component getFormattedDescriptions(@Nullable Player player, int level, boolean isEnhanced, boolean enabled) {
+	public Component getFormattedDescriptions(Player player) {
+		int score = getLevelScore(player);
+		return getFormattedDescriptions(player, ((score - 1) % 2) + 1, score > 2, !Plugin.getInstance().mAbilityManager.getDisabledSpecAbilities().contains(this), ServerProperties.getAbilityEnhancementsEnabled(player));
+	}
+
+	public Component getFormattedDescriptions(@Nullable Player player, int level, boolean isEnhanced, boolean enabled, boolean enhancementEnabled) {
 		List<Component> descriptions = getDescriptions();
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(player, 1, enabled));
@@ -361,7 +383,7 @@ public class AbilityInfo<T extends Ability> {
 			component = component.append(Component.newline()).append(getFormattedDescription(player, 2, enabled));
 		}
 		if (isEnhanced && descriptions.size() > 2) {
-			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled));
+			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled && enhancementEnabled));
 		}
 		return component;
 	}
@@ -397,7 +419,7 @@ public class AbilityInfo<T extends Ability> {
 			hoverableString += "*";
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled));
+			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled, ServerProperties.getAbilityEnhancementsEnabled(player)));
 	}
 
 	public TextColor getActionBarColor() {
@@ -405,11 +427,15 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public void sendDescriptions(CommandSender sender) {
-		sender.sendMessage(getFormattedDescriptions(sender instanceof Player player ? player : null, 2, false, true));
+		sender.sendMessage(getFormattedDescriptions(sender instanceof Player player ? player : null, 2, false, true, true));
 	}
 
 	public @Nullable T getPlayerAbility(Plugin plugin, @Nullable Player player) {
 		return plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, getAbilityClass());
+	}
+
+	public int getLevelScore(Player player) {
+		return mScoreboardId == null ? 0 : ScoreboardUtils.getScoreboardValue(player, mScoreboardId).orElse(0);
 	}
 
 	public JsonObject toJson() {

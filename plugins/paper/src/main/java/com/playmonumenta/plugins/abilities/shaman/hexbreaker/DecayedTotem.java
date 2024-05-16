@@ -23,7 +23,13 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -85,7 +91,6 @@ public class DecayedTotem extends TotemAbility {
 			.displayItem(Material.WITHER_ROSE);
 
 	private final double mDamage;
-	private final int mDuration;
 	private final double mRadius;
 	private final double mSlowness;
 	private final int mTargetCount;
@@ -110,11 +115,6 @@ public class DecayedTotem extends TotemAbility {
 	}
 
 	@Override
-	public int getInitialAbilityDuration() {
-		return mDuration;
-	}
-
-	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (ticks == 0) {
 			applyDecayedDamageBoost();
@@ -134,7 +134,7 @@ public class DecayedTotem extends TotemAbility {
 				if (mTargets.contains(mob) || standLocation.distance(mob.getLocation()) >= mRadius) {
 					continue;
 				}
-				impactMob(mob, mInterval + 5, false, false);
+				impactMob(mob, mInterval + 5, false, false, stats);
 				mTargets.add(mob);
 				if (mTargets.size() >= mTargetCount) {
 					break;
@@ -153,11 +153,11 @@ public class DecayedTotem extends TotemAbility {
 		}
 	}
 
-	private void impactMob(LivingEntity target, int duration, boolean dealDamage, boolean bonusAction) {
+	private void impactMob(LivingEntity target, int duration, boolean dealDamage, boolean bonusAction, ItemStatManager.PlayerItemStats stats) {
 		if (dealDamage) {
-			DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC,
-				mDamage * (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1),
-				ClassAbility.DECAYED_TOTEM, true);
+			DamageUtils.damage(mPlayer, target,
+				new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats),
+				mDamage * (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1), true, false, false);
 		}
 		EntityUtils.applySlow(mPlugin, duration, mSlowness, target);
 	}
@@ -175,7 +175,7 @@ public class DecayedTotem extends TotemAbility {
 	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
 		applyDecayedDamageBoost();
 		for (LivingEntity target : mTargets) {
-			impactMob(target, mInterval + 20, true, bonusAction);
+			impactMob(target, mInterval + 20, true, bonusAction, stats);
 		}
 		dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), mInterval + 20);
 	}

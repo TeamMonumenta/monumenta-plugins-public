@@ -14,7 +14,11 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +62,6 @@ public class FlameTotem extends TotemAbility {
 	public static final String CHARM_PULSE_DELAY = "Flame Totem Pulse Delay";
 
 	private double mDamage;
-	private final int mDuration;
 	private final double mRadius;
 	private final double mBombRadius;
 	private final int mBombCount;
@@ -118,11 +121,6 @@ public class FlameTotem extends TotemAbility {
 			+ (isEnhanced() ? ENHANCE_BOMB_BONUS : 0);
 		mEnhanceInfernoScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_INFERNO_SCALE, ENHANCE_INFERNO_SCALE);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
-	}
-
-	@Override
-	public int getInitialAbilityDuration() {
-		return mDuration;
 	}
 
 	@Override

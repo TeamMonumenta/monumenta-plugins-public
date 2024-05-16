@@ -104,7 +104,7 @@ public class Earthquake extends DepthsAbility {
 								knockup(mob);
 							}
 
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, false, true, false);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, true, false);
 
 							if (!EntityUtils.isBoss(mob)) {
 								EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);

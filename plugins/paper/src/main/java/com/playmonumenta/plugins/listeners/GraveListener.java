@@ -97,6 +97,11 @@ public class GraveListener implements Listener {
 				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			}
 		}
+
+		// Fix for Armorstand.setDisabledSlots not doing it's job - usb
+		if (event.getRightClicked().getScoreboardTags().contains(GraveManager.DISABLE_INTERACTION_TAG)) {
+			event.setCancelled(true);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
@@ -106,6 +111,11 @@ public class GraveListener implements Listener {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
 				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			}
+		}
+
+		// Fix for Armorstand.setDisabledSlots not doing it's job - usb
+		if (event.getRightClicked().getScoreboardTags().contains(GraveManager.DISABLE_INTERACTION_TAG)) {
+			event.setCancelled(true);
 		}
 	}
 

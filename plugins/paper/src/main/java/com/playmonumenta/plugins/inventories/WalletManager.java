@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -169,7 +170,7 @@ public class WalletManager implements Listener {
 		).filter(Objects::nonNull).collect(ImmutableList.toImmutableList());
 	}
 
-	private record WalletSettings(Region mMaxRegion, boolean allCurrencies) {
+	public record WalletSettings(Region mMaxRegion, boolean allCurrencies) {
 	}
 
 	private static final WalletSettings MAX_SETTINGS = new WalletSettings(Region.RING, true);
@@ -184,10 +185,10 @@ public class WalletManager implements Listener {
 
 	private static final Map<UUID, Wallet> mWallets = new HashMap<>();
 
-	private static class CompressionInfo {
-		private final ItemStack mCompressed;
-		private final ItemStack mBase;
-		private final int mAmount;
+	public static class CompressionInfo {
+		public final ItemStack mCompressed;
+		public final ItemStack mBase;
+		public final int mAmount;
 
 		CompressionInfo(ItemStack compressed, ItemStack base, int amount) {
 			mCompressed = compressed;
@@ -917,7 +918,7 @@ public class WalletManager implements Listener {
 		return false;
 	}
 
-	private static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
+	public static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
 		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
 			if (compressionInfo.mCompressed.isSimilar(item)) {
 				return compressionInfo;
@@ -926,8 +927,27 @@ public class WalletManager implements Listener {
 		return null;
 	}
 
+	public static @Nullable CompressionInfo getAsMaxUncompressed(ItemStack item) {
+
+		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
+			if (compressionInfo.mCompressed.isSimilar(item)) {
+				WalletManager.CompressionInfo finalInfo = new WalletManager.CompressionInfo(item.asOne(), item.asOne(), item.getAmount());
+
+				WalletManager.CompressionInfo info = WalletManager.getCompressionInfo(item);
+				while (info != null) {
+					finalInfo = new WalletManager.CompressionInfo(item, info.mBase.asOne(), finalInfo.mAmount * info.mAmount);
+					info = WalletManager.getCompressionInfo(info.mBase);
+				}
+
+				return finalInfo;
+			}
+		}
+
+		return null;
+	}
+
 	@Contract("null -> null")
-	private static @Nullable WalletManager.WalletSettings getSettings(@Nullable ItemStack item) {
+	public static @Nullable WalletManager.WalletSettings getSettings(@Nullable ItemStack item) {
 		return item == null ? null : WALLET_SETTINGS.get(ItemUtils.getIdentifier(item, false));
 	}
 
@@ -969,6 +989,56 @@ public class WalletManager implements Listener {
 				throw e;
 			}
 		}
+	}
+
+	/**
+	 * Give a player a currency ItemStack, with an option to notify them.
+	 * If the player has a wallet, add it to the wallet. If not, add it to the inventory.
+	 * If the inventory is full, we drop it on the ground.
+	 * If <code>notify</code> is <code>true</code>, the player will receive a message informing them of the addition.
+	 * @see InventoryUtils#playerHasWalletItem(Player)
+	 * @see InventoryUtils#giveItemWithStacksizeCheck(Player, ItemStack)
+	 *
+	 * @param player The player to give the currency to.
+	 * @param item The currency item.
+	 * @param notify Whether to send the player a message about it aswell.
+	 */
+	public static void giveCurrencyToPlayer(final Player player, ItemStack item, boolean notify) {
+		if (!WalletManager.isCurrency(item)) {
+			MMLog.warning("Attempted to give non-currency item " + item + " to player " + player.getName());
+			return;
+		}
+		int amount = item.getAmount();
+		if (notify) {
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		}
+		ItemStack walletItem = playerGetWalletItem(player);
+		if (walletItem != null) {
+			WalletSettings settings = getSettings(walletItem);
+			if (settings != null && WalletManager.canPutIntoWallet(item, settings)) {
+				if (notify) {
+					player.sendMessage(Component.text(item.getAmount() + " item" + (amount == 1 ? "" : "s") + " deposited into your wallet.", NamedTextColor.GOLD)
+						.hoverEvent(HoverEvent.showText(Component.text(amount + " " + ItemUtils.getPlainNameOrDefault(item), NamedTextColor.GRAY))));
+				}
+				WalletManager.getWallet(player).add(player, item); // this method sets the count of the item to 0, so we need to do it after notifying.
+				return;
+			}
+		}
+		InventoryUtils.giveItemWithStacksizeCheck(player, item);
+		if (notify) {
+			player.sendMessage(Component.text("Given ", NamedTextColor.GREEN).append(Component.text(amount + " " + ItemUtils.getPlainNameOrDefault(item) + ".", NamedTextColor.WHITE)));
+		}
+
+	}
+
+	@Nullable
+	public static ItemStack playerGetWalletItem(final Player player) {
+		for (ItemStack item : player.getInventory().getContents()) {
+			if (WalletManager.isWallet(item)) {
+				return item;
+			}
+		}
+		return null;
 	}
 
 }

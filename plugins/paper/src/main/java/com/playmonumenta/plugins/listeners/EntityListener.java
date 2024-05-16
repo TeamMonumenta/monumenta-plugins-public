@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.infusions.Quench;
 import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -639,6 +640,7 @@ public class EntityListener implements Listener {
 			if (entity instanceof Player player) {
 				double distance = Math.min(player.getLocation().distance(event.getEntity().getLocation()), player.getEyeLocation().distance(event.getEntity().getLocation()));
 				distance = Math.min(Math.max(-0.1 * distance + 1, 0), 1);
+				distance *= Quench.getDurationScaling(mPlugin, player);
 				ItemStatUtils.changeEffectsDurationSplash(player, item, distance);
 			}
 		}
@@ -1001,13 +1003,6 @@ public class EntityListener implements Listener {
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
 		if (event.getEntity() instanceof Mob mob) {
 			NmsUtils.getVersionAdapter().mobAIChanges(mob);
-		}
-
-		if (event.getEntity().getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD) && event.getEntity().getTicksLived() > 20) {
-			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
-			Entity entity = event.getEntity();
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), entity::remove);
-			return;
 		}
 
 		if (event.getEntity() instanceof IronGolem golem) {

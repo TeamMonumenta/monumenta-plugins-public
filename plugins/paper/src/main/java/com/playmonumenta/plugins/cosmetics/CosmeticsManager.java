@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
+import com.playmonumenta.plugins.cosmetics.finishers.PlayingFinisher;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -39,10 +40,10 @@ public class CosmeticsManager implements Listener {
 
 	public static final CosmeticsManager INSTANCE = new CosmeticsManager();
 
-	public Map<UUID, List<Cosmetic>> mPlayerCosmetics;
+	public final Map<UUID, List<Cosmetic>> mPlayerCosmetics = new HashMap<>();
+	public final Map<UUID, PlayingFinisher> mPlayingFinishers = new HashMap<>();
 
 	private CosmeticsManager() {
-		mPlayerCosmetics = new HashMap<>();
 	}
 
 	public static CosmeticsManager getInstance() {
@@ -291,6 +292,20 @@ public class CosmeticsManager implements Listener {
 		return "";
 	}
 
+	public void registerPlayingFinisher(PlayingFinisher playingFinisher) {
+		PlayingFinisher lastFinisher = mPlayingFinishers.put(playingFinisher.playerUuid(), playingFinisher);
+		if (lastFinisher != null) {
+			lastFinisher.cancel();
+		}
+	}
+
+	public void cancelPlayingFinisher(Player player) {
+		PlayingFinisher playingFinisher = mPlayingFinishers.remove(player.getUniqueId());
+		if (playingFinisher != null) {
+			playingFinisher.cancel();
+		}
+	}
+
 	//Handlers for player lifecycle events
 
 	//Discard cosmetic data a few ticks after player leaves shard
@@ -298,6 +313,9 @@ public class CosmeticsManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onQuit(PlayerQuitEvent event) {
 		Player p = event.getPlayer();
+
+		cancelPlayingFinisher(p);
+
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			if (!p.isOnline()) {
 				mPlayerCosmetics.remove(p.getUniqueId());
@@ -360,7 +378,7 @@ public class CosmeticsManager implements Listener {
 					}
 				}
 				//Check if we actually loaded any cosmetics
-				if (playerCosmetics.size() > 0) {
+				if (!playerCosmetics.isEmpty()) {
 					mPlayerCosmetics.put(p.getUniqueId(), playerCosmetics);
 				}
 			}
@@ -377,6 +395,12 @@ public class CosmeticsManager implements Listener {
 		Player player = mob.getKiller();
 
 		if (player != null && EntityUtils.isElite(mob)) {
+			PlayingFinisher playingFinisher = mPlayingFinishers.get(player.getUniqueId());
+			if (playingFinisher != null) {
+				playingFinisher.registerKill(mob, mob.getLocation());
+				return;
+			}
+
 			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getRandomActiveCosmetic(player, CosmeticType.ELITE_FINISHER);
 			if (activeCosmetic != null) {
 				EliteFinishers.activateFinisher(player, mob, mob.getLocation(), activeCosmetic.getName());

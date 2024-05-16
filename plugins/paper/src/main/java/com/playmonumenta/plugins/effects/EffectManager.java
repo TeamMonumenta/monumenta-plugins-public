@@ -163,6 +163,17 @@ public final class EffectManager implements Listener {
 			return effects;
 		}
 
+		// Gets ONLY active effects, but in EffectPair format.
+		public List<EffectPair> getEffectPairs() {
+			List<EffectPair> effects = new ArrayList<>();
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (Map.Entry<String, NavigableSet<Effect>> entry : priorityEffects.entrySet()) {
+					effects.add(new EffectPair(entry.getKey(), entry.getValue().last()));
+				}
+			}
+			return effects;
+		}
+
 		// Gets ALL effects, including non-active, hidden ones.
 		public List<EffectPair> getAllEffectPairs() {
 			List<EffectPair> effects = new ArrayList<>();
@@ -321,7 +332,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
 		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);
 		mEffectDeserializer.put(JudgementChainMobEffect.effectID, JudgementChainMobEffect::deserialize);
-		mEffectDeserializer.put(JudgementChainPlayerEffect.effectID, JudgementChainPlayerEffect::deserialize);
 		mEffectDeserializer.put(LichCurseEffect.effectId, LichCurseEffect::deserialize);
 		mEffectDeserializer.put(NegateDamage.effectID, NegateDamage::deserialize);
 		mEffectDeserializer.put(OnHitTimerEffect.effectID, OnHitTimerEffect::deserialize);
@@ -356,8 +366,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
 		mEffectDeserializer.put(UnstableAmalgamDisable.effectID, UnstableAmalgamDisable::deserialize);
 		mEffectDeserializer.put(VengefulTag.effectID, VengefulTag::deserialize);
+		mEffectDeserializer.put(VoodooBondsCurse.effectID, VoodooBondsCurse::deserialize);
 		mEffectDeserializer.put(VoodooBondsOtherPlayer.effectID, VoodooBondsOtherPlayer::deserialize);
-		mEffectDeserializer.put(VoodooBondsReaper.effectID, VoodooBondsReaper::deserialize);
 		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
 		mEffectDeserializer.put(ColoredGlowingEffect.effectID, ColoredGlowingEffect::deserialize);
 		mEffectDeserializer.put(FishQualityIncrease.effectID, FishQualityIncrease::deserialize);
@@ -378,6 +388,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(SiriusContagion.effectID, SiriusContagion::deserialize);
 		mEffectDeserializer.put(SiriusSetTargetEffect.effectID, SiriusSetTargetEffect::deserialize);
 		mEffectDeserializer.put(TemporalFlux.effectID, TemporalFlux::deserialize);
+		mEffectDeserializer.put(CholericFlamesAntiHeal.effectID, CholericFlamesAntiHeal::deserialize);
+		mEffectDeserializer.put(SoulRendLifeSteal.effectID, SoulRendLifeSteal::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -580,6 +592,15 @@ public final class EffectManager implements Listener {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects();
+		} else {
+			return null;
+		}
+	}
+
+	public @Nullable List<EffectPair> getEffectPairs(Entity entity) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getEffectPairs();
 		} else {
 			return null;
 		}

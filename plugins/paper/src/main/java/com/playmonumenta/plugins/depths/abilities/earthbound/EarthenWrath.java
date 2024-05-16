@@ -257,7 +257,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	private static Description<EarthenWrath> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<EarthenWrath>(color)
-			.add("Swap hands while to redirect all damage allies in a ")
+			.add("Swap hands to redirect all damage allies in a ")
 			.add(a -> a.mTransferRadius, TRANSFER_RADIUS)
 			.add(" block radius take from mobs (excluding percent health damage) to you at a ")
 			.addPercent(a -> a.mDamageReduction, PERCENT_DAMAGE_REDUCTION[rarity - 1], false, true)

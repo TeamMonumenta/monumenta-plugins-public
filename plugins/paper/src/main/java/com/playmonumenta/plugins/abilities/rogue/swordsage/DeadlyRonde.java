@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
-import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.DeadlyRondeCS;
@@ -18,7 +17,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -67,7 +68,6 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			.displayItem(Material.BLAZE_ROD);
 
 	private @Nullable BukkitRunnable mActiveRunnable = null;
-	private @Nullable AdvancingShadows mAdvancingShadows;
 	private int mRondeStacks = 0;
 
 	private final double mDamage;
@@ -81,10 +81,6 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, RONDE_KNOCKBACK_SPEED);
 		mMaxStacks = (int) ((isLevelOne() ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS) + CharmManager.getLevel(mPlayer, CHARM_STACKS));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DeadlyRondeCS());
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAdvancingShadows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AdvancingShadows.class);
-		});
 	}
 
 	@Override
@@ -187,4 +183,22 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		return mMaxStacks;
 	}
 
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+		return output;
+	}
 }

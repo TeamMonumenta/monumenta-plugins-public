@@ -9,7 +9,8 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -82,6 +83,6 @@ public class GenericCommand {
 	}
 
 	protected static void error(CommandSender sender, String msg) {
-		sender.sendMessage(ChatColor.RED + msg);
+		sender.sendMessage(Component.text(msg, NamedTextColor.RED));
 	}
 }

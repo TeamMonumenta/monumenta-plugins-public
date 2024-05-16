@@ -19,6 +19,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -175,4 +177,27 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		return MAX_BUFFS;
 	}
 
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		ClassAbility classAbility = INFO.getLinkedSpell();
+		int remainingCooldown = classAbility == null ? 0 : mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), classAbility);
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		if (remainingCooldown > 0) {
+			output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GOLD));
+		} else {
+			output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+		}
+		return output;
+	}
 }

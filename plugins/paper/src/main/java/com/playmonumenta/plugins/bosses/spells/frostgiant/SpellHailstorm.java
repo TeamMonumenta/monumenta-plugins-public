@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -22,8 +23,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +33,9 @@ import org.jetbrains.annotations.Nullable;
  3 for 2 seconds.
  */
 public class SpellHailstorm extends Spell {
+	private static final String SPELL_NAME = "Hailstorm";
+	private static final String SLOWNESS_SRC = "HailstormSlowness";
+	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
 
 	//Used when the boss teleports, prevent from doing damage
 	private boolean mDoDamage = true;
@@ -50,7 +52,6 @@ public class SpellHailstorm extends Spell {
 
 	private @Nullable BukkitRunnable mDelay;
 
-	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
 
 	public SpellHailstorm(Plugin plugin, LivingEntity boss, double radius, Location start) {
 		mBoss = boss;
@@ -131,9 +132,10 @@ public class SpellHailstorm extends Spell {
 
 							if (pLocY.distanceSquared(loc) > mRadius * mRadius && mDoDamage) {
 								Vector vel = player.getVelocity();
-								BossUtils.bossDamagePercent(mBoss, player, 0.15, "Hailstorm");
+								BossUtils.bossDamagePercent(mBoss, player, 0.15, SPELL_NAME);
 								player.setVelocity(vel);
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 0));
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+									new PercentSpeed(20 * 2, -0.15, SLOWNESS_SRC));
 							} else {
 								mDamage.remove(player);
 								this.cancel();
@@ -147,7 +149,7 @@ public class SpellHailstorm extends Spell {
 				mDamage.put(player, runnable);
 
 				if (!mWarned.contains(player)) {
-					player.sendMessage(Component.text("The Hailstorm is freezing! Move closer to the Giant!", NamedTextColor.DARK_RED));
+					player.sendMessage(Component.text("The " + SPELL_NAME + " is freezing! Move closer to the Giant!", NamedTextColor.DARK_RED));
 					mWarned.add(player);
 				}
 			}

@@ -8,6 +8,7 @@ public class StarBlight extends FlatHealthBoost {
 
 	public StarBlight(int duration, double amount, String modifierName) {
 		super(duration, amount, modifierName);
+		deleteOnLogout(true);
 	}
 
 	@Override

@@ -27,11 +27,11 @@ public class IchorSteelsage implements Infusion {
 	private static final double DAMAGE = 0.08;
 	private static final int JUMP_DURATION = 6 * 20;
 	private static final int EFFECT_DURATION = 8 * 20;
-	public static final String DESCRIPTION = String.format("Gain +%s Jump Boost for %s seconds if you currently have jump boost, additionally gain %s%% projectile damage while in midair for %s seconds. Cooldown: %s seconds.",
-		JUMP_AMPLIFIER,
-		StringUtils.ticksToSeconds(JUMP_DURATION),
+	public static final String DESCRIPTION = String.format("Gain %s%% projectile damage while in midair for %s seconds, additionally if you have Jump Boost, gain current level +%s Jump Boost for %s seconds. Cooldown: %s seconds.",
 		StringUtils.multiplierToPercentage(DAMAGE),
 		StringUtils.ticksToSeconds(EFFECT_DURATION),
+		JUMP_AMPLIFIER,
+		StringUtils.ticksToSeconds(JUMP_DURATION),
 		StringUtils.ticksToSeconds(COOLDOWN)
 	);
 

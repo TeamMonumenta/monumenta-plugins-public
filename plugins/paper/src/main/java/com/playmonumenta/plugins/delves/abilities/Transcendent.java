@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -104,9 +105,9 @@ public class Transcendent {
 
 	public static final String DESCRIPTION = "Elites become greatly empowered.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"Elites have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to be Transcendent."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("Elites have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to be Transcendent.")
 		};
 	}
 

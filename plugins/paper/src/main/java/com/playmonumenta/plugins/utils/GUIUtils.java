@@ -4,6 +4,7 @@ import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,12 +34,14 @@ public class GUIUtils {
 	public static final ItemStack FILLER = createFiller();
 
 	private static ItemStack createFiller() {
-		ItemStack filler = new ItemStack(FILLER_MATERIAL, 1);
-		createFiller(filler);
-		return filler;
+		return createFiller(FILLER_MATERIAL);
 	}
 
-	public static void createFiller(ItemStack filler) {
+	public static ItemStack createFiller(Material filler) {
+		return createFiller(new ItemStack(filler));
+	}
+
+	public static ItemStack createFiller(ItemStack filler) {
 		NBT.modify(filler, nbt -> {
 			nbt.modifyMeta((nbtr, meta) -> {
 				meta.displayName(Component.empty());
@@ -46,6 +49,7 @@ public class GUIUtils {
 			setPlaceholder(nbt);
 			setFiller(nbt);
 		});
+		return filler;
 	}
 
 	public static ItemStack createConfirm(@Nullable List<Component> lore) {
@@ -64,9 +68,13 @@ public class GUIUtils {
 	}
 
 	public static ItemStack createCancel(@Nullable List<Component> lore) {
+		return createCancel(Component.text("Cancel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true), lore);
+	}
+
+	public static ItemStack createCancel(Component displayName, @Nullable List<Component> lore) {
 		ItemStack cancel = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
 		ItemMeta meta = cancel.getItemMeta();
-		meta.displayName(Component.text("Cancel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		meta.displayName(displayName);
 		if (lore != null) {
 			meta.lore(lore);
 		}
@@ -139,11 +147,15 @@ public class GUIUtils {
 				if (currentLine.length() > 0 && currentLine.charAt(currentLine.length() - 1) == ' ') {
 					currentLine.setLength(currentLine.length() - 1);
 				}
-				String lastColor = findLastColor(currentLine.toString());
-				finalMinis.add(currentLine.toString());
+				String lineToAdd = currentLine.toString();
+				finalMinis.add(lineToAdd);
 				currentLine.setLength(0);
-				if (lastColor != null) {
-					currentLine.append(lastColor);
+
+				// Add any unclosed minimessage formatting to the start of the next line, in the same order
+				List<String> lingeringFormatting = findOpenFormatting(lineToAdd);
+				Collections.reverse(lingeringFormatting);
+				for (String format : lingeringFormatting) {
+					currentLine.insert(0, format);
 				}
 			}
 			if (newline) {
@@ -164,17 +176,20 @@ public class GUIUtils {
 			.toList();
 	}
 
-	private static @Nullable String findLastColor(String mini) {
+	private static List<String> findOpenFormatting(String mini) {
 		String pattern = "<.+?>";
 		Matcher matcher = Pattern.compile(pattern).matcher(mini);
-		String match = null;
+		List<String> formats = new ArrayList<>();
 		while (matcher.find()) {
-			match = matcher.group();
+			String match = matcher.group();
+			if (!match.contains("/")) {
+				formats.add(match);
+			} else {
+				String openMatch = match.replace("/", "");
+				formats.removeIf(openMatch::equals);
+			}
 		}
-		if (match == null || match.contains("/")) {
-			return null;
-		}
-		return match;
+		return formats;
 	}
 
 	private static Component fixLoreFormatting(Component c) {
@@ -253,7 +268,23 @@ public class GUIUtils {
 		return createBasicItem(new ItemStack(mat, amount), amount, name, desc, setPlainTag);
 	}
 
+	public static ItemStack createBasicItem(Material mat, Component name) {
+		return createBasicItem(mat, name, null);
+	}
+
+	public static ItemStack createBasicItem(Material mat, Component name, @Nullable String displayPlainTagValue) {
+		return createBasicItem(mat, 1, name, new ArrayList<>(), true, displayPlainTagValue);
+	}
+
+	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<Component> desc, boolean setPlainTag, @Nullable String displayPlainTagValue) {
+		return createBasicItem(new ItemStack(mat, amount), amount, name, desc, setPlainTag, displayPlainTagValue);
+	}
+
 	public static ItemStack createBasicItem(ItemStack base, int amount, Component name, List<Component> desc, boolean setPlainTag) {
+		return createBasicItem(base, amount, name, desc, setPlainTag, null);
+	}
+
+	public static ItemStack createBasicItem(ItemStack base, int amount, Component name, List<Component> desc, boolean setPlainTag, @Nullable String displayPlainTagValue) {
 		ItemStack item = ItemUtils.clone(base);
 		item.setAmount(amount);
 		ItemMeta meta = item.getItemMeta();
@@ -265,10 +296,20 @@ public class GUIUtils {
 			ItemUtils.setPlainTag(item);
 		}
 		setPlaceholder(item);
+		if (displayPlainTagValue != null && !displayPlainTagValue.isEmpty()) {
+			setDisplayPlainTag(item, displayPlainTagValue);
+		}
 		return item;
 	}
 
-	private static Component formatName(String name, TextColor nameColor, boolean nameBold) {
+	private static void setDisplayPlainTag(ItemStack icon, String value) {
+		ItemUtils.setPlainTag(icon);
+		NBT.modify(icon, nbt -> {
+			nbt.getOrCreateCompound("plain").getOrCreateCompound("display").setString("Name", value);
+		});
+	}
+
+	public static Component formatName(String name, TextColor nameColor, boolean nameBold) {
 		return Component.text(name, nameColor)
 			       .decoration(TextDecoration.ITALIC, false)
 			       .decoration(TextDecoration.BOLD, nameBold);
@@ -355,18 +396,10 @@ public class GUIUtils {
 		}
 	}
 
-	public static ItemStack createItemPlaceholder(ItemStack item) {
-		ItemStack placeholder = item.clone();
-		placeholder.lore(List.of());
-		setPlaceholder(placeholder);
-		return placeholder;
-	}
-
 	public static void setSkullOwner(ItemStack item, OfflinePlayer player) {
 		if (item.getItemMeta() instanceof SkullMeta skullMeta) {
 			skullMeta.setOwningPlayer(player);
 			item.setItemMeta(skullMeta);
 		}
 	}
-
 }

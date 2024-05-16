@@ -69,7 +69,7 @@ public class SpellSalientOfDecay extends Spell {
 			targets = players;
 		} else {
 			Collections.shuffle(players);
-			targets = players.subList(0, (int) Math.min(players.size(), Math.max(2, Math.min(CAP, Math.ceil(players.size() / 3)))));
+			targets = players.subList(0, (int) Math.min(players.size(), Math.max(2, Math.min(CAP, (players.size() + 2) / 3))));
 		}
 
 		BukkitRunnable runA = new BukkitRunnable() {

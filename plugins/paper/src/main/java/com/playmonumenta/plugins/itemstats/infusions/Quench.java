@@ -3,9 +3,7 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.PotionSplashEvent;
 
 public class Quench implements Infusion {
 
@@ -19,13 +17,6 @@ public class Quench implements Infusion {
 	@Override
 	public InfusionType getInfusionType() {
 		return InfusionType.QUENCH;
-	}
-
-	@Override
-	public void onPlayerPotionSplash(Plugin plugin, Player player, double value, PotionSplashEvent event) {
-		double distance = Math.min(player.getLocation().distance(event.getEntity().getLocation()), player.getEyeLocation().distance(event.getEntity().getLocation()));
-		distance = Math.min(Math.max(-0.1 * distance + 1, 0), 1);
-		ItemStatUtils.changeEffectsDurationSplash(player, event.getPotion().getItem(), distance * getDurationScaling(plugin, player));
 	}
 
 	public static double getDurationScaling(Plugin plugin, Player player) {

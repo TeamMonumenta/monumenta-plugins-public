@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins;
 
+import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
+import com.playmonumenta.plugins.discoveries.DiscoveryManager;
 import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.explosions.ExplosionManager;
@@ -29,10 +31,23 @@ import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
-import com.playmonumenta.plugins.integrations.*;
+import com.playmonumenta.plugins.integrations.ChestSortIntegration;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
-import com.playmonumenta.plugins.inventories.*;
+import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
+import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
+import com.playmonumenta.plugins.inventories.LootChestsInInventory;
+import com.playmonumenta.plugins.inventories.PlayerInventoryView;
+import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
@@ -41,7 +56,11 @@ import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.managers.DataCollectionManager;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
+import com.playmonumenta.plugins.managers.PlayerSkinManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
+import com.playmonumenta.plugins.market.MarketCommands;
+import com.playmonumenta.plugins.market.MarketListener;
+import com.playmonumenta.plugins.market.MarketManager;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.minigames.pzero.PzeroManager;
 import com.playmonumenta.plugins.mmquest.commands.MMQuest;
@@ -213,6 +232,7 @@ public class Plugin extends JavaPlugin {
 		DeathMsg.register();
 		DebugInfo.register(this);
 		DelvesCommands.register(this);
+		DiscoveryCommand.register();
 		DungeonAccessCommand.register();
 		EffectFromPotionCommand.register(this);
 		Effect.register(this);
@@ -230,6 +250,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatCommands.registerCharmCommand();
 		ItemStatCommands.registerColorCommand();
 		ItemStatCommands.registerConsumeCommand();
+		ItemStatCommands.registerDelveInfusionTypeCommand();
 		ItemStatCommands.registerEnchCommand();
 		ItemStatCommands.registerFishCommand();
 		ItemStatCommands.registerInfoCommand();
@@ -239,6 +260,7 @@ public class Plugin extends JavaPlugin {
 		JingleBells.register();
 		Launch.register();
 		LoadoutManagerCommand.register();
+		MarketCommands.register();
 		MMQuest.register(this);
 		MonumentaDebug.register(this);
 		MonumentaReload.register(this);
@@ -253,6 +275,7 @@ public class Plugin extends JavaPlugin {
 		ParticlesCommand.register();
 		PersistentDataCommand.register();
 		PickLevelAfterAnvils.register();
+		Ping.register();
 		PlayerCommand.register(this);
 		PlayerItemStatsGUICommand.register(this);
 		Portal1.register();
@@ -261,6 +284,7 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this);
 		RefreshClass.register(this);
 		RegisterTorch.register();
+		RepairItemCommand.register();
 		RemoveTags.register();
 		RenameItemCommand.register();
 		ResetClass.register(this);
@@ -301,6 +325,9 @@ public class Plugin extends JavaPlugin {
 		BlockDisplayCommand.register();
 		AddSpawnerEffectMarkersCommand.register();
 		SiriusNPCBoss.register();
+		EffectListCommand.register();
+		PlayerSkinManagerCommand.register();
+		ScanMobsCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -346,7 +373,7 @@ public class Plugin extends JavaPlugin {
 			obj = scoreboard.registerNewObjective("const", Criteria.DUMMY, Component.text("const"));
 		}
 		obj.getScore("$IsPlay").setScore(IS_PLAY_SERVER ? 1 : 0);
-		getLogger().info("Setting $IsPlay const = " + Integer.toString(IS_PLAY_SERVER ? 1 : 0) + " (" + (IS_PLAY_SERVER ? "play" : "build") + " server)");
+		getLogger().info("Setting $IsPlay const = " + (IS_PLAY_SERVER ? 1 : 0) + " (" + (IS_PLAY_SERVER ? "play" : "build") + " server)");
 
 		PluginManager manager = getServer().getPluginManager();
 
@@ -385,6 +412,7 @@ public class Plugin extends JavaPlugin {
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
+		new AbilityHotbar(this);
 
 		PlayerSaturationTracker.startTracking(this);
 
@@ -397,6 +425,8 @@ public class Plugin extends JavaPlugin {
 
 		//  Load info.
 		reloadMonumentaConfig(null);
+
+		MarketManager.reloadConfig();
 
 		// Chunk loading/unloading helper
 		manager.registerEvents(new ChunkManager(this), this);
@@ -490,8 +520,11 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PotionBarrelListener(), this);
 		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
 		manager.registerEvents(new TorchListener(), this);
+		manager.registerEvents(new MarketListener(), this);
 		manager.registerEvents(mPzeroManager, this);
+		manager.registerEvents(new Lockdown(), this);
 		manager.registerEvents(new IchorListener(), this);
+		manager.registerEvents(new DiscoveryManager(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);
@@ -575,6 +608,13 @@ public class Plugin extends JavaPlugin {
 					e.printStackTrace();
 				}
 
+				// Updates related to discoveries
+				try {
+					DiscoveryManager.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 				mTicks = (mTicks + 1) % Constants.TICKS_PER_SECOND;
 			}
 		}, 0L, 1L);
@@ -605,6 +645,11 @@ public class Plugin extends JavaPlugin {
 			LibraryOfSoulsIntegration.enable(this.getLogger());
 		}
 
+		// Enable Monumenta Network Chat integration
+		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaNetworkChat")) {
+			MonumentaNetworkChatIntegration.onEnable(this.getLogger());
+		}
+
 		// Provide placeholder API replacements if it is present
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
 			new PlaceholderAPIIntegration(this).register();
@@ -617,7 +662,7 @@ public class Plugin extends JavaPlugin {
 
 		// Register luckperms commands if LuckPerms is present
 		if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
-			LuckPermsIntegration.enable(this);
+			manager.registerEvents(new LuckPermsIntegration(this), this);
 		}
 
 		// Hook into PremiumVanish if present
@@ -627,6 +672,8 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into ProtocolLib if present
 		if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+			// load skins before this
+			new PlayerSkinManager();
 			mProtocolLibIntegration = new ProtocolLibIntegration(this);
 			if (Bukkit.getPluginManager().isPluginEnabled("PrometheusExporter")) {
 				PacketMonitoringCommand.register(this);

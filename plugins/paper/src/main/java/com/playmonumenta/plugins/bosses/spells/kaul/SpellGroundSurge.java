@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -24,8 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -51,8 +50,9 @@ public class SpellGroundSurge extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		mBoss.removePotionEffect(PotionEffectType.SLOW);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (20 * 2.75), 1));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+			new BaseMovementSpeedModifyEffect((int) (20 * 2.75), -0.3));
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		BukkitRunnable runnable = new BukkitRunnable() {

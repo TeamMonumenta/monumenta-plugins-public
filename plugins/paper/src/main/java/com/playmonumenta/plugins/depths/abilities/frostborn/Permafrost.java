@@ -72,7 +72,7 @@ public class Permafrost extends DepthsAbility {
 	public static void onSpawnerBreak(Player player, Block spawner, int iceDuration, double radius, int trailDuration, int trailIceDuration) {
 		Block block = spawner.getRelative(BlockFace.DOWN);
 		if (block.isSolid() || block.getType() == Material.WATER) {
-			DepthsUtils.spawnIceTerrain(block.getLocation(), iceDuration, player);
+			DepthsUtils.spawnIceTerrain(block, iceDuration, player);
 		}
 
 		ArrayList<Block> blocksToIce = new ArrayList<>();

@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +27,12 @@ public class FishedUpFinisher implements EliteFinisher {
 	private static final Particle.DustOptions REEL_COLOR = new Particle.DustOptions(Color.fromRGB(83, 83, 83), 1.5f);
 	private static final float RADIUS = 1f;
 
-	@Override public void run(Player p, Entity killedMob, Location loc) {
+	@Override
+	public void run(Player p, Entity killedMob, Location loc) {
+		if (!(killedMob instanceof LivingEntity le)) {
+			return;
+		}
+
 		Location mEyeLoc = p.getEyeLocation();
 		Vector mDirection = mEyeLoc.getDirection();
 		Vector mLookDirection = new Vector(mDirection.getX(), 0, mDirection.getZ()).normalize();
@@ -50,15 +57,10 @@ public class FishedUpFinisher implements EliteFinisher {
 			@Override public void run() {
 				if (mTicks == 0) {
 					mFishingRodTopLocation.getWorld().playSound(mFishingRodTopLocation, Sound.ENTITY_FISHING_BOBBER_THROW, 2, 1);
-					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EntityUtils.copyMob((LivingEntity) killedMob);
-					mClonedKilledMob.setHealth(1);
-					mClonedKilledMob.setInvulnerable(true);
-					mClonedKilledMob.setGravity(false);
-					mClonedKilledMob.setCollidable(false);
-					mClonedKilledMob.setAI(false);
-					mClonedKilledMob.addScoreboardTag("SkillImmune");
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
+					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "fishedfinisher", NamedTextColor.DARK_BLUE)
+						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 				}
 				new PPLine(Particle.REDSTONE, mFishingRodTopLocation, mHookLocation).data(LINE_COLOR).count(15).spawnAsPlayerActive(p);
 				if (mTicks < 20) {

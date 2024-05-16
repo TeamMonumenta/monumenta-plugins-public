@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -40,7 +42,8 @@ Players below 25% max health when the additional damage is dealt are instead kil
  */
 public class SpellDesecrate extends Spell {
 	private static final String SPELL_NAME = "Desecrate";
-
+	private static final String SLOWNESS_SRC = "DesecrateSlowness";
+	private static final String WEAKNESS_SRC = "DesecrateWeakness";
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final ChargeUpManager mChargeUp;
@@ -95,9 +98,11 @@ public class SpellDesecrate extends Spell {
 					for (Player player : players) {
 						mSmoke.location(player.getLocation()).spawnAsBoss();
 						mWitch.location(player.getLocation().add(0, 1, 0)).spawnAsBoss();
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 6));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+							new PercentSpeed(20 * 3, -1.0, SLOWNESS_SRC));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
+							new PercentDamageDealt(20 * 3, -1.0));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 3, -10));
-						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 10));
 						AbilityUtils.silencePlayer(player, 3 * 20);
 						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 15, null, false, true, "Desecrate");
 						MovementUtils.knockAway(mBoss.getLocation(), player, 0.1f, false);

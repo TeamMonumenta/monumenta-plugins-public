@@ -11,8 +11,9 @@ import org.bukkit.entity.Player;
 
 public class PermafrostMark extends Effect {
 	public static final String effectID = "PermafrostMark";
-	private int mIceTicks;
-	private Player mPlayer;
+	private final int mIceTicks;
+	private final Player mPlayer;
+
 
 	public PermafrostMark(int iceTicks, int duration, Player player) {
 		super(duration, effectID);

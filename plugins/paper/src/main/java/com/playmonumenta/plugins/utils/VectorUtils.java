@@ -185,4 +185,21 @@ public class VectorUtils {
 		return result;
 	}
 
+	// Converts a vector to the nearest of North, East, South, or West
+	public static Vector nearestCardinalDirection(Vector direction) {
+		// Ensure this is a unit vector
+		direction = direction.clone().normalize();
+		if (Math.abs(direction.getX()) > Math.abs(direction.getZ())) {
+			// EW
+			return new Vector(direction.getX() < 0 ? -1 : 1, 0, 0);
+		} else {
+			// NS
+			return new Vector(0, 0, direction.getZ() < 0 ? -1 : 1);
+		}
+	}
+
+	public static Vector swapXZAxes(Vector direction) {
+		return new Vector(direction.getZ(), direction.getY(), direction.getX());
+	}
+
 }

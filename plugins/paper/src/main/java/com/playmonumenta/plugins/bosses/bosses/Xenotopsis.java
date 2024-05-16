@@ -6,7 +6,13 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
-import com.playmonumenta.plugins.bosses.spells.xenotopsis.*;
+import com.playmonumenta.plugins.bosses.spells.xenotopsis.ChargedDeath;
+import com.playmonumenta.plugins.bosses.spells.xenotopsis.DarkRetaliation;
+import com.playmonumenta.plugins.bosses.spells.xenotopsis.DeathTouchedBlade;
+import com.playmonumenta.plugins.bosses.spells.xenotopsis.DeathlyBombs;
+import com.playmonumenta.plugins.bosses.spells.xenotopsis.FearfulSouls;
+import com.playmonumenta.plugins.bosses.spells.xenotopsis.GhostlyFlames;
+import com.playmonumenta.plugins.bosses.spells.xenotopsis.UmbralCannons;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryGame;
@@ -235,8 +241,6 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 		});
 
 		new BukkitRunnable() {
-			int mTicks = 0;
-
 			@Override
 			public void run() {
 				// decrease all player's death values depending on range, if they have not been hit in the past two seconds
@@ -277,9 +281,11 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 				if (PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).size() == 0) {
 					sendWorldDialogueMessage("DEATH'S HAND HAS ENSNARED YOU IN ITS GRASP. SINK BELOW THE WAVES, LIKE ALL THOSE WHO CAME BEFORE YOU THAT DARE ATTEMPT TO DEFY IT");
 					mBoss.remove();
+					this.cancel();
+					mDeathBossBars.keySet().forEach(player -> player.hideBossBar(mDeathBossBars.get(player)));
+					return;
 				}
 
-				mTicks++;
 				if (mBoss.isDead()) {
 					this.cancel();
 					mDeathBossBars.keySet().forEach(player -> player.hideBossBar(mDeathBossBars.get(player)));
@@ -405,7 +411,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 				// kill the player
 				sendDialogueMessageToPlayer(player, "LET YER SOUL BE CONSUMED BY THE ETERNAL MARCH OF DEATH");
 				mMonumentaPlugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
-				mMonumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.EFFECT_NAME);
+				mMonumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
 				PotionEffect resist = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 				if (resist != null && resist.getAmplifier() >= 4) {
 					player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);

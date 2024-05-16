@@ -271,17 +271,20 @@ public class TradeListener implements Listener {
 					to.setItemMeta(toMeta);
 				};
 			} else if (source.getType() == Material.SHIELD) {
-				// Using Bukkit's shield API doesn't work properly 8and doesn't support shields without banners), so edit NBT directly
+				// Using Bukkit's shield API doesn't work properly and doesn't support shields without banners), so edit NBT directly
 				clearDye = itemStack -> {
-					new NBTItem(itemStack, true).removeKey("BlockEntityTag");
+					NBT.modify(itemStack, nbt -> {
+						nbt.removeKey("BlockEntityTag");
+					});
 				};
 				copyDye = (from, to) -> {
-					NBTItem nbt = new NBTItem(to, true);
-					nbt.removeKey("BlockEntityTag");
-					NBTCompound fromBanner = new NBTItem(from).getCompound("BlockEntityTag");
-					if (fromBanner != null) {
-						nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromBanner);
-					}
+					NBT.modify(to, nbt -> {
+						nbt.removeKey("BlockEntityTag");
+						NBTCompound fromBanner = new NBTItem(from).getCompound("BlockEntityTag");
+						if (fromBanner != null) {
+							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromBanner);
+						}
+					});
 				};
 			} else {
 				continue;

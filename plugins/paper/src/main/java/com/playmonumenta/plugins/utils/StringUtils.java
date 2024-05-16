@@ -2,40 +2,153 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class StringUtils {
+	public static final Pattern UNNATURAL_CHARACTERS_RE = Pattern.compile("[^a-zA-Z0-9]+");
+	public static final TreeMap<Integer, String> TO_ROMAN_MAP = new TreeMap<>();
+	public static final TreeSet<String> NAME_PREFIXES;
+	public static final TreeSet<String> LOWERCASE_NAME_PREFIXES;
+
+	static {
+		TO_ROMAN_MAP.put(1000, "M");
+		TO_ROMAN_MAP.put(900, "CM");
+		TO_ROMAN_MAP.put(500, "D");
+		TO_ROMAN_MAP.put(400, "CD");
+		TO_ROMAN_MAP.put(100, "C");
+		TO_ROMAN_MAP.put(90, "XC");
+		TO_ROMAN_MAP.put(50, "L");
+		TO_ROMAN_MAP.put(40, "XL");
+		TO_ROMAN_MAP.put(10, "X");
+		TO_ROMAN_MAP.put(9, "IX");
+		TO_ROMAN_MAP.put(5, "V");
+		TO_ROMAN_MAP.put(4, "IV");
+		TO_ROMAN_MAP.put(1, "I");
+
+		NAME_PREFIXES = new TreeSet<>(Set.of(
+			// Tlaxan
+			"C'",
+			"R'",
+			"Ta'",
+			"T'",
+			"Z'",
+
+			// English articles
+			"An ",
+			"A ",
+			"The ",
+
+			// English honorifics (wikipedia: https://en.wikipedia.org/wiki/English_honorifics)
+			// Common titles
+			"Master ",
+			"Mr ",
+			"Mr. ",
+			"Mister ", // For some reason not explicitly listed
+			"Miss ",
+			"Mrs ",
+			"Mrs. ",
+			"Ms ",
+			"Ms. ",
+			"Mx ",
+			"Mx. ",
+
+			// Formal titles
+			"Sir ",
+			"Gentleman ",
+			"Sire ",
+			"Mistress ",
+			"Madam ",
+			"Ma'am ",
+			"Dame ",
+			"Lord ",
+			"Baron ",
+			"Viscount ",
+			"Count ",
+			"Earl ",
+			"Marquess ",
+			"Lady ",
+			"Baroness ",
+			"Viscountess ",
+			"Countess ",
+			"Marchioness ",
+			"Esq ",
+			"Excellency ",
+			"His Honor ",
+			"His Honour ",
+			"Her Honor ",
+			"Her Honour ",
+			"The Honorable ",
+			"The Honourable ",
+			"The Right Honorable ",
+			"The Right Honourable ",
+			"The Most Honorable ",
+			"The Most Honourable ",
+
+			// Academic and professional titles
+			"Dr ",
+			"Dr. ",
+			"Doctor ",
+			"Doc ",
+			"PhD ",
+			"Ph.D. ",
+			"MD ",
+			"M.D. ",
+			"Professor ",
+			"Prof ",
+			"Cl ",
+			"SCl ",
+			"Chancellor ",
+			"Vice-Chancellor ",
+			"Principal ",
+			"Vice-Principal ",
+			"President ",
+			"Vice-President ",
+			// "Master ", already listed above
+			"Warden ",
+			"Dean ",
+			"Regent ",
+			"Rector ",
+			"Provost ",
+			"Director ",
+			"Chief Executive ",
+
+			// How are these not listed?
+			"King ",
+			"Queen ",
+			"Duchess "
+		));
+		LOWERCASE_NAME_PREFIXES = NAME_PREFIXES
+			.stream()
+			.map(s -> s.toLowerCase(Locale.ROOT))
+			.collect(Collectors.toCollection(TreeSet::new));
+	}
 
 	public static String toRoman(int number) {
-		TreeMap<Integer, String> romanMap = new TreeMap<>();
-
-		romanMap.put(1000, "M");
-		romanMap.put(900, "CM");
-		romanMap.put(500, "D");
-		romanMap.put(400, "CD");
-		romanMap.put(100, "C");
-		romanMap.put(90, "XC");
-		romanMap.put(50, "L");
-		romanMap.put(40, "XL");
-		romanMap.put(10, "X");
-		romanMap.put(9, "IX");
-		romanMap.put(5, "V");
-		romanMap.put(4, "IV");
-		romanMap.put(1, "I");
-
-		Integer l = romanMap.floorKey(number);
+		Map.Entry<Integer, String> entry = TO_ROMAN_MAP.floorEntry(number);
+		Integer l = entry.getKey();
 		if (l == null) {
-			return "" + number;
+			return String.valueOf(number);
 		}
 		if (l == number) {
-			return "" + romanMap.get(l);
+			return entry.getValue();
 		}
-		return romanMap.get(l) + toRoman(number - l);
+		return entry.getValue() + toRoman(number - l);
 	}
 
 	public static int toArabic(String number) {
@@ -254,5 +367,89 @@ public class StringUtils {
 				return i + "th";
 			}
 		}
+	}
+
+	// Converts full name of certain currency to its short form
+	// e.g. Hyper Crystalline Shard -> HCS
+	public static String getCurrencyShortForm(@Nullable ItemStack currency) {
+		if (currency == null) {
+			return "TBD";
+		}
+		String fullName = ItemUtils.getPlainName(currency);
+		if (fullName.contains("xperience")) {
+			return fullName.charAt(0) + "XP";
+		} else {
+			StringBuilder result = new StringBuilder();
+			for (int i = 0; i < fullName.length(); i++) {
+				char c = fullName.charAt(i);
+				if (Character.isUpperCase(c)) {
+					result.append(c);
+				}
+			}
+			return result.toString();
+		}
+	}
+
+	public static @Nullable String getLongestPrefix(NavigableSet<String> prefixMap, String strWithPrefix) {
+		while (!prefixMap.isEmpty()) {
+			String previousPrefix = prefixMap.floor(strWithPrefix);
+			if (previousPrefix == null) {
+				return null;
+			}
+			if (strWithPrefix.startsWith(previousPrefix)) {
+				return previousPrefix;
+			}
+			prefixMap = prefixMap.headSet(previousPrefix, false);
+		}
+		return null;
+	}
+
+	public static String getNaturalSortKey(String str) {
+		String sortPrefix = str.toLowerCase(Locale.ROOT);
+		List<String> prefixes = new ArrayList<>();
+		while (true) {
+			String prefix = getLongestPrefix(LOWERCASE_NAME_PREFIXES, sortPrefix);
+			if (prefix == null) {
+				break;
+			}
+			prefixes.add(prefix);
+			sortPrefix = sortPrefix.substring(prefix.length());
+		}
+		StringBuilder stringBuilder = new StringBuilder(sortPrefix);
+		for (String prefix : prefixes) {
+			stringBuilder.append(prefix);
+		}
+
+		String naturalSameCase = UNNATURAL_CHARACTERS_RE
+			.matcher(stringBuilder
+				.toString())
+			.replaceAll("");
+		return naturalSameCase + " " + str;
+	}
+
+	public static List<String> sortedStrings(Collection<String> unsorted) {
+		TreeMap<String, String> sortedPlayers = new TreeMap<>();
+		for (String string : unsorted) {
+			String sortKey = StringUtils.getNaturalSortKey(string);
+			sortedPlayers.put(sortKey, string);
+		}
+		return new ArrayList<>(sortedPlayers.values());
+	}
+
+	private static final Set<Character> DIGITS = Set.of('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+
+	// Returns the positive integer that is at the end of s; if there is no integer, returns -1.
+	public static int getEndingInteger(String s) {
+		char[] chars = s.toCharArray();
+		for (int i = chars.length - 1; i > 0; i--) {
+			if (!DIGITS.contains(chars[i])) {
+				if (i == chars.length - 1) {
+					return -1;
+				}
+				return Integer.parseInt(s.substring(i + 1));
+			}
+		}
+		// We only get to this point if every character is an integer
+		return Integer.parseInt(s);
 	}
 }

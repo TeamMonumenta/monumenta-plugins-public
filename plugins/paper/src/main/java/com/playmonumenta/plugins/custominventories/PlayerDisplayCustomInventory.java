@@ -47,7 +47,7 @@ public class PlayerDisplayCustomInventory extends CustomInventory {
 			case CLASS_LOC -> {
 				if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.BARRIER) {
 					mInventory.close();
-					new ClassDisplayCustomInventory(mRequestingPlayer, mTargetPlayer, true).openInventory(mRequestingPlayer, Plugin.getInstance());
+					new ClassDisplayCustomInventory(mRequestingPlayer, mTargetPlayer, true).open();
 				}
 			}
 			case PS_LOC -> {
@@ -67,7 +67,7 @@ public class PlayerDisplayCustomInventory extends CustomInventory {
 							&& zenithAdvancement != null
 							&& mTargetPlayer.getAdvancementProgress(zenithAdvancement).isDone()) {
 					mInventory.close();
-					new CharmsGUI(mRequestingPlayer, mTargetPlayer, true, CharmManager.CharmType.ZENITH, true).open();
+					new CharmsGUI(mRequestingPlayer, mTargetPlayer, false, CharmManager.CharmType.ZENITH, true).open();
 				} else {
 					mRequestingPlayer.sendMessage("No valid charms UI to show.");
 					if (zenithAdvancement == null) {

@@ -42,7 +42,7 @@ public class WindAspect implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (AbilityUtils.isAspectTriggeringEvent(event, player) && !EntityUtils.isCCImmuneMob(enemy)) {
+		if (AbilityUtils.isAspectTriggeringEvent(event, player) && !EntityUtils.isCCImmuneMob(enemy) && EntityUtils.isHostileMob(enemy)) {
 			launch(plugin, player, enemy, level * (event.getType() == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 		}
 	}

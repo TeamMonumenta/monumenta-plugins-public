@@ -52,8 +52,8 @@ public enum DelvesModifier {
 	CARAPACE(12, Carapace::applyModifiers, createIcon(Material.NETHERITE_HELMET, Component.text("Carapace", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Carapace.DESCRIPTION), Carapace::rankDescription, 14, 1),
 	ENTROPY(13, null, createIcon(Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Entropy.DESCRIPTION), Entropy::rankDescription, 16, 1),
 	TWISTED(14, Twisted::applyModifiers, createIcon(Material.WITHER_ROSE, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Twisted.DESCRIPTION), Twisted::rankDescription, 19, 1),
-	FRAGILE(15, null, createIcon(Material.GLASS, Component.text("Fragile", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Fragile.DESCRIPTION), Fragile::rankDescription, 20, 5),
 	// Keep rotating modifiers after here -----------------------------------------------
+	FRAGILE(15, null, createIcon(Material.GLASS, Component.text("Fragile", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Fragile.DESCRIPTION), Fragile::rankDescription, 20, 5),
 	ASSASSINS(16, Assassins::applyModifiers, createIcon(Material.NETHERITE_SWORD, Component.text("Assassins", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Assassins.DESCRIPTION), Assassins::rankDescription, 21, 5),
 	ASTRAL(17, null, createIcon(Material.SPYGLASS, Component.text("Astral", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Astral.DESCRIPTION), Astral::rankDescription, 22, 5),
 	UNYIELDING(18, Unyielding::applyModifiers, createIcon(Material.NETHERITE_CHESTPLATE, Component.text("Unyielding", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Unyielding.DESCRIPTION), Unyielding::rankDescription, 23, 5),
@@ -69,11 +69,11 @@ public enum DelvesModifier {
 	private final int mIndex;
 	private final @Nullable BiConsumer<LivingEntity, Integer> mApplyFunc;
 	private final ItemStack mIcon;
-	private final Function<Integer, String[]> mRankDescriptions;
+	private final Function<Integer, Component[]> mRankDescriptions;
 	private final int mOldColumn;
 	private final int mPointsPerLevel;
 
-	DelvesModifier(int index, @Nullable BiConsumer<LivingEntity, Integer> applying, ItemStack stack, Function<Integer, String[]> rankDescriptions, int column, int pointsPerLevel) {
+	DelvesModifier(int index, @Nullable BiConsumer<LivingEntity, Integer> applying, ItemStack stack, Function<Integer, Component[]> rankDescriptions, int column, int pointsPerLevel) {
 		mIndex = index;
 		mApplyFunc = applying;
 		ItemMeta meta = stack.getItemMeta();
@@ -93,7 +93,7 @@ public enum DelvesModifier {
 		return mIcon;
 	}
 
-	public Function<Integer, String[]> getRankDescriptions() {
+	public Function<Integer, Component[]> getRankDescriptions() {
 		return mRankDescriptions;
 	}
 

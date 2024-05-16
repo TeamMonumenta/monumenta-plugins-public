@@ -93,7 +93,7 @@ public class CustomContainerItemGui extends Gui {
 			setItem(1 + posInPage / 9, posInPage % 9, new GuiItem(displayItem, false))
 				.onClick(event -> {
 					ItemStack movedItem = ItemUtils.clone(item);
-					ItemStatUtils.removePlayerModified(new NBTItem(movedItem, true));
+					NBT.modify(movedItem, ItemStatUtils::removePlayerModified);
 					switch (event.getClick()) {
 						case LEFT -> {
 							movedItem.setAmount((int) Math.min(movedItem.getMaxStackSize(), amount));

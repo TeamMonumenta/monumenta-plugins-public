@@ -12,9 +12,9 @@ import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
@@ -77,7 +77,7 @@ public class OrinCustomInventory extends CustomInventory {
 	 * Page 3: Region 3
 	 * Page 4: Plots
 	 * Page 5: Playerplots
-	 * Page 6: Default Page (dungeon shards, etc)
+	 * Page 6: Default Page (dungeon shards, etc.)
 	 * Page 10: Common for 11-19
 	 * Page 11: Region 1 Instance Bot
 	 * Page 12: Region 2 Instance Bot
@@ -123,7 +123,7 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(4, 0, "Docks", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "tp @S -2456.0 56.5 1104.0 90 0"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 18, "Market", "Click to teleport!", Material.BARREL, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/enter_new_market"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
-		ORIN_ITEMS.add(new TeleportEntry(4, 36, "Guild Plot", "Click to teleport!", Material.YELLOW_BANNER, null, 0, "teleportguild @S"));
+		ORIN_ITEMS.add(new TeleportEntry(4, 36, "Guild Plot", "Click to teleport!", Material.YELLOW_BANNER, null, 0, "teleportguild @S", "guild teleportgui @S"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 12, "Sierhaven", sortedDesc, Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 15, "Mistport", sortedDesc, Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
@@ -224,10 +224,7 @@ public class OrinCustomInventory extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		GUIUtils.refreshOffhand(event);
-		Player player;
-		if (event.getWhoClicked() instanceof Player) {
-			player = (Player) event.getWhoClicked();
-		} else {
+		if (!(event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
 		ItemStack clickedItem = event.getCurrentItem();
@@ -337,9 +334,9 @@ public class OrinCustomInventory extends CustomInventory {
 					MessagingUtils.sendStackTrace(player, e);
 				}
 			} else {
+				player.closeInventory();
 				String finalCommand = cmd.replace("@S", player.getName());
 				NmsUtils.getVersionAdapter().runConsoleCommandSilently(finalCommand);
-				player.closeInventory();
 			}
 		}
 	}
@@ -388,7 +385,8 @@ public class OrinCustomInventory extends CustomInventory {
 		try {
 			results = NetworkRelayAPI.getOnlineShardNames();
 		} catch (Exception e) {
-			e.printStackTrace();
+			player.sendMessage(Component.text("Unable to get list of online shards, please report this bug:", NamedTextColor.RED));
+			MessagingUtils.sendStackTrace(player, e);
 			player.closeInventory();
 		}
 		int index = 0;
@@ -429,12 +427,10 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 		Collections.sort(resultSortedList);
 
-		String shardName = "";
 		for (Integer shard : resultSortedList) {
-			if (shard == 0) {
-				shardName = searchTerm.substring(0, 1).toUpperCase(Locale.getDefault()) + searchTerm.substring(1);
-			} else {
-				shardName = searchTerm.substring(0, 1).toUpperCase(Locale.getDefault()) + searchTerm.substring(1) + "-" + shard;
+			String shardName = searchTerm;
+			if (shard != 0) {
+				shardName += "-" + shard;
 			}
 			if (index <= instanceLocations.length) {
 				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shardName, "", shard < 1 ? 1 : shard));

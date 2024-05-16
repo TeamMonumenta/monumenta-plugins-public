@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.bosses.ShieldSwitchBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -50,7 +52,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellDimensionDoor extends Spell {
-
 	private static final String SPELL_NAME = "Dimension Door";
 	private static final int COOLDOWN = 20 * 45;
 	private static final int PLAYER_CAP = 15;
@@ -73,9 +74,9 @@ public class SpellDimensionDoor extends Spell {
 	private final List<Location> mPortalLoc = new ArrayList<>();
 	private final List<Location> mReplaceLoc = new ArrayList<>();
 	private final double mRange;
-	private int mT = 20 * 10;
-	private boolean mCanRun = true;
 	private final ChargeUpManager mChargeUp;
+	private boolean mCanRun = true;
+	private int mT = 20 * 10;
 
 	public SpellDimensionDoor(Plugin plugin, LivingEntity boss, Location spawnLoc, double range) {
 		mPlugin = plugin;
@@ -131,7 +132,7 @@ public class SpellDimensionDoor extends Spell {
 		if (players.size() <= 2) {
 			targets = players;
 		} else {
-			int cap = (int) Math.min(PLAYER_CAP, Math.ceil(players.size() / 2));
+			int cap = (int) Math.min(PLAYER_CAP, Math.ceil(players.size() / 2.0));
 			for (int i = 0; i < cap; i++) {
 				Player player = players.get(mRand.nextInt(players.size()));
 				if (targets.contains(player)) {
@@ -356,7 +357,7 @@ public class SpellDimensionDoor extends Spell {
 			DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
 			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 			AbilityUtils.increaseDamageDealtPlayer(p, 20 * 30, -0.2, "Lich");
-			Lich.cursePlayer(plugin, p);
+			Lich.cursePlayer(p);
 		}
 		int tick = t;
 
@@ -411,9 +412,12 @@ public class SpellDimensionDoor extends Spell {
 					p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 					if (byPortal) {
 						p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
-						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 10));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
-						p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 1));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.GENERIC_NAME,
+							new PercentDamageReceived(20 * 5, -1.0));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, CustomRegeneration.effectID,
+							new CustomRegeneration(20 * 5, 1.0, 25, null, com.playmonumenta.plugins.Plugin.getInstance()));
+
 						p.sendMessage(Component.text("Something feels different. The shadows aren't clinging to me anymore.", NamedTextColor.AQUA));
 					} else {
 						DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);

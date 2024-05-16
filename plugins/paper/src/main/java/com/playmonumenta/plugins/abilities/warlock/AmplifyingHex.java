@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -17,21 +19,19 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 public class AmplifyingHex extends Ability {
@@ -59,7 +59,8 @@ public class AmplifyingHex extends Ability {
 	public static final String CHARM_CONE = "Amplifying Hex Cone";
 	public static final String CHARM_POTENCY = "Amplifying Hex Damage per Effect Potency";
 	public static final String CHARM_POTENCY_CAP = "Amplifying Hex Potency Cap";
-	public static final String CHARM_ENHANCED = "Amplifying Hex Health Threshold";
+	public static final String CHARM_ENHANCE_HEALTH = "Amplifying Hex Enhancement Health Threshold";
+	public static final String CHARM_ENHANCE_DAMAGE = "Amplifying Hex Enhancement Damage Bonus";
 
 	public static final AbilityInfo<AmplifyingHex> INFO =
 		new AbilityInfo<>(AmplifyingHex.class, "Amplifying Hex", AmplifyingHex::new)
@@ -67,13 +68,13 @@ public class AmplifyingHex extends Ability {
 			.scoreboardId("AmplifyingHex")
 			.shorthandName("AH")
 			.descriptions(
-				"Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, " +
-					"dealing 2 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) magic damage " +
-					"to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, " +
-					"and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.",
-				"The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.",
+				"Left click while sneaking with a scythe to unleash a magic cone up to 8 blocks in front of you, " +
+					"dealing magic damage equal to 2 + (0.5 * Player Level, capped based on region: R1 Level 7 / R2 Level 14 / R3 Level 21) " +
+					"to each enemy for each debuff it has. Debuffs include, but are not limited to, Fire, Slowness, Weaken, Decay, Bleed, and more. " +
+					"Deal an additional +1 damage for each extra level of debuff above 1, capped at 2 extra levels per debuff. 20% Slowness, Decay 2, etc. count as level 2 debuffs. Cooldown: 10s.",
+				"Range increased to 10 blocks. The extra debuff level damage is increased to +2 per extra level, and the extra debuff level cap is increased to 3 extra levels.",
 				"For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1.25% more damage to enemies and deal 1% max health damage to yourself.")
-			.simpleDescription("Deal damage to mobs in front of you for each debuff they have.")
+			.simpleDescription("Deal damage to mobs in front of you for each debuff they currently have.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AmplifyingHex::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
@@ -82,8 +83,11 @@ public class AmplifyingHex extends Ability {
 	private final float mAmplifierDamage;
 	private final int mAmplifierCap;
 	private final float mRadius;
+	private final double mConeAngle;
 	private final float mRegionCap;
 	private float mDamage = 0f;
+	private final double mEnhanceHealthThreshold;
+	private final double mEnhanceDamageBonus;
 
 	private final AmplifyingHexCS mCosmetic;
 
@@ -92,6 +96,7 @@ public class AmplifyingHex extends Ability {
 		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
 		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY_CAP, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
 		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
+		mConeAngle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
 		mRegionCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(player) ? R2_CAP : R1_CAP;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS());
@@ -105,6 +110,9 @@ public class AmplifyingHex extends Ability {
 				                 charmPower;
 			mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
 		});
+
+		mEnhanceHealthThreshold = ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_HEALTH);
+		mEnhanceDamageBonus = CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCE_DAMAGE, ENHANCEMENT_DAMAGE_MOD);
 	}
 
 	public boolean cast() {
@@ -112,50 +120,12 @@ public class AmplifyingHex extends Ability {
 			return false;
 		}
 
-		double angle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
-
-		new BukkitRunnable() {
-			final Location mLoc = mPlayer.getLocation();
-			double mRadiusIncrement = 0.5;
-
-			@Override
-			public void run() {
-				if (mRadiusIncrement == 0.5) {
-					mLoc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
-				}
-				Vector vec;
-				mRadiusIncrement += 1.25;
-				double degree = 90 - angle;
-				// particles about every 10 degrees
-				int degreeSteps = ((int) (2 * angle)) / 10;
-				double degreeStep = 2 * angle / degreeSteps;
-				for (int step = 0; step < degreeSteps; step++, degree += degreeStep) {
-					double radian1 = Math.toRadians(degree + mCosmetic.amplifyingAngle(degree, mRadiusIncrement));
-					vec = new Vector(FastUtils.cos(radian1) * mRadiusIncrement,
-						0.15 + mCosmetic.amplifyingHeight(mRadiusIncrement, mRadius + 1),
-						FastUtils.sin(radian1) * mRadiusIncrement);
-					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
-					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
-
-					Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
-					mCosmetic.amplifyingParticle(mPlayer, l);
-				}
-
-				if (mRadiusIncrement >= mRadius) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-
-
-		final Location soundLoc = mPlayer.getLocation();
-		mCosmetic.amplifyingEffects(mPlayer, mPlayer.getWorld(), soundLoc);
+		mCosmetic.onCast(mPlayer, mRadius, mConeAngle);
 
 		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 		double percentBoost = 0;
-		if (isEnhanced() && mPlayer.getHealth() > maxHealth * (ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCED))) {
-			percentBoost = mPlayer.getHealth() / maxHealth - (ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCED));
+		if (isEnhanced() && mPlayer.getHealth() > maxHealth * mEnhanceHealthThreshold) {
+			percentBoost = mPlayer.getHealth() / maxHealth - mEnhanceHealthThreshold;
 			double selfHarm = maxHealth * percentBoost;
 			double absorp = mPlayer.getAbsorptionAmount();
 			double newAbsorp = absorp - selfHarm;
@@ -166,35 +136,51 @@ public class AmplifyingHex extends Ability {
 				mPlayer.setHealth(maxHealth + newAbsorp);
 			}
 			//dummy damage
-			DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.OTHER, null, null, null), 0.001, true, false, false);
+			DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.TRUE, null, null, null), 0.001, true, false, false);
 
 			//multiply percent boost modifier
-			percentBoost *= ENHANCEMENT_DAMAGE_MOD;
+			percentBoost *= mEnhanceDamageBonus;
 		}
 
-		Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mRadius, 0), 2 * mRadius, mRadius, Math.toRadians(angle));
+		Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mRadius, 0), 2 * mRadius, mRadius, Math.toRadians(mConeAngle));
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			int debuffCount = 0;
 			int amplifierCount = 0;
-			for (PotionEffectType effectType : AbilityUtils.DEBUFFS) {
-				PotionEffect effect = mob.getPotionEffect(effectType);
-				if (effect != null) {
+
+			// Potion effect debuffs. We avoid stream for speed (hopefully)
+			for (PotionEffect e: mob.getActivePotionEffects()) {
+				if (AbilityUtils.DEBUFFS.contains(e.getType())) {
 					debuffCount++;
-					amplifierCount += Math.min(mAmplifierCap, effect.getAmplifier());
+					amplifierCount += Math.min(mAmplifierCap, e.getAmplifier());
 				}
 			}
 
-			int inferno = Inferno.getInfernoLevel(mPlugin, mob);
-			if (mob.getFireTicks() > 0 || inferno > 0) {
+			// Other debuffs
+			List<EffectManager.EffectPair> unfilteredEffectPairList = EffectManager.getInstance().getEffectPairs(mob);
+			Map<String, Double> effectPairList = new HashMap<>();
+			Map<String, Double> effectList = new HashMap<>();
+
+			if (unfilteredEffectPairList != null) {
+				for (EffectManager.EffectPair e : unfilteredEffectPairList) {
+					effectPairList.put(e.mSource, e.mEffect.getMagnitude());
+					effectList.put(e.mEffect.mEffectID, Math.max(e.mEffect.getMagnitude(),
+						effectList.getOrDefault(e.mEffect.mEffectID, 0.0)));
+				}
+			}
+
+			Double inferno = effectPairList.get(Inferno.INFERNO_EFFECT_NAME);
+			if (inferno != null) {
 				debuffCount++;
-				amplifierCount += Math.min(mAmplifierCap, inferno);
+				amplifierCount += (int) Math.min(mAmplifierCap, inferno);
+			} else if (mob.getFireTicks() > 0) {
+				debuffCount++;
 			}
 
 			if (EntityUtils.isStunned(mob)) {
 				debuffCount++;
 			}
 
-			if (EntityUtils.isParalyzed(mPlugin, mob)) {
+			if (effectPairList.containsKey(EntityUtils.PARALYZE_EFFECT_NAME)) {
 				debuffCount++;
 			}
 
@@ -202,42 +188,52 @@ public class AmplifyingHex extends Ability {
 				debuffCount++;
 			}
 
-			if (EntityUtils.isBleeding(mPlugin, mob)) {
+			Double bleed = effectPairList.get(EntityUtils.BLEED_EFFECT_NAME);
+			if (bleed != null) {
 				debuffCount++;
-				amplifierCount += Math.min(mAmplifierCap, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
+				amplifierCount += (int) Math.min(mAmplifierCap, bleed - 1);
 			}
 
 			//Custom slow effect interaction
-			if (EntityUtils.isSlowed(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.SLOW) == null) {
+			Double slow = effectPairList.get(EntityUtils.SLOW_EFFECT_NAME);
+			if (slow != null && mob.getPotionEffect(PotionEffectType.SLOW) == null) {
 				debuffCount++;
-				double slowAmp = EntityUtils.getSlowAmount(mPlugin, mob);
-				int slowLevel = (int) Math.floor(slowAmp * 10);
-				amplifierCount += Math.min((int) mAmplifierCap, Math.max(slowLevel - 1, 0));
+				int slowLevel = (int) Math.floor(slow * 10);
+				amplifierCount += Math.min(mAmplifierCap, Math.max(slowLevel - 1, 0));
 			}
 
 			//Custom weaken interaction
-			if (EntityUtils.isWeakened(mPlugin, mob)) {
+			Double weaken = effectPairList.get(EntityUtils.WEAKEN_EFFECT_NAME);
+			if (weaken != null) {
 				debuffCount++;
-				double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
-				int weakLevel = (int) Math.floor(weakAmp * 10);
+				int weakLevel = (int) Math.floor(weaken * 10);
 				amplifierCount += Math.min(mAmplifierCap, Math.max(weakLevel - 1, 0));
 			}
 
 			//Custom vuln interaction
-			if (EntityUtils.isVulnerable(mPlugin, mob)) {
+			Double vulnerable = effectPairList.get(EntityUtils.VULNERABILITY_EFFECT_NAME);
+			if (vulnerable != null) {
 				debuffCount++;
-				double vulnAmp = EntityUtils.getVulnAmount(mPlugin, mob);
-				amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
+				int vulnLevel = (int) Math.floor(vulnerable * 10);
+				amplifierCount += Math.min(mAmplifierCap, Math.max(vulnLevel - 1, 0));
 			}
 
 			//Custom DoT interaction
-			if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
+			Double dot = effectList.get(CustomDamageOverTime.effectID);
+			if (dot != null) {
 				debuffCount++;
-				int dotLevel = (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob);
-				amplifierCount += Math.min(mAmplifierCap, dotLevel - 1);
+				amplifierCount += (int) Math.min(mAmplifierCap, dot - 1);
+			}
+
+			// Custom choleric flames antiheal interaction
+			Double cholericFlames = effectPairList.get(CholericFlames.ANTIHEAL_EFFECT);
+			if (cholericFlames != null) {
+				debuffCount++;
 			}
 
 			if (debuffCount > 0) {
+				mCosmetic.onHit(mPlayer, mob);
+
 				double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
 				finalDamage *= (1 + percentBoost);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -18,8 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /*
@@ -43,8 +42,9 @@ public class SpellEarthenRupture extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		mBoss.removePotionEffect(PotionEffectType.SLOW);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 1));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+			new BaseMovementSpeedModifyEffect(50, -0.3));
 		BukkitRunnable runnable = new BukkitRunnable() {
 
 			@Override

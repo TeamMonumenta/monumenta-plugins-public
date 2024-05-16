@@ -8,11 +8,10 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
 public class SpellCrystalParticle extends Spell {
-
-	private LivingEntity mBoss;
-	private Location mSpawnLoc;
-	private PartialParticle mSoul;
-	private PartialParticle mFlame;
+	private final LivingEntity mBoss;
+	private final Location mSpawnLoc;
+	private final PartialParticle mSoul;
+	private final PartialParticle mFlame;
 
 	public SpellCrystalParticle(LivingEntity boss, Location spawn) {
 		mBoss = boss;
