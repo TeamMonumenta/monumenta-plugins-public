@@ -66,7 +66,7 @@ public class DungeonAccessCommand extends GenericCommand {
 				new BooleanArgument("useDelvePreset")
 			)
 			.executes((sender, args) -> {
-				startNew(args.getUnchecked("key player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"), args.getOrDefaultUnchecked("type", 0), args.getOrDefaultUnchecked("type", false));
+				startNew(args.getUnchecked("key player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"), args.getOrDefaultUnchecked("type", 0), args.getOrDefaultUnchecked("useDelvePreset", false));
 			})
 			.register();
 
