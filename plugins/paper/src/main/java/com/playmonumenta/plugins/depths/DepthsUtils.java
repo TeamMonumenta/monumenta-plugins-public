@@ -259,11 +259,11 @@ public class DepthsUtils {
 		return null;
 	}
 
-	public static String rewardString(@Nullable DepthsRoomType roomType) {
+	public static Component rewardComponent(@Nullable DepthsRoomType roomType) {
 		if (roomType != null) {
-			return roomType.getRewardString();
+			return roomType.getRewardComponent();
 		}
-		return "";
+		return Component.text("");
 	}
 
 	private static boolean canConvertToIce(Block b) {

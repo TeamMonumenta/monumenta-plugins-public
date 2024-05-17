@@ -263,7 +263,9 @@ public class DepthsParty {
 			if (rewardType != null) {
 				mPlayersInParty.forEach(dp -> dp.mEarnedRewards.add(rewardType));
 			}
-			sendMessage("This room's " + DepthsUtils.rewardString(mCurrentRoomType) + " reward has been found!");
+
+			sendMessage(Component.text("This room's ").append(DepthsUtils.rewardComponent(mCurrentRoomType))
+				.append(Component.text(" reward has been found!")));
 
 			if (mCurrentRoomType == DepthsRoomType.TREASURE || mCurrentRoomType == DepthsRoomType.TREASURE_ELITE) {
 				mCanGetTreasureReward = true;
@@ -468,7 +470,8 @@ public class DepthsParty {
 			}
 		}
 
-		sendMessage("Spawned new " + room.mRoomType.getRoomString() + " room" + (wildcard ? " (Wildcard)" : "") + "!");
+		sendMessage(Component.text("Spawned new ").append(room.mRoomType.getRoomComponent())
+			.append(Component.text(" room" + (wildcard ? " (Wildcard)" : "") + "!")));
 
 		mBeatBoss = false;
 	}
