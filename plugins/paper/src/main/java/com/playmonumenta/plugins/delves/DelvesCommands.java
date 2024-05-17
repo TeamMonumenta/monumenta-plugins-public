@@ -207,7 +207,7 @@ public class DelvesCommands {
 			.withOptionalArguments(dungeonArgOptional)
 			.executes((commandSender, args) -> {
 				int count = 0;
-				for (Player target : ((Collection<Player>) args.get("entity"))) {
+				for (Player target : ((Collection<Player>) args.get("player"))) {
 					count++;
 					DelvesUtils.clearDelvePlayerByShard(commandSender, target, args.getOrDefaultUnchecked("dungeon", DelvesUtils.getDungeonName(target)));
 				}

@@ -61,7 +61,7 @@ public class PZeroCommand {
 						new IntegerArgument("amount")
 					)
 					.executes((sender, args) -> {
-						for (Player player : (Collection<Player>) args.get("playesr")) {
+						for (Player player : (Collection<Player>) args.get("players")) {
 							Plugin.getInstance().mPzeroManager.restoreEnergy(player, args.getUnchecked("amount"), true);
 						}
 					}),
