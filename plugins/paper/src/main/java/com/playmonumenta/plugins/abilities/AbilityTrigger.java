@@ -145,7 +145,7 @@ public class AbilityTrigger {
 		}
 
 		public String getGuiTag(boolean enabled) {
-			return mGuiTag + (enabled ? "_true" : "_false");
+			return mGuiTag + (enabled ? "true" : "false");
 		}
 
 		@Override
