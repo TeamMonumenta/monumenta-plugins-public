@@ -83,7 +83,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 	public static final String bossName = "Vesperidys";
 
-	public static final String MUSIC_TITLE_AMBIENT = "epid:music.vesperidys_ambient";
+	public static final String MUSIC_TITLE_AMBIENT = "epic:music.vesperidys_ambient";
 	public static final int MUSIC_DURATION_AMBIENT = 1 * 60 + 27;
 	public static final String MUSIC_TITLE = "epic:music.vesperidys_phase1";
 	public static final int MUSIC_DURATION = 6 * 60 + 4; // seconds
