@@ -258,6 +258,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatCommands.registerLoreCommand();
 		ItemStatCommands.registerNameCommand();
 		ItemStatCommands.registerRemoveCommand();
+		ItemStatCommands.registerCopyCommand();
 		JingleBells.register();
 		Launch.register();
 		LoadoutManagerCommand.register();

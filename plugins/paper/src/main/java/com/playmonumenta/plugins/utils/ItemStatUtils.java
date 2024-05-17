@@ -81,6 +81,54 @@ public class ItemStatUtils {
 
 	public static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 
+	public static @Nullable ReadWriteNBT getMonumenta(@Nullable ReadWriteNBT nbt) {
+		if (nbt == null) {
+			return null;
+		}
+		return nbt.getCompound(MONUMENTA_KEY);
+	}
+
+	public static @Nullable ReadableNBT getMonumenta(@Nullable ReadableNBT nbt) {
+		if (nbt == null) {
+			return null;
+		}
+		return nbt.getCompound(MONUMENTA_KEY);
+	}
+
+	public static ReadWriteNBT getOrCreateMonumenta(ReadWriteNBT nbt) {
+		return nbt.getOrCreateCompound(MONUMENTA_KEY);
+	}
+
+	public static @Nullable ReadWriteNBT getStockFromMonumenta(@Nullable ReadWriteNBT monumenta) {
+		if (monumenta == null) {
+			return null;
+		}
+		return monumenta.getCompound(STOCK_KEY);
+	}
+
+	public static @Nullable ReadableNBT getStockFromMonumenta(@Nullable ReadableNBT monumenta) {
+		if (monumenta == null) {
+			return null;
+		}
+		return monumenta.getCompound(STOCK_KEY);
+	}
+
+	public static ReadWriteNBT getOrCreateStockFromMonumenta(ReadWriteNBT monumenta) {
+		return monumenta.getOrCreateCompound(STOCK_KEY);
+	}
+
+	public static @Nullable ReadWriteNBT getStock(@Nullable ReadWriteNBT nbt) {
+		return getStockFromMonumenta(getMonumenta(nbt));
+	}
+
+	public static @Nullable ReadableNBT getStock(@Nullable ReadableNBT nbt) {
+		return getStockFromMonumenta(getMonumenta(nbt));
+	}
+
+	public static ReadWriteNBT getOrCreateStock(ReadWriteNBT nbt) {
+		return getOrCreateStockFromMonumenta(getOrCreateMonumenta(nbt));
+	}
+
 	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item) {
 		applyCustomEffects(plugin, player, item, true);
 	}
@@ -600,7 +648,7 @@ public class ItemStatUtils {
 		}
 
 		NBT.modify(item, nbt -> {
-			ReadWriteNBTCompoundList effects = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(STOCK_KEY).getCompoundList(EffectType.KEY);
+			ReadWriteNBTCompoundList effects = getOrCreateStock(nbt).getCompoundList(EffectType.KEY);
 			ReadWriteNBT effect = effects.addCompound();
 			effect.setString(EFFECT_TYPE_KEY, type.getType());
 			effect.setDouble(EFFECT_STRENGTH_KEY, strength);
@@ -672,58 +720,34 @@ public class ItemStatUtils {
 	}
 
 	public static @Nullable ReadWriteNBTCompoundList getEffects(final ReadWriteNBT nbt) {
-		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadWriteNBT stock = monumenta.getCompound(STOCK_KEY);
+		ReadWriteNBT stock = getStock(nbt);
 		if (stock == null) {
 			return null;
 		}
-
 		return stock.getCompoundList(EffectType.KEY);
 	}
 
 	public static @Nullable ReadableNBTList<ReadWriteNBT> getEffects(final ReadableNBT nbt) {
-		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadableNBT stock = monumenta.getCompound(STOCK_KEY);
+		ReadableNBT stock = getStock(nbt);
 		if (stock == null) {
 			return null;
 		}
-
 		return stock.getCompoundList(EffectType.KEY);
 	}
 
 	public static @Nullable ReadWriteNBT getEnchantments(final ReadWriteNBT nbt) {
-		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadWriteNBT stock = monumenta.getCompound(STOCK_KEY);
+		ReadWriteNBT stock = getStock(nbt);
 		if (stock == null) {
 			return null;
 		}
-
 		return stock.getCompound(EnchantmentType.KEY);
 	}
 
 	public static @Nullable ReadableNBT getEnchantments(final ReadableNBT nbt) {
-		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadableNBT stock = monumenta.getCompound(STOCK_KEY);
+		ReadableNBT stock = getStock(nbt);
 		if (stock == null) {
 			return null;
 		}
-
 		return stock.getCompound(EnchantmentType.KEY);
 	}
 
@@ -750,12 +774,21 @@ public class ItemStatUtils {
 		return enchantment.getInteger(LEVEL_KEY);
 	}
 
+	public static void setEnchantments(ReadWriteNBT nbt, @Nullable ReadableNBT enchantments) {
+		ReadWriteNBT stock = getOrCreateStock(nbt);
+		stock.removeKey(EnchantmentType.KEY);
+		if (enchantments != null) {
+			ReadWriteNBT newEnchantments = stock.getOrCreateCompound(EnchantmentType.KEY);
+			newEnchantments.mergeCompound(enchantments);
+		}
+	}
+
 	public static void addEnchantment(final @Nullable ItemStack item, final EnchantmentType type, final int level) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			ReadWriteNBT enchantment = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(STOCK_KEY).getOrCreateCompound(EnchantmentType.KEY).getOrCreateCompound(type.getName());
+			ReadWriteNBT enchantment = getOrCreateStock(nbt).getOrCreateCompound(EnchantmentType.KEY).getOrCreateCompound(type.getName());
 			enchantment.setInteger(LEVEL_KEY, level);
 		});
 
@@ -850,30 +883,18 @@ public class ItemStatUtils {
 	}
 
 	public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
-		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadWriteNBT modified = monumenta.getCompound(PLAYER_MODIFIED_KEY);
+		ReadWriteNBT modified = getPlayerModified(nbt);
 		if (modified == null) {
 			return null;
 		}
-
 		return modified.getCompound(InfusionType.KEY);
 	}
 
 	public static @Nullable ReadableNBT getInfusions(final ReadableNBT nbt) {
-		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadableNBT modified = monumenta.getCompound(PLAYER_MODIFIED_KEY);
+		ReadableNBT modified = getPlayerModified(nbt);
 		if (modified == null) {
 			return null;
 		}
-
 		return modified.getCompound(InfusionType.KEY);
 	}
 
@@ -949,6 +970,15 @@ public class ItemStatUtils {
 		});
 	}
 
+	public static void setInfusions(ReadWriteNBT nbt, @Nullable ReadableNBT infusions) {
+		ReadWriteNBT stock = addPlayerModified(nbt);
+		stock.removeKey(InfusionType.KEY);
+		if (infusions != null) {
+			ReadWriteNBT newInfusions = stock.getOrCreateCompound(InfusionType.KEY);
+			newInfusions.mergeCompound(infusions);
+		}
+	}
+
 	public static void addInfusion(final @Nullable ItemStack item, final InfusionType type, final int level, final UUID infuser) {
 		addInfusion(item, type, level, infuser, true);
 	}
@@ -958,7 +988,7 @@ public class ItemStatUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			ReadWriteNBT infusion = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(PLAYER_MODIFIED_KEY).getOrCreateCompound(InfusionType.KEY).getOrCreateCompound(type.getName());
+			ReadWriteNBT infusion = addPlayerModified(nbt).getOrCreateCompound(InfusionType.KEY).getOrCreateCompound(type.getName());
 			infusion.setInteger(LEVEL_KEY, level);
 			infusion.setString(INFUSER_KEY, infuser.toString());
 		});
@@ -972,7 +1002,7 @@ public class ItemStatUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			ReadWriteNBT infusion = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(PLAYER_MODIFIED_KEY).getOrCreateCompound(InfusionType.KEY).getOrCreateCompound(type.getName());
+			ReadWriteNBT infusion = addPlayerModified(nbt).getOrCreateCompound(InfusionType.KEY).getOrCreateCompound(type.getName());
 			infusion.setInteger(LEVEL_KEY, level);
 			infusion.setString(INFUSER_NPC_KEY, npcName);
 		});
@@ -1007,30 +1037,18 @@ public class ItemStatUtils {
 	}
 
 	public static @Nullable ReadWriteNBTCompoundList getAttributes(final ReadWriteNBT nbt) {
-		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadWriteNBT stock = monumenta.getCompound(STOCK_KEY);
+		ReadWriteNBT stock = getStock(nbt);
 		if (stock == null) {
 			return null;
 		}
-
 		return stock.getCompoundList(AttributeType.KEY);
 	}
 
 	public static @Nullable ReadableNBTList<ReadWriteNBT> getAttributes(final ReadableNBT nbt) {
-		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		ReadableNBT stock = monumenta.getCompound(STOCK_KEY);
+		ReadableNBT stock = getStock(nbt);
 		if (stock == null) {
 			return null;
 		}
-
 		return stock.getCompoundList(AttributeType.KEY);
 	}
 
@@ -1077,13 +1095,24 @@ public class ItemStatUtils {
 		});
 	}
 
+	public static void setAttributes(ReadWriteNBT nbt, @Nullable ReadableNBTList<ReadWriteNBT> attributes) {
+		ReadWriteNBT stock = getOrCreateStock(nbt);
+		ReadWriteNBTCompoundList newAttributes = stock.getCompoundList(AttributeType.KEY);
+		newAttributes.clear();
+		if (attributes != null) {
+			for (ReadWriteNBT attr : attributes) {
+				newAttributes.addCompound().mergeCompound(attr);
+			}
+		}
+	}
+
 	public static void addAttribute(final ItemStack item, final AttributeType type, final double amount, final Operation operation, final Slot slot) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
 
 		NBT.modify(item, nbt -> {
-			ReadWriteNBTCompoundList attributes = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(STOCK_KEY).getCompoundList(AttributeType.KEY);
+			ReadWriteNBTCompoundList attributes = getOrCreateStock(nbt).getCompoundList(AttributeType.KEY);
 			// remove previous attribute before adding
 			attributes.removeIf((attribute) ->
 				attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName()));
@@ -1252,31 +1281,31 @@ public class ItemStatUtils {
 		}
 	}
 
-	public static int getShulkerSlots(@Nullable ItemStack item) {
+	public static int getShulkerSlots(ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + SHULKER_SLOTS_KEY, 27);
 		});
 	}
 
-	public static int getCustomInventoryItemTypesLimit(@Nullable ItemStack item) {
+	public static int getCustomInventoryItemTypesLimit(ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + CUSTOM_INVENTORY_TYPES_LIMIT_KEY, 0);
 		});
 	}
 
-	public static int getCustomInventoryItemsPerTypeLimit(@Nullable ItemStack item) {
+	public static int getCustomInventoryItemsPerTypeLimit(ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + CUSTOM_INVENTORY_ITEMS_PER_TYPE_LIMIT_KEY, 0);
 		});
 	}
 
-	public static int getCustomInventoryTotalItemsLimit(@Nullable ItemStack item) {
+	public static int getCustomInventoryTotalItemsLimit(ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + CUSTOM_INVENTORY_TOTAL_ITEMS_LIMIT_KEY, 0);
 		});
 	}
 
-	/**
+	/*
 	 * Checks if an item is a quiver, i.e. is a tipped arrow with the tag Monumenta.Stock.IsQuiver set to true.
 	 */
 	public static boolean isQuiver(@Nullable ItemStack item) {
@@ -1284,13 +1313,9 @@ public class ItemStatUtils {
 			return false;
 		}
 		return NBT.get(item, nbt -> {
-			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-			if (monumenta == null) {
-				return false;
-			}
-			ReadableNBT stock = monumenta.getCompound(STOCK_KEY);
+			ReadableNBT stock = getStock(nbt);
 			if (stock == null) {
-				return false;
+				return null;
 			}
 			return stock.getBoolean(IS_QUIVER_KEY);
 		});
@@ -1309,7 +1334,7 @@ public class ItemStatUtils {
 		});
 	}
 
-	public static QuiverListener.ArrowTransformMode getArrowTransformMode(@Nullable ItemStack item) {
+	public static QuiverListener.ArrowTransformMode getArrowTransformMode(ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return (QuiverListener.ArrowTransformMode) nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.NONE);
 		});
@@ -1321,7 +1346,7 @@ public class ItemStatUtils {
 			&& "Tesseract of Knowledge (u)".equals(ItemUtils.getPlainNameIfExists(item));
 	}
 
-	public static int getCharges(@Nullable ItemStack item) {
+	public static int getCharges(ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + CHARGES_KEY, 0);
 		});

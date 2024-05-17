@@ -20,7 +20,11 @@ import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -774,6 +778,36 @@ public class ItemStatCommands {
 			if (playerItemStats != null) {
 				playerItemStats.updateStats(player, true, true);
 			}
+		}).register();
+	}
+
+	public static void registerCopyCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.copystats");
+
+		new CommandAPICommand("copystats").withPermission(perms).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+
+			ItemStack offhand = player.getInventory().getItemInOffHand();
+			if (offhand.getType() == Material.AIR) {
+				player.sendMessage(Component.text("Must be holding an item in your offhand to copy from.", NamedTextColor.RED));
+				return;
+			}
+
+			ReadableNBT offhandNBT = NBT.readNbt(offhand);
+			ReadableNBT enchantments = ItemStatUtils.getEnchantments(offhandNBT);
+			ReadableNBT infusions = ItemStatUtils.getInfusions(offhandNBT);
+			ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(offhandNBT);
+
+			NBT.modify(item, nbt -> {
+				ItemStatUtils.setEnchantments(nbt, enchantments);
+				ItemStatUtils.setInfusions(nbt, infusions);
+				ItemStatUtils.setAttributes(nbt, attributes);
+			});
+
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 	}
 
