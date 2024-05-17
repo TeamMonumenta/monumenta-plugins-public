@@ -183,6 +183,7 @@ public class Plugin extends JavaPlugin {
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
 	public PlayerListener mPlayerListener;
 	public GrapplingListener mGrapplingListener;
+	public @Nullable AuditListener mAuditListener = null;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -460,7 +461,8 @@ public class Plugin extends JavaPlugin {
 		}
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
-			manager.registerEvents(new AuditListener(getLogger()), this);
+			mAuditListener = new AuditListener(getLogger());
+			manager.registerEvents(mAuditListener, this);
 		}
 		if (!IS_PLAY_SERVER) {
 			manager.registerEvents(NodePlanner.getInstance(), this);

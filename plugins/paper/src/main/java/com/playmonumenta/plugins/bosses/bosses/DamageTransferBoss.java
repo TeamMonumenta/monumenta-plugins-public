@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -44,7 +45,15 @@ public class DamageTransferBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
-				mTarget = targets.get(0);
+				targets.remove(mBoss);
+				for (LivingEntity e : targets) {
+					DamageTransferBoss otherBoss = BossManager.getInstance().getBoss(e, DamageTransferBoss.class);
+					if (otherBoss != null && otherBoss.mTarget == mBoss) {
+						continue;
+					}
+					mTarget = e;
+					return;
+				}
 			}, 1, true)
 		);
 

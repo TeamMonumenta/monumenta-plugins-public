@@ -120,6 +120,10 @@ public class AuditListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void death(PlayerDeathEvent event) {
 		Player player = event.getEntity();
+		Component message = event.deathMessage();
+		if (message == null) {
+			return;
+		}
 
 		logDeath("<" + player.getWorld().getName() + ">" + " Death: " + player.getName() + " " + MessagingUtils.plainText(event.deathMessage()));
 

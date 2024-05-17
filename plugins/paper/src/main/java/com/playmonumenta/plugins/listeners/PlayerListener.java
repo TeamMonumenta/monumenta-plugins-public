@@ -917,6 +917,10 @@ public class PlayerListener implements Listener {
 		Component deathMessage = event.deathMessage();
 		if (deathMessage != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
 			player.sendMessage(deathMessage);
+			if (mPlugin.mAuditListener != null) {
+				// The audit won't work later if the death message is null
+				mPlugin.mAuditListener.death(event);
+			}
 			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
 			event.deathMessage(null);
 		}

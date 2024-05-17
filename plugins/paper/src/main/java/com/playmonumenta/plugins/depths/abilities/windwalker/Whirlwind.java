@@ -70,7 +70,11 @@ public class Whirlwind extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.45f);
 		new PartialParticle(Particle.CLOUD, loc, 30, 1, 1, 1, 0.8).spawnAsPlayerActive(player);
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, radius)) {
-			e.setVelocity(e.getVelocity().add(e.getLocation().toVector().subtract(loc.subtract(0, 0.5, 0).toVector()).normalize().multiply(knockback).add(new Vector(0, 0.3, 0))));
+			Vector dir = e.getLocation().toVector().subtract(loc.subtract(0, 0.5, 0).toVector()).normalize().multiply(knockback);
+			if (!Double.isFinite(dir.getX())) {
+				dir = new Vector(0, 1, 0);
+			}
+			e.setVelocity(e.getVelocity().add(dir.add(new Vector(0, 0.3, 0))));
 			new PartialParticle(Particle.EXPLOSION_NORMAL, e.getLocation(), 5, 0, 0, 0, 0.35).spawnAsPlayerActive(player);
 		}
 		plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(duration, speed, SPEED_EFFECT_NAME));
