@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -78,8 +79,18 @@ public final class BlockInteractionsListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block block = event.getClickedBlock();
+		if (block == null) {
+			return;
+		}
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+			return;
+		}
+
 		Player player = event.getPlayer();
-		if (checkAction(block, player) && event.getAction() == Action.RIGHT_CLICK_BLOCK && INTERACTABLES.contains(block.getType())) {
+		Material type = block.getType();
+		if (checkAction(block, player) && INTERACTABLES.contains(type)) {
+			event.setCancelled(true);
+		} else if (type == Material.JUKEBOX && !player.isSneaking() && Tag.ITEMS_MUSIC_DISCS.isTagged(player.getInventory().getItemInMainHand().getType()) && commonChecks(player)) {
 			event.setCancelled(true);
 		}
 	}
@@ -109,20 +120,22 @@ public final class BlockInteractionsListener implements Listener {
 
 	private static boolean checkEntityAction(@Nullable Entity entity, @Nullable ItemStack playerItem, Player player) {
 		return entity != null
-			       && player.getGameMode() == GameMode.SURVIVAL
-			       && !ServerProperties.getIsTownWorld() // allow using item frames/armor stands in plots without having to disable this feature
 			       && playerItem != null // null/empty hand: takes an item from an armor stand and is allowed
 			       && !playerItem.getType().isAir()
 			       && ItemStatUtils.getTier(playerItem) != Tier.KEYTIER // allow placing key items in item frames and on armor stands
-			       && player.getScoreboardTags().contains(DISABLE_TAG);
+			       && commonChecks(player);
 	}
 
-	private static boolean checkAction(@Nullable Block block, Player player) {
+	private static boolean checkAction(Block block, Player player) {
 		return block != null
 			       && !player.isSneaking()
-			       && player.getGameMode() == GameMode.SURVIVAL
-			       && !ServerProperties.getIsTownWorld() // allow using blocks in plots without having to disable this feature
 			       && !player.getInventory().getItemInMainHand().getType().isAir() // allow interactions with an empty hand as an alternative to turning this feature off
-			       && player.getScoreboardTags().contains(DISABLE_TAG);
+			       && commonChecks(player);
+	}
+
+	private static boolean commonChecks(Player player) {
+		return player.getGameMode() == GameMode.SURVIVAL
+			&& !ServerProperties.getIsTownWorld()
+			&& player.getScoreboardTags().contains(DISABLE_TAG);
 	}
 }
