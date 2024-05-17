@@ -331,6 +331,7 @@ public class Plugin extends JavaPlugin {
 		EffectListCommand.register();
 		PlayerSkinManagerCommand.register();
 		ScanMobsCommand.register();
+		StatTrackAdd.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

@@ -1066,7 +1066,7 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
 
-		if (!event.isCancelled() && item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			// Stat tracker for consuming infinity items
 			// Needs to update the player's active item, not the event item, as that is a copy.
 			ItemStack activeItem = player.getActiveItem();

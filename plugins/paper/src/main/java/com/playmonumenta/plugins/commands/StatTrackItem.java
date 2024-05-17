@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
@@ -14,7 +15,6 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,31 +29,31 @@ import org.bukkit.inventory.ItemStack;
  */
 public class StatTrackItem extends GenericCommand {
 
+	public static final ImmutableMap<String, InfusionType> OPTIONS = ImmutableMap.<String, InfusionType>builder()
+		.put("kills", InfusionType.STAT_TRACK_KILLS)
+		.put("damage", InfusionType.STAT_TRACK_DAMAGE)
+		.put("melee", InfusionType.STAT_TRACK_MELEE)
+		.put("projectile", InfusionType.STAT_TRACK_PROJECTILE)
+		.put("magic", InfusionType.STAT_TRACK_MAGIC)
+		.put("boss", InfusionType.STAT_TRACK_BOSS)
+		.put("spawners", InfusionType.STAT_TRACK_SPAWNER)
+		.put("consumed", InfusionType.STAT_TRACK_CONSUMED)
+		.put("blocks", InfusionType.STAT_TRACK_BLOCKS)
+		.put("blocksbroken", InfusionType.STAT_TRACK_BLOCKS_BROKEN)
+		.put("deaths", InfusionType.STAT_TRACK_DEATH)
+		.put("riptide", InfusionType.STAT_TRACK_RIPTIDE)
+		.put("shield", InfusionType.STAT_TRACK_SHIELD_BLOCKED)
+		.put("repair", InfusionType.STAT_TRACK_REPAIR)
+		.put("convert", InfusionType.STAT_TRACK_CONVERT)
+		.put("dmgtaken", InfusionType.STAT_TRACK_DAMAGE_TAKEN)
+		.put("healdone", InfusionType.STAT_TRACK_HEALING_DONE)
+		.put("fish", InfusionType.STAT_TRACK_FISH_CAUGHT)
+		.build();
 
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.stattrackhelditem");
 
-		HashMap<String, InfusionType> options = new HashMap<>();
-		options.put("kills", InfusionType.STAT_TRACK_KILLS);
-		options.put("damage", InfusionType.STAT_TRACK_DAMAGE);
-		options.put("melee", InfusionType.STAT_TRACK_MELEE);
-		options.put("projectile", InfusionType.STAT_TRACK_PROJECTILE);
-		options.put("magic", InfusionType.STAT_TRACK_MAGIC);
-		options.put("boss", InfusionType.STAT_TRACK_BOSS);
-		options.put("spawners", InfusionType.STAT_TRACK_SPAWNER);
-		options.put("consumed", InfusionType.STAT_TRACK_CONSUMED);
-		options.put("blocks", InfusionType.STAT_TRACK_BLOCKS);
-		options.put("blocksbroken", InfusionType.STAT_TRACK_BLOCKS_BROKEN);
-		options.put("deaths", InfusionType.STAT_TRACK_DEATH);
-		options.put("riptide", InfusionType.STAT_TRACK_RIPTIDE);
-		options.put("shield", InfusionType.STAT_TRACK_SHIELD_BLOCKED);
-		options.put("repair", InfusionType.STAT_TRACK_REPAIR);
-		options.put("convert", InfusionType.STAT_TRACK_CONVERT);
-		options.put("dmgtaken", InfusionType.STAT_TRACK_DAMAGE_TAKEN);
-		options.put("healdone", InfusionType.STAT_TRACK_HEALING_DONE);
-		options.put("fish", InfusionType.STAT_TRACK_FISH_CAUGHT);
-
-		Argument<?> selectionArg = new MultiLiteralArgument("selection", options.keySet().toArray(new String[options.size()]));
+		Argument<?> selectionArg = new MultiLiteralArgument("selection", OPTIONS.keySet().toArray(String[]::new));
 
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
@@ -62,7 +62,7 @@ public class StatTrackItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				InfusionType selection = options.get(args.getUnchecked("selection"));
+				InfusionType selection = OPTIONS.get(args.getUnchecked("selection"));
 				if (selection == null) {
 					throw CommandAPI.failWithString("Invalid stat selection; how did we get here?");
 				}
