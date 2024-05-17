@@ -220,10 +220,10 @@ public class DamageListener implements Listener {
 			double damage = event.getDamage();
 			// Now, set damage to 0.001 (to allow for knockback effects), and customly damage enemy using damage function.
 			event.setDamage(0.001);
-			ProjectileIframe projectileIframe = mPlugin.mEffectManager.getActiveEffect(damagee, ProjectileIframe.class);
 			if (EntityUtils.isTrainingDummy(damagee)) {
 				TrainingDummyBoss.mNextTrueDamageReplacement = event.getType();
 			}
+			ProjectileIframe projectileIframe = mPlugin.mEffectManager.getActiveEffect(damagee, ProjectileIframe.class);
 			if (projectileIframe != null) {
 				int duration = projectileIframe.getDuration();
 				double magnitude = projectileIframe.getMagnitude();

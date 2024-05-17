@@ -263,7 +263,9 @@ public enum ClassAbility {
 	QUAKE("Quake", true),
 	EXPLOSIVE("Explosive", true),
 	INFERNO("Inferno", true),
-	REVERB("Reverb", true);
+	REVERB("Reverb", true),
+	TRIVIUM("Trivium", true)
+	;
 
 	private final String mName;
 	private final boolean mFake;

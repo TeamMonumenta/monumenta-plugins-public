@@ -91,11 +91,11 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			String damageString = damageToString(damage);
 
 			DamageEvent.DamageType type = event.getType();
-			if (mNextTrueDamageReplacement != null && type == DamageEvent.DamageType.TRUE) {
+			ClassAbility ability = event.getAbility();
+			if (mNextTrueDamageReplacement != null && type == DamageEvent.DamageType.TRUE && (ability == null || !ability.isFake())) {
 				type = mNextTrueDamageReplacement;
 			}
 			mNextTrueDamageReplacement = null;
-			ClassAbility ability = event.getAbility();
 
 			Component hoverDamage = Component.text("Damage: " + damageString + "\n");
 			Component hoverType = Component.text("Type: " + type.getDisplay() + "\n");

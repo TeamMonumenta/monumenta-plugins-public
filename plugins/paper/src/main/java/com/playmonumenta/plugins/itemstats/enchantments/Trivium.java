@@ -61,7 +61,7 @@ public class Trivium implements Enchantment {
 								// If this tick had more than 3 of the same damage event of the same ability...
 								// Proc Trivium, damage entity for 10% more damage per level.
 								for (DamageEvent e : eventList) {
-									DamageUtils.damage(p, e.getDamagee(), DamageEvent.DamageType.TRUE, e.getDamage() * (DAMAGE_PER_LEVEL * value), null, true, false);
+									DamageUtils.damage(p, e.getDamagee(), DamageEvent.DamageType.TRUE, e.getDamage() * (DAMAGE_PER_LEVEL * value), ClassAbility.TRIVIUM, true, false);
 								}
 								p.playSound(
 									p.getLocation(),
