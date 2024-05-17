@@ -5,7 +5,9 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.earthbound.Bulwark;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
+import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -142,6 +144,10 @@ public class AbilityHotbar {
 		if (name.equals("")) {
 			if (ability instanceof RapidFire) {
 				name = "RF";
+			} else if (ability instanceof DepthsDodging) {
+				name = "Dg";
+			} else if (ability instanceof Bulwark) {
+				name = "Bw";
 			} else {
 				return Component.text("");
 			}
@@ -153,9 +159,7 @@ public class AbilityHotbar {
 			.append(Component.text("]", NamedTextColor.YELLOW))
 			.append(Component.text(": ", NamedTextColor.WHITE));
 
-		if (charges > 0 && maxCharges > 1) {
-			output = output.append(Component.text(charges + "/" + maxCharges, (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW)));
-		} else if (AbilityUtils.isSilenced(player)) {
+		if (AbilityUtils.isSilenced(player)) {
 			output = output.append(Component.text(((int) Math.ceil(AbilityUtils.getSilenceDuration(player) / 20.0)) + "s", NamedTextColor.RED));
 		} else if (remainingCooldown > 0) {
 			output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GRAY));
