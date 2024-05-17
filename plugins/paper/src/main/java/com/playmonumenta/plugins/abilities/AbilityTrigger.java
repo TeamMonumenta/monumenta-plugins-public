@@ -63,7 +63,10 @@ public class AbilityTrigger {
 
 	public enum KeyOptions {
 		NO_POTION("not holding a potion", "may be holding a potion", Material.POTION,
-			player -> !ItemUtils.isSomePotion(player.getInventory().getItemInMainHand())),
+			player -> {
+				ItemStack mainhand = player.getInventory().getItemInMainHand();
+				return !(ItemUtils.isSomePotion(mainhand) || mainhand.getType() == Material.GLASS_BOTTLE);
+			}),
 		NO_FOOD("not holding food", "may be holding food", Material.COOKED_BEEF,
 			player -> !player.getInventory().getItemInMainHand().getType().isEdible()),
 		NO_PROJECTILE_WEAPON("not holding a projectile weapon", "may be holding a projectile weapon", Material.CROSSBOW,
@@ -75,10 +78,11 @@ public class AbilityTrigger {
 				ItemStack mainhand = player.getInventory().getItemInMainHand();
 				return !mainhand.getType().isBlock() || ItemUtils.isWand(mainhand);
 			}),
-		NO_MISC("not holding a compass, a multitool, or a riptide trident while swimming", "may be holding a compass, a multitool, or a riptide trident while swimming", Material.COMPASS,
+		NO_MISC("not holding a compass, multitool, riptide trident while swimming, or book", "may be holding a compass, multitool, riptide trident while swimming, or book", Material.COMPASS,
 			player -> {
 				ItemStack mainhand = player.getInventory().getItemInMainHand();
-				return !(mainhand.getType() == Material.COMPASS
+				Material type = mainhand.getType();
+				return !(type == Material.COMPASS || type == Material.WRITABLE_BOOK || type == Material.WRITTEN_BOOK
 					|| ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.MULTITOOL)
 					|| PlayerUtils.canRiptide(player, mainhand));
 			}),
