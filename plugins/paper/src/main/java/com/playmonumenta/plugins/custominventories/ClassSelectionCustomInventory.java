@@ -46,6 +46,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	private static final ArrayList<Integer> P3_ABILITY_LOCS = new ArrayList<>(Arrays.asList(9, 14, 18, 23, 27, 32, 36, 41));
 
+	/**
+	 *  gui identifiers are used for rp to put a texture to a gui. they would be unique to each gui and work
+	 *  pretty much like a filler.
+	 *  After implementing sample rp, it is discovered that the theoretical max item size cannot reach our need,
+	 *  so in some guis, two identifiers may be added.
+	 */
+	private static final int GUI_IDENTIFIER_LOC_L = 45; // bottom-left
+	private static final int GUI_IDENTIFIER_LOC_R = 53; // bottom-right
+
 	public static final ArrayList<Integer> P4_SPEC_LOCS = new ArrayList<>(Arrays.asList(20, 30, 40));
 	private static final MonumentaClasses mClasses = new MonumentaClasses();
 	public static final String R3_UNLOCK_SCOREBOARD = "R3Access";
@@ -247,11 +256,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		ItemStack summaryItem = GUIUtils.createBasicItem(Material.SCUTE, "Main Menu", NamedTextColor.WHITE, false,
 			"Pick a class to view abilities within that class. You can reset your class at any time, with no consequences.", NamedTextColor.LIGHT_PURPLE);
+		GUIUtils.setGuiNbtTag(summaryItem, "texture", "class_select_main_menu");
 		mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 
 		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != 0) {
 			ItemStack resetItem = GUIUtils.createBasicItem(Material.CYAN_BED, "Reset Your Class", NamedTextColor.WHITE, false,
 				"Click here to reset your class, allowing access to other choices.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(resetItem, "texture", "class_select_reset_class");
 			if (playerClass != null) {
 				GUIUtils.setGuiNbtTag(resetItem, "Class", playerClass.mClassName);
 			}
@@ -263,6 +274,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization, allowing access to choose either specialization.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(specItem, "texture", "cross_gui_reset_spec");
 			if (playerClass != null) {
 				GUIUtils.setGuiNbtTag(specItem, "Spec",
 					(spec == playerClass.mSpecOne.mSpecialization ? playerClass.mSpecOne : playerClass.mSpecTwo).mSpecName);
@@ -272,7 +284,12 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		ItemStack triggersItem = GUIUtils.createBasicItem(Material.JIGSAW, "Change Ability Triggers", NamedTextColor.WHITE, false,
 			"Click here to change which key combinations are used to cast abilities.", NamedTextColor.LIGHT_PURPLE);
+		GUIUtils.setGuiNbtTag(triggersItem, "texture", "class_select_trigger");
 		mInventory.setItem(P1_CHANGE_TRIGGERS_LOC, triggersItem);
+
+		// set gui identifier
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_1_l"));
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_1_r"));
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -294,9 +311,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		for (AbilityInfo<?> ability : userClass.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator), item);
-			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
+
+			// level one item
+			ItemStack levelOne = createLevelItem(userClass, ability, 1, player, false);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator) + 1, levelOne);
-			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
+
+			// level two item
+			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player, false);
 			mInventory.setItem(P2_ABILITY_LOCS.get(iterator++) + 2, levelTwo);
 		}
 		//specs
@@ -312,6 +333,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		//back button
 		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, "Back",
 			NamedTextColor.GRAY, false, "Return to the class selection page.", NamedTextColor.GRAY);
+		GUIUtils.setGuiNbtTag(backButton, "texture", "skill_select_back");
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
@@ -319,10 +341,24 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(specItem, "texture", "cross_gui_reset_spec");
 			GUIUtils.setGuiNbtTag(specItem, "Spec",
 				(spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
+
+		// set gui identifier
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_1_l");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, guiIdentifier);
+
+		guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_1_r");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -336,12 +372,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		for (AbilityInfo<?> ability : userClass.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator), item);
-			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
+
+			ItemStack levelOne = createLevelItem(userClass, ability, 1, player, false);
 			GUIUtils.setGuiNbtTag(levelOne, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 1, levelOne);
-			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
+
+			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player, false);
 			GUIUtils.setGuiNbtTag(levelTwo, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 2, levelTwo);
+
 			ItemStack enhanceItem = createEnhanceItem(userClass, ability, player);
 			GUIUtils.setGuiNbtTag(enhanceItem, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator++) + 3, enhanceItem);
@@ -360,16 +399,32 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		//back button
 		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, "Back",
 			NamedTextColor.GRAY, false, "Return to the class selection page.", NamedTextColor.GRAY);
+		GUIUtils.setGuiNbtTag(backButton, "texture", "skill_select_back");
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
-		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
+		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(specItem, "texture", "cross_gui_reset_spec");
 			GUIUtils.setGuiNbtTag(specItem, "Spec",
-				(ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+				(spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
+
+		// set gui identifier
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_2_l");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, guiIdentifier);
+
+		guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_2_r");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -382,9 +437,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		for (AbilityInfo<?> ability : spec.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P4_SPEC_LOCS.get(iterator), item);
-			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
+			ItemStack levelOne = createLevelItem(userClass, ability, 1, player, true);
 			mInventory.setItem(P4_SPEC_LOCS.get(iterator) + 1, levelOne);
-			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
+			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player, true);
 			mInventory.setItem(P4_SPEC_LOCS.get(iterator++) + 2, levelTwo);
 		}
 
@@ -396,7 +451,20 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		//back button
 		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, "Back",
 			NamedTextColor.GRAY, false, "Return to the skill selection page.", NamedTextColor.GRAY);
+		GUIUtils.setGuiNbtTag(backButton, "texture", "spec_select_back");
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
+
+		// set gui identifier
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_3_l");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec", spec.mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, guiIdentifier);
+
+		guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_3_r");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec", spec.mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, guiIdentifier);
+
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
 	}
@@ -588,7 +656,8 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 	}
 
-	public ItemStack createLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player) {
+	public ItemStack createLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player, boolean isSpec) {
+		ItemStack levelItem;
 		int getScore;
 		String scoreboard = ability.getScoreboard();
 		if (scoreboard == null) {
@@ -600,34 +669,51 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			}
 		}
 		Material newMat = getScore >= level ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
-		return GUIUtils.createBasicItem(newMat, 1,
+		levelItem = GUIUtils.createBasicItem(newMat, 1,
 			"Level " + level, theClass.mClassColor, true,
 			ability.getDescription(level).color(NamedTextColor.WHITE), 30, true);
+		if (isSpec) {
+			GUIUtils.setGuiNbtTag(levelItem, "texture", "spec_select_" + (getScore >= level ? "spec_lit" : "spec_unlit"));
+		} else {
+			GUIUtils.setGuiNbtTag(levelItem, "texture", "skill_select_" + (getScore >= level ? "sp_lit" : "sp_unlit"));
+		}
+		GUIUtils.setGuiNbtTag(levelItem, "skill", ability.getDisplayName());
+		GUIUtils.setGuiNbtTag(levelItem, "level", "" + level);
+		return levelItem;
 	}
 
 	public ItemStack createEnhanceItem(PlayerClass theClass, AbilityInfo<?> ability, Player player) {
 		if (ability.getDescriptions().size() == 3) {
 			Material newMat;
+			ItemStack newItem;
 			String scoreboard = ability.getScoreboard();
 			switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(player, scoreboard)) {
 				case 0 -> {
 					newMat = Material.BARRIER;
-					return GUIUtils.createBasicItem(newMat, 1,
+					ItemStack disabledEn = GUIUtils.createBasicItem(newMat, 1,
 						"Enhancement", theClass.mClassColor, true,
 						Component.text("Cannot Select; Choose levels in the ability first. Description: ").append(ability.getDescription(3)),
 						30, true);
+					GUIUtils.setGuiNbtTag(disabledEn, "texture", "skill_select_en_disabled");
+					return disabledEn;
 				}
-				case 1, 2 -> newMat = Material.ORANGE_STAINED_GLASS_PANE;
-				case 3, 4 -> newMat = Material.YELLOW_STAINED_GLASS_PANE;
+				case 1, 2 -> {
+					newMat = Material.ORANGE_STAINED_GLASS_PANE;
+				}
+				case 3, 4 -> {
+					newMat = Material.YELLOW_STAINED_GLASS_PANE;
+				}
 				default -> {
 					newMat = Material.BARRIER;
 					return GUIUtils.createBasicItem(newMat, "Unknown Level",
 						theClass.mClassColor, true, "Unknown level for ability.", NamedTextColor.WHITE);
 				}
 			}
-			return GUIUtils.createBasicItem(newMat, 1,
+			newItem = GUIUtils.createBasicItem(newMat, 1,
 				"Enhancement", theClass.mClassColor, true,
 				ability.getDescription(3), 30, true);
+				GUIUtils.setGuiNbtTag(newItem, "texture", (newMat == Material.YELLOW_STAINED_GLASS_PANE) ? "skill_select_en_lit" : "skill_select_en_unlit");
+			return newItem;
 		}
 
 		return GUIUtils.createBasicItem(Material.BARRIER, "No Option",
@@ -684,6 +770,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			int currentEnhanceCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
 			ItemStack summaryItem = GUIUtils.createBasicItem(currentEnhanceCount == 0 ? Material.BARRIER : Material.ENCHANTING_TABLE, "Enhancement Points", NamedTextColor.WHITE, false,
 				"You have " + currentEnhanceCount + " enhancement point" + (currentEnhanceCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_en" + (currentEnhanceCount == 0 ? "_none" : ""));
 			summaryItem.setAmount(currentEnhanceCount > 0 ? currentEnhanceCount : 1);
 			mInventory.setItem(COMMON_REMAINING_ENHANCEMENTS_LOC, summaryItem);
 		}
@@ -691,12 +778,14 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			int currentSpecCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC);
 			ItemStack summaryItem = GUIUtils.createBasicItem(currentSpecCount == 0 ? Material.BARRIER : Material.SAND, "Specialization Points", NamedTextColor.WHITE, false,
 				"You have " + currentSpecCount + " specialization point" + (currentSpecCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_spec" + (currentSpecCount == 0 ? "_none" : ""));
 			summaryItem.setAmount(currentSpecCount > 0 ? currentSpecCount : 1);
 			mInventory.setItem(COMMON_REMAINING_SPEC_LOC, summaryItem);
 		}
 		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
-		ItemStack summaryItem = GUIUtils.createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.GRASS_BLOCK, "Skill Points", NamedTextColor.WHITE, false,
+		ItemStack summaryItem = GUIUtils.createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.GREEN_CONCRETE, "Skill Points", NamedTextColor.WHITE, false,
 			"You have " + currentSkillCount + " skill point" + (currentSkillCount == 1 ? "" : "s") + " remaining.", NamedTextColor.LIGHT_PURPLE);
+		GUIUtils.setGuiNbtTag(summaryItem, "texture", "cross_gui_total_sp" + (currentSkillCount == 0 ? "_none" : ""));
 		summaryItem.setAmount(currentSkillCount > 0 ? currentSkillCount : 1);
 		mInventory.setItem(COMMON_REMAINING_SKILL_LOC, summaryItem);
 	}

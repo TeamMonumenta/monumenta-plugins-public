@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class GUIUtils {
-	public static final String GUI_KEY = "GUI";
+	public static final String GUI_KEY = "Gui";
 	public static final String PLACEHOLDER_KEY = "Placeholder";
 	public static final String FILLER_KEY = "Filler";
 	public static final Material FILLER_MATERIAL = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
@@ -352,6 +352,15 @@ public class GUIUtils {
 		NBT.modify(item, nbt -> {
 			nbt.getOrCreateCompound(GUI_KEY).setString(tagName, value);
 		});
+	}
+
+	/**
+	 * Creates a gui identifier item. This is for the rp to apply gui texture. Other than that it works like a filler.
+	 */
+	public static ItemStack createGuiIdentifierItem(String tag) {
+		ItemStack idItem = createFiller();
+		setGuiNbtTag(idItem, "texture", tag);
+		return idItem;
 	}
 
 	public static boolean isPlaceholder(final @Nullable ItemStack item) {
