@@ -49,8 +49,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	/**
 	 *  gui identifiers are used for rp to put a texture to a gui. they would be unique to each gui and work
 	 *  pretty much like a filler.
+	 *  After implementing sample rp, it is discovered that the theoretical max item size cannot reach our need,
+	 *  so in some guis, two identifiers may be added.
 	 */
-	private static final int GUI_IDENTIFIER_LOC = 45;
+	private static final int GUI_IDENTIFIER_LOC_L = 45; // bottom-left
+	private static final int GUI_IDENTIFIER_LOC_R = 53; // bottom-right
 
 	public static final ArrayList<Integer> P4_SPEC_LOCS = new ArrayList<>(Arrays.asList(20, 30, 40));
 	private static final MonumentaClasses mClasses = new MonumentaClasses();
@@ -285,7 +288,8 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(P1_CHANGE_TRIGGERS_LOC, triggersItem);
 
 		// set gui identifier
-		mInventory.setItem(GUI_IDENTIFIER_LOC, GUIUtils.createGuiIdentifierItem("gui_class_1"));
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_1_l"));
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_1_r"));
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -344,11 +348,17 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		// set gui identifier
-		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_1");
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_1_l");
 		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
 		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
 			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
-		mInventory.setItem(GUI_IDENTIFIER_LOC, guiIdentifier);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, guiIdentifier);
+
+		guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_1_r");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -404,11 +414,17 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		// set gui identifier
-		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_2");
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_2_l");
 		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
 		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
 			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
-		mInventory.setItem(GUI_IDENTIFIER_LOC, guiIdentifier);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, guiIdentifier);
+
+		guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_2_2_r");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec",
+			(spec == 0) ? "none" : (spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();
@@ -439,10 +455,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		// set gui identifier
-		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_3");
+		ItemStack guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_3_l");
 		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
 		GUIUtils.setGuiNbtTag(guiIdentifier, "spec", spec.mSpecName);
-		mInventory.setItem(GUI_IDENTIFIER_LOC, guiIdentifier);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, guiIdentifier);
+
+		guiIdentifier = GUIUtils.createGuiIdentifierItem("gui_class_3_r");
+		GUIUtils.setGuiNbtTag(guiIdentifier, "class", userClass.mClassName);
+		GUIUtils.setGuiNbtTag(guiIdentifier, "spec", spec.mSpecName);
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, guiIdentifier);
 
 		makeRemainingCountItems(player);
 		fillEmptyAndSetPlainTags();

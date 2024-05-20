@@ -30,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 public class AbilityTriggersGui extends Gui {
 
 	private static final Component MAIN_PAGE_TITLE = Component.text("Ability Triggers");
+	private static final int GUI_IDENTIFIER_LOC_L = 45;
+	private static final int GUI_IDENTIFIER_LOC_R = 53;
 	private @Nullable AbilityInfo<?> mSelectedAbility;
 	private @Nullable AbilityTriggerInfo<?> mSelectedTrigger;
 	private @Nullable AbilityTrigger mNewTrigger;
@@ -112,9 +114,11 @@ public class AbilityTriggersGui extends Gui {
 
 			// gui identifier - filler with tag for rp gui support (bottom left corner)
 			if (mPreviousGUI) {
-				setItem(8, GUIUtils.createGuiIdentifierItem("gui_class_4"));
+				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_4_l"));
+				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_4_r"));
 			} else {
-				setItem(8, GUIUtils.createGuiIdentifierItem("gui_depth_4"));
+				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_4_l"));
+				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_4_r"));
 			}
 
 
@@ -312,7 +316,8 @@ public class AbilityTriggersGui extends Gui {
 			}
 
 			// gui identifier - filler with tag for rp gui support (bottom left)
-			setItem(8, GUIUtils.createGuiIdentifierItem("gui_class_5"));
+			setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_5_l"));
+			setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_5_r"));
 
 			// accept/cancel buttons
 			if (!mNewTrigger.equals(mSelectedTrigger.getTrigger())) {
