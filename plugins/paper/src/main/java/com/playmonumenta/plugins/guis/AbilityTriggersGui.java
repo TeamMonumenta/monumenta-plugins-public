@@ -212,7 +212,7 @@ public class AbilityTriggersGui extends Gui {
 				update();
 			});
 			makeBinaryOptionIcon(1, 4, Material.FEATHER, "sneaking", mNewTrigger.getSneaking(), mNewTrigger::setSneaking);
-			makeBinaryOptionIcon(1, 5, Material.LEATHER_BOOTS, "sprinting", mNewTrigger.getSprinting(), mNewTrigger::setSprinting);
+			makeBinaryOptionIcon(1, 5, Material.IRON_BOOTS, "sprinting", mNewTrigger.getSprinting(), mNewTrigger::setSprinting);
 			makeBinaryOptionIcon(1, 6, Material.ROOTED_DIRT, "on ground", mNewTrigger.getOnGround(), mNewTrigger::setOnGround);
 
 			String looking = "Looking " + (mNewTrigger.getLookDirections().size() == 3 ? "anywhere"
