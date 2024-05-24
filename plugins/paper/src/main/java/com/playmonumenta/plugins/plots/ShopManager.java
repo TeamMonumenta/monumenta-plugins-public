@@ -687,15 +687,17 @@ public class ShopManager implements Listener {
 					plat.add(0, 1, 0);
 				}
 			});
+		} else {
+			unlockTileEntities(shop);
 		}
 
 		/* Lock regular entities */
 		for (Entity entity : shop.getEntities()) {
 			if (entity instanceof ItemFrame) {
 				entity.setInvulnerable(true);
-			} else if (entity instanceof ArmorStand) {
+			} else if (entity instanceof ArmorStand armorStand) {
 				entity.setInvulnerable(true);
-				((ArmorStand) entity).setDisabledSlots(EquipmentSlot.values());
+				armorStand.setDisabledSlots(EquipmentSlot.values());
 			}
 		}
 	}
@@ -718,13 +720,26 @@ public class ShopManager implements Listener {
 		shop.particles();
 		shop.enableSurvival();
 
+		unlockTileEntities(shop);
+
+		/* Unlock regular entities */
+		for (Entity entity : shop.getEntities()) {
+			if (entity instanceof ItemFrame) {
+				entity.setInvulnerable(false);
+			} else if (entity instanceof ArmorStand armorStand) {
+				entity.setInvulnerable(false);
+				armorStand.removeDisabledSlots(EquipmentSlot.values());
+			}
+		}
+	}
+
+	private static void unlockTileEntities(Shop shop) {
 		shop.iterExpandedArea((Location plat) -> {
 			/* Unlock tile entities */
 			plat.subtract(0, SHOP_DEPTH, 0);
 			for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
 				BlockState state = plat.getBlock().getState();
 				if (state instanceof Lockable lockable) {
-					((Lockable) state).getLock();
 					if (lockable.getLock().startsWith(LOCK_PREFIX)) {
 						lockable.setLock(null);
 						state.update();
@@ -733,16 +748,6 @@ public class ShopManager implements Listener {
 				plat.add(0, 1, 0);
 			}
 		});
-
-		/* Unlock regular entities */
-		for (Entity entity : shop.getEntities()) {
-			if (entity instanceof ItemFrame) {
-				entity.setInvulnerable(false);
-			} else if (entity instanceof ArmorStand) {
-				entity.setInvulnerable(false);
-				((ArmorStand)entity).removeDisabledSlots(EquipmentSlot.values());
-			}
-		}
 	}
 
 	private static void shopReset(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
