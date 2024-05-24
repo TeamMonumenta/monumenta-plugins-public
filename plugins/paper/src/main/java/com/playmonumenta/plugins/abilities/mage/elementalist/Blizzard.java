@@ -130,7 +130,7 @@ public class Blizzard extends Ability {
 					}
 				}
 
-				mCosmetic.tick(mPlayer, loc);
+				mCosmetic.tick(mPlayer, loc, mTicks, mLevelSize);
 
 				if (mTicks >= mDuration) {
 					this.cancel();
