@@ -144,14 +144,14 @@ public class TabEditListing implements MarketGuiTab {
 				.decoration(TextDecoration.ITALIC, false));
 			if (mOldListing.getAmountToSellRemaining() > 0) {
 				lore.add(MarketGuiIcons.GRAY_DASH
-					.append(Component.text(mOldListing.getAmountToSellRemaining(), NamedTextColor.WHITE))
+					.append(Component.text(mOldListing.getAmountToSellRemaining() * mOldListing.getBundleSize(), NamedTextColor.WHITE))
 					.append(MarketGuiIcons.GRAY_MULTIPLY)
-					.append(Component.text(ItemUtils.getPlainName(mOldListing.getItemToSell()), NamedTextColor.WHITE))
+					.append(ItemUtils.getDisplayName(mOldListing.getItemToSell()))
 					.decoration(TextDecoration.ITALIC, false));
 			}
 			if (mOldListing.getAmountToClaim() > 0) {
 				lore.add(MarketGuiIcons.GRAY_DASH
-					.append(Component.text(mOldListing.getAmountToClaim(), NamedTextColor.WHITE))
+					.append(Component.text(mOldListing.getAmountToClaim() * mOldListing.getAmountToBuy(), NamedTextColor.WHITE))
 					.append(MarketGuiIcons.GRAY_MULTIPLY)
 					.append(Component.text(ItemUtils.getPlainName(mOldListing.getCurrencyToBuy()), NamedTextColor.WHITE))
 					.decoration(TextDecoration.ITALIC, false));

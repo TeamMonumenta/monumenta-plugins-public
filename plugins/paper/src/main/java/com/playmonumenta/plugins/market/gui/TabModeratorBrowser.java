@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.market.gui;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.market.MarketListing;
 import com.playmonumenta.plugins.market.MarketManager;
@@ -87,7 +88,7 @@ public class TabModeratorBrowser implements MarketGuiTab {
 				if (i >= 54) {
 					break;
 				}
-				mGui.setItem(i++, listing.getListingDisplayItemStack(mPlayer, mGui.TAB_BAZAAR_BROWSER))
+				mGui.setItem(i++, new GuiItem(listing.getListingDisplayItemStack(mPlayer, mGui.TAB_BAZAAR_BROWSER), false))
 					.onClick((clickEvent) -> switchToBuyListingAction(listing));
 			}
 		}

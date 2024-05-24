@@ -72,8 +72,9 @@ public class MarketAudit {
 		String message = "CREATE\n" +
 			"Player : " + player.getName() + "\n" +
 			"Listing : " + targetListing.getDisplayId() + "\n" +
-			"To Sell : " + targetListing.getAmountToSellRemaining() + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
-		    "Price : " + targetListing.getAmountToBuy() + " * " + ItemUtils.getPlainName(targetListing.getCurrencyToBuy()) + "\n" +
+			"Trade : " + targetListing.getBundleSize() + " * " + getItemNameFromItemStack(targetListing.getItemToSell()) + "\n" +
+			"Amount of Trades : " + targetListing.getAmountToSellRemaining() + "\n" +
+		    "Price Per Trade : " + targetListing.getAmountToBuy() + " * " + ItemUtils.getPlainName(targetListing.getCurrencyToBuy()) + "\n" +
 			"Tax paid : " + taxDebt.mTotalRequiredAmount + " * " + ItemUtils.getPlainName(taxDebt.mItem);
 		AuditListener.logMarket(message);
 	}

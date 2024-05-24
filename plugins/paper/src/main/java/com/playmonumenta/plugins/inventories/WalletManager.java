@@ -918,6 +918,17 @@ public class WalletManager implements Listener {
 		return false;
 	}
 
+	public static List<CompressionInfo> getAllCompresionInfoMatchingBase(ItemStack item) {
+		List<CompressionInfo> out = new ArrayList<>();
+		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
+			if (compressionInfo.mBase.isSimilar(item)) {
+				out.add(compressionInfo);
+			}
+		}
+		out.sort(Comparator.comparingInt(o -> o.mAmount));
+		return out;
+	}
+
 	public static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
 		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
 			if (compressionInfo.mCompressed.isSimilar(item)) {

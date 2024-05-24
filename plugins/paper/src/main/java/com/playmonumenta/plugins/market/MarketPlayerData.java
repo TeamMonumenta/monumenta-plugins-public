@@ -9,6 +9,7 @@ import java.util.List;
 public class MarketPlayerData {
 	private final HashSet<Long> mOwnedListingIDList;
 	private List<MarketFilter> mPlayerFilters;
+	private MarketPlayerOptions mPlayerOptions;
 
 	public MarketPlayerData() {
 		this.mOwnedListingIDList = new HashSet<>();
@@ -56,5 +57,13 @@ public class MarketPlayerData {
 			MarketFilter.PREMADE_EQUIPABLE,
 			MarketFilter.PREMADE_NOTEQUIPABLE
 		));
+	}
+
+	public MarketPlayerOptions getPlayerOptions() {
+		return mPlayerOptions;
+	}
+
+	public void setPlayerOptions(MarketPlayerOptions playerOptions) {
+		this.mPlayerOptions = playerOptions;
 	}
 }

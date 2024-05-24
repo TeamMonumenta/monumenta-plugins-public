@@ -24,7 +24,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
@@ -48,8 +47,11 @@ public class MarketListing {
 	// the item to be sold
 	private final long mItemToSellID;
 
-	// amount of items left to be sold
+	// amount of trades left to be sold
 	private int mAmountToSellRemaining;
+
+	// amount of items per trade
+	private final int mBundleSize;
 
 	// item (currency) used to buy the item to be sold
 	private final long mCurrencyToBuyID;
@@ -67,7 +69,7 @@ public class MarketListing {
 	final String mListingCreationDate;
 
 	// date of expected expiration
-	private long mExpirationDate;
+	private final long mExpirationDate;
 
 	// Display name of the seller
 	private @Nullable String mOwnerName;
@@ -82,33 +84,28 @@ public class MarketListing {
 	private boolean mExpired;
 
 	// the region of the sold item. used for indexes/filters
-	private @Nullable
-	final Region mRegion;
+	private @Nullable Region mRegion;
 
 	// the location (sub-region, dungeon, etc...) of the sold item. used for indexes/filters
-	private @Nullable
-	final Location mLocation;
+	private @Nullable Location mLocation;
 
-	private @Nullable
-	final String mItemName;
+	private @Nullable String mItemName;
 
-	private @Nullable
-	final String mCurrencyName;
+	private @Nullable String mCurrencyName;
 
-	private @Nullable
-	final ItemType mItemType;
+	private @Nullable ItemType mItemType;
 
-	private @Nullable
-	final Tier mItemTier;
+	private @Nullable Tier mItemTier;
 
 	private @Nullable String mEditLocked;
 
-	public MarketListing(long listingID, MarketListingType type, long itemToSellID, int amountToSell, int pricePerItemAmount, long currencyToBuyID, Player owner) {
+	public MarketListing(long listingID, MarketListingType type, long itemToSellID, int amountToSell, int bundleSize, int pricePerTradeAmount, long currencyToBuyID, Player owner) {
 		this.mId = listingID;
 		this.mListingType = type;
 		this.mItemToSellID = itemToSellID;
 		this.mAmountToSellRemaining = amountToSell;
-		this.mAmountToBuy = pricePerItemAmount;
+		this.mAmountToBuy = pricePerTradeAmount;
+		this.mBundleSize = bundleSize;
 		this.mCurrencyToBuyID = currencyToBuyID;
 		this.mAmountToClaim = 0;
 		this.mListingCreationDate = DateUtils.trueUtcDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
@@ -119,15 +116,21 @@ public class MarketListing {
 		this.mExpired = false;
 		this.mEditLocked = null;
 
-		ItemStack itemToSell = MarketItemDatabase.getItemStackFromID(itemToSellID);
+		this.recalculateListingIndexValues();
+	}
+
+	public void recalculateListingIndexValues() {
+
+		ItemStack itemToSell = MarketItemDatabase.getItemStackFromID(this.mItemToSellID);
 		this.mRegion = ItemStatUtils.getRegion(itemToSell);
 		this.mLocation = ItemStatUtils.getLocation(itemToSell);
 		this.mItemName = ItemUtils.getPlainNameOrDefault(itemToSell);
 		this.mItemType = ItemUtils.getItemType(itemToSell);
 		this.mItemTier = ItemStatUtils.getTier(itemToSell);
 
-		ItemStack currencyToBuy = MarketItemDatabase.getItemStackFromID(currencyToBuyID);
+		ItemStack currencyToBuy = MarketItemDatabase.getItemStackFromID(this.mCurrencyToBuyID);
 		this.mCurrencyName = convertCurrencyItemStackToSmallestCurrencyName(currencyToBuy);
+
 	}
 
 	public MarketListing(Long listingID) {
@@ -137,6 +140,7 @@ public class MarketListing {
 		this.mItemName = "";
 		this.mAmountToSellRemaining = 0;
 		this.mAmountToBuy = 0;
+		this.mBundleSize = 0;
 		this.mCurrencyToBuyID = 0;
 		this.mAmountToClaim = 0;
 		this.mListingCreationDate = null;
@@ -158,6 +162,7 @@ public class MarketListing {
 		this.mItemToSellID = other.mItemToSellID;
 		this.mItemName = other.mItemName;
 		this.mAmountToSellRemaining = other.mAmountToSellRemaining;
+		this.mBundleSize = other.mBundleSize;
 		this.mCurrencyToBuyID = other.mCurrencyToBuyID;
 		this.mAmountToBuy = other.mAmountToBuy;
 		this.mAmountToClaim = other.mAmountToClaim;
@@ -173,6 +178,30 @@ public class MarketListing {
 		this.mCurrencyName = other.mCurrencyName;
 		this.mItemType = other.mItemType;
 		this.mItemTier = other.mItemTier;
+	}
+
+	public boolean isSimilar(MarketListing listing) {
+		return mId == listing.mId
+			&& mListingType == listing.mListingType
+			&& mAmountToSellRemaining == listing.mAmountToSellRemaining
+			&& mBundleSize == listing.mBundleSize
+			&& mAmountToBuy == listing.mAmountToBuy
+			&& mAmountToClaim == listing.mAmountToClaim
+			&& mLocked == listing.mLocked
+			&& mExpired == listing.mExpired
+			&& mItemToSellID == listing.mItemToSellID
+			&& mCurrencyToBuyID == listing.mCurrencyToBuyID
+			&& Objects.equals(mListingCreationDate, listing.mListingCreationDate)
+			&& mExpirationDate == listing.mExpirationDate
+			&& Objects.equals(mOwnerName, listing.mOwnerName)
+			&& mRegion == listing.mRegion
+			&& mLocation == listing.mLocation
+			&& Objects.equals(mEditLocked, listing.mEditLocked)
+			&& Objects.equals(mItemName, listing.mItemName)
+			&& Objects.equals(mCurrencyName, listing.mCurrencyName)
+			&& mItemType == listing.mItemType
+			&& mItemTier == listing.mItemTier
+			;
 	}
 
 	public long getId() {
@@ -234,8 +263,15 @@ public class MarketListing {
 		}
 		prevLore.addAll(newLore);
 		itemMeta.lore(prevLore);
+		if (getBundleSize() > 1) {
+			itemMeta.displayName(Component.text(getBundleSize() + " * ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).append(ItemUtils.getDisplayName(getItemToSell())));
+		}
 
 		item.setItemMeta(itemMeta);
+
+		item.setAmount(getBundleSize());
+
+		ItemUtils.setPlainName(item, ItemUtils.getPlainName(getItemToSell()));
 
 		return item;
 	}
@@ -256,7 +292,7 @@ public class MarketListing {
 		return newLore;
 	}
 
-	private Collection<? extends Component> getListingDisplayLorePlayerListings() {
+	private List<Component> getListingDisplayLorePlayerListings() {
 
 		List<Component> newLore = new ArrayList<>();
 
@@ -285,6 +321,10 @@ public class MarketListing {
 				.decoration(TextDecoration.ITALIC, false)
 			);
 			newLore.add(Component.text("Stock sold: ", NamedTextColor.GRAY).append(Component.text(Integer.toString(this.getAmountToClaim()), NamedTextColor.GREEN)).decoration(TextDecoration.ITALIC, false));
+		} else if (this.isExpired() || (this.getAmountToSellRemaining() == 0 && this.getAmountToClaim() == 0)) {
+			newLore.add(Component.empty());
+			newLore.add(Component.text("No stock left, and nothing to claim!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+			newLore.add(Component.text("Right click to delete this listing.", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 		}
 
 		newLore.add(Component.empty());
@@ -293,16 +333,93 @@ public class MarketListing {
 		return newLore;
 	}
 
+	public List<Component> getFullPriceTag(Player player) {
+
+		ItemStack currency = this.getCurrencyToBuy().clone();
+		ItemStack baseCurrency = currency;
+		int uncompressedAmount = this.getAmountToBuy();
+		WalletManager.CompressionInfo info = WalletManager.getCompressionInfo(currency);
+		if (info != null) {
+			uncompressedAmount *= info.mAmount;
+			baseCurrency = info.mBase;
+		}
+
+		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(baseCurrency.asQuantity(uncompressedAmount), player, true);
+
+		Component shortenedDisplayComp = switch (ItemUtils.getPlainName(baseCurrency)) {
+			case "Experience Bottle" -> calcShortenedDisplayCompForXP(uncompressedAmount);
+			case "Crystalline Shard" -> calcShortenedDisplayCompForCS(uncompressedAmount);
+			case "Archos Ring" -> calcShortenedDisplayCompForAR(uncompressedAmount);
+			default -> throw new IllegalStateException("Unexpected value: " + ItemUtils.getPlainName(baseCurrency));
+		};
+
+		List<Component> out = new ArrayList<>();
+
+		out.add(Component.text("Price:", NamedTextColor.YELLOW).append(shortenedDisplayComp).append(Component.text(debt.mMeetsRequirement ? " ✓" : " ✗", (debt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
+		out.add(Component.text("(" + uncompressedAmount + " " + ItemUtils.getPlainName(baseCurrency) + (debt.mWalletDebt > 0 ? ", " + debt.mNumInWallet + " in wallet)" : ")"), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+
+		return out;
+	}
+
+	private Component calcShortenedDisplayCompForXP(int uncompressedAmount) {
+		int xp = uncompressedAmount % 8;
+		uncompressedAmount = uncompressedAmount / 8;
+		int cxp = uncompressedAmount % 64;
+		int hxp = uncompressedAmount / 64;
+
+		Component out = Component.text("", NamedTextColor.GRAY);
+		if (hxp > 0) {
+			out = out.append(Component.text(" " + hxp, NamedTextColor.GRAY)).append(Component.text("Hxp", NamedTextColor.GOLD));
+		}
+		if (cxp > 0) {
+			out = out.append(Component.text(" " + cxp, NamedTextColor.GRAY)).append(Component.text("Cxp", NamedTextColor.GOLD));
+		}
+		if (xp > 0) {
+			out = out.append(Component.text(" " + xp, NamedTextColor.GRAY)).append(Component.text("xp", NamedTextColor.GOLD));
+		}
+		return out;
+	}
+
+	private Component calcShortenedDisplayCompForCS(int uncompressedAmount) {
+		int cs = uncompressedAmount % 8;
+		uncompressedAmount = uncompressedAmount / 8;
+		int ccs = uncompressedAmount % 64;
+		int hcs = uncompressedAmount / 64;
+
+		Component out = Component.text("", NamedTextColor.GRAY);
+		if (hcs > 0) {
+			out = out.append(Component.text(" " + hcs, NamedTextColor.GRAY)).append(Component.text("Hcs", NamedTextColor.AQUA));
+		}
+		if (ccs > 0) {
+			out = out.append(Component.text(" " + ccs, NamedTextColor.GRAY)).append(Component.text("Ccs", NamedTextColor.AQUA));
+		}
+		if (cs > 0) {
+			out = out.append(Component.text(" " + cs, NamedTextColor.GRAY)).append(Component.text("cs", NamedTextColor.AQUA));
+		}
+		return out;
+	}
+
+	private Component calcShortenedDisplayCompForAR(int uncompressedAmount) {
+		int ar = uncompressedAmount % 64;
+		int har = uncompressedAmount / 64;
+
+		Component out = Component.text("", NamedTextColor.GRAY);
+		if (har > 0) {
+			out = out.append(Component.text(" " + har, NamedTextColor.GRAY)).append(Component.text("Har", NamedTextColor.WHITE));
+		}
+		if (ar > 0) {
+			out = out.append(Component.text(" " + ar, NamedTextColor.GRAY)).append(Component.text("ar", NamedTextColor.WHITE));
+		}
+		return out;
+	}
+
 	public List<Component> getListingDisplayLoreListingsBrowser(Player player) {
 		List<Component> newLore = new ArrayList<>();
 
 		// requirement (itemToBuy)
 		ItemStack currency = this.getCurrencyToBuy().clone();
 		currency.setAmount(this.getAmountToBuy());
-		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, player, true);
-		newLore.add(Component.text(this.getAmountToBuy() + " " + ItemUtils.getPlainName(currency) + " ", NamedTextColor.WHITE)
-			.append(Component.text(debt.mMeetsRequirement ? "✓" : "✗", (debt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED)))
-			.append(Component.text(debt.mWalletDebt > 0 ? " (" + debt.mNumInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
+		newLore.addAll(getFullPriceTag(player));
 
 		// listing locked
 		if (this.isLocked()) {
@@ -399,30 +516,6 @@ public class MarketListing {
 		}
 
 		return MarketListingStatus.IS_PURCHASABLE;
-	}
-
-
-	public boolean isSimilar(MarketListing listing) {
-		return mId == listing.mId
-			&& mListingType == listing.mListingType
-			&& mAmountToSellRemaining == listing.mAmountToSellRemaining
-			&& mAmountToBuy == listing.mAmountToBuy
-			&& mAmountToClaim == listing.mAmountToClaim
-			&& mLocked == listing.mLocked
-			&& mExpired == listing.mExpired
-			&& mItemToSellID == listing.mItemToSellID
-			&& mCurrencyToBuyID == listing.mCurrencyToBuyID
-			&& Objects.equals(mListingCreationDate, listing.mListingCreationDate)
-			&& mExpirationDate == listing.mExpirationDate
-			&& Objects.equals(mOwnerName, listing.mOwnerName)
-			&& mRegion == listing.mRegion
-			&& mLocation == listing.mLocation
-			&& Objects.equals(mEditLocked, listing.mEditLocked)
-			&& Objects.equals(mItemName, listing.mItemName)
-			&& Objects.equals(mCurrencyName, listing.mCurrencyName)
-			&& mItemType == listing.mItemType
-			&& mItemTier == listing.mItemTier
-			;
 	}
 
 	public @Nullable String getEditLocked() {
@@ -541,5 +634,12 @@ public class MarketListing {
 			return ItemStatUtils.getTier(this.getItemToSell());
 		}
 		return mItemTier;
+	}
+
+	public int getBundleSize() {
+		if (mBundleSize == 0) {
+			return 1;
+		}
+		return mBundleSize;
 	}
 }

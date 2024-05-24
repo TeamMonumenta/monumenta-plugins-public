@@ -28,16 +28,16 @@ public enum ItemType {
 	public static ItemType of(ItemStack item) {
 		if (ItemStatUtils.isCharm(item)) {
 			return CHARM;
+		} else if (item.getType() == Material.SHIELD) {
+				return SHIELD;
 		} else if (ItemUtils.isArmorOrWearable(item)) {
 			return switch (ItemUtils.getEquipmentSlot(item)) {
-				case HEAD -> HELMET;
+				case HEAD -> (ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND) || ItemStatUtils.hasEnchantments(item) ? HELMET : MISC);
 				case CHEST -> CHESTPLATE;
 				case LEGS -> LEGGINGS;
 				case FEET -> BOOTS;
 				case HAND, OFF_HAND -> MISC;
 			};
-		} else if (item.getType() == Material.SHIELD) {
-			return SHIELD;
 		} else if (ItemUtils.isAlchemistItem(item)) {
 			return ALCHEMIST;
 		} else if (ItemUtils.isWand(item)) {

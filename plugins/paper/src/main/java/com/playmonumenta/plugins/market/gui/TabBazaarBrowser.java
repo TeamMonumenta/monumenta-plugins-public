@@ -219,6 +219,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 					filter = MarketFilter.mergeOf(filter, quicksearch);
 				}
 				filter.setSorter(new Sorter(mLoadedSortbyIndexes.get(mSelectedSortByIndex), mSortByDesc));
+				filter.startWithActiveOnly(true);
 
 				mListingsIDList = MarketRedisManager.getAllListingsIdsMatchingFilter(filter);
 				mLoadingStatus = 2;
@@ -239,6 +240,10 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	}
 
 	private List<MarketListing> loadListingsInPageFromLoadedListingsIdList() {
+		int max = getMaxPageDisplayable();
+		if (mCurrentPage > max) {
+			mCurrentPage = 0;
+		}
 		int searchIndex = mCurrentPage * 45;
 		ArrayList<MarketListing> listingsForPage = new ArrayList<>();
 
@@ -278,7 +283,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 				if (i >= 54) {
 					break;
 				}
-				mGui.setItem(i++, listing.getListingDisplayItemStack(mGui.mPlayer, mGui.TAB_BAZAAR_BROWSER))
+				mGui.setItem(i++, new GuiItem(listing.getListingDisplayItemStack(mGui.mPlayer, mGui.TAB_BAZAAR_BROWSER), false))
 					.onClick((clickEvent) -> switchToBuyListingAction(listing));
 			}
 		}
@@ -309,7 +314,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 							mCurrentPage = 0;
 						}
 						if (mCurrentPage < 0) {
-							mCurrentPage = maxPage;
+							mCurrentPage = maxPage - 1;
 						}
 						mLoadingStatus = 2;
 						mGui.open();

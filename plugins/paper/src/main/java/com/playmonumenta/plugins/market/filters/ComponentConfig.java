@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.market.filters;
 
+import com.playmonumenta.plugins.itemstats.enums.ItemType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.market.MarketListingIndex;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -28,6 +30,8 @@ public class ComponentConfig {
 	public static final Map<String, ComponentConfigObject> REGION_CONFIG;
 	public static final Map<String, ComponentConfigObject> CURRENCY_CONFIG;
 	public static final Map<String, ComponentConfigObject> LOCATION_CONFIG;
+	public static final Map<String, ComponentConfigObject> TYPE_CONFIG;
+	public static final Map<String, ComponentConfigObject> TIER_CONFIG;
 
 	@Nullable public static Map<String, ComponentConfigObject> mSelectedMap;
 
@@ -39,19 +43,49 @@ public class ComponentConfig {
 		put(Region.VALLEY.toString(), "King's Valley", null, ItemUtils.createBanner(Material.CYAN_BANNER, new Pattern(DyeColor.LIGHT_BLUE, PatternType.CROSS), new Pattern(DyeColor.BLUE, PatternType.CIRCLE_MIDDLE), new Pattern(DyeColor.BLACK, PatternType.FLOWER), new Pattern(DyeColor.BLUE, PatternType.TRIANGLES_TOP), new Pattern(DyeColor.BLUE, PatternType.TRIANGLES_BOTTOM)));
 		put(Region.ISLES.toString(), "Celsian Isles", "Quest101<13", ItemUtils.createBanner(Material.GREEN_BANNER, new Pattern(DyeColor.LIME, PatternType.GRADIENT_UP), new Pattern(DyeColor.GREEN, PatternType.BORDER), new Pattern(DyeColor.GREEN, PatternType.RHOMBUS_MIDDLE), new Pattern(DyeColor.LIME, PatternType.CIRCLE_MIDDLE)));
 		put(Region.RING.toString(), "Architect's Ring", "R3Access<1", ItemUtils.createBanner(Material.WHITE_BANNER, new Pattern(DyeColor.BROWN, PatternType.STRIPE_SMALL), new Pattern(DyeColor.GREEN, PatternType.TRIANGLES_BOTTOM), new Pattern(DyeColor.GREEN, PatternType.TRIANGLES_TOP), new Pattern(DyeColor.LIGHT_GRAY, PatternType.GRADIENT), new Pattern(DyeColor.GREEN, PatternType.STRIPE_MIDDLE), new Pattern(DyeColor.GRAY, PatternType.GRADIENT_UP), new Pattern(DyeColor.BLACK, PatternType.FLOWER), new Pattern(DyeColor.WHITE, PatternType.CIRCLE_MIDDLE)));
+		put(Region.SHULKER_BOX.toString(), "Multi-Region", null, ItemUtils.createBanner(Material.WHITE_BANNER));
+		put(Region.NONE.toString(), "No Region", null, ItemUtils.createBanner(Material.BLACK_BANNER));
 
 		CURRENCY_CONFIG = new HashMap<>();
 		selectMap(CURRENCY_CONFIG);
-		put("Experience Bottle", null, null, null);
-		put("Crystalline Shard", null, "Quest101<13", null);
-		put("Archos Ring", null, "R3Access<1", null);
+		put("Experience Bottle", "Experience Bottles", null, "epic:r1/items/currency/experience");
+		put("Crystalline Shard", "Crystalline Shards", "Quest101<13", "epic:r2/items/currency/crystalline_shard");
+		put("Archos Ring", "Archos Rings", "R3Access<1", "epic:r3/items/currency/archos_ring");
+
+		TYPE_CONFIG = new HashMap<>();
+		selectMap(TYPE_CONFIG);
+		put(ItemType.HELMET.toString(), "Helmets", null, new ItemStack(Material.LEATHER_HELMET, 1));
+		put(ItemType.CHESTPLATE.toString(), "Chestplates", null, new ItemStack(Material.LEATHER_CHESTPLATE, 1));
+		put(ItemType.LEGGINGS.toString(), "Leggings", null, new ItemStack(Material.LEATHER_LEGGINGS, 1));
+		put(ItemType.BOOTS.toString(), "Boots", null, new ItemStack(Material.LEATHER_BOOTS, 1));
+		put(ItemType.SHIELD.toString(), "Shields", null, new ItemStack(Material.SHIELD, 1));
+		put(ItemType.OFFHAND.toString(), "OffHands", null, new ItemStack(Material.TOTEM_OF_UNDYING, 1));
+		put(ItemType.AXE.toString(), "Axes", null, new ItemStack(Material.IRON_AXE, 1));
+		put(ItemType.SHOVEL.toString(), "Shovels", null, new ItemStack(Material.IRON_SHOVEL, 1));
+		put(ItemType.PICKAXE.toString(), "Pickaxes", null, new ItemStack(Material.IRON_PICKAXE, 1));
+		put(ItemType.MAINHAND.toString(), "Swords/Mainhand", null, new ItemStack(Material.IRON_SWORD, 1));
+		put(ItemType.SCYTHE.toString(), "Scythes", null, new ItemStack(Material.IRON_HOE, 1));
+		put(ItemType.WAND.toString(), "Wands", null, new ItemStack(Material.STICK, 1));
+		put(ItemType.ALCHEMIST.toString(), "Alchemist bags", null, "epic:r1/items/alchemists_bag");
+		put(ItemType.RANGED.toString(), "Bows/Ranged", null, new ItemStack(Material.BOW, 1));
+		put(ItemType.CONSUMABLE.toString(), "Consumable", null, new ItemStack(Material.COOKED_BEEF, 1));
+		put(ItemType.CHARM.toString(), "Charms", "Quest101<13", new ItemStack(Material.NETHER_STAR, 1));
+		put(ItemType.MISC.toString(), "Miscellaneous", null, new ItemStack(Material.LEATHER, 1));
+
+		TIER_CONFIG = new HashMap<>();
+		selectMap(TIER_CONFIG);
+		put(Tier.NONE.toString(), "No Tier", null, ItemUtils.createBanner(Material.WHITE_BANNER));
+		put(Tier.ZERO.toString(), "Tier 0", null, ItemUtils.createBanner(Material.WHITE_BANNER, new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM), new Pattern(DyeColor.BLACK, PatternType.STRIPE_LEFT), new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLACK, PatternType.STRIPE_RIGHT), new Pattern(DyeColor.BLACK, PatternType.STRIPE_DOWNLEFT), new Pattern(DyeColor.WHITE, PatternType.BORDER)));
+		put(Tier.I.toString(), "Tier 1", null, ItemUtils.createBanner(Material.WHITE_BANNER, new Pattern(DyeColor.BLACK, PatternType.STRIPE_CENTER), new Pattern(DyeColor.BLACK, PatternType.SQUARE_TOP_LEFT), new Pattern(DyeColor.WHITE, PatternType.CURLY_BORDER), new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM), new Pattern(DyeColor.WHITE, PatternType.BORDER)));
+		put(Tier.II.toString(), "Tier 2", null, ItemUtils.createBanner(Material.WHITE_BANNER, new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP), new Pattern(DyeColor.WHITE, PatternType.RHOMBUS_MIDDLE), new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM), new Pattern(DyeColor.BLACK, PatternType.STRIPE_DOWNLEFT), new Pattern(DyeColor.WHITE, PatternType.BORDER)));
+		put(Tier.III.toString(), "Tier 3", null, ItemUtils.createBanner(Material.WHITE_BANNER, new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM), new Pattern(DyeColor.BLACK, PatternType.STRIPE_MIDDLE), new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP), new Pattern(DyeColor.WHITE, PatternType.CURLY_BORDER), new Pattern(DyeColor.BLACK, PatternType.STRIPE_RIGHT), new Pattern(DyeColor.WHITE, PatternType.BORDER)));
+		put(Tier.IV.toString(), "Tier 4", null, ItemUtils.createBanner(Material.WHITE_BANNER, new Pattern(DyeColor.BLACK, PatternType.STRIPE_LEFT), new Pattern(DyeColor.WHITE, PatternType.HALF_HORIZONTAL_MIRROR), new Pattern(DyeColor.BLACK, PatternType.STRIPE_RIGHT), new Pattern(DyeColor.BLACK, PatternType.STRIPE_MIDDLE), new Pattern(DyeColor.WHITE, PatternType.BORDER)));
+		put(Tier.V.toString(), "Tier 5", null, ItemUtils.createBanner(Material.WHITE_BANNER, new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM), new Pattern(DyeColor.WHITE, PatternType.RHOMBUS_MIDDLE), new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLACK, PatternType.STRIPE_DOWNRIGHT), new Pattern(DyeColor.WHITE, PatternType.BORDER)));
 
 		LOCATION_CONFIG = new HashMap<>();
 		selectMap(LOCATION_CONFIG);
-
-		// NO REGION
-		put(Location.NONE.toString(), "No locations", null, null);
-		put(Location.SOULTHREAD, null);
+		put(Location.NONE, "No location", null, new ItemStack(Material.STRUCTURE_VOID, 1));
+		put(Location.SOULTHREAD, "Soul Threads", null, "epic:soul/soul_thread");
 		put(Location.QUEST, null);
 		put(Location.TRANSMOG, null);
 		put(Location.MYTHIC, null);
@@ -150,7 +184,7 @@ public class ComponentConfig {
 
 	private static void selectMap(Map<String, ComponentConfigObject> map) {
 		mSelectedMap = map;
-		mOrderIncrement = 0;
+		mOrderIncrement = 1;
 	}
 
 	private static void put(String key, @Nullable String displayName, @Nullable String conditions, @Nullable ItemStack displayIcon) {
@@ -169,6 +203,24 @@ public class ComponentConfig {
 	private static void put(Location loc, @Nullable String conditions, @NotNull String displayIconPath) {
 		if (mSelectedMap != null) {
 			mSelectedMap.put(loc.toString(), new ComponentConfigObject(mOrderIncrement++, loc.getDisplayName(), conditions, InventoryUtils.getItemFromLootTable(new org.bukkit.Location(Bukkit.getWorlds().get(0), 0, 0, 0), NamespacedKeyUtils.fromString(displayIconPath))));
+		}
+	}
+
+	private static void put(Location loc, @Nullable String displayName, @Nullable String conditions, @Nullable ItemStack displayIcon) {
+		if (mSelectedMap != null) {
+			mSelectedMap.put(loc.toString(), new ComponentConfigObject(mOrderIncrement++, displayName, conditions, displayIcon));
+		}
+	}
+
+	private static void put(Location loc, @Nullable String displayName, @Nullable String conditions, @NotNull String displayIconPath) {
+		if (mSelectedMap != null) {
+			mSelectedMap.put(loc.toString(), new ComponentConfigObject(mOrderIncrement++, displayName, conditions, InventoryUtils.getItemFromLootTable(new org.bukkit.Location(Bukkit.getWorlds().get(0), 0, 0, 0), NamespacedKeyUtils.fromString(displayIconPath))));
+		}
+	}
+
+	private static void put(String key, @Nullable String displayName, @Nullable String conditions, @NotNull String displayIconPath) {
+		if (mSelectedMap != null) {
+			mSelectedMap.put(key, new ComponentConfigObject(mOrderIncrement++, displayName, conditions, InventoryUtils.getItemFromLootTable(new org.bukkit.Location(Bukkit.getWorlds().get(0), 0, 0, 0), NamespacedKeyUtils.fromString(displayIconPath))));
 		}
 	}
 

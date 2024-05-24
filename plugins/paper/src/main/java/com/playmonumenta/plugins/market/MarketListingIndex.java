@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public enum MarketListingIndex {
@@ -84,7 +85,7 @@ public enum MarketListingIndex {
 		(MarketListing l) -> l.getItemType() != null,
 		true,
 		Material.FLOWER_BANNER_PATTERN,
-		null
+		ComponentConfig.TYPE_CONFIG
 	),
 
 	TIER("Tier",
@@ -93,7 +94,7 @@ public enum MarketListingIndex {
 		(MarketListing l) -> l.getItemTier() != null,
 		true,
 		Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE,
-		null
+		ComponentConfig.TIER_CONFIG
 	),
 
 	;
@@ -261,7 +262,7 @@ public enum MarketListingIndex {
 
 	}
 
-	public static void resyncAllIndexes() {
+	public static void resyncAllIndexes(Player player) {
 
 		// init
 		HashMap<MarketListingIndex, HashMap<String, ArrayList<Long>>> indexValuesMap = new HashMap<>();
@@ -282,6 +283,14 @@ public enum MarketListingIndex {
 			Map<String, String> map = hscanResult.getMap();
 			for (String json : map.values()) {
 				MarketListing listing = new Gson().fromJson(json, MarketListing.class);
+				// maybe some indexed fields changed their definition. recalculate, and update on the redis side if something got changed
+				MarketListing updatedListing = new MarketListing(listing);
+				updatedListing.recalculateListingIndexValues();
+				if (!listing.isSimilar(updatedListing)) {
+					if (MarketRedisManager.updateListingSafe(player, listing, updatedListing)) {
+						listing = updatedListing;
+					}
+				}
 
 				// store index data from listing
 				for (MarketListingIndex index : MarketListingIndex.values()) {

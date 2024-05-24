@@ -38,7 +38,7 @@ public class TabChooseCurrency implements MarketGuiTab {
 
 				mGui.setItem(1 + region, 3 + compression, MarketGuiIcons.buildChooseCurrencyIcon(currency))
 					.onLeftClick(() -> {
-						mGui.mCurrencyItem = currency;
+						((TabAddListing)mGui.TAB_ADD_LISTING).setCurrency(currency);
 						mGui.switchToTab(mGui.TAB_ADD_LISTING);
 					});
 			}

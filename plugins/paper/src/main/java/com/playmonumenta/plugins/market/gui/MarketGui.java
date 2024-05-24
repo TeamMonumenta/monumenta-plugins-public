@@ -6,28 +6,17 @@ import com.playmonumenta.plugins.market.MarketListing;
 import com.playmonumenta.plugins.market.MarketManager;
 import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class MarketGui extends Gui {
@@ -44,18 +33,7 @@ public class MarketGui extends Gui {
 	final MarketGuiTab TAB_PLAYER_LISTINGS = new TabPlayerListings(this);
 	final MarketGuiTab TAB_EDIT_LISTING = new TabEditListing(this);
 	final MarketGuiTab TAB_EDIT_FILTERS = new TabEditFilters(this);
-
-	// represents the item that is going to be sold
-	@Nullable ItemStack mItemToSell = null;
-
-	// represents the amount of item to be sold
-	int mAmountToSell = 0;
-
-	// represents the price per item
-	int mPricePerItemAmount = 1;
-
-	// represents the currency of the new listing
-	@Nullable ItemStack mCurrencyItem = InventoryUtils.getItemFromLootTableOrWarn(mPlayer.getLocation(), NamespacedKeyUtils.fromString("epic:r2/items/currency/compressed_crystalline_shard"));
+	final MarketGuiTab TAB_EDIT_OPTIONS = new TabEditOptions(this);
 
 	// status for the ongling data loading
 	// 0 -> no data is loaded
@@ -65,13 +43,9 @@ public class MarketGui extends Gui {
 	// 4 -> data loaded
 	int mIsLoadingData = 0;
 
-	List<Long> mPlayerListingsIds;
 	@Nullable MarketListing mFocusedListing;
-	int mBuyListingMultiplier;
 
 	boolean mIsOp;
-
-	int mPlayerMaxListings;
 
 	MarketFilter mForcedBlacklistFilter;
 
@@ -81,8 +55,6 @@ public class MarketGui extends Gui {
 		super(player, 6 * 9, Component.text("Player Market"));
 		mIsOp = player.hasPermission("monumenta.command.market");
 		mCurrentTab = TAB_MAIN_MENU;
-		mPlayerListingsIds = MarketManager.getInstance().getListingsOfPlayer(player);
-		mPlayerMaxListings = MarketManager.getConfig().mAmountOfPlayerListingsSlots;
 		mForcedBlacklistFilter = MarketManager.getInstance().getForcedFiltersOfPlayer(mPlayer);
 		endPlayerAction(mPlayer);
 	}
@@ -140,56 +112,10 @@ public class MarketGui extends Gui {
 		return baseModifier;
 	}
 
-	ItemStack createTradeMultiplierButton(int maxMultiplier) {
-		// Regular trade multiplier button:
-		ItemStack banner = new ItemStack(Material.LIGHT_BLUE_BANNER);
-		ItemMeta itemMeta = banner.getItemMeta();
-		if (itemMeta instanceof BannerMeta bannerMeta) {
-			// Add patterns for right-arrow:
-			bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.STRIPE_RIGHT));
-			bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.STRIPE_MIDDLE));
-			bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.STRIPE_TOP));
-			bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.STRIPE_BOTTOM));
-			bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.CURLY_BORDER));
-			// Change name and lore:
-			bannerMeta.displayName(Component.text("Trade Multiplier: (" + mBuyListingMultiplier + "x)", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			List<Component> lore = new ArrayList<>();
-			lore.add(Component.text("Left click to decrease, right click to increase.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text("Hold shift to offset by 8.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			if (mBuyListingMultiplier == 1) {
-				lore.add(Component.empty());
-				lore.add(Component.text("Left click to calculate your max multiplier.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-			}
-			if (mBuyListingMultiplier == maxMultiplier) {
-				lore.add(Component.empty());
-				lore.add(Component.text("right click to go back to multiplier x1.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-			}
-			bannerMeta.lore(lore);
-			// Hide patterns:
-			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // banner patterns are actually the same 'data' as potion effects, lmao
-			// Finalize:
-			banner.setItemMeta(bannerMeta);
-		}
-		return banner;
-	}
-
 	@Override
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
-		ItemStack item = event.getCurrentItem();
-		if (mCurrentTab == TAB_ADD_LISTING && !ItemUtils.isNullOrAir(item) && mCurrencyItem != null) {
-
-			List<String> errorMessages = MarketManager.itemIsSellable(mPlayer, event.getCurrentItem(), mCurrencyItem);
-			if (!errorMessages.isEmpty()) {
-				for (String message : errorMessages) {
-					mPlayer.sendMessage(Component.text(message, NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
-				}
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
-			} else {
-				// Change the item to be sold, when the "Add listing" tab is open
-				mAmountToSell = item.getAmount();
-				mItemToSell = item.asQuantity(1);
-				update();
-			}
+		if (mCurrentTab == TAB_ADD_LISTING) {
+			((TabAddListing)this.TAB_ADD_LISTING).onPlayerInventoryClickEvt(event);
 		}
 	}
 

@@ -13,12 +13,12 @@ import java.util.Iterator;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.jetbrains.annotations.Nullable;
 
 public class TabPlayerListings implements MarketGuiTab {
 
@@ -29,21 +29,50 @@ public class TabPlayerListings implements MarketGuiTab {
 
 	public TabPlayerListings(MarketGui marketGUI) {
 		this.mGui = marketGUI;
+		this.mListingsForPageList = new ArrayList<>();
+		this.mListingsList = new ArrayList<>();
+		this.mListingsIDList = new ArrayList<>();
 	}
 
 	Player mPlayer;
 	int mLoadingStatus;
 	List<Long> mListingsIDList;
-	@Nullable List<MarketListing> mListingsForPageList;
+	List<MarketListing> mListingsForPageList;
+
+	List<MarketListing> mListingsList;
 	int mCurrentPage;
 
 	@Override
 	public void setup() {
+		loadItems();
+
 		mGui.setItem(0, MarketGuiIcons.BACK_TO_MAIN_MENU).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_MAIN_MENU));
 		mGui.setItem(2, MarketGuiIcons.ADD_LISTING).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_ADD_LISTING));
-		mGui.setItem(8, mGui.buildChangePageIcon(mCurrentPage, getMaxPageDisplayable())).onClick((clickEvent) -> changePageAction(clickEvent));
+		mGui.setItem(8, mGui.buildChangePageIcon(mCurrentPage, getMaxPageDisplayable())).onClick(this::changePageAction);
 
-		if (mLoadingStatus == 4) {
+		if (mLoadingStatus == 4) { // finished loading the listing data
+
+			// for the claim-all button
+			int amountExpired = 0;
+			int amountClaimable = 0;
+			List<MarketListing> claimAllableListings = new ArrayList<>();
+			for (MarketListing listing : mListingsList) {
+				if (listing == null) {
+					continue;
+				}
+				if (listing.isExpired()) {
+					amountExpired++;
+					claimAllableListings.add(listing);
+				} else if (listing.getAmountToClaim() > 0) {
+					amountClaimable++;
+					claimAllableListings.add(listing);
+				}
+			}
+			GuiItem claimAllButton = mGui.setItem(4, buildClaimAllIcon(amountExpired, amountClaimable));
+			if (amountExpired > 0 || amountClaimable > 0) {
+				claimAllButton.onClick((clickAction) -> claimAllAction(claimAllableListings));
+			}
+
 			// items ready for display
 			displayItems();
 		} else {
@@ -51,17 +80,80 @@ public class TabPlayerListings implements MarketGuiTab {
 			mGui.setItem(3, 4, MarketGuiIcons.LOADING);
 		}
 
-		loadItems();
+	}
+
+	private void claimAllAction(List<MarketListing> claimAllableListings) {
+		if (MarketGui.initiatePlayerAction(mGui.mPlayer)) {
+			return;
+		}
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			MarketManager.collectAllAndRemoveExpiredFromListingList(mPlayer, claimAllableListings);
+			mLoadingStatus = 0;
+			MarketGui.endPlayerAction(mGui.mPlayer);
+			mGui.update();
+		});
+		mGui.update();
+	}
+
+	private GuiItem buildClaimAllIcon(int amountExpired, int amountClaimable) {
+		List<Component> lore = new ArrayList<>();
+
+		Component name = Component.text("Claim all", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true);
+
+		Material mat;
+
+		if (amountExpired == 0 && amountClaimable == 0) {
+			mat = Material.MINECART;
+
+			lore.add(Component.text("You do not have any claimable", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("or expired listings.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+
+		} else {
+			mat = Material.CHEST_MINECART;
+
+			if (amountExpired > 0) {
+				lore.add(Component.text("You have " + amountExpired + " expired listings.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Clicking this button will", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("give you everything left in", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("those listings, and delete them.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				if (amountClaimable > 0) {
+					lore.add(Component.empty());
+				}
+			}
+
+			if (amountClaimable > 0) {
+				lore.add(Component.text("You have " + amountClaimable + " claimable listings.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Clicking this button will give", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("you all the money claimable in", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("those listings.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			}
+
+		}
+
+		return new GuiItem(GUIUtils.createBasicItem(mat, 1, name, lore, false), false);
 	}
 
 	private void loadItems() {
 		if (mLoadingStatus == 2) {
-			// in async, load the listings that are wanted by the listingIDList, according to the current page,
+			// in sync, load the listings that are wanted by the listingIDList, according to the current page,
 			// and refresh the page when list is loaded
-			mLoadingStatus = 3;
+			mListingsForPageList = loadListingsInPageFromLoadedListingsIdList();
+			mLoadingStatus = 4;
+			mGui.update();
+		}
+
+		if (mLoadingStatus == 0) {
+			// in async, from the owned ListingID list of the player, load the entirety of the owned listing data.
+			mLoadingStatus = 1;
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				mListingsForPageList = loadListingsInPageFromLoadedListingsIdList();
-				mLoadingStatus = 4;
+				mListingsList = MarketRedisManager.getListings(mListingsIDList.toArray(new Long[0]));
+				MarketManager.unlinkListingsFromPlayerIfNotInList(mPlayer, mListingsIDList, mListingsList);
+				for (MarketListing listing : mListingsList) {
+					if (listing != null) {
+						MarketManager.handleListingExpiration(mPlayer, listing);
+					}
+				}
+				mLoadingStatus = 2;
 				mGui.update();
 			});
 		}
@@ -73,14 +165,11 @@ public class TabPlayerListings implements MarketGuiTab {
 
 		while (listingsForPage.size() < 45 && mListingsIDList != null && searchIndex < mListingsIDList.size()) {
 			int tries = (45 - listingsForPage.size()) + 5;
-			List<Long> browserListingsIDSublist = mListingsIDList.subList(searchIndex, Math.min(searchIndex + tries, mListingsIDList.size()));
-			searchIndex += browserListingsIDSublist.size();
-
-			if (!browserListingsIDSublist.isEmpty()) {
-				List<MarketListing> listings = MarketRedisManager.getListings(browserListingsIDSublist.toArray(new Long[0]));
-				MarketManager.unlinkListingsFromPlayerIfNotInList(mPlayer, browserListingsIDSublist, listings);
+			List<MarketListing> browserListingsSublist = mListingsList.subList(searchIndex, Math.min(searchIndex + tries, mListingsList.size()));
+			searchIndex += browserListingsSublist.size();
+			if (!browserListingsSublist.isEmpty()) {
 				// check the validity of each listing
-				for (MarketListing listing : listings) {
+				for (MarketListing listing : browserListingsSublist) {
 					if (listing != null) {
 						MarketManager.handleListingExpiration(mPlayer, listing);
 						listingsForPage.add(listing);
@@ -98,10 +187,10 @@ public class TabPlayerListings implements MarketGuiTab {
 			for (int i = 9; i < 54; i++) {
 				if (listingsIter.hasNext()) {
 					MarketListing listing = listingsIter.next();
-					mGui.setItem(i, listing.getListingDisplayItemStack(mPlayer, mGui.TAB_PLAYER_LISTINGS))
+					mGui.setItem(i, new GuiItem(listing.getListingDisplayItemStack(mPlayer, mGui.TAB_PLAYER_LISTINGS), false))
 						.onClick((clickEvent) -> clickOnListingAction(clickEvent, listing));
 				} else {
-					if ((mCurrentPage * 45) + (i - 9) < mGui.mPlayerMaxListings) {
+					if ((mCurrentPage * 45) + (i - 9) < MarketManager.getConfig().mAmountOfPlayerListingsSlots) {
 						mGui.setItem(i, buildOpenSlotIcon()).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_ADD_LISTING));
 					}
 				}
@@ -123,7 +212,14 @@ public class TabPlayerListings implements MarketGuiTab {
 				if (listing.getAmountToClaim() != 0) {
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 						MarketManager.claimClaimable(mPlayer, listing);
-						mLoadingStatus = 2;
+						mLoadingStatus = 0;
+						MarketGui.endPlayerAction(mPlayer);
+						mGui.update();
+					});
+				} else if (listing.isExpired() || (listing.getAmountToClaim() == 0 && listing.getAmountToSellRemaining() == 0)) {
+					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+						MarketManager.claimEverythingAndDeleteListing(mPlayer, listing);
+						mLoadingStatus = 0;
 						MarketGui.endPlayerAction(mPlayer);
 						mGui.update();
 					});
@@ -189,10 +285,12 @@ public class TabPlayerListings implements MarketGuiTab {
 		mGui.setSize(TAB_SIZE);
 
 		mPlayer = mGui.mPlayer;
-		mLoadingStatus = 2;
+		mLoadingStatus = 0;
 		mCurrentPage = 0;
 
 		mListingsIDList = MarketManager.getInstance().getListingsOfPlayer(mPlayer);
+		mListingsForPageList = new ArrayList<>();
+		mListingsList = new ArrayList<>();
 	}
 
 	@Override

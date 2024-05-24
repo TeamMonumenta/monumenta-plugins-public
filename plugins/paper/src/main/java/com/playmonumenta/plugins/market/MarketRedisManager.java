@@ -41,7 +41,7 @@ public class MarketRedisManager {
 	// any validity checks should be done before the call to this method
 	// returns a null listing if the creation failed
 	@Nullable
-	public static MarketListing createAndAddNewListing(Player player, ItemStack itemToSell, int amountToSell, int pricePerItemAmount, ItemStack currencyItemStack) {
+	public static MarketListing createAndAddNewListing(Player player, ItemStack itemToSell, int itemsPerTrade, int amountOfTrades, int pricePerTrade, ItemStack currencyItemStack) {
 
 		// increment the unique listingId in redis, and get it
 		long listingID = getNextListingID();
@@ -49,7 +49,7 @@ public class MarketRedisManager {
 		long currencyDatabaseID = MarketItemDatabase.getIDFromItemStack(currencyItemStack);
 
 		// build the listing
-		MarketListing listing = new MarketListing(listingID, MarketListingType.BAZAAR, itemToSellDatabaseID, amountToSell, pricePerItemAmount, currencyDatabaseID, player);
+		MarketListing listing = new MarketListing(listingID, MarketListingType.BAZAAR, itemToSellDatabaseID, amountOfTrades, itemsPerTrade, pricePerTrade, currencyDatabaseID, player);
 
 		// push the listing in redis
 		boolean updateOk = createListing(listing);
@@ -91,11 +91,8 @@ public class MarketRedisManager {
 		return true;
 	}
 
-	public static boolean updateListingSafe(@Nullable Player player, MarketListing oldListing, MarketListing newListing) {
+	public static boolean updateListingSafe(Player player, MarketListing oldListing, MarketListing newListing) {
 		long startTimestamp = System.currentTimeMillis();
-		if (player == null) {
-			return false;
-		}
 		String editLockedString = player.getName() + "-" + startTimestamp;
 		// fetch the listing
 		MarketListing tempListing = getListing(oldListing.getId());

@@ -751,6 +751,16 @@ public class ItemStatUtils {
 		return stock.getCompound(EnchantmentType.KEY);
 	}
 
+	public static boolean hasEnchantments(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return false;
+		}
+		return NBT.get(item, nbt -> {
+			ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
+			return enchantments != null;
+		});
+	}
+
 	public static int getEnchantmentLevel(final @Nullable ItemStack item, final EnchantmentType type) {
 		if (item == null || item.getType() == Material.AIR) {
 			return 0;

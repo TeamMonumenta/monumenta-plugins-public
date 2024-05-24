@@ -188,11 +188,20 @@ public class TabEditFilters implements MarketGuiTab {
 			config = mSelectedComponent.mField.getComponentConfig().get(value);
 		}
 
+		ItemStack icon;
 		ArrayList<Component> lore = new ArrayList<>();
 
-		if (config != null) {
+		if (config != null && config.getDisplayItemStack() != null) {
+			icon = config.getDisplayItemStack();
+		} else {
+			icon = new ItemStack(isUsed ? Material.LIME_CONCRETE : Material.GRAY_CONCRETE, 1);
+		}
+		if (config != null && config.getDisplayName() != null) {
+			ItemUtils.setName(icon, Component.text(config.getDisplayName(), isUsed ? NamedTextColor.GREEN : NamedTextColor.GRAY));
 			lore.add(Component.text("Real value:", NamedTextColor.DARK_GRAY));
 			lore.add(Component.text(value, NamedTextColor.DARK_GRAY));
+		} else {
+			ItemUtils.setName(icon, Component.text(value, isUsed ? NamedTextColor.GREEN : NamedTextColor.GRAY));
 		}
 
 		if (isUsed) {
@@ -203,18 +212,6 @@ public class TabEditFilters implements MarketGuiTab {
 			lore.add(Component.text("Click this to add", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("this value to the", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("component.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-		}
-
-		ItemStack icon;
-
-		if (config != null && config.getDisplayItemStack() != null) {
-			icon = config.getDisplayItemStack();
-		} else {
-			icon = new ItemStack(isUsed ? Material.LIME_CONCRETE : Material.GRAY_CONCRETE, 1);
-		}
-
-		if (config != null && config.getDisplayName() != null) {
-			ItemUtils.setName(icon, Component.text(config.getDisplayName(), isUsed ? NamedTextColor.GREEN : NamedTextColor.GRAY));
 		}
 
 		ItemUtils.setLore(icon, lore);

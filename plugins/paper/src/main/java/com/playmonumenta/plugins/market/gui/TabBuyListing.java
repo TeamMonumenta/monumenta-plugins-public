@@ -15,8 +15,14 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class TabBuyListing implements MarketGuiTab {
 
@@ -24,6 +30,8 @@ public class TabBuyListing implements MarketGuiTab {
 
 	static final Component TAB_TITLE = Component.text("Buy Listing");
 	static final int TAB_SIZE = 6 * 9;
+
+	int mBuyListingMultiplier;
 
 	public TabBuyListing(MarketGui marketGUI) {
 		this.mGui = marketGUI;
@@ -69,19 +77,26 @@ public class TabBuyListing implements MarketGuiTab {
 		mGui.setItem(2, 2, currency);
 
 		// multiplier button
-		mGui.setItem(2, 4, mGui.createTradeMultiplierButton(maxMultiplier))
+		mGui.setItem(2, 4, createTradeMultiplierButton(mBuyListingMultiplier, maxMultiplier))
 			.onClick((inventoryClickEvent) -> {
 				int offset = 1;
 				if (inventoryClickEvent.isShiftClick()) {
 					offset = 8;
 				}
-				mGui.mBuyListingMultiplier = mGui.modifyTradeMultiplier(mGui.mBuyListingMultiplier, inventoryClickEvent.isLeftClick() ? -offset : offset, maxMultiplier);
+				mBuyListingMultiplier = mGui.modifyTradeMultiplier(mBuyListingMultiplier, inventoryClickEvent.isLeftClick() ? -offset : offset, maxMultiplier);
 				mGui.update();
 			});
 
 		// itemToBeSold display
 		ItemStack listingItemStack = mGui.mFocusedListing.getItemToSell();
-		mGui.setItem(2, 6, listingItemStack);
+		if (mGui.mFocusedListing.getBundleSize() > 1) {
+			ItemMeta meta = listingItemStack.getItemMeta();
+			meta.displayName(Component.text(mGui.mFocusedListing.getBundleSize() + " * ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).append(ItemUtils.getDisplayName(mGui.mFocusedListing.getItemToSell())));
+			listingItemStack.setItemMeta(meta);
+			listingItemStack.setAmount(mGui.mFocusedListing.getBundleSize());
+			ItemUtils.setPlainName(listingItemStack, ItemUtils.getPlainName(mGui.mFocusedListing.getItemToSell()));
+		}
+		mGui.setItem(2, 6, new GuiItem(listingItemStack, false));
 
 
 		// cancel button
@@ -109,7 +124,7 @@ public class TabBuyListing implements MarketGuiTab {
 			errorLoreLines.add(Component.text("Wait for the data to finish loading", NamedTextColor.GOLD));
 		}
 
-		if (mGui.mBuyListingMultiplier <= 0 || mGui.mFocusedListing.getAmountToSellRemaining() <= 0) {
+		if (mBuyListingMultiplier <= 0 || mGui.mFocusedListing.getAmountToSellRemaining() <= 0) {
 			errorLoreLines.add(Component.text("This listing ran out of stock!", NamedTextColor.DARK_RED));
 		}
 
@@ -121,7 +136,7 @@ public class TabBuyListing implements MarketGuiTab {
 		}
 
 		if (errorLoreLines.isEmpty()) {
-			MarketListingStatus purchasableStatus = mGui.mFocusedListing.getPurchasableStatus(mGui.mBuyListingMultiplier);
+			MarketListingStatus purchasableStatus = mGui.mFocusedListing.getPurchasableStatus(mBuyListingMultiplier);
 			if (purchasableStatus.isError()) {
 				switch (purchasableStatus) {
 					case LOCKED:
@@ -142,8 +157,8 @@ public class TabBuyListing implements MarketGuiTab {
 
 		if (errorLoreLines.isEmpty()) {
 			List<Component> confirmLore = new ArrayList<>();
-			confirmLore.add(Component.text("Buy " + mGui.mBuyListingMultiplier + " " + ItemUtils.getPlainNameOrDefault(listingItemStack) + " for: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			confirmLore.add(Component.text((mGui.mBuyListingMultiplier * mGui.mFocusedListing.getAmountToBuy()) + " " + ItemUtils.getPlainNameOrDefault(mGui.mFocusedListing.getCurrencyToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			confirmLore.add(Component.text("Buy " + mBuyListingMultiplier + " " + ItemUtils.getPlainNameOrDefault(listingItemStack) + " for: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			confirmLore.add(Component.text((mBuyListingMultiplier * mGui.mFocusedListing.getAmountToBuy()) + " " + ItemUtils.getPlainNameOrDefault(mGui.mFocusedListing.getCurrencyToBuy()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			mGui.setItem(4, 5, GUIUtils.createConfirm(confirmLore))
 				.onClick((clickEvent) -> {
 					if (MarketGui.initiatePlayerAction(mGui.mPlayer)) {
@@ -151,7 +166,7 @@ public class TabBuyListing implements MarketGuiTab {
 					}
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 						if (mGui.mFocusedListing != null) {
-							MarketManager.performPurchase(mGui.mPlayer, mGui.mFocusedListing, mGui.mBuyListingMultiplier);
+							MarketManager.performPurchase(mGui.mPlayer, mGui.mFocusedListing, mBuyListingMultiplier);
 						}
 						mGui.mIsLoadingData = 2;
 						MarketGui.endPlayerAction(mGui.mPlayer);
@@ -258,12 +273,45 @@ public class TabBuyListing implements MarketGuiTab {
 		}
 	}
 
+	ItemStack createTradeMultiplierButton(int currentMult, int maxMultiplier) {
+		// Regular trade multiplier button:
+		ItemStack banner = new ItemStack(Material.LIGHT_BLUE_BANNER);
+		ItemMeta itemMeta = banner.getItemMeta();
+		if (itemMeta instanceof BannerMeta bannerMeta) {
+			// Add patterns for right-arrow:
+			bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.STRIPE_RIGHT));
+			bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.STRIPE_MIDDLE));
+			bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.STRIPE_TOP));
+			bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.STRIPE_BOTTOM));
+			bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.CURLY_BORDER));
+			// Change name and lore:
+			bannerMeta.displayName(Component.text("Trade Multiplier: (" + currentMult + "x)", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+			List<Component> lore = new ArrayList<>();
+			lore.add(Component.text("Left click to decrease, right click to increase.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("Hold shift to offset by 8.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			if (currentMult == 1) {
+				lore.add(Component.empty());
+				lore.add(Component.text("Left click to calculate your max multiplier.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			}
+			if (currentMult == maxMultiplier) {
+				lore.add(Component.empty());
+				lore.add(Component.text("right click to go back to multiplier x1.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			}
+			bannerMeta.lore(lore);
+			// Hide patterns:
+			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // banner patterns are actually the same 'data' as potion effects, lmao
+			// Finalize:
+			banner.setItemMeta(bannerMeta);
+		}
+		return banner;
+	}
+
 	@Override
 	public void onSwitch() {
 		mGui.setTitle(TAB_TITLE);
 		mGui.setSize(TAB_SIZE);
 		mGui.mIsLoadingData = 2;
-		mGui.mBuyListingMultiplier = 1;
+		mBuyListingMultiplier = 1;
 	}
 
 	@Override
