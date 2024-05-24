@@ -6,7 +6,10 @@ import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import java.util.Collections;
+import java.util.Objects;
+
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -39,6 +42,9 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 		@BossParam(help = "Number of mobs summoned")
 		public int MOB_COUNT = 1;
 
+		@BossParam(help = "Damage % transferred to spawn")
+		public double TRANSFER = 0;
+
 	}
 
 	private final Parameters mParam;
@@ -60,9 +66,16 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 			//it exploded
 			mParam.PARTICLES.spawn(mBoss, mBoss.getLocation().clone().add(0, 0.5, 0));
 			mParam.SOUNDS.play(mBoss.getLocation());
+			double health = mBoss.getHealth();
+			double maxHealth = Objects.requireNonNull(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+			double hpPercent = health/maxHealth;
 			for (int i = 0; i < mParam.MOB_COUNT; i++) {
 				Entity entity = mParam.POOL.spawn(mBoss.getLocation());
 				if (entity instanceof LivingEntity livingEntity) {
+					//Decrease its percent hp by the percent health the spawner is missing times the transfer amount.
+					livingEntity.setHealth(
+						(1 - mParam.TRANSFER) * (livingEntity.getHealth() - hpPercent * livingEntity.getHealth())
+						+ hpPercent * livingEntity.getHealth());
 					livingEntity.setAI(false);
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						livingEntity.setAI(true);
