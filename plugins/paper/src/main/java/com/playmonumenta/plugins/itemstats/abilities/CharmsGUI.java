@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.abilities;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
 import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -24,8 +25,29 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CharmsGUI extends Gui {
 	private static final int START_OF_CHARMS = 45;
-	private static final Material RED_FILLER = Material.RED_STAINED_GLASS_PANE;
-	private static final Material YELLOW_FILLER = Material.YELLOW_STAINED_GLASS_PANE;
+	private static final ItemStack AVAILABLE_CHARM_POWER_SLOT;
+	private static final ItemStack UNAVAILABLE_CHARM_POWER_SLOT;
+	private static final ItemStack CHARM_SLOT;
+
+	static {
+		AVAILABLE_CHARM_POWER_SLOT = GUIUtils.createBasicItem(Material.YELLOW_STAINED_GLASS_PANE,
+			"Available Charm Power",
+			NamedTextColor.YELLOW,
+			"This slot can power\nadditional charms.");
+		GUIUtils.setGuiNbtTag(AVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_1");
+
+		UNAVAILABLE_CHARM_POWER_SLOT = GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE,
+			"Unlockable Charm Power",
+			NamedTextColor.RED,
+			"Progress further in the Architect's Ring to unlock more Charm Power.");
+		GUIUtils.setGuiNbtTag(UNAVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_2");
+
+		CHARM_SLOT = GUIUtils.createBasicItem(Material.YELLOW_STAINED_GLASS_PANE,
+			"Available Charm Slot",
+			NamedTextColor.YELLOW,
+			"This slot can hold a charm if you have enough charm power.");
+		GUIUtils.setGuiNbtTag(CHARM_SLOT, "texture", "slot_charms_1");
+	}
 
 	private final Player mTargetPlayer;
 	private final boolean mMayEdit;
@@ -84,20 +106,18 @@ public class CharmsGUI extends Gui {
 		}
 
 		for (int i = START_OF_CHARMS; i < 52; i++) {
-			setItem(i, new ItemStack(RED_FILLER, 1));
+			setItem(i, CHARM_SLOT);
 		}
 
 		// Fill out yellow stained glass for visual display of charm budget
-		for (int i = 0; i < totalBudget; i++) {
-			int slot;
-			if (i > 9) {
-				slot = 29 + (i - 10);
-			} else if (i > 4) {
-				slot = 20 + (i - 5);
+		for (int i = 0; i < 15; i++) {
+			int x = i % 5 + 2;
+			int y = i / 5 + 1;
+			if (i < totalBudget) {
+				setItem(y, x, AVAILABLE_CHARM_POWER_SLOT);
 			} else {
-				slot = 11 + i;
+				setItem(y, x, UNAVAILABLE_CHARM_POWER_SLOT);
 			}
-			setItem(slot, new ItemStack(YELLOW_FILLER, 1));
 		}
 
 		Consumer<ItemStack> onCharmClick = charm -> {
@@ -148,25 +168,8 @@ public class CharmsGUI extends Gui {
 
 		int charmPower = CharmManager.getInstance().getUsedCharmPower(mTargetPlayer, mCharmType);
 
-		{ // Charm power indicator
-			ItemStack item = new ItemStack(Material.GLOWSTONE_DUST, Math.max(1, charmPower));
-
-			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("" + charmPower + " Charm Power Used", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-
-
-			List<Component> lore = new ArrayList<>();
-			lore.add(Component.text(String.format("%d Total Charm Power", totalBudget), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-			meta.lore(lore);
-
-			item.setItemMeta(meta);
-			ItemUtils.setPlainTag(item);
-			setItem(9, item);
-		}
-
 		{ // Charm effect indicator
-			ItemStack item = new ItemStack(Material.BOOK, 1);
+			ItemStack item = new ItemStack(Material.BOOK, Math.max(1, charmPower));
 
 			ItemMeta meta = item.getItemMeta();
 			meta.displayName(Component.text("Charm Effect Summary", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
@@ -174,11 +177,15 @@ public class CharmsGUI extends Gui {
 
 
 			List<Component> lore = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(mTargetPlayer, mCharmType);
+			lore.add(Component.empty());
+			lore.add(Component.text(charmPower + " Charm Power Used", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(totalBudget + " Total Charm Power", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 			meta.lore(lore);
 
 			item.setItemMeta(meta);
+			GUIUtils.setGuiNbtTag(item, "texture", "summary_charms_1");
 			ItemUtils.setPlainTag(item);
-			setItem(18, item);
+			setItem(9, item);
 		}
 
 		{ // Back gui button (if here from player details GUI
@@ -198,6 +205,12 @@ public class CharmsGUI extends Gui {
 			}
 		}
 
+		{ // Resource Pack GUI (not noticeable without RP except for extra NBT tag)
+			ItemStack item = GUIUtils.createFiller(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+			GUIUtils.setGuiNbtTag(item, "texture", "gui_charms_1");
+			setItem(0, 8, item);
+		}
+
 		{ // Escape gui button
 			ItemStack item = new ItemStack(Material.BARRIER, 1);
 
@@ -206,8 +219,10 @@ public class CharmsGUI extends Gui {
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
 			item.setItemMeta(meta);
+
+			GUIUtils.setGuiNbtTag(item, "texture", "exit_charms_1");
 			ItemUtils.setPlainTag(item);
-			setItem(8, item).onLeftClick(this::close);
+			setItem(5, 8, item).onLeftClick(this::close);
 		}
 
 		if (charmPower > totalBudget && mMayEdit && mPlayer.equals(mTargetPlayer)) {

@@ -43,9 +43,7 @@ public class GUIUtils {
 
 	public static ItemStack createFiller(ItemStack filler) {
 		NBT.modify(filler, nbt -> {
-			nbt.modifyMeta((nbtr, meta) -> {
-				meta.displayName(Component.empty());
-			});
+			nbt.modifyMeta((unused, meta) -> meta.displayName(Component.empty()));
 			setPlaceholder(nbt);
 			setFiller(nbt);
 		});
@@ -144,7 +142,7 @@ public class GUIUtils {
 			int wordLength = MessagingUtils.plainLengthFromMini(word);
 			boolean newline = wordLength > 0 && word.charAt(0) == '\n';
 			if (newline || MessagingUtils.plainLengthFromMini(currentLine.toString()) + wordLength > maxLength) {
-				if (currentLine.length() > 0 && currentLine.charAt(currentLine.length() - 1) == ' ') {
+				if (!currentLine.isEmpty() && currentLine.charAt(currentLine.length() - 1) == ' ') {
 					currentLine.setLength(currentLine.length() - 1);
 				}
 				String lineToAdd = currentLine.toString();
@@ -237,7 +235,7 @@ public class GUIUtils {
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, Component name, String desc, TextColor loreColor, int maxLoreLength, boolean setPlainTag) {
-		return createBasicItem(mat, amount, name, desc.equals("") ? Component.empty() : Component.text(desc, loreColor), maxLoreLength, setPlainTag);
+		return createBasicItem(mat, amount, name, desc.isEmpty() ? Component.empty() : Component.text("", loreColor).append(MessagingUtils.fromMiniMessage(desc)), maxLoreLength, setPlainTag);
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, String name, TextColor nameColor, boolean nameBold, Component desc, int maxLoreLength, boolean setPlainTag) {
@@ -330,7 +328,7 @@ public class GUIUtils {
 	public static void fillWithFiller(Inventory inventory, Material material, boolean clearInv) {
 		ItemStack filler = new ItemStack(material, 1);
 		createFiller(filler);
-		fillWithFiller(inventory, filler, false);
+		fillWithFiller(inventory, filler, clearInv);
 	}
 
 	public static void fillWithFiller(Inventory inventory, ItemStack filler, boolean clearInv) {
