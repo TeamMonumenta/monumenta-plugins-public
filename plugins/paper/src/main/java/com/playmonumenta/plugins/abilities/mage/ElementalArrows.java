@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.ElementalArrowsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -27,7 +29,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -64,6 +65,8 @@ public class ElementalArrows extends Ability {
 	public static final String CHARM_RANGE = "Elemental Arrows Range";
 	public static final String CHARM_THUNDER_COOLDOWN = "Elemental Arrows Thunder Arrow Cooldown";
 
+	private final ElementalArrowsCS mCosmetic;
+
 	public static final AbilityInfo<ElementalArrows> INFO =
 		new AbilityInfo<>(ElementalArrows.class, NAME, ElementalArrows::new)
 			.linkedSpell(ABILITY)
@@ -99,6 +102,7 @@ public class ElementalArrows extends Ability {
 
 	public ElementalArrows(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ElementalArrowsCS());
 	}
 
 	@Override
@@ -119,11 +123,13 @@ public class ElementalArrows extends Ability {
 		if (proj.hasMetadata(FIRE_ARROW_METAKEY)) {
 			applyArrowEffects(event, proj, enemy, thunder, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
 				EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
+				mCosmetic.fireEffect(mPlayer, enemy);
 			});
 		} else if (proj.hasMetadata(ICE_ARROW_METAKEY)) {
 			double slowAmplifier = SLOW_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
 			applyArrowEffects(event, proj, enemy, thunder, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
 				EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
+				mCosmetic.iceEffect(mPlayer, enemy);
 			});
 		}
 		return false; // creates new damage instances, but of a type it doesn't handle again
@@ -151,6 +157,7 @@ public class ElementalArrows extends Ability {
 		if (thunder) {
 			int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
 			effectAction = effectAction.andThen(entity -> EntityUtils.applyStun(mPlugin, stunDuration, entity));
+			mCosmetic.thunderEffect(mPlayer, enemy);
 			if (mSpellshockEnhanced) {
 				SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
 				if (existingStatic != null && existingStatic.isTriggered()) {
@@ -200,7 +207,7 @@ public class ElementalArrows extends Ability {
 			boolean thunderApplied = false;
 			if (isEnhanced() && !isOnCooldown()) {
 				projectile.setMetadata(THUNDER_ARROW_METAKEY, new FixedMetadataValue(mPlugin, 0));
-				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.END_ROD);
+				mCosmetic.thunderProjectile(mPlayer, projectile, mPlugin);
 				thunderApplied = true;
 				putOnCooldown();
 			}
@@ -209,13 +216,13 @@ public class ElementalArrows extends Ability {
 				projectile.setMetadata(ICE_ARROW_METAKEY, new FixedMetadataValue(mPlugin, 0));
 				projectile.setFireTicks(0);
 				if (!thunderApplied) {
-					mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SNOW_SHOVEL);
+					mCosmetic.iceProjectile(mPlayer, projectile, mPlugin);
 				}
 			} else {
 				projectile.setMetadata(FIRE_ARROW_METAKEY, new FixedMetadataValue(mPlugin, 0));
 				projectile.setFireTicks(ELEMENTAL_ARROWS_DURATION);
 				if (!thunderApplied) {
-					mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FLAME);
+					mCosmetic.fireProjectile(mPlayer, projectile, mPlugin);
 				}
 			}
 		}

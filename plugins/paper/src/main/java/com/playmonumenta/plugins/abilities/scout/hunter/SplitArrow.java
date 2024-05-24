@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.SplitArrowCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -20,9 +22,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -57,14 +56,15 @@ public class SplitArrow extends Ability {
 
 	private final double mDamagePercent;
 	private @Nullable SwiftCuts mSwiftCuts;
+	private final SplitArrowCS mCosmetic;
 
 	public SplitArrow(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamagePercent = isLevelOne() ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT;
-
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
 		});
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SplitArrowCS());
 	}
 
 	@Override
@@ -87,10 +87,10 @@ public class SplitArrow extends Ability {
 				if (nearestMob == null) {
 					break;
 				}
+				mCosmetic.splitArrowChain(mPlayer, sourceEnemy, nearestMob);
 				Location loc = sourceEnemy.getEyeLocation();
 				Location eye = nearestMob.getEyeLocation();
 				Vector dir = LocationUtils.getDirectionTo(eye, loc);
-				World world = mPlayer.getWorld();
 				for (int j = 0; j < 50; j++) {
 					loc.add(dir.clone().multiply(0.1));
 					new PartialParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(mPlayer);
@@ -100,10 +100,7 @@ public class SplitArrow extends Ability {
 				}
 
 				if (!EntityUtils.hasArrowIframes(mPlugin, nearestMob)) {
-					new PartialParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
-					world.playSound(eye, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, 1.2f);
-
+					mCosmetic.splitArrowEffect(mPlayer, nearestMob);
 					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, damage, mInfo.getLinkedSpell(), true, true);
 					MovementUtils.knockAway(sourceEnemy, nearestMob, 0.125f, 0.35f, true);
 					EntityUtils.applyArrowIframes(mPlugin, IFRAMES, nearestMob);

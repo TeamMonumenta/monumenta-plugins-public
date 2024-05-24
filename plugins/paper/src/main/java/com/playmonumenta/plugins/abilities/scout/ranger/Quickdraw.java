@@ -6,13 +6,14 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.QuickdrawCS;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -20,9 +21,6 @@ import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
@@ -62,9 +60,11 @@ public class Quickdraw extends Ability {
 			.displayItem(Material.BLAZE_POWDER);
 
 	public @Nullable Projectile mProjectile;
+	private final QuickdrawCS mCosmetic;
 
 	public Quickdraw(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new QuickdrawCS());
 	}
 
 	public boolean cast() {
@@ -78,12 +78,7 @@ public class Quickdraw extends Ability {
 			|| ItemUtils.isShootableItem(inOffHand)) {
 			return false;
 		}
-		World world = mPlayer.getWorld();
-
-		new PartialParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 1.4f);
+		mCosmetic.quickdrawCast(mPlayer);
 
 		boolean launched = shootProjectile(inMainHand, 0);
 		if (launched) {
@@ -157,7 +152,7 @@ public class Quickdraw extends Ability {
 		Bukkit.getPluginManager().callEvent(eventLaunch);
 
 		if (!eventLaunch.isCancelled()) {
-			mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.FIREWORKS_SPARK);
+			mCosmetic.quickdrawProjectileEffect(mPlugin, proj);
 		}
 
 		ItemStatManager.PlayerItemStats stats = DamageListener.getProjectileItemStats(proj);

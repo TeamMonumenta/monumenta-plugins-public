@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.SharpshooterCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -16,8 +18,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -51,11 +51,13 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	private final int mMaxStacks;
 	private final int mDecayTime;
+	private final SharpshooterCS mCosmetic;
 
 	public Sharpshooter(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY, SHARPSHOOTER_DECAY_TIMER);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SharpshooterCS());
 	}
 
 	private int mStacks = 0;
@@ -64,6 +66,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
+		mCosmetic.hitEffect(mPlayer, enemy);
 		boolean huntingCompanion = event.getAbility() == ClassAbility.HUNTING_COMPANION;
 		if (huntingCompanion || type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
 			double multiplier = 1 + PERCENT_BASE_DAMAGE;
@@ -112,17 +115,18 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public boolean playerConsumeArrowEvent() {
 		if (isLevelTwo() && FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL)) {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.3f, 1.0f);
+			mCosmetic.arrowSave(mPlayer);
 			return false;
 		}
 		return true;
 	}
 
-	public static void addStacks(Player player, int stacks) {
+	public void addStacks(Player player, int stacks) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS + (int) CharmManager.getLevel(player, CHARM_STACKS), ss.mStacks + stacks);
 			ss.showChargesMessage();
+			mCosmetic.stackCount(player, mStacks);
 			ClientModHandler.updateAbility(player, ss);
 		}
 	}

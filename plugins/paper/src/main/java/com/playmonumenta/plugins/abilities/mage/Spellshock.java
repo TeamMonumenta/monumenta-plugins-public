@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.SpellshockCS;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -12,7 +14,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -22,10 +23,6 @@ import java.util.EnumSet;
 import java.util.NavigableSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -73,6 +70,8 @@ public class Spellshock extends Ability {
 	public static final String CHARM_ENHANCE_SLOW = "Spellshock Enhancement Slowness Amplifier";
 	public static final String CHARM_ENHANCE_WEAK = "Spellshock Enhancement Weakness Amplifier";
 
+	private final SpellshockCS mCosmetic;
+
 	public static final AbilityInfo<Spellshock> INFO =
 		new AbilityInfo<>(Spellshock.class, NAME, Spellshock::new)
 			.linkedSpell(ABILITY)
@@ -112,6 +111,7 @@ public class Spellshock extends Ability {
 		super(plugin, player, INFO);
 		mLevelDamage = (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_SPELL);
 		mMeleeBonus = (isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_MELEE);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SpellshockCS());
 
 		// Wait a tick so that it can iterate through the ability manager properly, handles thunder arrows for the enhancement.
 		new BukkitRunnable() {
@@ -181,6 +181,7 @@ public class Spellshock extends Ability {
 				event.setDamage(event.getDamage() * (1 + mMeleeBonus));
 				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), PERCENT_SLOW_EFFECT_NAME));
 				existingStatic.trigger();
+				mCosmetic.meleeClearStatic(mPlayer, enemy);
 			}
 		} else if (eventAbility != null
 				&& !eventAbility.isFake()
@@ -204,17 +205,12 @@ public class Spellshock extends Ability {
 					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
 				}
 
-				Location loc = LocationUtils.getHalfHeightLocation(enemy);
-				World world = mPlayer.getWorld();
-				new PartialParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
-				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.75f, 2.5f);
-				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.75f, 2.0f);
-				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.75f, 1.5f);
+				mCosmetic.spellshockEffect(mPlayer, enemy);
 
 				// spellshock triggering other spellshocks propagates the damage at 100%
 				double spellShockDamage = eventAbility == ClassAbility.SPELLSHOCK ? event.getDamage() : event.getDamage() * mLevelDamage;
 
+				Location loc = LocationUtils.getHalfHeightLocation(enemy);
 				Hitbox hitbox = new Hitbox.SphereHitbox(loc, SIZE);
 				for (LivingEntity hitMob : hitbox.getHitMobs()) {
 					if (hitMob.isDead()) {
@@ -236,7 +232,7 @@ public class Spellshock extends Ability {
 					return false;
 				}
 
-				mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
+				mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS, mCosmetic));
 			}
 		}
 		return false; // Needs to apply to all damaged mobs. Uses an internal check to prevent recursion on dealing damage.

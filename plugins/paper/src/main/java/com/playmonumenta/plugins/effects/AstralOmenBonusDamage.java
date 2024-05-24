@@ -1,29 +1,26 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.AstralOmenCS;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-
 public class AstralOmenBonusDamage extends Effect {
-	public static final Particle.DustOptions COLOR_PURPLE = new Particle.DustOptions(Color.fromRGB(136, 147, 228), 1f);
+	public static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(136, 147, 228), 1f);
 	public static final String effectID = "AstralOmenBonusDamage";
-
 	private final double mAmount;
 	private final Player mPlayer;
+	private final AstralOmenCS mCosmetic;
 
-	public AstralOmenBonusDamage(int duration, double amount, Player player) {
+	public AstralOmenBonusDamage(int duration, double amount, Player player, AstralOmenCS cosmetic) {
 		super(duration, effectID);
 		mAmount = amount;
 		mPlayer = player;
+		mCosmetic = cosmetic;
+
 	}
 
 	@Override
@@ -37,12 +34,7 @@ public class AstralOmenBonusDamage extends Effect {
 			return;
 		}
 		if (source == mPlayer) {
-			World world = entity.getWorld();
-			Location loc = entity.getLocation().add(0, 1, 0);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1f, 1.25f);
-			world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1f, 1.75f);
-			new PartialParticle(Particle.CRIT, loc, 8, 0.25, 0.5, 0.25, 0.4).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
+			mCosmetic.bonusDamage(mPlayer, entity, COLOR);
 			event.setDamage(event.getDamage() * (1 + mAmount));
 		}
 	}
@@ -50,8 +42,7 @@ public class AstralOmenBonusDamage extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz) {
-			Location loc = entity.getLocation().add(0, 1, 0);
-			new PartialParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
+			mCosmetic.bonusDamageTick(mPlayer, entity, COLOR);
 		}
 	}
 

@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertis
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.EarthenTremorCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.*;
@@ -17,14 +19,9 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
 
 public class EarthenTremor extends Ability {
 
@@ -86,6 +83,7 @@ public class EarthenTremor extends Ability {
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.DIRT);
+	private final EarthenTremorCS mCosmetic;
 
 	public EarthenTremor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -103,6 +101,7 @@ public class EarthenTremor extends Ability {
 		mShockwaves = (int) (SHOCKWAVES + CharmManager.getLevel(mPlayer, CHARM_SHOCKWAVES));
 		mShockwaveDistance = CharmManager.getRadius(mPlayer, CHARM_SHOCKWAVE_DISTANCE, SHOCKWAVE_DISTANCE);
 		mShockwaveRadius = CharmManager.getRadius(mPlayer, CHARM_SHOCKWAVE_RADIUS, SHOCKWAVE_RADIUS);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EarthenTremorCS());
 	}
 
 	public boolean cast() {
@@ -121,19 +120,7 @@ public class EarthenTremor extends Ability {
 				mHitEntities.add(mob);
 			}
 		}
-
-		World world = mPlayer.getWorld();
-		Location loc = mPlayer.getLocation().add(0, 0.1, 0);
-		DisplayEntityUtils.groundBlockQuake(loc, mRadius, List.of(Material.PODZOL, Material.DIRT, Material.MUD), new Display.Brightness(12, 12));
-
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST,
-			SoundCategory.PLAYERS, 2, 0.6f);
-		world.playSound(loc, Sound.ITEM_AXE_WAX_OFF,
-			SoundCategory.PLAYERS, 0.4f, 0.5f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3,
-			SoundCategory.PLAYERS, 0.25f, 0.5f);
-		world.playSound(loc, Sound.ITEM_TOTEM_USE,
-			SoundCategory.PLAYERS, 0.4f, 2.0f);
+		mCosmetic.earthenTremorEffect(mPlayer, mRadius);
 
 		if (isEnhanced()) {
 			int angleBetween = 360 / mShockwaves;
@@ -142,9 +129,7 @@ public class EarthenTremor extends Ability {
 				Vector normDir = VectorUtils.rotateYAxis(forward, i).normalize();
 				Location shockwaveLoc = mPlayer.getLocation().add(normDir.clone().multiply(mRadius));
 				for (int j = 0; j < mShockwaveDistance; j++) {
-					DisplayEntityUtils.groundBlockQuake(shockwaveLoc.clone().add(0, 0.2, 0), mShockwaveRadius,
-						List.of(Material.DIORITE, Material.GRANITE, Material.IRON_ORE),
-						new Display.Brightness(8, 8));
+					mCosmetic.earthenTremorEnhancement(mPlayer, shockwaveLoc, mShockwaveRadius);
 					shockwaveLoc.add(normDir);
 					List<LivingEntity> mShockwaveHits = EntityUtils.getNearbyMobsInSphere(shockwaveLoc, mShockwaveRadius, null);
 					mShockwaveHits.removeAll(mHitEntities);

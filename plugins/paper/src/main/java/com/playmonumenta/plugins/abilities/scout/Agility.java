@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.AgilityCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -51,6 +53,8 @@ public class Agility extends Ability {
 
 	private Ability[] mScoutAbilities = {};
 
+	private final AgilityCS mCosmetic;
+
 	public Agility(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mHasteAmplifier = (isLevelOne() ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL) + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE);
@@ -62,6 +66,7 @@ public class Agility extends Ability {
 				                  .filter(Objects::nonNull)
 				                  .toArray(Ability[]::new);
 		});
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AgilityCS());
 	}
 
 	@Override
@@ -69,8 +74,10 @@ public class Agility extends Ability {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH || event.getType() == DamageType.MELEE_SKILL) {
 			if (isLevelTwo()) {
 				event.setDamage((event.getDamage() + AGILITY_BONUS_DAMAGE) * (1 + SCALING_DAMAGE));
+				mCosmetic.agilityEffectLevelTwo(mPlayer, enemy);
 			} else {
 				event.setDamage(event.getDamage() + AGILITY_BONUS_DAMAGE);
+				mCosmetic.agilityEffectLevelOne(mPlayer, enemy);
 			}
 		}
 		return false; // only changes event damage
@@ -85,6 +92,7 @@ public class Agility extends Ability {
 				if (linkedSpell != null && mPlugin.mTimers.isAbilityOnCooldown(uuid, linkedSpell)) {
 					int cooldownRefresh = (int) (ability.getModifiedCooldown() * ENHANCEMENT_COOLDOWN_REFRESH);
 					mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, cooldownRefresh);
+					mCosmetic.agilityEnhancementEffect(mPlayer);
 				}
 			}
 		}

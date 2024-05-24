@@ -126,9 +126,7 @@ public class DivineJustice extends Ability {
 		mDoHealingAndMultiplier = isLevelTwo();
 		mEnhanceDamage = ENHANCEMENT_ASH_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_DAMAGE);
 		mEnhanceDuration = CharmManager.getDuration(player, CHARM_ENHANCE_DURATION, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
-
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS());
-
 		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 

@@ -7,12 +7,12 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.TotemicProjectionCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -83,6 +83,7 @@ public class TotemicProjection extends Ability {
 	private final int mEnhanceDamageDuration;
 	private final double mDistributionRadius;
 	private final double mRadius;
+	private final TotemicProjectionCS mCosmetic;
 
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -95,6 +96,7 @@ public class TotemicProjection extends Ability {
 		mEnhanceDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE_PERCENT_PER, ENHANCE_DAMAGE_PERCENT_PER);
 		mDistributionRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE, DISTRIBUTION_RADIUS);
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE_RADIUS, RADIUS);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TotemicProjectionCS());
 	}
 
 	public boolean cast() {
@@ -151,11 +153,7 @@ public class TotemicProjection extends Ability {
 
 		if (stats != null) {
 			Location dropCenter = proj.getLocation();
-			mPlayer.playSound(dropCenter, Sound.BLOCK_VINE_BREAK,
-				SoundCategory.PLAYERS, 2.0f, 1.0f);
-			new PartialParticle(Particle.REVERSE_PORTAL, dropCenter, 20).spawnAsPlayerActive(mPlayer);
-			mPlayer.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE,
-				SoundCategory.PLAYERS, 1.0f, 1.7f);
+			mCosmetic.projectionCollision(mPlayer, dropCenter);
 
 			List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
 			if (totems.size() == 1) {
@@ -197,10 +195,8 @@ public class TotemicProjection extends Ability {
 			}
 
 			if (isLevelTwo()) {
-
+				mCosmetic.projectionAOE(mPlayer, dropCenter, mRadius);
 				List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(dropCenter, mRadius, null);
-				new PPCircle(Particle.REVERSE_PORTAL, dropCenter, mRadius).ringMode(false).countPerMeter(4).spawnAsPlayerActive(mPlayer);
-
 				for (LivingEntity mob : affectedMobs) {
 					EntityUtils.applySlow(mPlugin, mSlownessDuration, mSlownessPercent, mob);
 				}

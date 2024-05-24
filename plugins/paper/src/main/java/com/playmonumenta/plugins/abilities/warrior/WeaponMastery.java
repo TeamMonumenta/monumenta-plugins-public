@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.WeaponMasteryCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -52,6 +54,7 @@ public class WeaponMastery extends Ability {
 	private final double mDamageBonusSwordFlat;
 	private final double mDamageBonusAxe;
 	private final double mDamageBonusSword;
+	private final WeaponMasteryCS mCosmetic;
 
 	public WeaponMastery(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -60,6 +63,7 @@ public class WeaponMastery extends Ability {
 		double enhancementDamage = (isEnhanced() ? ENHANCED_DAMAGE : 0);
 		mDamageBonusAxe = (isLevelOne() ? AXE_1_DAMAGE : AXE_2_DAMAGE) + enhancementDamage;
 		mDamageBonusSword = (isLevelOne() ? 0 : SWORD_2_DAMAGE) + enhancementDamage;
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WeaponMasteryCS());
 	}
 
 	@Override
@@ -68,10 +72,13 @@ public class WeaponMastery extends Ability {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusAxeFlat) * (1 + mDamageBonusAxe));
+				mCosmetic.weaponMasteryAxeHit(mPlayer);
 			} else if (ItemUtils.isSword(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusSwordFlat) * (1 + mDamageBonusSword));
+				mCosmetic.weaponMasterySwordHit(mPlayer);
 				if (isEnhanced()) {
 					EntityUtils.applyWeaken(mPlugin, CharmManager.getDuration(mPlayer, CHARM_DURATION, SWORD_WEAKEN_DURATION), SWORD_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN), enemy);
+					mCosmetic.weaponMasteryBleedApply(mPlayer);
 				}
 			}
 		}

@@ -6,11 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.CleansingTotemCS;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PPSpiral;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -18,18 +18,15 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import org.bukkit.Color;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
 public class CleansingTotem extends TotemAbility {
-	public static final Particle.DustOptions DUST_CLEANSING_RING = new Particle.DustOptions(Color.fromRGB(0, 87, 255), 1.25f);
-
 	private static final int COOLDOWN = 30 * 20;
 	private static final int AOE_RANGE = 6;
 	private static final double HEAL_PERCENT = 0.06;
@@ -80,6 +77,7 @@ public class CleansingTotem extends TotemAbility {
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.BLUE_STAINED_GLASS);
+	private final CleansingTotemCS mCosmetic;
 
 	public CleansingTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Cleansing Totem Projectile", "CleansingTotem", "Cleansing Totem");
@@ -93,13 +91,13 @@ public class CleansingTotem extends TotemAbility {
 			+ (isEnhanced() ? ENHANCE_HEALING_PERCENT : 0);
 		mAbsorbCap = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_ABSORB_MAX, ENHANCE_ABSORB_CAP);
 		mChargeUpTicks = 0;
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CleansingTotemCS());
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (ticks == 0) {
-			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 2.0f, 1.3f);
-			world.playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8f, 2.0f);
+			mCosmetic.cleansingTotemSpawn(world, standLocation);
 		}
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
@@ -107,7 +105,7 @@ public class CleansingTotem extends TotemAbility {
 		if (isLevelTwo() && ticks == mDuration / (CLEANSES + (int) CharmManager.getLevel(mPlayer, CHARM_CLEANSES)) - 1) {
 			List<Player> cleansePlayers = PlayerUtils.playersInRange(standLocation, mRadius, true);
 			cleanseTargets(cleansePlayers);
-			new PPCircle(Particle.HEART, standLocation, mRadius).ringMode(false).countPerMeter(0.8).spawnAsPlayerActive(mPlayer);
+			mCosmetic.cleansingTotemCleanse(mPlayer, standLocation, mRadius);
 		}
 	}
 
@@ -118,6 +116,7 @@ public class CleansingTotem extends TotemAbility {
 			for (Player p : players) {
 				PlayerUtils.healPlayer(mPlugin, p,
 					EntityUtils.getMaxHealth(p) * mHealPercent * ChainLightning.ENHANCE_POSITIVE_EFFICIENCY);
+				mCosmetic.cleansingTotemHeal(mPlayer);
 			}
 			if (isLevelTwo()) {
 				cleanseTargets(players);
@@ -136,21 +135,14 @@ public class CleansingTotem extends TotemAbility {
 					AbsorptionUtils.addAbsorption(p, remainingHealing, mAbsorbCap, 15 * 20);
 				}
 			}
-
-			PPCircle cleansingRing = new PPCircle(Particle.REDSTONE, standLocation, mRadius)
-				.countPerMeter(1.05).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
-			PPSpiral cleansingSpiral = new PPSpiral(Particle.REDSTONE, standLocation, mRadius)
-				.distancePerParticle(0.075).ticks(5).count(1).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
-			cleansingRing.spawnAsPlayerActive(mPlayer);
-			cleansingSpiral.spawnAsPlayerActive(mPlayer);
 			dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), 40);
+			mCosmetic.cleansingTotemPulse(mPlayer, standLocation, mRadius);
 		}
 	}
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
-		new PartialParticle(Particle.HEART, standLocation, 45, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK, 0.7f, 0.5f);
+		mCosmetic.cleansingTotemExpire(world, standLocation, mPlayer);
 	}
 
 	private void cleanseTargets(List<Player> cleansePlayers) {

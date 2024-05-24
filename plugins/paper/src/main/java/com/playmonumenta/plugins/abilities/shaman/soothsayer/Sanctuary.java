@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.SanctuaryCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -22,7 +24,6 @@ public class Sanctuary extends Ability {
 	public static final String CHARM_SLOWNESS_PERCENT = "Sanctuary Slowness Amplifier";
 	public static final String CHARM_WEAKNESS_PERCENT = "Sanctuary Weakness Amplifier";
 	public static final String CHARM_VULNERABILITY_PERCENT = "Sanctuary Vulnerability Amplifier";
-
 
 	public static final AbilityInfo<Sanctuary> INFO =
 		new AbilityInfo<>(Sanctuary.class, "Sanctuary", Sanctuary::new)
@@ -45,7 +46,7 @@ public class Sanctuary extends Ability {
 	public final double mSlownessPercent;
 	public final double mWeaknessPercent;
 	public final double mVulnerabilityPercent;
-
+	private final SanctuaryCS mCosmetic;
 
 	public Sanctuary(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -55,6 +56,7 @@ public class Sanctuary extends Ability {
 		mSlownessPercent = SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT);
 		mWeaknessPercent = WEAKNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS_PERCENT);
 		mVulnerabilityPercent = VULNERABILITY_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULNERABILITY_PERCENT);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanctuaryCS());
 	}
 
 	public void dealSanctuaryDebuffs(List<LivingEntity> targets, int ticks) {
@@ -63,6 +65,9 @@ public class Sanctuary extends Ability {
 			EntityUtils.applyWeaken(mPlugin, ticks, mWeaknessPercent, target);
 			if (isLevelTwo()) {
 				EntityUtils.applyVulnerability(mPlugin, ticks, mVulnerabilityPercent, target);
+				mCosmetic.sanctuaryLevelTwo(target);
+			} else {
+				mCosmetic.sanctuaryLevelOne(target);
 			}
 		}
 	}

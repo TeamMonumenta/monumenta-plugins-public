@@ -9,12 +9,12 @@ import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.WhirlwindTotemCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.ShamanCooldownDecreasePerSecond;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPSpiral;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -22,9 +22,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -87,6 +84,7 @@ public class WhirlwindTotem extends TotemAbility {
 	private final double mSpeed;
 	private final double mDurationBoost;
 	private final int mInterval;
+	private final WhirlwindTotemCS mCosmetic;
 
 	public WhirlwindTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Whirlwind Totem Projectile", "WhirlwindTotem", "Whirlwind Totem");
@@ -100,17 +98,13 @@ public class WhirlwindTotem extends TotemAbility {
 		mSpeed = isLevelOne() ? 0 : (SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED));
 		mDurationBoost = DURATION_BOOST + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DURATION_BOOST);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WhirlwindTotemCS());
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (ticks == 0) {
-			world.playSound(standLocation, Sound.ENTITY_ENDER_EYE_LAUNCH,
-				SoundCategory.PLAYERS, 2.0f, 0.1f);
-			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR,
-				SoundCategory.PLAYERS, 2.0f, 0.7f);
-			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS,
-				SoundCategory.PLAYERS, 2.0f, 1.3f);
+			mCosmetic.whirlwindTotemSpawn(world, mPlayer, standLocation);
 			applyWhirlwindDurationBoost();
 		}
 		if (ticks % mInterval == 0) {
@@ -142,19 +136,14 @@ public class WhirlwindTotem extends TotemAbility {
 			}
 		}
 
-		PPSpiral windSpiral = new PPSpiral(Particle.SPELL_INSTANT, standLocation, mRadius).distancePerParticle(.05).ticks(5).count(1).delta(0);
-		windSpiral.spawnAsPlayerActive(mPlayer);
-		standLocation.getWorld().playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE,
-			SoundCategory.PLAYERS, 0.3f, 0.5f);
+		mCosmetic.whirlwindTotemPulse(mPlayer, standLocation, mRadius);
 		dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), INTERVAL + 20);
 		applyWhirlwindDurationBoost();
 	}
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
-		new PartialParticle(Particle.HEART, standLocation, 45, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK,
-			SoundCategory.PLAYERS, 0.7f, 0.5f);
+		mCosmetic.whirlwindTotemExpire(mPlayer, world, standLocation, mRadius);
 	}
 
 	public void applyWhirlwindDurationBoost() {

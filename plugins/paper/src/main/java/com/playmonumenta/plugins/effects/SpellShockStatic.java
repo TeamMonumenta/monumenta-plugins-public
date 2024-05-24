@@ -1,19 +1,16 @@
 package com.playmonumenta.plugins.effects;
 
-import com.playmonumenta.plugins.particle.PartialParticle;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import com.playmonumenta.plugins.cosmetics.skills.mage.SpellshockCS;
 import org.bukkit.entity.Entity;
 
 public class SpellShockStatic extends Effect {
 	public static final String effectID = "SpellShockStatic";
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
-
+	private final SpellshockCS mCosmetic;
 	private boolean mTriggered = false;
 
-	public SpellShockStatic(int duration) {
+	public SpellShockStatic(int duration, SpellshockCS cosmetic) {
 		super(duration, effectID);
+		mCosmetic = cosmetic;
 	}
 
 	public boolean isTriggered() {
@@ -27,9 +24,7 @@ public class SpellShockStatic extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		Location loc = entity.getLocation();
-		new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1).spawnAsEnemyBuff();
-		new PartialParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, COLOR).spawnAsEnemyBuff();
+		mCosmetic.tickEffect(entity);
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.VolleyCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -18,9 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
@@ -70,14 +69,15 @@ public class Volley extends Ability {
 
 	private final int mArrows;
 	private final double mMultiplier;
+	private final VolleyCS mCosmetic;
 
 	public Volley(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mArrows = (isLevelOne() ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT) + (int) CharmManager.getLevel(mPlayer, CHARM_ARROWS);
 		mMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
-
 		mVolley = new HashSet<>();
 		mVolleyHitMap = new HashMap<>();
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new VolleyCS());
 	}
 
 	@Override
@@ -90,10 +90,7 @@ public class Volley extends Ability {
 
 		// Start the cooldown first so we don't cause an infinite loop of Volleys
 		putOnCooldown();
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 0.75f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 1f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 1.33f);
+		mCosmetic.volleyEffect(mPlayer);
 		// Garbage Collector at home
 		mVolley.clear();
 		mVolleyHitMap.clear();
@@ -165,8 +162,10 @@ public class Volley extends Ability {
 			if (notBeenHit(enemy)) {
 				double damage = event.getDamage() * mMultiplier * (1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE));
 				event.setDamage(damage);
+				mCosmetic.volleyHit(mPlayer, enemy);
 				if (isEnhanced()) {
 					EntityUtils.applyBleed(mPlugin, ENHANCEMENT_BLEED_DURATION, ENHANCEMENT_BLEED_POTENCY, enemy);
+					mCosmetic.volleyBleed(mPlayer, enemy);
 				}
 			} else {
 				// Only let one Volley arrow hit a given mob

@@ -8,26 +8,20 @@ import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertis
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.FlameTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
@@ -48,8 +42,6 @@ public class FlameTotem extends TotemAbility {
 	private static final int BOMB_COUNT = 1;
 	private static final int ENHANCE_BOMB_BONUS = 1;
 	private static final double ENHANCE_INFERNO_SCALE = 0.5;
-
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
 	public static final String CHARM_DURATION = "Flame Totem Duration";
 	public static final String CHARM_RADIUS = "Flame Totem Radius";
@@ -103,6 +95,8 @@ public class FlameTotem extends TotemAbility {
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.MAGMA_BLOCK);
 
+	private final FlameTotemCS mCosmetic;
+
 	public FlameTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Flame Totem Projectile", "FlameTotem", "Flame Totem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
@@ -121,16 +115,15 @@ public class FlameTotem extends TotemAbility {
 			+ (isEnhanced() ? ENHANCE_BOMB_BONUS : 0);
 		mEnhanceInfernoScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_INFERNO_SCALE, ENHANCE_INFERNO_SCALE);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new FlameTotemCS());
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (isEnhanced()) {
-			PPCircle fireRing = new PPCircle(Particle.SOUL_FIRE_FLAME, standLocation, mRadius).ringMode(true).countPerMeter(0.2).delta(0);
-			fireRing.spawnAsPlayerActive(mPlayer);
+			mCosmetic.flameTotemTickEnhanced(mPlayer, standLocation, mRadius);
 		} else {
-			PPCircle fireRing = new PPCircle(Particle.FLAME, standLocation, mRadius).ringMode(true).countPerMeter(0.6).delta(0);
-			fireRing.spawnAsPlayerActive(mPlayer);
+			mCosmetic.flameTotemTick(mPlayer, standLocation, mRadius);
 		}
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
@@ -161,19 +154,9 @@ public class FlameTotem extends TotemAbility {
 				Location targetLocation = finalTarget.getLocation();
 				Location standEyeLocation = standLocation.clone().add(0, 1.5, 0);
 				if (isEnhanced()) {
-					new PPLine(Particle.SOUL_FIRE_FLAME, standEyeLocation, targetLocation)
-						.countPerMeter(8).delta(0).spawnAsPlayerActive(mPlayer);
-					ParticleUtils.explodingRingEffect(mPlugin, targetLocation.clone().add(0, 0.1, 0),
-						mBombRadius, 1.2, 5, 0.2,
-						loc -> new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0, 0.1, 0, 0)
-							.spawnAsPlayerActive(mPlayer));
+					mCosmetic.flameTotemBombEnhanced(mPlayer, standEyeLocation, targetLocation, standLocation, mPlugin, mBombRadius);
 				} else {
-					new PPLine(Particle.FLAME, standEyeLocation, targetLocation)
-						.countPerMeter(8).delta(0).spawnAsPlayerActive(mPlayer);
-					ParticleUtils.explodingRingEffect(mPlugin, targetLocation.clone().add(0, 0.1, 0),
-						mBombRadius, 1.2, 5, 0.2,
-						loc -> new PartialParticle(Particle.FLAME, loc, 1, 0, 0.1, 0, 0)
-							.spawnAsPlayerActive(mPlayer));
+					mCosmetic.flameTotemBomb(mPlayer, standEyeLocation, targetLocation, standLocation, mPlugin, mBombRadius);
 				}
 				List<LivingEntity> newImpactedMobs = EntityUtils.getNearbyMobsInSphere(targetLocation, mBombRadius, null);
 				for (LivingEntity mob : newImpactedMobs) {
@@ -184,17 +167,13 @@ public class FlameTotem extends TotemAbility {
 						stats, mEnhanceInfernoScale);
 					impactedMobs.add(mob);
 				}
-				standLocation.getWorld().playSound(standLocation, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE,
-					SoundCategory.PLAYERS, 0.3f, 0.5f);
 			}
 		}
 	}
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
-		new PartialParticle(Particle.REDSTONE, standLocation, 45, 0.2, 1.1, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_NORMAL, standLocation, 40, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
-		world.playSound(standLocation, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.7f, 0.5f);
 		mDecayedTotemBuff = 0;
+		mCosmetic.flameTotemExpire(world, mPlayer, standLocation);
 	}
 }

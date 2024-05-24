@@ -6,12 +6,14 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.SagesInsightCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,28 +21,19 @@ import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
+	public static final String NAME = "Sage's Insight";
 	private static final int DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS = 8;
 	private static final int SPEED_DURATION = 5 * 20;
 	private static final int ABILITIES_COUNT_1 = 2;
 	private static final int ABILITIES_COUNT_2 = 3;
 	private static final String ATTR_NAME = "SagesExtraSpeedAttr";
-
-	private static final float[] PITCHES = {1.6f, 1.8f, 1.6f, 1.8f, 2f};
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(222, 219, 36), 1.0f);
 
 	private final int mResetSize;
 	private final int mMaxStacks;
@@ -51,8 +44,10 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	public static final String CHARM_SPEED = "Sage's Insight Speed Amplifier";
 	public static final String CHARM_ABILITY = "Sage's Insight Ability Count";
 
+	private final SagesInsightCS mCosmetic;
+
 	public static final AbilityInfo<SagesInsight> INFO =
-		new AbilityInfo<>(SagesInsight.class, "Sage's Insight", SagesInsight::new)
+		new AbilityInfo<>(SagesInsight.class, NAME, SagesInsight::new)
 			.scoreboardId("SagesInsight")
 			.shorthandName("SgI")
 			.actionBarColor(TextColor.color(222, 219, 36))
@@ -81,6 +76,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		mSpeed = CharmManager.getLevelPercentDecimal(player, CHARM_SPEED);
 		mResets.clear();
 		mStacksMap = new HashMap<>();
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SagesInsightCS());
 	}
 
 	private int mStacks = 0;
@@ -107,9 +103,6 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			return false;
 		}
 		mTicksToStackDecay = CharmManager.getDuration(mPlayer, CHARM_DECAY, DECAY_TIMER);
-		World world = mPlayer.getWorld();
-		Location loc = mPlayer.getLocation();
-		Location locD = event.getDamagee().getLocation().add(0, 1, 0);
 
 		Boolean bool = mStacksMap.get(ability);
 		if (bool != null && bool) {
@@ -119,17 +112,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 				if (mSpeed > 0) {
 					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed", new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME));
 				}
-				new PartialParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 2.1, 0), 20, 0.5, 0.1, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
-				for (int i = 0; i < PITCHES.length; i++) {
-					float pitch = PITCHES[i];
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1, pitch);
-						}
-					}.runTaskLater(mPlugin, i);
-				}
+				mCosmetic.insightTrigger(mPlugin, mPlayer);
 
 				mStacks = 0;
 				for (ClassAbility s : mResets) {
@@ -142,8 +125,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 				}
 				mResets.clear();
 			} else {
-				new PartialParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
+				mCosmetic.insightStackGain(mPlayer, event);
 				showChargesMessage();
 			}
 			ClientModHandler.updateAbility(mPlayer, this);

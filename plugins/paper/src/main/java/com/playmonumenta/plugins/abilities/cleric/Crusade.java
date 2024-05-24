@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.CrusadeCS;
 import com.playmonumenta.plugins.effects.CrusadeTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -36,8 +38,11 @@ public class Crusade extends Ability {
 			.simpleDescription("Passively count Humanoid mobs as Undead. Temporarily mark Monstrous mobs as Undead with abilities.")
 			.displayItem(Material.ZOMBIE_HEAD);
 
+	private final CrusadeCS mCosmetic;
+
 	public Crusade(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CrusadeCS());
 	}
 
 	@Override
@@ -64,7 +69,7 @@ public class Crusade extends Ability {
 
 	private void addCrusadeTag(LivingEntity enemy) {
 		if (isLevelTwo() && !EntityUtils.isUndead(enemy) && !EntityUtils.isHumanlike(enemy)) {
-			mPlugin.mEffectManager.addEffect(enemy, "CrusadeTag", new CrusadeTag(TAG_DURATION));
+			mPlugin.mEffectManager.addEffect(enemy, "CrusadeTag", new CrusadeTag(TAG_DURATION, mCosmetic));
 		}
 	}
 

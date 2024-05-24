@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.AstralOmenCS;
 import com.playmonumenta.plugins.effects.AstralOmenArcaneStacks;
 import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
 import com.playmonumenta.plugins.effects.AstralOmenFireStacks;
@@ -15,7 +17,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -25,12 +26,9 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
-import org.bukkit.Location;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -61,6 +59,8 @@ public class AstralOmen extends Ability {
 	private final double mLevelBonusMultiplier;
 
 	private static final Map<ClassAbility, Type> mElementClassification;
+
+	private final AstralOmenCS mCosmetic;
 
 	public static final AbilityInfo<AstralOmen> INFO =
 		new AbilityInfo<>(AstralOmen.class, NAME, AstralOmen::new)
@@ -112,7 +112,7 @@ public class AstralOmen extends Ability {
 		THUNDER(STACKS_SOURCE_THUNDER, AstralOmenThunderStacks.COLOR);
 
 		private final String mSource;
-		private final Particle.DustOptions mColor;
+		public final Particle.DustOptions mColor;
 
 		Type(String source, Particle.DustOptions color) {
 			mSource = source;
@@ -123,6 +123,7 @@ public class AstralOmen extends Ability {
 	public AstralOmen(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER) : 0);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AstralOmenCS());
 	}
 
 	@Override
@@ -156,7 +157,6 @@ public class AstralOmen extends Ability {
 
 		int stacksThreshold = STACK_THRESHOLD + (int) CharmManager.getLevel(mPlayer, CHARM_STACK);
 		if (combo >= stacksThreshold) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
-			World world = enemy.getWorld();
 			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
 			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
@@ -168,24 +168,16 @@ public class AstralOmen extends Ability {
 					}
 					for (Map.Entry<Type, Integer> entry : levels.entrySet()) {
 						if (entry.getValue() > 0) {
-							new PartialParticle(Particle.REDSTONE, enemy.getLocation(), entry.getValue() * 5, 0.2, 0.2, 0.2, 0.1, entry.getKey().mColor).spawnAsPlayerActive(mPlayer);
+							mCosmetic.clearEffect(mPlayer, enemy, entry);
 						}
 					}
 				}
 			}
 
 			if (mLevelBonusMultiplier > 0) {
-				mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer));
+				mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer, mCosmetic));
 			}
 
-			Location loc = enemy.getLocation();
-			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 80, 0, 0, 0, 4).spawnAsPlayerActive(mPlayer);
-			for (Map.Entry<Type, Integer> e : levels.entrySet()) {
-				if (e.getValue() > 0) {
-					new PartialParticle(Particle.REDSTONE, loc, e.getValue() * 5, 0.2, 0.2, 0.2, 0.1, e.getKey().mColor).spawnAsPlayerActive(mPlayer);
-				}
-			}
-			world.playSound(loc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.3f, 1.5f);
 		} else {
 			// Effect implements Comparable in compareTo(), which uses the internal magnitude
 			// When EffectManager does addEffect(), it add()s to NavigableSet, which presumably uses compareTo()
@@ -199,10 +191,10 @@ public class AstralOmen extends Ability {
 				if (level > 0) {
 					Effect effect;
 					switch (type) {
-						case FIRE -> effect = new AstralOmenFireStacks(STACK_TICKS, level);
-						case ICE -> effect = new AstralOmenIceStacks(STACK_TICKS, level);
-						case THUNDER -> effect = new AstralOmenThunderStacks(STACK_TICKS, level);
-						default -> effect = new AstralOmenArcaneStacks(STACK_TICKS, level);
+						case FIRE -> effect = new AstralOmenFireStacks(STACK_TICKS, level, mPlayer, mCosmetic);
+						case ICE -> effect = new AstralOmenIceStacks(STACK_TICKS, level, mPlayer, mCosmetic);
+						case THUNDER -> effect = new AstralOmenThunderStacks(STACK_TICKS, level, mPlayer, mCosmetic);
+						default -> effect = new AstralOmenArcaneStacks(STACK_TICKS, level, mPlayer, mCosmetic);
 					}
 					mPlugin.mEffectManager.addEffect(enemy, type.mSource, effect);
 				}

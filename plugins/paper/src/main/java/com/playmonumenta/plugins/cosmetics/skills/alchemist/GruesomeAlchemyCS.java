@@ -62,6 +62,8 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 
 	public void damageOverTimeEffects(LivingEntity target) {
 		new PartialParticle(Particle.SQUID_INK, target.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+		// These particles are from Brutal Alchemy. Cosmetics made for Brutal Alchemy
+		// should therefore be done in combination with Gruesome Alchemy.
 	}
 
 }

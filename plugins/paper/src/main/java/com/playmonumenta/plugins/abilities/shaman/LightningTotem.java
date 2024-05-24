@@ -8,11 +8,11 @@ import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertis
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.LightningTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PPLightning;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -26,8 +26,6 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -104,6 +102,7 @@ public class LightningTotem extends TotemAbility {
 	private final List<Location> mAllLocs = new ArrayList<>();
 	private final int mInterval;
 	private final List<BukkitTask> mStormTasks = new ArrayList<>();
+	private final LightningTotemCS mCosmetic;
 
 	public LightningTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Lightning Totem Projectile", "LightningTotem", "Lightning Totem");
@@ -119,11 +118,12 @@ public class LightningTotem extends TotemAbility {
 		mStormRadius = CharmManager.getRadius(mPlayer, CHARM_STORM_RADIUS, STORM_DAMAGE_RADIUS);
 		mStormDuration = CharmManager.getDuration(mPlayer, CHARM_STORM_DURATION, STORM_DURATION);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LightningTotemCS());
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		new PPCircle(Particle.CRIT, standLocation.clone().add(0, 0.3, 0), mRadius).countPerMeter(0.4).spawnAsPlayerActive(mPlayer);
+		mCosmetic.lightningTotemTick(mPlayer, mRadius, standLocation);
 		mStormTasks.removeIf(BukkitTask::isCancelled);
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
@@ -155,12 +155,7 @@ public class LightningTotem extends TotemAbility {
 		if (mTarget != null) {
 			DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC,
 				mInfo.getLinkedSpell(), stats), damageApplied, true, false, false);
-			PPLightning lightning = new PPLightning(Particle.END_ROD, mTarget.getLocation())
-				.count(8).duration(3);
-			mPlayer.getWorld().playSound(mTarget.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST,
-				SoundCategory.PLAYERS, 1, 1.25f);
-			lightning.init(4, 2.5, 0.3, 0.3);
-			lightning.spawnAsPlayerActive(mPlayer);
+			mCosmetic.lightningTotemStrike(mPlayer, mTarget);
 		}
 		dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), INTERVAL + 20);
 	}
@@ -183,6 +178,7 @@ public class LightningTotem extends TotemAbility {
 
 					@Override
 					public void run() {
+						mCosmetic.lightningTotemEnhancementStorm(mPlayer, mLoc);
 						new PartialParticle(
 							Particle.REDSTONE,
 							mLoc.clone().add(0, 4, 0),
@@ -195,12 +191,7 @@ public class LightningTotem extends TotemAbility {
 						).spawnAsPlayerActive(mPlayer);
 
 						if (mTicks % mInterval == 0) {
-							PPLightning lightning = new PPLightning(Particle.END_ROD, mLoc)
-								.count(8).duration(3).height(4);
-							mPlayer.getWorld().playSound(mLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST,
-								SoundCategory.PLAYERS, 1, 1.25f);
-							lightning.init(3, 2.5, 0.3, 0.3);
-							lightning.spawnAsPlayerActive(mPlayer);
+							mCosmetic.lightningTotemEnhancementStrike(mPlayer, mLoc);
 							for (LivingEntity entity : EntityUtils.getNearbyMobsInSphere(mLoc, mStormRadius, mTarget)) {
 								DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(
 										DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), mStats),
@@ -218,9 +209,7 @@ public class LightningTotem extends TotemAbility {
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
-		new PartialParticle(Particle.FLASH, standLocation, 3, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
-		world.playSound(standLocation, Sound.ENTITY_BLAZE_DEATH,
-			SoundCategory.PLAYERS, 0.7f, 0.5f);
+		mCosmetic.lightningTotemExpire(mPlayer, standLocation, world);
 		mTarget = null;
 		mDecayedTotemBuff = 0;
 		mWhirlwindBuffPercent = 0;

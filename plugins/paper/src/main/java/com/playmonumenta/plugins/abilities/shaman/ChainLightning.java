@@ -10,9 +10,10 @@ import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertis
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.ChainLightningCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -27,9 +28,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -91,6 +89,7 @@ public class ChainLightning extends MultipleChargeAbility {
 	public double mDamage;
 	private final double mInitialRange;
 	private int mLastCastTicks = 0;
+	private final ChainLightningCS mCosmetic;
 
 
 	private final List<LivingEntity> mHitTargets = new ArrayList<>();
@@ -107,6 +106,7 @@ public class ChainLightning extends MultipleChargeAbility {
 		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mInitialRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_INITIAL_RANGE, INITIAL_RANGE);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainLightningCS());
 	}
 
 	public boolean cast() {
@@ -183,7 +183,6 @@ public class ChainLightning extends MultipleChargeAbility {
 		}
 		mLastCastTicks = ticks;
 
-		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.PLAYERS, 2.0f, 2.0f);
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
 			if (target != null) {
@@ -194,7 +193,7 @@ public class ChainLightning extends MultipleChargeAbility {
 					MovementUtils.knockAway(mPlayer.getLocation(), target, knockback, 0.6f * knockback, true);
 				}
 
-				new PPLine(Particle.END_ROD, mHitTargets.get(i).getEyeLocation().add(0, -0.5, 0), target.getEyeLocation().add(0, -0.5, 0), 0.08).deltaVariance(true).countPerMeter(8).spawnAsPlayerActive(mPlayer);
+				mCosmetic.chainLightningCast(mPlayer, mHitTargets, target, i);
 
 				if (isEnhanced() && target instanceof ArmorStand) {
 					for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {

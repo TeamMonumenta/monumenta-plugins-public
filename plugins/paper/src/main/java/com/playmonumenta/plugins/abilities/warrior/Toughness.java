@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.ToughnessCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -45,6 +47,7 @@ public class Toughness extends Ability {
 			.displayItem(Material.IRON_HELMET);
 
 	private final double mDoTDamageReduction;
+	private final ToughnessCS mCosmetic;
 
 	public Toughness(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -57,6 +60,8 @@ public class Toughness extends Ability {
 		healthBoost += CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH);
 		EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
 			new AttributeModifier(TOUGHNESS_MODIFIER_NAME, healthBoost, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ToughnessCS());
 	}
 
 	@Override
@@ -70,7 +75,7 @@ public class Toughness extends Ability {
 	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
 		if (isEnhanced() && mPlayer.getHealth() <= EntityUtils.getMaxHealth(mPlayer) * HEALTH_THRESHHOLD) {
 			event.setAmount(event.getAmount() * (1 + HEALING_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALING)));
+			mCosmetic.toughnessEnhancement(mPlayer);
 		}
 	}
-
 }

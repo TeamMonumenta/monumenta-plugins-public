@@ -11,11 +11,11 @@ import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DecayedTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -23,12 +23,9 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.Color;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
@@ -47,9 +44,6 @@ public class DecayedTotem extends TotemAbility {
 	private static final int TARGETS = 3;
 	private static final int FLAME_TOTEM_DAMAGE_BUFF = 1;
 	private static final int LIGHTNING_TOTEM_DAMAGE_BUFF = 5;
-
-	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
-	private static final Particle.DustOptions GREEN = new Particle.DustOptions(Color.fromRGB(5, 120, 5), 1.0f);
 
 	public static final String CHARM_DURATION = "Decayed Totem Duration";
 	public static final String CHARM_RADIUS = "Decayed Totem Radius";
@@ -98,6 +92,7 @@ public class DecayedTotem extends TotemAbility {
 	private final double mFlameTotemBuff;
 	private final double mLightningTotemBuff;
 	private final int mInterval;
+	private final DecayedTotemCS mCosmetic;
 
 	public DecayedTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Decayed Totem Projectile", "DecayedTotem", "Decayed Totem");
@@ -112,19 +107,16 @@ public class DecayedTotem extends TotemAbility {
 		mTargetCount = TARGETS + (int) CharmManager.getLevel(mPlayer, CHARM_TARGETS);
 		mFlameTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_FLAME_TOTEM_DAMAGE_BUFF, FLAME_TOTEM_DAMAGE_BUFF);
 		mLightningTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_LIGHTNING_TOTEM_DAMAGE_BUFF, LIGHTNING_TOTEM_DAMAGE_BUFF);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DecayedTotemCS());
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (ticks == 0) {
 			applyDecayedDamageBoost();
-			stand.getWorld().playSound(stand, Sound.BLOCK_CONDUIT_AMBIENT,
-				SoundCategory.PLAYERS, 20.0f, 1.2f);
-			stand.getWorld().playSound(stand, Sound.ENTITY_SKELETON_HURT,
-				SoundCategory.PLAYERS, 0.6f, 0.3f);
-			stand.getWorld().playSound(stand, Sound.ENTITY_PHANTOM_DEATH,
-				SoundCategory.PLAYERS, 0.5f, 0.2f);
+			mCosmetic.decayedTotemSpawn(mPlayer, stand);
 		}
+		mCosmetic.decayedTotemTick(mPlayer, stand);
 		mTargets.removeIf(mob -> !mob.getWorld().equals(standLocation.getWorld()) || standLocation.distance(mob.getLocation()) >= mRadius || mob.isDead());
 		if (mTargets.size() < mTargetCount) {
 			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
@@ -144,8 +136,7 @@ public class DecayedTotem extends TotemAbility {
 
 		if (ticks % 5 == 0) {
 			for (LivingEntity target : mTargets) {
-				new PPLine(Particle.REDSTONE, stand.getEyeLocation(), target.getLocation()).countPerMeter(8).delta(0.03).data(BLACK).spawnAsPlayerActive(mPlayer);
-				new PPLine(Particle.REDSTONE, stand.getEyeLocation(), target.getLocation()).countPerMeter(8).delta(0.03).data(GREEN).spawnAsPlayerActive(mPlayer);
+				mCosmetic.decayedTotemAnchor(mPlayer, stand, target);
 			}
 		}
 		if (ticks % mInterval == 0) {
@@ -164,9 +155,7 @@ public class DecayedTotem extends TotemAbility {
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
-		new PartialParticle(Particle.SQUID_INK, standLocation, 5, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK,
-			SoundCategory.PLAYERS, 0.7f, 0.5f);
+		mCosmetic.decayedTotemExpire(mPlayer, world, standLocation);
 		mTargets.clear();
 		applyDecayedDamageBoost();
 	}

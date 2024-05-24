@@ -6,10 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.SwiftnessCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -17,12 +18,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
@@ -65,11 +61,13 @@ public class Swiftness extends Ability {
 
 	private boolean mWasInNoMobilityZone = false;
 	private boolean mJumpBoost;
+	private final SwiftnessCS mCosmetic;
 
 	public Swiftness(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mJumpBoost = !player.getScoreboardTags().contains(NO_JUMP_BOOST_TAG);
 		addModifier(player);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SwiftnessCS());
 	}
 
 	@Override
@@ -79,10 +77,7 @@ public class Swiftness extends Ability {
 			event.setCancelled(true);
 			mPlayer.setNoDamageTicks(20);
 			mPlayer.setLastDamage(event.getDamage());
-			Location loc = mPlayer.getLocation();
-			World world = mPlayer.getWorld();
-			new PartialParticle(Particle.CLOUD, loc, 40, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.25f, 2f);
+			mCosmetic.swiftnessEnhancement(mPlayer);
 		}
 	}
 
@@ -108,14 +103,14 @@ public class Swiftness extends Ability {
 			mJumpBoost = false;
 			mPlayer.addScoreboardTag(NO_JUMP_BOOST_TAG);
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
+			mCosmetic.toggleJumpBoostOff(mPlayer);
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned off");
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		} else {
 			mJumpBoost = true;
 			mPlayer.removeScoreboardTag(NO_JUMP_BOOST_TAG);
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21, SWIFTNESS_EFFECT_JUMP_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
+			mCosmetic.toggleJumpBoostOn(mPlayer);
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		}
 		ClientModHandler.updateAbility(mPlayer, this);
 		return true;

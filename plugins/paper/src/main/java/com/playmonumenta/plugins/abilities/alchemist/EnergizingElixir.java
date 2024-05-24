@@ -7,13 +7,14 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.EnergizingElixirCS;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EnergizingElixirStacks;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -22,12 +23,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Arrays;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -106,6 +102,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 	private final int mMaxStacks;
 	private final int mPrice;
 	private final int mJumpBoostAmplifier;
+	private final EnergizingElixirCS mCosmetic;
 
 	public EnergizingElixir(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -115,6 +112,8 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		mMaxStacks = isEnhanced() ? ENHANCED_MAX_STACK + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS) : 0;
 		mPrice = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_PRICE);
 		mJumpBoostAmplifier = JUMP_LEVEL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EnergizingElixirCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
@@ -154,10 +153,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		applyEffects();
 
 		if (soundAndParticles) {
-			World world = mPlayer.getWorld();
-			Location loc = mPlayer.getLocation();
-			new PartialParticle(Particle.TOTEM, loc, 50, 1.5, 1, 1.5, 0).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.PLAYERS, 1, 0);
+			mCosmetic.activate(mPlayer);
 		}
 	}
 
@@ -166,9 +162,11 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (mPlayer.getScoreboardTags().remove(TOGGLE_TAG)) {
 			mPlayer.sendActionBar(Component.text("Energizing Elixir automatic recast has been disabled"));
 			ClientModHandler.updateAbility(mPlayer, this);
+			mCosmetic.toggleRecastOff(mPlayer);
 		} else if (!isOnCooldown() && mAlchemistPotions != null && mAlchemistPotions.decrementCharges(mPrice)) {
 			mPlayer.sendActionBar(Component.text("Energizing Elixir automatic recast has been enabled"));
 			mPlayer.getScoreboardTags().add(TOGGLE_TAG);
+			mCosmetic.toggleRecastOn(mPlayer);
 			activate(true);
 			putOnCooldown();
 		}
@@ -222,9 +220,13 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		}
 		if (mStacks > 0 && !mPlugin.mEffectManager.hasEffect(mPlayer, EnergizingElixirStacks.class)) {
 			if (toggled) {
-				mStacks = Math.min(mMaxStacks, mStacks + 1);
+				if (mStacks < 4) {
+					mStacks = Math.min(mMaxStacks, mStacks + 1);
+					mCosmetic.stackEffect(mPlayer);
+				}
 			} else {
 				mStacks--;
+				mCosmetic.stackEffect(mPlayer);
 			}
 			if (mStacks > 0) {
 				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(mDuration, mStacks));

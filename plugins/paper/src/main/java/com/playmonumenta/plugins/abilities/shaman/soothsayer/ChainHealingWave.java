@@ -10,8 +10,9 @@ import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.ChainHealingWaveCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -25,9 +26,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -80,6 +78,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 	public final double mHealPercent;
 	private final List<LivingEntity> mHitTargets = new ArrayList<>();
 	private int mLastCastTicks = 0;
+	private final ChainHealingWaveCS mCosmetic;
 
 	public ChainHealingWave(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -90,6 +89,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? BOUNCE_RANGE_2 : BOUNCE_RANGE_1);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mHealPercent = CharmManager.getExtraPercent(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainHealingWaveCS());
 	}
 
 	public boolean cast() {
@@ -149,11 +149,10 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
 			if (target instanceof Player) {
-				mPlayer.getWorld().playSound(target.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.6f);
-				mPlayer.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.1f, 1.0f);
+				mCosmetic.chainHeal(mPlayer, target);
 				PlayerUtils.healPlayer(mPlugin, (Player) target, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mHealPercent * EntityUtils.getMaxHealth(target)), mPlayer);
 			}
-			new PPLine(Particle.VILLAGER_HAPPY, mHitTargets.get(i).getEyeLocation().add(0, -0.5, 0), target.getEyeLocation().add(0, -0.5, 0)).countPerMeter(8).spawnAsPlayerActive(mPlayer);
+			mCosmetic.chainBeam(mHitTargets, i, target, mPlayer);
 		}
 		mHitTargets.removeIf(target -> !(target instanceof ArmorStand));
 		Collection<Ability> abilities = mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities();

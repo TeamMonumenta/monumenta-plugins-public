@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.classes;
 
 
-import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
 import com.playmonumenta.plugins.abilities.mage.MagmaShield;
@@ -9,6 +8,7 @@ import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
 import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
+import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
@@ -36,6 +36,7 @@ public enum ClassAbility {
 	// Arcanist
 	ASTRAL_OMEN(AstralOmen.NAME),
 	COSMIC_MOONBLADE(CosmicMoonblade.NAME),
+	SAGES_INSIGHT(SagesInsight.NAME),
 
 	// Elementalist
 	BLIZZARD(Blizzard.NAME),
@@ -66,10 +67,12 @@ public enum ClassAbility {
 	// [Cleric]
 	CELESTIAL_BLESSING("Celestial Blessing"),
 	CLEANSING_RAIN("Cleansing Rain"),
-	DIVINE_JUSTICE(DivineJustice.NAME),
+	DIVINE_JUSTICE("Divine Justice"),
 	HAND_OF_LIGHT("Hand of Light"),
 	SANCTIFIED_ARMOR("Sanctified Armor"),
 	ILLUMINATE("Illuminate"),
+	CRUSADE("Crusade"),
+	HEAVENLY_BOON("Heavenly Boon"),
 
 	// Hierophant
 	ENCHANTED_PRAYER("Enchanted Prayer"),
@@ -88,6 +91,8 @@ public enum ClassAbility {
 	HUNTING_COMPANION("Hunting Companion"),
 	SWIFT_CUTS("Swift Cuts"), //placeholder for cosmetic
 	SWIFTNESS("Swiftness"),
+	SHARPSHOOTER("Sharpshooter"),
+	AGILITY("Agility"),
 
 	// Hunter
 	PREDATOR_STRIKE("Predator Strike"),
@@ -128,6 +133,9 @@ public enum ClassAbility {
 	RIPOSTE("Riposte"),
 	SHIELD_BASH("Shield Bash"),
 	SHIELD_BASH_AOE("Shield Bash"), // special case for glorious battle
+	FRENZY("Frenzy"),
+	WEAPON_MASTERY("Weapon Mastery"),
+	TOUGHNESS("Toughness"),
 
 	// Berserker
 	METEOR_SLAM(MeteorSlam.NAME),

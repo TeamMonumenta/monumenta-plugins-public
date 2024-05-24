@@ -7,10 +7,11 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.CleansingRainCS;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -18,14 +19,8 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-
 
 public class CleansingRain extends Ability implements AbilityWithDuration {
 
@@ -62,10 +57,12 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 			.displayItem(Material.NETHER_STAR);
 
 	private final double mRadius;
+	private final CleansingRainCS mCosmetic;
 
 	public CleansingRain(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CleansingRainCS());
 	}
 
 	private int mCurrDuration = -1;
@@ -75,8 +72,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 			return false;
 		}
 
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.45f, 0.8f);
+		mCosmetic.rainCast(mPlayer);
 		putOnCooldown();
 
 		// Run cleansing rain here until it finishes
@@ -96,9 +92,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 
 				double ratio = mRadius / CLEANSING_RADIUS;
 				double smallRatio = ratio / 3;
-				new PartialParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), (int) (5 * ratio * ratio), 2.5 * ratio, 0.35, 2.5 * ratio, 0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), (int) (15 * ratio * ratio), 2.5 * ratio, 2, 2.5 * ratio, 0.001).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), (int) (1 * ratio * ratio), 2 * ratio, 1.5, 2 * ratio, 0.001).spawnAsPlayerActive(mPlayer);
+				mCosmetic.rainCloud(mPlayer, ratio);
 
 				List<Player> rainPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true);
 				for (Player player : rainPlayers) {
@@ -122,9 +116,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 				if (isEnhanced()) {
 					for (Player player : mCleansedPlayers) {
 						if (!rainPlayers.contains(player) && player != mPlayer) {
-							new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 4, 0), (int) (5 * smallRatio * smallRatio), 2.5 * smallRatio, 0.35, 2.5 * smallRatio, 0).spawnAsPlayerActive(player);
-							new PartialParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), (int) (15 * smallRatio * smallRatio), 2.5 * smallRatio, 2, 2.5 * smallRatio, 0.001).spawnAsPlayerActive(player);
-							new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), (int) (1 * smallRatio * smallRatio), 2 * smallRatio, 1.5, 2 * smallRatio, 0.001).spawnAsPlayerActive(player);
+							mCosmetic.rainEnhancement(mPlayer, smallRatio);
 						}
 
 						PotionUtils.clearNegatives(mPlugin, player);

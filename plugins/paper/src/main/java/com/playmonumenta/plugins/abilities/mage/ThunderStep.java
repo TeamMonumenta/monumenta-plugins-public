@@ -6,10 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.ThunderStepCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -18,12 +19,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,8 +34,6 @@ public class ThunderStep extends Ability {
 
 	public static final String NAME = "Thunder Step";
 	public static final ClassAbility ABILITY = ClassAbility.THUNDER_STEP;
-	public static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
-	public static final Particle.DustOptions COLOR_AQUA = new Particle.DustOptions(Color.AQUA, 0.75f);
 
 	/*
 	 * Cloud's standardised constant order:
@@ -69,6 +64,8 @@ public class ThunderStep extends Ability {
 	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
 	public static final String CHARM_RADIUS = "Thunder Step Radius";
 	public static final String CHARM_DISTANCE = "Thunder Step Distance";
+
+	private final ThunderStepCS mCosmetic;
 
 	public static final AbilityInfo<ThunderStep> INFO =
 		new AbilityInfo<>(ThunderStep.class, NAME, ThunderStep::new)
@@ -119,6 +116,7 @@ public class ThunderStep extends Ability {
 		super(plugin, player, INFO);
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelDistance = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ThunderStepCS());
 	}
 
 	public boolean cast() {
@@ -191,25 +189,16 @@ public class ThunderStep extends Ability {
 		return true;
 	}
 
-	private void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {
-		World world = location.getWorld();
-		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
+	public void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {
 		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE);
-
 		double ratio = radius / SIZE;
-		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10)
-			.minimumCount(1).spawnAsPlayerActive(mPlayer);
+		mCosmetic.castEffect(mPlayer, ratio);
+
 		Hitbox hitbox = new Hitbox.SphereHitbox(location.clone().add(0, 0.9, 0), radius);
 		List<LivingEntity> enemies = hitbox.getHitMobs();
-
-		// The more enemies, the fewer particles for each one
 		int mobParticles = Math.max(
-			1,
-			20 / Math.max(1, enemies.size()) // Never divide by 0. Always maximum 20 particles for <= 1 enemy
+			1, 20 / Math.max(1, enemies.size()) // Never divide by 0. Always maximum 20 particles for <= 1 enemy
 		);
-
 		for (LivingEntity enemy : enemies) {
 			if (spellDamage > 0) {
 				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, true);
@@ -218,10 +207,7 @@ public class ThunderStep extends Ability {
 			if (enhancementParalyze && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.paralyze(mPlugin, ENHANCEMENT_PARALYZE_DURATION, enemy);
 			}
-
-			Location enemyParticleLocation = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);
-			new PartialParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
+			mCosmetic.onDamage(mPlayer, enemy, mobParticles);
 		}
 	}
 

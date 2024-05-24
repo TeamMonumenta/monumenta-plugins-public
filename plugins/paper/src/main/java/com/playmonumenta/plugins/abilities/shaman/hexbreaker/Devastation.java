@@ -9,21 +9,18 @@ import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DevastationCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -64,6 +61,7 @@ public class Devastation extends Ability {
 
 	public double mDamage;
 	private final double mRadius;
+	private final DevastationCS mCosmetic;
 
 	public Devastation(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -73,6 +71,7 @@ public class Devastation extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DevastationCS());
 	}
 
 	public boolean cast() {
@@ -120,15 +119,7 @@ public class Devastation extends Ability {
 		}
 		TotemicEmpowerment.removeTotem(mPlayer, totemToNuke);
 
-		for (Particle particle : List.of(Particle.FLAME, Particle.LAVA)) {
-			ParticleUtils.explodingRingEffect(mPlugin, targetLoc.clone().add(0, 0.1, 0), mRadius, 1.2, 5, 0.2, loc -> new PartialParticle(particle, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer));
-		}
-		targetLoc.getWorld().playSound(targetLoc, Sound.BLOCK_END_PORTAL_SPAWN,
-			SoundCategory.PLAYERS, 0.3f, 2.0f);
-		targetLoc.getWorld().playSound(targetLoc, Sound.BLOCK_ENDER_CHEST_OPEN,
-			SoundCategory.PLAYERS, 0.6f, 0.6f);
-		targetLoc.getWorld().playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT,
-			SoundCategory.PLAYERS, 1.0f, 1.0f);
+		mCosmetic.devastationCast(mPlugin, targetLoc, mPlayer, mRadius);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, mRadius)) {
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);

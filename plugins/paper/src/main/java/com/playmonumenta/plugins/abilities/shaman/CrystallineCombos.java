@@ -8,37 +8,31 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.CrystallineCombosCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PPPeriodic;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.AbstractMap;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -117,14 +111,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 	private boolean mSpendingStacks = false;
 	protected @Nullable BukkitTask mSystemTask = null;
 	private static final Particle.DustOptions PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 200, 200), 0.8f);
-	private static final Collection<Map.Entry<Double, ParticleUtils.SpawnParticleAction>> PARTICLES =
-		List.of(new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.4,
-			(Location loc) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0.1, 0.1, 0.1, PARTICLE_COLOR)
-				.spawnAsOtherPlayerActive()));
-	private static final Collection<Map.Entry<Double, ParticleUtils.SpawnParticleAction>> PARTICLES_BREAK =
-		List.of(new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.4,
-			(Location loc) -> new PartialParticle(Particle.CRIT_MAGIC, loc, 1)
-				.spawnAsOtherPlayerActive()));
+	private final CrystallineCombosCS mCosmetic;
 
 	public CrystallineCombos(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -144,6 +131,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 					CharmManager.getLevel(player, CHARM_STACK_DECAY_TIME));
 		mTotalShots = (int) ((isLevelTwo() ? SHOT_COUNT_2 : SHOT_COUNT_1) + CharmManager.getLevel(player, CHARM_SHOT_COUNT));
 		mShotDelay = CharmManager.getCooldown(player, CHARM_SHOT_DELAY, SHOT_DELAY);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CrystallineCombosCS());
 	}
 
 	public boolean cast() {
@@ -166,7 +154,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (enemy.isDead() && event.getAbility() != mInfo.getLinkedSpell() && MetadataUtils.checkOnceThisTick(mPlugin, enemy, "CrytallineCombosStack")) {
+				if (enemy.isDead() && event.getAbility() != mInfo.getLinkedSpell() && MetadataUtils.checkOnceThisTick(mPlugin, enemy, "CrystallineCombosStack")) {
 					mCrystalStacks++;
 					mDecayTimer = 0;
 					updateNotify();
@@ -183,13 +171,9 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 				final int mGapBetweenParticleColors = 200 / mCrystalStackThreshold;
 				double mRotationAngle = 0;
 				final List<PPPeriodic> mParticles = new ArrayList<>();
-
 				{
 					for (int i = 0; i < 3; i++) {
-						mParticles.add(new PPPeriodic(Particle.REDSTONE,
-							mPlayer.getLocation())
-							.extra(0.1)
-							.data(new Particle.DustOptions(Color.fromRGB(100, 100, 255), 0.8f)));
+						mCosmetic.crystallineCombosSwirl(mParticles, mPlayer);
 					}
 				}
 
@@ -210,14 +194,13 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 						mCrystalShots = mCrystalStacks;
 					}
 					if (mCrystalStacks >= mCrystalStackThreshold) {
-						mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE,
-							 SoundCategory.PLAYERS, 2, 1.5f);
 						mDecayTimer = 0;
 						mCrystalStacks = 0;
 						mCrystalShots = mTotalShots;
 						mSpendingStacks = true;
 						updateNotify();
 						fireStack();
+						mCosmetic.crystallineCombosTrigger(mPlayer);
 					}
 
 					if (mT % 20 == 0 && mCrystalStacks > 0) {
@@ -248,19 +231,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 					}
 					if (mCrystalShots > 0) {
 						for (int i = 0; i < 3; i++) {
-							PPPeriodic particle = mParticles.get(i);
-							particle.location(
-									LocationUtils.getHalfHeightLocation(mPlayer)
-										.add(
-											FastUtils.cos(Math.toRadians(mRotationAngle + (i * 120))),
-											-0.1,
-											FastUtils.sin(Math.toRadians(mRotationAngle + (i * 120)))
-										)
-								).data(new Particle.DustOptions(
-									Color.fromRGB(mSpendingStacks ? 255 : colorAdjust,
-										mSpendingStacks ? 150 : colorAdjust,
-										mSpendingStacks ? 150 : 255), 0.8f))
-								.spawnAsPlayerPassive(mPlayer);
+							mCosmetic.crystallineCombosActiveSwirl(mParticles, mPlayer, mRotationAngle, mSpendingStacks, colorAdjust, i);
 						}
 					}
 				}
@@ -294,17 +265,9 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		for (LivingEntity target : targets) {
 			if (!DamageUtils.isImmuneToDamage(target, DamageEvent.DamageType.MAGIC)) {
 				hitSomething = true;
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_HIT,
-					SoundCategory.PLAYERS, 1.2f, 1.0f);
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK,
-					SoundCategory.PLAYERS, 2f, 1.4f);
+				mCosmetic.crystallineCombosHit(mPlayer, target, PARTICLE_COLOR);
 				DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, mCrystalDamage,
 					ClassAbility.CRYSTALLINE_COMBOS, true, false);
-				new PPLine(Particle.REDSTONE,
-					LocationUtils.getHalfHeightLocation(mPlayer).add(0, -0.1, 0),
-					LocationUtils.getHalfHeightLocation(target)).data(PARTICLE_COLOR)
-					.delta(0.1).extra(0.1).countPerMeter(10)
-					.spawnAsPlayerActive(mPlayer);
 				updateNotify();
 				break;
 			}
@@ -313,13 +276,9 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 			mCrystalShots--;
 		}
 		if (mCrystalShots <= 0) {
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2.0f, 1.0f);
+			mCosmetic.crystallineCombosExpire(mPlayer, mPlugin);
 			updateNotify();
 			mSpendingStacks = false;
-			ParticleUtils.explodingRingEffect(mPlugin, LocationUtils.getHalfHeightLocation(mPlayer), 2.5,
-				1, 5, PARTICLES);
-			ParticleUtils.explodingRingEffect(mPlugin, LocationUtils.getHalfHeightLocation(mPlayer), 2.5,
-				1, 5, PARTICLES_BREAK);
 		}
 	}
 

@@ -8,6 +8,9 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.HeavenlyBoonCS;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.HeavenlyBoonTracker;
@@ -15,20 +18,15 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -73,6 +71,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	public static final AbilityInfo<HeavenlyBoon> INFO =
 		new AbilityInfo<>(HeavenlyBoon.class, "Heavenly Boon", HeavenlyBoon::new)
+			.linkedSpell(ClassAbility.HEAVENLY_BOON)
 			.scoreboardId("HeavenlyBoon")
 			.shorthandName("HB")
 			.descriptions(
@@ -112,12 +111,15 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private final ImmutableMap<String, Double> mPotStrengthChange;
 	private final double mRadius;
 	private int mLastSuccessfulProcTick = 0;
+	private final HeavenlyBoonCS mCosmetic;
 
 	private @Nullable Crusade mCrusade;
 
 	public HeavenlyBoon(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mTracker = new KillTriggeredAbilityTracker(player, this, BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HeavenlyBoonCS());
 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
 		mDurationChange = CharmManager.getDuration(player, CHARM_DURATION, 0);
@@ -167,7 +169,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 				boolean isBoonPotion = false;
 				for (String boon : BOON_DROPS) {
-					if (potion.getItem().getItemMeta().displayName().toString().contains(boon)) {
+					if (Objects.requireNonNull(potion.getItem().getItemMeta().displayName()).toString().contains(boon)) {
 						isBoonPotion = true;
 						break;
 					}
@@ -217,8 +219,18 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 			ThrownPotion splashPotion = EntityUtils.spawnSplashPotion(mPlayer, potion);
 			PotionUtils.mimicSplashPotionEffect(mPlayer, splashPotion);
-			PotionUtils.splashPotionParticlesAndSound(mPlayer, splashPotion.getPotionMeta().getColor());
-			heavenlyBoonSound(mPlayer);
+			String name = ItemUtils.getRawDisplayNameAsString(potion);
+			if (name.contains("Regeneration")) {
+				mCosmetic.splashEffectRegeneration(mPlayer);
+			} else if (name.contains("Speed")) {
+				mCosmetic.splashEffectSpeed(mPlayer);
+			} else if (name.contains("Strength")) {
+				mCosmetic.splashEffectStrength(mPlayer);
+			} else if (name.contains("Resistance")) {
+				mCosmetic.splashEffectResistance(mPlayer);
+			} else if (name.contains("Absorption")) {
+				mCosmetic.splashEffectAbsorption(mPlayer);
+			}
 
 			if (isEnhanced() && Bukkit.getCurrentTick() > mLastSuccessfulProcTick + ENHANCEMENT_COOLDOWN_TICKS) {
 				mLastSuccessfulProcTick = Bukkit.getCurrentTick();
@@ -251,11 +263,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				}
 			}
 		}
-	}
-
-	public static void heavenlyBoonSound(Player player) {
-		// copied from sacred provisions sound
-		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
 	}
 
 	public static void cancelExtensions(Player player) {

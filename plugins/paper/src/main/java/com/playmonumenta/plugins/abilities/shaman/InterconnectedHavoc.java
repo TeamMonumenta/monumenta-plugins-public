@@ -7,15 +7,15 @@ import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertis
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.InterconnectedHavocCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -60,6 +60,8 @@ public class InterconnectedHavoc extends Ability {
 			.simpleDescription("Forms lines between your active totems, dealing damage to mobs crossing those lines.")
 			.displayItem(Material.CHAIN);
 
+	private final InterconnectedHavocCS mCosmetic;
+
 	public InterconnectedHavoc(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
@@ -71,6 +73,7 @@ public class InterconnectedHavoc extends Ability {
 		mDamage *= SupportExpertise.damageBuff(mPlayer);
 		mKnockback = (float) CharmManager.getExtraPercent(mPlayer, CHARM_ENHANCEMENT_KNOCKBACK, KNOCKBACK);
 		mStunTime = CharmManager.getDuration(mPlayer, CHARM_ENHANCEMENT_STUN, STUN_TIME);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new InterconnectedHavocCS());
 	}
 
 	@Override
@@ -94,9 +97,9 @@ public class InterconnectedHavoc extends Ability {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, ClassAbility.INTERCONNECTED_HAVOC, false, false);
 				}
 				if (mobsForDamage.isEmpty()) {
-					new PPLine(Particle.ENCHANTMENT_TABLE, startPoint, endPoint).countPerMeter(10).spawnAsPlayerActive(mPlayer);
+					mCosmetic.havocLine(mPlayer, startPoint, endPoint);
 				} else {
-					new PPLine(Particle.DAMAGE_INDICATOR, startPoint, endPoint).countPerMeter(4).spawnAsPlayerActive(mPlayer);
+					mCosmetic.havocDamage(mPlayer, startPoint, endPoint);
 				}
 				if (isEnhanced()) {
 					targetMobs.removeIf(mBlockedMobs::contains);

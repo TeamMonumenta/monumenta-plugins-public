@@ -6,24 +6,20 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.CelestialBlessingCS;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -88,6 +84,7 @@ public class CelestialBlessing extends Ability {
 	private final int mDuration;
 	private final double mExtraDamage;
 	private final EnumSet<DamageType> mAffectedDamageTypes;
+	private final CelestialBlessingCS mCosmetic;
 
 	private @Nullable Crusade mCrusade;
 
@@ -97,6 +94,8 @@ public class CelestialBlessing extends Ability {
 		mExtraDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE);
 		mAffectedDamageTypes = isEnhanced() ? AFFECTED_DAMAGE_TYPES_ENHANCE : AFFECTED_DAMAGE_TYPES;
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CelestialBlessingCS());
+
 		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
@@ -104,8 +103,6 @@ public class CelestialBlessing extends Ability {
 		if (isOnCooldown()) {
 			return false;
 		}
-
-		World world = mPlayer.getWorld();
 
 		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, CELESTIAL_RADIUS), true);
 
@@ -118,26 +115,13 @@ public class CelestialBlessing extends Ability {
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(mDuration, CELESTIAL_EXTRA_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(mDuration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
-					// Tick effect
-					Location loc = p.getLocation().add(0, 1, 0);
-					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsPlayerBuff(mPlayer);
-					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsPlayerBuff(mPlayer);
-					new PartialParticle(Particle.VILLAGER_HAPPY, loc, 2, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(mPlayer);
+					mCosmetic.tickEffect(mPlayer, p, fourHertz, twoHertz, oneHertz);
 				},
 				(entity) -> {
-					// Lose effect
-					Location loc = p.getLocation();
-					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1f, 0.65f);
-					new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(mPlayer);
-					new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0).spawnAsPlayerBuff(mPlayer);
-					new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(mPlayer);
+					mCosmetic.loseEffect(mPlayer, p);
 				})
 			);
-			// Start effect
-			Location loc = p.getLocation();
-			world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.5f, 1.75f);
-			world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.75f, 1.25f);
-			world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.75f, 1.1f);
+			mCosmetic.startEffect(mPlayer, p);
 		}
 
 		putOnCooldown();
