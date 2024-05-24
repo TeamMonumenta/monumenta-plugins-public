@@ -1325,7 +1325,7 @@ public class ItemStatUtils {
 		return NBT.get(item, nbt -> {
 			ReadableNBT stock = getStock(nbt);
 			if (stock == null) {
-				return null;
+				return false;
 			}
 			return stock.getBoolean(IS_QUIVER_KEY);
 		});
