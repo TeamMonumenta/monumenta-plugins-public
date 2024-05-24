@@ -250,7 +250,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				lockedClass = !player.hasPermission(oneClass.mPermissionString);
 				permLock = !player.hasPermission(oneClass.mPermissionString);
 			}
-			ItemStack createItem = createClassItem(oneClass, (playerClass != null && playerClass != oneClass), lockedClass, permLock);
+			ItemStack createItem = createClassItem(oneClass, (playerClass != null && playerClass != oneClass), playerClass == oneClass, lockedClass, permLock);
 			mInventory.setItem(P1_CLASS_LOCS.get(currentIndex++), createItem);
 		}
 
@@ -627,33 +627,27 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.BARRIER, "Unknown", playerClass.mClassColor, false,
 				"You haven't unlocked this specialization yet.", NamedTextColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
-		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == otherSpec.mSpecialization) {
+			return;
+		}
+		int specScore = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		if (specScore == otherSpec.mSpecialization) {
 			//unlocked, but using other spec
 			ItemStack specItem = GUIUtils.createBasicItem(Material.BARRIER, spec.mSpecName, playerClass.mClassColor, false,
 				"Reset your specialization to select a new one.", NamedTextColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
-		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == spec.mSpecialization) {
-			//unlocked and already using this spec
-			ItemStack specItem = GUIUtils.createBasicItem(spec.mDisplayItem, spec.mSpecName, playerClass.mClassColor, false,
-				"Click to view your specialization skills.", NamedTextColor.WHITE);
-			ItemMeta newMeta = specItem.getItemMeta();
-			if (spec.mPassiveName != null) {
-				GUIUtils.splitLoreLine(newMeta, spec.mPassiveName + " (Passive): " + spec.mPassiveDescription, NamedTextColor.GREEN, 30, false);
-			}
-			specItem.setItemMeta(newMeta);
-			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
-		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == 0) {
-			//unlocked and no spec selected
-			ItemStack specItem = GUIUtils.createBasicItem(spec.mDisplayItem, spec.mSpecName, playerClass.mClassColor, false,
-				"Click to choose this specialization!", NamedTextColor.GRAY);
-			ItemMeta newMeta = specItem.getItemMeta();
-			GUIUtils.splitLoreLine(newMeta, "Description: " + spec.mDescription, NamedTextColor.YELLOW, 30, false);
-			if (spec.mPassiveName != null) {
-				GUIUtils.splitLoreLine(newMeta, spec.mPassiveName + " (Passive): " + spec.mPassiveDescription, NamedTextColor.GREEN, 30, false);
-			}
-			specItem.setItemMeta(newMeta);
-			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
+			return;
 		}
+		boolean chosen = specScore == spec.mSpecialization;
+		//unlocked and already using this spec
+		ItemStack specItem = GUIUtils.createBasicItem(spec.mDisplayItem, spec.mSpecName, playerClass.mClassColor, false,
+			chosen ? "Click to view your specialization skills." : "Click to choose this specialization!", NamedTextColor.WHITE);
+		ItemMeta newMeta = specItem.getItemMeta();
+		GUIUtils.splitLoreLine(newMeta, "Description: " + spec.mDescription, NamedTextColor.YELLOW, 30, false);
+		if (spec.mPassiveName != null) {
+			GUIUtils.splitLoreLine(newMeta, spec.mPassiveName + " (Passive): " + spec.mPassiveDescription, NamedTextColor.GREEN, 30, false);
+		}
+		specItem.setItemMeta(newMeta);
+		mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
 	}
 
 	public ItemStack createLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player, boolean isSpec) {
@@ -736,7 +730,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			theClass.mClassColor, true, lore, 30, true);
 	}
 
-	public ItemStack createClassItem(PlayerClass classToItemize, boolean otherChosen, boolean locked, boolean permissionLock) {
+	public ItemStack createClassItem(PlayerClass classToItemize, boolean otherChosen, boolean chosen, boolean locked, boolean permissionLock) {
 		if (locked) {
 			if (permissionLock) {
 				return GUIUtils.createBasicItem(Material.BARRIER, classToItemize.mClassName,
@@ -750,7 +744,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				classToItemize.mClassColor, true, "Reset your class to choose this one!", NamedTextColor.RED);
 		}
 		ItemStack newItem = GUIUtils.createBasicItem(classToItemize.mDisplayItem, classToItemize.mClassName,
-			classToItemize.mClassColor, true, "Click to choose this class!", NamedTextColor.GRAY);
+			classToItemize.mClassColor, true, chosen ? "Click to view your skills." : "Click to choose this class!", NamedTextColor.GRAY);
 		if (classToItemize.mClassDescription != null) {
 			ItemMeta newMeta = newItem.getItemMeta();
 			GUIUtils.splitLoreLine(newMeta, "Description: " + classToItemize.mClassDescription, NamedTextColor.YELLOW, 30, false);
