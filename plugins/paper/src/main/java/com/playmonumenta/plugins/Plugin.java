@@ -560,18 +560,15 @@ public class Plugin extends JavaPlugin {
 				final boolean twoHertz = (mTicks % 10) == 0;
 				final boolean fourHertz = (mTicks % 5) == 0;
 
-				// Every 10 ticks - 2 times a second
-				if (twoHertz) {
-					//  Update cooldowns.
+				// Every 5 ticks - 4 times a second
+				if (fourHertz) {
+					// Update ability cooldowns
 					try {
-						mTimers.updateCooldowns(Constants.HALF_TICKS_PER_SECOND);
+						mTimers.updateCooldowns(Constants.QUARTER_TICKS_PER_SECOND);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				}
 
-				// Every 5 ticks - 4 times a second
-				if (fourHertz) {
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						try {
 							mAbilityManager.periodicTrigger(player, twoHertz, oneHertz, mTicks);
@@ -594,7 +591,7 @@ public class Plugin extends JavaPlugin {
 					e.printStackTrace();
 				}
 
-				// Update cooldowns
+				// Play particles at tracked projectiles
 				try {
 					mProjectileEffectTimers.update();
 				} catch (Exception e) {
