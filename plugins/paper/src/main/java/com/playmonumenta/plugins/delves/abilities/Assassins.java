@@ -26,7 +26,7 @@ public class Assassins {
 	static {
 		ABILITY_POOL = new ArrayList<>();
 
-		//TpBehindTargetedBoss
+		//TpBehindBoss
 		List<String> tpBehind = new ArrayList<>();
 		tpBehind.add(TpBehindBoss.identityTag);
 		tpBehind.add(TpBehindBoss.identityTag + "[range=50,random=false]");

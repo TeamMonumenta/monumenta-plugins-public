@@ -47,7 +47,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("deprecation") // we have to use deprecated boss tags here still
+//@SuppressWarnings("deprecation") // we have to use deprecated boss tags here still
 public class BossManager implements Listener {
 
 	/********************************************************************************
@@ -99,7 +99,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(FireResistantBoss.identityTag, FireResistantBoss::new);
 		registerStatelessBoss(HungerCloudBoss.identityTag, HungerCloudBoss::new);
 		registerStatelessBoss(BlockBreakBoss.identityTag, BlockBreakBoss::new, new BlockBreakBoss.Parameters());
-		registerStatelessBoss(PulseLaserBoss.identityTag, PulseLaserBoss::new, new PulseLaserBoss.Parameters());
 		registerStatelessBoss(ArcaneLaserBoss.identityTag, ArcaneLaserBoss::new, new ArcaneLaserBoss.Parameters());
 		registerStatelessBoss(WeaponSwitchBoss.identityTag, WeaponSwitchBoss::new);
 		registerStatelessBoss(ShieldSwitchBoss.identityTag, ShieldSwitchBoss::new, new ShieldSwitchBoss.Parameters());
@@ -108,7 +107,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(InfestedBoss.identityTag, InfestedBoss::new);
 		registerStatelessBoss(FireballBoss.identityTag, FireballBoss::new);
 		registerStatelessBoss(TpBehindBoss.identityTag, TpBehindBoss::new, new TpBehindBoss.Parameters());
-		registerStatelessBoss(TpBehindTargetedBoss.identityTag, TpBehindTargetedBoss::new);
 		registerStatelessBoss(TpSwapBoss.identityTag, TpSwapBoss::new, new TpSwapBoss.Parameters());
 		registerStatelessBoss(FlameNovaBoss.identityTag, FlameNovaBoss::new, new FlameNovaBoss.Parameters());
 		registerStatelessBoss(PlayerTargetBoss.identityTag, PlayerTargetBoss::new);
@@ -129,7 +127,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(BerserkerBoss.identityTag, BerserkerBoss::new);
 		registerStatelessBoss(SnowballDamageBoss.identityTag, SnowballDamageBoss::new, new SnowballDamageBoss.Parameters());
 		registerStatelessBoss(CorruptInfestedBoss.identityTag, CorruptInfestedBoss::new);
-		registerStatelessBoss(FlameLaserBoss.identityTag, FlameLaserBoss::new, new FlameLaserBoss.Parameters());
 		registerStatelessBoss(SpecterParticleBoss.identityTag, SpecterParticleBoss::new);
 		registerStatelessBoss(DreadnaughtParticleBoss.identityTag, DreadnaughtParticleBoss::new);
 		registerStatelessBoss(DreadlingBoss.identityTag, DreadlingBoss::new);
@@ -165,7 +162,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(MeteorSlamBoss.identityTag, MeteorSlamBoss::new, new MeteorSlamBoss.Parameters());
 		registerStatelessBoss(SwingBoss.identityTag, SwingBoss::new, new SwingBoss.Parameters());
 		registerStatelessBoss(MistMob.identityTag, MistMob::new);
-		registerStatelessBoss(HookBoss.identityTag, HookBoss::new, new HookBoss.Parameters());
 		registerStatelessBoss(FrostGiantIcicle.identityTag, FrostGiantIcicle::new);
 		registerStatelessBoss(SpellSlingerBoss.identityTag, SpellSlingerBoss::new);
 		registerStatelessBoss(VindictiveBoss.identityTag, VindictiveBoss::new);
@@ -178,7 +174,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(ShadePossessedBoss.identityTag, ShadePossessedBoss::new);
 		registerStatelessBoss(TwistedDespairBoss.identityTag, TwistedDespairBoss::new);
 		registerStatelessBoss(CoordinatedAttackBoss.identityTag, CoordinatedAttackBoss::new, new CoordinatedAttackBoss.Parameters());
-		registerStatelessBoss(AbilitySilenceBoss.identityTag, AbilitySilenceBoss::new, new AbilitySilenceBoss.Parameters());
 		registerStatelessBoss(ShiftingBoss.identityTag, ShiftingBoss::new);
 		registerStatelessBoss(BulletHellBoss.identityTag, BulletHellBoss::new, new BulletHellBoss.Parameters());
 		registerStatelessBoss(CarapaceBoss.identityTag, CarapaceBoss::new);
@@ -189,7 +184,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(AntiSuffocationBoss.identityTag, AntiSuffocationBoss::new);
 		registerStatelessBoss(DamageCapBoss.identityTag, DamageCapBoss::new, new DamageCapBoss.Parameters());
 		registerStatelessBoss(ImmortalMountBoss.identityTag, ImmortalMountBoss::new, new ImmortalMountBoss.Parameters());
-		registerStatelessBoss(SilenceOnHitBoss.identityTag, SilenceOnHitBoss::new);
 		registerStatelessBoss(FalseSpiritPortal.identityTag, FalseSpiritPortal::new);
 		registerStatelessBoss(TffBookSummonBoss.identityTag, TffBookSummonBoss::new);
 		registerStatelessBoss(ArcaneProjectileBoss.identityTag, ArcaneProjectileBoss::new, new ArcaneProjectileBoss.Parameters());
@@ -197,7 +191,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RebornBoss.identityTag, RebornBoss::new, new RebornBoss.Parameters());
 		registerStatelessBoss(NoFireBoss.identityTag, NoFireBoss::new);
 		registerStatelessBoss(DistanceCloserBoss.identityTag, DistanceCloserBoss::new);
-		registerStatelessBoss(WeakHookBoss.identityTag, WeakHookBoss::new, new WeakHookBoss.Parameters());
 		registerStatelessBoss(AuraEffectBoss.identityTag, AuraEffectBoss::new, new AuraEffectBoss.Parameters());
 		registerStatelessBoss(DummyDecoyBoss.identityTag, DummyDecoyBoss::new);
 		registerStatelessBoss(LaserBoss.identityTag, LaserBoss::new, new LaserBoss.Parameters());
