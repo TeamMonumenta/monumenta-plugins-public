@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -136,6 +137,8 @@ The elemental will lose his "Raise Jungle" ability, but will still possess the o
  */
 
 public class Kaul extends SerializedLocationBossAbilityGroup {
+	public static final String identityTag = "boss_kaul";
+	public static final int detectionRange = 50;
 	public static final int ARENA_WIDTH = 111;
 	// Barrier layer is from Y 62.0 to 64.0
 	public static final int ARENA_MAX_Y = 62;
@@ -144,32 +147,27 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_2 = 12;
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_3 = 10;
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_4 = 6;
-
 	private static final int MAX_HEALTH = 2048;
 	private static final double SCALING_X = 0.7;
 	private static final double SCALING_Y = 0.65;
-
-	// At the centre of the Kaul shrine,
-	// upon the height of most of the arena's surface
-	private LivingEntity mShrineMarker;
-
-	public static final String identityTag = "boss_kaul";
-	public static final int detectionRange = 50;
 	private static final String primordial = "PrimordialElemental";
 	private static final String immortal = "ImmortalElemental";
-	private boolean mDefeated = false;
-	private boolean mCooldown = false;
-	private boolean mPrimordialPhase = false;
-	private int mHits = 0;
-	private int mPlayerCount;
-	private double mDefenseScaling;
-
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
 	private static final String PUTRID_PLAGUE_TAG_RED = "KaulPutridPlagueRed";
 	private static final String PUTRID_PLAGUE_TAG_BLUE = "KaulPutridPlagueBlue";
 	private static final String PUTRID_PLAGUE_TAG_YELLOW = "KaulPutridPlagueYellow";
 	private static final String PUTRID_PLAGUE_TAG_GREEN = "KaulPutridPlagueGreen";
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
+
+	// At the centre of the Kaul shrine,
+	// upon the height of most of the arena's surface
+	private LivingEntity mShrineMarker;
+	private boolean mDefeated = false;
+	private boolean mCooldown = false;
+	private boolean mPrimordialPhase = false;
+	private int mHits = 0;
+	private int mPlayerCount;
+	private double mDefenseScaling;
 
 	public Kaul(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
@@ -202,8 +200,14 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					this.cancel();
 				}
 			}
-
 		}.runTaskTimer(mPlugin, 0, 5);
+
+		/* These spells need to be shared between phases in this manner to prevent double casting on phase change
+		 * I would do this for all of the spells here but I'll just thank Java for having no support for true pass by
+		 * copy for objects instead
+		 */
+		SpellKaulsJudgement kaulsJudgement = new SpellKaulsJudgement(mBoss, this);
+		SpellVolcanicDemise volcanicDemise = new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation());
 
 		SpellManager phase1Spells = new SpellManager(
 			Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
@@ -211,31 +215,26 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
 
-		// Needed to prevent potential double instance on phase change
-		SpellKaulsJudgement singleKaulsJudgementInstance = new SpellKaulsJudgement(mBoss, this);
-
 		SpellManager phase2Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, false),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
 				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc),
-				singleKaulsJudgementInstance));
+				kaulsJudgement));
 
 		SpellManager phase3Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-				new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
 				new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-				singleKaulsJudgementInstance));
+				volcanicDemise, kaulsJudgement));
 
 		SpellManager phase4Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-				new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
-				new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
+				new SpellGroundSurge(mPlugin, mBoss, detectionRange),
+				volcanicDemise));
 
 		List<UUID> hit = new ArrayList<>();
-
 		List<UUID> cd = new ArrayList<>();
 		SpellPlayerAction action = new SpellPlayerAction(this::getArenaParticipants, (Player player) -> {
 			Vector loc = player.getLocation().toVector();
@@ -243,7 +242,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
 					return;
 				}
-				// Damage has no direction so can't be blocked */
+				/* Damage has no direction so can't be blocked */
 				if (BossUtils.bossDamagePercent(mBoss, player, 0.4)) {
 					/* Player survived the damage */
 					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
@@ -263,78 +262,48 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			}
 		});
 
-		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
-			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0),
-				8, 0.35, 0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss()),
+		// These spells need to be shared between phases in this manner to prevent double casting on phase change
+		SpellLightningStorm lightningStorm = new SpellLightningStorm(boss, this);
+		SpellBossBlockBreak bossBlockBreak = new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true);
+		SpellShieldStun shieldStun = new SpellShieldStun(30 * 20);
+		SpellBaseParticleAura greenParticleAura = new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
+			new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0),
+				8, 0.35, 0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss());
+		SpellBaseParticleAura angryParticleAura = new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
+			new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
+				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
+			new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
+				0.35, 0.1).spawnAsBoss();
+			new PartialParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
+				0.35, RED_COLOR).spawnAsBoss();
+			new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
+				0.45, 0.35, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
+		});
+		SpellConditionalTeleport conditionalTeleport = new SpellConditionalTeleport(mBoss, spawnLoc,
+			b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+			  || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+			  || b.getLocation().getBlock().getType() == Material.LAVA
+			  || b.getLocation().getBlock().getType() == Material.WATER);
+
+		List<Spell> phase1PassiveSpells = Arrays.asList(
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineMarker.getLocation()),
-			new SpellLightningStorm(boss, this),
-			new SpellShieldStun(30 * 20),
-			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().getBlock().getType() == Material.LAVA
-				|| b.getLocation().getBlock().getType() == Material.WATER), action
+			lightningStorm, bossBlockBreak, shieldStun, greenParticleAura, conditionalTeleport, action
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
-			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0),
-					8, 0.35, 0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss()),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true, mShrineMarker.getLocation()),
-			new SpellLightningStorm(boss, this),
-			new SpellShieldStun(30 * 20),
-			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().getBlock().getType() == Material.LAVA
-				|| b.getLocation().getBlock().getType() == Material.WATER), action
+			lightningStorm, bossBlockBreak, shieldStun, greenParticleAura, conditionalTeleport, action
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
-			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
-				new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-					0.35, 0.1).spawnAsBoss();
-				new PartialParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-					0.35, RED_COLOR).spawnAsBoss();
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-					0.45, 0.35, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
-			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true, mShrineMarker.getLocation()),
-			new SpellLightningStorm(boss, this),
-			new SpellShieldStun(30 * 20),
-			new SpellConditionalTeleport(mBoss, spawnLoc,
-				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().getBlock().getType() == Material.LAVA
-					     || b.getLocation().getBlock().getType() == Material.WATER), action
+			lightningStorm, bossBlockBreak, shieldStun, angryParticleAura, conditionalTeleport, action
 		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
-			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
-				new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-					0.35, 0.1).spawnAsBoss();
-				new PartialParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-					0.35, RED_COLOR).spawnAsBoss();
-				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-					0.45, 0.35, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
-			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true, mShrineMarker.getLocation()),
-			new SpellLightningStorm(boss, this),
-			new SpellShieldStun(30 * 20),
-			new SpellConditionalTeleport(mBoss, spawnLoc,
-				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().getBlock().getType() == Material.LAVA
-					     || b.getLocation().getBlock().getType() == Material.WATER), action
+			lightningStorm, bossBlockBreak, shieldStun, angryParticleAura, conditionalTeleport, action
 		);
-
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
@@ -352,7 +321,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 		// Phase 2
 		events.put(66, mBoss -> {
-			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
+			sendDialogue("THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -360,6 +329,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
 				new PercentDamageReceived(20 * 9999, -1.0));
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
 			new BukkitRunnable() {
 				@Override
@@ -434,7 +404,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										0.75f);
 								}
 								new BukkitRunnable() {
-
 									@Override
 									public void run() {
 										mBoss.setInvulnerable(false);
@@ -442,32 +411,26 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										teleport(mSpawnLoc);
 										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 										new BukkitRunnable() {
-
 											@Override
 											public void run() {
 												changePhase(phase2Spells, phase2PassiveSpells, null);
 											}
-
 										}.runTaskLater(mPlugin, 20 * 10);
 									}
-
 								}.runTaskLater(mPlugin, 20 * 2);
 							}
 						}
-
 					}.runTaskTimer(mPlugin, 30, 1);
 				}
-
 			}.runTaskLater(mPlugin, 20 * 2);
-			sendDialogue("THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.");
 		});
 
 		// Forcecast Raise Jungle
-		events.put(60, mBoss -> super.forceCastSpell(SpellRaiseJungle.class));
+		events.put(60, mBoss -> forceCastSpell(SpellRaiseJungle.class));
 
 		// Phase 2.5
 		events.put(50, mBoss -> {
-			changePhase(SpellManager.EMPTY, passiveSpells, null);
+			sendDialogue("THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -475,7 +438,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
 				new PercentDamageReceived(20 * 9999, -1.0));
 			teleport(mSpawnLoc.clone().add(0, 5, 0));
+			changePhase(SpellManager.EMPTY, phase1PassiveSpells, null);
 			mPrimordialPhase = true;
+
 			new BukkitRunnable() {
 				final Location mLoc = mSpawnLoc;
 				double mRotation = 0;
@@ -500,9 +465,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						new PartialParticle(Particle.CRIT_MAGIC, mLoc, 50, 0.1, 0.1, 0.1, 1).spawnAsBoss();
 						new PartialParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
 							Material.DIRT.createBlockData()).spawnAsBoss();
-						LivingEntity miniboss = spawnPrimordial(mLoc);
+						LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, primordial);
 						new BukkitRunnable() {
-
 							@Override
 							public void run() {
 								if (miniboss == null) {
@@ -515,12 +479,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 									mPrimordialPhase = false;
 									new BukkitRunnable() {
-
 										@Override
 										public void run() {
-											changePhase(phase2Spells, passiveSpells, null);
+											changePhase(phase2Spells, phase1PassiveSpells, null);
 										}
-
 									}.runTaskLater(mPlugin, 20 * 10);
 								}
 
@@ -528,32 +490,30 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 									this.cancel();
 								}
 							}
-
 						}.runTaskTimer(mPlugin, 0, 20);
 					}
 					if (mBoss.isDead()) {
 						this.cancel();
 					}
 				}
-
 			}.runTaskTimer(plugin, 0, 1);
-			sendDialogue("THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.");
 		});
 
 		// Force-cast Kaul's Judgement if it hasn't been cast yet.
-		events.put(40, mBoss -> forceCastSpell(SpellKaulsJudgement.class));
+		events.put(40, mBoss -> forceCastSpell(kaulsJudgement.getClass()));
 
 		// Phase 3
 		events.put(33, mBoss -> {
-			changePhase(SpellManager.EMPTY, passiveSpells, null);
+			sendDialogue("YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
 				new PercentDamageReceived(20 * 9999, -1.0));
-			new BukkitRunnable() {
+			changePhase(SpellManager.EMPTY, phase1PassiveSpells, null);
 
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					List<ArmorStand> points = new ArrayList<>();
@@ -687,34 +647,33 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			sendDialogue("YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.");
 		});
-
 
 		// Phase 3.25
 		//Summons a Immortal Elemental at 30% HP
 		events.put(30, mBoss -> {
-			summonImmortal(plugin, world);
 			sendDialogue("PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.");
+			summonImmortal(plugin, world);
 		});
 
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
-		events.put(25, mBoss -> forceCastSpell(SpellKaulsJudgement.class));
+		events.put(25, mBoss -> forceCastSpell(kaulsJudgement.getClass()));
 
 		events.put(10, mBoss -> {
-			changePhase(phase4Spells, phase4PassiveSpells, null);
-			forceCastSpell(SpellVolcanicDemise.class);
 			sendDialogue("THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.");
+			changePhase(phase4Spells, phase4PassiveSpells, null);
+			// Force casting Volcanic Demise teleports Kaul back to his camp spot on top of the shrine and whatnot
+			// See bossCastAbility() for more info
+			forceCastSpell(volcanicDemise.getClass());
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		//Construct the boss with a delay to prevent the passives from going off during the dialogue
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
-				constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 10);
+				constructBoss(phase1Spells, phase1PassiveSpells, detectionRange, bossBar, 20 * 10);
 
 				// Advancements listeners
 
@@ -727,10 +686,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							this.cancel();
 						}
 					}
-
 				}.runTaskTimer(mPlugin, 0, 1);
 			}
-
 		}.runTaskLater(mPlugin, (20 * 10) + 1);
 	}
 
@@ -757,16 +714,11 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0);
 					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
 					new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsBoss();
-					LivingEntity miniboss = spawnImmortal(mLoc);
+					LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, immortal);
 					if (miniboss != null) {
-						EntityUtils.setAttributeBase(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, 0) + 0.01);
-						miniboss.setInvulnerable(true);
-						miniboss.setCustomNameVisible(true);
 						new BukkitRunnable() {
-
 							@Override
 							public void run() {
-
 								if (mBoss.isDead() || !mBoss.isValid() || mDefeated) {
 									this.cancel();
 									if (!miniboss.isDead()) {
@@ -774,7 +726,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 									}
 								}
 							}
-
 						}.runTaskTimer(mPlugin, 0, 20);
 					}
 				}
@@ -782,7 +733,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					this.cancel();
 				}
 			}
-
 		}.runTaskTimer(plugin, 0, 1);
 	}
 
@@ -804,7 +754,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-
 				mRadius += 1;
 				for (int i = 0; i < 15; i += 1) {
 					mRotation += 24;
@@ -814,7 +763,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-
 				}
 				mY -= mY * mYminus;
 				mYminus += 0.02;
@@ -824,9 +772,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				if (mRadius >= r) {
 					this.cancel();
 				}
-
 			}
-
 		}.runTaskTimer(plugin, 0, 1);
 	}
 
@@ -882,14 +828,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		mAdvancements.forEach(a -> a.onPlayerDeath(event.getPlayer()));
 	}
 
-	private @Nullable LivingEntity spawnPrimordial(Location loc) {
-		return (LivingEntity) LibraryOfSoulsIntegration.summon(loc, primordial);
-	}
-
-	private @Nullable LivingEntity spawnImmortal(Location loc) {
-		return (LivingEntity) LibraryOfSoulsIntegration.summon(loc, immortal);
-	}
-
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		Spell spell = event.getSpell();
@@ -900,12 +838,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new PercentDamageReceived(20 * 9999, -1.0));
 			mBoss.setAI(false);
 			new BukkitRunnable() {
-
 				@Override
 				public void run() {
 					teleport(mSpawnLoc.clone().add(0, 5, 0));
 					new BukkitRunnable() {
-
 						@Override
 						public void run() {
 							// If the Primordial Elemental is active, don't allow other abilities to turn Kaul's AI back on
@@ -921,10 +857,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								}
 							}
 						}
-
 					}.runTaskLater(mPlugin, spell.castTicks());
 				}
-
 			}.runTaskLater(mPlugin, 1);
 		}
 	}
@@ -989,7 +923,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					this.cancel();
 				}
 			}
-
 		}.runTaskTimer(mPlugin, 0, 1);
 		new BukkitRunnable() {
 			int mT = 0;
@@ -1034,7 +967,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								}
 							}
 						}
-
 					}.runTaskTimer(mPlugin, 30, 1);
 				}
 			}
@@ -1052,12 +984,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		team.color(NamedTextColor.WHITE);
 		team.addEntity(mBoss);
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
-				player.removePotionEffect(PotionEffectType.GLOWING);
-			}
-		}
-
 		EntityEquipment equips = mBoss.getEquipment();
 		ItemStack[] armorc = equips.getArmorContents();
 		ItemStack m = equips.getItemInMainHand();
@@ -1066,7 +992,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-				mBoss.getEquipment().clear();
+				Objects.requireNonNull(mBoss.getEquipment()).clear();
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 100, 0));
 				mBoss.setAI(false);
 				mBoss.setSilent(true);
@@ -1126,12 +1052,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							}
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
 						}
-
 					}
-
 				}.runTaskTimer(mPlugin, 40, 1);
 			}
-
 		}.runTaskLater(mPlugin, 1);
 	}
 

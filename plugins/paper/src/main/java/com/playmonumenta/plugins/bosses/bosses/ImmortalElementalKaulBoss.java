@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.List;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -31,8 +32,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaulimmortal";
@@ -40,73 +39,62 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 
 	public ImmortalElementalKaulBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mBoss.setRemoveWhenFarAway(false);
 
 		Location spawnLoc = mBoss.getLocation();
 		World world = mBoss.getWorld();
-		int bossTargetHp = 0;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 512;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+
+		// NOTE: Some of the Immortal's stats are inherent to the mob and aren't set here. Check the LoS entry when
+		// making changes to the mob
+		mBoss.setRemoveWhenFarAway(false);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0) + 0.01);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseCharge(plugin, mBoss, 20, 20, 160, true,
+			new SpellBaseCharge(plugin, mBoss, 40, 65, 60, false,
 				(LivingEntity target) -> {
-					new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 30, 1, 1.25f, 1, 0).spawnAsEntityActive(boss);
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
-						new BaseMovementSpeedModifyEffect(40, -0.75));
-					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 1f, 1.5f);
+						new BaseMovementSpeedModifyEffect(65, -0.9));
+					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3.0f, 1.5f);
 				},
 				// Warning particles
-				(Location loc) -> {
-					new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0).spawnAsEntityActive(boss);
-				},
+				(Location loc) -> new PartialParticle(Particle.SMOKE_NORMAL, loc, 5, 0.7f, 0.9f, 0.7f, 0).spawnAsEntityActive(boss),
 				// Charge attack sound/particles at boss location
 				(LivingEntity player) -> {
-					new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0).spawnAsEntityActive(boss);
-					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
+					new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 75, 1, 1.5f, 1, 0).spawnAsEntityActive(boss);
+					world.playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3.0f, 0.5f);
 				},
 				// Attack hit a player
 				(LivingEntity target) -> {
-					new PartialParticle(Particle.SMOKE_NORMAL, target.getLocation(), 80, 1, 1, 1, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.REDSTONE, target.getLocation(), 50, 1, 1.5f, 1, 0)
+						.data(new Particle.DustOptions(Color.RED, 2)).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.BLOCK_DUST, target.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
-					world.playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1f, 0.85f);
+					world.playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2.0f, 0.85f);
 					BossUtils.blockableDamage(mBoss, target, DamageType.MELEE, 25);
 					MovementUtils.knockAway(mBoss.getLocation(), target, 0.4f, 0.4f);
 				},
 				// Attack particles
-				(Location loc) -> {
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).minimumCount(1).spawnAsEntityActive(boss);
-				},
-				// Ending particles on boss
+				(Location loc) -> new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).minimumCount(1).spawnAsEntityActive(boss),
+				// Ending particles and sound on boss
 				() -> {
-					new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 200, 2, 2, 2, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.BLOCK_DUST, boss.getLocation(), 50, 1, 1.5f, 1, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_MUD_PLACE, SoundCategory.HOSTILE, 3.0f, 0.7f);
 				}
 			),
 			new SpellEarthenRupture(plugin, mBoss),
 			new SpellPrimordialBolt(plugin, mBoss)
 		));
 
-		List<Spell> passiveSpells = Arrays.asList(new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
+		List<Spell> passiveSpells = Arrays.asList(new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
 				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-					0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss);
-			}),
+				0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss)),
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellShieldStun(30 * 20),
-			new SpellConditionalTeleport(mBoss, spawnLoc,
-				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-					     || b.getLocation().getBlock().getType() == Material.LAVA
-					     || b.getLocation().getBlock().getType() == Material.WATER));
-
+			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().getBlock().getType() == Material.LAVA
+				|| b.getLocation().getBlock().getType() == Material.WATER)
+		);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, null);
 	}

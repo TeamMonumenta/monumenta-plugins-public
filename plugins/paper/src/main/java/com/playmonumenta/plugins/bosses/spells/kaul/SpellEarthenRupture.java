@@ -27,6 +27,7 @@ spans out 6 blocks, knocking back all players, dealing 18 damage, and applying S
  */
 public class SpellEarthenRupture extends Spell {
 	private static final String SPELL_NAME = "Earthen Rupture";
+	private static final String SLOWNESS_SRC = "EarthenRuptureSlowness";
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -52,26 +53,26 @@ public class SpellEarthenRupture extends Spell {
 
 				Location loc = mBoss.getLocation();
 				if (mChargeUp.getTime() % 2 == 0) {
-					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 2, 0.9f);
+					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 2.0f, 0.9f);
 				}
 
-				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
-				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.BLOCK_DUST, loc, 6, 0.4f, 0.1f, 0.4f, 0.2f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25f, 0.1f, 0.25f, 0.2f).spawnAsEntityActive(mBoss);
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 					mChargeUp.reset();
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 0.9f);
-					new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2.0f, 0.9f);
+					new PartialParticle(Particle.BLOCK_DUST, loc, 150, 3, 0.1f, 3, 0.25f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1f, 3, 0.25f).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1f, 3, 0.25f).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {
 						DamageUtils.damage(mBoss, player, DamageType.BLAST, 20, null, false, true, SPELL_NAME);
-						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "EarthenRuptureSlowness",
-							new PercentSpeed(20 * 10, -0.5, "EarthenRuptureSlowness"));
+						MovementUtils.knockAway(loc, player, 0.50f, 1.6f);
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+							new PercentSpeed(20 * 10, -0.5, SLOWNESS_SRC));
 					}
 				}
 			}
@@ -88,7 +89,7 @@ public class SpellEarthenRupture extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 20 * 15;
+		return 20 * 10;
 	}
 
 }
