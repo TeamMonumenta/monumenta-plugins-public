@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.utils.BlockUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -20,15 +21,15 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellBaseShatter extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRadius;
-	private int mCooldown;
-	private int mDelay;
-	private int mNumLines;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRadius;
+	private final int mCooldown;
+	private final int mDelay;
+	private final int mNumLines;
 	private final double mHeight;
-	private Spell.GetSpellTargets<LivingEntity> mSpellTargets;
-	private Material mIndicator;
+	private final Spell.GetSpellTargets<LivingEntity> mSpellTargets;
+	private final Material mIndicator;
 	private final HitAction mHitAction;
 	private final WarningAesthetics mWarningAesthetics;
 	private final LaunchAesthetics mLaunchAesthetics;
@@ -92,7 +93,7 @@ public class SpellBaseShatter extends Spell {
 
 	@Override
 	public void run() {
-		mBoss.setAI(false);
+		EntityUtils.selfRoot(mBoss, mDelay);
 		List<? extends LivingEntity> targets = mSpellTargets.getTargets();
 
 		LivingEntity target = null;
@@ -119,6 +120,12 @@ public class SpellBaseShatter extends Spell {
 
 			@Override
 			public void run() {
+				if (EntityUtils.shouldCancelSpells(mBoss)) {
+					SpellBaseShatter.this.cancel();
+					EntityUtils.cancelSelfRoot(mBoss);
+					return;
+				}
+
 				mT += 2;
 				mPitch += 0.025f;
 
@@ -171,7 +178,7 @@ public class SpellBaseShatter extends Spell {
 
 				//End shatter, deal damage, show visuals
 				if (mT >= mDelay) {
-					mBoss.setAI(true);
+					EntityUtils.cancelSelfRoot(mBoss);
 					this.cancel();
 					mLaunchAesthetics.launch(mBoss, mBoss.getLocation());
 					Vector vec;
