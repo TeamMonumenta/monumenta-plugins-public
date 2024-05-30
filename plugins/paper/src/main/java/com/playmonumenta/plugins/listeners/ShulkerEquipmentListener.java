@@ -373,7 +373,7 @@ public class ShulkerEquipmentListener implements Listener {
 			ParrotManager.updateParrots(player);
 			playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_LEFT, playerLeft);
 			playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT, playerRight);
-			return playerModified;
+			return;
 		});
 	}
 

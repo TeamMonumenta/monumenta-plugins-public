@@ -1355,7 +1355,7 @@ public class CharmManager {
 
 	public List<Component> getSummaryOfAllAttributesAsComponents(Player p, CharmType charmType) {
 		if (mEnabledCharmType != charmType) {
-			return List.of(Component.text("These Charms are currently disabled!", NamedTextColor.RED));
+			return Arrays.asList(Component.text("These Charms are currently disabled!", NamedTextColor.RED));
 		}
 
 		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
