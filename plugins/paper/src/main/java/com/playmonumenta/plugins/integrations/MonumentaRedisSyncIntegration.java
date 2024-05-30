@@ -36,12 +36,15 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 	private static boolean mEnabled = false;
 
-	public static final ArgumentSuggestions<CommandSender> ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((unused)
+	public static final ArgumentSuggestions<CommandSender> ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((info)
 		-> {
 		if (!mEnabled) {
 			return new String[0];
 		}
-		return MonumentaRedisSyncAPI.getAllCachedPlayerNames().toArray(new String[0]);
+		if (info.sender().hasPermission("monumenta.listoffline")) {
+			return MonumentaRedisSyncAPI.getAllCachedPlayerNames().toArray(String[]::new);
+		}
+		return Bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new);
 	});
 
 	private final Plugin mPlugin;
