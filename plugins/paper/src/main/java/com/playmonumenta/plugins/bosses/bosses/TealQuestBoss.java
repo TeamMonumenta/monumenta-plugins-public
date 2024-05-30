@@ -135,7 +135,7 @@ public class TealQuestBoss extends SerializedLocationBossAbilityGroup {
 			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
 		}), new SpellCrowdControlClear(boss, CLEAR_TIME)));
 
-		BossBarManager barManager = new BossBarManager(plugin, mBoss, detectionRange, BarColor.BLUE, BarStyle.SOLID, null);
+		BossBarManager barManager = new BossBarManager(mBoss, detectionRange, BarColor.BLUE, BarStyle.SOLID, null);
 
 		super.constructBoss(manager, passives, detectionRange, barManager);
 	}

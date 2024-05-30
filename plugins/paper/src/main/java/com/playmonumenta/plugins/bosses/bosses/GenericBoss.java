@@ -25,7 +25,7 @@ public class GenericBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
-		BossBarManager bossBar = new BossBarManager(plugin, boss, p.DETECTION, p.BAR_COLOR, p.BAR_STYLE, null, p.BOSS_FOG);
+		BossBarManager bossBar = new BossBarManager(boss, p.DETECTION, p.BAR_COLOR, p.BAR_STYLE, null, p.BOSS_FOG);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), p.DETECTION, bossBar);
 	}

@@ -173,7 +173,7 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 			}
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events);
 		constructBoss(phase1Spells, Collections.emptyList(), detectionRange, bossBar);
 	}
 

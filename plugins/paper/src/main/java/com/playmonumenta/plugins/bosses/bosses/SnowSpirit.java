@@ -114,7 +114,7 @@ public class SnowSpirit extends SerializedLocationBossAbilityGroup {
 
 		events.put(0, mBoss -> changePhase(SpellManager.EMPTY, Collections.emptyList(), null));
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
 		constructBoss(activeSpells1, passiveSpells, detectionRange, bossBar, 20 * 10);
 
 		new BukkitRunnable() {

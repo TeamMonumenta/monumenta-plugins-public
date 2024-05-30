@@ -687,7 +687,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 											player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 										}
 
-										BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
+										BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
 										constructBoss(phase1Spells, phase1PassiveSpells, detectionRange, bossBar, 20 * 10);
 
 										mBoss.setGravity(true);

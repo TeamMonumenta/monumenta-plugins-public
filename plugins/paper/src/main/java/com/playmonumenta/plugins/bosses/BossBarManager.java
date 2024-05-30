@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
@@ -9,7 +11,6 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class BossBarManager {
@@ -18,7 +19,6 @@ public class BossBarManager {
 		void run(LivingEntity boss);
 	}
 
-	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final int mRange;
 	private final @Nullable Map<Integer, BossHealthAction> mEvents;
@@ -26,16 +26,15 @@ public class BossBarManager {
 	private int mEventCursor;
 	private final boolean mCapDamage;
 
-	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events) {
-		this(plugin, boss, range, color, style, events, true);
+	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events) {
+		this(boss, range, color, style, events, true);
 	}
 
-	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog) {
-		this(plugin, boss, range, color, style, events, bossFog, true);
+	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog) {
+		this(boss, range, color, style, events, bossFog, true);
 	}
 
-	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage) {
-		mPlugin = plugin;
+	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage) {
 		mBoss = boss;
 		mRange = range;
 		mEvents = events;
@@ -46,10 +45,10 @@ public class BossBarManager {
 			mEventCursor--;
 		}
 
+		mBar = Bukkit.getServer().createBossBar(boss.getName(), color, style, BarFlag.PLAY_BOSS_MUSIC);
 		if (bossFog) {
-			mBar = Bukkit.getServer().createBossBar(boss.getName(), color, style, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
-		} else {
-			mBar = Bukkit.getServer().createBossBar(boss.getName(), color, style, BarFlag.PLAY_BOSS_MUSIC);
+			mBar.addFlag(BarFlag.CREATE_FOG);
+			mBar.addFlag(BarFlag.DARKEN_SKY);
 		}
 		mBar.setVisible(true);
 
@@ -79,6 +78,7 @@ public class BossBarManager {
 			if (progress * 100 > 99 && mEventCursor >= 99) {
 				BossHealthAction event = mEvents.get(mEventCursor);
 				if (event != null) {
+					MMLog.fine("Running BossHealthAction for " + MessagingUtils.plainText(mBoss.name()) + " at " + mEventCursor + "% health.");
 					event.run(mBoss);
 					if (mCapDamage) {
 						double cap = mEventCursor / 100.0;
@@ -95,6 +95,7 @@ public class BossBarManager {
 				}
 				BossHealthAction event = mEvents.get(mEventCursor);
 				if (event != null) {
+					MMLog.fine("Running BossHealthAction for " + MessagingUtils.plainText(mBoss.name()) + " at " + mEventCursor + "% health.");
 					event.run(mBoss);
 					if (mCapDamage) {
 						double cap = mEventCursor / 100.0;
@@ -107,7 +108,7 @@ public class BossBarManager {
 		}
 
 		if (!Double.isFinite(progress) || progress > 1.0f || progress < 0f) {
-			mPlugin.getLogger().severe("Boss '" + mBoss.getName() + "' has invalid health " +
+			MMLog.warning("Boss '" + mBoss.getName() + "' has invalid health " +
 				mBoss.getHealth() + " out of max " + maxHealth);
 		} else {
 			mBar.setProgress(progress);
@@ -124,5 +125,18 @@ public class BossBarManager {
 
 	public void remove() {
 		mBar.setVisible(false);
+	}
+
+	public boolean capsDamage() {
+		return mCapDamage;
+	}
+
+	// Returns the highest health percentage (0 through 100) lower than current bar progress with an unused BossHealthAction
+	// If none exist, returns 0
+	public int getNextHealthThreshold() {
+		if (mEvents == null) {
+			return 0;
+		}
+		return mEvents.keySet().stream().filter(i -> i < mEventCursor).mapToInt(i -> i).max().orElse(0);
 	}
 }

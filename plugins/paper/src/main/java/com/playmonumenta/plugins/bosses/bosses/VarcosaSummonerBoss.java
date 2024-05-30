@@ -80,7 +80,7 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 			action, tooHighAction);
 		SpellManager activeSpells = new SpellManager(List.of(new SpellPurgeNegatives(mBoss, 100)));
 
-		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, null);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, null);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}

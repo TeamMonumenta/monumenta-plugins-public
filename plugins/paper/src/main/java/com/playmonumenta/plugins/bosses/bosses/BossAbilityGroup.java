@@ -40,7 +40,7 @@ public abstract class BossAbilityGroup {
 	private @Nullable BukkitRunnable mTaskPassive = null;
 	private @Nullable BukkitRunnable mTaskActive = null;
 	private boolean mUnloaded = false;
-	private Integer mNextActiveTimer = 0;
+	private int mNextActiveTimer = 0;
 	public boolean mDead = false;
 
 	protected BossAbilityGroup(Plugin plugin, String identityTag, LivingEntity boss) {
@@ -62,6 +62,7 @@ public abstract class BossAbilityGroup {
 		mActiveSpells.cancelAll();
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
+		MMLog.fine("Changed phase for " + mIdentityTag + ". Boss's health is currently at " + 100 * mBoss.getHealth() / EntityUtils.getMaxHealth(mBoss) + "%. " + mActiveSpells.toString());
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange) {
@@ -217,12 +218,16 @@ public abstract class BossAbilityGroup {
 			SpellCastEvent event = new SpellCastEvent(mBoss, this, sp);
 			Bukkit.getPluginManager().callEvent(event);
 		} else {
-			mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but boss does not have this spell!");
+			MMLog.severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but boss does not have this spell!");
 		}
 	}
 
 	public String getIdentityTag() {
 		return mIdentityTag;
+	}
+
+	public @Nullable BossBarManager getBossBar() {
+		return mBossBar;
 	}
 
 	/********************************************************************************

@@ -104,7 +104,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(10, mBoss -> forceCastSpell(SpellGhostlyCannons.class));
-		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(spells, passiveSpells, detectionRange, bossBar);
 	}

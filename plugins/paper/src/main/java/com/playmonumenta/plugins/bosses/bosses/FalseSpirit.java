@@ -221,7 +221,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 			sendDialogue(6, true);
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
 		constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 10);
 
 		new BukkitRunnable() {

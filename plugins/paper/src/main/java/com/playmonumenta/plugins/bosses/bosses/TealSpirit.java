@@ -283,7 +283,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 
 		players.forEach(player -> player.sendMessage(Component.text("the full wrath of time itself will be upon you!", NamedTextColor.DARK_AQUA)));
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
 	}
 

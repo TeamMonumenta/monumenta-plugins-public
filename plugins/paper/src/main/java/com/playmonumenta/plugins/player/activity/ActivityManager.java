@@ -93,7 +93,7 @@ public class ActivityManager {
 		mActivity.put(playerId, mActivity.getOrDefault(playerId, 0) + 1);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			mActivity.put(playerId, Math.max(mActivity.getOrDefault(playerId, 0) - 1, 0));
-			MMLog.fine("Player " + playerId + " has activity: " + mActivity.getOrDefault(playerId, 0));
+			MMLog.fine("Player " + playerName + " has activity: " + mActivity.getOrDefault(playerId, 0));
 		}, 20 * 6 * 60);
 		MMLog.fine("Player " + playerName + " has activity: " + mActivity.getOrDefault(playerId, 0));
 	}

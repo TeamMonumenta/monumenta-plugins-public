@@ -256,7 +256,7 @@ public class Samwell extends BossAbilityGroup {
 			new SpellRealitySlash(plugin, mBoss, this, 4),
 			new SpellSummonLavaTitan(plugin, mBoss, mSpawnLoc, 4)
 		));
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, null, false);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, null, false);
 
 		super.constructBoss(SpellManager.EMPTY, mInactivePassives, detectionRange, bossBar);
 	}

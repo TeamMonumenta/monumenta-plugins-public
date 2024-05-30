@@ -73,6 +73,8 @@ import com.playmonumenta.plugins.gallery.bosses.GallerySummonMobBoss;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -707,6 +709,26 @@ public class BossManager implements Listener {
 			Boss mountBoss = mBosses.get(mount.getUniqueId());
 			if (mountBoss != null) {
 				mountBoss.onPassengerHurt(event);
+			}
+		}
+
+		if (boss != null && !event.isCancelled() && event.getFinalDamage(true) >= damagee.getHealth()) {
+			for (BossAbilityGroup ability : boss.getAbilities()) {
+				BossBarManager bossBar = ability.getBossBar();
+				if (bossBar != null && bossBar.capsDamage()) {
+					int nextEventHealthPercent = bossBar.getNextHealthThreshold();
+					if (nextEventHealthPercent > 0) {
+						double setHealth = nextEventHealthPercent * EntityUtils.getMaxHealth(damagee) / 100;
+						double newDamage;
+						if (damagee.getHealth() < setHealth) {
+							newDamage = 0;
+						} else {
+							newDamage = damagee.getHealth() - setHealth + 1; // Adding 1 makes sure we actually go below the threshold but don't kill the boss
+						}
+						event.setDamage(newDamage); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
+						MMLog.fine("Because of remaining BossHealthAction at " + nextEventHealthPercent + "% health on entity " + MessagingUtils.plainText(damagee.name()) + ", reduced damage to " + newDamage + ".");
+					}
+				}
 			}
 		}
 	}

@@ -631,7 +631,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 													@Override
 													public void run() {
-														changePhase(phase3Spells, phase3PassiveSpells, null);
+														// If the next phase change has already happened, don't do anything!
+														if (getActiveSpells().isEmpty()) {
+															changePhase(phase3Spells, phase3PassiveSpells, null);
+														}
 													}
 
 												}.runTaskLater(mPlugin, 20 * 10);
@@ -658,7 +661,13 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
-		events.put(25, mBoss -> forceCastSpell(kaulsJudgement.getClass()));
+		events.put(25, mBoss -> {
+			// If we get here really fast, we might not actually have the active spells yet
+			if (getActiveSpells().isEmpty()) {
+				changePhase(phase3Spells, phase3PassiveSpells, null);
+			}
+			forceCastSpell(kaulsJudgement.getClass());
+		});
 
 		events.put(10, mBoss -> {
 			sendDialogue("THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.");
@@ -667,7 +676,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			// See bossCastAbility() for more info
 			forceCastSpell(volcanicDemise.getClass());
 		});
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		//Construct the boss with a delay to prevent the passives from going off during the dialogue
 		new BukkitRunnable() {

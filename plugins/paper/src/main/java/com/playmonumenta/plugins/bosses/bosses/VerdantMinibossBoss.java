@@ -140,7 +140,7 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 5);
 
 		mBoss.setRemoveWhenFarAway(false);
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.YELLOW, BarStyle.SEGMENTED_10, null);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.YELLOW, BarStyle.SEGMENTED_10, null);
 		super.constructBoss(SpellManager.EMPTY, Arrays.asList(new SpellBlockBreak(boss), new SpellShieldStun(10 * 20)), detectionRange, bossBar);
 	}
 

@@ -249,7 +249,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			mLimbsDied = false;
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		constructBoss(phase1Spells, passives, detectionRange, bossBar, 140, 1, true);
 

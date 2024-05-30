@@ -164,7 +164,7 @@ public final class Svalgot extends SerializedLocationBossAbilityGroup {
 				mBoss.setGravity(true);
 				mBoss.setInvulnerable(false);
 
-				BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+				BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 				constructBoss(normalSpells, passiveNormalSpells, detectionRange, bossBar, 20 * 10);
 			}
 		}.runTaskLater(mPlugin, 20 * 6 + 10);

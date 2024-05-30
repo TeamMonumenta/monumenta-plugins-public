@@ -200,7 +200,7 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(spells);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 

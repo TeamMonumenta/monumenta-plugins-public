@@ -284,7 +284,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					}
 					getDialogueAction4().run(mob);
 				});
-				BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+				BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 				super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
 			}
 			case "Normal" -> {
@@ -443,7 +443,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 
 				events.put(5, getDialogueAction4());
 
-				BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+				BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 				super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
 
 			}
@@ -560,7 +560,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 
 				events.put(5, getDialogueAction4());
 
-				BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+				BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 				super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
 			}
 		}

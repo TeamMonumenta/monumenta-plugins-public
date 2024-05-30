@@ -226,7 +226,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> changePhase(phase3Spells, phase3Passives, null), 180);
 		});
 
-		mBossBar = new BossBarManager(plugin, boss, DETECTION_RANGE, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		mBossBar = new BossBarManager(boss, DETECTION_RANGE, BarColor.RED, BarStyle.SEGMENTED_10, events);
 		super.constructBoss(phase1Spells, phase1Passives, DETECTION_RANGE, mBossBar);
 
 		// initialize death values

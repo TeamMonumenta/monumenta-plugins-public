@@ -165,7 +165,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
 
-					BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
+					BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
 					constructBoss(normalSpells, passiveNormalSpells, detectionRange, bossBar, 20 * 10);
 
 					for (Player player : getPlayers()) {

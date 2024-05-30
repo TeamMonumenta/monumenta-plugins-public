@@ -239,7 +239,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 
 		events.put(50, mBoss -> PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"This cannot be!\",\"color\":\"white\"}]"));
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, bossBar);
 	}

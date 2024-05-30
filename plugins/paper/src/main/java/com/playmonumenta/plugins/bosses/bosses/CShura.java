@@ -152,7 +152,7 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 					mBoss.setAI(true);
 					mBoss.setInvulnerable(false);
 					mCutscene = false;
-					BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, events);
+					BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, events);
 					constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 				}
 			}

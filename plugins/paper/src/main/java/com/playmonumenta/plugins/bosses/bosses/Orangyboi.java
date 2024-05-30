@@ -27,7 +27,7 @@ public class Orangyboi extends SerializedLocationBossAbilityGroup {
 
 		Spell spell = new SpellGenericCharge(plugin, mBoss, detectionRange, 15.0F);
 
-		BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
 
 		super.constructBoss(spell, detectionRange, bossBar);
 	}

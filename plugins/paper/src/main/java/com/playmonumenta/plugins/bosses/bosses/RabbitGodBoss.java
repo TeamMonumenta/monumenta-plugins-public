@@ -368,7 +368,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 			}.runTaskTimer(plugin, 0, 20 * 6);
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 15);
 	}

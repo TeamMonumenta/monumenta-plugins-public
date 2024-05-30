@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.bosses.spells.sirius.*;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.StarBlight;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -187,7 +186,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 		//bossbar and constructing
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			BossBarManager bossBar = new BossBarManager(mPlugin, boss, 100, BarColor.PURPLE, BarStyle.SEGMENTED_10, null, false);
+			BossBarManager bossBar = new BossBarManager(boss, 100, BarColor.PURPLE, BarStyle.SEGMENTED_10, null, false);
 			constructBoss(spells, passives, 100, bossBar, 100, 1);
 			mPlayerCount = getPlayersInArena(false).size();
 			mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);

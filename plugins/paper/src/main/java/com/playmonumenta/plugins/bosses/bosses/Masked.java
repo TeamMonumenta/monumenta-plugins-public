@@ -194,7 +194,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, PHASE_CHANGE_DIALOG_COMMAND);
 		});
 
-		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, DETECTION_RANGE, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(mBoss, DETECTION_RANGE, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
 		super.constructBoss(activeSpells1, passiveSpells1, DETECTION_RANGE, bossBar);
 	}
 }

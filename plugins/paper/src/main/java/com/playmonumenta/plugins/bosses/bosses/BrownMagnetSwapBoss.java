@@ -79,7 +79,7 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 			mRedTeam.addEntry(mBoss.getUniqueId().toString());
 		}
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, 40, mIsPositive ? BarColor.RED : BarColor.BLUE, BarStyle.SEGMENTED_20, null);
+		BossBarManager bossBar = new BossBarManager(boss, 40, mIsPositive ? BarColor.RED : BarColor.BLUE, BarStyle.SEGMENTED_20, null);
 
 		List<Spell> passives = List.of(
 			new SpellRunAction(() -> {

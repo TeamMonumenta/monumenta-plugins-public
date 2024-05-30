@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public class SpellManager {
 	public static final SpellManager EMPTY = new SpellManager(Collections.emptyList());
 
-	private Map<Class<? extends Spell>, Spell> mReadySpells;
+	private final Map<Class<? extends Spell>, Spell> mReadySpells;
 	private final Queue<Spell> mCooldownSpells;
 	private final int mCooldown;
 	private final boolean mIsEmpty;
@@ -39,7 +39,7 @@ public class SpellManager {
 	}
 
 	public List<Spell> getSpells() {
-		List<Spell> spells = new ArrayList<Spell>();
+		List<Spell> spells = new ArrayList<>();
 		if (mIsEmpty) {
 			return spells;
 		}
@@ -54,13 +54,13 @@ public class SpellManager {
 		if (mIsEmpty) {
 			mReadySpells = Collections.emptyMap();
 		} else {
-			mReadySpells = new HashMap<Class<? extends Spell>, Spell>();
+			mReadySpells = new HashMap<>();
 			for (Spell spell : spells) {
 				mReadySpells.put(spell.getClass(), spell);
 			}
 		}
 
-		mCooldownSpells = new ArrayDeque<Spell>();
+		mCooldownSpells = new ArrayDeque<>();
 		mCooldown = (int)Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
 	}
 
@@ -145,5 +145,19 @@ public class SpellManager {
 				spell.cancel();
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("Spell Manager: [");
+		List<Spell> spells = getSpells();
+		for (int i = 0; i < spells.size(); i++) {
+			if (i > 0) {
+				builder.append(", ");
+			}
+			builder.append(spells.get(i).toString());
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 }

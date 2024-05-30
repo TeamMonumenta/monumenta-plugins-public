@@ -222,7 +222,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellTectonicDevastation.class);
 			hide();
 		});
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 		super.constructBoss(phase1Spells, phase1Passives, detectionRange, bossBar, 12 * 20);
 
 		hide();

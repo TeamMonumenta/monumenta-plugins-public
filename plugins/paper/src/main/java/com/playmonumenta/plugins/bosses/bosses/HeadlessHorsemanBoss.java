@@ -207,7 +207,7 @@ public class HeadlessHorsemanBoss extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellHellzoneGrenade.class);
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange * 2, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(phase1Spells, passives, detectionRange, bossBar);
 	}

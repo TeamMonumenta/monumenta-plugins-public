@@ -500,7 +500,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellVesperidysDarkHole.class);
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
 		super.constructBoss(SpellManager.EMPTY, mBasePassives, detectionRange, bossBar);
 	}
 

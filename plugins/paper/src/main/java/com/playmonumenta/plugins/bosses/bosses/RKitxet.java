@@ -190,7 +190,7 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 			}
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, bossBar, 7 * 20);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);

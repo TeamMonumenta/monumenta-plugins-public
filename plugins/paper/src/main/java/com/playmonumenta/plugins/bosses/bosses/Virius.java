@@ -61,7 +61,7 @@ public class Virius extends SerializedLocationBossAbilityGroup {
 				})
 		));
 
-		BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, bossBar);
 	}

@@ -843,7 +843,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 										}
 
-										BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange,
+										BossBarManager bossBar = new BossBarManager(boss, detectionRange,
 											BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
 										constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar);
 										this.cancel();

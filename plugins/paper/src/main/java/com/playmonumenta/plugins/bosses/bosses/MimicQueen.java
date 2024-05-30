@@ -96,7 +96,7 @@ public final class MimicQueen extends SerializedLocationBossAbilityGroup {
 			new SpellPurgeNegatives(boss, 20 * 6)
 		);
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, null);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, null);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}

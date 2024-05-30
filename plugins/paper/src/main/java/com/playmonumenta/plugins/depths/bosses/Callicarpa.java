@@ -232,7 +232,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		});
 
 		// Boss Bar and Construct
-		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
 		constructBoss(phase1Spells, passives, detectionRange, bossBar, 100, 1, true);
 	}
 

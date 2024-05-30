@@ -107,7 +107,7 @@ public final class CrownbearerBoss extends SerializedLocationBossAbilityGroup {
 					.append(Component.text("My allies, aid me! Let us finish this fight!")));
 		});
 
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, bossBar);
 	}

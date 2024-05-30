@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -239,6 +240,14 @@ public class SpellVolcanicDemise extends Spell {
 							}
 						}
 					}
+				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				if (mY > 0) {
+					MMLog.warning("Volcanic Demise cancelled early!");
 				}
 			}
 		};
