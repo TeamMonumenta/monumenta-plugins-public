@@ -164,7 +164,10 @@ public class ShulkerEquipmentListener implements Listener {
 						return;
 					}
 
-					swapEquipment(player, pInv, sbox);
+					boolean swapped = swapEquipment(player, pInv, sbox);
+					if (!swapped) {
+						return;
+					}
 
 					sMeta.setBlockState(sbox);
 					sboxItem.setItemMeta(sMeta);
@@ -196,7 +199,10 @@ public class ShulkerEquipmentListener implements Listener {
 					}
 
 					// Swap Skills, Equipment, Charms
-					swapEquipment(player, pInv, sbox);
+					boolean swapped = swapEquipment(player, pInv, sbox);
+					if (!swapped) {
+						return;
+					}
 					swapCharms(player, sbox);
 
 					sMeta.setBlockState(sbox);
@@ -286,14 +292,14 @@ public class ShulkerEquipmentListener implements Listener {
 		return item == null || !ItemUtils.isShulkerBox(item.getType()) || FirmamentOverride.isFirmamentItem(item) || WorldshaperOverride.isWorldshaperItem(item) || isPotionInjectorItem(item);
 	}
 
-	private void swapEquipment(Player player, PlayerInventory pInv, ShulkerBox sbox) {
+	private boolean swapEquipment(Player player, PlayerInventory pInv, ShulkerBox sbox) {
 		/* Prevent swapping/nesting shulkers */
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
 			if (!canSwapItem(item)) {
 				player.sendMessage(Component.text("You can not store shulker boxes", NamedTextColor.RED));
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.1f);
-				return;
+				return false;
 			}
 		}
 
@@ -317,6 +323,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 		// Reset player's attack cooldown so it cannot be exploited by swapping from high to low cooldown items of the same type
 		PlayerUtils.resetAttackCooldown(player);
+		return true;
 	}
 
 	private void swapItem(PlayerInventory from, Inventory to, int fromSlot, int toSlot) {
@@ -332,30 +339,34 @@ public class ShulkerEquipmentListener implements Listener {
 		if (!vanityData.mLockboxSwapEnabled) {
 			return;
 		}
-		ReadWriteNBT vanityItems = NBT.itemStackToNBT(shulkerBox).getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).getOrCreateCompound(ItemStatUtils.VANITY_ITEMS_KEY);
-		for (EquipmentSlot slot : EquipmentSlot.values()) {
-			if (slot == EquipmentSlot.HAND) {
-				continue;
-			}
-			String slotKey = slot.name().toLowerCase(Locale.ROOT);
-			ItemStack newVanity = vanityItems.hasTag(slotKey) ? vanityItems.getItemStack(slotKey) : null;
-			if (newVanity != null && newVanity.getType() != Material.AIR) {
-				if (!VanityManager.isValidVanityItem(player, newVanity, slot)) {
-					newVanity = null;
-				} else if (ItemStatUtils.isDirty(newVanity)) {
-					ItemUtils.setPlainTag(newVanity);
-					ItemUpdateHelper.generateItemStats(newVanity);
-					ItemStatUtils.removeDirty(newVanity);
+
+		NBT.modify(shulkerBox, nbt -> {
+			ReadWriteNBT vanityItems = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).getOrCreateCompound(ItemStatUtils.VANITY_ITEMS_KEY);
+
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				if (slot == EquipmentSlot.HAND) {
+					continue;
 				}
+				String slotKey = slot.name().toLowerCase(Locale.ROOT);
+				ItemStack newVanity = vanityItems.getItemStack(slotKey);
+				if (newVanity != null && newVanity.getType() != Material.AIR) {
+					if (!VanityManager.isValidVanityItem(player, newVanity, slot)) {
+						newVanity = null;
+					} else if (ItemStatUtils.isDirty(newVanity)) {
+						ItemUtils.setPlainTag(newVanity);
+						ItemUpdateHelper.generateItemStats(newVanity);
+						ItemStatUtils.removeDirty(newVanity);
+					}
+				}
+				ItemStack oldVanity = vanityData.getEquipped(slot);
+				if (oldVanity == null || oldVanity.getType() == Material.AIR) {
+					vanityItems.removeKey(slotKey);
+				} else {
+					vanityItems.setItemStack(slotKey, oldVanity);
+				}
+				vanityData.equip(slot, newVanity, null);
 			}
-			ItemStack oldVanity = vanityData.getEquipped(slot);
-			if (oldVanity == null || oldVanity.getType() == Material.AIR) {
-				vanityItems.removeKey(slotKey);
-			} else {
-				vanityItems.setItemStack(slotKey, oldVanity);
-			}
-			vanityData.equip(slot, newVanity, null);
-		}
+		});
 	}
 
 	private void swapParrots(Player player, ItemStack shulkerBox) {
@@ -373,7 +384,6 @@ public class ShulkerEquipmentListener implements Listener {
 			ParrotManager.updateParrots(player);
 			playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_LEFT, playerLeft);
 			playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT, playerRight);
-			return;
 		});
 	}
 
