@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.bosses.bosses.HostileBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.SanctifiedArmorCS;
@@ -125,10 +126,26 @@ public class SanctifiedArmor extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (source != null
-			&& (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
-			&& (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK || damager instanceof Projectile)
-			&& Crusade.enemyTriggersAbilities(source, mCrusade)) {
+		if (source == null) {
+			return;
+		}
+
+		DamageType type = event.getType();
+		if (type == DamageType.MELEE) {
+			// Potential edge case that would get through is a mob with boss_hostile and a melee type spell
+			// but better to have this than ignore boss_hostile mobs completely (since they do not do DamageCause.ENTITY_ATTACK)
+			if (!(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK || source.getScoreboardTags().contains(HostileBoss.identityTag))) {
+				return;
+			}
+		} else if (type == DamageType.PROJECTILE) {
+			if (!(damager instanceof Projectile)) {
+				return;
+			}
+		} else {
+			return;
+		}
+
+		if (Crusade.enemyTriggersAbilities(source, mCrusade)) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 
