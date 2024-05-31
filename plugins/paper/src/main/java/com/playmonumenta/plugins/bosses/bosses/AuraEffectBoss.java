@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -52,8 +53,8 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = List.of(
 			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS,
 				(Entity entity) -> {
-					p.PARTICLE.spawn(boss, entity.getLocation(), p.RADIUS / 2f, p.HEIGHT / 2f, p.RADIUS / 2f);
-					p.PARTICLE_ENTITY.spawn(boss, entity.getLocation().clone().add(0, 1, 0));
+					p.PARTICLE.spawn(boss, LocationUtils.getEntityCenter(entity), p.RADIUS / 2f, p.HEIGHT / 2f, p.RADIUS / 2f);
+					p.PARTICLE_ENTITY.spawn(boss, LocationUtils.getEntityCenter(entity));
 				},
 				(p.EFFECTS == EffectsList.EMPTY ? null :
 					 (Player player) -> {

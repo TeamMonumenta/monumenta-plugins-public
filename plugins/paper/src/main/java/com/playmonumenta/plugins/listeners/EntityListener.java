@@ -53,6 +53,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -1018,6 +1019,9 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().setAttackRange(hoglin, 1.8);
 		} else if (event.getEntity() instanceof FallingBlock fallingBlock) {
 			fallingBlock.setMetadata(FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, new FixedMetadataValue(mPlugin, ZoneUtils.hasZoneProperty(fallingBlock.getLocation(), ZoneProperty.ADVENTURE_MODE)));
+		} else if (event.getEntity() instanceof Bee bee) {
+			// stop bees from running super fast when they get near the ground
+			EntityUtils.setAttributeBase(bee, Attribute.GENERIC_MOVEMENT_SPEED, 0.1);
 		}
 	}
 

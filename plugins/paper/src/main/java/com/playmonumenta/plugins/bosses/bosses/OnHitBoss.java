@@ -6,8 +6,10 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.Collections;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -28,10 +30,10 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		//Particle & Sounds!
 		@BossParam(help = "Particle summoned when the player got hit by the boss")
-		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,20,0,0,0,1,#ffffff,2)]");
+		public ParticlesList PARTICLE = ParticlesList.EMPTY;
 
 		@BossParam(help = "Sound played when the player got hit by the boss")
-		public SoundsList SOUND = SoundsList.fromString("[(BLOCK_PORTAL_TRIGGER,0.25,2)]");
+		public SoundsList SOUND = SoundsList.EMPTY;
 
 		@BossParam(help = "Executes a Command as the CONSOLE when player gets hit.")
 		public String COMMAND_AS_BOSS = "";
@@ -41,6 +43,9 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		@BossParam(help = "if set, makes boss_onhit only trigger when the spell with this name deals damage")
 		public String SPELL_NAME = "";
+
+		@BossParam(help = "if set, only triggers on this type of damage")
+		public @Nullable DamageType DAMAGE_TYPE = null;
 	}
 
 	private final Parameters mParams;
@@ -61,6 +66,11 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		if (!mParams.SPELL_NAME.equals("") && !mParams.SPELL_NAME.equals(event.getBossSpellName())) {
 			// If it isn't the spell that we want, don't trigger anything
+			return;
+		}
+
+		if (mParams.DAMAGE_TYPE != null && event.getType() != mParams.DAMAGE_TYPE) {
+			// if it isn't the right damage type, don't trigger
 			return;
 		}
 
