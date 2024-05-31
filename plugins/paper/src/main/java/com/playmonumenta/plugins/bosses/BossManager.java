@@ -108,6 +108,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -712,7 +713,7 @@ public class BossManager implements Listener {
 			}
 		}
 
-		if (boss != null && !event.isCancelled() && event.getFinalDamage(true) >= damagee.getHealth()) {
+		if (boss != null && !event.isCancelled() && event.getCause() != EntityDamageEvent.DamageCause.VOID && event.getFinalDamage(true) >= damagee.getHealth()) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {
 				BossBarManager bossBar = ability.getBossBar();
 				if (bossBar != null && bossBar.capsDamage()) {
