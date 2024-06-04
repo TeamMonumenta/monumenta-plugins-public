@@ -178,7 +178,7 @@ public class TimeWarpCommand {
 			throw CommandAPI.failWithString("Time testing is not enabled");
 		}
 
-		long amount = args.getOrDefaultUnchecked("amount", 0);
+		long amount = args.getOrDefaultUnchecked("amount", 0L);
 		String unitName = args.getUnchecked("unit");
 		ChronoUnit unit = unitName == null ? ChronoUnit.SECONDS : ChronoUnit.valueOf(unitName.toUpperCase(Locale.getDefault()));
 
@@ -191,7 +191,7 @@ public class TimeWarpCommand {
 			throw CommandAPI.failWithString("Time testing is not enabled");
 		}
 
-		long amount = args.getOrDefaultUnchecked("amount", 0);
+		long amount = args.getOrDefaultUnchecked("amount", 0L);
 		String unitName = args.getUnchecked("unit");
 		ChronoUnit unit = unitName == null ? ChronoUnit.SECONDS : ChronoUnit.valueOf(unitName.toUpperCase(Locale.getDefault()));
 
