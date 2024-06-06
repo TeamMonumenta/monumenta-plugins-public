@@ -87,6 +87,7 @@ public class CustomTradeGui extends Gui {
 	private final String mTitle;
 	private final String mCustomTagKey = "trade_preview";
 	private final NamespacedKey mCustomTagNamespacedKey = new NamespacedKey(mPlugin, mCustomTagKey);
+	private final boolean mGuiTagsActive = GUIUtils.getGuiTextureObjective(mPlayer);
 	//endregion
 
 	//region <CACHED_VARS>
@@ -113,21 +114,23 @@ public class CustomTradeGui extends Gui {
 		"", NamedTextColor.GRAY, 0);
 	private final ItemStack mBackgroundChain = GUIUtils.createBasicItem(Material.IRON_BARS, "", NamedTextColor.GRAY, false,
 		"", NamedTextColor.GRAY, 0);
+
+	private static final int GUI_ID_GENERAL_L = 45;
+	private static final int GUI_ID_GENERAL_R = 8;
+	private static final int GUI_ID_CONFIRM_L = 45;
+	private static final int GUI_ID_CONFIRM_R = 53;
 	//endregion
 
 	//region <SUBCLASSES>
 	private enum TradeType {
-		WEAPON("Weapons"), ARMOR("Armor"), OFFHAND("Offhands"), CHARM("Charms"), MISC("Misc"), GENERAL("Trades");
+		WEAPON("Weapons", "trade_menu_weapons"), ARMOR("Armor", "trade_menu_armor"), OFFHAND("Offhands", "trade_menu_offhands"), CHARM("Charms", "trade_menu_charms"), MISC("Misc", "trade_menu_misc"), GENERAL("Trades", "trade_menu_trade");
 
-		private final String mName;
+		public final String mName;
+		public final String mTag;
 
-		TradeType(String name) {
+		TradeType(String name, String tag) {
 			this.mName = name;
-		}
-
-		@Override
-		public String toString() {
-			return mName;
+			this.mTag = tag;
 		}
 	}
 
@@ -336,6 +339,12 @@ public class CustomTradeGui extends Gui {
 
 	@Override
 	protected void setup() {
+		// Manual filler:
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 5; j++) {
+				setItem(j, i, GUIUtils.FILLER);
+			}
+		}
 		// Background panes:
 		for (int i = 0; i < 9; i++) {
 			setItem(0, i, mBackgroundPane);
@@ -393,16 +402,25 @@ public class CustomTradeGui extends Gui {
 		if (mCurrentTab == null) {
 			mCurrentTab = mDisplayTradeTypes.get(0);
 		}
+
 		// Load trades for the current tab:
 		int numTrades = showTrades(mCurrentTab);
 		int pageCount = getMaxPages(numTrades);
 		// Display header and icons for all tabs:
-		setItem(0, 4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
-			"Tab: " + mCurrentTab + "\nPage: " + mCurrentPage + "/" + pageCount, NamedTextColor.GRAY, 20));
+		ItemStack tempItem1 = GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
+			"Tab: " + ((mCurrentTab != null) ? mCurrentTab.mName : "") + "\nPage: " + mCurrentPage + "/" + pageCount, NamedTextColor.GRAY, 20);
+		GUIUtils.setGuiNbtTag(tempItem1, "texture", "trade_menu_help", mGuiTagsActive);
+		setItem(0, 4, tempItem1);
 		int guiCol = 1;
 		for (TradeType tradeType : mDisplayTradeTypes) {
-			setItem(5, guiCol, GUIUtils.createBasicItem((mCurrentTab == tradeType ? Material.BLUE_STAINED_GLASS_PANE : Material.CYAN_STAINED_GLASS_PANE), tradeType.toString() + (mCurrentTab == tradeType ? " (Selected)" : ""), NamedTextColor.YELLOW, false,
-				"", NamedTextColor.GRAY, 0)).onLeftClick(() -> {
+			boolean isSelected = (mCurrentTab == tradeType);
+			String name = tradeType.mName + (isSelected ? " (Selected)" : "");
+			String tag = tradeType.mTag + (isSelected ? "_selected" : "");
+			ItemStack tempItem2 = GUIUtils.createBasicItem(
+				(isSelected ? Material.BLUE_STAINED_GLASS_PANE : Material.CYAN_STAINED_GLASS_PANE),
+				name, NamedTextColor.YELLOW, false, "", NamedTextColor.GRAY, 0);
+			GUIUtils.setGuiNbtTag(tempItem2, "texture", tag, mGuiTagsActive);
+			setItem(5, guiCol, tempItem2).onLeftClick(() -> {
 					// Select Tab:
 				if (mCurrentTab != tradeType) {
 					mCurrentTab = tradeType;
@@ -439,14 +457,21 @@ public class CustomTradeGui extends Gui {
 			});
 		}
 		// Button to toggle between showing all trades or trade you can buy:
-		setItem(5, 8, GUIUtils.createBasicItem(mShowAllTrades ? Material.AMETHYST_CLUSTER : Material.MEDIUM_AMETHYST_BUD, mShowAllTrades ? "Showing: All Trades" : "Showing: Trades You Can Buy", NamedTextColor.YELLOW, true,
-			"Click to toggle. ", NamedTextColor.GRAY, 20)).onLeftClick(() -> {
+		Material material = mShowAllTrades ? Material.AMETHYST_CLUSTER : Material.MEDIUM_AMETHYST_BUD;
+		String name = mShowAllTrades ? "Showing: All Trades" : "Showing: Trades You Can Buy";
+		String tag = mShowAllTrades ? "trade_menu_show_all" : "trade_menu_show_affordable";
+		ItemStack tempItem = GUIUtils.createBasicItem(material, name, NamedTextColor.YELLOW, true,
+			"Click to toggle. ", NamedTextColor.GRAY, 20);
+		GUIUtils.setGuiNbtTag(tempItem, "texture", tag, mGuiTagsActive);
+		setItem(5, 8, tempItem).onLeftClick(() -> {
 			// Page Flip:
 			mShowAllTrades = !mShowAllTrades;
 			mCurrentPage = 1;
 			playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
 			update();
 		});
+		// RP Support: gui identifiers.
+		setGuiIdentifiers();
 	}
 
 	private void openConfirmTradeView() {
@@ -463,8 +488,10 @@ public class CustomTradeGui extends Gui {
 		String itemName = ItemUtils.getPlainNameOrDefault(recipe.getResult());
 		TradeReq tradeReq = new TradeReq(mPlayer, mSelectedTrade, mSelectedTradeMultiplier, true);
 		// Header:
-		setItem(0, 4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
-			itemName, NamedTextColor.GRAY, 20));
+		ItemStack tempItem = GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
+			itemName, NamedTextColor.GRAY, 20);
+		GUIUtils.setGuiNbtTag(tempItem, "texture", "trade_confirm_help", mGuiTagsActive);
+		setItem(0, 4, tempItem);
 		// Custom Multipliers: display the base trade (multiplier of 1):
 		boolean displayAsBase = (mSelectedTradeMultiplier > mSelectedTradeMaxMultiplier);
 		int displayMultiplier = displayAsBase ? 1 : mSelectedTradeMultiplier;
@@ -519,11 +546,7 @@ public class CustomTradeGui extends Gui {
 				update();
 			});
 		// Back Button:
-		ItemStack backButton =
-			tradeReq.status() ?
-				GUIUtils.createCancel(List.of(Component.text("Return to the previous page.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))) :
-				GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
-					"Return to the previous page.", NamedTextColor.GRAY, 40);
+		ItemStack backButton = createBackButton(tradeReq.status());
 		setItem(4, 3, backButton).onLeftClick(this::navToGeneralView);
 		// Confirm/Deny Button:
 		if (tradeReq.status()) {
@@ -533,6 +556,8 @@ public class CustomTradeGui extends Gui {
 		} else {
 			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq));
 		}
+		// RP Support: gui identifiers.
+		setGuiIdentifiers();
 	}
 	//endregion
 
@@ -972,6 +997,7 @@ public class CustomTradeGui extends Gui {
 			itemMeta.lore(Arrays.asList(lore));
 			// Finalize:
 			book.setItemMeta(itemMeta);
+			GUIUtils.setGuiNbtTag(book, "texture", "trade_confirm_multiplier", mGuiTagsActive);
 			return book;
 		}
 		// Regular trade multiplier button:
@@ -1009,6 +1035,7 @@ public class CustomTradeGui extends Gui {
 			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // banner patterns are actually the same 'data' as potion effects, lmao
 			// Finalize:
 			banner.setItemMeta(bannerMeta);
+			GUIUtils.setGuiNbtTag(banner, "texture", "trade_confirm_multiplier", mGuiTagsActive);
 		}
 		return banner;
 	}
@@ -1031,17 +1058,24 @@ public class CustomTradeGui extends Gui {
 		confirmLore.add(comp);
 		confirmLore.addAll(tradeReq.lore());
 		// Set item material and name:
-		ItemStack item;
-		if (tradeReq.status()) {
-			item = GUIUtils.createConfirm(confirmLore);
-		} else {
-			item = new ItemStack(Material.BARRIER);
-			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("Missing material(s)", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(confirmLore);
-			item.setItemMeta(meta);
-		}
-		return item;
+		boolean canAfford = tradeReq.status();
+		String tag = canAfford ? "trade_confirm_confirm" : "trade_confirm_unaffordable";
+		Material material = canAfford ? Material.GREEN_STAINED_GLASS_PANE : Material.BARRIER;
+		Component name = Component.text((canAfford ? "Confirm" : "Missing material(s)"), (canAfford ? NamedTextColor.GREEN : NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true);
+		ItemStack tempItem = GUIUtils.createBasicItem(material, 1, name, confirmLore, false, null);
+		GUIUtils.setGuiNbtTag(tempItem, "texture", tag, mGuiTagsActive);
+		return tempItem;
+	}
+
+	private ItemStack createBackButton(boolean canAfford) {
+		// Set item material and name:
+		String tag = canAfford ? "trade_confirm_cancel" : "trade_confirm_back";
+		Material material = canAfford ? Material.ORANGE_STAINED_GLASS_PANE : Material.ARROW;
+		String name = canAfford ? "Cancel" : "Back";
+		ItemStack tempItem = GUIUtils.createBasicItem(material, name, NamedTextColor.GRAY, false,
+			"Return to the previous page.", NamedTextColor.GRAY, 40);
+		GUIUtils.setGuiNbtTag(tempItem, "texture", tag, mGuiTagsActive);
+		return tempItem;
 	}
 
 	private ItemStack createTradePreviewGuiItem(MerchantRecipe recipe, TradeReq tradeReq, boolean includePriceInLore, int multiplier) {
@@ -1082,6 +1116,22 @@ public class CustomTradeGui extends Gui {
 		// Finalize and return:
 		item.setItemMeta(itemMeta);
 		return item;
+	}
+
+	private void setGuiIdentifiers() {
+		// Sets filler with tag for rp gui support.
+		// Different tags depending on if in general trade view or confirm trade view.
+		boolean isGeneral = (mSelectedTrade == null);
+		int locationL = isGeneral ? GUI_ID_GENERAL_L : GUI_ID_CONFIRM_L;
+		int locationR = isGeneral ? GUI_ID_GENERAL_R : GUI_ID_CONFIRM_R;
+		String tagL = isGeneral ? "gui_trade_1_l" : "gui_trade_2_l";
+		String tagR = isGeneral ? "gui_trade_1_r" : "gui_trade_2_r";
+		ItemStack tempL = mBackgroundPane.clone();
+		ItemStack tempR = mBackgroundPane.clone();
+		GUIUtils.setGuiNbtTag(tempL, "texture", tagL, mGuiTagsActive);
+		GUIUtils.setGuiNbtTag(tempR, "texture", tagR, mGuiTagsActive);
+		setItem(locationL, tempL);
+		setItem(locationR, tempR);
 	}
 	//endregion
 
