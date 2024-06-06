@@ -326,6 +326,9 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(39, "Spoof World Names",
 				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", NamedTextColor.LIGHT_PURPLE,
 				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
+			new PebItem(40, "Resource Pack GUI Textures",
+				"Click to enable or disable the Monumenta Resource Pack applying background textures to various GUIs. (Requires v5.0.0 or higher to work when enabled.)", NamedTextColor.LIGHT_PURPLE,
+				Material.BEEHIVE, false).playerCommand("guitextures"),
 			new PebItem(41, "Simplified Tab List",
 				"Click to enable or disable the simplified tab list, removing custom effects from the tab list."
 				+ " Recommended if using an up-to-date version of the Unofficial Monumenta Mod (1.9.8+).", NamedTextColor.LIGHT_PURPLE,

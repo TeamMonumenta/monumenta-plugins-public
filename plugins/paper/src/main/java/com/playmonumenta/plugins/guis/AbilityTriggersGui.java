@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory
 import com.playmonumenta.plugins.depths.guis.DepthsSummaryGUI;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -38,10 +39,12 @@ public class AbilityTriggersGui extends Gui {
 	private int mKeyOptionsStartIndex = 0;
 	// true for class GUI, false for depths summary GUI
 	private final boolean mPreviousGUI;
+	private final boolean mGuiTextures;
 
 	public AbilityTriggersGui(Player player, boolean previousGUI) {
 		super(player, 6 * 9, MAIN_PAGE_TITLE);
 		mPreviousGUI = previousGUI;
+		mGuiTextures = GUIUtils.getGuiTextureObjective(player);
 	}
 
 	@Override
@@ -54,13 +57,13 @@ public class AbilityTriggersGui extends Gui {
 			if (mPreviousGUI) {
 				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
 					"Return to the class selection page.", NamedTextColor.GRAY, 40);
-				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_back");
+				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
 					.onLeftClick(() -> new ClassSelectionCustomInventory(mPlayer).openInventory(mPlayer, mPlugin));
 			} else {
 				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
 					"Return to the ability summary page.", NamedTextColor.GRAY, 40);
-				GUIUtils.setGuiNbtTag(tempItem, "texture", "depth_trigger_main_back");
+				GUIUtils.setGuiNbtTag(tempItem, "texture", "depth_trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
 					.onLeftClick(() -> new DepthsSummaryGUI(mPlayer).openInventory(mPlayer, mPlugin));
 			}
@@ -72,7 +75,7 @@ public class AbilityTriggersGui extends Gui {
 					Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.
 					Eagle Eye is an exception: it allows other abilities to trigger after it.
 					Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).""", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", "depth_main_help");
+			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_help", mGuiTextures);
 			setItem(4, tempItem);
 
 			// trigger icons
@@ -112,15 +115,14 @@ public class AbilityTriggersGui extends Gui {
 				}
 			}
 
-			// gui identifier - filler with tag for rp gui support (bottom left corner)
+			// gui identifier - filler with tag for rp gui support
 			if (mPreviousGUI) {
-				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_4_l"));
-				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_4_r"));
+				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_4_l", mGuiTextures));
+				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_4_r", mGuiTextures));
 			} else {
-				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_4_l"));
-				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_4_r"));
+					setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_4_l", mGuiTextures));
+					setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_4_r", mGuiTextures));
 			}
-
 
 			// "revert all" button - top right to hopefully prevent accidental presses
 			int numberOfCustomTriggers = mPlugin.mAbilityManager.getNumberOfCustomTriggers(mPlayer);
@@ -129,7 +131,7 @@ public class AbilityTriggersGui extends Gui {
 					Component.text("This resets all triggers of all abilities of all classes back to defaults!\nYou currently have ", NamedTextColor.RED)
 						.append(Component.text(numberOfCustomTriggers, NamedTextColor.GOLD))
 						.append(Component.text(" custom trigger" + (numberOfCustomTriggers == 1 ? "" : "s") + " defined.", NamedTextColor.RED)), 40, true);
-				GUIUtils.setGuiNbtTag(tempItem, "texture", "depth_main_reset_trigger");
+				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_reset_trigger", mGuiTextures);
 				setItem(8, tempItem)
 					.onLeftClick(() -> {
 						mPlugin.mAbilityManager.clearCustomTriggers(mPlayer);
@@ -145,7 +147,7 @@ public class AbilityTriggersGui extends Gui {
 			// back icon
 			tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back",
 				NamedTextColor.GRAY, false, "Return to the trigger selection page.", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_back");
+			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_back", mGuiTextures);
 			setItem(0, 0, tempItem)
 					.onLeftClick(() -> {
 						mSelectedAbility = null;
@@ -171,22 +173,21 @@ public class AbilityTriggersGui extends Gui {
 			// options
 			tempItem = GUIUtils.createBasicItem(Material.BARRIER, mNewTrigger.isEnabled() ? "Trigger enabled" : "Trigger disabled", mNewTrigger.isEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED, false,
 				"Click to " + (mNewTrigger.isEnabled() ? "disable" : "enable") + " the trigger", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_" + (mNewTrigger.isEnabled() ? "enabled" : "disabled"));
+			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_" + (mNewTrigger.isEnabled() ? "enabled" : "disabled"), mGuiTextures);
 			makeOptionIcons(1, 0, tempItem, mNewTrigger.isEnabled() ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setEnabled(!mNewTrigger.isEnabled());
 				update();
 			});
 			tempItem = GUIUtils.createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
 				"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", NamedTextColor.GRAY, 40);
-
 			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_" + (
 				switch (mNewTrigger.getKey()) {
-				case LEFT_CLICK -> "left";
-				case RIGHT_CLICK -> "right";
-				case SWAP -> "swap";
-				case DROP -> "drop";
-				default -> "";
-			}));
+					case LEFT_CLICK -> "left";
+					case RIGHT_CLICK -> "right";
+					case SWAP -> "swap";
+					case DROP -> "drop";
+					default -> "";
+				}), mGuiTextures);
 			makeOptionIcons(1, 1, tempItem, switch (mNewTrigger.getKey()) {
 				case LEFT_CLICK -> Material.IRON_SWORD;
 				case RIGHT_CLICK -> Material.BOW;
@@ -206,7 +207,7 @@ public class AbilityTriggersGui extends Gui {
 			});
 			tempItem = GUIUtils.createBasicItem(Material.SHEARS, "Double click: " + (mNewTrigger.isDoubleClick() ? "yes" : "no"), mNewTrigger.isDoubleClick() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
 				"Click to toggle requiring a double click", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_dclick_" + (mNewTrigger.isDoubleClick() ? "true" : "false"));
+			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_dclick_" + (mNewTrigger.isDoubleClick() ? "true" : "false"), mGuiTextures);
 			makeOptionIcons(1, 3, tempItem, mNewTrigger.isDoubleClick() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setDoubleClick(!mNewTrigger.isDoubleClick());
 				update();
@@ -230,7 +231,7 @@ public class AbilityTriggersGui extends Gui {
 			});
 			tempItem = GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.GRAY, false,
 				"Click to cycle through look directions", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", guiTag);
+			GUIUtils.setGuiNbtTag(tempItem, "texture", guiTag, mGuiTextures);
 			makeOptionIcons(1, 7, tempItem, mNewTrigger.getLookDirections().size() == 3 ? Material.GRAY_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				EnumSet<AbilityTrigger.LookDirection> lookDirections = mNewTrigger.getLookDirections();
 				AbilityTrigger.LookDirection[] values = AbilityTrigger.LookDirection.values();
@@ -259,7 +260,7 @@ public class AbilityTriggersGui extends Gui {
 
 			tempItem = GUIUtils.createBasicItem(Material.POINTED_DRIPSTONE, "Allow fall-through: " + (mNewTrigger.isFallThrough() ? "yes" : "no"), mNewTrigger.isFallThrough() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
 				"Click to toggle whether another ability with an overlapping trigger will be triggered if this ability fails or is on cooldown.", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_fall_through_" + (mNewTrigger.isFallThrough() ? "true" : "false"));
+			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_fall_through_" + (mNewTrigger.isFallThrough() ? "true" : "false"), mGuiTextures);
 			makeOptionIcons(1, 8, tempItem, mNewTrigger.isFallThrough() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setFallThrough(!mNewTrigger.isFallThrough());
 				update();
@@ -269,7 +270,7 @@ public class AbilityTriggersGui extends Gui {
 			tempItem = GUIUtils.createBasicItem(Material.CHAIN_COMMAND_BLOCK, "Extras", NamedTextColor.WHITE, false,
 				"Extra options for held items.\n"
 					+ "When the main key is changed these are set to defaults, unless the trigger has an unchangeable item restriction.", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_extras");
+			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_extras", mGuiTextures);
 			setItem(3, 0, tempItem);
 
 			int colStart = 1;
@@ -280,7 +281,7 @@ public class AbilityTriggersGui extends Gui {
 			} else if (mKeyOptionsStartIndex > 1) {
 				colStart = 2;
 				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Scroll back for more options", NamedTextColor.GRAY);
-				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_scroll_back");
+				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_scroll_back", mGuiTextures);
 				setItem(3, 1, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex -= 6;
 					update();
@@ -289,7 +290,7 @@ public class AbilityTriggersGui extends Gui {
 			if (mKeyOptionsStartIndex + 7 < AbilityTrigger.KeyOptions.values().length) {
 				colEnd = 7;
 				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Scroll forward for more options", NamedTextColor.GRAY);
-				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_scroll_forward");
+				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_scroll_forward", mGuiTextures);
 				setItem(3, 8, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex += mKeyOptionsStartIndex == 0 ? 7 : 6;
 					update();
@@ -301,7 +302,7 @@ public class AbilityTriggersGui extends Gui {
 				boolean enabled = mNewTrigger.getKeyOptions().contains(keyOption);
 				tempItem = GUIUtils.createBasicItem(keyOption.getMaterial(), capitalize(keyOption.getDisplay(enabled)), enabled ? NamedTextColor.RED : NamedTextColor.GRAY, false,
 					"Click to toggle", NamedTextColor.GRAY, 40);
-				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_" + keyOption.getGuiTag(enabled));
+				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_" + keyOption.getGuiTag(enabled), mGuiTextures);
 				makeOptionIcons(3, col, tempItem, enabled ? Material.RED_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 					EnumSet<AbilityTrigger.KeyOptions> keyOptions = mNewTrigger.getKeyOptions();
 					if (!keyOptions.remove(keyOption)) {
@@ -317,9 +318,14 @@ public class AbilityTriggersGui extends Gui {
 				});
 			}
 
-			// gui identifier - filler with tag for rp gui support (bottom left)
-			setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_5_l"));
-			setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_5_r"));
+			// gui identifier - filler with tag for rp gui support
+			if (mPreviousGUI) {
+				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_5_l", mGuiTextures));
+				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_5_r", mGuiTextures));
+			} else {
+				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_5_l", mGuiTextures));
+				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_5_r", mGuiTextures));
+			}
 
 			// accept/cancel buttons
 			if (!mNewTrigger.equals(mSelectedTrigger.getTrigger())) {
@@ -330,7 +336,7 @@ public class AbilityTriggersGui extends Gui {
 					meta.lore(List.of(Component.text("Accept trigger changes", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 					confirm.setItemMeta(meta);
 					ItemUtils.setPlainTag(confirm);
-					GUIUtils.setGuiNbtTag(confirm, "texture", "trigger_detail_confirm");
+					GUIUtils.setGuiNbtTag(confirm, "texture", "trigger_detail_confirm", mGuiTextures);
 					setItem(5, 2, confirm).onLeftClick(() -> {
 						mSelectedTrigger.setTrigger(mNewTrigger);
 						mPlugin.mAbilityManager.setCustomTrigger(mPlayer, mSelectedAbility, mSelectedTrigger.getId(), mNewTrigger);
@@ -347,7 +353,7 @@ public class AbilityTriggersGui extends Gui {
 					meta.lore(List.of(Component.text("Discard current trigger changes", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 					cancel.setItemMeta(meta);
 					ItemUtils.setPlainTag(cancel);
-					GUIUtils.setGuiNbtTag(cancel, "texture", "trigger_detail_cancel");
+					GUIUtils.setGuiNbtTag(cancel, "texture", "trigger_detail_cancel", mGuiTextures);
 					setItem(5, 6, cancel).onLeftClick(() -> {
 						mNewTrigger = new AbilityTrigger(mSelectedTrigger.getTrigger());
 						mSelectedAbility = null;
@@ -360,7 +366,7 @@ public class AbilityTriggersGui extends Gui {
 			// revert button
 			tempItem = GUIUtils.createBasicItem(Material.BARRIER, "Revert to default", NamedTextColor.DARK_RED, false,
 				"Revert any custom trigger changes", NamedTextColor.GRAY, 40);
-			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_revert");
+			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_revert", mGuiTextures);
 			if (!mSelectedTrigger.getTrigger().equals(mSelectedAbility.getTrigger(mSelectedTrigger.getId()).getTrigger())) {
 				setItem(5, 4, tempItem).onLeftClick(() -> {
 					mNewTrigger = new AbilityTrigger(mSelectedAbility.getTrigger(mSelectedTrigger.getId()).getTrigger());
@@ -386,7 +392,7 @@ public class AbilityTriggersGui extends Gui {
 		setItem(row, column, display).onLeftClick(onClick);
 		ItemStack indicator = display.clone();
 		indicator.setType(indicatorMaterial);
-		GUIUtils.setGuiNbtTag(indicator, "texture", "trigger_detail_empty");
+		GUIUtils.setGuiNbtTag(indicator, "texture", "trigger_detail_empty", mGuiTextures);
 		setItem(row + 1, column, indicator).onLeftClick(onClick);
 	}
 
@@ -409,7 +415,7 @@ public class AbilityTriggersGui extends Gui {
 			: "_both");
 		ItemStack tempItem = GUIUtils.createBasicItem(material, displayName, color, false,
 			"Click to cycle through options", NamedTextColor.GRAY, 40);
-		GUIUtils.setGuiNbtTag(tempItem, "texture", guiTag);
+		GUIUtils.setGuiNbtTag(tempItem, "texture", guiTag, mGuiTextures);
 
 		makeOptionIcons(row, column, tempItem, value, () -> {
 			setter.accept(AbilityTrigger.BinaryOption.values()[(value.ordinal() + 1) % AbilityTrigger.BinaryOption.values().length]);

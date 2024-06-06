@@ -293,6 +293,7 @@ public class Plugin extends JavaPlugin {
 		ResetClass.register();
 		RestartEmptyCommand.register(this);
 		RocketJump.register();
+		GUITextures.register();
 		RunWithPlaceholdersCommand.register();
 		ScanChests.register();
 		SeasonalEventCommand.register();

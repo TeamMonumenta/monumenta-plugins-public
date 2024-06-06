@@ -35,15 +35,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class DelveCustomInventory extends CustomInventory {
 
-	private static final ItemStack SELECT_ALL_MOD_ITEM = getSelectAllModifiers();
-	private static final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
-	private static final ItemStack BOUNTY_SELECTION_ITEM = getBountySelection();
-	private static final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
-	private static final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
-	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), new String[] {"Some of these modifiers are randomly available each week.", "Selecting at least one will result in 25% increased XP."});
+	private final ItemStack SELECT_ALL_MOD_ITEM = getSelectAllModifiers();
+	private final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
+	private final ItemStack BOUNTY_SELECTION_ITEM = getBountySelection();
+	private final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
+	private final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
+	private final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), new String[] {"Some of these modifiers are randomly available each week.", "Selecting at least one will result in 25% increased XP."});
 	private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
-	static {
+	{
 		ItemMeta meta = STARTING_ITEM.getItemMeta();
 		meta.displayName(Component.text("Start delve!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		STARTING_ITEM.setItemMeta(meta);
@@ -90,7 +90,7 @@ public class DelveCustomInventory extends CustomInventory {
 		DUNGEON_FUNCTION_MAPPINGS.put("brown", "function monumenta:lobbies/d13/new");
 	}
 
-	private static final int[] DELVE_MOD_ITEM_SLOTS = {
+	private final int[] DELVE_MOD_ITEM_SLOTS = {
 		///* 0,*/   1,  2,  3,  4,  5,  6,  7, // 8,
 		///* 9,*/  10, 11, 12, 13, 14, 15, 16, //17,
 		///*18,*/  19, 20, 21, 22, 23, 24, 25, //26,
@@ -105,9 +105,11 @@ public class DelveCustomInventory extends CustomInventory {
 
 	private static final int TOTAL_POINT_SLOT = 0;
 	private static final int START_SLOT = 8;
-	private static final int PRESET_SLOT = 36;
+	private static final int PRESET_SLOT = 52;
 	private static final int PAGE_LEFT_SLOT = 45;
 	private static final int PAGE_RIGHT_SLOT = 53;
+	private static final int GUI_IDENTIFIER_LOC_L = 36;
+	private static final int GUI_IDENTIFIER_LOC_R = 44;
 
 	private final Player mOwner;
 	private final boolean mEditableDelvePoint;
@@ -116,6 +118,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private int mTotalPoint = 0;
 	private int mIgnoreOldEntropyPoint;
 	@Nullable private final DelvePreset mPreset;
+	private final boolean mGuiTextures;
 
 	private final Map<DelvesModifier, Integer> mPointSelected = new HashMap<>();
 
@@ -133,6 +136,7 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 		mIgnoreOldEntropyPoint = mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0);
 		mPreset = preset;
+		mGuiTextures = GUIUtils.getGuiTextureObjective(owner);
 		loadInv();
 	}
 
@@ -144,6 +148,15 @@ public class DelveCustomInventory extends CustomInventory {
 		mTotalPoint = 0;
 		mInventory.clear();
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
+
+		mInventory.setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_delve_1_l", mGuiTextures));
+		mInventory.setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_delve_1_r", mGuiTextures));
+		GUIUtils.setGuiNbtTag(SELECT_ALL_MOD_ITEM, "texture", "all_delve_1", mGuiTextures);
+		GUIUtils.setGuiNbtTag(REMOVE_ALL_MOD_ITEM, "texture", "clear_delve_1", mGuiTextures);
+		GUIUtils.setGuiNbtTag(STARTING_ITEM, "texture", "start_delve_1", mGuiTextures);
+		GUIUtils.setGuiNbtTag(STARTING_ITEM_NOT_ENOUGH_POINTS, "texture", "start_delve_2", mGuiTextures);
+		GUIUtils.setGuiNbtTag(ROTATING_DELVE_MODIFIER_INFO, "texture", "rotateinfo_delve_1", mGuiTextures);
+		GUIUtils.setGuiNbtTag(BOUNTY_SELECTION_ITEM, "texture", "backtobounty_delve_1", mGuiTextures);
 
 		for (DelvesModifier mod : mods) {
 			mTotalPoint += mPointSelected.getOrDefault(mod, 0) * mod.getPointsPerLevel();
@@ -181,6 +194,11 @@ public class DelveCustomInventory extends CustomInventory {
 					ItemStack stack = DelvesUtils.getRankItem(mod, j + 1, level);
 					if (stack != null) {
 						int slot = (DELVE_MOD_ITEM_SLOTS[i] - (9 * (j + 1)));
+						if (j >= level) {
+							GUIUtils.setGuiNbtTag(stack, "texture", "rank_delve_2", mGuiTextures);
+						} else {
+							GUIUtils.setGuiNbtTag(stack, "texture", "rank_delve_1", mGuiTextures);
+						}
 						mInventory.setItem(slot, stack);
 						if (level > DelvesUtils.MODIFIER_RANK_CAPS.getOrDefault(mod, 0)) {
 							break;
@@ -195,15 +213,15 @@ public class DelveCustomInventory extends CustomInventory {
 
 		if (mPage > 0) {
 			mInventory.setItem(PAGE_LEFT_SLOT, getPreviousPage());
-		} else if (mEditableDelvePoint) {
-			mInventory.setItem(PAGE_LEFT_SLOT, REMOVE_ALL_MOD_ITEM);
-			if (mDungeonName.equals("ring")) {
+			if (mDungeonName.equals("ring") && mEditableDelvePoint) {
 				DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
 				if (delvePreset != null) {
 					ItemStack presetItem = GUIUtils.createBasicItem(delvePreset.mDisplayItem, "Use Bounty Preset", NamedTextColor.WHITE, true, delvePreset.mName, NamedTextColor.AQUA);
 					mInventory.setItem(PRESET_SLOT, presetItem);
 				}
 			}
+		} else if (mEditableDelvePoint) {
+			mInventory.setItem(PAGE_LEFT_SLOT, REMOVE_ALL_MOD_ITEM);
 		} else if (mPreset != null && !mPreset.isDungeonChallengePreset()) {
 			mInventory.setItem(PAGE_LEFT_SLOT, BOUNTY_SELECTION_ITEM);
 		}
@@ -250,6 +268,12 @@ public class DelveCustomInventory extends CustomInventory {
 		int depthPoints = mTotalPoint;
 
 		ItemStack item = new ItemStack(Material.SOUL_LANTERN, Math.max(1, depthPoints));
+
+		if (mTotalPoint > 0) {
+			GUIUtils.setGuiNbtTag(item, "texture", "summary_delve_1", mGuiTextures);
+		} else {
+			GUIUtils.setGuiNbtTag(item, "texture", "summary_delve_2", mGuiTextures);
+		}
 
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text("Delve Summary", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
@@ -362,11 +386,15 @@ public class DelveCustomInventory extends CustomInventory {
 	}
 
 	private ItemStack getNextPage() {
-		return GUIUtils.createBasicItem(Material.ARROW, "Next Page", NamedTextColor.WHITE, true, "");
+		ItemStack item = GUIUtils.createBasicItem(Material.ARROW, "Next Page", NamedTextColor.WHITE, true, "");
+		GUIUtils.setGuiNbtTag(item, "texture", "right_delve_1", mGuiTextures);
+		return item;
 	}
 
 	private ItemStack getPreviousPage() {
-		return GUIUtils.createBasicItem(Material.ARROW, "Previous Page", NamedTextColor.WHITE, true, "");
+		ItemStack item = GUIUtils.createBasicItem(Material.ARROW, "Previous Page", NamedTextColor.WHITE, true, "");
+		GUIUtils.setGuiNbtTag(item, "texture", "left_delve_1", mGuiTextures);
+		return item;
 	}
 
 	@Override
@@ -446,7 +474,7 @@ public class DelveCustomInventory extends CustomInventory {
 			}
 		}
 
-		if (slot == PRESET_SLOT && mPage == 0 && mDungeonName.equals("ring") && mEditableDelvePoint) {
+		if (slot == PRESET_SLOT && mPage > 0 && mDungeonName.equals("ring") && mEditableDelvePoint) {
 			DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
 			if (delvePreset != null) {
 				mPointSelected.putAll(delvePreset.mModifiers);
@@ -462,7 +490,6 @@ public class DelveCustomInventory extends CustomInventory {
 
 					List<DelvesModifier> entropyableMods = DelvesModifier.valuesList();
 					entropyableMods.remove(DelvesModifier.ENTROPY);
-					entropyableMods.remove(DelvesModifier.FRAGILE);
 					entropyableMods.removeAll(DelvesModifier.rotatingDelveModifiers());
 					entropyableMods.remove(DelvesModifier.TWISTED);
 

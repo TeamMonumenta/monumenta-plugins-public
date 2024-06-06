@@ -26,7 +26,7 @@ public class RestlessSoulsCS implements CosmeticSkill {
 
 	@Override
 	public Material getDisplayItem() {
-		return Material.VEX_SPAWN_EGG;
+		return Material.ENDER_EYE;
 	}
 
 	public void vexTick(Player player, LivingEntity vex, int ticks) {

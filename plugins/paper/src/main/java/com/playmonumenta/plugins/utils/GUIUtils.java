@@ -30,6 +30,7 @@ public class GUIUtils {
 	public static final String GUI_KEY = "Gui";
 	public static final String PLACEHOLDER_KEY = "Placeholder";
 	public static final String FILLER_KEY = "Filler";
+	public static final String GUI_TEXTURES_OBJECTIVE = "GUITextures";
 	public static final Material FILLER_MATERIAL = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
 	public static final ItemStack FILLER = createFiller();
 
@@ -340,24 +341,33 @@ public class GUIUtils {
 	}
 
 	/**
+	 * Checks if the player has the required toggle for GUI textures enabled.
+	 */
+	public static boolean getGuiTextureObjective(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, GUIUtils.GUI_TEXTURES_OBJECTIVE).orElse(1) == 1;
+	}
+
+	/**
 	 * Sets a tag in the "GUI" tag on the item. This allows resource packs to style icons differently even if the name is the same
 	 * without having to rely on lore that may change often.
 	 */
-	public static void setGuiNbtTag(ItemStack item, String tagName, @Nullable String value) {
+	public static void setGuiNbtTag(ItemStack item, String tagName, @Nullable String value, boolean active) {
 		if (value == null) {
 			return;
 		}
-		NBT.modify(item, nbt -> {
-			nbt.getOrCreateCompound(GUI_KEY).setString(tagName, value);
-		});
+		if (active) {
+			NBT.modify(item, nbt -> {
+				nbt.getOrCreateCompound(GUI_KEY).setString(tagName, value);
+			});
+		}
 	}
 
 	/**
 	 * Creates a gui identifier item. This is for the rp to apply gui texture. Other than that it works like a filler.
 	 */
-	public static ItemStack createGuiIdentifierItem(String tag) {
+	public static ItemStack createGuiIdentifierItem(String tag, boolean active) {
 		ItemStack idItem = createFiller();
-		setGuiNbtTag(idItem, "texture", tag);
+		setGuiNbtTag(idItem, "texture", tag, active);
 		return idItem;
 	}
 

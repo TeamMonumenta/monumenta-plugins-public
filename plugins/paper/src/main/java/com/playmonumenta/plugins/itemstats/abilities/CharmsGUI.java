@@ -25,28 +25,38 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CharmsGUI extends Gui {
 	private static final int START_OF_CHARMS = 45;
-	private static final ItemStack AVAILABLE_CHARM_POWER_SLOT;
-	private static final ItemStack UNAVAILABLE_CHARM_POWER_SLOT;
-	private static final ItemStack CHARM_SLOT;
+	private final ItemStack AVAILABLE_CHARM_POWER_SLOT;
+	private final ItemStack UNAVAILABLE_CHARM_POWER_SLOT;
+	private final ItemStack CHARM_SLOT;
+	private final ItemStack EXIT;
+	private final ItemStack BACK_TO_PDGUI;
+	private final boolean mGuiTextures;
 
-	static {
+	{
 		AVAILABLE_CHARM_POWER_SLOT = GUIUtils.createBasicItem(Material.YELLOW_STAINED_GLASS_PANE,
 			"Available Charm Power",
 			NamedTextColor.YELLOW,
 			"This slot can power\nadditional charms.");
-		GUIUtils.setGuiNbtTag(AVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_1");
 
 		UNAVAILABLE_CHARM_POWER_SLOT = GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE,
 			"Unlockable Charm Power",
 			NamedTextColor.RED,
 			"Progress further in the Architect's Ring to unlock more Charm Power.");
-		GUIUtils.setGuiNbtTag(UNAVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_2");
 
 		CHARM_SLOT = GUIUtils.createBasicItem(Material.YELLOW_STAINED_GLASS_PANE,
 			"Available Charm Slot",
 			NamedTextColor.YELLOW,
 			"This slot can hold a charm if you have enough charm power.");
-		GUIUtils.setGuiNbtTag(CHARM_SLOT, "texture", "slot_charms_1");
+
+		EXIT = GUIUtils.createBasicItem(Material.BARRIER,
+			"Save and Exit GUI",
+			NamedTextColor.RED,
+			true);
+
+		BACK_TO_PDGUI = GUIUtils.createBasicItem(Material.ARROW,
+			"Back to Player Details GUI",
+			NamedTextColor.GRAY,
+			true);
 	}
 
 	private final Player mTargetPlayer;
@@ -84,11 +94,19 @@ public class CharmsGUI extends Gui {
 		mMayEdit = mayEdit;
 		mCharmType = charmType;
 		mFromPDGUI = fromPDGUI;
+		mGuiTextures = GUIUtils.getGuiTextureObjective(requestingPlayer);
 	}
 
 
 	@Override
 	protected void setup() {
+		setItem(0, 8, GUIUtils.createGuiIdentifierItem("gui_charms_1", mGuiTextures));
+		GUIUtils.setGuiNbtTag(AVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_1", mGuiTextures);
+		GUIUtils.setGuiNbtTag(UNAVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_2", mGuiTextures);
+		GUIUtils.setGuiNbtTag(CHARM_SLOT, "texture", "slot_charms_1", mGuiTextures);
+		GUIUtils.setGuiNbtTag(EXIT, "texture", "exit_charms_1", mGuiTextures);
+		GUIUtils.setGuiNbtTag(BACK_TO_PDGUI, "texture", "back_charms_1", mGuiTextures);
+
 		// getOrDefault could hypothetically return a null, but present value. It won't, but it makes IntelliJ feel better I guess.
 		List<ItemStack> charms = mCharmType.mPlayerCharms.get(mTargetPlayer.getUniqueId());
 		if (charms == null) {
@@ -169,12 +187,11 @@ public class CharmsGUI extends Gui {
 		int charmPower = CharmManager.getInstance().getUsedCharmPower(mTargetPlayer, mCharmType);
 
 		{ // Charm effect indicator
-			ItemStack item = new ItemStack(Material.BOOK, Math.max(1, charmPower));
+			ItemStack summary = new ItemStack(Material.BOOK, Math.max(1, charmPower));
 
-			ItemMeta meta = item.getItemMeta();
+			ItemMeta meta = summary.getItemMeta();
 			meta.displayName(Component.text("Charm Effect Summary", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-
 
 			List<Component> lore = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(mTargetPlayer, mCharmType);
 			lore.add(Component.empty());
@@ -182,48 +199,22 @@ public class CharmsGUI extends Gui {
 			lore.add(Component.text(totalBudget + " Total Charm Power", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 			meta.lore(lore);
 
-			item.setItemMeta(meta);
-			GUIUtils.setGuiNbtTag(item, "texture", "summary_charms_1");
-			ItemUtils.setPlainTag(item);
-			setItem(9, item);
+			summary.setItemMeta(meta);
+			ItemUtils.setPlainTag(summary);
+			GUIUtils.setGuiNbtTag(summary, "texture", "summary_charms_1", mGuiTextures);
+			setItem(9, summary);
 		}
 
-		{ // Back gui button (if here from player details GUI
-			if (mFromPDGUI) {
-				ItemStack item = new ItemStack(Material.ARROW, 1);
-
-				ItemMeta meta = item.getItemMeta();
-				meta.displayName(Component.text("Back to Player Details GUI", NamedTextColor.GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-
-				item.setItemMeta(meta);
-				ItemUtils.setPlainTag(item);
-				setItem(0, item).onLeftClick(() -> {
-					this.close();
-					new PlayerDisplayCustomInventory(mPlayer, mTargetPlayer).openInventory(mPlayer, mPlugin);
-				});
-			}
+		// Back gui button (if here from player details GUI
+		if (mFromPDGUI) {
+			setItem(0, BACK_TO_PDGUI).onLeftClick(() -> {
+				this.close();
+				new PlayerDisplayCustomInventory(mPlayer, mTargetPlayer).openInventory(mPlayer, mPlugin);
+			});
 		}
 
-		{ // Resource Pack GUI (not noticeable without RP except for extra NBT tag)
-			ItemStack item = GUIUtils.createFiller(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-			GUIUtils.setGuiNbtTag(item, "texture", "gui_charms_1");
-			setItem(0, 8, item);
-		}
-
-		{ // Escape gui button
-			ItemStack item = new ItemStack(Material.BARRIER, 1);
-
-			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("Save and Exit GUI", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-
-			item.setItemMeta(meta);
-
-			GUIUtils.setGuiNbtTag(item, "texture", "exit_charms_1");
-			ItemUtils.setPlainTag(item);
-			setItem(5, 8, item).onLeftClick(this::close);
-		}
+		// Exit button
+		setItem(5, 8, EXIT).onLeftClick(this::close);
 
 		if (charmPower > totalBudget && mMayEdit && mPlayer.equals(mTargetPlayer)) {
 			for (ItemStack charm : new ArrayList<>(charms)) {

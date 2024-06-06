@@ -36,6 +36,7 @@ public class ClassDisplayCustomInventory extends Gui {
 	private PlayerClass mClass;
 	private @Nullable PlayerSpec mSpec = null;
 	private final boolean mFromPDGUI;
+	private boolean mGuiTextures;
 
 	public ClassDisplayCustomInventory(Player player) {
 		this(player, player);
@@ -69,6 +70,7 @@ public class ClassDisplayCustomInventory extends Gui {
 			return;
 		}
 		mFiller = GUIUtils.createFiller(mClass.mClassGlassFiller);
+		mGuiTextures = GUIUtils.getGuiTextureObjective(requestingPlayer);
 	}
 
 	@Override
@@ -130,7 +132,7 @@ public class ClassDisplayCustomInventory extends Gui {
 		}
 		Material newMat = getScore == 2 ? ABILITY_L2_MAT : (getScore == 1 ? ABILITY_L1_MAT : Material.STRUCTURE_VOID);
 		ItemStack item = GUIUtils.createBasicItem(newMat, "Level " + getScore, NamedTextColor.GRAY, false, "Click to view description.", NamedTextColor.DARK_GRAY);
-		GUIUtils.setGuiNbtTag(item, "Skill", ability.getDisplayName());
+		GUIUtils.setGuiNbtTag(item, "Skill", ability.getDisplayName(), mGuiTextures);
 		return createClickableItem(item, ability);
 	}
 
@@ -169,7 +171,7 @@ public class ClassDisplayCustomInventory extends Gui {
 			}
 
 			ItemStack item = GUIUtils.createBasicItem(newMat, levelString, NamedTextColor.GRAY, false, "Click to view description.", NamedTextColor.DARK_GRAY);
-			GUIUtils.setGuiNbtTag(item, "Skill", ability.getDisplayName());
+			GUIUtils.setGuiNbtTag(item, "Skill", ability.getDisplayName(), mGuiTextures);
 			return createClickableItem(item, ability);
 		}
 

@@ -76,7 +76,7 @@ public class RestlessSouls extends Ability {
 					"Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > -100% Healing. " +
 					"Melancholic Lament > 10% Weaken. Withering Gaze > Decay 1. Haunting Shades > 10% Vulnerability.")
 			.simpleDescription("Mobs that die near you spawn a vex that targets enemies, dealing damage and silencing them.")
-			.displayItem(Material.VEX_SPAWN_EGG);
+			.displayItem(Material.ENDER_EYE);
 
 
 	private final boolean mLevel;

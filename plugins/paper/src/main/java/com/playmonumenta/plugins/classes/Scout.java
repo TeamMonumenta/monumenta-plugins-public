@@ -51,7 +51,7 @@ public class Scout extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103e";
 		mSpecOne.mSpecialization = RANGER_SPEC_ID;
 		mSpecOne.mSpecName = "Ranger";
-		mSpecOne.mDisplayItem = Material.LARGE_FERN;
+		mSpecOne.mDisplayItem = Material.WHEAT;
 		mSpecOne.mDescription = "Rangers are agile experts of exploration that have unparalleled mastery of movement.";
 
 		mSpecTwo.mAbilities.add(PinningShot.INFO);
