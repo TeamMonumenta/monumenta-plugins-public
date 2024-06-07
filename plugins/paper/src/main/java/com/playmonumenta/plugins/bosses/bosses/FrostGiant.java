@@ -738,11 +738,6 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		teleport(mStartLoc);
 
-		if (event != null) {
-			event.setCancelled(true);
-			event.setReviveHealth(100);
-		}
-
 		Location loc = mBoss.getLocation().clone();
 		for (double degree = 0; degree < 360; degree += 5) {
 			double radian = Math.toRadians(degree);

@@ -51,7 +51,7 @@ public class SpellMiasma extends Spell {
 						new PercentDamageDealt(6 * 20, 0.2));
 					if (!mWarnedPlayers.contains(player)) {
 						mWarnedPlayers.add(player);
-						player.sendMessage(Component.text("BEGONE THEN! FLY AWAY LITTLE, BIRD!", NamedTextColor.LIGHT_PURPLE));
+						player.sendMessage(Component.text("BEGONE THEN! FLY AWAY LITTLE BIRD!", NamedTextColor.LIGHT_PURPLE));
 					}
 				}
 			}

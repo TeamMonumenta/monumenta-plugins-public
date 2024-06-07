@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
 import com.playmonumenta.plugins.bosses.spells.exalted.SpellAxtalGroundSurge;
 import com.playmonumenta.plugins.bosses.spells.exalted.SpellAxtalTotem;
 import com.playmonumenta.plugins.bosses.spells.exalted.SpellConditionalTpBehindPlayer;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -113,7 +115,8 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 						if (p.getLocation().distance(loc) <= r && (LocationUtils.hasLineOfSight(p.getLocation(), loc) || LocationUtils.hasLineOfSight(p.getEyeLocation(), loc))) {
 							double dist = p.getLocation().distance(loc);
 							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, maxDmg * (1 - dist / r), null, false, true, "Corruption Blast");
-							PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2, 10));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "CorruptionBlast",
+								new PercentDamageReceived(2, -1.0));
 						}
 					}
 					loc.getWorld().createExplosion(loc, 7, false, true, mBoss);
@@ -152,7 +155,8 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 						if (p.getLocation().distance(loc) <= r && (LocationUtils.hasLineOfSight(p.getLocation(), loc) || LocationUtils.hasLineOfSight(p.getEyeLocation(), loc))) {
 							double dist = p.getLocation().distance(loc);
 							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, maxDmg * (1 - dist / r), null, false, true, "Corruption Blast");
-							PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2, 10));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "CorruptionBlast",
+								new PercentDamageReceived(2, -1.0));
 						}
 					}
 					loc.getWorld().createExplosion(loc, 7, false, true, mBoss);
@@ -191,7 +195,8 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 						if (p.getLocation().distance(loc) <= r && (LocationUtils.hasLineOfSight(p.getLocation(), loc) || LocationUtils.hasLineOfSight(p.getEyeLocation(), loc))) {
 							double dist = p.getLocation().distance(loc);
 							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, maxDmg * (1 - dist / r), null, false, true, "Corruption Blast");
-							PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2, 10));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "CorruptionBlast",
+								new PercentDamageReceived(2, -1.0));
 						}
 					}
 					loc.getWorld().createExplosion(loc, 7, false, true, mBoss);
@@ -211,20 +216,19 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		));
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
-		events.put(100, mBoss -> {
-			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-				.sendMessage(Component.text("At l", NamedTextColor.DARK_RED).append(
-					Component.text("a", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
-					Component.text("st, the keys a", NamedTextColor.DARK_RED)).append(
-					Component.text("re", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
-					Component.text("... Th", NamedTextColor.DARK_RED)).append(
-					Component.text("e Nigh", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
-					Component.text("tmare... is h", NamedTextColor.DARK_RED)).append(
-					Component.text("e", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
-					Component.text("re... I can ", NamedTextColor.DARK_RED)).append(
-					Component.text("be ", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
-					Component.text("free...", NamedTextColor.DARK_RED)));
-		});
+		events.put(100, mBoss -> PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
+			.sendMessage(Component.text("At l", NamedTextColor.DARK_RED).append(
+				Component.text("a", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
+				Component.text("st, the keys a", NamedTextColor.DARK_RED)).append(
+				Component.text("re", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
+				Component.text("... Th", NamedTextColor.DARK_RED)).append(
+				Component.text("e Nigh", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
+				Component.text("tmare... is h", NamedTextColor.DARK_RED)).append(
+				Component.text("e", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
+				Component.text("re... I can ", NamedTextColor.DARK_RED)).append(
+				Component.text("be ", NamedTextColor.DARK_RED, TextDecoration.OBFUSCATED)).append(
+				Component.text("free...", NamedTextColor.DARK_RED)))
+		);
 		events.put(67, (mBoss) -> {
 			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
 				.sendMessage(Component.text("She can see us so clearly. So many eyes watching... We are nothing but a show for them...", NamedTextColor.DARK_RED));
@@ -287,6 +291,8 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 
 	private void phaseTransition(int radius, double initKBSpeed, EnumSet<Material> mIgnoredMats, SpellManager phaseChangeActive,
 	                             SpellManager activeSpells, List<Spell> passiveSpells) {
+		final String SLOWNESS_SRC = "EXCAxtalKnockAwaySlowness";
+
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		World world = mBoss.getWorld();
 		Location bossLoc = mBoss.getLocation();
@@ -298,7 +304,8 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 			double distance = player.getLocation().distance(bossLoc);
 			double speed = initKBSpeed * (1 - distance / radius);
 			MovementUtils.knockAway(mBoss.getLocation(), player, (float) speed, false);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+				new PercentSpeed(20 * 50, -0.3, SLOWNESS_SRC));
 		}
 
 		// replace blocks -> teleport to random player
@@ -334,7 +341,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		new BukkitRunnable() {
 			double mRadius = 0.0;
 			@Override public void run() {
-				List<Block> blocks = new ArrayList<Block>();
+				List<Block> blocks = new ArrayList<>();
 				// take max for preventing div by 0
 				// max radius = 32, 360 / (32 * 8)) > 1
 				// min radius = 1, 360 / 8 < 360
