@@ -180,7 +180,7 @@ public class MusicGui extends Gui {
 				addDungeonItem(1, 5, Material.LIGHT_BLUE_WOOL, Location.LIGHTBLUE, MusicPage.LIGHTBLUE, "LightBlue");
 				addDungeonItem(1, 6, Material.YELLOW_WOOL, Location.YELLOW, MusicPage.YELLOW, "Yellow");
 
-				addDungeonItem(2, 2, Material.GLASS_BOTTLE, Location.LABS, MusicPage.LABS, "Labs");
+				addDungeonItem(2, 2, Material.GLASS_BOTTLE, Location.LABS, MusicPage.LABS, "OldLab");
 				addDungeonItem(2, 3, Material.JUNGLE_LEAVES, Location.WILLOWS, MusicPage.WILLOWS, "R1Bonus");
 				addDungeonItem(2, 4, Material.FIRE_CORAL, Location.REVERIE, MusicPage.REVERIE, "Corrupted");
 				addDungeonItem(2, 5, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
