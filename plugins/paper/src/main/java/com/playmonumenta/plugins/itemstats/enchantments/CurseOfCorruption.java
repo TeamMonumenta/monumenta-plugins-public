@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -16,6 +17,8 @@ import org.bukkit.potion.PotionEffectType;
 public class CurseOfCorruption implements Enchantment {
 
 	private static List<Player> mCorruptionPlayers = new ArrayList<>();
+	private static final String SLOWNESS_SOURCE = "Curse of Corruption";
+	private static final double SLOWNESS_AMOUNT_PER_LEVEL = -0.15;
 
 	@Override
 	public String getName() {
@@ -35,12 +38,14 @@ public class CurseOfCorruption implements Enchantment {
 				if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 					plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, PotionEffect.INFINITE_DURATION, 0, true, false));
 				}
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) - 2, true, false));
+				plugin.mEffectManager.clearEffects(player, SLOWNESS_SOURCE);
+				plugin.mEffectManager.addEffect(player, SLOWNESS_SOURCE,
+					new PercentSpeed(Integer.MAX_VALUE, SLOWNESS_AMOUNT_PER_LEVEL * (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) - 1), SLOWNESS_SOURCE).displaysTime(false));
 				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, PotionEffect.INFINITE_DURATION, (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) - 1, true, false));
 			}
 		} else if (mCorruptionPlayers.remove(player)) {
+			plugin.mEffectManager.clearEffects(player, SLOWNESS_SOURCE);
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.BLINDNESS);
-			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.SLOW);
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.SLOW_DIGGING);
 		}
 	}
