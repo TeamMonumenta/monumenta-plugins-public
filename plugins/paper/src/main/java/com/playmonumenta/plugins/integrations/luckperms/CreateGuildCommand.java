@@ -66,7 +66,7 @@ import static com.playmonumenta.plugins.utils.MessagingUtils.ESCAPED_TEXT_COLOR_
 public class CreateGuildCommand {
 	private static final String[] SUGGESTIONS = {"@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13,gamemode=!spectator]"};
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"DataFlowIssue"})
 	public static void register(Plugin plugin) {
 		// guild mod create <guild name> <guild color> <guild tag> <founders>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.mod.create");
@@ -253,6 +253,10 @@ public class CreateGuildCommand {
 			guildFounderGroupData.add(InheritanceNode.builder(guildManagerGroup).build());
 			LuckPermsIntegration.GM.saveGroup(guildFounderGroup).join();
 
+			for (GuildPermission guildPermission : GuildPermission.values()) {
+				guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true);
+			}
+
 			for (Player founder : founders) {
 				User user = LuckPermsIntegration.UM.getUser(founder.getUniqueId());
 				if (user == null) {
@@ -268,19 +272,27 @@ public class CreateGuildCommand {
 
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				// Create guild chat channel
-				ChannelGlobal guildChannel = MonumentaNetworkChatIntegration.createGuildChannel(sender, guildTag, guildMemberGroupId);
-				if (guildChannel == null) {
-					sender.sendMessage(Component.text("The guild channel "
-							+ guildTag
-							+ " could not be created. The rest of the guild should be set up correctly.",
+				String chatPerm = GuildPermission.CHAT.guildPermissionString(guildRootGroup);
+				ChannelGlobal guildChannel = null;
+				if (chatPerm == null) {
+					sender.sendMessage(Component.text("Could not get chat permission for "
+							+ guildTag + ".",
 						NamedTextColor.RED));
 				} else {
-					try {
-						guildChannel.color(sender, guildColor);
-						MonumentaNetworkChatIntegration.saveChannel(guildChannel);
-					} catch (WrapperCommandSyntaxException e) {
-						sender.sendMessage(Component.text("Failed to set guild chat channel's color.",
+					guildChannel = MonumentaNetworkChatIntegration.createGuildChannel(sender, guildTag, chatPerm);
+					if (guildChannel == null) {
+						sender.sendMessage(Component.text("The guild channel "
+								+ guildTag
+								+ " could not be created. The rest of the guild should be set up correctly.",
 							NamedTextColor.RED));
+					} else {
+						try {
+							guildChannel.color(sender, guildColor);
+							MonumentaNetworkChatIntegration.saveChannel(guildChannel);
+						} catch (WrapperCommandSyntaxException e) {
+							sender.sendMessage(Component.text("Failed to set guild chat channel's color.",
+								NamedTextColor.RED));
+						}
 					}
 				}
 

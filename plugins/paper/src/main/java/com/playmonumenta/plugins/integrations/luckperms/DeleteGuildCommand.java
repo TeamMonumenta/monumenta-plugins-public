@@ -49,8 +49,8 @@ public class DeleteGuildCommand {
 					return;
 				}
 				Group guild = optGuild.get();
-				if (!LuckPermsIntegration.isModern(guild)) {
-					audience.sendMessage(Component.text("Legacy guild " + guildName + " may cannot be deleted automatically", NamedTextColor.RED));
+				if (!LuckPermsIntegration.isValidGuild(guild)) {
+					audience.sendMessage(Component.text("Invalid guild " + guildName + " may cannot be deleted automatically", NamedTextColor.RED));
 					audience.sendMessage(Component.text("The below clickables suggest commands rather than run them:", NamedTextColor.RED));
 					audience.sendMessage(Component.text("[Delete guild chat (insert guild tag into command)]", NamedTextColor.LIGHT_PURPLE)
 						.clickEvent(ClickEvent.suggestCommand("/chat channel delete ")));

@@ -196,7 +196,7 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 		Bukkit.getScheduler().runTaskAsynchronously(mPlugin, () -> {
 			try {
 				TreeMap<String, Group> sortMap = new TreeMap<>();
-				for (Group guild : LuckPermsIntegration.getGuilds(false, false).join()) {
+				for (Group guild : LuckPermsIntegration.getGuilds().join()) {
 					String guildName = LuckPermsIntegration.getNonNullGuildName(guild);
 					String sortKey = StringUtils.getNaturalSortKey(guildName);
 					sortMap.put(sortKey, guild);

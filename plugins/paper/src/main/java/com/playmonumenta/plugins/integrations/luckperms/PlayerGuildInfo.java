@@ -1,25 +1,40 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerGuildInfo {
+	private final User mUser;
+	private final @Nullable String mPlayerName;
 	private final Group mGuild;
 	private final GuildAccessLevel mAccessLevel;
 	private final GuildInviteLevel mInviteLevel;
-	private final boolean mIsLegacy;
+	private final EnumSet<GuildPermission> mGuildPermissions;
 
-	private PlayerGuildInfo(Group guild, GuildAccessLevel accessLevel, GuildInviteLevel inviteLevel, boolean isLegacy) {
+	private PlayerGuildInfo(User user,
+	                        Group guild,
+	                        GuildAccessLevel accessLevel,
+	                        GuildInviteLevel inviteLevel,
+	                        EnumSet<GuildPermission> guildPermissions) {
+		mUser = user;
+		mPlayerName = MonumentaRedisSyncIntegration.cachedUuidToName(user.getUniqueId());
 		mGuild = guild;
 		mAccessLevel = accessLevel;
 		mInviteLevel = inviteLevel;
-		mIsLegacy = isLegacy;
+		mGuildPermissions = guildPermissions;
 	}
 
 	public static CompletableFuture<PlayerGuildInfo> of(User user, Group guild) {
@@ -27,27 +42,30 @@ public class PlayerGuildInfo {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				boolean isLegacy = !LuckPermsIntegration.isModern(guild);
 				Group root;
 				GuildAccessLevel accessLevel;
 				GuildInviteLevel inviteLevel;
-				if (isLegacy) {
-					root = guild;
-					accessLevel = GuildAccessLevel.NONE;
-					inviteLevel = GuildInviteLevel.NONE;
+				EnumSet<GuildPermission> guildPermissions;
+				root = LuckPermsIntegration.getGuildRoot(guild);
+				if (root == null) {
+					throw new RuntimeException("Could not find guild root for " + guild.getName());
 				} else {
-					root = LuckPermsIntegration.getGuildRoot(guild);
-					if (root == null) {
-						root = guild;
-						isLegacy = true;
-						accessLevel = GuildAccessLevel.NONE;
-						inviteLevel = GuildInviteLevel.NONE;
-					} else {
-						accessLevel = LuckPermsIntegration.getAccessLevel(root, user);
-						inviteLevel = LuckPermsIntegration.getInviteLevel(root, user);
+					accessLevel = LuckPermsIntegration.getAccessLevel(root, user);
+					inviteLevel = LuckPermsIntegration.getInviteLevel(root, user);
+					guildPermissions = EnumSet.noneOf(GuildPermission.class);
+					for (GuildPermission guildPermission : GuildPermission.values()) {
+						if (guildPermission.hasAccess(root, user)) {
+							guildPermissions.add(guildPermission);
+						}
 					}
 				}
-				PlayerGuildInfo guildInfo = new PlayerGuildInfo(root, accessLevel, inviteLevel, isLegacy);
+				PlayerGuildInfo guildInfo = new PlayerGuildInfo(
+					user,
+					root,
+					accessLevel,
+					inviteLevel,
+					guildPermissions
+				);
 				future.complete(guildInfo);
 			} catch (Exception ex) {
 				future.completeExceptionally(ex);
@@ -89,16 +107,50 @@ public class PlayerGuildInfo {
 		if (!(o instanceof PlayerGuildInfo other)) {
 			return false;
 		}
-		return getGuild().equals(other.getGuild());
+		return mUser.equals(other.mUser)
+			&& Objects.equals(mPlayerName, other.mPlayerName)
+			&& mGuild.equals(other.mGuild)
+			&& mAccessLevel.equals(other.mAccessLevel)
+			&& mInviteLevel.equals(other.mInviteLevel);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = mGuild.hashCode();
+		int result = mUser.hashCode();
+		result = 31 * result + (mPlayerName == null ? 0 : mPlayerName.hashCode());
+		result = 31 * result + mGuild.hashCode();
 		result = 31 * result + mAccessLevel.hashCode();
 		result = 31 * result + mInviteLevel.hashCode();
-		result = 31 * result + (mIsLegacy ? 1 : 0);
 		return result;
+	}
+
+	public User getUser() {
+		return mUser;
+	}
+
+	public UUID getUniqueId() {
+		return mUser.getUniqueId();
+	}
+
+	public @Nullable String getPlayerName() {
+		return mPlayerName;
+	}
+
+	public String getNonNullName() {
+		if (mPlayerName == null) {
+			return mUser.getUniqueId().toString().toLowerCase(Locale.ROOT);
+		}
+		return mPlayerName;
+	}
+
+	public String getNameSortKey() {
+		String tempString;
+		if (mPlayerName == null) {
+			tempString = "~Z~Z~Z~" + mUser.getUniqueId().toString().toLowerCase(Locale.ROOT);
+		} else {
+			tempString = mPlayerName;
+		}
+		return StringUtils.getNaturalSortKey(tempString);
 	}
 
 	public Group getGuild() {
@@ -113,7 +165,7 @@ public class PlayerGuildInfo {
 		return mInviteLevel;
 	}
 
-	public boolean isLegacy() {
-		return mIsLegacy;
+	public EnumSet<GuildPermission> getGuildPermissions() {
+		return mGuildPermissions.clone();
 	}
 }

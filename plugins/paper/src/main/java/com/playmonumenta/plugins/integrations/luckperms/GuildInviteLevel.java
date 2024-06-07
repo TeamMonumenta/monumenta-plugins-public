@@ -86,7 +86,7 @@ public enum GuildInviteLevel {
 
 		Group root = LuckPermsIntegration.getGuildRoot(guild);
 		if (root == null) {
-			future.completeExceptionally(new Exception("Provided group is not a modern guild!"));
+			future.completeExceptionally(new Exception("Provided group is not a valid guild!"));
 			return future;
 		}
 		String rootIdWithSeparator = root.getName() + ".";

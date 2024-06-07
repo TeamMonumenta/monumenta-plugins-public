@@ -72,8 +72,8 @@ public enum GuildOrder {
 					try {
 						Group root = LuckPermsIntegration.getGuildRoot(guild);
 						if (root == null) {
-							// Legacy guild or non-guild
-							count = LuckPermsIntegration.getGroupMembers(guild).join().size();
+							// Non-guild
+							count = 0;
 						} else {
 							count = LuckPermsIntegration.getAllGuildMembers(root, true).join().size();
 						}

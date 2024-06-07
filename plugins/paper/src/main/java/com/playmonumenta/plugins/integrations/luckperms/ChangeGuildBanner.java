@@ -38,14 +38,14 @@ public class ChangeGuildBanner {
 				}
 
 				if (!(sender instanceof Player senderPlayer)) {
-					sender.sendMessage(Component.text("Guilds must be upgraded by a player", NamedTextColor.RED));
+					sender.sendMessage(Component.text("Guild banners must be updated by a player", NamedTextColor.RED));
 					return;
 				}
 
 				ItemStack guildBannerTemplate = senderPlayer.getInventory().getItemInMainHand();
 				if (!ItemUtils.isBanner(guildBannerTemplate)) {
 					senderPlayer.sendMessage(Component.text(
-						"To upgrade a guild, you must hold their banner.",
+						"To update a guild's banner, you must be holding it.",
 						NamedTextColor.RED));
 					return;
 				}

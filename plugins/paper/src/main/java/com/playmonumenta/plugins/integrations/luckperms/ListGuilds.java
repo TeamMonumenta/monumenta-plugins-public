@@ -13,7 +13,6 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.List;
 import java.util.TreeMap;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.model.group.Group;
@@ -33,22 +32,12 @@ public class ListGuilds {
 			.withArguments(new LiteralArgument("list"))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
-				run(plugin, sender, false);
-			})
-			.register();
-
-		new CommandAPICommand("guild")
-			.withArguments(new LiteralArgument("mod"))
-			.withArguments(new LiteralArgument("list"))
-			.withArguments(new LiteralArgument("legacy"))
-			.executes((sender, args) -> {
-				CommandUtils.checkPerm(sender, perms);
-				run(plugin, sender, true);
+				run(plugin, sender);
 			})
 			.register();
 	}
 
-	public static void run(Plugin plugin, CommandSender sender, boolean legacyGuilds) throws WrapperCommandSyntaxException {
+	public static void run(Plugin plugin, CommandSender sender) throws WrapperCommandSyntaxException {
 		if (ServerProperties.getShardName().contains("build")) {
 			throw CommandAPI.failWithString("This command cannot be run on the build shard.");
 		}
@@ -56,7 +45,7 @@ public class ListGuilds {
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			List<Group> guilds;
 			try {
-				guilds = LuckPermsIntegration.getGuilds(legacyGuilds, legacyGuilds).join();
+				guilds = LuckPermsIntegration.getGuilds().join();
 			} catch (Exception ex) {
 				Bukkit.getScheduler().runTask(plugin, () -> {
 					sender.sendMessage(Component.text("Unable to list guilds:", NamedTextColor.RED));
@@ -73,16 +62,8 @@ public class ListGuilds {
 						String guildSortKey = StringUtils.getNaturalSortKey(guildName + "_" + guildId);
 						Component guildEntry = Component.text(guildName)
 							.insertion(guildId);
-						if (legacyGuilds) {
-							String upgradeCommand = "/upgradeguild " + CommandUtils.quoteIfNeeded(guildId);
-							guildEntry = guildEntry
-								.hoverEvent(Component.text(upgradeCommand))
-								.insertion(upgradeCommand)
-								.clickEvent(ClickEvent.suggestCommand(upgradeCommand));
-						} else {
-							guildEntry = guildEntry
-								.hoverEvent(Component.text("Group ID: " + guildId));
-						}
+						guildEntry = guildEntry
+							.hoverEvent(Component.text("Group ID: " + guildId));
 						sortedGuildComponents.put(guildSortKey, guildEntry);
 						break;
 					}

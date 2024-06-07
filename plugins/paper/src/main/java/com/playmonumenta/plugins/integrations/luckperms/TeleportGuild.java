@@ -14,6 +14,7 @@ import java.util.Optional;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -48,6 +49,7 @@ public class TeleportGuild {
 	private static void run(Player player, @Nullable String guildName) {
 		World world = player.getWorld();
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			User user = LuckPermsIntegration.getUser(player);
 			Group group;
 
 			if (guildName == null) {
@@ -86,6 +88,18 @@ public class TeleportGuild {
 				} else {
 					Component err = Component.text("The guild " + actualGuildName
 						+ " is locked. A moderator will need to unlock the guild first.", NamedTextColor.RED);
+					player.sendMessage(err);
+					return;
+				}
+			}
+
+			if (!GuildPermission.VISIT.hasAccess(group, user)) {
+				if (player.isOp()) {
+					player.sendMessage(Component.text("The guild " + actualGuildName
+						+ " has not granted you permission to visit their plot, but your operator status lets you bypass this.", NamedTextColor.GOLD));
+				} else {
+					Component err = Component.text("The guild " + actualGuildName
+						+ " has not granted you permission to visit their plot.", NamedTextColor.RED);
 					player.sendMessage(err);
 					return;
 				}

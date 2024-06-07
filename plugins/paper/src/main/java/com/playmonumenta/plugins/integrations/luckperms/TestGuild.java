@@ -12,13 +12,13 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
 import org.bukkit.entity.Player;
 
-// TODO Legacy, update this
 public class TestGuild {
 	public static void register() {
 
-		// testguild <playername>
+		// testguild <playername> <guild name>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.testguild");
 
 		List<Argument<?>> arguments = new ArrayList<>();
@@ -36,21 +36,22 @@ public class TestGuild {
 	}
 
 	private static void run(String guildName, Player player) throws WrapperCommandSyntaxException {
-		String cleanName = GuildArguments.getIdFromName(guildName);
-		if (cleanName == null) {
+		String guildId = GuildArguments.getIdFromName(guildName);
+		if (guildId == null) {
 			throw CommandAPI.failWithString("Could not identify guild by name: " + guildName);
 		}
-		String guestPermName = GuildAccessLevel.GUEST.groupNameFromRoot(cleanName);
 
-		if (!player.hasPermission("group." + guestPermName)) {
-			throw CommandAPI.failWithString("Player '" + player.getName() + "' does not have guest access to this guild!");
+		Group guildRoot = LuckPermsIntegration.getGroup(guildId);
+		if (guildRoot == null) {
+			throw CommandAPI.failWithString("The guild " + guildName + " does not have a loaded group");
 		}
 
-		Group guestGroup = LuckPermsIntegration.getGroup(guestPermName);
-		if (guestGroup == null) {
-			throw CommandAPI.failWithString("The guild " + guildName + " does not have a loaded guest group?");
+		User user = LuckPermsIntegration.getUser(player);
+		if (!GuildPermission.VISIT.hasAccess(guildRoot, user)) {
+			throw CommandAPI.failWithString("Player '" + player.getName() + "' does not permission to visit this guild plot!");
 		}
-		if (LuckPermsIntegration.isLocked(guestGroup)) {
+
+		if (LuckPermsIntegration.isLocked(guildRoot)) {
 			throw CommandAPI.failWithString("The guild " + guildName + " is current on lockdown and cannot be entered!");
 		}
 	}

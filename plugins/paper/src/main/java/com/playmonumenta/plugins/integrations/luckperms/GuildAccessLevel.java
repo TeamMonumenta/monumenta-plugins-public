@@ -88,7 +88,7 @@ public enum GuildAccessLevel {
 
 		Group root = LuckPermsIntegration.getGuildRoot(guild);
 		if (root == null) {
-			future.completeExceptionally(new Exception("Provided group is not a modern guild!"));
+			future.completeExceptionally(new Exception("Provided group is not a valid guild!"));
 			return future;
 		}
 		String rootIdWithSeparator = root.getName() + ".";
@@ -103,6 +103,9 @@ public enum GuildAccessLevel {
 				GuildAccessLevel foundAccessLevel = GuildAccessLevel.byGroup(inheritanceNode.getGroupName());
 				if (!GuildAccessLevel.NONE.equals(foundAccessLevel)) {
 					targetData.remove(inheritanceNode);
+					for (GuildPermission guildPermission : GuildPermission.values()) {
+						guildPermission.setExplicitPermission(guild, target, null);
+					}
 				}
 			}
 		}

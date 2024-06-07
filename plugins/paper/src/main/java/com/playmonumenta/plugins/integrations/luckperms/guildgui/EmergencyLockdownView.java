@@ -4,12 +4,10 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.List;
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -260,11 +258,8 @@ public class EmergencyLockdownView extends View {
 	}
 
 	private boolean hasLockdownAccess() {
-		Group guildAccessGroup = LuckPermsIntegration.getGuild(mGui.mTargetUser);
 		return mGui.mPlayer.isOp() || (
-			guildAccessGroup != null
-				&& Objects.equals(LuckPermsIntegration.getGuildRoot(mGui.mGuildGroup), LuckPermsIntegration.getGuildRoot(guildAccessGroup))
-				&& GuildAccessLevel.byGroup(guildAccessGroup).compareTo(GuildAccessLevel.MANAGER) <= 0
+			mGui.isManager()
 				&& mGui.mPlayer.hasPermission(ACTIVATE_LOCKDOWN)
 		);
 	}

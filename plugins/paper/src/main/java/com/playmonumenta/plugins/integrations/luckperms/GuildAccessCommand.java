@@ -253,6 +253,9 @@ public class GuildAccessCommand {
 
 				if (inheritanceNode.getGroupName().equals(targetAccessGroupId)) {
 					targetData.remove(node);
+					for (GuildPermission guildPermission : GuildPermission.values()) {
+						guildPermission.setExplicitPermission(guildRoot, target, null);
+					}
 				}
 			}
 

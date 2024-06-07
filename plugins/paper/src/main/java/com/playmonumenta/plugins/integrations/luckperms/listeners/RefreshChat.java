@@ -187,7 +187,7 @@ public class RefreshChat {
 			Group accessLevelGroup = LuckPermsIntegration.getGuild(user);
 			Group guildRoot = LuckPermsIntegration.getGuildRoot(accessLevelGroup);
 			if (guildRoot == null) {
-				// Player is not in a modern guild
+				// Player is not in a valid guild
 				continue;
 			}
 			Group memberGroup = GuildAccessLevel.MEMBER.getLoadedGroupFromRoot(guildRoot);

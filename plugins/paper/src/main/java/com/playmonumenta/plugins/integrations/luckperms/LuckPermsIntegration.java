@@ -168,7 +168,7 @@ public class LuckPermsIntegration implements Listener {
 		TeleportGuildGui.register(plugin);
 		TestGuild.register();
 		TransferLPPermissions.register(plugin);
-		UpgradeGuild.register(plugin);
+		UpdateGuilds.register(plugin);
 
 		EventBus eventBus = LP.getEventBus();
 		GuildArguments.registerLuckPermsEvents(plugin, eventBus);
@@ -218,28 +218,16 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	public static CompletableFuture<List<Group>> getGuilds() {
-		return getGuilds(false, false);
-	}
-
-	public static CompletableFuture<List<Group>> getGuilds(boolean includeLegacy, boolean onlyLegacy) {
 		CompletableFuture<List<Group>> result = new CompletableFuture<>();
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				String targetMetaKey = includeLegacy ? GUILD_MEMBER_GUILD_NAME_MK : GUILD_MEMBER_ROOT_ID_MK;
 				Map<String, Collection<MetaNode>> guildNodeMatches
-					= GM.searchAll(NodeMatcher.metaKey(targetMetaKey)).join();
+					= GM.searchAll(NodeMatcher.metaKey(GUILD_MEMBER_ROOT_ID_MK)).join();
 
 				List<Group> groups = new ArrayList<>();
 				for (Map.Entry<String, Collection<MetaNode>> guildMatch : guildNodeMatches.entrySet()) {
 					String guildId = guildMatch.getKey();
-					Optional<Group> optGroup = GM.loadGroup(guildId).join();
-					if (optGroup.isPresent()) {
-						Group group = optGroup.get();
-						if (onlyLegacy && isModern(group)) {
-							continue;
-						}
-						groups.add(group);
-					}
+					GM.loadGroup(guildId).join().ifPresent(groups::add);
 				}
 				result.complete(groups);
 			} catch (Exception ex) {
@@ -320,7 +308,7 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	@Contract("null -> false")
-	public static boolean isModern(@Nullable Group guild) {
+	public static boolean isValidGuild(@Nullable Group guild) {
 		return getGuildRoot(guild) != null;
 	}
 
@@ -467,15 +455,21 @@ public class LuckPermsIntegration implements Listener {
 		return null;
 	}
 
+	public static @Nullable String getGuildPartialId(Group group) {
+		String guildPlainTag = getGuildPlainTag(group);
+		if (guildPlainTag == null) {
+			return null;
+		}
+		return getGuildPartialIdFromPlainTag(guildPlainTag);
+	}
+
+	public static String getGuildPartialIdFromPlainTag(String guildPlainTag) {
+		return getCleanLpString(guildPlainTag);
+	}
+
 	public static @Nullable String getRawGuildName(Group group) {
 		Group guildRoot = getGuildRoot(group);
 		if (guildRoot == null) {
-			// Legacy guild
-			for (MetaNode node : group.resolveInheritedNodes(NodeType.META, QueryOptions.nonContextual())) {
-				if (node.getMetaKey().equals(GUILD_MEMBER_GUILD_NAME_MK)) {
-					return node.getMetaValue();
-				}
-			}
 			return null;
 		}
 		for (MetaNode node : guildRoot.resolveInheritedNodes(NodeType.META, QueryOptions.nonContextual())) {
@@ -489,13 +483,7 @@ public class LuckPermsIntegration implements Listener {
 	public static String getNonNullGuildName(Group group) {
 		Group guildRoot = getGuildRoot(group);
 		if (guildRoot == null) {
-			// Legacy guild
-			for (MetaNode node : group.resolveInheritedNodes(NodeType.META, QueryOptions.nonContextual())) {
-				if (node.getMetaKey().equals(GUILD_MEMBER_GUILD_NAME_MK)) {
-					return node.getMetaValue() + " <Guild is legacy and needs updating>";
-				}
-			}
-			return group.getName() + " <Guild is legacy and needs updating>";
+			return group.getName() + " <Guild is invalid (no guild root found)>";
 		}
 		for (MetaNode node : guildRoot.resolveInheritedNodes(NodeType.META, QueryOptions.nonContextual())) {
 			if (node.getMetaKey().equals(GUILD_ROOT_NAME_MK)) {
@@ -520,33 +508,6 @@ public class LuckPermsIntegration implements Listener {
 		}
 
 		Component guildTag;
-		if (guildColor == null) {
-			// Legacy guild - preview upgrade without performing upgrade
-			for (Node node : guild.getNodes()) {
-				if (node instanceof PrefixNode thePrefixNode) {
-					String prefixTag = thePrefixNode.getMetaValue();
-					if (prefixTag.length() < 7 || !prefixTag.startsWith("#")) {
-						if (!prefixTag.isEmpty()) {
-							guildColor = MessagingUtils.colorByHexit(prefixTag.charAt(0));
-							if (guildColor == null) {
-								guildPlainTag = prefixTag.substring(1);
-							} else {
-								guildPlainTag = prefixTag;
-							}
-						}
-					} else {
-						guildPlainTag = prefixTag.substring(7);
-						String guildColorString = prefixTag.substring(0, 7);
-						guildColor = TextColor.fromHexString(guildColorString);
-					}
-				} else if (node instanceof MetaNode metaNode) {
-					if (metaNode.getMetaKey().equals(GUILD_MEMBER_GUILD_NAME_MK)) {
-						guildName = Component.text(metaNode.getMetaValue());
-					}
-				}
-			}
-		}
-
 		if (guildColor == null) {
 			guildTag = Component.text(guildPlainTag);
 		} else {
@@ -580,10 +541,40 @@ public class LuckPermsIntegration implements Listener {
 		return guildName;
 	}
 
+	public static Component getGroupDescription(@Nullable Group group) {
+		if (group == null) {
+			return Component.text("None");
+		}
+
+		Group guildRoot = getGuildRoot(group);
+		if (guildRoot == null) {
+			return Component.text(group.getFriendlyName());
+		}
+
+		Component guildComponent = getGuildFullComponent(guildRoot);
+
+		GuildAccessLevel accessLevel = GuildAccessLevel.byGroup(group);
+		if (!GuildAccessLevel.NONE.equals(accessLevel)) {
+			return guildComponent
+				.append(Component.space())
+				.append(Component.text(accessLevel.mLabel));
+		}
+
+		GuildInviteLevel inviteLevel = GuildInviteLevel.byGroup(group);
+		if (!GuildInviteLevel.NONE.equals(inviteLevel)) {
+			return guildComponent
+				.append(Component.text(" ("))
+				.append(Component.text(inviteLevel.mDescription))
+				.append(Component.text(")"));
+		}
+
+		return guildComponent;
+	}
+
 	public static void setGuildTp(CommandSender sender, Group group, Plugin plugin, Location loc) {
 		Group root = getGuildRoot(group);
 		if (root == null) {
-			sender.sendMessage(Component.text("Specified group is not a modern guild", NamedTextColor.RED));
+			sender.sendMessage(Component.text("Specified group is not a valid guild (no guild root found)", NamedTextColor.RED));
 			return;
 		}
 
@@ -851,7 +842,7 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	public static String getGuildId(String plainGuildTag) {
-		return "guild." + LuckPermsIntegration.getCleanLpString(plainGuildTag);
+		return GUILD_MK + "." + LuckPermsIntegration.getCleanLpString(plainGuildTag);
 	}
 
 	public static String getCleanLpString(String lpString) {
@@ -986,12 +977,19 @@ public class LuckPermsIntegration implements Listener {
 		}
 	}
 
+	public static ItemStack getErrorQuestionMarkPlayerHead() {
+		ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
+		meta.setPlayerProfile(ERROR_QUESTION_MARK_PLAYER_PROFILE);
+		playerHead.setItemMeta(meta);
+		return playerHead;
+	}
+
 	public static ItemStack getGuildBanner(Group guild) {
 		Group group = getGuildRoot(guild);
 		if (group == null) {
-			ItemStack notAGuild = new ItemStack(Material.PLAYER_HEAD);
-			SkullMeta meta = (SkullMeta) notAGuild.getItemMeta();
-			meta.setPlayerProfile(ERROR_QUESTION_MARK_PLAYER_PROFILE);
+			ItemStack notAGuild = getErrorQuestionMarkPlayerHead();
+			ItemMeta meta = notAGuild.getItemMeta();
 			meta.displayName(Component.text("[no guild banner set]",
 					NamedTextColor.RED,
 					TextDecoration.BOLD)
@@ -1492,7 +1490,7 @@ public class LuckPermsIntegration implements Listener {
 
 	public static void updatePlayerGuildChat(Player player) {
 		Group guild = getGuild(player);
-		if (isModern(guild)) {
+		if (isValidGuild(guild)) {
 			String plainTag = getGuildPlainTag(guild);
 			if (plainTag == null) {
 				return;

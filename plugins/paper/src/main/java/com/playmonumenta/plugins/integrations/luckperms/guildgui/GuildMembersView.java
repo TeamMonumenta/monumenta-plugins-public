@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.integrations.luckperms.guildgui;
 
-import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.GuildInviteLevel;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.PlayerGuildInfo;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,12 +14,12 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
 public class GuildMembersView extends View {
 	protected static final int PAGE_START_X = 1;
@@ -37,8 +36,8 @@ public class GuildMembersView extends View {
 		GuildInviteLevel.GUEST_INVITE
 	);
 
-	protected TreeMap<GuildAccessLevel, List<String>> mGuildPlayers = new TreeMap<>();
-	protected TreeMap<GuildInviteLevel, List<String>> mGuildInvites = new TreeMap<>();
+	protected TreeMap<GuildAccessLevel, List<PlayerGuildInfo>> mGuildPlayers = new TreeMap<>();
+	protected TreeMap<GuildInviteLevel, List<PlayerGuildInfo>> mGuildInvites = new TreeMap<>();
 
 	public GuildMembersView(GuildGui gui) {
 		super(gui);
@@ -57,8 +56,8 @@ public class GuildMembersView extends View {
 		int totalRows = 0;
 
 		TreeMap<Integer, GuildAccessLevel> accessStartIndices = new TreeMap<>();
-		for (Map.Entry<GuildAccessLevel, List<String>> accessLevelEntry : mGuildPlayers.entrySet()) {
-			List<String> playerList = accessLevelEntry.getValue();
+		for (Map.Entry<GuildAccessLevel, List<PlayerGuildInfo>> accessLevelEntry : mGuildPlayers.entrySet()) {
+			List<PlayerGuildInfo> playerList = accessLevelEntry.getValue();
 
 			GuildAccessLevel accessLevel = accessLevelEntry.getKey();
 			accessStartIndices.put(totalRows * PAGE_WIDTH, accessLevel);
@@ -66,8 +65,8 @@ public class GuildMembersView extends View {
 		}
 
 		TreeMap<Integer, GuildInviteLevel> inviteStartIndices = new TreeMap<>();
-		for (Map.Entry<GuildInviteLevel, List<String>> inviteLevelEntry : mGuildInvites.entrySet()) {
-			List<String> inviteList = inviteLevelEntry.getValue();
+		for (Map.Entry<GuildInviteLevel, List<PlayerGuildInfo>> inviteLevelEntry : mGuildInvites.entrySet()) {
+			List<PlayerGuildInfo> inviteList = inviteLevelEntry.getValue();
 
 			GuildInviteLevel inviteLevel = inviteLevelEntry.getKey();
 			inviteStartIndices.put(totalRows * PAGE_WIDTH, inviteLevel);
@@ -93,11 +92,11 @@ public class GuildMembersView extends View {
 					GuildInviteLevel inviteLevel = inviteIndexLevelPair.getValue();
 
 					if (relativeIndex == 0 || (y == 0 && x == 0)) {
-						setInviteHeaderItem(y, inviteLevel);
+						setInviteHeaderIcon(y, inviteLevel);
 					}
 
-					List<String> inviteLevelPlayers = mGuildInvites.computeIfAbsent(inviteLevel, k -> new ArrayList<>());
-					setPlayerIcon(x, y, relativeIndex, inviteLevelPlayers);
+					List<PlayerGuildInfo> inviteLevelPlayers = mGuildInvites.computeIfAbsent(inviteLevel, k -> new ArrayList<>());
+					mGui.setPlayerIcon(PAGE_START_Y + y, PAGE_START_X + x, relativeIndex, inviteLevelPlayers);
 
 					continue;
 				}
@@ -108,11 +107,11 @@ public class GuildMembersView extends View {
 				GuildAccessLevel accessLevel = accessIndexLevelPair.getValue();
 
 				if (relativeIndex == 0 || (y == 0 && x == 0)) {
-					setAccessHeaderItem(y, accessLevel);
+					setAccessHeaderIcon(y, accessLevel);
 				}
 
-				List<String> accessLevelPlayers = mGuildPlayers.computeIfAbsent(accessLevel, k -> new ArrayList<>());
-				setPlayerIcon(x, y, relativeIndex, accessLevelPlayers);
+				List<PlayerGuildInfo> accessLevelPlayers = mGuildPlayers.computeIfAbsent(accessLevel, k -> new ArrayList<>());
+				mGui.setPlayerIcon(PAGE_START_Y + y, PAGE_START_X + x, relativeIndex, accessLevelPlayers);
 			}
 		}
 	}
@@ -126,14 +125,21 @@ public class GuildMembersView extends View {
 				return;
 			}
 
-			TreeMap<GuildAccessLevel, List<String>> guildPlayers = new TreeMap<>();
+			TreeMap<GuildAccessLevel, List<PlayerGuildInfo>> guildPlayers = new TreeMap<>();
 			for (GuildAccessLevel accessLevel : GUILD_ACCESS_LEVELS) {
-				List<String> sortedPlayers;
+				List<PlayerGuildInfo> sortedPlayers;
 
 				try {
 					Collection<UUID> playerUuids
 						= LuckPermsIntegration.getGuildMembers(mGui.mGuildGroup, accessLevel).join();
-					sortedPlayers = PlayerUtils.sortedPlayerNamesFromUuids(playerUuids);
+					Map<String, PlayerGuildInfo> playerSortingMap = new TreeMap<>();
+					for (UUID playerUuid : playerUuids) {
+						User user = LuckPermsIntegration.loadUser(playerUuid).join();
+						PlayerGuildInfo playerGuildInfo = PlayerGuildInfo.of(user, mGui.mGuildGroup).join();
+						String sortKey = playerGuildInfo.getNameSortKey();
+						playerSortingMap.put(sortKey, playerGuildInfo);
+					}
+					sortedPlayers = new ArrayList<>(playerSortingMap.values());
 				} catch (Exception ex) {
 					Bukkit.getScheduler().runTask(mGui.mMainPlugin, () -> {
 						mGui.mPlayer.sendMessage(Component.text("Failed to get guild " + accessLevel.mId + ":",
@@ -145,14 +151,21 @@ public class GuildMembersView extends View {
 				guildPlayers.put(accessLevel, sortedPlayers);
 			}
 
-			TreeMap<GuildInviteLevel, List<String>> guildInvites = new TreeMap<>();
+			TreeMap<GuildInviteLevel, List<PlayerGuildInfo>> guildInvites = new TreeMap<>();
 			for (GuildInviteLevel inviteLevel : GUILD_INVITE_LEVELS) {
-				List<String> sortedInvites;
+				List<PlayerGuildInfo> sortedInvites;
 
 				try {
 					Collection<UUID> playerUuids
 						= LuckPermsIntegration.getGuildInvites(mGui.mGuildGroup, inviteLevel).join();
-					sortedInvites = PlayerUtils.sortedPlayerNamesFromUuids(playerUuids);
+					Map<String, PlayerGuildInfo> playerSortingMap = new TreeMap<>();
+					for (UUID playerUuid : playerUuids) {
+						User user = LuckPermsIntegration.loadUser(playerUuid).join();
+						PlayerGuildInfo playerGuildInfo = PlayerGuildInfo.of(user, mGui.mGuildGroup).join();
+						String sortKey = playerGuildInfo.getNameSortKey();
+						playerSortingMap.put(sortKey, playerGuildInfo);
+					}
+					sortedInvites = new ArrayList<>(playerSortingMap.values());
 				} catch (Exception ex) {
 					Bukkit.getScheduler().runTask(mGui.mMainPlugin, () -> {
 						mGui.mPlayer.sendMessage(Component.text("Failed to get guild " + inviteLevel.mId + ":",
@@ -172,99 +185,11 @@ public class GuildMembersView extends View {
 		});
 	}
 
-	private void setAccessHeaderItem(int pageY, GuildAccessLevel accessLevel) {
-		Material material;
-		Component name;
-		List<Component> lore = new ArrayList<>();
-		switch (accessLevel) {
-			case FOUNDER -> {
-				material = Material.NETHERITE_HELMET;
-				name = Component.text("Founder", NamedTextColor.DARK_GRAY);
-			}
-			case MANAGER -> {
-				material = Material.DIAMOND_HELMET;
-				name = Component.text("Manager", NamedTextColor.AQUA);
-			}
-			case MEMBER -> {
-				material = Material.GOLDEN_HELMET;
-				name = Component.text("Member", NamedTextColor.GOLD);
-			}
-			case GUEST -> {
-				material = Material.IRON_HELMET;
-				name = Component.text("Guest", NamedTextColor.GRAY);
-			}
-			default -> {
-				material = Material.LEATHER_HELMET;
-				name = Component.text("None?", NamedTextColor.BLACK);
-			}
-		}
-		switch (accessLevel) {
-			case FOUNDER:
-				lore.add(
-					Component.text("Founders may:", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May promote and demote", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  members to managers", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May promote but not demote", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  members to founders", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				// fall through
-			case MANAGER:
-				lore.add(
-					Component.text("Managers and up may:", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May add and remove", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  guests and members", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May lock the guild until", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  a moderator is available", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				// fall through
-			case MEMBER:
-				lore.add(
-					Component.text("Members and up may:", NamedTextColor.GOLD)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May talk in guild chat", NamedTextColor.GOLD)
-						.decoration(TextDecoration.ITALIC, false));
-				// fall through
-			case GUEST:
-				lore.add(
-					Component.text("Guests and up may:", NamedTextColor.GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May visit the guild", NamedTextColor.GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				break;
-			default:
-				lore.add(Component.text("- This should not appear!", NamedTextColor.RED)
-					.decoration(TextDecoration.ITALIC, false));
-		}
-
-		ItemStack item = new ItemStack(material);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(name.decoration(TextDecoration.ITALIC, false));
-		meta.lore(lore);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(meta);
-
-		mGui.setItem(PAGE_START_Y + pageY, GuildGui.ROW_LABEL_X, item);
+	private void setAccessHeaderIcon(int pageY, GuildAccessLevel accessLevel) {
+		mGui.setAccessHeaderIcon(PAGE_START_Y + pageY, GuildGui.ROW_LABEL_X, accessLevel);
 	}
 
-	private void setInviteHeaderItem(int pageY, GuildInviteLevel inviteLevel) {
+	private void setInviteHeaderIcon(int pageY, GuildInviteLevel inviteLevel) {
 		Material material;
 		Component name;
 		List<Component> lore = new ArrayList<>();
@@ -306,46 +231,5 @@ public class GuildMembersView extends View {
 		item.setItemMeta(meta);
 
 		mGui.setItem(PAGE_START_Y + pageY, GuildGui.ROW_LABEL_X, item);
-	}
-
-	private void setPlayerIcon(int x, int y, int relativeIndex, List<String> players) {
-		ItemStack item;
-		ItemMeta meta;
-
-		if (relativeIndex >= players.size()) {
-			return;
-		}
-		String playerName = players.get(relativeIndex);
-
-		boolean nameIsUnknown;
-		UUID playerUuid;
-		try {
-			playerUuid = UUID.fromString(playerName);
-			nameIsUnknown = true;
-		} catch (IllegalArgumentException unused) {
-			playerUuid = MonumentaRedisSyncIntegration.cachedNameToUuid(playerName);
-			nameIsUnknown = false;
-		}
-		if (playerUuid == null) {
-			item = new ItemStack(Material.BARRIER);
-			meta = item.getItemMeta();
-			meta.displayName(Component.text("Could not look up UUID for " + playerName, NamedTextColor.RED)
-				.decoration(TextDecoration.ITALIC, false));
-			item.setItemMeta(meta);
-			mGui.setItem(y + PAGE_START_Y, x + PAGE_START_X, item);
-			return;
-		}
-
-		item = new ItemStack(Material.PLAYER_HEAD);
-		meta = item.getItemMeta();
-		if (meta instanceof SkullMeta skullMeta) {
-			if (nameIsUnknown) {
-				skullMeta.setPlayerProfile(Bukkit.createProfile(playerUuid, playerUuid.toString()));
-			} else {
-				skullMeta.setPlayerProfile(Bukkit.createProfile(playerUuid, playerName));
-			}
-		}
-		item.setItemMeta(meta);
-		mGui.setItem(PAGE_START_Y + y, PAGE_START_X + x, item);
 	}
 }

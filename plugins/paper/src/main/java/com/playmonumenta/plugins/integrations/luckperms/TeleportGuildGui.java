@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -137,7 +138,7 @@ public class TeleportGuildGui extends Gui {
 			guildOrderLore.add(
 				Component.text("", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false)
-					.append(Component.keybind(Constants.Keybind.hotbar(i).asKeybind()))
+					.append(Component.keybind(Constants.Keybind.hotbar(i)))
 					.append(Component.text(": " + orders[i].mName)));
 		}
 
@@ -199,8 +200,9 @@ public class TeleportGuildGui extends Gui {
 		item.setItemMeta(meta);
 		setItem(row, column, new GuiItem(item, false))
 			.onClick((InventoryClickEvent event) -> {
-				if (!mPlayer.hasPermission("group." + guild.getName())) {
-					mPlayer.sendMessage(Component.text("You no longer have access to that guild.", NamedTextColor.RED));
+				if (!GuildPermission.VISIT.hasAccess(guild, mPlayerUser)) {
+					mPlayer.sendMessage(Component.text("You no longer have access to that guild's plot.", NamedTextColor.RED));
+					refresh();
 					return;
 				}
 
@@ -289,9 +291,12 @@ public class TeleportGuildGui extends Gui {
 
 			List<PlayerGuildInfo> guilds = mOrder.sortGuilds(
 				PlayerGuildInfo.ofCollection(
-					mPlayerUser,
-					LuckPermsIntegration.getRelevantGuilds(mPlayerUser, true, false)
-				).join()
+						mPlayerUser,
+						LuckPermsIntegration.getRelevantGuilds(mPlayerUser, true, false)
+					).join()
+					.stream()
+					.filter(playerGuildInfo -> playerGuildInfo.getGuildPermissions().contains(GuildPermission.VISIT))
+					.collect(Collectors.toList())
 			).join();
 
 			Group mainGuild = LuckPermsIntegration.getGuild(mPlayerUser);

@@ -43,6 +43,7 @@ public class RenameGuild {
 
 	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.guild.mod.renameguild");
 
+	@SuppressWarnings("DataFlowIssue")
 	public static CommandAPICommand attach(Plugin plugin, CommandAPICommand rootCommand) {
 		CommandAPICommand tagSubCommand = new CommandAPICommand("tag")
 			.withArguments(List.of(
@@ -283,7 +284,13 @@ public class RenameGuild {
 			LuckPermsIntegration.pushUpdate();
 
 			// Update channel
-			Channel channel = MonumentaNetworkChatIntegration.transferGuildChannel(sender, oldTag, newTag, memberGroupId);
+			String chatPerm = GuildPermission.CHAT.guildPermissionString(newRoot);
+			if (chatPerm == null) {
+				future.complete(Component.text("Could not identify chat permission.",
+					NamedTextColor.RED));
+				return;
+			}
+			Channel channel = MonumentaNetworkChatIntegration.transferGuildChannel(sender, oldTag, newTag, chatPerm);
 			if (channel == null) {
 				future.complete(Component.text("Could not update guild channel as it does not exist.",
 					NamedTextColor.RED));

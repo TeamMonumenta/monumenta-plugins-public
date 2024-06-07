@@ -65,7 +65,7 @@ public class AllGuildsView extends View {
 				List<PlayerGuildInfo> guilds = mOrder.sortGuilds(
 					PlayerGuildInfo.ofCollection(
 						user,
-						LuckPermsIntegration.getGuilds(true, false).join()
+						LuckPermsIntegration.getGuilds().join()
 					).join()
 				).join();
 

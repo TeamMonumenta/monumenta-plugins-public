@@ -22,7 +22,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-// TODO Make an actual API to hook this into, rather than running commands
 public class MonumentaNetworkChatIntegration {
 	private static boolean ENABLED = false;
 
@@ -39,13 +38,13 @@ public class MonumentaNetworkChatIntegration {
 		RemotePlayerManager.refreshLocalPlayer(player);
 	}
 
-	public static @Nullable ChannelGlobal createGuildChannel(CommandSender sender, String guildTag, String cleanGuildName) {
+	public static @Nullable ChannelGlobal createGuildChannel(CommandSender sender, String guildTag, String permission) {
 		if (!ENABLED) {
 			return null;
 		}
 
 		ChannelGlobal channel = new ChannelGlobal(guildTag);
-		channel.setChannelPermission("group." + cleanGuildName);
+		channel.setChannelPermission(permission);
 		try {
 			ChannelManager.registerNewChannel(sender, channel);
 			return channel;
@@ -56,7 +55,7 @@ public class MonumentaNetworkChatIntegration {
 		}
 	}
 
-	public static @Nullable Channel transferGuildChannel(Audience audience, String oldGuildTag, String newGuildTag, String newCleanGuildName) {
+	public static @Nullable Channel transferGuildChannel(Audience audience, String oldGuildTag, String newGuildTag, String permission) {
 		if (!ENABLED) {
 			return null;
 		}
@@ -65,7 +64,7 @@ public class MonumentaNetworkChatIntegration {
 		try {
 			if (channel instanceof ChannelPermissionNode permissionNode) {
 				ChannelManager.renameChannel(oldGuildTag, newGuildTag);
-				permissionNode.setChannelPermission("group." + newCleanGuildName);
+				permissionNode.setChannelPermission(permission);
 
 				saveChannel(channel);
 				return channel;
@@ -143,6 +142,12 @@ public class MonumentaNetworkChatIntegration {
 
 	public static void unloadChannel(Channel channel) {
 		ChannelManager.unloadChannel(channel);
+	}
+
+	public static void setChannelPermission(Channel channel, String permission) {
+		if (channel instanceof ChannelPermissionNode permissionNode) {
+			permissionNode.setChannelPermission(permission);
+		}
 	}
 
 	public static void saveChannel(Channel channel) {

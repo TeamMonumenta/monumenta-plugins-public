@@ -82,7 +82,7 @@ public class BulkGuildBanners {
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			List<Group> guilds;
 			try {
-				guilds = LuckPermsIntegration.getGuilds(false, false).join();
+				guilds = LuckPermsIntegration.getGuilds().join();
 			} catch (Exception ex) {
 				Bukkit.getScheduler().runTask(plugin, () -> {
 					sender.sendMessage(Component.text("Unable to list guilds:", NamedTextColor.RED));
