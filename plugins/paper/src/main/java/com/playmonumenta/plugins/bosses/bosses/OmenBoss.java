@@ -30,6 +30,8 @@ public class OmenBoss extends BossAbilityGroup {
 		public String SPELL_NAME = "Omen";
 		@BossParam(help = "telegraph duration in ticks")
 		public int TEL_DURATION = 20 * 2;
+		@BossParam(help = "telegraph interval in ticks (Only used if instant is set to true)")
+		public int TEL_INTERVAL = 4;
 		@BossParam(help = "max range of the ground lines")
 		public double MAX_RANGE = 24;
 		@BossParam(help = "width of the omen")
@@ -70,6 +72,10 @@ public class OmenBoss extends BossAbilityGroup {
 		public double PARTICLE_GAP = 1.0;
 		@BossParam(help = "particle gap but for tel")
 		public double PARTICLE_GAP_TEL = 1.0;
+		@BossParam(help = "size of the center safe spot, in percent. Default: 1.0")
+		public double SAFESPOT_SIZE = 1.0;
+		@BossParam(help = "whether the telegraph and attack are instant rather than having travel time")
+		public boolean INSTANT = false;
 		@BossParam(help = "whether boss can move during the cast")
 		public boolean CAN_MOVE = true;
 		@BossParam(help = "whether the omen will be directed at a player")
@@ -131,7 +137,7 @@ public class OmenBoss extends BossAbilityGroup {
 
 					@Override
 					public void run() {
-						if (mT == 0) {
+						if ((!p.INSTANT && mT == 0) || (p.INSTANT && mT % p.TEL_INTERVAL == 0 && mT < p.TEL_DURATION)) {
 							mBasevec.add(new Vector(0, 0, 1 + p.BLADE_HEAD_OFFSET));
 							mBasevec.add(new Vector(-4, 0, -2 - p.BLADE_TAIL_OFFSET).normalize());
 							mBasevec.add(new Vector(4, 0, -2 - p.BLADE_TAIL_OFFSET).normalize());
@@ -181,32 +187,54 @@ public class OmenBoss extends BossAbilityGroup {
 					//spawn loc shift up by y offset
 					Vector dir = vec.get(0);
 
-					Location startLoc = mBoss.getLocation().add(0, p.HEIGHT_OFFSET, 0).add(dir);
+					Location startLoc = mBoss.getLocation().add(0, p.HEIGHT_OFFSET, 0).add(dir.clone().multiply(p.SAFESPOT_SIZE));
 					//launch blade tip
-					new BukkitRunnable() {
+					if (p.INSTANT) {
 						int mT = 0;
+						moveBlade(mT, startLoc, dir, warning, vec);
+					} else {
+						new BukkitRunnable() {
+							int mT = 0;
 
-						@Override
-						public void run() {
-							mT++;
-							Location anchor;
-							//iterate twice for higher accuracy
-							for (int x = 0; x < 2; x++) {
-								anchor = startLoc.clone().add(dir.clone().multiply(p.VELOCITY / 20 * (mT + 0.5 * x)));
-								if (anchor.distance(startLoc) > p.MAX_RANGE) {
-									this.cancel();
+							@Override
+							public void run() {
+								mT++;
+								Location anchor;
+								//iterate twice for higher accuracy
+								for (int x = 0; x < 2; x++) {
+									anchor = startLoc.clone().add(dir.clone().multiply(p.VELOCITY / 20 * (mT + 0.5 * x)));
+									if (anchor.distance(startLoc) > p.MAX_RANGE) {
+										this.cancel();
+									}
+									//play sounds
+									if (mT % 4 == 0) {
+										p.SOUND_WAVE.play(anchor);
+									}
+									//construct blade
+									createBlade(anchor, startLoc, vec, warning);
 								}
-								//play sounds
-								if (mT % 4 == 0) {
-									p.SOUND_WAVE.play(anchor);
-								}
-								//construct blade
-								createBlade(anchor, startLoc, vec, warning);
 							}
+
+						}.runTaskTimer(mPlugin, 0, 1);
+					}
+
+				}
+			}
+
+			public void moveBlade(int mT, Location startLoc, Vector dir, boolean warning, List<Vector> vec) {
+				Location anchor = startLoc.clone();
+				while (anchor.distance(startLoc) < p.MAX_RANGE) {
+					mT++;
+					//iterate twice for higher accuracy
+					for (int x = 0; x < 2; x++) {
+						anchor = startLoc.clone().add(dir.clone().multiply(p.VELOCITY / 20 * (mT + 0.5 * x)));
+						//play sounds
+						if (mT % 4 == 0) {
+							p.SOUND_WAVE.play(anchor);
 						}
-
-					}.runTaskTimer(mPlugin, 0, 1);
-
+						//construct blade
+						createBlade(anchor, startLoc, vec, warning);
+					}
 				}
 			}
 
