@@ -24,6 +24,8 @@ public class SpellThrowSummon extends Spell {
 
 	private final int mMobCapRange;
 	private final int mMobCap;
+	private final String mMobCapName;
+	private final boolean mCapMobsByName;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final EntityTargets mTargets;
@@ -46,7 +48,7 @@ public class SpellThrowSummon extends Spell {
 	public SpellThrowSummon(Plugin plugin, LivingEntity boss, EntityTargets targets, int lobs, int cooldownTicks,
 							String summonName, boolean fromPool, int lobDelay, double heightOffset, float yVelocity,
 							double variance, double yVariance, double distanceScalar,
-							int mobCapRange, int mobCap, boolean removeOnDeath,
+							int mobCapRange, int mobCap, boolean capMobByName, String mobCapName, boolean removeOnDeath,
 							ParticlesList particles, SoundsList sounds) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -64,6 +66,8 @@ public class SpellThrowSummon extends Spell {
 		mDistanceScalar = distanceScalar;
 		mMobCapRange = mobCapRange;
 		mMobCap = mobCap;
+		mCapMobsByName = capMobByName;
+		mMobCapName = mobCapName;
 		mRemoveOnDeath = removeOnDeath;
 
 		mThrowParticle = particles;
@@ -176,8 +180,23 @@ public class SpellThrowSummon extends Spell {
 
 	@Override
 	public boolean canRun() {
-		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap || mTargets.getTargetsList(mBoss).isEmpty()) {
-			return false;
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange);
+		int mobCount = 0;
+		for (LivingEntity mob : nearbyMobs) {
+			if (mob.getName().equals(mMobCapName)) {
+				mobCount++;
+			}
+		}
+
+		if (mCapMobsByName) {
+			if (mobCount >= mMobCap
+				|| mTargets.getTargetsList(mBoss).isEmpty()) {
+				return false;
+			}
+		} else {
+			if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap || mTargets.getTargetsList(mBoss).isEmpty()) {
+				return false;
+			}
 		}
 		return true;
 	}

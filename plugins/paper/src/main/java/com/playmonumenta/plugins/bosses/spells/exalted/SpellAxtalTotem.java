@@ -27,14 +27,16 @@ public class SpellAxtalTotem extends Spell {
 		mRange = range;
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 1.5f);
 		new PartialParticle(Particle.PORTAL, mBoss.getLocation().add(0, 1, 0), 75, 0.0, 0.0, 0.0).spawnAsBoss();
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, mBoss.getLocation().add(0, 1, 0), 50, 0.0, 0.0, 0.0).spawnAsBoss();
 		new BukkitRunnable() {
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 				EntityTargets target = EntityTargets.GENERIC_ONE_PLAYER_TARGET.setOptional(false).setRange(mRange);
 				int count = (int) Math.min(Math.ceil(players.size() / 2.0) + 1, 6);
@@ -43,14 +45,15 @@ public class SpellAxtalTotem extends Spell {
 
 				// all input values not defined above are default values
 				Spell spell = new SpellThrowSummon(mPlugin, mBoss, target, count, 0, summonPool, true, 20,
-					0, 0.2f, 0, 0, distanceScalar, 10, 15, false,
+					0, 0.2f, 0, 0, distanceScalar, 10, 15, false, "", false,
 					ParticlesList.fromString("[(FLAME,10,0.2,0.2,0.2,0.1)]"), SoundsList.fromString("[(ENTITY_SHULKER_SHOOT,1,1)]"));
 				spell.run();
 			}
 		}.runTaskLater(mPlugin, 30);
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 20 * 7;
 	}
 }

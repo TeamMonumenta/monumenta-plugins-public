@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -18,14 +19,16 @@ public class SpellSpawnMobs extends Spell {
 	private final int mSpawns;
 	private final int mMobCap;
 	private final double mMobCapRange;
+	private final boolean mCapMobsByName;
+	private final String mMobCapName;
 
 	private final LivingEntity mBoss;
 
 	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, int mobcap) {
-		this(boss, spawns, losname, cooldown, range, minrange, mobcap, DEFAULT_MOB_CAP_RADIUS);
+		this(boss, spawns, losname, cooldown, range, minrange, mobcap, DEFAULT_MOB_CAP_RADIUS, false, "");
 	}
 
-	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, int mobcap, double mobcaprange) {
+	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, int mobcap, double mobcaprange, boolean capmobsbyname, String mobcapname) {
 		mBoss = boss;
 		mSummonRange = range;
 		mMinSummonRange = minrange;
@@ -34,6 +37,8 @@ public class SpellSpawnMobs extends Spell {
 		mSpawns = spawns;
 		mMobCap = mobcap;
 		mMobCapRange = mobcaprange;
+		mCapMobsByName = capmobsbyname;
+		mMobCapName = mobcapname;
 	}
 
 	@Override
@@ -77,9 +82,24 @@ public class SpellSpawnMobs extends Spell {
 
 	@Override
 	public boolean canRun() {
-		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange);
+		int mobCount = 0;
+		for (LivingEntity mob : nearbyMobs) {
+			if (mob.getName().equals(mMobCapName)) {
+				mobCount++;
+			}
+		}
+
+		if (mCapMobsByName) {
+			if (mobCount >= mMobCap
 				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ))) {
-			return false;
+				return false;
+			}
+		} else {
+			if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap
+				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ))) {
+				return false;
+			}
 		}
 		return true;
 	}

@@ -28,6 +28,10 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 		public int MOB_CAP = 15;
 		@BossParam(help = "Radius of mobs counted for the mob cap check where the ability fails to spawn mobs (Default = 10)")
 		public double MOB_CAP_RANGE = 10;
+		@BossParam(help = "whether or not to cap mobs by name")
+		public boolean CAP_MOBS_BY_NAME = false;
+		@BossParam(help = "name of the mob checked when checking for mob cap. include spaces if needed!")
+		public String MOB_CAP_NAME = "";
 	}
 
 	public SpawnMobsBoss(Plugin plugin, LivingEntity boss) {
@@ -35,7 +39,7 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		Spell spell = new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE, p.MOB_CAP, p.MOB_CAP_RANGE);
+		Spell spell = new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE, p.MOB_CAP, p.MOB_CAP_RANGE, p.CAP_MOBS_BY_NAME, p.MOB_CAP_NAME);
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

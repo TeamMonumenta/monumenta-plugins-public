@@ -58,6 +58,10 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		public int MOB_CAP_RANGE = 10;
 		@BossParam(help = "don't throw more mobs if there are at least [mobcap] many mobs nearby already")
 		public int MOB_CAP = 15;
+		@BossParam(help = "whether or not to cap mobs by name (only for mobs, not pools of mobs")
+		public boolean CAP_MOBS_BY_NAME = false;
+		@BossParam(help = "name of the mob that the cap checks for. Spaces included!")
+		public String MOB_CAP_NAME = "";
 
 		@BossParam(help = "whether or not to remove any summoned entities when the boss dies")
 		public boolean REMOVE_ON_DEATH = false;
@@ -67,7 +71,6 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Sound played when the boss throws a mob")
 		public SoundsList THROW_SOUND = SoundsList.fromString("[(ENTITY_SHULKER_SHOOT,1,1)]");
-
 	}
 
 	public ThrowSummonBoss(Plugin plugin, LivingEntity boss) {
@@ -81,7 +84,7 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		}
 
 		Spell spell = new SpellThrowSummon(plugin, boss, targets, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL, p.LOB_DELAY,
-			p.HEIGHT_OFFSET, p.Y_VELOCITY, p.THROW_VARIANCE, p.THROW_Y_VARIANCE, p.DISTANCE_SCALAR, p.MOB_CAP_RANGE, p.MOB_CAP, p.REMOVE_ON_DEATH,
+			p.HEIGHT_OFFSET, p.Y_VELOCITY, p.THROW_VARIANCE, p.THROW_Y_VARIANCE, p.DISTANCE_SCALAR, p.MOB_CAP_RANGE, p.MOB_CAP, p.CAP_MOBS_BY_NAME, p.MOB_CAP_NAME, p.REMOVE_ON_DEATH,
 			p.THROW_PARTICLE, p.THROW_SOUND);
 
 
