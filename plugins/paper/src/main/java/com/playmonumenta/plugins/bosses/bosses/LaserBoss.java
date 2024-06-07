@@ -56,7 +56,7 @@ public class LaserBoss extends BossAbilityGroup {
 		public boolean BREAK_BLOCKS = false;
 
 		@BossParam(help = "if breakblocks = true, this is the radius of the blocks that will be deleted")
-		public int BLOCK_BREAK_RADIUS = 3;
+		public int BLOCK_BREAK_RADIUS = 0;
 
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
@@ -147,7 +147,10 @@ public class LaserBoss extends BossAbilityGroup {
 
 				if (p.CAN_BLOCK) {
 					if (blocked) {
-						breakBlocks(loc, p.BLOCK_BREAK_RADIUS);
+						if (p.BREAK_BLOCKS) {
+							breakBlocks(loc, p.BLOCK_BREAK_RADIUS);
+						}
+
 						return;
 					}
 				}
