@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -25,6 +26,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
@@ -395,6 +397,19 @@ public class ParrotManager implements Listener {
 	public void onCFlight(PlayerToggleFlightEvent event) {
 		final Player player = event.getPlayer();
 		if (areParrotsVisible(player) && !event.isFlying()) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					updateParrots(player);
+				}
+			}.runTaskLater(mPlugin, 5L);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onStopSpectate(PlayerGameModeChangeEvent event) {
+		final Player player = event.getPlayer();
+		if (areParrotsVisible(player) && !event.getNewGameMode().equals(GameMode.SPECTATOR)) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
