@@ -45,7 +45,7 @@ public class SpellPortalSummons extends Spell {
 		loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 20, 1);
 		int summonCount = SPAWN_COUNT + (2 * PlayerUtils.playersInRange(mBoss.getLocation(), PortalBoss.detectionRange, true).size());
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), PortalBoss.detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" FABRICATING… ATTACK INTELLIGENCE INSTALLED. HORDE, PURGE INTRUDERS.\",\"color\":\"red\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), PortalBoss.detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" FABRICATING... ATTACK INTELLIGENCE INSTALLED. HORDE, PURGE INTRUDERS.\",\"color\":\"red\"}]");
 
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;

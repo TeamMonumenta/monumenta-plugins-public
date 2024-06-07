@@ -2345,9 +2345,9 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					mTuulenDisplay.setInterpolationDelay(-1);
 					mAuroraDisplay.setInterpolationDelay(-1);
 					for (Player p : getPlayersInArena(false)) {
-						p.sendMessage(Component.text("[Sirius]", NamedTextColor.GOLD).append(Component.text(" If I am to die, I am taking them with me…", NamedTextColor.AQUA, TextDecoration.BOLD)));
+						p.sendMessage(Component.text("[Sirius]", NamedTextColor.GOLD).append(Component.text(" If I am to die, I am taking them with me...", NamedTextColor.AQUA, TextDecoration.BOLD)));
 						p.sendMessage(Component.text("[Tuulen]", NamedTextColor.GOLD).append(Component.text(" What is this?! The blight is gathering around me! Please, destroy Sirius now, before it’s too late!", NamedTextColor.GRAY, TextDecoration.BOLD)));
-						p.sendMessage(Component.text("[Aurora]", NamedTextColor.GOLD).append(Component.text(" I as well… I can’t… hold it off anymore…", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)));
+						p.sendMessage(Component.text("[Aurora]", NamedTextColor.GOLD).append(Component.text(" I as well... I can’t... hold it off anymore...", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)));
 					}
 				}
 				if (mTicks == 2) {

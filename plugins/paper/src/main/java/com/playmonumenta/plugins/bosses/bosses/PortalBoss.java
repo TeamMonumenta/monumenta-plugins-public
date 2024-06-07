@@ -116,7 +116,7 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
 					.sendMessage(Component.text("", NamedTextColor.RED)
 							.append(Component.text("[Iota]", NamedTextColor.GOLD))
-							.append(Component.text(" DAMAGE SUSTAINED. OVERCLOCKING… POWER LEVEL RAISED. INTRUDER - DESTRUCTION IS ASSURED.")));
+							.append(Component.text(" DAMAGE SUSTAINED. OVERCLOCKING... POWER LEVEL RAISED. INTRUDER - DESTRUCTION IS ASSURED.")));
 			mPhase = 2;
 			hide();
 		});
@@ -124,7 +124,7 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
 					.sendMessage(Component.text("", NamedTextColor.RED)
 							.append(Component.text("[Iota]", NamedTextColor.GOLD))
-							.append(Component.text(" THIS MACHINE FAILS. NO MATTER. THIS LAB IS VAST. I AM…INF"))
+							.append(Component.text(" THIS MACHINE FAILS. NO MATTER. THIS LAB IS VAST. I AM...INF"))
 							.append(Component.text("69").decoration(TextDecoration.OBFUSCATED, true))
 							.append(Component.text("IN"))
 							.append(Component.text("  8").decoration(TextDecoration.OBFUSCATED, true))
@@ -144,7 +144,7 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 							.append(Component.text(" SUSTA"))
 							.append(Component.text("  32").decoration(TextDecoration.OBFUSCATED, true))
 							.append(Component.text("ED..."))
-							.append(Component.text(" Bermuda? Wher9… am I? The rift…", NamedTextColor.BLUE))
+							.append(Component.text(" Bermuda? Wher9... am I? The rift...", NamedTextColor.BLUE))
 							.append(Component.text(" 43267").decoration(TextDecoration.OBFUSCATED, true))
 							.append(Component.text("THOUGHT PROTOCOL OVERRIDDEN. RIFT PROTECTION RESUMED. INTRUDERS WILL BE EXPUNGED.")));
 			mPhase = 3;
@@ -242,7 +242,7 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 							.append(Component.text("[Iota]", NamedTextColor.GOLD))
 							.append(Component.text(" I AM INDESTRUCT"))
 							.append(Component.text("698765").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("  The core… destroy it… ", NamedTextColor.BLUE))
+							.append(Component.text("  The core... destroy it... ", NamedTextColor.BLUE))
 							.append(Component.text("  44546").decoration(TextDecoration.OBFUSCATED, true))
 							.append(Component.text("MY DEMISE IS IMPOSSIBLE")));
 			expose();
@@ -312,8 +312,8 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendTitle(player, Component.text("Iota", NamedTextColor.DARK_RED, TextDecoration.BOLD), Component.text("Corrupted Construct", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 						Component pre = Component.text("[Iota] ", NamedTextColor.GOLD);
-						player.sendMessage(pre.append(Component.text("INTRUSION DETECTED -- INTRUDERS ENTERING INNER CHAMBER. RIFT PROXIMITY… 100%", NamedTextColor.RED)));
-						player.sendMessage(pre.append(Component.text("DELETION PROTOCOL COMMENCING. INTRUDERS ARE FRAIL: CHANCE OF SURVIVAL….. 0.00001%.", NamedTextColor.RED)));
+						player.sendMessage(pre.append(Component.text("INTRUSION DETECTED -- INTRUDERS ENTERING INNER CHAMBER. RIFT PROXIMITY... 100%", NamedTextColor.RED)));
+						player.sendMessage(pre.append(Component.text("DELETION PROTOCOL COMMENCING. INTRUDERS ARE FRAIL: CHANCE OF SURVIVAL..... 0.00001%.", NamedTextColor.RED)));
 						player.sendMessage(pre.append(Component.text("BRING IT ON.", NamedTextColor.RED, TextDecoration.BOLD)));
 
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
@@ -342,7 +342,7 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 					.append(Component.text("4").decoration(TextDecoration.OBFUSCATED, true))
 					.append(Component.text("DER..."))
 					.append(Component.text("65789").decoration(TextDecoration.OBFUSCATED, true))
-					.append(Component.text(" Thank… you… tell Bermuda… that thing… it broke me… I didn't mean to…", NamedTextColor.BLUE)));
+					.append(Component.text(" Thank... you... tell Bermuda... that thing... it broke me... I didn't mean to...", NamedTextColor.BLUE)));
 		}
 
 		// Fix misplaced blocks
