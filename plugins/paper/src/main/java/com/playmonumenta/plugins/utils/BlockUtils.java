@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -334,4 +335,22 @@ public class BlockUtils {
 		return -1;
 	}
 
+	public static List<Block> getBlocksInSphere(Location loc, double radius) {
+		World world = loc.getWorld();
+		double bx = loc.getX();
+		double by = loc.getY();
+		double bz = loc.getZ();
+		List<Block> blocks = new ArrayList<>();
+		for (double x = bx - radius; x <= bx + radius; x++) {
+			for (double y = by - radius; y <= by + radius; y++) {
+				for (double z = bz - radius; z <= bz + radius; z++) {
+					Location check = new Location(world, x, by, z);
+					if (check.distance(loc) <= radius) {
+						blocks.add(check.getBlock());
+					}
+				}
+			}
+		}
+		return blocks;
+	}
 }

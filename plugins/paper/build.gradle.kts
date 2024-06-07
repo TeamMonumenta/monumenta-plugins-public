@@ -49,7 +49,7 @@ dependencies {
 	compileOnly("com.playmonumenta:monumenta-network-relay:1.1")
 	compileOnly("com.playmonumenta:structures:10.0")
 	compileOnly("com.playmonumenta:worlds:2.0")
-	compileOnly("com.playmonumenta:libraryofsouls:4.2")
+	compileOnly("com.playmonumenta:libraryofsouls:5.3.1")
 	compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.19.4-v2")
 	compileOnly("com.mojang:brigadier:1.0.18")
 	compileOnly("com.goncalomb.bukkit:nbteditor:3.2")

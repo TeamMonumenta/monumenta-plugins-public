@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,8 @@ public class StarfallBoss extends BossAbilityGroup {
 		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 		@BossParam(help = "how often particles/sounds spawn during the starfall's falling sequence (BASED ON HEIGHT)")
 		public int FALL_AESTHETIC_INTERVAL = 1;
+		@BossParam(help = "knockback dealt by the meteor")
+		public float KNOCKBACK = 0.6f;
 
 	}
 
@@ -160,6 +163,7 @@ public class StarfallBoss extends BossAbilityGroup {
 										BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, meteorCenter, p.SPELL_NAME);
 									}
 									p.EFFECTS.apply(target, mBoss);
+									MovementUtils.knockAway(meteorCenter, target, p.KNOCKBACK, true);
 								}
 
 								cancel();

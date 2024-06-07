@@ -294,7 +294,6 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		}
 
 		if (!targets.isEmpty()) {
-			mAestheticsBoss.launch(mBoss, bossLocation);
 			for (Entity target : targets) {
 				new BukkitRunnable() {
 					int mLobsLaunched = 0;
@@ -302,6 +301,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 					final Entity mTarget = target;
 					@Override
 					public void run() {
+						mAestheticsBoss.launch(mBoss, bossLocation);
 						launchGrenade(mBossLocation, mTarget, additionalParameters);
 						mLobsLaunched++;
 						if (mLobsLaunched >= mLobs) {

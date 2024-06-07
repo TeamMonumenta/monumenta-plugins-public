@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseGrenadeLauncher;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
@@ -61,12 +62,16 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "Determines which nearby players should be hit by the explosion and the radius of the lingering")
 		public EntityTargets EXPLOSION_TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, 3, true, EntityTargets.Limit.DEFAULT, new ArrayList<>(), EntityTargets.TagsListFiter.DEFAULT);
 
+		@BossParam(help = "Particles played when a bomb is thrown")
+		public ParticlesList PARTICLE_LAUNCH = ParticlesList.EMPTY;
 		@BossParam(help = "Particles that follow the bomb throw arc")
 		public ParticlesList PARTICLE_BOMB = ParticlesList.fromString("[(CRIT,5)]");
 
 		@BossParam(help = "Particles summoned at the explosion")
 		public ParticlesList PARTICLE_EXPLOSION = ParticlesList.fromString("[(EXPLOSION_HUGE,10,2,2,2,1.5)]");
 
+		@BossParam(help = "Sounds played when a bomb is thrown")
+		public SoundsList SOUND_LAUNCH = SoundsList.EMPTY;
 		@BossParam(help = "Sounds played at the grenade location each tick")
 		public SoundsList SOUND_GRENADE = SoundsList.fromString("[(BLOCK_ANVIL_FALL,3,0.5)]");
 
@@ -100,9 +105,14 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
 		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 
+		@BossParam(help = "y-velocity of the thrown grenade")
 		public float Y_VELOCITY = 0.7f;
 
+		@BossParam(help = "will deviate off of the target location by a random amount, up to this many blocks away")
 		public double LOB_VARIANCE = 0.0;
+
+		@BossParam(help = "knockback dealt by the grenade")
+		public float KNOCKBACK = 0f;
 
 	}
 
@@ -130,8 +140,9 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				return p.EXPLOSION_TARGET.getTargetsListByLocation(boss, loc);
 			},
 			(LivingEntity bosss, Location loc) -> {
-				//init aesthetics
-				//not used for now
+				// bomb launch aesthetics
+				p.PARTICLE_LAUNCH.spawn(boss, loc);
+				p.SOUND_LAUNCH.play(loc);
 			},
 			(LivingEntity bosss, Location loc) -> {
 				//aesthetics follow the grenade
@@ -156,6 +167,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				}
 
 				p.EFFECTS.apply(target, boss);
+				MovementUtils.knockAway(loc, target, p.KNOCKBACK, true);
 			},
 			//Aesthetics and hit for the lingering ring
 			(Location loc) -> {
