@@ -44,6 +44,7 @@ public class DarkPact extends Ability {
 	private static final int MAX_ABSORPTION = 6;
 	private static final int COOLDOWN = 20 * 14;
 	private static final double EXTENDED_ANTIHEAL = -2.0 / 3.0;
+	private static final int CANCEL_WINDOW = 7 * 20;
 
 	public static final String CHARM_COOLDOWN = "Dark Pact Cooldown";
 	public static final String CHARM_DAMAGE = "Dark Pact Melee Damage";
@@ -62,9 +63,10 @@ public class DarkPact extends Ability {
 				("Pressing the drop key while not sneaking and holding a scythe causes a dark aura to form around you. " +
 					 "For the next %s seconds, your scythe attacks deal +%s%% melee damage. " +
 					 "Each kill during this time increases the duration of your aura by %s second and gives %s absorption health (capped at %s) for the duration of the aura. " +
-					 "However, you cannot heal for %s seconds, and healing is reduced by %s%% until the aura ends. Cooldown: %ss.")
+					 "However, you cannot heal for %s seconds, and healing is reduced by %s%% until the aura ends. " +
+					 "You may retrigger this ability again after %s seconds to cancel your pact. Cooldown: %ss.")
 					.formatted(StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_1), StringUtils.ticksToSeconds(DURATION_INCREASE_ON_KILL),
-						ABSORPTION_ON_KILL, MAX_ABSORPTION, StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(-EXTENDED_ANTIHEAL), StringUtils.ticksToSeconds(COOLDOWN)),
+						ABSORPTION_ON_KILL, MAX_ABSORPTION, StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(-EXTENDED_ANTIHEAL), StringUtils.ticksToSeconds(CANCEL_WINDOW), StringUtils.ticksToSeconds(COOLDOWN)),
 				("Attacks with a scythe deal +%s%% melee damage, and your Soul Rend bypasses the healing prevention, healing you by +%s/+%s HP, depending on the level of Soul Rend. " +
 					 "Nearby players are still healed as normal.")
 					.formatted(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_2), SoulRend.DARK_PACT_HEAL_1, SoulRend.DARK_PACT_HEAL_2))
@@ -78,24 +80,38 @@ public class DarkPact extends Ability {
 
 	private final double mPercentDamageDealt;
 	private boolean mActive = false;
-	private @Nullable JudgementChain mJudgementChain;
+	private int mStartingTick = 0;
 
 	private final DarkPactCS mCosmetic;
 
 	public DarkPact(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2);
-		Bukkit.getScheduler().runTask(plugin, () -> mJudgementChain = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, JudgementChain.class));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DarkPactCS());
 	}
 
 	public boolean cast() {
 		if (isOnCooldown()) {
+			if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME) && Bukkit.getServer().getCurrentTick() - mStartingTick >= CANCEL_WINDOW) {
+				mActive = false;
+				ClientModHandler.updateAbility(mPlayer, this);
+
+				mPlugin.mEffectManager.clearEffects(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME);
+				mPlugin.mEffectManager.clearEffects(mPlayer, PERCENT_HEAL_EFFECT_NAME);
+				mPlugin.mEffectManager.clearEffects(mPlayer, AESTHETICS_EFFECT_NAME);
+
+				return true;
+			}
+
 			return false;
 		}
 
 		World world = mPlayer.getWorld();
 		mCosmetic.onCast(mPlayer, world, mPlayer.getLocation());
+
+		mActive = true;
+		ClientModHandler.updateAbility(mPlayer, this);
+		mStartingTick = Bukkit.getServer().getCurrentTick();
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
@@ -115,9 +131,6 @@ public class DarkPact extends Ability {
 		}
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_REFRESH, DURATION_INCREASE_ON_KILL);
-		if (mJudgementChain != null && mJudgementChain.isLevelTwo() && mPlugin.mEffectManager.hasEffect(event.getEntity(), JudgementChain.EFFECT_NAME)) {
-			duration += mJudgementChain.getBonusDarkPactExtension();
-		}
 
 		NavigableSet<Effect> aestheticsEffects = mPlugin.mEffectManager.getEffects(mPlayer, AESTHETICS_EFFECT_NAME);
 		if (aestheticsEffects != null) {

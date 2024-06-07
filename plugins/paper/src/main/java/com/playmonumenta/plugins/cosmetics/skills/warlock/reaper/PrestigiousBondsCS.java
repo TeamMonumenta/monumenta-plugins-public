@@ -8,8 +8,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,8 +31,6 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(224, 208, 80), 1.25f);
 	private static final Particle.DustOptions GOLD_COLOR_SMALL = new Particle.DustOptions(Color.fromRGB(224, 208, 80), 0.8f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.0f);
-	private boolean mCurseSpreadThisTick = false;
-	private boolean mCurseDeathThisTick = false;
 
 	@Override
 	public @Nullable List<String> getDescription() {
@@ -67,15 +66,13 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	}
 
 	@Override
-	public void launchPin(Player player, Location startLoc, Location endLoc, boolean doSound) {
+	public void launchPin(Player player, Location startLoc, Location endLoc) {
 		World world = player.getWorld();
 
-		if (doSound) {
-			world.playSound(startLoc, Sound.ENTITY_ENDER_PEARL_THROW, SoundCategory.PLAYERS, 0.8f, 2.0f);
-			world.playSound(startLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5f, 1.3f);
-			world.playSound(startLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.7f);
-			world.playSound(startLoc, Sound.ENTITY_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.0f, 2.0f);
-		}
+		world.playSound(startLoc, Sound.ENTITY_ENDER_PEARL_THROW, SoundCategory.PLAYERS, 0.8f, 2.0f);
+		world.playSound(startLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5f, 1.3f);
+		world.playSound(startLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.7f);
+		world.playSound(startLoc, Sound.ENTITY_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.0f, 2.0f);
 
 		new PPLine(Particle.REDSTONE, startLoc, endLoc).data(LIGHT_COLOR).countPerMeter(4).delta(0.07).spawnAsPlayerActive(player);
 		new PPLine(Particle.SPELL_INSTANT, startLoc, endLoc)
@@ -107,19 +104,44 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 				}
 			}
 		}
+
+		startLoc.subtract(0, 2, 0);
+		new BukkitRunnable() {
+			double mD = 30;
+			@Override
+			public void run() {
+				Vector vec;
+				for (double degree = mD; degree < mD + 40; degree += 8) {
+					double radian1 = Math.toRadians(degree);
+					double cos = FastUtils.cos(radian1);
+					double sin = FastUtils.sin(radian1);
+					for (double r = 1; r < 5; r += 0.5) {
+						vec = new Vector(cos * r, 1, sin * r);
+						vec = VectorUtils.rotateXAxis(vec, startLoc.getPitch());
+						vec = VectorUtils.rotateYAxis(vec, startLoc.getYaw());
+
+						Location l = startLoc.clone().add(vec);
+						new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, GOLD_COLOR_SMALL).spawnAsPlayerActive(player);
+						new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, LIGHT_COLOR).spawnAsPlayerActive(player);
+					}
+				}
+				mD += 40;
+				if (mD >= 150) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	@Override
-	public void hitMob(Player player, LivingEntity mob, boolean doSound) {
+	public void hitMob(Player player, LivingEntity mob) {
 		World world = player.getWorld();
 		Location loc = LocationUtils.getEntityCenter(mob);
 
-		if (doSound) {
-			world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1.5f, 1.0f);
-			world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1.5f, 1.5f);
-			world.playSound(loc, Sound.ENTITY_BEE_STING, SoundCategory.PLAYERS, 0.4f, 0.5f);
-			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.4f, 1.5f);
-		}
+		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1.5f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_BEE_STING, SoundCategory.PLAYERS, 0.4f, 0.5f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.4f, 1.5f);
 
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0.25, 0.5, 0.25, 0.05).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SPELL_INSTANT, mob.getEyeLocation(), 15, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(player);
@@ -147,10 +169,8 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	@Override
 	public void curseSpread(Player player, LivingEntity toMob, LivingEntity sourceMob) {
 		World world = sourceMob.getWorld();
-		if (!mCurseSpreadThisTick) {
-			mCurseSpreadThisTick = true;
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> mCurseSpreadThisTick = false);
-			world.playSound(sourceMob.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.35f, 0.9f);
+		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "PrestigiousBondsCurseSound")) {
+			world.playSound(sourceMob.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.35f, 0.95f);
 		}
 		Location mLoc = toMob.getLocation();
 		Location eLoc = sourceMob.getLocation();
@@ -161,29 +181,6 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 			t -> 0.5 + 0.5 * FastUtils.sinDeg(t * 10),
 				t -> 0, t -> 0.125 * FastUtils.cosDeg(t * 10),
 				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(player)
-		);
-	}
-
-	@Override
-	public void curseDeath(Player player, LivingEntity toMob, LivingEntity sourceMob) {
-		World world = sourceMob.getWorld();
-		Location toLoc = LocationUtils.getEntityCenter(toMob);
-		Location fromLoc = LocationUtils.getEntityCenter(sourceMob);
-		if (!mCurseDeathThisTick) {
-			mCurseDeathThisTick = true;
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> mCurseDeathThisTick = false);
-			world.playSound(sourceMob.getLocation(), Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 0.8f, 1.0f);
-			world.playSound(sourceMob.getLocation(), Sound.ENTITY_STRAY_DEATH, SoundCategory.PLAYERS, 0.8f, 0.6f);
-			world.playSound(sourceMob.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 0.8f, 0.8f);
-		}
-
-		new PartialParticle(Particle.REDSTONE, toLoc, 30, 0.4, 0.7, 0.4, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, toLoc, 40, 0.5, 0.5, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
-		Vector mFront = toLoc.toVector().subtract(fromLoc.toVector());
-		ParticleUtils.drawCurve(fromLoc.clone().add(0, 0.75, 0), 1, 36, mFront,
-			t -> 0.5 + 0.5 * FastUtils.sinDeg(t * 10),
-			t -> 0, t -> 0.125 * FastUtils.cosDeg(t * 10),
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 		);
 	}
 }

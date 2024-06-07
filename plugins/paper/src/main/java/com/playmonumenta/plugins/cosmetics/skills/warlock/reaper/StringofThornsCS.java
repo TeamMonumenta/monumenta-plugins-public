@@ -8,13 +8,14 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
@@ -30,7 +31,6 @@ public class StringofThornsCS extends VoodooBondsCS {
 	private static final Particle.DustOptions DARK_GREEN_SMALL = new Particle.DustOptions(Color.fromRGB(0, 80, 20), 0.8f);
 	private static final Particle.DustOptions TRANSITION_GREEN_1 = new Particle.DustOptions(Color.fromRGB(0, 85, 35), 1f);
 	private static final Particle.DustOptions TRANSITION_GREEN_2 = new Particle.DustOptions(Color.fromRGB(110, 175, 0), 1f);
-	private boolean mTriggeredThisTick = false;
 
 	@Override
 	public @Nullable List<String> getDescription() {
@@ -51,15 +51,13 @@ public class StringofThornsCS extends VoodooBondsCS {
 	}
 
 	@Override
-	public void launchPin(Player player, Location startLoc, Location endLoc, boolean doSound) {
+	public void launchPin(Player player, Location startLoc, Location endLoc) {
 		World world = player.getWorld();
-		if (doSound) {
-			world.playSound(startLoc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 0.8f, 1.7f);
-			world.playSound(startLoc, Sound.ENTITY_CREEPER_DEATH, SoundCategory.PLAYERS, 1f, 0.7f);
-			world.playSound(startLoc, Sound.BLOCK_GRASS_STEP, SoundCategory.PLAYERS, 1f, 0.6f);
-			world.playSound(startLoc, Sound.BLOCK_VINE_STEP, SoundCategory.PLAYERS, 1f, 0.8f);
-			world.playSound(startLoc, Sound.BLOCK_LANTERN_BREAK, SoundCategory.PLAYERS, 1f, 0.5f);
-		}
+		world.playSound(startLoc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 0.8f, 1.7f);
+		world.playSound(startLoc, Sound.ENTITY_CREEPER_DEATH, SoundCategory.PLAYERS, 1f, 0.7f);
+		world.playSound(startLoc, Sound.BLOCK_GRASS_STEP, SoundCategory.PLAYERS, 1f, 0.6f);
+		world.playSound(startLoc, Sound.BLOCK_VINE_STEP, SoundCategory.PLAYERS, 1f, 0.8f);
+		world.playSound(startLoc, Sound.BLOCK_LANTERN_BREAK, SoundCategory.PLAYERS, 1f, 0.5f);
 
 		Vector direction = LocationUtils.getDirectionTo(endLoc, startLoc);
 		new BukkitRunnable() {
@@ -103,19 +101,44 @@ public class StringofThornsCS extends VoodooBondsCS {
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+
+		startLoc.subtract(0, 2, 0);
+		new BukkitRunnable() {
+			double mD = 30;
+			@Override
+			public void run() {
+				Vector vec;
+				for (double degree = mD; degree < mD + 40; degree += 8) {
+					double radian1 = Math.toRadians(degree);
+					double cos = FastUtils.cos(radian1);
+					double sin = FastUtils.sin(radian1);
+					for (double r = 1; r < 5; r += 0.5) {
+						vec = new Vector(cos * r, 1, sin * r);
+						vec = VectorUtils.rotateXAxis(vec, startLoc.getPitch());
+						vec = VectorUtils.rotateYAxis(vec, startLoc.getYaw());
+
+						Location l = startLoc.clone().add(vec);
+						DustOptions color = ParticleUtils.getTransition(TRANSITION_GREEN_1, TRANSITION_GREEN_2, l.distance(endLoc) / startLoc.distance(endLoc) * 1.1);
+						new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, color).spawnAsPlayerActive(player);
+					}
+				}
+				mD += 40;
+				if (mD >= 150) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	@Override
-	public void hitMob(Player player, LivingEntity mob, boolean doSound) {
+	public void hitMob(Player player, LivingEntity mob) {
 		World world = player.getWorld();
 		Location loc = LocationUtils.getEntityCenter(mob);
 
-		if (doSound) {
-			world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_PLACE, SoundCategory.PLAYERS, 1.0f, 0.9f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 1.0f, 0.85f);
-			world.playSound(loc, Sound.BLOCK_CHAIN_STEP, SoundCategory.PLAYERS, 1.0f, 0.66f);
-			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.6f, 1.5f);
-		}
+		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_PLACE, SoundCategory.PLAYERS, 1.0f, 0.9f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 1.0f, 0.85f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_STEP, SoundCategory.PLAYERS, 1.0f, 0.66f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.6f, 1.5f);
 
 		new PartialParticle(Particle.GLOW_SQUID_INK, loc, 8, 0.25, 0.5, 0.25, 0.05).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FALLING_DUST, loc, 25, 0.35, 0.6, 0.35, 0).data(Material.LIME_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
@@ -153,9 +176,7 @@ public class StringofThornsCS extends VoodooBondsCS {
 		Location sourceMobLoc = LocationUtils.getHalfHeightLocation(sourceMob);
 		Location toMobLoc = LocationUtils.getHalfHeightLocation(toMob);
 
-		if (!mTriggeredThisTick) {
-			mTriggeredThisTick = true;
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> mTriggeredThisTick = false);
+		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "StringofThornsCurseSound")) {
 			world.playSound(sourceMobLoc, Sound.BLOCK_SWEET_BERRY_BUSH_PLACE, SoundCategory.PLAYERS, 0.8f, 0.9f);
 			world.playSound(sourceMobLoc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 0.85f);
 			world.playSound(sourceMobLoc, Sound.BLOCK_CHAIN_STEP, SoundCategory.PLAYERS, 0.6f, 0.66f);
@@ -190,10 +211,5 @@ public class StringofThornsCS extends VoodooBondsCS {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void curseDeath(Player player, LivingEntity toMob, LivingEntity sourceMob) {
-
 	}
 }

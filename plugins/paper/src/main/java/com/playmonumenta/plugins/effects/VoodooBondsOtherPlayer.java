@@ -24,15 +24,17 @@ import org.jetbrains.annotations.Nullable;
 public class VoodooBondsOtherPlayer extends Effect {
 	public static final String effectID = "VoodooBondsOtherPlayer";
 	private final Player mReaper;
+	private final double mResist;
 
 	int mRotation = 0;
 	private boolean mTriggerTickParticle = false;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
-	public VoodooBondsOtherPlayer(int duration, Player reaper) {
+	public VoodooBondsOtherPlayer(int duration, Player reaper, double resist) {
 		super(duration, effectID);
 		mReaper = reaper;
+		mResist = resist;
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 		// send damage to reaper
 		double percentDamage = Math.min(event.getFinalDamage(true), entity.getHealth()) / EntityUtils.getMaxHealth(entity);
-		double receivedDamageModifier = 1 + CharmManager.getLevelPercentDecimal(mReaper, VoodooBonds.CHARM_RECEIVED_DAMAGE);
+		double receivedDamageModifier = (1 - mResist) * (1 + CharmManager.getLevelPercentDecimal(mReaper, VoodooBonds.CHARM_RECEIVED_DAMAGE));
 		double damageToDeal = EntityUtils.getMaxHealth(mReaper) * (percentDamage * receivedDamageModifier);
 		double absorbHealth = AbsorptionUtils.getAbsorption(mReaper);
 		if (absorbHealth <= 0) {
