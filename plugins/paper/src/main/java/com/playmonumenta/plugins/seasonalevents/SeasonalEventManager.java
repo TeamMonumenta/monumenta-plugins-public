@@ -157,9 +157,24 @@ public class SeasonalEventManager {
 	 * Runs through the missions list and returns all
 	 * matching the current week number of the pass
 	 */
-	public static List<WeeklyMission> getActiveMissions() {
+	public static List<Mission> getActiveMissions() {
+		List<Mission> result = new ArrayList<>();
 		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getActiveMissions();
+			int week = mActivePass.getWeekOfPass();
+			result.addAll(mActivePass.getActiveWeeklyMissions());
+			for (LongMission longMission : mActivePass.getLongMissions()) {
+				if (longMission.isActive(week)) {
+					result.add(longMission);
+				}
+			}
+			return result;
+		}
+		return result;
+	}
+
+	public static List<WeeklyMission> getActiveWeeklyMissions() {
+		if (mActivePass != null && mActivePass.isActive()) {
+			return mActivePass.getActiveWeeklyMissions();
 		}
 		return new ArrayList<>();
 	}
@@ -172,12 +187,30 @@ public class SeasonalEventManager {
 	}
 
 	/**
-	 * Triggered by multiple event handlers, this method adds an amount of progress
-	 * to the provided weekly mission number for that week
+	 * Triggered by multiple event handlers, this method adds
+	 * an amount of progress to the provided pass mission
 	 */
-	public static void addWeeklyMissionProgress(Player p, int missionNumber, int amount) {
-		if (mActivePass != null && mActivePass.isActive()) {
-			mActivePass.addWeeklyMissionProgress(p, missionNumber, amount);
+	public static void addMissionProgress(Player p, Mission mission, int amount) {
+		if (mActivePass == null || !mActivePass.isActive() || !mission.isActive(mActivePass.getWeekOfPass())) {
+			return;
+		}
+
+		if (mission instanceof WeeklyMission targetMission) {
+			List<WeeklyMission> activeWeeklyMissions = getActiveWeeklyMissions();
+			for (int missionIndex = 0; missionIndex < activeWeeklyMissions.size(); missionIndex++) {
+				WeeklyMission testMission = activeWeeklyMissions.get(missionIndex);
+				if (targetMission.equals(testMission)) {
+					mActivePass.addWeeklyMissionProgress(p, missionIndex, amount);
+				}
+			}
+		} else if (mission instanceof LongMission targetMission) {
+			List<LongMission> longMissions = mActivePass.getLongMissions();
+			for (int missionIndex = 0; missionIndex < longMissions.size(); missionIndex++) {
+				LongMission testMission = longMissions.get(missionIndex);
+				if (targetMission.equals(testMission)) {
+					mActivePass.addLongMissionProgress(p, missionIndex, amount);
+				}
+			}
 		}
 	}
 

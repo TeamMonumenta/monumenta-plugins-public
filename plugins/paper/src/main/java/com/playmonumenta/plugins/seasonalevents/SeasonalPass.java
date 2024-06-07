@@ -11,11 +11,14 @@ import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,7 +50,8 @@ public class SeasonalPass {
 	public TextColor mNameColor;
 	public int mNumberOfWeeks = 0;
 	public int mTotalMp = 0;
-	public final Map<Integer, List<WeeklyMission>> mMissions = new HashMap<>();
+	public final Map<Integer, List<WeeklyMission>> mWeeklyMissions = new HashMap<>();
+	public final List<LongMission> mLongMissions = new ArrayList<>();
 	public final List<SeasonalReward> mRewards = new ArrayList<>();
 
 	/**
@@ -70,6 +74,12 @@ public class SeasonalPass {
 		Map<CosmeticType, Integer> rewardsSoFar = new HashMap<>();
 
 		String startDateStr = data.get("start_date").getAsString();
+		if (showWarnings && !mPassStart.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
+			sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr + " "
+				+ mName + ": Does not start on a Friday (starts on "
+				+ mPassStart.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+				+ " instead)", NamedTextColor.RED));
+		}
 		JsonArray rewardParse = data.get("rewards").getAsJsonArray();
 		for (JsonElement rewardElement : rewardParse) {
 			try {
@@ -105,6 +115,12 @@ public class SeasonalPass {
 	private void loadMissions(final CommandSender sender, JsonObject data, boolean showWarnings) {
 		int numberOfWeeks = 0;
 		String startDateStr = data.get("start_date").getAsString();
+		if (showWarnings && !mPassStart.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
+			sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+				+ mName + ": Does not start on a Friday (starts on "
+				+ mPassStart.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+				+ " instead)", NamedTextColor.RED));
+		}
 		mName = data.get("pass_name").getAsString();
 		mDisplayItem = Material.getMaterial(data.get("pass_displayitem").getAsString());
 		String nameColorStr = data.get("pass_namecolor").getAsString();
@@ -120,12 +136,17 @@ public class SeasonalPass {
 		JsonArray missionParse = data.get("missions").getAsJsonArray();
 		for (JsonElement missionElement : missionParse) {
 			try {
-				WeeklyMission mission = new WeeklyMission(sender, startDateStr, mName, missionElement, showWarnings);
+				JsonObject missionObject = missionElement.getAsJsonObject();
+				Mission mission = Mission.loadMission(sender, startDateStr, mName, missionObject, showWarnings);
 				if (!mission.mIsBonus) {
 					mTotalMp += mission.mMP;
 				}
-				numberOfWeeks = Integer.max(numberOfWeeks, mission.mWeek);
-				mMissions.computeIfAbsent(mission.mWeek, k -> new ArrayList<>()).add(mission);
+				numberOfWeeks = Integer.max(numberOfWeeks, mission.lastWeek());
+				if (mission instanceof WeeklyMission weeklyMission) {
+					mWeeklyMissions.computeIfAbsent(weeklyMission.mWeek, k -> new ArrayList<>()).add(weeklyMission);
+				} else if (mission instanceof LongMission longMission) {
+					mLongMissions.add(longMission);
+				}
 			} catch (Exception e) {
 				MessagingUtils.sendStackTrace(sender, e);
 			}
@@ -216,17 +237,44 @@ public class SeasonalPass {
 	}
 
 	/**
-	 * Returns all missions for the current week number of the pass
+	 * Returns weekly missions for the current week of the pass
 	 */
-	public List<WeeklyMission> getActiveMissions() {
-		return getMissionsInWeek(getWeekOfPass());
+	public List<WeeklyMission> getActiveWeeklyMissions() {
+		return getActiveWeeklyMissions(getWeekOfPass());
 	}
 
 	/**
-	 * Method to get missions for given week
+	 * Returns weekly missions for given week
 	 */
-	public List<WeeklyMission> getMissionsInWeek(int week) {
-		return mMissions.getOrDefault(week, new ArrayList<>());
+	public List<WeeklyMission> getActiveWeeklyMissions(int week) {
+		return mWeeklyMissions.getOrDefault(week, new ArrayList<>());
+	}
+
+	/**
+	 * Returns all long missions for the pass
+	 */
+	public List<LongMission> getLongMissions() {
+		return mLongMissions;
+	}
+
+	/**
+	 * Returns long missions that are active for the current week of the pass
+	 */
+	public List<LongMission> getActiveLongMissions() {
+		return getActiveLongMissions(getWeekOfPass());
+	}
+
+	/**
+	 * Returns long missions that are active for a given week
+	 */
+	public List<LongMission> getActiveLongMissions(int week) {
+		List<LongMission> results = new ArrayList<>();
+		for (LongMission mission : getLongMissions()) {
+			if (mission.isActive(week)) {
+				results.add(mission);
+			}
+		}
+		return results;
 	}
 
 	/**
@@ -257,11 +305,10 @@ public class SeasonalPass {
 	 * Triggered by multiple event handlers, this method adds an amount of progress
 	 * to the provided weekly mission number for that week
 	 */
-	public void addWeeklyMissionProgress(Player p, int missionNumber, int amount) {
+	public void addWeeklyMissionProgress(Player p, int missionIndex, int amount) {
 		LocalDateTime now = DateUtils.localDateTime();
-		int missionIndex = missionNumber - 1;
 		int week = getWeekOfPass();
-		int numWeeklyMissions = mMissions.getOrDefault(week, List.of()).size();
+		int numWeeklyMissions = mWeeklyMissions.getOrDefault(week, List.of()).size();
 		if (missionIndex < 0 || missionIndex >= numWeeklyMissions) {
 			return;
 		}
@@ -271,18 +318,50 @@ public class SeasonalPass {
 			MMLog.warning("No season pass player progress found for " + p.getName());
 			return;
 		}
-		int missionProgress = playerProgress.getPassMissionProgress(now, missionIndex).orElse(0);
+		int missionProgress = playerProgress.getWeeklyMissionProgress(now, missionIndex).orElse(0);
 		if (missionProgress < 0) {
 			// Mission already completed
 			return;
 		}
-		missionProgress = playerProgress.addPassMissionProgress(now, missionIndex, amount);
+		missionProgress = playerProgress.addWeeklyMissionProgress(now, missionIndex, amount);
 		if (missionProgress < 0) {
 			//Play an animation and notify player
 			p.sendMessage(Component.text(
 					"You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!",
 					NamedTextColor.GOLD,
 					TextDecoration.BOLD));
+			EntityUtils.fireworkAnimation(p);
+		}
+	}
+
+	public void addLongMissionProgress(Player p, int missionIndex, int amount) {
+		LocalDateTime now = DateUtils.localDateTime();
+		int week = getWeekOfPass();
+		int numLongMissions = mLongMissions.size();
+		if (missionIndex < 0 || missionIndex >= numLongMissions) {
+			return;
+		}
+		if (!mLongMissions.get(missionIndex).isActive(week)) {
+			return;
+		}
+
+		PlayerProgress playerProgress = SeasonalEventManager.getPlayerProgress(p);
+		if (playerProgress == null) {
+			MMLog.warning("No season pass player progress found for " + p.getName());
+			return;
+		}
+		int missionProgress = playerProgress.getLongMissionProgress(now, missionIndex);
+		if (missionProgress < 0) {
+			// Mission already completed
+			return;
+		}
+		missionProgress = playerProgress.addLongMissionProgress(now, missionIndex, amount);
+		if (missionProgress < 0) {
+			//Play an animation and notify player
+			p.sendMessage(Component.text(
+				"You completed a multi-week mission! Open the Seasonal Pass menu to claim your progress!",
+				NamedTextColor.GOLD,
+				TextDecoration.BOLD));
 			EntityUtils.fireworkAnimation(p);
 		}
 	}

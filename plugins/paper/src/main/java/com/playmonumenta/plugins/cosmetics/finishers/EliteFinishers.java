@@ -37,9 +37,11 @@ public class EliteFinishers {
 			.put(PaintSplashFinisher.NAME, new PaintSplashFinisher())
 			.put(PoultryficationFinisher.NAME, new PoultryficationFinisher())
 			.put(Promenade.NAME, new Promenade())
+			.put(ShootingStarFinisher.NAME, new ShootingStarFinisher())
 			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
+			.put(SupernovaFinisher.NAME, new SupernovaFinisher())
 			.put(SwordRainFinisher.NAME, new SwordRainFinisher())
-			//.put(TwinkleTwinkleLittleStar.NAME, new TwinkleTwinkleLittleStar()) // TODO Uncomment for the next season pass
+			.put(TwinkleTwinkleLittleStar.NAME, new TwinkleTwinkleLittleStar())
 			.put(USAFireworkFinisher.NAME, new USAFireworkFinisher())
 			.put(VictoryThemeFinisher.NAME, new VictoryThemeFinisher())
 			.put(WarmFireworkFinisher.NAME, new WarmFireworkFinisher())

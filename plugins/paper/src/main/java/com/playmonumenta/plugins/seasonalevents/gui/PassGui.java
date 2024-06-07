@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.seasonalevents.LongMission;
 import com.playmonumenta.plugins.seasonalevents.PlayerProgress;
 import com.playmonumenta.plugins.seasonalevents.PlayerProgress.PassProgress;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
@@ -665,16 +666,16 @@ public class PassGui extends Gui {
 			});
 	}
 
-	public void addMissionIcon(int y,
-	                           int x,
-	                           List<WeeklyMission> weekMissions,
-	                           @Nullable PlayerProgress playerProgress,
-	                           int week,
-	                           int missionIndex) {
-		if (weekMissions.size() <= missionIndex) {
+	public void addWeeklyMissionIcon(int y,
+	                                 int x,
+	                                 List<WeeklyMission> weekMissions,
+	                                 @Nullable PlayerProgress playerProgress,
+	                                 int week,
+	                                 int missionIndex) {
+		if (missionIndex >= weekMissions.size()) {
 			ItemStack item = new ItemStack(Material.BARRIER);
 			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("Mission?", NamedTextColor.RED, TextDecoration.BOLD)
+			meta.displayName(Component.text("Weekly Mission?", NamedTextColor.RED, TextDecoration.BOLD)
 				.decoration(TextDecoration.ITALIC, false));
 			GUIUtils.splitLoreLine(meta, "Failed to load mission", NamedTextColor.RED, 30, false);
 			List<Component> lore = meta.lore();
@@ -735,7 +736,7 @@ public class PassGui extends Gui {
 		if (playerProgress == null) {
 			progress = 0;
 		} else {
-			progress = playerProgress.getPassMissionProgress(weekStart, missionIndex).orElse(0);
+			progress = playerProgress.getWeeklyMissionProgress(weekStart, missionIndex).orElse(0);
 		}
 		String progressStr = String.valueOf(progress);
 
@@ -787,7 +788,7 @@ public class PassGui extends Gui {
 		}
 		lore.add(statusMessage);
 		if (mIsModerator) {
-			int modifiedProgress = mModifiedPlayerProgress.getPassMissionProgress(weekStart, missionIndex).orElse(0);
+			int modifiedProgress = mModifiedPlayerProgress.getWeeklyMissionProgress(weekStart, missionIndex).orElse(0);
 			if (modifiedProgress < 0) {
 				modifiedProgress = mission.mAmount;
 			}
@@ -848,33 +849,222 @@ public class PassGui extends Gui {
 			guiItem.onClick((InventoryClickEvent event) -> {
 				switch (event.getClick()) {
 					case LEFT -> {
-						mModifiedPlayerProgress.addPassMissionProgress(weekStart, missionIndex, 1);
+						mModifiedPlayerProgress.addWeeklyMissionProgress(weekStart, missionIndex, 1);
 						updateWithClickSound();
 					}
 					case RIGHT -> {
-						mModifiedPlayerProgress.addPassMissionProgress(weekStart, missionIndex, -1);
+						mModifiedPlayerProgress.addWeeklyMissionProgress(weekStart, missionIndex, -1);
 						updateWithClickSound();
 					}
 					case SHIFT_LEFT -> {
-						mModifiedPlayerProgress.addPassMissionProgress(weekStart, missionIndex, 10);
+						mModifiedPlayerProgress.addWeeklyMissionProgress(weekStart, missionIndex, 10);
 						updateWithClickSound();
 					}
 					case SHIFT_RIGHT -> {
-						mModifiedPlayerProgress.addPassMissionProgress(weekStart, missionIndex, -10);
+						mModifiedPlayerProgress.addWeeklyMissionProgress(weekStart, missionIndex, -10);
 						updateWithClickSound();
 					}
 					case SWAP_OFFHAND -> {
-						int modifiedProgress = mModifiedPlayerProgress.getPassMissionProgress(weekStart, missionIndex)
+						int modifiedProgress = mModifiedPlayerProgress.getWeeklyMissionProgress(weekStart, missionIndex)
 							.orElse(0);
 						if (modifiedProgress < 0) {
-							mModifiedPlayerProgress.setPassMissionProgress(weekStart, missionIndex, 0);
+							mModifiedPlayerProgress.setWeeklyMissionProgress(weekStart, missionIndex, 0);
 						} else {
-							mModifiedPlayerProgress.setPassMissionProgress(weekStart, missionIndex, -1);
+							mModifiedPlayerProgress.setWeeklyMissionProgress(weekStart, missionIndex, -1);
 						}
 						updateWithClickSound();
 					}
 					case DROP -> {
-						mModifiedPlayerProgress.setPassMissionProgress(weekStart, missionIndex, progress);
+						mModifiedPlayerProgress.setWeeklyMissionProgress(weekStart, missionIndex, progress);
+						updateWithClickSound();
+					}
+					default -> {
+					}
+				}
+			});
+		}
+	}
+
+	public void addLongMissionIcon(int y,
+	                               int x,
+	                               List<LongMission> longMissions,
+	                               @Nullable PlayerProgress playerProgress,
+	                               int currentMissionIndex) {
+		if (currentMissionIndex >= longMissions.size()) {
+			ItemStack item = new ItemStack(Material.BARRIER);
+			ItemMeta meta = item.getItemMeta();
+			meta.displayName(Component.text("Multi-Week Mission?", NamedTextColor.RED, TextDecoration.BOLD)
+				.decoration(TextDecoration.ITALIC, false));
+			GUIUtils.splitLoreLine(meta, "Failed to load mission", NamedTextColor.RED, 30, false);
+			List<Component> lore = meta.lore();
+			if (lore == null) {
+				lore = new ArrayList<>();
+			}
+			lore.add(0, Component.text("Weeks ? through ?", NamedTextColor.GOLD, TextDecoration.BOLD)
+				.decoration(TextDecoration.ITALIC, false));
+			meta.lore(lore);
+			item.setItemMeta(meta);
+			setItem(y, x, item);
+			return;
+		}
+		LongMission mission = longMissions.get(currentMissionIndex);
+		int trueMissionIndex = mPass.getLongMissions().indexOf(mission);
+		String missionDescription = mission.mDescription;
+		if (missionDescription == null) {
+			missionDescription = "Mission description not set";
+		}
+		String missionAmount = String.valueOf(mission.mAmount);
+
+		long firstWeek = mission.firstWeek();
+		LocalDateTime weekStart = mPass.mPassStart.plusWeeks(firstWeek - 1);
+
+		int openedWeek = mPass.getWeekOfPass(DateUtils.localDateTime(7 * mOpenedEpochWeek)) - 1;
+
+		int progress;
+		if (playerProgress == null) {
+			progress = 0;
+		} else {
+			progress = playerProgress.getLongMissionProgress(weekStart, trueMissionIndex);
+		}
+		String progressStr = String.valueOf(progress);
+
+		Component statusMessage;
+		Material mat;
+		if (isFuture(weekStart)) {
+			statusMessage = Component.text("Future Mission", NamedTextColor.LIGHT_PURPLE)
+				.decoration(TextDecoration.ITALIC, false);
+			mat = Material.MAGENTA_CONCRETE_POWDER;
+			missionDescription = "???";
+			progressStr = "?";
+			missionAmount = "?";
+		} else if (progress < 0) {
+			statusMessage = Component.text("Completed", NamedTextColor.GREEN)
+				.decoration(TextDecoration.ITALIC, false);
+			mat = Material.GREEN_CONCRETE_POWDER;
+			progressStr = missionAmount;
+		} else if (mission.lastWeek() <= openedWeek) {
+			// Previous week, cannot be completed anymore (except by mods)
+			statusMessage = Component.text("Incomplete", NamedTextColor.DARK_RED)
+				.decoration(TextDecoration.ITALIC, false);
+			mat = Material.RED_CONCRETE_POWDER;
+		} else {
+			statusMessage = Component.text("In progress", NamedTextColor.YELLOW)
+				.decoration(TextDecoration.ITALIC, false);
+			mat = Material.YELLOW_CONCRETE_POWDER;
+		}
+
+		int weeks = mission.lastWeek() - mission.firstWeek() + 1;
+		ItemStack item = new ItemStack(mat, 7 * weeks);
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(Component.text("Multi-Week Mission " + (currentMissionIndex + 1), NamedTextColor.GREEN, TextDecoration.BOLD)
+			.decoration(TextDecoration.ITALIC, false));
+		GUIUtils.splitLoreLine(meta, missionDescription, NamedTextColor.RED, 30, false);
+
+		List<Component> lore = meta.lore();
+		if (lore == null) {
+			lore = new ArrayList<>();
+		}
+		lore.add(0, Component.text("Weeks " + mission.firstWeek() + " through " + mission.lastWeek(),
+				NamedTextColor.GOLD, TextDecoration.BOLD)
+			.decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("Progress: " + progressStr + "/" + missionAmount, NamedTextColor.DARK_GREEN)
+			.decoration(TextDecoration.ITALIC, false));
+		if (mission.mIsBonus) {
+			lore.add(Component.text("Reward: " + mission.mMP + " Bonus MP", NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false));
+		} else {
+			lore.add(Component.text("Reward: " + mission.mMP + " MP", NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false));
+		}
+		lore.add(statusMessage);
+		if (mIsModerator) {
+			int modifiedProgress = mModifiedPlayerProgress.getLongMissionProgress(weekStart, trueMissionIndex);
+			if (modifiedProgress < 0) {
+				modifiedProgress = mission.mAmount;
+			}
+
+			lore.add(Component.text("Modified progress: " + modifiedProgress, NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false));
+
+			lore.add(Component.empty()
+				.color(NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false)
+				.append(Component.text("Left click")
+					.decoration(TextDecoration.BOLD, true))
+				.append(Component.text(": +1 Progress")));
+
+			lore.add(Component.empty()
+				.color(NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false)
+				.append(Component.text("Right click")
+					.decoration(TextDecoration.BOLD, true))
+				.append(Component.text(": -1 Progress")));
+
+			lore.add(Component.empty()
+				.color(NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false)
+				.append(Component.text("Shift left click")
+					.decoration(TextDecoration.BOLD, true))
+				.append(Component.text(": +10 Progress")));
+
+			lore.add(Component.empty()
+				.color(NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false)
+				.append(Component.text("Shift right click")
+					.decoration(TextDecoration.BOLD, true))
+				.append(Component.text(": -10 Progress")));
+
+			lore.add(Component.empty()
+				.color(NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false)
+				.append(Component.keybind(Keybind.SWAP_OFFHAND)
+					.decoration(TextDecoration.BOLD, true))
+				.append(Component.text(": Toggle completion")));
+
+			lore.add(Component.empty()
+				.color(NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false)
+				.append(Component.keybind(Keybind.DROP)
+					.decoration(TextDecoration.BOLD, true))
+				.append(Component.text(": Restore unmodified progress")));
+
+			lore.add(Component.text("", NamedTextColor.RED, TextDecoration.BOLD)
+				.decoration(TextDecoration.ITALIC, false)
+				.append(Component.text("Confirm changes with top/left icon")));
+		}
+		meta.lore(lore);
+		item.setItemMeta(meta);
+		GuiItem guiItem = setItem(y, x, item);
+		if (mIsModerator) {
+			guiItem.onClick((InventoryClickEvent event) -> {
+				switch (event.getClick()) {
+					case LEFT -> {
+						mModifiedPlayerProgress.addLongMissionProgress(weekStart, trueMissionIndex, 1);
+						updateWithClickSound();
+					}
+					case RIGHT -> {
+						mModifiedPlayerProgress.addLongMissionProgress(weekStart, trueMissionIndex, -1);
+						updateWithClickSound();
+					}
+					case SHIFT_LEFT -> {
+						mModifiedPlayerProgress.addLongMissionProgress(weekStart, trueMissionIndex, 10);
+						updateWithClickSound();
+					}
+					case SHIFT_RIGHT -> {
+						mModifiedPlayerProgress.addLongMissionProgress(weekStart, trueMissionIndex, -10);
+						updateWithClickSound();
+					}
+					case SWAP_OFFHAND -> {
+						int modifiedProgress = mModifiedPlayerProgress.getLongMissionProgress(weekStart, trueMissionIndex);
+						if (modifiedProgress < 0) {
+							mModifiedPlayerProgress.setLongMissionProgress(weekStart, trueMissionIndex, 0);
+						} else {
+							mModifiedPlayerProgress.setLongMissionProgress(weekStart, trueMissionIndex, -1);
+						}
+						updateWithClickSound();
+					}
+					case DROP -> {
+						mModifiedPlayerProgress.setLongMissionProgress(weekStart, trueMissionIndex, progress);
 						updateWithClickSound();
 					}
 					default -> {

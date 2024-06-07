@@ -331,6 +331,6 @@ public class TwinkleTwinkleLittleStar implements EliteFinisher {
 
 	@Override
 	public Material getDisplayItem() {
-		return Material.NETHER_STAR;
+		return Material.NOTE_BLOCK;
 	}
 }

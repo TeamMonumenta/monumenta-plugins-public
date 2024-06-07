@@ -24,7 +24,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerProgress {
 	public static class PassProgress {
-		private final Map<Integer, List<Integer>> mMissionProgress = new TreeMap<>();
+		// Stored in json as mission_progress for legacy reasons
+		private final Map<Integer, List<Integer>> mWeeklyMissionProgress = new TreeMap<>();
+		// Multi-week mission progress
+		private final List<Integer> mLongMissionProgress = new ArrayList<>();
 		private int mEarnedPoints = 0;
 		private int mClaimedPoints = 0;
 
@@ -47,7 +50,7 @@ public class PlayerProgress {
 					}
 
 					int weekNumber = Integer.parseInt(weekEntryJson.getKey());
-					List<Integer> weekProgress = mMissionProgress.computeIfAbsent(weekNumber, k -> new ArrayList<>());
+					List<Integer> weekProgress = mWeeklyMissionProgress.computeIfAbsent(weekNumber, k -> new ArrayList<>());
 
 					for (JsonElement missionEntryJson : weekJsonObject) {
 						if (missionEntryJson instanceof JsonPrimitive missionProgressJson
@@ -59,14 +62,26 @@ public class PlayerProgress {
 					}
 				}
 			}
+
+			if (passJson.get("long_mission_progress") instanceof JsonArray longProgressArray) {
+				for (JsonElement longMissionElement : longProgressArray) {
+					if (longMissionElement instanceof JsonPrimitive longMissionPrimitive
+						&& longMissionPrimitive.isNumber()) {
+						mLongMissionProgress.add(longMissionPrimitive.getAsInt());
+					} else {
+						mLongMissionProgress.add(0);
+					}
+				}
+			}
 		}
 
 		public PassProgress(PassProgress from) {
 			mEarnedPoints = from.mEarnedPoints;
 			mClaimedPoints = from.mClaimedPoints;
-			for (Map.Entry<Integer, List<Integer>> weekEntry : from.mMissionProgress.entrySet()) {
-				mMissionProgress.put(weekEntry.getKey(), new ArrayList<>(new ArrayList<>(weekEntry.getValue())));
+			for (Map.Entry<Integer, List<Integer>> weekEntry : from.mWeeklyMissionProgress.entrySet()) {
+				mWeeklyMissionProgress.put(weekEntry.getKey(), new ArrayList<>(new ArrayList<>(weekEntry.getValue())));
 			}
+			mLongMissionProgress.addAll(from.mLongMissionProgress);
 		}
 
 		public JsonObject toJson() {
@@ -76,7 +91,7 @@ public class PlayerProgress {
 			result.addProperty("claimed_points", mClaimedPoints);
 
 			JsonObject missionProgressJson = new JsonObject();
-			for (Map.Entry<Integer, List<Integer>> weekProgress : mMissionProgress.entrySet()) {
+			for (Map.Entry<Integer, List<Integer>> weekProgress : mWeeklyMissionProgress.entrySet()) {
 				JsonArray weekProgressJson = new JsonArray();
 				for (Integer missionProgress : weekProgress.getValue()) {
 					weekProgressJson.add(missionProgress);
@@ -85,15 +100,19 @@ public class PlayerProgress {
 			}
 			result.add("mission_progress", missionProgressJson);
 
+			if (!mLongMissionProgress.isEmpty()) {
+				JsonArray longMissionArray = new JsonArray();
+				for (int missionProgress : mLongMissionProgress) {
+					longMissionArray.add(missionProgress);
+				}
+				result.add("long_mission_progress", longMissionArray);
+			}
+
 			return result;
 		}
 
 		public int getMissionPoints() {
 			return mEarnedPoints;
-		}
-
-		public void setMissionPoints(int amount) {
-			mEarnedPoints = amount;
 		}
 
 		public void addMissionPoints(int amount) {
@@ -109,54 +128,53 @@ public class PlayerProgress {
 		}
 
 		public @Nullable List<Integer> getWeekProgress(int week) {
-			return mMissionProgress.get(week);
+			return mWeeklyMissionProgress.get(week);
 		}
 
 		public List<Integer> getOrComputeWeekProgress(int week) {
-			return mMissionProgress.computeIfAbsent(week, k -> new ArrayList<>());
+			return mWeeklyMissionProgress.computeIfAbsent(week, k -> new ArrayList<>());
+		}
+
+		public int getLongMissionProgress(int index) {
+			if (index < 0 || index >= mLongMissionProgress.size()) {
+				return 0;
+			}
+			return mLongMissionProgress.get(index);
 		}
 
 		public static List<Component> diff(@Nullable PassProgress old, @Nullable PassProgress updated) {
 			List<Component> results = new ArrayList<>();
 
-			if (old != null && updated != null) {
-				TreeSet<Integer> allKeys = new TreeSet<>(old.mMissionProgress.keySet());
-				allKeys.addAll(updated.mMissionProgress.keySet());
+			if (old == null) {
+				old = new PassProgress();
+			}
 
-				for (int week : allKeys) {
-					List<Integer> oldWeekProgress = old.mMissionProgress.get(week);
-					List<Integer> newWeekProgress = updated.mMissionProgress.get(week);
+			if (updated == null) {
+				updated = new PassProgress();
+			}
 
-					if (oldWeekProgress == null) {
-						diffLine(results, true, week, Objects.requireNonNull(newWeekProgress));
-					} else if (newWeekProgress == null) {
-						diffLine(results, false, week, oldWeekProgress);
-					} else if (!oldWeekProgress.equals(newWeekProgress)) {
-						diffLine(results, false, week, oldWeekProgress);
-						diffLine(results, true, week, newWeekProgress);
-					}
-				}
+			TreeSet<Integer> allKeys = new TreeSet<>(old.mWeeklyMissionProgress.keySet());
+			allKeys.addAll(updated.mWeeklyMissionProgress.keySet());
 
-				if (!results.isEmpty()) {
-					results.add(Component.text("-", NamedTextColor.RED)
-						.append(Component.text(" MP: " + old.mEarnedPoints)));
-					results.add(Component.text("+", NamedTextColor.GREEN)
-						.append(Component.text(" MP: " + updated.mEarnedPoints)));
+			for (int week : allKeys) {
+				List<Integer> oldWeekProgress = old.mWeeklyMissionProgress.get(week);
+				List<Integer> newWeekProgress = updated.mWeeklyMissionProgress.get(week);
+
+				if (oldWeekProgress == null) {
+					diffWeeklyMissionLine(results, true, week, Objects.requireNonNull(newWeekProgress));
+				} else if (newWeekProgress == null) {
+					diffWeeklyMissionLine(results, false, week, oldWeekProgress);
+				} else if (!oldWeekProgress.equals(newWeekProgress)) {
+					diffWeeklyMissionLine(results, false, week, oldWeekProgress);
+					diffWeeklyMissionLine(results, true, week, newWeekProgress);
 				}
-			} else if (old != null) {
-				for (Map.Entry<Integer, List<Integer>> weekEntry : old.mMissionProgress.entrySet()) {
-					int week = weekEntry.getKey();
-					List<Integer> weekProgress = weekEntry.getValue();
-					diffLine(results, false, week, weekProgress);
-				}
+			}
+
+			diffLongMissions(results, old.mLongMissionProgress, updated.mLongMissionProgress);
+
+			if (!results.isEmpty()) {
 				results.add(Component.text("-", NamedTextColor.RED)
 					.append(Component.text(" MP: " + old.mEarnedPoints)));
-			} else if (updated != null) {
-				for (Map.Entry<Integer, List<Integer>> weekEntry : updated.mMissionProgress.entrySet()) {
-					int week = weekEntry.getKey();
-					List<Integer> weekProgress = weekEntry.getValue();
-					diffLine(results, true, week, weekProgress);
-				}
 				results.add(Component.text("+", NamedTextColor.GREEN)
 					.append(Component.text(" MP: " + updated.mEarnedPoints)));
 			}
@@ -164,11 +182,35 @@ public class PlayerProgress {
 			return results;
 		}
 
-		private static void diffLine(List<Component> diffLines, boolean isAdded, int week, List<Integer> weekProgress) {
-			Component line = Component.text(isAdded ? "+" : "-", isAdded ? NamedTextColor.GREEN : NamedTextColor.RED)
+		private static void diffWeeklyMissionLine(List<Component> diffLines, boolean isAdded, int week, List<Integer> weekProgress) {
+			Component header = Component.text(isAdded ? "+" : "-", isAdded ? NamedTextColor.GREEN : NamedTextColor.RED)
 				.append(Component.text(" Week " + week));
-			for (int missionProgress : weekProgress) {
+			appendIntegerList(diffLines, header, weekProgress);
+		}
+
+		private static void diffLongMissions(List<Component> diffLines, List<Integer> old, List<Integer> updated) {
+			if (old.equals(updated)) {
+				return;
+			}
+
+			Component header;
+
+			header = Component.text("-", NamedTextColor.RED)
+				.append(Component.text(" Long Missions"));
+			appendIntegerList(diffLines, header, old);
+
+			header = Component.text("+", NamedTextColor.GREEN)
+				.append(Component.text(" Long Missions"));
+			appendIntegerList(diffLines, header, updated);
+		}
+
+		private static void appendIntegerList(List<Component> diffLines, Component header, List<Integer> list) {
+			Component line = header;
+			for (int missionProgress : list) {
 				line = line.append(Component.text(", " + missionProgress));
+			}
+			if (list.isEmpty()) {
+				line = line.append(Component.text("<not set>"));
 			}
 			diffLines.add(line);
 		}
@@ -221,15 +263,11 @@ public class PlayerProgress {
 		return result;
 	}
 
-	public PassProgress getOrCreatePassProgress(SeasonalPass pass) {
-		return mAllPassProgress.computeIfAbsent(pass.mPassStart, k -> new PassProgress());
-	}
-
 	public @Nullable PassProgress getPassProgress(SeasonalPass pass) {
 		return mAllPassProgress.get(pass.mPassStart);
 	}
 
-	public Optional<Integer> getPassMissionProgress(LocalDateTime missionDate, int missionIndex) {
+	public Optional<Integer> getWeeklyMissionProgress(LocalDateTime missionDate, int missionIndex) {
 		if (missionIndex < 0) {
 			return Optional.empty();
 		}
@@ -251,7 +289,7 @@ public class PlayerProgress {
 		return Optional.of(weekProgress.get(missionIndex));
 	}
 
-	public void setPassMissionProgress(LocalDateTime missionDate, int missionIndex, int value) {
+	public void setWeeklyMissionProgress(LocalDateTime missionDate, int missionIndex, int value) {
 		if (missionIndex < 0) {
 			return;
 		}
@@ -261,7 +299,7 @@ public class PlayerProgress {
 			return;
 		}
 		int week = pass.getWeekOfPass(missionDate);
-		List<WeeklyMission> weeklyMissions = pass.getMissionsInWeek(week);
+		List<WeeklyMission> weeklyMissions = pass.getActiveWeeklyMissions(week);
 		int numMissions = weeklyMissions.size();
 		if (missionIndex > numMissions) {
 			return;
@@ -292,7 +330,7 @@ public class PlayerProgress {
 		weekProgress.set(missionIndex, value);
 	}
 
-	public int addPassMissionProgress(LocalDateTime missionDate, int missionIndex, int value) {
+	public int addWeeklyMissionProgress(LocalDateTime missionDate, int missionIndex, int value) {
 		if (missionIndex < 0) {
 			return 0;
 		}
@@ -302,7 +340,7 @@ public class PlayerProgress {
 			return 0;
 		}
 		int week = pass.getWeekOfPass(missionDate);
-		List<WeeklyMission> weeklyMissions = pass.getMissionsInWeek(week);
+		List<WeeklyMission> weeklyMissions = pass.getActiveWeeklyMissions(week);
 		int numMissions = weeklyMissions.size();
 		if (missionIndex > numMissions) {
 			return 0;
@@ -339,6 +377,110 @@ public class PlayerProgress {
 		}
 
 		weekProgress.set(missionIndex, value);
+		return value;
+	}
+
+	public int getLongMissionProgress(LocalDateTime missionDate, int missionIndex) {
+		SeasonalPass pass = SeasonalEventManager.getPass(missionDate);
+		if (pass == null) {
+			return 0;
+		}
+
+		PassProgress passProgress = mAllPassProgress.get(pass.mPassStart);
+		if (passProgress == null) {
+			return 0;
+		}
+
+		return passProgress.getLongMissionProgress(missionIndex);
+	}
+
+	public void setLongMissionProgress(LocalDateTime missionDate, int missionIndex, int value) {
+		if (missionIndex < 0) {
+			return;
+		}
+
+		SeasonalPass pass = SeasonalEventManager.getPass(missionDate);
+		if (pass == null) {
+			return;
+		}
+
+		List<LongMission> longMissions = pass.getLongMissions();
+		int numMissions = longMissions.size();
+		if (missionIndex >= numMissions) {
+			return;
+		}
+		LongMission mission = longMissions.get(missionIndex);
+
+		PassProgress passProgress;
+		passProgress = mAllPassProgress.computeIfAbsent(pass.mPassStart, k -> new PassProgress());
+
+		while (passProgress.mLongMissionProgress.size() < numMissions) {
+			passProgress.mLongMissionProgress.add(0);
+		}
+
+		int oldValue = passProgress.mLongMissionProgress.get(missionIndex);
+
+		boolean wasComplete = oldValue < 0;
+		boolean isComplete = value < 0 || value >= mission.mAmount;
+		if (!isComplete) {
+			if (wasComplete) {
+				passProgress.addMissionPoints(-mission.mMP);
+			}
+		} else {
+			value = -1;
+			if (!wasComplete) {
+				passProgress.addMissionPoints(mission.mMP);
+			}
+		}
+
+		passProgress.mLongMissionProgress.set(missionIndex, value);
+	}
+
+	public int addLongMissionProgress(LocalDateTime missionDate, int missionIndex, int value) {
+		if (missionIndex < 0) {
+			return 0;
+		}
+
+		SeasonalPass pass = SeasonalEventManager.getPass(missionDate);
+		if (pass == null) {
+			return 0;
+		}
+		List<LongMission> longMissions = pass.getLongMissions();
+		int numMissions = longMissions.size();
+		if (missionIndex > numMissions) {
+			return 0;
+		}
+		LongMission mission = longMissions.get(missionIndex);
+
+		PassProgress passProgress;
+		passProgress = mAllPassProgress.computeIfAbsent(pass.mPassStart, k -> new PassProgress());
+
+		while (passProgress.mLongMissionProgress.size() < numMissions) {
+			passProgress.mLongMissionProgress.add(0);
+		}
+
+		int oldValue = passProgress.mLongMissionProgress.get(missionIndex);
+		if (value < 0 && oldValue < 0) {
+			// Exception for mod work; only used when reverting progress
+			value = mission.mAmount + value;
+		} else {
+			value += oldValue;
+		}
+
+		boolean wasComplete = oldValue < 0;
+		boolean isComplete = value < 0 || value >= mission.mAmount;
+		if (!isComplete) {
+			if (wasComplete) {
+				passProgress.addMissionPoints(-mission.mMP);
+			}
+		} else {
+			value = -1;
+			if (!wasComplete) {
+				passProgress.addMissionPoints(mission.mMP);
+			}
+		}
+
+		passProgress.mLongMissionProgress.set(missionIndex, value);
 		return value;
 	}
 

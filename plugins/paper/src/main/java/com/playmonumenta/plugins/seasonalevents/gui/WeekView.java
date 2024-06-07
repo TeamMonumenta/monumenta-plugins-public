@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents.gui;
 
+import com.playmonumenta.plugins.seasonalevents.LongMission;
 import com.playmonumenta.plugins.seasonalevents.PlayerProgress;
 import com.playmonumenta.plugins.seasonalevents.PlayerProgress.PassProgress;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
@@ -74,12 +75,23 @@ public class WeekView extends View {
 			item.setItemMeta(meta);
 			mGui.setItem(0, 2, item);
 
-			List<WeeklyMission> weekMissions = pass.getMissionsInWeek(displayWeek);
+			List<WeeklyMission> weekMissions = pass.getActiveWeeklyMissions(displayWeek);
+			List<LongMission> longMissions = pass.getActiveLongMissions();
 			PlayerProgress playerProgress = SeasonalEventManager.getPlayerProgress(displayedPlayer);
 
-			int numMissions = weekMissions.size();
-			for (int missionIndex = 0; missionIndex < numMissions; missionIndex++) {
-				mGui.addMissionIcon(0, 3 + missionIndex, weekMissions, playerProgress, week, missionIndex);
+			int missionIndex;
+			int numWeeklyMissions = weekMissions.size();
+			for (missionIndex = 0; missionIndex < numWeeklyMissions; missionIndex++) {
+				mGui.addWeeklyMissionIcon(0, 3 + missionIndex, weekMissions, playerProgress, week, missionIndex);
+			}
+
+			int numLongMissions = longMissions.size();
+			for (missionIndex = 0; missionIndex < numLongMissions; missionIndex++) {
+				mGui.addLongMissionIcon(0,
+					3 + numWeeklyMissions + missionIndex,
+					longMissions,
+					playerProgress,
+					missionIndex);
 			}
 		}
 

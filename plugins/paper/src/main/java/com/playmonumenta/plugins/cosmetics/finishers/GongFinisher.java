@@ -204,7 +204,6 @@ public class GongFinisher implements EliteFinisher {
 					loc.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 0.1f);
 					loc.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 0.1f);
 					loc.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 0.1f);
-					loc.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 0.1f);
 				}
 
 				if (mTicks >= 49) {

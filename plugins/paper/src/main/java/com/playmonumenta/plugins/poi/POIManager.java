@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -47,6 +48,8 @@ public class POIManager implements Listener {
 		if (!pois.add(poi)) {
 			return false;
 		}
+		//Call MonumentaEvent as poi_biome content
+		Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, poi.getLocation()));
 
 		// Generate loot chest
 		List<Component> loreList = new ArrayList<>();

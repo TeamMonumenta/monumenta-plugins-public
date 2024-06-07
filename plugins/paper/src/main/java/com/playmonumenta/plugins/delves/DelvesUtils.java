@@ -357,6 +357,10 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("ruin", "DMASDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("portal", "DPSDelve");
 
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("starpoint", "DSPDelve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("keep", "DPKDelve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("wolfswood", "DWWDelve");
+
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev1", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev2", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("mobs", "DTestDelve");
