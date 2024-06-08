@@ -1111,7 +1111,15 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			int mTick = 0;
 
 			boolean hasFedora(Player p) {
-				return MessagingUtils.plainText(p.getEquipment().getHelmet().displayName()).equals("Fedora");
+				ItemStack helmet = p.getInventory().getHelmet();
+				if (helmet == null) {
+					return false;
+				}
+				Component name = helmet.getItemMeta().displayName();
+				if (name == null) {
+					return false;
+				}
+				return MessagingUtils.plainText(name).equals("Fedora");
 			}
 
 			@Override
