@@ -37,6 +37,10 @@ public class PlayerGuildInfo {
 		mGuildPermissions = guildPermissions;
 	}
 
+	public CompletableFuture<PlayerGuildInfo> getUpdated() {
+		return of(mUser, mGuild);
+	}
+
 	public static CompletableFuture<PlayerGuildInfo> of(User user, Group guild) {
 		CompletableFuture<PlayerGuildInfo> future = new CompletableFuture<>();
 

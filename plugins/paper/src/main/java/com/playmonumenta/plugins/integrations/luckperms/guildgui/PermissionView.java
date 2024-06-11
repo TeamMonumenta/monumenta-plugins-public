@@ -8,13 +8,16 @@ import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.model.PermissionHolder;
 import net.luckperms.api.model.group.Group;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -29,31 +32,62 @@ public class PermissionView extends View {
 	protected static final int PERMISSION_ROW = 4;
 
 	protected final PermissionHolder mTarget;
-	protected final ItemStack mTargetIcon;
+	protected final Supplier<CompletableFuture<ItemStack>> mRefreshTargetIcon;
 	protected final @Nullable Consumer<InventoryClickEvent> mOnTargetClick;
+	protected final View mPreviousView;
+	protected ItemStack mTargetIcon;
 
 	public PermissionView(GuildGui gui,
 	                      PermissionHolder target,
-	                      ItemStack targetIcon,
+						  ItemStack targetIcon,
+	                      Supplier<CompletableFuture<ItemStack>> refreshTargetIcon,
 	                      @Nullable Consumer<InventoryClickEvent> onTargetClick) {
 		super(gui);
 		mTarget = target;
 		mTargetIcon = targetIcon;
+		mRefreshTargetIcon = refreshTargetIcon;
 		mOnTargetClick = onTargetClick;
+		if (mGui.mView instanceof PermissionView lastPermissionView) {
+			mPreviousView = lastPermissionView.mPreviousView;
+		} else {
+			mPreviousView = mGui.mView;
+		}
 	}
 
 	@Override
 	public void setup() {
-		GuiItem targetItem = mGui.setItem(TARGET_Y, TARGET_X, mTargetIcon);
+		setBackIcon();
+
+		Component targetName = mTargetIcon.getItemMeta().displayName();
+		GuiItem targetIcon = mGui.setItem(TARGET_Y, TARGET_X, mTargetIcon);
 		if (mOnTargetClick != null) {
-			targetItem.onClick(mOnTargetClick);
+			targetIcon.onClick(mOnTargetClick);
 		}
 
-		setPermissionIcon(PERMISSION_ROW, 3, GuildPermission.CHAT);
-		setPermissionIcon(PERMISSION_ROW, 5, GuildPermission.VISIT);
+		setPermissionIcon(PERMISSION_ROW, 3, GuildPermission.CHAT, targetName);
+		setPermissionIcon(PERMISSION_ROW, 5, GuildPermission.VISIT, targetName);
 	}
 
-	protected void setPermissionIcon(int row, int column, GuildPermission guildPermission) {
+	@Override
+	public void refresh() {
+		super.refresh();
+
+		Bukkit.getScheduler().runTaskAsynchronously(mGui.mMainPlugin, () -> {
+			ItemStack refreshedTargetIcon = mRefreshTargetIcon.get().join();
+
+			Bukkit.getScheduler().runTask(mGui.mMainPlugin, () -> {
+				mTargetIcon = refreshedTargetIcon;
+				mGui.update();
+			});
+		});
+	}
+
+	protected void setPermissionIcon(
+		int row,
+		int column,
+		GuildPermission guildPermission,
+		@Nullable Component targetName
+	) {
 		if (mGui.mGuildGroup == null) {
 			ItemStack item = LuckPermsIntegration.getErrorQuestionMarkPlayerHead();
 			ItemMeta meta = item.getItemMeta();
@@ -79,7 +113,6 @@ public class PermissionView extends View {
 			material = isPermitted ? Material.LIME_CONCRETE : Material.PINK_CONCRETE;
 		}
 
-		Component targetName = mTargetIcon.getItemMeta().displayName();
 		if (targetName == null) {
 			targetName = Component.text(mTarget.getFriendlyName(), NamedTextColor.RED);
 		}
@@ -186,5 +219,11 @@ public class PermissionView extends View {
 				.append(Component.text(" by default"));
 		}
 		return resultComponent;
+	}
+
+	protected void setBackIcon() {
+		ItemStack backIcon = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.WHITE, true);
+		mGui.setItem(GuildGui.HEADER_Y, 0, backIcon)
+			.onClick((InventoryClickEvent event) -> mGui.setView(mPreviousView));
 	}
 }

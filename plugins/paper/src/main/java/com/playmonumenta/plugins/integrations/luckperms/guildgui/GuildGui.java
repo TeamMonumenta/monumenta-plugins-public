@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -68,7 +69,6 @@ public class GuildGui extends Gui {
 	protected @Nullable String mGuildId;
 	protected @Nullable Group mGuildGroup;
 	protected View mView;
-	protected int mPage = 0;
 
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.gui");
@@ -419,45 +419,6 @@ public class GuildGui extends Gui {
 		});
 	}
 
-	protected void setPageArrows(int totalRows) {
-		int maxPage = Math.floorDiv(Math.max(0, totalRows - 1), PAGE_HEIGHT);
-		mPage = Math.max(0, Math.min(mPage, maxPage));
-
-		ItemStack item;
-		ItemMeta meta;
-
-		// Prev/Next page buttons
-		if (mPage > 0) {
-			item = new ItemStack(Material.ARROW);
-			meta = item.getItemMeta();
-			meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE, TextDecoration.BOLD)
-				.decoration(TextDecoration.ITALIC, false));
-			item.setItemMeta(meta);
-			setItem(HEADER_Y, 0, item).onClick((InventoryClickEvent event) -> clickPrev());
-		}
-
-		if (mPage < maxPage) {
-			item = new ItemStack(Material.ARROW);
-			meta = item.getItemMeta();
-			meta.displayName(Component.text("Next Page", NamedTextColor.WHITE, TextDecoration.BOLD)
-				.decoration(TextDecoration.ITALIC, false));
-			item.setItemMeta(meta);
-			setItem(HEADER_Y, 8, item).onClick((InventoryClickEvent event) -> clickNext());
-		}
-	}
-
-	private void clickPrev() {
-		mPage--;
-		mPlayer.playSound(mPlayer, Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		update();
-	}
-
-	private void clickNext() {
-		mPage++;
-		mPlayer.playSound(mPlayer, Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		update();
-	}
-
 	protected void setGuildIcon(int row, int column, PlayerGuildInfo guildInfo) {
 		Group guild = guildInfo.getGuild();
 		GuildAccessLevel accessLevel = guildInfo.getAccessLevel();
@@ -485,11 +446,11 @@ public class GuildGui extends Gui {
 		}
 		for (GuildPermission guildPermission : GuildPermission.values()) {
 			if (guildInfo.getGuildPermissions().contains(guildPermission)) {
-				lore.add(Component.text("Allowed to ", NamedTextColor.GREEN)
+				lore.add(Component.text("- May ", NamedTextColor.GREEN)
 					.decoration(TextDecoration.ITALIC, false)
 					.append(Component.text(guildPermission.mLabel)));
 			} else {
-				lore.add(Component.text("Not allowed to ", NamedTextColor.RED)
+				lore.add(Component.text("- May Not ", NamedTextColor.RED)
 					.decoration(TextDecoration.ITALIC, false)
 					.append(Component.text(guildPermission.mLabel)));
 			}
@@ -726,7 +687,7 @@ public class GuildGui extends Gui {
 		switch (accessLevel) {
 			case FOUNDER:
 				lore.add(
-					Component.text("Founders may:", NamedTextColor.DARK_GRAY)
+					Component.text("Founders:", NamedTextColor.DARK_GRAY)
 						.decoration(TextDecoration.ITALIC, false));
 				lore.add(
 					Component.text("- May promote and demote", NamedTextColor.DARK_GRAY)
@@ -743,7 +704,7 @@ public class GuildGui extends Gui {
 				// fall through
 			case MANAGER:
 				lore.add(
-					Component.text("Managers and up may:", NamedTextColor.AQUA)
+					Component.text("Managers and up:", NamedTextColor.AQUA)
 						.decoration(TextDecoration.ITALIC, false));
 				lore.add(
 					Component.text("- May add and remove", NamedTextColor.AQUA)
@@ -760,23 +721,42 @@ public class GuildGui extends Gui {
 				// fall through
 			case MEMBER:
 				lore.add(
-					Component.text("Members and up may:", NamedTextColor.GOLD)
+					Component.text("Members and up:", NamedTextColor.GOLD)
 						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May talk in guild chat", NamedTextColor.GOLD)
-						.decoration(TextDecoration.ITALIC, false));
-				// fall through
+				break;
 			case GUEST:
 				lore.add(
-					Component.text("Guests and up may:", NamedTextColor.GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May visit the guild", NamedTextColor.GRAY)
+					Component.text("Guests:", NamedTextColor.GRAY)
 						.decoration(TextDecoration.ITALIC, false));
 				break;
 			default:
 				lore.add(Component.text("- This should not appear!", NamedTextColor.RED)
 					.decoration(TextDecoration.ITALIC, false));
+		}
+
+		Group guildRoot = LuckPermsIntegration.getGuildRoot(mGuildGroup);
+		Group displayedAccessLevel;
+		if (guildRoot != null) {
+			// GuildPermissions are always granted to Member and up, and are optional for guests
+			if (accessLevel.equals(GuildAccessLevel.GUEST)) {
+				displayedAccessLevel = GuildAccessLevel.GUEST.getLoadedGroupFromRoot(guildRoot);
+			} else {
+				displayedAccessLevel = GuildAccessLevel.MEMBER.getLoadedGroupFromRoot(guildRoot);
+			}
+
+			if (displayedAccessLevel != null) {
+				for (GuildPermission guildPermission : GuildPermission.values()) {
+					if (guildPermission.hasAccess(guildRoot, displayedAccessLevel)) {
+						lore.add(Component.text("- May ", NamedTextColor.GREEN)
+							.decoration(TextDecoration.ITALIC, false)
+							.append(Component.text(guildPermission.mLabel)));
+					} else {
+						lore.add(Component.text("- May Not ", NamedTextColor.RED)
+							.decoration(TextDecoration.ITALIC, false)
+							.append(Component.text(guildPermission.mLabel)));
+					}
+				}
+			}
 		}
 
 		if (GuildAccessLevel.GUEST.equals(accessLevel) && mayManagePermissions(false)) {
@@ -811,6 +791,11 @@ public class GuildGui extends Gui {
 				View view = new PermissionView(this,
 					guestGroup,
 					getAccessHeaderIcon(GuildAccessLevel.GUEST),
+					() -> {
+						CompletableFuture<ItemStack> future = new CompletableFuture<>();
+						future.complete(getAccessHeaderIcon(GuildAccessLevel.GUEST));
+						return future;
+					},
 					onGuestAccessHeaderClick());
 				setView(view);
 			}
@@ -872,11 +857,11 @@ public class GuildGui extends Gui {
 		if (GuildAccessLevel.GUEST.equals(playerGuildInfo.getAccessLevel())) {
 			for (GuildPermission guildPermission : GuildPermission.values()) {
 				if (playerGuildInfo.getGuildPermissions().contains(guildPermission)) {
-					lore.add(Component.text("Allowed to ", NamedTextColor.GREEN)
+					lore.add(Component.text("- May ", NamedTextColor.GREEN)
 						.decoration(TextDecoration.ITALIC, false)
 						.append(Component.text(guildPermission.mLabel)));
 				} else {
-					lore.add(Component.text("Not allowed to ", NamedTextColor.RED)
+					lore.add(Component.text("- May Not ", NamedTextColor.RED)
 						.decoration(TextDecoration.ITALIC, false)
 						.append(Component.text(guildPermission.mLabel)));
 				}
@@ -908,6 +893,16 @@ public class GuildGui extends Gui {
 				View view = new PermissionView(this,
 					playerGuildInfo.getUser(),
 					getPlayerIconItem(playerGuildInfo),
+					() -> {
+						CompletableFuture<ItemStack> future = new CompletableFuture<>();
+
+						Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
+							PlayerGuildInfo updated = playerGuildInfo.getUpdated().join();
+							future.complete(getPlayerIconItem(updated));
+						});
+
+						return future;
+					},
 					onPlayerIconClick(playerGuildInfo));
 				setView(view);
 			}

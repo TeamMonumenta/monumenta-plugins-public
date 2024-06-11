@@ -73,7 +73,7 @@ public class GuildMembersView extends View {
 			totalRows += Math.max(1, (inviteList.size() + PAGE_WIDTH - 1) / PAGE_WIDTH);
 		}
 
-		mGui.setPageArrows(totalRows);
+		setPageArrows(totalRows);
 
 		if (mGui.mGuildGroup == null) {
 			mGui.setTitle(Component.text("Guild not found"));
@@ -84,7 +84,7 @@ public class GuildMembersView extends View {
 
 		for (int y = 0; y < GuildGui.PAGE_HEIGHT; y++) {
 			for (int x = 0; x < PAGE_WIDTH; x++) {
-				int absoluteIndex = (mGui.mPage * GuildGui.PAGE_HEIGHT + y) * PAGE_WIDTH + x;
+				int absoluteIndex = (mPage * GuildGui.PAGE_HEIGHT + y) * PAGE_WIDTH + x;
 				Map.Entry<Integer, GuildInviteLevel> inviteIndexLevelPair
 					= inviteStartIndices.floorEntry(absoluteIndex);
 				if (inviteIndexLevelPair != null) {

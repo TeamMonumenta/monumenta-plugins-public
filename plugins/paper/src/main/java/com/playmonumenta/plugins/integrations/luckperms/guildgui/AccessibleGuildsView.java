@@ -25,7 +25,7 @@ public class AccessibleGuildsView extends View {
 	@Override
 	public void setup() {
 		int totalRows = Math.floorDiv((mAccessibleGuilds.size() + PAGE_WIDTH - 1), PAGE_WIDTH);
-		mGui.setPageArrows(totalRows);
+		setPageArrows(totalRows);
 
 		mGui.setTitle(Component.text("Your Guilds"));
 
@@ -36,7 +36,7 @@ public class AccessibleGuildsView extends View {
 			}
 
 			for (int x = 0; x < PAGE_WIDTH; x++) {
-				index = (mGui.mPage * GuildGui.PAGE_HEIGHT + y) * PAGE_WIDTH + x;
+				index = (mPage * GuildGui.PAGE_HEIGHT + y) * PAGE_WIDTH + x;
 				if (index >= mAccessibleGuilds.size()) {
 					break;
 				}
