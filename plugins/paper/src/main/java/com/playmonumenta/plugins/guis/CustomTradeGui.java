@@ -1126,12 +1126,8 @@ public class CustomTradeGui extends Gui {
 		int locationR = isGeneral ? GUI_ID_GENERAL_R : GUI_ID_CONFIRM_R;
 		String tagL = isGeneral ? "gui_trade_1_l" : "gui_trade_2_l";
 		String tagR = isGeneral ? "gui_trade_1_r" : "gui_trade_2_r";
-		ItemStack tempL = mBackgroundPane.clone();
-		ItemStack tempR = mBackgroundPane.clone();
-		GUIUtils.setGuiNbtTag(tempL, "texture", tagL, mGuiTagsActive);
-		GUIUtils.setGuiNbtTag(tempR, "texture", tagR, mGuiTagsActive);
-		setItem(locationL, tempL);
-		setItem(locationR, tempR);
+		setItem(locationL, GUIUtils.createGuiIdentifierItem(tagL, mGuiTagsActive));
+		setItem(locationR, GUIUtils.createGuiIdentifierItem(tagR, mGuiTagsActive));
 	}
 	//endregion
 
