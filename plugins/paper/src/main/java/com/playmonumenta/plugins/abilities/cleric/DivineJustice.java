@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
@@ -136,7 +137,8 @@ public class DivineJustice extends Ability {
 			return false;
 		}
 		if ((event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) ||
-			(event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true))) {
+			(event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
+			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
 			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
@@ -172,10 +174,8 @@ public class DivineJustice extends Ability {
 				}
 				mComboNumber = 0;
 			}
-
-			return true;
 		}
-		return false;
+		return false; // keep the ability open for more Multishot crits this tick
 	}
 
 	@Override
