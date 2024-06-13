@@ -16,10 +16,10 @@ public class GUITextures {
 			.executesPlayer((player, args) -> {
 				if (ScoreboardUtils.getScoreboardValue(player, GUIUtils.GUI_TEXTURES_OBJECTIVE).orElse(0) == 0) {
 					ScoreboardUtils.setScoreboardValue(player, GUIUtils.GUI_TEXTURES_OBJECTIVE, 1);
-					player.sendMessage(Component.text("Resource Pack GUI textures have been ", NamedTextColor.GOLD).append(Component.text("enabled", NamedTextColor.GREEN).append(Component.text(".", NamedTextColor.GOLD))));
+					player.sendMessage(Component.text("Resource Pack GUI textures have been ", NamedTextColor.GOLD).append(Component.text("disabled", NamedTextColor.RED).append(Component.text(".", NamedTextColor.GOLD))));
 				} else {
 					ScoreboardUtils.setScoreboardValue(player, GUIUtils.GUI_TEXTURES_OBJECTIVE, 0);
-					player.sendMessage(Component.text("Resource Pack GUI textures have been ", NamedTextColor.GOLD).append(Component.text("disabled", NamedTextColor.RED).append(Component.text(".", NamedTextColor.GOLD))));
+					player.sendMessage(Component.text("Resource Pack GUI textures have been ", NamedTextColor.GOLD).append(Component.text("enabled", NamedTextColor.GREEN).append(Component.text(".", NamedTextColor.GOLD))));
 				}
 			})
 			.register();

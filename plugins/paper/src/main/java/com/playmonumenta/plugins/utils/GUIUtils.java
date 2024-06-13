@@ -341,10 +341,10 @@ public class GUIUtils {
 	}
 
 	/**
-	 * Checks if the player has the required toggle for GUI textures enabled.
+	 * Checks if the player has the required toggle for GUI textures enabled. Enabled when the score is 0.
 	 */
 	public static boolean getGuiTextureObjective(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, GUIUtils.GUI_TEXTURES_OBJECTIVE).orElse(1) == 1;
+		return ScoreboardUtils.getScoreboardValue(player, GUIUtils.GUI_TEXTURES_OBJECTIVE).orElse(0) == 0;
 	}
 
 	/**
