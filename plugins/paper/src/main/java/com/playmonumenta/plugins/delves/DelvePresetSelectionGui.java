@@ -26,8 +26,10 @@ public class DelvePresetSelectionGui extends Gui {
 
 	@Override
 	public void setup() {
-		ItemStack background = GUIUtils.createGuiIdentifierItem("gui_delve_2", mGuiTextures);
-		setItem(0, 0, background);
+		ItemStack backgroundl = GUIUtils.createGuiIdentifierItem("gui_delve_2_l", mGuiTextures);
+		setItem(0, 0, backgroundl);
+		ItemStack backgroundr = GUIUtils.createGuiIdentifierItem("gui_delve_2_r", mGuiTextures);
+		setItem(0, 8, backgroundr);
 
 		Map<Integer, List<DelvePreset>> levelMap = new HashMap<>();
 		for (int i = 1; i <= 3; i++) {
