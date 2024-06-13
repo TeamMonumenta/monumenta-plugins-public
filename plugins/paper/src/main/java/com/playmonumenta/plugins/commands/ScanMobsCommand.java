@@ -6,6 +6,7 @@ import com.goncalomb.bukkit.nbteditor.nbt.MobNBT;
 import com.goncalomb.bukkit.nbteditor.nbt.attributes.Attribute;
 import com.goncalomb.bukkit.nbteditor.nbt.attributes.AttributeContainer;
 import com.goncalomb.bukkit.nbteditor.nbt.attributes.AttributeType;
+import com.goncalomb.bukkit.nbteditor.nbt.variables.EffectsVariable;
 import com.goncalomb.bukkit.nbteditor.nbt.variables.FloatVariable;
 import com.goncalomb.bukkit.nbteditor.nbt.variables.ItemsVariable;
 import com.goncalomb.bukkit.nbteditor.nbt.variables.NBTVariable;
@@ -13,9 +14,11 @@ import com.google.common.collect.Multimap;
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.libraryofsouls.SoulEntry;
 import com.playmonumenta.libraryofsouls.SoulsDatabase;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
@@ -27,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.attribute.AttributeModifier;
@@ -36,12 +41,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
 
 public class ScanMobsCommand {
 	public static Iterator<Soul> ARMOR_SOULS = Collections.emptyIterator();
 	public static Iterator<Soul> EQUIPMENT_SOULS = Collections.emptyIterator();
 	public static Iterator<Soul> HEALTH_SOULS = Collections.emptyIterator();
+	public static Iterator<Soul> EFFECT_SOULS = Collections.emptyIterator();
 
 	public static EnumSet<EntityType> BASE_ARMOR_TYPES = EnumSet.of(
 		EntityType.ZOMBIE,
@@ -61,52 +69,32 @@ public class ScanMobsCommand {
 		Enchantment.DAMAGE_ALL
 	);
 
+	private static final IntegerArgument countArg = new IntegerArgument("count");
+
 	public static void register() {
-		IntegerArgument countArg = new IntegerArgument("count");
+		if (ServerProperties.getShardName().contains("build")) {
+			return;
+		}
+		registerSubCommand("armor", ScanMobsCommand::refreshArmor, ScanMobsCommand::getArmor);
+		registerSubCommand("equipment", ScanMobsCommand::refreshEquipment, ScanMobsCommand::getEquipment);
+		registerSubCommand("health", ScanMobsCommand::refreshHealth, ScanMobsCommand::getHealth);
+		registerSubCommand("effects", ScanMobsCommand::refreshEffects, ScanMobsCommand::getEffects);
+	}
 
+	private static void registerSubCommand(String command, Consumer<Player> refresh, BiConsumer<Player, Integer> getter) {
 		new CommandAPICommand("scanmobs")
 			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("armor"), new LiteralArgument("refresh"))
+			.withArguments(new LiteralArgument(command), new LiteralArgument("refresh"))
 			.executesPlayer((player, args) -> {
-				refreshArmor(player);
+				refresh.accept(player);
 			}).register();
 
 		new CommandAPICommand("scanmobs")
 			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("armor"), new LiteralArgument("get"))
+			.withArguments(new LiteralArgument(command), new LiteralArgument("get"))
 			.withOptionalArguments(countArg)
 			.executesPlayer((player, args) -> {
-				getArmor(player, args.getByArgumentOrDefault(countArg, 1));
-			}).register();
-
-		new CommandAPICommand("scanmobs")
-			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("refresh"))
-			.executesPlayer((player, args) -> {
-				refreshEquipment(player);
-			}).register();
-
-		new CommandAPICommand("scanmobs")
-			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("equipment"), new LiteralArgument("get"))
-			.withOptionalArguments(countArg)
-			.executesPlayer((player, args) -> {
-				getEquipment(player, args.getByArgumentOrDefault(countArg, 1));
-			}).register();
-
-		new CommandAPICommand("scanmobs")
-			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("health"), new LiteralArgument("refresh"))
-			.executesPlayer((player, args) -> {
-				refreshHealth(player);
-			}).register();
-
-		new CommandAPICommand("scanmobs")
-			.withPermission("monumenta.command.scanmobs")
-			.withArguments(new LiteralArgument("health"), new LiteralArgument("get"))
-			.withOptionalArguments(countArg)
-			.executesPlayer((player, args) -> {
-				getHealth(player, args.getByArgumentOrDefault(countArg, 1));
+				getter.accept(player, args.getByArgumentOrDefault(countArg, 1));
 			}).register();
 	}
 
@@ -329,5 +317,61 @@ public class ScanMobsCommand {
 		}
 		HEALTH_SOULS = souls.iterator();
 		player.sendMessage("Refreshed. Found " + souls.size() + " mobs with non-max health.");
+	}
+
+	private static void getEffects(Player player, int count) {
+		int i = 0;
+		while (EFFECT_SOULS.hasNext() && i < count) {
+			Soul soul = EFFECT_SOULS.next();
+			i++;
+			ItemStack bosItem = soul.getBoS();
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(bosItem);
+			List<PotionEffect> effects = getPotionEffects(entityNBT);
+
+			String mobName = MessagingUtils.plainText(soul.getDisplayName());
+
+			ItemUtils.modifyMeta(bosItem, meta -> meta.displayName(soul.getDisplayName()));
+			InventoryUtils.giveItem(player, bosItem);
+			Component msg = Component.text(mobName + " has bad effects: ");
+			for (PotionEffect effect : effects) {
+				if (!isBadEffect(effect)) {
+					continue;
+				}
+				msg = msg.append(Component.text("{" + effect.getType() + " (" + StringUtils.ticksToTime(effect.getDuration()) + ")} "));
+			}
+
+			player.sendMessage(msg);
+		}
+	}
+
+	private static void refreshEffects(Player player) {
+		List<Soul> souls = new ArrayList<>();
+		List<SoulEntry> originalSouls = SoulsDatabase.getInstance().getSouls();
+		for (SoulEntry soul : originalSouls) {
+			EntityNBT entityNBT = BookOfSouls.bookToEntityNBT(soul.getBoS());
+			for (PotionEffect effect : getPotionEffects(entityNBT)) {
+				if (isBadEffect(effect)) {
+					souls.add(soul);
+					break;
+				}
+			}
+		}
+		EFFECT_SOULS = souls.iterator();
+		player.sendMessage("Refreshed. Found " + souls.size() + " mobs with bad effects.");
+	}
+
+	private static List<PotionEffect> getPotionEffects(EntityNBT nbt) {
+		if (nbt.getVariable("ActiveEffects") instanceof EffectsVariable effects) {
+			ItemStack item = effects.getItem();
+			if (item != null && item.getItemMeta() instanceof PotionMeta potionMeta) {
+				return potionMeta.getCustomEffects();
+			}
+		}
+		return List.of();
+	}
+
+	private static boolean isBadEffect(PotionEffect effect) {
+		// Arbitrary choice of 10 minutes
+		return effect.getDuration() >= 12000;
 	}
 }
