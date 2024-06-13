@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -25,11 +26,10 @@ import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 public class CharmsCommand extends GenericCommand {
 
-	public static void register(Plugin plugin) {
+	public static void register() {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.charm");
 		CommandPermission charmFactoryPerms = CommandPermission.fromString("monumenta.command.charmfactory");
@@ -171,6 +171,9 @@ public class CharmsCommand extends GenericCommand {
 			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
+				if (checkZone(player)) {
+					return;
+				}
 				new CharmsGUI(player).open();
 			}).register();
 
@@ -184,6 +187,9 @@ public class CharmsCommand extends GenericCommand {
 				Player viewer = player;
 				if (sender instanceof Player s) {
 					viewer = s;
+				}
+				if (checkZone(viewer)) {
+					return;
 				}
 				new CharmsGUI(viewer, player).open();
 			}).register();
@@ -208,6 +214,9 @@ public class CharmsCommand extends GenericCommand {
 			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
+				if (checkZone(player)) {
+					return;
+				}
 				new CharmsGUI(player).open();
 			}).register();
 
@@ -218,6 +227,9 @@ public class CharmsCommand extends GenericCommand {
 			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((sender, args) -> {
+				if (checkZone(sender)) {
+					return;
+				}
 				Player player = args.getUnchecked("player");
 				if (!PremiumVanishIntegration.canSee(sender, player)) {
 					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
@@ -233,6 +245,9 @@ public class CharmsCommand extends GenericCommand {
 			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
+				if (checkZone(player)) {
+					return;
+				}
 				new CharmsGUI(player, CharmManager.CharmType.ZENITH).open();
 			}).register();
 
@@ -243,6 +258,9 @@ public class CharmsCommand extends GenericCommand {
 			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((sender, args) -> {
+				if (checkZone(sender)) {
+					return;
+				}
 				Player player = args.getUnchecked("player");
 				if (!PremiumVanishIntegration.canSee(sender, player)) {
 					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
@@ -276,5 +294,13 @@ public class CharmsCommand extends GenericCommand {
 				}
 			}).register();
 
+	}
+
+	private static boolean checkZone(Player player) {
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_CHARMS)) {
+			player.sendMessage(Component.text("Charms cannot be accessed here!", NamedTextColor.RED));
+			return true;
+		}
+		return false;
 	}
 }

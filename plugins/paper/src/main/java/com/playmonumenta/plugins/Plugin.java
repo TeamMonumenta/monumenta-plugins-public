@@ -223,7 +223,7 @@ public class Plugin extends JavaPlugin {
 		BossFight.register();
 		ChangeLogLevel.register();
 		ChargeUpBarCommand.register(this);
-		CharmsCommand.register(this);
+		CharmsCommand.register();
 		ClaimRaffle.register(this);
 		ClearPortals.register();
 		CoreProtectLogCommand.register();
