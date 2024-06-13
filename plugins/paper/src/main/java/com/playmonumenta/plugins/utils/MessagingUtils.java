@@ -284,11 +284,15 @@ public class MessagingUtils {
 		player.sendMessage(builder.create());
 	}
 
-	public static Component concatinateComponents(List<Component> components) {
+	public static Component concatenateComponents(List<Component> components) {
+		return concatenateComponents(components, Component.newline());
+	}
+
+	public static Component concatenateComponents(List<Component> components, Component separator) {
 		Component output = Component.empty();
 		for (int i = 0; i < components.size(); i++) {
 			if (i > 0) {
-				output = output.append(Component.newline());
+				output = output.append(separator);
 			}
 			output = output.append(components.get(i));
 		}

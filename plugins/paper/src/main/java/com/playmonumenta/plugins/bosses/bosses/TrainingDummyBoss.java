@@ -184,7 +184,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 			if (type == DamageEvent.DamageType.MELEE && player.getInventory().getItemInMainHand().getType() == Material.AIR) {
 				List<Component> effects = DisplayableEffect.getSortedEffectDisplayComponents(com.playmonumenta.plugins.Plugin.getInstance(), mBoss);
-				Component effectHover = MessagingUtils.concatinateComponents(effects);
+				Component effectHover = MessagingUtils.concatenateComponents(effects);
 				player.sendMessage(Component.text("Your punch clears the training dummy of all its status effects.", NamedTextColor.AQUA).hoverEvent(effectHover));
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss);
 			}

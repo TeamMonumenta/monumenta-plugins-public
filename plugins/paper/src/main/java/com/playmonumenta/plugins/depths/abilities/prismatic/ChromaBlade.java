@@ -68,7 +68,6 @@ public class ChromaBlade extends DepthsAbility {
 	public static final Particle.DustOptions WINDWALKER_COLOR = new Particle.DustOptions(Color.fromRGB(200, 240, 220), 1f);
 	public static final Particle.DustOptions PRISMATIC_COLOR = new Particle.DustOptions(Color.fromRGB(245, 200, 245), 1f);
 
-
 	public static final String ABILITY_NAME = "Chroma Blade";
 	public static final double[] DAMAGE = {14, 16, 18, 20, 22, 26};
 	public static final int COOLDOWN = 12 * 20;
@@ -699,14 +698,14 @@ public class ChromaBlade extends DepthsAbility {
 			.add(" melee damage. If your weapon's attack speed is below 1.3, perform slower, wider slashes with 25% increased cooldown instead.")
 			.add(" Additionally, gain a bonus effect depending on the tree of the last ability you used.")
 			.addCooldown(COOLDOWN)
-			.addConditionalTree(DepthsTree.FROSTBORN, getFrostbornDescription(color))
-			.addConditionalTree(DepthsTree.FLAMECALLER, getFlamecallerDescription(color))
-			.addConditionalTree(DepthsTree.DAWNBRINGER, getDawnbringerDescription(color))
-			.addConditionalTree(DepthsTree.EARTHBOUND, getEarthboundDescription(color))
-			.addConditionalTree(DepthsTree.SHADOWDANCER, getShadowdancerDescription(color))
-			.addConditionalTree(DepthsTree.STEELSAGE, getSteelsageDescription(color))
-			.addConditionalTree(DepthsTree.WINDWALKER, getWindwalkerDescription(color))
-			.add(getPrismaticDescription(color));
+			.addConditionalTreeOrAbility(DepthsTree.FROSTBORN, getFrostbornDescription(color))
+			.addConditionalTreeOrAbility(DepthsTree.FLAMECALLER, getFlamecallerDescription(color))
+			.addConditionalTreeOrAbility(DepthsTree.DAWNBRINGER, getDawnbringerDescription(color))
+			.addConditionalTreeOrAbility(DepthsTree.EARTHBOUND, getEarthboundDescription(color))
+			.addConditionalTreeOrAbility(DepthsTree.SHADOWDANCER, getShadowdancerDescription(color))
+			.addConditionalTreeOrAbility(DepthsTree.STEELSAGE, getSteelsageDescription(color))
+			.addConditionalTreeOrAbility(DepthsTree.WINDWALKER, getWindwalkerDescription(color))
+			.addConditionalTreeOrAbility(DepthsTree.PRISMATIC, getPrismaticDescription(color));
 	}
 
 	private static Description<ChromaBlade> getFrostbornDescription(TextColor color) {

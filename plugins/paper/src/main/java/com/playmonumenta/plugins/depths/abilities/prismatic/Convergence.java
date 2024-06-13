@@ -22,9 +22,12 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.PrecisionStrike;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -77,13 +80,7 @@ public class Convergence extends DepthsAbility {
 	}
 
 	private void activate(Location loc, Block block) {
-		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
-		if (party == null) {
-			return;
-		}
-		Set<AbilityInfo<?>> spawnerAbilities = new HashSet<>();
-		party.mPlayersInParty.stream().map(DepthsPlayer::getPlayer).filter(Objects::nonNull).map(mPlugin.mAbilityManager::getPlayerAbilities).map(AbilityCollection::getAbilitiesIgnoringSilence)
-			.forEach(abilities -> abilities.stream().map(Ability::getInfo).filter(info -> info instanceof DepthsAbilityInfo<?> dinfo && dinfo.getDepthsTrigger() == DepthsTrigger.SPAWNER).forEach(spawnerAbilities::add));
+		Set<AbilityInfo<?>> spawnerAbilities = getSpawnerAbilities(mPlugin, mPlayer);
 		for (AbilityInfo<?> info : spawnerAbilities) {
 			if (info == Entrench.INFO) {
 				Entrench.onSpawnerBreak(mPlugin, mPlayer, mRarity, loc);
@@ -99,10 +96,36 @@ public class Convergence extends DepthsAbility {
 		}
 	}
 
+	private static Set<AbilityInfo<?>> getSpawnerAbilities(Plugin plugin, Player player) {
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(player);
+		if (party == null) {
+			return Set.of();
+		}
+		Set<AbilityInfo<?>> spawnerAbilities = new HashSet<>();
+		party.mPlayersInParty.stream().map(DepthsPlayer::getPlayer).filter(Objects::nonNull).map(plugin.mAbilityManager::getPlayerAbilities).map(AbilityCollection::getAbilitiesIgnoringSilence)
+			.forEach(abilities -> abilities.stream().map(Ability::getInfo).filter(info -> info instanceof DepthsAbilityInfo<?> dinfo && dinfo.getDepthsTrigger() == DepthsTrigger.SPAWNER).filter(info -> info != INFO).forEach(spawnerAbilities::add));
+		return spawnerAbilities;
+	}
+
 	private static Description<Convergence> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Convergence>(color)
 			.add("Breaking a spawner or killing an Elite mob triggers each of your living teammates' spawner break abilities at ")
 			.add(DepthsUtils.getRarityComponent(rarity))
-			.add(" level");
+			.add(" level.")
+			.add(ability -> {
+					if (ability == null) {
+						return Component.empty();
+					}
+					Player player = ability.getPlayer();
+					Set<AbilityInfo<?>> spawnerAbilities = getSpawnerAbilities(Plugin.getInstance(), player);
+					if (spawnerAbilities.isEmpty()) {
+						return Component.empty();
+					}
+					List<Component> names = spawnerAbilities.stream()
+						.map(info -> info instanceof DepthsAbilityInfo dInfo ? dInfo.getColoredName() : null)
+						.filter(Objects::nonNull).toList();
+					Component namesComp = MessagingUtils.concatenateComponents(names, Component.text(", "));
+					return Component.text("\n\nCurrent abilities: ").append(namesComp);
+			 });
 	}
 }

@@ -144,6 +144,17 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 		return addConditionalPlayer(p -> DepthsManager.getInstance().hasTreeUnlocked(p, tree), description);
 	}
 
+	public DescriptionBuilder<T> addConditionalTreeOrAbility(DepthsTree tree, Description<T> description) {
+		return addConditionalPlayer(p -> {
+			if (DepthsManager.getInstance().hasTreeUnlocked(p, tree)) {
+				return true;
+			}
+			return DepthsManager.getInstance().getPlayerAbilities(p).stream()
+				.filter(da -> da.getDepthsTree() == tree)
+				.anyMatch(AbilityInfo::hasCooldown);
+		}, description);
+	}
+
 	public DescriptionBuilder<T> addConditionalDepthsContent(DepthsContent content, String s) {
 		return addConditional(a -> DepthsUtils.getDepthsContent() == content, a -> Component.text(s));
 	}

@@ -438,6 +438,10 @@ public class AbilityInfo<T extends Ability> {
 		return mScoreboardId == null ? 0 : ScoreboardUtils.getScoreboardValue(player, mScoreboardId).orElse(0);
 	}
 
+	public boolean hasCooldown() {
+		return mCooldowns != null && !mCooldowns.isEmpty();
+	}
+
 	public JsonObject toJson() {
 		JsonObject info = new JsonObject();
 		if (mScoreboardId != null) {
