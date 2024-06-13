@@ -171,7 +171,7 @@ public class SeasonalEventListener implements Listener {
 					SeasonalEventManager.addMissionProgress(p, mission, 1);
 				} else if (mission.mType == MissionType.DELVE_BOUNTY && content == MonumentaContent.DELVE_BOUNTY) {
 					SeasonalEventManager.addMissionProgress(p, mission, 1);
-				} else if (mission.mType == MissionType.POI_BIOME && content.getContentType() == ContentType.POI) {
+				} else if (mission.mType == MissionType.POI_BIOME && mission.mContent != null && mission.mContent.contains(content)) {
 					// POI matches up - award points
 					SeasonalEventManager.addMissionProgress(p, mission, 1);
 				}

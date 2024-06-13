@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.delves.DelvesModifier;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -71,14 +72,14 @@ public abstract class Mission {
 		} else {
 			String missionTypeStr = missionTypeJson.getAsString();
 			mType = MissionType.getMissionTypeSelection(missionTypeStr);
-			if (mType == null && showWarnings) {
+			if (showWarnings && mType == null) {
 				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
 						+ passName + ": No such mission type " + missionTypeStr, NamedTextColor.RED)
 					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
 			}
 		}
 		mMP = missionObject.get("mp").getAsInt();
-		if (mMP <= 0 && showWarnings) {
+		if (showWarnings && mMP <= 0) {
 			sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
 					+ passName + ": Mission MP is <= 0: " + mMP, NamedTextColor.RED)
 				.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
@@ -89,12 +90,17 @@ public abstract class Mission {
 			mIsBonus = true;
 		}
 		mAmount = missionObject.get("amount").getAsInt();
-		if (mAmount <= 0 && showWarnings) {
+		if (showWarnings && mAmount <= 0) {
 			sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
 					+ passName + ": Mission Amount is <= 0: " + mAmount, NamedTextColor.RED)
 				.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
 		}
 		mDescription = missionObject.get("description").getAsString();
+		if (showWarnings && mDescription.isBlank()) {
+			sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+					+ passName + ": Mission description is blank", NamedTextColor.RED)
+				.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+		}
 
 		// Optional fields
 
@@ -111,10 +117,33 @@ public abstract class Mission {
 							.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
 					}
 					continue;
+				} else {
+					if (mType == MissionType.DELVE_MODIFIER || mType == MissionType.DELVE_POINTS || mType == MissionType.CHALLENGE_DELVE) {
+						if (showWarnings && !DelvesUtils.SHARD_SCOREBOARD_PREFIX_MAPPINGS.containsKey(monumentaContent.getLabel())) {
+							sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+									+ " " + passName
+									+ ": Mission type requires content with delve modifiers, but no delve modifiers are supported for content "
+									+ contentStr, NamedTextColor.RED)
+								.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+						}
+					}
+					if (mType == MissionType.POI_BIOME) {
+						if (showWarnings && ContentType.POI != monumentaContent.getContentType()) {
+							sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+									+ " " + passName + ": Mission type requires POI content type, but found content type "
+									+ monumentaContent.getContentType() + " instead", NamedTextColor.RED)
+								.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+						}
+					}
 				}
 				contentList.add(monumentaContent);
 			}
 			mContent = contentList;
+			if (showWarnings && mContent.isEmpty()) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+						+ " " + passName + ": Content list is empty", NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
 		}
 		if (missionObject.get("region") != null) {
 			mRegion = missionObject.get("region").getAsInt();
@@ -124,15 +153,42 @@ public abstract class Mission {
 						NamedTextColor.RED)
 					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
 			}
+			if (showWarnings && mType == MissionType.REGIONAL_CONTENT && mRegion == 0) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+							+ " " + passName + ": Regional content mission has region set to 0",
+						NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
 		}
 		if (missionObject.get("delvepoints") != null) {
 			mDelvePoints = missionObject.get("delvepoints").getAsInt();
+			if (showWarnings && MissionType.DELVE_POINTS != mType) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+							+ " " + passName + ": \"delvepoints\" field is only used by \"delve_points\" content type, not " + mType,
+						NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
+		} else if (showWarnings && MissionType.DELVE_POINTS == mType) {
+			sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+						+ " " + passName + ": \"delvepoints\" field is required for \"delve_points\" content type, but is missing",
+					NamedTextColor.RED)
+				.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
 		}
 		if (missionObject.get("modifierrank") != null) {
 			mModifierRank = missionObject.get("modifierrank").getAsInt();
+			if (showWarnings && mModifierRank <= 0) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+						+ passName + ": Modifier Rank is <= 0: " + mMP, NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
 		}
 		if (missionObject.get("rotatingamount") != null) {
 			mRotatingModifiersAmount = missionObject.get("rotatingamount").getAsInt();
+			if (showWarnings && mRotatingModifiersAmount <= 0) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+						+ passName + ": Rotating Amount is <= 0: " + mMP, NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
 		}
 		if (missionObject.get("delvemodifier") != null) {
 			// This compares using integers - in json need to list the number of the modifier, not the name!
@@ -179,9 +235,32 @@ public abstract class Mission {
 				}
 			}
 		}
+		if ((mDelveModifiers == null || mDelveModifiers.isEmpty()) && mRotatingModifiersAmount <= 0) {
+			if (showWarnings && MissionType.DELVE_MODIFIER == mType) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+							+ " " + passName
+							+ ": \"delvemodifier\" and/or \"rotatingamount\" field are required for \"delve_modifier\" content type, but are missing or empty",
+						NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
+		}
+
 		JsonElement ascensionJson = missionObject.get("ascension");
 		if (ascensionJson instanceof JsonPrimitive ascensionPrimitive && ascensionPrimitive.isNumber()) {
 			mAscension = ascensionPrimitive.getAsInt();
+			if (showWarnings && MissionType.ZENITH_ASCENSION != mType) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+							+ " " + passName + ": \"ascension\" field is only used by for \"zenith_ascension\" content type, but is set anyways",
+						NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
+		} else {
+			if (showWarnings && MissionType.ZENITH_ASCENSION == mType) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+							+ " " + passName + ": \"ascension\" field is required for \"zenith_ascension\" content type, but is missing",
+						NamedTextColor.RED)
+					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
+			}
 		}
 	}
 
