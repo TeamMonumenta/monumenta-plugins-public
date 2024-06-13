@@ -32,6 +32,7 @@ public class TabPlayerListings implements MarketGuiTab {
 		this.mListingsForPageList = new ArrayList<>();
 		this.mListingsList = new ArrayList<>();
 		this.mListingsIDList = new ArrayList<>();
+		mPlayer = mGui.mPlayer;
 	}
 
 	Player mPlayer;

@@ -127,8 +127,6 @@ public class AbilityHotbar {
 
 		ClassAbility classAbility = ability.getInfo().getLinkedSpell();
 		int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
-		int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
-		int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 
 		TextColor color = ability.getInfo().getActionBarColor();
 		String name = switch (depthsTrigger) {

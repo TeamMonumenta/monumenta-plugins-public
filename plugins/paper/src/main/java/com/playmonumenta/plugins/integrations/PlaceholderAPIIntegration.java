@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -20,8 +21,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -31,22 +34,35 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
+	public enum ShrineType {
+		SPEED("Speed", "D1Finished", NamedTextColor.AQUA),
+		RESISTANCE("Resistance", "D3Finished", NamedTextColor.GRAY),
+		STRENGTH("Strength", "D4Finished", NamedTextColor.DARK_RED),
+		INTUITIVE("Intuitive", "D5Finished", NamedTextColor.GOLD),
+		THRIFT("Thrift", "D6Finished", NamedTextColor.LIGHT_PURPLE),
+		HARVESTER("Harvester", "D7Finished", NamedTextColor.DARK_GREEN),
+		;
+
+		public final String mName;
+		public final String mObjective;
+		public final TextColor mColor;
+
+		ShrineType(String name, String objective, TextColor color) {
+			mName = name;
+			mObjective = objective;
+			mColor = color;
+		}
+
+		public int getRemainingTime() {
+			return ScoreboardUtils.getScoreboardValue("$PatreonShrine", mObjective).orElse(0);
+		}
+	}
+
 	private static final Pattern SHARD_NUMBER_PATTERN = Pattern.compile("(?:-|^dev)(\\d+)$");
 
-	private static final List<Pair<String, String>> mShrineNames = new ArrayList<>(
-			Arrays.asList(
-					Pair.of("Speed", "D1Finished"),
-					Pair.of("Resistance", "D3Finished"),
-					Pair.of("Strength", "D4Finished"),
-					Pair.of("Intuitive", "D5Finished"),
-					Pair.of("Thrift", "D6Finished"),
-					Pair.of("Harvester", "D7Finished")
-			)
-	);
+	private volatile List<ShrineType> mActiveShrines = new ArrayList<>();
 
-	private volatile List<Pair<String, String>> mActiveShrines = new ArrayList<>();
-
-	protected @Nullable BukkitTask mSystemTask = null;
+	protected BukkitTask mSystemTask;
 
 	private final Plugin mPlugin;
 
@@ -58,13 +74,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 			@Override
 			public void run() {
-				List<Pair<String, String>> activeShrines = new ArrayList<>();
-				for (Pair<String, String> shrine : mShrineNames) {
-					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", shrine.getRight()).orElse(0) > 1) {
-						activeShrines.add(shrine);
-					}
-				}
-				mActiveShrines = activeShrines;
+				mActiveShrines = new ArrayList<>(Arrays.stream(ShrineType.values()).filter(shrine -> shrine.getRemainingTime() > 1).toList());
 			}
 		}.runTaskTimer(mPlugin, 0, 15);
 	}
@@ -121,20 +131,19 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrineicon_simplified_".length()).isEmpty() ? 0 :
 					            Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
-				List<Pair<String, String>> activeShrines = mActiveShrines;
-				if (index < activeShrines.size()) {
-					Pair<String, String> currentShrine = activeShrines.get(index);
-					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0) > 1) {
-						return "active/" + currentShrine.getLeft();
+				if (index < mActiveShrines.size()) {
+					ShrineType currentShrine = mActiveShrines.get(index);
+					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.mObjective).orElse(0) > 1) {
+						return "active/" + currentShrine.mName;
 					} else {
-						return "inactive/" + currentShrine.getLeft();
+						return "inactive/" + currentShrine.mName;
 					}
 				}
 			} else {
 				String shrineType = identifier.substring("shrineicon_".length());
-				for (Pair<String, String> shrineName : mShrineNames) {
-					if (shrineName.getLeft().equalsIgnoreCase(shrineType)) {
-						if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", shrineName.getRight()).orElse(0) > 1) {
+				for (ShrineType shrineName : ShrineType.values()) {
+					if (shrineName.mName.equalsIgnoreCase(shrineType)) {
+						if (shrineName.getRemainingTime() > 1) {
 							return "active";
 						} else {
 							return "inactive";
@@ -150,15 +159,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrine_simplified_".length()).isEmpty() ? 0 :
 					            Integer.parseInt(identifier.substring("shrine_simplified_".length()));
-				List<Pair<String, String>> activeShrines = mActiveShrines;
-				if (index < activeShrines.size()) {
-					Pair<String, String> currentShrine = activeShrines.get(index);
-					remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.getRight()).orElse(0);
+				if (index < mActiveShrines.size()) {
+					ShrineType currentShrine = mActiveShrines.get(index);
+					remainingTime = currentShrine.getRemainingTime();
 					if (remainingTime >= 1) {
 						remainingTime = (int) Math.floor(remainingTime / 60.0);
-						return ChatColor.AQUA + currentShrine.getLeft() + ": " + ChatColor.WHITE + remainingTime + "m";
+						return MessagingUtils.legacyFromComponent(Component.text(currentShrine.mName + ": ", currentShrine.mColor).append(Component.text(remainingTime + "m", NamedTextColor.WHITE)));
 					} else {
-						activeShrines.remove(index);
+						mActiveShrines.remove(index);
 						return "";
 					}
 				} else {
@@ -167,14 +175,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 			} else {
 				String shrineType = identifier.substring("shrine_".length());
-				for (Pair<String, String> shrineName : mShrineNames) {
-					if (shrineName.getLeft().equalsIgnoreCase(shrineType)) {
-						remainingTime = ScoreboardUtils.getScoreboardValue("$PatreonShrine", shrineName.getRight()).orElse(0);
+				for (ShrineType shrineName : ShrineType.values()) {
+					if (shrineName.mName.equalsIgnoreCase(shrineType)) {
+						remainingTime = shrineName.getRemainingTime();
 						if (remainingTime >= 1) {
 							remainingTime = (int) Math.floor(remainingTime / 60.0);
-							return ChatColor.AQUA + shrineName.getLeft() + ": " + ChatColor.WHITE + remainingTime + "m";
+							return MessagingUtils.legacyFromComponent(Component.text(shrineName.mName + ": ", shrineName.mColor).append(Component.text(remainingTime + "m", NamedTextColor.WHITE)));
 						} else {
-							return ChatColor.AQUA + shrineName.getLeft() + ChatColor.WHITE + " is not active.";
+							return MessagingUtils.legacyFromComponent(Component.text(shrineName.mName, shrineName.mColor).append(Component.text(" is not active", NamedTextColor.WHITE)));
 						}
 					}
 				}

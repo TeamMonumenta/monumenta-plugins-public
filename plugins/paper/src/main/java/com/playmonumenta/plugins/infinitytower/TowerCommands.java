@@ -16,6 +16,8 @@ import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobStats;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -32,7 +34,6 @@ import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -756,6 +757,9 @@ public class TowerCommands {
 		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_INFO) {
 			String losName = info.mLosName;
 			SoulEntry soul = SoulsDatabase.getInstance().getSoul(losName);
+			if (soul == null) {
+				continue;
+			}
 
 			Attributable entity = (Attributable) soul.summon(player.getLocation().add(0, -100, 0));
 			info.mMobStats.mHP = EntityUtils.getMaxHealth(entity);
@@ -784,9 +788,13 @@ public class TowerCommands {
 		}
 
 		SoulEntry soul = SoulsDatabase.getInstance().getSoul(mob);
+		if (soul == null) {
+			MMLog.warning("Failed to find soul " + mob);
+			return;
+		}
 
 		LivingEntity entity = (LivingEntity) soul.summon(sender.getLocation().add(0, -100, 0));
-		String mobName = ((TextComponent) entity.customName()).content();
+		String mobName = MessagingUtils.plainText(entity.customName());
 
 		if (mobName.startsWith("IT")) {
 			mobName = mobName.replace("IT", "");

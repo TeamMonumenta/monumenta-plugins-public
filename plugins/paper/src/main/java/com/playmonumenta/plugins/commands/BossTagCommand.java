@@ -617,6 +617,9 @@ public class BossTagCommand {
 
 		for (String soulName : soulsName) {
 			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
+			if (soul == null) {
+				continue;
+			}
 			NBTTagList nbtTagsList = soul.getNBT().getList("Tags");
 
 			if (nbtTagsList != null && nbtTagsList.getAsArray() != null) {
@@ -1077,6 +1080,9 @@ public class BossTagCommand {
 		Map<Soul, List<String>> soulDeprecatedTagMap = new LinkedHashMap<>();
 		for (String soulName : LibraryOfSoulsIntegration.getSoulNames()) {
 			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
+			if (soul == null) {
+				continue;
+			}
 			List<String> errors = checkEntity(Component.text(" (soul label: " + soul.getLabel() + ")", NamedTextColor.BLUE), soul.getLabel(), soul.getNBT(), player);
 			if (!errors.isEmpty()) {
 				soulDeprecatedTagMap.put(soul, errors);

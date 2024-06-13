@@ -35,7 +35,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	public static final int detectionRange = 64;
 
 	private final com.playmonumenta.plugins.Plugin mMonPlugin = com.playmonumenta.plugins.Plugin.getInstance();
-	private @Nullable Player mPlayer;
+	private @Nullable Player mPlayer = null;
 	private double mDamage = 0;
 	private double mRange = 0;
 	private int mSilenceTime = 0;
@@ -45,7 +45,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 
 	private Ability[] mAbilities = {};
 	private static final String DOT_EFFECT_NAME = "RestlessSoulsDamageOverTimeEffect";
-	private RestlessSoulsCS mCosmetic;
+	private @Nullable RestlessSoulsCS mCosmetic = null;
 
 	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -70,61 +70,60 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 					             .map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
 			});
 		}
-		mCosmetic.createTeam().addEntity(mBoss);
+		cosmetic.createTeam().addEntity(mBoss);
 	}
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		event.setCancelled(true);
-		attack(mMonPlugin, mPlayer, mPlayerItemStats, mBoss, damagee, mLevelOne, mDamage, mSilenceTime, mAbilities, mDuration, mRange);
+		attack(damagee);
 	}
 
-	public void attack(com.playmonumenta.plugins.Plugin plugin, @Nullable Player p, @Nullable ItemStatManager.PlayerItemStats playerItemStats,
-	                          LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
-	                          Ability[] abilities, int duration, double mRange) {
-		if (p != null || playerItemStats != null) {
+	public void attack(LivingEntity damagee) {
+		if (mPlayer == null || mCosmetic == null) {
+			return;
+		}
 
-			mCosmetic.vexAttack(p, boss, damagee, mRange);
+		mCosmetic.vexAttack(mPlayer, mBoss, damagee, mRange);
 
-			// tag mob to prevent it from spawning more stuff
-			damagee.addScoreboardTag("TeneGhost");
+		// tag mob to prevent it from spawning more stuff
+		damagee.addScoreboardTag("TeneGhost");
 
-			DamageUtils.damage(p, damagee, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, playerItemStats), damage, true, true, false);
+		DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, mPlayerItemStats), mDamage, true, true, false);
 
-			// remove tag if mob is not dead
-			if (!damagee.isDead()) {
-				damagee.removeScoreboardTag("TeneGhost");
+		// remove tag if mob is not dead
+		if (!damagee.isDead()) {
+			damagee.removeScoreboardTag("TeneGhost");
+		}
+		// debuff
+		for (LivingEntity e : EntityUtils.getNearbyMobs(damagee.getLocation(), mRange)) {
+			if (!EntityUtils.isBoss(e)) {
+				EntityUtils.applySilence(mMonPlugin, mSilenceTime, e);
 			}
-			// debuff
-			for (LivingEntity e : EntityUtils.getNearbyMobs(damagee.getLocation(), mRange)) {
-				if (!EntityUtils.isBoss(e)) {
-					EntityUtils.applySilence(plugin, silenceTime, e);
-				}
-				if (!levelOne && p != null) {
-					for (Ability ability : abilities) {
-						if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().getLinkedSpell())) {
-							if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {
-								EntityUtils.applyFire(plugin, duration, e, p, playerItemStats);
-								if (ability.isLevelTwo()) {
-									plugin.mEffectManager.addEffect(e, CholericFlames.ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(duration));
-								}
-							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.GRASPING_CLAWS) {
-								EntityUtils.applySlow(plugin, duration, 0.1, e);
-							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.MELANCHOLIC_LAMENT) {
-								EntityUtils.applyWeaken(plugin, duration, 0.1, e);
-							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
-								EntityUtils.applyVulnerability(plugin, duration, 0.1, e);
-							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
-								plugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, playerItemStats, ClassAbility.RESTLESS_SOULS, DamageType.AILMENT));
+			if (!mLevelOne) {
+				for (Ability ability : mAbilities) {
+					if (ability != null && mMonPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().getLinkedSpell())) {
+						if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {
+							EntityUtils.applyFire(mMonPlugin, mDuration, e, mPlayer, mPlayerItemStats);
+							if (ability.isLevelTwo()) {
+								mMonPlugin.mEffectManager.addEffect(e, CholericFlames.ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(mDuration));
 							}
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.GRASPING_CLAWS) {
+							EntityUtils.applySlow(mMonPlugin, mDuration, 0.1, e);
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.MELANCHOLIC_LAMENT) {
+							EntityUtils.applyWeaken(mMonPlugin, mDuration, 0.1, e);
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
+							EntityUtils.applyVulnerability(mMonPlugin, mDuration, 0.1, e);
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
+							mMonPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDuration, 1, 40, mPlayer, mPlayerItemStats, ClassAbility.RESTLESS_SOULS, DamageType.AILMENT));
 						}
 					}
 				}
 			}
-
-			// kill vex
-			boss.remove();
 		}
+
+		// kill vex
+		mBoss.remove();
 	}
 
 	@Override

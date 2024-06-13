@@ -47,7 +47,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	@Nullable List<MarketListing> mListingsForPageList;
 
 	int mSelectedFilter;
-	List<MarketFilter> mLoadedMarketFilters;
+	List<MarketFilter> mLoadedMarketFilters = new ArrayList<>();
 	@Nullable String mQuicksearchValue;
 
 	List<MarketListingIndex> mLoadedSortbyIndexes;

@@ -26,6 +26,7 @@ public class TabModeratorBrowser implements MarketGuiTab {
 
 	public TabModeratorBrowser(MarketGui marketGUI) {
 		this.mGui = marketGUI;
+		mPlayer = mGui.mPlayer;
 	}
 
 	Player mPlayer;

@@ -32,9 +32,6 @@ public class TabAddListing implements MarketGuiTab {
 
 	Player mPlayer;
 
-	// listings owned by the player
-	List<Long> mPlayerListingsIds;
-
 	// represents the item that is going to be sold
 	@Nullable ItemStack mItemToSell = null;
 
@@ -58,8 +55,8 @@ public class TabAddListing implements MarketGuiTab {
 
 	@Override
 	public void setup() {
-		mPlayerListingsIds = MarketManager.getInstance().getListingsOfPlayer(mPlayer);
-		if (mPlayerListingsIds.size() >= MarketManager.getConfig().mAmountOfPlayerListingsSlots) {
+		List<Long> playerListingsIds = MarketManager.getInstance().getListingsOfPlayer(mPlayer);
+		if (playerListingsIds.size() >= MarketManager.getConfig().mAmountOfPlayerListingsSlots) {
 			mPlayer.sendMessage(Component.text("You do not have enough slots to add a new listing", NamedTextColor.RED));
 			mGui.switchToTab(mGui.TAB_PLAYER_LISTINGS);
 			return;

@@ -88,7 +88,6 @@ import java.util.logging.Level;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -982,9 +981,9 @@ public class BossManager implements Listener {
 		} else {
 			if (mStatefulBosses.get(requestedTag) != null) {
 				if (sender != null) {
-					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-						"' but it requires positional arguments");
+					sender.sendMessage(Component.text("There is a boss with the tag '", NamedTextColor.GOLD)
+						.append(Component.text(requestedTag, NamedTextColor.GREEN))
+						.append(Component.text("' but it requires positional arguments", NamedTextColor.GOLD)));
 					sender.sendMessage(Component.text("Try again with some ending location coordinates", NamedTextColor.GOLD));
 				}
 			} else {
@@ -1016,9 +1015,9 @@ public class BossManager implements Listener {
 		} else {
 			if (mStatelessBosses.get(requestedTag) != null) {
 				if (sender != null) {
-					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-						"' but it does not take positional arguments");
+					sender.sendMessage(Component.text("There is a boss with the tag '", NamedTextColor.GOLD)
+						.append(Component.text(requestedTag, NamedTextColor.GREEN))
+						.append(Component.text("' but it does not take positional arguments", NamedTextColor.GOLD)));
 					sender.sendMessage(Component.text("Try again without the coordinates", NamedTextColor.GOLD));
 				}
 			} else {
