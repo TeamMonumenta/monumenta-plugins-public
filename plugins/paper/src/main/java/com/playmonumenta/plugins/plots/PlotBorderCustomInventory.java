@@ -201,9 +201,9 @@ public class PlotBorderCustomInventory extends CustomInventory {
 				player.sendMessage("Started loading plot border: " + name);
 				COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + 120);
 				Location loc = player.getLocation();
-				loc.setX(-1392);
+				loc.setX(-1393);
 				loc.setY(0);
-				loc.setZ(-1392);
+				loc.setZ(-1393);
 				StructuresAPI.loadAndPasteStructure("plots/borders/" + cmd, loc, false, true).whenComplete((unused, ex) -> {
 					if (ex != null) {
 						player.sendMessage("Plot border completed with error: " + ex.getMessage());
