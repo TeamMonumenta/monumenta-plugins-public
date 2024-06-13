@@ -798,7 +798,7 @@ public class ItemUpdateHelper {
 						indexesToRemove.add(i);
 						continue;
 					}
-					if (duration <= 0) {
+					if (duration == 0 || duration < -1) {
 						errors.add("[Effect] Invalid duration: '" + type + "' duration: '" + duration + "' strength: '" + strength + "' (Duration set to 1)");
 						effect.setInteger(ItemStatUtils.EFFECT_DURATION_KEY, 1);
 						continue;

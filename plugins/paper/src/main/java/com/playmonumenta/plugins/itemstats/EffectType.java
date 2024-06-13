@@ -296,11 +296,13 @@ public enum EffectType {
 
 		Component component = Component.text(text, TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
 		if (includeTime) {
+			String timeString;
 			int minutes = duration / 1200;
-			int seconds = (duration / 20) % 60;
-			String timeString = "(" + minutes + ":" + (seconds > 9 ? seconds : "0" + seconds) + ")";
-			if (minutes > 999) {
+			if (minutes > 999 || duration < 0) {
 				timeString = "(∞)";
+			} else {
+				int seconds = (duration / 20) % 60;
+				timeString = "(" + minutes + ":" + (seconds > 9 ? seconds : "0" + seconds) + ")";
 			}
 			component = component.append(Component.text(" " + timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false));
 		}

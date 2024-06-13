@@ -380,13 +380,12 @@ public class PotionUtils {
 	public static void applyPotion(@Nullable Entity applier, LivingEntity applied, PotionEffect effect) {
 		if (applied.hasPotionEffect(effect.getType())) {
 			PotionEffect targetPotionEffect = applied.getPotionEffect(effect.getType());
-			if (
-					targetPotionEffect != null && (
-							targetPotionEffect.getAmplifier() < effect.getAmplifier()
-									|| (
-									targetPotionEffect.getAmplifier() == effect.getAmplifier()
-											&& targetPotionEffect.getDuration() < effect.getDuration()
-							))
+			if (targetPotionEffect == null) {
+				return;
+			}
+			if (targetPotionEffect.getAmplifier() < effect.getAmplifier()
+				|| (targetPotionEffect.getAmplifier() == effect.getAmplifier()
+					&& compareDurations(effect, targetPotionEffect))
 			) {
 				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 				Bukkit.getPluginManager().callEvent(event);
@@ -538,5 +537,20 @@ public class PotionUtils {
 	 */
 	public static void applyColoredGlowing(String source, Entity entity, @Nullable NamedTextColor color, int duration) {
 		Plugin.getInstance().mEffectManager.addEffect(entity, source, new ColoredGlowingEffect(duration, color));
+	}
+
+	private static boolean compareDurations(PotionEffect effect1, PotionEffect effect2) {
+		return compareDurations(effect1.getDuration(), effect2.getDuration());
+	}
+
+	// Returns true if duration1 is strictly greater than duration 2, accounting for infinite effects
+	public static boolean compareDurations(int duration1, int duration2) {
+		if (duration2 == -1) {
+			return false;
+		} else if (duration1 == -1) {
+			return true;
+		} else {
+			return duration1 > duration2;
+		}
 	}
 }

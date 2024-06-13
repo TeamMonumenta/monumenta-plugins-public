@@ -494,6 +494,27 @@ public class ItemStatCommands {
 		}).register();
 
 		new CommandAPICommand("editconsume").withPermission(perms)
+			.withArguments(effectArg)
+			.withArguments(new LiteralArgument("infinite"))
+			.withArguments(strengthArg)
+			.executesPlayer((player, args) -> {
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
+				String effectString = args.getByArgument(effectArg);
+				EffectType type = EffectType.fromType(effectString);
+				if (type == null) {
+					throw CommandAPI.failWithString("Invalid effect type " + effectString);
+				} else if (type.getPotionEffectType() == null) {
+					throw CommandAPI.failWithString("Infinite duration can only be used with vanilla effects!");
+				}
+				double strength = args.getByArgument(strengthArg);
+
+				ItemStatUtils.addConsumeEffect(item, type, strength, -1);
+			}).register();
+
+		new CommandAPICommand("editconsume").withPermission(perms)
 			.withArguments(new LiteralArgument("del"))
 			.withArguments(indexArg)
 			.executesPlayer((player, args) -> {

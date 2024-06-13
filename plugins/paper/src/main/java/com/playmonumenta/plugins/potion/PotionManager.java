@@ -69,7 +69,7 @@ public class PotionManager {
 	}
 
 	public void addPotion(Player player, PotionID id, PotionEffect effect, double intensity) {
-		addPotion(player, id, new PotionInfo(effect.getType(), (int)(((double)effect.getDuration()) * intensity),
+		addPotion(player, id, new PotionInfo(effect.getType(), (int) (effect.getDuration() * intensity),
 		                                     effect.getAmplifier(), effect.isAmbient(), effect.hasParticles(), effect.hasIcon()));
 	}
 
