@@ -248,9 +248,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)
 			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			if (getPlayer().isSneaking()) {
-				Grappling.pullMob(mPlayer, target, Grappling.MOB_HORIZONTAL_SPEED);
+				Grappling.pullMob(mPlayer, target, Grappling.MOB_HORIZONTAL_SPEED, grappling);
 			} else {
-				Grappling.pullMob(target, mPlayer, Grappling.PLAYER_HORIZONTAL_SPEED);
+				Grappling.pullMob(target, mPlayer, Grappling.PLAYER_HORIZONTAL_SPEED, grappling);
 			}
 			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);
 		}

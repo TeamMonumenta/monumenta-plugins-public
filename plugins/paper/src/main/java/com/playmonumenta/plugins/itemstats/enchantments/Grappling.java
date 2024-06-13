@@ -52,9 +52,10 @@ import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 
 public class Grappling implements Enchantment {
-	private static final int MAX_HEIGHT_GAIN_PER_LEVEL = 1;
-	private static final int PICKUP_RANGE_SQUARED = 9;
-	public static final double PLAYER_HORIZONTAL_SPEED = 8.0 / 200;
+	private static final double MAX_VERTICAL_PER_LEVEL = 1;
+	private static final double MAX_HORIZONTAL_PER_LEVEL = 0.5;
+	private static final int PICKUP_RANGE_SQUARED = 12;
+	public static final double PLAYER_HORIZONTAL_SPEED = 15.0 / 200;
 	public static final double MOB_HORIZONTAL_SPEED = 29.0 / 200;
 	private static final int COOLDOWN = 5 * 20;
 	public static String MAX_CHARGES_SCOREBOARD = "GrapplingMaxCharges";
@@ -161,7 +162,7 @@ public class Grappling implements Enchantment {
 		}
 
 		Location hookLoc = hitBlock.getLocation().add(0.5, 0.5, 0.5).subtract(v.normalize());
-		spawnPickupHook(player, level, hookLoc, v);
+		spawnPickupHook(player, level, hookLoc, v, hitBlock);
 		doSucceedEffects(player, hookLoc, hitBlock.getType());
 	}
 
@@ -177,7 +178,7 @@ public class Grappling implements Enchantment {
 		}
 
 		if (player.isSneaking()) {
-			hook.pullTowards(player);
+			hook.pullTowards(player, level);
 			return;
 		}
 
@@ -186,7 +187,7 @@ public class Grappling implements Enchantment {
 
 	private void pullPlayer(Player player, double level, PickupHook hook) {
 		// Pull player
-		Block hitBlock = hook.getLocation().getBlock();
+		Block hitBlock = hook.getHitBlock();
 		new PartialParticle(Particle.BLOCK_CRACK, hook.getLocation(), 40, 0.25, 0.25, 0.25, hitBlock.getType().createBlockData()).spawnAsPlayerActive(player);
 
 		int ping = 100; // Default value of 100ms
@@ -195,7 +196,7 @@ public class Grappling implements Enchantment {
 		}
 
 		// Based off of the player's current velocity and ping, estimate where they're going to be by the time they actually get sent flying
-		double tickDelay = (ping / (1000f / Constants.TICKS_PER_SECOND));
+		double tickDelay = Math.ceil(ping / (1000f / Constants.TICKS_PER_SECOND));
 		double yDisplacementInNTicks;
 		if (PlayerUtils.isOnGround(player)) {
 			yDisplacementInNTicks = 0;
@@ -209,9 +210,9 @@ public class Grappling implements Enchantment {
 		Vector v = hitBlock.getLocation().subtract(playerLoc).toVector();
 
 		double vertDist = v.getY();
-		if (vertDist > MAX_HEIGHT_GAIN_PER_LEVEL * level) {
+		if (vertDist > MAX_VERTICAL_PER_LEVEL * level) {
 			// Cap vertical movement
-			hitBlock = hitBlock.getLocation().subtract(0, vertDist - MAX_HEIGHT_GAIN_PER_LEVEL * level, 0).getBlock();
+			hitBlock = hitBlock.getLocation().subtract(0, vertDist - MAX_VERTICAL_PER_LEVEL * level, 0).getBlock();
 		}
 
 		Location landingZone = hitBlock.getLocation()
@@ -232,18 +233,17 @@ public class Grappling implements Enchantment {
 			hook.mPulledOnce = true;
 			return;
 		}
-		hook.pullTowards(player);
-		player.setVelocity(calcVelocity(landingZone, playerLoc, PLAYER_HORIZONTAL_SPEED));
+		hook.pullTowards(player, level);
+		player.setVelocity(calcVelocity(landingZone, playerLoc, PLAYER_HORIZONTAL_SPEED, level));
 	}
 
-	private static void spawnPickupHook(Player player, double level, Location spawnLocation, Vector pointingVector) {
+	private static void spawnPickupHook(Player player, double level, Location spawnLocation, Vector pointingVector, Block hitBlock) {
 		// Maybe someday we can have a custom texture for the hook... a man can dream
-		PickupHook hook = new PickupHook(spawnLocation, pointingVector);
+		PickupHook hook = new PickupHook(spawnLocation, pointingVector, hitBlock);
 
 		// Players should only have one hook out at a time
 		if (mPlayerHookMap.get(player.getUniqueId()) != null) {
 			PickupHook oldHook = mPlayerHookMap.remove(player.getUniqueId());
-			doFailEffects(player, oldHook.getLocation());
 			oldHook.remove();
 		}
 		mPlayerHookMap.put(player.getUniqueId(), hook);
@@ -268,7 +268,9 @@ public class Grappling implements Enchantment {
 
 			@Override
 			public void run() {
-				new PPLine(Particle.CRIT, player.getLocation(), hook.getLocation()).shift((20 - (mTicks % 20)) / 20.0).countPerMeter(1).delta(0.05).extra(0.075).spawnAsPlayerActive(player);
+				if (!hook.mPulledOnce) {
+					new PPLine(Particle.CRIT, player.getLocation(), hook.getLocation()).shift((20 - (mTicks % 20)) / 20.0).countPerMeter(1).delta(0.05).extra(0.075).spawnAsPlayerActive(player);
+				}
 				if (mTicks >= cooldownRemaining * hz / 20) {
 					mRechargeImmediately = true;
 					this.cancel();
@@ -306,6 +308,7 @@ public class Grappling implements Enchantment {
 
 	private static void handleMob(Player player, double level, ProjectileHitEvent event, Projectile proj, Mob mob) {
 		double distance = mob.getLocation().distance(player.getLocation());
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> decrementShotsFired(player), COOLDOWN);
 		if (distance > level) {
 			doFailEffects(player, mob.getLocation());
 			return;
@@ -316,17 +319,17 @@ public class Grappling implements Enchantment {
 
 		doSucceedEffects(player, mob.getLocation(), Material.REDSTONE_BLOCK);
 		if (player.isSneaking()) {
-			pullMob(player, mob, MOB_HORIZONTAL_SPEED);
+			pullMob(player, mob, MOB_HORIZONTAL_SPEED, level);
 		} else {
-			pullMob(mob, player, PLAYER_HORIZONTAL_SPEED);
+			pullMob(mob, player, PLAYER_HORIZONTAL_SPEED, level);
 		}
 	}
 
-	public static void pullMob(LivingEntity stationary, LivingEntity mover, double speed) {
+	public static void pullMob(LivingEntity stationary, LivingEntity mover, double speed, double level) {
 		if (EntityUtils.isBoss(mover) || EntityUtils.isCCImmuneMob(mover)) {
 			return;
 		}
-		mover.setVelocity(calcVelocity(stationary.getLocation(), mover.getLocation(), speed));
+		mover.setVelocity(calcVelocity(stationary.getEyeLocation(), mover.getLocation(), speed, level));
 	}
 
 	/**
@@ -336,20 +339,29 @@ public class Grappling implements Enchantment {
 	 * @param target      Entity being launched
 	 * @return Velocity
 	 */
-	private static Vector calcVelocity(Location landingZone, Entity target) {
-		return calcVelocity(landingZone, target.getLocation(), MOB_HORIZONTAL_SPEED);
+	private static Vector calcVelocity(Location landingZone, Entity target, double level) {
+		return calcVelocity(landingZone, target.getLocation(), MOB_HORIZONTAL_SPEED, level);
 	}
 
-	private static Vector calcVelocity(Location landingZone, Location estimatedLocationAfterLag, double flightSpeed) {
+	private static Vector calcVelocity(Location landingZone, Location estimatedLocationAfterLag, double flightSpeed, double level) {
 		Vector distVector = landingZone.subtract(estimatedLocationAfterLag).toVector();
 
 		double yDist = distVector.getY();
 		// from wiki: displacement d(N) = y0 + 50(v0 + 3.92) * (1 - 0.98^N) - 3.92N where N is number of ticks, y0 is starting height, v0 is starting velocity
-		// double v0 = (yDist + 3.92 * FLIGHT_TIME_IN_TICKS) / (50 * (1 - Math.pow(0.98, FLIGHT_TIME_IN_TICKS))) - 3.92;
-		// Simpler equation, assuming we don't change FLIGHT_TIME_IN_TICKS from 20
-		double v0 = 0.06 * yDist + 0.8;
+
+		// Approximation for velocity needed to get specific height
+		double v0;
+		if (yDist <= 0) {
+			v0 = -Math.pow(-yDist / 5.93, 0.578) + 0.8;
+		} else {
+			v0 = Math.pow(yDist / 5.93, 0.578);
+		}
 
 		distVector.setY(0);
+		if (distVector.lengthSquared() > MAX_HORIZONTAL_PER_LEVEL * MAX_HORIZONTAL_PER_LEVEL * level * level) {
+			distVector.normalize();
+			distVector.multiply(MAX_HORIZONTAL_PER_LEVEL * level);
+		}
 		distVector.multiply(flightSpeed);
 		distVector.setY(v0);
 
@@ -397,9 +409,10 @@ public class Grappling implements Enchantment {
 	private static class PickupHook {
 		private final ArmorStand mCarrier;
 		private final ItemDisplay mDisplay;
+		private final Block mHitBlock;
 		private boolean mPulledOnce = false;
 
-		public PickupHook(Location spawnLocation, Vector pointingVector) {
+		public PickupHook(Location spawnLocation, Vector pointingVector, Block hitBlock) {
 			mCarrier = spawnLocation.getWorld().spawn(spawnLocation, ArmorStand.class, carrier -> {
 				carrier.setVisible(false);
 				carrier.setGravity(false);
@@ -416,6 +429,7 @@ public class Grappling implements Enchantment {
 					comicallyLarge.getScale().mul(0.5f),
 					comicallyLarge.getRightRotation()));
 			});
+			mHitBlock = hitBlock;
 		}
 
 		public void remove() {
@@ -432,7 +446,7 @@ public class Grappling implements Enchantment {
 			}
 		}
 
-		public void pullTowards(Player player) {
+		public void pullTowards(Player player, double level) {
 			if (mPulledOnce) {
 				return;
 			}
@@ -441,7 +455,7 @@ public class Grappling implements Enchantment {
 			mCarrier.addPassenger(mDisplay);
 			Vector v = getLocation().subtract(player.getLocation()).toVector().multiply(0.5);
 			mCarrier.setVelocity(calcVelocity(player.getLocation().add(v),
-				mCarrier));
+				mCarrier, level));
 		}
 
 		public boolean isValid() {
@@ -454,6 +468,10 @@ public class Grappling implements Enchantment {
 
 		public ItemDisplay getDisplay() {
 			return mDisplay;
+		}
+
+		public Block getHitBlock() {
+			return mHitBlock;
 		}
 	}
 }
