@@ -611,8 +611,7 @@ public class ColorSplash extends DepthsAbility {
 					return;
 				}
 
-				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7)
-					.delta(0.25, 0.45, 0.25).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 
 				new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), WINDWALKER_RADIUS).getHitMobs()
 					.stream().filter(mob -> !mHitMobs.contains(mob.getUniqueId()) && !EntityUtils.isBoss(mob)).forEach(mob -> {

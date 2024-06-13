@@ -94,6 +94,7 @@ public class DepthsWindWalk extends DepthsAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
 			boolean mTickOne = true;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
@@ -102,7 +103,7 @@ public class DepthsWindWalk extends DepthsAbility {
 					return;
 				}
 
-				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 
 				Iterator<LivingEntity> iter = mMobsNotHit.iterator();
 				while (iter.hasNext()) {
@@ -125,6 +126,7 @@ public class DepthsWindWalk extends DepthsAbility {
 
 						iter.remove();
 					}
+					mTicks++;
 				}
 
 				Material block = mPlayer.getLocation().getBlock().getType();
