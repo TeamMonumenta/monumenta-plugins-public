@@ -383,7 +383,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(GroundSeekerBoss.identityTag, GroundSeekerBoss::new, new GroundSeekerBoss.Parameters());
 		registerStatelessBoss(DescriptionBoss.identityTag, DescriptionBoss::new, new DescriptionBoss.Parameters());
 		registerStatelessBoss(HexfallRespawnBoss.identityTag, HexfallRespawnBoss::new, new HexfallRespawnBoss.Parameters());
-		registerStatelessBoss(HexfallFloramancerBoss.identityTag, HexfallFloramancerBoss::new);
+		registerStatelessBoss(HexfallFloramancerBoss.identityTag, HexfallFloramancerBoss::new, new HexfallFloramancerBoss.Parameters());
 		registerStatelessBoss(FlowerPlaceBoss.identityTag, FlowerPlaceBoss::new, new FlowerPlaceBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */

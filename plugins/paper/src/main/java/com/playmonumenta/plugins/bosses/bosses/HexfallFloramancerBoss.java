@@ -26,13 +26,20 @@ import org.bukkit.util.Vector;
 
 public class HexfallFloramancerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_floramancer";
-
 	private final List<Material> FLOWER_BLOCKS = List.of(Material.POPPY, Material.DANDELION, Material.PINK_TULIP, Material.CORNFLOWER);
 	private static final Particle.DustOptions LIME = new Particle.DustOptions(Color.fromRGB(155, 210, 0), 1f);
 	private static final Particle.DustOptions NEON = new Particle.DustOptions(Color.fromRGB(215, 255, 0), 1f);
 
+	public static class Parameters extends BossParameters {
+		public int DETECTION = 40;
+		public int DELAY = 2 * 20;
+		public int COOLDOWN = 5 * 20;
+		public int FLOWERS_SPAWNED = 4;
+	}
+
 	public HexfallFloramancerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
+		Parameters p = BossParameters.getParameters(boss, identityTag, new HexfallFloramancerBoss.Parameters());
 
 		Spell spell = new Spell() {
 			@Override
@@ -43,7 +50,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 
 				List<Block> flowers = BlockUtils.getBlocksInSphere(mBoss.getLocation(), 20);
 				flowers.removeIf(block -> !FLOWER_BLOCKS.contains(block.getType()));
-				for (int i = 0; i < 3; i++) {
+				for (int i = 0; i < p.FLOWERS_SPAWNED; i++) {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						if (!flowers.isEmpty()) {
 							Block flower = flowers.get(FastUtils.randomIntInRange(0, flowers.size() - 1));
@@ -55,7 +62,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 
 			@Override
 			public int cooldownTicks() {
-				return 6 * 20;
+				return p.COOLDOWN;
 			}
 
 			@Override
@@ -66,7 +73,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 			}
 		};
 
-		super.constructBoss(spell, 40, null, 40);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 
 	private void launchMagicTo(Block targetBlock) {
