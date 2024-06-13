@@ -170,28 +170,28 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				mCosmetic.gloryTick(mPlayer, mT);
 				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 				List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius).getHitMobs();
-				if (PlayerUtils.isOnGround(mPlayer) && !mPierced) {
-					mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
-					Location location = mPlayer.getLocation();
-					World world = mPlayer.getWorld();
-					mCosmetic.gloryOnLand(world, mPlayer, location, radius);
-					mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+				if (PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer)) {
+					if (!mPierced) {
+						mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
+						Location location = mPlayer.getLocation();
+						World world = mPlayer.getWorld();
+						mCosmetic.gloryOnLand(world, mPlayer, location, radius);
+						mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
-					LivingEntity nearest = EntityUtils.getNearestMob(location, mobs);
-					if (nearest == null) {
-						this.cancel();
-						return;
+						LivingEntity nearest = EntityUtils.getNearestMob(location, mobs);
+						if (nearest == null) {
+							this.cancel();
+							return;
+						}
+
+						DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
+						mCosmetic.gloryOnDamage(world, mPlayer, nearest);
+
+						float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
+						for (LivingEntity mob : mobs) {
+							MovementUtils.knockAway(mPlayer, mob, knockback, true);
+						}
 					}
-
-					DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
-					mCosmetic.gloryOnDamage(world, mPlayer, nearest);
-
-					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
-					for (LivingEntity mob : mobs) {
-						MovementUtils.knockAway(mPlayer, mob, knockback, true);
-					}
-					this.cancel();
-				} else if (PlayerUtils.isOnGround(mPlayer)) {
 					this.cancel();
 				}
 

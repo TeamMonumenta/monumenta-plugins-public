@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import com.destroystokyo.paper.MaterialSetTag;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -39,7 +38,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
@@ -317,9 +315,7 @@ public class PlayerUtils {
 	 */
 	public static boolean isFreeFalling(Player player) {
 		if (!isOnGround(player) && player.getLocation().isChunkLoaded()) {
-			Material playerFeetMaterial = player.getLocation().getBlock().getType();
-			// Accounts for vines, ladders, nether vines, scaffolding etc
-			return !MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial);
+			return BlockUtils.isClimbable(player.getLocation().getBlock());
 		}
 
 		return false;
@@ -534,6 +530,14 @@ public class PlayerUtils {
 	 */
 	public static boolean isOnGround(Player player) {
 		return player.isOnGround();
+	}
+
+	public static boolean isOnGroundOrMountIsOnGround(Player player) {
+		if (isOnGround(player)) {
+			return true;
+		}
+		Entity base = EntityUtils.getEntityStackBase(player);
+		return base.isOnGround();
 	}
 
 	/**

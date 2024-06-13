@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -26,6 +27,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -129,8 +131,8 @@ public class DepthsWindWalk extends DepthsAbility {
 					mTicks++;
 				}
 
-				Material block = mPlayer.getLocation().getBlock().getType();
-				if (!mTickOne && (PlayerUtils.isOnGround(mPlayer) || block == Material.WATER || block == Material.LAVA || block == Material.LADDER)) {
+				Block block = mPlayer.getLocation().getBlock();
+				if (!mTickOne && (PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer) || BlockUtils.isWaterlogged(block) || block.getType() == Material.LAVA || BlockUtils.isClimbable(block))) {
 					this.cancel();
 					return;
 				}

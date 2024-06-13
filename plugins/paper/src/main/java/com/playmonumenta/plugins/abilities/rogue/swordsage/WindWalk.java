@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.WindWalkCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -20,6 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -143,8 +145,8 @@ public class WindWalk extends MultipleChargeAbility {
 					}
 				}
 
-				Material block = mPlayer.getLocation().getBlock().getType();
-				if (mTicks > 1 && (PlayerUtils.isOnGround(mPlayer) || block == Material.WATER || block == Material.LAVA || block == Material.LADDER)) {
+				Block block = mPlayer.getLocation().getBlock();
+				if (mTicks > 1 && (PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer) || BlockUtils.isWaterlogged(block) || block.getType() == Material.LAVA || BlockUtils.isClimbable(block))) {
 					this.cancel();
 					return;
 				}

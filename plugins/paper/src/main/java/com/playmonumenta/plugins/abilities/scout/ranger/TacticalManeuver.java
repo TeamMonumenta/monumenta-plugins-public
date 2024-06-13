@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.TacticalManeuverCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -21,6 +22,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -114,13 +116,13 @@ public class TacticalManeuver extends MultipleChargeAbility {
 				@Override
 				public void run() {
 					// Needs the 5 tick delay since being close to the ground will cancel the runnable
-					if ((mTicks > 5 && PlayerUtils.isOnGround(mPlayer)) || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
+					if ((mTicks > 5 && PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer)) || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded() || mTicks > 30 * 20) {
 						this.cancel();
 						return;
 					}
 
-					Material block = mPlayer.getLocation().getBlock().getType();
-					if (block == Material.WATER || block == Material.LAVA || block == Material.LADDER) {
+					Block block = mPlayer.getLocation().getBlock();
+					if (BlockUtils.isWaterlogged(block) || block.getType() == Material.LAVA || BlockUtils.isClimbable(block)) {
 						this.cancel();
 						return;
 					}

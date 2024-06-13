@@ -603,10 +603,9 @@ public class ColorSplash extends DepthsAbility {
 					return;
 				}
 
-				Material inMaterial = mPlayer.getLocation().getBlock().getType();
-				if (mTicks >= 5 && (PlayerUtils.isOnGround(mPlayer) || inMaterial.equals(Material.WATER)
-					|| inMaterial.equals(Material.LAVA) || inMaterial.equals(Material.LADDER)
-				)) {
+				Block block = mPlayer.getLocation().getBlock();
+				if (mTicks >= 5 && (PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer) || BlockUtils.isWaterlogged(block) || block.getType() == Material.LAVA || BlockUtils.isClimbable(block))
+				) {
 					cancel();
 					return;
 				}

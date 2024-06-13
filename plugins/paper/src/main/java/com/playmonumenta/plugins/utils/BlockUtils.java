@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.destroystokyo.paper.MaterialSetTag;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -230,6 +231,14 @@ public class BlockUtils {
 
 	public static boolean isTorch(Block block) {
 		return TORCHES.contains(block.getType());
+	}
+
+	public static boolean isClimbable(Block block) {
+		return isClimbable(block.getType());
+	}
+
+	public static boolean isClimbable(Material material) {
+		return MaterialSetTag.CLIMBABLE.isTagged(material);
 	}
 
 	public static boolean canBeBroken(Block block) {
