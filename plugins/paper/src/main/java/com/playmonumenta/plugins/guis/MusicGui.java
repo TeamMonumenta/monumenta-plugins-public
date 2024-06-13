@@ -97,7 +97,7 @@ public class MusicGui extends Gui {
 				addMusicItem(1, 1, Material.MUSIC_DISC_WAIT, "Storm's Eye", Location.LIGHTBLUE, "Sierhaven", "Casiel368", "epic:music.sierhaven", 222, checkAdvance("monumenta:quests/r1/sierhaven"));
 				addMusicItem(1, 2, Material.MUSIC_DISC_BLOCKS, "Locus Amoenus", Location.RUSH, "Nyr", "Casiel368", "epic:music.nyr", 176, checkAdvance("monumenta:quests/r1/nyr"));
 				addMusicItem(1, 3, Material.MUSIC_DISC_FAR, "In Memoriam", Location.KAUL, "Farr", "Whitebeard_OP", "epic:music.farr", 156, checkAdvance("monumenta:quests/r1/farr"));
-				addMusicItem(1, 4, Material.MUSIC_DISC_MALL, "Silent Shanty", Location.MIDBLUE, "Lowtide", "TinyBoundler", "epic:music.lowtide", 85, checkAdvance("monumenta:quests/r1/lowtide"));
+				addMusicItem(1, 4, Material.MUSIC_DISC_MALL, "Silent Shanty", Location.MIDBLUE, "Lowtide", "TinyBoulder", "epic:music.lowtide", 85, checkAdvance("monumenta:quests/r1/lowtide"));
 				addMusicItem(1, 5, Material.MUSIC_DISC_CHIRP, "Eastern Wardens", Location.RUSH, "Highwatch", "Whitebeard_OP", "epic:music.highwatch", 209, checkAdvance("monumenta:quests/r1/highwatch"));
 				addMusicItem(1, 6, Material.MUSIC_DISC_WAIT, "Trading Waves", Location.LIGHTBLUE, "Oceangate", "Michael228p", "epic:music.oceangate", 207, checkAdvance("monumenta:quests/r1/oceangate"));
 				addMusicItem(1, 7, Material.MUSIC_DISC_STRAD, "A Haven in Stone", Location.WHITE, "Ta'Eldim", "Whitebeard_OP", "epic:music.eldim", 146, checkAdvance("monumenta:quests/r1/taeldim"));

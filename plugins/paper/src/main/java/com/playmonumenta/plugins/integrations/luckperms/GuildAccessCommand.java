@@ -280,8 +280,12 @@ public class GuildAccessCommand {
 					sender.sendMessage(Component.text(String.format("Successfully removed %s from the guild", target.getUsername()), NamedTextColor.GOLD));
 					return;
 				}
-				boolean promoted = targetAccess.ordinal() < targetCurrentAccess.ordinal();
-				sender.sendMessage(Component.text(String.format("Successfully %s %s to %s", (promoted ? "promoted" : "demoted"), target.getUsername(), targetAccess.mLabel), NamedTextColor.GOLD));
+				if (targetAccess.ordinal() != targetCurrentAccess.ordinal()) {
+					boolean promoted = targetAccess.ordinal() < targetCurrentAccess.ordinal();
+					sender.sendMessage(Component.text(String.format("Successfully %s %s to %s", (promoted ? "promoted" : "demoted"), target.getUsername(), targetAccess.mLabel), NamedTextColor.GOLD));
+				} else {
+					sender.sendMessage(Component.text(String.format("Could not modify rank because %s is already a %s", target.getUsername(), targetAccess.mLabel), NamedTextColor.RED));
+				}
 			});
 		});
 	}

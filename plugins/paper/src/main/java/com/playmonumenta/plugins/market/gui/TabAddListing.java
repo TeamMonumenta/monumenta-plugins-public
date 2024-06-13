@@ -168,15 +168,15 @@ public class TabAddListing implements MarketGuiTab {
 				error = true;
 			}
 
-			lore.add(Component.text("you will need to pay a tax of:", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("You will need to pay a tax of:", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text(taxDebt.mTotalRequiredAmount + " " + ItemUtils.getPlainName(taxDebt.mItem) + " ", NamedTextColor.WHITE)
 				.append(MarketGuiIcons.getCheckboxOrXmark(taxDebt.mMeetsRequirement))
 				.append(Component.text(taxDebt.mWalletDebt > 0 ? " (" + taxDebt.mNumInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text(String.format("Tax Rate: %.1f%%", MarketManager.getConfig().mBazaarTaxRate * 100), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			if (!taxDebt.mMeetsRequirement) {
-				lore.add(Component.text("You do not possess enough money", NamedTextColor.RED));
+				lore.add(Component.text("There is not enough money", NamedTextColor.RED));
 				lore.add(Component.text("in your inventory or wallet", NamedTextColor.RED));
-				lore.add(Component.text("To pay the tax.", NamedTextColor.RED));
+				lore.add(Component.text("to pay the tax.", NamedTextColor.RED));
 				error = true;
 			}
 			lore.add(Component.empty());
@@ -196,7 +196,7 @@ public class TabAddListing implements MarketGuiTab {
 		}
 
 		if (error) {
-			return GUIUtils.createBasicItem(Material.GOLD_INGOT, 1, GUIUtils.formatName("Wrong parameters !", NamedTextColor.RED, true),
+			return GUIUtils.createBasicItem(Material.GOLD_INGOT, 1, GUIUtils.formatName("Wrong parameters!", NamedTextColor.RED, true),
 				lore, true, "gui_exclamation_mark");
 		}
 		return GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, 1, GUIUtils.formatName("Confirm the Creation", NamedTextColor.GREEN, true),

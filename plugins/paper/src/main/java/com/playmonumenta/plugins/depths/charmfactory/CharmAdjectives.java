@@ -30,7 +30,7 @@ public enum CharmAdjectives {
 	POLAR("Polar", DepthsTree.FROSTBORN),
 	CRISP("Crisp", DepthsTree.FROSTBORN),
 	ROBUST("Robust", DepthsTree.EARTHBOUND),
-	STUDY("Study", DepthsTree.EARTHBOUND),
+	STURDY("Sturdy", DepthsTree.EARTHBOUND),
 	RUGGED("Rugged", DepthsTree.EARTHBOUND),
 	VITAL("Vital", DepthsTree.EARTHBOUND),
 	STOUT("Stout", DepthsTree.EARTHBOUND),
