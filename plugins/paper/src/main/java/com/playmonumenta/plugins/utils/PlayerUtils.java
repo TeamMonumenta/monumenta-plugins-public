@@ -315,7 +315,7 @@ public class PlayerUtils {
 	 */
 	public static boolean isFreeFalling(Player player) {
 		if (!isOnGround(player) && player.getLocation().isChunkLoaded()) {
-			return BlockUtils.isClimbable(player.getLocation().getBlock());
+			return !BlockUtils.isClimbable(player.getLocation().getBlock());
 		}
 
 		return false;
