@@ -350,18 +350,20 @@ public class GUIUtils {
 	/**
 	 * Sets a tag in the "GUI" tag on the item. This allows resource packs to style icons differently even if the name is the same
 	 * without having to rely on lore that may change often.
+	 *
+	 * Also returns the argument passed in, which is useful for nested function calls.
 	 */
-	public static void setGuiNbtTag(ItemStack item, String tagName, @Nullable String value, boolean active) {
+	public static ItemStack setGuiNbtTag(ItemStack item, String tagName, @Nullable String value, boolean active) {
 		if (value == null) {
-			return;
+			return item;
 		}
 		if (active) {
 			NBT.modify(item, nbt -> {
 				nbt.getOrCreateCompound(GUI_KEY).setString(tagName, value);
 			});
 		}
+		return item;
 	}
-
 	/**
 	 * Creates a gui identifier item. This is for the rp to apply gui texture. Other than that it works like a filler.
 	 */
@@ -371,6 +373,11 @@ public class GUIUtils {
 		return idItem;
 	}
 
+	public static ItemStack createGuiIdentifierItem(ItemStack item, String tag, boolean active) {
+		ItemStack idItem = ItemUtils.clone(item);
+		setGuiNbtTag(idItem, "texture", tag, active);
+		return idItem;
+	}
 	public static boolean isPlaceholder(final @Nullable ItemStack item) {
 		if (ItemUtils.isNullOrAir(item)) {
 			return false;

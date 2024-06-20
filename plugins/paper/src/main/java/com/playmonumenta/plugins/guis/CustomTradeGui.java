@@ -69,16 +69,26 @@ public class CustomTradeGui extends Gui {
 
 	// Options:
 	// Note: mPeb_tradeGUI_main & mPeb_tradeGUI_locked are also scoreboards, but not tested in here.
-	private final int mPebTradeGUITheme; // 0: classic. 1: sleek.
-	private final int mPebTradeGUISpacing; // 0: auto. 1: force 16. 2: force 28.
-	private final int mPebTradeGUIPreviewDisplay; // 0: display price on preview. 1: dont.
-	private final int mPebTradeGUITradeOrg; // 0: split trades by type. 1: dont.
-	private final int mPebTradeGUIConfirm; // 0: bring up confirm menu. 1: dont.
-	private final int mPebTradeGUIQuickBuy; // 0: shift click on preview trade to buy 1. 1: disabled.
-	private final int mPebTradeGUISuccess; // 0: return to preview upon successful trade. 1: close gui. 2: do nothing.
-	private final int mPebTradeGUIParticles; // 0: particles on. 1: off.
-	private final int mPebTradeGUISounds; // 0: sounds on. 1: off.
-	private final int mPebTradeGUIWallet; // 0: enabled, prioritize inventory. 1: disabled. 2: enabled, prioritize wallet.
+	// THEME: 0: classic. 1: sleek.
+	private final int mPebTradeGUITheme = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.THEME).orElse(0);
+	// SPACING: 0: auto. 1: force 16. 2: force 28.
+	private final int mPebTradeGUISpacing = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SPACING).orElse(0);
+	// PREVIEWDISPLAY: 0: display price on preview. 1: dont.
+	private final int mPebTradeGUIPreviewDisplay = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PREVIEWDISPLAY).orElse(0);
+	// TRADEORG: 0: split trades by type. 1: dont.
+	private final int mPebTradeGUITradeOrg = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.TRADEORG).orElse(0);
+	// CONFIRM: 0: bring up confirm menu. 1: dont.
+	private final int mPebTradeGUIConfirm = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.CONFIRM).orElse(0);
+	// QUICKBUY: 0: shift click on preview trade to buy 1. 1: disabled.
+	private final int mPebTradeGUIQuickBuy = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.QUICKBUY).orElse(0);
+	// SUCCESS: 0: return to preview upon successful trade. 1: close gui. 2: do nothing.
+	private final int mPebTradeGUISuccess = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SUCCESS).orElse(2);
+	// PARTICLES: 0: particles on. 1: off.
+	private final int mPebTradeGUIParticles = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PARTICLES).orElse(0);
+	// SOUNDS: 0: sounds on. 1: off.
+	private final int mPebTradeGUISounds = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SOUNDS).orElse(0);
+	// WALLET: 0: enabled, prioritize inventory. 1: disabled. 2: enabled, prioritize wallet.
+	private final int mPebTradeGUIWallet = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.WALLET).orElse(0);
 	//endregion
 
 	//region <FINAL_VARS>
@@ -88,6 +98,15 @@ public class CustomTradeGui extends Gui {
 	private final String mCustomTagKey = "trade_preview";
 	private final NamespacedKey mCustomTagNamespacedKey = new NamespacedKey(mPlugin, mCustomTagKey);
 	private final boolean mGuiTagsActive = GUIUtils.getGuiTextureObjective(mPlayer);
+	private final ItemStack mBorderPane =
+		(mPebTradeGUITheme == 0) ?
+			GUIUtils.setGuiNbtTag(
+				GUIUtils.createBasicItem(Material.BROWN_STAINED_GLASS_PANE, "", NamedTextColor.GRAY, false,
+					"", NamedTextColor.GRAY, 0), "texture", "gui_trade_filler", mGuiTagsActive
+			) :
+			GUIUtils.FILLER;
+	private static final int GUI_ID_LOC_L = 0;
+	private static final int GUI_ID_LOC_R = 8;
 	//endregion
 
 	//region <CACHED_VARS>
@@ -107,18 +126,6 @@ public class CustomTradeGui extends Gui {
 	private @Nullable TradeType mCurrentTab = null;
 	private int mCurrentPage = 1;
 	private boolean mShowAllTrades = true; // toggle between showing all trades versus the ones you can currently buy.
-	//endregion
-
-	//region <GUI_ITEMS>
-	private ItemStack mBackgroundPane = GUIUtils.createBasicItem(Material.BROWN_STAINED_GLASS_PANE, "", NamedTextColor.GRAY, false,
-		"", NamedTextColor.GRAY, 0);
-	private final ItemStack mBackgroundChain = GUIUtils.createBasicItem(Material.IRON_BARS, "", NamedTextColor.GRAY, false,
-		"", NamedTextColor.GRAY, 0);
-
-	private static final int GUI_ID_GENERAL_L = 45;
-	private static final int GUI_ID_GENERAL_R = 8;
-	private static final int GUI_ID_CONFIRM_L = 45;
-	private static final int GUI_ID_CONFIRM_R = 53;
 	//endregion
 
 	//region <SUBCLASSES>
@@ -317,43 +324,24 @@ public class CustomTradeGui extends Gui {
 		mVillager = villager;
 		mTrades = trades;
 		mTitle = MessagingUtils.plainText(title);
-		// Setup PEB options:
-		mPebTradeGUITheme = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.THEME).orElse(0);
-		mPebTradeGUISpacing = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SPACING).orElse(0);
-		mPebTradeGUIPreviewDisplay = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PREVIEWDISPLAY).orElse(0);
-		mPebTradeGUITradeOrg = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.TRADEORG).orElse(0);
-		mPebTradeGUIConfirm = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.CONFIRM).orElse(0);
-		mPebTradeGUIQuickBuy = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.QUICKBUY).orElse(0);
-		mPebTradeGUISuccess = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SUCCESS).orElse(2);
-		mPebTradeGUIParticles = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PARTICLES).orElse(0);
-		mPebTradeGUISounds = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SOUNDS).orElse(0);
-		mPebTradeGUIWallet = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.WALLET).orElse(0);
-		// Options:
-			// tradeOrg:
+		// Setup Trade Lists:
 		organizeTrades();
-			// theme:
-		if (mPebTradeGUITheme == 1) {
-			mBackgroundPane = GUIUtils.FILLER;
-		}
 	}
 
 	@Override
 	protected void setup() {
-		// Manual filler:
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 5; j++) {
-				setItem(j, i, GUIUtils.FILLER);
+		// Border panes:
+		if (mPebTradeGUITheme == 0) {
+			for (int i = 0; i < 9; i++) {
+				setItem(0, i, mBorderPane);
+				setItem(5, i, mBorderPane);
+			}
+			for (int i = 1; i < 5; i++) {
+				setItem(i, 0, mBorderPane);
+				setItem(i, 8, mBorderPane);
 			}
 		}
 		// Background panes:
-		for (int i = 0; i < 9; i++) {
-			setItem(0, i, mBackgroundPane);
-			setItem(5, i, mBackgroundPane);
-		}
-		for (int i = 1; i < 5; i++) {
-			setItem(i, 0, mBackgroundPane);
-			setItem(i, 8, mBackgroundPane);
-		}
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.LOCKED).orElse(0) == 1) {
 			// Locked Trades:
 			openLockedTradeView();
@@ -383,18 +371,20 @@ public class CustomTradeGui extends Gui {
 	private void openLockedTradeView() {
 		setItem(0, 4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Error: ", NamedTextColor.BLUE, false,
 			"You don't meet the requirements to view these trades!", NamedTextColor.GRAY, 20));
+		ItemStack chain = GUIUtils.createBasicItem(Material.IRON_BARS, "", NamedTextColor.GRAY, false,
+			"", NamedTextColor.GRAY, 0);
 		// Amogus:
-		setItem(1, 3, mBackgroundChain);
-		setItem(1, 4, mBackgroundChain);
-		setItem(1, 5, mBackgroundChain);
-		setItem(2, 5, mBackgroundChain);
-		setItem(2, 6, mBackgroundChain);
-		setItem(3, 3, mBackgroundChain);
-		setItem(3, 4, mBackgroundChain);
-		setItem(3, 5, mBackgroundChain);
-		setItem(3, 6, mBackgroundChain);
-		setItem(4, 3, mBackgroundChain);
-		setItem(4, 5, mBackgroundChain);
+		setItem(1, 3, chain);
+		setItem(1, 4, chain);
+		setItem(1, 5, chain);
+		setItem(2, 5, chain);
+		setItem(2, 6, chain);
+		setItem(3, 3, chain);
+		setItem(3, 4, chain);
+		setItem(3, 5, chain);
+		setItem(3, 6, chain);
+		setItem(4, 3, chain);
+		setItem(4, 5, chain);
 	}
 
 	private void openGeneralTradeView() {
@@ -407,20 +397,22 @@ public class CustomTradeGui extends Gui {
 		int numTrades = showTrades(mCurrentTab);
 		int pageCount = getMaxPages(numTrades);
 		// Display header and icons for all tabs:
-		ItemStack tempItem1 = GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
-			"Tab: " + ((mCurrentTab != null) ? mCurrentTab.mName : "") + "\nPage: " + mCurrentPage + "/" + pageCount, NamedTextColor.GRAY, 20);
-		GUIUtils.setGuiNbtTag(tempItem1, "texture", "trade_menu_help", mGuiTagsActive);
-		setItem(0, 4, tempItem1);
+		setItem(0, 4,
+			GUIUtils.setGuiNbtTag(
+				GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
+					"Tab: " + ((mCurrentTab != null) ? mCurrentTab.mName : "") + "\nPage: " + mCurrentPage + "/" + pageCount, NamedTextColor.GRAY, 20),
+				"texture", "trade_menu_help", mGuiTagsActive));
 		int guiCol = 1;
 		for (TradeType tradeType : mDisplayTradeTypes) {
 			boolean isSelected = (mCurrentTab == tradeType);
 			String name = tradeType.mName + (isSelected ? " (Selected)" : "");
 			String tag = tradeType.mTag + (isSelected ? "_selected" : "");
-			ItemStack tempItem2 = GUIUtils.createBasicItem(
-				(isSelected ? Material.BLUE_STAINED_GLASS_PANE : Material.CYAN_STAINED_GLASS_PANE),
-				name, NamedTextColor.YELLOW, false, "", NamedTextColor.GRAY, 0);
-			GUIUtils.setGuiNbtTag(tempItem2, "texture", tag, mGuiTagsActive);
-			setItem(5, guiCol, tempItem2).onLeftClick(() -> {
+			setItem(5, guiCol,
+				GUIUtils.setGuiNbtTag(
+					GUIUtils.createBasicItem(
+						(isSelected ? Material.BLUE_STAINED_GLASS_PANE : Material.CYAN_STAINED_GLASS_PANE),
+						name, NamedTextColor.YELLOW, false, "", NamedTextColor.GRAY, 0), "texture", tag, mGuiTagsActive))
+				.onLeftClick(() -> {
 					// Select Tab:
 				if (mCurrentTab != tradeType) {
 					mCurrentTab = tradeType;
@@ -437,9 +429,11 @@ public class CustomTradeGui extends Gui {
 			mCurrentPage = pageCount;
 		}
 		if (mCurrentPage < pageCount) {
-			// EX - we are on page 1 out of 2:
-			setItem(5, 7, GUIUtils.createBasicItem(Material.ARROW, "Next Page (" + (mCurrentPage + 1) + ")", NamedTextColor.YELLOW, false,
-				"", NamedTextColor.GRAY, 0)).onLeftClick(() -> {
+			// NEXT PAGE BUTTON
+			setItem(5, 7,
+				GUIUtils.setGuiNbtTag(GUIUtils.createBasicItem(Material.ARROW, "Next Page (" + (mCurrentPage + 1) + ")", NamedTextColor.YELLOW, false,
+					"", NamedTextColor.GRAY, 0), "texture", "next_page", mGuiTagsActive)
+				).onLeftClick(() -> {
 				// Page Flip:
 				mCurrentPage++;
 				playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
@@ -447,9 +441,11 @@ public class CustomTradeGui extends Gui {
 			});
 		}
 		if (mCurrentPage > 1) {
-			// EX - we are on page 2:
-			setItem(5, 6, GUIUtils.createBasicItem(Material.ARROW, "Previous Page (" + (mCurrentPage - 1) + ")", NamedTextColor.YELLOW, false,
-				"", NamedTextColor.GRAY, 0)).onLeftClick(() -> {
+			// PREV PAGE BUTTON
+			setItem(5, 6,
+				GUIUtils.setGuiNbtTag(GUIUtils.createBasicItem(Material.ARROW, "Previous Page (" + (mCurrentPage - 1) + ")", NamedTextColor.YELLOW, false,
+					"", NamedTextColor.GRAY, 0), "texture", "prev_page", mGuiTagsActive)
+				).onLeftClick(() -> {
 				// Page Flip:
 				mCurrentPage--;
 				playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
@@ -460,10 +456,11 @@ public class CustomTradeGui extends Gui {
 		Material material = mShowAllTrades ? Material.AMETHYST_CLUSTER : Material.MEDIUM_AMETHYST_BUD;
 		String name = mShowAllTrades ? "Showing: All Trades" : "Showing: Trades You Can Buy";
 		String tag = mShowAllTrades ? "trade_menu_show_all" : "trade_menu_show_affordable";
-		ItemStack tempItem = GUIUtils.createBasicItem(material, name, NamedTextColor.YELLOW, true,
-			"Click to toggle. ", NamedTextColor.GRAY, 20);
-		GUIUtils.setGuiNbtTag(tempItem, "texture", tag, mGuiTagsActive);
-		setItem(5, 8, tempItem).onLeftClick(() -> {
+		setItem(5, 8,
+			GUIUtils.setGuiNbtTag(
+				GUIUtils.createBasicItem(material, name, NamedTextColor.YELLOW, true,
+					"Click to toggle. ", NamedTextColor.GRAY, 20), "texture", tag, mGuiTagsActive))
+			.onLeftClick(() -> {
 			// Page Flip:
 			mShowAllTrades = !mShowAllTrades;
 			mCurrentPage = 1;
@@ -488,10 +485,11 @@ public class CustomTradeGui extends Gui {
 		String itemName = ItemUtils.getPlainNameOrDefault(recipe.getResult());
 		TradeReq tradeReq = new TradeReq(mPlayer, mSelectedTrade, mSelectedTradeMultiplier, true);
 		// Header:
-		ItemStack tempItem = GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
-			itemName, NamedTextColor.GRAY, 20);
-		GUIUtils.setGuiNbtTag(tempItem, "texture", "trade_confirm_help", mGuiTagsActive);
-		setItem(0, 4, tempItem);
+		setItem(0, 4,
+			GUIUtils.setGuiNbtTag(
+				GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
+					itemName, NamedTextColor.GRAY, 20),
+				"texture", "trade_confirm_help", mGuiTagsActive));
 		// Custom Multipliers: display the base trade (multiplier of 1):
 		boolean displayAsBase = (mSelectedTradeMultiplier > mSelectedTradeMaxMultiplier);
 		int displayMultiplier = displayAsBase ? 1 : mSelectedTradeMultiplier;
@@ -1062,9 +1060,8 @@ public class CustomTradeGui extends Gui {
 		String tag = canAfford ? "trade_confirm_confirm" : "trade_confirm_unaffordable";
 		Material material = canAfford ? Material.GREEN_STAINED_GLASS_PANE : Material.BARRIER;
 		Component name = Component.text((canAfford ? "Confirm" : "Missing material(s)"), (canAfford ? NamedTextColor.GREEN : NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true);
-		ItemStack tempItem = GUIUtils.createBasicItem(material, 1, name, confirmLore, false, null);
-		GUIUtils.setGuiNbtTag(tempItem, "texture", tag, mGuiTagsActive);
-		return tempItem;
+		return GUIUtils.setGuiNbtTag(
+			GUIUtils.createBasicItem(material, 1, name, confirmLore, false, null), "texture", tag, mGuiTagsActive);
 	}
 
 	private ItemStack createBackButton(boolean canAfford) {
@@ -1072,10 +1069,9 @@ public class CustomTradeGui extends Gui {
 		String tag = canAfford ? "trade_confirm_cancel" : "trade_confirm_back";
 		Material material = canAfford ? Material.ORANGE_STAINED_GLASS_PANE : Material.ARROW;
 		String name = canAfford ? "Cancel" : "Back";
-		ItemStack tempItem = GUIUtils.createBasicItem(material, name, NamedTextColor.GRAY, false,
-			"Return to the previous page.", NamedTextColor.GRAY, 40);
-		GUIUtils.setGuiNbtTag(tempItem, "texture", tag, mGuiTagsActive);
-		return tempItem;
+		return GUIUtils.setGuiNbtTag(
+			GUIUtils.createBasicItem(material, name, NamedTextColor.GRAY, false,
+				"Return to the previous page.", NamedTextColor.GRAY, 40), "texture", tag, mGuiTagsActive);
 	}
 
 	private ItemStack createTradePreviewGuiItem(MerchantRecipe recipe, TradeReq tradeReq, boolean includePriceInLore, int multiplier) {
@@ -1121,13 +1117,12 @@ public class CustomTradeGui extends Gui {
 	private void setGuiIdentifiers() {
 		// Sets filler with tag for rp gui support.
 		// Different tags depending on if in general trade view or confirm trade view.
+		// Different base item depending on theme.
 		boolean isGeneral = (mSelectedTrade == null);
-		int locationL = isGeneral ? GUI_ID_GENERAL_L : GUI_ID_CONFIRM_L;
-		int locationR = isGeneral ? GUI_ID_GENERAL_R : GUI_ID_CONFIRM_R;
 		String tagL = isGeneral ? "gui_trade_1_l" : "gui_trade_2_l";
 		String tagR = isGeneral ? "gui_trade_1_r" : "gui_trade_2_r";
-		setItem(locationL, GUIUtils.createGuiIdentifierItem(tagL, mGuiTagsActive));
-		setItem(locationR, GUIUtils.createGuiIdentifierItem(tagR, mGuiTagsActive));
+		setItem(GUI_ID_LOC_L, GUIUtils.createGuiIdentifierItem(mBorderPane, tagL, mGuiTagsActive));
+		setItem(GUI_ID_LOC_R, GUIUtils.createGuiIdentifierItem(mBorderPane, tagR, mGuiTagsActive));
 	}
 	//endregion
 
