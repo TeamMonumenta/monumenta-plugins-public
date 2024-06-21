@@ -236,7 +236,7 @@ public class TeleportAsync extends GenericCommand {
 	}
 
 	public static Rotation getLocationRotation(Location loc) {
-		return new Rotation(loc.getPitch(), loc.getYaw());
+		return new Rotation(loc.getYaw(), loc.getPitch());
 	}
 
 	private static Rotation getFacingRotation(Location dst, Location facing) {
@@ -247,6 +247,6 @@ public class TeleportAsync extends GenericCommand {
 		Location workLoc = dst.clone();
 		workLoc.setDirection(facingVec);
 
-		return new Rotation(workLoc.getPitch(), workLoc.getYaw());
+		return getLocationRotation(workLoc);
 	}
 }
