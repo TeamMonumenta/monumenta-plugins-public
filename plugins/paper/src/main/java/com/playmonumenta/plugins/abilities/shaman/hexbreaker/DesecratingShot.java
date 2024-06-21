@@ -41,7 +41,7 @@ public class DesecratingShot extends Ability {
 			.scoreboardId("DesecratingShot")
 			.shorthandName("DS")
 			.descriptions(
-				String.format("Upon hitting a mob with a fully charge projectile, apply %s%% weakness for %ss and deal %s%% magic damage of the projectile's damage in a %s block radius. %ss cooldown.",
+				String.format("Upon hitting a mob with a fully charged projectile, apply %s%% weakness for %ss and deal %s%% magic damage of the projectile's damage in a %s block radius. %ss cooldown.",
 					StringUtils.multiplierToPercentage(WEAKNESS_1),
 					StringUtils.ticksToSeconds(WEAKNESS_DURATION),
 					StringUtils.multiplierToPercentage(DAMAGE_1),
