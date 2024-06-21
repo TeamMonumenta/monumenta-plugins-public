@@ -176,12 +176,13 @@ public class DeclarationAurora extends Spell {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			double mRadius = 0.1;
+			double mInnerRadius = -0.5;
 			final double mIncrease = RADIUS / 10.0;
 			final Location mGround = mSirius.mBoss.getLocation().subtract(0, 2, 0);
 
 			@Override
 			public void run() {
-				for (double radius = 0; radius < mRadius; radius += 0.5) {
+				for (double radius = (mInnerRadius < 0 ? 0 : mInnerRadius); radius < mRadius; radius += 0.5) {
 					for (double theta = 0; theta < 2 * Math.PI; theta += Math.PI / 6) {
 						Location loc = mPortalLoc.clone().add(FastUtils.cos(theta) * radius, 0, FastUtils.sin(theta) * radius);
 						for (double i = mPortalLoc.getY(); i > mGround.getY(); i -= 0.5) {
@@ -201,6 +202,7 @@ public class DeclarationAurora extends Spell {
 					this.cancel();
 				}
 				mRadius += mIncrease * 2;
+				mInnerRadius += mIncrease;
 				mTicks += 2;
 			}
 		}.runTaskTimer(mPlugin, 0, 2);

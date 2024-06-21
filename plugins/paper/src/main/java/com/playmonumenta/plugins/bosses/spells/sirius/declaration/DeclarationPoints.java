@@ -90,14 +90,15 @@ public class DeclarationPoints extends Spell {
 	private void cleanse() {
 		new BukkitRunnable() {
 			int mTicks = 0;
+			int mLastRadius = 0;
 
 			// by the end of cleanse duration radius needs to be ~= 75
 			@Override
 			public void run() {
 				mTicks += 5;
 				int radii = (int) (50 * (mTicks / (float) CLEANSEDURATION));
-				mConverter.restoreFullCircle(mSirius.mTuulenLocation, radii);
-				mConverter.restoreFullCircle(mSirius.mAuroraLocation, radii);
+				mConverter.restoreFullCircle(mSirius.mTuulenLocation, radii, mLastRadius);
+				mConverter.restoreFullCircle(mSirius.mAuroraLocation, radii, mLastRadius);
 				World world = mSirius.mBoss.getWorld();
 				world.playSound(mSirius.mAuroraLocation, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.NEUTRAL, 0.2f, 1.8f);
 				world.playSound(mSirius.mAuroraLocation, Sound.ITEM_TRIDENT_RETURN, SoundCategory.NEUTRAL, 0.4f, 0.8f);
@@ -107,6 +108,7 @@ public class DeclarationPoints extends Spell {
 					mConverter.convertBehind();
 					this.cancel();
 				}
+				mLastRadius = radii;
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
 	}

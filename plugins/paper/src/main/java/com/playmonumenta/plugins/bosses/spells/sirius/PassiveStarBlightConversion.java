@@ -81,7 +81,7 @@ public class PassiveStarBlightConversion extends Spell {
 			//random seed so it follows a different pattern.
 			mOnCooldown = true;
 			Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN);
-			convertBehind();
+			//convertBehind();
 			mSirius.updateCollisionBox(0);
 		}
 	}
@@ -157,32 +157,51 @@ public class PassiveStarBlightConversion extends Spell {
 	}
 
 	public void restoreFullCircle(Location center, int radius) {
-		for (int x = (int) Math.min(Math.abs((center.getX() - radius) - mCornerOne.getX()), mDeltaX);
-			 x > Math.max(Math.abs((center.getX() + radius) - mCornerOne.getX()), 0); x--) {
-			double mRealX = x;
-			for (double z = Math.min(Math.abs((center.getZ() - radius)), mCornerTwo.getZ()); z < Math.max(Math.abs((center.getZ() + radius)), mCornerOne.getZ()); z++) {
-				double mRealZ = mCornerOne.getZ() - z;
-				List<BlockData> blockData = mRestore.get("x" + mRealX + "z" + mRealZ);
-				if (blockData != null && mBlighted[x][(int) mRealZ]) {
-					int mCount = 0;
-					for (double y = mCornerTwo.getY(); y < mCornerOne.getY(); y++) {
-						Location loc = new Location(mSirius.mBoss.getWorld(), mCornerOne.getX() - mRealX, y, z);
-						if (!IGNORED_MATS.contains(loc.getBlock().getType()) && mCount < blockData.size()) {
-							if (getHorizontalDistance(loc, center) <= radius * radius) {
-								loc.getBlock().setBlockData(blockData.get(mCount));
-								loc.getBlock().getState().update();
-								mBlighted[x][(int) mRealZ] = false;
-								mCount++;
-							}
-						}
-						if (mCount == blockData.size()) {
-							break;
-						}
+		restoreFullCircle(center, radius, 0);
+	}
+
+	public void restoreFullCircle(Location center, int radius, int previousRadius) {
+		int previousSquared = previousRadius * previousRadius;
+		int squareRadius = radius * radius;
+		for (int z = radius; z >= 0; z--) {
+			for (int x = 0; x <= radius; x++) {
+				int distance = z * z + x * x;
+				if (distance > squareRadius) {
+					break;
+				}
+				if (distance < previousSquared) {
+					continue;
+				}
+				for (int i = 0; i < 4; i++) {
+					int dxSign = (i < 2) ? 1 : -1;
+					int dzSign = (i % 2 == 0) ? 1 : -1;
+					double mRealX = mCornerOne.x() - (center.x() + x*dxSign);
+					double mRealZ = mCornerOne.z() - (center.z() + z*dzSign);
+					List<BlockData> blockData = mRestore.get("x" + mRealX + "z" + mRealZ);
+					if (blockData != null && mBlighted[(int) mRealX][(int) mRealZ]) {
+						restoreColumn(center, x*dxSign, z*dzSign, blockData);
+						mBlighted[(int) mRealX][(int) mRealZ] = false;
 					}
 				}
+
 			}
 		}
+	}
 
+	private void restoreColumn(Location center, int x, int z, List<BlockData> blockData) {
+		int mCount = 0;
+		for (double y = mCornerTwo.getY(); y < mCornerOne.getY(); y++) {
+			Location loc = center.clone().add(x, 0, z);
+			loc.setY(y);
+			if (!IGNORED_MATS.contains(loc.getBlock().getType()) && mCount < blockData.size()) {
+				loc.getBlock().setBlockData(blockData.get(mCount));
+				loc.getBlock().getState().update();
+				mCount++;
+			}
+			if (mCount == blockData.size()) {
+				break;
+			}
+		}
 	}
 
 	//get Horizontal distance from loc2 to loc1. The result is not square rooted
