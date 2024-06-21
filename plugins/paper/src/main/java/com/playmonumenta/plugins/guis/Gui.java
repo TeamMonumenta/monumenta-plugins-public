@@ -33,6 +33,7 @@ public abstract class Gui {
 	public final Player mPlayer;
 	protected int mSize;
 	private Component mTitle;
+	private final boolean mCloseOnTeleport;
 	private boolean mTitleDirty = false;
 	private GuiCustomInventory mCustomInventory;
 
@@ -45,10 +46,15 @@ public abstract class Gui {
 	}
 
 	public Gui(Player player, int size, Component title) {
+		this(player, size, title, false);
+	}
+
+	public Gui(Player player, int size, Component title, boolean closeOnTeleport) {
 		mPlugin = Plugin.getInstance();
 		mPlayer = player;
 		mSize = size;
 		mTitle = title;
+		mCloseOnTeleport = closeOnTeleport;
 		mCustomInventory = new GuiCustomInventory(size, title);
 		mItems = new ArrayList<>(size);
 	}
@@ -169,6 +175,10 @@ public abstract class Gui {
 
 	public Inventory getInventory() {
 		return mCustomInventory.getInventory();
+	}
+
+	public boolean getCloseOnTeleport() {
+		return mCloseOnTeleport;
 	}
 
 	/**

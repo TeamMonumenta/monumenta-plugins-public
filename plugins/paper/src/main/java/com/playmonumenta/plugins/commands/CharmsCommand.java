@@ -296,7 +296,7 @@ public class CharmsCommand extends GenericCommand {
 
 	}
 
-	private static boolean checkZone(Player player) {
+	public static boolean checkZone(Player player) {
 		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_CHARMS)) {
 			player.sendMessage(Component.text("Charms cannot be accessed here!", NamedTextColor.RED));
 			return true;

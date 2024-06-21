@@ -1210,6 +1210,11 @@ public class PlayerListener implements Listener {
 		if (!event.isCancelled()) {
 			mPlugin.mTrackingManager.mPlayers.updateLocation(player, event.getTo(), 0);
 		}
+
+		Gui gui = Gui.getOpenGui(player);
+		if (gui != null && gui.getCloseOnTeleport()) {
+			gui.close();
+		}
 	}
 
 	private static boolean collidesWithUnbreakableBlock(World world, BoundingBox boundingBox) {

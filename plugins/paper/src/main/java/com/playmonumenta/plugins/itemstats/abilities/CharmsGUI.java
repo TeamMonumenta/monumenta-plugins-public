@@ -89,7 +89,7 @@ public class CharmsGUI extends Gui {
 	}
 
 	public CharmsGUI(Player requestingPlayer, Player targetPlayer, boolean mayEdit, CharmManager.CharmType charmType, boolean fromPDGUI) {
-		super(requestingPlayer, 54, Component.text(targetPlayer.getName() + "'s Charms"));
+		super(requestingPlayer, 54, Component.text(targetPlayer.getName() + "'s Charms"), true);
 		mTargetPlayer = targetPlayer;
 		mMayEdit = mayEdit;
 		mCharmType = charmType;
