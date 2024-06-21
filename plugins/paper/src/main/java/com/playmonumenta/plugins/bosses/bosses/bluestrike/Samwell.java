@@ -353,9 +353,15 @@ public class Samwell extends BossAbilityGroup {
 			event.setDamage(event.getDamage() * 0.1);
 		} else if (!mPhase4Damaged) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				if (mDefeated) {
+					return;
+				}
 				sendMessage("It can't be... I can't feel the Blue Wool anymore... Has it run out? Or... has it turned its back on me??");
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					if (mDefeated) {
+						return;
+					}
 					sendMessage(Component.empty()
 						.append(Component.text("Please", NamedTextColor.RED, TextDecoration.ITALIC))
 						.append(Component.text("! ", NamedTextColor.RED))
