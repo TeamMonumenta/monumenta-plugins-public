@@ -25,6 +25,9 @@ public class ChainLightningCS implements CosmeticSkill {
 
 	public void chainLightningCast(Player player, List<LivingEntity> mHitTargets, LivingEntity target, int i) {
 		new PPLine(Particle.END_ROD, mHitTargets.get(i).getEyeLocation().add(0, -0.5, 0), target.getEyeLocation().add(0, -0.5, 0), 0.08).deltaVariance(true).countPerMeter(8).spawnAsPlayerActive(player);
+	}
+
+	public void chainLightningSound(Player player) {
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.PLAYERS, 2.0f, 2.0f);
 	}
 }

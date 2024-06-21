@@ -121,9 +121,10 @@ public class Riposte extends Ability implements AbilityWithDuration {
 				mCosmetic.onParry(mPlayer, world, playerLoc, source);
 				putOnCooldown();
 				ClientModHandler.updateAbility(mPlayer, this);
-				event.setCancelled(true);
 				mPlayer.setNoDamageTicks(20);
 				mPlayer.setLastDamage(event.getDamage());
+				event.setDamage(0);
+				event.setCancelled(true);
 
 				if (isEnhanced()) {
 					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ENHANCEMENT_DAMAGE);

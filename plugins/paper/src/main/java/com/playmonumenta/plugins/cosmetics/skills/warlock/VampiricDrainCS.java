@@ -37,7 +37,7 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-			"\"Vampires never use the tricks of human.\"",
+			"\"Vampires never use the tricks of humans.\"",
 			"Compared to souls, blood will always offer",
 			"a far more effective path."
 		);

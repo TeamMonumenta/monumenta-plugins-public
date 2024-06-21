@@ -182,7 +182,7 @@ public class ChainLightning extends MultipleChargeAbility {
 			return;
 		}
 		mLastCastTicks = ticks;
-
+		mCosmetic.chainLightningSound(mPlayer);
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
 			if (target != null) {
