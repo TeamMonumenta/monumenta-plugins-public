@@ -270,14 +270,13 @@ public class TradeListener implements Listener {
 				};
 				copyDye = (from, to) -> {
 					to.setType(from.getType());
-					// Prevent adding block state tags if no tags exist in the original item
-					boolean hasTag = NBT.get(from, nbt -> nbt.getCompound("BlockEntityTag") != null);
-					if (hasTag) {
-						BlockStateMeta fromBsm = (BlockStateMeta) from.getItemMeta();
-						BlockStateMeta toBsm = (BlockStateMeta) to.getItemMeta();
-						toBsm.setBlockState(fromBsm.getBlockState());
-						to.setItemMeta(toBsm);
-					}
+					NBT.modify(to, nbt -> {
+						nbt.removeKey("BlockEntityTag");
+						NBTCompound fromShulker = new NBTItem(from).getCompound("BlockEntityTag");
+						if (fromShulker != null) {
+							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromShulker);
+						}
+					});
 				};
 			} else if (source.getItemMeta() instanceof LeatherArmorMeta
 				           && !ItemUtils.getPlainLoreIfExists(source).contains("Arena of Terth")) {
