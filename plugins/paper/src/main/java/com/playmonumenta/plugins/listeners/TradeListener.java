@@ -244,6 +244,12 @@ public class TradeListener implements Listener {
 		// Used to not create duplicate trades if the player for some reason has multiple identical items.
 		List<ItemStack> createdTrades = new ArrayList<>();
 
+		// Trades with 2 different dyed ingredients are not being handled at the same time.
+		// These lists save the handled ingredients in different lists depending on the slot.
+		// It is then used to find all the different combinations to add to the list of trades.
+		List<ItemStack> firstIngredients = new ArrayList<>();
+		List<ItemStack> secondIngredients = new ArrayList<>();
+
 		for (int slot = 0; slot < recipe.getIngredients().size(); slot++) {
 			ItemStack source = recipe.getIngredients().get(slot);
 			if (source == null || source.getType() == Material.AIR) {
@@ -255,8 +261,24 @@ public class TradeListener implements Listener {
 			BiConsumer<ItemStack, ItemStack> copyDye;
 			if (ItemUtils.isShulkerBox(source.getType())) {
 				isSameType = ItemUtils::isShulkerBox;
-				clearDye = itemStack -> itemStack.setType(Material.SHULKER_BOX);
-				copyDye = (from, to) -> to.setType(from.getType());
+				clearDye = itemStack -> {
+					itemStack.setType(Material.SHULKER_BOX);
+					// Adds the default Bukkit block state tags if absent
+					BlockStateMeta bsm = (BlockStateMeta) itemStack.getItemMeta();
+					bsm.setBlockState(bsm.getBlockState());
+					itemStack.setItemMeta(bsm);
+				};
+				copyDye = (from, to) -> {
+					to.setType(from.getType());
+					// Prevent adding block state tags if no tags exist in the original item
+					boolean hasTag = NBT.get(from, nbt -> nbt.getCompound("BlockEntityTag") != null);
+					if (hasTag) {
+						BlockStateMeta fromBsm = (BlockStateMeta) from.getItemMeta();
+						BlockStateMeta toBsm = (BlockStateMeta) to.getItemMeta();
+						toBsm.setBlockState(fromBsm.getBlockState());
+						to.setItemMeta(toBsm);
+					}
+				};
 			} else if (source.getItemMeta() instanceof LeatherArmorMeta
 				           && !ItemUtils.getPlainLoreIfExists(source).contains("Arena of Terth")) {
 				clearDye = itemStack -> {
@@ -311,11 +333,6 @@ public class TradeListener implements Listener {
 				ItemStack newSource = ItemUtils.clone(source);
 				copyDye.accept(playerItem, newSource);
 
-				ItemStack originalResult = trade.getOriginalResult();
-				if (originalResult != null) {
-					copyDye.accept(playerItem, originalResult);
-				}
-
 				// create the new trade
 				MerchantRecipe newRecipe = new MerchantRecipe(recipe.getResult(), recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
 					recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.shouldIgnoreDiscounts());
@@ -327,6 +344,25 @@ public class TradeListener implements Listener {
 				trades.add(newTrade);
 
 				createdTrades.add(playerItem);
+				if (slot == 0) {
+					firstIngredients.add(playerItem);
+				} else if (slot == 1) {
+					secondIngredients.add(playerItem);
+				}
+			}
+		}
+		// Finds all unique combinations of ingredients to add to the list of trades.
+		if (recipe.getIngredients().size() == 2 && !firstIngredients.isEmpty() && !secondIngredients.isEmpty()) {
+			for (ItemStack first : firstIngredients) {
+				for (ItemStack second : secondIngredients) {
+					MerchantRecipe newRecipe = new MerchantRecipe(recipe.getResult(), recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
+						recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.shouldIgnoreDiscounts());
+					List<ItemStack> newIngredients = List.of(first, second);
+					newRecipe.setIngredients(newIngredients);
+					TradeWindowOpenEvent.Trade newTrade = new TradeWindowOpenEvent.Trade(trade);
+					newTrade.setRecipe(newRecipe);
+					trades.add(newTrade);
+				}
 			}
 		}
 	}

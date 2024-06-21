@@ -336,7 +336,10 @@ public class ShulkerEquipmentListener implements Listener {
 
 	private void swapVanity(Player player, ItemStack shulkerBox) {
 		VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
-		if (!vanityData.mLockboxSwapEnabled) {
+		if (!vanityData.mLockboxSwapEnabled || vanityData.getEquipped().isEmpty()) {
+			NBT.modify(shulkerBox, nbt -> {
+				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			});
 			return;
 		}
 
