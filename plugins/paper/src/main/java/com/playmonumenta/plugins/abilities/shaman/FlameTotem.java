@@ -4,8 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -53,7 +51,7 @@ public class FlameTotem extends TotemAbility {
 	public static final String CHARM_ENHANCE_INFERNO_SCALE = "Flame Totem Enhancement Inferno Efficiency";
 	public static final String CHARM_PULSE_DELAY = "Flame Totem Pulse Delay";
 
-	private double mDamage;
+	private final double mDamage;
 	private final double mRadius;
 	private final double mBombRadius;
 	private final int mBombCount;
@@ -104,8 +102,6 @@ public class FlameTotem extends TotemAbility {
 		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
 			(isLevelOne() ? DAMAGE_1 : DAMAGE_2));
-		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
-		mDamage *= SupportExpertise.damageBuff(mPlayer);
 
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? AOE_RANGE_2 : AOE_RANGE_1);

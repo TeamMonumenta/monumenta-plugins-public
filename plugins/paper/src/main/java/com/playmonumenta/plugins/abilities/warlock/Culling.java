@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -24,7 +23,7 @@ public class Culling extends Ability {
 
 	public static final AbilityInfo<Culling> INFO =
 		new AbilityInfo<>(Culling.class, null, Culling::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Warlock.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Warlock.CLASS_ID);
 
 	public Culling(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

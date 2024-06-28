@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -151,49 +150,49 @@ public class EntityTargets implements Cloneable {
 		IS_CLASSLESS {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return ScoreboardUtils.getScoreboardValue(entity, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == 0;
+				return entity instanceof Player player && AbilityUtils.getClassNum(player) == 0;
 			}
 		},
 		IS_MAGE {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return PlayerUtils.isMage((Player) entity);
+				return entity instanceof Player player && PlayerUtils.isMage(player);
 			}
 		},
 		IS_WARRIOR {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return PlayerUtils.isWarrior((Player) entity);
+				return entity instanceof Player player && PlayerUtils.isWarrior(player);
 			}
 		},
 		IS_CLERIC {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return PlayerUtils.isCleric((Player) entity);
+				return entity instanceof Player player && PlayerUtils.isCleric(player);
 			}
 		},
 		IS_ROGUE {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return PlayerUtils.isRogue((Player) entity);
+				return entity instanceof Player player && PlayerUtils.isRogue(player);
 			}
 		},
 		IS_ALCHEMIST {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return PlayerUtils.isAlchemist((Player) entity);
+				return entity instanceof Player player && PlayerUtils.isAlchemist(player);
 			}
 		},
 		IS_SCOUT {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return PlayerUtils.isScout((Player) entity);
+				return entity instanceof Player player && PlayerUtils.isScout(player);
 			}
 		},
 		IS_WARLOCK {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return PlayerUtils.isWarlock((Player) entity);
+				return entity instanceof Player player && PlayerUtils.isWarlock(player);
 			}
 		},
 		HAS_LINEOFSIGHT {

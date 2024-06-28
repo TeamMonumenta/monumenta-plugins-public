@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
@@ -469,38 +468,31 @@ public class PlayerUtils {
 	}
 
 	public static boolean isMage(Player player) {
-		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
-		return opt.orElse(0) == Mage.CLASS_ID;
+		return AbilityUtils.getClassNum(player) == Mage.CLASS_ID;
 	}
 
 	public static boolean isWarrior(Player player) {
-		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
-		return opt.orElse(0) == Warrior.CLASS_ID;
+		return AbilityUtils.getClassNum(player) == Warrior.CLASS_ID;
 	}
 
 	public static boolean isCleric(Player player) {
-		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
-		return opt.orElse(0) == Cleric.CLASS_ID;
+		return AbilityUtils.getClassNum(player) == Cleric.CLASS_ID;
 	}
 
 	public static boolean isRogue(Player player) {
-		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
-		return opt.orElse(0) == Rogue.CLASS_ID;
+		return AbilityUtils.getClassNum(player) == Rogue.CLASS_ID;
 	}
 
 	public static boolean isAlchemist(Player player) {
-		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
-		return opt.orElse(0) == Alchemist.CLASS_ID;
+		return AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID;
 	}
 
 	public static boolean isScout(Player player) {
-		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
-		return opt.orElse(0) == Scout.CLASS_ID;
+		return AbilityUtils.getClassNum(player) == Scout.CLASS_ID;
 	}
 
 	public static boolean isWarlock(Player player) {
-		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
-		return opt.orElse(0) == Warlock.CLASS_ID;
+		return AbilityUtils.getClassNum(player) == Warlock.CLASS_ID;
 	}
 
 	public static void resetAttackCooldown(Player player) {

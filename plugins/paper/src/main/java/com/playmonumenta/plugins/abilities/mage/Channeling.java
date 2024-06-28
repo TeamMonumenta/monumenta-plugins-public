@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -21,7 +20,7 @@ public class Channeling extends Ability {
 
 	public static final AbilityInfo<Channeling> INFO =
 		new AbilityInfo<>(Channeling.class, null, Channeling::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Mage.CLASS_ID)
+			.canUse(player -> AbilityUtils.getClassNum(player) == Mage.CLASS_ID)
 			.priorityAmount(999);
 
 	private boolean mCast = false;

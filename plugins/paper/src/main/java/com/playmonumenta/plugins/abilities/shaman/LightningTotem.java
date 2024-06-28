@@ -4,8 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -92,7 +90,7 @@ public class LightningTotem extends TotemAbility {
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.YELLOW_WOOL);
 
-	private double mDamage;
+	private final double mDamage;
 	private final double mRadius;
 	private @Nullable LivingEntity mTarget = null;
 	public double mDecayedTotemBuff = 0;
@@ -110,8 +108,6 @@ public class LightningTotem extends TotemAbility {
 			AbilityUtils.resetClass(player);
 		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
-		mDamage *= SupportExpertise.damageBuff(mPlayer);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TOTEM_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 		mStormDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_STORM_DAMAGE, STORM_DAMAGE_PERCENT);

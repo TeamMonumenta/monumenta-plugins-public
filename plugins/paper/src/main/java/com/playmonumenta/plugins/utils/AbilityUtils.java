@@ -310,8 +310,12 @@ public class AbilityUtils {
 		return false;
 	}
 
+	public static int getClassNum(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
+	}
+
 	public static String getClass(Player player) {
-		return getClass(ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0));
+		return getClass(getClassNum(player));
 	}
 
 	public static String getClass(int classId) {
@@ -342,8 +346,12 @@ public class AbilityUtils {
 		};
 	}
 
+	public static int getSpecNum(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
+	}
+
 	public static String getSpec(Player player) {
-		return getSpec(ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0));
+		return getSpec(getSpecNum(player));
 	}
 
 	public static String getSpec(int specId) {
@@ -477,7 +485,7 @@ public class AbilityUtils {
 	}
 
 	public static void resetClass(Player player) {
-		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0) == 0) {
+		if (getClassNum(player) == 0) {
 			player.sendMessage(Component.text("You do not have a class.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 			return;
 		}
@@ -491,7 +499,7 @@ public class AbilityUtils {
 	}
 
 	public static void resetSpec(Player player) {
-		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0) == 0) {
+		if (getSpecNum(player) == 0) {
 			player.sendMessage(Component.text("You do not have a specialization.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 			return;
 		}
@@ -512,8 +520,8 @@ public class AbilityUtils {
 
 		// Remove any skills from other classes (this is also used to clear skills by first clearing selected class and/or spec)
 
-		int playerClass = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0);
-		int playerSpec = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0);
+		int playerClass = getClassNum(player);
+		int playerSpec = getSpecNum(player);
 		MonumentaClasses mClasses = new MonumentaClasses();
 		for (PlayerClass mClass : mClasses.mClasses) {
 			if (playerClass != mClass.mClass) {
@@ -565,7 +573,7 @@ public class AbilityUtils {
 		int remainingSpecPoints = getEffectiveTotalSpecPoints(player);
 		int remainingEnhancementPoints = ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0);
 		for (PlayerClass mClass : mClasses.mClasses) {
-			if (mClass.mClass == ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0)) {
+			if (mClass.mClass == AbilityUtils.getClassNum(player)) {
 				List<AbilityInfo<?>> abilities = mClass.mAbilities;
 				List<AbilityInfo<?>> specAbilities = mClass.mSpecOne.mAbilities;
 				specAbilities.addAll(mClass.mSpecTwo.mAbilities);

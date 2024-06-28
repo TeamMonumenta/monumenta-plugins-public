@@ -51,11 +51,11 @@ public class ClassDisplayCustomInventory extends Gui {
 		mFromPDGUI = fromPDGUI;
 		mTargetPlayer = targetPlayer;
 		mRequestingPlayer = requestingPlayer;
-		int currentClass = ScoreboardUtils.getScoreboardValue(targetPlayer, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		int currentClass = AbilityUtils.getClassNum(targetPlayer);
 		for (PlayerClass oneClass : mClasses.mClasses) {
 			if (currentClass == oneClass.mClass) {
 				mClass = oneClass;
-				int currentSpec = ScoreboardUtils.getScoreboardValue(targetPlayer, AbilityUtils.SCOREBOARD_SPEC_NAME);
+				int currentSpec = AbilityUtils.getSpecNum(targetPlayer);
 				if (currentSpec == oneClass.mSpecOne.mSpecialization) {
 					mSpec = oneClass.mSpecOne;
 				} else if (currentSpec == oneClass.mSpecTwo.mSpecialization) {

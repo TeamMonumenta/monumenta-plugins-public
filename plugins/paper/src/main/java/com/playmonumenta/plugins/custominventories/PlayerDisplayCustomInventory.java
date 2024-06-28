@@ -83,7 +83,7 @@ public class PlayerDisplayCustomInventory extends CustomInventory {
 
 	public void setLayout(Player clickedPlayer) {
 		mInventory.clear();
-		int currentClass = ScoreboardUtils.getScoreboardValue(clickedPlayer, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
+		int currentClass = AbilityUtils.getClassNum(clickedPlayer);
 		PlayerClass playerClass = null;
 		for (PlayerClass oneClass : mClasses.mClasses) {
 			if (currentClass == oneClass.mClass) {

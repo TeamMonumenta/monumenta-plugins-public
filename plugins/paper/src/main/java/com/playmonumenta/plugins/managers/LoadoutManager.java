@@ -595,8 +595,8 @@ public class LoadoutManager implements Listener {
 			}
 		}
 		if (loadout.mIncludeClass) {
-			if (loadout.mClass.mClassId != ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0)
-				    || loadout.mClass.mSpecId != ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0)) {
+			if (loadout.mClass.mClassId != AbilityUtils.getClassNum(player)
+				    || loadout.mClass.mSpecId != AbilityUtils.getSpecNum(player)) {
 				return false;
 			}
 			for (Map.Entry<String, Integer> entry : loadout.mClass.mAbilityScores.entrySet()) {
@@ -829,13 +829,13 @@ public class LoadoutManager implements Listener {
 
 		public void setClassFromPlayer(Player player) {
 			mClass.mAbilityScores.clear();
-			mClass.mClassId = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
+			mClass.mClassId = AbilityUtils.getClassNum(player);
 			PlayerClass playerClass = new MonumentaClasses().getClassById(mClass.mClassId);
 			if (playerClass == null) {
 				mClass.mSpecId = 0;
 				return;
 			}
-			mClass.mSpecId = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
+			mClass.mSpecId = AbilityUtils.getSpecNum(player);
 			PlayerSpec playerSpec = playerClass.getSpecById(mClass.mSpecId);
 			for (AbilityInfo<?> ability : playerClass.mAbilities) {
 				String scoreboard = ability.getScoreboard();

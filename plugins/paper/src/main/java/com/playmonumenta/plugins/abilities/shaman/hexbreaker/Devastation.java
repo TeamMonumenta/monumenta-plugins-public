@@ -69,7 +69,6 @@ public class Devastation extends Ability {
 			AbilityUtils.resetClass(player);
 		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DevastationCS());
 	}

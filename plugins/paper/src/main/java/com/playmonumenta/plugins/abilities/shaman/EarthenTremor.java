@@ -5,15 +5,18 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.EarthenTremorCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -47,7 +50,7 @@ public class EarthenTremor extends Ability {
 	public static final String CHARM_SHOCKWAVE_RADIUS = "Earthen Tremor Shockwave Radius";
 	public static final String CHARM_SHOCKWAVE_DISTANCE = "Earthen Tremor Shockwave Distance";
 
-	private double mDamage;
+	private final double mDamage;
 	private final double mRadius;
 	private final int mSilenceDuration;
 	private final float mKnockback;
@@ -93,8 +96,6 @@ public class EarthenTremor extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
 			isEnhanced() ? (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + DAMAGE_BONUS_ENHANCE
 				: (isLevelOne() ? DAMAGE_1 : DAMAGE_2));
-		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
-		mDamage *= SupportExpertise.damageBuff(mPlayer);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
 		mSilenceDuration = CharmManager.getDuration(mPlayer, CHARM_SILENCE_DURATION, SILENCE_DURATION);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);

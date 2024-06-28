@@ -145,7 +145,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				} else if (SKILL_PAGE_SPEC_LOCS.contains(chosenSlot)) {
 					//assign spec, make pg 3
 					for (PlayerClass oneClass : mClasses.mClasses) {
-						if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+						if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 							int specIndex = SKILL_PAGE_SPEC_LOCS.indexOf(chosenSlot);
 							PlayerSpec chosenSpec = (specIndex == 0) ? oneClass.mSpecOne : oneClass.mSpecTwo;
 							ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, chosenSpec.mSpecialization);
@@ -156,7 +156,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					AbilityUtils.resetSpec(player);
 					updateYellowTessCooldown(player);
 					for (PlayerClass oneClass : mClasses.mClasses) {
-						if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+						if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 							makeSkillSelectPage(oneClass, player);
 						}
 					}
@@ -183,7 +183,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				} else if (SKILL_PAGE_SPEC_LOCS.contains(chosenSlot)) {
 					//assign spec, make pg 3
 					for (PlayerClass oneClass : mClasses.mClasses) {
-						if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+						if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 							int specIndex = SKILL_PAGE_SPEC_LOCS.indexOf(chosenSlot);
 							PlayerSpec chosenSpec = (specIndex == 0) ? oneClass.mSpecOne : oneClass.mSpecTwo;
 							ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, chosenSpec.mSpecialization);
@@ -193,7 +193,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				} else if (chosenSlot == SKILL_PAGE_RESET_SPEC_LOC) {
 					AbilityUtils.resetSpec(player);
 					for (PlayerClass oneClass : mClasses.mClasses) {
-						if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+						if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 							makeSkillSelectPage(oneClass, player);
 						}
 					}
@@ -213,7 +213,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				} else if (chosenSlot == COMMON_BACK_LOC) {
 					//back to page two
 					for (PlayerClass oneClass : mClasses.mClasses) {
-						if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+						if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 							makeSkillSelectPage(oneClass, player);
 							break;
 						}
@@ -231,7 +231,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.clear();
 		mCurrentPage = 1;
 		//Get the current class, if they have one.
-		int currentClass = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		int currentClass = AbilityUtils.getClassNum(player);
 		PlayerClass playerClass = null;
 		for (PlayerClass oneClass : mClasses.mClasses) {
 			if (currentClass == oneClass.mClass) {
@@ -261,7 +261,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		GUIUtils.setGuiNbtTag(summaryItem, "texture", "class_select_main_menu", mGuiTextures);
 		mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 
-		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != 0) {
+		if (AbilityUtils.getClassNum(player) != 0) {
 			ItemStack resetItem = GUIUtils.createBasicItem(Material.CYAN_BED, "Reset Your Class", NamedTextColor.WHITE, false,
 				"Click here to reset your class, allowing access to other choices.", NamedTextColor.LIGHT_PURPLE);
 			GUIUtils.setGuiNbtTag(resetItem, "texture", "class_select_reset_class", mGuiTextures);
@@ -272,7 +272,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		//possibly create reset spec item
-		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		int spec = AbilityUtils.getSpecNum(player);
 		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization, allowing access to choose either specialization.", NamedTextColor.LIGHT_PURPLE);
@@ -340,7 +340,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
-		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		int spec = AbilityUtils.getSpecNum(player);
 		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", NamedTextColor.LIGHT_PURPLE);
@@ -407,7 +407,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
-		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		int spec = AbilityUtils.getSpecNum(player);
 		if (spec != 0) {
 			ItemStack specItem = GUIUtils.createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", NamedTextColor.LIGHT_PURPLE);
@@ -482,7 +482,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			currentLocations = P2_ABILITY_LOCS;
 		}
 		for (PlayerClass oneClass : mClasses.mClasses) {
-			if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+			if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 				//found class, find ability
 				int abilityIndex = currentLocations.indexOf(chosenSlot);
 				AbilityInfo<?> selectedAbility = oneClass.mAbilities.get(abilityIndex);
@@ -531,11 +531,12 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		PlayerClass theClass = null;
 		PlayerSpec spec = null;
 		for (PlayerClass oneClass : mClasses.mClasses) {
-			if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+			if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 				theClass = oneClass;
-				if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == oneClass.mSpecOne.mSpecialization) {
+				int currentSpec = AbilityUtils.getSpecNum(player);
+				if (currentSpec == oneClass.mSpecOne.mSpecialization) {
 					spec = oneClass.mSpecOne;
-				} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == oneClass.mSpecTwo.mSpecialization) {
+				} else if (currentSpec == oneClass.mSpecTwo.mSpecialization) {
 					spec = oneClass.mSpecTwo;
 				}
 				break;
@@ -572,7 +573,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	public void applyEnhancementChosen(int chosenSlot, Player player, boolean add) {
 		for (PlayerClass oneClass : mClasses.mClasses) {
-			if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
+			if (AbilityUtils.getClassNum(player) == oneClass.mClass) {
 				//found class, find ability
 				int abilityIndex = P3_ABILITY_LOCS.indexOf(chosenSlot);
 				AbilityInfo<?> selectedAbility = oneClass.mAbilities.get(abilityIndex);
@@ -634,7 +635,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
 			return;
 		}
-		int specScore = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		int specScore = AbilityUtils.getSpecNum(player);
 		if (specScore == otherSpec.mSpecialization) {
 			//unlocked, but using other spec
 			ItemStack specItem = GUIUtils.createBasicItem(Material.BARRIER, spec.mSpecName, playerClass.mClassColor, false,

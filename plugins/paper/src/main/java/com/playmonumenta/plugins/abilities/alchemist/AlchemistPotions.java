@@ -88,7 +88,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
 				.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
 				.linkedSpell(ClassAbility.ALCHEMIST_POTION)
-				.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
+				.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID);
 
 	public final GruesomeAlchemyCS mCosmetic;
 	private boolean mHasGruesomeAlchemy = false;

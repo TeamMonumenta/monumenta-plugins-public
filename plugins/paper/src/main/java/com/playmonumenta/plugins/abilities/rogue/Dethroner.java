@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -19,7 +18,7 @@ public class Dethroner extends Ability {
 
 	public static final AbilityInfo<Dethroner> INFO =
 		new AbilityInfo<>(Dethroner.class, null, Dethroner::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Rogue.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Rogue.CLASS_ID);
 
 	public Dethroner(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

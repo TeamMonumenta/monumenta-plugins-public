@@ -56,7 +56,7 @@ public class DesecratingShot extends Ability {
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.TNT);
 
-	private double mDamagePercent;
+	private final double mDamagePercent;
 	private final double mWeaknessPercent;
 	private final int mDuration;
 	private final double mRadius;
@@ -68,7 +68,6 @@ public class DesecratingShot extends Ability {
 			AbilityUtils.resetClass(player);
 		}
 		mDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamagePercent *= DestructiveExpertise.damageBuff(mPlayer);
 		mWeaknessPercent = (isLevelOne() ? WEAKNESS_1 : WEAKNESS_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, WEAKNESS_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);

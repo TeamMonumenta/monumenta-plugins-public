@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -37,7 +36,7 @@ public class Rejuvenation extends Ability {
 
 	public static final AbilityInfo<Rejuvenation> INFO =
 		new AbilityInfo<>(Rejuvenation.class, null, Rejuvenation::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Cleric.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Cleric.CLASS_ID);
 
 	private int mTimer = 0;
 

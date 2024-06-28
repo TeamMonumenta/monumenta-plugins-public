@@ -3,15 +3,17 @@ package com.playmonumenta.plugins.abilities.shaman;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.InterconnectedHavocCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
@@ -33,9 +35,9 @@ public class InterconnectedHavoc extends Ability {
 	public static final String CHARM_ENHANCEMENT_STUN = "Interconnected Havoc Stun Duration";
 
 	private final double mRange;
-	private double mDamage;
-	private float mKnockback;
-	private int mStunTime;
+	private final double mDamage;
+	private final float mKnockback;
+	private final int mStunTime;
 	private int mClearTimer;
 	private final List<LivingEntity> mHitMobs = new ArrayList<>();
 	private final List<LivingEntity> mBlockedMobs = new ArrayList<>();
@@ -69,8 +71,6 @@ public class InterconnectedHavoc extends Ability {
 		}
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, isLevelOne() ? RANGE_1 : RANGE_2);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
-		mDamage *= SupportExpertise.damageBuff(mPlayer);
 		mKnockback = (float) CharmManager.getExtraPercent(mPlayer, CHARM_ENHANCEMENT_KNOCKBACK, KNOCKBACK);
 		mStunTime = CharmManager.getDuration(mPlayer, CHARM_ENHANCEMENT_STUN, STUN_TIME);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new InterconnectedHavocCS());

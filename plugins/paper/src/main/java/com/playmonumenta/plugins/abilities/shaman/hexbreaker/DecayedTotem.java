@@ -99,7 +99,7 @@ public class DecayedTotem extends TotemAbility {
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE) * DestructiveExpertise.damageBuff(mPlayer);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, isLevelTwo() ? INTERVAL_2 : INTERVAL_1);

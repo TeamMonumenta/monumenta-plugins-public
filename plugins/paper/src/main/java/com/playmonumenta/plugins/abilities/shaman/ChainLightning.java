@@ -6,8 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -86,7 +84,7 @@ public class ChainLightning extends MultipleChargeAbility {
 
 	public final double mBounceRange;
 	public final int mTargets;
-	public double mDamage;
+	public final double mDamage;
 	private final double mInitialRange;
 	private int mLastCastTicks = 0;
 	private final ChainLightningCS mCosmetic;
@@ -102,8 +100,6 @@ public class ChainLightning extends MultipleChargeAbility {
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BOUNCE_RANGE);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamage *= SupportExpertise.damageBuff(mPlayer);
-		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mInitialRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_INITIAL_RANGE, INITIAL_RANGE);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainLightningCS());

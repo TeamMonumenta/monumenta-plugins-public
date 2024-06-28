@@ -35,7 +35,7 @@ public class TotemicEmpowerment extends Ability {
 
 	public static final AbilityInfo<TotemicEmpowerment> INFO =
 		new AbilityInfo<>(TotemicEmpowerment.class, null, TotemicEmpowerment::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Shaman.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Shaman.CLASS_ID);
 
 	private @Nullable SupportExpertise mSupportExpertise;
 
