@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.io.File;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -238,6 +240,19 @@ public abstract class ExperiencinatorUtils {
 					remainingValue -= given * conversionResult.getValue();
 
 					ItemStack resultStack = conversionResult.getItem();
+					ItemStack circusTicket = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/circus_ticket")));
+					ItemStack carnivalToken = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/carnival_token")));
+					if (resultStack.displayName().equals(circusTicket.displayName())) {
+						for (int j = 0; j < given; j++) {
+							PlayerUtils.executeCommandOnPlayer(player, "function monumenta:advancements/general/igor/got_a_ticket_scores");
+						}
+					}
+					if (resultStack.displayName().equals(carnivalToken.displayName())) {
+						for (int j = 0; j < given; j++) {
+							PlayerUtils.executeCommandOnPlayer(player, "function monumenta:mechanisms/carnival/got_a_token_scores");
+						}
+					}
+
 					resultStack.setAmount(given);
 					if (existingSlots.size() > i && existingSlots.get(i) >= 0 && ItemUtils.isNullOrAir(player.getInventory().getItem(existingSlots.get(i)))) {
 						player.getInventory().setItem(existingSlots.get(i), resultStack);
