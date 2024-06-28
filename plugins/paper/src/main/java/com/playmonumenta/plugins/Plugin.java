@@ -226,6 +226,7 @@ public class Plugin extends JavaPlugin {
 		CharmsCommand.register();
 		ClaimRaffle.register(this);
 		ClearPortals.register();
+		CooldownsCommand.register(this);
 		CoreProtectLogCommand.register();
 		CosmeticsCommand.register(this);
 		CustomEffect.register();

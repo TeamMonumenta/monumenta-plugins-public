@@ -5,10 +5,9 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import org.bukkit.entity.Player;
@@ -253,13 +252,8 @@ public class CooldownTimers {
 		}
 	}
 
-	public Collection<Integer> getCooldowns(UUID playerID) {
-		HashMap<ClassAbility, Integer> player = mTimers.get(playerID);
-		if (player != null) {
-			return player.values();
-		} else {
-			return Collections.emptyList();
-		}
+	public Map<ClassAbility, Integer> getCooldowns(UUID playerID) {
+		return mTimers.getOrDefault(playerID, new HashMap<>());
 	}
 
 	/**

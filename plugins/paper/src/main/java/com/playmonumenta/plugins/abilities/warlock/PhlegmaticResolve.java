@@ -155,7 +155,7 @@ public class PhlegmaticResolve extends Ability {
 		}
 
 		int cooldowns = 0;
-		for (Integer ability : mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId())) {
+		for (Integer ability : mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId()).values()) {
 			if (ability > 0) {
 				cooldowns++;
 			}
