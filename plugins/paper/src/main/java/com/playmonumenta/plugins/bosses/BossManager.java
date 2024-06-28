@@ -385,6 +385,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(HexfallRespawnBoss.identityTag, HexfallRespawnBoss::new, new HexfallRespawnBoss.Parameters());
 		registerStatelessBoss(HexfallFloramancerBoss.identityTag, HexfallFloramancerBoss::new, new HexfallFloramancerBoss.Parameters());
 		registerStatelessBoss(FlowerPlaceBoss.identityTag, FlowerPlaceBoss::new, new FlowerPlaceBoss.Parameters());
+		registerStatelessBoss(WingedBoss.identityTag, WingedBoss::new, new WingedBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
