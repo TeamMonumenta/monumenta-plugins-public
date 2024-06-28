@@ -175,6 +175,14 @@ public class ShulkerEquipmentListener implements Listener {
 					swapVanity(player, sboxItem);
 					swapParrots(player, sboxItem);
 
+					// Remove unnecessary player modified compound if empty
+					NBT.modify(sboxItem, nbt -> {
+						ReadWriteNBT playerModified = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+						if (playerModified.getKeys().isEmpty()) {
+							nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.PLAYER_MODIFIED_KEY);
+						}
+					});
+
 					player.updateInventory();
 					event.setCancelled(true);
 					mPlugin.mItemStatManager.updateStats(player);
@@ -336,10 +344,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 	private void swapVanity(Player player, ItemStack shulkerBox) {
 		VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
-		if (!vanityData.mLockboxSwapEnabled || vanityData.getEquipped().isEmpty()) {
-			NBT.modify(shulkerBox, nbt -> {
-				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.PLAYER_MODIFIED_KEY);
-			});
+		if (!vanityData.mLockboxSwapEnabled) {
 			return;
 		}
 
@@ -368,6 +373,11 @@ public class ShulkerEquipmentListener implements Listener {
 					vanityItems.setItemStack(slotKey, oldVanity);
 				}
 				vanityData.equip(slot, newVanity, null);
+			}
+
+			// Remove unnecessary vanity items compound if empty
+			if (vanityItems.getKeys().isEmpty()) {
+				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).removeKey(ItemStatUtils.VANITY_ITEMS_KEY);
 			}
 		});
 	}
