@@ -194,7 +194,8 @@ public class PortalTeleportCheck extends BukkitRunnable {
 			return recentVelocity.getY() > 0.01;
 		} else if (portal.mFacing == BlockFace.UP) {
 			// Floor portals must be entered going downwards or level to the ground, not upwards
-			return recentVelocity.getY() < 0.01;
+			// Additionally, prevent player from teleporting if sneaking, to prevent being looped between two floor portals
+			return recentVelocity.getY() < 0.01 && !player.isSneaking();
 		} else {
 			// Wall portals must be entered by going in their direction
 			// To test this, check if the player would hit the portal if they kept going in the current direction
