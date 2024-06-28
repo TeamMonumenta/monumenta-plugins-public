@@ -139,18 +139,23 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadableItemNBT;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -159,6 +164,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 public class CharmManager {
@@ -167,7 +174,7 @@ public class CharmManager {
 		NORMAL(AbilityUtils.CHARM_POWER, KEY_PLUGIN_DATA, ItemStatUtils::isNormalCharm, ItemStatUtils::getCharmClassComponent),
 		ZENITH(AbilityUtils.DEPTHS_CHARM_POWER, KEY_PLUGIN_DATA_DEPTHS, ItemStatUtils::isZenithCharm, CharmFactory::getZenithCharmRarityComponent);
 
-		public final Map<UUID, List<ItemStack>> mPlayerCharms;
+		public final @NonNull Map<UUID, List<ItemStack>> mPlayerCharms; // This is never null. Any given instance of CharmType has this initialized to at LEAST an empty HashMap.
 
 		private final String mScoreboard;
 		private final String mPluginDataKey;
@@ -244,11 +251,7 @@ public class CharmManager {
 	// Add the string in this list, with other effects from the same ability/enchantment
 	// If it is a "debuff" (i.e. a greater number is worse), then ALSO list it in the next method
 	private void loadCharmEffects() {
-		if (mEnabledCharmType == CharmType.ZENITH) {
-			mCharmEffectList = Arrays.stream(CharmEffects.values()).map(effect -> effect.mEffectName).toList();
-			return;
-		}
-		mCharmEffectList = Arrays.asList(
+		mCharmEffectList = Stream.concat(Arrays.stream(CharmEffects.values()).map(effect -> effect.mEffectName), Stream.of(
 			// Custom Enchantments
 			Inferno.CHARM_DAMAGE,
 			ThunderAspect.CHARM_STUN_CHANCE,
@@ -1005,16 +1008,11 @@ public class CharmManager {
 			WhirlwindTotem.CHARM_SPEED,
 			WhirlwindTotem.CHARM_DURATION_BOOST,
 			WhirlwindTotem.CHARM_PULSE_DELAY
-		);
+		)).toList();
 	}
 
 	private void loadFlippedColorEffects() {
-		if (mEnabledCharmType == CharmType.ZENITH) {
-			mFlippedColorEffectSubstrings = Arrays.stream(CharmEffects.values()).filter(effect -> effect.mEffectCap < 0).map(effect -> effect.mEffectName).toList();
-			return;
-		}
-
-		mFlippedColorEffectSubstrings = Arrays.asList(
+		mFlippedColorEffectSubstrings = Stream.concat(Arrays.stream(CharmEffects.values()).filter(effect -> effect.mEffectCap < 0).map(effect -> effect.mEffectName), Stream.of(
 			JunglesNourishment.CHARM_COOLDOWN,
 			RageOfTheKeter.CHARM_COOLDOWN,
 			IntoxicatingWarmth.CHARM_COOLDOWN,
@@ -1120,30 +1118,34 @@ public class CharmManager {
 			WhirlwindTotem.CHARM_PULSE_DELAY,
 			ElementalSpiritIce.CHARM_COOLDOWN2,
 			ElementalSpiritFire.CHARM_COOLDOWN2
-		);
+		)).toList();
 	}
 
-	public List<ItemStack> getCharms(Player player, CharmType charmType) {
+	/** Returns the charms a player has equipped that are of type <code>charmType</code>
+	 *
+	 * @param player The player
+	 * @param charmType The type of charm to query
+	 * @return The charms of the given type that the player currently has equipped.
+	 */
+	public @NonNull List<ItemStack> getCharms(Player player, CharmType charmType) {
 		return charmType.mPlayerCharms.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
 	}
 
+	/** Add (equip) a charm onto a player.
+	 * Returns false if passed a null player or if the charm is not valid.
+	 *
+	 * @param p The player
+	 * @param charm The charm
+	 * @param charmType The type of said charm.
+	 * @return True if successful
+	 */
+	@Contract("null, _, _ -> false")
 	public boolean addCharm(@Nullable Player p, ItemStack charm, CharmType charmType) {
 		if (p == null || !validateCharm(p, charm, charmType)) {
 			return false;
 		}
-		UUID uuid = p.getUniqueId();
-
 		ItemStack charmCopy = new ItemStack(charm);
-
-		Map<UUID, List<ItemStack>> charmMap = charmType.mPlayerCharms;
-		List<ItemStack> playerCharms = charmMap.get(uuid);
-		if (playerCharms != null) {
-			playerCharms.add(charmCopy);
-		} else {
-			playerCharms = new ArrayList<>();
-			playerCharms.add(charmCopy);
-			charmMap.put(uuid, playerCharms);
-		}
+		getCharms(p, charmType).add(charmCopy);
 		updateCharms(p, charmType);
 		return true;
 	}
@@ -1211,34 +1213,23 @@ public class CharmManager {
 		if (p == null) {
 			return false;
 		}
-		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
-		if (charms != null && slot < charms.size()) {
-			charms.remove(slot);
-			return true;
-		}
-		return false;
+		List<ItemStack> charms = getCharms(p, charmType);
+		return slot < charms.size() && null != charms.remove(slot);
 	}
 
 	public void clearCharms(@Nullable Player p, CharmType charmType) {
 		if (p == null) {
 			return;
 		}
-		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
-		if (charms != null) {
-			charms.clear();
-			updateCharms(p, charmType);
-		}
+		getCharms(p, charmType).clear();
+		updateCharms(p, charmType);
 	}
 
 	public void updateCharms(Player p, CharmType charmType) {
-		updateCharms(p, charmType, charmType.mPlayerCharms.computeIfAbsent(p.getUniqueId(), key -> new ArrayList<>()));
+		updateCharms(p, charmType, getCharms(p, charmType));
 	}
 
-	public void updateCharms(@Nullable Player p, CharmType charmType, List<ItemStack> equippedCharms) {
-		if (p == null) {
-			return;
-		}
-
+	public void updateCharms(@NonNull Player p, CharmType charmType, List<ItemStack> equippedCharms) {
 		if (mEnabledCharmType != charmType) {
 			return;
 		}
@@ -1326,119 +1317,120 @@ public class CharmManager {
 		return 0;
 	}
 
-	public Map<String, Double> getSummaryOfAllAttributes(Player p, CharmType charmType) {
-		if (mEnabledCharmType != charmType) {
+	/** Summarize a player's charm attributes into a map, given the type of charm to summarize.
+	 *
+	 * @param p The player
+	 * @param charmType The type of the charm.
+	 * @return A TreeMap sorted on effect name, representing a summary of all the <code>charmType</code> charm attributes of this player
+	 * @see CharmManager#getSummaryOfAllAttributesAsComponents(Player, CharmType)
+	 * @see com.playmonumenta.plugins.managers.DataCollectionManager.PlayerInformation#PlayerInformation(String, Player)
+	 */
+	@SuppressWarnings("JavadocReference")
+	@Contract(value = "_, _ -> !null", pure = true)
+	public @NonNull Map<String, Double> getSummaryOfAllAttributes(Player p, CharmType charmType) {
+		if (getCharms(p, charmType).isEmpty()) {
 			return Collections.emptyMap();
 		}
-
-		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
-		if (allEffects == null) {
-			return Collections.emptyMap();
-		}
-
-		Map<String, Double> result = new HashMap<>();
-		for (String effect : mCharmEffectList) {
-			if (allEffects.containsKey(effect)) {
-				result.put(effect, allEffects.get(effect));
-			}
-
-			String percentEffect = effect + "%";
-			if (allEffects.containsKey(percentEffect)) {
-				result.put(percentEffect, allEffects.get(percentEffect));
-			}
-		}
-
-		return ImmutableMap.copyOf(result);
+		return ImmutableMap.copyOf(getCharms(p, charmType)
+			.stream()
+			.map(this::readCharm)
+			.flatMap(Collection::stream)
+			.reduce(
+				new TreeMap<>(),
+				(map, charm) -> {
+					final var newName = charm.mEffect + (charm.mIsPercent ? "%" : ""); // we add a percent sign here (see method getSummaryOfAllAttributesAsComponents)
+					map.put(newName, map.getOrDefault(newName, 0.0) + charm.mValue);
+					return map;
+				},
+				(resultMap, acc) -> {
+					acc.forEach((key, value) ->
+						resultMap.merge(key, value, Double::sum)
+					);
+					return resultMap;
+				}
+			));
 	}
 
+	private static final DecimalFormat valueFormatter = new DecimalFormat("#.###"); // i hate floats
+
+	/** Summarizes the charms of a given player that match the given CharmType.
+	 * Used for rendering charm info into GUI components.
+	 *
+	 * @param p The player
+	 * @param charmType The type of charms we want to summarize.
+	 * @see CharmsGUI#setup()
+	 * @return The summary of all the charm attributes of the given type as components.
+	 */
 	public List<Component> getSummaryOfAllAttributesAsComponents(Player p, CharmType charmType) {
+		List<Component> output = new ArrayList<>();
 		if (mEnabledCharmType != charmType) {
-			List<Component> output = new ArrayList<>();
-			output.add(Component.text("These Charms are currently disabled!", NamedTextColor.RED));
-			return output;
+			output.add(Component.text("These Charms are currently disabled!", NamedTextColor.RED)); // let the player know the charms are disabled
 		}
 
-		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
-		if (allEffects == null) {
-			return new ArrayList<>();
-		}
+		Map<String, Double> summary = getSummaryOfAllAttributes(p, charmType);
 
 		//Sort the effects in the order in the manager list
-		List<String> orderedEffects = new ArrayList<>();
-		for (String effect : mCharmEffectList) {
-			if (allEffects.containsKey(effect)) {
-				orderedEffects.add(effect);
-			}
+		Set<String> orderedEffects = summary.keySet();
 
-			String percentEffect = effect + "%";
-			if (allEffects.containsKey(percentEffect)) {
-				orderedEffects.add(percentEffect);
-			}
-		}
-
-		List<Component> components = new ArrayList<>();
 		for (String s : orderedEffects) {
-			Double value = allEffects.getOrDefault(s, 0.0);
+			double value = getValueOrCap(summary.getOrDefault(s, 0.0), s);
 			if (value != 0) {
 
-				// Strip ugly .0s
-				String desc = s + " : " + value;
-				if (desc.endsWith(".0")) {
-					desc = desc.substring(0, desc.length() - 2);
-				}
+				// Strip .0s and calm down floating point lengths by restricting to 3 decimal places.
+				String desc = s + " : " + valueFormatter.format(value);
 
-				double effectAmount = allEffects.getOrDefault(s, 0.0);
-				TextColor charmColor = getCharmEffectColor(effectAmount > 0, s.replace("%", ""));
+				TextColor charmColor = getCharmEffectColor(value > 0, s.replace("%", ""));
 
 				if (s.contains("%")) {
 					desc += "%";
 				}
 
 				// If depths effect is maxed, display as such
-				if (mEnabledCharmType == CharmType.ZENITH) {
+				if (charmType == CharmType.ZENITH) {
 					CharmEffects effect = CharmEffects.getEffect(s.replace("%", ""));
 					if (effect != null) {
-						if (effectAmount == effect.mEffectCap) {
+						if (value == effect.mEffectCap) {
 							charmColor = TextColor.fromHexString("#e49b20");
 							desc += " (MAX)";
 						}
 					}
 				}
 
-				components.add(Component.text(desc, charmColor).decoration(TextDecoration.ITALIC, false));
+				output.add(Component.text(desc, charmColor).decoration(TextDecoration.ITALIC, false));
 			}
 		}
-		return components;
+		return output;
 	}
 
-	public String getSummaryOfCharmNames(Player p, CharmType charmType) {
-		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
-		if (charms != null) {
-			StringBuilder summary = new StringBuilder();
+	/** Summarize the names of the charms a player has equipped of a given type, including the total charm power used.
+	 *
+	 * @param p The player
+	 * @param charmType The type of the charms.
+	 * @return A summary of charm names of a given type on a given player.
+	 */
+	public Component getSummaryOfCharmNames(Player p, CharmType charmType) {
+		List<ItemStack> charms = getCharms(p, charmType);
+		if (!charms.isEmpty()) {
+			Component summary = Component.text("");
 			int powerBudget = 0;
 			for (ItemStack item : charms) {
-				if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-					summary.append(item.displayName()).append("\n");
-					powerBudget += ItemStatUtils.getCharmPower(item);
-				}
+				summary = summary.append(Component.text(item.displayName() + "\n"));
+				powerBudget += ItemStatUtils.getCharmPower(item);
 			}
-			summary.append(NamedTextColor.YELLOW).append("Charm Power: ").append(powerBudget);
-			return summary.toString();
+			summary = summary.append(Component.text("Charm Power: " + powerBudget, NamedTextColor.YELLOW));
+			return summary;
 		}
-		return NamedTextColor.GRAY + "no charms";
+		return Component.text("no charms", NamedTextColor.GRAY);
 	}
 
+	/** Returns the total amount of charm power the player is using by their charms of type <code>charmType</code>
+	 *
+	 * @param p The player
+	 * @param charmType The type of the charms.
+	 * @return The total used charm power of all the charms the player is using of type <code>charmType</code>
+	 */
 	public int getUsedCharmPower(Player p, CharmType charmType) {
-		List<ItemStack> charms = charmType.mPlayerCharms.get(p.getUniqueId());
-		int powerBudget = 0;
-		if (charms != null) {
-			for (ItemStack item : charms) {
-				if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-					powerBudget += ItemStatUtils.getCharmPower(item);
-				}
-			}
-		}
-		return powerBudget;
+		return getCharms(p, charmType).stream().map(ItemStatUtils::getCharmPower).reduce(0, Integer::sum);
 	}
 
 	//Handlers for player lifecycle events
@@ -1554,14 +1546,18 @@ public class CharmManager {
 		return (baseValue + flatLevel) * ((percentLevel / 100.0) + 1);
 	}
 
+	/** Returns the given value, or the cap of the charm's effect if the value is over it
+	 *
+	 * @param value The value
+	 * @param charmEffectName The effect name
+	 * @return Returns the passed value, or returns the max value for the stat.
+	 */
 	public double getValueOrCap(double value, String charmEffectName) {
-		if (mEnabledCharmType != CharmType.ZENITH) {
-			return value;
-		}
+
 		CharmEffects effect = CharmEffects.getEffect(charmEffectName);
 		if (effect == null) {
 			return value;
-		} else if ((effect.mEffectCap > 0 && effect.mEffectCap < value) || (effect.mEffectCap < 0 && effect.mEffectCap > value)) {
+		} else if ((effect.mEffectCap > 0 && effect.mEffectCap <= value) || (effect.mEffectCap < 0 && effect.mEffectCap >= value)) {
 			return effect.mEffectCap;
 		} else {
 			return value;
@@ -1585,6 +1581,15 @@ public class CharmManager {
 			mValue = value;
 			mIsPercent = isPercent;
 			mEffect = effect;
+		}
+
+		@Override
+		public String toString() {
+			return "CharmParsedInfo{" +
+				"mValue=" + mValue +
+				", mIsPercent=" + mIsPercent +
+				", mEffect='" + mEffect + '\'' +
+				'}';
 		}
 	}
 }
