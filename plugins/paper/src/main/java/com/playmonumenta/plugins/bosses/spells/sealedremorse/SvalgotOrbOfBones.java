@@ -35,7 +35,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 	private static final int LIFETIME_TICKS = 20 * 6;
 	private static final double HITBOX_LENGTH = 2;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
-	private static final boolean LINGERS = true;
+	private static final boolean LINGERS = false;
 	private static final int DAMAGE = 42;
 	private static final NamedTextColor COLOR = NamedTextColor.RED;
 

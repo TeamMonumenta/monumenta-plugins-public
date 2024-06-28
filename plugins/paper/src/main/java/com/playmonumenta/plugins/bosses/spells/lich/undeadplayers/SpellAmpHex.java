@@ -29,9 +29,9 @@ import org.bukkit.util.Vector;
 
 public class SpellAmpHex extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Collection<PotionEffectType> mBadEffects = Arrays.asList(
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Collection<PotionEffectType> mBadEffects = Arrays.asList(
 		PotionEffectType.BLINDNESS,
 		PotionEffectType.CONFUSION,
 		PotionEffectType.HUNGER,
@@ -43,9 +43,9 @@ public class SpellAmpHex extends Spell {
 		PotionEffectType.WEAKNESS,
 		PotionEffectType.WITHER
 	);
-	private PartialParticle mPortal;
-	private PartialParticle mBreath;
-	private PartialParticle mSmoke;
+	private final PartialParticle mPortal;
+	private final PartialParticle mBreath;
+	private final PartialParticle mSmoke;
 
 	public SpellAmpHex(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;

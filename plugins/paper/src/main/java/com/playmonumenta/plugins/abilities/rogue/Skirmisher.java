@@ -56,10 +56,14 @@ public class Skirmisher extends Ability {
 
 	private final double mIsolatedPercentDamage;
 	private final double mIsolatedFlatDamage;
+	private final double mFriendlyRadius;
+	private final double mSplashRadius;
 	private final SkirmisherCS mCosmetic;
 
 	public Skirmisher(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mFriendlyRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, SKIRMISHER_FRIENDLY_RADIUS);
+		mSplashRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_SPLASH_RADIUS);
 		mIsolatedPercentDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2);
 		mIsolatedFlatDamage = isLevelOne() ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SkirmisherCS());
@@ -73,7 +77,7 @@ public class Skirmisher extends Ability {
 
 			// If Enhanced and triggers on a melee strike,
 			if (isEnhanced() && event.getType() == DamageType.MELEE) {
-				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_SPLASH_RADIUS), enemy);
+				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(loc, mSplashRadius, enemy);
 				nearbyEntities.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 				LivingEntity selectedEnemy = EntityUtils.getNearestMob(loc, nearbyEntities);
 
@@ -85,7 +89,7 @@ public class Skirmisher extends Ability {
 			}
 
 			if (event.getAbility() != mInfo.getLinkedSpell() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
-				if (EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SKIRMISHER_FRIENDLY_RADIUS), enemy).size() >= MOB_COUNT_CUTOFF
+				if (EntityUtils.getNearbyMobs(loc, mFriendlyRadius, enemy).size() >= MOB_COUNT_CUTOFF
 					    || (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
 					event.setDamage((event.getDamage() + mIsolatedFlatDamage) * (1 + mIsolatedPercentDamage));
 					mCosmetic.aesthetics(mPlayer, loc, world, enemy);

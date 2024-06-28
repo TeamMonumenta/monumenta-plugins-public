@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsParty;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -36,19 +37,20 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class BrambleBall extends Spell {
-	public static final String SPELL_NAME = "Bramble Ball";
-	public static final int COOLDOWN = 200;
-	public static final int CAST_DELAY = 30;
-	public static final int AIR_TIME = 200;
-	public static final double DAMAGE = 50;
-	public static final double BRAMBLE_SPEED = 0.175;
-	public static final double BRAMBLE_SPEED_A8_INCREASE = 0.025;
-	public static final double BRAMBLE_FALL_SPEED = 0.05;
-	public static final int PLAYER_HIT_DEBUFFS_DURATION = 100;
-	public static final int BRAMBLE_FIELD_DURATION = 400;
-	public static final int BRAMBLE_FIELD_ACTIVATE_INTERVAL = 5;
-	public static final double BRAMBLE_FIELD_RADIUS = 6;
-	public static final Color[] BRAMBLE_COLORS = {Color.fromRGB(79, 59, 15), Color.fromRGB(47, 102, 17)};
+	private static final String SPELL_NAME = "Bramble Ball";
+	private static final int COOLDOWN = 200;
+	private static final int CAST_DELAY = 30;
+	private static final int AIR_TIME = 200;
+	private static final double DAMAGE = 50;
+	private static final double BRAMBLE_SPEED = 0.175;
+	private static final double BRAMBLE_SPEED_A8_INCREASE = 0.025;
+	private static final double BRAMBLE_FALL_SPEED = 0.05;
+	private static final String SLOWNESS_SRC = "BrambleBallSlowness";
+	private static final int PLAYER_HIT_DEBUFFS_DURATION = 100;
+	private static final int BRAMBLE_FIELD_DURATION = 400;
+	private static final int BRAMBLE_FIELD_ACTIVATE_INTERVAL = 5;
+	private static final double BRAMBLE_FIELD_RADIUS = 6;
+	private static final Color[] BRAMBLE_COLORS = {Color.fromRGB(79, 59, 15), Color.fromRGB(47, 102, 17)};
 
 	private final Particle.DustOptions[] mBrambleOptions = {
 		new Particle.DustOptions(BRAMBLE_COLORS[0], 1.5f),
@@ -173,7 +175,8 @@ public class BrambleBall extends Spell {
 					Player hitPlayer = hitPlayers.get(0);
 					// Apply major slowness and jump negation
 					hitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PLAYER_HIT_DEBUFFS_DURATION, -10, true, false, false));
-					hitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PLAYER_HIT_DEBUFFS_DURATION, 10, true, false, false));
+					Plugin.getInstance().mEffectManager.addEffect(hitPlayer, SLOWNESS_SRC,
+						new PercentSpeed(PLAYER_HIT_DEBUFFS_DURATION, -1.0, SLOWNESS_SRC));
 					DamageUtils.damage(mBoss, hitPlayer, DamageEvent.DamageType.MAGIC, DAMAGE, null, true, true, SPELL_NAME);
 					return true;
 				}

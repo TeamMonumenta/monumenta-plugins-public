@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -22,35 +23,33 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellAutoAttack extends Spell {
-
-	private Plugin mPlugin;
-	private Lich mLich;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private int mTicks;
-	private double mRange;
-	private double mINC = 0;
-	private int mPhase;
-	private int mCeiling;
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.0f);
-	private PartialParticle mPSmoke1;
-	private PartialParticle mPRed;
-	private PartialParticle mPWitch;
-	private PartialParticle mPCrit1;
-	private PartialParticle mPCrit2;
-	private PartialParticle mPSmoke2;
-	private PartialParticle mPYellow;
-	private PartialParticle mPSoul;
-	private PartialParticle mPWitch2;
-	private PartialParticle mPYellow2;
+
+	private final Plugin mPlugin;
+	private final Lich mLich;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final int mTicks;
+	private final double mRange;
+	private double mINC = 0;
+	private final int mPhase;
+	private final int mCeiling;
+	private final PartialParticle mPSmoke1;
+	private final PartialParticle mPRed;
+	private final PartialParticle mPWitch;
+	private final PartialParticle mPCrit1;
+	private final PartialParticle mPCrit2;
+	private final PartialParticle mPSmoke2;
+	private final PartialParticle mPYellow;
+	private final PartialParticle mPSoul;
+	private final PartialParticle mPWitch2;
+	private final PartialParticle mPYellow2;
 
 	public SpellAutoAttack(Plugin plugin, Lich lich, LivingEntity boss, Location loc, int ticks, double range, int ceil, int phase) {
 		mPlugin = plugin;
@@ -111,8 +110,9 @@ public class SpellAutoAttack extends Spell {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 1.5f, 0);
 						}
 						mPSmoke1.location(mBoss.getLocation()).spawnAsBoss();
-						mBoss.removePotionEffect(PotionEffectType.SLOW);
-						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 1));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentSpeed.GENERIC_NAME);
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentSpeed.GENERIC_NAME,
+							new PercentSpeed(20, 0.3, PercentSpeed.GENERIC_NAME));
 
 						if (mBoss == null || mBoss.isDead()) {
 							this.cancel();
@@ -125,12 +125,11 @@ public class SpellAutoAttack extends Spell {
 							if (players.size() > 0) {
 								if (mBoss.getLocation().getY() >= mCenter.getY() + 3) {
 									Collections.shuffle(players);
-									List<Player> targets = players.subList(0, (int) Math.min(players.size(), Math.max(2, Math.ceil(players.size() / 5))));
+									List<Player> targets = players.subList(0, (int) Math.min(players.size(), Math.max(2, Math.ceil(players.size() / 5.0))));
 									for (Player p : targets) {
 										launchBolt(p);
 									}
-								} else if (mBoss instanceof Mob) {
-									Mob mob = (Mob) mBoss;
+								} else if (mBoss instanceof Mob mob) {
 									if (mob.getTarget() != null && mob.getTarget() instanceof Player) {
 										launchBolt((Player) mob.getTarget());
 									} else {
@@ -159,7 +158,7 @@ public class SpellAutoAttack extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_CAT_HISS, SoundCategory.HOSTILE, 3.0f, 0.5f);
 
 		Vector dir = LocationUtils.getDirectionTo(target.getLocation().add(0, 1, 0), mBoss.getLocation());
-		Location tloc = mBoss.getLocation().setDirection(dir);
+		Location tLoc = mBoss.getLocation().setDirection(dir);
 		BukkitRunnable runB = new BukkitRunnable() {
 			int mT = 0;
 
@@ -172,7 +171,7 @@ public class SpellAutoAttack extends Spell {
 						double radian1 = Math.toRadians(degree);
 						v = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
 						v = VectorUtils.rotateXAxis(v, 0);
-						v = VectorUtils.rotateYAxis(v, tloc.getYaw() + 90);
+						v = VectorUtils.rotateYAxis(v, tLoc.getYaw() + 90);
 
 						Location loc = mBoss.getLocation().clone().add(v);
 						mPRed.location(loc).spawnAsBoss();
@@ -185,7 +184,7 @@ public class SpellAutoAttack extends Spell {
 							double radian2 = Math.toRadians(degree1);
 							vec = new Vector(Math.cos(radian2) * r1, 0, Math.sin(radian2) * r1);
 							vec = VectorUtils.rotateXAxis(vec, 0);
-							vec = VectorUtils.rotateYAxis(vec, tloc.getYaw() + 90);
+							vec = VectorUtils.rotateYAxis(vec, tLoc.getYaw() + 90);
 
 							Location l = mBoss.getLocation().clone().add(vec);
 							mPWitch.location(l).spawnAsBoss();

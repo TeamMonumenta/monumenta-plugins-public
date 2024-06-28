@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.depths.guis.DepthsAscensionGUI;
 import com.playmonumenta.plugins.depths.guis.ZenithCharmPowerGUI;
 import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
+import com.playmonumenta.plugins.guis.MusicGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -12,8 +13,10 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -154,7 +157,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openparrotgui")
 			.executesPlayer((player, args) -> {
 				try {
-					new ParrotCustomInventory(player).openInventory(player, plugin);
+					new ParrotCustomInventory(player).open();
 				} catch (Exception ex) {
 					String msg = "Failed to open Parrot GUI: " + ex.getMessage();
 					player.sendMessage(msg);
@@ -168,7 +171,7 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				try {
-					new ParrotCustomInventory(player).openInventory(player, plugin);
+					new ParrotCustomInventory(player).open();
 				} catch (Exception ex) {
 					String msg = "Failed to open Parrot GUI: " + ex.getMessage();
 					sender.sendMessage(msg);
@@ -249,7 +252,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openclassdisplaygui")
 			.executesPlayer((player, args) -> {
 				if (!AbilityUtils.getClass(player).equals("No Class")) {
-					new ClassDisplayCustomInventory(player).openInventory(player, plugin);
+					new ClassDisplayCustomInventory(player).open();
 				}
 			})
 			.register();
@@ -259,7 +262,7 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				if (!AbilityUtils.getClass(player).equals("No Class")) {
-					new ClassDisplayCustomInventory(player).openInventory(player, plugin);
+					new ClassDisplayCustomInventory(player).open();
 				}
 			})
 			.register();
@@ -375,6 +378,40 @@ public class CustomInventoryCommands {
 				Player p = (Player) args[0];
 				new DepthsAscensionGUI(p).open();
 			}).register();
+
+		new CommandAPICommand("openmusicgui")
+			.withPermission("monumenta.command.openmusicgui")
+			.withArguments(
+				new EntitySelectorArgument.OnePlayer("player"),
+				new MultiLiteralArgument(Arrays.stream(MusicGui.MusicPage.values()).map(page -> page.mLabel).toArray(String[]::new)),
+				new BooleanArgument("fromRecordPlayer"),
+				new BooleanArgument("playToOthers")
+			)
+			.executes((sender, args) -> {
+				Player p = (Player) args[0];
+				String label = (String) args[1];
+				MusicGui.MusicPage musicPage = Arrays.stream(MusicGui.MusicPage.values()).filter(page -> page.mLabel.equals(label)).findAny().orElse(null);
+				boolean fromRecordPlayer = (boolean) args[2];
+				boolean playToOthers = (boolean) args[3];
+				if (musicPage != null) {
+					new MusicGui(p, musicPage, fromRecordPlayer, playToOthers).open();
+				}
+			}).register();
+
+		new CommandAPICommand("openenchantexplanations")
+			.withPermission("monumenta.command.openenchantexplanations.self")
+			.executesPlayer((player, args) -> {
+				new EnchantopediaGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("openenchantexplanationsfor")
+			.withPermission("monumenta.command.openenchantexplanations.others")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new EnchantopediaGui(player).open();
+			})
+			.register();
 	}
 
 	private static void emote(Player player) {

@@ -152,7 +152,7 @@ public class Dodging extends Ability {
 		if (proj.getShooter() instanceof Player) {
 			return true;
 		}
-		if (mPlayer.getActiveItem() != null && mPlayer.getActiveItem().getType() == Material.SHIELD) {
+		if (mPlayer.getActiveItem().getType() == Material.SHIELD) {
 			return true;
 		}
 		if (proj instanceof Fireball && mPlayer.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
@@ -274,5 +274,4 @@ public class Dodging extends Ability {
 			mCosmetic.deflectTrailEffect(mPlayer, particleLocation);
 		}
 	}
-
 }

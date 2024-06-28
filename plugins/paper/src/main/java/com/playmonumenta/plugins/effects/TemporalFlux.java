@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class TemporalFlux extends ZeroArgumentEffect {
 
-	//private int mCurrentDuration;
 	public static final String GENERIC_NAME = "Paradox";
 	public static final String effectID = "TemporalFlux";
 	public static final int MAX_TIME = 30 * 20;
@@ -32,6 +31,7 @@ public class TemporalFlux extends ZeroArgumentEffect {
 	public TemporalFlux(int duration) {
 		super(duration, effectID);
 		mBossBar = BossBar.bossBar(Component.text("Paradox expires in " + (duration / 20) + "seconds!", NamedTextColor.BLUE), 1, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
+		deleteOnLogout(true);
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class TemporalFlux extends ZeroArgumentEffect {
 			mBossBar.progress(progress);
 			mBossBar.name(Component.text("Paradox expires in " + (getDuration() / 20) + " seconds!", NamedTextColor.BLUE));
 			if (progress <= 0.01) {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, Stasis.GENERIC_NAME);
+				Plugin.getInstance().mEffectManager.clearEffects(entity, Stasis.GENERIC_NAME);
 				if (entity instanceof Player) {
 					entity.setInvulnerable(false);
 				}
@@ -105,7 +105,7 @@ public class TemporalFlux extends ZeroArgumentEffect {
 	@Override
 	public void entityLoseEffect(Entity entity) {
 		entity.hideBossBar(mBossBar);
-		entity.sendMessage(Component.text("You are no longer inflicted with Paradox, you are safe for now.", NamedTextColor.GRAY));
+		entity.sendMessage(Component.text("You are no longer inflicted with Paradox; you are safe for now.", NamedTextColor.GRAY));
 	}
 
 	public static TemporalFlux deserialize(JsonObject object, Plugin plugin) {

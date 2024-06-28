@@ -181,18 +181,12 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			return true;
 		}
 		mDeactivationRunnable.cancel();
-		putOnCooldown();
 
+		int cooldown = getModifiedCooldown();
 		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
-			for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
-				ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
-				if (abil == this && linkedSpell != null) {
-					int totalCD = abil.getModifiedCooldown();
-					int reducedCD = (int) Math.floor(totalCD * (SwiftCuts.PREDATOR_STRIKE_CDR + CharmManager.getLevelPercentDecimal(mPlayer, SwiftCuts.CHARM_ENHANCE)));
-					mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, reducedCD);
-				}
-			}
+			cooldown = (int) (cooldown * (1 - mSwiftCuts.getPredatorStrikeCDR()));
 		}
+		putOnCooldown(cooldown);
 
 		projectile.remove();
 		mPlugin.mProjectileEffectTimers.removeEntity(projectile);

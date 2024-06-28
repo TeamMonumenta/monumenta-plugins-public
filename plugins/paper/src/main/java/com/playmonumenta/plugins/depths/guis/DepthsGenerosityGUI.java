@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +40,7 @@ public class DepthsGenerosityGUI extends AbstractDepthsRewardGUI {
 			DepthsAbilityItem item = dp.mGenerosityGifts.get(0);
 			if (DepthsManager.getInstance().getPlayerLevelInAbility(item.mAbility, player) < item.mRarity &&
 				    DepthsManager.getInstance().getPlayerAbilities(player).stream()
+					    .filter(abilityInfo -> !Objects.equals(abilityInfo.getDisplayName(), item.mAbility))
 					    .filter(abilityInfo -> !abilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
 					    .noneMatch(abilityInfo -> abilityInfo.getDepthsTrigger().equals(item.mTrigger))) {
 				DepthsManager.getInstance().setPlayerLevelInAbility(item.mAbility, player, item.mRarity);

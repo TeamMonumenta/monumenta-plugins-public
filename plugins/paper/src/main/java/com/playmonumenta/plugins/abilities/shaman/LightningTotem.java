@@ -14,12 +14,25 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLightning;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -82,7 +95,6 @@ public class LightningTotem extends TotemAbility {
 			.displayItem(Material.YELLOW_WOOL);
 
 	private double mDamage;
-	private final int mDuration;
 	private final double mRadius;
 	private @Nullable LivingEntity mTarget = null;
 	public double mDecayedTotemBuff = 0;
@@ -107,11 +119,6 @@ public class LightningTotem extends TotemAbility {
 		mStormRadius = CharmManager.getRadius(mPlayer, CHARM_STORM_RADIUS, STORM_DAMAGE_RADIUS);
 		mStormDuration = CharmManager.getDuration(mPlayer, CHARM_STORM_DURATION, STORM_DURATION);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
-	}
-
-	@Override
-	public int getInitialAbilityDuration() {
-		return mDuration;
 	}
 
 	@Override

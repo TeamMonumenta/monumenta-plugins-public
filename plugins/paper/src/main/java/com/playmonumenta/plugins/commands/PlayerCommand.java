@@ -3,9 +3,12 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.PEBCustomInventory;
 import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.arguments.*;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 
@@ -25,6 +28,10 @@ public class PlayerCommand {
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((sender, args) -> {
 					Player player = (Player) args[0];
+					if (!PremiumVanishIntegration.canSee((Player) sender, player)) {
+						sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+						return;
+					}
 					new PlayerDisplayCustomInventory((Player) sender, player).openInventory((Player) sender, plugin);
 				})
 			)

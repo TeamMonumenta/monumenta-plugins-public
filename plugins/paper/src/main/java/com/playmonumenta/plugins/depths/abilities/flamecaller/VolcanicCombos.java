@@ -36,6 +36,7 @@ public class VolcanicCombos extends DepthsCombosAbility {
 
 	public static final DepthsAbilityInfo<VolcanicCombos> INFO =
 		new DepthsAbilityInfo<>(VolcanicCombos.class, ABILITY_NAME, VolcanicCombos::new, DepthsTree.FLAMECALLER, DepthsTrigger.COMBO)
+			.linkedSpell(ClassAbility.VOLCANIC_COMBOS)
 			.displayItem(Material.BLAZE_ROD)
 			.descriptions(VolcanicCombos::getDescription)
 			.singleCharm(false);

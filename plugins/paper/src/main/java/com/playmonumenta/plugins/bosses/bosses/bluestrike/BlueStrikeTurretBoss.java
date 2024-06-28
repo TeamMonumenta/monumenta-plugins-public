@@ -24,7 +24,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Shulker;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -36,8 +35,7 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 
 	public BlueStrikeTurretBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		Team redTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
-		redTeam.addEntry(boss.getUniqueId().toString());
+		ScoreboardUtils.addEntityToTeam(boss, "Red", NamedTextColor.RED);
 		mBoss.setGlowing(true);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.VILLAGER));

@@ -57,6 +57,11 @@ public class EnchantedPrayerAoE extends Effect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		// Prevents effect triggering multiple times in the same tick
+		if (getDuration() == 0) {
+			return;
+		}
+
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}

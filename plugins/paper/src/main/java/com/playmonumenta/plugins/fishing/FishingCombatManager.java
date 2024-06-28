@@ -30,9 +30,11 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -161,6 +163,12 @@ public class FishingCombatManager implements Listener {
 		arena.mOccupied = false;
 
 		Hitbox ejectionSpace = new Hitbox.SphereHitbox(new Location(world, arena.mCoordinates.getX(), arena.mCoordinates.getY(), arena.mCoordinates.getZ()), radius);
+
+		// Clear leftover tridents / arrows
+		for (Entity entity : ejectionSpace.getHitEntities(entity -> entity instanceof Trident || entity instanceof Arrow)) {
+			entity.remove();
+		}
+
 		for (Player player : ejectionSpace.getHitPlayers(true)) {
 			player.teleport(Objects.requireNonNullElseGet(arena.mOrigin, () -> player.getWorld().getSpawnLocation()));
 			mPlayerArenaMap.remove(player);

@@ -39,9 +39,16 @@ public interface DisplayableEffect {
 	}
 
 	static List<DisplayableEffect> getSortedEffects(Plugin plugin, LivingEntity entity) {
-		List<DisplayableEffect> effects = getEffects(plugin, entity);
+		return sortEffects(getEffects(plugin, entity));
+	}
+
+	static List<DisplayableEffect> sortEffects(List<DisplayableEffect> effects) {
 		effects.sort((effect1, effect2) -> effect2.getDisplayPriority() - effect1.getDisplayPriority());
 		return effects;
+	}
+
+	static List<Component> getSortedEffectDisplayComponents(Plugin plugin, LivingEntity entity) {
+		return getSortedEffects(plugin, entity).stream().map(DisplayableEffect::getDisplay).filter(Objects::nonNull).toList();
 	}
 
 	static List<String> getSortedEffectDisplays(Plugin plugin, LivingEntity entity) {
@@ -56,13 +63,7 @@ public interface DisplayableEffect {
 			}
 		}
 
-		List<String> displays = new ArrayList<>();
-		for (DisplayableEffect effect : getSortedEffects(plugin, entity)) {
-			Component display = effect.getDisplay();
-			if (display != null) {
-				displays.add(MessagingUtils.legacyFromComponent(display));
-			}
-		}
+		List<String> displays = getSortedEffectDisplayComponents(plugin, entity).stream().map(MessagingUtils::legacyFromComponent).toList();
 		CACHED_LIST_MAP.put(entity, displays);
 		return displays;
 	}

@@ -140,7 +140,7 @@ public class DelvesManager implements Listener {
 	}
 
 	//return all players running this dungeon or in MAX_PARTY_DISTANCE radius
-	protected static List<Player> getParty(Location loc) {
+	public static List<Player> getParty(Location loc) {
 		List<Player> players = DelvesUtils.playerInRangeForDelves(loc);
 
 		if (players.isEmpty()) {

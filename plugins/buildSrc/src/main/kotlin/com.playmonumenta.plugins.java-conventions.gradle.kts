@@ -57,6 +57,10 @@ repositories {
     }
 
     maven {
+        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-chat/master/mvn-repo/")
+    }
+
+    maven {
         url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-relay/master/mvn-repo/")
     }
 
@@ -99,7 +103,7 @@ group = "com.playmonumenta.plugins"
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
 
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 

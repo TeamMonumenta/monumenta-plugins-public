@@ -40,4 +40,12 @@ public class AdvancementUtils {
 		AdvancementProgress progress = player.getAdvancementProgress(advancement);
 		progress.awardCriteria(criteria);
 	}
+
+	public static boolean checkAdvancement(Player player, String key) {
+		Advancement adv = Bukkit.getAdvancement(NamespacedKeyUtils.fromString(key));
+		if (adv == null) {
+			return false;
+		}
+		return player.getAdvancementProgress(adv).isDone();
+	}
 }

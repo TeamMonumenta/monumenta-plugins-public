@@ -15,8 +15,7 @@ public enum DepthsTree {
 	DAWNBRINGER("Dawnbringer", DepthsUtils.DAWNBRINGER, Material.SUNFLOWER, "Bestows passive and active buffs to allies including speed, damage, resistance, and healing."),
 	EARTHBOUND("Earthbound", DepthsUtils.EARTHBOUND, Material.LEATHER_CHESTPLATE, "Resolute tank with capabilities of taking aggro and granting resistance to self, armed with minor crowd control."),
 	FLAMECALLER("Flamecaller", DepthsUtils.FLAMECALLER, Material.FIRE_CHARGE, "Caster of strong burst AOE abilities and potent damage over time."),
-	FROSTBORN("Frostborn", DepthsUtils.FROSTBORN, Material.ICE, "Manipulates the flow of combat by debuffing enemies with ice generating abilities and high damage potential." +
-		"\n\nPassive: Placing ice on top of existing ice deals 15% max HP damage to non-Boss mobs above the replaced ice."),
+	FROSTBORN("Frostborn", DepthsUtils.FROSTBORN, Material.ICE, "Manipulates the flow of combat by debuffing enemies with ice generating abilities and high damage potential."),
 	SHADOWDANCER("Shadowdancer", DepthsUtils.SHADOWDANCER, Material.IRON_SWORD, "Skilled in single target melee damage, especially against bosses and elites."),
 	STEELSAGE("Steelsage", DepthsUtils.STEELSAGE, Material.CROSSBOW, "Master of ranged abilities with dual AOE and single target damage capabilities."),
 	WINDWALKER("Windwalker", DepthsUtils.WINDWALKER, Material.FEATHER, "An arsenal of movement abilities and crowd control, allowing precise maneuvers and quick escapes."),

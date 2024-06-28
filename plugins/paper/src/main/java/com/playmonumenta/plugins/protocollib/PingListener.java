@@ -1,0 +1,81 @@
+package com.playmonumenta.plugins.protocollib;
+
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.playmonumenta.plugins.Plugin;
+import java.util.HashMap;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Triple;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+public class PingListener extends PacketAdapter {
+	private static final int BASE_ID = "the_portals rules!".hashCode();
+	private static final HashMap<Integer, Triple<Player, Consumer<Integer>, Long>> mActionMap = new HashMap<>();
+	private static int itemCounter = 0;
+
+	public PingListener(Plugin plugin) {
+		super(plugin, ListenerPriority.NORMAL, PacketType.Play.Client.PONG);
+	}
+
+	/**
+	 * Sends a ping to a player, then performs an action using the player's ping. May be preferable to player.getPing(), as it doesn't use a weighted average.
+	 * Please note the action is performed <u>asynchronously</u>.
+	 *
+	 * @param player         Player to check the ping of
+	 * @param onPongReceived Consumer that consumes the ping when the player client responds
+	 * @param timeout        Number of ticks to wait until timeout
+	 * @param runOnTimeout   Whether the consumer should be run even if timeout occurs
+	 * @param onTimeout      Called if timeout occurs
+	 */
+	public static void submitPingAction(Player player, Consumer<Integer> onPongReceived, int timeout, boolean runOnTimeout, @Nullable Runnable onTimeout) {
+		int id = BASE_ID + itemCounter;
+		itemCounter += 1;
+		mActionMap.put(id, Triple.of(player, onPongReceived, System.currentTimeMillis()));
+		PacketContainer ping = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PING);
+		ping.getIntegers().write(0, id);
+		ProtocolLibrary.getProtocolManager().sendServerPacket(player, ping);
+		// Check for timeout
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mActionMap.containsKey(id)) {
+					mActionMap.remove(id);
+
+					if (runOnTimeout) {
+						onPongReceived.accept(timeout);
+					}
+					if (onTimeout != null) {
+						onTimeout.run();
+					}
+				}
+			}
+		}.runTaskLater(Plugin.getInstance(), timeout);
+	}
+
+	@Override
+	public void onPacketReceiving(PacketEvent event) {
+		int id = event.getPacket().getIntegers().read(0);
+		var entry = mActionMap.get(id);
+		if (entry == null) {
+			return;
+		}
+		Player submittedPlayer = entry.getLeft();
+		if (!event.getPlayer().equals(submittedPlayer)) {
+			// Chances of the id colliding with another plugin's ping/pong are slim...
+			Bukkit.getLogger().warning("PingListener had a collision with another plugin's ping/pong response with id = " + id);
+			// Chances of the id colliding while the *same* player is also queued is downright astronomical.
+			return;
+		}
+		var action = entry.getMiddle();
+		long timeSent = entry.getRight();
+		action.accept((int) (System.currentTimeMillis() - timeSent));
+		mActionMap.remove(id);
+	}
+}

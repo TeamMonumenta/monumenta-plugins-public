@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -28,10 +29,10 @@ public class Haunted {
 
 	public static final String DESCRIPTION = "Your regrets haunt you.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"A looming figure haunts you relentlessly,",
-			"only moving when you do."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("A looming figure haunts you relentlessly,"),
+			Component.text("only moving when you do.")
 		};
 	}
 

@@ -103,6 +103,7 @@ public enum ClassAbility {
 	AMPLIFYING("Amplifying Hex"),
 	CHOLERIC_FLAMES("Choleric Flames"),
 	CURSED_WOUND("Cursed Wound"),
+	PHLEGMATIC_RESOLVE("Phlegmatic Resolve"),
 	GRASPING_CLAWS("Grasping Claws"),
 	MELANCHOLIC_LAMENT("Melancholic Lament"),
 	SANGUINE_HARVEST("Sanguine Harvest"),
@@ -183,9 +184,11 @@ public enum ClassAbility {
 	// [DEPTHS ABILITIES]
 	// FLAMECALLER
 	APOCALYPSE("Apocalypse"),
+	DETONATION("Detonation"),
 	FIREBALL("Fireball"),
-	IGNEOUS_RUNE("Igneous Rune"),
 	FLAMESTRIKE("Flamestrike"),
+	IGNEOUS_RUNE("Igneous Rune"),
+	VOLCANIC_COMBOS("Volcanic Combos"),
 	VOLCANIC_METEOR("Volcanic Meteor"),
 	PYROBLAST("Pyroblast"),
 
@@ -228,6 +231,7 @@ public enum ClassAbility {
 	// FROSTBORN
 	ICE_LANCE("Ice Lance"),
 	ICE_BARRIER("Ice Barrier"),
+	FRIGID_COMBOS("Frigid Combos"),
 	FROST_NOVA_DEPTHS("Frost Nova"),
 	AVALANCHE("Avalanche"),
 	PIERCING_COLD("Piercing Cold"),

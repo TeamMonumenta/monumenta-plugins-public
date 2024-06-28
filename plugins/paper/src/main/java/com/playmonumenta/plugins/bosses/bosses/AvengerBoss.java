@@ -119,8 +119,7 @@ public class AvengerBoss extends BossAbilityGroup {
 				}.runTaskTimer(mPlugin, 0, 1);
 
 				// Heal the mob
-				double maxHealth = EntityUtils.getMaxHealth(mBoss);
-				mBoss.setHealth(Math.min(maxHealth, mBoss.getHealth() + maxHealth * mParam.HEAL_PERCENT));
+				EntityUtils.healMob(mBoss, EntityUtils.getMaxHealth(mBoss) * mParam.HEAL_PERCENT);
 
 				// Increment stacks, and if cap not hit, increase stats
 				if (mStacks < mParam.MAX_STACKS) {

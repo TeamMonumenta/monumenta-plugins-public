@@ -65,11 +65,11 @@ public class DepthsSplitArrow extends DepthsAbility {
 			LivingEntity sourceEnemy = enemy;
 			List<LivingEntity> chainedMobs = new ArrayList<>();
 			for (int j = 0; j < count; j++) {
-				LivingEntity nearestMob = EntityUtils.getNearestMob(enemy.getLocation(), mRange, enemy);
 				chainedMobs.add(sourceEnemy);
 				List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(sourceEnemy.getLocation(), mRange);
 				nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 				nearbyMobs.removeAll(chainedMobs);
+				LivingEntity nearestMob = EntityUtils.getNearestMob(sourceEnemy.getLocation(), nearbyMobs);
 				if (nearestMob == null) {
 					break;
 				}

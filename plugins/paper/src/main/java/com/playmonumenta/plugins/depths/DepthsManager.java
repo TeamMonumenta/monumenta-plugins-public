@@ -1118,7 +1118,11 @@ public class DepthsManager {
 	 */
 	public void playerSelectedRoom(DepthsRoomType roomType, Player player) {
 		DepthsParty party = getDepthsParty(player);
-		if (player == null || party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null) {
+		if (player == null || party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null || party.mIsLoadingRoom) {
+			return;
+		}
+		if (party.mSpawnedForcedCleansingRoom && !party.isAscensionPurgeMet()) {
+			party.sendMessage("Each player must remove an ability before moving on!");
 			return;
 		}
 		party.mNextRoomChoices.clear();
@@ -1131,7 +1135,7 @@ public class DepthsManager {
 
 		boolean wildcard = roomType == DepthsRoomType.WILDCARD;
 		if (wildcard) {
-			incrementTreasure(player.getLocation(), player, 1);
+			incrementTreasure(null, player, 1);
 			roomType = getWildcardRoomType();
 		}
 
@@ -1487,6 +1491,7 @@ public class DepthsManager {
 			DepthsUtils.sendFormattedMessage(p, DepthsContent.DARKEST_DEPTHS, "Player not in depths system!");
 			return;
 		}
+		party.mSpawnedForcedCleansingRoom = false; // reset this.
 		if (dp.mGraveRunnable != null) {
 			dp.mDead = false;
 			dp.mGraveRunnable.cancel();
@@ -1973,5 +1978,15 @@ public class DepthsManager {
 
 	public boolean hasActiveAbility(DepthsPlayer dp) {
 		return getPlayerAbilities(dp).stream().anyMatch(info -> info.getDepthsTrigger().isActive());
+	}
+
+	public @Nullable DepthsParty getParty(World world) {
+		UUID uuid = world.getUID();
+		for (DepthsParty party : mParties) {
+			if (uuid.equals(party.mWorldUUID)) {
+				return party;
+			}
+		}
+		return null;
 	}
 }

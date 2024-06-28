@@ -58,12 +58,12 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 	private final ExperiencinatorConfig.Experiencinator mExperiencinator;
 	private final ItemStack mExperiencinatorItem;
 	private final ExperiencinatorConfig mConfig;
-	private final LinkedHashMap<Region, Set<Tier>> mAvailableOptions; // LinkedHashMap to preserve iteration order
+	private final Map<Region, Set<Tier>> mAvailableOptions; // LinkedHashMap to preserve iteration order
 	private final List<Tier> mVisibleTiers;
 	private final ExperiencinatorSettings mSettings;
 
 	private ExperiencinatorSettingsGui(Player owner, ExperiencinatorConfig.Experiencinator experiencinator, ItemStack experiencinatorItem, ExperiencinatorConfig config,
-	                                   LinkedHashMap<Region, Set<Tier>> availableOptions, List<Tier> visibleTiers) {
+	                                   Map<Region, Set<Tier>> availableOptions, List<Tier> visibleTiers) {
 		super(owner, (3 + availableOptions.size()) * 9, experiencinator.getName() + " Settings");
 
 		mPlayer = owner;

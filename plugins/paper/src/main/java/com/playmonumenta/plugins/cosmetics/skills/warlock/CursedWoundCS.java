@@ -40,7 +40,8 @@ public class CursedWoundCS implements CosmeticSkill {
 		anvilParticle(player, entity);
 	}
 
-	public void onCriticalAttack(World world, Location loc) {
+	public void onCriticalAttack(World world, Player player, LivingEntity mob, int cooldowns) {
+		Location loc = player.getLocation();
 		world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 0.3f, 1.5f);
 		world.playSound(loc, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.PLAYERS, 0.2f, 1.4f);
@@ -54,8 +55,8 @@ public class CursedWoundCS implements CosmeticSkill {
 		anvilParticle(player, entity);
 	}
 
-	public void onReleaseStoredEffects(Player player, World world, Location loc, Entity entity, double radius) {
-		world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.8f);
+	public void onReleaseStoredEffects(Player player, Entity entity, double radius) {
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.8f);
 		anvilParticle(player, entity, 25, radius, radius);
 	}
 

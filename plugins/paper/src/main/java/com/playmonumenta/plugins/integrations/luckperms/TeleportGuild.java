@@ -1,18 +1,22 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import dev.jorel.commandapi.CommandAPI;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
@@ -22,27 +26,28 @@ public class TeleportGuild {
 
 	@SuppressWarnings("unchecked")
 	public static void register() {
-		// teleportguild <guildname> <player>
+		// teleportguild <player> [<guildname>]
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportguild");
 
 		List<Argument<?>> arguments = new ArrayList<>();
 
 		arguments.add(new EntitySelectorArgument.ManyPlayers("player"));
 		new CommandAPICommand(COMMAND)
-			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
+				CommandUtils.checkPerm(sender, perms);
 				for (Player player : (List<Player>)args[0]) {
 					run(player, null);
 				}
 			})
 			.register();
 
-		arguments.add(new TextArgument("guild name"));
+		arguments.add(new TextArgument("guild name")
+			.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS));
 		new CommandAPICommand(COMMAND)
-			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
+				CommandUtils.checkPerm(sender, perms);
 				for (Player player : (List<Player>)args[0]) {
 					run(player, (String)args[1]);
 				}
@@ -50,38 +55,62 @@ public class TeleportGuild {
 			.register();
 	}
 
-	private static void run(Player player, @Nullable String guildName) throws WrapperCommandSyntaxException {
+	private static void run(Player player, @Nullable String guildName) {
+		World world = player.getWorld();
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			Group group;
 
-		Group group;
+			if (guildName == null) {
+				// Look up the player's guild
+				group = LuckPermsIntegration.getGuild(player);
+				if (group == null) {
+					Component err = Component.text("You are not in a guild", NamedTextColor.RED);
+					player.sendMessage(err);
+					return;
+				}
+			} else {
+				// need to look up from name
 
-		if (guildName == null) {
-			// Look up the player's guild
-			group = LuckPermsIntegration.getGuild(player);
-			if (group == null) {
-				Component err = Component.text("You are not in a guild!", NamedTextColor.RED);
-				player.sendMessage(err);
-				throw CommandAPI.failWithAdventureComponent(err);
+				// Guild name sanitization for command usage
+				String guildId = GuildArguments.getIdFromName(guildName);
+				if (guildId == null) {
+					player.sendMessage(Component.text("Could not identify guild by name '" + guildName
+						+ "'", NamedTextColor.RED));
+					return;
+				}
+
+				group = LuckPermsIntegration.GM.loadGroup(guildId).join().orElse(null);
+				if (group == null) {
+					player.sendMessage(Component.text("The luckperms group '" + guildId
+						+ "' does not exist", NamedTextColor.RED));
+					return;
+				}
 			}
-		} else {
-			// need to look up from name
 
-			// Guild name sanitization for command usage
-			//TODO: Better lookup of guild name?
-			String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
+			String actualGuildName = LuckPermsIntegration.getNonNullGuildName(group);
 
-			group = LuckPermsIntegration.GM.getGroup(cleanGuildName);
-			if (group == null) {
-				throw CommandAPI.failWithString("The luckperms group '" + cleanGuildName + "' does not exist");
+			if (LuckPermsIntegration.isLocked(group)) {
+				if (player.isOp()) {
+					player.sendMessage(Component.text("The guild " + actualGuildName
+						+ " is locked, but your operator status lets you bypass this.", NamedTextColor.GOLD));
+				} else {
+					Component err = Component.text("The guild " + actualGuildName
+						+ " is locked. A moderator will need to unlock the guild first.", NamedTextColor.RED);
+					player.sendMessage(err);
+					return;
+				}
 			}
-		}
 
-		Location loc = LuckPermsIntegration.getGuildTp(player.getWorld(), group);
+			Optional<Location> optLoc = LuckPermsIntegration.getGuildTp(world, group).join();
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				if (optLoc.isEmpty()) {
+					player.sendMessage(Component.text("The teleport for your guild is not set up", NamedTextColor.RED));
+					player.sendMessage(Component.text("Please ask a moderator to fix this", NamedTextColor.RED));
+					return;
+				}
 
-		if (loc == null) {
-			player.sendMessage(Component.text("The teleport for your guild is not set up", NamedTextColor.RED));
-			player.sendMessage(Component.text("Please ask a moderator to fix this", NamedTextColor.RED));
-		} else {
-			player.teleport(loc, PlayerTeleportEvent.TeleportCause.COMMAND);
-		}
+				player.teleport(optLoc.get(), PlayerTeleportEvent.TeleportCause.COMMAND);
+			});
+		});
 	}
 }

@@ -26,7 +26,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +44,7 @@ public class FrigidCombos extends DepthsCombosAbility {
 
 	public static final DepthsAbilityInfo<FrigidCombos> INFO =
 		new DepthsAbilityInfo<>(FrigidCombos.class, ABILITY_NAME, FrigidCombos::new, DepthsTree.FROSTBORN, DepthsTrigger.COMBO)
+			.linkedSpell(ClassAbility.FRIGID_COMBOS)
 			.displayItem(Material.BLUE_DYE)
 			.descriptions(FrigidCombos::getDescription)
 			.singleCharm(false);
@@ -79,7 +79,7 @@ public class FrigidCombos extends DepthsCombosAbility {
 		Location targetLoc = enemy.getLocation();
 		World world = targetLoc.getWorld();
 
-		boolean isOnIce = isOnIce(enemy);
+		boolean isOnIce = DepthsUtils.isOnIce(enemy);
 		double damage = isOnIce ? shatterDamage : normalDamage;
 		double radius = isOnIce ? shatterRadius : normalRadius;
 
@@ -114,11 +114,6 @@ public class FrigidCombos extends DepthsCombosAbility {
 
 		playSounds(world, playerLoc);
 		new PartialParticle(Particle.SNOW_SHOVEL, LocationUtils.getHalfHeightLocation(enemy), 25, .5, .2, .5, 0.65).spawnAsPlayerActive(player);
-	}
-
-	private static boolean isOnIce(LivingEntity entity) {
-		Location loc = entity.getLocation();
-		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
 	public static void playSounds(World world, Location loc) {

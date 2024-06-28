@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,10 +18,10 @@ public class Legionary {
 
 	public static final String DESCRIPTION = "Enemies come in larger numbers.";
 
-	public static String[] rankDescription(int level) {
-			return new String[]{
-				"Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance",
-				"to spawn a copy of each enemy."
+	public static Component[] rankDescription(int level) {
+			return new Component[]{
+				Component.text("Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
+				Component.text("to spawn a copy of each enemy.")
 			};
 	}
 

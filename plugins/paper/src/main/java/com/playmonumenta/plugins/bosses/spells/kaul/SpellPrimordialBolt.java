@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import com.playmonumenta.plugins.bosses.bosses.PrimordialElementalKaulBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -23,13 +24,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public class SpellPrimordialBolt extends SpellBaseBolt {
-	private static final String SLOWNESS_TAG = "PrimordialBoltSlowness";
-	private static final String WEAKNESS_TAG = "PrimordialBoltWeakness";
+	private static final String SLOWNESS_SRC = "PrimordialBoltSlowness";
+	private static final String WEAKNESS_SRC = "PrimordialBoltWeakness";
 	private static final int DIRECT_HIT_DEBUFF_DURATION = 20 * 15;
 	private static final int AOE_HIT_DEBUFF_DURATION = 20 * 10;
 	private static final double SLOWNESS_POTENCY = -0.3;
@@ -41,19 +40,20 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				if (entity.getLocation().getY() > 60) {
 					return;
 				}
-				float t = tick / 15;
+				float t = tick / 15f;
 				World world = boss.getWorld();
 				if (tick == 1) {
 					PotionUtils.applyColoredGlowing(PrimordialElementalKaulBoss.identityTag, boss, NamedTextColor.RED, 20 * 2);
-					world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
-					world.playSound(boss.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
+					world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.HOSTILE, 5f, 0.5f);
+					world.playSound(boss.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_AMBIENT, SoundCategory.HOSTILE, 5f, 0.5f);
 				}
 				new PartialParticle(Particle.LAVA, boss.getLocation(), 1, 0.35, 0, 0.35, 0.005).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.BLOCK_CRACK, boss.getLocation(), 3, 0, 0, 0, 0.5,
 					Material.STONE.createBlockData()).spawnAsEntityActive(boss);
 				world.playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 10, t);
-				boss.removePotionEffect(PotionEffectType.SLOW);
-				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+					new BaseMovementSpeedModifyEffect(40, -0.3));
 			},
 
 			(Entity entity) -> {
@@ -91,18 +91,18 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				}
 				if (!blocked) {
 					BossUtils.blockableDamage(boss, player, DamageType.BLAST, 37, "Primordial Bolt", prevLoc);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_TAG,
-						new PercentSpeed(DIRECT_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_TAG));
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_TAG,
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+						new PercentSpeed(DIRECT_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
 						new PercentDamageDealt(DIRECT_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY, DamageType.getScalableDamageType()));
 				} else {
 					for (Player p : PlayerUtils.playersInRange(loc, 2.5, true)) {
 						if (p.getLocation().getY() <= 60) {
 							BossUtils.blockableDamage(boss, p, DamageType.BLAST, 16, "Primordial Bolt", prevLoc);
 							MovementUtils.knockAway(loc, p, 0.3f, false);
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_TAG,
-								new PercentSpeed(AOE_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_TAG));
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_TAG,
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+								new PercentSpeed(AOE_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
 								new PercentDamageDealt(AOE_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY, DamageType.getScalableDamageType()));
 						}
 					}
@@ -113,10 +113,8 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.9f);
 			},
 
-			// Only allow targetting players below y=60
-			(Player player) -> {
-				return player != null && player.getLocation().getY() < 60;
-			}
+			// Only allow targeting of players below y=60
+			(Player player) -> player != null && player.getLocation().getY() < 60
 		);
 	}
 }

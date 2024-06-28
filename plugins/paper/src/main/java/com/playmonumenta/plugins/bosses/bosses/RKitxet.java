@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellVerdantProtection;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.*;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -243,6 +242,9 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
@@ -267,12 +269,10 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 					message = "Thank you...";
 				} else {
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-					SongManager.stopSong(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true),
-						true);
 					this.cancel();
 					return;
 				}
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+				for (Player player : players) {
 					player.sendMessage(Component.text(message, NamedTextColor.GREEN));
 				}
 				mCount++;

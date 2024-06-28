@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -41,7 +40,7 @@ public class AstralWeaverCS extends DodgingCS {
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, loc, 50, 0.25, 0.45, 0.25, 0, new Particle.DustOptions(rollColor(), 0.5f)).spawnAsPlayerActive(player);
 
-		ArrayList<Vector> fullStar = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(5, 3, 0.35, true, true), 3);
+		List<Vector> fullStar = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(5, 3, 0.35, true, true), 3);
 		Location dodgeLoc = player.getLocation().clone().add(0, 0.1, 0);
 
 		new BukkitRunnable() {

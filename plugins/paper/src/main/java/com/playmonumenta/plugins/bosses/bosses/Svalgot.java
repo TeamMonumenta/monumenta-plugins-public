@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -29,6 +31,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -79,7 +82,7 @@ public final class Svalgot extends SerializedLocationBossAbilityGroup {
 			new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Svalgot]\",\"color\":\"gold\"},{\"text\":\" My pain only grows my power!\",\"color\":\"dark_gray\"}]");
+			sendMessage("My pain only grows my power!");
 		});
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(spawnLoc, 75)) {
@@ -111,7 +114,7 @@ public final class Svalgot extends SerializedLocationBossAbilityGroup {
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0) * 1.05);
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 0) * 1.25);
 
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Svalgot]\",\"color\":\"gold\"},{\"text\":\" Broer, for you and for the Blackflame, I will bathe in their blood!\",\"color\":\"dark_gray\"}]");
+					sendMessage("Broer, for you and for the Blackflame, I will bathe in their blood!");
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_DEATH, SoundCategory.HOSTILE, 3, 0);
 
 					World world = mBoss.getWorld();
@@ -172,7 +175,7 @@ public final class Svalgot extends SerializedLocationBossAbilityGroup {
 		if ((mGhalkor == null || mGhalkor.isDead() || !mGhalkor.isValid()) && (mGhalkorBoss == null || !mGhalkorBoss.mSummonedFinalBoss)) {
 			mSummonedFinalBoss = true;
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Svalgot]\",\"color\":\"gold\"},{\"text\":\" With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!\",\"color\":\"dark_gray\"}]");
+			sendMessage("With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!");
 
 			Entity beast = LibraryOfSoulsIntegration.summon(mSpawnLoc.add(2, -3, 0), BeastOfTheBlackFlame.losName);
 			if (beast instanceof LivingEntity leBeast) {
@@ -190,7 +193,7 @@ public final class Svalgot extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		int playerCount = getPlayers().size();
 		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
@@ -214,5 +217,16 @@ public final class Svalgot extends SerializedLocationBossAbilityGroup {
 		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
+	}
+
+	public List<Player> getPlayers() {
+		return PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+	}
+
+	public void sendMessage(String message) {
+		Component component = Component.text("[Svalgot] ", NamedTextColor.GOLD).append(Component.text(message, NamedTextColor.DARK_GRAY));
+		for (Player player : getPlayers()) {
+			player.sendMessage(component);
+		}
 	}
 }

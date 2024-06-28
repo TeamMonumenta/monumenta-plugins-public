@@ -2,11 +2,21 @@ package com.playmonumenta.plugins.commands;
 
 import com.goncalomb.bukkit.nbteditor.nbt.attributes.ItemModifier;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -26,9 +36,12 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TimeArgument;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -604,24 +617,47 @@ public class ItemStatCommands {
 			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
 
-		argumentsOther.add(new StringArgument("NPC Name"));
+		final List<String> options = List.of("player", "npc");
+		argumentsOther.add(new MultiLiteralArgument("player", "npc"));
+		argumentsOther.add(new StringArgument("npc name/player name"));
 
-		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther).executes((sender, args) -> {
+		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther)
+		.executes((sender, args) -> {
 			Player player = (Player) args[0];
 			String enchantment = (String) args[1];
 			Integer level = (Integer) args[2];
-			String npcName = (String) args[3];
+			String option = (String) args[3];
+			String name = (String) args[4];
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {
 				player.sendMessage(Component.text("Must be holding an item!", NamedTextColor.RED));
 				return;
 			}
-			if (npcName == null || npcName.isEmpty()) {
-				player.sendMessage(Component.text("Invalid NPC name!", NamedTextColor.RED));
+			if (option == null || option.isEmpty() || !options.contains(option)) {
+				throw CommandAPI.failWithAdventureComponent(Component.text("Invalid option! Must be player or npc", NamedTextColor.RED));
+			}
+			if (name == null || name.isEmpty()) {
+				player.sendMessage(Component.text("Invalid NPC name, player name or uuid!", NamedTextColor.RED));
 				return;
 			}
 
-			addNpcInfusion(item, player, enchantment, level, npcName);
+			if (option.toLowerCase(Locale.ROOT).contains("player")) {
+				@Nullable UUID uuid = null;
+				try {
+					// first attempt to parse it as a valid uuid
+					uuid = UUID.fromString(name);
+				} catch (IllegalArgumentException ex) {
+					// if invalid, parse it as a player name
+					uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
+				}
+				if (uuid == null) {
+					throw CommandAPI.failWithAdventureComponent(Component.text("Could not find a valid player from username in redis", NamedTextColor.RED));
+				}
+				addUuidInfusion(item, player, enchantment, level, uuid);
+			} else {
+				addNpcInfusion(item, player, enchantment, level, name);
+			}
+
 		}).register();
 	}
 
@@ -639,6 +675,23 @@ public class ItemStatCommands {
 		if (infusionType != null) {
 			if (level > 0) {
 				ItemStatUtils.addInfusion(item, infusionType, level, player.getUniqueId(), false);
+			} else {
+				ItemStatUtils.removeInfusion(item, infusionType, false);
+			}
+		}
+
+		ItemUpdateHelper.generateItemStats(item);
+		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+		if (playerItemStats != null) {
+			playerItemStats.updateStats(player, true, true);
+		}
+	}
+
+	private static void addUuidInfusion(ItemStack item, Player player, String enchantment, int level, UUID uuid) {
+		InfusionType infusionType = InfusionType.getInfusionType(enchantment);
+		if (infusionType != null) {
+			if (level > 0) {
+				ItemStatUtils.addInfusion(item, infusionType, level, uuid, false);
 			} else {
 				ItemStatUtils.removeInfusion(item, infusionType, false);
 			}
@@ -763,6 +816,7 @@ public class ItemStatCommands {
 
 			// Copied from nbti command to set the attributes to an empty list instead of removing them entirely
 			ItemModifier.setItemStackModifiers(item, new ArrayList<>());
+			ItemUpdateHelper.addDummyAttributeIfNeeded(item);
 
 			ItemUtils.setPlainLore(item);
 
@@ -789,6 +843,34 @@ public class ItemStatCommands {
 				message = message.append(Component.text(" "));
 			}
 			sender.sendMessage(message);
+		}).register();
+	}
+
+	public static void registerDelveInfusionTypeCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.delveinfusiontype");
+
+		new CommandAPICommand("delveinfusiontype").withPermission(perms).withArguments(new LiteralArgument("get")).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			DelveInfusionUtils.DelveInfusionMaterial type = DelveInfusionUtils.getDelveInfusionMaterial(item);
+			player.sendMessage(type.mItemNamePlural);
+		}).register();
+
+		new CommandAPICommand("delveinfusiontype").withPermission(perms).withArguments(new LiteralArgument("set"), new MultiLiteralArgument(Arrays.stream(DelveInfusionUtils.DelveInfusionMaterial.values()).map(m -> m.mLabel).toArray(String[]::new))).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			String label = (String) args[0];
+			for (DelveInfusionUtils.DelveInfusionMaterial m : DelveInfusionUtils.DelveInfusionMaterial.values()) {
+				if (m.mLabel.equals(label)) {
+					DelveInfusionUtils.setDelveInfusionMaterial(item, m);
+					return;
+				}
+			}
+			player.sendMessage(Component.text("Failed to find Delve Infusion Material " + label, NamedTextColor.RED));
 		}).register();
 	}
 

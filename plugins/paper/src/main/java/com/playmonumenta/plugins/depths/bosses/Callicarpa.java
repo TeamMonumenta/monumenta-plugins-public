@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPFlower;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -60,22 +61,22 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class Callicarpa extends SerializedLocationBossAbilityGroup {
-
 	public static final String identityTag = "boss_callicarpa";
-	public static final int detectionRange = 100;
+	/* These are used in other Callicarpa spells */
 	public static final String FLOWER_TAG = "callicarpa_flower";
 	public static final String FLOWER_EVOLVED_TAG = "callicarpa_flowerevolved";
 	public static final String FLOWER_SPOT_TAG = "callicarpa_flowerspot";
 	public static final String MOB_SPAWN_SPOT_TAG = "callicarpa_mobspot";
-	public static final double HEALTH = 7500;
-	public static final int MENACE_SPAWN_DURATION = 10;
-	public static final double MENACE_SPAWN_HEIGHT = 10;
-	public static final int MENACE_MOUNT_START_DELAY = 6;
-	public static final int MENACE_MOUNT_DELAY = 8;
-	public static final Color MENACE_LINK_COLOR = Color.fromRGB(114, 39, 179);
-	public static final Particle.DustOptions mMenaceLinkOptions = new Particle.DustOptions(MENACE_LINK_COLOR, 2);
+	public static final int detectionRange = 100;
 
-	public static final String MUSIC_TITLE = "epic:music.hedera";
+	private static final double HEALTH = 7500;
+	private static final int MENACE_SPAWN_DURATION = 10;
+	private static final double MENACE_SPAWN_HEIGHT = 10;
+	private static final int MENACE_MOUNT_START_DELAY = 6;
+	private static final int MENACE_MOUNT_DELAY = 8;
+	private static final Color MENACE_LINK_COLOR = Color.fromRGB(114, 39, 179);
+	private static final Particle.DustOptions mMenaceLinkOptions = new Particle.DustOptions(MENACE_LINK_COLOR, 2);
+	private static final String MUSIC_TITLE = "epic:music.hedera";
 	private static final int MUSIC_DURATION = 202; // seconds
 
 	private final int mFloorY;
@@ -305,6 +306,11 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		Location loc = mBoss.getLocation();
+		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true);
+
+		BossUtils.endBossFightEffects(players);
+
 		// Kill off the Menace
 		if (mMenace != null) {
 			mMenace.setHealth(0);
@@ -312,17 +318,14 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		}
 
 		// Kill off all the Flowers
-		Location loc = mBoss.getLocation();
 		loc.getNearbyEntities(200, 30, 200).stream()
 			.filter(e -> e.getScoreboardTags().contains(FLOWER_TAG)).forEach(Entity::remove);
 
-		for (Player player : PlayerUtils.playersInRange(loc, detectionRange, true)) {
+		for (Player player : players) {
 			player.sendMessage(
 				Component.text("[Callicarpa] ", NamedTextColor.GOLD)
 					.append(Component.text("Oh yes, at last, the voice recedes... with final breath... I am now freed...", NamedTextColor.DARK_GREEN))
 			);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
 		}
 
 		new BukkitRunnable() {

@@ -61,7 +61,7 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 	private static final int RADIUS = SpellKaulsFury.RADIUS;
 	private static final double DAMAGE_RADIUS = SpellKaulsFury.DAMAGE_RADIUS;
 	private static final double DAMAGE = SpellKaulsFury.DAMAGE;
-	private static final int IMPACT_TIME = 1 * 20;
+	private static final int IMPACT_TIME = 20; // 1 second
 	private static final int CHARGE_TIME = FURY_PERIOD - IMPACT_TIME;
 
 	private @Nullable Player mFuryTarget = null;
@@ -135,7 +135,6 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 					new PartialParticle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 1, 0), 10, 1, 1, 1).spawnAsBoss();
 				} else {
 					this.cancel();
-					return;
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
@@ -334,9 +333,7 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 					mBoss.setAI(false);
 				},
 				// Warning particles
-				(Location loc) -> {
-					new PartialParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0).spawnAsBoss();
-				},
+				(Location loc) -> new PartialParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0).spawnAsBoss(),
 				// Charge attack sound/particles at boss location
 				(LivingEntity player) -> {
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15).spawnAsBoss();

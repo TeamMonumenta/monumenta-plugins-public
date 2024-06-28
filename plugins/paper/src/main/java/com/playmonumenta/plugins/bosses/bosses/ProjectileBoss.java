@@ -220,16 +220,10 @@ public class ProjectileBoss extends BossAbilityGroup {
 						}
 
 						if (p.HEAL_AMOUNT > 0) {
-							double hp = target.getHealth() + p.HEAL_AMOUNT;
-							double max = EntityUtils.getMaxHealth(target);
-							if (hp >= max) {
-								target.setHealth(max);
-								if (p.OVERHEAL) {
-									int missing = (int) (hp - max);
-									AbsorptionUtils.addAbsorption(target, missing, p.HEAL_AMOUNT, -1);
-								}
-							} else {
-								target.setHealth(hp);
+							double healed = EntityUtils.healMob(target, p.HEAL_AMOUNT);
+							if (p.OVERHEAL && healed < p.HEAL_AMOUNT) {
+								double missing = p.HEAL_AMOUNT - healed;
+								AbsorptionUtils.addAbsorption(target, missing, p.HEAL_AMOUNT, -1);
 							}
 						}
 						p.EFFECTS.apply(target, boss);

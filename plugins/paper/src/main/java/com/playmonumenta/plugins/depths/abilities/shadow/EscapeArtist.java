@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -21,6 +23,7 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.EnumSet;
@@ -154,11 +157,11 @@ public class EscapeArtist extends DepthsAbility {
 
 		new PartialParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "EscapeArtistProjectile", Particle.SMOKE_NORMAL);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "Escape Artist Projectile", Particle.SMOKE_NORMAL);
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		mPlayerItemStatsMap.put(proj, playerItemStats);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
 			@Override
@@ -183,7 +186,10 @@ public class EscapeArtist extends DepthsAbility {
 
 				if (proj.isDead()) {
 					if (mPlayerItemStatsMap.remove(proj) != null) {
-						executeTeleport(proj.getLocation().add(0, 1, 0).setDirection(mPlayer.getEyeLocation().getDirection()));
+						DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
+						if (dp != null && !dp.mDead) {
+							executeTeleport(proj.getLocation().add(0, 1, 0).setDirection(mPlayer.getEyeLocation().getDirection()));
+						}
 					}
 					mPlugin.mProjectileEffectTimers.removeEntity(proj);
 					this.cancel();
@@ -191,7 +197,7 @@ public class EscapeArtist extends DepthsAbility {
 
 				mT++;
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 
 		world.playSound(loc, Sound.ENTITY_ENDER_PEARL_THROW, SoundCategory.PLAYERS, 1.0f, 2.0f);
 		world.playSound(loc, Sound.BLOCK_WOODEN_TRAPDOOR_OPEN, SoundCategory.PLAYERS, 1.0f, 1.5f);
@@ -235,28 +241,28 @@ public class EscapeArtist extends DepthsAbility {
 		if (!ZoneUtils.hasZoneProperty(originalLoc, ZoneProperty.NO_MOBILITY_ABILITIES)
 			&& !ZoneUtils.hasZoneProperty(destination, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 
-			mPlayer.teleport(destination);
+			if (LocationUtils.blinkCollisionCheck(mPlayer, destination.toVector())) {
+				Vector vec = destination.clone().subtract(originalLoc).toVector().normalize().multiply(0.4);
+				vec.setY(0.4);
+				mPlayer.setVelocity(vec);
 
-			Vector vec = destination.clone().subtract(originalLoc).toVector().normalize().multiply(0.4);
-			vec.setY(0.4);
-			mPlayer.setVelocity(vec);
+				mPlugin.mEffectManager.addEffect(mPlayer, "EscapeArtistFallImmunity", new PercentDamageReceived(60, -1, EnumSet.of(DamageType.FALL)));
 
-			mPlugin.mEffectManager.addEffect(mPlayer, "EscapeArtistFallImmunity", new PercentDamageReceived(60, -1, EnumSet.of(DamageType.FALL)));
+				new PPLine(Particle.SQUID_INK, originalLoc, destination, 0.2)
+					.countPerMeter(3)
+					.spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.DRAGON_BREATH, destination, 20, 0.2, 0.2, 0.2, 0.15).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SPELL_WITCH, destination, 20, 0.2, 0.2, 0.2, 0.15).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.SMOKE_LARGE, destination, 1.5)
+					.ringMode(false)
+					.countPerMeter(3)
+					.extra(0.1)
+					.spawnAsPlayerActive(mPlayer);
 
-			new PPLine(Particle.SQUID_INK, originalLoc, destination, 0.2)
-				.countPerMeter(3)
-				.spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.DRAGON_BREATH, destination, 20, 0.2, 0.2, 0.2, 0.15).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SPELL_WITCH, destination, 20, 0.2, 0.2, 0.2, 0.15).spawnAsPlayerActive(mPlayer);
-			new PPCircle(Particle.SMOKE_LARGE, destination, 1.5)
-				.ringMode(false)
-				.countPerMeter(3)
-				.extra(0.1)
-				.spawnAsPlayerActive(mPlayer);
-
-			world.playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 0.95f);
-			world.playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.25f);
-			world.playSound(destination, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.PLAYERS, 0.5f, 2.0f);
+				world.playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 0.95f);
+				world.playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.25f);
+				world.playSound(destination, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.PLAYERS, 0.5f, 2.0f);
+			}
 		}
 	}
 

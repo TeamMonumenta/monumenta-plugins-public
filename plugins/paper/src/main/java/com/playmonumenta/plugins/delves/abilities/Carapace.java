@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 
 public class Carapace {
@@ -23,11 +24,11 @@ public class Carapace {
 
 	public static final String DESCRIPTION = "Enemies gain a protective shell.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"Enemies have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to gain Carapaces.",
-			"Carapaces block the first hit the enemy takes, and the enemy",
-			"deals 30% more damage until the Carapace is broken."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("Enemies have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to gain Carapaces."),
+			Component.text("Carapaces block the first hit the enemy takes, and the enemy"),
+			Component.text("deals 30% more damage until the Carapace is broken.")
 		};
 	}
 

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.common.base.Ascii;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -116,7 +117,7 @@ public class FileUtils {
 
 		try (Stream<Path> stream = Files.walk(folderPath, 100, FileVisitOption.FOLLOW_LINKS)) {
 			stream.forEach(path -> {
-				if (path.toString().toLowerCase().endsWith(endsWith) && !path.toFile().isDirectory()) {
+				if (Ascii.toLowerCase(path.toString()).endsWith(endsWith) && !path.toFile().isDirectory()) {
 					// Note - this will pass directories that end with .json back to the caller too
 					matchedFiles.add(path);
 				}

@@ -424,7 +424,7 @@ public class PassGui extends Gui {
 		int index = -1;
 		for (SeasonalPass otherPass : SeasonalEventManager.mAllPasses.descendingMap().values()) {
 			if (index == -1) {
-				if (!otherPass.isActive()) {
+				if (!otherPass.hasStarted()) {
 					if (mPass == otherPass) {
 						isFuturePass = true;
 						break;

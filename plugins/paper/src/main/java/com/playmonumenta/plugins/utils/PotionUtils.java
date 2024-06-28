@@ -137,9 +137,6 @@ public class PotionUtils {
 		public boolean mInfinite;
 		public int mHeavenlyBoonExtensions;
 
-		public PotionInfo() {
-		}
-
 		public PotionInfo(PotionEffect effect) {
 			mType = effect.getType();
 			mDuration = effect.getDuration();
@@ -149,6 +146,17 @@ public class PotionUtils {
 			mShowIcon = effect.hasIcon();
 			mInfinite = isInfinite(effect.getDuration());
 			mHeavenlyBoonExtensions = 0;
+		}
+
+		public PotionInfo(PotionInfo potionInfo) {
+			mType = potionInfo.mType;
+			mDuration = potionInfo.mDuration;
+			mAmplifier = potionInfo.mAmplifier;
+			mAmbient = potionInfo.mAmbient;
+			mShowParticles = potionInfo.mShowParticles;
+			mShowIcon = potionInfo.mShowIcon;
+			mInfinite = potionInfo.mInfinite;
+			mHeavenlyBoonExtensions = potionInfo.mHeavenlyBoonExtensions;
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
@@ -181,7 +189,7 @@ public class PotionUtils {
 			return potionInfoObject;
 		}
 
-		public void loadFromJsonObject(JsonObject object) throws Exception {
+		public PotionInfo(JsonObject object) throws Exception {
 			mType = PotionEffectType.getByName(object.get("type").getAsString());
 			mDuration = object.get("duration").getAsInt();
 			mAmplifier = object.get("amplifier").getAsInt();

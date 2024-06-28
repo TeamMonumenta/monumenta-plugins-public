@@ -5,42 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import de.tr7zw.nbtapi.NBT;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SerializationUtils {
-	private static final String SERIALCONST = "SERIALDATA=";
-	private static final int SERIALLEN = 50;
-
-	private static List<String> serializeStringToLore(String data) {
-		List<String> ret = new ArrayList<String>();
-		for (int start = 0; start < data.length(); start += SERIALLEN) {
-			ret.add(SERIALCONST + data.substring(start, Math.min(data.length(), start + SERIALLEN)));
-		}
-		return ret;
-	}
-
-	private static String deserializeStringFromLore(List<String> lore) {
-		String retval = "";
-		for (String str : lore) {
-			if (str.startsWith(SERIALCONST)) {
-				retval += str.substring(SERIALCONST.length());
-			}
-		}
-		return retval;
-	}
-
-
 	public static void storeDataOnEntity(LivingEntity entity, String identityTag, String data) throws Exception {
 		NBT.modifyPersistentData(entity, nbt -> {
 			nbt.setString("monumenta:" + identityTag, data);
@@ -51,27 +20,6 @@ public class SerializationUtils {
 		return NBT.getPersistentData(entity, nbt -> {
 			return nbt.getString("monumenta:" + identityTag);
 		});
-	}
-
-	public static void stripSerializationDataFromDrops(EntityDeathEvent event) {
-		ListIterator<ItemStack> iter = event.getDrops().listIterator();
-		while (iter.hasNext()) {
-			ItemStack item = iter.next();
-			if (item.hasItemMeta()) {
-				ItemMeta meta = item.getItemMeta();
-
-				if (meta.hasDisplayName() && meta.getDisplayName().equals(SERIALCONST)) {
-					iter.remove();
-				}
-
-				List<Component> lore = meta.lore();
-				if (lore != null) {
-					lore.removeIf(l -> MessagingUtils.plainText(l).startsWith(SERIALCONST));
-					meta.lore(lore);
-					item.setItemMeta(meta);
-				}
-			}
-		}
 	}
 
 	@FunctionalInterface

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.particle;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -426,6 +427,14 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return forEachNearbyPlayer(
 			(Player player) -> spawnForPlayerInternal(player, source)
 		);
+	}
+
+	public SelfT spawnForPlayers(ParticleCategory source, Collection<Player> players) {
+		prepareSpawn();
+		players.forEach(player -> {
+			spawnForPlayerInternal(player, source);
+		});
+		return getSelf();
 	}
 
 	public SelfT spawnForPlayer(ParticleCategory source, Player player) {

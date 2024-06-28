@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 public class UpdatePlainName {
 	public static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.updateplainname");
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand("monumenta")
 			.withPermission(PERMISSION)

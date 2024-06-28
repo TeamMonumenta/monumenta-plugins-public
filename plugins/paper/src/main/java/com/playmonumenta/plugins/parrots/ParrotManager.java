@@ -4,12 +4,14 @@ import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.plots.AnimalLimits;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -107,8 +109,12 @@ public class ParrotManager implements Listener {
 			return null;
 		}
 
+		public String getScoreboard() {
+			return "ParrotBought" + mNumber;
+		}
+
 		public boolean hasUnlocked(Player player) {
-			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought" + mNumber).orElse(0) > 0;
+			return ScoreboardUtils.getScoreboardValue(player, getScoreboard()).orElse(0) > 0;
 		}
 	}
 
@@ -343,7 +349,7 @@ public class ParrotManager implements Listener {
 		for (Parrot parrot : player.getWorld().getEntitiesByClass(Parrot.class)) {
 			if (parrot.getVariant() == variant.getVariant()
 				    && parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)
-				    && variant.getName().equals(parrot.getCustomName())) {
+				    && variant.getName().equals(MessagingUtils.plainText(parrot.customName()))) {
 				parrot.remove();
 			}
 		}
@@ -381,9 +387,15 @@ public class ParrotManager implements Listener {
 				return;
 			}
 
+			Component customName = parrot.customName();
+			if (customName == null) {
+				return;
+			}
+			String name = MessagingUtils.plainText(customName);
+
 			// parrot spawned with an old version will not have the tag, so we need to check the name
 			for (ParrotVariant variant : ParrotVariant.values()) {
-				if (parrot.getCustomName() != null && parrot.getCustomName().contains(variant.mName)) {
+				if (name.contains(variant.mName)) {
 					event.setCancelled(true);
 					return;
 				}

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.BladeDanceCS;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -19,9 +20,11 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public class BladeDance extends Ability {
@@ -72,6 +75,7 @@ public class BladeDance extends Ability {
 
 	private final double mDamage;
 	private final int mSlowDuration;
+	private boolean mIsActive = false;
 
 	private final BladeDanceCS mCosmetic;
 
@@ -91,7 +95,7 @@ public class BladeDance extends Ability {
 		World world = mPlayer.getWorld();
 		mCosmetic.danceStart(mPlayer, world, mPlayer.getLocation());
 
-		mPlayer.setInvulnerable(true);
+		mIsActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -102,7 +106,7 @@ public class BladeDance extends Ability {
 				mCosmetic.danceTick(mPlayer, world, loc, mTicks, radius);
 
 				if (mTicks >= CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION)) {
-					mPlayer.setInvulnerable(false);
+					mIsActive = false;
 
 					mCosmetic.danceEnd(mPlayer, world, loc, radius);
 
@@ -125,5 +129,13 @@ public class BladeDance extends Ability {
 
 		putOnCooldown();
 		return true;
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (mIsActive) {
+			event.setDamage(0);
+			event.setCancelled(true);
+		}
 	}
 }

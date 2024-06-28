@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PotionManager {
 	//  Player ID / Player Potion Info
-	private HashMap<UUID, PlayerPotionInfo> mPlayerPotions = new HashMap<UUID, PlayerPotionInfo>();
+	private final HashMap<UUID, PlayerPotionInfo> mPlayerPotions = new HashMap<UUID, PlayerPotionInfo>();
 
 	public enum PotionID {
 		APPLIED_POTION(0, "APPLIED_POTION"),

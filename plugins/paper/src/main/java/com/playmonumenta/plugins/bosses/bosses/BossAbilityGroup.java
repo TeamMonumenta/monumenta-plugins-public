@@ -197,8 +197,9 @@ public abstract class BossAbilityGroup {
 
 	private void handleMissingBoss() {
 		MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. It has been removed and untracked via the fallback system.");
-		BossManager.getInstance().stopTrackingBoss(mBoss);
-		mBoss.remove();
+		BossManager.getInstance().unload(mBoss, true);
+		// usb: this is triggering when it shouldn't, don't remove bosses if they might be persistant
+		// mBoss.remove();
 	}
 
 	public void forceCastRandomSpell() {

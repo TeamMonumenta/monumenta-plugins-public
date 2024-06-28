@@ -58,7 +58,7 @@ public class SpellShieldSwitch extends Spell {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (damager instanceof Projectile proj) {
+		if (damager instanceof Projectile) {
 			ItemStack curItem = mLauncher.getEquipment().getItemInMainHand();
 
 			if (curItem != null && curItem.getType().equals(Material.SHIELD)) {

@@ -9,7 +9,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
@@ -21,16 +23,21 @@ public class Riftborn {
 
 	public static final String DESCRIPTION = "Spawners have a chance of generating portals.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"There is a 7.5% chance to spawn",
-			"a void gate near a spawner, which",
-			"summons rift enemies and protects",
-			"the spawner from destruction."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("There is a 7.5% chance to spawn"),
+			Component.text("a void gate near a spawner, which"),
+			Component.text("summons rift enemies and protects"),
+			Component.text("the spawner from destruction.")
 		};
 	}
 
 	public static void spawnGate(Block block) {
+		// Prevent gates from being created near spawners placed on bedrock.
+		if (block.getRelative(0, -1, 0).getType() == Material.BEDROCK) {
+			return;
+		}
+
 		List<Location> validSpawnLocs = new ArrayList<>();
 		for (int i = -1; i < 2; i++) {
 			for (int j = -1; j < 2; j++) {

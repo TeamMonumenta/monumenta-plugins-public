@@ -98,6 +98,7 @@ public class Effect {
 				.register();
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void registerPostSecondsArguments(Plugin plugin, List<Argument<?>> arguments, CommandPermission perms) {
 		arguments.add(new IntegerArgument("amplifier", 0));
 		new CommandAPICommand(COMMAND)

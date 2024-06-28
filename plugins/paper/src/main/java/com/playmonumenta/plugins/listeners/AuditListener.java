@@ -121,8 +121,7 @@ public class AuditListener implements Listener {
 	public void death(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
-		// TODO Update MessageUtils.plain() to accept a language file to translate with
-		logDeath("<" + player.getWorld().getName() + ">" + " Death: " + player.getName() + " " + event.getDeathMessage());
+		logDeath("<" + player.getWorld().getName() + ">" + " Death: " + player.getName() + " " + MessagingUtils.plainText(event.deathMessage()));
 
 		checkDestroy(player);
 	}
@@ -143,7 +142,6 @@ public class AuditListener implements Listener {
 	public void creative(InventoryCreativeEvent event) {
 		HumanEntity player = event.getWhoClicked();
 
-		event.getCursor();
 		if (!event.getCursor().getType().equals(Material.AIR)) {
 			ItemStack lastItem = mLastCreativeDestroy.get(player);
 			ItemStack newItem = event.getCursor();
@@ -278,6 +276,13 @@ public class AuditListener implements Listener {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);
 			MonumentaNetworkRelayIntegration.sendModAuditLogMessage(createLocationData() + " " + message);
+		}
+	}
+
+	public static void logMarket(String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendMarketAuditLogMessage(createLocationData() + " " + message);
 		}
 	}
 

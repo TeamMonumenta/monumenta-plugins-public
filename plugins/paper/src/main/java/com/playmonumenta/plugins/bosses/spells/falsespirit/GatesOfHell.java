@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -12,20 +13,18 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class GatesOfHell extends Spell {
 
 	//All armor stands at gates which have the gates of hell tag
 	//These armor stands also have an additional tag that corresponds with the direction it faces "N" "E" "S" or "W"
-	private List<LivingEntity> mPortals;
+	private final List<LivingEntity> mPortals;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 
-	private List<LivingEntity> mOpenPortals = new ArrayList<>();
+	private final List<LivingEntity> mOpenPortals = new ArrayList<>();
 
 	//Which portal number in succession (1-6)
 	int mNum;
@@ -72,12 +71,12 @@ public class GatesOfHell extends Spell {
 						portalEntity.remove();
 					}
 					mOpenPortals.remove(portal);
-					mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 					this.cancel();
 				}
 
-				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 30, 4));
-
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+					new PercentDamageReceived(30, -1.0));
 			}
 		};
 

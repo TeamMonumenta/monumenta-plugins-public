@@ -229,13 +229,13 @@ public class SpellBullet extends Spell {
 							}
 						} else if (mPattern == Pattern.NUE && (correctedTicks / 60) % 2 == 0) {
 							int even = ((correctedTicks / mEmissionSpeed) % 2 == 1) ? 1 : -1;
-							double angleOffset = (correctedTicks / 60) / 8.0 * Math.PI;
+							double angleOffset = (correctedTicks / 60.0) / 8.0 * Math.PI;
 							for (int i = 0; i < 4; i++) {
 								launchParametrizedBullet(nueRunnable(hittablePlayers, new Vector(1, 0, 0).rotateAroundY(mRandomAngle + angleOffset + i * Math.PI / 2.0), even, correctedTicks, false));
 							}
 						} else if (mPattern == Pattern.HARD_NUE && (correctedTicks / 60) % 2 == 0) {
 							int even = ((correctedTicks / mEmissionSpeed) % 2 == 1) ? 1 : -1;
-							double angleOffset = (correctedTicks / 60) / 16.0 * Math.PI;
+							double angleOffset = (correctedTicks / 60.0) / 16.0 * Math.PI;
 							for (int i = 0; i < 8; i++) {
 								launchParametrizedBullet(nueRunnable(hittablePlayers, new Vector(1, 0, 0).rotateAroundY(mRandomAngle + angleOffset + i * Math.PI / 4.0), even, correctedTicks, true));
 							}

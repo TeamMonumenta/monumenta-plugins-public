@@ -3,10 +3,13 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -19,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -386,6 +390,60 @@ public class BossUtils {
 	public static void hideBossBar(BossBar bar, World world) {
 		for (Player player : world.getPlayers()) {
 			player.hideBossBar(bar);
+		}
+	}
+
+	public static void endBossFightEffects(List<Player> players) {
+		endBossFightEffects(null, players, 10 * 20, false, false);
+	}
+
+	public static void endBossFightEffects(@Nullable LivingEntity boss, List<Player> players) {
+		endBossFightEffects(boss, players, 10 * 20, false, false);
+	}
+
+	public static void endBossFightEffects(@Nullable LivingEntity boss, List<Player> players, int winEffectDuration) {
+		endBossFightEffects(boss, players, winEffectDuration, false, false);
+	}
+
+	/**
+	 * Handles generic end of boss fight tasks for stateful bosses.
+	 * This should only be called by the overridden death method for each boss that uses it.
+	 * @param boss Boss to apply effects to. Defaults to null
+	 * @param players List of Players to apply effects to
+	 * @param winEffectDuration Duration of win effects to apply to players in ticks. Defaults to 10 seconds
+	 * @param keepBossAlive If true, make boss invulnerable, remove its AI, remove gravity, etc. Defaults to false
+	 * @param removeGlowing If true, remove glowing effect from boss. Defaults to false
+	 */
+	public static void endBossFightEffects(@Nullable LivingEntity boss, List<Player> players, int winEffectDuration, boolean keepBossAlive, boolean removeGlowing) {
+		final String BOSS_WIN_RESISTANCE = "BossWinResistance";
+		final String BOSS_WIN_REGENERATION = "BossWinRegeneration";
+		final int REGENERATION_INTERVAL = 12;
+
+		if (boss != null) {
+			if (keepBossAlive) {
+				boss.setHealth(1);
+				boss.setInvulnerable(true);
+				boss.setAI(false);
+				boss.setGravity(false);
+				boss.setPersistent(true);
+				boss.setSilent(true);
+				Plugin.getInstance().mEffectManager.clearEffects(boss, PercentDamageReceived.GENERIC_NAME);
+				Plugin.getInstance().mEffectManager.addEffect(boss, PercentDamageReceived.GENERIC_NAME,
+					new PercentDamageReceived(20 * 60, -1.0));
+			}
+
+			if (removeGlowing) {
+				boss.removePotionEffect(PotionEffectType.GLOWING);
+				boss.setGlowing(false);
+			}
+		}
+
+		for (Player player : players) {
+			Plugin.getInstance().mEffectManager.addEffect(player, BOSS_WIN_RESISTANCE,
+				new PercentDamageReceived(winEffectDuration, -1.0));
+			Plugin.getInstance().mEffectManager.addEffect(player, BOSS_WIN_REGENERATION,
+				new CustomRegeneration(winEffectDuration, 1, REGENERATION_INTERVAL, null, Plugin.getInstance()));
+			SongManager.stopSong(player, true);
 		}
 	}
 }

@@ -383,7 +383,7 @@ public class BossTagCommand {
 			}
 
 
-			Boolean found = false;
+			boolean found = false;
 			Map<String, String> oldParams = new HashMap<>();
 			Map<String, String> newParams = new HashMap<>();
 
@@ -494,8 +494,8 @@ public class BossTagCommand {
 
 		if (nbtTagsList != null && nbtTagsList.size() > 0) {
 			for (Object tag : nbtTagsList.getAsArray()) {
-				if (statelessBoss.contains(tag)) {
-					bossTags.add((String) tag);
+				if (tag instanceof String stringTag && statelessBoss.contains(stringTag)) {
+					bossTags.add(stringTag);
 				}
 			}
 		}
@@ -587,7 +587,7 @@ public class BossTagCommand {
 		}
 	}
 
-	private static void searchTag(Player player, String bossTag) throws WrapperCommandSyntaxException {
+	private static void searchTag(Player player, String bossTag) {
 		int indexBracket = bossTag.indexOf("[");
 		String realBossTag = bossTag;
 		Map<String, String> param = new LinkedHashMap<>();
@@ -600,7 +600,7 @@ public class BossTagCommand {
 		List<Soul> soulsList = new ArrayList<>();
 		Set<String> soulsName = LibraryOfSoulsAPI.getSoulNames();
 
-		Boolean shouldAdd = false;
+		boolean shouldAdd;
 
 		if (indexBracket == -1) {
 			player.sendMessage(Component.empty()
@@ -617,13 +617,11 @@ public class BossTagCommand {
 		for (String soulName : soulsName) {
 			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
 			NBTTagList nbtTagsList = soul.getNBT().getList("Tags");
-			shouldAdd = false;
-
 
 			if (nbtTagsList != null && nbtTagsList.getAsArray() != null) {
 				for (Object tag : nbtTagsList.getAsArray()) {
 
-					if (((String) tag).contains(realBossTag)) {
+					if (tag instanceof String stringTag && stringTag.contains(realBossTag)) {
 						shouldAdd = true;
 
 						if (!param.isEmpty()) {
@@ -632,8 +630,8 @@ public class BossTagCommand {
 
 							//load a map with the params that the soul has
 							for (Object tagSecond : nbtTagsList.getAsArray()) {
-								if (((String) tagSecond).startsWith(realBossTag + "[")) {
-									BossUtils.addModifiersFromString(currentParam, ((String) tagSecond).replace(realBossTag, ""));
+								if (tagSecond instanceof String stringTagSecond && stringTagSecond.startsWith(realBossTag + "[")) {
+									BossUtils.addModifiersFromString(currentParam, stringTagSecond.replace(realBossTag, ""));
 								}
 							}
 
@@ -1068,7 +1066,7 @@ public class BossTagCommand {
 
 	}
 
-	public static void checkAllLos(Player player, boolean spawnChest) throws WrapperCommandSyntaxException {
+	public static void checkAllLos(Player player, boolean spawnChest) {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))

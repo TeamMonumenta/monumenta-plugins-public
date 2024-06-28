@@ -110,7 +110,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 
 							int playerCount = players.size();
 							for (int j = 1; j <= playerCount; j++) {
-								mN = mN + (45 / j);
+								mN = mN + (45.0 / j);
 							}
 							mPlayerScalingHP = mN;
 

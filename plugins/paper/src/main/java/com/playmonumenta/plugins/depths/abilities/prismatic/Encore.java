@@ -111,7 +111,6 @@ public class Encore extends DepthsAbility {
 		return true;
 	}
 
-	@SuppressWarnings("unused")
 	private <T extends DepthsAbility> void abilityCastEventInner(DepthsAbility a, DepthsAbilityInfo<T> info, ClassAbility spell) {
 		Class<T> clazz = info.getAbilityClass();
 		if (a.getClass() != clazz) {

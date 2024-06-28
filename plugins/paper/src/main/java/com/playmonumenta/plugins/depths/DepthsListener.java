@@ -21,7 +21,9 @@ import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -32,7 +34,9 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.io.File;
@@ -47,6 +51,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -210,12 +215,13 @@ public class DepthsListener implements Listener {
 
 			// Extra damage taken at higher floors
 			int floor = party.getFloor();
+			int scalingFactor = (floor - 1) / 3;
 			if (floor > 15) {
-				double multiplier = 1 + (0.1 * (((floor - 1) / 3) - 4));
+				double multiplier = 1 + (0.1 * (scalingFactor - 4));
 			    event.setDamage(event.getDamage() * multiplier);
 			}
 			if (source != null && EntityUtils.isBoss(source) && floor > 3) {
-				double multiplier = 1 + (0.05 * ((floor - 1) / 3));
+				double multiplier = 1 + (0.05 * scalingFactor);
 			    event.setDamage(event.getDamage() * multiplier);
 			}
 		}
@@ -319,44 +325,44 @@ public class DepthsListener implements Listener {
 						MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED),
 							Component.text("Please wait to be revived!", NamedTextColor.RED));
 
-						ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class);
-						grave.setInvulnerable(true);
-						//grave.setDisabledSlots(EquipmentSlot.values());
-						grave.setCollidable(false);
-						grave.setBasePlate(false);
-						grave.customName(Component.text(player.getName() + "'s Grave", NamedTextColor.RED));
-						grave.setCustomNameVisible(true);
-						grave.setGlowing(true);
-						grave.setArms(true);
-						grave.setGravity(true);
-						ScoreboardUtils.addEntityToTeam(grave, "GraveGreen", NamedTextColor.GREEN);
-						grave.addDisabledSlots(EquipmentSlot.values());
-						grave.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.CHEST, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.LEGS, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.FEET, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addEquipmentLock(EquipmentSlot.OFF_HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
-						grave.addScoreboardTag(GRAVE_TAG);
+						ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class, g -> {
+							g.setInvulnerable(true);
+							// TODO: setDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
+							g.setDisabledSlots(EquipmentSlot.values());
+							g.setCollidable(false);
+							g.setBasePlate(false);
+							g.customName(Component.text(player.getName() + "'s Grave", NamedTextColor.RED));
+							g.setCustomNameVisible(true);
+							g.setGlowing(true);
+							g.setArms(true);
+							g.setGravity(true);
+							ScoreboardUtils.addEntityToTeam(g, "GraveGreen", NamedTextColor.GREEN);
+							g.addScoreboardTag(GRAVE_TAG);
+							g.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
 
-						VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
-						for (EquipmentSlot slot : EquipmentSlot.values()) {
-							ItemStack item;
-							if (slot != EquipmentSlot.HEAD) {
-								item = ItemUtils.clone(player.getEquipment().getItem(slot));
-								if (ItemUtils.isNullOrAir(item)) {
-									continue;
+							// TODO: steal this code to be used in other graves or standardize graves across content - usb
+							VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
+							for (EquipmentSlot slot : EquipmentSlot.values()) {
+								ItemStack item;
+								if (slot != EquipmentSlot.HEAD) {
+									item = ItemUtils.clone(player.getInventory().getItem(slot).clone());
+									if (ItemUtils.isNullOrAir(item)) {
+										continue;
+									}
+									VanityManager.applyVanity(item, vanityData, slot, false);
+									// usb: remove stats from item before adding to armorstand in case of dupe
+									// this should happen after applying vanity
+									ItemUpdateHelper.removeStats(item);
+								} else {
+									item = new ItemStack(Material.PLAYER_HEAD);
+									if (item.getItemMeta() instanceof SkullMeta skullMeta) {
+										skullMeta.setOwningPlayer(player);
+										item.setItemMeta(skullMeta);
+									}
 								}
-								VanityManager.applyVanity(item, vanityData, slot, false);
-							} else {
-								item = new ItemStack(Material.PLAYER_HEAD);
-								if (item.getItemMeta() instanceof SkullMeta skullMeta) {
-									skullMeta.setOwningPlayer(player);
-									item.setItemMeta(skullMeta);
-								}
+								g.setItem(slot, item);
 							}
-							grave.setItem(slot, item);
-						}
+						});
 
 						BossBar graveBar = BossBar.bossBar(Component.text(player.getName() + "'s Grave", NamedTextColor.RED),
 							1, BossBar.Color.RED, BossBar.Overlay.PROGRESS, Set.of());
@@ -526,6 +532,8 @@ public class DepthsListener implements Listener {
 			rebirth.rerollAbilities(dp);
 			rebirth.applyResistance();
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(teleportTo));
+			dp.mDead = false;
+			dp.mCurrentlyReviving = false;
 			dp.mNumDeaths--;
 			dp.sendMessage("You have been reborn!");
 			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
@@ -570,16 +578,18 @@ public class DepthsListener implements Listener {
 
 			MMLog.finer("Player " + player.getName() +
 				" nearZenithBoss=" + nearZenithBoss +
-				" nearHostileMob=" + (EntityUtils.getNearestHostile(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null)
+				" nearHostileMob=" + (EntityUtils.getNearestHostileTargetable(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS) != null)
 			);
 
 			if (nearZenithBoss) {
 				player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_BOSS_TAG);
+				MMLog.info(player.getName() + " logged out near boss and will have their death counter increased.");
 			} else {
 				List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(player.getLocation(), DISCONNECT_ANTICHEESE_RADIUS);
 				nearbyMobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 				if (!nearbyMobs.isEmpty()) {
 					player.getScoreboardTags().add(DISCONNECT_ANTICHEESE_MOB_TAG);
+					MMLog.info(player.getName() + " logged out near mobs and will have their death counter increased. Number of mobs: " + nearbyMobs.size());
 				}
 			}
 		}
@@ -708,6 +718,7 @@ public class DepthsListener implements Listener {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
 					shouldOfflineTeleport = false;
+					MMLog.info(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 					AuditListener.logDeath(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 				}
 			}
@@ -719,5 +730,13 @@ public class DepthsListener implements Listener {
 		// Make sure to remove anticheese tags
 		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_MOB_TAG);
 		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_BOSS_TAG);
+
+		if (dp == null
+			&& player.getGameMode() == GameMode.SURVIVAL
+			&& !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.LOOTROOM)
+			&& manager.getParty(player.getWorld()) != null
+			&& Plugin.IS_PLAY_SERVER) {
+			PlayerUtils.executeCommandOnPlayer(player, "function monumenta:lobbies/abandon_instance");
+		}
 	}
 }

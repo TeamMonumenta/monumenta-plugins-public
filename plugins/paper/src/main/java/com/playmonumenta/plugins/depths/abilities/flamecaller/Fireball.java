@@ -180,6 +180,7 @@ public class Fireball extends DepthsAbility {
 
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, true);
+			EntityUtils.applyFire(mPlugin, mFireDuration, mob, mPlayer);
 		}
 	}
 
@@ -191,9 +192,7 @@ public class Fireball extends DepthsAbility {
 			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
 			.add(" seconds in a ")
 			.add(a -> a.mRadius, RADIUS)
-			.add(" radius.")
+			.add(" block radius.")
 			.addCooldown(COOLDOWN);
-
-
 	}
 }

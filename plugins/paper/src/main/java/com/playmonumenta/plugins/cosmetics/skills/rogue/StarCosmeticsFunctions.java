@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.util.Vector;
 
 public class StarCosmeticsFunctions {
@@ -23,7 +24,7 @@ public class StarCosmeticsFunctions {
 		return starPoints;
 	}
 
-	public static ArrayList<Vector> interpolatePolygon(Vector[] polygonVertices, int interpolationCount) {
+	public static List<Vector> interpolatePolygon(Vector[] polygonVertices, int interpolationCount) {
 		ArrayList<Vector> starFull = new ArrayList<>();
 		float step = 1.0f / (float) (interpolationCount + 1);
 		for (int starPointIterator = 0; starPointIterator < polygonVertices.length; starPointIterator++) {

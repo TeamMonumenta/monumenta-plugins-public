@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -243,6 +244,6 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 
 	public void markPos(Location loc) {
 		Location tempLoc = new Location(loc.getWorld(), loc.getX() + 0.5, loc.getY() + 0.5, loc.getZ() + 0.5);
-		loc.getWorld().spawnParticle(Particle.BLOCK_MARKER, tempLoc, 1, Material.BARRIER.createBlockData());
+		new PartialParticle(Particle.BLOCK_MARKER, tempLoc, 1, Material.BARRIER.createBlockData()).spawnFull();
 	}
 }

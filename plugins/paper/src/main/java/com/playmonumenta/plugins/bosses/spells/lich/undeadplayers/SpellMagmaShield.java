@@ -27,13 +27,12 @@ Undead Mage - Casts Magma shield every 10 second(s) dealing 30 damage in
 a cone in front of it and setting players on fire for 5 seconds.
  */
 public class SpellMagmaShield extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PartialParticle mFlame1;
-	private PartialParticle mFlame2;
-	private PartialParticle mLava;
-	private PartialParticle mSmoke;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PartialParticle mFlame1;
+	private final PartialParticle mFlame2;
+	private final PartialParticle mLava;
+	private final PartialParticle mSmoke;
 
 	public SpellMagmaShield(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;

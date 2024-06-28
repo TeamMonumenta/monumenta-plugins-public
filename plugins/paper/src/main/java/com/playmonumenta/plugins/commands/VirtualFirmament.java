@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class VirtualFirmament {
@@ -16,7 +17,7 @@ public class VirtualFirmament {
 			.withAliases("vf")
 			.executesPlayer((player, args) -> {
 				boolean enabled = ScoreboardUtils.toggleTag(player, TAG);
-				player.sendMessage(ChatColor.GOLD + "Virtual Firmament " + (enabled ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
+				player.sendMessage(Component.text("Virtual Firmament ", NamedTextColor.GOLD).append(enabled ? Component.text("enabled", NamedTextColor.GREEN) : Component.text("disabled", NamedTextColor.RED)));
 				player.updateInventory();
 			})
 			.register();

@@ -38,7 +38,7 @@ public class Flamestrike extends DepthsAbility {
 	public static final double[] DAMAGE = {14, 17, 20, 23, 26, 32};
 	public static final int HEIGHT = 6;
 	public static final int RADIUS = 7;
-	public static final int ANGLE = 70;
+	public static final int HALF_ANGLE = 70;
 	public static final int FIRE_TICKS = 4 * 20;
 	public static final float KNOCKBACK = 0.5f;
 
@@ -56,6 +56,7 @@ public class Flamestrike extends DepthsAbility {
 	private final double mRadius;
 	private final int mFireDuration;
 	private final double mKnockback;
+	private final double mHalfAngle;
 
 	public Flamestrike(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -63,6 +64,7 @@ public class Flamestrike extends DepthsAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.FLAMESTRIKE_RANGE.mEffectName, RADIUS);
 		mFireDuration = CharmManager.getDuration(mPlayer, CharmEffects.FLAMESTRIKE_FIRE_DURATION.mEffectName, FIRE_TICKS);
 		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FLAMESTRIKE_KNOCKBACK.mEffectName, KNOCKBACK);
+		mHalfAngle = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FLAMESTRIKE_CONE_ANGLE.mEffectName, HALF_ANGLE);
 	}
 
 	public boolean cast() {
@@ -73,9 +75,7 @@ public class Flamestrike extends DepthsAbility {
 
 		Hitbox hitbox = Hitbox.approximateCylinderSegment(
 			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0),
-			2 * HEIGHT, mRadius, Math.toRadians(
-				CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.FLAMESTRIKE_CONE_ANGLE.mEffectName, ANGLE)
-			));
+			2 * HEIGHT, mRadius, Math.toRadians(mHalfAngle));
 
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			EntityUtils.applyFire(mPlugin, mFireDuration, mob, mPlayer);
@@ -96,9 +96,9 @@ public class Flamestrike extends DepthsAbility {
 				}
 				Vector vec;
 				mTempRadius += 1.25;
-				for (double degree = 30; degree <= 150; degree += 10) {
+				for (double degree = -mHalfAngle; degree <= mHalfAngle; degree += 10) {
 					double radian1 = Math.toRadians(degree);
-					vec = new Vector(FastUtils.cos(radian1) * mTempRadius, 0.125, FastUtils.sin(radian1) * mTempRadius);
+					vec = new Vector(FastUtils.sin(radian1) * mTempRadius, 0.125, FastUtils.cos(radian1) * mTempRadius);
 					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 

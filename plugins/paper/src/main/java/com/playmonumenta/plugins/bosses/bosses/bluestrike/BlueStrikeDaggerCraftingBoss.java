@@ -13,6 +13,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -23,7 +24,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
@@ -57,9 +57,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			.register();
 	}
 
-	private final Location mSpawnLoc;
 	public static String identityTag = "boss_bluestrikedaggercraft";
-	public static @Nullable BukkitTask mRunnable;
 	public List<Spell> mOnlinePassives;
 	public List<Spell> mOfflinePassives = new ArrayList<>();
 	private final Samwell mSamwellAbility;
@@ -84,7 +82,6 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 
 	BlueStrikeDaggerCraftingBoss(Plugin plugin, LivingEntity boss, Samwell samwell) {
 		super(plugin, identityTag, boss);
-		mSpawnLoc = mBoss.getLocation();
 		boss.getScoreboardTags().add(NPC_TAG);
 
 		mSamwellAbility = samwell;
@@ -92,7 +89,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		Location daggerLoc = mSamwellAbility.mDaggerLoc;
 
 		mOnlinePassives = List.of(
-				new SpellCraftDaggerAnimation(mBoss, daggerLoc)
+			new SpellCraftDaggerAnimation(mBoss, daggerLoc)
 		);
 
 		super.constructBoss(mSpellManager, mOfflinePassives, 100, null);
@@ -102,77 +99,39 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 	// Due to ScriptedQuests auto-cancelling the damageEvent, we need to use ScriptedQuests
 	// interactables / quests to call this function (via a command). Fun!
 	public void onInteract(Player player) {
-		String npcName = mBoss.getName();
-
 		if (mSamwellAbility.mDefeated) {
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "Quick, grab the wool. Let’s get out of here...");
-				}
-				case "levyn" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "He be DEAD!! Go get us tha wool! The traitor be DEAD!");
-				}
-				case "izzy" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "Hurry, go grab the wool. I don’t want to be here anymore.");
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(player,
+				"Quick, grab the wool. Let’s get out of here...",
+				"He be DEAD!! Go get us tha wool! The traitor be DEAD!",
+				"Hurry, go grab the wool. I don’t want to be here anymore."
+			);
 			return;
 		}
 
 		if (mSamwellAbility.mCraftPhase) {
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "I’ve started crafting the dagger. Keep them off me!");
-				}
-				case "levyn" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "I’m puttin’ yer dagger togetha! Keep me safe, cap’n!");
-				}
-				case "izzy" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "I’ve started putting together the dagger. Keep me safe!");
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(player,
+				"I’ve started crafting the dagger. Keep them off me!",
+				"I’m puttin’ yer dagger togetha! Keep me safe, cap’n!",
+				"I’ve started putting together the dagger. Keep me safe!"
+			);
 			return;
 		}
 
 		if (mSamwellAbility.mPhase >= 4) {
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "He’s vulnerable now, don’t worry about the stupid daggers!");
-				}
-				case "levyn" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "It be no time fer another dagger! Go finish ‘im!");
-				}
-				case "izzy" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "Just focus on Samwell so we can get the wool!");
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(player,
+				"He’s vulnerable now, don’t worry about the stupid daggers!",
+				"It be no time fer another dagger! Go finish ‘im!",
+				"Just focus on Samwell so we can get the wool!"
+			);
 			return;
 		}
 
 		if (mSamwellAbility.mDaggerPhase) {
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "It's done! Collect the dagger and let's take this monster down.");
-				}
-				case "levyn" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "Ahoy cap'n, the dagger be done! Get Samwell, quick!");
-				}
-				case "izzy" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "It's done, Captain! Get the dagger and stab the traitor!");
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(player,
+				"It's done! Collect the dagger and let's take this monster down.",
+				"Ahoy cap'n, the dagger be done! Get Samwell, quick!",
+				"It's done, Captain! Get the dagger and stab the traitor!"
+			);
 			return;
 		}
 
@@ -194,56 +153,30 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		}
 
 		if (shards == mSamwellAbility.getShards()) {
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "If you want me to do anything, I need you to grab some Blackblood Shards.");
-				}
-				case "levyn" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "Yarr, get ye some of them shards and I can try an' help!");
-				}
-				case "izzy" -> {
-					MessagingUtils.sendNPCMessage(player, npcName, "If you can get ahold of some Blackblood Shards, I might be able to help!");
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(player,
+				"If you want me to do anything, I need you to grab some Blackblood Shards.",
+				"Yarr, get ye some of them shards and I can try an' help!",
+				"If you can get ahold of some Blackblood Shards, I might be able to help!"
+			);
 			return;
 		}
 
 		if (mSamwellAbility.getShards() >= mSamwellAbility.mShardsReq) {
 			// Begin Crafting
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "That's enough. We'll start conjuring the dagger!"));
-				}
-				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Yarr, that be enough! Dagger ahoy!"));
-				}
-				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "That should do it. We'll start weaving the dagger together now."));
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(player,
+				"That's enough. We'll start conjuring the dagger!",
+				"Yarr, that be enough! Dagger ahoy!",
+				"That should do it. We'll start weaving the dagger together now."
+			);
 			mIsCrafter = true;
 			mSamwellAbility.startCraftPhase();
 		} else {
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Thank you. We'll need " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more to put together the dagger."));
-				}
-				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Gonna need ye to get " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more cap'n! Then it'll be dagger ahoy!"));
-				}
-				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "If you can grab " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more, we should be able to get the dagger together. Thanks!"));
-				}
-				default -> {
-
-				}
-			}
+			int remainingShards = mSamwellAbility.mShardsReq - mSamwellAbility.getShards();
+			sendMessage(null,
+				"Thank you. We'll need " + remainingShards + " more to put together the dagger.",
+				"Gonna need ye to get " + remainingShards + " more cap'n! Then it'll be dagger ahoy!",
+				"If you can grab " + remainingShards + " more, we should be able to get the dagger together. Thanks!"
+			);
 		}
 	}
 
@@ -254,44 +187,24 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 	public void complete() {
 		changePhase(mSpellManager, mOfflinePassives, null);
 		if (mIsCrafter) {
-			String npcName = mBoss.getName();
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "It's done! Collect the dagger and let's take this monster down."));
-				}
-				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Ahoy cap'n, the dagger be done! Get Samwell, quick!"));
-				}
-				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "It's done, Captain! Get the dagger and stab the traitor!"));
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(null,
+				"It's done! Collect the dagger and let's take this monster down.",
+				"Ahoy cap'n, the dagger be done! Get Samwell, quick!",
+				"It's done, Captain! Get the dagger and stab the traitor!"
+			);
 
 			mIsCrafter = false;
 		}
 	}
 
 	public void takeDamage() {
-		String npcName = mBoss.getName();
 		if (mSamwellAbility.getFails() < 2) {
 			mSamwellAbility.addFail();
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Help! The Masked are on me! I can't focus!"));
-				}
-				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Yarr, help me! Can't be craftin' if them fools are on me!"));
-				}
-				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Quick! Help! I'm under attack!"));
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(null,
+				"Help! The Masked are on me! I can't focus!",
+				"Yarr, help me! Can't be craftin' if them fools are on me!",
+				"Quick! Help! I'm under attack!"
+			);
 
 			// KB all nearby melee targets for a bit of a "buffer", if players are losing badly.
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), 5);
@@ -302,21 +215,29 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			}
 		} else {
 			// 3 Fails = Restart!
-			switch (npcName.toLowerCase(Locale.getDefault())) {
-				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "There was too many of them... We'll need new shards - the Masked ruined it..."));
-				}
-				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "My spleen! I can't keep craftin' like this, cap'n! Gimme some new sharrrrds!"));
-				}
-				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "I'm sorry Captain, we'll need more shards. The Masked broke what we've made."));
-				}
-				default -> {
-
-				}
-			}
+			sendMessage(null,
+				"There was too many of them... We'll need new shards - the Masked ruined it...",
+				"My spleen! I can't keep craftin' like this, cap'n! Gimme some new sharrrrds!",
+				"I'm sorry Captain, we'll need more shards. The Masked broke what we've made."
+			);
 			failure();
+		}
+	}
+
+	// Set player to null to send to all players in the arena
+	private void sendMessage(@Nullable Player player, String bhairavi, String levyn, String izzy) {
+		String npcName = mBoss.getName();
+		String msg = switch (npcName.toLowerCase(Locale.getDefault())) {
+			case "bhairavi" -> bhairavi;
+			case "levyn" -> levyn;
+			case "izzy" -> izzy;
+			default -> null;
+		};
+		if (msg != null) {
+			Collection<Player> players = player == null ? mSamwellAbility.getPlayers() : List.of(player);
+			for (Player p : players) {
+				MessagingUtils.sendNPCMessage(p, npcName, msg);
+			}
 		}
 	}
 

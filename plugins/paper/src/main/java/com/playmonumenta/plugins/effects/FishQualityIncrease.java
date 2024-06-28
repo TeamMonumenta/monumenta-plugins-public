@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ public class FishQualityIncrease extends SingleArgumentEffect {
 
 	public FishQualityIncrease(int duration, double amount) {
 		super(duration, amount, effectID);
+		displays(ServerProperties.getShardName().contains("ring"));
 	}
 
 	@Override

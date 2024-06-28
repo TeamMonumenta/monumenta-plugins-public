@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells.callicarpa;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsParty;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -26,17 +27,16 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class LeafNova extends Spell {
-
-	public static final int DURATION = 4 * 20;
-	public static final int DURATION_A15_DECREASE = 20;
-	public static final int COOLDOWN = 10 * 20;
-	public static final int MAX_RANGE = 10;
-	public static final Particle.DustOptions LEAF_COLOR = new Particle.DustOptions(Color.fromRGB(14, 123, 8), 1.0f);
-	public static final Particle.DustOptions PROJ_COLOR = new Particle.DustOptions(Color.fromRGB(79, 59, 18), 1.0f);
-	public static final int RADIUS = 5;
-	public static final int NOVA_DAMAGE = 50;
-	public static final int PROJECTILE_DAMAGE = 25;
-	public static final Sound CHARGE_SOUND = Sound.BLOCK_BAMBOO_BREAK;
+	private static final int DURATION = 4 * 20;
+	private static final int DURATION_A15_DECREASE = 20;
+	private static final int COOLDOWN = 10 * 20;
+	private static final int MAX_RANGE = 10;
+	private static final Particle.DustOptions LEAF_COLOR = new Particle.DustOptions(Color.fromRGB(14, 123, 8), 1.0f);
+	private static final Particle.DustOptions PROJ_COLOR = new Particle.DustOptions(Color.fromRGB(79, 59, 18), 1.0f);
+	private static final int RADIUS = 5;
+	private static final int NOVA_DAMAGE = 50;
+	private static final int PROJECTILE_DAMAGE = 25;
+	private static final Sound CHARGE_SOUND = Sound.BLOCK_BAMBOO_BREAK;
 
 	private final LivingEntity mBoss;
 	private final int mFinalCooldown;
@@ -55,10 +55,11 @@ public class LeafNova extends Spell {
 			return;
 		}
 
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mFinalDuration, 20));
+		Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+			new BaseMovementSpeedModifyEffect(mFinalDuration, -1.0));
+
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
-			Location mOldLoc = mBoss.getLocation();
 			double mCurrentRadius = RADIUS;
 
 			@Override
@@ -117,7 +118,6 @@ public class LeafNova extends Spell {
 					this.cancel();
 				}
 				mTicks += 1;
-				mOldLoc = mBoss.getLocation();
 			}
 		};
 		runnable.runTaskTimer(Plugin.getInstance(), 0, 1);

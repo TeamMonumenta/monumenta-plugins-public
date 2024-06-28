@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.delves.abilities;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -10,9 +11,9 @@ public class Fragile {
 
 	public static final String DESCRIPTION = "Deaths cause extra shatter.";
 
-	public static String[] rankDescription(int level) {
-		return new String[]{
-			"Upon death, players get +1 extra level of shatter."
+	public static Component[] rankDescription(int level) {
+		return new Component[]{
+			Component.text("Upon death, players get +1 extra level of shatter.")
 		};
 	}
 

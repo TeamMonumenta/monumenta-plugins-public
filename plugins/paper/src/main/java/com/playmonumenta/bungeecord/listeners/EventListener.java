@@ -5,9 +5,10 @@ import de.myzelyam.api.vanish.BungeeVanishAPI;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -42,14 +43,13 @@ public class EventListener implements Listener {
 		if (!isVanished) {
 			/* No vanish - send everyone the login message */
 
-			BaseComponent[] msg = new ComponentBuilder(player.getName())
-				.color(ChatColor.AQUA)
-				.append(operation)
-				.color(ChatColor.YELLOW)
-				.create();
+			TextComponent msg = Component.text()
+				.append(Component.text(player.getName(), NamedTextColor.AQUA))
+				.append(Component.text(operation, NamedTextColor.YELLOW))
+				.build();
 
 			for (ProxiedPlayer p : mMain.getProxy().getPlayers()) {
-				p.sendMessage(msg);
+				p.sendMessage(BungeeComponentSerializer.get().serialize(msg));
 			}
 
 		} else {
@@ -65,13 +65,11 @@ public class EventListener implements Listener {
 				}
 			}
 
-			BaseComponent[] msg = new ComponentBuilder(player.getName())
-				.color(ChatColor.AQUA)
-				.append(operation)
-				.color(ChatColor.YELLOW)
-				.append(" vanished")
-				.color(ChatColor.RED)
-				.create();
+			TextComponent msg = Component.text()
+				.append(Component.text(player.getName(), NamedTextColor.AQUA))
+				.append(Component.text(operation, NamedTextColor.YELLOW))
+				.append(Component.text(" vanished", NamedTextColor.RED))
+				.build();
 
 			for (ProxiedPlayer p : mMain.getProxy().getPlayers()) {
 				int seeLevel = -1;
@@ -82,7 +80,7 @@ public class EventListener implements Listener {
 					}
 				}
 				if (seeLevel >= useLevel) {
-					p.sendMessage(msg);
+					p.sendMessage(BungeeComponentSerializer.get().serialize(msg));
 				}
 			}
 		}

@@ -41,7 +41,7 @@ import org.bukkit.util.Vector;
 public class GuardingBolt extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Guarding Bolt";
-	public static final int COOLDOWN = 24 * 20;
+	public static final int COOLDOWN = 20 * 20;
 	private static final int RADIUS = 4;
 	private static final int RANGE = 25;
 	private static final int[] DAMAGE = {15, 18, 21, 24, 27, 35};
@@ -82,6 +82,15 @@ public class GuardingBolt extends DepthsAbility {
 		World world = startLoc.getWorld();
 		RayTraceResult result = world.rayTraceEntities(startLoc, dir, mRange, 0.5,
 			e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e) || Metalmancy.isMetalmancy(e));
+		// if no one was found, try again 2 more times with increasing ray size until someone is found
+		if (result == null) {
+			result = world.rayTraceEntities(startLoc, dir, mRange, 0.75,
+				e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e) || Metalmancy.isMetalmancy(e));
+		}
+		if (result == null) {
+			result = world.rayTraceEntities(startLoc, dir, mRange, 1.00,
+				e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e) || Metalmancy.isMetalmancy(e));
+		}
 
 		if (result != null && result.getHitEntity() instanceof LivingEntity target) {
 			if (ZoneUtils.hasZoneProperty(target, ZoneUtils.ZoneProperty.LOOTROOM)) {
@@ -120,6 +129,12 @@ public class GuardingBolt extends DepthsAbility {
 			}
 			if (userLoc.distance(targetLoc) > 1) {
 				mPlayer.teleport(targetLoc);
+
+				if (!DepthsUtils.isDepthsGrave(target)) {
+					Vector vec = targetLoc.clone().subtract(userLoc).toVector().normalize().multiply(0.25);
+					vec.setY(0.4);
+					mPlayer.setVelocity(vec);
+				}
 			}
 			doDamage(targetLoc);
 
@@ -146,7 +161,7 @@ public class GuardingBolt extends DepthsAbility {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 			EntityUtils.applyStun(mPlugin, mStunDuration, enemy);
 
 			Location enemyParticleLocation = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);
@@ -158,7 +173,8 @@ public class GuardingBolt extends DepthsAbility {
 	private static Description<GuardingBolt> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<GuardingBolt>(color)
 			.add("Left click while sneaking and looking directly at a player")
-			.addConditionalDepthsContent(DepthsContent.CELESTIAL_ZENITH, " or grave")
+			.addConditionalDepthsContent(DepthsContent.DARKEST_DEPTHS, " or Steel Construct")
+			.addConditionalDepthsContent(DepthsContent.CELESTIAL_ZENITH, ", Steel Construct, or grave")
 			.add(" within ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks to dash to their location. Mobs within ")

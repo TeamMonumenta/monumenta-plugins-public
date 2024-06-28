@@ -39,7 +39,7 @@ public class CurseOfShrapnel implements Enchantment {
 			}
 			new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1).spawnAsPlayerActive(player);
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				DamageUtils.damage(null, player, DamageEvent.DamageType.OTHER, level, null, true, false);
+				DamageUtils.damage(null, player, DamageEvent.DamageType.TRUE, level, null, true, false);
 			});
 		}
 	}

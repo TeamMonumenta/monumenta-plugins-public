@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.StarCosmeticsFunctions;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -44,7 +43,7 @@ public class GalacticRainCS extends CoupDeGraceCS {
 		World world = player.getWorld();
 
 		Vector[] starVertices = StarCosmeticsFunctions.generateStarVertices(8, 0.35, 0.5, false, false);
-		ArrayList<Vector> star = StarCosmeticsFunctions.interpolatePolygon(starVertices, 1);
+		List<Vector> star = StarCosmeticsFunctions.interpolatePolygon(starVertices, 1);
 
 		Vector direction = player.getLocation().clone().subtract(loc.clone()).getDirection();
 		double angle = Math.atan2(direction.getX(), direction.getZ());
@@ -56,8 +55,8 @@ public class GalacticRainCS extends CoupDeGraceCS {
 		Vector approachVector = new Vector(FastUtils.cos(approachAngle), 0, FastUtils.sin(approachAngle));
 
 		Vector[] pentagramStarVertices = StarCosmeticsFunctions.generateStarVertices(5, 3, 0.5, true, true);
-		ArrayList<Vector> pentagramPentagon = StarCosmeticsFunctions.interpolatePolygon(new Vector[] { pentagramStarVertices[1], pentagramStarVertices[3], pentagramStarVertices[5], pentagramStarVertices[7], pentagramStarVertices[9] }, 3);
-		ArrayList<Vector> pentagramStar = StarCosmeticsFunctions.interpolatePolygon(pentagramStarVertices, 4);
+		List<Vector> pentagramPentagon = StarCosmeticsFunctions.interpolatePolygon(new Vector[] { pentagramStarVertices[1], pentagramStarVertices[3], pentagramStarVertices[5], pentagramStarVertices[7], pentagramStarVertices[9] }, 3);
+		List<Vector> pentagramStar = StarCosmeticsFunctions.interpolatePolygon(pentagramStarVertices, 4);
 		pentagramStar.addAll(pentagramPentagon);
 
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 1.3f);

@@ -61,7 +61,7 @@ public class WindBombCS implements CosmeticSkill {
 	}
 
 	public String getProjectileName() {
-		return "Wind Bomb";
+		return "Wind Bomb Projectile";
 	}
 
 	public @Nullable Particle getProjectileParticle() {

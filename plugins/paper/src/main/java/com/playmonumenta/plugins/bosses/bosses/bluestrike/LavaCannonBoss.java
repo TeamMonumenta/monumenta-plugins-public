@@ -30,7 +30,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -77,8 +76,7 @@ public class LavaCannonBoss extends BossAbilityGroup {
 
 	private LavaCannonBoss(Plugin plugin, LivingEntity boss, Samwell samwell) {
 		super(plugin, identityTag, boss);
-		Team darkRedTeam = ScoreboardUtils.getExistingTeamOrCreate("DarkRed", NamedTextColor.DARK_RED);
-		darkRedTeam.addEntry(boss.getUniqueId().toString());
+		ScoreboardUtils.addEntityToTeam(boss, "DarkRed", NamedTextColor.DARK_RED);
 		boss.setGlowing(true);
 
 		mSamwell = samwell;

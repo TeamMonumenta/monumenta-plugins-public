@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.IndependentIframeTracker;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
@@ -32,13 +33,13 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -77,16 +78,17 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private final int mMaxCharges;
 	private int mCharges;
 	private int mChargeTime;
+	private final IndependentIframeTracker mIframeTracker;
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
-	private final Map<UUID, Integer> mMobsIframeMap;
 
 	private static @Nullable ItemStack GRUESOME_POTION = null;
 	private static @Nullable ItemStack BRUTAL_POTION = null;
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
 			new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
-					.linkedSpell(ClassAbility.ALCHEMIST_POTION)
-					.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
+				.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
+				.linkedSpell(ClassAbility.ALCHEMIST_POTION)
+				.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
 
 	public final GruesomeAlchemyCS mCosmetic;
 	private boolean mHasGruesomeAlchemy = false;
@@ -96,12 +98,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
+		mIframeTracker = new IndependentIframeTracker(IFRAME_BETWEEN_POT);
+
 		mChargeTime = POTIONS_TIMER_BASE;
 		mMaxCharges = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CHARGES, MAX_CHARGES);
 		mCharges = Math.min(ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0), mMaxCharges);
 
 		mPlayerItemStatsMap = new WeakHashMap<>();
-		mMobsIframeMap = new HashMap<>();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GruesomeAlchemyCS());
 
@@ -253,20 +256,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE);
 			}
 
-			mMobsIframeMap.values().removeIf(tick -> tick + IFRAME_BETWEEN_POT < Bukkit.getServer().getCurrentTick());
-
-			if (mMobsIframeMap.containsKey(mob.getUniqueId())) {
-				applyEffects(mob, isGruesome, playerItemStats);
-				return;
-			}
-
-			double beforeHealth = mob.getHealth();
-			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
-			double healthDelta = beforeHealth - mob.getHealth();
-			// Only apply iframes if the mob took damage from our potion
-			if (healthDelta > 0) {
-				mMobsIframeMap.put(mob.getUniqueId(), Bukkit.getServer().getCurrentTick());
-			}
+			double finalDamage = damage;
+			mIframeTracker.damage(mob, () -> DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, true, false));
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome, playerItemStats);
@@ -470,5 +461,21 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	public boolean isAlchemistPotion(ThrownPotion potion) {
 		return BRUTAL_POTION != null && ItemUtils.getPlainNameIfExists(BRUTAL_POTION).equals(ItemUtils.getPlainNameIfExists(potion.getItem()));
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text("AP", isGruesomeMode() ? NamedTextColor.RED : TextColor.color(0, 255, 0)))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+		return output;
 	}
 }

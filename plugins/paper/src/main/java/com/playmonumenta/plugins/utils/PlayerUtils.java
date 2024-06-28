@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackHealingDone;
@@ -26,9 +27,12 @@ import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.OptionalInt;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -538,5 +542,21 @@ public class PlayerUtils {
 
 	public static boolean canRiptide(Player player, ItemStack mainhand) {
 		return (LocationUtils.isLocationInWater(player.getLocation()) || player.isInRain()) && ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.RIPTIDE);
+	}
+
+	// Can be called sync or async
+	public static List<String> sortedPlayerNamesFromUuids(Collection<UUID> playerUuids) {
+		Set<String> playerNames = new HashSet<>();
+
+		for (UUID playerUuid : playerUuids) {
+			String playerName = MonumentaRedisSyncIntegration.cachedUuidToName(playerUuid);
+			playerNames.add(playerName != null ? playerName : playerUuid.toString());
+		}
+
+		return StringUtils.sortedStrings(playerNames);
+	}
+
+	public static List<String> sortedPlayerNames(Collection<Player> players) {
+		return StringUtils.sortedStrings(players.stream().map(Player::getName).toList());
 	}
 }

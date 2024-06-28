@@ -75,20 +75,7 @@ public class DamageUtils {
 	 * @param amount  amount of damage to be dealt
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount) {
-		damage(damager, damagee, type, amount, null);
-	}
-
-	/**
-	 * Deals damage to a LivingEntity.
-	 *
-	 * @param damager LivingEntity dealing damage, pass null if not applicable
-	 * @param damagee LivingEntity receiving damage
-	 * @param type    DamageType the damage counts as
-	 * @param amount  amount of damage to be dealt
-	 * @param ability ClassAbility causing the damage, pass null if not applicable
-	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability) {
-		damage(damager, damagee, type, amount, ability, false);
+		damage(damager, damagee, type, amount, null, false);
 	}
 
 	/**

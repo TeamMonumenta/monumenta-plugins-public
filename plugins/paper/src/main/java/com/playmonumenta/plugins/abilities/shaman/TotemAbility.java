@@ -45,6 +45,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	public final String mDisplayName;
 	public double mWhirlwindBuffPercent = 0;
 	public boolean mDecayedBuffed = false;
+	public int mDuration;
 	public int mChargeUpTicks = PULSE_DELAY;
 	public boolean mIsCharging = true;
 
@@ -154,7 +155,6 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 			durationStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 		}
 
-		int duration = getInitialAbilityDuration();
 		mCurrDuration = 0;
 		ClientModHandler.updateAbility(mPlayer, this);
 		mTotemTickingRunnable = new BukkitRunnable() {
@@ -177,13 +177,13 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 				if (durationStand != null) {
 					if (mIsCharging) {
-						AbilityUtils.produceChargeUpString(stand, durationStand, mChargeUpTicks, duration);
+						AbilityUtils.produceChargeUpString(stand, durationStand, mChargeUpTicks, mDuration);
 					} else {
-						AbilityUtils.produceDurationString(stand, durationStand, duration, mT, mWhirlwindBuffPercent, mDecayedBuffed);
+						AbilityUtils.produceDurationString(stand, durationStand, mDuration, mT, mWhirlwindBuffPercent, mDecayedBuffed);
 					}
 				}
 
-				if (((mWhirlwindBuffPercent != 0 && mT >= duration * mWhirlwindBuffPercent) || (mWhirlwindBuffPercent == 0 && mT >= duration))
+				if (((mWhirlwindBuffPercent != 0 && mT >= mDuration * mWhirlwindBuffPercent) || (mWhirlwindBuffPercent == 0 && mT >= mDuration))
 					|| mPlayer.isDead() || !mPlayer.isOnline()
 					|| !mPlayer.getWorld().equals(standLocation.getWorld())) {
 					mWhirlwindBuffPercent = 0;
@@ -215,7 +215,9 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	}
 
 	@Override
-	public abstract int getInitialAbilityDuration();
+	public int getInitialAbilityDuration() {
+		return mDuration + mChargeUpTicks;
+	}
 
 	@Override
 	public int getRemainingAbilityDuration() {

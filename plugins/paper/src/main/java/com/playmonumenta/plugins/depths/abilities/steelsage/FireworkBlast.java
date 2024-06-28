@@ -134,7 +134,7 @@ public class FireworkBlast extends DepthsAbility {
 
 					if (!directHit) {
 						for (LivingEntity e : EntityUtils.getNearbyMobs(loc, mRadius)) {
-							DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, false, true, false);
+							DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
 
 							new PartialParticle(Particle.SMOKE_LARGE, e.getLocation(), 20, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
 						}
@@ -145,7 +145,7 @@ public class FireworkBlast extends DepthsAbility {
 						world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 2f, 1.2f);
 
 						for (LivingEntity e : EntityUtils.getNearbyMobs(loc, mDirectHitRadius)) {
-							DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, false, true, false);
+							DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
 
 							new PartialParticle(Particle.SMOKE_LARGE, e.getLocation(), 20, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
 							new PartialParticle(Particle.REDSTONE, e.getLocation(), 10, 0.25, 0.25, 0.25, GRAY_COLOR).spawnAsPlayerActive(mPlayer);

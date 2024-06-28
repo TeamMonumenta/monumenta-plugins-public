@@ -64,7 +64,7 @@ import org.jetbrains.annotations.Nullable;
 public class ColorSplash extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Color Splash";
-	public static final int COOLDOWN = 35 * 20;
+	public static final int COOLDOWN = 30 * 20;
 	public static final int ACTIVATION_DELAY = 20;
 
 	public static final int FROSTBORN_DURATION = 10 * 20;
@@ -735,7 +735,7 @@ public class ColorSplash extends DepthsAbility {
 			.addDuration(DAWNBRINGER_HEAL_INTERVAL)
 			.add("s. Extra healing will be converted to absorption, up to ")
 			.add(DAWNBRINGER_MAX_OVERHEAL)
-			.add(" health, which last for ")
+			.add(" health, which lasts for ")
 			.addDuration(DAWNBRINGER_OVERHEAL_DURATION)
 			.add("s. Additionally, you can revive teammates from ")
 			.add(DAWNBRINGER_EXTRA_REVIVE_RADIUS)
@@ -792,9 +792,9 @@ public class ColorSplash extends DepthsAbility {
 			.addPercent(a -> WINDWALKER_SPEED[rarity - 1], WINDWALKER_SPEED[rarity - 1], false, true)
 			.add(" speed. Additionally, every time you swap hands, you initiate a Wind Walk, gaining ")
 			.addDuration(WINDWALKER_IFRAMES)
-			.add("s of Invincibility Frames, launching yourself, and applying levitation and ")
+			.add("s of Invincibility Frames, launching yourself, applying levitation and ")
 			.addPercent(WINDWALKER_VULNERABILITY)
-			.add(" vulnerability, and stunning for 1.5s non-Boss mobs you hit. This secondary effect has a cooldown of ")
+			.add(" vulnerability, and stunning non-Boss mobs hit for 1.5s. This secondary effect has a cooldown of ")
 			.addDuration(WINDWALKER_LAND_COOLDOWN)
 			.add("s, which starts counting down from the moment the Wind Walk ends.");
 	}

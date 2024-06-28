@@ -3,7 +3,14 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.ItemType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -28,22 +35,30 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
@@ -452,15 +467,42 @@ public class ItemUtils {
 
 	private static final EnumSet<Material> DEFAULT_ATTRIBUTE_MATERIALS = EnumSet.of(Material.TRIDENT); // tridents also count since they have melee attack damage
 
+	private static final Map<Material, Material> BANNER_TO_FLOOR_BANNER = new HashMap<>();
+	private static final Map<Material, Material> BANNER_TO_WALL_BANNER = new HashMap<>();
+
 	static {
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.ARMOR);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.AXES);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.BOWS); // technically doesn't apply to bows since it's melee attack damage
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.HOES);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.PICKAXES);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SHOVELS);
-			DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SWORDS);
-			// ! for future minecraft versions: add more items with base vanilla attributes
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.ARMOR);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.AXES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.BOWS); // technically doesn't apply to bows since it's melee attack damage
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.HOES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.PICKAXES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SHOVELS);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SWORDS);
+		// ! for future minecraft versions: add more items with base vanilla attributes
+
+		registerBannerType(Material.WHITE_BANNER, Material.WHITE_WALL_BANNER);
+		registerBannerType(Material.ORANGE_BANNER, Material.ORANGE_WALL_BANNER);
+		registerBannerType(Material.MAGENTA_BANNER, Material.MAGENTA_WALL_BANNER);
+		registerBannerType(Material.LIGHT_BLUE_BANNER, Material.LIGHT_BLUE_WALL_BANNER);
+		registerBannerType(Material.YELLOW_BANNER, Material.YELLOW_WALL_BANNER);
+		registerBannerType(Material.LIME_BANNER, Material.LIME_WALL_BANNER);
+		registerBannerType(Material.PINK_BANNER, Material.PINK_WALL_BANNER);
+		registerBannerType(Material.GRAY_BANNER, Material.GRAY_WALL_BANNER);
+		registerBannerType(Material.LIGHT_GRAY_BANNER, Material.LIGHT_GRAY_WALL_BANNER);
+		registerBannerType(Material.CYAN_BANNER, Material.CYAN_WALL_BANNER);
+		registerBannerType(Material.PURPLE_BANNER, Material.PURPLE_WALL_BANNER);
+		registerBannerType(Material.BLUE_BANNER, Material.BLUE_WALL_BANNER);
+		registerBannerType(Material.BROWN_BANNER, Material.BROWN_WALL_BANNER);
+		registerBannerType(Material.GREEN_BANNER, Material.GREEN_WALL_BANNER);
+		registerBannerType(Material.RED_BANNER, Material.RED_WALL_BANNER);
+		registerBannerType(Material.BLACK_BANNER, Material.BLACK_WALL_BANNER);
+	}
+
+	private static void registerBannerType(Material floorBanner, Material wallBanner) {
+		BANNER_TO_FLOOR_BANNER.put(floorBanner, floorBanner);
+		BANNER_TO_FLOOR_BANNER.put(wallBanner, floorBanner);
+		BANNER_TO_WALL_BANNER.put(wallBanner, wallBanner);
+		BANNER_TO_WALL_BANNER.put(floorBanner, wallBanner);
 	}
 
 	// Return the quest ID string, which is assumed to start with "#Q", or null
@@ -655,10 +697,10 @@ public class ItemUtils {
 			return null;
 		}
 		ItemMeta itemMeta = book.getItemMeta();
-		if (itemMeta == null || !(itemMeta instanceof BookMeta)) {
-			return null;
+		if (itemMeta instanceof BookMeta bookMeta) {
+			return bookMeta.getAuthor();
 		}
-		return ((BookMeta) itemMeta).getAuthor();
+		return null;
 	}
 
 	public static @Nullable LootTable getLootTable(@Nullable ItemStack itemStack) {
@@ -949,10 +991,11 @@ public class ItemUtils {
 		if (plainLore.isEmpty() && itemStack.hasItemMeta()) {
 			ItemMeta itemMeta = itemStack.getItemMeta();
 			if (itemMeta.hasLore()) {
-				if (itemMeta.lore() == null) {
+				List<Component> lore = itemMeta.lore();
+				if (lore == null) {
 					return plainLore;
 				}
-				for (Component loreLine : itemMeta.lore()) {
+				for (Component loreLine : lore) {
 					plainLore.add(toPlainTagText(loreLine));
 				}
 			}
@@ -1261,6 +1304,14 @@ public class ItemUtils {
 		};
 	}
 
+	public static @Nullable Material toFloorBanner(Material banner) {
+		return BANNER_TO_FLOOR_BANNER.get(banner);
+	}
+
+	public static @Nullable Material toWallBanner(Material banner) {
+		return BANNER_TO_WALL_BANNER.get(banner);
+	}
+
 	public static boolean hasLore(ItemStack item) {
 		return item.hasItemMeta() && item.getItemMeta().hasLore();
 	}
@@ -1425,6 +1476,10 @@ public class ItemUtils {
 		});
 	}
 
+	public static ItemType getItemType(ItemStack item) {
+		return ItemType.of(item);
+	}
+
 	public static String getGiveCommand(ItemStack item) {
 		if (item == null) {
 			return "/tellraw @s {\"text\":\"Item is null\"}";
@@ -1478,6 +1533,39 @@ public class ItemUtils {
 	 */
 	public static Component getDisplayName(ItemStack item) {
 		return NmsUtils.getVersionAdapter().getDisplayName(item);
+	}
+
+	public static ItemStack createBanner(Material material, org.bukkit.block.banner.Pattern... patterns) {
+		return createBanner(material, null, patterns);
+	}
+
+	public static ItemStack createBanner(Material material, @Nullable List<Component> lore, org.bukkit.block.banner.Pattern... patterns) {
+		ItemStack banner = new ItemStack(material);
+		ItemMeta itemMeta = banner.getItemMeta();
+		if (itemMeta instanceof BannerMeta bannerMeta) {
+			for (org.bukkit.block.banner.Pattern pattern : patterns) {
+				bannerMeta.addPattern(pattern);
+			}
+			// Change lore:
+			bannerMeta.lore(lore);
+			// Hide patterns:
+			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // banner patterns are actually the same 'data' as potion effects, lmao
+			// Finalize:
+			banner.setItemMeta(bannerMeta);
+		}
+		return banner;
+	}
+
+	public static void setName(ItemStack item, TextComponent name) {
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(name);
+		item.setItemMeta(meta);
+	}
+
+	public static void setLore(ItemStack item, List<Component> lore) {
+		ItemMeta meta = item.getItemMeta();
+		meta.lore(lore);
+		item.setItemMeta(meta);
 	}
 
 	/**
@@ -1609,6 +1697,44 @@ public class ItemUtils {
 		return lock;
 	}
 
+	public static @Nullable ReadableNBTList<String> getPages(ItemStack itemStack) {
+		ReadWriteNBT nbtTags = NBT.itemStackToNBT(itemStack).getCompound("tag");
+
+		if (nbtTags == null) {
+			return null;
+		}
+
+		ReadableNBTList<String> pages = nbtTags.getStringList("pages");
+		if (pages == null) {
+			return null;
+		}
+
+		return pages;
+	}
+
+	public static @Nullable List<Component> getSignContents(ItemStack item) {
+		if (item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (!meta.hasDisplayName()) {
+				if (ItemUtils.isSign(item.getType()) && meta instanceof BlockStateMeta blockStateMeta) {
+					BlockState blockState = blockStateMeta.getBlockState();
+					if (blockState instanceof Sign signItem) {
+						return signItem.lines();
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ItemStack itemStack) {
+		ReadWriteNBT nbtTags = NBT.itemStackToNBT(itemStack).getCompound("tag");
+		if (nbtTags == null) {
+			return null;
+		}
+		return getContainerItems(nbtTags);
+	}
+
 	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ReadableNBT nbt) {
 		ReadableNBT blockEntityTag = nbt.getCompound("BlockEntityTag");
 		if (blockEntityTag == null) {
@@ -1616,11 +1742,32 @@ public class ItemUtils {
 		}
 
 		ReadableNBTList<ReadWriteNBT> itemStacks = blockEntityTag.getCompoundList("Items");
-		if (itemStacks == null) {
-			return null;
-		}
-
 		return itemStacks;
+	}
+
+	public static void addPlainLoreLine(ItemStack item, String line) {
+		List<String> lore = getPlainLore(item);
+		lore.add(line);
+		setPlainLore(item, lore);
+	}
+
+	public static void setSnowballItem(ThrowableProjectile snowball, ItemStack oldItem) {
+		ItemStack newItem = oldItem.clone();
+		setPlainTag(newItem);
+		addPlainLoreLine(newItem, "ThrownSnowball");
+		snowball.setItem(newItem);
+	}
+
+	public static void setMapId(MapMeta meta, int id) {
+		meta.setMapView(Bukkit.getMap(id));
+	}
+
+	public static List<Component> getNonNullLoreCopy(ItemStack item) {
+		List<Component> lore = item.lore();
+		if (lore == null) {
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(lore);
 	}
 
 }

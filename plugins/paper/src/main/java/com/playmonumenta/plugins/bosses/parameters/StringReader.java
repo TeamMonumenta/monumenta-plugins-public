@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;

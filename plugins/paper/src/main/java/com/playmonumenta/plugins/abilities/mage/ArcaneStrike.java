@@ -65,7 +65,7 @@ public class ArcaneStrike extends Ability {
 				String.format("The damage is increased to %s. Mobs that are on fire or slowed take %s additional damage.",
 					DAMAGE_2,
 					BONUS_DAMAGE_2),
-				String.format("Your enchantment on-hit effects are now also applied to all other enemies hit in the radius. Also this skill's damage is increased by %s%%.",
+				String.format("The damage is increased by %s%%. Your enchantment on-hit effects are now also applied to all other enemies hit in the radius.",
 					StringUtils.multiplierToPercentage(ENHANCEMENT_DAMAGE_MULTIPLIER - 1)
 				)
 			)

@@ -45,7 +45,7 @@ public class SiriusSetTargetEffect extends Effect {
 	public void onDeath(EntityDeathEvent event) {
 		LivingEntity entity = event.getEntity().getKiller();
 		if (entity != null) {
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(entity, mSirius.PARTICIPATION_TAG, new CustomTimerEffect(30 * 20, "Participated").displays(false));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(entity, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(30 * 20, "Participated").displays(false));
 		}
 
 	}

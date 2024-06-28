@@ -1,9 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
 import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
@@ -86,7 +91,7 @@ public class CommandUtils {
 	public static void error(CommandSender sender, String msg) {
 		if ((sender instanceof Player)
 			|| ((sender instanceof ProxiedCommandSender) && (((ProxiedCommandSender)sender).getCaller() instanceof Player))) {
-			sender.sendMessage(ChatColor.RED + msg);
+			sender.sendMessage(Component.text(msg, NamedTextColor.RED));
 		} else {
 			sender.sendMessage(msg);
 		}
@@ -115,9 +120,9 @@ public class CommandUtils {
 		return !RE_ALLOWED_WITHOUT_QUOTES.matcher(arg).matches();
 	}
 
-	public static @Nullable String quoteIfNeeded(@Nullable String arg) {
+	public static String quoteIfNeeded(@Nullable String arg) {
 		if (arg == null) {
-			return null;
+			return "null";
 		}
 		if (requiresQuotes(arg)) {
 			return "\"" + arg.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
@@ -126,4 +131,32 @@ public class CommandUtils {
 		}
 	}
 
+	public static List<String> quoteIfNeeded(Collection<String> args) {
+		List<String> result = new ArrayList<>();
+		for (String arg :args) {
+			result.add(quoteIfNeeded(arg));
+		}
+		return result;
+	}
+
+	public static List<String> alwaysQuote(Collection<String> args) {
+		List<String> result = new ArrayList<>();
+		for (String arg :args) {
+			result.add(alwaysQuote(arg));
+		}
+		return result;
+	}
+
+	public static String alwaysQuote(@Nullable String arg) {
+		if (arg == null) {
+			return "null";
+		}
+		return "\"" + arg.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+	}
+
+	public static void checkPerm(CommandSender sender, CommandPermission permission) throws WrapperCommandSyntaxException {
+		if (!sender.hasPermission(permission.toString())) {
+			throw CommandAPI.failWithString("You do not have permission for this command.");
+		}
+	}
 }

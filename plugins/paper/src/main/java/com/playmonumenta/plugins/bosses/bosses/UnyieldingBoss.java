@@ -69,9 +69,10 @@ public class UnyieldingBoss extends BossAbilityGroup {
 						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 2f, 1f);
 					}
 					if (mTicks % mParam.TICKS_TO_HEAL == 0 && mBoss.getHealth() > 0) {
-						double hp = mBoss.getHealth() + maxHealth * mParam.HEALING;
-						mBoss.setHealth(Math.min(hp, maxHealth));
-						new PartialParticle(Particle.VILLAGER_HAPPY, mBoss.getLocation().add(0, mBoss.getBoundingBox().getHeight() / 2, 0), 3, mBoss.getBoundingBox().getWidthX() / 2.0, mBoss.getBoundingBox().getHeight() / 2, mBoss.getBoundingBox().getWidthZ() / 2.0, 0).spawnAsEntityActive(mBoss);
+						double healed = EntityUtils.healMob(mBoss, maxHealth * mParam.HEALING);
+						if (healed > 0) {
+							new PartialParticle(Particle.VILLAGER_HAPPY, mBoss.getLocation().add(0, mBoss.getBoundingBox().getHeight() / 2, 0), 3, mBoss.getBoundingBox().getWidthX() / 2.0, mBoss.getBoundingBox().getHeight() / 2, mBoss.getBoundingBox().getWidthZ() / 2.0, 0).spawnAsEntityActive(mBoss);
+						}
 					}
 					if (mTicks >= mParam.DURATION_TICKS) {
 						this.cancel();

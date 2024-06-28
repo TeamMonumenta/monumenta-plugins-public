@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseGrenadeLauncher;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,8 +58,8 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "Targets of the spell. Defaults to one player that the mob has line of sight to")
 		public EntityTargets BOMB_TARGET = EntityTargets.GENERIC_ONE_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 
-		@BossParam(help = "Contains both the target of the explosion and the radius of the lingering")
-		public EntityTargets EXPLOSION_TARGET = EntityTargets.GENERIC_PLAYER_TARGET;
+		@BossParam(help = "Determines which nearby players should be hit by the explosion and the radius of the lingering")
+		public EntityTargets EXPLOSION_TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, 3, true, EntityTargets.Limit.DEFAULT, new ArrayList<>(), EntityTargets.TagsListFiter.DEFAULT);
 
 		@BossParam(help = "Particles that follow the bomb throw arc")
 		public ParticlesList PARTICLE_BOMB = ParticlesList.fromString("[(CRIT,5)]");

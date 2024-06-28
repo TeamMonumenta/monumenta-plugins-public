@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.IndependentIframeTracker;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -57,6 +58,7 @@ public class LightningBottle extends DepthsAbility {
 	public static final int DURATION = 3 * 20;
 	public static final int DEATH_RADIUS = 32;
 	public static final double RADIUS = 4;
+	private static final int IFRAME_BETWEEN_POT = 10;
 
 	public static final DepthsAbilityInfo<LightningBottle> INFO =
 		new DepthsAbilityInfo<>(LightningBottle.class, ABILITY_NAME, LightningBottle::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
@@ -73,6 +75,7 @@ public class LightningBottle extends DepthsAbility {
 	private final double mDamage;
 	private final int mDuration;
 	private final double mRadius;
+	private final IndependentIframeTracker mIframeTracker;
 
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 	private int mCount = 0;
@@ -80,6 +83,8 @@ public class LightningBottle extends DepthsAbility {
 
 	public LightningBottle(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mIframeTracker = new IndependentIframeTracker(IFRAME_BETWEEN_POT);
+
 		mPlayerItemStatsMap = new WeakHashMap<>();
 		mKillsPer = KILLS_PER + (int) CharmManager.getLevel(mPlayer, CharmEffects.LIGHTNING_BOTTLE_KILLS_PER_BOTTLE.mEffectName);
 		mBottlesGiven = BOTTLES_GIVEN;
@@ -133,7 +138,7 @@ public class LightningBottle extends DepthsAbility {
 
 			Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 			for (LivingEntity entity : hitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, false, true, false);
+				mIframeTracker.damage(entity, () -> DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, true, false));
 
 				EntityUtils.applyVulnerability(mPlugin, mDuration, mVuln, entity);
 				EntityUtils.applySlow(mPlugin, mDuration, mSlow, entity);

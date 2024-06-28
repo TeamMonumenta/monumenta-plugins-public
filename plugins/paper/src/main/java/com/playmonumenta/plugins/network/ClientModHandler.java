@@ -172,7 +172,7 @@ public class ClientModHandler {
 		} else {
 			info.power = (info.percentage ? effect.getMagnitude() * 100 : effect.getMagnitude());
 		}
-		info.positive = effect.isBuff() && effect.getMagnitude() >= 0;
+		info.positive = effect.isBuff() == effect.getMagnitude() >= 0;
 		info.displayPriority = effect.getDisplayPriority();
 	}
 

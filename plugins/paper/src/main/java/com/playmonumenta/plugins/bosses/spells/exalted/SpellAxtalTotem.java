@@ -43,7 +43,7 @@ public class SpellAxtalTotem extends Spell {
 
 				// all input values not defined above are default values
 				Spell spell = new SpellThrowSummon(mPlugin, mBoss, target, count, 0, summonPool, true, 20,
-					0, 0.2f, 0, 0, distanceScalar, 10, 15,
+					0, 0.2f, 0, 0, distanceScalar, 10, 15, false,
 					ParticlesList.fromString("[(FLAME,10,0.2,0.2,0.2,0.1)]"), SoundsList.fromString("[(ENTITY_SHULKER_SHOOT,1,1)]"));
 				spell.run();
 			}

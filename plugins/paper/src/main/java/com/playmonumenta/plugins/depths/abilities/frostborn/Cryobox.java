@@ -166,7 +166,7 @@ public class Cryobox extends DepthsAbility {
 				};
 
 			for (Location loc : locs) {
-				DepthsUtils.spawnIceTerrain(loc, mIceDuration, mPlayer);
+				DepthsUtils.spawnIceTerrain(loc.getBlock(), mIceDuration, mPlayer);
 			}
 		}
 

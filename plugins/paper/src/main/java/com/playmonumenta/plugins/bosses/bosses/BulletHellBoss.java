@@ -88,7 +88,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 			new SpellBullet(plugin, boss, new Vector(0, p.OFFSET_Y, 0), p.DURATION, p.DELAY, p.EMISSION_TICKS, p.VELOCITY, p.DETECTION, p.HITBOX_RADIUS, p.COOLDOWN, p.BULLET_DURATION, p.PATTERN,
 				p.ACCEL, p.ACCEL_START, p.ACCEL_END, p.PASS_THROUGH, p.ROTATION_SPEED,
 				(Entity entity, int tick) -> {
-					float t = tick / 10;
+					float t = tick / 10f;
 					if (tick % 5 == 0) {
 						world.playSound(mBoss.getLocation(), p.CHARGE_SOUND, SoundCategory.HOSTILE, p.CHARGE_VOLUME, t);
 					}

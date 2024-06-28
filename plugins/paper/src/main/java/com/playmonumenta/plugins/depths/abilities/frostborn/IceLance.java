@@ -92,7 +92,7 @@ public class IceLance extends DepthsAbility {
 
 		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
 			mPlugin.mEffectManager.addEffect(mob, "IceLanceMark", new IceLanceMark(ICE_TICKS, CHILLED_DURATION, mPlayer));
-			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
+			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 			EntityUtils.applySlow(mPlugin, mDuration, mAmplifier, mob);
 			EntityUtils.applyWeaken(mPlugin, mDuration, mAmplifier, mob);
 			MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);

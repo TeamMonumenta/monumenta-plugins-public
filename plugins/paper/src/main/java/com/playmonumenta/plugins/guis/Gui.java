@@ -38,7 +38,11 @@ public abstract class Gui {
 
 	private final List<GuiItem> mItems;
 
-	private final ItemStack mFiller = GUIUtils.FILLER;
+	public ItemStack mFiller = GUIUtils.FILLER;
+
+	public Gui(Player player, int size, String title) {
+		this(player, size, Component.text(title));
+	}
 
 	public Gui(Player player, int size, Component title) {
 		mPlugin = Plugin.getInstance();
@@ -154,6 +158,17 @@ public abstract class Gui {
 
 	public GuiItem setItem(int index, ItemStack item) {
 		return setItem(index, new GuiItem(item));
+	}
+
+	public @Nullable GuiItem getItem(int index) {
+		if (mItems.size() <= index) {
+			return null;
+		}
+		return mItems.get(index);
+	}
+
+	public Inventory getInventory() {
+		return mCustomInventory.getInventory();
 	}
 
 	/**

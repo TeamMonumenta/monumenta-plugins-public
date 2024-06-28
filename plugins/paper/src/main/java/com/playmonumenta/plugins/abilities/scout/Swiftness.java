@@ -38,6 +38,7 @@ public class Swiftness extends Ability {
 	private static final double SWIFTNESS_SPEED_BONUS = 0.2;
 	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
 	private static final double DODGE_CHANCE = 0.15;
+	private static final String NO_JUMP_BOOST_TAG = "SwiftnessJumpBoostDisable";
 
 	public static final String CHARM_SPEED = "Swiftness Speed Amplifier";
 	public static final String CHARM_JUMP_BOOST = "Swiftness Jump Boost Amplifier";
@@ -63,10 +64,11 @@ public class Swiftness extends Ability {
 			.displayItem(Material.RABBIT_FOOT);
 
 	private boolean mWasInNoMobilityZone = false;
-	private boolean mJumpBoost = true;
+	private boolean mJumpBoost;
 
 	public Swiftness(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mJumpBoost = !player.getScoreboardTags().contains(NO_JUMP_BOOST_TAG);
 		addModifier(player);
 	}
 
@@ -104,11 +106,13 @@ public class Swiftness extends Ability {
 	public boolean toggleJumpBoost() {
 		if (mJumpBoost) {
 			mJumpBoost = false;
+			mPlayer.addScoreboardTag(NO_JUMP_BOOST_TAG);
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned off");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		} else {
 			mJumpBoost = true;
+			mPlayer.removeScoreboardTag(NO_JUMP_BOOST_TAG);
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21, SWIFTNESS_EFFECT_JUMP_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);

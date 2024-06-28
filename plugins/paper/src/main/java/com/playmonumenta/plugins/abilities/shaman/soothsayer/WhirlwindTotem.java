@@ -20,7 +20,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
@@ -76,7 +81,6 @@ public class WhirlwindTotem extends TotemAbility {
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.BLUE_STAINED_GLASS);
 
-	private final int mDuration;
 	private final double mRadius;
 	private final double mCDRPerSecond;
 	private final int mCDRMax;
@@ -96,11 +100,6 @@ public class WhirlwindTotem extends TotemAbility {
 		mSpeed = isLevelOne() ? 0 : (SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED));
 		mDurationBoost = DURATION_BOOST + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DURATION_BOOST);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
-	}
-
-	@Override
-	public int getInitialAbilityDuration() {
-		return mDuration;
 	}
 
 	@Override

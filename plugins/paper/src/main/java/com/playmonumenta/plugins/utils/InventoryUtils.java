@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -342,6 +343,32 @@ public class InventoryUtils {
 		}
 	}
 
+	/**
+	 * A check for if a player has a wallet in their inventory.
+	 * @see WalletManager#isWallet(ItemStack)
+	 * @param player The player
+	 * @return <code>true</code> if the player has a Wallet item in their inventory.
+	 */
+	public static boolean playerHasWalletItem(final Player player) {
+		return Arrays.stream(player.getInventory().getContents()).anyMatch(WalletManager::isWallet);
+	}
+
+	public static void giveItemWithStacksizeCheck(final Player player, @Nullable ItemStack item) {
+		if (item == null) {
+			return;
+		}
+		if (item.getMaxStackSize() == -1) {
+			giveItem(player, item);
+			return;
+		}
+		int remainingToGive = item.getAmount();
+		while (remainingToGive > 0) {
+			int toGive = Math.min(remainingToGive, item.getMaxStackSize());
+			giveItem(player, item.asQuantity(toGive));
+			remainingToGive -= toGive;
+		}
+	}
+
 	public static void giveItem(final Player player, final @Nullable ItemStack item) {
 		giveItem(player, item, false);
 	}
@@ -556,15 +583,14 @@ public class InventoryUtils {
 			       .sum();
 	}
 
-	/**
-	 * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
-	 */
+	 /**
+	  * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
+	  */
 	public static boolean isFull(Inventory inventory) {
 		return Arrays.stream(inventory.getStorageContents()).noneMatch(ItemUtils::isNullOrAir);
 	}
 
-	/**
-	 * Inserts an item stack into an inventory, using only the first {@code size} slots of the inventory.
+	 /** Inserts an item stack into an inventory, using only the first {@code size} slots of the inventory.
 	 *
 	 * @param inventory The inventory to put the item into
 	 * @param size      Maximum number of inventory slots to use

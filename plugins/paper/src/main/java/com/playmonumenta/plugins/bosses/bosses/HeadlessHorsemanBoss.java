@@ -281,11 +281,11 @@ public class HeadlessHorsemanBoss extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		BossUtils.endBossFightEffects(mPlayers);
+
 		for (Player player : mPlayers) {
 			player.sendMessage(Component.text("[The Horseman] No matter. I'll be seeing you all again soon.", NamedTextColor.DARK_RED));
-			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.HOSTILE, 1.0f, 0.1f);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
+			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.HOSTILE, 1.0f, 0.5f);
 		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mSpawnLoc, arenaSize)) {
 			if (mob instanceof Phantom) {

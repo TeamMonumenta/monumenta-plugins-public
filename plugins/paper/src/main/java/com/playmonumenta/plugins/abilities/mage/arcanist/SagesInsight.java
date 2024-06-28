@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -27,6 +29,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;
@@ -175,4 +178,22 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		return mMaxStacks - 1; // -1 as "max stacks" is never reached - it immediately resets back to 0
 	}
 
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+		return output;
+	}
 }

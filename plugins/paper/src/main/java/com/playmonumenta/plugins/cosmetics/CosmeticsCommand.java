@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -43,7 +42,6 @@ public class CosmeticsCommand extends GenericCommand {
 					return Arrays.stream(Material.values())
 						.filter(mat -> !mat.isLegacy())
 						.map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":")
-						.map(CommandUtils::quoteIfNeeded)
 						.toArray(String[]::new);
 				} else if (type == CosmeticType.COSMETIC_SKILL) {
 					return CosmeticSkills.getNames();
@@ -60,7 +58,6 @@ public class CosmeticsCommand extends GenericCommand {
 						CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT))).stream()
 					.map(Cosmetic::getName)
 					.filter(n -> n.startsWith(info.currentArg()))
-					.map(CommandUtils::quoteIfNeeded)
 					.toArray(String[]::new)));
 
 		// ADD COSMETIC COMMAND

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.EnumSet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -30,11 +31,11 @@ public class Infernal {
 
 	public static final String DESCRIPTION = "Fiery enemies can spawn.";
 
-	public static String[] rankDescription(int level) {
-			return new String[]{
-				"Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to spawn Embers.",
-				"Players take +" + Math.round(BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Burning Damage",
-				"and +" + Math.round(ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Environmental Damage."
+	public static Component[] rankDescription(int level) {
+			return new Component[]{
+				Component.text("Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to spawn Embers."),
+				Component.text("Players take +" + Math.round(BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Burning Damage"),
+				Component.text("and +" + Math.round(ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Environmental Damage.")
 			};
 	}
 

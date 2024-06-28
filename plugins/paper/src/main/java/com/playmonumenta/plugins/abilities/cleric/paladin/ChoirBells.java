@@ -47,6 +47,7 @@ public class ChoirBells extends Ability {
 			.linkedSpell(ClassAbility.CHOIR_BELLS)
 			.scoreboardId("ChoirBells")
 			.shorthandName("CB")
+			.hotbarName("\uD83D\uDD14")
 			.descriptions(
 				"While not sneaking, pressing the swap key afflicts all enemies in a 10-block radius with 10% slowness for 8s. " +
 					"Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, " +

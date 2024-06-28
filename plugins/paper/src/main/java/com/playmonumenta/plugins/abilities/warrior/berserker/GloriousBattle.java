@@ -27,6 +27,10 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -74,7 +78,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.shorthandName("GB")
 			.descriptions(
 				("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
-					 "Shift and swap hands to consume a stack and charge forwards at %s blocks per second, gaining full knockback resistance until landing. " +
+					 "Shift and swap hands while holding a sword or axe to consume a stack and charge forwards at %s blocks per second, gaining full knockback resistance until landing. " +
 					 "Vertical movement speed is capped at %s blocks per second upwards. " +
 					 "Colliding with enemies while charging deals %s damage and %s extra damage. " +
 					 "When you land without dealing damage, deal %s damage to the nearest mob within %s blocks. " +
@@ -241,5 +245,32 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	@Override
 	public int getMaxCharges() {
 		return mStackLimit;
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		if (charges >= 1 && maxCharges > 1) {
+			output = output.append(Component.text(charges + "/" + maxCharges, charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW));
+		} else {
+			if (charges >= 1) {
+				output = output.append(Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD));
+			} else {
+				output = output.append(Component.text("✘", NamedTextColor.RED, TextDecoration.BOLD));
+			}
+		}
+
+		return output;
 	}
 }

@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
 import com.playmonumenta.plugins.bosses.bosses.Svalgot;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -16,16 +18,15 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SvalgotRisingBlackflame extends Spell {
 	private static final double DAMAGE = 34;
-
+	private static final String SLOWNESS_SRC = "RisingBlackflameSlowness";
+	private static final int SLOWNESS_DURATION = 20 * 10;
+	private static final double SLOWNESS_POTENCY = -0.5;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
-
 	private final Svalgot mBossClass;
 
 	public SvalgotRisingBlackflame(Plugin plugin, LivingEntity boss, Svalgot bossClass) {
@@ -37,8 +38,10 @@ public class SvalgotRisingBlackflame extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		mBoss.removePotionEffect(PotionEffectType.SLOW);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 1));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+			new BaseMovementSpeedModifyEffect(50, -0.3));
+
 		new BukkitRunnable() {
 			public int mTicks = 0;
 
@@ -69,7 +72,8 @@ public class SvalgotRisingBlackflame extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, DAMAGE, "Rising Blackflame", loc);
 						MovementUtils.knockAway(loc, player, 0.50f, 1f, false);
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+							new PercentSpeed(SLOWNESS_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
 					}
 				}
 

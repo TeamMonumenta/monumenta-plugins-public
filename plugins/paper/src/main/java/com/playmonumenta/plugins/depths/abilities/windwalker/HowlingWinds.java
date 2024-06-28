@@ -80,7 +80,7 @@ public class HowlingWinds extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, 1.25, "HowlingWindsProjectile", Particle.CLOUD);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, 1.25, "Howling Winds Projectile", Particle.CLOUD);
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		mProjectiles.put(proj, playerItemStats);
 		// Clear out list just in case

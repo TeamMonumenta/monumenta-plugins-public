@@ -75,11 +75,6 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	}
 
 	@Override
-	public @Nullable String getPlugin() {
-		return null;
-	}
-
-	@Override
 	public String getAuthor() {
 		return "Team Epic";
 	}

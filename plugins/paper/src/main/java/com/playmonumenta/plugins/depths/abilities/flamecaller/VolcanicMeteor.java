@@ -120,7 +120,7 @@ public class VolcanicMeteor extends DepthsAbility {
 								double multiplier = Math.min(Math.max(0, (mRadius - distance) / 4), 1);
 
 								EntityUtils.applyFire(mPlugin, mFireDuration, e, mPlayer, playerItemStats);
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage * multiplier, false, true, false);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage * multiplier, true, true, false);
 							}
 							break;
 						}
@@ -146,7 +146,7 @@ public class VolcanicMeteor extends DepthsAbility {
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage in a ")
 			.add(a -> a.mRadius, SIZE)
-			.add(" block radius and apply fire for ")
+			.add(" block radius and applies fire for ")
 			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
 			.add(" seconds. The damage is reduced depending on the distance from the center.")
 			.addCooldown(COOLDOWN_TICKS);

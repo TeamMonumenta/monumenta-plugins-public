@@ -36,6 +36,9 @@ public class ScorchedEarthDamage extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
+		if (event.getSource() == null) {
+			return;
+		}
 		DamageType type = event.getType();
 		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER && type != DamageType.TRUE && event.getAbility() != ClassAbility.SCORCHED_EARTH
 			    && (type != DamageType.MELEE || !(event.getDamager() instanceof Player player) || player.getCooledAttackStrength(0) > 0.5f)) {

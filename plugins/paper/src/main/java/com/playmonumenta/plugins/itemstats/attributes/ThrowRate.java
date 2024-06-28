@@ -97,7 +97,7 @@ public class ThrowRate implements Attribute {
 				}
 				AbilityManager.getManager().playerShotProjectileEvent(player, newProj);
 			}
-		} else if (proj instanceof Snowball) {
+		} else if (proj instanceof Snowball oldSnowball) {
 			if (value > 0) {
 				// If a trident made from the volley skill, don't run sound/unbreaking
 				Volley volley = AbilityManager.getManager().getPlayerAbility(player, Volley.class);
@@ -113,6 +113,7 @@ public class ThrowRate implements Attribute {
 				snowball.setShooter(player);
 				snowball.setVelocity(proj.getVelocity());
 				DamageListener.addProjectileItemStats(snowball, player);
+				ItemUtils.setSnowballItem(snowball, oldSnowball.getItem());
 				player.playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.5f, 0.5f);
 				AbilityManager.getManager().playerShotProjectileEvent(player, snowball);
 

@@ -6,6 +6,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -37,6 +38,8 @@ public class DropKeyPacketListener extends PacketAdapter {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				Plugin.getInstance().mAbilityManager.checkTrigger(player, AbilityTrigger.Key.DROP);
 				Plugin.getInstance().mItemStatManager.onPlayerDropItem(Plugin.getInstance(), player);
+				// usb: prevent players from able to drink conusmables at sprinting speed by spamming the drop key
+				NmsUtils.getVersionAdapter().releaseActiveItem(player, true);
 				player.updateInventory();
 			});
 		}

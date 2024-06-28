@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -36,8 +37,8 @@ while in a pool.
 -maybe change to spoopy's house of jump scare boss hand attack
  */
 public class SpellGraspingHands extends Spell {
-
 	private static final String SPELL_NAME = "Grasping Hands";
+	private static final String SLOWNESS_SRC = "GraspingHandsSlowness";
 	private static final int CAP = 7;
 	private static final double DURATION = 20 * 7;
 	private static final int HEAL_CAP = 75;
@@ -151,7 +152,8 @@ public class SpellGraspingHands extends Spell {
 										Vector v = p.getVelocity();
 										BossUtils.bossDamagePercent(mBoss, p, 0.15, SPELL_NAME);
 										p.setVelocity(v);
-										p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, 2));
+										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p,
+											SLOWNESS_SRC, new PercentSpeed(20 * 4, -0.5, SLOWNESS_SRC));
 										p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 4, -4));
 									}
 									//heal mobs except boss

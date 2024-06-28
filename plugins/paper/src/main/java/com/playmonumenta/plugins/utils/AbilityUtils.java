@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.cosmetics.skills.StealthCosmeticSkill;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
@@ -110,9 +111,9 @@ public class AbilityUtils {
 							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false, cosmetic));
 						} else if (ItemUtils.isPickaxe(item) || !(DepthsUtils.isWeaponItem(item) || ItemUtils.isProjectileWeapon(item))) {
 							// Run after this loop is complete to avoid concurrent modification
-							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, true, cosmetic));
+							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false, cosmetic));
 						} else {
-							player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, 0.05f);
+							new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, 0.05f).spawnAsPlayerBuff(player);
 							entry.setValue(entry.getValue() - 1);
 						}
 					}
@@ -208,6 +209,22 @@ public class AbilityUtils {
 
 	public static void unsilencePlayer(Player player) {
 		Plugin.getInstance().mEffectManager.clearEffects(player, ABILITY_SILENCE_EFFECT_NAME);
+	}
+
+	public static boolean isSilenced(Player player) {
+		if (player == null) {
+			return false;
+		}
+		return Plugin.getInstance().mEffectManager.hasEffect(player, ABILITY_SILENCE_EFFECT_NAME);
+	}
+
+	public static int getSilenceDuration(Player player) {
+		Effect effect = Plugin.getInstance().mEffectManager.getActiveEffect(player, ABILITY_SILENCE_EFFECT_NAME);
+		if (effect != null) {
+			return effect.getDuration();
+		} else {
+			return 0;
+		}
 	}
 
 	public static void increaseHealingPlayer(Player player, int duration, double healBoost, String cause) {
@@ -670,7 +687,14 @@ public class AbilityUtils {
 		if (particle != null) {
 			plugin.mProjectileEffectTimers.addEntity(proj, particle);
 		}
-		proj.customName(Component.text(name));
+		Component nameComponent = Component.text(name);
+		proj.customName(nameComponent);
+		ItemStack item = proj.getItem();
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(nameComponent);
+		item.setItemMeta(meta);
+		ItemUtils.setPlainName(item);
+		proj.setItem(item);
 		return proj;
 	}
 
