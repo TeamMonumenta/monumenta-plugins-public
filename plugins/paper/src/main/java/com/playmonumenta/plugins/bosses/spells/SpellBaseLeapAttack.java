@@ -241,6 +241,11 @@ public class SpellBaseLeapAttack extends Spell {
 
 					// At least one tick has passed to avoid insta smacking a nearby player
 					mHasBeenOneTick = true;
+
+					// Cancel if boss is dead
+					if (mBoss.isDead() || !mBoss.isValid()) {
+						this.cancel();
+					}
 				}
 			}
 		};

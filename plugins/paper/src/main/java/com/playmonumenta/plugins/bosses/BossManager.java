@@ -426,6 +426,7 @@ public class BossManager implements Listener {
 		registerStatefulBoss(ImperialConstruct.identityTag, ImperialConstruct::new);
 		registerStatefulBoss(Samwell.identityTag, Samwell::new);
 		registerStatefulBoss(TealSpirit.identityTag, TealSpirit::new);
+		registerStatefulBoss(SalieriTheSwordsage.identityTag, SalieriTheSwordsage::new);
 		registerStatefulBoss(Xenotopsis.identityTag, Xenotopsis::new);
 		registerStatefulBoss(ExaltedCAxtal.identityTag, ExaltedCAxtal::new);
 		registerStatefulBoss(Sirius.identityTag, Sirius::new);
