@@ -84,6 +84,7 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -906,8 +907,12 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 		// If the player got killed by a spectre, give the spectre owner the Player Slayer advancement
 		if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent damageByEntityEvent) {
+			Entity source = damageByEntityEvent.getDamager();
+			if (source instanceof Projectile proj && proj.getShooter() instanceof Entity shooter) {
+				source = shooter;
+			}
 			for (Player p : world.getPlayers()) {
-				if (damageByEntityEvent.getDamager().getScoreboardTags().contains("Undead" + p.getName())) {
+				if (source.getScoreboardTags().contains("Undead" + p.getName())) {
 					AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r2/lich/player_slayer");
 					break;
 				}
