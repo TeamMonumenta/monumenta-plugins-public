@@ -46,6 +46,7 @@ public class LoadoutManagerGui extends Gui {
 
 	private static final int LOADOUTS_START = 9;
 	private static final int MAX_LOADOUTS = 5 * 9;
+	private static final String ARMORY_ZENITH_UPGRADE_TAG = "ArmoryZenithUpgrade";
 	private final Player mTarget;
 	LoadoutManager.LoadoutData mLoadoutData;
 
@@ -490,13 +491,30 @@ public class LoadoutManagerGui extends Gui {
 			// button to include/exclude charms
 			// button to set to current
 			// show charms
-			setItem(4, 0, GUIUtils.createBasicItem(selectedLoadout.mIncludeCharms ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE,
-				"Charms " + (selectedLoadout.mIncludeCharms ? "Included" : "Excluded"),
-				selectedLoadout.mIncludeCharms ? NamedTextColor.GREEN : NamedTextColor.RED, true,
-				"Click to toggle whether this loadout swaps your charms."))
+			setItem(4, 0, GUIUtils.createBasicItem(selectedLoadout.mIncludeCharms ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, 1,
+				Component.text("Charms " + (selectedLoadout.mIncludeCharms ? "Included" : "Excluded"),
+					selectedLoadout.mIncludeCharms ? NamedTextColor.GREEN : NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+				mPlayer.getScoreboardTags().contains(ARMORY_ZENITH_UPGRADE_TAG) ?
+					List.of(
+						Component.text("Left-click to toggle whether", NamedTextColor.GRAY),
+						Component.text("this loadout swaps your charms.", NamedTextColor.GRAY),
+						Component.text("Right-click to toggle between", NamedTextColor.GRAY),
+						Component.text("overworld and zenith charms.", NamedTextColor.GRAY),
+						Component.text("Current mode: ", NamedTextColor.GRAY).append(Component.text(selectedLoadout.mUseZenithCharms ? "zenith" : "overworld", NamedTextColor.WHITE))
+					) :
+					List.of(
+						Component.text("Click to toggle whether this", NamedTextColor.GRAY),
+						Component.text("loadout swaps your charms.", NamedTextColor.GRAY)
+					), true))
 				.onLeftClick(() -> {
 					selectedLoadout.mIncludeCharms = !selectedLoadout.mIncludeCharms;
 					update();
+				})
+				.onRightClick(() -> {
+					if (mPlayer.getScoreboardTags().contains(ARMORY_ZENITH_UPGRADE_TAG)) {
+						selectedLoadout.mUseZenithCharms = !selectedLoadout.mUseZenithCharms;
+						update();
+					}
 				});
 			if (selectedLoadout.mIncludeCharms) {
 				setItem(4, 1, getPlayerHead(GUIUtils.createBasicItem(Material.PLAYER_HEAD, "Set to current", NamedTextColor.WHITE, true,
@@ -507,7 +525,7 @@ public class LoadoutManagerGui extends Gui {
 					});
 
 				int i = 0;
-				for (ItemUtils.ItemIdentifier charm : selectedLoadout.mCharms) {
+				for (ItemUtils.ItemIdentifier charm : selectedLoadout.mUseZenithCharms ? selectedLoadout.mZenithCharms : selectedLoadout.mCharms) {
 					setItem(4, 2 + i, GUIUtils.createBasicItem(charm.mType, 1, charm.getDisplayName().color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD), List.of(), true));
 					i++;
 				}

@@ -184,6 +184,12 @@ public class LoadoutManager implements Listener {
 			name == null ? null : name.getAsString());
 	}
 
+	private static ItemUtils.ZenithCharmIdentifier parseItemIdentifier(JsonObject json, String typeProperty, String nameProperty, String uuidProperty) {
+		JsonPrimitive name = json.getAsJsonPrimitive(nameProperty);
+		return new ItemUtils.ZenithCharmIdentifier(Material.valueOf(json.getAsJsonPrimitive(typeProperty).getAsString()),
+			name == null ? null : name.getAsString(), json.getAsJsonPrimitive(uuidProperty).getAsLong());
+	}
+
 	public static boolean isEquipmentStorageBox(@Nullable ItemStack item) {
 		return item != null && ItemUtils.isShulkerBox(item.getType()) && STORAGE_SHULKER_NAME.equals(ItemUtils.getPlainNameIfExists(item));
 	}
@@ -340,9 +346,18 @@ public class LoadoutManager implements Listener {
 
 				// Swap charms
 				if (full && loadout.mIncludeCharms) {
+					CharmManager.CharmType type;
+					List<ItemUtils.ItemIdentifier> loadoutCharms;
+					if (loadout.mUseZenithCharms) {
+						type = CharmManager.CharmType.ZENITH;
+						loadoutCharms = loadout.mZenithCharms;
+					} else {
+						type = CharmManager.CharmType.NORMAL;
+						loadoutCharms = loadout.mCharms;
+					}
 					List<ItemUtils.ItemIdentifier> itemsNotFound = new ArrayList<>();
 					List<ItemUtils.ItemIdentifier> failedItems = new ArrayList<>();
-					List<ItemStack> activeCharms = Plugin.getInstance().mCharmManager.getCharms(player, CharmManager.CharmType.NORMAL);
+					List<ItemStack> activeCharms = Plugin.getInstance().mCharmManager.getCharms(player, type);
 					Set<ItemStack> oldCharmsSet = new HashSet<>(activeCharms);
 					List<ItemStack> oldCharms = new ArrayList<>(activeCharms);
 					activeCharms.clear();
@@ -350,11 +365,11 @@ public class LoadoutManager implements Listener {
 
 					// Equip new charms, swapping with old charms as far as possible
 					charmLoop:
-					for (ItemUtils.ItemIdentifier charmIdentifier : loadout.mCharms) {
+					for (ItemUtils.ItemIdentifier charmIdentifier : loadoutCharms) {
 						// First, check if equipped charms match and re-equip them if so
 						for (Iterator<ItemStack> iterator = oldCharms.iterator(); iterator.hasNext(); ) {
 							ItemStack oldCharm = iterator.next();
-							if (charmIdentifier.isIdentifierFor(oldCharm, false) && Plugin.getInstance().mCharmManager.validateCharm(player, oldCharm, CharmManager.CharmType.NORMAL)) {
+							if (charmIdentifier.isIdentifierFor(oldCharm, false) && Plugin.getInstance().mCharmManager.validateCharm(player, oldCharm, type)) {
 								activeCharms.add(oldCharm);
 								iterator.remove();
 								continue charmLoop;
@@ -368,7 +383,7 @@ public class LoadoutManager implements Listener {
 									ItemStatUtils.cleanIfNecessary(newItem);
 									ItemStack newItemClone = ItemUtils.clone(newItem);
 									newItemClone.setAmount(1);
-									if (!Plugin.getInstance().mCharmManager.validateCharm(player, newItemClone, CharmManager.CharmType.NORMAL)) {
+									if (!Plugin.getInstance().mCharmManager.validateCharm(player, newItemClone, type)) {
 										failedItems.add(charmIdentifier);
 										continue charmLoop;
 									}
@@ -396,7 +411,7 @@ public class LoadoutManager implements Listener {
 					swappedCharms = !oldCharmsSet.equals(new HashSet<>(activeCharms));
 
 					if (swappedCharms) {
-						Plugin.getInstance().mCharmManager.updateCharms(player, CharmManager.CharmType.NORMAL, activeCharms);
+						Plugin.getInstance().mCharmManager.updateCharms(player, type, activeCharms);
 					}
 					if (!itemsNotFound.isEmpty()) {
 						player.sendMessage(Component.text("Could not find all charms for this loadout! Hover this message to see missing charms.", NamedTextColor.RED)
@@ -587,8 +602,17 @@ public class LoadoutManager implements Listener {
 			}
 		}
 		if (loadout.mIncludeCharms) {
-			List<ItemStack> charms = Plugin.getInstance().mCharmManager.getCharms(player, CharmManager.CharmType.NORMAL);
-			for (ItemUtils.ItemIdentifier charm : loadout.mCharms) {
+			CharmManager.CharmType type;
+			List<ItemUtils.ItemIdentifier> loadoutCharms;
+			if (loadout.mUseZenithCharms) {
+				type = CharmManager.CharmType.ZENITH;
+				loadoutCharms = loadout.mZenithCharms;
+			} else {
+				type = CharmManager.CharmType.NORMAL;
+				loadoutCharms = loadout.mCharms;
+			}
+			List<ItemStack> charms = Plugin.getInstance().mCharmManager.getCharms(player, type);
+			for (ItemUtils.ItemIdentifier charm : loadoutCharms) {
 				if (charms.stream().noneMatch(item -> charm.isIdentifierFor(item, false))) {
 					return false;
 				}
@@ -659,7 +683,8 @@ public class LoadoutManager implements Listener {
 							if (!ItemUtils.isNullOrAir(item)
 								    && data.mLoadouts.stream()
 									       .noneMatch(loadout -> loadout.mEquipment.stream().anyMatch(loadoutItem -> isLoadoutItem(loadoutItem, false, item))
-										                             || loadout.mCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false)))) {
+											   || loadout.mCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false))
+											   || loadout.mZenithCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false)))) {
 								if (InventoryUtils.canFitInInventory(item, player.getInventory())) {
 									player.getInventory().addItem(ItemUtils.clone(item));
 									item.setAmount(0);
@@ -771,11 +796,14 @@ public class LoadoutManager implements Listener {
 		public boolean mIncludeCharms = true;
 		public boolean mIncludeClass = true;
 
+		public boolean mUseZenithCharms = false;
+
 		public List<LoadoutItem> mEquipment = new ArrayList<>();
 		public Map<EquipmentSlot, ItemStack> mVanity = new EnumMap<>(EquipmentSlot.class);
 		public int mLeftParrot;
 		public int mRightParrot;
 		public List<ItemUtils.ItemIdentifier> mCharms = new ArrayList<>();
+		public List<ItemUtils.ItemIdentifier> mZenithCharms = new ArrayList<>();
 		public LoadoutClass mClass = new LoadoutClass();
 
 		public boolean mIsQuickSwap = false;
@@ -818,11 +846,20 @@ public class LoadoutManager implements Listener {
 		}
 
 		public void setCharmsFromPlayer(Player player) {
-			List<ItemStack> charms = CharmManager.CharmType.NORMAL.mPlayerCharms.get(player.getUniqueId());
-			mCharms.clear();
+			CharmManager.CharmType type;
+			List<ItemUtils.ItemIdentifier> loadoutCharms;
+			if (mUseZenithCharms) {
+				type = CharmManager.CharmType.ZENITH;
+				loadoutCharms = mZenithCharms;
+			} else {
+				type = CharmManager.CharmType.NORMAL;
+				loadoutCharms = mCharms;
+			}
+			List<ItemStack> charms = type.mPlayerCharms.get(player.getUniqueId());
+			loadoutCharms.clear();
 			if (charms != null) {
 				for (ItemStack charm : charms) {
-					mCharms.add(ItemUtils.getIdentifier(charm, false));
+					loadoutCharms.add(ItemUtils.getIdentifier(charm, false));
 				}
 			}
 		}
@@ -872,6 +909,8 @@ public class LoadoutManager implements Listener {
 			json.addProperty("includeCharms", mIncludeCharms);
 			json.addProperty("includeClass", mIncludeClass);
 
+			json.addProperty("useZenithCharms", mUseZenithCharms);
+
 			JsonArray equipment = new JsonArray();
 			for (LoadoutItem loadoutItem : mEquipment) {
 				equipment.add(loadoutItem.toJson());
@@ -886,6 +925,19 @@ public class LoadoutManager implements Listener {
 				charms.add(charmJson);
 			}
 			json.add("charms", charms);
+
+			JsonArray zenithCharms = new JsonArray();
+			for (ItemUtils.ItemIdentifier charm : mZenithCharms) {
+				if (!(charm instanceof ItemUtils.ZenithCharmIdentifier zenithCharm)) {
+					continue;
+				}
+				JsonObject charmJson = new JsonObject();
+				charmJson.addProperty("type", zenithCharm.mType.name());
+				charmJson.addProperty("name", zenithCharm.mName);
+				charmJson.addProperty("uuid", zenithCharm.mUUID);
+				zenithCharms.add(charmJson);
+			}
+			json.add("zenithCharms", zenithCharms);
 
 			json.add("class", mClass.toJson());
 
@@ -931,12 +983,25 @@ public class LoadoutManager implements Listener {
 			loadout.mIncludeCharms = json.getAsJsonPrimitive("includeCharms").getAsBoolean();
 			loadout.mIncludeClass = json.getAsJsonPrimitive("includeClass").getAsBoolean();
 
+			loadout.mUseZenithCharms = false;
+			JsonPrimitive useZenithCharmsPrimitive = json.getAsJsonPrimitive("useZenithCharms");
+			if (useZenithCharmsPrimitive != null) {
+				loadout.mUseZenithCharms = useZenithCharmsPrimitive.getAsBoolean();
+			}
+
 			for (JsonElement equipment : json.getAsJsonArray("equipment")) {
 				loadout.mEquipment.add(LoadoutItem.fromJson(equipment.getAsJsonObject()));
 			}
 
 			for (JsonElement charm : json.getAsJsonArray("charms")) {
 				loadout.mCharms.add(parseItemIdentifier(charm.getAsJsonObject(), "type", "name"));
+			}
+
+			JsonArray zenithCharms = json.getAsJsonArray("zenithCharms");
+			if (zenithCharms != null) {
+				for (JsonElement charm : json.getAsJsonArray("zenithCharms")) {
+					loadout.mZenithCharms.add(parseItemIdentifier(charm.getAsJsonObject(), "type", "name", "uuid"));
+				}
 			}
 
 			loadout.mClass = LoadoutClass.fromJson(json.getAsJsonObject("class"));

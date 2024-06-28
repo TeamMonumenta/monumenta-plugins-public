@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -16,6 +17,7 @@ import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTList;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
@@ -1574,7 +1576,7 @@ public class ItemUtils {
 	 * (e.g. dyeing shulker or due to Multitool) and are still considered the same item.
 	 * Whether this is taken into account or not depends on the value of the 'normalized' parameter various methods take.
 	 */
-	public static final class ItemIdentifier {
+	public static class ItemIdentifier {
 		public final Material mType;
 		public final @Nullable String mName;
 
@@ -1627,9 +1629,49 @@ public class ItemUtils {
 		}
 	}
 
+	public static class ZenithCharmIdentifier extends ItemIdentifier {
+		public final long mUUID;
+
+		public ZenithCharmIdentifier(@Nullable Material type, @Nullable String name, long uuid) {
+			super(type, name);
+			this.mUUID = uuid;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (!(o instanceof ZenithCharmIdentifier that)) {
+				return false;
+			}
+			return mType == that.mType && Objects.equals(mName, that.mName) && mUUID == that.mUUID;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(mType, mName, mUUID);
+		}
+
+		@Override
+		public ItemIdentifier normalized(BooleanSupplier isMultitool) {
+			return this;
+		}
+	}
+
 	public static ItemIdentifier getIdentifier(@Nullable ItemStack item, boolean normalized) {
 		if (item != null) {
 			ItemIdentifier id = new ItemIdentifier(item.getType(), getPlainNameIfExists(item));
+			if (item.getType() != Material.AIR && item.getAmount() != 0) {
+				NBTItem nbt = new NBTItem(item);
+				ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+				if (playerModified != null) {
+					long uuid = playerModified.getLong(CharmFactory.CHARM_UUID_KEY);
+					if (uuid != 0 && item.getItemMeta().hasDisplayName()) {
+						id = new ZenithCharmIdentifier(item.getType(), MessagingUtils.plainText(item.getItemMeta().displayName()), uuid);
+					}
+				}
+			}
 			if (normalized) {
 				return id.normalized(() -> ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL));
 			}
