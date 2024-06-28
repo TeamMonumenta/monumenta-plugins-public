@@ -16,6 +16,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LootTableManager implements Listener {
@@ -253,5 +254,9 @@ public class LootTableManager implements Listener {
 
 	public static @Nullable LootTableEntry getLootTableEntry(NamespacedKey key) {
 		return INSTANCE.mTables.get(key);
+	}
+
+	public @NotNull Map<NamespacedKey, LootTableEntry> getTables() {
+		return mTables;
 	}
 }

@@ -333,6 +333,7 @@ public class Plugin extends JavaPlugin {
 		EffectListCommand.register();
 		PlayerSkinManagerCommand.register();
 		ScanMobsCommand.register();
+		WhatTableCommand.register();
 		StatTrackAdd.register();
 
 		try {

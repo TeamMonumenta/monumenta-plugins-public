@@ -448,9 +448,6 @@ public class MasterworkUtils {
 		Masterwork m = ItemStatUtils.getMasterwork(item);
 		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING) {
 			path += "/invalid_masterwork_selection";
-		} else if (m == Masterwork.ZERO) {
-			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-				        + toCleanPathName(ItemUtils.getPlainName(item));
 		} else {
 			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/" +
 				        toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + m.getName();
