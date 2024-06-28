@@ -7,8 +7,9 @@ import com.playmonumenta.libraryofsouls.bestiary.BestiaryManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -39,12 +40,11 @@ public class DescriptionBoss extends BossAbilityGroup {
 	}
 
 	private final Parameters mParams;
-	private boolean mSentOnce;
+	private final String ALREADY_SENT_TAG = "boss_description_sent";
 
 	public DescriptionBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
-		mSentOnce = false;
 
 		if (mParams.ON_SPAWN) {
 			sendDescription();
@@ -61,7 +61,7 @@ public class DescriptionBoss extends BossAbilityGroup {
 	}
 
 	public void sendDescription() {
-		if (mSentOnce) {
+		if (ScoreboardUtils.checkTag(mBoss, ALREADY_SENT_TAG)) {
 			return;
 		}
 
@@ -71,11 +71,10 @@ public class DescriptionBoss extends BossAbilityGroup {
 			for (Player player : players) {
 				if (BestiaryManager.getKillsForMob(player, soul) < mParams.KILL_REQ) {
 					List<Component> description = LibraryOfSoulsAPI.getDescription(mParams.LOS_NAME);
-					// only once per tick, as we don't want it to send twice if spawner spawns multiple mobs
-					if (description != null && MetadataUtils.checkOnceThisTick(mPlugin, player, "MobDescriptionFor" + player.getName())) {
+					if (description != null) {
 						player.sendMessage(Component.text("New mob encountered! ", NamedTextColor.GREEN, TextDecoration.ITALIC)
-							.append(Component.text(mBoss.getName(), NamedTextColor.GREEN, TextDecoration.BOLD))
-							.append(Component.text(":", NamedTextColor.GREEN)));
+							.append(Component.text(mBoss.getName()).decoration(TextDecoration.ITALIC, false))
+							.append(Component.text(":", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)));
 						Component message = Component.empty();
 						Iterator<Component> iter = description.iterator();
 						while (iter.hasNext()) {
@@ -85,8 +84,15 @@ public class DescriptionBoss extends BossAbilityGroup {
 							}
 						}
 						player.sendMessage(message);
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.MASTER, 1f, 1f);
-						mSentOnce = true;
+						player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1f, 0.69f);
+
+						// mute the descriptions of all other nearby copies of this mob and itself, as we've already played it to players
+						mBoss.addScoreboardTag(ALREADY_SENT_TAG);
+						List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), mParams.RANGE);
+						mobs.removeIf(mob -> !mob.getName().equals(mBoss.getName()));
+						for (LivingEntity mob : mobs) {
+							mob.addScoreboardTag(ALREADY_SENT_TAG);
+						}
 					}
 				}
 			}
