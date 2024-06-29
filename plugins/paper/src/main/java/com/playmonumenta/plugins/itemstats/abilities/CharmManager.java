@@ -1256,7 +1256,7 @@ public class CharmManager {
 		}
 
 		//Then calculate the cap. Just checks the last character for in case an effect has a percent in it
-		allEffects.replaceAll((a, b) -> Math.ceil(getValueOrCap(b, a.charAt(a.length() - 1) == '%' ? a.substring(0, a.length() - 1) : a) * 1000) / 1000);
+		allEffects.replaceAll((a, b) -> Math.ceil(getValueOrCap(b, a.charAt(a.length() - 1) == '%' ? a.substring(0, a.length() - 1) : a, charmType) * 1000) / 1000);
 
 		//Store to local map
 		mPlayerCharmEffectMap.put(uuid, allEffects);
@@ -1373,13 +1373,14 @@ public class CharmManager {
 		Set<String> orderedEffects = summary.keySet();
 
 		for (String s : orderedEffects) {
-			double value = getValueOrCap(summary.getOrDefault(s, 0.0), s);
+			final var normalized = s.replace("%", "");
+			double value = getValueOrCap(summary.getOrDefault(s, 0.0), normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
 			if (value != 0) {
 
 				// Strip .0s and calm down floating point lengths by restricting to 3 decimal places.
 				String desc = s + " : " + valueFormatter.format(value);
 
-				TextColor charmColor = getCharmEffectColor(value > 0, s.replace("%", ""));
+				TextColor charmColor = getCharmEffectColor(value > 0, normalized);
 
 				if (s.contains("%")) {
 					desc += "%";
@@ -1387,7 +1388,7 @@ public class CharmManager {
 
 				// If depths effect is maxed, display as such
 				if (charmType == CharmType.ZENITH) {
-					CharmEffects effect = CharmEffects.getEffect(s.replace("%", ""));
+					CharmEffects effect = CharmEffects.getEffect(normalized);
 					if (effect != null) {
 						if (value == effect.mEffectCap) {
 							charmColor = TextColor.fromHexString("#e49b20");
@@ -1552,16 +1553,18 @@ public class CharmManager {
 	 * @param charmEffectName The effect name
 	 * @return Returns the passed value, or returns the max value for the stat.
 	 */
-	public double getValueOrCap(double value, String charmEffectName) {
-
-		CharmEffects effect = CharmEffects.getEffect(charmEffectName);
-		if (effect == null) {
-			return value;
-		} else if ((effect.mEffectCap > 0 && effect.mEffectCap <= value) || (effect.mEffectCap < 0 && effect.mEffectCap >= value)) {
-			return effect.mEffectCap;
-		} else {
-			return value;
+	public double getValueOrCap(double value, String charmEffectName, CharmType charmType) {
+		if (charmType == CharmType.ZENITH) {
+			CharmEffects effect = CharmEffects.getEffect(charmEffectName);
+			if (effect != null && shouldCap(value, effect)) {
+				return effect.mEffectCap;
+			}
 		}
+		return value;
+	}
+
+	private boolean shouldCap(double value, CharmEffects effect) {
+		return (effect.mEffectCap > 0 && effect.mEffectCap <= value) || (effect.mEffectCap < 0 && effect.mEffectCap >= value);
 	}
 
 	public static TextColor getCharmEffectColor(boolean isPositive, String charmEffectName) {
