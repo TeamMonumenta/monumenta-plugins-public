@@ -129,7 +129,7 @@ public final class ParrotCustomInventory extends Gui {
 		ItemStack hxp = loadItemTable("epic:r1/items/currency/hyper_experience");
 		ItemStack pulsatingGold = loadItemTable("epic:r1/items/currency/pulsating_gold");
 		ItemStack pulsatingEmerald = loadItemTable("epic:r2/items/currency/pulsating_emerald");
-		ItemStack shardOfTheMantle = loadItemTable("epic:r1/kaul/crownshard");
+		ItemStack shardOfTheMantle = loadItemTable("epic:r1/items/currency/shard_of_the_mantle");
 		ItemStack titanicKnowledge = loadItemTable("epic:r2/eldrask/materials/epic_material");
 		ItemStack ancestralEffigy = loadItemTable("epic:r2/lich/materials/ancestral_effigy");
 		ItemStack voidstainedGeode = loadItemTable("epic:r2/depths/loot/voidstained_geode");
