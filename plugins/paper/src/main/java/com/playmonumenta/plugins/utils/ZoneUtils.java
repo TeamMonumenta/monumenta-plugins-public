@@ -61,7 +61,7 @@ public class ZoneUtils {
 		PORTAL_GUN_ENABLED("Portal Gun Enabled"),
 		PRECIOUS_BLOCK_DROPS_DISABLED("Precious Block Drops Disabled"),
 		ITEM_FRAMES_EDITABLE("Item Frames Editable"),
-		NO_CHARMS("No Charms"),
+		NO_VIRTUAL_INVENTORIES("No Virtual Inventories"),
 		;
 
 		private final String mPropertyName;
