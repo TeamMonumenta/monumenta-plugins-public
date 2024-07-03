@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -113,9 +114,13 @@ public class PassGui extends Gui {
 		setTitle(displayName);
 
 		if (!mIsModerator && mPlayer.getUniqueId().equals(mDisplayedPlayerId)) {
-			// Give rewards
-			for (SeasonalPass oldPass : SeasonalEventManager.mAllPasses.values()) {
-				oldPass.claimMP(mPlayer);
+			if (ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_VIRTUAL_INVENTORIES)) {
+				mPlayer.sendMessage(Component.text("You have unclaimed rewards, but may not claim them here.", NamedTextColor.GRAY));
+			} else {
+				// Give rewards
+				for (SeasonalPass oldPass : SeasonalEventManager.mAllPasses.values()) {
+					oldPass.claimMP(mPlayer);
+				}
 			}
 		}
 
