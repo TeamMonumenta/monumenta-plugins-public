@@ -97,13 +97,11 @@ public class WhatTableCommand {
 
 	private static CompletableFuture<Optional<List<NamespacedKey>>> searchForItemByName(String name, Location location) {
 		return new CompletableFuture<Optional<List<NamespacedKey>>>().completeAsync(() -> {
-			System.out.println("looking for " + name);
 			final var ret = Optional.of(LootTableManager.INSTANCE.getTables().keySet().stream().filter(namespacedKey -> Optional.ofNullable(Bukkit.getServer().getLootTable(namespacedKey))
 				.map(x -> x.populateLoot(null, new LootContext.Builder(location).build()))
 				.map(x ->
 					x.stream()
 						.filter(ItemStack::hasItemMeta)
-						.peek(y -> System.out.println(ItemUtils.getPlainName(y)))
 						.anyMatch(item -> ItemUtils.getRawDisplayNameAsString(item).toLowerCase(Locale.ROOT).contains(name.toLowerCase(Locale.ROOT)))
 				).orElse(false)).toList());
 			return !ret.get().isEmpty() ? ret : Optional.empty();
