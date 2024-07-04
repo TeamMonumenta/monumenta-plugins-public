@@ -562,8 +562,11 @@ public class AbilityUtils {
 				player.sendMessage(Component.text("You have not unlocked this specialization yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 				AbilityManager.getManager().resetPlayerAbilities(player);
 				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+			} else if (playerSpec != 0 && playerSpec != mClass.mSpecOne.mSpecialization && playerSpec != mClass.mSpecTwo.mSpecialization) {
+				player.sendMessage(Component.text("You had an invalid specialisation.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+				AbilityManager.getManager().resetPlayerAbilities(player);
+				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
 			}
-
 
 		}
 
