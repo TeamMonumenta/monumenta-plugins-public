@@ -151,13 +151,11 @@ public class HandOfLight extends Ability {
 		if (damage > 0) {
 			doCooldown = true;
 			for (LivingEntity mob : nearbyMobs) {
-				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
-
 				Location loc = mob.getLocation();
-				mCosmetic.lightDamageEffect(mPlayer, loc, mob);
+				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
+				mCosmetic.lightDamageEffect(mPlayer, loc, mob, undeadMobs);
 			}
-
-			mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+			mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1, nearbyMobs);
 		}
 
 		List<Player> nearbyPlayers = hitbox.getHitPlayers(mPlayer, true);
@@ -177,7 +175,7 @@ public class HandOfLight extends Ability {
 				mCosmetic.lightHealEffect(mPlayer, loc, p);
 			}
 
-			mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) mRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+			mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) mRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1, nearbyPlayers);
 
 			if (isEnhanced()) {
 				cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);

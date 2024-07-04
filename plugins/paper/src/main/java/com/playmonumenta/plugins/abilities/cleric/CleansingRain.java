@@ -72,7 +72,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 			return false;
 		}
 
-		mCosmetic.rainCast(mPlayer);
+		mCosmetic.rainCast(mPlayer, mRadius);
 		putOnCooldown();
 
 		// Run cleansing rain here until it finishes
@@ -92,7 +92,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 
 				double ratio = mRadius / CLEANSING_RADIUS;
 				double smallRatio = ratio / 3;
-				mCosmetic.rainCloud(mPlayer, ratio);
+				mCosmetic.rainCloud(mPlayer, ratio, mRadius);
 
 				List<Player> rainPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true);
 				for (Player player : rainPlayers) {
@@ -116,7 +116,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 				if (isEnhanced()) {
 					for (Player player : mCleansedPlayers) {
 						if (!rainPlayers.contains(player) && player != mPlayer) {
-							mCosmetic.rainEnhancement(mPlayer, smallRatio);
+							mCosmetic.rainEnhancement(mPlayer, smallRatio, mRadius);
 						}
 
 						PotionUtils.clearNegatives(mPlugin, player);

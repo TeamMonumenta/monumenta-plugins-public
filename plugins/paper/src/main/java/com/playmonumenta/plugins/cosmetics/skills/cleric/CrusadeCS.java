@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 
 public class CrusadeCS implements CosmeticSkill {
@@ -28,6 +29,10 @@ public class CrusadeCS implements CosmeticSkill {
 		Location loc = enemy.getLocation().add(0, enemy.getHeight() + 0.6, 0);
 		new PartialParticle(Particle.REDSTONE, loc, 20, 0.01, 0.35, 0.01, COLOR).spawnAsEnemyBuff();
 		new PartialParticle(Particle.REDSTONE, loc.add(0, 0.2, 0), 20, 0.175, 0.01, 0.01, COLOR).spawnAsEnemyBuff();
+	}
+
+	public void crusadeEnhancement(Player player, long numMobs) {
+
 	}
 }
 

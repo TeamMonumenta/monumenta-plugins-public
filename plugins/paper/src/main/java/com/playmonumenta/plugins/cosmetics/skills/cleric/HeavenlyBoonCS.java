@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class HeavenlyBoonCS implements CosmeticSkill {
@@ -24,27 +25,27 @@ public class HeavenlyBoonCS implements CosmeticSkill {
 		return Material.SPLASH_POTION;
 	}
 
-	public void splashEffectRegeneration(Player player) {
+	public void splashEffectRegeneration(Player player, LivingEntity mob) {
 		PotionUtils.splashPotionParticlesAndSound(player, Color.fromRGB(255, 102, 204));
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
 	}
 
-	public void splashEffectSpeed(Player player) {
+	public void splashEffectSpeed(Player player, LivingEntity mob) {
 		PotionUtils.splashPotionParticlesAndSound(player, Color.fromRGB(102, 204, 255));
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
 	}
 
-	public void splashEffectStrength(Player player) {
+	public void splashEffectStrength(Player player, LivingEntity mob) {
 		PotionUtils.splashPotionParticlesAndSound(player, Color.fromRGB(153, 0, 51));
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
 	}
 
-	public void splashEffectResistance(Player player) {
+	public void splashEffectResistance(Player player, LivingEntity mob) {
 		PotionUtils.splashPotionParticlesAndSound(player, Color.fromRGB(102, 153, 153));
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
 	}
 
-	public void splashEffectAbsorption(Player player) {
+	public void splashEffectAbsorption(Player player, LivingEntity mob) {
 		PotionUtils.splashPotionParticlesAndSound(player, Color.fromRGB(255, 214, 0));
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
 	}

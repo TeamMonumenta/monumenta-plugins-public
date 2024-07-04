@@ -177,7 +177,7 @@ public class LuminousInfusion extends Ability {
 
 		Location loc = damagee.getLocation();
 		World world = mPlayer.getWorld();
-		mCosmetic.infusionHitEffect(world, mPlayer, damagee);
+		mCosmetic.infusionHitEffect(world, mPlayer, damagee, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS));
 
 		// Exclude the damagee so that the knockaway is valid
 		List<LivingEntity> affected = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS)).getHitMobs(damagee);

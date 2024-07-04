@@ -150,10 +150,17 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	 * affectedEntities list so they don't get potion effects applied to them twice
 	 */
 	@Override
-	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
-	                                           PotionSplashEvent event) {
+	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (!(potion.getShooter() instanceof Player)) {
 			return true;
+		}
+
+		boolean isBoonPotion = false;
+		for (String boon : BOON_DROPS) {
+			if (Objects.requireNonNull(potion.getItem().getItemMeta().displayName()).toString().contains(boon)) {
+				isBoonPotion = true;
+				break;
+			}
 		}
 
 		boolean hasPositiveEffects = PotionUtils.hasPositiveEffects(PotionUtils.getEffects(potion.getItem()));
@@ -175,14 +182,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					continue;
 				}
 
-				boolean isBoonPotion = false;
-				for (String boon : BOON_DROPS) {
-					if (Objects.requireNonNull(potion.getItem().getItemMeta().displayName()).toString().contains(boon)) {
-						isBoonPotion = true;
-						break;
-					}
-				}
-
 				// Apply custom effects from potion
 				if (isBoonPotion) {
 					ItemStatUtils.changeDurationAndStrengths(p, potion.getItem(), mDurationChange, mPotStrengthChange);
@@ -193,7 +192,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				/* Remove this player from the "usual" application of potion effects */
 				affectedEntities.remove(p);
 			}
-			return false;
 		}
 
 		return true;
@@ -233,15 +231,15 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			PotionUtils.mimicSplashPotionEffect(mPlayer, splashPotion);
 			String name = ItemUtils.getRawDisplayNameAsString(potion);
 			if (name.contains("Regeneration")) {
-				mCosmetic.splashEffectRegeneration(mPlayer);
+				mCosmetic.splashEffectRegeneration(mPlayer, mob);
 			} else if (name.contains("Speed")) {
-				mCosmetic.splashEffectSpeed(mPlayer);
+				mCosmetic.splashEffectSpeed(mPlayer, mob);
 			} else if (name.contains("Strength")) {
-				mCosmetic.splashEffectStrength(mPlayer);
+				mCosmetic.splashEffectStrength(mPlayer, mob);
 			} else if (name.contains("Resistance")) {
-				mCosmetic.splashEffectResistance(mPlayer);
+				mCosmetic.splashEffectResistance(mPlayer, mob);
 			} else if (name.contains("Absorption")) {
-				mCosmetic.splashEffectAbsorption(mPlayer);
+				mCosmetic.splashEffectAbsorption(mPlayer, mob);
 			}
 
 			if (isEnhanced() && !isOnCooldown()) {

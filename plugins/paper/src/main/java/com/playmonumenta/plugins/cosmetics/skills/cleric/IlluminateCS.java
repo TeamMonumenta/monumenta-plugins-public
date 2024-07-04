@@ -118,7 +118,7 @@ public class IlluminateCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 0.25f, 0.5f);
 	}
 
-	public void sanctifiedZoneEffects(Player player, Location location, double radius, int ticks) {
+	public void sanctifiedZoneEffects(Player player, Location location, double radius, int ticks, double maxDuration) {
 		Location loc = location.clone();
 
 		// attempt to step up to avoid placing the ring inside the floor

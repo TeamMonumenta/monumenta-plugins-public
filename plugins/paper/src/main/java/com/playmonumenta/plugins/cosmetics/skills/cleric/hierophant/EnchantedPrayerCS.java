@@ -54,7 +54,7 @@ public class EnchantedPrayerCS implements CosmeticSkill {
 		new PartialParticle(Particle.SPELL_INSTANT, loc, 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(user);
 	}
 
-	public void onEffectTrigger(Player player, World world, Location loc, LivingEntity enemy) {
+	public void onEffectTrigger(Player player, World world, Location loc, LivingEntity enemy, double mEffectSize) {
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.2f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.5f, 1.8f);
 		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 0.8f, 1.6f);

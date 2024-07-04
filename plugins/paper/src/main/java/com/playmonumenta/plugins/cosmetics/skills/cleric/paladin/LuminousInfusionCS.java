@@ -47,7 +47,7 @@ public class LuminousInfusionCS implements CosmeticSkill {
 		new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(player);
 	}
 
-	public void infusionHitEffect(World world, Player player, LivingEntity damagee) {
+	public void infusionHitEffect(World world, Player player, LivingEntity damagee, double radius) {
 		Location loc = damagee.getLocation();
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3).spawnAsPlayerActive(player);

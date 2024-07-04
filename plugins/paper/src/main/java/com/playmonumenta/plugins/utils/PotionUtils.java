@@ -20,6 +20,7 @@ import java.util.NavigableSet;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -135,7 +136,6 @@ public class PotionUtils {
 		public boolean mShowParticles;
 		public boolean mShowIcon;
 		public boolean mInfinite;
-		public int mHeavenlyBoonExtensions;
 
 		public PotionInfo(PotionEffect effect) {
 			mType = effect.getType();
@@ -145,7 +145,6 @@ public class PotionUtils {
 			mShowParticles = effect.hasParticles();
 			mShowIcon = effect.hasIcon();
 			mInfinite = isInfinite(effect.getDuration());
-			mHeavenlyBoonExtensions = 0;
 		}
 
 		public PotionInfo(PotionInfo potionInfo) {
@@ -156,7 +155,6 @@ public class PotionUtils {
 			mShowParticles = potionInfo.mShowParticles;
 			mShowIcon = potionInfo.mShowIcon;
 			mInfinite = potionInfo.mInfinite;
-			mHeavenlyBoonExtensions = potionInfo.mHeavenlyBoonExtensions;
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
@@ -173,7 +171,6 @@ public class PotionUtils {
 			mShowParticles = showParticles;
 			mShowIcon = showIcon;
 			mInfinite = isInfinite(duration);
-			mHeavenlyBoonExtensions = heavenlyBoonExtensions;
 		}
 
 		public JsonObject getAsJsonObject() {
@@ -184,7 +181,6 @@ public class PotionUtils {
 			potionInfoObject.addProperty("amplifier", mAmplifier);
 			potionInfoObject.addProperty("ambient", mAmbient);
 			potionInfoObject.addProperty("show_particles", mShowParticles);
-			potionInfoObject.addProperty("heavenly_boon_extensions", mHeavenlyBoonExtensions);
 
 			return potionInfoObject;
 		}
@@ -196,11 +192,6 @@ public class PotionUtils {
 			mAmbient = object.get("ambient").getAsBoolean();
 			mShowParticles = object.get("show_particles").getAsBoolean();
 			mInfinite = isInfinite(mDuration);
-			if (object.has("heavenly_boon_extensions")) {
-				mHeavenlyBoonExtensions = object.get("heavenly_boon_extensions").getAsInt();
-			} else {
-				mHeavenlyBoonExtensions = 0;
-			}
 		}
 	}
 
@@ -515,6 +506,13 @@ public class PotionUtils {
 			color = Color.WHITE;
 		}
 		player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.POTION_BREAK, color.asRGB());
+	}
+
+	public static void splashPotionParticlesAndSound(Player player, @Nullable Color color, Location loc) {
+		if (color == null) {
+			color = Color.WHITE;
+		}
+		player.getWorld().playEffect(loc, org.bukkit.Effect.POTION_BREAK, color.asRGB());
 	}
 
 	public static void instantDrinkParticles(Player player, @Nullable Color color) {

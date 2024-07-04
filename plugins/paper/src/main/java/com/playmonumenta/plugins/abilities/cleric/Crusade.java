@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.CrusadeCS;
 import com.playmonumenta.plugins.effects.CrusadeTag;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Crusade extends Ability {
 	public static final String NAME = "Crusade";
+	public static final ClassAbility ABILITY = ClassAbility.CRUSADE;
 
 	public static final int TAG_DURATION = 10 * 20;
 	public static final double ENHANCEMENT_RADIUS = 8;
@@ -27,12 +29,13 @@ public class Crusade extends Ability {
 
 	public static final AbilityInfo<Crusade> INFO =
 		new AbilityInfo<>(Crusade.class, NAME, Crusade::new)
+			.linkedSpell(ABILITY)
 			.scoreboardId(NAME)
 			.shorthandName("Crs")
 			.descriptions(
 				"Your abilities now treat \"human-like\" enemies, such as illagers and witches, as Undead.",
 				"After being damaged or debuffed by cleric abilities, any mob will count as undead for the next 10s.",
-				String.format("Gain %s%% ability damage for every mob affected by this ability within %s blocks, capping at %s mobs.",
+				String.format("Gain %s%% ability damage for every undead mob within %s blocks, including those marked by Crusade, capping at %s mobs.",
 					(int) (ENHANCEMENT_BONUS_DAMAGE * 100), ENHANCEMENT_RADIUS, ENHANCEMENT_MAX_MOBS)
 			)
 			.simpleDescription("Passively count Humanoid mobs as Undead. Temporarily mark Monstrous mobs as Undead with abilities.")
@@ -56,6 +59,7 @@ public class Crusade extends Ability {
 				.getHitMobs().stream().filter(e -> enemyTriggersAbilities(e, this)).limit(ENHANCEMENT_MAX_MOBS).count();
 			double damagePerMob = ENHANCEMENT_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 			event.setDamage(event.getDamage() * (1 + damagePerMob * numMobs));
+			mCosmetic.crusadeEnhancement(mPlayer, numMobs);
 		}
 
 		addCrusadeTag(enemy);

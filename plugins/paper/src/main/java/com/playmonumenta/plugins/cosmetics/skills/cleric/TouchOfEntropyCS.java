@@ -60,13 +60,13 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	}
 
 	@Override
-	public void lightHealCastEffect(World world, Location userLoc, Plugin plugin, Player player, float radius, double angle) {
+	public void lightHealCastEffect(World world, Location userLoc, Plugin plugin, Player player, float radius, double angle, List<Player> nearbyPlayers) {
 		world.playSound(userLoc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.5f, 1.25f);
 		cone(player, radius, angle, false);
 	}
 
 	@Override
-	public void lightDamageEffect(Player player, Location loc, LivingEntity target) {
+	public void lightDamageEffect(Player player, Location loc, LivingEntity target, List<LivingEntity> undeadMobs) {
 		loc = loc.clone().add(0, 1, 0);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125)
 			.spawnAsPlayerActive(player);
@@ -80,7 +80,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	}
 
 	@Override
-	public void lightDamageCastEffect(World world, Location userLoc, Plugin plugin, Player player, float radius, double angle) {
+	public void lightDamageCastEffect(World world, Location userLoc, Plugin plugin, Player player, float radius, double angle, List<LivingEntity> nearbyMobs) {
 		world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.5f, 0.6f);
 		world.playSound(userLoc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.5f, 0.85f);
 		cone(player, radius, angle, true);

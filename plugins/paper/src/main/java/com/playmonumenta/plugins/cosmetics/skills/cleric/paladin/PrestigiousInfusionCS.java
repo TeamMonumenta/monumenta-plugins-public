@@ -130,7 +130,7 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	}
 
 	@Override
-	public void infusionHitEffect(World world, Player player, LivingEntity damagee) {
+	public void infusionHitEffect(World world, Player player, LivingEntity damagee, double radius) {
 		Location mCenter = damagee.getLocation();
 		world.playSound(mCenter, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1, 0.75f);
 		world.playSound(mCenter, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 3f, 1.5f);

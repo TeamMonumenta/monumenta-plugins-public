@@ -163,7 +163,7 @@ public class Illuminate extends Ability {
 
 		ClientModHandler.updateAbility(mPlayer, this);
 
-		final Location mLoc = mPlayer.getEyeLocation();
+		Location mLoc = mPlayer.getEyeLocation();
 		final Vector mIncrement = mLoc.getDirection().multiply(mMoveSpeed);
 
 		mPlayersInZone.clear();
@@ -279,7 +279,7 @@ public class Illuminate extends Ability {
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mZoneLoc, radius);
 				mMobsInZone.addAll(mobs);
 
-				mCosmetic.sanctifiedZoneEffects(mPlayer, mZoneLoc, radius, mZoneTicks);
+				mCosmetic.sanctifiedZoneEffects(mPlayer, mZoneLoc, radius, mZoneTicks, maxDuration);
 
 				mZoneTicks += 1;
 				if (mZoneTicks > maxDuration) {

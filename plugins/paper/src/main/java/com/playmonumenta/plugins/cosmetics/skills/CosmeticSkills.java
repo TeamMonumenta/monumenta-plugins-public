@@ -20,11 +20,25 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.RitualRin
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneScorchedEarthCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneTabooCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.PrestigiousEsotericCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.AnathemaCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.AwakeningCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodbathCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodyRetaliationCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.ContortingBoltCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DarkPunishmentCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.ForceFieldCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.PurgingPyreCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.SoulStrainCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.TouchOfEntropyCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.VitalityExtractionCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.AnimatingAuraCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.PrestigiousBeamCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.SpectralSerpentCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.TelekinesisCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.HypnoticChantCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.ImpalingDistortionCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.PrestigiousInfusionCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.RipplingBeamCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SanguineAegisCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.TwistedLanceCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.VolcanicBurstCS;
@@ -111,6 +125,20 @@ public class CosmeticSkills {
 		BloodyRetaliationCS::new,
 		PrestigiousInfusionCS::new,
 		PrestigiousBeamCS::new,
+		AwakeningCS::new,
+		SoulStrainCS::new,
+		VitalityExtractionCS::new,
+		BloodbathCS::new,
+		PurgingPyreCS::new,
+		ContortingBoltCS::new,
+		AnathemaCS::new,
+		ForceFieldCS::new,
+		RipplingBeamCS::new,
+		HypnoticChantCS::new,
+		ImpalingDistortionCS::new,
+		TelekinesisCS::new,
+		AnimatingAuraCS::new,
+		SpectralSerpentCS::new,
 
 		//Mage
 		VolcanicBurstCS::new,

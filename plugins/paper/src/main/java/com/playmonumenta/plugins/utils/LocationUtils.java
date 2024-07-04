@@ -691,6 +691,15 @@ public class LocationUtils {
 		}
 	}
 
+	public static double distanceToGround(Location loc, double minHeight, double maxDistance) {
+		Vector toGround = LocationUtils.getVectorTo(loc, fallToGround(loc, minHeight));
+		if (toGround.getY() > maxDistance) {
+			return 0;
+		} else {
+			return toGround.getY();
+		}
+	}
+
 	public static @Nullable String getPoiNameFromLocation(Location location) {
 		StructuresPlugin structuresPlugin = StructuresPlugin.getInstance();
 		if (structuresPlugin.mRespawnManager != null) {
