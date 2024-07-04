@@ -134,7 +134,7 @@ public final class ParrotCustomInventory extends Gui {
 		ItemStack ancestralEffigy = loadItemTable("epic:r2/lich/materials/ancestral_effigy");
 		ItemStack voidstainedGeode = loadItemTable("epic:r2/depths/loot/voidstained_geode");
 		ItemStack persistentParchment = loadItemTable("epic:r1/delves/rogue/persistent_parchment");
-		ItemStack unicornPuke = loadItemTable("epic:r1/dungeons/4/static_uncommons/unicorn_puke");
+		ItemStack unicornPuke = loadItemTable("epic:r1/items/uncommons/lightblue/unicorn_puke");
 		ItemStack blitzDoubloon = loadItemTable("epic:r1/blitz/blitz_doubloon");
 
 		//==================================================================================================
@@ -440,7 +440,7 @@ public final class ParrotCustomInventory extends Gui {
 				unicornPuke, 1),
 			null, null);
 
-		List<String> twistedMobsKilled = List.of("AlricLordofFrostedWinds", "YeigarLastEmperor", "SalazarArchitectofViridia", "XenoShatteredScalllawag", "IsadoratheBloodiedQueen", "CTelsketCrimsonConqueror", "AesirLightbringer");
+		List<String> twistedMobsKilled = List.of("AlricLordofFrostedWinds", "YeigarLastEmperor", "SalazarArchitectofViridia", "XenoShatteredScalllawag", "IsadoratheBloodiedQueen", "CTelsketCrimsonConqueror", "AesirLightbringer", "CZaniltheSoulcrusher");
 		boolean twistedUnlocked = true;
 
 		for (String twistedMobName : twistedMobsKilled) {
