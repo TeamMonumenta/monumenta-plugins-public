@@ -11,6 +11,8 @@ import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
@@ -71,7 +73,7 @@ public class Infernal {
 					}
 				}
 
-
+				spawningLoc.getWorld().playSound(spawningLoc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.2f);
 				Entity entity = INFERNAL_LAND_POOL.spawn(spawningLoc);
 				// Safety net in case the Infernal doesn't get summoned for some reason
 				if (entity != null && mob.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {

@@ -10,6 +10,8 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Colossal {
@@ -54,7 +56,9 @@ public class Colossal {
 
 		new PartialParticle(Particle.FLASH, loc).minimumCount(1).spawnAsEnemy();
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 30, 0.2, 0.2, 0.2, 0.1).spawnAsEnemy();
-
+		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 0.2f, 0.1f);
+		loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 0.6f, 0.1f);
+		loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.HOSTILE, 0.4f, 0.1f);
 		new PPRectPrism(Particle.REDSTONE, loc.clone().add(-0.5, -0.5, -0.5), loc.clone().add(0.5, 0.5, 0.5))
 				.countPerMeter(20).edgeMode(true).gradientColor(Color.fromRGB(247, 188, 37), Color.fromRGB(235, 69, 28), 0.75f)
 				.data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1f)).spawnAsEnemy();

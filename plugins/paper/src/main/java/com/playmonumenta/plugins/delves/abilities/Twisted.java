@@ -157,7 +157,12 @@ public class Twisted {
 		mobsInArea.remove(mob);
 		Location spawningLoc = mob.getLocation().clone();
 
-		mob.getWorld().playSound(spawningLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.5f);
+		spawningLoc.getWorld().playSound(spawningLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.1f, 0.2f);
+		spawningLoc.getWorld().playSound(spawningLoc, Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 0.3f, 0.1f);
+		spawningLoc.getWorld().playSound(spawningLoc, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 1.2f, 0.1f);
+		spawningLoc.getWorld().playSound(spawningLoc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.HOSTILE, 1.4f, 0.3f);
+		spawningLoc.getWorld().playSound(spawningLoc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 1.6f, 0.1f);
+		spawningLoc.getWorld().playSound(spawningLoc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 5f, 0.1f);
 		int count = MAX_SPIRAL_ANIMATOR_COUNT;
 		for (LivingEntity le : mobsInArea) {
 			final int countFinal = count;

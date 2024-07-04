@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -45,6 +47,9 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 				Location loc = mBoss.getLocation();
 				boolean isWaterLoc = BlockUtils.containsWater(loc.getBlock());
 				Entity entity;
+				loc.getWorld().playSound(loc, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 0.6f, 0.8f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1.3f, 0.5f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.HOSTILE, 0.6f, 0.7f);
 				if (isWaterLoc) {
 					entity = DREADNAUGHT_WATER_POOL.spawn(loc);
 				} else {

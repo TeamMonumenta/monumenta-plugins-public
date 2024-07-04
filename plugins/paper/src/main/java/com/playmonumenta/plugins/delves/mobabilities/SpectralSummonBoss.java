@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -44,6 +46,8 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 				Location loc = mBoss.getLocation();
 				boolean isWaterLoc = BlockUtils.containsWater(loc.getBlock());
 				Entity entity;
+				loc.getWorld().playSound(loc, Sound.ENTITY_SKELETON_AMBIENT, SoundCategory.HOSTILE, 1f, 0.2f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_SKELETON_DEATH, SoundCategory.HOSTILE, 0.2f, 0.1f);
 				if (isWaterLoc) {
 					entity = SPECTRAL_WATER_POOL.spawn(loc);
 				} else {
