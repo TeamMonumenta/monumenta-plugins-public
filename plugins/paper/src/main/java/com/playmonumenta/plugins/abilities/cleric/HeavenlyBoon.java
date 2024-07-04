@@ -11,19 +11,22 @@ import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTrigg
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HeavenlyBoonCS;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.HeavenlyBoonTracker;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.itemstats.EffectType;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.*;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -32,7 +35,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 
@@ -44,14 +46,12 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double HEAVENLY_BOON_1_CHANCE = 0.1;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.2;
 	private static final double HEAVENLY_BOON_HEAL_1 = 0.2;
-	private static final double HEAVENLY_BOON_HEAL_2 = 0.4;
+	private static final double HEAVENLY_BOON_HEAL_2 = 0.3;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0;
-	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
-	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 2 * 60 * 60 * 20;
-	private static final int MAX_EXTENSIONS = 10;
-
-	private static final int ENHANCEMENT_COOLDOWN_TICKS = 20;
+	private static final double ENHANCEMENT_CDR = 0.1;
+	private static final int ENHANCEMENT_CDR_CAP = 20;
+	private static final int ENHANCEMENT_COOLDOWN = 8 * 20;
 
 	private static final int BOSS_DAMAGE_THRESHOLD_R1 = 100;
 	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 200;
@@ -68,6 +68,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_RESIST_AMPLIFIER = "Heavenly Boon Resistance Amplifier";
 	public static final String CHARM_ABSORPTION_AMPLIFIER = "Heavenly Boon Absorption Amplifier";
 
+	public static final String CHARM_ENHANCE_COOLDOWN = "Heavenly Boon Enhancement Cooldown";
+	public static final String CHARM_ENHANCE_CDR = "Heavenly Boon Enhancement Cooldown Reduction";
+	public static final String CHARM_ENHANCE_CDR_CAP = "Heavenly Boon Enhancement Cooldown Reduction Cap";
+
 
 	public static final AbilityInfo<HeavenlyBoon> INFO =
 		new AbilityInfo<>(HeavenlyBoon.class, "Heavenly Boon", HeavenlyBoon::new)
@@ -75,16 +79,17 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.scoreboardId("HeavenlyBoon")
 			.shorthandName("HB")
 			.descriptions(
-				"Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever an undead mob you have hit within 1.5s dies or you deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an 20% Instant Health potion, with an additional effect of either Regen I, +10% Strength, +10% Resistance, +20% Speed, or +20% Absorption with a 20 second duration.",
+				"Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever an undead mob you have hit within 1.5s dies or you deal non-true damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an 20% Instant Health potion, with an additional effect of either Regen I, +10% Strength, +10% Resistance, +20% Speed, or +20% Absorption with a 20 second duration.",
 				"The chance to be splashed upon killing an undead mob is increased to 20%. The effect potions now give 40% Instant Health and the durations of each are increased to 50 seconds.",
 				String.format(
-					"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
-						" (up to a maximum of %s hours, and up to %s times per effect) on all players in the radius.",
-					(int) (ENHANCEMENT_POTION_EFFECT_BONUS * 100),
-					ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 60 * 20),
-					MAX_EXTENSIONS
+					"When a potion is created by this skill, decrease all other ability cooldowns of all players in the radius by %s%% (max %ss). " +
+						"This effect has a cooldown of %s seconds.",
+					StringUtils.multiplierToPercentage(ENHANCEMENT_CDR),
+					StringUtils.ticksToSeconds(ENHANCEMENT_CDR_CAP),
+					StringUtils.ticksToSeconds(ENHANCEMENT_COOLDOWN)
 				))
 			.simpleDescription("Share all positive splash potion effects with nearby players and occasionally generate splash potions when killing Undead enemies.")
+			.cooldown(0, 0, ENHANCEMENT_COOLDOWN, CHARM_ENHANCE_COOLDOWN)
 			.displayItem(Material.SPLASH_POTION);
 
 	private static final ImmutableSet<String> BOON_DROPS = ImmutableSet.of(
@@ -110,7 +115,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private final int mDurationChange;
 	private final ImmutableMap<String, Double> mPotStrengthChange;
 	private final double mRadius;
-	private int mLastSuccessfulProcTick = 0;
+	private final double mEnhanceCDR;
+	private final int mEnhanceCDRCap;
 	private final HeavenlyBoonCS mCosmetic;
 
 	private @Nullable Crusade mCrusade;
@@ -132,6 +138,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			"Absorption", CharmManager.getLevelPercentDecimal(player, CHARM_ABSORPTION_AMPLIFIER)
 		);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, HEAVENLY_BOON_RADIUS);
+		mEnhanceCDR = ENHANCEMENT_CDR + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_CDR);
+		mEnhanceCDRCap = CharmManager.getDuration(player, CHARM_ENHANCE_CDR_CAP, ENHANCEMENT_CDR_CAP);
 
 		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
@@ -193,6 +201,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType().equals(DamageType.TRUE)) {
+			return false; // don't count true damage
+		}
+
 		mTracker.updateDamageDealtToBosses(event);
 
 		if (enemy.isValid()) {
@@ -232,59 +244,22 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				mCosmetic.splashEffectAbsorption(mPlayer);
 			}
 
-			if (isEnhanced() && Bukkit.getCurrentTick() > mLastSuccessfulProcTick + ENHANCEMENT_COOLDOWN_TICKS) {
-				mLastSuccessfulProcTick = Bukkit.getCurrentTick();
-				for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
-					mPlugin.mPotionManager.modifyPotionDuration(p,
-						potionInfo -> {
-							if (potionInfo.mDuration > ENHANCEMENT_POTION_EFFECT_MAX_DURATION
-								    || potionInfo.mInfinite
-								    || potionInfo.mType == null
-								    || !PotionUtils.hasPositiveEffects(potionInfo.mType)
-								    || potionInfo.mHeavenlyBoonExtensions >= MAX_EXTENSIONS) {
-								return potionInfo.mDuration;
-							}
-							potionInfo.mHeavenlyBoonExtensions++;
-							return Math.min(potionInfo.mDuration + (int) (potionInfo.mDuration * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_DURATION);
-						});
-					List<Effect> effects = mPlugin.mEffectManager.getEffects(p);
-					if (effects != null) {
-						for (Effect e : effects) {
-							if (e.isBuff()
-								    && (e.getDuration() < ENHANCEMENT_POTION_EFFECT_MAX_DURATION
-									        && e.getDuration() != PotionEffect.INFINITE_DURATION)
-								    && EffectType.isEffectTypeAppliedEffect(mPlugin.mEffectManager.getSource(p, e))
-								    && e.getHeavenlyBoonExtensions() < MAX_EXTENSIONS) {
-								e.incrementHeavenlyBoonExtensions();
-								e.setDuration(Math.min(e.getDuration() + (int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
-							}
+			if (isEnhanced() && !isOnCooldown()) {
+				putOnCooldown();
+
+				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
+					for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilities()) {
+						ClassAbility linkedSpell = ability.getInfo().getLinkedSpell();
+						if (ability == this || linkedSpell == null) {
+							continue;
 						}
+						int reducedCD = Math.min((int) (ability.getModifiedCooldown() * mEnhanceCDR), mEnhanceCDRCap);
+						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, reducedCD);
 					}
+
+					mCosmetic.enhanceCDR(player);
 				}
 			}
 		}
-	}
-
-	public static void cancelExtensions(Player player) {
-		List<Effect> effects = EffectManager.getInstance().getAllEffects(player);
-		for (Effect effect : effects) {
-			if (effect.mHeavenlyBoonExtensions > 0) {
-				effect.setDuration(reduceDuration(effect.getDuration(), effect.mHeavenlyBoonExtensions));
-				effect.mHeavenlyBoonExtensions = 0;
-			}
-		}
-
-		List<PotionUtils.PotionInfo> infos = Plugin.getInstance().mPotionManager.getPotionInfoList(player);
-		for (PotionUtils.PotionInfo info : infos) {
-			if (info.mHeavenlyBoonExtensions > 0) {
-				info.mDuration = reduceDuration(info.mDuration, info.mHeavenlyBoonExtensions);
-				info.mHeavenlyBoonExtensions = 0;
-			}
-		}
-		Plugin.getInstance().mPotionManager.refreshEffects(player);
-	}
-
-	private static int reduceDuration(int duration, int extensions) {
-		return (int) Math.round(duration * Math.pow(1 + ENHANCEMENT_POTION_EFFECT_BONUS, -extensions));
 	}
 }

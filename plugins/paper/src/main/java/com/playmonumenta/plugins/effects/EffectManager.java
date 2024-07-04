@@ -262,7 +262,6 @@ public final class EffectManager implements Listener {
 						serializedEffect.addProperty("displaysTime", effect.doesDisplayTime());
 						serializedEffect.addProperty("displays", effect.doesDisplay());
 						serializedEffect.addProperty("deleteOnLogout", effect.shouldDeleteOnLogout());
-						serializedEffect.addProperty("heavenlyBoonExtensions", effect.mHeavenlyBoonExtensions);
 						if (serializedEffect.has("effectID")) {
 							inner.add(serializedEffect);
 						} else {
@@ -781,9 +780,6 @@ public final class EffectManager implements Listener {
 			if (delete) {
 				Bukkit.getScheduler().runTaskLater(plugin, deserializedEffect::clearEffect, 5);
 			}
-		}
-		if (deserializedEffect != null && object.has("heavenlyBoonExtensions")) {
-			deserializedEffect.mHeavenlyBoonExtensions = object.get("heavenlyBoonExtensions").getAsInt();
 		}
 
 		return deserializedEffect;

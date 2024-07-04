@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.depths;
 
-import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
@@ -120,9 +119,6 @@ public class DepthsPlayer {
 		ScoreboardUtils.setScoreboardValue(p, "DDDelve2", 0);
 
 		sendMessage("Initializing Depths System! Press button again to begin.");
-
-		// Remove Heavenly Boon extensions when beginning a run
-		HeavenlyBoon.cancelExtensions(p);
 	}
 
 	public List<DepthsTree> initTrees(Player player) {
