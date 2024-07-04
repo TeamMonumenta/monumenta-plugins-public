@@ -220,8 +220,8 @@ public class ZenithLoot {
 		LootTable pomeTable = Bukkit.getLootTable(POME_KEY);
 		if (pomeTable != null) {
 			for (int i = 0; i < (int) (treasureScore * ((CURRENCY_PER_ASC_LEVEL * ascensionLevel) + 1)) - 54; i++) {
-				// 1/8 chance to drop a pome per treasure score excess in ascension
-				if (r.nextInt(8) == 0) {
+				// 1/10 chance to drop a pome per treasure score excess in ascension
+				if (r.nextInt(10) == 0) {
 					loot = pomeTable.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						for (ItemStack item : loot) {

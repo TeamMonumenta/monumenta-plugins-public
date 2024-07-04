@@ -151,8 +151,8 @@ public class DepthsLoot {
 		LootTable pomeTable = Bukkit.getLootTable(POME_KEY);
 		if (pomeTable != null) {
 			for (int i = 0; i < treasureScore - 54; i++) {
-				// 1/50 chance to drop a pome per treasure score in endless mode
-				if (r.nextInt(50) == 0) {
+				// 1/60 chance to drop a pome per treasure score in endless mode
+				if (r.nextInt(60) == 0) {
 					loot = pomeTable.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						for (ItemStack item : loot) {
@@ -172,7 +172,6 @@ public class DepthsLoot {
 				for (ItemStack item : loot) {
 					Item lootOnGround = loc.getWorld().dropItem(loc, item);
 					PotionUtils.applyColoredGlowing("DepthsLootRoom", lootOnGround, NamedTextColor.LIGHT_PURPLE, 10000);
-
 				}
 			}
 		}
