@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
@@ -60,18 +61,22 @@ public class Trivium implements Enchantment {
 							if (eventList.size() >= 3) {
 								// If this tick had more than 3 of the same damage event of the same ability...
 								// Proc Trivium, damage entity for 10% more damage per level.
+								Location loc = player.getLocation().zero();
 								for (DamageEvent e : eventList) {
+									loc.add(e.getDamagee().getLocation());
 									DamageUtils.damage(p, e.getDamagee(), DamageEvent.DamageType.TRUE, e.getDamage() * (DAMAGE_PER_LEVEL * value), ClassAbility.TRIVIUM, true, false);
 								}
+								// Find the average location of all entities hit
+								loc.multiply((double) 1 / eventList.size());
 								p.playSound(
-									p.getLocation(),
+									loc,
 									Sound.ENTITY_ILLUSIONER_CAST_SPELL,
 									SoundCategory.PLAYERS,
 									0.8f,
 									2f
 								);
 								p.playSound(
-									p.getLocation(),
+									loc,
 									Sound.ENTITY_BLAZE_SHOOT,
 									SoundCategory.PLAYERS,
 									0.8f,
