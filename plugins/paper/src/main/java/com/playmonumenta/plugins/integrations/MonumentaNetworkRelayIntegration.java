@@ -11,6 +11,7 @@ public class MonumentaNetworkRelayIntegration {
 	public static final String AUDIT_LOG_DEATH_CHANNEL = "Monumenta.Automation.DeathAuditLog";
 	public static final String AUDIT_LOG_PLAYERS_CHANNEL = "Monumenta.Automation.PlayerAuditLog";
 	public static final String AUDIT_LOG_MARKET_CHANNEL = "Monumenta.Automation.MarketAuditLog";
+	public static final String AUDIT_LOG_REPORT_CHANNEL = "Monumenta.Automation.ReportAuditLog";
 	public static final String ADMIN_ALERT_CHANNEL = "Monumenta.Automation.AdminNotification";
 
 	private final Logger mLogger;
@@ -77,5 +78,9 @@ public class MonumentaNetworkRelayIntegration {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	public static void sendReportAuditLogMessage(String message) {
+		sendAuditLogMessage(message, AUDIT_LOG_REPORT_CHANNEL);
 	}
 }

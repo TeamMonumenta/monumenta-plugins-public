@@ -304,6 +304,15 @@ public class AuditListener implements Listener {
 		}
 	}
 
+	public static void logReport(String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendReportAuditLogMessage(createLocationData() + " " + message);
+		}
+
+	}
+
+
 	public static String createLocationData() {
 		String playerShard = PlaceholderAPI.setPlaceholders(null, "%network-relay_shard%");
 		return "<" + playerShard + ">";

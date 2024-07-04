@@ -289,6 +289,7 @@ public class Plugin extends JavaPlugin {
 		RefreshClass.register(this);
 		RegisterTorch.register();
 		RepairItemCommand.register();
+		ReportCommand.register();
 		RemoveTags.register();
 		RenameItemCommand.register();
 		ResetClass.register();
