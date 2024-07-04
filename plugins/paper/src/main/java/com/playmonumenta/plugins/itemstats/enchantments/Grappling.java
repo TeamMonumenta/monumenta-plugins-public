@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.GrapplingFallDR;
 import com.playmonumenta.plugins.effects.ItemCooldown;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.protocollib.PingListener;
@@ -54,6 +54,7 @@ import org.bukkit.util.Vector;
 public class Grappling implements Enchantment {
 	private static final double MAX_VERTICAL_PER_LEVEL = 1;
 	private static final double MAX_HORIZONTAL_PER_LEVEL = 0.5;
+	private static final double FALL_DR_PER_LEVEL = -0.015;
 	private static final int PICKUP_RANGE_SQUARED = 12;
 	public static final double PLAYER_HORIZONTAL_SPEED = 15.0 / 200;
 	public static final double MOB_HORIZONTAL_SPEED = 29.0 / 200;
@@ -219,6 +220,16 @@ public class Grappling implements Enchantment {
 			.add(0.5, 1, 0.5)     // Add 0.5 x and z because coordinates will place you at the northeast corner; add 1 y so we are on top of block
 			.add(0, 2, 0);        // Add 2 so we overshoot a bit and fall onto the location
 
+		// Apply fall damage reduction until player lands
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Plugin.getInstance().mEffectManager.addEffect(player, "GrapplingFallDR", new GrapplingFallDR(200, FALL_DR_PER_LEVEL * level)), 5);
+
+		double r = Math.max(0.5, v.length() / 10);
+		new PPCircle(Particle.SPIT, player.getLocation(), r).countPerMeter(10).delta(0).ringMode(false).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL, player.getLocation(), r).countPerMeter(10).delta(0).spawnAsPlayerActive(player);
+		player.getWorld().playSound(player, Sound.ENTITY_ENDER_EYE_LAUNCH, SoundCategory.PLAYERS, 1f, 1f);
+		player.getWorld().playSound(player, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
+		player.getWorld().playSound(player, Sound.ENTITY_LEASH_KNOT_PLACE, SoundCategory.PLAYERS, 1f, 1f);
+
 		Vector angleCheck = hitBlock.getLocation().add(0.5, 1, 0.5).subtract(playerLoc).toVector();
 		double hypotenuse = angleCheck.length();
 		double downAngle = Math.acos(angleCheck.getY() / hypotenuse);
@@ -228,8 +239,6 @@ public class Grappling implements Enchantment {
 			v.multiply(PLAYER_HORIZONTAL_SPEED * 2);
 			v.setY(v.getY() * 1.5);
 			player.setVelocity(v);
-			// Apply fall damage reduction
-			Plugin.getInstance().mEffectManager.addEffect(player, "GrapplingFallDR", new PercentDamageReceived(20, -0.666, EnumSet.of(DamageEvent.DamageType.FALL)));
 			hook.mPulledOnce = true;
 			return;
 		}
@@ -283,7 +292,6 @@ public class Grappling implements Enchantment {
 						Plugin.getInstance().mEffectManager.clearEffects(player, ItemCooldown.toSource(EnchantmentType.GRAPPLING));
 						player.setCooldown(COOLDOWN_ITEM, 0);
 						doPickupAnimation(player);
-						Plugin.getInstance().mEffectManager.clearEffects(player, "GrapplingFallDR");
 						mRechargeImmediately = true;
 						this.cancel();
 					}
