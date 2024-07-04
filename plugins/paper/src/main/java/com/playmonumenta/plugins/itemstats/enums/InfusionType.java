@@ -95,7 +95,8 @@ public enum InfusionType {
 	STAT_TRACK_CONVERT(new StatTrackConvert(), "", true, false, false, true, false, false, false, false),
 	STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false, false, false, false),
 	STAT_TRACK_HEALING_DONE(new StatTrackHealingDone(), "", true, false, false, true, false, false, false, false),
-	STAT_TRACK_FISH_CAUGHT(new StatTrackFishCaught(), "", true, false, false, true, false, false, false, false);
+	STAT_TRACK_FISH_CAUGHT(new StatTrackFishCaught(), "", true, false, false, true, false, false, false, false),
+	STAT_TRACK_CHEST_BROKEN(new StatTrackChests(), "", true, false, false, true, false, false, false, false);
 
 	public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
 		.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));

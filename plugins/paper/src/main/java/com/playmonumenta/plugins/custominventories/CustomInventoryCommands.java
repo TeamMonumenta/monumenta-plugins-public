@@ -71,13 +71,13 @@ public class CustomInventoryCommands {
 			})
 			.register();
 
-
 		new CommandAPICommand("openpeb")
 			.withPermission("monumenta.command.openpeb")
 			.executesPlayer((player, args) -> {
 				new PEBCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
+
 		new CommandAPICommand("openpeb")
 			.withPermission("monumenta.command.openpeb")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))

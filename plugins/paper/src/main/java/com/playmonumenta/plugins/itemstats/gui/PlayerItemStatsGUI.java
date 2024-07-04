@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,6 +41,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerItemStatsGUI extends CustomInventory {
+	public static final String LEFT_INFUSION_SETTING_SCORE = "PlayerStatsInfusionSettingLeft";
+	public static final String RIGHT_INFUSION_SETTING_SCORE = "PlayerStatsInfusionSettingRight";
 
 	static class Settings {
 		final EnumSet<PSGUISecondaryStat> mSecondaryStatEnabled = EnumSet.noneOf(PSGUISecondaryStat.class);
@@ -189,7 +192,18 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			                              .orElse(ServerProperties.getRegion(player));
 		mLeftStats.mPlayerItemStats.setRegion(region);
 		mRightStats.mPlayerItemStats.setRegion(region);
+		final var infusionSettingCount = InfusionSetting.values().length;
+		final var left = ScoreboardUtils.getScoreboardValue(player, LEFT_INFUSION_SETTING_SCORE).orElse(0) % infusionSettingCount;
+		final var right = ScoreboardUtils.getScoreboardValue(player, RIGHT_INFUSION_SETTING_SCORE).orElse(0) % infusionSettingCount;
+		mLeftStats.mInfusionSetting = InfusionSetting.values()[left];
+		mRightStats.mInfusionSetting = InfusionSetting.values()[right];
 		generateInventory();
+	}
+
+	private void doSetInfusionSetting(PSGUIStats target, InfusionSetting setting) {
+		target.mInfusionSetting = setting;
+		final var score = target == mLeftStats ? LEFT_INFUSION_SETTING_SCORE : RIGHT_INFUSION_SETTING_SCORE;
+		ScoreboardUtils.setScoreboardValue(mViewer, score, setting.ordinal());
 	}
 
 	private void setEquipmentFromPlayer(boolean right, Player player) {
@@ -276,8 +290,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				mRightStats.mDisplayedEquipment.clear();
 				mRightStats.mDisplayedEquipment.putAll(leftDisplayEquipment);
 				InfusionSetting leftInfusionSetting = mLeftStats.mInfusionSetting;
-				mLeftStats.mInfusionSetting = mRightStats.mInfusionSetting;
-				mRightStats.mInfusionSetting = leftInfusionSetting;
+				doSetInfusionSetting(mLeftStats, mRightStats.mInfusionSetting);
+				doSetInfusionSetting(mRightStats, leftInfusionSetting);
 				generateInventory();
 				return;
 			}
@@ -313,7 +327,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 			if (slot == INFUSION_SETTINGS_LEFT_SLOT || slot == INFUSION_SETTINGS_RIGHT_SLOT) {
 				PSGUIStats stats = (slot == INFUSION_SETTINGS_LEFT_SLOT ? mLeftStats : mRightStats);
-				stats.mInfusionSetting = InfusionSetting.values()[(stats.mInfusionSetting.ordinal() + (event.getClick().isLeftClick() ? 1 : InfusionSetting.values().length - 1)) % InfusionSetting.values().length];
+				doSetInfusionSetting(stats, InfusionSetting.values()[(stats.mInfusionSetting.ordinal() + (event.getClick().isLeftClick() ? 1 : InfusionSetting.values().length - 1)) % InfusionSetting.values().length]);
 				generateInventory();
 				return;
 			}

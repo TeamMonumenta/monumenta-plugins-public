@@ -48,6 +48,7 @@ public class StatTrackItem extends GenericCommand {
 		.put("dmgtaken", InfusionType.STAT_TRACK_DAMAGE_TAKEN)
 		.put("healdone", InfusionType.STAT_TRACK_HEALING_DONE)
 		.put("fish", InfusionType.STAT_TRACK_FISH_CAUGHT)
+		.put("chests", InfusionType.STAT_TRACK_CHEST_BROKEN)
 		.build();
 
 	public static void register() {

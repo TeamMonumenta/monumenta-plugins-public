@@ -127,8 +127,9 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		String dio = "I feel it... partin'... the beyond calls... and I answer...";
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, 50, "tellraw @s [\"\",{\"text\":\"" + dio + "\",\"color\":\"red\"}]");
+		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 10, true, false);
+		sendMessage("I feel it... partin'... the beyond calls... and I answer...");
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -170,7 +171,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 			@Override
 			public void run() {
 				String[] dio = {"The light... it burns...", "That lantern be shinin' through the beyond..."};
-				PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, 50, "tellraw @s [\"\",{\"text\":\"" + dio[mCount] + "\",\"color\":\"red\"}]");
+				sendMessage(dio[mCount]);
 				mCount++;
 				if (mCount == dio.length) {
 					this.cancel();
@@ -186,6 +187,17 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 			as.setInvulnerable(true);
 			as.setMarker(true);
 			as.addScoreboardTag("summon_constantly_stand");
+		}
+	}
+
+	public List<Player> getPlayers() {
+		return PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+	}
+
+	public void sendMessage(String message) {
+		Component component = Component.text(message, NamedTextColor.RED);
+		for (Player player : getPlayers()) {
+			player.sendMessage(component);
 		}
 	}
 }
