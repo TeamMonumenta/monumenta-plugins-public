@@ -466,28 +466,21 @@ public class TradeListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (event.getClickedInventory() instanceof MerchantInventory merchantInventory
-			    && event.getSlot() == 2 // result slot
-			    && (isShulkerBoxWithContents(merchantInventory, 0) || isShulkerBoxWithContents(merchantInventory, 1))) {
+			&& event.getSlot() == 2
+			&& (isInvalidItem(merchantInventory, 0) || isInvalidItem(merchantInventory, 1))) {
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		}
 	}
 
-	private static boolean isShulkerBoxWithContents(MerchantInventory merchantInventory, int slot) {
+	private static boolean isInvalidItem(MerchantInventory merchantInventory, int slot) {
 		if (slot >= merchantInventory.getSize()) {
 			return false;
 		}
 		ItemStack item = merchantInventory.getItem(slot);
-		if (item == null || !ItemUtils.isShulkerBox(item.getType())) {
+		if (item == null) {
 			return false;
 		}
-		if (!(item.getItemMeta() instanceof BlockStateMeta meta)
-			    || !(meta.getBlockState() instanceof ShulkerBox shulkerBox)
-			    || shulkerBox.getInventory().isEmpty()) {
-			return false;
-		}
-		// After this point, a shulker box with contents is in the trade.
-		// Only allow the trade if the trade requires a shulker box with the exact same contents.
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
 		if (merchantRecipe == null) {
 			return true;
@@ -496,7 +489,29 @@ public class TradeListener implements Listener {
 		if (slot >= ingredients.size()) {
 			return true;
 		}
-		return !item.isSimilar(ingredients.get(slot));
+		ItemStack ingredient = ingredients.get(slot);
+		return isShulkerBoxWithContents(item, ingredient) || isNotVanillaItem(item, ingredient);
 	}
 
+	private static boolean isShulkerBoxWithContents(ItemStack item, ItemStack ingredient) {
+		if (!ItemUtils.isShulkerBox(item.getType())) {
+			return false;
+		}
+		if (!(item.getItemMeta() instanceof BlockStateMeta meta)
+			    || !(meta.getBlockState() instanceof ShulkerBox shulkerBox)
+			    || shulkerBox.getInventory().isEmpty()) {
+			return false;
+		}
+		return !item.isSimilar(ingredient);
+	}
+
+	// checks if ingredient is vanilla and player item is NOT vanilla
+	private static boolean isNotVanillaItem(ItemStack item, ItemStack ingredient) {
+		ItemStack vanillaItem = new ItemStack(ingredient.getType());
+		// ingredient is not a vanilla item, ignore
+		if (!ingredient.isSimilar(vanillaItem)) {
+			return false;
+		}
+		return !item.isSimilar(vanillaItem);
+	}
 }
