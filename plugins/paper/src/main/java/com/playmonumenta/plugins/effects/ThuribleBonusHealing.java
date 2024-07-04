@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class ThuribleBonusHealing extends SingleArgumentEffect {
@@ -15,7 +17,12 @@ public class ThuribleBonusHealing extends SingleArgumentEffect {
 	}
 
 	@Override
+	public @Nullable Component getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(" " + getDisplayedName()));
+	}
+
+	@Override
 	public @Nullable String getDisplayedName() {
-		return "Thurible Healing";
+		return "Rejuvenation Heal";
 	}
 }

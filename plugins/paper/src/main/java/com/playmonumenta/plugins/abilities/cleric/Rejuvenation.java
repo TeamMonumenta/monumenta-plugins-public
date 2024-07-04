@@ -60,7 +60,7 @@ public class Rejuvenation extends Ability {
 					NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(player, PERCENT_HEAL_EFFECT_NAME);
 					if (effectGroup != null) {
 						ThuribleBonusHealing effect = (ThuribleBonusHealing) effectGroup.last();
-						healPercent = effect.getMagnitude();
+						healPercent = PERCENT_HEAL * (1 + effect.getMagnitude());
 					}
 					Integer lastHealTick = LAST_HEAL_TICK.get(player.getUniqueId());
 					if (lastHealTick == null || Bukkit.getServer().getCurrentTick() - lastHealTick >= HEAL_INTERVAL) {

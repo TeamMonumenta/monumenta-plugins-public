@@ -37,6 +37,8 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private static final int THURIBLE_COOLDOWN = 8 * 20;
 	private static final double EFFECT_PERCENT_1 = 0.10;
 	private static final double EFFECT_PERCENT_2 = 0.15;
+	private static final double THURIBLE_HEALING_PERCENT_1 = 1.0;
+	private static final double THURIBLE_HEALING_PERCENT_2 = 2.0;
 	private static final int MAX_BUFFS = 4;
 	private static final double DAMAGE_BREAK_PERCENT = 0.6;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
@@ -158,10 +160,11 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	private Effect[] getEffectArray(int duration) {
 		double effectPercent = isLevelOne() ? EFFECT_PERCENT_1 : EFFECT_PERCENT_2;
+		double healingPercent = isLevelOne() ? THURIBLE_HEALING_PERCENT_1 : THURIBLE_HEALING_PERCENT_2;
 		return new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + effectPercent, PERCENT_ATTACK_SPEED_EFFECT_NAME),
 		                     new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + effectPercent, PERCENT_SPEED_EFFECT_NAME),
 		                     new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + effectPercent, AFFECTED_DAMAGE_TYPES),
-		                     new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + effectPercent)};
+		                     new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + healingPercent)};
 	}
 
 	@Override
