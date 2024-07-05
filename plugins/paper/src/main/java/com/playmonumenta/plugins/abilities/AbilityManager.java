@@ -187,6 +187,7 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -664,8 +665,8 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, Ability::playerConsumeArrowEvent);
 	}
 
-	public boolean playerThrewSplashPotionEvent(Player player, ThrownPotion potion) {
-		return conditionalCastCancellable(player, (ability) -> ability.playerThrewSplashPotionEvent(potion));
+	public boolean playerThrewSplashPotionEvent(Player player, ThrownPotion potion, ProjectileLaunchEvent event) {
+		return conditionalCastCancellable(player, (ability) -> ability.playerThrewSplashPotionEvent(potion, event));
 	}
 
 	public boolean playerThrewLingeringPotionEvent(Player player, ThrownPotion potion) {

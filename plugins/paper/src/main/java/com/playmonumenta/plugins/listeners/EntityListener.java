@@ -559,7 +559,7 @@ public class EntityListener implements Listener {
 				}
 
 				if (potionItem.getType() == Material.SPLASH_POTION) {
-					if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
+					if (!mAbilities.playerThrewSplashPotionEvent(player, potion, event)) {
 						event.setCancelled(true);
 						return;
 					}

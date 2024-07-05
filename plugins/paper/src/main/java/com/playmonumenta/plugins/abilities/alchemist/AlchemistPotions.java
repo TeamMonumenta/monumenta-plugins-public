@@ -48,6 +48,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -135,7 +136,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion, ProjectileLaunchEvent e) {
 		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
 			mPlayer.setMetadata(METADATA_KEY, new FixedMetadataValue(mPlugin, mPlayer.getTicksLived()));
 			if (decrementCharge()) {

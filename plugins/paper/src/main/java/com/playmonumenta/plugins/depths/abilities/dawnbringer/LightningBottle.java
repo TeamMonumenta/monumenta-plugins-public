@@ -17,10 +17,12 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,6 +32,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -37,6 +40,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LightningBottle extends DepthsAbility {
 	public static final String ABILITY_NAME = "Lightning Bottle";
-	public static final String POTION_NAME = ABILITY_NAME;
+	public static final String POTION_NAME_BASE = ABILITY_NAME + " [%d]";
 	public static final double[] DAMAGE = {6, 7.5, 9, 10.5, 12, 15};
 	public static final double[] VULNERABILITY = {0.1, 0.13, 0.16, 0.19, 0.22, 0.28};
 	public static final double SLOWNESS = 0.2;
@@ -98,12 +102,37 @@ public class LightningBottle extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (isLightningBottle(potion.getItem())) {
-			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
-			mPlayerItemStatsMap.put(potion, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion, ProjectileLaunchEvent event) {
+		int amt;
+		final var item = potion.getItem();
+		if (isLightningBottle(item)) {
+			event.setCancelled(true); // regardless, we don't allow the normal event to go through.
 		}
+		if (0 != (amt = getLightningBottleAmount(item))) {
+			// we copy the alchemist bag mech here
 
+			ThrownPotion potionClone = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
+			ItemStack newPotion = item.clone();
+			ItemUtils.setPlainTag(newPotion);
+			potionClone.setItem(newPotion);
+			potionClone.setShooter(mPlayer);
+			potionClone.setVelocity(potion.getVelocity());
+			event.setCancelled(true);
+			mPlugin.mProjectileEffectTimers.addEntity(potionClone, Particle.SPELL);
+			mPlayerItemStatsMap.put(potionClone, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+
+			// Trying to use setLightningBottleAmount(potion.getItem(), amt - 1); for some reason doesn't work by the way.
+			final var contents = mPlayer.getInventory().getContents(); // here we iterate through the hotbar to find the lightning bottle(s) and update them.
+			for (int i = 0; i < 8; i++) {
+				final var itemstack = contents[i];
+				if (null != itemstack && isLightningBottle(itemstack)) {
+					setLightningBottleAmount(itemstack, amt - 1);
+				}
+			}
+
+			mPlayer.updateInventory();
+
+		}
 		return true;
 	}
 
@@ -153,29 +182,21 @@ public class LightningBottle extends DepthsAbility {
 		mCount++;
 		if (mCount >= mKillsPer) {
 			mCount = 0;
-
 			Inventory inv = mPlayer.getInventory();
-			ItemStack firstFoundPotStack = null;
-			int potCount = 0;
-
+			boolean flag = true;
 			for (ItemStack item : inv.getContents()) {
-				if (item != null && isLightningBottle(item)) {
-					if (firstFoundPotStack == null) {
-						firstFoundPotStack = item;
-					}
-					potCount += item.getAmount();
+				if (item != null && isLightningBottle(item)) { // if the player has a bottle.
+					setLightningBottleAmount(item, Math.min(mMaxStack, getLightningBottleAmount(item) + mBottlesGiven)); // give it a new amount.
+					flag = false;
+					break;
 				}
+			} // otherwise give them a new one.
+			if (flag) {
+				ItemStack newPotions = getBaseLightningBottle();
+				setLightningBottleAmount(newPotions, mBottlesGiven);
+				inv.addItem(newPotions);
 			}
-
-			if (potCount < mMaxStack) {
-				if (firstFoundPotStack != null) {
-					firstFoundPotStack.setAmount(Math.min(mMaxStack, firstFoundPotStack.getAmount() + mBottlesGiven));
-				} else {
-					ItemStack newPotions = getLightningBottle();
-					newPotions.setAmount(mBottlesGiven);
-					inv.addItem(newPotions);
-				}
-			}
+			mPlayer.updateInventory();
 		}
 	}
 
@@ -184,23 +205,42 @@ public class LightningBottle extends DepthsAbility {
 		return mDeathRadius;
 	}
 
-	public ItemStack getLightningBottle() {
+	public ItemStack getBaseLightningBottle() {
 		ItemStack itemStack = new ItemStack(Material.SPLASH_POTION, 1);
 		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
 
 		potionMeta.setBasePotionData(new PotionData(PotionType.MUNDANE));
 		potionMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // Hide "No Effects" vanilla potion effect lore
 		potionMeta.setColor(Color.YELLOW);
-		potionMeta.displayName(DepthsTree.DAWNBRINGER.color(POTION_NAME).decoration(TextDecoration.ITALIC, false));
 		potionMeta.lore(List.of(Component.text("A unique potion used by Dawnbringers.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)));
-
 		itemStack.setItemMeta(potionMeta);
+		setLightningBottleAmount(itemStack, 1);
+
 		ItemUtils.setPlainTag(itemStack); // Support for resource pack textures like with other items & mechanisms
 		return itemStack;
 	}
 
+	/*
+	 * Also updates the displayName.
+	 * Sets the amount contained in a lightning bottle.
+	 */
+	private void setLightningBottleAmount(ItemStack item, int amount) {
+		final var itemMeta = Objects.requireNonNull(item.getItemMeta()); // this really isn't needed; it's to appease the dog. This is never null since Lightning Bottles always have ItemMeta.
+
+		itemMeta.displayName(DepthsTree.DAWNBRINGER.color(POTION_NAME_BASE.formatted(amount)).decoration(TextDecoration.ITALIC, false));
+		item.setItemMeta(itemMeta);
+		NBT.modify(item, nbt -> {
+			nbt.setInteger("bottle_amount", amount);
+		});
+	}
+
+	private int getLightningBottleAmount(ItemStack item) {
+		return NBT.get(item, (ReadableItemNBT n) -> n.getInteger("bottle_amount"));
+	}
+
+
 	public static boolean isLightningBottle(ItemStack item) {
-		return item.getType() == Material.SPLASH_POTION && InventoryUtils.testForItemWithName(item, POTION_NAME, true);
+		return item.getType() == Material.SPLASH_POTION && ItemUtils.hasPlainName(item) && ItemUtils.getPlainName(item).contains(ABILITY_NAME);
 	}
 
 	private static Description<LightningBottle> getDescription(int rarity, TextColor color) {

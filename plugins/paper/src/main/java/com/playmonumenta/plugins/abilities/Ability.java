@@ -36,6 +36,7 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
@@ -214,7 +215,7 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion, ProjectileLaunchEvent event) {
 		return true;
 	}
 
