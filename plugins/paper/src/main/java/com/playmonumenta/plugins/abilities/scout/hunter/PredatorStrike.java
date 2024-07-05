@@ -321,8 +321,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		// nuke method: 0 dmg then do true damage that doesn't scale with anything
 		if (event.getAbility() == ClassAbility.PREDATOR_STRIKE && event.getType() != DamageType.TRUE &&
 			    event.getFinalDamage(true) > damageCap) {
-			event.setType(DamageType.TRUE);
-			event.setDamage(damageCap);
+			event.setDamageCap((double) damageCap);
 		}
 
 		return false;
