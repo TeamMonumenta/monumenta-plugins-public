@@ -39,7 +39,7 @@ public class IchorSteelEffect extends Effect {
 		DamageType type = event.getType();
 		if (LocationUtils.isAirborne(entity) &&
 				(AFFECTED_PROJECTILE_DAMAGE_TYPES.contains(type) || (mPrismatic && AFFECTED_PRISMATIC_DAMAGE_TYPES.contains(type)))) {
-			event.setDamage(event.getDamage() * (1 + mDamage));
+			event.updateDamageWithMultiplier(1 + mDamage);
 			((Player) entity).playSound(entity.getLocation(), Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 1.5f);
 		}
 	}

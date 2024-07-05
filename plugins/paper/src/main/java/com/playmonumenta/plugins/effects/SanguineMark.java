@@ -45,7 +45,7 @@ public class SanguineMark extends Effect {
 		if (mLevelTwo && event.getDamager() instanceof Player player && event.getType() == DamageEvent.DamageType.MELEE && mDuration != 0) {
 			mCosmetic.onHurt(livingEntity, player);
 
-			event.setDamage(event.getDamage() * (1 + mDamageBoost));
+			event.updateDamageWithMultiplier(1 + mDamageBoost);
 
 			double maxHealth = EntityUtils.getMaxHealth(player);
 			PlayerUtils.healPlayer(mPlugin, player, mHealPercent * maxHealth, mPlayer);

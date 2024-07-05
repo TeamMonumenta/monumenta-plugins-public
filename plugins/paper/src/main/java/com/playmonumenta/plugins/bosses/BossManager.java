@@ -731,7 +731,7 @@ public class BossManager implements Listener {
 						} else {
 							newDamage = damagee.getHealth() - setHealth + 1; // Adding 1 makes sure we actually go below the threshold but don't kill the boss
 						}
-						event.setDamage(newDamage); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
+						event.setDamageCap(newDamage); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
 						MMLog.fine("Because of remaining BossHealthAction at " + nextEventHealthPercent + "% health on entity " + MessagingUtils.plainText(damagee.name()) + ", reduced damage to " + newDamage + ".");
 					}
 				}

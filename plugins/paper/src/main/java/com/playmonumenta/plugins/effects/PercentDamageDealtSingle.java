@@ -17,13 +17,13 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 	public static final String effectID = "PercentDamageDealtSingle";
 
 	private boolean mHasDoneDamage;
-	private boolean mMultiplicative;
+	private final boolean mMultiplicative;
 
 	public PercentDamageDealtSingle(int duration, double amount) {
 		this(duration, amount, null, false);
 	}
 
-	public PercentDamageDealtSingle(int duration, double amount, EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
+	public PercentDamageDealtSingle(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
 		this(duration, amount, affectedDamageTypes, false);
 	}
 

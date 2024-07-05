@@ -56,6 +56,7 @@ public class BruteForce extends Ability {
 			.simpleDescription("Critical hits deal extra damage and knock back nearby mobs.")
 			.displayItem(Material.STONE_AXE);
 
+	private final double mFlatDamage;
 	private final double mMultiplier;
 
 	private final BruteForceCS mCosmetic;
@@ -65,7 +66,8 @@ public class BruteForce extends Ability {
 
 	public BruteForce(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;
+		mFlatDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, BRUTE_FORCE_DAMAGE);
+		mMultiplier = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BruteForceCS());
 	}
@@ -73,11 +75,13 @@ public class BruteForce extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
+			double originalDamage = event.getFlatDamage();
+			event.setDamage(originalDamage + mFlatDamage);
+			event.updateDamageWithMultiplier(1 + mMultiplier);
+
 			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
-			damageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damageBonus);
 
-			event.setDamage(event.getFlatDamage() + damageBonus);
-
+			// TODO this might be unnecessary or bugged but it's not the main issue right now
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
 				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
 					if (priorityEffects instanceof PercentDamageDealt damageEffect) {

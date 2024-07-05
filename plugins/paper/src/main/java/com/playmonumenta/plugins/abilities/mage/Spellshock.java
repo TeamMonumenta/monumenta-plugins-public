@@ -140,7 +140,7 @@ public class Spellshock extends Ability {
 					eventAbility == ClassAbility.ELEMENTAL_SPIRIT_FIRE ||
 					eventAbility == ClassAbility.STARFALL) {
 					double damageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ENHANCEMENT_DAMAGE_MULTIPLIER) + 1;
-					event.setDamage(event.getDamage() * damageMultiplier);
+					event.updateDamageWithMultiplier(damageMultiplier);
 				} else if (eventAbility == ClassAbility.FROST_NOVA ||
 					eventAbility == ClassAbility.ELEMENTAL_ARROWS_ICE ||
 					eventAbility == ClassAbility.ELEMENTAL_SPIRIT_ICE ||

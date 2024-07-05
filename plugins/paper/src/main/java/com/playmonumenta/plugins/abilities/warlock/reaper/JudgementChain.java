@@ -199,7 +199,7 @@ public class JudgementChain extends MultipleChargeAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlugin.mEffectManager.hasEffect(enemy, EFFECT_NAME)) {
-			event.setDamage(event.getDamage() * (1 + mChainDmgBonus));
+			event.setDamage(event.getFlatDamage() * (1 + mChainDmgBonus));
 		}
 		return false;
 	}

@@ -30,7 +30,7 @@ public class SupportExpertise extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		ClassAbility ability = event.getAbility();
 		if (ability != null && !ability.isFake() && event.getType() == DamageEvent.DamageType.MAGIC) {
-			event.setDamage(event.getDamage() * (1 + AbilityUtils.getEffectiveTotalSpecPoints(mPlayer) * DAMAGE_BOOST));
+			event.setDamage(event.getFlatDamage() * (1 + AbilityUtils.getEffectiveTotalSpecPoints(mPlayer) * DAMAGE_BOOST));
 		}
 		return true;
 	}

@@ -206,6 +206,7 @@ public class DamageEvent extends Event implements Cancellable {
 	private double mDamageReductionMultiplier = 1;
 	private double mFlatDamage;
 	private double mUnmodifiableDamage = 0;
+	private @Nullable Double mDamageCap = null;
 	private boolean mIsCrit = false;
 
 	public DamageEvent(EntityDamageEvent event, LivingEntity damagee) {
@@ -319,6 +320,10 @@ public class DamageEvent extends Event implements Cancellable {
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt
 		double damage = Math.max(Math.min(mFlatDamage * mGearDamageMultiplier * mDamageMultiplier * mDamageReductionMultiplier * critModifier() + mUnmodifiableDamage, 1000000), 0);
 
+		if (mDamageCap != null) {
+			damage = Math.min(damage, mDamageCap);
+		}
+
 		if (mMetadata.mType == DamageType.POISON && mDamagee instanceof Player && mDamagee.getHealth() - damage <= 0) {
 			mEvent.setDamage(Math.max(mDamagee.getHealth() - 1, 0));
 			return;
@@ -350,6 +355,16 @@ public class DamageEvent extends Event implements Cancellable {
 
 	private double critModifier() {
 		return mIsCrit ? 1.5 : 1;
+	}
+
+	// Will override an existing cap!
+	public void setDamageCap(@Nullable Double cap) {
+		mDamageCap = cap;
+		recalculateDamage();
+	}
+
+	public @Nullable Double getDamageCap() {
+		return mDamageCap;
 	}
 
 	public void addUnmodifiableDamage(double damage) {
