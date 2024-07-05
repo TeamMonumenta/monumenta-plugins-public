@@ -290,7 +290,7 @@ public class SnowSpirit extends SerializedLocationBossAbilityGroup {
 			ItemStack helmet = player.getInventory().getHelmet();
 			if (ItemUtils.getPlainName(helmet).contains("The Grinch")) {
 				Location loc = mBoss.getLocation();
-				event.setDamage(event.getDamage() * 1.2);
+				event.updateDamageWithMultiplier(1.2);
 				player.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.75f, 1.65f);
 				player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.75f, 0.5f);
 			}

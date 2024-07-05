@@ -29,7 +29,7 @@ public class DamageReducedBoss extends BossAbilityGroup {
 			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc.add(0, 1.4, 0), 20, 0, 0, 0, 0.4).spawnAsEntityActive(mBoss);
 			event.setCancelled(true);
 		} else {
-			event.setDamage(event.getDamage() - 4);
+			event.setDamage(event.getFlatDamage() - 4);
 		}
 	}
 }

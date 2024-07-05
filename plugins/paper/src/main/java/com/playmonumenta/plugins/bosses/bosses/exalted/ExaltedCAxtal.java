@@ -25,7 +25,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -399,7 +398,7 @@ public class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		event.setDamage(event.getDamage() / mCoefficient);
+		event.setDamage(event.getFlatDamage() / mCoefficient);
 	}
 
 	@Override

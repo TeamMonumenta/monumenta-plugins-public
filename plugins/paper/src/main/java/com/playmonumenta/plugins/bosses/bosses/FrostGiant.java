@@ -935,7 +935,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		event.setDamage(event.getDamage() / mDefenseScaling);
+		event.setDamage(event.getFlatDamage() / mDefenseScaling);
 		LivingEntity source = event.getSource();
 		if (!mFrostArmorActive) {
 			if (source instanceof Player player) {

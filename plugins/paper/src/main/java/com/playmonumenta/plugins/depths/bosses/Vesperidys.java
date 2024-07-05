@@ -684,7 +684,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					mDamageCap = Math.max(0.01, mDamageCap - damageCapReduction);
 				}
 
-				event.setDamage(event.getDamage() * crystalResistanceMultiplier());
+				event.setDamage(event.getFlatDamage() * crystalResistanceMultiplier());
 
 				if (mParty != null && mParty.getAscension() >= 15) {
 					double distance = player.getLocation().distance(mBoss.getLocation());
@@ -707,7 +707,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					double minDistance = 10;
 					if (distance > minDistance) {
 						double percentDamage = Math.max(minPercent, Math.min(1.0, -((1 - minPercent) / (maxDistance - minDistance)) * (distance - minDistance) + 1));
-						event.setDamage(event.getDamage() * percentDamage);
+						event.setDamage(event.getFlatDamage() * percentDamage);
 						if (distance > minDistance + (maxDistance - minDistance) / 2) {
 							Location loc = mBoss.getLocation();
 							loc.add(0, 1, 0);

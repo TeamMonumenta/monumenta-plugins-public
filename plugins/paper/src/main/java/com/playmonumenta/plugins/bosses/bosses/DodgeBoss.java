@@ -59,7 +59,7 @@ public class DodgeBoss extends BossAbilityGroup {
 		if (mParams.DAMAGE_REDUCTION >= 1) {
 			event.setCancelled(true);
 		} else {
-			event.setDamage(event.getDamage() * (1 - mParams.DAMAGE_REDUCTION));
+			event.setDamage(event.getFlatDamage() * (1 - mParams.DAMAGE_REDUCTION));
 		}
 
 		World world = mBoss.getWorld();

@@ -229,7 +229,7 @@ public class DepthsListener implements Listener {
 		ClassAbility ability = event.getAbility();
 		DamageEvent.DamageType type = event.getType();
 		if (ability != null && !ability.isFake() && type != DamageEvent.DamageType.TRUE && type != DamageEvent.DamageType.OTHER && event.getSource() instanceof Player player) {
-			event.setDamage(event.getDamage() * DepthsUtils.getDamageMultiplier());
+			event.setDamage(event.getFlatDamage() * DepthsUtils.getDamageMultiplier());
 
 			ItemStatManager.PlayerItemStats playerItemStats = event.getPlayerItemStats();
 			if (playerItemStats == null) {

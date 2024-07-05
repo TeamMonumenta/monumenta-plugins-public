@@ -62,7 +62,7 @@ public class DelveScalingBoss extends BossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		if (mPoints > 0) {
-			event.setDamage(event.getDamage() * mResistMult);
+			event.setDamage(event.getFlatDamage() * mResistMult);
 		}
 	}
 }

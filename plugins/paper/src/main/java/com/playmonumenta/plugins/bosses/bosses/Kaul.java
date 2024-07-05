@@ -821,7 +821,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		event.setDamage(event.getDamage() / mDefenseScaling);
+		event.setDamage(event.getFlatDamage() / mDefenseScaling);
 	}
 
 	@Override
