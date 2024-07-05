@@ -4,8 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
-import com.playmonumenta.plugins.classes.PlayerClass;
-import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -23,7 +21,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import de.tr7zw.nbtapi.NBTItem;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +113,11 @@ public class YellowTesseractOverride extends BaseOverride {
 			player.sendMessage(Component.text("You have not completed Primeval Creations III!", NamedTextColor.RED));
 			return false;
 		}
+		// If a player doesn't have any abilities, tell them that's required
+		if (AbilityManager.getManager().getPlayerAbilities(player).getAbilitiesIgnoringSilence().isEmpty()) {
+			player.sendMessage(Component.text("You need to have a class and abilities first!", NamedTextColor.RED));
+			return false;
+		}
 
 		// This tesseract is not updated or otherwise broken, replace it with a fresh one
 		if (ItemStatUtils.getTier(item) != Tier.UNIQUE) {
@@ -128,11 +130,6 @@ public class YellowTesseractOverride extends BaseOverride {
 			    || !InventoryUtils.testForItemWithName(item, CONFIGURED.content(), false)) {
 			/* Not active */
 			if (action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
-				// If a player doesn't have any abilities, tell them that's required
-				if (AbilityManager.getManager().getPlayerAbilities(player).getAbilitiesIgnoringSilence().isEmpty()) {
-					player.sendMessage(Component.text("You need to have a class and abilities first!", NamedTextColor.RED));
-					return false;
-				}
 				storeSkills(player, item);
 			}
 		} else if (player.isSneaking()
@@ -340,6 +337,9 @@ public class YellowTesseractOverride extends BaseOverride {
 	 */
 	public static boolean loadClass(Player player, int classId, int specId, Map<String, Integer> targetSkills, boolean useDisplayName) {
 
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, classId);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, specId);
+
 		MonumentaClasses classes = new MonumentaClasses();
 		List<AbilityInfo<?>> allAbilities = classes.mClasses.stream()
 			                                    .flatMap(c -> Stream.concat(c.mAbilities.stream(), Stream.concat(c.mSpecOne.mAbilities.stream(), c.mSpecTwo.mAbilities.stream())))
@@ -351,18 +351,6 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
-		PlayerClass mc = classes.mClasses.stream()
-			                 .filter(c -> c.mClass == classId)
-			                 .findFirst()
-			                 .orElse(null);
-		PlayerSpec spec = mc == null ? null : Stream.of(mc.mSpecOne, mc.mSpecTwo)
-			                                      .filter(s -> s.mSpecialization == specId)
-			                                      .findFirst()
-			                                      .orElse(null);
-
-		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, mc != null ? mc.mClass : 0);
-		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, spec != null ? spec.mSpecialization : 0);
-
 		int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player);
 		int totalSpec = AbilityUtils.getEffectiveTotalSpecPoints(player);
 		int totalEnhancement = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
@@ -372,7 +360,16 @@ public class YellowTesseractOverride extends BaseOverride {
 		int totalEnhancementsAdded = 0;
 		// We want to separate different points here because of fast track, since people with fast track can cheese the skill cap otherwise
 		// Check all abilities of the selected class + spec for matches
-		List<AbilityInfo<?>> classAbilities = mc != null ? mc.mAbilities : Collections.emptyList();
+		List<AbilityInfo<?>> classAbilities = classes.mClasses.stream()
+			                                      .filter(c -> c.mClass == classId)
+			                                      .flatMap(x -> x.mAbilities.stream())
+			                                      .toList();
+		List<AbilityInfo<?>> specAbilities = classes.mClasses.stream()
+			                                     .filter(c -> c.mClass == classId)
+			                                     .flatMap(c -> Stream.of(c.mSpecOne, c.mSpecTwo))
+			                                     .filter(spec -> spec.mSpecialization == specId)
+			                                     .flatMap(spec -> spec.mAbilities.stream())
+			                                     .toList();
 		for (AbilityInfo<?> reference : classAbilities) {
 			@Nullable Integer level = targetSkills.get(useDisplayName ? reference.getDisplayName() : reference.getScoreboard());
 			if (level != null) {
@@ -388,7 +385,6 @@ public class YellowTesseractOverride extends BaseOverride {
 				}
 			}
 		}
-		List<AbilityInfo<?>> specAbilities = spec != null ? spec.mAbilities : Collections.emptyList();
 		for (AbilityInfo<?> reference : specAbilities) {
 			@Nullable Integer level = targetSkills.get(useDisplayName ? reference.getDisplayName() : reference.getScoreboard());
 			if (level != null) {
