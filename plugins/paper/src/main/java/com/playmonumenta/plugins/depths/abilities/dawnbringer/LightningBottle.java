@@ -50,7 +50,7 @@ public class LightningBottle extends DepthsAbility {
 	public static final String ABILITY_NAME = "Lightning Bottle";
 	public static final String POTION_NAME = ABILITY_NAME;
 	public static final double[] DAMAGE = {6, 7.5, 9, 10.5, 12, 15};
-	public static final double[] VULNERABILITY = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
+	public static final double[] VULNERABILITY = {0.1, 0.13, 0.16, 0.19, 0.22, 0.28};
 	public static final double SLOWNESS = 0.2;
 	public static final int MAX_STACK = 12;
 	public static final int KILLS_PER = 4;

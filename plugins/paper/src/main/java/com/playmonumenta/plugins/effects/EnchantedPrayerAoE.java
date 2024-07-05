@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.EnchantedPrayerCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -65,7 +66,8 @@ public class EnchantedPrayerAoE extends Effect {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
+			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			World world = entity.getWorld();
 			mCosmetic.onEffectTrigger(mPlayer, world, enemy.getLocation(), enemy, mEffectSize);
 			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mEffectSize).getHitMobs()) {

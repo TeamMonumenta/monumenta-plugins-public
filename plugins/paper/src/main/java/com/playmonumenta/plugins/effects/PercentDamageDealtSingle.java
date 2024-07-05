@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -16,14 +17,20 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 	public static final String effectID = "PercentDamageDealtSingle";
 
 	private boolean mHasDoneDamage;
+	private boolean mMultiplicative;
 
 	public PercentDamageDealtSingle(int duration, double amount) {
-		this(duration, amount, null);
+		this(duration, amount, null, false);
 	}
 
-	public PercentDamageDealtSingle(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
+	public PercentDamageDealtSingle(int duration, double amount, EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
+		this(duration, amount, affectedDamageTypes, false);
+	}
+
+	public PercentDamageDealtSingle(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes, boolean multiplicative) {
 		super(duration, amount, affectedDamageTypes, effectID);
 		mHasDoneDamage = false;
+		mMultiplicative = multiplicative;
 	}
 
 	@Override
@@ -34,12 +41,20 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		if (mHasDoneDamage) {
+			return;
+		}
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		if (!mHasDoneDamage && (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType()))) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
+			|| (mAffectedDamageTypes.contains(DamageEvent.DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			mHasDoneDamage = true;
-			event.setDamage(event.getDamage() * Math.max(0, 1 + mAmount));
+			if (mMultiplicative) {
+				event.setDamage(event.getFlatDamage() * (1 + mAmount));
+			} else {
+				event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
+			}
 		}
 	}
 

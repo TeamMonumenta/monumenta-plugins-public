@@ -29,7 +29,7 @@ public class Decapitation implements Infusion {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
-			event.setDamage(event.getDamage() * getDamageDealtMultiplier(value));
+			event.updateGearDamageWithMultiplier(getDamageDealtMultiplier(value));
 		}
 	}
 

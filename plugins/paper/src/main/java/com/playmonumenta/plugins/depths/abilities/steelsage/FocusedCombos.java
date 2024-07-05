@@ -54,7 +54,7 @@ public class FocusedCombos extends DepthsCombosAbility {
 	@Override
 	public void activate(DamageEvent event, LivingEntity enemy) {
 		EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedAmount, enemy);
-		event.setDamage(event.getDamage() * (1 + mDamage));
+		event.updateDamageWithMultiplier(1 + mDamage);
 
 		Location playerLoc = mPlayer.getLocation();
 		mPlayer.playSound(playerLoc, Sound.BLOCK_WEEPING_VINES_BREAK, SoundCategory.PLAYERS, 2, 0.8f);

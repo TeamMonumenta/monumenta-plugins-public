@@ -38,7 +38,7 @@ public class TotemicProjection extends Ability {
 	private static final double TIME_TO_DROP = 75;
 	private static final double XZ_DISTANCE_TO_DROP = 14;
 	private static final int DISTRIBUTION_RADIUS = 3;
-	private static final double ENHANCE_DAMAGE_PERCENT_PER = 0.15;
+	private static final double ENHANCE_DAMAGE_PERCENT_PER = 0.10;
 	private static final int ENHANCE_DAMAGE_PERCENT_DURATION = 6 * 20;
 
 	public static final String CHARM_SLOWNESS_PERCENT = "Totemic Projection Slowness Amplifier";

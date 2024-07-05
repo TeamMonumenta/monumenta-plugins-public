@@ -58,7 +58,7 @@ public class IgneousRune extends DepthsAbility {
 	private static final double DAMAGE_RADIUS = 6;
 	private static final double[] DAMAGE = {20, 24, 28, 32, 36, 44};
 	private static final int FIRE_DURATION = 6 * 20;
-	private static final double RUNE_STRENGTH = 0.1;
+	private static final double RUNE_STRENGTH = 0.15;
 	private static final double RUNE_SPEED = 0.1;
 	private static final int BUFF_DURATION = 6 * 20;
 

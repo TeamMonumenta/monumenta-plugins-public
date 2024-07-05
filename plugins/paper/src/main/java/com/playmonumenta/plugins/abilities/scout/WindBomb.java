@@ -49,7 +49,7 @@ public class WindBomb extends Ability {
 	private static final int COOLDOWN_2 = 20 * 10;
 	private static final double DAMAGE_FRACTION_1 = 0.4;
 	private static final double DAMAGE_FRACTION_2 = 0.5;
-	private static final double MIDAIR_DAMAGE_BONUS = 0.15;
+	private static final double MIDAIR_DAMAGE_BONUS = 0.2;
 	private static final int RADIUS = 3;
 	private static final double VELOCITY = 1.5;
 
@@ -211,7 +211,7 @@ public class WindBomb extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (isLevelTwo() && LocationUtils.isAirborne(enemy) && event.getType() != DamageEvent.DamageType.TRUE) {
-			event.setDamage(event.getDamage() * (1 + MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER)));
+			event.updateDamageWithMultiplier(1 + MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER));
 		}
 		return false;
 	}

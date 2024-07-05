@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.utils.MMLog;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -199,6 +201,12 @@ public class DamageEvent extends Event implements Cancellable {
 	private boolean mLifelineCancel;
 
 	private final double mOriginalDamage;
+	private double mDamageMultiplier = 1;
+	private double mGearDamageMultiplier = 1;
+	private double mDamageReductionMultiplier = 1;
+	private double mFlatDamage;
+	private double mUnmodifiableDamage = 0;
+	private boolean mIsCrit = false;
 
 	public DamageEvent(EntityDamageEvent event, LivingEntity damagee) {
 		this(event, damagee, DamageType.getType(event.getCause()));
@@ -217,6 +225,7 @@ public class DamageEvent extends Event implements Cancellable {
 		mDamager = event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent ? entityDamageByEntityEvent.getDamager() : null;
 		mMetadata = metadata;
 		mOriginalDamage = event.getDamage();
+		mFlatDamage = event.getDamage();
 		mEvent = event;
 		mLifelineCancel = false;
 
@@ -271,14 +280,80 @@ public class DamageEvent extends Event implements Cancellable {
 			damage = 0;
 		}
 
+		// Update flat damage, since we're setting a new base
+		// In case something goes horribly wrong, log the stack trace when set to finest
+		mFlatDamage = damage;
+		MMLog.finest(Arrays.toString(Thread.currentThread().getStackTrace()));
+
+		recalculateDamage();
+	}
+
+	public void updateDamageWithMultiplier(double damageMultiplier) {
+		if (damageMultiplier < 0) {
+			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage multiplier: " + damageMultiplier, new Exception());
+		}
+
+		if (damageMultiplier > 1) {
+			// Accumulate damage multiplier (Additively)
+			mDamageMultiplier += (damageMultiplier - 1);
+		} else {
+			// Accumulate weakness / reduction multiplier (Multiplicatively)
+			mDamageReductionMultiplier *= Math.max(0, damageMultiplier);
+		}
+
+		recalculateDamage();
+	}
+
+	public void updateGearDamageWithMultiplier(double damageGearMultiplier) {
+		if (damageGearMultiplier < 0) {
+			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage multiplier: " + damageGearMultiplier, new Exception());
+		}
+
+		// Accumulate damage multiplier
+		mGearDamageMultiplier += (damageGearMultiplier - 1);
+
+		recalculateDamage();
+	}
+
+	private void recalculateDamage() {
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt
-		damage = Math.max(Math.min(damage, 1000000), 0);
+		double damage = Math.max(Math.min(mFlatDamage * mGearDamageMultiplier * mDamageMultiplier * mDamageReductionMultiplier * critModifier() + mUnmodifiableDamage, 1000000), 0);
 
 		if (mMetadata.mType == DamageType.POISON && mDamagee instanceof Player && mDamagee.getHealth() - damage <= 0) {
 			mEvent.setDamage(Math.max(mDamagee.getHealth() - 1, 0));
 			return;
 		}
+
 		mEvent.setDamage(damage);
+	}
+
+	public double getFlatDamage() {
+		return mFlatDamage;
+	}
+
+	public double getDamageMultiplier() {
+		return mDamageMultiplier;
+	}
+
+	public double getGearDamageMultiplier() {
+		return mGearDamageMultiplier;
+	}
+
+	public double getWeaknessMultiplier() {
+		return mDamageReductionMultiplier;
+	}
+
+	public void setIsCrit(boolean crit) {
+		mIsCrit = crit;
+		recalculateDamage();
+	}
+
+	private double critModifier() {
+		return mIsCrit ? 1.5 : 1;
+	}
+
+	public void addUnmodifiableDamage(double damage) {
+		mUnmodifiableDamage += damage;
 	}
 
 	public DamageType getType() {

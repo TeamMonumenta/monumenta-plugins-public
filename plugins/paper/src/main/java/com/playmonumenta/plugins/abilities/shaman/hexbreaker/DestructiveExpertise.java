@@ -11,7 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class DestructiveExpertise extends Ability {
-	public static final double DAMAGE_BOOST = 0.06;
+	public static final double DAMAGE_BOOST = 0.05;
 
 	public static final AbilityInfo<DestructiveExpertise> INFO =
 		new AbilityInfo<>(DestructiveExpertise.class, null, DestructiveExpertise::new)

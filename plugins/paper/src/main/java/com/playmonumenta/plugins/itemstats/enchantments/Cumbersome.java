@@ -11,8 +11,6 @@ import org.bukkit.entity.Player;
 
 public class Cumbersome implements Enchantment {
 
-	public static final double CRIT_BONUS = 1.5;
-
 	@Override
 	public String getName() {
 		return "Cumbersome";
@@ -24,14 +22,16 @@ public class Cumbersome implements Enchantment {
 	}
 
 	@Override
+	// after CritScaling (Priority of 4999) to change it back to non-crit
+	// doesn't affect ability triggers
 	public double getPriorityAmount() {
-		return 29;
+		return new CritScaling().getPriorityAmount() + 1;
 	}
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
-			event.setDamage(event.getDamage() / CRIT_BONUS);
+			event.setIsCrit(false);
 		}
 	}
 }

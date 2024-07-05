@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -27,8 +28,8 @@ public class ChoirBells extends Ability {
 	private static final int DURATION = 20 * 8;
 	private static final double WEAKEN_EFFECT_1 = 0.2;
 	private static final double WEAKEN_EFFECT_2 = 0.35;
-	private static final double VULNERABILITY_EFFECT_1 = 0.2;
-	private static final double VULNERABILITY_EFFECT_2 = 0.35;
+	private static final double VULNERABILITY_EFFECT_1 = 0.35;
+	private static final double VULNERABILITY_EFFECT_2 = 0.5;
 	private static final double SLOWNESS_AMPLIFIER_1 = 0.1;
 	private static final double SLOWNESS_AMPLIFIER_2 = 0.2;
 	private static final int COOLDOWN = 16 * 20;
@@ -49,10 +50,27 @@ public class ChoirBells extends Ability {
 			.shorthandName("CB")
 			.hotbarName("\uD83D\uDD14")
 			.descriptions(
-				"While not sneaking, pressing the swap key afflicts all enemies in a 10-block radius with 10% slowness for 8s. " +
-					"Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, " +
-					"and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 16s.",
-				"Slowness is increased from 10% to 20%. Vulnerability and weakness are increased from 20% to 35%.")
+				("While not sneaking, pressing the swap key afflicts all enemies in a %d-block radius with %s%% slowness for %ds. " +
+					"Undead enemies also switch targets over to you, are dealt %d magic damage, " +
+					"and are afflicted with %s%% vulnerability and %s%% weakness for %ds. Cooldown: %ds.")
+					.formatted(
+						CHOIR_BELLS_RANGE,
+						StringUtils.multiplierToPercentage(SLOWNESS_AMPLIFIER_1),
+						DURATION,
+						DAMAGE,
+						StringUtils.multiplierToPercentage(VULNERABILITY_EFFECT_1),
+						StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1),
+						DURATION,
+						COOLDOWN),
+				"Slowness is increased from %s%% to %s%%. Vulnerability is increased from %s%% to %s%%. Weakness is increased from %s%% to %s%%."
+					.formatted(
+						StringUtils.multiplierToPercentage(SLOWNESS_AMPLIFIER_1),
+						StringUtils.multiplierToPercentage(SLOWNESS_AMPLIFIER_2),
+						StringUtils.multiplierToPercentage(VULNERABILITY_EFFECT_1),
+						StringUtils.multiplierToPercentage(VULNERABILITY_EFFECT_2),
+						StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1),
+						StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2)
+					))
 			.simpleDescription("Taunt, slow, and apply vulnerability to nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChoirBells::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)))

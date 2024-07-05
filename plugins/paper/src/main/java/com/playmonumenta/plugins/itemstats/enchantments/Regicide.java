@@ -38,13 +38,13 @@ public class Regicide implements Enchantment {
 		return 28;
 	}
 
-	public static double calculateDamage(double level, Player player, LivingEntity target, DamageEvent event) {
+	public static double calculateDamageMultiplier(double level, Player player, LivingEntity target, DamageEvent event) {
 		if (EntityUtils.isElite(target)) {
-			return event.getDamage() * (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level));
+			return (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level));
 		} else if (EntityUtils.isBoss(target)) {
-			return event.getDamage() * (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, BOSS_BONUS_PER_LEVEL * level));
+			return (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, BOSS_BONUS_PER_LEVEL * level));
 		} else {
-			return event.getDamage();
+			return 1;
 		}
 	}
 
@@ -55,7 +55,7 @@ public class Regicide implements Enchantment {
 			    && event.getType() != DamageType.FALL
 			    && event.getType() != DamageType.OTHER
 			    && event.getType() != DamageType.TRUE) {
-			event.setDamage(calculateDamage(level, player, target, event));
+				event.updateGearDamageWithMultiplier(calculateDamageMultiplier(level, player, target, event));
 		}
 	}
 }

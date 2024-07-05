@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -15,6 +16,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,6 +38,7 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 	private static final int MAX_KILLS = 15;
 	private static final int DURATION_INCREASE = 7; // was 0.333333 seconds but minecraft tick system is bad
 	private static final int MAX_DURATION_INCREASE = 5 * 20;
+	private static final double REFUND_POTION_AMOUNT = 0.5;
 
 	public static final String TRANSMUTATION_POTION_METAKEY = "TransmutationRingPotion";
 
@@ -64,8 +67,10 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 							StringUtils.multiplierToPercentage(MAX_KILLS * DAMAGE_PER_DEATH_AMPLIFIER),
 							StringUtils.ticksToSeconds(TRANSMUTATION_RING_1_COOLDOWN)
 					),
-				"Mobs that die within this ring also increase its duration by %ss per mob, up to %s extra seconds. Cooldown: %ss."
+				("Mobs that die within this ring refunds %s Alchemist Potions and " +
+				"increase its duration by %ss per mob, up to %s extra seconds. Cooldown: %ss.")
 					.formatted(
+							REFUND_POTION_AMOUNT,
 							StringUtils.ticksToSeconds(DURATION_INCREASE),
 							StringUtils.ticksToSeconds(MAX_DURATION_INCREASE),
 							StringUtils.ticksToSeconds(TRANSMUTATION_RING_2_COOLDOWN)
@@ -83,12 +88,17 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 	private final TransmutationRingCS mCosmetic;
 
 	private @Nullable BukkitTask mActiveTask;
+	private @Nullable AlchemistPotions mAlchemistPotions;
 
 	public TransmutationRing(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TRANSMUTATION_RING_RADIUS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TransmutationRingCS());
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		});
 	}
 
 	@Override
@@ -180,6 +190,9 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		mKills++;
 		mCosmetic.effectOnKill(mPlayer, event.getEntity().getLocation());
+		if (mAlchemistPotions != null && isLevelTwo()) {
+			mAlchemistPotions.modifyCurrentPotionTimer(mAlchemistPotions.getChargeTime() * REFUND_POTION_AMOUNT);
+		}
 	}
 
 	@Override

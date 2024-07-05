@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 public class Pyromania extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Pyromania";
-	public static final double[] DAMAGE = {0.02, 0.025, 0.03, 0.035, 0.04, 0.05};
+	public static final double[] DAMAGE = {0.03, 0.04, 0.05, 0.06, 0.075, 0.1};
 	public static final int RADIUS = 6;
 	public static final int TWISTED_RADIUS = 8;
 
@@ -60,7 +60,7 @@ public class Pyromania extends DepthsAbility {
 		}
 
 		if (fireCount > 0) {
-			event.setDamage(event.getDamage() * (1 + (mDamagePerMob * fireCount)));
+			event.updateDamageWithMultiplier(1 + (mDamagePerMob * fireCount));
 		}
 		return false;
 	}

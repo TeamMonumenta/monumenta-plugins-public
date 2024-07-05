@@ -29,7 +29,7 @@ public class GalleryExecutionerRageEffect extends GalleryConsumableEffect {
 			}
 			double maxHealth = EntityUtils.getMaxHealth(entity);
 			if (entity.getHealth() < maxHealth) {
-				event.setDamage(event.getDamage() * MELEE_DAMAGE_INCREASE);
+				event.updateDamageWithMultiplier(MELEE_DAMAGE_INCREASE);
 			}
 
 			if (entity.getHealth() + entity.getAbsorptionAmount() <= event.getFinalDamage(true)) {

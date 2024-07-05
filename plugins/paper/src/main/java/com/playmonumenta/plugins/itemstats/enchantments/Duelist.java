@@ -43,9 +43,9 @@ public class Duelist implements Enchantment {
 		if (EntityUtils.isHumanlike(enemy)) {
 			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PER_LEVEL);
 			if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-				event.setDamage(event.getDamage() + damage);
+				event.setDamage(event.getFlatDamage() + damage);
 			} else if (event.getType() == DamageType.MELEE) {
-				event.setDamage(event.getDamage() + damage * player.getCooledAttackStrength(0));
+				event.setDamage(event.getFlatDamage() + damage * player.getCooledAttackStrength(0));
 			}
 		}
 	}

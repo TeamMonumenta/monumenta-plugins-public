@@ -31,15 +31,10 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0) {
 			if (event.getType() == DamageType.MELEE) {
-				event.setDamage(event.getDamage() + DAMAGE);
+				event.setDamage(event.getFlatDamage() + DAMAGE);
 			} else if (event.getAbility() != null && !event.getAbility().isFake()) {
-				double initialDamage = event.getDamage();
-
-				//Find out what the damage with full spell power would be here
-				float fullDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) initialDamage);
-
-				//Get the difference, divide it by 4 and add it to the damage
-				event.setDamage(initialDamage + ((fullDamage - initialDamage) * SPELL_MOD));
+				float spellMultiplier = SpellPower.getSpellDamage(mPlugin, mPlayer, 1);
+				event.updateDamageWithMultiplier(1 + (spellMultiplier - 1) * SPELL_MOD);
 			}
 		}
 		return false; // only changes event damage

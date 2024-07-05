@@ -7,25 +7,23 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
-public class PercentDamageDealt extends Effect {
-	public static final String GENERIC_NAME = "PercentDamageDealt";
-	public static final String effectID = "PercentDamageDealt";
+public class GearDamageIncrease extends Effect {
+	public static final String GENERIC_NAME = "GearDamageIncrease";
+	public static final String effectID = "GearDamageIncrease";
 
 	protected final double mAmount;
 	protected final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 	protected final int mPriority;
 	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate = null;
 
-	private PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, String id) {
+	private GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, String id) {
 		super(duration, id);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
@@ -33,20 +31,20 @@ public class PercentDamageDealt extends Effect {
 		mPredicate = predicate;
 	}
 
-	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
+	public GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
 		this(duration, amount, affectedDamageTypes, priority, predicate, effectID);
 	}
 
-	public PercentDamageDealt(int duration, double amount) {
+	public GearDamageIncrease(int duration, double amount) {
 		this(duration, amount, null, 0, null);
 	}
 
-	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
+	public GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
 		this(duration, amount, affectedDamageTypes, 0, null);
 	}
 
 	// Only call this in PercentDamageDealtSingle
-	protected PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes, String effectIdentifier) {
+	protected GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, String effectIdentifier) {
 		this(duration, amount, affectedDamageTypes, 0, null, effectIdentifier);
 	}
 
@@ -83,7 +81,7 @@ public class PercentDamageDealt extends Effect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
+		if (event.getType() == DamageType.TRUE) {
 			return;
 		}
 		if (mPredicate != null && !mPredicate.test(entity, enemy)) {
@@ -91,18 +89,13 @@ public class PercentDamageDealt extends Effect {
 		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
 			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
-			event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
+			event.updateGearDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
 	}
 
 	@Override
-	public @Nullable Component getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
-	}
-
-	@Override
 	public @Nullable String getDisplayedName() {
-		return "Damage Dealt";
+		return "Gear Damage Dealt";
 	}
 
 	@Override
@@ -126,7 +119,7 @@ public class PercentDamageDealt extends Effect {
 		return object;
 	}
 
-	public static @Nullable PercentDamageDealt deserialize(JsonObject object, Plugin plugin) {
+	public static @Nullable GearDamageIncrease deserialize(JsonObject object, Plugin plugin) {
 		if (object.has("hasPredicate") && object.get("hasPredicate").getAsBoolean()) {
 			// Noper nope nope not dealing with this
 			return null;
@@ -141,13 +134,13 @@ public class PercentDamageDealt extends Effect {
 			List<DamageType> damageTypeList = new ArrayList<>();
 			for (JsonElement element : damageTypes) {
 				String string = element.getAsString();
-				damageTypeList.add(DamageEvent.DamageType.valueOf(string));
+				damageTypeList.add(DamageType.valueOf(string));
 			}
 
-			EnumSet<DamageEvent.DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
-			return new PercentDamageDealt(duration, amount, damageTypeSet, priority, null);
+			EnumSet<DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
+			return new GearDamageIncrease(duration, amount, damageTypeSet, priority, null);
 		} else {
-			return new PercentDamageDealt(duration, amount, null, priority, null);
+			return new GearDamageIncrease(duration, amount, null, priority, null);
 		}
 	}
 

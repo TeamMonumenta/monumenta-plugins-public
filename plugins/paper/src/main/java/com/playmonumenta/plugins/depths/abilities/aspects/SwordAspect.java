@@ -28,7 +28,7 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
-			event.setDamage(event.getDamage() + DAMAGE);
+			event.setDamage(event.getFlatDamage() + DAMAGE);
 		}
 		return false; // only changes event damage
 	}

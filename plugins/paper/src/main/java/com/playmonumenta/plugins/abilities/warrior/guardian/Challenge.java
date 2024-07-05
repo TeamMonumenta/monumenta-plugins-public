@@ -39,8 +39,8 @@ public class Challenge extends Ability {
 	private static final String SPEED_EFFECT_NAME = "ChallengePercentSpeedEffect";
 	private static final String AFFECTED_MOB_EFFECT_NAME = "ChallengeMobEffect";
 	private static final int DURATION = 20 * 10;
-	private static final double PERCENT_DAMAGE_DEALT_EFFECT_1 = 0.15;
-	private static final double PERCENT_DAMAGE_DEALT_EFFECT_2 = 0.2;
+	private static final double PERCENT_DAMAGE_DEALT_EFFECT_1 = 0.2;
+	private static final double PERCENT_DAMAGE_DEALT_EFFECT_2 = 0.3;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageType.getAllMeleeTypes();
 
 	private static final int ABSORPTION_PER_MOB_1 = 1;

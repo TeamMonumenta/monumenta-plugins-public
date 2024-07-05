@@ -82,7 +82,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 				multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE)) / 2;
 			}
 
-			event.setDamage(event.getDamage() * multiplier);
+			event.updateDamageWithMultiplier(multiplier);
 
 			if (!huntingCompanion && isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage()) && (type != DamageType.PROJECTILE || (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)))) {
 				mTicksToStackDecay = mDecayTime;

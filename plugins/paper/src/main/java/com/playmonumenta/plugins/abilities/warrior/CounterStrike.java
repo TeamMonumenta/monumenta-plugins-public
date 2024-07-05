@@ -121,7 +121,7 @@ public class CounterStrike extends Ability {
 				}
 			}
 
-			event.setDamage(event.getDamage() * (1 + mDamage));
+			event.updateDamageWithMultiplier(1 + mDamage);
 
 			mLastHurtTicks.remove(enemy);
 			boolean recalculationNeeded = mAbsorptionMobs.remove(enemy);

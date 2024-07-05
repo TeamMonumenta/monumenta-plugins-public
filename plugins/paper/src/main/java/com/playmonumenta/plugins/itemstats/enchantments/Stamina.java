@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.GearDamageIncrease;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -74,7 +75,7 @@ public class Stamina implements Enchantment {
 		}
 
 		double damage = Math.min(currStamina + (DAMAGE_BONUS * level), DAMAGE_CAP * level);
-		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new PercentDamageDealt(DURATION, damage, AFFECTED_DAMAGE_TYPES));
+		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new GearDamageIncrease(DURATION, damage, AFFECTED_DAMAGE_TYPES));
 
 		player.getWorld().playSound(
 			player.getLocation(),

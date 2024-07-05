@@ -51,7 +51,7 @@ public class Panacea extends Ability implements AbilityWithDuration {
 	private static final int PANACEA_2_SLOW_TICKS = 2 * 20;
 	private static final int COOLDOWN = 20 * 20;
 	private static final double PANACEA_LEVEL_1_DOT_MULTIPLIER = 0.15;
-	private static final double PANACEA_LEVEL_2_DOT_MULTIPLIER = 0.30;
+	private static final double PANACEA_LEVEL_2_DOT_MULTIPLIER = 0.25;
 	private static final String PANACEA_DOT_EFFECT_NAME = "PanaceaDamageOverTimeEffect";
 	private static final int PANACEA_DOT_PERIOD = 10;
 	private static final int PANACEA_DOT_DURATION = 20 * 9;

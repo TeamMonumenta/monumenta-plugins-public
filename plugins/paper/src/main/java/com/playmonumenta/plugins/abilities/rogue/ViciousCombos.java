@@ -33,7 +33,7 @@ public class ViciousCombos extends Ability {
 	private static final double VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0.15;
 	private static final int ENHANCEMENT_COOLDOWN_REDUCTION = 1 * 20;
 	private static final int ENHANCEMENT_CHARGE_LIFETIME = 3 * 20;
-	private static final double ENHANCEMENT_DAMAGE_INCREASE = 0.1;
+	private static final double ENHANCEMENT_DAMAGE_INCREASE = 0.2;
 
 	public static final String CHARM_CDR = "Vicious Combos Cooldown Reduction";
 	public static final String CHARM_RADIUS = "Vicious Combos Radius";
@@ -119,9 +119,8 @@ public class ViciousCombos extends Ability {
 			    && event.getType() == DamageEvent.DamageType.MELEE
 			    && mLastAbility != null
 			    && Bukkit.getServer().getCurrentTick() < mAbilityCastTime + ENHANCEMENT_CHARGE_LIFETIME) {
-
 			double enhancementDamageMulti = ENHANCEMENT_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
-			event.setDamage(event.getDamage() * (1 + enhancementDamageMulti));
+			event.updateDamageWithMultiplier(1 + enhancementDamageMulti);
 			mPlugin.mTimers.updateCooldown(mPlayer, mLastAbility, ENHANCEMENT_COOLDOWN_REDUCTION);
 
 			// mPlayer.sendMessage(mLastAbility.getName() + " has been reduced!");

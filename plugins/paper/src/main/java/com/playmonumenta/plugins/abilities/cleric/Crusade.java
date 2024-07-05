@@ -23,8 +23,8 @@ public class Crusade extends Ability {
 
 	public static final int TAG_DURATION = 10 * 20;
 	public static final double ENHANCEMENT_RADIUS = 8;
-	public static final int ENHANCEMENT_MAX_MOBS = 6;
-	public static final double ENHANCEMENT_BONUS_DAMAGE = 0.05;
+	public static final int ENHANCEMENT_MAX_MOBS = 5;
+	public static final double ENHANCEMENT_BONUS_DAMAGE = 0.08;
 	public static final String CHARM_DAMAGE = "Crusade Enhancement Damage Amplifier";
 
 	public static final AbilityInfo<Crusade> INFO =
@@ -58,7 +58,7 @@ public class Crusade extends Ability {
 			long numMobs = new Hitbox.SphereHitbox(mPlayer.getLocation(), ENHANCEMENT_RADIUS)
 				.getHitMobs().stream().filter(e -> enemyTriggersAbilities(e, this)).limit(ENHANCEMENT_MAX_MOBS).count();
 			double damagePerMob = ENHANCEMENT_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
-			event.setDamage(event.getDamage() * (1 + damagePerMob * numMobs));
+			event.updateDamageWithMultiplier(1 + damagePerMob * numMobs);
 			mCosmetic.crusadeEnhancement(mPlayer, numMobs);
 		}
 

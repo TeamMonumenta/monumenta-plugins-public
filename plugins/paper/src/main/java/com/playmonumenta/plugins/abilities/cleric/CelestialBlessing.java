@@ -32,7 +32,7 @@ public class CelestialBlessing extends Ability {
 	private static final int CELESTIAL_DURATION = 15 * 20;
 	private static final double CELESTIAL_RADIUS = 12;
 	private static final double CELESTIAL_1_EXTRA_DAMAGE = 0.20;
-	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
+	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.30;
 	private static final double CELESTIAL_EXTRA_SPEED = 0.20;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(

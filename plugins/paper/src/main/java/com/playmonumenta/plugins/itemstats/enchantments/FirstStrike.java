@@ -61,8 +61,8 @@ public class FirstStrike implements Enchantment {
 				if (type == DamageType.PROJECTILE) {
 					bonus *= PROJ_REDUCTION;
 				}
-				double damage = event.getDamage() * (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, bonus));
-				event.setDamage(damage);
+
+				event.updateGearDamageWithMultiplier(1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, bonus));
 
 				double widthDelta = PartialParticle.getWidthDelta(enemy);
 				double doubleWidthDelta = widthDelta * 2;

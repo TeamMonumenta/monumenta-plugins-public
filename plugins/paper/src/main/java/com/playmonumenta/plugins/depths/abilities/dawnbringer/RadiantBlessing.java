@@ -30,7 +30,7 @@ public class RadiantBlessing extends DepthsAbility {
 	public static final String ABILITY_NAME = "Radiant Blessing";
 	private static final int HEALING_RADIUS = 18;
 	private static final int COOLDOWN = 22 * 20;
-	private static final double[] PERCENT_DAMAGE = {0.12, 0.15, 0.18, 0.21, 0.24, 0.3};
+	private static final double[] PERCENT_DAMAGE = {0.12, 0.16, 0.2, 0.24, 0.28, 0.36};
 	private static final int DURATION = 10 * 20;
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "RadiantBlessingPercentDamageReceivedEffect";
 	private static final double PERCENT_DAMAGE_RECEIVED = 0.2;

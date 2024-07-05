@@ -144,7 +144,7 @@ public class Riposte extends Ability implements AbilityWithDuration {
 		if (event.getType() == DamageType.MELEE
 				&& ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())
 				&& mCurrDuration != -1) {
-			event.setDamage(event.getDamage() * (1 + RIPOSTE_SWORD_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE)));
+			event.updateDamageWithMultiplier(1 + RIPOSTE_SWORD_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE));
 			if (mRunnable != null && !mRunnable.isCancelled()) {
 				mRunnable.cancel();
 			}

@@ -16,7 +16,7 @@ public class GalleryDamageEffect extends GalleryStackableEffect {
 	@Override
 	public void onPlayerDamage(GalleryPlayer player, DamageEvent event, LivingEntity entity) {
 		if (!DamageEvent.DamageType.getUnscalableDamageType().contains(event.getType())) {
-			event.setDamage(event.getDamage() * (1.0 + mStacks * DAMAGE_EFFECT_PER_STACK));
+			event.updateDamageWithMultiplier(1.0 + mStacks * DAMAGE_EFFECT_PER_STACK);
 		}
 	}
 

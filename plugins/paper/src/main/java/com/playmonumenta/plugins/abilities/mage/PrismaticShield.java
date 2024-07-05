@@ -39,7 +39,7 @@ public class PrismaticShield extends Ability {
 	private static final int STUN_DURATION = 20;
 	private static final int ENHANCEMENT_DURATION = 5 * 20;
 	private static final double HEAL_PERCENT = 0.05;
-	private static final double DAMAGE_BUFF_PERCENT = 0.2;
+	private static final double DAMAGE_BUFF_PERCENT = 0.25;
 	private static final int ENHANCEMENT_COOLDOWN_REDUCTION_TICKS = 5 * 20;
 	private static final String DAMAGE_BUFF_NAME = "PrismaticShieldDamageBuff";
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";

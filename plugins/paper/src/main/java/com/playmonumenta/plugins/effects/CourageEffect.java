@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -42,7 +43,8 @@ public class CourageEffect extends Effect {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
+		 || (mAffectedDamageTypes.contains(DamageEvent.DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			double amount = mAmount;
 
 			int currentTick = entity.getTicksLived();

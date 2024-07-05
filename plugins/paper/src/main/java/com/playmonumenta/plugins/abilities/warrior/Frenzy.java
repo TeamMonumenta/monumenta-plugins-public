@@ -23,7 +23,7 @@ public class Frenzy extends Ability {
 	private static final double PERCENT_ATTACK_SPEED_EFFECT_1 = 0.3;
 	private static final double PERCENT_ATTACK_SPEED_EFFECT_2 = 0.4;
 	private static final double PERCENT_SPEED = 0.2;
-	private static final double DAMAGE_BONUS = 0.15;
+	private static final double DAMAGE_BONUS = 0.2;
 	private static final String PERCENT_ATTACK_SPEED_EFFECT_NAME = "FrenzyPercentAttackSpeedEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "FrenzyPercentSpeedEffect";
 	private static final String PERCENT_DAMAGE_SINGLE_EFFECT_NAME = "FrenzyPercentDamageDealtSingleEffect";

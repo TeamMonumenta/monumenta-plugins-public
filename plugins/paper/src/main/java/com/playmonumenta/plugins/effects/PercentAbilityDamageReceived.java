@@ -43,7 +43,7 @@ public class PercentAbilityDamageReceived extends Effect {
 			if (EntityUtils.isBoss(entity) && amount > 0) {
 				amount = amount / 2;
 			}
-			event.setDamage(event.getDamage() * (1 + amount));
+			event.updateDamageWithMultiplier(1 + amount);
 		}
 	}
 

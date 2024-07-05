@@ -38,8 +38,10 @@ import org.jetbrains.annotations.Nullable;
 public class AlchemicalArtillery extends Ability {
 	private static final int COOLDOWN = 20 * 6;
 
-	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 1.5;
-	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 2.5;
+	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 0.75;
+	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 1.5;
+	private static final double ARTILLERY_1_DAMAGE_RAW = 4.5;
+	private static final double ARTILLERY_2_DAMAGE_RAW = 6;
 	private static final double ARTILLERY_RANGE_MULTIPLIER = 1.5;
 	private static final int ARTILLERY_POTION_COST = 2;
 	private static final int AFTERSHOCK_DELAY = 20;
@@ -61,17 +63,20 @@ public class AlchemicalArtillery extends Ability {
 			.actionBarColor(TextColor.color(255, 0, 0))
 			.descriptions(
 				("Pressing the Drop Key while holding an Alchemist Bag and not sneaking launches a heavy bomb that " +
-				"explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing %s%% of your " +
+				"explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing %s + %s%% of your " +
 				"potion's damage and applying your selected potion's effects, in an area that is %s%% of your potion's radius. " +
 				"The initial speed of the bomb scales with your projectile speed. This costs you %s potions. %ss cooldown.")
 					.formatted(
+						ARTILLERY_1_DAMAGE_RAW,
 						StringUtils.multiplierToPercentage(ARTILLERY_1_DAMAGE_MULTIPLIER),
 						StringUtils.multiplierToPercentage(ARTILLERY_RANGE_MULTIPLIER),
 						ARTILLERY_POTION_COST,
 						StringUtils.ticksToSeconds(COOLDOWN)
 					),
-				"The damage of the bomb is increased to %s%%"
-					.formatted(StringUtils.multiplierToPercentage(ARTILLERY_2_DAMAGE_MULTIPLIER)),
+				"The damage of the bomb is increased to %s + %s%%"
+					.formatted(
+						ARTILLERY_2_DAMAGE_RAW,
+						StringUtils.multiplierToPercentage(ARTILLERY_2_DAMAGE_MULTIPLIER)),
 				("Add an aftershock to the explosion, which happens %ss after it, and deals %s%% of the original explosion damage. " +
 				"If possible, the aftershock also applies the potion effect opposite of the one that you have selected.")
 					.formatted(
@@ -194,6 +199,7 @@ public class AlchemicalArtillery extends Ability {
 		}
 
 		double potionDamage = mAlchemistPotions.getDamage(playerItemStats) * (isLevelOne() ? ARTILLERY_1_DAMAGE_MULTIPLIER : ARTILLERY_2_DAMAGE_MULTIPLIER);
+		potionDamage += (isLevelOne() ? ARTILLERY_1_DAMAGE_RAW : ARTILLERY_2_DAMAGE_RAW);
 		double potionRadius = mAlchemistPotions.getRadius(playerItemStats);
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, potionRadius * ARTILLERY_RANGE_MULTIPLIER);

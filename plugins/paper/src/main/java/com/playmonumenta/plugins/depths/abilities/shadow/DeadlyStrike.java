@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 public class DeadlyStrike extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Deadly Strike";
-	public static final double[] DAMAGE = {0.10, 0.125, 0.15, 0.175, 0.2, 0.25};
+	public static final double[] DAMAGE = {0.10, 0.15, 0.20, 0.25, 0.3, 0.4};
 
 	public static final DepthsAbilityInfo<DeadlyStrike> INFO =
 		new DepthsAbilityInfo<>(DeadlyStrike.class, ABILITY_NAME, DeadlyStrike::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
@@ -37,8 +37,8 @@ public class DeadlyStrike extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
-			event.setDamage(event.getDamage() * (1 + mDamage));
-			}
+			event.updateDamageWithMultiplier(1 + mDamage);
+		}
 		return false; // only changes event damage
 	}
 

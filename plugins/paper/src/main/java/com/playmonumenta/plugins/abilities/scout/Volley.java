@@ -59,8 +59,8 @@ public class Volley extends Ability {
 			.shorthandName("Vly")
 			.descriptions(
 				String.format("When you shoot a projectile while sneaking, you shoot a volley consisting of %d projectiles instead. " +
-					              "Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: 15s.", VOLLEY_1_ARROW_COUNT, (int) ((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100)),
-				String.format("Increases the number of projectiles to %d and enhances the bonus damage to %d%%.", VOLLEY_2_ARROW_COUNT, (int) ((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)),
+					              "Only one arrow is consumed, and each projectile deals %sx damage. Cooldown: %ds.", VOLLEY_1_ARROW_COUNT, VOLLEY_1_DAMAGE_MULTIPLIER, VOLLEY_COOLDOWN),
+				String.format("Increases the number of projectiles to %d and enhances the damage to %sx.", VOLLEY_2_ARROW_COUNT, VOLLEY_2_DAMAGE_MULTIPLIER),
 				String.format("Volley now fires in a 360 degree arc. The projectiles inflict %d%% Bleed for %ds.", (int) (ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20))
 			.simpleDescription("Fire a volley of projectiles in front of you.")
 			.cooldown(VOLLEY_COOLDOWN, CHARM_COOLDOWN)
@@ -160,8 +160,7 @@ public class Volley extends Ability {
 		Entity proj = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && mVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
-				double damage = event.getDamage() * mMultiplier * (1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE));
-				event.setDamage(damage);
+				event.updateDamageWithMultiplier(mMultiplier * (1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
 				mCosmetic.volleyHit(mPlayer, enemy);
 				if (isEnhanced()) {
 					EntityUtils.applyBleed(mPlugin, ENHANCEMENT_BLEED_DURATION, ENHANCEMENT_BLEED_POTENCY, enemy);

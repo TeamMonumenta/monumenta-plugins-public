@@ -38,9 +38,9 @@ public class Channeling extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
-			&& mCast
-			&& mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0) {
-			event.setDamage((event.getDamage() * (1 + (PERCENT_MELEE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)))));
+			    && mCast
+			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0) {
+			event.updateDamageWithMultiplier(1 + (PERCENT_MELEE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
 			mCast = false;
 		}
 		return false; // only changes event damage

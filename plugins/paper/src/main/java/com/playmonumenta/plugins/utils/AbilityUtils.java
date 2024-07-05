@@ -750,4 +750,8 @@ public class AbilityUtils {
 		}
 		return droppedItem;
 	}
+
+	public static boolean hasSpecialProjSkillScaling(@Nullable ClassAbility classAbility) {
+		return classAbility == ClassAbility.HUNTING_COMPANION || classAbility == ClassAbility.HALLOWED_BEAM;
+	}
 }

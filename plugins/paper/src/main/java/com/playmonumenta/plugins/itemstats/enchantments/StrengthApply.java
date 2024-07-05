@@ -33,7 +33,7 @@ public class StrengthApply implements Enchantment {
 			    && event.getType() != DamageEvent.DamageType.TRUE
 			    && player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
 			int potLevel = player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE).getAmplifier();
-			event.setDamage(event.getDamage() * (1 + (potLevel + 1) * DAMAGE_ADD_PER_LEVEL));
+			event.updateDamageWithMultiplier(1 + (potLevel + 1) * DAMAGE_ADD_PER_LEVEL);
 		}
 	}
 }

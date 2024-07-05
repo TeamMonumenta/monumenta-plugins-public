@@ -124,7 +124,7 @@ public class IceAspect implements Enchantment {
 			apply(plugin, player, level, duration, enemy, type == DamageType.MELEE);
 
 			if (enemy instanceof Blaze) {
-				event.setDamage(event.getDamage() + 1.0);
+				event.setDamage(event.getFlatDamage() + 1.0);
 			}
 		}
 	}

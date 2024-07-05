@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 public class PrimordialMastery extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Primordial Mastery";
-	public static final double[] SPELL_MOD = {0.08, 0.095, 0.11, 0.125, 0.14, 0.18};
+	public static final double[] SPELL_MOD = {0.08, 0.12, 0.16, 0.2, 0.24, 0.32};
 
 	public static final DepthsAbilityInfo<PrimordialMastery> INFO =
 		new DepthsAbilityInfo<>(PrimordialMastery.class, ABILITY_NAME, PrimordialMastery::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
@@ -40,7 +40,7 @@ public class PrimordialMastery extends DepthsAbility {
 			return false;
 		}
 		if (event.getAbility() != null && !event.getAbility().isFake()) {
-			event.setDamage(event.getDamage() * (1 + mDamageModifier));
+			event.updateDamageWithMultiplier(1 + mDamageModifier);
 		}
 		return false; // only changes event damage
 	}

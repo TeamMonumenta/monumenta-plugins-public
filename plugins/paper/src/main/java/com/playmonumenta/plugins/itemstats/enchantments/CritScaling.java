@@ -31,10 +31,10 @@ public class CritScaling implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
-			event.setDamage(event.getDamage() * player.getCooledAttackStrength(0));
+			event.updateDamageWithMultiplier(player.getCooledAttackStrength(0));
 		}
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
-			event.setDamage(event.getDamage() * CRIT_BONUS);
+			event.setIsCrit(true);
 		}
 	}
 }

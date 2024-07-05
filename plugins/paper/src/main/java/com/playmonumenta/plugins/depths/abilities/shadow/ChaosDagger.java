@@ -183,7 +183,7 @@ public class ChaosDagger extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (enemy == mHitMob && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)) {
-			event.setDamage(event.getDamage() * (1 + mDamageMultiplier));
+			event.setDamage(event.getFlatDamage() * (1 + mDamageMultiplier));
 			mHitMob = null;
 			if (!enemy.isInvisible()) {
 				enemy.setGlowing(false);
@@ -216,7 +216,7 @@ public class ChaosDagger extends DepthsAbility {
 			.addDuration(DAMAGE_DURATION)
 			.add(" seconds, you deal ")
 			.addPercent(a -> a.mDamageMultiplier, DAMAGE[rarity - 1], false, true)
-			.add(" more damage. If this damage kills the target, gain stealth for ")
+			.add(" more damage multiplicatively. If this damage kills the target, gain stealth for ")
 			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION)
 			.add(" seconds. The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path.")
 			.addCooldown(COOLDOWN);

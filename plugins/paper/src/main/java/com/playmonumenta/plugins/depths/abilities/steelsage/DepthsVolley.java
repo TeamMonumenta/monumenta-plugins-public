@@ -46,7 +46,7 @@ public class DepthsVolley extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volley";
 	private static final int COOLDOWN = 15 * 20;
 	public static final int[] ARROWS = {7, 9, 11, 13, 15, 18};
-	private static final double[] DAMAGE_MULTIPLIER = {0.4, 0.5, 0.6, 0.7, 0.8, 1.0};
+	private static final double[] DAMAGE_MULTIPLIER = {0.8, 1.05, 1.3, 1.55, 1.8, 2.3};
 
 	public static final String CHARM_COOLDOWN = "Volley Cooldown";
 
@@ -150,7 +150,7 @@ public class DepthsVolley extends DepthsAbility {
 		Entity damager = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && damager instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && mDepthsVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
-				event.setDamage(event.getDamage() * (1 + mDamageMultiplier));
+				event.updateDamageWithMultiplier(mDamageMultiplier);
 			} else {
 				// Only let one Volley arrow hit a given mob
 				event.setCancelled(true);

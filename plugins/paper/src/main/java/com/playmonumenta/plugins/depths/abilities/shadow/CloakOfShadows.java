@@ -80,7 +80,7 @@ public class CloakOfShadows extends DepthsAbility {
 		putOnCooldown();
 		AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
 
-		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, mDamage, EnumSet.of(DamageEvent.DamageType.MELEE)));
+		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, mDamage, EnumSet.of(DamageEvent.DamageType.MELEE), true));
 
 		new BukkitRunnable() {
 
@@ -127,7 +127,7 @@ public class CloakOfShadows extends DepthsAbility {
 			.addDuration(DAMAGE_DURATION)
 			.add(" seconds deals ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
-			.add(" more damage.")
+			.add(" more damage multiplicatively.")
 			.addCooldown(COOLDOWN);
 	}
 

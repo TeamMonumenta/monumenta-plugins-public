@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 public class ProjectileMastery extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Projectile Mastery";
-	public static final double[] SPELL_MOD = {0.08, 0.10, 0.12, 0.14, 0.16, 0.20};
+	public static final double[] SPELL_MOD = {0.15, 0.2, 0.25, 0.3, 0.35, 0.45};
 
 	public static final DepthsAbilityInfo<ProjectileMastery> INFO =
 		new DepthsAbilityInfo<>(ProjectileMastery.class, ABILITY_NAME, ProjectileMastery::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
@@ -37,7 +37,7 @@ public class ProjectileMastery extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) {
-			event.setDamage(event.getDamage() * (1 + mDamage));
+			event.updateDamageWithMultiplier(1 + mDamage);
 		}
 		return false; // only changes event damage
 	}

@@ -193,7 +193,6 @@ public class HallowedBeam extends MultipleChargeAbility {
 					MovementUtils.knockAway(healedPlayer, le, 0.65f, true);
 				}
 			} else {
-
 				mCosmetic.beamHarm(world, mPlayer, targetedEntity, dir, CAST_RANGE);
 				Location eLoc = LocationUtils.getHalfHeightLocation(targetedEntity);
 				int stunDuration;
@@ -201,6 +200,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 					double damage = ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
 					damage += Sniper.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.SNIPER));
 					damage += PointBlank.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.POINT_BLANK));
+					// Must be multiplicative since getAttributeAmount returns the attribute as a decimal
 					damage *= mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
 					damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 					DamageUtils.damage(mPlayer, targetedEntity, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);

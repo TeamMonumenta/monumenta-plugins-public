@@ -158,8 +158,7 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 		clearSummons();
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
-		double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) * multiply;
+		double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
 		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);

@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 
 public class Flexibility extends DepthsAbility {
 	public static final String ABILITY_NAME = "Flexibility";
-	public static final double[] DAMAGE = {0.015, 0.02, 0.025, 0.03, 0.035, 0.045};
+	public static final double[] DAMAGE = {0.015, 0.025, 0.035, 0.045, 0.055, 0.075};
 
 	public static final DepthsAbilityInfo<Flexibility> INFO =
 		new DepthsAbilityInfo<>(Flexibility.class, ABILITY_NAME, Flexibility::new, DepthsTree.PRISMATIC, DepthsTrigger.PASSIVE)
@@ -44,7 +44,7 @@ public class Flexibility extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DamageEvent.DamageType.getScalableDamageType().contains(event.getType())) {
-			event.setDamage(event.getDamage() * mDamage);
+			event.updateDamageWithMultiplier(mDamage);
 		}
 		return false;
 	}

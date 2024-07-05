@@ -91,7 +91,8 @@ public class Skirmisher extends Ability {
 			if (event.getAbility() != mInfo.getLinkedSpell() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
 				if (EntityUtils.getNearbyMobs(loc, mFriendlyRadius, enemy).size() >= MOB_COUNT_CUTOFF
 					    || (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
-					event.setDamage((event.getDamage() + mIsolatedFlatDamage) * (1 + mIsolatedPercentDamage));
+					event.setDamage(event.getFlatDamage() + mIsolatedFlatDamage);
+					event.updateDamageWithMultiplier(1 + mIsolatedPercentDamage);
 					mCosmetic.aesthetics(mPlayer, loc, world, enemy);
 				}
 			}

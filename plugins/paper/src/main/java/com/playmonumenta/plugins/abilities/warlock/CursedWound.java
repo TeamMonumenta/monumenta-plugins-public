@@ -137,7 +137,7 @@ public class CursedWound extends Ability {
 				}
 			}
 
-			event.setDamage(event.getDamage() * (1 + (Math.min(cooldowns, CURSED_WOUND_CAP + CharmManager.getLevel(mPlayer, CHARM_CAP)) * (mCursedWoundDamage + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)))));
+			event.updateDamageWithMultiplier(1 + (Math.min(cooldowns, CURSED_WOUND_CAP + CharmManager.getLevel(mPlayer, CHARM_CAP)) * (mCursedWoundDamage + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE))));
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				mCosmetic.onCriticalAttack(world, mPlayer, enemy, cooldowns);

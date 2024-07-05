@@ -178,7 +178,7 @@ public class Spellshock extends Ability {
 				&& mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0) {
 			SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
 			if (existingStatic != null) {
-				event.setDamage(event.getDamage() * (1 + mMeleeBonus));
+				event.updateDamageWithMultiplier(1 + mMeleeBonus);
 				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), PERCENT_SLOW_EFFECT_NAME));
 				existingStatic.trigger();
 				mCosmetic.meleeClearStatic(mPlayer, enemy);

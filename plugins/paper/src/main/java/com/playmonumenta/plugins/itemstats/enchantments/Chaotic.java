@@ -42,9 +42,9 @@ public class Chaotic implements Enchantment {
 		int rand = FastUtils.RANDOM.nextInt(2 * (int) value + 1) - (int) value;
 		if (event.getType() == DamageType.MELEE) {
 			new PartialParticle(Particle.DAMAGE_INDICATOR, enemy.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
-			event.setDamage(Math.max(0, event.getDamage() + rand * player.getCooledAttackStrength(0)));
+			event.setDamage(event.getFlatDamage() + rand * player.getCooledAttackStrength(0));
 		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-			event.setDamage(Math.max(0, event.getDamage() + rand));
+			event.setDamage(event.getFlatDamage() + rand);
 		}
 	}
 }

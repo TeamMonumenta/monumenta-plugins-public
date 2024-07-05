@@ -40,9 +40,9 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	private static final double PERCENT_ABSORPTION_PENALTY = 0.5;
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.5;
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "TabooKnockbackResistanceEffect";
-	private static final double MAGIC_DAMAGE_INCREASE_1 = 0.15;
-	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.25;
-	private static final double MAGIC_DAMAGE_INCREASE_BURST = 0.4;
+	private static final double MAGIC_DAMAGE_INCREASE_1 = 0.2;
+	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.3;
+	private static final double MAGIC_DAMAGE_INCREASE_BURST = 0.5;
 	private static final int BURST_SECONDS = 5;
 	private static final int BURST_COOLDOWN = 20 * 20;
 	private static final String TABOO_HEALING_SICKNESS = "TabooHealingSickness";
@@ -239,7 +239,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	public boolean onDamage(DamageEvent event, LivingEntity damgee) {
 		if (mCurrentState != TabooState.INACTIVE && event.getType() == DamageType.MAGIC) {
 			double actualIncrease = mMagicDamageIncrease + ((mCurrentState == TabooState.BURST) ? MAGIC_DAMAGE_INCREASE_BURST : 0);
-			event.setDamage(event.getDamage() * (1 + actualIncrease));
+			event.updateDamageWithMultiplier(1 + actualIncrease);
 		}
 		return false;
 	}

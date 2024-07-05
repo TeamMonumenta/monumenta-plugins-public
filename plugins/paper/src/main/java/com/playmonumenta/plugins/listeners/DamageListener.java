@@ -84,10 +84,6 @@ public class DamageListener implements Listener {
 				event.setDamage(EntityUtils.getAttributeOrDefault(wither, Attribute.GENERIC_ATTACK_DAMAGE, event.getDamage()));
 			}
 
-			if (event.getEntity() instanceof LivingEntity mob) {
-				event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
-			}
-
 			if (entityDamageByEntityEvent.getDamager() instanceof Player player
 				    && event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
 				PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
@@ -172,6 +168,8 @@ public class DamageListener implements Listener {
 		LivingEntity damagee = event.getDamagee();
 		Entity damager = event.getDamager();
 		LivingEntity source = event.getSource();
+
+		event.updateDamageWithMultiplier(EntityUtils.vulnerabilityMult(damagee));
 
 		// Player getting damaged
 		if (damagee instanceof Player player) {

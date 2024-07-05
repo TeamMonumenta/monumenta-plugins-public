@@ -103,9 +103,9 @@ public class HexEater implements Enchantment {
 			//Trident throw does not rely on player attack strength
 			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * effects * DAMAGE);
 			if (tridentThrow) {
-				event.setDamage(event.getDamage() + damage);
+				event.setDamage(event.getFlatDamage() + damage);
 			} else {
-				event.setDamage(event.getDamage() + damage * player.getCooledAttackStrength(0));
+				event.setDamage(event.getFlatDamage() + damage * player.getCooledAttackStrength(0));
 			}
 			new PartialParticle(Particle.SPELL_WITCH, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 		}

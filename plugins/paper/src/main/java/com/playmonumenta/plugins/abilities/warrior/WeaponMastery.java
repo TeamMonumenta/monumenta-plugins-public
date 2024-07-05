@@ -29,7 +29,7 @@ public class WeaponMastery extends Ability {
 	private static final double SWORD_2_DAMAGE = 0.1;
 	private static final double WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE = 0.1;
 	private static final double SWORD_WEAKEN = 0.1;
-	private static final double ENHANCED_DAMAGE = 0.075;
+	private static final double ENHANCED_DAMAGE = 0.1;
 	private static final int SWORD_WEAKEN_DURATION = 4 * 20;
 	private static final double AXE_SPEED = 0.15;
 	private static final String SPEED_EFFECT = "WeaponMasterySpeedEffect";
@@ -71,10 +71,12 @@ public class WeaponMastery extends Ability {
 		if (event.getType() == DamageType.MELEE) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand)) {
-				event.setDamage((event.getDamage() + mDamageBonusAxeFlat) * (1 + mDamageBonusAxe));
+				event.addUnmodifiableDamage(mDamageBonusAxeFlat);
+				event.updateDamageWithMultiplier(1 + mDamageBonusAxe);
 				mCosmetic.weaponMasteryAxeHit(mPlayer);
 			} else if (ItemUtils.isSword(mainHand)) {
-				event.setDamage((event.getDamage() + mDamageBonusSwordFlat) * (1 + mDamageBonusSword));
+				event.addUnmodifiableDamage(mDamageBonusSwordFlat);
+				event.updateDamageWithMultiplier(1 + mDamageBonusSword);
 				mCosmetic.weaponMasterySwordHit(mPlayer);
 				if (isEnhanced()) {
 					EntityUtils.applyWeaken(mPlugin, CharmManager.getDuration(mPlayer, CHARM_DURATION, SWORD_WEAKEN_DURATION), SWORD_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN), enemy);

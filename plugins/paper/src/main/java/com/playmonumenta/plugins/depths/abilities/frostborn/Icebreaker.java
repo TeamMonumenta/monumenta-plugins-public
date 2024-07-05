@@ -22,8 +22,8 @@ import org.bukkit.entity.Player;
 public class Icebreaker extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Icebreaker";
-	public static final double[] ICE_DAMAGE = {0.20, 0.23, 0.26, 0.29, 0.32, 0.40};
-	public static final double[] EFFECT_DAMAGE = {0.10, 0.115, 0.13, 0.145, 0.16, 0.20};
+	public static final double[] ICE_DAMAGE = {0.20, 0.265, 0.33, 0.395, 0.46, 0.59};
+	public static final double[] EFFECT_DAMAGE = {0.10, 0.133, 0.165, 0.198, 0.23, 0.295};
 
 	public static final DepthsAbilityInfo<Icebreaker> INFO =
 		new DepthsAbilityInfo<>(Icebreaker.class, ABILITY_NAME, Icebreaker::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
@@ -46,7 +46,7 @@ public class Icebreaker extends DepthsAbility {
 		if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER) {
 			return false;
 		}
-		event.setDamage(event.getDamage() * Math.max(getIceMultiplier(enemy), getDebuffMultiplier(enemy)));
+		event.updateDamageWithMultiplier(Math.max(getIceMultiplier(enemy), getDebuffMultiplier(enemy)));
 		return false; // only changes event damage
 	}
 

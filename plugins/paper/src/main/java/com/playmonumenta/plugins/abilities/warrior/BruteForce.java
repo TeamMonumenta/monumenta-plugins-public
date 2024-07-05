@@ -76,7 +76,7 @@ public class BruteForce extends Ability {
 			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
 			damageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damageBonus);
 
-			event.setDamage(event.getDamage() + damageBonus);
+			event.setDamage(event.getFlatDamage() + damageBonus);
 
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
 				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {

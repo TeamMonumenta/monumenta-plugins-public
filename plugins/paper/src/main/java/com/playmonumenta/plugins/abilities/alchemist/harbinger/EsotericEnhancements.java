@@ -34,8 +34,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class EsotericEnhancements extends Ability implements PotionAbility {
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.8;
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.35;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 1;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.5;
+	private static final double ABERRATION_POTION_DAMAGE_RAW_1 = 6;
+	private static final double ABERRATION_POTION_DAMAGE_RAW_2 = 7.5;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
 	private static final int ABERRATION_SUMMON_DURATION = 30;
 	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
@@ -64,25 +66,30 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 			.descriptions(
 				("When afflicting a mob with a Brutal potion within %ss of afflicting that mob with a Gruesome potion, " +
 				"summon an Alchemical Aberration. The Aberration targets the mob with the highest health within %s blocks " +
-				"and explodes on that mob, dealing %s%% of your potion damage and applying %s%% Bleed for %ss to all mobs " +
+				"and explodes on that mob, dealing %s + %s%% of your potion damage and applying %s%% Bleed for %ss to all mobs " +
 				"in a %s block radius. Cooldown: %ss.")
 					.formatted(
 							StringUtils.ticksToSeconds(ABERRATION_SUMMON_DURATION),
 							StringUtils.to2DP(ABERRATION_TARGET_RADIUS),
+							ABERRATION_POTION_DAMAGE_RAW_1,
 							StringUtils.multiplierToPercentage(ABERRATION_POTION_DAMAGE_MULTIPLIER_1),
 							StringUtils.multiplierToPercentage(ABERRATION_BLEED_AMOUNT),
 							StringUtils.ticksToSeconds(ABERRATION_BLEED_DURATION),
 							StringUtils.to2DP(ABERRATION_DAMAGE_RADIUS),
 							StringUtils.ticksToSeconds(ABERRATION_COOLDOWN)
 					),
-				"Damage is increased to %s%% of your potion damage."
-					.formatted(StringUtils.multiplierToPercentage(ABERRATION_POTION_DAMAGE_MULTIPLIER_2))
+				"Damage is increased to %s + %s%% of your potion damage."
+					.formatted(
+						ABERRATION_POTION_DAMAGE_RAW_2,
+						StringUtils.multiplierToPercentage(ABERRATION_POTION_DAMAGE_MULTIPLIER_2)
+					)
 			)
 			.simpleDescription("Stack the effects of gruesome and brutal on an enemy to summon a friendly creeper.")
 			.cooldown(ABERRATION_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.CREEPER_HEAD);
 
 	private final double mDamageMultiplier;
+	private final double mDamageRaw;
 	private final HashMap<LivingEntity, Integer> mAppliedMobs;
 	private final EsotericEnhancementsCS mCosmetic;
 
@@ -92,6 +99,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 		mAppliedMobs = new HashMap<>();
 
 		mDamageMultiplier = isLevelOne() ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2;
+		mDamageRaw = isLevelOne() ? ABERRATION_POTION_DAMAGE_RAW_1 : ABERRATION_POTION_DAMAGE_RAW_2;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EsotericEnhancementsCS());
 	}
@@ -134,6 +142,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamageMultiplier * playerItemStats.getItemStats().get(AttributeType.POTION_DAMAGE.getItemStat()));
+			damage += mDamageRaw;
 			alchemicalAberrationBoss.spawn(mPlayer, damage, radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), playerItemStats);
 
 			aberration.setMaxFuseTicks(CharmManager.getDuration(mPlayer, CHARM_FUSE, aberration.getMaxFuseTicks()));
@@ -152,6 +161,13 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 						aberration.remove();
 						this.cancel();
 						return;
+					}
+
+					List<LivingEntity> inRadiusMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), radius, aberration).stream()
+						.filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
+						.filter(mob -> isValidTarget(aberration, mob)).toList();
+					if (!inRadiusMobs.isEmpty()) {
+						mTarget = inRadiusMobs.stream().max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
 					}
 
 					if (!isValidTarget(aberration, mTarget)) {
@@ -182,6 +198,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	}
 
 	private @Nullable LivingEntity findTarget(LivingEntity aberration) {
+
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration).stream()
 			.filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
 			.filter(mob -> isValidTarget(aberration, mob)).toList();

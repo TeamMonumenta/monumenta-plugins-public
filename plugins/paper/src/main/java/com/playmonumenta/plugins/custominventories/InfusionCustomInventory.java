@@ -35,7 +35,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-
 public class InfusionCustomInventory extends CustomInventory {
 
 	@FunctionalInterface
@@ -59,15 +58,6 @@ public class InfusionCustomInventory extends CustomInventory {
 
 
 	static {
-		// Add items to mPanelList and mInfusionPanelsMap
-
-		addItems(InfusionSelection.VITALITY, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Vitality.HEALTH_MOD_PER_LEVEL * i) + "% max health" + perLevel + ".");
-		addItems(InfusionSelection.TENACITY, (i, perLevel) -> "Take " + StringUtils.multiplierToPercentage(Tenacity.DAMAGE_REDUCTION_PER_LEVEL * i) + "% less damage" + perLevel + ".");
-		addItems(InfusionSelection.VIGOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Vigor.DAMAGE_MOD_PER_LEVEL * i) + "% more melee damage" + perLevel + ".");
-		addItems(InfusionSelection.FOCUS, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Focus.DAMAGE_MOD_PER_LEVEL * i) + "% more projectile damage" + perLevel + ".");
-		addItems(InfusionSelection.PERSPICACITY, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Perspicacity.DAMAGE_MOD_PER_LEVEL * i) + "% more magic damage" + perLevel + ".");
-		addItems(InfusionSelection.ACUMEN, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Acumen.ACUMEN_MULTIPLIER * i) + "% more experience" + perLevel + ".");
-
 		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
 			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be infused.", NamedTextColor.DARK_GRAY)).toList();
 
@@ -81,6 +71,15 @@ public class InfusionCustomInventory extends CustomInventory {
 	public InfusionCustomInventory(Player owner) {
 		super(owner, ROW * COLUMNS, "Infusions");
 		mMapFunction = new HashMap<>();
+
+		// Add items to mPanelList and mInfusionPanelsMap
+		addItems(InfusionSelection.VITALITY, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Vitality.HEALTH_MOD_PER_LEVEL * i) + "% max health" + perLevel + ".");
+		addItems(InfusionSelection.TENACITY, (i, perLevel) -> "Take " + StringUtils.multiplierToPercentage(Tenacity.DAMAGE_REDUCTION_PER_LEVEL * i) + "% less damage" + perLevel + ".");
+		addItems(InfusionSelection.VIGOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Vigor.getDamageForRegion(owner) * i) + "% more melee damage" + perLevel + ".");
+		addItems(InfusionSelection.FOCUS, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Focus.getDamageForRegion(owner) * i) + "% more projectile damage" + perLevel + ".");
+		addItems(InfusionSelection.PERSPICACITY, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Perspicacity.getDamageForRegion(owner) * i) + "% more magic damage" + perLevel + ".");
+		addItems(InfusionSelection.ACUMEN, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Acumen.ACUMEN_MULTIPLIER * i) + "% more experience" + perLevel + ".");
+
 		loadInv(owner);
 	}
 
@@ -119,7 +118,7 @@ public class InfusionCustomInventory extends CustomInventory {
 
 	private static void addInfoItems(InfusionSelection infusion, IntFunction<String> function) {
 		List<ItemStack> items = IntStream.range(1, 5)
-			.mapToObj(i -> GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel() + " level " + i, infusion.getColor(), true, function.apply(i), NamedTextColor.GRAY))
+			.mapToObj(i -> GUIUtils.createBasicItem(infusion.getMaterial(), infusion.getCapitalizedLabel() + " Level " + i, infusion.getColor(), true, function.apply(i), NamedTextColor.GRAY))
 			.toList();
 		mInfusionPanelsMap.put(infusion, items);
 	}

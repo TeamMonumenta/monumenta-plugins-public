@@ -39,7 +39,7 @@ public class MagicDamageMultiply implements Attribute {
 		}
 
 		if (event.getType() == DamageType.MAGIC) {
-			event.setDamage(event.getDamage() * value);
+			event.updateGearDamageWithMultiplier(value);
 		}
 	}
 }

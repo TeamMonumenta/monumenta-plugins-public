@@ -49,8 +49,7 @@ public class Versatility implements Enchantment {
 		if (type == DamageType.MELEE || type == DamageType.MELEE_ENCH || type == DamageType.MELEE_SKILL) {
 			if (proj != null || magic != null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
-				double damage = event.getDamage() * (1 + bonus);
-				event.setDamage(damage);
+				event.updateGearDamageWithMultiplier(1 + bonus);
 
 				audioVisuals(player, enemy);
 			}
@@ -60,8 +59,7 @@ public class Versatility implements Enchantment {
 		} else if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
 			if (melee != null || magic != null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
-				double damage = event.getDamage() * (1 + bonus);
-				event.setDamage(damage);
+				event.updateGearDamageWithMultiplier(1 + bonus);
 
 				audioVisuals(player, enemy);
 			}
@@ -71,8 +69,7 @@ public class Versatility implements Enchantment {
 		} else if (type == DamageType.MAGIC) {
 			if (proj != null || melee != null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
-				double damage = event.getDamage() * (1 + bonus);
-				event.setDamage(damage);
+				event.updateGearDamageWithMultiplier(1 + bonus);
 
 				audioVisuals(player, enemy);
 			}

@@ -21,10 +21,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class GruesomeAlchemy extends Ability implements PotionAbility {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
-	private static final double GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER = 0.1;
-	private static final double GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER = 0.2;
-	private static final double GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 0.1;
-	private static final double GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 0.2;
+	private static final double GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER = 0.15;
+	private static final double GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER = 0.25;
+	private static final double GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 0.15;
+	private static final double GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 0.25;
 	private static final double GRUESOME_ALCHEMY_WEAKEN_AMPLIFIER = 0.1;
 
 	public static final double GRUESOME_POTION_DAMAGE_MULTIPLIER = 0.8;

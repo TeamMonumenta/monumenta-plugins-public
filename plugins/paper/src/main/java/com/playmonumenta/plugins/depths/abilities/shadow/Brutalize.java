@@ -50,9 +50,9 @@ public class Brutalize extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
-			double originalDamage = event.getDamage();
+			double originalDamage = event.getFlatDamage();
 			double brutalizeDamage = mDamage * originalDamage;
-			event.setDamage(originalDamage + brutalizeDamage);
+			event.setDamage(event.getFlatDamage() + brutalizeDamage);
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, 1.65f);

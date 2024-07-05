@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 public class DarkCombos extends DepthsCombosAbility {
 
 	public static final String ABILITY_NAME = "Dark Combos";
-	public static final double[] VULN_AMPLIFIER = {0.15, 0.1875, 0.225, 0.2625, 0.3, 0.375};
+	public static final double[] VULN_AMPLIFIER = {0.14, 0.20, 0.26, 0.32, 0.38, 0.5};
 	public static final int DURATION = 20 * 3;
 	public static final int HIT_REQUIREMENT = 3;
 

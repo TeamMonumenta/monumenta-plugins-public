@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 public class LuminousInfusion extends Ability {
 	public static final int DAMAGE_1 = 12;
 	public static final int DAMAGE_UNDEAD_1 = 25;
-	public static final double DAMAGE_MULTIPLIER_2 = 0.15;
+	public static final double DAMAGE_MULTIPLIER_2 = 0.2;
 	public static final int INFUSED_HITS = 1;
 
 	private final boolean mDoMultiplierAndFire;
@@ -56,14 +56,26 @@ public class LuminousInfusion extends Ability {
 			.scoreboardId("LuminousInfusion")
 			.shorthandName("LI")
 			.descriptions(
-				"While sneaking, pressing the swap key charges your hands with holy light. " +
+				("While sneaking, pressing the swap key charges your hands with holy light. " +
 					"The next attack or ability you perform against an undead enemy is infused with explosive power, " +
-					"dealing 25 magic damage to it and all other undead enemies in a 4 block radius around it, or 12 against non-undead, " +
-					"and knocking other enemies away from it. Cooldown: 12s.",
-				"Your melee attacks now passively deal 15% magic damage to undead enemies, " +
-					"and Divine Justice now passively deals 15% more total damage. " +
-					"Damaging an undead enemy now passively sets it on fire for 3s. " +
-					"Applies inferno at 50% efficiency for magic and projectile attacks.")
+					"dealing %d magic damage to it and all other undead enemies in a %s block radius around it, or %d against non-undead, " +
+					"and knocking other enemies away from it. Cooldown: %ss.")
+					.formatted(
+						DAMAGE_UNDEAD_1,
+						RADIUS,
+						DAMAGE_1,
+						(COOLDOWN / 20)
+					),
+				("Your melee attacks now passively deal %s%% magic damage to undead enemies, " +
+					"and Divine Justice now passively deals %s%% more total damage. " +
+					"Damaging an undead enemy now passively sets it on fire for %ss. " +
+					"Applies inferno at %s%% efficiency for magic and projectile attacks.")
+					.formatted(
+						(DAMAGE_MULTIPLIER_2 * 100),
+						(DAMAGE_MULTIPLIER_2 * 100),
+						(FIRE_DURATION_2 / 20),
+						(INFERNO_SCALE * 100)
+					))
 			.simpleDescription("Upon activating, the next damage dealt to an Undead enemy causes an explosion.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LuminousInfusion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
@@ -125,7 +137,7 @@ public class LuminousInfusion extends Ability {
 		if (mDoMultiplierAndFire && event.getAbility() == ClassAbility.DIVINE_JUSTICE) {
 			double originalDamage = event.getDamage();
 			mLastPassiveDJDamage = originalDamage * DAMAGE_MULTIPLIER_2;
-			event.setDamage(originalDamage + mLastPassiveDJDamage);
+			event.setDamage(event.getFlatDamage() + mLastPassiveDJDamage);
 			return false;
 		}
 

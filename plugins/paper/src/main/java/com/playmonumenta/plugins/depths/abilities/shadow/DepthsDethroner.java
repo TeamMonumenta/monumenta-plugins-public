@@ -19,8 +19,8 @@ import org.bukkit.entity.Player;
 public class DepthsDethroner extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dethroner";
-	public static final double[] ELITE_DAMAGE = {0.14, 0.175, 0.21, 0.245, 0.28, 0.35};
-	public static final double[] BOSS_DAMAGE = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
+	public static final double[] ELITE_DAMAGE = {0.14, 0.21, 0.28, 0.35, 0.42, 0.56};
+	public static final double[] BOSS_DAMAGE = {0.10, 0.15, 0.20, 0.25, 0.30, 0.40};
 
 	public static final DepthsAbilityInfo<DepthsDethroner> INFO =
 		new DepthsAbilityInfo<>(DepthsDethroner.class, ABILITY_NAME, DepthsDethroner::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
@@ -45,9 +45,9 @@ public class DepthsDethroner extends DepthsAbility {
 		}
 
 		if (EntityUtils.isBoss(enemy)) {
-			event.setDamage(event.getDamage() * (1 + mBossDamage));
+			event.updateDamageWithMultiplier(1 + mBossDamage);
 		} else if (EntityUtils.isElite(enemy)) {
-			event.setDamage(event.getDamage() * (1 + mEliteDamage));
+			event.updateDamageWithMultiplier(1 + mEliteDamage);
 		}
 		return false; // only changes event damage
 	}

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -40,8 +41,8 @@ public class ProjectileDamageMultiply implements Attribute {
 			return;
 		}
 
-		if (type.equals(DamageType.PROJECTILE) || type.equals(DamageType.PROJECTILE_SKILL)) {
-			event.setDamage(event.getDamage() * value);
+		if (type.equals(DamageType.PROJECTILE) || type.equals(DamageType.PROJECTILE_SKILL) || AbilityUtils.hasSpecialProjSkillScaling(event.getAbility())) {
+			event.updateGearDamageWithMultiplier(value);
 		}
 	}
 

@@ -20,8 +20,8 @@ import org.bukkit.entity.Player;
 public class Aeromancy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Aeromancy";
-	public static final double[] PLAYER_DAMAGE = {0.12, 0.15, 0.18, 0.21, 0.24, 0.3};
-	public static final double[] MOB_DAMAGE = {0.056, 0.07, 0.084, 0.098, 0.112, 0.156};
+	public static final double[] PLAYER_DAMAGE = {0.12, 0.16, 0.2, 0.24, 0.28, 0.36};
+	public static final double[] MOB_DAMAGE = {0.06, 0.08, 0.1, 0.12, 0.14, 0.18};
 
 	public static final DepthsAbilityInfo<Aeromancy> INFO =
 		new DepthsAbilityInfo<>(Aeromancy.class, ABILITY_NAME, Aeromancy::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
@@ -45,7 +45,7 @@ public class Aeromancy extends DepthsAbility {
 			return false;
 		}
 
-		event.setDamage(event.getDamage() * damageMultiplier(enemy));
+		event.updateDamageWithMultiplier(damageMultiplier(enemy));
 		return false; // only changes event damage
 	}
 

@@ -34,8 +34,7 @@ public class Technique implements Enchantment {
 			if (event.getType() == DamageType.PROJECTILE) {
 				bonus *= PROJ_REDUCTION;
 			}
-			double damage = event.getDamage() * (1 + bonus);
-			event.setDamage(damage);
+			event.updateGearDamageWithMultiplier(1 + bonus);
 
 			player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5f, 1f);
 			player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 0.9f, 0.8f);

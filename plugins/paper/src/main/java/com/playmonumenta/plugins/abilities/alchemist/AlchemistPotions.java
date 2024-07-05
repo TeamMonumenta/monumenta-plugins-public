@@ -406,6 +406,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mChargeTime -= ticks;
 	}
 
+	public int getChargeTime() {
+		return mChargeTime;
+	}
+
 	/**
 	 * Modifies the time until the next potion is ready, in ticks. Add positive values to make it ready faster, and negative to make it slower.
 	 */

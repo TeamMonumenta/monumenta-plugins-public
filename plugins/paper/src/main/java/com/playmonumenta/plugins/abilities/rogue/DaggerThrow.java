@@ -35,7 +35,7 @@ public class DaggerThrow extends Ability {
 	private static final int DAGGER_THROW_DAGGERS = 3;
 	private static final double DAGGER_THROW_1_VULN = 0.2;
 	private static final double DAGGER_THROW_2_VULN = 0.4;
-	private static final double DAGGER_THROW_VULN_ENHANCEMENT = 0.1;
+	private static final double DAGGER_THROW_VULN_ENHANCEMENT = 0.2;
 	private static final double DAGGER_THROW_SPREAD = Math.toRadians(25);
 
 	public static final String CHARM_DAMAGE = "Dagger Throw Damage";
