@@ -15,9 +15,9 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.NavigableSet;
-
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -96,13 +96,13 @@ public class DesecratingShot extends Ability {
 			//Check if totemic projection u is active as otherwise ordering doesn't work.
 			NavigableSet<PercentDamageDealt> effects = mPlugin.mEffectManager.getEffects(mPlayer, PercentDamageDealt.class);
 			for (PercentDamageDealt effect : effects) {
-				if (effect.getAffectedDamageTypes() != null &&
-					effect.getAffectedDamageTypes().contains(DamageType.PROJECTILE)) {
+				EnumSet<DamageType> types = effect.getAffectedDamageTypes();
+				if (types == null || types.contains(DamageType.PROJECTILE)) {
 					double magnitude = 1 + effect.getMagnitude();
 					event.updateDamageWithMultiplier(magnitude);
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 }

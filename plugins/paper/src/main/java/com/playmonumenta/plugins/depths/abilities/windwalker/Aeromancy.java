@@ -52,10 +52,10 @@ public class Aeromancy extends DepthsAbility {
 	private double damageMultiplier(Entity damagee) {
 		double multiplier = 1;
 		if (LocationUtils.isAirborne(mPlayer)) {
-			multiplier *= 1 + mPlayerDamage;
+			multiplier += mPlayerDamage;
 		}
 		if (LocationUtils.isAirborne(damagee)) {
-			multiplier *= 1 + mMobDamage;
+			multiplier += mMobDamage;
 		}
 		return multiplier;
 	}

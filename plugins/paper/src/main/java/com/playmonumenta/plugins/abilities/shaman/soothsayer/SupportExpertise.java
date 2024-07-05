@@ -32,6 +32,6 @@ public class SupportExpertise extends Ability {
 		if (ability != null && !ability.isFake() && event.getType() == DamageEvent.DamageType.MAGIC) {
 			event.setDamage(event.getFlatDamage() * (1 + AbilityUtils.getEffectiveTotalSpecPoints(mPlayer) * DAMAGE_BOOST));
 		}
-		return true;
+		return false;
 	}
 }

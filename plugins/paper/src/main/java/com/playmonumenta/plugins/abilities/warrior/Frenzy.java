@@ -40,7 +40,7 @@ public class Frenzy extends Ability {
 			.descriptions(
 				"Gain +30% Attack Speed for 5 seconds after killing a mob.",
 				"Gain +40% Attack Speed and +20% Speed for 5 seconds after killing a mob.",
-				"Additionally, your next melee damage within 5 seconds after getting a kill deals 15% extra damage.")
+				"Additionally, your next melee damage within 5 seconds after getting a kill deals 20% extra damage.")
 			.simpleDescription("Killing mobs increases your speed and attack speed.")
 			.displayItem(Material.FEATHER);
 
