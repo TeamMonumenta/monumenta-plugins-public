@@ -135,7 +135,7 @@ public class LuminousInfusion extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		// Divine Justice integration
 		if (mDoMultiplierAndFire && event.getAbility() == ClassAbility.DIVINE_JUSTICE) {
-			double originalDamage = event.getDamage();
+			double originalDamage = event.getFlatDamage();
 			mLastPassiveDJDamage = originalDamage * DAMAGE_MULTIPLIER_2;
 			event.setDamage(event.getFlatDamage() + mLastPassiveDJDamage);
 			return false;

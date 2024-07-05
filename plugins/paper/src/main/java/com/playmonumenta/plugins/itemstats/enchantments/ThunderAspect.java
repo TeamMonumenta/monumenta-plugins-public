@@ -69,7 +69,7 @@ public class ThunderAspect implements Enchantment {
 			}
 
 			if (enemy instanceof IronGolem || enemy instanceof Guardian) {
-				event.setDamage(event.getFlatDamage() + BONUS_DAMAGE);
+				event.addUnmodifiableDamage(BONUS_DAMAGE);
 			}
 
 			if (event.getAbility() == ClassAbility.ERUPTION) {

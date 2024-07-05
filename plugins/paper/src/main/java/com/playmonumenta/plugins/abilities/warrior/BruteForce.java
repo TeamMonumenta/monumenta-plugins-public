@@ -76,7 +76,7 @@ public class BruteForce extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
 			double originalDamage = event.getFlatDamage();
-			event.setDamage(originalDamage + mFlatDamage);
+			event.addUnmodifiableDamage(mFlatDamage);
 			event.updateDamageWithMultiplier(1 + mMultiplier);
 
 			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
