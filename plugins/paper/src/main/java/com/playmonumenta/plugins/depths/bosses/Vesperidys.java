@@ -677,7 +677,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 				double maxHealth = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, BOSS_HEALTH);
 				double damage = event.getDamage();
 				if (damage > maxHealth * mDamageCap) {
-					event.setDamage(maxHealth * mDamageCap);
+					event.setDamageCap(maxHealth * mDamageCap);
 					mDamageCap = 0.01;
 				} else {
 					double damageCapReduction = Math.max(0, damage / maxHealth - 0.01);
