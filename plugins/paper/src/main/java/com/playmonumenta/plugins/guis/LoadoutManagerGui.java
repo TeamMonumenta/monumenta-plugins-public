@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.guis;
 
 import com.google.common.collect.ImmutableSet;
+import com.playmonumenta.plugins.Constants.Keybind;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
@@ -193,8 +194,9 @@ public class LoadoutManagerGui extends Gui {
 						ItemUtils.modifyMeta(icon, meta -> {
 							meta.displayName(Component.text(loadout.mName, NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 							List<Component> lore = new ArrayList<>();
-							if (loadout.mIsQuickSwap) {
-								lore.add(Component.text("Quick-Swap Loadout", NamedTextColor.GOLD, TextDecoration.ITALIC));
+							Component quickSwapsComponent = loadout.quickSwapsComponent();
+							if (quickSwapsComponent != null) {
+								lore.add(quickSwapsComponent);
 							}
 							if (loadout.mIncludeClass) {
 								PlayerClass playerClass = new MonumentaClasses().getClassById(loadout.mClass.mClassId);
@@ -324,26 +326,45 @@ public class LoadoutManagerGui extends Gui {
 				});
 
 			// set as quickswap loadout button
-			setItem(0, 6, GUIUtils.createBasicItem(selectedLoadout.mIsQuickSwap ? Material.GOLDEN_SWORD : Material.STONE_SWORD, 1,
-				Component.text(selectedLoadout.mIsQuickSwap ? "Is Quick-Swap Loadout" : "Set to Quick-Swap Loadout",
-					selectedLoadout.mIsQuickSwap ? NamedTextColor.GOLD : NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-				List.of(
-					Component.text("The Quick-Swap Loadout can", NamedTextColor.GRAY),
-					Component.text("be quickly switched to by", NamedTextColor.GRAY),
-					Component.text("pressing ", NamedTextColor.GRAY).append(Component.keybind("key.swapOffhand", NamedTextColor.WHITE)).append(Component.text(" on the", NamedTextColor.GRAY)),
-					Component.text(LoadoutManager.LOADOUT_MANAGER_NAME + " item in an inventory.", NamedTextColor.GRAY),
-					Component.text("If this loadout is already equipped,", NamedTextColor.GRAY),
-					Component.text("using the same button will instead", NamedTextColor.GRAY),
-					Component.text("restore the previous loadout.", NamedTextColor.GRAY)
-				), true))
-				.onLeftClick(() -> {
-					if (!selectedLoadout.mIsQuickSwap) {
+			boolean quickSwapSet = !selectedLoadout.mQuickSwaps.isEmpty();
+			Component quickSwapsComponent = selectedLoadout.quickSwapsComponent();
+			List<Component> quickSwapLore = new ArrayList<>();
+			if (quickSwapsComponent != null) {
+				quickSwapLore.add(quickSwapsComponent);
+			}
+			quickSwapLore.addAll(List.of(
+				Component.text("The Quick-Swap Loadout can", NamedTextColor.GRAY),
+				Component.text("be quickly switched to by", NamedTextColor.GRAY),
+				Component.text("pressing ", NamedTextColor.GRAY).append(Component.keybind(Keybind.SWAP_OFFHAND, NamedTextColor.WHITE)).append(Component.text(" or your hotbar buttons on the", NamedTextColor.GRAY)),
+				Component.text(LoadoutManager.LOADOUT_MANAGER_NAME + " item in an inventory.", NamedTextColor.GRAY),
+				Component.text("If this loadout is already equipped,", NamedTextColor.GRAY),
+				Component.text("using the same button will instead", NamedTextColor.GRAY),
+				Component.text("restore the previous loadout.", NamedTextColor.GRAY)
+			));
+			setItem(0, 6, GUIUtils.createBasicItem(quickSwapSet ? Material.GOLDEN_SWORD : Material.STONE_SWORD, 1,
+				Component.text(quickSwapSet ? "Is Quick-Swap Loadout" : "Set to Quick-Swap Loadout",
+					quickSwapSet ? NamedTextColor.GOLD : NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+				quickSwapLore, true))
+				.onClick((InventoryClickEvent event) -> {
+					Keybind keybind = switch (event.getClick()) {
+						case SWAP_OFFHAND -> Keybind.SWAP_OFFHAND;
+						case NUMBER_KEY -> Keybind.hotbar(event.getHotbarButton());
+						default -> null;
+					};
+					if (keybind == null) {
+						mPlayer.sendActionBar(Component.text("Please press ", NamedTextColor.WHITE)
+							.decoration(TextDecoration.ITALIC, false)
+							.append(Component.keybind(Keybind.SWAP_OFFHAND))
+							.append(Component.text(" or a hotbar key to modify quick swap settings")));
+						return;
+					}
+					if (!selectedLoadout.mQuickSwaps.contains(keybind)) {
 						for (LoadoutManager.Loadout loadout : mLoadoutData.mLoadouts) {
-							loadout.mIsQuickSwap = false;
+							loadout.mQuickSwaps.remove(keybind);
 						}
-						selectedLoadout.mIsQuickSwap = true;
+						selectedLoadout.mQuickSwaps.add(keybind);
 					} else {
-						selectedLoadout.mIsQuickSwap = false;
+						selectedLoadout.mQuickSwaps.remove(keybind);
 					}
 					update();
 				});

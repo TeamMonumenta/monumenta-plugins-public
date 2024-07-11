@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.playmonumenta.plugins.Constants.Keybind;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
@@ -15,6 +16,7 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
+import com.playmonumenta.plugins.guis.LoadoutManagerGui;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -37,6 +39,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -55,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiPredicate;
@@ -73,19 +77,24 @@ import org.bukkit.SoundCategory;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class LoadoutManager implements Listener {
 
 	private static final String KEY_PLUGIN_DATA = "MonumentaLoadouts";
 
+	public static final String LOADOUT_MANAGER_PERMISSION = "monumenta.feature.loadoutmanager";
+	public static final Material LOADOUT_MANAGER_MATERIAL = Material.SMITHING_TABLE;
 	public static final String LOADOUT_MANAGER_NAME = "Mechanical Armory";
 	public static final String STORAGE_SHULKER_NAME = "Equipment Case";
 
@@ -176,6 +185,24 @@ public class LoadoutManager implements Listener {
 
 	public LoadoutData getData(Player player) {
 		return mData.computeIfAbsent(player.getUniqueId(), key -> new LoadoutData());
+	}
+
+	private static boolean isLoadoutManager(ItemStack item) {
+		if (item == null || !LOADOUT_MANAGER_MATERIAL.equals(item.getType())) {
+			return false;
+		}
+
+		ItemMeta meta = item.getItemMeta();
+		if (meta == null) {
+			return false;
+		}
+
+		Component displayName = meta.displayName();
+		if (displayName == null) {
+			return false;
+		}
+
+		return LOADOUT_MANAGER_NAME.equals(MessagingUtils.plainText(displayName));
 	}
 
 	private static ItemUtils.ItemIdentifier parseItemIdentifier(JsonObject json, String typeProperty, String nameProperty) {
@@ -338,7 +365,8 @@ public class LoadoutManager implements Listener {
 					}
 
 					if (swappedEquipment.get()) {
-						// Reset player's attack cooldown so it cannot be exploited by swapping from high to low cooldown items of the same type
+						// Reset player's attack cooldown so that it cannot be exploited by
+						// swapping from high to low cooldown items of the same type
 						PlayerUtils.resetAttackCooldown(player);
 					}
 
@@ -632,7 +660,55 @@ public class LoadoutManager implements Listener {
 		return true;
 	}
 
+	public void openOwnGui(Player player) {
+		if (!player.hasPermission(LOADOUT_MANAGER_PERMISSION)) {
+			player.sendMessage(Component.text(
+				LOADOUT_MANAGER_NAME + " is currently disabled.",
+				NamedTextColor.RED
+			));
+			return;
+		}
+
+		if (ScoreboardUtils.getScoreboardValue(player, "Portal").orElse(0) <= 0) {
+			player.sendMessage(Component.text(
+				"You must have completed P.O.R.T.A.L. to use this item.",
+				NamedTextColor.RED
+			));
+			return;
+		}
+
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
+			YellowTesseractOverride.setCooldown(player, 0);
+		}
+
+		if (YellowTesseractOverride.getCooldown(player) > 0) {
+			player.sendMessage(Component.text("Warning: Swapping skills is on cooldown! You will be silenced if you perform any changes to your class or abilities.", NamedTextColor.YELLOW));
+		}
+
+		new LoadoutManagerGui(player).open();
+	}
+
 	public void quickSwap(Player player) {
+		quickSwap(player, Keybind.SWAP_OFFHAND);
+	}
+
+	public void quickSwap(Player player, Keybind keybind) {
+		if (!player.hasPermission(LOADOUT_MANAGER_PERMISSION)) {
+			player.sendMessage(Component.text(
+				LOADOUT_MANAGER_NAME + " is currently disabled.",
+				NamedTextColor.RED
+			));
+			return;
+		}
+
+		if (ScoreboardUtils.getScoreboardValue(player, "Portal").orElse(0) <= 0) {
+			player.sendMessage(Component.text(
+				"You must have completed P.O.R.T.A.L. to use this item.",
+				NamedTextColor.RED
+			));
+			return;
+		}
+
 		if (ClickLimiter.isLocked(player)) {
 			return;
 		}
@@ -643,7 +719,7 @@ public class LoadoutManager implements Listener {
 
 		LoadoutData data = getData(player);
 		for (Loadout loadout : data.mLoadouts) {
-			if (loadout.mIsQuickSwap) {
+			if (loadout.mQuickSwaps.contains(keybind)) {
 				if (data.mBackSwapLoadout != null && isEquipped(player, loadout)) {
 					swapTo(player, data.mBackSwapLoadout, true);
 				} else {
@@ -656,7 +732,12 @@ public class LoadoutManager implements Listener {
 				return;
 			}
 		}
-		player.sendMessage(Component.text("No quickswap loadout defined. Open the GUI to define one!", NamedTextColor.RED));
+
+		player.sendMessage(
+			Component.text("You do not have a loadout set for the keybind ", NamedTextColor.GRAY)
+				.append(Component.keybind(keybind))
+				.append(Component.text(". Open the GUI to define one!"))
+		);
 	}
 
 	public void retrieveUnusedItems(Player player) {
@@ -754,6 +835,32 @@ public class LoadoutManager implements Listener {
 		}, 10);
 	}
 
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void inventoryClickEvent(InventoryClickEvent event) {
+		if (!(event.getWhoClicked() instanceof Player player)) {
+			return;
+		}
+
+		if (!ItemUtils.isNullOrAir(event.getCursor())) {
+			// Don't trigger when clicking while having an item on the cursor
+			return;
+		}
+
+		if (!isLoadoutManager(event.getCurrentItem())) {
+			return;
+		}
+
+		switch (event.getClick()) {
+			case RIGHT -> openOwnGui(player);
+			case SWAP_OFFHAND -> quickSwap(player, Keybind.SWAP_OFFHAND);
+			case NUMBER_KEY -> quickSwap(player, Keybind.hotbar(event.getHotbarButton()));
+			default -> {
+				return;
+			}
+		}
+		event.setCancelled(true);
+	}
+
 	public static class LoadoutData {
 
 		public List<Loadout> mLoadouts = new ArrayList<>();
@@ -806,7 +913,7 @@ public class LoadoutManager implements Listener {
 		public List<ItemUtils.ItemIdentifier> mZenithCharms = new ArrayList<>();
 		public LoadoutClass mClass = new LoadoutClass();
 
-		public boolean mIsQuickSwap = false;
+		public TreeSet<Keybind> mQuickSwaps = new TreeSet<>();
 
 		public boolean mClearEmpty = false;
 
@@ -941,7 +1048,11 @@ public class LoadoutManager implements Listener {
 
 			json.add("class", mClass.toJson());
 
-			json.addProperty("isQuickSwap", mIsQuickSwap);
+			JsonArray quickSwapsJson = new JsonArray();
+			for (Keybind keybind : mQuickSwaps) {
+				quickSwapsJson.add(keybind.asKeybind());
+			}
+			json.add("quickSwaps", quickSwapsJson);
 			json.addProperty("clearEmpty", mClearEmpty);
 
 			JsonObject vanity = new JsonObject();
@@ -1006,7 +1117,21 @@ public class LoadoutManager implements Listener {
 
 			loadout.mClass = LoadoutClass.fromJson(json.getAsJsonObject("class"));
 
-			loadout.mIsQuickSwap = json.getAsJsonPrimitive("isQuickSwap").getAsBoolean();
+			JsonElement isQuickSwapJson = json.get("isQuickSwap");
+			if (isQuickSwapJson instanceof JsonPrimitive isQuickSwapPrimitive && isQuickSwapPrimitive.isBoolean()) {
+				if (isQuickSwapPrimitive.getAsBoolean()) {
+					loadout.mQuickSwaps.add(Keybind.SWAP_OFFHAND);
+				}
+			} else {
+				for (JsonElement quickSwapJson : json.getAsJsonArray("quickSwaps")) {
+					if (quickSwapJson instanceof JsonPrimitive quickSwapPrimitive && quickSwapPrimitive.isString()) {
+						Keybind keybind = Keybind.of(quickSwapPrimitive.getAsString());
+						if (keybind != null) {
+							loadout.mQuickSwaps.add(keybind);
+						}
+					}
+				}
+			}
 			loadout.mClearEmpty = json.getAsJsonPrimitive("clearEmpty").getAsBoolean();
 
 			for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("vanity").entrySet()) {
@@ -1024,6 +1149,16 @@ public class LoadoutManager implements Listener {
 			loadout.mRightParrot = json.getAsJsonPrimitive("rightParrot").getAsInt();
 
 			return loadout;
+		}
+
+		public @Nullable Component quickSwapsComponent() {
+			if (mQuickSwaps.isEmpty()) {
+				return null;
+			}
+			return Component.text("Quick-Swap Loadout for ", NamedTextColor.GOLD, TextDecoration.ITALIC)
+				.append(MessagingUtils.concatenateComponentsWithAnd(mQuickSwaps.stream()
+					.map(Component::keybind)
+					.collect(Collectors.toUnmodifiableList())));
 		}
 	}
 

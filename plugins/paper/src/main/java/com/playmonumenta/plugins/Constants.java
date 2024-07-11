@@ -11,6 +11,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 public class Constants {
@@ -272,6 +273,15 @@ public class Constants {
 
 			Keybind[] values = Keybind.values();
 			return values[index + HOTBAR_1.ordinal()];
+		}
+
+		public static @Nullable Keybind of(String keybindId) {
+			for (Keybind keybind : Keybind.values()) {
+				if (keybindId.equals(keybind.asKeybind())) {
+					return keybind;
+				}
+			}
+			return null;
 		}
 
 		@Override

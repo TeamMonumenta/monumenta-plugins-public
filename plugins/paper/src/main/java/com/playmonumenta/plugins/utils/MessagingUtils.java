@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
@@ -295,6 +296,26 @@ public class MessagingUtils {
 				output = output.append(separator);
 			}
 			output = output.append(components.get(i));
+		}
+		return output;
+	}
+
+	public static Component concatenateComponentsWithAnd(Collection<Component> components) {
+		Component output = Component.empty();
+		int size = components.size();
+		int i = 0;
+		for (Component component : components) {
+			if (size > 2 && i > 0) {
+				output = output.append(Component.text(", "));
+			}
+			if (size > 2 && i + 1 == size) {
+				output = output.append(Component.text("and "));
+			}
+			if (size == 2 && i == 1) {
+				output = output.append(Component.text(" and "));
+			}
+			output = output.append(component);
+			i++;
 		}
 		return output;
 	}
