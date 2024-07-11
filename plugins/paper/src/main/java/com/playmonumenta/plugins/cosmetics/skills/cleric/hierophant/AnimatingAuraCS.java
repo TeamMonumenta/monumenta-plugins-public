@@ -70,7 +70,7 @@ public class AnimatingAuraCS extends ThuribleProcessionCS {
 			new PPLine(Particle.REDSTONE, loc.clone().subtract(front), loc2.clone().subtract(front.clone().multiply(0.5))).data(LIME).countPerMeter(10).scaleLength(0.8).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPCircle(Particle.REDSTONE, loc.clone().add(front.clone().multiply(0.5)), 2).data(LIME).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 		}
-		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, 4).countPerMeter(10).extraRange(0.1, 0.15).innerRadiusFactor(1)
+		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, 4).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
 			.directionalMode(true).delta(2, 1, -8).rotateDelta(true).spawnAsPlayerActive(player);
 	}
 

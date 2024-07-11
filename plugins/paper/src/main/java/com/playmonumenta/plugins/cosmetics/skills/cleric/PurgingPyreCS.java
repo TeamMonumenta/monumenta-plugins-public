@@ -94,7 +94,7 @@ public class PurgingPyreCS extends CleansingRainCS {
 			new PPLine(Particle.REDSTONE, loc.clone().add(front), loc.clone().add(front.clone().multiply(0.5)).add(right90.clone().multiply(0.5))).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPCircle(Particle.REDSTONE, loc2.clone().add(front.clone().multiply(0.5)), mRadius*0.3).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 		}
-		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, mRadius).countPerMeter(10).extraRange(0.1, 0.15).innerRadiusFactor(1)
+		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, mRadius).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
 			.directionalMode(true).delta(1, 0.2, 4).rotateDelta(true).spawnAsPlayerActive(player);
 	}
 

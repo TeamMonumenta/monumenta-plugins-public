@@ -64,8 +64,8 @@ public class RipplingBeamCS extends HolyJavelinCS {
 	@Override
 	public void javelinSound(World world, Location loc) {
 		world.playSound(loc, Sound.ENTITY_VEX_AMBIENT, SoundCategory.PLAYERS, 1.9f, 1.5f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.7f, 0.8f);
-		world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.9f, 0.7f);
+		world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1.9f, 0.8f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1.1f, 1.4f);
 		world.playSound(loc, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 2.0f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.25f, 1.0f);

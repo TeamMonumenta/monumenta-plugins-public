@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
@@ -29,6 +30,7 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 	private static final Particle.DustOptions GOLD_COLOR2 = new Particle.DustOptions(Color.fromRGB(240, 255, 79), 2.8f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 239, 207), 1.5f);
 	private static final BlockData GOLD_DUST = Bukkit.createBlockData(Material.GOLD_BLOCK);
+	private int mPitch = -1;
 
 	@Override
 	public @Nullable List<String> getDescription() {
@@ -71,7 +73,7 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.75f, 0.55f);
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 0.65f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2.4f, 0.6f);
-
+		mPitch = -1;
 		float delta = (float) (radius / 2.1);
 		new PartialParticle(Particle.END_ROD, loc.clone().add(0, 1, 0), 75, 0.5, 0.5, 0.5, 0.25).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, loc, 60, 0.25, 0.25, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
@@ -109,10 +111,12 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 
 	@Override
 	public void remedyPulseEffect(World world, Location playerLoc, Player mPlayer, int pulse, int maxPulse, double radius) {
-		float pitch = (float) Math.pow(2, 1.0 * pulse / maxPulse - 0.75);
-		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_BELL, 1f, pitch);
-		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.9f, pitch);
-		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_GUITAR, 0.85f, pitch);
+		// Plays the F# Major scale
+		int[] interval = {1, 2, 2, 1, 2, 2, 2};
+		mPitch += interval[pulse % 7];
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_BELL, 1f, Constants.NotePitches.calculatePitch(mPitch));
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.9f, Constants.NotePitches.calculatePitch(mPitch));
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_GUITAR, 0.85f, Constants.NotePitches.calculatePitch(mPitch));
 
 		float delta = (float) (radius / 2.1);
 		double radiusShrink = radius * (maxPulse - pulse + 1) / (maxPulse + 1);

@@ -60,7 +60,7 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 	@Override
 	public void infusionStartEffect(World world, Player player, Location loc) {
 		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air...");
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.4f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.6f, 0.6f);
 		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc.subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0), 2, 0, 4,
 			List.of(
 				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(1.0, (Location location) ->
@@ -84,10 +84,10 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 	@Override
 	public void infusionHitEffect(World world, Player player, LivingEntity damagee, double radius) {
 		Location loc = damagee.getLocation();
-		world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.75f, 1.7f);
-		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.6f, 0.9f);
-		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1.2f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_ALLAY_DEATH, SoundCategory.PLAYERS, 0.8f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.9f, 1.7f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.7f, 0.9f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1.3f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_ALLAY_DEATH, SoundCategory.PLAYERS, 0.9f, 0.8f);
 		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player);
 		new PPLightning(Particle.REDSTONE, loc).maxWidth(2).hopXZ(2).hopY(0).height(12).duration(3).count(12).data(CYAN).spawnAsPlayerActive(player);
 		new BukkitRunnable() {
@@ -103,7 +103,7 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 							new PartialParticle(Particle.REDSTONE, lineLoc, 1, 0.0, 0.0, 0.0, 0.0).data(colorTransition).spawnAsPlayerActive(player));
 				}
 				new PartialParticle(Particle.SWEEP_ATTACK, loc, 2, 1.35f, 1.8f, 1.35f, 0.3).spawnAsPlayerActive(player);
-				world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1.6f, 0.8f);
+				world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1.75f, 0.8f);
 				mTicks++;
 				if (mTicks > 5) {
 					this.cancel();
@@ -137,8 +137,8 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 			new PPLine(Particle.REDSTONE, loc.clone().add(left120.clone().multiply(0.5)), loc4.clone().add(side90.clone().multiply(0.5))).data(PURPLE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPLine(Particle.REDSTONE, loc.clone().add(right120.clone().multiply(0.5)), loc5.clone().subtract(side90.clone().multiply(0.5))).data(PURPLE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 		}
-		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius).countPerMeter(10).extraRange(0.1, 0.15).innerRadiusFactor(1)
-			.directionalMode(true).delta(3, 1, -12).rotateDelta(true).spawnAsPlayerActive(player);
+		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
+			.directionalMode(true).delta(2, 1, -8).rotateDelta(true).spawnAsPlayerActive(player);
 	}
 
 	@Override

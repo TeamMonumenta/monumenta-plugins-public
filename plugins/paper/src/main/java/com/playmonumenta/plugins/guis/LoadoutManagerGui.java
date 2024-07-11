@@ -300,8 +300,8 @@ public class LoadoutManagerGui extends Gui {
 				Component.text(selectedLoadout.mName, NamedTextColor.GOLD, TextDecoration.BOLD),
 				List.of(
 					Component.text("Click to change the name of this loadout.", NamedTextColor.GRAY),
-					Component.text("Shift left click an item in your inventory", NamedTextColor.GRAY),
-					Component.text("to use it as display icon for this loadout.", NamedTextColor.GRAY)
+					Component.text("Shift left click an item in your inventory or the class", NamedTextColor.GRAY),
+					Component.text("summary item to use it as display icon for this loadout.", NamedTextColor.GRAY)
 				), false);
 			setItem(0, 4, new GuiItem(loadoutIcon, false))
 				.onLeftClick(() -> {
@@ -594,6 +594,11 @@ public class LoadoutManagerGui extends Gui {
 
 	@Override
 	protected boolean onGuiClick(InventoryClickEvent event) {
+		ItemStack currentItem = event.getCurrentItem();
+		if (mSelectedLoadout != null && event.getClick() == ClickType.SHIFT_LEFT && event.getSlot() == 47 && mSelectedLoadout.mIncludeClass) {
+			mSelectedLoadout.mDisplayItem = VanityManager.cleanCopyForDisplay(currentItem);
+			update();
+		}
 		if (mRearrangingLoadout != null) {
 			int index = event.getSlot() - LOADOUTS_START;
 			if (0 <= index && index < MAX_LOADOUTS) {

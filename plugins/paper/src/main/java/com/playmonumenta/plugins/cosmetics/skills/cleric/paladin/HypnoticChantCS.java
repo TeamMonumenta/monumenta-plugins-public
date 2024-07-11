@@ -43,7 +43,7 @@ public class HypnoticChantCS extends ChoirBellsCS {
 		return NAME;
 	}
 
-	Particle.DustOptions GREEN = new Particle.DustOptions(Color.fromRGB(0, 210, 170), 0.8f);
+	Particle.DustOptions GREEN = new Particle.DustOptions(Color.fromRGB(0, 210, 170), 0.9f);
 
 	@Override
 	public void bellsCastEffect(Player player, double range) {
@@ -74,7 +74,7 @@ public class HypnoticChantCS extends ChoirBellsCS {
 				new PPCircle(Particle.REDSTONE, l, range / 1.5).data(GREEN).countPerMeter(10).delta(delta, 0, delta).arcDegree(d[0], d[0] + 180).spawnAsPlayerActive(player);
 				new PPCircle(Particle.REDSTONE, l, range / 3).data(GREEN).countPerMeter(10).delta(delta, 0, delta).arcDegree(d[0] - 180, d[0]).spawnAsPlayerActive(player);
 			}
-			new PPCircle(Particle.ENCHANTMENT_TABLE, l, range).countPerMeter(10).extraRange(0.1, 0.2).innerRadiusFactor(1)
+			new PPCircle(Particle.ENCHANTMENT_TABLE, l, range).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
 				.directionalMode(true).delta(2, 0.2, -8).rotateDelta(true).spawnAsPlayerActive(player);
 			new PartialParticle(Particle.FLASH, l.clone().add(0, 4, 0), 1, 0, 0, 0, 0.1).spawnAsPlayerActive(player);
 		}, 10);

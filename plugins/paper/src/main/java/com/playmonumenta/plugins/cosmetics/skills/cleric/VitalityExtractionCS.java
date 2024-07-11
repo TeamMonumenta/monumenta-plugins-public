@@ -76,9 +76,9 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
-		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.05, 0.05, 0.05).data(colorSpeed).ringMode(true).countPerMeter(5).spawnAsPlayerActive(player);
+		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorSpeed).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
-		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(3).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
 			FastUtils.randomDoubleInRange(1, 1.5),
 			FastUtils.randomDoubleInRange(-0.75, 0.75)), loc.clone().add(0, 1, 0), player, mob, colorSpeed);
@@ -94,9 +94,9 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
 		player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_SNIFF, SoundCategory.PLAYERS, 1.3f, 1.8f);
-		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.05, 0.05, 0.05).data(colorStrength).ringMode(true).countPerMeter(5).spawnAsPlayerActive(player);
+		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorStrength).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
-		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(3).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
 			FastUtils.randomDoubleInRange(1, 1.5),
 			FastUtils.randomDoubleInRange(-0.75, 0.75)), loc.clone().add(0, 1, 0), player, mob, colorStrength);
@@ -112,9 +112,9 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
 		player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, SoundCategory.PLAYERS, 1.8f, 0.9f);
-		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.05, 0.05, 0.05).data(colorResistance).ringMode(true).countPerMeter(5).spawnAsPlayerActive(player);
+		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorResistance).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
-		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(3).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
 			FastUtils.randomDoubleInRange(1, 1.5),
 			FastUtils.randomDoubleInRange(-0.75, 0.75)), loc.clone().add(0, 1, 0), player, mob, colorResistance);
@@ -130,9 +130,9 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
 		player.playSound(player.getLocation(), Sound.ENTITY_STRIDER_HAPPY, SoundCategory.PLAYERS, 1.5f, 1.0f);
-		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.05, 0.05, 0.05).data(colorAbsorption).ringMode(true).countPerMeter(5).spawnAsPlayerActive(player);
+		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorAbsorption).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
-		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(3).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
 			FastUtils.randomDoubleInRange(1, 1.5),
 			FastUtils.randomDoubleInRange(-0.75, 0.75)), loc.clone().add(0, 1, 0), player, mob, colorAbsorption);
@@ -185,7 +185,7 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 							.directionalMode(true).spawnAsPlayerActive(player);
 					}
 					Color c = color.getColor();
-					new PartialParticle(Particle.REDSTONE, mL, 1, 0.04, 0.04, 0.04, 0,
+					new PartialParticle(Particle.REDSTONE, mL, 2, 0.08, 0.08, 0.08, 0,
 						new Particle.DustOptions(c, 1.2f))
 						.spawnAsPlayerActive(player);
 

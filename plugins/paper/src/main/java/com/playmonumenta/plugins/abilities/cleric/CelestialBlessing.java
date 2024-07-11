@@ -121,8 +121,9 @@ public class CelestialBlessing extends Ability {
 					mCosmetic.loseEffect(mPlayer, p);
 				})
 			);
-			mCosmetic.startEffect(mPlayer, p);
+			mCosmetic.startEffectTargets(p);
 		}
+		mCosmetic.startEffectCaster(mPlayer);
 
 		putOnCooldown();
 		return true;

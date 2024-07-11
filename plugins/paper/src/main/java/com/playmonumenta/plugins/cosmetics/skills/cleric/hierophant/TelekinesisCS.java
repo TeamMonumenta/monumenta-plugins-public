@@ -89,7 +89,7 @@ public class TelekinesisCS extends EnchantedPrayerCS {
 	}
 
 	@Override
-	public void onEffectTrigger(Player player, World world, Location loc, LivingEntity enemy, double effectSize) {
+	public void onEffectTrigger(Player player, Player cleric, World world, Location loc, LivingEntity enemy, double effectSize) {
 		Location playerLoc = player.getLocation().add(0, 4, 0);
 		Location enemyLoc = enemy.getLocation().add(0, 0.5, 0);
 		Vector dir = LocationUtils.getDirectionTo(enemyLoc, playerLoc);
@@ -121,14 +121,16 @@ public class TelekinesisCS extends EnchantedPrayerCS {
 					new PartialParticle(Particle.BLOCK_CRACK, location, 1, 0, 1, 0, 0.25).data(block).directionalMode(true).spawnAsPlayerActive(player))
 			)
 		);
-		mKillBoulder = 1;
+		if (player == cleric) {
+			mKillBoulder = 1;
+		}
 	}
 
 	@Override
 	public void effectTick(Player player) {
 		Location loc = player.getLocation().add(0, 4 + 0.5 * FastUtils.sinDeg(mTicks * 8), 0);
 		new PartialParticle(Particle.GLOW, loc, 1, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.FALLING_SPORE_BLOSSOM, loc, 1, 0.3, 0.3, 0.3, 0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FALLING_DUST, loc, 1, 0.3, 0.3, 0.3, 0).data(Material.COBBLESTONE.createBlockData()).spawnAsPlayerActive(player);
 	}
 
 	public void telekinesisBoulder(Player player, ItemDisplay display) {

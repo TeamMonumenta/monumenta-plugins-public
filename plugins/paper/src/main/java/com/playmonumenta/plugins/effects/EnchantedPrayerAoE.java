@@ -69,7 +69,7 @@ public class EnchantedPrayerAoE extends Effect {
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
 			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			World world = entity.getWorld();
-			mCosmetic.onEffectTrigger(mPlayer, world, enemy.getLocation(), enemy, mEffectSize);
+			mCosmetic.onEffectTrigger(mPlayer, mCleric, world, enemy.getLocation(), enemy, mEffectSize);
 			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mEffectSize).getHitMobs()) {
 				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
 				Crusade.addCrusadeTag(le, mCrusade);

@@ -57,9 +57,9 @@ public class SoulStrainCS extends DivineJusticeCS {
 		new PartialParticle(Particle.SCULK_CHARGE_POP, LocationUtils.getHalfHeightLocation(enemy), 20, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.GLOW, LocationUtils.getHalfHeightLocation(enemy), 12, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
 		enemyLoc.setDirection(dir);
-		ParticleUtils.drawHalfArc(enemyLoc.clone().add(0, 1, 0).subtract(dir.clone().multiply(2.25)), 2, ANGLE[combo], 0, 160, 5, 0.1,
+		ParticleUtils.drawHalfArc(enemyLoc.clone().add(0, 1, 0).subtract(dir.clone().multiply(2.25)), 2, ANGLE[combo], 0, 160, 5, 0.15,
 			(Location l, int ring) ->
-				new PartialParticle(Particle.REDSTONE, l, 2, 0.04, 0.04, 0.04, 0).data(CYAN).spawnAsPlayerActive(player));
+				new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0).data(CYAN).spawnAsPlayerActive(player));
 		if (combo == 2) {
 			world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.7f, 1.2f);
 			world.playSound(enemyLoc, Sound.BLOCK_GRINDSTONE_USE, SoundCategory.PLAYERS, 0.75f, 1.1f);
@@ -84,7 +84,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 				new PPLine(Particle.REDSTONE, loc2, loc2.clone().subtract(front.clone().multiply(2))).data(RED).countPerMeter(12).delta(delta, 0, delta).spawnAsPlayerActive(player);
 				new PPCircle(Particle.REDSTONE, loc.clone().add(right.clone().multiply(0.5)).subtract(front.clone().multiply(1.5)), width/2).data(RED).countPerMeter(12).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			}
-			new PPCircle(Particle.ENCHANTMENT_TABLE, enemyLoc, hieroglyphRadius).countPerMeter(15).extraRange(0.1, 0.125).innerRadiusFactor(1)
+			new PPCircle(Particle.ENCHANTMENT_TABLE, enemyLoc, hieroglyphRadius).countPerMeter(12).extraRange(0.1, 0.15).innerRadiusFactor(1)
 				.directionalMode(true).delta(-2, 0.2, 8).rotateDelta(true).spawnAsPlayerActive(player);
 		}
 	}

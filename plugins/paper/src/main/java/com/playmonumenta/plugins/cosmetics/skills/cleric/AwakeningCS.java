@@ -52,9 +52,9 @@ public class AwakeningCS extends CelestialBlessingCS {
 	@Override
 	public void tickEffect(Player player, Player target, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		Location loc = target.getLocation().add(0, 1, 0);
-		new PartialParticle(Particle.REDSTONE, loc, 1, 0.5, 0.5, 0.5, 0).data(LIGHT_CYAN).spawnAsPlayerBuff(player);
-		new PartialParticle(Particle.REDSTONE, loc, 1, 0.5, 0.5, 0.5, 0).data(CYAN).spawnAsPlayerBuff(player);
-		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 1, 0.5, 0.5, 0.5, 0).spawnAsPlayerBuff(player);
+		new PartialParticle(Particle.REDSTONE, loc, 2, 0.8, 0.8, 0.8, 0).data(LIGHT_CYAN).spawnAsPlayerBuff(player);
+		new PartialParticle(Particle.REDSTONE, loc, 2, 0.8, 0.8, 0.8, 0).data(CYAN).spawnAsPlayerBuff(player);
+		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 1, 0.8, 0.8, 0.8, 0).spawnAsPlayerBuff(player);
 	}
 
 	@Override
@@ -67,35 +67,57 @@ public class AwakeningCS extends CelestialBlessingCS {
 	}
 
 	@Override
-	public void startEffect(Player player, Player target) {
+	public void startEffectTargets(Player player) {
 		Location locPlayer = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
-		Location locTarget = target.getLocation().subtract(0, LocationUtils.distanceToGround(target.getLocation(), 0, PlayerUtils.getJumpHeight(target)), 0);
-		World world = target.getWorld();
-		world.playSound(locPlayer, Sound.ENTITY_WARDEN_ROAR, SoundCategory.PLAYERS, 1.0f, 0.8f);
-		player.playSound(locTarget, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.3f, 0.7f);
-		player.playSound(locTarget, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.3f, 0.6f);
-		world.playSound(locPlayer, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 0.25f, 0.9f);
-		player.playSound(locTarget, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 1.1f);
-		Location arcLoc1 = locPlayer.clone().add(0, 1, 0);
+		World world = player.getWorld();
+		world.playSound(locPlayer, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.3f, 0.7f);
+		world.playSound(locPlayer, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.3f, 0.6f);
+		world.playSound(locPlayer, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 1.1f);
+		// Hieroglyph for "Mind"
+		Vector front = locPlayer.getDirection().setY(0).normalize().multiply(3);
+		Vector left = VectorUtils.rotateTargetDirection(front, -120, 0);
+		Vector right = VectorUtils.rotateTargetDirection(front, 120, 0);
+		Location loc1 = locPlayer.clone().add(front);
+		Location loc2 = locPlayer.clone().add(left);
+		Location loc3 = locPlayer.clone().add(right);
+		for (int i = 0; i < 2; i++) {
+			double delta = 0.2*i;
+			final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 180 - 60 * i, 180 - 60 * i), 1.2f - i * 0.2f);
+			new PPLine(Particle.REDSTONE, loc1, loc2).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
+			new PPLine(Particle.REDSTONE, loc1, loc3).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
+			new PPLine(Particle.REDSTONE, loc2, loc3).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
+			new PPLine(Particle.REDSTONE, loc1, locPlayer.clone().subtract(front)).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
+		}
+		new PPCircle(Particle.ENCHANTMENT_TABLE, locPlayer, 3).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
+			.directionalMode(true).delta(1, 1, -4).rotateDelta(true).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void startEffectCaster(Player caster) {
+		Location locCaster = caster.getLocation().subtract(0, LocationUtils.distanceToGround(caster.getLocation(), 0, PlayerUtils.getJumpHeight(caster)), 0);
+		World world = caster.getWorld();
+		world.playSound(locCaster, Sound.ENTITY_WARDEN_ROAR, SoundCategory.PLAYERS, 1.0f, 0.8f);
+		world.playSound(locCaster, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 0.25f, 0.9f);
+		Location arcLoc1 = locCaster.clone().add(0, 1, 0);
 		arcLoc1.setPitch(0);
-		Location arcLoc2 = locPlayer.clone().add(0, 2.5, 0);
+		Location arcLoc2 = locCaster.clone().add(0, 2.5, 0);
 		arcLoc2.setPitch(0);
-		ParticleUtils.drawHalfArc(arcLoc1, 4 + Math.random(), -10 + 20*Math.random(), 0, 350, 5, 0.2,
+		ParticleUtils.drawHalfArc(arcLoc1, 4 + Math.random(), -10 + 20*Math.random(), 0, 359, 5, 0.2,
 			(Location l, int ring) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
 				new Particle.DustTransition(
 					ParticleUtils.getTransition(LIGHT_CYAN, CYAN, ring / 4D).getColor(),
 					ParticleUtils.getTransition(PURPLE, DARK_PURPLE, ring / 4D).getColor(),
 					1.2f
 				))
-				.directionalMode(false).spawnAsPlayerActive(player));
-		ParticleUtils.drawHalfArc(arcLoc2, 4 + Math.random(), 180 + 10 - 20*Math.random(), 0, 350, 5, 0.2,
+				.directionalMode(false).spawnAsPlayerActive(caster));
+		ParticleUtils.drawHalfArc(arcLoc2, 4 + Math.random(), 180 + 10 - 20*Math.random(), 0, 359, 5, 0.2,
 			(Location l, int ring) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
 				new Particle.DustTransition(
 					ParticleUtils.getTransition(LIGHT_CYAN, CYAN, ring / 4D).getColor(),
 					ParticleUtils.getTransition(PURPLE, DARK_PURPLE, ring / 4D).getColor(),
 					1.2f
 				))
-				.directionalMode(false).spawnAsPlayerActive(player));
+				.directionalMode(false).spawnAsPlayerActive(caster));
 		new BukkitRunnable() {
 			int mTicks = 0;
 			int mIter = 0;
@@ -105,10 +127,10 @@ public class AwakeningCS extends CelestialBlessingCS {
 				for (int i = 0; i < 10; i++) {
 					for (int spiral = 0; spiral < 3; spiral++) {
 						double degree = mDegree + spiral * 360.0 / 3;
-						Location l1 = locPlayer.clone().add((3 * FastUtils.cosDeg(degree)) / Math.pow(2, mTicks), Math.pow(mIter, 2) / 275, (3 * FastUtils.sinDeg(degree)) / Math.pow(2, mTicks));
+						Location l1 = locCaster.clone().add((3 * FastUtils.cosDeg(degree)) / Math.pow(2, mTicks), Math.pow(mIter, 2) / 275, (3 * FastUtils.sinDeg(degree)) / Math.pow(2, mTicks));
 						Vector v = new Vector(-FastUtils.sinDeg(degree), 0.5, FastUtils.cosDeg(degree));
 						new PartialParticle(Particle.END_ROD, l1, 1, v.getX(), 1, v.getZ(), 0.05, null, true, 0.02)
-							.spawnAsPlayerActive(player);
+							.spawnAsPlayerActive(caster);
 					}
 					mDegree += 10;
 					mIter++;
@@ -119,22 +141,5 @@ public class AwakeningCS extends CelestialBlessingCS {
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
-		// Hieroglyph for "Mind"
-		Vector front = locTarget.getDirection().setY(0).normalize().multiply(3);
-		Vector left = VectorUtils.rotateTargetDirection(front, -120, 0);
-		Vector right = VectorUtils.rotateTargetDirection(front, 120, 0);
-		Location loc1 = locTarget.clone().add(front);
-		Location loc2 = locTarget.clone().add(left);
-		Location loc3 = locTarget.clone().add(right);
-		for (int i = 0; i < 2; i++) {
-			double delta = 0.2*i;
-			final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 180 - 60 * i, 180 - 60 * i), 1.2f - i * 0.2f);
-			new PPLine(Particle.REDSTONE, loc1, loc2).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-			new PPLine(Particle.REDSTONE, loc1, loc3).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-			new PPLine(Particle.REDSTONE, loc2, loc3).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-			new PPLine(Particle.REDSTONE, loc1, locTarget.clone().subtract(front)).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-		}
-		new PPCircle(Particle.ENCHANTMENT_TABLE, locTarget, 3).countPerMeter(10).extraRange(0.1, 0.15).innerRadiusFactor(1)
-			.directionalMode(true).delta(1, 1, -4).rotateDelta(true).spawnAsPlayerActive(player);
 	}
 }

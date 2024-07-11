@@ -40,11 +40,15 @@ public class CelestialBlessingCS implements CosmeticSkill {
 		new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(player);
 	}
 
-	public void startEffect(Player player, Player target) {
-		Location loc = target.getLocation();
-		World world = target.getWorld();
+	public void startEffectTargets(Player player) {
+		Location loc = player.getLocation();
+		World world = player.getWorld();
 		world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.5f, 1.75f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.75f, 1.25f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.75f, 1.1f);
+	}
+
+	public void startEffectCaster(Player caster) {
+
 	}
 }

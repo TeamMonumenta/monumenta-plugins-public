@@ -66,9 +66,9 @@ public class BloodbathCS extends IlluminateCS {
 		Vector left = VectorUtils.rotateTargetDirection(front, -90, 90);
 		Vector swirl1 = VectorUtils.rotateTargetDirection(right, (24 * mProjectileTransition) % 360, 0);
 		Vector swirl2 = VectorUtils.rotateTargetDirection(left, (24 * mProjectileTransition) % 360, 0);
-		new PartialParticle(Particle.REDSTONE, loc.clone().add(swirl1), 6, 0.12, 0.12, 0.12, 0.1, color).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, loc.clone().add(swirl2), 6, 0.12, 0.12, 0.12, 0.1, color).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIMSON_SPORE, loc, 1, 0.12, 0.12, 0.12, 0.1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc.clone().add(swirl1), 6, 0.1, 0.1, 0.1, 0.1, color).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc.clone().add(swirl2), 6, 0.1, 0.1, 0.1, 0.1, color).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIMSON_SPORE, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsPlayerActive(player);
 		mProjectileTransition++;
 	}
 
@@ -90,14 +90,14 @@ public class BloodbathCS extends IlluminateCS {
 		line2a.delta(0.05).shift(-radius * 0.5).offset(Math.random()).count(1).spawnAsPlayerActive(player);
 
 		if ((ticks != 0 && ticks % 40 == 0) || ticks == maxTicks - 1) {
-			Location spark1 = loc.clone().add(vec).add(0, 0.5, 0);
-			new PartialParticle(Particle.SMALL_FLAME, spark1, 1, 0.25, 0).spawnAsPlayerActive(player);
+			Location spark1 = loc.clone().add(vec);
+			new PartialParticle(Particle.SMALL_FLAME, spark1, 1, 0.35, 0).spawnAsPlayerActive(player);
 
-			Location spark2 = loc.clone().subtract(vec).subtract(0, 0.5, 0);
-			new PartialParticle(Particle.SMALL_FLAME, spark2, 1, 0.25, 0).spawnAsPlayerActive(player);
+			Location spark2 = loc.clone().subtract(vec);
+			new PartialParticle(Particle.SMALL_FLAME, spark2, 1, 0.35, 0).spawnAsPlayerActive(player);
 
 			PPCircle sparkfloor = new PPCircle(Particle.FALLING_DUST, loc, radius * 0.9).ringMode(false);
-			sparkfloor.count((int) (radius * radius * 3)).location(loc.clone().subtract(0, 0.25, 0)).delta(0.2).extra(0.1).data(Material.NETHER_WART_BLOCK.createBlockData()).spawnAsPlayerActive(player);
+			sparkfloor.count((int) (radius * radius * 3)).delta(0.2).extra(0.1).data(Material.NETHER_WART_BLOCK.createBlockData()).spawnAsPlayerActive(player);
 		}
 
 		if (ticks == 0 && location.getBlock().getType().equals(Material.AIR)) {
@@ -124,7 +124,7 @@ public class BloodbathCS extends IlluminateCS {
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.5f, 1.4f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1.3f, 0.6f);
 		world.playSound(loc, Sound.BLOCK_BEACON_AMBIENT, SoundCategory.PLAYERS, 1.4f, 2.0f);
-		world.playSound(loc, Sound.ENTITY_SKELETON_HORSE_AMBIENT, SoundCategory.PLAYERS, 1.6f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_SKELETON_HORSE_AMBIENT, SoundCategory.PLAYERS, 1.6f, 0.9f);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.9f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_TURTLE_EGG_BREAK, SoundCategory.PLAYERS, 0.8f, 0.7f);
 	}
@@ -173,8 +173,8 @@ public class BloodbathCS extends IlluminateCS {
 				new PPLine(Particle.REDSTONE, loc.clone().subtract(front).add(left.clone().multiply(0.5)), loc3.clone().subtract(front)).data(RED).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 				new PPCircle(Particle.REDSTONE, loc.clone().subtract(front), 0.3 * radius).arcDegree(d[0], d[0] + 180).data(RED).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			}
-			new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius).countPerMeter(10).extraRange(0.1, 0.15).innerRadiusFactor(1)
-				.directionalMode(true).delta(-2, 0.2, -8).rotateDelta(true).spawnAsPlayerActive(player);
+			new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
+				.directionalMode(true).delta(-2, 1, -8).rotateDelta(true).spawnAsPlayerActive(player);
 		}
 
 		if (ticks >= 10) {
@@ -182,13 +182,13 @@ public class BloodbathCS extends IlluminateCS {
 			if (ticks % 2 == 0 && ticks % 20 < 10) {
 				double pulseRadius = radius / 10 * (ticks % 10 + 1);
 				final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(200 - 10 * (ticks % 10), 0, 20), 1.2f);
-				new PPCircle(Particle.REDSTONE, loc, pulseRadius).countPerMeter(10).delta(0.2).rotateDelta(true).data(RED).spawnAsPlayerActive(player);
+				new PPCircle(Particle.REDSTONE, loc, pulseRadius).countPerMeter(10).delta(0.15).rotateDelta(true).data(RED).spawnAsPlayerActive(player);
 			}
 		}
 	}
 
 	@Override
 	public void enhanceTickDamageEffect(Player player, LivingEntity mob) {
-		new PartialParticle(Particle.FLAME, mob.getLocation()).count(5).delta(0.4).extra(0.1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FLAME, mob.getLocation()).count(3).delta(0.35).extra(0.1).spawnAsPlayerActive(player);
 	}
 }
