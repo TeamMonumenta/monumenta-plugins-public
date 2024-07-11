@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.sirius;
 
 import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -97,7 +98,7 @@ public class SpellCosmicPortals extends Spell {
 				if (mTicks > DURATION) {
 					List<Player> pList = mSirius.getPlayersInArena(false);
 					for (Player p : mPortalLoc.getNearbyPlayers(finalMRadius)) {
-						if (pList.contains(p)) {
+						if (pList.contains(p) && !StasisListener.isInStasis(p)) {
 							int rand = FastUtils.randomIntInRange(0, 1);
 							Location tpLoc = mSirius.mBoss.getLocation().add(15, PORTALHEIGHT, (Math.pow(-1, rand) * 30));
 							//stops falling off the back

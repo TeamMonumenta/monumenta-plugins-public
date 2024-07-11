@@ -137,7 +137,7 @@ public class PotionConsumeListener implements Listener {
 			event.setCancelled(true);
 
 			if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !isOnlyGlowing(customEffects)) {
-				player.sendMessage(Component.text("Infinite potions can not be quick drinked!", NamedTextColor.RED));
+				player.sendMessage(Component.text("Infinite potions cannot be quick drunk!", NamedTextColor.RED));
 				float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
 				player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f + pitch);
 				return true;

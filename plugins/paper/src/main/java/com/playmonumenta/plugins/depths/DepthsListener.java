@@ -406,7 +406,7 @@ public class DepthsListener implements Listener {
 
 									EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbility(player, EternalSavior.class);
 									if (eternalSavior != null && eternalSavior.hasIncreasedReviveRadius()) {
-										if (player.getLocation().distanceSquared(grave.getLocation()) <= Math.pow(eternalSavior.getIncreasedReviveRadius(), 2)) {
+										if (eternalSavior.getSaviorLocation().distanceSquared(grave.getLocation()) <= Math.pow(eternalSavior.getIncreasedReviveRadius(), 2)) {
 											return false;
 										}
 									}

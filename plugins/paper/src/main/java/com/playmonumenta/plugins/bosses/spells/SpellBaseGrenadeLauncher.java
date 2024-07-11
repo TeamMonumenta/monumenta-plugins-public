@@ -301,11 +301,13 @@ public class SpellBaseGrenadeLauncher extends Spell {
 					final Entity mTarget = target;
 					@Override
 					public void run() {
-						mAestheticsBoss.launch(mBoss, bossLocation);
-						launchGrenade(mBossLocation, mTarget, additionalParameters);
-						mLobsLaunched++;
-						if (mLobsLaunched >= mLobs) {
-							cancel();
+						if (!mBoss.isDead()) {
+							mAestheticsBoss.launch(mBoss, bossLocation);
+							launchGrenade(mBossLocation, mTarget, additionalParameters);
+							mLobsLaunched++;
+							if (mLobsLaunched >= mLobs) {
+								cancel();
+							}
 						}
 					}
 				}.runTaskTimer(mPlugin, delay, mLobsDelay);

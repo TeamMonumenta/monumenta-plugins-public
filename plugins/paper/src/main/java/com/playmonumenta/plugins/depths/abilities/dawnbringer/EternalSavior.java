@@ -66,6 +66,7 @@ public class EternalSavior extends DepthsAbility {
 			.descriptions(EternalSavior::getDescription)
 			.priorityAmount(10000);
 
+	private Location mStasisLocation;
 	private final int mStasisDuration;
 	private final double mHeal;
 	private final double mRadius;
@@ -116,6 +117,7 @@ public class EternalSavior extends DepthsAbility {
 			int mTicks = 0;
 			@Override
 			public void run() {
+				mStasisLocation = mPlayer.getLocation().clone();
 				Location loc = mPlayer.getLocation();
 				World world = mPlayer.getWorld();
 
@@ -313,6 +315,10 @@ public class EternalSavior extends DepthsAbility {
 
 	public double getIncreasedReviveRadius() {
 		return mRadius / 2;
+	}
+
+	public Location getSaviorLocation() {
+		return mStasisLocation;
 	}
 
 	private static Description<EternalSavior> getDescription(int rarity, TextColor color) {

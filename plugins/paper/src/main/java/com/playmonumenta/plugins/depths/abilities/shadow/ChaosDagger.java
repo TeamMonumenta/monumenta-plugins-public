@@ -212,7 +212,7 @@ public class ChaosDagger extends DepthsAbility {
 		return new DescriptionBuilder<ChaosDagger>(color)
 			.add("Swap hands to throw a cursed dagger that stuns an enemy for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds (rooting bosses instead). The next time you damage this mob with melee or projectile damage within ")
+			.add(" seconds (rooting bosses instead). The next time you deal non-ability melee or projectile damage within ")
 			.addDuration(DAMAGE_DURATION)
 			.add(" seconds, you deal ")
 			.addPercent(a -> a.mDamageMultiplier, DAMAGE[rarity - 1], false, true)
