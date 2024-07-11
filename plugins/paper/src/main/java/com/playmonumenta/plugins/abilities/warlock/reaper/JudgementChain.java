@@ -167,8 +167,20 @@ public class JudgementChain extends MultipleChargeAbility {
 				destination.setY(loc.getY());
 			}
 
-			EntityUtils.selfRoot(entity, 5); // tiny root to prevent weird movement after TP
-			EntityUtils.teleportStack(entity, destination);
+			final Location finalDestination = destination;
+			new BukkitRunnable() { // teleport multiple times so that it actually updates
+
+				int mTicks = 0;
+				@Override
+				public void run() {
+					EntityUtils.teleportStack(entity, finalDestination);
+
+					mTicks++;
+					if (mTicks >= 5) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
 		}
 
 		mCosmetic.onSummonChain(mPlayer, entity, oldLocation);
