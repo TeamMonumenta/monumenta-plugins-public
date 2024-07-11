@@ -281,7 +281,7 @@ public class SpellAutoAttack extends Spell {
 			damageDealt = -0.2;
 		}
 		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, damage, cause, mBoss.getLocation());
-		AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, damageReceived, "Lich");
+		AbilityUtils.increaseDamageReceivedPlayer(player, 20 * 5, damageReceived, "Lich");
 		AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, damageDealt, "Lich");
 	}
 

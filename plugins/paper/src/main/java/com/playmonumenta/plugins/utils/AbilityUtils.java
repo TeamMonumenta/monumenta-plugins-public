@@ -28,7 +28,6 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,7 +53,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -240,7 +238,7 @@ public class AbilityUtils {
 	}
 
 	// the unluck potion effect does not increase nor decrease luck attribute
-	public static void increaseDamageRecievedPlayer(Player player, int duration, double damageBoost, String cause) {
+	public static void increaseDamageReceivedPlayer(Player player, int duration, double damageBoost, String cause) {
 		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageReceived(duration, damageBoost));
 		if (damageBoost > 0) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration, -1));
@@ -258,44 +256,6 @@ public class AbilityUtils {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, duration, -1));
 		}
 
-	}
-
-	// You can't just use a negative value with the add method if the potions to be remove are distributed across multiple stacks
-	// Returns false if the player doesn't have enough potions in their inventory
-	public static boolean removeAlchemistPotions(Player player, int numPotionsToRemove) {
-		Inventory inv = player.getInventory();
-		List<ItemStack> potionStacks = new ArrayList<ItemStack>();
-		int potionCount = 0;
-
-		// Make sure the player has enough potions
-		for (ItemStack item : inv.getContents()) {
-			if (item != null && InventoryUtils.testForItemWithName(item, "Alchemist's Potion", true)) {
-				potionCount += item.getAmount();
-				potionStacks.add(item);
-				if (potionCount >= numPotionsToRemove) {
-					break;
-				}
-			}
-		}
-
-		if (potionCount >= numPotionsToRemove) {
-			for (ItemStack potionStack : potionStacks) {
-				if (potionStack.getAmount() >= numPotionsToRemove) {
-					potionStack.setAmount(potionStack.getAmount() - numPotionsToRemove);
-					break;
-				} else {
-					numPotionsToRemove -= potionStack.getAmount();
-					potionStack.setAmount(0);
-					if (numPotionsToRemove == 0) {
-						break;
-					}
-				}
-			}
-
-			return true;
-		}
-
-		return false;
 	}
 
 	public static boolean refundPotion(Player player, ThrownPotion potion) {
@@ -522,49 +482,53 @@ public class AbilityUtils {
 
 		int playerClass = getClassNum(player);
 		int playerSpec = getSpecNum(player);
-		MonumentaClasses mClasses = new MonumentaClasses();
-		for (PlayerClass mClass : mClasses.mClasses) {
-			if (playerClass != mClass.mClass) {
-				for (AbilityInfo<?> ability : mClass.mAbilities) {
+		MonumentaClasses classes = new MonumentaClasses();
+		for (PlayerClass aClass : classes.mClasses) {
+			if (playerClass != aClass.mClass) {
+				for (AbilityInfo<?> ability : aClass.mAbilities) {
 					String scoreboard = ability.getScoreboard();
 					if (scoreboard != null) {
 						ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 					}
 				}
 			}
-			if (playerSpec != mClass.mSpecOne.mSpecialization) {
-				for (AbilityInfo<?> ability : mClass.mSpecOne.mAbilities) {
+			if (playerSpec != aClass.mSpecOne.mSpecialization) {
+				for (AbilityInfo<?> ability : aClass.mSpecOne.mAbilities) {
 					String scoreboard = ability.getScoreboard();
 					if (scoreboard != null) {
 						ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 					}
 				}
 			}
-			if (playerSpec != mClass.mSpecTwo.mSpecialization) {
-				for (AbilityInfo<?> ability : mClass.mSpecTwo.mAbilities) {
+			if (playerSpec != aClass.mSpecTwo.mSpecialization) {
+				for (AbilityInfo<?> ability : aClass.mSpecTwo.mAbilities) {
 					String scoreboard = ability.getScoreboard();
 					if (scoreboard != null) {
 						ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 					}
 				}
 			}
-			if (playerClass == mClass.mClass &&
-				(mClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, mClass.mQuestReq).orElse(0) < mClass.mQuestReqMin && !getEffectiveSpecs(player))) &&
-				(mClass.mPermissionString != null && !player.hasPermission(mClass.mPermissionString))) {
-				player.sendMessage(Component.text("You have not unlocked this class yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
-				AbilityManager.getManager().resetPlayerAbilities(player);
-				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
-			} else if (playerSpec == mClass.mSpecOne.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(mClass.mSpecOne.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
-				player.sendMessage(Component.text("You have not unlocked this specialization yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
-				AbilityManager.getManager().resetPlayerAbilities(player);
-				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
-			} else if (playerSpec == mClass.mSpecTwo.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(mClass.mSpecTwo.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
-				player.sendMessage(Component.text("You have not unlocked this specialization yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
-				AbilityManager.getManager().resetPlayerAbilities(player);
-				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
-			}
+		}
 
+		PlayerClass chosenClass = classes.mClasses.stream().filter(c -> c.mClass == playerClass).findFirst().orElse(null);
 
+		String errorMessage = null;
+		if (chosenClass != null &&
+			    (chosenClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, chosenClass.mQuestReq).orElse(0) < chosenClass.mQuestReqMin && !getEffectiveSpecs(player))) &&
+			    (chosenClass.mPermissionString != null && !player.hasPermission(chosenClass.mPermissionString))) {
+			errorMessage = "You have not unlocked this class yet.";
+		} else if (chosenClass != null && playerSpec == chosenClass.mSpecOne.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(chosenClass.mSpecOne.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
+			errorMessage = "You have not unlocked this specialization yet.";
+		} else if (chosenClass != null && playerSpec == chosenClass.mSpecTwo.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(chosenClass.mSpecTwo.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
+			errorMessage = "You have not unlocked this specialization yet.";
+		} else if (playerSpec != 0 && (chosenClass == null || (playerSpec != chosenClass.mSpecOne.mSpecialization && playerSpec != chosenClass.mSpecTwo.mSpecialization))) {
+			errorMessage = "You had an invalid specialisation.";
+		}
+		if (errorMessage != null) {
+			player.sendMessage(Component.text(errorMessage, NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			AbilityManager.getManager().resetPlayerAbilities(player);
+			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+			chosenClass = null;
 		}
 
 		// Update remaining skill point scores (and reset class if more skills are assigned than total skill points are available)
@@ -572,34 +536,32 @@ public class AbilityUtils {
 		int remainingSkillPoints = getEffectiveTotalSkillPoints(player);
 		int remainingSpecPoints = getEffectiveTotalSpecPoints(player);
 		int remainingEnhancementPoints = ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0);
-		for (PlayerClass mClass : mClasses.mClasses) {
-			if (mClass.mClass == AbilityUtils.getClassNum(player)) {
-				List<AbilityInfo<?>> abilities = mClass.mAbilities;
-				List<AbilityInfo<?>> specAbilities = mClass.mSpecOne.mAbilities;
-				specAbilities.addAll(mClass.mSpecTwo.mAbilities);
-				// Loop over base abilities
-				for (AbilityInfo<?> ability : abilities) {
-					// Enhanced ability
-					String scoreboard = ability.getScoreboard();
-					if (scoreboard == null) {
-						continue;
-					}
-					int score = ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0);
-					if (score > 2) {
-						remainingEnhancementPoints--;
-						remainingSkillPoints -= score - 2;
-					} else {
-						remainingSkillPoints -= score;
-					}
+		if (chosenClass != null) {
+			List<AbilityInfo<?>> abilities = chosenClass.mAbilities;
+			List<AbilityInfo<?>> specAbilities = chosenClass.mSpecOne.mAbilities;
+			specAbilities.addAll(chosenClass.mSpecTwo.mAbilities);
+			// Loop over base abilities
+			for (AbilityInfo<?> ability : abilities) {
+				// Enhanced ability
+				String scoreboard = ability.getScoreboard();
+				if (scoreboard == null) {
+					continue;
 				}
-				// Loop over specs
-				for (AbilityInfo<?> specAbility : specAbilities) {
-					String scoreboard = specAbility.getScoreboard();
-					if (scoreboard == null) {
-						continue;
-					}
-					remainingSpecPoints -= ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0);
+				int score = ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0);
+				if (score > 2) {
+					remainingEnhancementPoints--;
+					remainingSkillPoints -= score - 2;
+				} else {
+					remainingSkillPoints -= score;
 				}
+			}
+			// Loop over specs
+			for (AbilityInfo<?> specAbility : specAbilities) {
+				String scoreboard = specAbility.getScoreboard();
+				if (scoreboard == null) {
+					continue;
+				}
+				remainingSpecPoints -= ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0);
 			}
 		}
 

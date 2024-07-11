@@ -73,7 +73,7 @@ public class SpellPotionCloud extends Spell {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
 							new PercentSpeed(20 * 30, -0.15, SLOWNESS_SRC));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 30, 0));
-						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 30, 0.15, "Lich");
+						AbilityUtils.increaseDamageReceivedPlayer(p, 20 * 30, 0.15, "Lich");
 					}
 				}
 
@@ -91,7 +91,7 @@ public class SpellPotionCloud extends Spell {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
 							new PercentSpeed(20 * 10, -0.3, SLOWNESS_SRC));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 10, 2));
-						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 10, 0.25, "Lich");
+						AbilityUtils.increaseDamageReceivedPlayer(p, 20 * 10, 0.25, "Lich");
 						MovementUtils.knockAway(loc, p, 0.7f, false);
 					}
 				}

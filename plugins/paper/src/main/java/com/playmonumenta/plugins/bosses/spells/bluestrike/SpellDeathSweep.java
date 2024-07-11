@@ -178,7 +178,7 @@ public class SpellDeathSweep extends Spell {
 
 	public void hit(Player player) {
 		String cause = "Death Sweep";
-		AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 8, 0.2, cause);
+		AbilityUtils.increaseDamageReceivedPlayer(player, 20 * 8, 0.2, cause);
 		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE, 65, cause, mBoss.getLocation());
 		MovementUtils.knockAway(mBoss, player, 1f, 0.5f);
 	}

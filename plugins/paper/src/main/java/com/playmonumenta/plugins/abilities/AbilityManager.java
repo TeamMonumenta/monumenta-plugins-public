@@ -495,6 +495,9 @@ public class AbilityManager {
 			return collection;
 		}
 
+		// anti-cheat
+		AbilityUtils.updateAbilityScores(player);
+
 		for (AbilityInfo<?> ability : mReferenceAbilities) {
 			if (ability.testCanUse(player)) {
 				Ability newAbility = ability.newInstance(mPlugin, player);
