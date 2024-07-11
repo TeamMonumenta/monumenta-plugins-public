@@ -51,7 +51,7 @@ public class Eruption implements Enchantment {
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
-			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+			if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 				return;
 			}
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), CharmManager.getRadius(player, CHARM_RADIUS, RADIUS));

@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Objective;
@@ -211,6 +212,16 @@ public class ScoreboardUtils {
 		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(name);
 		if (objective != null) {
 			objective.unregister();
+		}
+	}
+
+	public static void removeEntityToTeam(LivingEntity entity, String teamName) {
+		Team team = getExistingTeamOrCreate(teamName);
+
+		if (entity instanceof Player player) {
+			team.removeEntry(player.getName());
+		} else {
+			team.removeEntry(entity.getUniqueId().toString());
 		}
 	}
 }

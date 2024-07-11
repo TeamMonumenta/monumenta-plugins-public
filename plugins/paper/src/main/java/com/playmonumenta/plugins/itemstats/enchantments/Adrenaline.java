@@ -51,7 +51,7 @@ public class Adrenaline implements Enchantment {
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
 		if (ItemUtils.isPickaxe(player.getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
-			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+			if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 				return;
 			}
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR).spawnAsPlayerBuff(player);

@@ -35,7 +35,7 @@ public class Sapper implements Enchantment {
 		//Needed for check below. Probably safe?
 		ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER && !ItemUtils.isPickaxe(player.getInventory().getItemInOffHand())) {
-			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+			if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 				return;
 			}
 			value = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, value);

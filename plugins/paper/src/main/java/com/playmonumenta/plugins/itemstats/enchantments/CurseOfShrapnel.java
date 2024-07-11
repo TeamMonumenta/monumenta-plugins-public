@@ -34,7 +34,7 @@ public class CurseOfShrapnel implements Enchantment {
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		if (ItemUtils.isPickaxe(player.getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
-			if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+			if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 				return;
 			}
 			new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1).spawnAsPlayerActive(player);

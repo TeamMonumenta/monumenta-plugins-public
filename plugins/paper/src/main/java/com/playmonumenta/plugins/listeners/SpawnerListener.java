@@ -8,32 +8,20 @@ import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
-import com.playmonumenta.plugins.utils.BlockUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.SpawnerUtils;
+import com.playmonumenta.plugins.spawners.actions.ParticleHaloTask;
+import com.playmonumenta.plugins.utils.*;
+
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Color;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Marker;
-import org.bukkit.entity.Player;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -49,11 +37,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.utils.SpawnerUtils.*;
+
 public class SpawnerListener implements Listener {
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_RADIUS = 20;
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_TICKS = Constants.TEN_MINUTES;
+	public static final Map<Location, UUID> spawnerCatMap = new HashMap<>();
 
-	private static class MobInfo {
+	public static class MobInfo {
 		private WeakReference<LivingEntity> mMob;
 		private UUID mUUID;
 		private boolean mDespawned = false;
@@ -114,17 +105,17 @@ public class SpawnerListener implements Listener {
 	private static final int PLAYER_CHECK_RADIUS_SQUARED = 5 * 5;
 	private static final int INACTIVITY_TIMER = 20 * 45;
 	private static final int CLEANER_INTERVAL = 20 * 30;
-
-	private final Map<UUID, MobInfo> mMobInfos = new HashMap<>();
+	private static final Map<UUID, MobInfo> mMobInfos = new HashMap<>();
 	/*
 	 * Need to use the full spawner Location, not just x/y/z, to ensure that only this
 	 * specific spawner on this specific world is included
 	 */
-	private final Map<Location, List<MobInfo>> mSpawnerInfos = new HashMap<>();
+	public static final Map<Location, List<MobInfo>> mSpawnerInfos = new HashMap<>();
 
 	private final BukkitRunnable mCleaner;
 
-	private @Nullable String mRecentlyBrokenSpawnerLosPool = null;
+	private static @Nullable String mRecentlyBrokenSpawnerLosPool = null;
+
 
 	public SpawnerListener(Plugin plugin) {
 		mCleaner = new BukkitRunnable() {
@@ -182,7 +173,10 @@ public class SpawnerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void spawnerSpawnEvent(SpawnerSpawnEvent event) {
+	public static void spawnerSpawnEvent(SpawnerSpawnEvent event) {
+		CreatureSpawner spawner = event.getSpawner();
+		Block spawnerBlock = spawner.getBlock();
+
 		if (event.getEntity() instanceof LivingEntity mob) {
 			List<MobInfo> spawnerInfo = mSpawnerInfos.computeIfAbsent(event.getSpawner().getLocation(), k -> new ArrayList<>());
 
@@ -194,7 +188,7 @@ public class SpawnerListener implements Listener {
 
 			// Check the list of mobs from the spawner to see if any should be disposed of
 			// or, if the spawner has a LoS Pool attached, replace it with a mob from the pool first
-			String poolName = SpawnerUtils.getLosPool(event.getSpawner().getBlock());
+			String poolName = getLosPool(event.getSpawner().getBlock());
 			LoSPool losPool = LoSPool.EMPTY;
 			boolean hasPool = false;
 			if (poolName != null) {
@@ -263,6 +257,46 @@ public class SpawnerListener implements Listener {
 					mMobInfos.put(mob.getUniqueId(), mobInfo);
 				}
 			}
+			// check if the spawner is guarded and add a particle halo around the mob
+			if (hasGuardedAttribute(spawnerBlock)) {
+				if (!(mob instanceof Player)) {
+					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_CHAIN_FALL, SoundCategory.HOSTILE, 0.5f, 1f);
+					ParticleHaloTask haloTask = new ParticleHaloTask(mob, Particle.SCULK_SOUL);
+					haloTask.start();
+					PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, spawnerBlock.getLocation().clone().add(0.5, 0.5, 0.5), mob.getLocation().clone().add(0, mob.getHeight() / 2, 0));
+					line.countPerMeter(10).spawnAsEnemy();
+				}
+			}
+
+			// make mob invulnerable if the spawner is protected
+			if (getProtector(spawnerBlock) && !(mob instanceof Player)) {
+				ScoreboardUtils.addEntityToTeam(mob, "protectedMob", NamedTextColor.AQUA);
+				mob.setGlowing(true);
+				mob.setInvulnerable(true);
+				if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
+					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
+					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
+				}
+			}
+
+			// each spawn decays goes down by one until it disappears
+			if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "decayingCheck")) {
+				int decaying = getDecaying(spawnerBlock);
+				if (decaying > 0) {
+					decaying--;
+					setDecaying(spawnerBlock, decaying);
+					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_SAND_PLACE, SoundCategory.HOSTILE, 0.85f, 2f);
+					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_AZALEA_FALL, SoundCategory.HOSTILE, 0.60f, 2f);
+					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_SAND_PLACE, SoundCategory.HOSTILE, 0.85f, 2f);
+					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_AZALEA_FALL, SoundCategory.HOSTILE, 0.60f, 2f);
+					if (decaying == 0) {
+						removeProtector(spawnerBlock);
+						spawnerBlock.setType(Material.AIR);
+						spawner.getWorld().playSound(spawnerBlock.getLocation(), Sound.ENTITY_ITEM_BREAK, SoundCategory.BLOCKS, 1.0f, 1.0f);
+					}
+				}
+			}
+
 		}
 	}
 
@@ -343,52 +377,52 @@ public class SpawnerListener implements Listener {
 
 		// Shielded spawner markers
 		if (event.getEntity() instanceof Marker marker) {
-			SpawnerUtils.startSpawnerEffectsDisplay(marker);
+			startSpawnerEffectsDisplay(marker);
 		}
 	}
 
 	// Prevent block explosions (for example respawn anchors) from breaking special spawners.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
-		event.blockList().removeIf(block -> SpawnerUtils.isSpawner(block) && (SpawnerUtils.getShields(block) > 0 || SpawnerUtils.getBreakActionIdentifiers(block).size() > 0));
+		event.blockList().removeIf(block -> isSpawner(block) && (getShields(block) > 0 || getGuarded(block) > 0 || getCat(block) > 0 || getSequence(block) > 0 || getProtector(block) || getEnsnared(block) > 0 || getBreakActionIdentifiers(block).size() > 0));
 	}
 
 	// Prevent entity explosions from breaking special spawners.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		event.blockList().removeIf(block -> SpawnerUtils.isSpawner(block) && (SpawnerUtils.getShields(block) > 0 || SpawnerUtils.getBreakActionIdentifiers(block).size() > 0));
+		event.blockList().removeIf(block -> isSpawner(block) && (getShields(block) > 0 || getGuarded(block) > 0 || getCat(block) > 0 || getSequence(block) > 0 || getProtector(block) || getEnsnared(block) > 0 || getBreakActionIdentifiers(block).size() > 0));
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
 		Block block = event.getBlock();
 
-		if (!SpawnerUtils.isSpawner(block)) {
+		if (!isSpawner(block)) {
 			return;
 		}
 
 		if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
-			SpawnerUtils.removeEffectsDisplayMarker(block);
+			removeProtector(block);
 			return;
 		}
 
 		int damage = 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING);
-		int shieldsBefore = SpawnerUtils.getShields(block);
-		boolean brokeSpawner = SpawnerUtils.tryBreakSpawner(block, damage);
-		int shieldsAfter = SpawnerUtils.getShields(block);
+		int shieldsBefore = getShields(block);
+		boolean brokeSpawner = tryBreakSpawner(block, damage, true);
+		int shieldsAfter = getShields(block);
 
 		if (!brokeSpawner) {
 			event.setCancelled(true);
 		} else {
-			mRecentlyBrokenSpawnerLosPool = SpawnerUtils.getLosPool(block);
+			removeProtector(block);
 		}
 
 		Location blockLoc = BlockUtils.getCenterBlockLocation(block);
 
-		if (SpawnerUtils.hasShieldsAttribute(block)) {
+		if (hasShieldsAttribute(block)) {
 			if (shieldsBefore != 0 && shieldsAfter == 0) {
 				doShieldFullBreakAnimation(blockLoc);
-			} else {
+			} else if (!brokeSpawner && getSequence(block) <= 0) {
 				doShieldBreakAnimation(blockLoc, shieldsAfter);
 			}
 		}
@@ -399,7 +433,7 @@ public class SpawnerListener implements Listener {
 	public void blockWasBrokenEvent(BlockBreakEvent event) {
 		Block block = event.getBlock();
 
-		if (!SpawnerUtils.isSpawner(block)) {
+		if (!isSpawner(block)) {
 			return;
 		}
 
@@ -407,11 +441,11 @@ public class SpawnerListener implements Listener {
 			return;
 		}
 
-		SpawnerUtils.removeEffectsDisplayMarker(block);
-		SpawnerActionManager.triggerActions(SpawnerUtils.getBreakActionIdentifiers(block), event.getPlayer(), block, mRecentlyBrokenSpawnerLosPool);
+		removeEffectsDisplayMarker(block);
+		SpawnerActionManager.triggerActions(getBreakActionIdentifiers(block), event.getPlayer(), block, mRecentlyBrokenSpawnerLosPool);
 	}
 
-	private void doShieldBreakAnimation(Location blockLoc, int shields) {
+	public static void doShieldBreakAnimation(Location blockLoc, int shields) {
 		if (shields == 0) {
 			return;
 		}
@@ -427,45 +461,110 @@ public class SpawnerListener implements Listener {
 	}
 
 	private void doShieldFullBreakAnimation(Location blockLoc) {
-		SpawnerUtils.removeEffectsDisplayMarker(blockLoc.getBlock());
+		removeEffectsDisplayMarker(blockLoc.getBlock());
 		blockLoc.getWorld().playSound(blockLoc, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 0.6f, 2f);
 		new PPCircle(Particle.FLAME, blockLoc, 1).rotateDelta(true).delta(1, 0, 0)
 			.directionalMode(true).extra(0.1).countPerMeter(4).distanceFalloff(16).spawnFull();
+	}
+
+	private static void removeProtector(Block block) {
+		if (getProtector(block)) {
+			block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
+			block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
+			List<MobInfo> spawnerInfo = mSpawnerInfos.get(block.getLocation());
+			if (spawnerInfo != null) {
+				for (MobInfo mobInfo : spawnerInfo) {
+					LivingEntity mob = mobInfo.getMob();
+					if (mob != null) {
+						mob.setGlowing(false);
+						mob.setInvulnerable(false);
+						ScoreboardUtils.removeEntityToTeam(mob, "protectedMob");
+					}
+				}
+			}
+		}
+		mRecentlyBrokenSpawnerLosPool = getLosPool(block);
+		spawnersWithCat.remove(block.getLocation());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 
-		if (!SpawnerUtils.isSpawner(block)) {
+		if (!isSpawner(block)) {
 			return;
 		}
 
 		Player player = event.getPlayer();
 		ItemStack item = event.getItemInHand();
 
-		int shields = SpawnerUtils.getShields(item);
+		int shields = getShields(item);
 		if (shields > 0) {
 			player.sendMessage(Component.text("Placed a spawner with " + shields + " shields.", NamedTextColor.GOLD));
-			SpawnerUtils.setShields(block, shields);
+			setShields(block, shields);
 		}
 
-		String losPool = SpawnerUtils.getLosPool(item);
+		String losPool = getLosPool(item);
 		if (losPool != null) {
 			player.sendMessage(Component.text("Placed a spawner with " + losPool + " LoS Pool.", NamedTextColor.GOLD));
-			SpawnerUtils.setLosPool(block, losPool);
+			setLosPool(block, losPool);
 		}
 
-		List<String> breakActions = SpawnerUtils.getBreakActionIdentifiers(item);
+		int guarded = getGuarded(item);
+		if (guarded > 0) {
+			player.sendMessage(Component.text("Placed a guarded spawner with a radius of " + guarded + ".", NamedTextColor.GOLD));
+			setGuarded(block, guarded);
+		}
+
+		int decaying = getDecaying(item);
+		if (decaying > 0) {
+			player.sendMessage(Component.text("Placed a decaying spawner after " + decaying + " waves.", NamedTextColor.GOLD));
+			setDecaying(block, decaying);
+		}
+
+		int ensnared = getEnsnared(item);
+		if (ensnared > 0) {
+			player.sendMessage(Component.text("Placed an ensnaring spawner with a radius of " + ensnared + ".", NamedTextColor.GOLD));
+			setEnsnared(block, ensnared);
+		}
+
+		int rally = getRally(item);
+		if (rally > 0) {
+			player.sendMessage(Component.text("Placed a rallying spawner with a radius of " + rally + ".", NamedTextColor.GOLD));
+			setRally(block, rally);
+		}
+
+		boolean protector = getProtector(item);
+		if (protector) {
+			player.sendMessage(Component.text("Placed a protector spawner.", NamedTextColor.GOLD));
+			setProtector(block, true);
+		}
+
+		int cat = getCat(item);
+		int catRadius = getCatRadius(item);
+		if (cat > 0) {
+			player.sendMessage(Component.text("Placed a cat spawner with a health of " + cat + " and radius of " + catRadius + ".", NamedTextColor.GOLD));
+			setCat(block, cat);
+			setCatRadius(block, catRadius);
+		}
+
+		int sequence = getSequence(item);
+		int sequenceRadius = getSequenceRadius(item);
+		if (sequence > 0) {
+			player.sendMessage(Component.text("Placed a sequential spawner with a sequence number of " + sequence + " and radius of " + sequenceRadius + ".", NamedTextColor.GOLD));
+			setSequence(block, sequence);
+			setSequenceRadius(block, sequenceRadius);
+		}
+
+		List<String> breakActions = getBreakActionIdentifiers(item);
 		if (breakActions.size() > 0) {
 			player.sendMessage(Component.text("Placed a spawner with " + breakActions.size() + " break action(s):", NamedTextColor.GOLD));
-			player.sendMessage(Component.text(SpawnerUtils.getBreakActionIdentifiers(item).toString(), NamedTextColor.GOLD));
-			SpawnerUtils.transferBreakActionList(item, block);
+			player.sendMessage(Component.text(getBreakActionIdentifiers(item).toString(), NamedTextColor.GOLD));
+			transferBreakActionList(item, block);
 		}
 
-		if (shields > 0 || losPool != null || breakActions.size() > 0) {
-			SpawnerUtils.addEffectsDisplayMarker(block);
+		if (shields > 0 || losPool != null || decaying > 0 || protector || breakActions.size() > 0) {
+			addEffectsDisplayMarker(block);
 		}
 	}
-
 }

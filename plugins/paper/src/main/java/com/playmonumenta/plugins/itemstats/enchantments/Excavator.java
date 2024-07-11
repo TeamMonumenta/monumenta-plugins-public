@@ -44,7 +44,7 @@ public class Excavator implements Enchantment {
 			return;
 		}
 
-		if (SpawnerUtils.getShields(event.getBlock()) > 0) {
+		if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 			return;
 		}
 

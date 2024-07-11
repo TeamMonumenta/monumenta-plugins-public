@@ -6,13 +6,7 @@ import com.playmonumenta.plugins.utils.SpawnerUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.SuggestionInfo;
-import dev.jorel.commandapi.arguments.ArgumentSuggestions;
-import dev.jorel.commandapi.arguments.FunctionArgument;
-import dev.jorel.commandapi.arguments.GreedyStringArgument;
-import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
-import dev.jorel.commandapi.arguments.StringArgument;
-import dev.jorel.commandapi.arguments.TextArgument;
+import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +35,94 @@ public class SpawnerCommand {
 									int shields = args.getUnchecked("shields");
 									SpawnerUtils.setShields(item, shields);
 								}),
+					new CommandAPICommand("type")
+						.withSubcommands(
+							new CommandAPICommand("guarded")
+								.withArguments(new IntegerArgument("guarded"))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
+										return;
+									}
+
+									int guardBlock = args.getUnchecked("guarded");
+									SpawnerUtils.setGuarded(item, guardBlock);
+								}),
+							new CommandAPICommand("ensnared")
+								.withArguments(new IntegerArgument("ensnared"))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
+										return;
+									}
+
+									int ensnaredBlock = args.getUnchecked("ensnared");
+									SpawnerUtils.setEnsnared(item, ensnaredBlock);
+								}),
+							new CommandAPICommand("decaying")
+								.withArguments(new IntegerArgument("decaying"))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
+										return;
+									}
+
+									int decayingBlock = args.getUnchecked("decaying");
+									SpawnerUtils.setDecaying(item, decayingBlock);
+								}),
+							new CommandAPICommand("protector")
+								.withArguments(new BooleanArgument("protector"))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
+										return;
+									}
+
+									boolean protector = args.getUnchecked("protector");
+									SpawnerUtils.setProtector(item, protector);
+								}),
+							new CommandAPICommand("rally")
+								.withArguments(new IntegerArgument("rally"))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
+										return;
+									}
+
+									int rallyBlock = args.getUnchecked("rally");
+									SpawnerUtils.setRally(item, rallyBlock);
+								}),
+							new CommandAPICommand("cat")
+								.withArguments(new IntegerArgument("cat"))
+								.withArguments(new IntegerArgument("catRadius"))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
+										return;
+									}
+
+									int catBlock = args.getUnchecked("cat");
+									int catRadius = args.getUnchecked("catRadius");
+
+									SpawnerUtils.setCat(item, catBlock);
+									SpawnerUtils.setCatRadius(item, catRadius);
+								}),
+							new CommandAPICommand("sequential")
+								.withArguments(new IntegerArgument("sequence"))
+								.withArguments(new IntegerArgument("radius"))
+								.executesPlayer((player, args) -> {
+									ItemStack item = getHeldItemAndSendErrors(player);
+									if (item == null) {
+										return;
+									}
+
+									int sequenceBlock = args.getUnchecked("sequence");
+									int sequenceRadius = args.getUnchecked("radius");
+
+									SpawnerUtils.setSequence(item, sequenceBlock);
+									SpawnerUtils.setSequenceRadius(item, sequenceRadius);
+								})
+						),
 						new CommandAPICommand("function")
 								.withSubcommands(
 										new CommandAPICommand("set")
