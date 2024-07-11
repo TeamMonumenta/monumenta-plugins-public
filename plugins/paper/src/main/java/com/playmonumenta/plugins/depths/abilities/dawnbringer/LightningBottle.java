@@ -123,7 +123,7 @@ public class LightningBottle extends DepthsAbility {
 
 			// Trying to use setLightningBottleAmount(potion.getItem(), amt - 1); for some reason doesn't work by the way.
 			final var contents = mPlayer.getInventory().getContents(); // here we iterate through the hotbar to find the lightning bottle(s) and update them.
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < 9; i++) {
 				final var itemstack = contents[i];
 				if (null != itemstack && isLightningBottle(itemstack)) {
 					setLightningBottleAmount(itemstack, amt - 1);
