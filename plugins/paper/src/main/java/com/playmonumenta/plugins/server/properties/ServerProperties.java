@@ -6,9 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
 import java.io.File;
@@ -100,40 +102,51 @@ public class ServerProperties {
 		return INSTANCE.mKeepLowTierInventory;
 	}
 
-	public static boolean getClassSpecializationsEnabled(@Nullable Player player) {
+	// Returns null if the default region should be used
+	private static @Nullable Integer getEffectiveRegion(@Nullable Player player) {
 		if (player == null) {
-			return INSTANCE.mClassSpecializationsEnabled;
+			return null;
 		}
-		if (INSTANCE.mClassSpecializationsEnabled) {
-			return true;
+
+		String shard = getShardName();
+		if (shard.contains("plots")) {
+			// Default to highest region unlocked
+			int plotRegion = PlotManager.getPlotRegion(player).orElse(3);
+			if (PlayerUtils.hasUnlockedRing(player)) {
+				return plotRegion;
+			} else if (PlayerUtils.hasUnlockedIsles(player)) {
+				return Math.max(plotRegion, 2);
+			} else {
+				return 1;
+			}
 		}
-		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(getShardName());
+
+		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(shard);
 		if (mapping == null) {
-			return false;
+			return null;
 		}
 		String typeName = mapping.getTypeName();
 		if (typeName == null) {
-			return false;
+			return null;
 		}
-		return ScoreboardUtils.getScoreboardValue(player.getName(), typeName).orElse(0) == 1;
+		// This assumes that the dungeon mapping is only used for R3 Exalted dungeons
+		return ScoreboardUtils.getScoreboardValue(player.getName(), typeName).orElse(0) == 1 ? 3 : null;
+	}
+
+	public static boolean getClassSpecializationsEnabled(@Nullable Player player) {
+		Integer effectiveRegion = getEffectiveRegion(player);
+		if (effectiveRegion == null) {
+			return INSTANCE.mClassSpecializationsEnabled;
+		}
+		return effectiveRegion >= 2;
 	}
 
 	public static boolean getAbilityEnhancementsEnabled(@Nullable Player player) {
-		if (player == null) {
+		Integer effectiveRegion = getEffectiveRegion(player);
+		if (effectiveRegion == null) {
 			return INSTANCE.mAbilityEnhancementsEnabled;
 		}
-		if (INSTANCE.mAbilityEnhancementsEnabled) {
-			return true;
-		}
-		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(getShardName());
-		if (mapping == null) {
-			return false;
-		}
-		String typeName = mapping.getTypeName();
-		if (typeName == null) {
-			return false;
-		}
-		return ScoreboardUtils.getScoreboardValue(player.getName(), typeName).orElse(0) == 1;
+		return effectiveRegion >= 3;
 	}
 
 	public static String getGameplayDataExportPath() {

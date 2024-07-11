@@ -4,7 +4,6 @@ import com.goncalomb.bukkit.nbteditor.nbt.attributes.ItemModifier;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -139,10 +138,7 @@ public class ItemStatCommands {
 			ItemStatUtils.editItemInfo(item, region, tier, m, location);
 
 			ItemUpdateHelper.generateItemStats(item);
-			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, true);
-			}
+			Plugin.getInstance().mItemStatManager.updateStats(player);
 		}).register();
 	}
 
@@ -641,10 +637,7 @@ public class ItemStatCommands {
 		}
 
 		ItemUpdateHelper.generateItemStats(item);
-		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-		if (playerItemStats != null) {
-			playerItemStats.updateStats(player, true, true);
-		}
+		Plugin.getInstance().mItemStatManager.updateStats(player);
 	}
 
 	private static void addUuidInfusion(@Nullable ItemStack item, Player player, String enchantment, int level, UUID uuid) {
@@ -662,10 +655,7 @@ public class ItemStatCommands {
 		}
 
 		ItemUpdateHelper.generateItemStats(item);
-		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-		if (playerItemStats != null) {
-			playerItemStats.updateStats(player, true, true);
-		}
+		Plugin.getInstance().mItemStatManager.updateStats(player);
 	}
 
 	private static void addNpcInfusion(@Nullable ItemStack item, Player player, String enchantment, int level, String npcName) {
@@ -683,10 +673,7 @@ public class ItemStatCommands {
 		}
 
 		ItemUpdateHelper.generateItemStats(item);
-		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-		if (playerItemStats != null) {
-			playerItemStats.updateStats(player, true, true);
-		}
+		Plugin.getInstance().mItemStatManager.updateStats(player);
 	}
 
 	public static void registerAttrCommand() {
@@ -748,10 +735,7 @@ public class ItemStatCommands {
 			}
 
 			ItemUpdateHelper.generateItemStats(item);
-			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, true);
-			}
+				Plugin.getInstance().mItemStatManager.updateStats(player);
 		}).register();
 	}
 
@@ -795,10 +779,7 @@ public class ItemStatCommands {
 
 			ItemUtils.setPlainLore(item);
 
-			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, true);
-			}
+			Plugin.getInstance().mItemStatManager.updateStats(player);
 		}).register();
 	}
 

@@ -575,4 +575,12 @@ public class PlayerUtils {
 	public static List<String> sortedPlayerNames(Collection<Player> players) {
 		return StringUtils.sortedStrings(players.stream().map(Player::getName).toList());
 	}
+
+	public static boolean hasUnlockedIsles(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, "Quest101").orElse(0) >= 12;
+	}
+
+	public static boolean hasUnlockedRing(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) >= 1;
+	}
 }

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -84,10 +83,7 @@ public class Resurrection implements Enchantment {
 				}
 			}
 
-			ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
-			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, true);
-			}
+			Plugin.getInstance().mItemStatManager.updateStats(player);
 		}
 
 		return true;

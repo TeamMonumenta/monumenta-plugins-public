@@ -493,10 +493,7 @@ public class ItemStatManager implements Listener {
 		if (mUpdateStatsDelayed.isEmpty()) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				for (Player p : mUpdateStatsDelayed) {
-					PlayerItemStats playerItemStats = mPlayerItemStatsMappings.get(p.getUniqueId());
-					if (playerItemStats != null) {
-						playerItemStats.updateStats(p, true, true);
-					}
+					Plugin.getInstance().mItemStatManager.updateStats(p);
 				}
 				mUpdateStatsDelayed.clear();
 			});

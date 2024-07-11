@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
@@ -44,6 +46,8 @@ import org.jetbrains.annotations.Nullable;
 public class PlotManager {
 	@SuppressWarnings("unchecked")
 	public static void registerCommands() {
+		IntegerArgument regionArg = new IntegerArgument("region", 1, 3);
+
 		new CommandAPICommand("plot")
 			.withPermission(CommandPermission.NONE)
 			/* ACCESS */
@@ -242,6 +246,22 @@ public class PlotManager {
 							});
 						}
 					}
+				}))
+			/* REGION */
+			.withSubcommand(new CommandAPICommand("region")
+				.withPermission(CommandPermission.fromString("monumenta.plot.region"))
+				.withArguments(regionArg)
+				.executesPlayer((player, args) -> {
+					int region = args.getByArgument(regionArg);
+					OptionalInt oldRegion = getPlotRegion(player);
+					if (oldRegion.isPresent() && oldRegion.getAsInt() == region) {
+						player.sendMessage(Component.text("Your plot region was already " + region + "!", NamedTextColor.GOLD));
+						return;
+					}
+					ScoreboardUtils.setScoreboardValue(player, "PlotRegion", region);
+					AbilityUtils.refreshClass(player);
+					Plugin.getInstance().mItemStatManager.updateStats(player);
+					player.sendMessage(Component.text("Set your plot region to " + region + "!", NamedTextColor.GOLD));
 				}))
 			.register();
 	}
@@ -610,5 +630,9 @@ public class PlotManager {
 			}
 			return uuid;
 		}
+	}
+
+	public static OptionalInt getPlotRegion(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, "PlotRegion");
 	}
 }
