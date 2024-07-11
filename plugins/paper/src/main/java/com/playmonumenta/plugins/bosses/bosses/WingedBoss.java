@@ -5,17 +5,33 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,9 +65,10 @@ public final class WingedBoss extends BossAbilityGroup {
 		final double[] distanceThresholds = {0, p.SAFE_DISTANCE + 0.01, p.SAFE_DISTANCE + 0.25, p.SAFE_DISTANCE + 5.25, p.SAFE_DISTANCE + 10.25, p.SAFE_DISTANCE + 20.25, 9999};
 		final double[] speedValues = {0, 0, 0.125, 0.15, 0.2125, 0.5, 0.5};
 
-		// Offset the boss' spawn location
+		// Offset the boss' spawn location and disable gravity
 		Location spawnLoc = boss.getLocation();
 		boss.teleport(spawnLoc.add(0, 1.5, 0));
+		mBoss.setGravity(false);
 
 		// Spawn wings
 		ItemStack[] armor = banner(p.BANNER_PATTERN);
@@ -168,6 +185,8 @@ public final class WingedBoss extends BossAbilityGroup {
 			forwards.setY(0);
 		}
 
+		double mobSpeed = EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.2);
+		forwards.multiply(mobSpeed * 5);
 		NmsUtils.getVersionAdapter().moveEntity(mBoss, forwards);
 	}
 
