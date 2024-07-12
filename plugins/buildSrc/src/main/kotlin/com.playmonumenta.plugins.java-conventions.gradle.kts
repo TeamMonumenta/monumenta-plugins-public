@@ -7,96 +7,23 @@ plugins {
 
 repositories {
     mavenLocal()
-    jcenter()
-    maven {
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-
-    maven {
-        url = uri("https://repo.maven.apache.org/maven2/")
-    }
-
-    maven {
-        url = uri("https://jitpack.io")
-    }
-
-    maven {
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-    }
-
-    maven {
-        url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-    }
-
-    maven {
-        url = uri("https://maven.playpro.com/")
-    }
-
-    maven {
-        url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
-    }
-
-    maven {
-        url = uri("https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
-    }
-
-    maven {
-        url = uri("https://ci.mg-dev.eu/plugin/repository/everything")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-redis-sync/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-structure-management/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://maven.enginehub.org/repo/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-chat/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-relay/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-world-management/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/library-of-souls/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/scripted-quests/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://repo.codemc.org/repository/nms")
-    }
-
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.maven.apache.org/maven2/")
+    maven("https://jitpack.io")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://maven.playpro.com/")
+    maven("https://repo.dmulloy2.net/nexus/repository/public/")
+    maven("https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
+    maven("https://ci.mg-dev.eu/plugin/repository/everything")
+    maven("https://maven.enginehub.org/repo/")
+    maven("https://repo.codemc.org/repository/nms")
     // NBT API
-    maven {
-        url = uri("https://repo.codemc.org/repository/maven-public/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-relay/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/NuVotifier/master/mvn-repo/")
-    }
-
-    // This is ridiculously jank - accessing the repo from github when it's local... but can't get it to work otherwise
-    maven {
-        url = uri("https://raw.githubusercontent.com/TeamMonumenta/monumenta-plugins-public/master/plugins/paper/repo/")
-    }
+    maven("https://repo.codemc.org/repository/maven-public/")
+	mavenCentral()
+	maven("https://libraries.minecraft.net/")
+	maven("https://repo.codemc.org/repository/maven-public/")
+	maven("https://maven.playmonumenta.com/releases/")
 }
 
 group = "com.playmonumenta.plugins"

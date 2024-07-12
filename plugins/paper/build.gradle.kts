@@ -6,18 +6,12 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
 	id("com.github.johnrengelman.shadow") version "7.1.2"
 	id("com.playmonumenta.plugins.java-conventions")
-	id("com.playmonumenta.deployment") version "1.0"
+	id("com.playmonumenta.deployment") version "1.+"
 	id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
 	id("net.minecrell.plugin-yml.bungee") version "0.5.1" // Generates bungee.yml
 	id("java")
 	id("net.ltgt.errorprone") version "3.1.0"
 	id("net.ltgt.nullaway") version "1.6.0"
-}
-
-repositories {
-	mavenCentral()
-	maven("https://libraries.minecraft.net/")
-	maven("https://repo.codemc.org/repository/maven-public/")
 }
 
 dependencies {
@@ -43,16 +37,16 @@ dependencies {
 	compileOnly("net.coreprotect:coreprotect:2.15.0") {
 		exclude(group = "org.bukkit")
 	}
-	compileOnly("com.playmonumenta:scripted-quests:7.0")
-	compileOnly("com.playmonumenta:redissync:4.1")
-	compileOnly("com.playmonumenta:monumenta-network-chat:2.7.4")
+	compileOnly("com.playmonumenta:scripted-quests:7.0:all")
+	compileOnly("com.playmonumenta:redissync:4.1:all")
+	compileOnly("com.playmonumenta:monumenta-network-chat:2.11.1")
 	compileOnly("com.playmonumenta:monumenta-network-relay:1.1")
-	compileOnly("com.playmonumenta:structures:10.0")
-	compileOnly("com.playmonumenta:worlds:2.0")
+	compileOnly("com.playmonumenta:structures:10.2")
+	compileOnly("com.playmonumenta:worlds:2.3.1")
 	compileOnly("com.playmonumenta:libraryofsouls:5.3.1")
 	compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.19.4-v2")
 	compileOnly("com.mojang:brigadier:1.0.18")
-	compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
+	compileOnly("com.playmonumenta:nbteditor:4.1:all")
 	compileOnly("de.tr7zw:item-nbt-api-plugin:2.12.0-SNAPSHOT")
 	compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
 	compileOnly("io.prometheus:simpleclient:0.11.0")
@@ -63,8 +57,8 @@ dependencies {
 	// Bungeecord deps
 	compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")
 	compileOnly("com.google.code.gson:gson:2.8.5")
-	compileOnly("com.playmonumenta:monumenta-network-relay:1.0")
-	compileOnly("com.vexsoftware:nuvotifier-universal:2.7.2")
+	compileOnly("com.playmonumenta:monumenta-network-relay:2.7")
+	compileOnly("com.vexsoftware:nuvotifier-universal:3.0.0:all")
 }
 
 group = "com.playmonumenta"
