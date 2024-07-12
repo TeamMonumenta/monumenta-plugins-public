@@ -316,7 +316,7 @@ public class PlotManager {
 				String name = MonumentaRedisSyncIntegration.cachedUuidToName(key);
 				if (name != null) {
 					Component msg = Component.text("  " + name, NamedTextColor.AQUA).append(Component.text(" (#" + other.mPlotId + ")", NamedTextColor.GOLD));
-					if (other.mExpiration <= 0) {
+					if (other.mExpiration > 0) {
 						msg = msg.append(Component.text(" Expires: ", NamedTextColor.GREEN)).append(Component.text(MessagingUtils.getTimeDifferencePretty(other.mExpiration), NamedTextColor.AQUA));
 					}
 					sender.sendMessage(msg);
