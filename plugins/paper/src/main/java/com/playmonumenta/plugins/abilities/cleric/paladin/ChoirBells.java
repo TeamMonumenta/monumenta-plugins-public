@@ -56,12 +56,12 @@ public class ChoirBells extends Ability {
 					.formatted(
 						CHOIR_BELLS_RANGE,
 						StringUtils.multiplierToPercentage(SLOWNESS_AMPLIFIER_1),
-						DURATION,
+						DURATION/20,
 						DAMAGE,
 						StringUtils.multiplierToPercentage(VULNERABILITY_EFFECT_1),
 						StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1),
-						DURATION,
-						COOLDOWN),
+						DURATION/20,
+						COOLDOWN/20),
 				"Slowness is increased from %s%% to %s%%. Vulnerability is increased from %s%% to %s%%. Weakness is increased from %s%% to %s%%."
 					.formatted(
 						StringUtils.multiplierToPercentage(SLOWNESS_AMPLIFIER_1),
