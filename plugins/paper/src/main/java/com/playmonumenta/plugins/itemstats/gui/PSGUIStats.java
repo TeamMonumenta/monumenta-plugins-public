@@ -155,10 +155,10 @@ class PSGUIStats {
 
 		result *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER[getRegionScaling(mPlayer, true)];
 
-		result *= Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER));
-		result *= Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION));
-		result *= Vengeful.getDamageDealtMultiplier(getInfusion(InfusionType.VENGEFUL));
-		result *= Decapitation.getDamageDealtMultiplier(getInfusion(InfusionType.DECAPITATION));
+		result += Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER)) - 1;
+		result += Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION)) - 1;
+		result += Vengeful.getDamageDealtMultiplier(getInfusion(InfusionType.VENGEFUL)) - 1;
+		result += Decapitation.getDamageDealtMultiplier(getInfusion(InfusionType.DECAPITATION)) - 1;
 
 		return result;
 	}

@@ -101,8 +101,8 @@ enum PSGUIStat {
 	// melee
 	ATTACK_DAMAGE_ADD("+flat Attack Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD)),
 	ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY)
-		                                                                                 * stats.getDamageDealtMultiplier()
-		                                                                                 * (1 + Vigor.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.VIGOR))),
+		                                                                                 + stats.getDamageDealtMultiplier()
+		                                                                                 + Vigor.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.VIGOR)),
 	TOTAL_ATTACK_DAMAGE("Total Attack Damage", Formatting.NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
 	ATTACK_SPEED("Attack Speed", Formatting.NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)
 		                                                         * (1 + (Grace.ATKS_BONUS * stats.getInfusion(InfusionType.GRACE)))),
@@ -110,8 +110,8 @@ enum PSGUIStat {
 	// projectile
 	PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
 	PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY)
-		                                                                                         * stats.getDamageDealtMultiplier()
-		                                                                                         * (1 + Focus.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.FOCUS))),
+		                                                                                         + stats.getDamageDealtMultiplier()
+		                                                                                         + Focus.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.FOCUS)),
 	TOTAL_PROJECTILE_DAMAGE("Total Projectile Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * PROJECTILE_DAMAGE_MULTIPLY.get(stats)),
 	PROJECTILE_SPEED("Projectile Speed", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_SPEED)),
 	PROJECTILE_RATE("Shoot/Throw Rate", Formatting.NUMBER, stats -> {
@@ -135,8 +135,8 @@ enum PSGUIStat {
 	SPELL_POWER("Spell Power", Formatting.PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
 	MAGIC_DAMAGE_ADD("+flat Magic Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
 	MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY)
-		                                                                               * stats.getDamageDealtMultiplier()
-		                                                                               * (1 + Perspicacity.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.PERSPICACITY))),
+		                                                                               + stats.getDamageDealtMultiplier()
+		                                                                               + Perspicacity.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.PERSPICACITY)),
 	TOTAL_SPELL_DAMAGE("Total Spell Damage %", Formatting.PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
 	COOLDOWN_MULTIPLIER("Cooldown Multiplier", Formatting.PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
 		                                                                        * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
