@@ -39,7 +39,7 @@ dependencies {
 	}
 	compileOnly("com.playmonumenta:scripted-quests:7.0:all")
 	compileOnly("com.playmonumenta:redissync:4.1:all")
-	compileOnly("com.playmonumenta:monumenta-network-chat:2.11.1")
+	compileOnly("com.playmonumenta:monumenta-network-chat:2.13")
 	compileOnly("com.playmonumenta:monumenta-network-relay:1.1")
 	compileOnly("com.playmonumenta:structures:10.2")
 	compileOnly("com.playmonumenta:worlds:2.3.1")
