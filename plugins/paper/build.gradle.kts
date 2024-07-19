@@ -51,7 +51,7 @@ dependencies {
 	compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
 	compileOnly("io.prometheus:simpleclient:0.11.0")
 	compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
-	errorprone("com.google.errorprone:error_prone_core:2.23.0")
+	errorprone("com.google.errorprone:error_prone_core:2.29.1")
 	errorprone("com.uber.nullaway:nullaway:0.10.18")
 
 	// Bungeecord deps

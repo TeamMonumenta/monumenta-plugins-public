@@ -36,7 +36,16 @@ tasks.withType<JavaCompile> {
 
 pmd {
     isConsoleOutput = true
-    toolVersion = "6.41.0"
+    toolVersion = "7.2.0"
     ruleSets = listOf("$rootDir/pmd-ruleset.xml")
     setIgnoreFailures(true)
+}
+
+checkstyle {
+    toolVersion = "10.17.0"
+}
+
+tasks.withType<Checkstyle>().configureEach {
+    minHeapSize = "200m"
+    maxHeapSize = "1g"
 }
