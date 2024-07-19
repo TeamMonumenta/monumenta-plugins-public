@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
@@ -80,6 +81,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Powerable;
@@ -100,6 +102,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -116,42 +119,15 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerAnimationType;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerBedLeaveEvent;
-import org.bukkit.event.player.PlayerChangedMainHandEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerExpChangeEvent;
-import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerFishEvent.State;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemBreakEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRegisterChannelEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerRiptideEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.event.player.PlayerTakeLecternBookEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -486,6 +462,30 @@ public class PlayerListener implements Listener {
 					relative.setBlockData(lowerWaterLight, false);
 				}
 			}
+		}
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void signChangeEvent(SignChangeEvent event) {
+		Player player = event.getPlayer();
+		if (!(event.getBlock() instanceof Sign sign)) {
+			return;
+		}
+		Location loc = sign.getLocation();
+		List<Component> lines = sign.getSide(event.getSide()).lines();
+		Component allSignLines = MessagingUtils.concatenateComponents(lines, Component.newline());
+		if (MonumentaNetworkChatIntegration.hasBadWord(player, allSignLines)) {
+			AuditListener.logSevere(player.getName()
+				+ " attempted to place a sign with a bad word: `/s "
+				+ ServerProperties.getShardName()
+				+ "` `/world " + loc.getWorld().getName()
+				+ "` `/tp @s " + loc.getBlockX()
+				+ " " + loc.getBlockY()
+				+ " " + loc.getBlockZ()
+				+ "`"
+			);
+			event.setCancelled(true);
 		}
 	}
 
@@ -831,6 +831,46 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void playerEditBookEvent(PlayerEditBookEvent event) {
+		Player player = event.getPlayer();
+		Location loc = player.getLocation();
+		BookMeta bookMeta = event.getNewBookMeta();
+
+		String title = bookMeta.getTitle();
+		if (title != null) {
+			if (MonumentaNetworkChatIntegration.hasBadWord(player, title)) {
+				AuditListener.logSevere(player.getName()
+					+ " attempted to title a book with a bad word: `/s "
+					+ ServerProperties.getShardName()
+					+ "` `/world " + loc.getWorld().getName()
+					+ "` `/tp @s " + loc.getBlockX()
+					+ " " + loc.getBlockY()
+					+ " " + loc.getBlockZ()
+					+ "`"
+				);
+				event.setCancelled(true);
+				return;
+			}
+		}
+
+		for (Component page : bookMeta.pages()) {
+			if (MonumentaNetworkChatIntegration.hasBadWord(player, page)) {
+				AuditListener.logSevere(player.getName()
+					+ " attempted to update a book with a bad word: `/s "
+					+ ServerProperties.getShardName()
+					+ "` `/world " + loc.getWorld().getName()
+					+ "` `/tp @s " + loc.getBlockX()
+					+ " " + loc.getBlockY()
+					+ " " + loc.getBlockZ()
+					+ "`"
+				);
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
+
 	// Player ran a command
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
@@ -890,7 +930,7 @@ public class PlayerListener implements Listener {
 
 		// Debuff mobs around player in dungeon if running solo
 		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
-			if (PlayerUtils.otherPlayersInRange(player, 64, true).size() == 0) {
+			if (PlayerUtils.otherPlayersInRange(player, 64, true).isEmpty()) {
 				// Delay by a tick to allow the entity that killed the player (if any) to still be valid until all damage/death events resolve
 				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 					List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(player.getLocation(), 20);
@@ -926,7 +966,7 @@ public class PlayerListener implements Listener {
 			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
 			event.deathMessage(null);
 		}
-		//Dont repeat if they died in the last 5 ticks
+		// Don't repeat if they died in the last 5 ticks
 		if (!MetadataUtils.checkOnceInRecentTicks(mPlugin, player, PLAYER_DEATH_TICK_TAG, 5)) {
 			event.deathMessage(null);
 			// Clear effects

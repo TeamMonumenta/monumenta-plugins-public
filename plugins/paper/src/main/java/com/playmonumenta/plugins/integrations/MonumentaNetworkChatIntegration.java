@@ -1,6 +1,12 @@
 package com.playmonumenta.plugins.integrations;
 
-import com.playmonumenta.networkchat.*;
+import com.playmonumenta.networkchat.ChannelManager;
+import com.playmonumenta.networkchat.ChatFilter;
+import com.playmonumenta.networkchat.DefaultChannels;
+import com.playmonumenta.networkchat.NetworkChatPlugin;
+import com.playmonumenta.networkchat.PlayerState;
+import com.playmonumenta.networkchat.PlayerStateManager;
+import com.playmonumenta.networkchat.RemotePlayerManager;
 import com.playmonumenta.networkchat.channel.Channel;
 import com.playmonumenta.networkchat.channel.ChannelGlobal;
 import com.playmonumenta.networkchat.channel.interfaces.ChannelPermissionNode;
@@ -286,5 +292,18 @@ public class MonumentaNetworkChatIntegration {
 
 		ChannelSettings channelSettings = playerState.channelSettings(channel);
 		channelSettings.messagesPlaySound(notificationsEnabled);
+	}
+
+	public static boolean hasBadWord(CommandSender sender, String text) {
+		return hasBadWord(sender, Component.text(text));
+	}
+
+	public static boolean hasBadWord(CommandSender sender, Component text) {
+		if (!ENABLED) {
+			return false;
+		}
+
+		ChatFilter chatFilter = NetworkChatPlugin.globalBadWordFilter();
+		return chatFilter.hasBadWord(sender, text);
 	}
 }

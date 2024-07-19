@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
+import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
@@ -62,6 +65,22 @@ public class SignOverride extends BaseOverride {
 						final @Nullable DyeColor signColor = signItem.getColor();
 						final boolean glowing = signItem.isGlowingText();
 						final List<Component> signLines = signItem.lines();
+
+						Component allSignLines = MessagingUtils.concatenateComponents(signLines, Component.newline());
+						if (MonumentaNetworkChatIntegration.hasBadWord(player, allSignLines)) {
+							AuditListener.logSevere(player.getName()
+									+ " attempted to place a sign with a bad word: `/s "
+									+ ServerProperties.getShardName()
+									+ "` `/world " + loc.getWorld().getName()
+									+ "` `/tp @s " + loc.getBlockX()
+									+ " " + loc.getBlockY()
+									+ " " + loc.getBlockZ()
+									+ "`"
+							);
+							item.setAmount(0);
+							return false;
+						}
+
 						new BukkitRunnable() {
 							@Override
 							public void run() {
@@ -145,6 +164,22 @@ public class SignOverride extends BaseOverride {
 						loreLines.add(Component.text(COPIED_SIGN_HEADER, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 						Component loreHeader = Component.text("> ").color(NamedTextColor.BLACK).decoration(TextDecoration.ITALIC, false);
 						Component loreBase = Component.text("").color(NamedTextColor.BLACK);
+
+						Component allSignLines = MessagingUtils.concatenateComponents(signLines, Component.newline());
+						if (MonumentaNetworkChatIntegration.hasBadWord(player, allSignLines)) {
+							Location loc = block.getLocation();
+							AuditListener.logSevere(player.getName()
+								+ " attempted to copy a sign with a bad word: `/s "
+								+ ServerProperties.getShardName()
+								+ "` `/world " + loc.getWorld().getName()
+								+ "` `/tp @s " + loc.getBlockX()
+								+ " " + loc.getBlockY()
+								+ " " + loc.getBlockZ()
+								+ "`"
+							);
+							item.setAmount(0);
+							return false;
+						}
 
 						signItem.setColor(dyeColor);
 						Color color = dyeColor.getColor();
