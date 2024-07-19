@@ -671,6 +671,9 @@ public class ShopManager implements Listener {
 		}
 
 		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.9f);
+		if (shopEntity instanceof Shulker shulker) {
+			shulker.setColor(DyeColor.RED);
+		}
 		shop.particles();
 		shop.disableSurvival();
 
@@ -717,6 +720,9 @@ public class ShopManager implements Listener {
 		}
 
 		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.5f);
+		if (shopEntity instanceof Shulker shulker) {
+			shulker.setColor(DyeColor.MAGENTA);
+		}
 		shop.particles();
 		shop.enableSurvival();
 
