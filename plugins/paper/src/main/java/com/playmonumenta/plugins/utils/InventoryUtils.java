@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -211,27 +212,40 @@ public class InventoryUtils {
 	}
 
 	private static int removeNamedItemsFromInventory(final Inventory inventory, final String name) {
-		int dropped = 0;
+		return removeItemsFromInventoryWhen(inventory, x -> x.hasItemMeta() && x.getItemMeta().hasDisplayName() && MessagingUtils.plainText(x.getItemMeta().displayName()).equals(name), true);
+	}
+
+	/**
+	 * Remove items matching a predicate from a given inventory
+	 *
+	 * @param inventory             The inventory to remove from
+	 * @param p                     The predicate to use
+	 * @param includeSubInventories Whether to search through shulkers
+	 */
+	public static int removeItemsFromInventoryWhen(final Inventory inventory, final Predicate<ItemStack> p, final boolean includeSubInventories) {
 		@Nullable ItemStack[] items = inventory.getContents();
+		if (0 == items.length) {
+			return 0;
+		}
+		int removed = 0;
 
 		for (int i = 0; i < items.length; i++) {
 			ItemStack item = items[i];
-			if (item != null && item.hasItemMeta()) {
+			if (item != null) {
 				ItemMeta itemMeta = item.getItemMeta();
-				if (itemMeta.hasDisplayName() && MessagingUtils.plainText(itemMeta.displayName()).equals(name)) {
+				if (p.test(item)) {
 					items[i] = null;
-				} else {
+					removed++;
+				} else if (includeSubInventories) {
 					if (itemMeta instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
 						@Nullable ItemStack[] shulkerItems = shulker.getInventory().getContents();
 						for (int j = 0; j < shulkerItems.length; j++) {
 							ItemStack shulkerItemOfJ = shulkerItems[j];
-							if (shulkerItemOfJ != null
-								&& shulkerItemOfJ.hasItemMeta() && shulkerItemOfJ.getItemMeta().hasDisplayName()
-								&& MessagingUtils.plainText(shulkerItemOfJ.getItemMeta().displayName()).equals(name)) {
+							if (shulkerItemOfJ != null && p.test(shulkerItemOfJ)) {
 								shulkerItems[j] = null;
+								removed++;
 							}
 						}
-
 						shulker.getInventory().setContents(shulkerItems);
 						meta.setBlockState(shulker);
 						item.setItemMeta(meta);
@@ -239,10 +253,8 @@ public class InventoryUtils {
 				}
 			}
 		}
-
 		inventory.setContents(items);
-
-		return dropped;
+		return removed;
 	}
 
 	public static int removeSoulboundItemFromInventory(final Inventory inventory, final String itemPlainName, final int amount, final Player player) {
@@ -257,7 +269,7 @@ public class InventoryUtils {
 			ItemStack slot = items[i];
 			if (slot != null &&
 				ItemUtils.getPlainName(slot).equals(itemPlainName) &&
-				    isSoulboundToPlayer(slot, player)) {
+				isSoulboundToPlayer(slot, player)) {
 				total += slot.getAmount();
 				matched.add(i);
 			}
@@ -330,7 +342,7 @@ public class InventoryUtils {
 
 	public static boolean isArmorSlotFromId(final int slotId) {
 		return slotId == OFFHAND_SLOT || slotId == HELMET_SLOT || slotId == CHESTPLATE_SLOT
-			   || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
+			|| slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
 	}
 
 	static void shuffleArray(final int[] ar) {
@@ -345,9 +357,10 @@ public class InventoryUtils {
 
 	/**
 	 * A check for if a player has a wallet in their inventory.
-	 * @see WalletManager#isWallet(ItemStack)
+	 *
 	 * @param player The player
 	 * @return <code>true</code> if the player has a Wallet item in their inventory.
+	 * @see WalletManager#isWallet(ItemStack)
 	 */
 	public static boolean playerHasWalletItem(final Player player) {
 		return Arrays.stream(player.getInventory().getContents()).anyMatch(WalletManager::isWallet);
@@ -577,20 +590,21 @@ public class InventoryUtils {
 
 	public static int numInInventory(ItemStack[] inventory, ItemStack item) {
 		return Arrays.stream(inventory)
-			       .filter(Objects::nonNull)
-			       .filter(item::isSimilar)
-			       .mapToInt(ItemStack::getAmount)
-			       .sum();
+			.filter(Objects::nonNull)
+			.filter(item::isSimilar)
+			.mapToInt(ItemStack::getAmount)
+			.sum();
 	}
 
-	 /**
-	  * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
-	  */
+	/**
+	 * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
+	 */
 	public static boolean isFull(Inventory inventory) {
 		return Arrays.stream(inventory.getStorageContents()).noneMatch(ItemUtils::isNullOrAir);
 	}
 
-	 /** Inserts an item stack into an inventory, using only the first {@code size} slots of the inventory.
+	/**
+	 * Inserts an item stack into an inventory, using only the first {@code size} slots of the inventory.
 	 *
 	 * @param inventory The inventory to put the item into
 	 * @param size      Maximum number of inventory slots to use
@@ -604,8 +618,8 @@ public class InventoryUtils {
 		for (int i = 0; i < size; i++) {
 			ItemStack invItem = inventory.getItem(i);
 			if (invItem != null
-				    && invItem.getAmount() < invItem.getMaxStackSize()
-				    && invItem.isSimilar(itemStack)) {
+				&& invItem.getAmount() < invItem.getMaxStackSize()
+				&& invItem.isSimilar(itemStack)) {
 				int deposited = Math.min(itemStack.getAmount(), invItem.getMaxStackSize() - invItem.getAmount());
 				itemStack.subtract(deposited);
 				invItem.add(deposited);

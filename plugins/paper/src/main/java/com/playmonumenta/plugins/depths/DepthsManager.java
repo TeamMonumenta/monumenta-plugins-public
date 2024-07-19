@@ -908,7 +908,6 @@ public class DepthsManager {
 
 		// Called when the player logs out even if they are still alive - check that they are online
 		if (p.isOnline()) {
-			InventoryUtils.removeNamedItems(p, LightningBottle.POTION_NAME_BASE);
 			InventoryUtils.removeSpecialItems(p, false, true, false);
 		}
 	}

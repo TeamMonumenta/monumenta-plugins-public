@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
@@ -186,15 +187,23 @@ public class LightningBottle extends DepthsAbility {
 			boolean flag = true;
 			for (ItemStack item : inv.getContents()) {
 				if (item != null && isLightningBottle(item)) { // if the player has a bottle.
-					setLightningBottleAmount(item, Math.min(mMaxStack, getLightningBottleAmount(item) + mBottlesGiven)); // give it a new amount.
+					int amt;
+					if ((amt = getLightningBottleAmount(item)) >= mMaxStack) {
+						break; // no need to give any more.
+					}
+					int newAmount;
+					setLightningBottleAmount(item, newAmount = Math.min(mMaxStack, amt + mBottlesGiven)); // give it a new amount.
+					mPlayer.sendActionBar(Component.text("+%d Lightning Bottle Charges [%d/%d]!".formatted(newAmount - amt, newAmount, mMaxStack), NamedTextColor.GOLD)); // inform the player
 					flag = false;
 					break;
 				}
-			} // otherwise give them a new one.
+			}
+			// otherwise give them a new one.
 			if (flag) {
 				ItemStack newPotions = getBaseLightningBottle();
 				setLightningBottleAmount(newPotions, mBottlesGiven);
 				inv.addItem(newPotions);
+				mPlayer.sendActionBar(Component.text("You have received a Lightning Bottle!", NamedTextColor.GOLD));
 			}
 			mPlayer.updateInventory();
 		}
@@ -205,6 +214,8 @@ public class LightningBottle extends DepthsAbility {
 		return mDeathRadius;
 	}
 
+
+	final Style STYLE = Style.style().color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).build();
 	public ItemStack getBaseLightningBottle() {
 		ItemStack itemStack = new ItemStack(Material.SPLASH_POTION, 1);
 		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
@@ -212,7 +223,9 @@ public class LightningBottle extends DepthsAbility {
 		potionMeta.setBasePotionData(new PotionData(PotionType.MUNDANE));
 		potionMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // Hide "No Effects" vanilla potion effect lore
 		potionMeta.setColor(Color.YELLOW);
-		potionMeta.lore(List.of(Component.text("A unique potion used by Dawnbringers.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)));
+		potionMeta.lore(List.of(Component.text("A unique potion used by Dawnbringers.", STYLE),
+			Component.text("Taking this item outside of the dungeon", STYLE),
+			Component.text("will instead drop it in the dungeon.", STYLE)));
 		itemStack.setItemMeta(potionMeta);
 		setLightningBottleAmount(itemStack, 1);
 
@@ -233,6 +246,8 @@ public class LightningBottle extends DepthsAbility {
 			nbt.setInteger("bottle_amount", amount);
 		});
 	}
+
+
 
 	private int getLightningBottleAmount(ItemStack item) {
 		return NBT.get(item, (ReadableItemNBT n) -> n.getInteger("bottle_amount"));
