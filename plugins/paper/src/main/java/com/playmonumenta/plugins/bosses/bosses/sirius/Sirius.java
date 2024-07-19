@@ -8,7 +8,18 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBasePassiveAbility;
-import com.playmonumenta.plugins.bosses.spells.sirius.*;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveDeclaration;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlight;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlightConversion;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveTentacleManager;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightBomb;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightWall;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedBolts;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedPods;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellCosmicPortals;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellFromTheStars;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellSiriusBeams;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellSummonTheStars;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -18,12 +29,20 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -52,6 +71,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -75,41 +95,45 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	public Location mSpawnCornerTwo;
 	public Location mTuulenLocation;
 	public Location mAuroraLocation;
-	public Villager mTuulen;
-	public Villager mAurora;
+	private final SpellBlightedPods mPods;
 	private final SiriusNPCBoss mTuulenBoss;
 	private final SiriusNPCBoss mAuroraBoss;
-	public int mBlocks;
-	public double mDeclerationScaleAmount;
+	public Villager mTuulen;
+	public Villager mAurora;
 	private static final double DAMAGE_PER_PHASE = 750;
 	public static final int DAMAGE_PHASE_DURATION = 14 * 20;
-	public boolean mDamagePhase;
 	private @Nullable BossBar mDamagePhaseHPBar;
-	public boolean mAnimationLock;
-	public boolean mCheeseLock;
-	public boolean mDone;
+
 	public PassiveStarBlightConversion mStarBlightConverter;
 	private final SpellSummonTheStars mSpawner;
 	public List<BlockDisplay> mDisplays;
 	public List<List<BlockDisplay>> mTentacles;
 	public List<List<Transformation>> mTentacleRestTransforms;
-	private List<Transformation> mStoredTransformations;
+	private final List<Transformation> mStoredTransformations;
 	private List<BlockDisplay> mTempDisplay;
 	private List<BlockDisplay> mGate;
-	private PassiveTentacleManager mTentacleManager;
+	private final PassiveTentacleManager mTentacleManager;
 	private boolean mCollisionOn;
 	private double mHp;
 	private double mMaxHp;
+	private double mDefenseScaling;
+	public double mDeclerationScaleAmount;
+	public int mBlocks;
 	private int mMobsKilled;
 	private int mMobsToMove;
-	private SpellBlightedPods mPods;
-	//Defense scaling stuff
 	private int mPlayerCount;
-	private int mStartingPlayerCount;
-	private double mDefenseScaling;
+	private final int mStartingPlayerCount;
+	//Defense scaling stuff
+
+	public boolean mDamagePhase;
+	public boolean mAnimationLock;
+	public boolean mCheeseLock;
+	public boolean mDone;
 	private boolean mClose;
 	private static final double SCALING_X = 0.6;
 	private static final double SCALING_Y = 0.35;
+	// memo stuff
+	private Set<Player> mPlayers = new HashSet<>();
 
 	//z is star blight line
 
@@ -127,6 +151,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mBoss.customName(Component.text("Sirius, the Final Herald", NamedTextColor.DARK_AQUA, TextDecoration.BOLD));
 		mBlocks = 20;
 		mHp = 0;
+		mBoss.setHealth(20);
 		mTempDisplay = new ArrayList<>();
 		mDamagePhase = false;
 		mAnimationLock = false;
@@ -154,24 +179,36 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		PassiveDeclaration declarations = new PassiveDeclaration(plugin, this, mStarBlightConverter, mSpawner);
 		mPods = new SpellBlightedPods(this, plugin);
 		List<Spell> passives = List.of(
-			new SpellBasePassiveAbility(1 * 20, mTentacleManager),
+			new SpellBasePassiveAbility(20, mTentacleManager),
 			new SpellBasePassiveAbility(declarations.cooldownTicks(), declarations),
 			new PassiveStarBlight(this, mStarBlightConverter),
 			new SpellBasePassiveAbility(mSpawner.cooldownTicks(), mSpawner),
 			mStarBlightConverter
 		);
 		SpellManager spells = new SpellManager(List.of(
-				new SpellBlightWall(plugin, this, declarations),
-				new SpellBlightBomb(this, plugin, mStarBlightConverter),
-				new SpellCosmicPortals(this, plugin),
-				new SpellFromTheStars(this, plugin, mTentacleManager, declarations),
-				mPods
+			new SpellBlightWall(plugin, this, declarations),
+			new SpellBlightBomb(this, plugin, mStarBlightConverter),
+			new SpellCosmicPortals(this, plugin),
+			new SpellFromTheStars(this, plugin, mTentacleManager, declarations),
+			mPods
 		));
 		//Boss visuals
 		spawnGate();
-		//used to stop people running inside of sirius
-		//mBox = BoundingBox.of(mBoss.getLocation().subtract(0, 2, 0), 3.5, 7, 3.5);
-		//startPlayerTracker();
+		//Teleport players out of the roof
+		for (Player p : getPlayersInArena(false)) {
+			if (p.getLocation().getY() > 90) {
+				switch (FastUtils.randomIntInRange(0, 1)) {
+					case 0:
+						p.teleport(mAuroraLocation);
+						break;
+					case 1:
+						p.teleport(mTuulenLocation);
+						break;
+					default:
+						break;
+				}
+			}
+		}
 		startDeathTracker();
 		mTentacles = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
@@ -183,7 +220,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		}
 		makeVisual();
 		mBoss.setVisibleByDefault(false);
-		mStartingPlayerCount = getPlayersInArena(false).size();
+		mStartingPlayerCount = (mPlayers = getPlayersInArena(false)).size();
 		Bukkit.getScheduler().runTaskLater(plugin, this::startVisual, 10);
 
 		// Disable White Tesseract for the duration of the fight. The tag is cleared in SQ login/death files and the win mcfunction
@@ -196,14 +233,15 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			BossBarManager bossBar = new BossBarManager(boss, 100, BarColor.PURPLE, BarStyle.SEGMENTED_10, null, false);
 			constructBoss(spells, passives, 100, bossBar, 100, 1);
-			mPlayerCount = getPlayersInArena(false).size();
+			recalculatePlayers();
+			mPlayerCount = mPlayers.size();
 			mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 			mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 		}, 6 * 20);
 
 	}
 
-	public void changeHp(Boolean declerationFail, int distance) {
+	public void changeHp(boolean declerationFail, int distance) {
 		if (declerationFail) {
 			applyDeclerationFail(distance > 0);
 		}
@@ -214,7 +252,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mBlocks -= (int) (distance * mDeclerationScaleAmount);
 		//pass
 		if (distance > 0) {
-			for (Player p : getPlayersInArena(false)) {
+			for (Player p : mPlayers) {
 				p.playSound(p, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.HOSTILE, 0.8f, 1.5f);
 				p.playSound(p, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.HOSTILE, 0.3f, 0.1f);
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -227,7 +265,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		}
 		//fail
 		if (distance < 0) {
-			for (Player p : getPlayersInArena(false)) {
+			for (Player p : mPlayers) {
 				p.playSound(p, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 2f, 0.1f);
 				p.playSound(p, Sound.ENTITY_WARDEN_EMERGE, SoundCategory.HOSTILE, 0.8f, 1.2f);
 			}
@@ -261,6 +299,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					p.setHealth(0); // For good measure
 				}
 			}
+			mPlayers.clear();
 		} else {
 			mBoss.setHealth(mBlocks);
 			//move the entire boss
@@ -274,7 +313,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				}
 				updateCollisionBox(distance);
 			}
-			for (Player p : getPlayersInArena(false)) {
+			for (Player p : mPlayers) {
 				p.sendMessage(Component.text("[Tuulen]", NamedTextColor.GOLD).append(Component.text(" Great work adventurers, it seems like all of the blight you have destroyed has injured him.", NamedTextColor.GRAY)));
 			}
 			if (!mBoss.isDead()) {
@@ -288,11 +327,12 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void startDamagePhase(@Nullable String passNpc, @Nullable Component passMessage, @Nullable String failNpc, @Nullable Component failMessage) {
+		recalculatePlayers();
 		if (!mDamagePhase) {
 			mHp = DAMAGE_PER_PHASE * mDefenseScaling;
 			mMaxHp = DAMAGE_PER_PHASE * mDefenseScaling;
 			mDamagePhaseHPBar = BossBar.bossBar(Component.text("Core Stability Remaining", NamedTextColor.AQUA), 1, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
-			for (Player p : getPlayersInArena(false)) {
+			for (Player p : mPlayers) {
 				p.showBossBar(mDamagePhaseHPBar);
 			}
 			mBoss.setGlowing(true);
@@ -301,7 +341,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			Bukkit.getScheduler().runTaskLater(mPlugin, this::makeDamageVisual, 1);
 			stopCollision();
 			mStarBlightConverter.restoreFullCircle(mBoss.getLocation(), 9);
-			for (Player p : getPlayersInArena(false)) {
+			for (Player p : mPlayers) {
 				p.playSound(p, Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.3f, 0.6f);
 				p.playSound(p, Sound.ITEM_TOTEM_USE, SoundCategory.HOSTILE, 0.4f, 0.6f);
 				p.playSound(p, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.HOSTILE, 0.7f, 0.6f);
@@ -319,11 +359,11 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						changeHp(true, 1);
 						mBar.remove();
 						if (passMessage != null && passNpc != null) {
-							for (Player p : getPlayersInArena(false)) {
+							for (Player p : mPlayers) {
 								MessagingUtils.sendNPCMessage(p, passNpc, passMessage);
 							}
 						}
-						for (Player p : getPlayersInArena(false)) {
+						for (Player p : mPlayers) {
 							p.hideBossBar(mDamagePhaseHPBar);
 						}
 						mBoss.setGlowing(false);
@@ -335,11 +375,11 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					}
 					if (mTicks > DAMAGE_PHASE_DURATION) {
 						mBar.remove();
-						for (Player p : getPlayersInArena(false)) {
+						for (Player p : mPlayers) {
 							p.hideBossBar(mDamagePhaseHPBar);
 						}
 						if (failMessage != null && failNpc != null) {
-							for (Player p : getPlayersInArena(false)) {
+							for (Player p : mPlayers) {
 								MessagingUtils.sendNPCMessage(p, failNpc, failMessage);
 							}
 						}
@@ -354,7 +394,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						mDamagePhase = false;
 						undoDamageVisual();
 						startCollision();
-						for (Player p : getPlayersInArena(false)) {
+						for (Player p : mPlayers) {
 							p.hideBossBar(mDamagePhaseHPBar);
 						}
 						this.cancel();
@@ -390,32 +430,34 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
-	public List<Player> getPlayersInArena(boolean obeyStealth) {
-		List<Player> players = new ArrayList<>();
+	public Set<Player> getPlayersInArena(boolean obeyStealth) {
+		Set<Player> players = new HashSet<>();
 		BoundingBox box = new BoundingBox(mCornerOne.getX(), mCornerOne.getY(), mCornerOne.getZ(), mCornerTwo.getX(), mCornerTwo.getY(), mCornerTwo.getZ());
 		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, 100, true, !obeyStealth)) {
 			if (p.getBoundingBox().overlaps(box) && p.getGameMode() != GameMode.SPECTATOR) {
 				players.add(p);
-
-
 			}
 		}
 		return players;
 	}
 
-	public List<Player> getValidDeclarationPlayersInArena(boolean obeyStealth) {
-		List<Player> players = new ArrayList<>();
-		for (Player p : getPlayersInArena(obeyStealth)) {
+	public Set<Player> getPlayers() {
+		return mPlayers;
+	}
+
+	public Set<Player> getValidDeclarationPlayersInArena() {
+		Set<Player> valid = new HashSet<>();
+		for (Player p : mPlayers) {
 			Effect declarationParticipation = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
 			if (declarationParticipation == null || declarationParticipation.getMagnitude() < 3) {
-				players.add(p);
+				valid.add(p);
 			}
 		}
-		return players;
+		return valid;
 	}
 
 	public void applyDeclerationFail(boolean pass) {
-		for (Player p : getPlayersInArena(false)) {
+		for (Player p : mPlayers) {
 			Effect declarationParticipation = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, PARTICIPATION_TAG);
 			Effect fail = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
 			if (declarationParticipation == null) {
@@ -461,13 +503,13 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		List<Player> players = getPlayersInArena(false);
+		Set<Player> ps = getPlayersInArena(false); // fine, better safe than sorry
 
-		BossUtils.endBossFightEffects(players);
+		BossUtils.endBossFightEffects(new ArrayList<>(ps));
 		mStarBlightConverter.restoreAll();
 		mSpawner.wipeMobs();
 		removeCollisionBox();
-		for (Player p : players) {
+		for (Player p : ps) {
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, SpellBlightedBolts.BLIGHTEDBOLTTAG);
 		}
@@ -483,9 +525,10 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void unload() {
+		recalculatePlayers();
 		mStarBlightConverter.restoreAll();
 		mSpawner.wipeMobs();
-		for (Player p : getPlayersInArena(false)) {
+		for (Player p : getPlayersInArena(false)) { // fine, better safe than sorry
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, SpellBlightedBolts.BLIGHTEDBOLTTAG);
 		}
@@ -565,7 +608,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 
 	private void startCollisionBox() {
-		updateCollisionBox(1);
+		updateCollisionBox(0);
 	}
 
 
@@ -573,15 +616,15 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		if (!mBoss.isDead()) {
 			Location loc = mBoss.getLocation().subtract(2, 2, 2);
 			//clean previous
-			Location old = loc.clone().subtract(blocksMoved, 0, 0);
-			checkHitboxArea(blocksMoved, old, Material.BARRIER, Material.AIR);
-			old = loc.clone().add(6, 0, 0);
-			checkHitboxArea(blocksMoved, old, Material.BARRIER, Material.AIR);
+			Location old = loc.clone().subtract(blocksMoved + 1, 0, 0);
+			checkHitboxArea(blocksMoved + 1, old, Material.BARRIER, Material.AIR);
+			old = loc.clone().add(6 + blocksMoved, 0, 0);
+			checkHitboxArea(blocksMoved + 6, old, Material.BARRIER, Material.AIR);
 			if (mCollisionOn) {
 				checkHitboxArea(6, loc, Material.AIR, Material.BARRIER);
 			}
 			List<Entity> entities = new ArrayList<>();
-			for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), 5, true, true)) {
+			for (Player p : PlayerUtils.playersInRange(mPlayers, mBoss.getLocation(), 5, true, true)) {
 				if (p.getLocation().getBlock().getType().equals(Material.BARRIER)) {
 					entities.add(p);
 				}
@@ -623,7 +666,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	private void removeCollisionBox() {
 		Location loc = mBoss.getLocation().subtract(2, 2, 2);
-		checkHitboxArea(5, loc, Material.BARRIER, Material.AIR);
+		checkHitboxArea(6, loc, Material.BARRIER, Material.AIR);
 
 	}
 
@@ -631,11 +674,11 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	public void startDeathTracker() {
 		new BukkitRunnable() {
 			int mTicks = 0;
-			List<Player> mLastTickPlayers = getPlayersInArena(false);
+			Set<Player> mLastTickPlayers = mPlayers;
 
 			@Override
 			public void run() {
-				List<Player> mCurrentPlayears = getPlayersInArena(false);
+				Set<Player> mCurrentPlayears = getPlayersInArena(false); // needed.
 				mLastTickPlayers.removeAll(mCurrentPlayears);
 				for (Player p : mLastTickPlayers) {
 					EffectManager.getInstance().clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
@@ -645,6 +688,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					}
 				}
 				if (!mLastTickPlayers.isEmpty()) {
+					mPlayers = mCurrentPlayears; // update the current players
 					mPlayerCount = mCurrentPlayears.size();
 					if (mPlayerCount == 0) {
 						loseAnimation();
@@ -685,7 +729,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-				mPlayers = getPlayersInArena(false);
+				mPlayers = new ArrayList<>(getPlayers());
 				if (mTicks == 0) {
 					mPlayers.forEach(p -> {
 						if (AbilityUtils.isClassless(p)) {
@@ -721,7 +765,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	private void undoDamageVisual() {
 		//4 temp displays
-		for (Player p : getPlayersInArena(false)) {
+		for (Player p : mPlayers) {
 			p.playSound(p, Sound.ENTITY_WARDEN_DIG, SoundCategory.HOSTILE, 0.9f, 2f);
 			p.playSound(p, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.4f, 0.9f);
 			p.playSound(p, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1.1f, 0.6f);
@@ -756,6 +800,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			display.setInterpolationDelay(-1);
 			display.setInterpolationDuration(20);
 			display.addScoreboardTag("SiriusDisplay");
+			EntityUtils.setRemoveEntityOnUnload(display);
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> display.setTransformation(new Transformation(new Vector3f(0, 10, 0), new AxisAngle4f(), new Vector3f(3, 11, 5), new AxisAngle4f())), 1);
 			mGate.add(display);
 		}
@@ -830,7 +875,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				if (mTicks == 1) {
 					for (BlockDisplay mDisplay : mDisplays) {
 						mDisplay.setInterpolationDelay(-1);
-						mDisplay.setInterpolationDuration(1 * 20);
+						mDisplay.setInterpolationDuration(20);
 						Transformation trans = mDisplay.getTransformation();
 						mDisplay.setTransformation(new Transformation(trans.getTranslation().sub(0, 42, 0), trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
 					}
@@ -843,6 +888,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 							dis.setTransformation(new Transformation(trans.getTranslation(), trans.getLeftRotation(), scale, trans.getRightRotation()));
 						}
 					}
+
 				}
 				if (mTicks < 21) {
 					Vector direction = mBoss.getLocation().add(0, 42 - mTicks * 2.1, 0).toVector().subtract(mBoss.getLocation().add(0, 42 - mTicks * 2.1 - 2, 0).toVector()).normalize();
@@ -855,7 +901,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 
 				if (mTicks == 22) {
-					for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), 12, true, false)) {
+					for (Player p : PlayerUtils.playersInRange(mPlayers, mBoss.getLocation(), 12, true, false)) {
 						double maxOriginalDamage = 1000;
 						Vector vec = LocationUtils.getVectorTo(mBoss.getLocation().clone(), p.getLocation().clone());
 						vec.setY(0); //remove y
@@ -871,6 +917,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 								p.setHealth(0); // For good measure
 							}
 							AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r3/sirius/starfall");
+							mPlayers.remove(p); // get rid of them early on.
 						} else {
 							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, maxOriginalDamage * ratio, null, true, true, "crushing weight.");
 						}
@@ -909,7 +956,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 							Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 								for (int i = 0; i < 4; i++) {
 									Display dis = mTentacles.get(i).get(mPos);
-									for (Player p : PlayerUtils.playersInRange(dis.getLocation(), 5, true, true)) {
+									for (Player p : PlayerUtils.playersInRange(mPlayers, dis.getLocation(), 5, true, true)) {
 										p.playSound(p, Sound.BLOCK_CHORUS_FLOWER_GROW, SoundCategory.HOSTILE, 5, 0.5f);
 									}
 									dis.setInterpolationDelay(-1);
@@ -944,7 +991,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.6f, 2.0f);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 0.1f);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2.0f, 0.1f);
-					for (Player p : getPlayersInArena(false)) {
+					for (Player p : mPlayers) {
 						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Sirius", NamedTextColor.AQUA), Component.text("The Final Herald", NamedTextColor.DARK_AQUA));
 
 						p.sendMessage(Component.text("[Tuulen]", NamedTextColor.GOLD).append(Component.text(" Is it Sirius?", NamedTextColor.GRAY)));
@@ -2347,13 +2394,14 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			@Nullable LivingEntity mTentacleBox1 = null;
 			@Nullable LivingEntity mTentacleBox2 = null;
 			@Nullable LivingEntity mTentacleBox4 = null;
-			BlockDisplay mTuulenDisplay = mBoss.getWorld().spawn(mTuulenLocation.clone().subtract(0.75f, 0.75f, 0.75f), BlockDisplay.class);
-			BlockDisplay mAuroraDisplay = mBoss.getWorld().spawn(mAuroraLocation.clone().subtract(0.75f, 0.75f, 0.75f), BlockDisplay.class);
+			final BlockDisplay mTuulenDisplay = mBoss.getWorld().spawn(mTuulenLocation.clone().subtract(0.75f, 0.75f, 0.75f), BlockDisplay.class);
+			final BlockDisplay mAuroraDisplay = mBoss.getWorld().spawn(mAuroraLocation.clone().subtract(0.75f, 0.75f, 0.75f), BlockDisplay.class);
 			int mAliveTentacles = 3;
-			ChargeUpManager mBar = new ChargeUpManager(mBoss, 30 * 20, Component.text("Companions Corrupted in ", NamedTextColor.RED), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 75);
+			final ChargeUpManager mBar = new ChargeUpManager(mBoss, 30 * 20, Component.text("Companions Corrupted in ", NamedTextColor.RED), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 75);
 
 			@Override
 			public void run() {
+				recalculatePlayers(); // this is the final part, make sure we have everyone we need.
 				mBar.nextTick();
 				if (mTicks % 20 == 0) {
 					mBar.setTitle(Component.text("Companions Corrupted in " + ((30 * 20 - mTicks) / 20), NamedTextColor.RED));
@@ -2394,7 +2442,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					mAuroraDisplay.setInterpolationDuration(1);
 					mTuulenDisplay.setInterpolationDelay(-1);
 					mAuroraDisplay.setInterpolationDelay(-1);
-					for (Player p : getPlayersInArena(false)) {
+					for (Player p : mPlayers) {
 						p.sendMessage(Component.text("[Sirius]", NamedTextColor.GOLD).append(Component.text(" If I am to die, I am taking them with me...", NamedTextColor.AQUA, TextDecoration.BOLD)));
 						p.sendMessage(Component.text("[Tuulen]", NamedTextColor.GOLD).append(Component.text(" What is this?! The blight is gathering around me! Please, destroy Sirius now, before it’s too late!", NamedTextColor.GRAY, TextDecoration.BOLD)));
 						p.sendMessage(Component.text("[Aurora]", NamedTextColor.GOLD).append(Component.text(" I as well... I can’t... hold it off anymore...", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)));
@@ -2456,7 +2504,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						mStarBlightConverter.restoreAll();
 						mSpawner.wipeMobs();
-						for (Player player : getPlayersInArena(false)) {
+						for (Player player : mPlayers) {
 							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.DARK_AQUA), Component.text("Sirius, The Final Herald", NamedTextColor.AQUA));
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							if (mClose) {
@@ -2471,7 +2519,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						mBeam.cancel();
 						new BukkitRunnable() {
 							int mTicks = 0;
-							int mRate = mDisplays.size() / (6 * 20 - 21);
+							final int mRate = mDisplays.size() / (6 * 20 - 21);
 							int mPos = 0;
 
 							@Override
@@ -2508,7 +2556,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						if (p.isInvulnerable()) {
 							p.setInvulnerable(false);
 						}
-						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.OTHER, 999999999, null, true, false, "never ending blight.");
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.TRUE, 999999999, null, true, false, "never ending blight.");
 						if (p.getHealth() > 0) {
 							p.setHealth(0); // For good measure
 						}
@@ -2540,5 +2588,19 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				mTicks++;
 			}
 		}.runTaskTimer(mPlugin, intduration, 1);
+	}
+
+	private void recalculatePlayers() {
+		mPlayers = getPlayersInArena(false);
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
+	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		mPlayers.remove(event.getPlayer()); // remove players that die
 	}
 }

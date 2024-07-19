@@ -41,11 +41,11 @@ public class SpellBlightWall extends Spell {
 	private static final float KNOCKBACKSTRENGTH = 1;
 
 	private boolean mOnCooldown;
-	private PassiveDeclaration mDeclerations;
-	private Plugin mPlugin;
-	private Sirius mSirius;
-	private double mLength;
-	private double mWidth;
+	private final PassiveDeclaration mDeclerations;
+	private final Plugin mPlugin;
+	private final Sirius mSirius;
+	private final double mLength;
+	private final double mWidth;
 	private static final int DELAY = 5 * 20;
 	private static final int WAVEDELAY = 7 * 20;
 	private boolean mPrimed;
@@ -96,7 +96,7 @@ public class SpellBlightWall extends Spell {
 		int finalDuration = duration;
 		new BukkitRunnable() {
 			int mTicks = 0;
-			ChargeUpManager mBar = new ChargeUpManager(mSirius.mBoss, DELAY,
+			final ChargeUpManager mBar = new ChargeUpManager(mSirius.mBoss, DELAY,
 				Component.text("Charging Blight Wave", NamedTextColor.RED), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 75);
 			final int mBlocks = mSirius.mBlocks;
 
@@ -106,7 +106,7 @@ public class SpellBlightWall extends Spell {
 				Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN + 20);
 				if (mTicks == 0) {
 					World world = mSirius.mBoss.getWorld();
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						world.playSound(p, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 0.7f, 2f);
 						world.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.4f, 1.2f);
 						world.playSound(p, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.HOSTILE, 0.6f, 0.6f);
@@ -160,11 +160,11 @@ public class SpellBlightWall extends Spell {
 	private void wave(Location loc1, Location loc2, double speed) {
 		new BukkitRunnable() {
 			int mTicks = 0;
-			Location mLocOne = loc1.clone();
-			Location mLocTwo = loc2.clone();
-			int mGapPos = FastUtils.randomIntInRange(2, 6);
-			double mSpeed = speed;
-			List<BlockDisplay> mDisplays = new ArrayList<>();
+			final Location mLocOne = loc1.clone();
+			final Location mLocTwo = loc2.clone();
+			final int mGapPos = FastUtils.randomIntInRange(2, 6);
+			final double mSpeed = speed;
+			final List<BlockDisplay> mDisplays = new ArrayList<>();
 
 			@Override
 			public void run() {
@@ -185,11 +185,33 @@ public class SpellBlightWall extends Spell {
 								display.setInterpolationDelay(-1);
 								display.setInterpolationDuration(1);
 								display.addScoreboardTag("SiriusDisplay");
+							} else {
+								//Gap
+								Location loc = mLocOne.clone().add(0, h, i);
+								BlockDisplay close = mSirius.mBoss.getWorld().spawn(loc, BlockDisplay.class);
+								BlockDisplay far = mSirius.mBoss.getWorld().spawn(loc.clone().add(0, 0, 10f), BlockDisplay.class);
+								mDisplays.add(close);
+								mDisplays.add(far);
+								Transformation trans = new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(1, 10, 0.1f), new AxisAngle4f());
+								close.setTransformation(trans);
+								close.setInterpolationDelay(-1);
+								close.setInterpolationDuration(1);
+								close.addScoreboardTag("SiriusDisplay");
+								close.setGlowing(true);
+								close.setGlowColorOverride(Color.fromRGB(255, 255, 255));
+								close.setBlock(Bukkit.createBlockData(Material.CYAN_STAINED_GLASS));
+								far.setTransformation(trans);
+								far.setInterpolationDelay(-1);
+								far.setInterpolationDuration(1);
+								far.addScoreboardTag("SiriusDisplay");
+								far.setGlowing(true);
+								far.setGlowColorOverride(Color.fromRGB(255, 255, 255));
+								far.setBlock(Bukkit.createBlockData(Material.CYAN_STAINED_GLASS));
 							}
 						}
 					}
 				}
-				List<Player> pList = mSirius.getPlayersInArena(false);
+				var pList = mSirius.getPlayers();
 				if (mTicks % 5 == 0) {
 					for (Player p : pList) {
 						p.playSound(p, Sound.ENTITY_WARDEN_AMBIENT, SoundCategory.HOSTILE, 0.6f, 1.5f);

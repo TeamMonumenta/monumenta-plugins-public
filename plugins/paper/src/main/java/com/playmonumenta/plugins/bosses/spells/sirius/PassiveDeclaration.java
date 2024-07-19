@@ -27,7 +27,7 @@ public class PassiveDeclaration extends Spell {
 	public boolean mTp;
 	private boolean mOnCooldown;
 	private boolean mFirstRun;
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private @Nullable Spell mLastSpell;
 	public boolean mTpBlocked;
 
@@ -69,7 +69,7 @@ public class PassiveDeclaration extends Spell {
 		}
 		if (!mOnCooldown && !mSirius.mCheeseLock) {
 			mTp = false;
-			for (Player p : mSirius.getPlayersInArena(false)) {
+			for (Player p : mSirius.getPlayers()) {
 				p.playSound(p, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.2f, 0.1f);
 				p.playSound(p, Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.4f, 0.1f);
 				p.playSound(p, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.HOSTILE, 2f, 0.1f);

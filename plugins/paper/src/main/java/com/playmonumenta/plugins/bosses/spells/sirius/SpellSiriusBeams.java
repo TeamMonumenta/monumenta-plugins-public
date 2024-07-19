@@ -27,9 +27,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellSiriusBeams {
-	private Sirius mSirius;
-	private Location mBeamStartLoc;
-	private Plugin mPlugin;
+	private final Sirius mSirius;
+	private final Location mBeamStartLoc;
+	private final Plugin mPlugin;
 	private static final float SPEED = 2;
 	private static final int DAMAGE = 40;
 	private boolean mCancel;
@@ -45,7 +45,7 @@ public class SpellSiriusBeams {
 
 	private void run() {
 		List<Location> mTargetLocs = new ArrayList<>();
-		List<Player> mPList = mSirius.getPlayersInArena(false);
+		var mPList = new ArrayList<>(mSirius.getPlayers());
 		Collections.shuffle(mPList);
 		if (!mPList.isEmpty()) {
 			for (int i = 0; i < Math.min(mPList.size() / 4.0, 4); i++) {
@@ -79,7 +79,7 @@ public class SpellSiriusBeams {
 					final double mStepCount = LocationUtils.getVectorTo(loc, mBeamStartLoc).length();
 					Vector dir = LocationUtils.getDirectionTo(loc, mBeamStartLoc);
 					for (int i = 0; i < mStepCount; i++) {
-						for (Player player : PlayerUtils.playersInRange(mBox.getCenter().toLocation(mSirius.mBoss.getWorld()), 5, true)) {
+						for (Player player : PlayerUtils.playersInRange(mPList, mBox.getCenter().toLocation(mSirius.mBoss.getWorld()), 5, true, false)) {
 							if (player.getBoundingBox().overlaps(mBox) && player.getNoDamageTicks() < 0) {
 								DamageUtils.damage(mSirius.mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Blight Beams");
 								MovementUtils.knockAway(mBox.getCenter().toLocation(mSirius.mBoss.getWorld()), player, 0.3f, 0.1f);

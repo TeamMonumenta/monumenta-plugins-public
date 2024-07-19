@@ -25,11 +25,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class DeclarationDamage extends Spell {
 
-	private Plugin mPlugin;
-	private Sirius mSirius;
+	private final Plugin mPlugin;
+	private final Sirius mSirius;
 	private double mOrbRadius;
 	private boolean mDone;
-	private PassiveStarBlightConversion mConverter;
+	private final PassiveStarBlightConversion mConverter;
 
 	private static final int RADIUS = 3;
 	private static final int ANIMATIONDURATION = 5 * 20;
@@ -44,11 +44,11 @@ public class DeclarationDamage extends Spell {
 
 	@Override
 	public void run() {
-		for (Player p : mSirius.getPlayersInArena(false)) {
+		for (Player p : mSirius.getPlayers()) {
 			p.playSound(p, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.HOSTILE, 1, 1);
 		}
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			for (Player p : mSirius.getPlayersInArena(false)) {
+			for (Player p : mSirius.getPlayers()) {
 				p.playSound(p, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.HOSTILE, 1, 2);
 			}
 		}, 14);
@@ -58,7 +58,7 @@ public class DeclarationDamage extends Spell {
 		Location mPortalTwo = mSirius.mBoss.getLocation().clone().add(-2, 3, -5);
 		Location mOrbLocation = mSirius.mBoss.getLocation().clone().add(-2, 3, 0);
 		mDone = false;
-		for (Player p : mSirius.getPlayersInArena(false)) {
+		for (Player p : mSirius.getPlayers()) {
 			MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("Let the symbol of infinity form in the naked air. The blight must spread!", NamedTextColor.AQUA, TextDecoration.BOLD));
 		}
 		mSirius.startDamagePhase(
@@ -74,31 +74,26 @@ public class DeclarationDamage extends Spell {
 			@Override
 			public void run() {
 				if (mTicks == 0) {
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						p.playSound(p, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 0.3f, 0.6f);
 						p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_3, SoundCategory.HOSTILE, 0.5f, 1.5f);
 						p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 0.5f, 0.4f);
 					}
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						for (Player p : mSirius.getPlayersInArena(false)) {
+						for (Player p : mSirius.getPlayers()) {
 							p.playSound(p, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.HOSTILE, 2, 0.8f);
 							p.playSound(p, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 0.4f, 0.7f);
 						}
 					}, 7);
 
 				}
-				for (Player p : mSirius.getPlayersInArena(false)) {
+				for (Player p : mSirius.getPlayers()) {
 					if (LocationUtils.getVectorTo(p.getLocation(), mOrbLocation).length() <= mOrbRadius) {
 						PassiveStarBlight.applyStarBlight(p);
 					}
 				}
 				if (mTicks % 10 == 0) {
-					ParticleUtils.drawSphere(mOrbLocation, 32, mOrbRadius, new ParticleUtils.ParametricParticle() {
-						@Override
-						public void run(Location loc, int t) {
-							new PartialParticle(Particle.REDSTONE, loc).count(1).data(new Particle.DustOptions(STARBLIGHT, 1.25f)).spawnAsBoss();
-						}
-					});
+					ParticleUtils.drawSphere(mOrbLocation, 32, mOrbRadius, (loc, t) -> new PartialParticle(Particle.REDSTONE, loc).count(1).data(new Particle.DustOptions(STARBLIGHT, 1.25f)).spawnAsBoss());
 					if (!mDone) {
 						for (int rad = 0; rad < 32; rad++) {
 							// outer circle
@@ -149,8 +144,8 @@ public class DeclarationDamage extends Spell {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			double mCurrentRadius = RADIUS;
-			Location mBulletOne = mPortalOne.clone();
-			Location mBulletTwo = mPortalTwo.clone();
+			final Location mBulletOne = mPortalOne.clone();
+			final Location mBulletTwo = mPortalTwo.clone();
 
 
 			@Override

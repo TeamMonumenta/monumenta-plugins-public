@@ -18,11 +18,11 @@ import org.joml.Matrix4f;
 
 public class PassiveTentacleManager extends Spell {
 	public boolean mCancelMovements;
-	private Sirius mSirius;
+	private final Sirius mSirius;
 
-	private Plugin mPlugin;
-	private List<Tentacle> mTentacles;
-	private static final int TELEGRAPHDURATION = 1 * 20;
+	private final Plugin mPlugin;
+	private final List<Tentacle> mTentacles;
+	private static final int TELEGRAPHDURATION = 20;
 	private static final int DAMAGE = 60;
 	private static final int SPEED = 2; //knockback
 
@@ -203,7 +203,7 @@ public class PassiveTentacleManager extends Spell {
 			for (Tentacle tent : mTentacles) {
 				tent.updateBoundingBox();
 			}
-			for (Player p : PlayerUtils.playersInRange(mSirius.mBoss.getLocation(), 15, true, true)) {
+			for (Player p : PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mBoss.getLocation(), 15, true, true)) {
 				for (Tentacle tent : mTentacles) {
 					if (tent.mBox.overlaps(p.getBoundingBox())) {
 						if (tent.canRun()) {
@@ -221,15 +221,15 @@ public class PassiveTentacleManager extends Spell {
 	}
 
 	private class Tentacle extends Spell {
-		private List<List<Matrix4f>> mMatrix;
+		private final List<List<Matrix4f>> mMatrix;
 		private static final int COOLDOWN = 10 * 20;
 		private boolean mOnCooldown;
-		private int mListPos;
-		private Vector mVec1;
-		private Vector mVec2;
+		private final int mListPos;
+		private final Vector mVec1;
+		private final Vector mVec2;
 		private BoundingBox mBox;
 		private boolean mWiggleLock;
-		private List<List<Matrix4f>> mWiggleMatrix;
+		private final List<List<Matrix4f>> mWiggleMatrix;
 
 		public Tentacle(List<List<Matrix4f>> matrix, int listPos, Vector vec1, Vector vec2, List<List<Matrix4f>> wiggleMatrix) {
 			mMatrix = matrix;
@@ -285,9 +285,9 @@ public class PassiveTentacleManager extends Spell {
 						double mX = (mVec1.getX() - mVec2.getX());
 						double mZ = (mVec1.getZ() - mVec2.getZ());
 						if (mListPos % 2 == 0) {
-							ParticleUtils.drawRectangleTelegraph(mSirius.mBoss.getLocation().add(mVec2.getX(), mVec1.getY(), -mVec1.getZ()), mX, mZ, 10, 1, TELEGRAPHDURATION, 0.2, Particle.END_ROD, mPlugin, (LivingEntity) mSirius.mBoss);
+							ParticleUtils.drawRectangleTelegraph(mSirius.mBoss.getLocation().add(mVec2.getX(), mVec1.getY(), -mVec1.getZ()), mX, mZ, 10, 1, TELEGRAPHDURATION, 0.2, Particle.END_ROD, mPlugin, mSirius.mBoss);
 						} else {
-							ParticleUtils.drawRectangleTelegraph(mSirius.mBoss.getLocation().add(mVec2.getX(), mVec1.getY(), mVec2.getZ()), mX, mZ, 10, 1, TELEGRAPHDURATION, 0.2, Particle.END_ROD, mPlugin, (LivingEntity) mSirius.mBoss);
+							ParticleUtils.drawRectangleTelegraph(mSirius.mBoss.getLocation().add(mVec2.getX(), mVec1.getY(), mVec2.getZ()), mX, mZ, 10, 1, TELEGRAPHDURATION, 0.2, Particle.END_ROD, mPlugin, mSirius.mBoss);
 						}
 					}
 					if ((mTicks > TELEGRAPHDURATION && mTicks < TELEGRAPHDURATION + 5) && mTentalceFrame < mMatrix.size()) {
@@ -339,7 +339,7 @@ public class PassiveTentacleManager extends Spell {
 		}
 
 		private void hurt(boolean forward) {
-			for (Player p : PlayerUtils.playersInRange(mSirius.mBoss.getLocation(), 10, true, true)) {
+			for (Player p : PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mBoss.getLocation(), 10, true, true)) {
 				if (mBox.overlaps(p.getBoundingBox())) {
 					DamageUtils.damage(null, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, "Tentacle Swipe");
 					if (forward) {

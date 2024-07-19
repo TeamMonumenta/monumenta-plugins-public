@@ -32,9 +32,9 @@ public class SpellBlightedBolts extends Spell {
 	public static final int CONATGIONDAMAGE = 30;
 	public static final int SAFEDURATION = 15 * 20;
 	private boolean mOnCooldown;
-	private Plugin mPlugin;
-	private Sirius mSirius;
-	private PassiveStarBlightConversion mConvertor;
+	private final Plugin mPlugin;
+	private final Sirius mSirius;
+	private final PassiveStarBlightConversion mConvertor;
 
 
 	public SpellBlightedBolts(Plugin plugin, Sirius sirius, PassiveStarBlightConversion convertor) {
@@ -93,7 +93,7 @@ public class SpellBlightedBolts extends Spell {
 				if (!block.isLiquid() && mHitbox.overlaps(block.getBoundingBox())) {
 					mConvertor.convertColumn(block.getX(), block.getZ());
 				}
-				for (Player player : PlayerUtils.playersInRange(mLocation, HITBOXLENGTH + 2, true)) {
+				for (Player player : PlayerUtils.playersInRange(mSirius.getPlayers(), mLocation, HITBOXLENGTH + 2, true, true)) {
 					if (mHitbox.overlaps(player.getBoundingBox())) {
 						hitaction(mSirius.mBoss.getWorld(), player, mLocation);
 						this.cancel();
@@ -116,7 +116,7 @@ public class SpellBlightedBolts extends Spell {
 	public void run() {
 		mOnCooldown = true;
 		Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN + 20);
-		List<Player> pList = mSirius.getPlayersInArena(false);
+		final var pList = new ArrayList<>(mSirius.getPlayers());
 		Collections.shuffle(pList);
 		int shotCount = pList.size() / 3 + 1;
 		List<Player> targets = new ArrayList<>();
@@ -156,7 +156,7 @@ public class SpellBlightedBolts extends Spell {
 		world.playSound(hitloc, Sound.ENTITY_ALLAY_HURT, SoundCategory.HOSTILE, 0.6f, 0.6f);
 		world.playSound(hitloc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.HOSTILE, 0.6f, 1.4f);
 		new PPExplosion(Particle.WAX_OFF, hitloc).count(20).spawnAsBoss();
-		DamageUtils.damage((LivingEntity) mSirius.mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Starblight Infection");
+		DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Starblight Infection");
 		if (com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, SpellBlightedBolts.BLIGHTEDBOLTTAG) == null
 			&& com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, "BlightProtection") == null) {
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SpellBlightedBolts.BLIGHTEDBOLTTAG, new SiriusContagion(SpellBlightedBolts.BLIGHTEDBOLTCONTAGIONDURATION, SpellBlightedBolts.BLIGHTEDBOLTTAG));

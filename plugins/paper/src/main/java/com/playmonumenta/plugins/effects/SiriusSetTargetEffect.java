@@ -2,18 +2,17 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.List;
+import java.util.ArrayList;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 
 public class SiriusSetTargetEffect extends Effect {
 	public static final String effectID = "SiriusSetTargetEffect";
-	private Sirius mSirius;
-	private LivingEntity mTarget;
+	private final Sirius mSirius;
+	private final LivingEntity mTarget;
 
 	public SiriusSetTargetEffect(int duration, Sirius sirius, LivingEntity target) {
 		super(duration, effectID);
@@ -31,7 +30,7 @@ public class SiriusSetTargetEffect extends Effect {
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		List<Player> pList = mSirius.getPlayersInArena(true);
+		var pList = new ArrayList<>(mSirius.getPlayers());
 		Mob mob = (Mob) entity;
 		if (!pList.isEmpty()) {
 			mob.setTarget(FastUtils.getRandomElement(pList));

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Color;
@@ -22,9 +23,9 @@ import org.bukkit.util.BoundingBox;
 
 public class SpellCosmicPortals extends Spell {
 
-	private boolean mOnCooldown;
-	private Sirius mSirius;
-	private Plugin mPlugin;
+	private final boolean mOnCooldown;
+	private final Sirius mSirius;
+	private final Plugin mPlugin;
 	private static final int COOLDOWN = 15 * 20;
 	private static final int DURATION = 4 * 20;
 
@@ -41,8 +42,8 @@ public class SpellCosmicPortals extends Spell {
 	@Override
 	public void run() {
 		//teleports players 15 blocks behind sirius in the balcony row.
-		double mPortalCount = mSirius.getPlayersInArena(false).size() * PORTALSPERPLAYER;
-		List<Player> mTargets = mSirius.getPlayersInArena(true);
+		List<Player> mTargets = new ArrayList<>(mSirius.getPlayers());
+		double mPortalCount = mTargets.size() * PORTALSPERPLAYER;
 		Collections.shuffle(mTargets);
 		for (int i = 0; i < mPortalCount; i++) {
 			World world = mTargets.get(i).getWorld();
@@ -96,7 +97,7 @@ public class SpellCosmicPortals extends Spell {
 				}
 
 				if (mTicks > DURATION) {
-					List<Player> pList = mSirius.getPlayersInArena(false);
+					var pList = mSirius.getPlayers();
 					for (Player p : mPortalLoc.getNearbyPlayers(finalMRadius)) {
 						if (pList.contains(p) && !StasisListener.isInStasis(p)) {
 							int rand = FastUtils.randomIntInRange(0, 1);

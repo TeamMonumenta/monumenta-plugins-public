@@ -46,8 +46,9 @@ public class SpellGhostWalk extends Spell {
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
 		new BukkitRunnable() {
 			int mTicks = 0;
+			final Team mPrevious = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(mBoss.getUniqueId().toString());
 			final Team mPurple = ScoreboardUtils.getExistingTeamOrCreate("light_purple", NamedTextColor.LIGHT_PURPLE);
-			boolean mGlowingBefore = mBoss.isGlowing();
+			final boolean mGlowingBefore = mBoss.isGlowing();
 
 			@Override
 			public void run() {
@@ -68,6 +69,9 @@ public class SpellGhostWalk extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 0.4f, 1.2f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.2f, 0.4f);
 					this.cancel();
+					if (mPrevious != null) {
+						mPrevious.addEntity(mBoss);
+					}
 				}
 				mTicks += 20;
 			}

@@ -6,7 +6,14 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.LivingEntity;
@@ -22,9 +29,9 @@ public class SpellBlightBomb extends Spell {
 
 	private static final int COOLDOWN = 10 * 20;
 	private boolean mOnCooldown;
-	private Sirius mSirius;
-	private Plugin mPlugin;
-	private PassiveStarBlightConversion mConverter;
+	private final Sirius mSirius;
+	private final Plugin mPlugin;
+	private final PassiveStarBlightConversion mConverter;
 	private static final double BOMBSPERPLAYER = 0.25;
 	private static final int BOMBFLIGHTDURATION = 2 * 20; // edit the equation if you change this
 	private static final int BOMBDURATION = 5 * 20;
@@ -41,7 +48,7 @@ public class SpellBlightBomb extends Spell {
 	public void run() {
 		mOnCooldown = true;
 		Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN + 20);
-		int mBombCount = (int) (mSirius.getPlayersInArena(false).size() * BOMBSPERPLAYER + 1);
+		int mBombCount = (int) (mSirius.getPlayers().size() * BOMBSPERPLAYER + 1);
 		if (mSirius.mBlocks <= 10) {
 			mBombCount *= 2;
 		}
@@ -85,8 +92,8 @@ public class SpellBlightBomb extends Spell {
 
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;
-			float mX = (float) ((target.getX() - grenade.getLocation().getX()) * (1.0 / BOMBFLIGHTDURATION));
-			float mZ = (float) ((target.getZ() - grenade.getLocation().getZ()) * (1.0 / BOMBFLIGHTDURATION));
+			final float mX = (float) ((target.getX() - grenade.getLocation().getX()) * (1.0 / BOMBFLIGHTDURATION));
+			final float mZ = (float) ((target.getZ() - grenade.getLocation().getZ()) * (1.0 / BOMBFLIGHTDURATION));
 			@Nullable
 			LivingEntity mBomb = null;
 
@@ -132,6 +139,7 @@ public class SpellBlightBomb extends Spell {
 						mBomb.addScoreboardTag(Sirius.MOB_TAG);
 						mGold.addEntity(mBomb);
 						mBomb.setGlowing(true);
+						mBomb.customName(Component.text(mBomb.getName(), NamedTextColor.WHITE));
 						World world = mBomb.getWorld();
 						Location loc = mBomb.getLocation();
 						world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 0.4f, 1.2f);

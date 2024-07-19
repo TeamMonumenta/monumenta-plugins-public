@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
-import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -40,10 +39,10 @@ public class DeclarationTp extends Spell {
 	private static final int RADIUS = 7;
 	private static final int PORTALHEIGHT = 1;
 	private static final int DURATION = 12 * 20;
-	private Location mPortalOneLoc;
-	private Location mPortalTwoLoc;
-	private Plugin mPlugin;
-	private Sirius mSirius;
+	private final Location mPortalOneLoc;
+	private final Location mPortalTwoLoc;
+	private final Plugin mPlugin;
+	private final Sirius mSirius;
 
 
 	public DeclarationTp(Plugin plugin, Sirius sirius) {
@@ -74,7 +73,7 @@ public class DeclarationTp extends Spell {
 
 						@Override
 						public void run() {
-							for (Player p : mSirius.getPlayersInArena(false)) {
+							for (Player p : mSirius.getPlayers()) {
 								p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.4f + mTicks / 10.0f);
 							}
 							if (mTicks >= 10) {
@@ -86,7 +85,7 @@ public class DeclarationTp extends Spell {
 					mTuulenSword.setItemStack(DisplayEntityUtils.generateRPItem(Material.IRON_SWORD, "Silver Knight's Failure"));
 					DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, LocationUtils.getVectorTo(mMidPoint, mSirius.mTuulenLocation.clone().add(0, 1.25, 0)), 0);
 					mTuulenSword.addScoreboardTag("SiriusDisplay");
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("You... come join our power...", NamedTextColor.AQUA, TextDecoration.BOLD));
 						p.playSound(p, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 1f, 0.6f);
 					}
@@ -124,7 +123,7 @@ public class DeclarationTp extends Spell {
 					}, 20);
 				}
 				if (mTicks == 20) {
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 2f, 0.1f);
 						p.playSound(p, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.4f, 0.8f);
 					}
@@ -133,7 +132,7 @@ public class DeclarationTp extends Spell {
 					mManager.setTitle(Component.text("Channeling Power Behind the Tomb", NamedTextColor.DARK_PURPLE));
 					mManager.setChargeTime(DURATION - 20);
 					mManager.update();
-					List<Player> pList = mSirius.getPlayersInArena(false);
+					var pList = mSirius.getPlayers();
 					for (Player p : pList) {
 						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("There is no time, woolbearer! Come behind the tomb and be cleansed!", NamedTextColor.GRAY, TextDecoration.BOLD));
 					}
@@ -175,8 +174,8 @@ public class DeclarationTp extends Spell {
 				if (mTicks >= DURATION) {
 					int passers = 0;
 					//cleanse all people in radius
-					List<Player> pList = mSirius.getValidDeclarationPlayersInArena(false);
-					for (Player p : PlayerUtils.playersInRange(mMidPoint, RADIUS, true, true)) {
+					var pList = mSirius.getValidDeclarationPlayersInArena();
+					for (Player p : PlayerUtils.playersInRange(pList, mMidPoint, RADIUS, true, true)) {
 						passers++;
 						EffectManager.getInstance().clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 						p.playSound(p, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 0.7f, 1.2f);
@@ -186,29 +185,26 @@ public class DeclarationTp extends Spell {
 						new PPExplosion(Particle.CLOUD, p.getLocation()).delta(0.5).count(10).spawnAsBoss();
 					}
 					//make sure everyone is tagged with participation if they tried also
-					for (Player p : PlayerUtils.playersInRange(mMidPoint, RADIUS + 3, true, true)) {
+					for (Player p : PlayerUtils.playersInRange(pList, mMidPoint, RADIUS + 3, true, true)) {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));
 					}
 					if (passers >= pList.size() / 2.0 + 0.5) {
 						mSirius.changeHp(true, 1);
-						for (Player p : mSirius.getPlayersInArena(false)) {
+						for (Player p : mSirius.getPlayers()) {
 							MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("You have bathed in the blood of the Stars and lived. Rejoin the battle!", NamedTextColor.DARK_PURPLE));
 						}
 					} else {
 						mSirius.changeHp(true, -5);
-						for (Player p : mSirius.getPlayersInArena(false)) {
+						for (Player p : mSirius.getPlayers()) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("There is no escape...", NamedTextColor.AQUA));
 						}
 					}
-					if (mTuulenSword != null) {
-						//fall through the ground then delete it
-						Transformation trans = mTuulenSword.getTransformation();
-						mTuulenSword.setInterpolationDelay(-1);
-						mTuulenSword.setInterpolationDuration(10);
-						mTuulenSword.setTransformation(new Transformation(trans.getTranslation().sub(0, 5, 0), trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
-						Bukkit.getScheduler().runTaskLater(mPlugin, () -> mTuulenSword.remove(), 10);
-
-					}
+					//fall through the ground then delete it
+					Transformation trans = mTuulenSword.getTransformation();
+					mTuulenSword.setInterpolationDelay(-1);
+					mTuulenSword.setInterpolationDuration(10);
+					mTuulenSword.setTransformation(new Transformation(trans.getTranslation().sub(0, 5, 0), trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
+					Bukkit.getScheduler().runTaskLater(mPlugin, mTuulenSword::remove, 10);
 
 					this.cancel();
 				}

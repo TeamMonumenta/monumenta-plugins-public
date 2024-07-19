@@ -22,9 +22,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class DeclarationPoints extends Spell {
-	private Sirius mSirius;
-	private Plugin mPlugin;
-	private PassiveStarBlightConversion mConverter;
+	private final Sirius mSirius;
+	private final Plugin mPlugin;
+	private final PassiveStarBlightConversion mConverter;
 	private static final int DURATION = 7 * 20;
 	private static final double RADIUS = 6;
 	private static final int CLEANSEDURATION = 3 * 20;
@@ -37,7 +37,7 @@ public class DeclarationPoints extends Spell {
 
 	@Override
 	public void run() {
-		for (Player p : mSirius.getPlayersInArena(false)) {
+		for (Player p : mSirius.getPlayers()) {
 			MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("This tomb will be yours. There is no escape from this blight.", NamedTextColor.AQUA, TextDecoration.BOLD));
 		}
 		mConverter.blightArena(List.of(mSirius.mAuroraLocation.getBlock().getLocation(), mSirius.mTuulenLocation.getBlock().getLocation()), RADIUS, 4 * 20, 2 * 20, mPlugin);
@@ -56,21 +56,21 @@ public class DeclarationPoints extends Spell {
 				}
 				if (mTicks >= DURATION) {
 					mManager.remove();
-					List<Player> mProtectedPlayers = PlayerUtils.playersInRange(mSirius.mTuulenLocation, RADIUS, true, true);
-					mProtectedPlayers.addAll(PlayerUtils.playersInRange(mSirius.mAuroraLocation, RADIUS, true, true));
-					List<Player> mAttemptPlayers = PlayerUtils.playersInRange(mSirius.mTuulenLocation, RADIUS + 3, true, true);
-					mAttemptPlayers.addAll(PlayerUtils.playersInRange(mSirius.mAuroraLocation, RADIUS + 3, true, true));
+					List<Player> mProtectedPlayers = PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mTuulenLocation, RADIUS, true, true);
+					mProtectedPlayers.addAll(PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mAuroraLocation, RADIUS, true, true));
+					List<Player> mAttemptPlayers = PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mTuulenLocation, RADIUS + 3, true, true);
+					mAttemptPlayers.addAll(PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mAuroraLocation, RADIUS + 3, true, true));
 					for (Player p : mAttemptPlayers) {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(2 * 60 * 20, 1, "").displays(false).deleteOnLogout(true));
 					}
-					if (mProtectedPlayers.size() >= (int) (mSirius.getValidDeclarationPlayersInArena(false).size() / 2.0 + 0.5)) {
+					if (mProtectedPlayers.size() >= (int) (mSirius.getValidDeclarationPlayersInArena().size() / 2.0 + 0.5)) {
 						mSirius.changeHp(true, 1);
-						for (Player p : mSirius.getPlayersInArena(false)) {
+						for (Player p : mSirius.getPlayers()) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("This place should have been theirs! How have you stopped this?", NamedTextColor.AQUA));
 						}
 					} else {
 						mSirius.changeHp(true, -5);
-						for (Player p : mSirius.getPlayersInArena(false)) {
+						for (Player p : mSirius.getPlayers()) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("Yes, this tomb will become a portal to the Beyond...", NamedTextColor.AQUA));
 						}
 					}

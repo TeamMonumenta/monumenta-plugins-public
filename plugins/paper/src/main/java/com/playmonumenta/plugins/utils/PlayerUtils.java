@@ -82,9 +82,9 @@ public class PlayerUtils {
 
 	public static boolean playerCountsForLootScaling(Player player) {
 		return player.getGameMode() != GameMode.SPECTATOR
-				   && (player.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
-				   && ActivityManager.getManager().isActive(player)
-				   && !Shattered.hasMaxShatteredItemEquipped(player);
+			&& (player.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
+			&& ActivityManager.getManager().isActive(player)
+			&& !Shattered.hasMaxShatteredItemEquipped(player);
 	}
 
 	public static List<Player> playersInLootScalingRange(Location loc) {
@@ -92,8 +92,8 @@ public class PlayerUtils {
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			return loc.getWorld().getPlayers().stream()
-					   .filter(PlayerUtils::playerCountsForLootScaling)
-					   .toList();
+				.filter(PlayerUtils::playerCountsForLootScaling)
+				.toList();
 		}
 
 		// In a POI, all players within the same POI are in range
@@ -140,20 +140,35 @@ public class PlayerUtils {
 		return playerIsInPOI(player.getLocation(), player);
 	}
 
-	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable, boolean includeDead) {
+
+	/**
+	 * Given a list of players, a location, and settings, returns the players that are close enough to <code>range</code>.
+	 *
+	 * @param ps                   Players we will check
+	 * @param loc                  The location to check
+	 * @param range                The valid range
+	 * @param includeNonTargetable Whether to include non-targetable players
+	 * @param includeDead          Whether to include players that are currently dead
+	 * @return The players that fit the criteria
+	 */
+	public static List<Player> playersInRange(Iterable<Player> ps, Location loc, double range, boolean includeNonTargetable, boolean includeDead) {
 		List<Player> players = new ArrayList<>();
 
 		double rangeSquared = range * range;
-		for (Player player : loc.getWorld().getPlayers()) {
+		for (Player player : ps) {
 			if (player.getLocation().distanceSquared(loc) < rangeSquared
-					&& player.getGameMode() != GameMode.SPECTATOR
-					&& (includeNonTargetable || !AbilityUtils.isStealthed(player))
-					&& (includeDead || !Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class))) {
+				&& player.getGameMode() != GameMode.SPECTATOR
+				&& (includeNonTargetable || !AbilityUtils.isStealthed(player))
+				&& (includeDead || !Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class))) {
 				players.add(player);
 			}
 		}
 
 		return players;
+	}
+
+	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable, boolean includeDead) {
+		return playersInRange(loc.getWorld().getPlayers(), loc, range, includeNonTargetable, includeDead);
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
@@ -539,6 +554,7 @@ public class PlayerUtils {
 
 	/**
 	 * Same ^
+	 *
 	 * @param shoulder True for right shoulder, false for left shoulder
 	 */
 	public static Entity getPlayerShoulderEntity(Player player, boolean shoulder) {
@@ -547,6 +563,7 @@ public class PlayerUtils {
 
 	/**
 	 * Same ^
+	 *
 	 * @param shoulder True for right shoulder, false for left shoulder
 	 */
 	public static void setPlayerShoulderEntity(Player player, @Nullable Entity shoulderEntity, boolean shoulder) {

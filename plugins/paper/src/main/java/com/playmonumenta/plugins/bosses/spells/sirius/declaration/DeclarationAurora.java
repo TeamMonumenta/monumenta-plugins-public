@@ -33,12 +33,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
 public class DeclarationAurora extends Spell {
-	private Location mCenter;
-	private Plugin mPlugin;
-	private Sirius mSirius;
+	private final Location mCenter;
+	private final Plugin mPlugin;
+	private final Sirius mSirius;
 	private List<Location> mPowerLocation;
 	private List<Entity> mPowerEntities;
-	private Team mMagenta;
+	private final Team mMagenta;
 	private static final int DURATION = 10 * 20;
 	private static final int RADIUS = 3;
 
@@ -58,17 +58,17 @@ public class DeclarationAurora extends Spell {
 
 	@Override
 	public void run() {
-		for (Player p : mSirius.getPlayersInArena(false)) {
+		for (Player p : mSirius.getPlayers()) {
 			p.playSound(p, Sound.BLOCK_LARGE_AMETHYST_BUD_PLACE, SoundCategory.HOSTILE, 1, 1);
 			p.playSound(p, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.HOSTILE, 1, 1.5f);
 		}
 		mSirius.mAnimationLock = true;
-		for (Player p : mSirius.getPlayersInArena(false)) {
+		for (Player p : mSirius.getPlayers()) {
 			MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("I have plucked forth stardust for our battle. Gather it, quickly!", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
 		}
 		mPowerLocation = new ArrayList<>();
 		mPowerEntities = new ArrayList<>();
-		int mSpawns = mSirius.getPlayersInArena(false).size() - 1 + 3;
+		int mSpawns = mSirius.getPlayers().size() - 1 + 3;
 		generateEnergy(Math.min(mSpawns, 18));
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -98,7 +98,7 @@ public class DeclarationAurora extends Spell {
 				if (mPowerEntities.isEmpty()) {
 					//PEW PEW
 					mManager.remove();
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("That should be enough. Let me shape it into a weapon... \nStrike the Herald! Now!", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
 						//p.sendMessage(Component.text("[Aurora]", NamedTextColor.GOLD).append(Component.text(" That should be enough. Let me shape it into a weapon... \n Strike the Herald! Now!", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)));
 					}
@@ -118,7 +118,7 @@ public class DeclarationAurora extends Spell {
 					for (Entity entity : mPowerEntities) {
 						entity.remove();
 					}
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Aurora", Component.text("No! I needed more! Incompetence!", NamedTextColor.DARK_PURPLE));
 					}
 					mSirius.mAnimationLock = false;
@@ -243,7 +243,7 @@ public class DeclarationAurora extends Spell {
 			/*
 			 * Invisible, Glowing, No ai, no gravity, 1hp small magma cube
 			 */
-			new PPExplosion(Particle.END_ROD, loc).count(5).delta(1).spawnAsBoss();
+			new PPExplosion(Particle.END_ROD, loc).count(3).delta(1).spawnAsBoss();
 			Entity mSpawn = LibraryOfSoulsIntegration.summon(loc, "StarEnergy");
 			if (mSpawn != null) {
 				mPowerEntities.add(mSpawn);

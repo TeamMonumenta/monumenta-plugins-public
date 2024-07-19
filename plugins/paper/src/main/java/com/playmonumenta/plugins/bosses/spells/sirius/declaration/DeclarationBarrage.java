@@ -27,8 +27,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class DeclarationBarrage extends Spell {
-	private Sirius mSirius;
-	private Plugin mPlugin;
+	private final Sirius mSirius;
+	private final Plugin mPlugin;
 	private static final int DAMAGE = 85;
 	private static final int DURATION = 15 * 20;
 	private static final int RADIUS = 3;
@@ -45,15 +45,15 @@ public class DeclarationBarrage extends Spell {
 
 	@Override
 	public void run() {
-		for (Player p : mSirius.getPlayersInArena(false)) {
+		for (Player p : mSirius.getPlayers()) {
 			p.playSound(p, Sound.ENTITY_WARDEN_ROAR, SoundCategory.HOSTILE, 1f, 2f);
 			MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("The stars whisper their truth to us. Let the comets tell us what they must.", NamedTextColor.AQUA, TextDecoration.BOLD));
 		}
-		mCount = mSirius.getValidDeclarationPlayersInArena(false).size();
+		mCount = mSirius.getValidDeclarationPlayersInArena().size();
 
 		new BukkitRunnable() {
-			List<Location> mTargetLocs = new ArrayList<>();
-			ChargeUpManager mBar = new ChargeUpManager(mSirius.mBoss, DURATION, Component.text("Impaling Doom", NamedTextColor.RED), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 75);
+			final List<Location> mTargetLocs = new ArrayList<>();
+			final ChargeUpManager mBar = new ChargeUpManager(mSirius.mBoss, DURATION, Component.text("Impaling Doom", NamedTextColor.RED), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 75);
 			int mTicks = 0;
 			float mMeteorcount = 0;
 
@@ -66,7 +66,7 @@ public class DeclarationBarrage extends Spell {
 					//stop more than 15 players getting meteored per time to prevent lag
 					//also players will bunch up more.
 					int mPlayerCount = 15;
-					List<Player> mPList = mSirius.getPlayersInArena(false);
+					List<Player> mPList = new ArrayList<>(mSirius.getPlayersInArena(false));
 					Collections.shuffle(mPList);
 					for (Player p : mPList) {
 						if (mPlayerCount > 0) {
@@ -102,13 +102,13 @@ public class DeclarationBarrage extends Spell {
 					this.cancel();
 				}
 				if (mTicks >= DURATION) {
-					if (mCount * 0.90 <= mSirius.getPlayersInArena(false).size()) {
-						for (Player p : mSirius.getPlayersInArena(false)) {
+					if (mCount * 0.90 <= mSirius.getPlayers().size()) {
+						for (Player p : mSirius.getPlayers()) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("No! Your flesh must bind with their blood! Do not escape!", NamedTextColor.AQUA));
 						}
 						mSirius.changeHp(false, 1);
 					} else {
-						for (Player p : mSirius.getPlayersInArena(false)) {
+						for (Player p : mSirius.getPlayers()) {
 							MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("Yes, I can feel their blood take hold... One step closer...", NamedTextColor.AQUA));
 						}
 						mSirius.changeHp(false, -5);
@@ -130,7 +130,7 @@ public class DeclarationBarrage extends Spell {
 		List<BlockDisplay> mDisplays = createSpike(loc);
 		new BukkitRunnable() {
 			int mTicks = 0;
-			World mWorld = loc.getWorld();
+			final World mWorld = loc.getWorld();
 
 			@Override
 			public void run() {
@@ -193,6 +193,7 @@ public class DeclarationBarrage extends Spell {
 		display.setBrightness(new Display.Brightness(15, 15));
 		mDisplays.add(display);
 		display.addScoreboardTag("SiriusDisplay");
+		EntityUtils.setRemoveEntityOnUnload(display);
 		return display;
 	}
 

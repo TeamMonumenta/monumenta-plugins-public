@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.List;
+import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 
 public class PassiveStarBlight extends Spell {
 	private final Sirius mSirius;
-	private PassiveStarBlightConversion mConverter;
+	private final PassiveStarBlightConversion mConverter;
 	public static final String STARBLIGHTAG = "Starblight";
 	public static final double STARBLIGHTCHANGEAMOUNT = -2.0;
 	public static final int TICKSBETWENSTARBLIGHT = 40;
@@ -33,7 +33,7 @@ public class PassiveStarBlight extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> mPlayers = mSirius.getPlayersInArena(false);
+		Set<Player> mPlayers = mSirius.getPlayers();
 		EffectManager manager = Plugin.getInstance().mEffectManager;
 		for (Player p : mPlayers) {
 			int x = (int) p.getLocation().getX();

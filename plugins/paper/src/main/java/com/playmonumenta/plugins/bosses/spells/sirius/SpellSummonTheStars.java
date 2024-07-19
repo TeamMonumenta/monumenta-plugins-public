@@ -43,11 +43,11 @@ public class SpellSummonTheStars extends Spell {
 	private boolean mOnCooldown = false;
 	private int mMobLimit;
 	private static final int COOLDOWN = 15 * 20;
-	private Sirius mSirius;
+	private final Sirius mSirius;
 	private int mMobsAlive;
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private static final Color STARBLIGHT = Color.fromRGB(0, 128, 128);
-	private LoSPool mMobPool;
+	private final LoSPool mMobPool;
 
 	public SpellSummonTheStars(Plugin plugin, Sirius sirius) {
 		mSirius = sirius;
@@ -60,7 +60,7 @@ public class SpellSummonTheStars extends Spell {
 	@Override
 	public void run() {
 		mOnCooldown = true;
-		int mPlayerCount = mSirius.getPlayersInArena(false).size();
+		int mPlayerCount = mSirius.getPlayers().size();
 		mMobLimit = mPlayerCount * 10 + 10;
 		double scaleAmount = 1;
 		if (mMobLimit >= 30) {
@@ -167,7 +167,7 @@ public class SpellSummonTheStars extends Spell {
 
 	public void mobDecleration(int duration, double summonsPerPlayer) {
 		mActiveMobs = new ArrayList<>();
-		List<Player> pList = mSirius.getPlayersInArena(false);
+		List<Player> pList = new ArrayList<>(mSirius.getPlayers());
 		mMobsAlive = (int) (pList.size() * summonsPerPlayer + 1.5);
 		Collections.shuffle(pList);
 		mMobsAlive = Math.min(21, mMobsAlive);
@@ -188,7 +188,7 @@ public class SpellSummonTheStars extends Spell {
 					} else {
 						spawn = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, FastUtils.getRandomElement(SpellBlightedPods.MINIBOSSES));
 						if (spawn != null) {
-							int maxHealth = (int) (SpellBlightedPods.BASEHEALTH * BossUtils.healthScalingCoef(+mSirius.getPlayersInArena(false).size(), SpellBlightedPods.SCALING_X, SpellBlightedPods.SCALING_Y));
+							int maxHealth = (int) (SpellBlightedPods.BASEHEALTH * BossUtils.healthScalingCoef(+mSirius.getPlayers().size(), SpellBlightedPods.SCALING_X, SpellBlightedPods.SCALING_Y));
 							Objects.requireNonNull(spawn.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(maxHealth);
 							spawn.setHealth(maxHealth); //half of the hp is effected by damage done to the pod
 						}
@@ -239,9 +239,9 @@ public class SpellSummonTheStars extends Spell {
 				for (Entity e : mActiveMobs) {
 					new PPCircle(Particle.NAUTILUS, e.getLocation().clone().add(0, e.getHeight() + 0.5, 0), 0.5).ringMode(true).count(5).spawnAsBoss();
 				}
-				if (mMobsAlive == 0 || mActiveMobs.size() == 0) {
+				if (mMobsAlive == 0 || mActiveMobs.isEmpty()) {
 					mSirius.changeHp(true, 1);
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("Their bearers, shattered in nothingness... They will not be pleased.", NamedTextColor.AQUA));
 					}
 					mManager.remove();
@@ -250,7 +250,7 @@ public class SpellSummonTheStars extends Spell {
 				}
 				if (mTicks >= duration) {
 					mSirius.changeHp(true, -5);
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("The starlight will shine brighter while they live. You have failed, conquerers.", NamedTextColor.AQUA));
 					}
 					for (Entity entity : mActiveMobs) {

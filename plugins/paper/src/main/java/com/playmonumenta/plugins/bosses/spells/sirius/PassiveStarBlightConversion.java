@@ -22,14 +22,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class PassiveStarBlightConversion extends Spell {
 	private boolean mOnCooldown;
-	private Sirius mSirius;
+	private final Sirius mSirius;
 	public double mDeltaX;
 	public double mDeltaY;
 	public double mDeltaZ;
 	public boolean[][] mBlighted;
 	public Location mCornerOne;
 	public Location mCornerTwo;
-	private Map<String, List<BlockData>> mRestore;
+	private final Map<String, List<BlockData>> mRestore;
 	private @Nullable Map<String, List<BlockData>> mBlight;
 	private boolean mLoaded;
 	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
@@ -102,16 +102,17 @@ public class PassiveStarBlightConversion extends Spell {
 			x = Math.floor(x);
 			z = Math.floor(z);
 			if (x < mDeltaX && z < mDeltaZ) {
-				mBlighted[(int) x][(int) z] = true;
-				List<BlockData> mBlightData = mBlight.get("x" + x + "z" + z);
-				if (mBlightData != null) {
-					int blightCount = mBlightData.size() - 1;
-					for (int i = 0; i < mCornerOne.getY() - mCornerTwo.getY() && !mBlightData.isEmpty(); i++) {
-						Location loc = new Location(mSirius.mBoss.getWorld(), mCornerOne.getX() - x, mCornerOne.getY() - i - 2, mCornerOne.getZ() - z);
-						if (!IGNORED_MATS.contains(loc.getBlock().getType()) && blightCount >= 0) {
-							loc.getBlock().setBlockData(mBlightData.get(blightCount));
-							loc.getBlock().getState().update();
-							blightCount--;
+				if (!mBlighted[(int) x][(int) z]) {
+					mBlighted[(int) x][(int) z] = true;
+					List<BlockData> mBlightData = mBlight.get("x" + x + "z" + z);
+					if (mBlightData != null) {
+						int blightCount = mBlightData.size() - 1;
+						for (int i = 0; i < mCornerOne.getY() - mCornerTwo.getY() && !mBlightData.isEmpty(); i++) {
+							Location loc = new Location(mSirius.mBoss.getWorld(), mCornerOne.getX() - x, mCornerOne.getY() - i - 2, mCornerOne.getZ() - z);
+							if (!IGNORED_MATS.contains(loc.getBlock().getType()) && blightCount >= 0) {
+								loc.getBlock().setBlockData(mBlightData.get(blightCount), false);
+								blightCount--;
+							}
 						}
 					}
 				}
@@ -142,14 +143,15 @@ public class PassiveStarBlightConversion extends Spell {
 		for (double z = mCornerTwo.getZ(); z < mCornerOne.getZ(); z++) {
 			List<BlockData> blockData = mRestore.get("x" + ((double) relativeX) + "z" + (mCornerOne.getZ() - z));
 			if (blockData != null) {
-				int mCount = 0;
-				for (double y = mCornerTwo.getY(); y < mCornerOne.getY(); y++) {
-					Location loc = new Location(mSirius.mBoss.getWorld(), x, y, z);
-					if (!IGNORED_MATS.contains(loc.getBlock().getType()) && mCount < blockData.size()) {
-						loc.getBlock().setBlockData(blockData.get(mCount));
-						loc.getBlock().getState().update();
-						mBlighted[relativeX][(int) (mCornerOne.getZ() - z)] = false;
-						mCount++;
+				if (mBlighted[relativeX][(int) (mCornerOne.getZ() - z)]) {
+					int mCount = 0;
+					mBlighted[relativeX][(int) (mCornerOne.getZ() - z)] = false;
+					for (double y = mCornerTwo.getY(); y < mCornerOne.getY(); y++) {
+						Location loc = new Location(mSirius.mBoss.getWorld(), x, y, z);
+						if (!IGNORED_MATS.contains(loc.getBlock().getType()) && mCount < blockData.size()) {
+							loc.getBlock().setBlockData(blockData.get(mCount));
+							mCount++;
+						}
 					}
 				}
 			}
@@ -194,8 +196,7 @@ public class PassiveStarBlightConversion extends Spell {
 			Location loc = center.clone().add(x, 0, z);
 			loc.setY(y);
 			if (!IGNORED_MATS.contains(loc.getBlock().getType()) && mCount < blockData.size()) {
-				loc.getBlock().setBlockData(blockData.get(mCount));
-				loc.getBlock().getState().update();
+				loc.getBlock().setBlockData(blockData.get(mCount), false);
 				mCount++;
 			}
 			if (mCount == blockData.size()) {
@@ -390,7 +391,7 @@ public class PassiveStarBlightConversion extends Spell {
 				}
 				mLoaded = true;
 			} catch (Exception e) {
-				com.playmonumenta.plugins.Plugin.getInstance().getLogger().log(Level.FINER, "StarblightConversion: File failed to be found" + e.toString());
+				com.playmonumenta.plugins.Plugin.getInstance().getLogger().log(Level.FINER, "StarblightConversion: File failed to be found" + e);
 			}
 
 		});

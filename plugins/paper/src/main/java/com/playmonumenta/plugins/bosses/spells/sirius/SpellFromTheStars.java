@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPillar;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -33,9 +34,9 @@ import org.joml.Vector3f;
 
 public class SpellFromTheStars extends Spell {
 
-	private Sirius mSirius;
+	private final Sirius mSirius;
 	private boolean mOnCooldown;
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private boolean mPrimed;
 	private final PassiveTentacleManager mTentancleManager;
 	private final PassiveDeclaration mDeclerations;
@@ -94,8 +95,8 @@ public class SpellFromTheStars extends Spell {
 		BukkitRunnable castRunnable = new BukkitRunnable() {
 			int mTicks = 0;
 			int mRadius = RADIUS;
-			Location mCircleLoc = LocationUtils.fallToGround(mSirius.mBoss.getLocation(), mSirius.mBoss.getLocation().subtract(0, 10, 0).getY());
-			ChargeUpManager mManager = new ChargeUpManager(mSirius.mBoss, 50, Component.text("From The Stars", NamedTextColor.RED), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 50);
+			final Location mCircleLoc = LocationUtils.fallToGround(mSirius.mBoss.getLocation(), mSirius.mBoss.getLocation().subtract(0, 10, 0).getY());
+			final ChargeUpManager mManager = new ChargeUpManager(mSirius.mBoss, 50, Component.text("From The Stars", NamedTextColor.RED), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 50);
 
 			@Override
 			public void run() {
@@ -188,6 +189,7 @@ public class SpellFromTheStars extends Spell {
 										blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
 										blockDisplay.setInterpolationDuration(2);
 										blockDisplay.addScoreboardTag("SiriusDisplay");
+										EntityUtils.setRemoveEntityOnUnload(blockDisplay);
 
 										BukkitRunnable runnable = new BukkitRunnable() {
 											int mTicks = 0;
@@ -226,7 +228,7 @@ public class SpellFromTheStars extends Spell {
 											if (mTT > 6 || (MAX_HEIGHT_DELAY * (-0.3 * ((mTT - 3) * (mTT - 3)) + 1) >= -0.5) || mSirius.mDone) {
 												this.cancel();
 
-												for (Player p : PlayerUtils.playersInRange(mLoc, RADIUS, false, true)) {
+												for (Player p : PlayerUtils.playersInRange(mSirius.getPlayers(), mLoc, RADIUS, false, true)) {
 													Location yAdjusted = LocationUtils.fallToGround(p.getLocation(), mMinY);
 													Location yAdjustedOrigin = mLoc.clone().set(mLoc.getX(), yAdjusted.getY(), mLoc.getZ());
 													double distance = yAdjusted.distance(yAdjustedOrigin);
@@ -244,7 +246,7 @@ public class SpellFromTheStars extends Spell {
 								}
 
 								if (mR % 2 == 0) {
-									for (Player p : mSirius.getPlayersInArena(false)) {
+									for (Player p : mSirius.getPlayers()) {
 										p.playSound(p, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 0.6f, 2f);
 									}
 								}

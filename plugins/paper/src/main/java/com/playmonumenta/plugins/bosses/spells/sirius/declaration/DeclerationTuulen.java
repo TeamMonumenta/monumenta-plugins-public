@@ -36,7 +36,7 @@ public class DeclerationTuulen extends Spell {
 	private final Sirius mSirius;
 	private final Plugin mPlugin;
 	private List<Mob> mSpawnedMobs;
-	private LivingEntity mTarget;
+	private final LivingEntity mTarget;
 	private static final float MOBSPERPLAYERPERTICK = 0.035f;
 	private static final int RADIUS = 7;
 	private static final int DURATION = 12 * 20;
@@ -80,7 +80,7 @@ public class DeclerationTuulen extends Spell {
 		List<DisplayEntityUtils.DisplayAnimation> mDisplays = new ArrayList<>();
 		Team mRed = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
 		mTarget.setGlowing(true);
-		for (Player p : mSirius.getPlayersInArena(false)) {
+		for (Player p : mSirius.getPlayers()) {
 			MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("Sirius has turned his eye to me. Protect my position as I gather my strength!", NamedTextColor.GRAY, TextDecoration.BOLD));
 		}
 		float mThrowRate = (DURATION - 20) / (SILVERKNIGHTLOCATIONS.size() - 1f);
@@ -92,13 +92,13 @@ public class DeclerationTuulen extends Spell {
 			float mMobCount = 0;
 			int mThrown = 0;
 			int mHitsRemaining = 2;
-			ChargeUpManager mBar = new ChargeUpManager(mSirius.mBoss, DURATION, Component.text("Defend Tuulen!", NamedTextColor.GRAY), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 75);
+			final ChargeUpManager mBar = new ChargeUpManager(mSirius.mBoss, DURATION, Component.text("Defend Tuulen!", NamedTextColor.GRAY), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 75);
 
 			@Override
 			public void run() {
 				mBar.nextTick();
 				List<LivingEntity> toRemove = new ArrayList<>();
-				mMobCount += Math.min(mSirius.getPlayersInArena(false).size() * MOBSPERPLAYERPERTICK, MOBSPERPLAYERPERTICK * 5);
+				mMobCount += Math.min(mSirius.getPlayers().size() * MOBSPERPLAYERPERTICK, MOBSPERPLAYERPERTICK * 5);
 				List<LivingEntity> mobs = new ArrayList<>();
 				while (mMobCount >= 1) {
 					mMobCount--;
@@ -132,12 +132,12 @@ public class DeclerationTuulen extends Spell {
 						for (LivingEntity entity : entities) {
 							MovementUtils.knockAway(mTarget, entity, 0.5f, 0.5f, false);
 						}
-						for (Player p : mSirius.getPlayersInArena(false)) {
+						for (Player p : mSirius.getPlayers()) {
 							MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("My concentration wanes. Stop them!", NamedTextColor.GRAY));
 						}
 						if (mHitsRemaining <= 0) {
 							swing();
-							for (Player p : mSirius.getPlayersInArena(false)) {
+							for (Player p : mSirius.getPlayers()) {
 								MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("I hath lost the magic. Protect me better, woolbearer!", NamedTextColor.GRAY));
 							}
 							mBar.remove();
@@ -161,7 +161,7 @@ public class DeclerationTuulen extends Spell {
 				}
 				if (mTicks == DURATION) {
 					swing();
-					for (Player p : mSirius.getPlayersInArena(false)) {
+					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("Unleash thy fury on the Herald!", NamedTextColor.GRAY, TextDecoration.BOLD));
 					}
 					for (Location loc : SILVERKNIGHTLOCATIONS) {
@@ -210,7 +210,7 @@ public class DeclerationTuulen extends Spell {
 					animation.addKeyframe(new Transformation(new Vector3f((float) vecToBoss.getX(), (float) vecToBoss.getY(), (float) vecToBoss.getZ()), new AxisAngle4f(), new Vector3f(2f), new AxisAngle4f()), 5);
 					animation = animation.removeDisplaysAfterwards();
 					animation.addCancelFrame(new Transformation(new Vector3f((float) fallVec.x(), (float) fallVec.y(), (float) fallVec.z()), new AxisAngle4f((float) (-Math.PI / 2 - Math.PI / 4.0f), 0, 0, 1), new Vector3f(2f), new AxisAngle4f()), 10);
-					animation.addCancelDelay(1 * 20);
+					animation.addCancelDelay(20);
 					//Delayed to allow for the size and rotation to be constant
 					DisplayEntityUtils.DisplayAnimation finalAnimation = animation;
 					Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), finalAnimation::play, 1);
@@ -254,9 +254,9 @@ public class DeclerationTuulen extends Spell {
 			return mSirius.mTuulenLocation;
 		}
 		//Generate x between -radius and radius then random between negative or positive of the square root.
-		Double x = FastUtils.randomDoubleInRange(-RADIUS, RADIUS);
-		Double radiusRemaining = RADIUS * RADIUS - (x * x);
-		Double z = Math.sqrt(radiusRemaining);
+		double x = FastUtils.randomDoubleInRange(-RADIUS, RADIUS);
+		double radiusRemaining = RADIUS * RADIUS - (x * x);
+		double z = Math.sqrt(radiusRemaining);
 		if (FastUtils.randomIntInRange(0, 1) == 0) {
 			z *= -1;
 		}
