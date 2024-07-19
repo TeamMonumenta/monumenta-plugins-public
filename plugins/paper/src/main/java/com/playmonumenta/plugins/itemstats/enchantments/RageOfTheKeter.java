@@ -31,7 +31,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class RageOfTheKeter implements Enchantment {
 
-	private static final double DAMAGE_PERCENT = 0.15;
+	private static final double DAMAGE_PERCENT = 0.20;
 	private static final double SPEED_PERCENT = 0.15;
 	private static final int DURATION = 20 * 15;
 	private static final int COOLDOWN = 20 * 25;

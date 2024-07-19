@@ -25,7 +25,7 @@ public class FirstStrike implements Enchantment {
 
 	private static final double DAMAGE_PER_LEVEL = 0.1;
 	private static final double PROJ_REDUCTION = 0.75;
-	private static final int DURATION = 10000 * 20;
+	private static final int DURATION = 3 * 20;
 	private static final String SOURCE = "FirstStrikeDisable";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
 	public static final String CHARM_DAMAGE = "First Strike Damage";
