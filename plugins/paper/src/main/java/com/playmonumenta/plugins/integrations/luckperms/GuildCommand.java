@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.InviteNotification;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -13,12 +14,16 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.NotNull;
 
 public class GuildCommand {
 	public static void register(Plugin plugin) {
@@ -65,6 +70,8 @@ public class GuildCommand {
 		.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS);
 	private static final CommandPermission REBUILD_PERMISSION
 		= CommandPermission.fromString("monumenta.command.guild.mod.rebuildtag");
+	private static final CommandPermission GUILD_BOUNDS_PERMISSION
+		= CommandPermission.fromString("monumenta.command.guild.mod.guildbounds");
 
 	private static CommandAPICommand attach(CommandAPICommand root) {
 		//used to attach a few small commands that don't need their own file.
@@ -136,9 +143,62 @@ public class GuildCommand {
 				});
 			});
 
-		return root.withSubcommands(
-			rebuildTagSub
-		);
+		CommandAPICommand guildIslandTestSub = getGuildIslandTestSub(plugin);
+
+		return root
+			.withSubcommands(
+				rebuildTagSub
+			)
+			.withSubcommands(
+				guildIslandTestSub
+			);
+	}
+
+	private static @NotNull CommandAPICommand getGuildIslandTestSub(Plugin plugin) {
+		CommandAPICommand guildIslandTestSub = new CommandAPICommand("guildislandtest");
+		guildIslandTestSub
+			.executes((sender, args) -> {
+				CommandUtils.checkPerm(sender, GUILD_BOUNDS_PERMISSION);
+				if (senderCannotRunCommand(sender, true)) {
+					return;
+				}
+
+				if (!"plots".equals(ServerProperties.getShardName())) {
+					throw CommandAPI.failWithString("This command only works on the plots shard.");
+				}
+
+				final World originalPlotsWorld = Bukkit.getWorlds().get(0);
+				Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+					List<Group> guilds = LuckPermsIntegration.getGuilds().join();
+					int numGuilds = guilds.size();
+
+					int guildNum = 0;
+					boolean foundProblems = false;
+					for (Group guild : guilds) {
+						guildNum++;
+
+						List<BoundingBox> boundingBoxes
+							= Lockdown.getOriginalGuildPlotAndIslands(originalPlotsWorld, guild, false).join();
+						int numGuildIslands = Math.max(boundingBoxes.size() - 1, 0);
+						boolean isProblem = numGuildIslands > 1;
+						foundProblems |= isProblem;
+
+						String guildName = LuckPermsIntegration.getNonNullGuildName(guild);
+						sender.sendMessage(Component.text("- " + guildNum + "/" + numGuilds
+								+ ": " + guildName + " has " + numGuildIslands + " guild island(s)",
+							isProblem ? NamedTextColor.RED : NamedTextColor.GREEN));
+
+						try {
+							Thread.sleep(50);
+						} catch (InterruptedException ignored) {
+							// This delay reduces lag from loading chunks, getting interrupted is irrelevant
+						}
+					}
+
+					sender.sendMessage(Component.text("Done!", foundProblems ? NamedTextColor.RED : NamedTextColor.GREEN));
+				});
+			});
+		return guildIslandTestSub;
 	}
 
 	public static boolean senderCannotRunCommand(CommandSender sender, boolean needOp)

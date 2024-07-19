@@ -123,7 +123,7 @@ public class Lockdown implements Listener {
 						+ ") Checking guild plot locations...");
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 						List<BoundingBox> boundingBoxes
-							= lockAndGetOriginalGuildPlotAndIslands(originalPlotsWorld, guild).join();
+							= getOriginalGuildPlotAndIslands(originalPlotsWorld, guild, true).join();
 						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 							lockedGuildAreas.put(originalPlotsWorld.getUID(), boundingBoxes);
 							MMLog.info("[Guild Lockdown Kicker] (" + currentIter + "/" + numGuilds
@@ -239,7 +239,7 @@ public class Lockdown implements Listener {
 
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 				List<BoundingBox> boundingBoxes
-					= lockAndGetOriginalGuildPlotAndIslands(originalPlotsWorld, guild).join();
+					= getOriginalGuildPlotAndIslands(originalPlotsWorld, guild, true).join();
 				Bukkit.getScheduler().runTask(Plugin.getInstance(),
 					() -> lockedGuildAreas.put(originalPlotsWorld.getUID(), boundingBoxes));
 			});
@@ -300,7 +300,7 @@ public class Lockdown implements Listener {
 						ShopManager.shopLock(entity, null, true);
 					} catch (Exception ex) {
 						Location shopLoc = entity.getLocation();
-						MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage("Unable to lock guild plot for "
+						MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage("Unable to lock guild market plot for "
 							+ MessagingUtils.plainText(LuckPermsIntegration.getGuildFullComponent(guild))
 							+ " at " + shopLoc.getBlockX()
 							+ " " + shopLoc.getBlockY()
@@ -383,7 +383,11 @@ public class Lockdown implements Listener {
 		}
 	}
 
-	private static CompletableFuture<List<BoundingBox>> lockAndGetOriginalGuildPlotAndIslands(World originalPlotsWorld, Group guild) {
+	public static CompletableFuture<List<BoundingBox>> getOriginalGuildPlotAndIslands(
+		World originalPlotsWorld,
+		Group guild,
+		boolean lockArea
+	) {
 		CompletableFuture<List<BoundingBox>> future = new CompletableFuture<>();
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			List<BoundingBox> result = new ArrayList<>();
@@ -446,26 +450,28 @@ public class Lockdown implements Listener {
 
 				result.add(originalGuildPlot);
 
-				// Get door bounding box
-				Vector doorCornerA = plotCornerA.toVector().clone()
-					.add(plotDirection.clone().multiply(-39))
-					.add(plotSidewaysDirection.clone().multiply(-15));
-				Vector doorCornerB = plotCornerA.toVector().clone()
-					.add(plotDirection.clone().multiply(-39))
-					.add(plotSidewaysDirection.clone().multiply(-19));
-				BoundingBox originalGuildPlotDoor = new BoundingBox(doorCornerA.getX(),
-					99.0,
-					doorCornerA.getZ(),
-					doorCornerB.getX(),
-					103.0,
-					doorCornerB.getZ())
-					// Plus 1 to include the full blocks
-					.expand(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+				if (lockArea) {
+					// Get door bounding box
+					Vector doorCornerA = plotCornerA.toVector().clone()
+						.add(plotDirection.clone().multiply(-39))
+						.add(plotSidewaysDirection.clone().multiply(-15));
+					Vector doorCornerB = plotCornerA.toVector().clone()
+						.add(plotDirection.clone().multiply(-39))
+						.add(plotSidewaysDirection.clone().multiply(-19));
+					BoundingBox originalGuildPlotDoor = new BoundingBox(doorCornerA.getX(),
+						99.0,
+						doorCornerA.getZ(),
+						doorCornerB.getX(),
+						103.0,
+						doorCornerB.getZ())
+						// Plus 1 to include the full blocks
+						.expand(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
 
-				for (int x = (int) originalGuildPlotDoor.getMinX(); x < originalGuildPlotDoor.getMaxX(); x++) {
-					for (int z = (int) originalGuildPlotDoor.getMinZ(); z < originalGuildPlotDoor.getMaxZ(); z++) {
-						for (int y = (int) originalGuildPlotDoor.getMinY(); y < originalGuildPlotDoor.getMaxY(); y++) {
-							originalPlotsWorld.setBlockData(x, y, z, Material.BARRIER.createBlockData());
+					for (int x = (int) originalGuildPlotDoor.getMinX(); x < originalGuildPlotDoor.getMaxX(); x++) {
+						for (int z = (int) originalGuildPlotDoor.getMinZ(); z < originalGuildPlotDoor.getMaxZ(); z++) {
+							for (int y = (int) originalGuildPlotDoor.getMinY(); y < originalGuildPlotDoor.getMaxY(); y++) {
+								originalPlotsWorld.setBlockData(x, y, z, Material.BARRIER.createBlockData());
+							}
 						}
 					}
 				}
