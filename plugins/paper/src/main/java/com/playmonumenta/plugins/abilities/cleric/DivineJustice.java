@@ -12,33 +12,24 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import java.util.NavigableSet;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,8 +51,6 @@ public class DivineJustice extends Ability {
 	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = 20 * 20;
 	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = 4 * 60 * 20;
 	public static final String ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME = "DivineJusticeBonusDamageEffect";
-	public static final Material ASH_MATERIAL = Material.GUNPOWDER;
-	public static final String ASH_NAME = "Purified Ash";
 
 	public static final String CHARM_DAMAGE = "Divine Justice Damage";
 	public static final String CHARM_SELF = "Divine Justice Self Heal";
@@ -113,7 +102,7 @@ public class DivineJustice extends Ability {
 	// Passive damage to share with Holy Javelin
 	public double mLastPassiveDamage = 0;
 
-	private final DivineJusticeCS mCosmetic;
+	public final DivineJusticeCS mCosmetic;
 
 	private int mComboNumber = 0;
 	private @Nullable BukkitRunnable mComboRunnable = null;
@@ -138,7 +127,7 @@ public class DivineJustice extends Ability {
 		}
 		if ((event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) ||
 			(event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
-			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
+				&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
 			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
@@ -223,16 +212,8 @@ public class DivineJustice extends Ability {
 	}
 
 	private void spawnAsh(Location loc) {
-		ItemStack itemStack = new ItemStack(ASH_MATERIAL);
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		itemMeta.displayName(Component.text(ASH_NAME, NamedTextColor.GRAY)
-			.decoration(TextDecoration.ITALIC, false));
-		itemStack.setItemMeta(itemMeta);
-		ItemUtils.setPlainName(itemStack);
-		Item item = loc.getWorld().dropItemNaturally(loc, itemStack);
-		item.setGlowing(true); // glowing is conditionally disabled for non-clerics in GlowingReplacer
-		item.setPickupDelay(Integer.MAX_VALUE);
-		EntityUtils.makeItemInvulnereable(item);
+		Item item = AbilityUtils.spawnAbilityItem(loc.getWorld(), loc, mCosmetic.justiceAsh(), mCosmetic.justiceAshName(), true, 0.3, true, true);
+		mCosmetic.justiceAshColor(item);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -247,18 +228,7 @@ public class DivineJustice extends Ability {
 
 					applyEnhancementEffect(player, false);
 
-					player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_STEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
-					player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.2f, 0.2f);
-
-					Location particleLocation = item.getLocation().add(0, 0.2, 0);
-					new PartialParticle(Particle.ASH, particleLocation, 50)
-						.delta(0.15, 0.1, 0.15)
-						.spawnAsPlayerActive(player);
-					new PartialParticle(Particle.REDSTONE, particleLocation, 7)
-						.delta(0.1, 0.1, 0.1)
-						.data(new Particle.DustOptions(Color.fromBGR(100, 100, 100), 1))
-						.spawnAsPlayerActive(player);
-
+					mCosmetic.justiceAshPickUp(player, item.getLocation());
 					item.remove();
 
 					this.cancel();
@@ -272,11 +242,6 @@ public class DivineJustice extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-	}
-
-	public static boolean isAsh(Item item) {
-		return item.getItemStack().getType() == ASH_MATERIAL
-			&& ASH_NAME.equals(ItemUtils.getPlainNameIfExists(item.getItemStack()));
 	}
 
 	public static boolean canPickUpAsh(Player player) {
