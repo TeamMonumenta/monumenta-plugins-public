@@ -214,6 +214,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
 		mKey.setHealth(mPhylactHealth);
 
+		// Disable White Tesseract for the duration of the fight. The tag is cleared in SQ login/death files and the win mcfunction
+		playersInRange(mStart.getLocation(), detectionRange, true).forEach(player -> player.addScoreboardTag("WhiteTessDisabled"));
+
 		mDefeated = false;
 		mActivated = false;
 		mDead = false;

@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -997,6 +998,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		ItemStack[] armorc = equips.getArmorContents();
 		ItemStack m = equips.getItemInMainHand();
 		ItemStack o = equips.getItemInOffHand();
+
+		// Disable White Tesseract for the duration of the fight. The tag is cleared in SQ login/death files and the win mcfunction
+		getArenaParticipants().forEach(player -> player.addScoreboardTag("WhiteTessDisabled"));
 		new BukkitRunnable() {
 
 			@Override
@@ -1197,7 +1201,44 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					mSucceededPlayersForAdvancement.add(p.getUniqueId());
 				}
 			}
-		});
+		},
+
+		// Vanilla
+		new KaulAdvancementHandler() {
+		final HashSet<UUID> mHs = new HashSet<>();
+		int mTick = 0;
+
+		@Override
+		void onBossSpawn() {
+			getArenaParticipants().forEach(p -> {
+				if (AbilityUtils.isClassless(p)) {
+					mHs.add(p.getUniqueId());
+				}
+			});
+		}
+
+		@Override
+		void onTick() {
+			mTick++;
+			if (mTick % 10 != 0) {
+				return;
+			}
+			getArenaParticipants().forEach(p -> {
+				if (mHs.contains(p.getUniqueId()) && !AbilityUtils.isClassless(p)) {
+					mHs.remove(p.getUniqueId());
+				}
+			});
+		}
+
+		@Override
+		void onBossDeath() {
+			getArenaParticipants().forEach(p -> {
+				if (mHs.contains(p.getUniqueId()) && AbilityUtils.isClassless(p)) {
+					AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/vanilla");
+				}
+			});
+		}
+	});
 
 	private static class KaulAdvancementHandler {
 		void onBossSpawn() {

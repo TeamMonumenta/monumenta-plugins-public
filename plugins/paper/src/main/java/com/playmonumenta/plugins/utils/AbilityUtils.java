@@ -306,6 +306,10 @@ public class AbilityUtils {
 		};
 	}
 
+	public static boolean isClassless(Player player) {
+		return AbilityUtils.getClassNum(player) == 0;
+	}
+
 	public static int getSpecNum(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
 	}

@@ -25,6 +25,8 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -39,9 +41,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -195,6 +199,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
 	private final UltimateSeismicRuin mRuin;
 	private final Location mStartLoc;
+	private boolean mFightOver = false;
 	private boolean mCutsceneDone = false;
 	private @Nullable LivingEntity mNorthStand;
 	private @Nullable LivingEntity mEastStand;
@@ -734,6 +739,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			}
 		}
 
+		mFightOver = true;
 		BossUtils.endBossFightEffects(mBoss, players, 20 * 40, true, false);
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		teleport(mStartLoc);
@@ -861,7 +867,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 
 					this.cancel();
 
-					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, fighterRange, true)) {
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc.clone().subtract(0, 44, 0), fighterRange, true)) {
 						MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.AQUA), Component.text("Eldrask, The Waking Giant", NamedTextColor.DARK_AQUA));
 						player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 					}
@@ -1052,10 +1058,53 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		mBoss.setPersistent(true);
 
 		for (Player player : players) {
+			// Disable White Tesseract for the duration of the fight. The tag is cleared in SQ login/death files and the win mcfunction
+			player.addScoreboardTag("WhiteTessDisabled");
 			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
 				player.removePotionEffect(PotionEffectType.GLOWING);
 			}
 		}
+
+		// Ice Cold Vanilla advancement
+		new BukkitRunnable() {
+			int mTicks = 0;
+			final HashSet<UUID> mHs = new HashSet<>();
+			List<Player> mPlayers = Collections.emptyList();
+
+			@Override
+			public void run() {
+				mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+				if (mTicks == 0) {
+					mPlayers.forEach(p -> {
+						if (AbilityUtils.isClassless(p)) {
+							mHs.add(p.getUniqueId());
+						}
+					});
+				}
+
+				mPlayers.forEach(p -> {
+					if (mHs.contains(p.getUniqueId()) && !AbilityUtils.isClassless(p)) {
+						mHs.remove(p.getUniqueId());
+					}
+				});
+
+				if (mFightOver) {
+					this.cancel();
+					mPlayers.forEach(p -> {
+						if (mHs.contains(p.getUniqueId()) && AbilityUtils.isClassless(p)) {
+							AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r2/fg/ice_cold_vanilla");
+						}
+					});
+					return;
+				}
+
+				if (mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+					return;
+				}
+				mTicks += 10;
+			}
+		}.runTaskTimer(mPlugin, 0, 10);
 	}
 
 	//Punch Resist

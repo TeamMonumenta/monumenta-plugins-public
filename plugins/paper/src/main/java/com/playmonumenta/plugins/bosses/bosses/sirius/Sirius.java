@@ -22,7 +22,9 @@ import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -183,6 +185,12 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mBoss.setVisibleByDefault(false);
 		mStartingPlayerCount = getPlayersInArena(false).size();
 		Bukkit.getScheduler().runTaskLater(plugin, this::startVisual, 10);
+
+		// Disable White Tesseract for the duration of the fight. The tag is cleared in SQ login/death files and the win mcfunction
+		getPlayersInArena(false).forEach(player -> player.addScoreboardTag("WhiteTessDisabled"));
+
+		// "Why So Sirius" Classless Advancement
+		classlessAdvancementHandler();
 
 		//bossbar and constructing
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -667,6 +675,48 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	public void startCollision() {
 		mCollisionOn = true;
 		updateCollisionBox(0);
+	}
+
+	public void classlessAdvancementHandler() {
+		new BukkitRunnable() {
+			int mTicks = 0;
+			final HashSet<UUID> mHs = new HashSet<>();
+			List<Player> mPlayers = Collections.emptyList();
+
+			@Override
+			public void run() {
+				mPlayers = getPlayersInArena(false);
+				if (mTicks == 0) {
+					mPlayers.forEach(p -> {
+						if (AbilityUtils.isClassless(p)) {
+							mHs.add(p.getUniqueId());
+						}
+					});
+				}
+
+				mPlayers.forEach(p -> {
+					if (mHs.contains(p.getUniqueId()) && !AbilityUtils.isClassless(p)) {
+						mHs.remove(p.getUniqueId());
+					}
+				});
+
+				if (mDone) {
+					this.cancel();
+					mPlayers.forEach(p -> {
+						if (mHs.contains(p.getUniqueId()) && AbilityUtils.isClassless(p)) {
+							AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r3/sirius/so_sirius");
+						}
+					});
+					return;
+				}
+
+				if (mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+					return;
+				}
+				mTicks += 10;
+			}
+		}.runTaskTimer(mPlugin, 0, 10);
 	}
 
 	private void undoDamageVisual() {
