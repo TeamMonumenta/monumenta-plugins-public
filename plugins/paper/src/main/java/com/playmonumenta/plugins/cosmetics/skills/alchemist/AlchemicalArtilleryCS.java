@@ -36,6 +36,10 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 		return Material.MAGMA_CREAM;
 	}
 
+	public void onSpawn(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_RAVAGER_STEP, SoundCategory.PLAYERS, 0.5f, 0.5f);
+	}
+
 	public void periodicEffects(Player caster, MagmaCube grenade, Item physicsItem, int ticks) {
 		Location particleLoc = LocationUtils.getHalfHeightLocation(grenade);
 		new PartialParticle(Particle.SMOKE_LARGE, particleLoc, 2, 0, 0, 0, 0.05).spawnAsPlayerActive(caster);

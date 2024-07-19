@@ -53,10 +53,17 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 		World world = player.getWorld();
 
 		// sounds
-		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_HIT, 1, 0.5f);
-		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.5f, 1.5f);
+		world.playSound(loc, "minecraft:block.amethyst_block.resonate", 2.0f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.PLAYERS, 0.2f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.8f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.6f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_ALLAY_ITEM_GIVEN, SoundCategory.PLAYERS, 1.8f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.PLAYERS, 0.2f, 0.4f);
+		world.playSound(loc, Sound.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 2.0f, 0.4f);
+		world.playSound(loc, Sound.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 2.5f, 0.8f);
+		world.playSound(loc, Sound.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 3.0f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.5f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.3f, 0.7f);
 
 		// extra landing particles
 		double delta = (radius - 1) / 2;

@@ -47,6 +47,17 @@ public class ArcaneArtilleryCS extends AlchemicalArtilleryCS {
 	}
 
 	@Override
+	public void onSpawn(World world, Location loc) {
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.7f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.8f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.0f, 1.4f);
+		world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 2.0f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.7f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.7f, 0.4f);
+		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 2.0f, 0.4f);
+	}
+
+	@Override
 	public void periodicEffects(Player caster, MagmaCube grenade, Item physicsItem, int ticks) {
 		Location cubeCenter = LocationUtils.getHalfHeightLocation(grenade);
 
@@ -79,11 +90,12 @@ public class ArcaneArtilleryCS extends AlchemicalArtilleryCS {
 		loc.setDirection(loc.toVector().subtract(caster.getLocation().toVector()));
 
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1.25f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 1, 1);
-		world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
-		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
+		world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.2f, 1.7f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 0.9f, 1.3f);
+		world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 2.0f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.3f, 0.7f);
+		world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.7f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 1.0f, 1.4f);
 
 		// explosion effect
 		new PartialParticle(Particle.FLASH, loc).minimumCount(1).spawnAsPlayerActive(caster);

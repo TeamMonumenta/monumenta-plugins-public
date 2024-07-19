@@ -16,6 +16,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -47,30 +49,33 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		return NAME;
 	}
 
-	@Override
-	public void effectsOnSwap(Player mPlayer, boolean isGruesomeBeforeSwap) {
-		// TODO custom? it's just sounds, and having the same is probably be beneficial for recognition
-		super.effectsOnSwap(mPlayer, isGruesomeBeforeSwap);
-	}
-
 	private Symbol mLastSymbol = ArcanePotionsCS.PHLOGISTON;
 
 	@Override
-	public void effectsOnSplash(Player mPlayer, Location loc, boolean isGruesome, double radius, boolean isSpecialPot) {
+	public void effectsOnSplash(Player player, Location loc, boolean isGruesome, double radius, boolean isSpecialPot) {
 		if (isSpecialPot) {
 			return; // having both normal + special pot particles is too much for this
 		}
 
 		// sound
-		loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_HIT, 1, 0.5f);
+		World world = loc.getWorld();
+		if (isGruesome) {
+			world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.3f, 1.6f);
+			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.3f, 1.2f);
+			world.playSound(loc, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 1.7f, 0.8f);
+		} else {
+			world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 2.0f, 0.4f);
+			world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 0.5f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 2.0f, 0.4f);
+		}
 
 		// particle circle
 		Location location = loc.clone().add(0, 0.125, 0);
-		location.setDirection(loc.toVector().subtract(mPlayer.getLocation().toVector()));
+		location.setDirection(loc.toVector().subtract(player.getLocation().toVector()));
 		List<Symbol> symbols = new ArrayList<>(LARGE_SYMBOLS);
 		symbols.remove(mLastSymbol);
 		mLastSymbol = FastUtils.getRandomElement(symbols);
-		drawAlchemyCircle(mPlayer, location, radius, 3, isGruesome, mLastSymbol, false);
+		drawAlchemyCircle(player, location, radius, 3, isGruesome, mLastSymbol, false);
 	}
 
 	@Override

@@ -39,11 +39,10 @@ public class ArcaneRemedyCS extends WardingRemedyCS {
 	public void remedyStartEffect(World world, Location loc, Player player, double radius) {
 
 		// sounds
-		world.playSound(loc, Sound.BLOCK_LARGE_AMETHYST_BUD_PLACE, SoundCategory.PLAYERS, 2f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_LARGE_AMETHYST_BUD_PLACE, SoundCategory.PLAYERS, 2f, 0.75f);
-		world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.75f, 2f);
-		world.playSound(loc, Sound.BLOCK_CONDUIT_ATTACK_TARGET, SoundCategory.PLAYERS, 0.75f, 1.5f);
-		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.75f, 1.5f);
+		world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.6f, 1.7f);
+		world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 2.0f, 0.4f);
+		world.playSound(loc, Sound.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 2.0f, 0.4f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 0.7f, 1.0f);
 
 		// big circle on the ground
 		ArcanePotionsCS.drawAlchemyCircle(player, loc.add(0, 0.25, 0), radius, 3, true, ArcanePotionsCS.BISMUTH_ORE, true);
@@ -56,9 +55,8 @@ public class ArcaneRemedyCS extends WardingRemedyCS {
 			return;
 		}
 
-		for (int i = 0; i < 2; i++) {
-			AbilityUtils.playPassiveAbilitySound(playerLoc, pulse < maxPulse - 1 ? Sound.BLOCK_AMETHYST_BLOCK_STEP : Sound.BLOCK_LARGE_AMETHYST_BUD_BREAK, 1, 0.5f);
-		}
+		AbilityUtils.playPassiveAbilitySound(playerLoc, pulse < maxPulse - 1 ? Sound.BLOCK_AMETHYST_BLOCK_STEP : Sound.BLOCK_LARGE_AMETHYST_BUD_BREAK, 0.7f, 0.4f);
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.ITEM_TRIDENT_RETURN, 0.8f, 0.8f);
 
 	}
 

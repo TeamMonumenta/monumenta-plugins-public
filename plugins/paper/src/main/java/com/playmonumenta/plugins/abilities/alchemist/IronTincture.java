@@ -20,8 +20,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -107,7 +105,7 @@ public class IronTincture extends Ability {
 		Location loc = mPlayer.getEyeLocation();
 		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, IRON_TINCTURE_VELOCITY);
 		Item tincture = AbilityUtils.spawnAbilityItem(world, loc, Material.SPLASH_POTION, mCosmetic.tinctureName(), false, velocity, true, true);
-		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
+		mCosmetic.onThrow(world, loc);
 
 		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
@@ -126,7 +124,7 @@ public class IronTincture extends Ability {
 						continue;
 					}
 
-					mCosmetic.pickupEffects(l, p);
+					mCosmetic.pickupEffects(l.getWorld(), l, p);
 
 					tincture.remove();
 

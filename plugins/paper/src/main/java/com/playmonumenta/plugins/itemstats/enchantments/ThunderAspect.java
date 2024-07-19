@@ -25,7 +25,9 @@ import org.bukkit.entity.Guardian;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class ThunderAspect implements Enchantment {
 	public static final double CHANCE = 0.1;
@@ -82,8 +84,6 @@ public class ThunderAspect implements Enchantment {
 				if (FastUtils.RANDOM.nextDouble() < chance) {
 					if (!EntityUtils.isElite(enemy) && !EntityUtils.isCCImmuneMob(enemy)) {
 						EntityUtils.applyStun(plugin, DURATION_PROJ, enemy);
-
-						World world = enemy.getWorld();
 						Location halfHeightLocation = LocationUtils.getHalfHeightLocation(enemy);
 						double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
 						// /particle dust 1 0.945 0.431 1 7053 78.9 7069 0.225 0.45 0.225 0 10
@@ -112,21 +112,10 @@ public class ThunderAspect implements Enchantment {
 						partialParticle.mVaryPositiveY = true;
 						partialParticle.spawnAsEnemy();
 
+						World world = enemy.getWorld();
 						Location enemyLocation = enemy.getLocation();
-						world.playSound(
-							enemyLocation,
-							Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
-							SoundCategory.PLAYERS,
-							0.5f,
-							1.5f
-						);
-						world.playSound(
-							enemyLocation,
-							Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
-							SoundCategory.PLAYERS,
-							0.5f,
-							1.2f
-						);
+						world.playSound(enemyLocation, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 0.5f, 1.5f);
+						world.playSound(enemyLocation, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 0.5f, 1.2f);
 					}
 				}
 			}
@@ -134,6 +123,13 @@ public class ThunderAspect implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy, boolean particles) {
+		Location loc = enemy.getLocation();
+		World world = enemy.getWorld();
+		if (particles) {
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.5f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.2f, 2.0f);
+		}
+
 		double chance = (CHANCE + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE)) * level * (particles ? player.getCooledAttackStrength(0) : 1);
 		if (FastUtils.RANDOM.nextDouble() < chance) {
 			if (EntityUtils.isElite(enemy)) {
@@ -143,14 +139,23 @@ public class ThunderAspect implements Enchantment {
 			}
 
 			if (particles && !EntityUtils.isCCImmuneMob(enemy)) {
-				Location loc = enemy.getLocation();
-				World world = enemy.getWorld();
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 0.65f, 1.5f);
 				loc = loc.add(0, 1, 0);
 				new PartialParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_YELLOW).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_FAINT_YELLOW).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.15).spawnAsPlayerActive(player);
 			}
+		}
+	}
+
+	@Override
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			World world = player.getWorld();
+			Location loc = player.getLocation();
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.5f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 0.9f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.35f, 2.0f);
 		}
 	}
 }

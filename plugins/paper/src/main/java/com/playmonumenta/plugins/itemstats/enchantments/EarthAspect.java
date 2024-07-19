@@ -8,20 +8,26 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
 import java.util.EnumSet;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class EarthAspect implements Enchantment {
 
@@ -52,7 +58,7 @@ public class EarthAspect implements Enchantment {
 			if (type == DamageEvent.DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE) {
 				level /= 2;
 			}
-			apply(plugin, player, level);
+			apply(plugin, player, level, type);
 		}
 	}
 
@@ -63,11 +69,11 @@ public class EarthAspect implements Enchantment {
 			if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 				return;
 			}
-			apply(plugin, player, level);
+			apply(plugin, player, level, null);
 		}
 	}
 
-	public static void apply(Plugin plugin, Player player, double level) {
+	public static void apply(Plugin plugin, Player player, double level, @Nullable DamageEvent.DamageType type) {
 		plugin.mEffectManager.addEffect(player, EARTH_STRING, new PercentDamageReceived(DURATION, DAMAGE_REDUCTION_PER_LEVEL * level));
 
 		double widthDelta = PartialParticle.getWidthDelta(player);
@@ -97,13 +103,24 @@ public class EarthAspect implements Enchantment {
 			COLOR
 		).spawnAsEnemy();
 
-		player.getWorld().playSound(
-			player.getLocation(),
-			Sound.BLOCK_GRAVEL_BREAK,
-			SoundCategory.PLAYERS,
-			1.0f,
-			1.0f
-		);
+		World world = player.getWorld();
+		Location loc = player.getLocation();
+		if (type == DamageEvent.DamageType.MELEE) {
+			world.playSound(loc, Sound.BLOCK_AZALEA_LEAVES_BREAK, SoundCategory.PLAYERS, 1.2f, 0.7f);
+			world.playSound(loc, Sound.ITEM_BONE_MEAL_USE, SoundCategory.PLAYERS, 1.2f, 0.7f);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.8f, 0.9f);
+		} else {
+			world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		}
+	}
+
+	@Override
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			World world = player.getWorld();
+			Location loc = player.getLocation();
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.6f, 1.1f);
+		}
 	}
 
 }

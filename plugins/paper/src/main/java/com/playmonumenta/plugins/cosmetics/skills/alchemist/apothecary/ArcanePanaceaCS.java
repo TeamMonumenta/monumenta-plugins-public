@@ -50,19 +50,13 @@ public class ArcanePanaceaCS extends PanaceaCS {
 	@Override
 	public void castEffects(Player player, double radius) {
 		World world = player.getWorld();
-		for (int i = 0; i < 2; i++) {
-			world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.75f, 0.5f);
-		}
-		for (int i = 0; i < 5; i++) {
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
-			}, 3L * i);
-		}
+		Location loc = player.getLocation();
+		sounds(world, loc);
 
 		// big circle
-		Vector up = VectorUtils.rotationToVector(player.getLocation().getYaw(), player.getLocation().getPitch() - 90);
-		Vector right = player.getLocation().getDirection().crossProduct(up);
-		Location centerLocation = player.getEyeLocation().add(player.getLocation().getDirection().multiply(RING_DISTANCE));
+		Vector up = VectorUtils.rotationToVector(loc.getYaw(), loc.getPitch() - 90);
+		Vector right = loc.getDirection().crossProduct(up);
+		Location centerLocation = player.getEyeLocation().add(loc.getDirection().multiply(RING_DISTANCE));
 		double smallRadius = RING_RADIUS * 0.4;
 		double arcCut = Math.toDegrees(2 * Math.asin(smallRadius / RING_RADIUS / 2));
 		new PPCircle(Particle.ENCHANTMENT_TABLE, centerLocation, RING_RADIUS)
@@ -123,15 +117,7 @@ public class ArcanePanaceaCS extends PanaceaCS {
 
 	@Override
 	public void projectileReverseEffects(Player player, Location loc, double radius) {
-		World world = loc.getWorld();
-		for (int i = 0; i < 2; i++) {
-			world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.5f, 0.65f);
-		}
-		for (int i = 0; i < 3; i++) {
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
-			}, 3L * i);
-		}
+		sounds(loc.getWorld(), loc);
 
 		Vector vec1 = VectorUtils.rotateYAxis(new Vector(1, 0, 0), loc.getYaw());
 		Vector vec2 = vec1.getCrossProduct(loc.getDirection());
@@ -164,6 +150,13 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, LocationUtils.getHalfHeightLocation(target), 16)
 				.delta(target.getBoundingBox().getWidthX() / 3, target.getBoundingBox().getHeight() / 3, target.getBoundingBox().getWidthZ() / 3)
 				.spawnAsEnemy();
+	}
+
+	private void sounds(World world, Location loc) {
+		world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.0f, 1.4f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.5f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.4f);
+		world.playSound(loc, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 1.0f, 1.8f);
 	}
 
 }

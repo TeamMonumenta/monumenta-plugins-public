@@ -46,6 +46,15 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 	}
 
 	@Override
+	public void onThrow(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 0.7f, 0.4f);
+		world.playSound(loc, Sound.ITEM_ARMOR_EQUIP_NETHERITE, SoundCategory.PLAYERS, 0.7f, 0.8f);
+		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 5.0f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 2.0f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.8f, 2.0f);
+	}
+
+	@Override
 	public void onGroundEffect(Location location, Player caster, int twoTicks) {
 		// sound
 		if (twoTicks % 10 == 0) {
@@ -79,9 +88,12 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 	}
 
 	@Override
-	public void pickupEffects(Location location, Player p) {
-		location.getWorld().playSound(location, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.85f);
-		location.getWorld().playSound(location, Sound.BLOCK_LARGE_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, 1, 0.5f);
+	public void pickupEffects(World world, Location location, Player p) {
+		world.playSound(location, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.8f);
+		world.playSound(location, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.6f, 0.8f);
+		world.playSound(location, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.8f, 1.7f);
+		world.playSound(location, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.5f, 2.0f);
+		world.playSound(location, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.6f, 1.0f);
 		new PartialParticle(Particle.BLOCK_DUST, location, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, location.clone().add(0, 0.3, 0))
 				.count(20).delta(0.05, 0.1, 0.05)

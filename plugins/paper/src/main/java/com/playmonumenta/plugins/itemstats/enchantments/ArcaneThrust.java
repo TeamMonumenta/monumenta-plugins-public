@@ -86,7 +86,13 @@ public class ArcaneThrust implements Enchantment {
 						}
 					}
 				}
-				world.playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
+
+				Location playerLoc = player.getLocation();
+				world.playSound(playerLoc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 0.7f, 1.4f);
+				world.playSound(playerLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5f, 1.1f);
+				world.playSound(playerLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.6f, 1.8f);
+				world.playSound(playerLoc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 2.0f);
+				world.playSound(playerLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.8f, 0.6f);
 			}
 		}
 	}

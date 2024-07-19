@@ -56,8 +56,7 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 		}
 
 		if (ticks % (2 * SPARK_PARTICLE_LIFETIME) == 0) {
-			float fraction = 1f * ticks / duration;
-			loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 0.5f + 0.5f * fraction, 0.5f + 0.5f * fraction);
+			loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 2.0f, 0.6f);
 		}
 
 		loc = loc.clone().add(0, 0.25, 0);
@@ -122,10 +121,13 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 	@Override
 	public void explodeEffects(Player caster, Location loc, double radius) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.6f, 0f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.6f, 1.25f);
-		world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
-		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
+		world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.2f, 1.7f);
+		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 4.0f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.PLAYERS, 0.2f, 1.7f);
+		world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 1.0f, 1.4f);
+		world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.5f, 0.4f);
+		world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.0f, 2.0f);
 
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 30, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(caster);
 		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1).minimumCount(1).spawnAsPlayerActive(caster);

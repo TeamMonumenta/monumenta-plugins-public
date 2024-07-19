@@ -22,6 +22,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class IceAspect implements Enchantment {
 	public static final int ICE_ASPECT_DURATION = 20 * 4;
@@ -98,27 +100,9 @@ public class IceAspect implements Enchantment {
 
 				World world = enemy.getWorld();
 				Location enemyLocation = enemy.getLocation();
-				world.playSound(
-					enemyLocation,
-					Sound.BLOCK_SOUL_SAND_PLACE,
-					SoundCategory.PLAYERS,
-					1f,
-					0.5f
-				);
-				world.playSound(
-					enemyLocation,
-					Sound.BLOCK_GLASS_BREAK,
-					SoundCategory.PLAYERS,
-					0.75f,
-					1.1f
-				);
-				world.playSound(
-					enemyLocation,
-					Sound.BLOCK_GLASS_BREAK,
-					SoundCategory.PLAYERS,
-					0.5f,
-					1.3f
-				);
+				world.playSound(enemyLocation, Sound.BLOCK_SOUL_SAND_PLACE, SoundCategory.PLAYERS, 1f, 0.5f);
+				world.playSound(enemyLocation, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.75f, 1.1f);
+				world.playSound(enemyLocation, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.3f);
 			}
 
 			apply(plugin, player, level, duration, enemy, type == DamageType.MELEE);
@@ -133,6 +117,22 @@ public class IceAspect implements Enchantment {
 		EntityUtils.applySlow(plugin, CharmManager.getDuration(player, CHARM_DURATION, duration), (level * SLOW_PER_LEVEL) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW), enemy);
 		if (particles) {
 			new PartialParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerBuff(player);
+			World world = enemy.getWorld();
+			Location loc = enemy.getLocation();
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.45f, 1.1f);
+			world.playSound(loc, Sound.ENTITY_TURTLE_HURT_BABY, SoundCategory.PLAYERS, 0.45f, 0.7f);
+		}
+	}
+
+	@Override
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			World world = player.getWorld();
+			Location loc = player.getLocation();
+			world.playSound(loc, Sound.ENTITY_TURTLE_HURT_BABY, SoundCategory.PLAYERS, 0.8f, 0.7f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.8f, 0.7f);
+			world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 5.5f, 0.6f);
+			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 0.7f);
 		}
 	}
 }

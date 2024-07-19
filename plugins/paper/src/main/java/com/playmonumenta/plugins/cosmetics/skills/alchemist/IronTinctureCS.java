@@ -30,6 +30,10 @@ public class IronTinctureCS implements CosmeticSkill {
 		return "Iron Tincture";
 	}
 
+	public void onThrow(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
+	}
+
 	public void onGroundEffect(Location location, Player caster, int twoTicks) {
 		new PartialParticle(Particle.SPELL, location, 3, 0, 0, 0, 0.1).spawnAsPlayerActive(caster);
 	}
@@ -37,8 +41,8 @@ public class IronTinctureCS implements CosmeticSkill {
 	public void tinctureExpireEffects(Location location, Player caster) {
 	}
 
-	public void pickupEffects(Location location, Player p) {
-		location.getWorld().playSound(location, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.85f);
+	public void pickupEffects(World world, Location location, Player p) {
+		world.playSound(location, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.85f);
 		new PartialParticle(Particle.BLOCK_DUST, location, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
 		new PartialParticle(Particle.FIREWORKS_SPARK, location, 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(p);
 	}

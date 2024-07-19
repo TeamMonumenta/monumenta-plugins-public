@@ -22,8 +22,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -122,7 +120,7 @@ public class AlchemicalArtillery extends Ability {
 			return;
 		}
 
-		loc.getWorld().playSound(loc, Sound.ENTITY_RAVAGER_STEP, SoundCategory.PLAYERS, 0.5f, 0.5f);
+		mCosmetic.onSpawn(loc.getWorld(), loc);
 		double baseVelocityMultiplier = (mAlchemistPotions.getSpeed() - 1) / 2 + 1;
 		double velocityMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, baseVelocityMultiplier);
 		Vector vel = loc.getDirection().normalize().multiply(velocityMultiplier);

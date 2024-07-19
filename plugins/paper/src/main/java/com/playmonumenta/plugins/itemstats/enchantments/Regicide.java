@@ -9,8 +9,14 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.EnumSet;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class Regicide implements Enchantment {
 
@@ -38,7 +44,7 @@ public class Regicide implements Enchantment {
 		return 28;
 	}
 
-	public static double calculateDamageMultiplier(double level, Player player, LivingEntity target, DamageEvent event) {
+	public static double calculateDamageMultiplier(double level, Player player, LivingEntity target) {
 		if (EntityUtils.isElite(target)) {
 			return (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level));
 		} else if (EntityUtils.isBoss(target)) {
@@ -50,12 +56,32 @@ public class Regicide implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
-		if (event.getType() != DamageType.AILMENT
-			    && event.getType() != DamageType.POISON
-			    && event.getType() != DamageType.FALL
-			    && event.getType() != DamageType.OTHER
-			    && event.getType() != DamageType.TRUE) {
-				event.updateGearDamageWithMultiplier(calculateDamageMultiplier(level, player, target, event));
+		DamageType type = event.getType();
+		if (type != DamageType.AILMENT
+			    && type != DamageType.POISON
+			    && type != DamageType.FALL
+			    && type != DamageType.OTHER
+			    && type != DamageType.TRUE
+		) {
+			double mult = calculateDamageMultiplier(level, player, target);
+			event.updateGearDamageWithMultiplier(mult);
+			if (mult > 1) {
+				World world = target.getWorld();
+				Location loc = target.getLocation();
+				if (type == DamageType.MELEE) {
+					world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 0.8f, 0.7f);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			World world = player.getWorld();
+			Location loc = player.getLocation();
+			world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 2.0f, 0.8f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.7f, 0.8f);
 		}
 	}
 }

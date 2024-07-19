@@ -17,9 +17,12 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -72,6 +75,15 @@ public class Reverb implements Enchantment {
 		mDamageThisTick += damage;
 		mHighestDamageThisTick = FastMath.max(damage, mHighestDamageThisTick);
 
+		DamageEvent.DamageType type = event.getType();
+		World world = enemy.getWorld();
+		Location loc = enemy.getLocation();
+		if (type == DamageEvent.DamageType.MELEE) {
+			world.playSound(loc, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 0.4f, 1.1f);
+			world.playSound(loc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.1f, 0.7f);
+			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.0f, 0.5f);
+		}
+
 		// Start the task 1 tick later, to give ample time to sum the damage, and check if the mob is definitely dead.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			if (mDamageThisTick != 0) {
@@ -87,11 +99,13 @@ public class Reverb implements Enchantment {
 
 				final Location enemyLocation = enemy.getEyeLocation().clone();
 				LivingEntity hitMob = EntityUtils.getNearestHostileTargetable(enemyLocation, CharmManager.getRadius(player, CHARM_RADIUS, DETECTION_RADIUS));
-
-
 				if (hitMob == null) {
 					return;
 				}
+
+				world.playSound(enemyLocation, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 2.0f, 0.7f);
+				world.playSound(enemyLocation, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 5.0f, 0.4f);
+				world.playSound(enemyLocation, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 0.2f, 2.0f);
 
 				// Start the particle show, then apply damage.
 				new BukkitRunnable() {
@@ -110,8 +124,10 @@ public class Reverb implements Enchantment {
 
 						// When the animation is done:
 						if (mTicks >= mBoltDurations) {
-							player.playSound(player.getLocation(), Sound.BLOCK_SOUL_SAND_STEP, SoundCategory.PLAYERS, 1.5f, 0.5f);
 							new PartialParticle(Particle.SOUL, targetLocation, 25, 0.3, 0.3, 0.3, 0.05).spawnAsEnemy();
+							world.playSound(targetLocation, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.8f, 0.4f);
+							world.playSound(targetLocation, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.3f, 1.6f);
+							world.playSound(targetLocation, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 0.6f);
 
 							double finalDamage = value * (overkill * OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL + highestDamage * HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL);
 							DamageUtils.damage(player, hitMob, DamageEvent.DamageType.OTHER, (double) Math.round(CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, finalDamage)), ClassAbility.REVERB, true, false);
@@ -160,5 +176,18 @@ public class Reverb implements Enchantment {
 			return Color.fromRGB(80, 140 + randInt, 200);
 		}
 		return Color.fromRGB(80 + randInt, 80, 200);
+	}
+
+	@Override
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			World world = player.getWorld();
+			Location loc = player.getLocation();
+			world.playSound(loc, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 2.0f, 0.7f);
+			world.playSound(loc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.4f, 0.4f);
+			world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 5.0f, 0.6f);
+			world.playSound(loc, Sound.ENTITY_ALLAY_HURT, SoundCategory.PLAYERS, 0.2f, 0.6f);
+			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 0.5f, 0.7f);
+		}
 	}
 }

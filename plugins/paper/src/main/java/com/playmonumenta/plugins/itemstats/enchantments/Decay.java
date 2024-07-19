@@ -9,9 +9,16 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.EnumSet;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class Decay implements Enchantment {
 
@@ -42,14 +49,14 @@ public class Decay implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		DamageType type = event.getType();
 		if (AbilityUtils.isAspectTriggeringEvent(event, player)) {
+			DamageType type = event.getType();
 			int duration = (int) (DURATION * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
-			apply(plugin, enemy, duration, value, player);
+			apply(plugin, enemy, duration, value, player, type);
 		}
 	}
 
-	public static void apply(Plugin plugin, LivingEntity enemy, int duration, double decayLevel, Player player) {
+	public static void apply(Plugin plugin, LivingEntity enemy, int duration, double decayLevel, Player player, DamageType type) {
 		int finalDuration = CharmManager.getDuration(player, CHARM_DURATION, duration);
 		double desiredPeriod = 40 / decayLevel;
 		if (desiredPeriod > finalDuration) { // Can happen with enchantment reductions from region scaling
@@ -60,5 +67,21 @@ public class Decay implements Enchantment {
 		double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, 1) * adjustedPeriod / desiredPeriod;
 		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME,
 			new CustomDamageOverTime(finalDuration, damage, adjustedPeriod, player, plugin.mItemStatManager.getPlayerItemStatsCopy(player), null, DamageType.AILMENT));
+
+		if (type == DamageType.MELEE) {
+			World world = enemy.getWorld();
+			Location loc = enemy.getLocation();
+			world.playSound(loc, Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.PLAYERS, 0.35f, 0.9f);
+		}
+	}
+
+	@Override
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			World world = player.getWorld();
+			Location loc = player.getLocation();
+			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.05f, 0.7f);
+			world.playSound(loc, Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.PLAYERS, 0.4f, 0.7f);
+		}
 	}
 }
