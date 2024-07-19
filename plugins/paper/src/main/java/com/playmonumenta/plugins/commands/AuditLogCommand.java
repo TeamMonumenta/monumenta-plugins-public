@@ -44,7 +44,7 @@ public class AuditLogCommand {
 			.withPermission(CommandPermission.fromString("monumenta.command.auditlog"))
 			.withArguments(new GreedyStringArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.logSevere(args.getUnchecked("message"));
+				AuditListener.logChatMod(args.getUnchecked("message"));
 			})
 			.register();
 	}
