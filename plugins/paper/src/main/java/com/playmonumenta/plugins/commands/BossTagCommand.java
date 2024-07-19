@@ -150,6 +150,34 @@ public class BossTagCommand {
 						editBossTag(player, args.getUnchecked("index"), args.getUnchecked("boss_tag"));
 					})
 			)
+
+			.withSubcommand(
+				new CommandAPICommand("copy")
+					.withArguments(
+						new IntegerArgument("sourceInventorySlotIndex", 0, 40),
+						new IntegerArgument("targetInventorySlotIndex", 0, 40)
+					)
+					.executesPlayer((player, args) -> {
+						copyTags(
+							player,
+							getBosSlot(player, args.getUnchecked("sourceInventorySlotIndex")),
+							getBosSlot(player, args.getUnchecked("targetInventorySlotIndex")));
+					})
+			)
+
+			.withSubcommand(
+				new CommandAPICommand("copy_from_mainhand")
+					.withArguments(
+						new IntegerArgument("targetInventorySlotIndex", 0, 40)
+					)
+					.executesPlayer((player, args) -> {
+						copyTags(
+							player,
+							getBos(player),
+							getBosSlot(player, args.getUnchecked("targetInventorySlotIndex")));
+					})
+			)
+
 			.withSubcommand(
 				new CommandAPICommand("delete")
 					.withArguments(new IntegerArgument("index"))
@@ -451,6 +479,18 @@ public class BossTagCommand {
 			throw CommandAPI.failWithString("That Book of Souls is corrupted!");
 		}
 		throw CommandAPI.failWithString("You must be holding a Book of Souls!");
+	}
+
+	private static BookOfSouls getBosSlot(Player player, int index) throws WrapperCommandSyntaxException {
+		ItemStack item = player.getInventory().getItem(index);
+		if (BookOfSouls.isValidBook(item)) {
+			BookOfSouls bos = BookOfSouls.getFromBook(item);
+			if (bos != null) {
+				return bos;
+			}
+			throw CommandAPI.failWithString("That Book of Souls is corrupted!");
+		}
+		throw CommandAPI.failWithString("No Book of Souls found in slot " + Integer.toString(index));
 	}
 
 	private static void infoBossTag(Player player, String bossTag) throws IllegalArgumentException, IllegalAccessException {
@@ -862,6 +902,31 @@ public class BossTagCommand {
 		listBossTags(player);
 	}
 
+	/**
+	 * Copies all boss tags from held Book of Souls to another.
+	 *
+	 * @param player Player holding the Book of Souls.
+	 */
+	private static void copyTags(Player player, BookOfSouls fromBos, BookOfSouls toBos) throws WrapperCommandSyntaxException {
+		NBTTagList fromNbtTagsList = fromBos.getEntityNBT().getData().getList("Tags");
+		ListVariable toTags = (ListVariable) toBos.getEntityNBT().getVariable("Tags");
+
+		player.sendMessage(Component.empty()
+									.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+									.append(Component.text("Copying tags...", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+		Arrays.stream(fromNbtTagsList.getAsArray())
+			  .map(Object::toString)
+			  .forEach(tag -> toTags.add(tag, player));
+
+		toBos.saveBook();
+
+		player.sendMessage(Component.empty()
+			  .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			  .append(Component.text("Tags successfully copied!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+	}
 
 	private static Tooltip<String>[] suggestionBossTagBasedonBoS(SuggestionInfo<CommandSender> info) {
 		try {
@@ -1210,6 +1275,16 @@ public class BossTagCommand {
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag add <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag add ")))
 			                   .append(Component.text(" Add a boss tag to your currently held Book of Souls. Checks if the BoS has the current boss_tag implemented.", NamedTextColor.GRAY))
+		);
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("/bosstag copy <from> <to>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag copy ")))
+			                   .append(Component.text(" Copies bosstags from the <from> inventory slot to the <to> inventory slot. Inventory slots are numbered in Bukkit convention, e.g., 0-8 for hotbar", NamedTextColor.GRAY))
+		);
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("/bosstag copyFromMainhand <to>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag copy ")))
+			                   .append(Component.text(" Copies bosstags from the mainhand to the <to> inventory slot. Inventory slots are numbered in Bukkit convention, e.g., 0-8 for hotbar", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
