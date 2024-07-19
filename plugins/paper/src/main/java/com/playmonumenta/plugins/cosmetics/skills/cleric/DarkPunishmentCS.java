@@ -127,7 +127,9 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 		partialParticle
 			.spawnAsPlayerActive(player);
 
-		Location loc = player.getLocation().add(0, 1, 0);
+		Vector dir = player.getEyeLocation().getDirection();
+		enemyLoc.setDirection(dir);
+		Location loc = enemyLoc.add(0, 1, 0).subtract(dir.multiply(2.35));
 		ParticleUtils.drawHalfArc(loc, 2.1, ANGLE[combo], -20, 140, 7, 0.2,
 			(Location l, int ring) -> {
 				new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 1, 0, 0, 0, 0,
