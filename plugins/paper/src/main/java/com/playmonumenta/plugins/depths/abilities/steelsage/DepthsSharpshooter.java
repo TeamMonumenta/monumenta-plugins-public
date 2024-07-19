@@ -23,6 +23,7 @@ import org.bukkit.entity.Projectile;
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
 	public static final String ABILITY_NAME = "Sharpshooter";
+	public static final double[] PASSIVE_DAMAGE = {0.15, 0.2, 0.25, 0.3, 0.35, 0.45};
 	public static final double[] DAMAGE_PER_STACK = {0.03, 0.042, 0.054, 0.066, 0.078, 0.102};
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
 	private static final int TWISTED_SHARPSHOOTER_DECAY_TIMER = 20 * 6;
@@ -36,7 +37,8 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	private final int mMaxStacks;
 	private final int mDecayTimerLength;
-	private final double mDamage;
+	private final double mPassiveDamage;
+	private final double mStackDamage;
 
 	private int mStacks = 0;
 	private int mTicksToStackDecay = 0;
@@ -45,13 +47,15 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		super(plugin, player, INFO);
 		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CharmEffects.SHARPSHOOTER_MAX_STACKS.mEffectName);
 		mDecayTimerLength = CharmManager.getDuration(mPlayer, CharmEffects.SHARPSHOOTER_DECAY_TIMER.mEffectName, mRarity >= 6 ? TWISTED_SHARPSHOOTER_DECAY_TIMER : SHARPSHOOTER_DECAY_TIMER);
-		mDamage = DAMAGE_PER_STACK[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SHARPSHOOTER_DAMAGE_PER_STACK.mEffectName);
+		mPassiveDamage = PASSIVE_DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SHARPSHOOTER_PASSIVE_DAMAGE.mEffectName);
+		mStackDamage = DAMAGE_PER_STACK[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SHARPSHOOTER_DAMAGE_PER_STACK.mEffectName);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) {
-			event.updateDamageWithMultiplier(1 + mStacks * mDamage);
+			double mult = 1 + mPassiveDamage + mStacks * mStackDamage;
+			event.updateDamageWithMultiplier(mult);
 
 			// Critical arrow and mob is actually going to take damage
 			if (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
@@ -84,12 +88,15 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	private static Description<DepthsSharpshooter> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<DepthsSharpshooter>(color)
+			.add("You deal ")
+			.addPercent(a -> a.mPassiveDamage, PASSIVE_DAMAGE[rarity - 1], false, true)
+			.add(" more projectile damage. ")
 			.add("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to ")
 			.add(a -> a.mMaxStacks, MAX_STACKS)
 			.add(". Stacks decay after ")
 			.addDuration(a -> a.mDecayTimerLength, rarity == 6 ? TWISTED_SHARPSHOOTER_DECAY_TIMER : SHARPSHOOTER_DECAY_TIMER, false, rarity == 6)
 			.add(" seconds of not gaining a stack. Each stack increases your projectile damage by ")
-			.addPercent(a -> a.mDamage, DAMAGE_PER_STACK[rarity - 1], false, true)
+			.addPercent(a -> a.mStackDamage, DAMAGE_PER_STACK[rarity - 1], false, true)
 			.add(".");
 	}
 

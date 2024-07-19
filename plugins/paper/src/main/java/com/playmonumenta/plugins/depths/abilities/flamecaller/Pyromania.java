@@ -23,6 +23,7 @@ public class Pyromania extends DepthsAbility {
 	public static final double[] DAMAGE = {0.03, 0.04, 0.05, 0.06, 0.075, 0.1};
 	public static final int RADIUS = 6;
 	public static final int TWISTED_RADIUS = 8;
+	public static final int MAX_ENTITIES = 10;
 
 	public static final DepthsAbilityInfo<Pyromania> INFO =
 		new DepthsAbilityInfo<>(Pyromania.class, ABILITY_NAME, Pyromania::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
@@ -60,14 +61,14 @@ public class Pyromania extends DepthsAbility {
 		}
 
 		if (fireCount > 0) {
-			event.updateDamageWithMultiplier(1 + (mDamagePerMob * fireCount));
+			event.updateDamageWithMultiplier(1 + (mDamagePerMob * Math.min(MAX_ENTITIES, fireCount)));
 		}
 		return false;
 	}
 
 	private static Description<Pyromania> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Pyromania>(color)
-			.add("For every mob and player on fire within ")
+			.add("For every mob and player on fire (up to 10, total) within ")
 			.add(a -> a.mRadius, rarity == 6 ? TWISTED_RADIUS : RADIUS, false, null, rarity == 6)
 			.add(" blocks of you, gain ")
 			.addPercent(a -> a.mDamagePerMob, DAMAGE[rarity - 1], false, true)

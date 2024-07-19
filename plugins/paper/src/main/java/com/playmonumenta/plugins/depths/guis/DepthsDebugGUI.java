@@ -78,7 +78,7 @@ public class DepthsDebugGUI extends CustomInventory {
 						event.getWhoClicked().sendMessage(DepthsManager.getInstance().getPartySummary(mPlayerToDebug));
 						event.getWhoClicked().closeInventory();
 					}
-					case "abilityinfo" -> new DepthsSummaryGUI(player, mPlayerToDebug).openInventory(player, mPlugin);
+					case "abilityinfo" -> new DepthsSummaryGUI(player, mPlayerToDebug).open();
 					case "delveinfo" -> {
 						DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(mPlayerToDebug);
 						if (dp != null && dp.getContent() == DepthsContent.DARKEST_DEPTHS) {

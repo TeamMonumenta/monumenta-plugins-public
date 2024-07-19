@@ -44,6 +44,7 @@ public class RapidFire extends DepthsAbility {
 	public static final int[] ARROWS = {4, 5, 6, 7, 8, 10};
 	public static final int DAMAGE = 10;
 	public static final int COOLDOWN = 22 * 20;
+	public static final int FIRE_RATE = 3;
 	public static final String META_DATA_TAG = "RapidFireArrow";
 
 	public static final String CHARM_COOLDOWN = "Rapid Fire Cooldown";
@@ -60,6 +61,7 @@ public class RapidFire extends DepthsAbility {
 
 	private final int mArrows;
 	private final double mDamage;
+	private final int mFireRate;
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
@@ -67,6 +69,7 @@ public class RapidFire extends DepthsAbility {
 		super(plugin, player, INFO);
 		mArrows = ARROWS[mRarity - 1] + (int) CharmManager.getLevel(mPlayer, CharmEffects.RAPID_FIRE_ARROWS.mEffectName);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.RAPID_FIRE_DAMAGE.mEffectName, DAMAGE);
+		mFireRate = (int) (FIRE_RATE / (1 + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.RAPID_FIRE_FIRERATE.mEffectName)));
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
@@ -114,7 +117,7 @@ public class RapidFire extends DepthsAbility {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 3));
+		}.runTaskTimer(mPlugin, 0, mFireRate));
 		putOnCooldown();
 		return true;
 	}

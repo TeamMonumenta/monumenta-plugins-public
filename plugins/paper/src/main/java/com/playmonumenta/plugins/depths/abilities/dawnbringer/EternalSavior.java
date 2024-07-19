@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
+import com.playmonumenta.plugins.effects.Aesthetics;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -19,6 +21,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -39,7 +42,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-
 import static org.bukkit.Material.LIGHT;
 
 public class EternalSavior extends DepthsAbility {
@@ -52,6 +54,8 @@ public class EternalSavior extends DepthsAbility {
 	public static final double[] ABSORPTION = {4, 5, 6, 7, 8, 10};
 	public static final int ABSORPTION_DURATION = 5 * 20;
 	public static final int STUN_DURATION = 20;
+	public static final double WEAKNESS = 0.8;
+	public static final int WEAKNESS_DURATION = 2 * 20;
 
 	public static final String CHARM_COOLDOWN = "Eternal Savior Cooldown";
 
@@ -66,14 +70,15 @@ public class EternalSavior extends DepthsAbility {
 			.descriptions(EternalSavior::getDescription)
 			.priorityAmount(10000);
 
-	private Location mStasisLocation;
 	private final int mStasisDuration;
 	private final double mHeal;
 	private final double mRadius;
 	private final double mAbsorption;
 	private final int mAbsorptionDuration;
 	private final int mStunDuration;
+
 	private boolean mStasisActive;
+	private @Nullable Location mStasisLocation;
 
 	public EternalSavior(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -83,6 +88,9 @@ public class EternalSavior extends DepthsAbility {
 		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.ETERNAL_SAVIOR_ABSORPTION.mEffectName, ABSORPTION[mRarity - 1]);
 		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CharmEffects.ETERNAL_SAVIOR_ABSORPTION_DURATION.mEffectName, ABSORPTION_DURATION);
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.ETERNAL_SAVIOR_STUN_DURATION.mEffectName, STUN_DURATION);
+
+		mStasisActive = false;
+		mStasisLocation = null;
 	}
 
 	@Override
@@ -185,7 +193,9 @@ public class EternalSavior extends DepthsAbility {
 				}
 
 				if (mTicks % 4 == 0) {
-					List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true);
+					Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
+					List<Player> players = hitbox.getHitPlayers(true);
+					players.remove(mPlayer);
 					for (Player p : players) {
 						// heal 5 times per second
 						double healed = PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * mHeal / 5, mPlayer);
@@ -206,6 +216,17 @@ public class EternalSavior extends DepthsAbility {
 						createOrb(new Vector(FastUtils.randomDoubleInRange(-0.5, 0.5),
 							FastUtils.randomDoubleInRange(0.3, 0.5),
 							FastUtils.randomDoubleInRange(-0.5, 0.5)), sourceLoc, mPlayer, players.get(0));
+					}
+
+					// for mobs, weaken them
+					for (LivingEntity mob : hitbox.getHitMobs()) {
+						mPlugin.mEffectManager.addEffect(mob, "EternalSaviorWeakness", new PercentDamageDealt(WEAKNESS_DURATION, -WEAKNESS));
+						mPlugin.mEffectManager.addEffect(mob, "EternalSaviorAesthetics", new Aesthetics(WEAKNESS_DURATION,
+							(entity, fourHertz, twoHertz, oneHertz) -> {
+								new PartialParticle(Particle.SPELL_INSTANT, LocationUtils.getEntityCenter(entity), 2, 0.25, 0.25, 0.25, 0).spawnAsEnemyBuff();
+							},
+							(entity) -> { }
+						));
 					}
 				}
 
@@ -309,12 +330,12 @@ public class EternalSavior extends DepthsAbility {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
-	public boolean hasIncreasedReviveRadius() {
+	public boolean isActive() {
 		return mStasisActive;
 	}
 
 	public double getIncreasedReviveRadius() {
-		return mRadius / 2;
+		return mRadius;
 	}
 
 	public Location getSaviorLocation() {
@@ -331,9 +352,12 @@ public class EternalSavior extends DepthsAbility {
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks for ")
 			.addPercent(a -> a.mHeal * STASIS_DURATION / 20, HEAL_PER_SECOND[rarity - 1] * STASIS_DURATION / 20, false, true)
-			.add(" of their max health over the full duration and begin reviving all graves in a ")
-			.add(a -> a.mRadius / 2.0, RADIUS / 2.0)
-			.add(" block radius. When stasis ends, give ")
+			.add(" of their max health over the full duration and begin reviving all nearby graves.")
+			.add(" Nearby mobs deal ")
+			.addPercent(WEAKNESS)
+			.add(" less damage while they are nearby and for ")
+			.addDuration(WEAKNESS_DURATION)
+			.add(" seconds afterwards. When stasis ends, give ")
 			.add(a -> a.mAbsorption, ABSORPTION[rarity - 1], false, null, true)
 			.add(" absorption to all players within ")
 			.add(a -> a.mRadius, RADIUS)
@@ -341,9 +365,7 @@ public class EternalSavior extends DepthsAbility {
 			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
 			.add(" seconds and stun nearby mobs for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds and knock them away.")
+			.add(" second.")
 			.addCooldown(COOLDOWN);
 	}
-
-
 }

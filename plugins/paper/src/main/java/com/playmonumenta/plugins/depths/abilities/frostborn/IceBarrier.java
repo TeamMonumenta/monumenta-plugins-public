@@ -42,8 +42,8 @@ public class IceBarrier extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ice Barrier";
 	public static final double[] DAMAGE = {13, 16, 19, 22, 25, 30};
-	public static final int[] ICE_TICKS = {8 * 20, 10 * 20, 12 * 20, 14 * 20, 16 * 20, 20 * 20};
-	public static final int[] COOLDOWN = {20 * 20, 18 * 20, 16 * 20, 14 * 20, 12 * 20, 8 * 20};
+	public static final int ICE_TICKS = 14 * 20;
+	public static final int COOLDOWN = 14 * 20;
 	public static final int CAST_RANGE = 30;
 	public static final int[] MAX_LENGTH = {20, 25, 30, 35, 40, 50};
 	public static final int CAST_TIME = 5 * 20;
@@ -70,7 +70,7 @@ public class IceBarrier extends DepthsAbility {
 		super(plugin, player, INFO);
 		mRange = (int) CharmManager.getRadius(mPlayer, CharmEffects.ICE_BARRIER_CAST_RANGE.mEffectName, CAST_RANGE);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.ICE_BARRIER_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
-		mIceDuration = CharmManager.getDuration(mPlayer, CharmEffects.ICE_BARRIER_ICE_DURATION.mEffectName, ICE_TICKS[mRarity - 1]);
+		mIceDuration = CharmManager.getDuration(mPlayer, CharmEffects.ICE_BARRIER_ICE_DURATION.mEffectName, ICE_TICKS);
 		mLength = CharmManager.getRadius(mPlayer, CharmEffects.ICE_BARRIER_MAX_LENGTH.mEffectName, MAX_LENGTH[mRarity - 1]);
 		mIsPrimed = false;
 		mPrimedLoc = null;
@@ -190,11 +190,11 @@ public class IceBarrier extends DepthsAbility {
 			.add(" seconds and within ")
 			.add(a -> a.mLength, MAX_LENGTH[rarity - 1], false, null, true)
 			.add(" blocks of the first marker forms a wall of ice connecting the two points, lasting for ")
-			.addDuration(a -> a.mIceDuration, ICE_TICKS[rarity - 1])
+			.addDuration(a -> a.mIceDuration, ICE_TICKS)
 			.add(" seconds. If there is a height difference of 4 or more blocks between the two markers, an ice staircase is placed instead. Deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs near the ice when placed. Enemies that break the barrier are stunned for 2s. Cooldown is refunded if no second marker is placed.")
-			.addCooldown(COOLDOWN[rarity - 1], true);
+			.addCooldown(COOLDOWN);
 	}
 
 

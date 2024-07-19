@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -1792,5 +1794,19 @@ public class PlayerListener implements Listener {
 
 	public boolean isPlayerTransferring(Player player) {
 		return mTransferringPlayers.contains(player.getUniqueId());
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void customEffectApplyEvent(CustomEffectApplyEvent event) {
+		if (event.getEntity() instanceof Player player) {
+			mPlugin.mAbilityManager.customEffectApplyEvent(player, event);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void effectTypeApplyFromPotionEvent(EffectTypeApplyFromPotionEvent event) {
+		if (event.getEntity() instanceof Player player) {
+			mPlugin.mAbilityManager.effectTypeApplyFromPotionEvent(player, event);
+		}
 	}
 }

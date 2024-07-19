@@ -65,7 +65,7 @@ public class AbilityTriggersGui extends Gui {
 					"Return to the ability summary page.", NamedTextColor.GRAY, 40);
 				GUIUtils.setGuiNbtTag(tempItem, "texture", "depth_trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
-					.onLeftClick(() -> new DepthsSummaryGUI(mPlayer).openInventory(mPlayer, mPlugin));
+					.onLeftClick(() -> new DepthsSummaryGUI(mPlayer).open());
 			}
 
 			// help icon

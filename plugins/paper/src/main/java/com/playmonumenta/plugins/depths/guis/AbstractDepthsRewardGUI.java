@@ -1,22 +1,26 @@
 package com.playmonumenta.plugins.depths.guis;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfObscurity;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfRuin;
+import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractDepthsRewardGUI extends CustomInventory {
+public abstract class AbstractDepthsRewardGUI extends Gui {
 
 	public static final List<List<Integer>> SLOT_MAP = Arrays.asList(
 		Arrays.asList(13),
@@ -26,71 +30,76 @@ public abstract class AbstractDepthsRewardGUI extends CustomInventory {
 		Arrays.asList(9, 11, 13, 15, 17)
 	);
 
-	protected static final Material FILLER = GUIUtils.FILLER_MATERIAL;
 	protected final boolean mReturnToSummary;
-	protected final List<Integer> mSlotsUsed;
+	protected final boolean mReroll;
 
-	public AbstractDepthsRewardGUI(Player player, boolean fromSummaryGUI, String title) {
+	public AbstractDepthsRewardGUI(Player player, boolean fromSummaryGUI, String title, boolean reroll) {
 		super(player, 27, title);
-
 		mReturnToSummary = fromSummaryGUI;
+		mReroll = reroll;
+	}
 
-		List<DepthsAbilityItem> items = getOptions(player);
-		if (items == null || items.isEmpty()) {
-			mSlotsUsed = new ArrayList<>();
+	@Override
+	public void setup() {
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
+		if (depthsPlayer == null) {
 			return;
 		}
 
-		mSlotsUsed = SLOT_MAP.get(items.size() - 1);
+		List<DepthsAbilityItem> items = getOptions();
+		if (items == null || items.isEmpty()) {
+			return;
+		}
 
-		GUIUtils.fillWithFiller(mInventory, true);
+		List<Integer> slotsUsed = SLOT_MAP.get(items.size() - 1);
 
-		for (int i = 0; i < mSlotsUsed.size(); i++) {
+		for (int i = 0; i < slotsUsed.size(); i++) {
 			DepthsAbilityItem dai = items.get(i);
 			ItemStack item;
 			if (dai == null) {
 				item = GUIUtils.createBasicItem(Material.BARRIER, "Do not accept the gift", NamedTextColor.RED, true);
+			} else if (i == slotsUsed.size() - 1 && depthsPlayer.mAbilities.getOrDefault(CurseOfObscurity.ABILITY_NAME, 0) > 0) {
+				item = GUIUtils.createBasicItem(Material.ROTTEN_FLESH, DepthsTree.CURSE.color("UnknownChoice").decorate(TextDecoration.OBFUSCATED));
 			} else {
 				item = dai.mItem;
 			}
-			mInventory.setItem(mSlotsUsed.get(i), item);
-		}
-	}
 
-	@Override
-	protected void inventoryClick(InventoryClickEvent event) {
-		event.setCancelled(true);
-		GUIUtils.refreshOffhand(event);
-		if (event.getClickedInventory() != mInventory ||
-			    event.getCurrentItem() == null ||
-			    event.getCurrentItem().getType() == FILLER ||
-			    event.isShiftClick()) {
-			return;
+			int slot = i;
+			setItem(slotsUsed.get(i), new GuiItem(item).onLeftClick(() -> {
+				playerClickedItem(slot);
+				close();
+
+				// Trigger Curse of Ruin - we could disable this on generosity, but I think it's probably fine
+				CurseOfRuin ruin = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, CurseOfRuin.class);
+				if (ruin != null) {
+					ruin.downgrade(depthsPlayer);
+				}
+
+				if (!depthsPlayer.mEarnedRewards.isEmpty()) {
+					DepthsManager.getInstance().getRoomReward(mPlayer, null, mReturnToSummary);
+				} else if (mReturnToSummary) {
+					DepthsGUICommands.summary(mPlayer);
+				}
+			}));
 		}
 
-		int slot = -1;
-		for (int i = 0; i < mSlotsUsed.size(); i++) {
-			if (event.getSlot() == mSlotsUsed.get(i)) {
-				slot = i;
-				break;
+		if (mReroll) {
+			int count = depthsPlayer.mRerolls;
+			if (count > 0) {
+				ItemStack item = GUIUtils.createBasicItem(Material.NAUTILUS_SHELL, count, "Reroll", NamedTextColor.DARK_AQUA, true, Component.text("Click to reroll these options.\n", NamedTextColor.GRAY).append(Component.text("You have " + count + " reroll" + (count > 1 ? "s" : "") + " remaining.")), 30, true);
+				setItem(2, 4, new GuiItem(item).onLeftClick(() -> {
+					close();
+					depthsPlayer.mRerolls--;
+					UUID uuid = depthsPlayer.mPlayerId;
+					DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
+					DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
+					DepthsManager.getInstance().getRoomReward(mPlayer, null, mReturnToSummary);
+				}));
 			}
 		}
-		if (slot < 0) {
-			return;
-		}
-
-		Player player = (Player) event.getWhoClicked();
-		playerClickedItem(player, slot);
-		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
-		player.closeInventory();
-		if (depthsPlayer != null && depthsPlayer.mEarnedRewards.size() > 0) {
-			DepthsManager.getInstance().getRoomReward(player, null, mReturnToSummary);
-		} else if (mReturnToSummary) {
-			DepthsGUICommands.summary(Plugin.getInstance(), player);
-		}
 	}
 
-	protected abstract @Nullable List<@Nullable DepthsAbilityItem> getOptions(Player player);
+	protected abstract @Nullable List<@Nullable DepthsAbilityItem> getOptions();
 
-	protected abstract void playerClickedItem(Player player, int slot);
+	protected abstract void playerClickedItem(int slot);
 }

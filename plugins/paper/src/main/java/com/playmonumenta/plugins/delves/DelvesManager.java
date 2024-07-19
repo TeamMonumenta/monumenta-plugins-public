@@ -458,6 +458,10 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onExpChange(PlayerExpChangeEvent event) {
+		if (ServerProperties.getDepthsEnabled()) {
+			// A17 Chronology shouldn't give extra xp in Zenith (or any similar thing in the future)
+			return;
+		}
 		Player player = event.getPlayer();
 		for (DelvesModifier mod : DelvesModifier.rotatingDelveModifiers()) {
 			if (getRank(player, mod) > 0) {

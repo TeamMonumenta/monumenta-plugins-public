@@ -43,21 +43,21 @@ public class Charity extends DepthsAbility {
 			.add(" seconds.");
 	}
 
-	public static void onCharityRevive(Player revivedPlayer, List<Player> revivers, int charityLevel) {
-		if (charityLevel == 0) {
-			return;
-		}
-
+	public static void onCharityRevive(Player revivedPlayer, List<Player> revivers) {
 		revivedPlayer.getWorld().playSound(revivedPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.85f);
-		// Give absorption to the revived player, based on highest level
-		AbsorptionUtils.addAbsorption(revivedPlayer, ABSORPTION[charityLevel - 1], ABSORPTION[charityLevel - 1], DURATION);
-		// Give absorption to the revivers that have this ability, based on their level in it
-		revivers.forEach(player -> {
-			int level = DepthsManager.getInstance().getPlayerLevelInAbility(ABILITY_NAME, player);
+
+		int highestAbsorption = 0;
+		for (Player reviver : revivers) {
+			int level = DepthsManager.getInstance().getPlayerLevelInAbility(ABILITY_NAME, reviver);
 			if (level == 0) {
-				return;
+				break;
 			}
-			AbsorptionUtils.addAbsorption(player, ABSORPTION[level - 1], ABSORPTION[level - 1], DURATION);
-		});
+			int absorption = ABSORPTION[level - 1];
+			highestAbsorption = Math.max(absorption, highestAbsorption);
+			AbsorptionUtils.addAbsorption(reviver, absorption, absorption, DURATION);
+		}
+		if (highestAbsorption > 0) {
+			AbsorptionUtils.addAbsorption(revivedPlayer, highestAbsorption, highestAbsorption, DURATION);
+		}
 	}
 }

@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
@@ -54,8 +55,10 @@ public class Diversity extends DepthsAbility {
 			// Since all abilities are refreshed when we get a new ability, we only have to calculate the value once
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				Set<DepthsTree> uniqueTrees = DepthsManager.getInstance().getPlayerAbilities(player).stream()
-					.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT))
-					.map(DepthsAbilityInfo::getDepthsTree).collect(Collectors.toSet());
+					.map(DepthsAbilityInfo::getDepthsTree)
+					.filter(Objects::nonNull) // Weapon Aspects have null tree
+					.filter(depthsTree -> depthsTree != DepthsTree.CURSE)
+					.collect(Collectors.toSet());
 
 				mTreeCount = Math.min(uniqueTrees.size(), TREES_REQUIRED);
 				if (mTreeCount >= TREES_REQUIRED) {

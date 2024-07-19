@@ -45,7 +45,7 @@ public class PointBlank implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
-		if (event.getType() == DamageType.PROJECTILE) {
+		if (event.getType() == DamageType.PROJECTILE && !event.isCancelled()) {
 			if (event.getDamager() instanceof AbstractArrow arrow && !(arrow instanceof Trident) && !arrow.isCritical()) {
 				return;
 			}

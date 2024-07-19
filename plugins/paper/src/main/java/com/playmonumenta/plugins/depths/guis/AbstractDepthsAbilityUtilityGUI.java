@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.guis;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
+import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -57,6 +58,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 		if (items == null || items.size() == 0) {
 			return false;
 		}
+		items.removeIf(item -> item.mTree == DepthsTree.CURSE);
 
 		GUIUtils.fillWithFiller(mInventory, true);
 

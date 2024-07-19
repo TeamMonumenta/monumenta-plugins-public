@@ -9,16 +9,16 @@ import org.jetbrains.annotations.Nullable;
 public class DepthsAbilitiesGUI extends AbstractDepthsRewardGUI {
 
 	public DepthsAbilitiesGUI(Player player, boolean fromSummaryGUI) {
-		super(player, fromSummaryGUI, "Select an Ability");
+		super(player, fromSummaryGUI, "Select an Ability", true);
 	}
 
 	@Override
-	protected @Nullable List<@Nullable DepthsAbilityItem> getOptions(Player player) {
-		return DepthsManager.getInstance().getAbilityUnlocks(player);
+	protected @Nullable List<@Nullable DepthsAbilityItem> getOptions() {
+		return DepthsManager.getInstance().getAbilityUnlocks(mPlayer);
 	}
 
 	@Override
-	protected void playerClickedItem(Player player, int slot) {
-		DepthsManager.getInstance().playerChoseItem(player, slot);
+	protected void playerClickedItem(int slot) {
+		DepthsManager.getInstance().playerChoseItem(mPlayer, slot);
 	}
 }

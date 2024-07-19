@@ -747,4 +747,32 @@ public class LocationUtils {
 			return hitLoc;
 		}
 	}
+
+	/**
+	 * Vary a location by some uniform +/- variance along all three axes.
+	 * @param loc the starting location
+	 * @param var will vary the location by -var to +var in each axis
+	 * @return the new location
+	 */
+	public static Location varyInUniform(Location loc, double var) {
+		return varyInUniform(loc, var, var, var);
+	}
+
+	/**
+	 * Vary a location by some uniform +/- variance along all three axes.
+	 * @param loc the starting location
+	 * @param xVar x-axis variance
+	 * @param yVar y-axis variance
+	 * @param zVar z-axis variance
+	 * @return the new location
+	 */
+	public static Location varyInUniform(Location loc, double xVar, double yVar, double zVar) {
+		return loc.clone().add(new Vector(FastUtils.randomDoubleInRange(-xVar, xVar), FastUtils.randomDoubleInRange(-yVar, yVar), FastUtils.randomDoubleInRange(-zVar, zVar)));
+	}
+
+	public static Location varyInCircle(Location loc, double radius) {
+		double r = Math.sqrt(FastUtils.RANDOM.nextDouble());
+		double theta = FastUtils.randomDoubleInRange(0, 360);
+		return loc.clone().add(new Vector(radius * r * FastUtils.cosDeg(theta), 0, radius * r * FastUtils.sinDeg(theta)));
+	}
 }

@@ -9,16 +9,16 @@ import org.jetbrains.annotations.Nullable;
 public class DepthsUpgradeGUI extends AbstractDepthsRewardGUI {
 
 	public DepthsUpgradeGUI(Player player, boolean fromSummaryGUI) {
-		super(player, fromSummaryGUI, "Select an Upgrade");
+		super(player, fromSummaryGUI, "Select an Upgrade", true);
 	}
 
 	@Override
-	protected @Nullable List<@Nullable DepthsAbilityItem> getOptions(Player player) {
-		return DepthsManager.getInstance().getAbilityUpgradeOptions(player);
+	protected @Nullable List<@Nullable DepthsAbilityItem> getOptions() {
+		return DepthsManager.getInstance().getAbilityUpgradeOptions(mPlayer);
 	}
 
 	@Override
-	protected void playerClickedItem(Player player, int slot) {
-		DepthsManager.getInstance().playerUpgradedItem(player, slot);
+	protected void playerClickedItem(int slot) {
+		DepthsManager.getInstance().playerUpgradedItem(mPlayer, slot);
 	}
 }

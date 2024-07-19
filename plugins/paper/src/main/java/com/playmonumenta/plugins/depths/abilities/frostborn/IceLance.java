@@ -1,16 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
-import com.playmonumenta.plugins.effects.IceLanceMark;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -19,9 +20,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
@@ -31,6 +32,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -47,7 +49,6 @@ public class IceLance extends DepthsAbility {
 	private static final double AMPLIFIER = 0.2;
 	private static final int RANGE = 8;
 	public static final int ICE_TICKS = 6 * 20;
-	public static final int CHILLED_DURATION = 30 * 20;
 
 	public static final String CHARM_COOLDOWN = "Ice Lance Cooldown";
 
@@ -82,20 +83,57 @@ public class IceLance extends DepthsAbility {
 		putOnCooldown();
 
 		Location startLoc = mPlayer.getEyeLocation();
+		Vector direction = startLoc.getDirection().multiply(0.5);
 		World world = startLoc.getWorld();
 
-		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, mRange, loc -> {
-			new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
-			world.playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1, 0.75f);
-		});
+		Location endLoc = startLoc.clone();
+		Location checkLoc = startLoc.clone();
+		for (int i = 0; i < 40; i++) {
+			if (startLoc.distance(checkLoc) > mRange) {
+				endLoc = checkLoc.clone();
+				break;
+			}
+			if ((checkLoc.getBlock().isSolid() && !DepthsUtils.isIce(checkLoc.getBlock().getType()))) {
+				endLoc = checkLoc.clone();
+
+				// if we hit a solid (non ice block, also play particles too
+				new PartialParticle(Particle.CLOUD, endLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+				world.playSound(endLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
+				world.playSound(endLoc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1, 0.75f);
+
+				break;
+			}
+
+			checkLoc.add(direction);
+		}
 
 		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
-			mPlugin.mEffectManager.addEffect(mob, "IceLanceMark", new IceLanceMark(ICE_TICKS, CHILLED_DURATION, mPlayer));
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
+
 			EntityUtils.applySlow(mPlugin, mDuration, mAmplifier, mob);
 			EntityUtils.applyWeaken(mPlugin, mDuration, mAmplifier, mob);
 			MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
+
+			// place ice under mob
+			Block deathSpot = mob.getLocation().add(0, -1, 0).getBlock();
+			List<Block> iceLocations = ImmutableList.of(
+				deathSpot.getRelative(-1, 0, -1),
+				deathSpot.getRelative(-1, 0, 0),
+				deathSpot.getRelative(-1, 0, 1),
+				deathSpot.getRelative(0, 0, -1),
+				deathSpot.getRelative(0, 0, 0),
+				deathSpot.getRelative(0, 0, 1),
+				deathSpot.getRelative(1, 0, -1),
+				deathSpot.getRelative(1, 0, 0),
+				deathSpot.getRelative(1, 0, 1),
+				deathSpot.getRelative(-2, 0, 0),
+				deathSpot.getRelative(2, 0, 0),
+				deathSpot.getRelative(0, 0, -2),
+				deathSpot.getRelative(0, 0, 2)
+			);
+			for (Block b : iceLocations) {
+				DepthsUtils.iceExposedBlock(b, mIceDuration, mPlayer);
+			}
 		}
 
 		new PartialParticle(Particle.EXPLOSION_NORMAL, startLoc, 10, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
@@ -134,19 +172,17 @@ public class IceLance extends DepthsAbility {
 
 	private static Description<IceLance> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<IceLance>(color)
-			.add("Right click to shoot an ice lance that travels ")
+			.add("Right click to shoot an ice lance that travels for ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks and pierces through mobs, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage and applying ")
 			.addPercent(a -> a.mAmplifier, AMPLIFIER)
-			.add(" slowness and weaken for ")
+			.add(" Slowness and Weaken for ")
 			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds. Mobs hit by the lance are Chilled for ")
-			.addDuration(CHILLED_DURATION)
-			.add(" seconds. When a Chilled mob dies, ice is created underneath it that lasts for ")
+			.add(" seconds. Mobs hit by the lance have ice created under them that lasts for ")
 			.addDuration(a -> a.mIceDuration, ICE_TICKS)
-			.add(" seconds.")
+			.add(" seconds. The lance can pass through ice blocks.")
 			.addCooldown(COOLDOWN);
 	}
 

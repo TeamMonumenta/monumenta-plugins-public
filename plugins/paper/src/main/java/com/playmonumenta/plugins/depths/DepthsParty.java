@@ -71,6 +71,8 @@ public class DepthsParty {
 	public int mRoomNumber;
 	// The number of spawners remaining in the current room to break for the party to proceed
 	public int mSpawnersToBreak;
+	// The number of mobs killed in the current room
+	public int mMobsToKill;
 	// The current type of room players are in
 	public @Nullable DepthsRoomType mCurrentRoomType;
 	// The saved choices for the party's next room options
@@ -184,7 +186,7 @@ public class DepthsParty {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
 					//Get random ability to start
 					int[] chances = {80, 15, 5, 0, 0};
-					DepthsManager.getInstance().getRandomAbility(Objects.requireNonNull(p), dp, chances, false, false);
+					DepthsManager.getInstance().getRandomAbility(Objects.requireNonNull(p), dp, chances, null, false);
 				}
 			}
 
@@ -192,6 +194,7 @@ public class DepthsParty {
 
 		mRoomNumber = 0;
 		mSpawnersToBreak = 0;
+		mMobsToKill = 0;
 		mHasAtLeastOneAbility = false;
 		mOldRooms = new ArrayList<>();
 		mLootRoomLocations = new ArrayList<>();
@@ -280,6 +283,15 @@ public class DepthsParty {
 			l.getWorld().playSound(l, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			EntityUtils.fireworkAnimation(l);
 			spawnRoomReward(l, rewardType != null);
+		}
+	}
+
+	public void playerKilledMob() {
+		if (mCurrentRoom == null) {
+			return;
+		}
+		if (mMobsToKill > 0) {
+			mMobsToKill--;
 		}
 	}
 
@@ -398,6 +410,7 @@ public class DepthsParty {
 		mCurrentRoomType = room.mRoomType;
 		//Set to percentage of total spawners in the room
 		mSpawnersToBreak = (int) (room.mSpawnerCount * DepthsManager.ROOM_SPAWNER_PERCENT);
+		mMobsToKill = (int) (room.mSpawnerCount * DepthsManager.MOBS_PER_SPAWNER);
 		mRoomNumber++;
 		mSpawnedReward = false;
 
@@ -429,6 +442,9 @@ public class DepthsParty {
 				DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(room.mRoomType);
 				if (rewardType != null) {
 					for (DepthsPlayer dp : mPlayersInParty) {
+						if (getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_START) {
+							dp.mEarnedRewards.add(DepthsRewardType.CURSE);
+						}
 						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
 						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
 						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
@@ -444,8 +460,11 @@ public class DepthsParty {
 						}
 					}
 					DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints / 2, mDelveModifiers, false);
-					if (mAscension >= 13) {
-						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints / 2, mDelveModifiers, true);
+					if (mAscension >= DepthsEndlessDifficulty.ASCENSION_TWISTED) {
+						DepthsEndlessDifficulty.applyTwisted(this);
+						if (mAscension >= DepthsEndlessDifficulty.ASCENSION_CHRONOLOGY) {
+							DepthsEndlessDifficulty.applyChronology(this);
+						}
 					}
 
 				}
@@ -573,7 +592,7 @@ public class DepthsParty {
 			if (getContent() == DepthsContent.DARKEST_DEPTHS) {
 				DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, (roomReached > 120) && !mIsSixPlayerMode);
 			} else {
-				ZenithLoot.generateLoot(lootRoomLoc.clone().add(ZenithLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, getAscension() >= 15 && !mIsSixPlayerMode && victory, getAscension(), victory);
+				ZenithLoot.generateLoot(lootRoomLoc.clone().add(ZenithLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, getAscension() >= 18 && !mIsSixPlayerMode && victory, getAscension(), victory);
 			}
 
 			//Set their highest room score and do announcements

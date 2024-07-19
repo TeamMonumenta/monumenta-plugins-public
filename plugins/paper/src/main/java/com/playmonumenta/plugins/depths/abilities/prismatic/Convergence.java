@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Entrench;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.FlameSpirit;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
+import com.playmonumenta.plugins.depths.abilities.shadow.PhantomForce;
 import com.playmonumenta.plugins.depths.abilities.steelsage.PrecisionStrike;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -92,6 +93,8 @@ public class Convergence extends DepthsAbility {
 				Whirlwind.onSpawnerBreak(mPlugin, mPlayer, mRarity, loc);
 			} else if (info == PrecisionStrike.INFO) {
 				PrecisionStrike.onSpawnerBreak(mPlugin, mPlayer, mRarity);
+			} else if (info == PhantomForce.INFO) {
+				PhantomForce.onSpawnerBreak(mPlugin, mPlayer, mRarity, loc);
 			}
 		}
 	}

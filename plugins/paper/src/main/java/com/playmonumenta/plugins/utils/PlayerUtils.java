@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.classes.Rogue;
 import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDependency;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
@@ -194,12 +195,16 @@ public class PlayerUtils {
 			return 0;
 		}
 
-		if ((sourcePlayer != null) && (player != sourcePlayer)) {
+		boolean sourceIsNotTarget = sourcePlayer != null && player != sourcePlayer;
+		if (sourceIsNotTarget) {
 			double healBonus = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TRIAGE) * 0.05;
 			healAmount *= 1 + healBonus;
 		}
 
 		EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+		if (sourceIsNotTarget) {
+			CurseOfDependency.OTHER_PLAYER_EVENT = event;
+		}
 		Bukkit.getPluginManager().callEvent(event);
 		if (!event.isCancelled()) {
 			double oldHealth = player.getHealth();

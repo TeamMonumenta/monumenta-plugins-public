@@ -34,7 +34,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 
 	protected @Nullable BukkitRunnable mRunnable;
 
-	private static final int HOPS_PER_BLOCK = 2;
+	protected double mHopsPerBlock = 2;
 
 	// To prevent each line from looking too sparse (ugly),
 	// if player's particle multiplier setting is not completely off,
@@ -121,6 +121,15 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 		return this;
 	}
 
+	public PPLightning hopsPerBlock(double hops) {
+		mHopsPerBlock = hops;
+		return this;
+	}
+
+	public double hopsPerBlock() {
+		return mHopsPerBlock;
+	}
+
 	public @Nullable BukkitRunnable runnable() {
 		return mRunnable;
 	}
@@ -176,7 +185,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 			return;
 		}
 
-		int hopCount = (int) Math.ceil(mHeight * HOPS_PER_BLOCK);
+		int hopCount = (int) Math.ceil(mHeight * mHopsPerBlock);
 		double endHeight = strikeLocation.getY();
 		double startHeight = endHeight + mHeight;
 

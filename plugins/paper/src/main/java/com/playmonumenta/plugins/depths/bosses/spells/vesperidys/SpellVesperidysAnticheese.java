@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths.bosses.spells.vesperidys;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
@@ -19,7 +18,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
@@ -144,14 +142,8 @@ public class SpellVesperidysAnticheese extends Spell {
 				e.remove();
 			}
 
-			// Metalmancy Build Platform Checkers
+			// Delve Mob Build Platform Checkers
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mSpawnLoc, Vesperidys.detectionRange)) {
-				Set<String> tags = le.getScoreboardTags();
-				if (tags.contains(MetalmancyBoss.identityTag) && !tags.contains(VesperidysBlockPlacerBoss.identityTag)) {
-					// Metalmancy now places blocks on void and tps back up. (and cleanse corruption but we don't talk about that)
-					mPlugin.mBossManager.manuallyRegisterBoss(le, new VesperidysBlockPlacerBoss(mPlugin, le, mVesperidys, 0));
-				}
-
 				if (ScoreboardUtils.checkTag(le, "delve_mob")) {
 					mPlugin.mBossManager.manuallyRegisterBoss(le, new VesperidysBlockPlacerBoss(mPlugin, le, mVesperidys, 0));
 				}

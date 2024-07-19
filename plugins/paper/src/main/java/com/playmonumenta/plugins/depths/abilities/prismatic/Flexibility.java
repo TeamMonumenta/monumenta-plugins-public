@@ -36,7 +36,9 @@ public class Flexibility extends DepthsAbility {
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mDamage = 1 + DAMAGE[mRarity - 1] * DepthsManager.getInstance().getPlayerAbilities(player).stream()
 				.filter(info -> info.getDepthsTrigger() != DepthsTrigger.PASSIVE)
-				.map(DepthsAbilityInfo::getDepthsTree).filter(Objects::nonNull)
+				.map(DepthsAbilityInfo::getDepthsTree)
+				.filter(Objects::nonNull) // Weapon Aspects have null tree
+				.filter(tree -> tree != DepthsTree.CURSE) // Curse of Anchoring would count otherwise
 				.collect(Collectors.toSet()).size();
 		});
 	}

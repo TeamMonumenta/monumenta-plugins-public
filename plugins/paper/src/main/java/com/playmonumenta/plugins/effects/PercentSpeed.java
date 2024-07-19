@@ -18,7 +18,7 @@ public class PercentSpeed extends Effect {
 	public static final String effectID = "PercentSpeed";
 	public static final String GENERIC_NAME = "PercentSpeed";
 
-	private final double mAmount;
+	private double mAmount;
 	private final String mModifierName;
 
 	private boolean mWasInNoMobilityZone = false;
@@ -74,6 +74,13 @@ public class PercentSpeed extends Effect {
 			}
 
 			mWasInNoMobilityZone = isInNoMobilityZone;
+		}
+	}
+
+	public void setAmount(double speed, Entity entity) {
+		mAmount = speed;
+		if (mUsed) {
+			entityGainEffect(entity);
 		}
 	}
 

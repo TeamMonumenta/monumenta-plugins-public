@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -81,15 +80,15 @@ public class GuardingBolt extends DepthsAbility {
 		Vector dir = startLoc.getDirection();
 		World world = startLoc.getWorld();
 		RayTraceResult result = world.rayTraceEntities(startLoc, dir, mRange, 0.5,
-			e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e) || Metalmancy.isMetalmancy(e));
+			e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e));
 		// if no one was found, try again 2 more times with increasing ray size until someone is found
 		if (result == null) {
 			result = world.rayTraceEntities(startLoc, dir, mRange, 0.75,
-				e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e) || Metalmancy.isMetalmancy(e));
+				e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e));
 		}
 		if (result == null) {
 			result = world.rayTraceEntities(startLoc, dir, mRange, 1.00,
-				e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e) || Metalmancy.isMetalmancy(e));
+				e -> (e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR) || DepthsUtils.isDepthsGrave(e));
 		}
 
 		if (result != null && result.getHitEntity() instanceof LivingEntity target) {

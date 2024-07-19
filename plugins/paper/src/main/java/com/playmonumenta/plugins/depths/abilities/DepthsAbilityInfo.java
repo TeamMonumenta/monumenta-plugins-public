@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -36,6 +37,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	private final DepthsTrigger mDepthsTrigger;
 	private final @Nullable DepthsTree mDepthsTree;
 	private boolean mSingleAbilityCharm;
+	private boolean mHasLevels;
+	private boolean mOfferableFloor1;
+	private boolean mOfferablePastFloor1;
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
 	                         @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
@@ -43,6 +47,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		mDepthsTree = depthsTree;
 		mDepthsTrigger = depthsTrigger;
 		mSingleAbilityCharm = true;
+		mHasLevels = depthsTree != DepthsTree.CURSE && depthsTrigger != DepthsTrigger.WEAPON_ASPECT;
+		mOfferableFloor1 = true;
+		mOfferablePastFloor1 = true;
 		canUse(player -> DepthsManager.getInstance().getPlayerLevelInAbility(displayName, player) > 0);
 	}
 
@@ -145,6 +152,21 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return this;
 	}
 
+	public DepthsAbilityInfo<T> hasLevels(boolean hasLevels) {
+		mHasLevels = hasLevels;
+		return this;
+	}
+
+	public DepthsAbilityInfo<T> canBeOfferedFloor1(boolean offerableFloor1) {
+		mOfferableFloor1 = offerableFloor1;
+		return this;
+	}
+
+	public DepthsAbilityInfo<T> canBeOfferedPastFloor1(boolean offerablePastFloor1) {
+		mOfferablePastFloor1 = offerablePastFloor1;
+		return this;
+	}
+
 	@Override
 	public DepthsAbilityInfo<T> actionBarColor(TextColor color) {
 		super.actionBarColor(color);
@@ -172,11 +194,12 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return mSingleAbilityCharm;
 	}
 
+	public boolean getHasLevels() {
+		return mHasLevels;
+	}
 
 	//Whether the player is eligible to have this ability offered
 	public boolean canBeOffered(Player player) {
-
-
 		// Make sure the player doesn't have this ability already
 		if (DepthsManager.getInstance().getPlayerLevelInAbility(getDisplayName(), player) > 0) {
 			return false;
@@ -202,7 +225,16 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		if (dp == null) {
 			return false;
 		}
-		if (dp.mWandAspectCharges > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC) {
+		if (dp.mWandAspectCharges > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC && mDepthsTree != DepthsTree.CURSE) {
+			return false;
+		}
+
+		DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
+		if (party == null) {
+			return false;
+		}
+		boolean floor1 = party.getFloor() <= 1;
+		if ((floor1 && !mOfferableFloor1) || (!floor1 && !mOfferablePastFloor1)) {
 			return false;
 		}
 
@@ -253,10 +285,15 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			meta.displayName(getColoredName().colorIfAbsent(NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			if (mDepthsTree != null) {
 				List<Component> lore = new ArrayList<>();
-				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity, oldRarity));
+				if (mHasLevels) {
+					lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity, oldRarity));
+				} else {
+					lore.add(mDepthsTree.getNameComponent());
+				}
 				meta.lore(lore);
 			}
-			GUIUtils.splitLoreLine(meta, getDescription(rarity, getPlayerAbility(Plugin.getInstance(), player)), 30, false);
+			Component description = getDescription(mHasLevels ? rarity : 1, getPlayerAbility(Plugin.getInstance(), player));
+			GUIUtils.splitLoreLine(meta, description, 30, false);
 			stack.setItemMeta(meta);
 			ItemUtils.setPlainName(stack, name);
 			item = new DepthsAbilityItem(stack, name, rarity, mDepthsTrigger, mDepthsTree);
@@ -295,5 +332,4 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		}
 		return component;
 	}
-
 }

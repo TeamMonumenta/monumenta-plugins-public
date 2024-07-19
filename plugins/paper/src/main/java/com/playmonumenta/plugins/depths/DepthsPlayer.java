@@ -62,6 +62,10 @@ public class DepthsPlayer {
 	public int mDeathRoom;
 	// Number of times this player has died as relevant for graves (gets reduced with bosses beaten, so is not an accurate total count)
 	public int mNumDeaths;
+	// Remaining number of unused rerolls
+	public int mRerolls;
+	// Rerolls previously gained from Opportunity
+	public int mOpportunityRerolls;
 	// Unique mobs killed by this player with the Solar Ray ability
 	private final List<String> mSolarRayUniqueMobNames = new ArrayList<>();
 
@@ -69,6 +73,11 @@ public class DepthsPlayer {
 	public boolean mDiversityActive = false;
 	// Whether the prismatic given by Diversity has been given
 	public boolean mDiversityGift = false;
+
+	// Whether the player has triggered Curse of Gluttony
+	public boolean mGluttonyTriggered = false;
+	// Whether the player is currently processing Abnormality
+	public boolean mCurrentAbnormality = false;
 
 	// Abilities that the player can receive from Generosity
 	public final List<DepthsAbilityItem> mGenerosityGifts = new ArrayList<>();
@@ -112,6 +121,9 @@ public class DepthsPlayer {
 		mEarnedRewards = new ConcurrentLinkedQueue<>();
 
 		mDeathRoom = -1;
+
+		mRerolls = 1;
+		mOpportunityRerolls = 0;
 
 		mContent = DepthsUtils.getDepthsContent();
 

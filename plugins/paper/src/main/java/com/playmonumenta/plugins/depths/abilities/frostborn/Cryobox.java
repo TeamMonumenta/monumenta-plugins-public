@@ -30,6 +30,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class Cryobox extends DepthsAbility {
@@ -42,8 +43,10 @@ public class Cryobox extends DepthsAbility {
 	private static final int ELEVATE_RADIUS = 2;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int DURATION = 12 * 20;
-	private static final int ICE_DURATION = 15 * 20;
+	private static final int ICE_DURATION = 12 * 20;
 	private static final int FROZEN_DURATION = 2 * 20;
+	private static final int REPLENISH_DURATION = 4 * 20;
+	private static final int REPLENISH_AMOUNT = 2; // 4 times a second
 
 	public static final String CHARM_COOLDOWN = "Cryobox Cooldown";
 
@@ -170,6 +173,21 @@ public class Cryobox extends DepthsAbility {
 			}
 		}
 
+		// restore 8 absorption/sec while standing on ice
+		new BukkitRunnable() {
+			int mTicks = 0;
+			@Override
+			public void run() {
+				if (DepthsUtils.isOnIce(mPlayer)) {
+					AbsorptionUtils.addAbsorption(mPlayer, REPLENISH_AMOUNT, mAbsorptionHealth, 10);
+				}
+
+				mTicks += 5;
+				if (mTicks >= REPLENISH_DURATION) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 5);
 	}
 
 	@Override
@@ -191,7 +209,9 @@ public class Cryobox extends DepthsAbility {
 			.add(KNOCKBACK_RADIUS)
 			.add(" blocks will be knocked back and frozen for ")
 			.addDuration(a -> a.mFrozenDuration, FROZEN_DURATION)
-			.add(" seconds.")
+			.add(" seconds. For the next ")
+			.addDuration(REPLENISH_DURATION)
+			.add(" seconds, standing on ice rapidly replenishes this absorption, restoring 8 absorption per second.")
 			.addCooldown(COOLDOWN);
 	}
 

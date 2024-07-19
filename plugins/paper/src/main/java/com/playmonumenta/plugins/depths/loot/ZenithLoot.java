@@ -34,7 +34,7 @@ public class ZenithLoot {
 	public static final NamespacedKey GEODE_KEY = NamespacedKeyUtils.fromString("epic:r3/items/currency/indigo_blightdust");
 	public static final NamespacedKey AUGMENT_KEY = NamespacedKeyUtils.fromString("epic:r3/items/currency/weightedfortitude");
 	public static final NamespacedKey POME_KEY = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_pome");
-	public static final NamespacedKey TROPHY_KEY = NamespacedKeyUtils.fromString("epic:r3/depths2/uriddans_eternal_call");
+	public static final NamespacedKey TROPHY_KEY = NamespacedKeyUtils.fromString("epic:r3/depths2/uriddans_eternal_call_a18");
 	public static final NamespacedKey HALLOWEEN_KEY = NamespacedKey.fromString("epic:event/halloween2019/creepers_delight");
 
 	public static final String DAILY_TAG = "zenith_daily";
@@ -46,7 +46,7 @@ public class ZenithLoot {
 	public static final double DUNGEON_PER_ASC_LEVEL = 0.2;
 
 	//Starts at ascension level 0, ends at 15 odds
-	public static final int[] ASCENSION_CHARM_ROLLS_SCORE = {18, 18, 17, 16, 15, 16, 15, 14, 13, 12, 13, 12, 11, 10, 9, 9};
+	public static final int[] ASCENSION_CHARM_ROLLS_SCORE = {18, 18, 17, 16, 15, 16, 15, 14, 13, 12, 13, 12, 11, 10, 9, 10, 9, 8, 7};
 
 	public static final Vector LOOT_ROOM_LOOT_OFFSET = new Vector(-21, 5, 0);
 
@@ -68,7 +68,10 @@ public class ZenithLoot {
 		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{30, 25, 27, 15, 3});
 		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{30, 25, 27, 15, 3});
 		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{30, 25, 27, 15, 3});
-		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{20, 25, 31, 20, 4}); //15
+		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{20, 25, 31, 20, 4});
+		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{20, 25, 31, 20, 4});
+		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{20, 25, 31, 20, 4});
+		ASCENSION_CHARM_RARITY_ODDS.add(new int[]{20, 25, 31, 20, 4}); // 18
 
 	}
 

@@ -70,7 +70,13 @@ public class DepthsAscensionGUI extends Gui {
 		new AscensionLevelDetails(14, "You will no longer be offered active abilities in a tree that you have 4 active abilities from.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 25),
 		new AscensionLevelDetails(15, "All bosses are now stronger.",
-			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 40)
+			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 29),
+		new AscensionLevelDetails(16, "Choose a Curse at the beginning of the dungeon.",
+			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 30),
+		new AscensionLevelDetails(17, "Your party is assigned the Chronology delve modifier.",
+			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 31),
+		new AscensionLevelDetails(18, "Choose a Curse after beating each boss.",
+			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 32)
 	));
 
 	public DepthsAscensionGUI(Player p) {

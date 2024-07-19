@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
@@ -223,6 +222,10 @@ public class DepthsUtils {
 		return DepthsManager.getPrismaticAbilities().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList().contains(s);
 	}
 
+	public static boolean isCurseAbility(String s) {
+		return DepthsManager.getCurseAbilities().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList().contains(s);
+	}
+
 	/**
 	 * Returns the party of nearby players, if applicable
 	 *
@@ -330,7 +333,7 @@ public class DepthsUtils {
 		List<Block> blocks = event.blockList();
 		for (Block b : blocks) {
 			Boolean barrier = iceBarrier.get(b.getLocation());
-			if (barrier != null && barrier && !ScoreboardUtils.checkTag(event.getEntity(), MetalmancyBoss.identityTag)) {
+			if (barrier != null && barrier) {
 				// Apply ice barrier stun passive effect to the mob
 				EntityUtils.applyStun(Plugin.getInstance(), 2 * 20, le);
 				return;

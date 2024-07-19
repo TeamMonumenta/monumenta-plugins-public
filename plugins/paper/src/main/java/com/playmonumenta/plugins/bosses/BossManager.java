@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AbilityMarkerEntityBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.PhantomForceBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTargetNPCBoss;
@@ -337,7 +337,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(LichShieldBoss.identityTag, LichShieldBoss::new);
 		registerStatelessBoss(LichKeyGlowBoss.identityTag, LichKeyGlowBoss::new);
 		registerStatelessBoss(FestiveTessUpgradeSnowmenBoss.identityTag, FestiveTessUpgradeSnowmenBoss::new, new FestiveTessUpgradeSnowmenBoss.Parameters());
-		registerStatelessBoss(MetalmancyBoss.identityTag, MetalmancyBoss::new);
 		registerStatelessBoss(RestlessSoulsBoss.identityTag, RestlessSoulsBoss::new);
 		registerStatelessBoss(AlchemicalAberrationBoss.identityTag, AlchemicalAberrationBoss::new);
 		registerStatelessBoss(AbilityMarkerEntityBoss.identityTag, AbilityMarkerEntityBoss::new);
@@ -386,6 +385,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(HexfallFloramancerBoss.identityTag, HexfallFloramancerBoss::new, new HexfallFloramancerBoss.Parameters());
 		registerStatelessBoss(FlowerPlaceBoss.identityTag, FlowerPlaceBoss::new, new FlowerPlaceBoss.Parameters());
 		registerStatelessBoss(WingedBoss.identityTag, WingedBoss::new, new WingedBoss.Parameters());
+		registerStatelessBoss(PhantomForceBoss.identityTag, PhantomForceBoss::new);
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);

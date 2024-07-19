@@ -13,12 +13,12 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -27,7 +27,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
@@ -42,23 +41,18 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 import static java.awt.Color.HSBtoRGB;
 
 public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	public static final String ABILITY_NAME = "Refraction";
-	public static final double[] DAMAGE = {3.5, 4, 4.5, 5, 5.5, 6.5};
-	public static final int COOLDOWN_TICKS = 25 * 20;
-	public static final int DISTANCE = 50;
-	public static final int DURATION = 5 * 20;
-	public static final int MAX_DURATION = 15 * 20;
+	public static final double[] DAMAGE = {5, 5.75, 6.5, 7.25, 8, 9.5};
+	public static final int COOLDOWN_TICKS = 20 * 20;
+	public static final int DISTANCE = 40;
+	public static final int DURATION = (int) (3.5 * 20);
 	public static final int EFFECT_DURATION = 3 * 20;
 	public static final int BUFF_DURATION = 10 * 20;
-	public static final int DURATION_ON_KILL = 20;
-	public static final String WIND_UP_EFFECT = "RefractionWindUpEffect";
 
-	public int mDuration = DURATION;
-	public int mCurrDuration = 0;
+	public int mCurrDuration = -1;
 
 	public static final DepthsAbilityInfo<Refraction> INFO =
 		new DepthsAbilityInfo<>(Refraction.class, ABILITY_NAME, Refraction::new, DepthsTree.PRISMATIC, DepthsTrigger.SWAP)
@@ -83,13 +77,10 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 			return false;
 		}
 
-		mPlugin.mEffectManager.addEffect(mPlayer, WIND_UP_EFFECT, new PercentSpeed(DURATION + 30, -0.5, WIND_UP_EFFECT));
-
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-		mDuration = DURATION;
-
 		Location loc = mPlayer.getEyeLocation();
+		Location l = loc.clone().add(loc.getDirection());
 		new BukkitRunnable() {
 			double mPitch = 0;
 			double mRadiusDecrement = 0;
@@ -98,13 +89,6 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 			@Override
 			public void run() {
 				World world = mPlayer.getWorld();
-				AbilityTriggerInfo.TriggerRestriction holdingWeapon = DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION;
-				if (holdingWeapon != null && !holdingWeapon.test(mPlayer)) {
-					mPlugin.mEffectManager.clearEffects(mPlayer, WIND_UP_EFFECT);
-					world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1.2f, 1f);
-					this.cancel();
-					return;
-				}
 
 				mT += 1;
 				mPitch += 0.05;
@@ -116,7 +100,6 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 
 				if (mT < 30) {
 					mRadiusDecrement += (radius / 30);
-					Location l = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection());
 					Vector y = VectorUtils.rotationToVector(l.getYaw(), l.getPitch() - 90);
 					Vector x = y.clone().crossProduct(l.getDirection());
 					new PPCircle(Particle.ELECTRIC_SPARK, l, radius - mRadiusDecrement)
@@ -150,10 +133,10 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 
 				}
 
-				world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1, 0.5f + (float) mPitch);
+				world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1.5f, 0.5f + (float) mPitch);
 				if (mT >= 30) {
 					this.cancel();
-					pulseLaser(playerItemStats, dPlayer);
+					pulseLaser(playerItemStats, dPlayer, loc);
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
@@ -161,7 +144,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 		return true;
 	}
 
-	private void pulseLaser(ItemStatManager.PlayerItemStats playerItemStats, DepthsPlayer depthsPlayer) {
+	private void pulseLaser(ItemStatManager.PlayerItemStats playerItemStats, DepthsPlayer depthsPlayer, Location loc) {
 		mCurrDuration = 0;
 
 		new BukkitRunnable() {
@@ -171,44 +154,47 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 			@Override
 			public void run() {
 				World world = mPlayer.getWorld();
-				AbilityTriggerInfo.TriggerRestriction holdingWeapon = DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION;
-				if (holdingWeapon != null && !holdingWeapon.test(mPlayer)) {
-					mPlugin.mEffectManager.clearEffects(mPlayer, WIND_UP_EFFECT);
-					world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1.2f, 1f);
-					this.cancel();
-					return;
-				}
 
 				mCurrDuration++;
 				mAngle += 0.5;
 				mHue = 0.0f;
-				Location startLoc = mPlayer.getEyeLocation();
-				Vector dir = startLoc.getDirection().normalize();
-				Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, DISTANCE, (hitBlockLoc) -> {
+				Vector dir = loc.getDirection().normalize();
+				Location endLoc = LocationUtils.rayTraceToBlock(loc, loc.getDirection(), DISTANCE, (hitBlockLoc) -> {
 					if (mCurrDuration % 5 == 0) {
 						new PartialParticle(Particle.FIREWORKS_SPARK, hitBlockLoc, 10, 0.1, 0.1, 0.1, 0.3).spawnAsPlayerActive(mPlayer);
 						world.playSound(hitBlockLoc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 1, 1.5f);
 					}
 				});
 
-				startLoc.getWorld().playSound(mPlayer.getEyeLocation(), Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 2f);
-				startLoc.getWorld().playSound(mPlayer.getEyeLocation(), Sound.ENTITY_GUARDIAN_ATTACK, SoundCategory.PLAYERS, 0.5f, 2f);
+				world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 2f);
+				world.playSound(mPlayer.getEyeLocation(), Sound.ENTITY_GUARDIAN_ATTACK, SoundCategory.PLAYERS, 0.5f, 2f);
 
+				Location adjustedLoc = loc.clone();
+				adjustedLoc.setPitch(adjustedLoc.getPitch() + 90);
+				Vector vec = adjustedLoc.getDirection();
+				vec = vec.clone().rotateAroundAxis(dir, (-Math.PI / 24) * mAngle);
+				vec = vec.normalize().multiply(0.75);
 
-				Location pLoc = mPlayer.getEyeLocation();
-				pLoc.setPitch(pLoc.getPitch() + 90);
-				Vector pVec = new Vector(pLoc.getDirection().getX(), pLoc.getDirection().getY(), pLoc.getDirection().getZ());
-				pVec = pVec.clone().rotateAroundAxis(dir, (-Math.PI / 24) * mAngle);
-				pVec = pVec.normalize().multiply(0.75);
+				Location currLoc = loc.clone();
 
-				Location currLoc = startLoc.clone();
+				// every other tick, play particles in the gaps to create a fuller beam
+				if (mCurrDuration % 2 == 0) {
+					currLoc.add(dir.clone().multiply(0.25));
+					vec.rotateAroundAxis(dir, Math.PI / 24);
+				}
+
+				Vector dir2 = dir.clone().multiply(0.5);
 				for (int i = 0; i < DISTANCE; i++) {
-					currLoc.add(startLoc.getDirection());
-					new PartialParticle(Particle.ELECTRIC_SPARK, currLoc, 2, 0.15, 0.15, 0.15, 0.15).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.REDSTONE, currLoc.clone().add(pVec), 1, 0, 0, 0, 0, new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.REDSTONE, currLoc.clone().subtract(pVec), 1, 0, 0, 0, 0, new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.REDSTONE, currLoc.clone().add(dir.clone().multiply(0.5)).add(pVec.clone().rotateAroundAxis(dir, Math.PI / 12)), 1, 0, 0, 0, 0, new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.REDSTONE, currLoc.clone().add(dir.clone().multiply(0.5)).subtract(pVec.clone().rotateAroundAxis(dir, Math.PI / 12)), 1, 0, 0, 0, 0, new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
+					Vector vec2 = vec.clone().rotateAroundAxis(dir, Math.PI / 12);
+
+					currLoc.add(dir);
+
+					new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc).count(1).extra(0.10).delta(0.10).spawnAsPlayerActive(mPlayer);
+					new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc.clone().add(dir2)).count(1).extra(0.15).delta(0.15).spawnAsPlayerActive(mPlayer);
+					new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(vec)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
+					new PPPeriodic(Particle.REDSTONE, currLoc.clone().subtract(vec)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
+					new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(dir2).add(vec2)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
+					new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(dir2).subtract(vec2)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
 
 					mHue += 0.05f;
 
@@ -222,10 +208,10 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 						break;
 					}
 
-					pVec.rotateAroundAxis(dir, Math.PI / 6);
+					vec.rotateAroundAxis(dir, Math.PI / 6);
 				}
 
-				Hitbox hitbox = Hitbox.approximateCylinder(startLoc, endLoc, 0.75, true).accuracy(0.5);
+				Hitbox hitbox = Hitbox.approximateCylinder(loc, endLoc, 0.75, true).accuracy(0.5);
 
 				if (mCurrDuration % 5 == 0) {
 					List<LivingEntity> hitMobs = hitbox.getHitMobs();
@@ -236,21 +222,17 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 						new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.SPELL_INSTANT, mob.getLocation().add(0, 1, 0), 20, 0.1, 0.2, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
 						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], true, false, false);
-						if (depthsPlayer.mEligibleTrees.stream().anyMatch(tree -> tree.equals(DepthsTree.FLAMECALLER))) {
+						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.FLAMECALLER)) {
 							EntityUtils.applyFire(mPlugin, EFFECT_DURATION, mob, mPlayer, playerItemStats);
 						}
-						if (depthsPlayer.mEligibleTrees.stream().anyMatch(tree -> tree.equals(DepthsTree.FROSTBORN))) {
+						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.FROSTBORN)) {
 							EntityUtils.applySlow(mPlugin, EFFECT_DURATION, 0.1, mob);
 						}
-						if (depthsPlayer.mEligibleTrees.stream().anyMatch(tree -> tree.equals(DepthsTree.SHADOWDANCER))) {
+						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.SHADOWDANCER)) {
 							EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, 0.1, mob);
 						}
-						if (depthsPlayer.mEligibleTrees.stream().anyMatch(tree -> tree.equals(DepthsTree.STEELSAGE))) {
+						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.STEELSAGE)) {
 							EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, 0.1, mob);
-						}
-
-						if (mob.getHealth() <= 0 || mob.isDead()) {
-							extendDuration();
 						}
 					}
 
@@ -270,22 +252,19 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 							}
 						}.runTaskTimer(mPlugin, 0, 1);
 						new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 10, 0.5, 0.2, 0.5, 1).spawnAsPlayerActive(mPlayer);
-						if (depthsPlayer.mEligibleTrees.stream().anyMatch(tree -> tree.equals(DepthsTree.DAWNBRINGER))) {
+						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.DAWNBRINGER)) {
 							PlayerUtils.healPlayer(mPlugin, player, EntityUtils.getMaxHealth(player) * 0.05, mPlayer);
 						}
-						if (depthsPlayer.mEligibleTrees.stream().anyMatch(tree -> tree.equals(DepthsTree.EARTHBOUND))) {
+						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.EARTHBOUND)) {
 							mPlugin.mEffectManager.addEffect(player, "REFRACTION_EARTHBOUND_RESIST", new PercentDamageReceived(BUFF_DURATION, -0.1));
 						}
-						if (depthsPlayer.mEligibleTrees.stream().anyMatch(tree -> tree.equals(DepthsTree.WINDWALKER))) {
+						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.WINDWALKER)) {
 							mPlugin.mEffectManager.addEffect(player, "REFRACTION_WINDWALKER_SPEED", new PercentSpeed(BUFF_DURATION, 0.1, "Refraction Windwalker Speed"));
 						}
 					}
-
-
 				}
 
-
-				if (mCurrDuration >= mDuration) {
+				if (mCurrDuration >= DURATION) {
 					this.cancel();
 					world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1.2f, 1f);
 				}
@@ -299,45 +278,23 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	public void extendDuration() {
-		NavigableSet<Effect> slowEffects = mPlugin.mEffectManager.getEffects(mPlayer, WIND_UP_EFFECT);
-		if (slowEffects == null || slowEffects.isEmpty()) {
-			return;
-		}
-		int oldDuration = mDuration;
-		mDuration = Math.min(mDuration + DURATION_ON_KILL, MAX_DURATION);
-		int addedDuration = mDuration - oldDuration;
-		if (addedDuration <= 0) {
-			return;
-		}
-		for (Effect effect : slowEffects) {
-			effect.setDuration(effect.getDuration() + addedDuration);
-		}
-
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1f, 1.3f);
-		world.playSound(mPlayer, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1f, 1.3f);
-	}
-
 	@Override
 	public int getInitialAbilityDuration() {
-		return mDuration;
+		return DURATION;
 	}
 
 	@Override
 	public int getRemainingAbilityDuration() {
-		return mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+		return mCurrDuration >= 0 ? getInitialAbilityDuration() - mCurrDuration : 0;
 	}
 
 	private static Description<Refraction> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Refraction>(color)
-			.add("Swap hands to begin channeling a powerful beam. After this period, release a beam of prismatic energy which deals ")
+			.add("Swap hands to begin charging a stationary, powerful beam in the direction you face. After a 1 second windup, it releases a beam of prismatic energy that deals ")
 			.addDepthsDamage(a -> DAMAGE[rarity - 1] * 4, DAMAGE[rarity - 1] * 4, true)
 			.add(" magic damage per second for ")
 			.addDuration(a -> DURATION, DURATION)
-			.add(" seconds. Each mob killed increases the duration by 1 second, up to a max of ")
-			.addDuration(a -> MAX_DURATION, MAX_DURATION)
-			.add(" seconds. You are slowed by 50% for the entire duration of this ability and must continue to hold a weapon throughout. Additionally, every hit by the beam will apply status effects to allies and enemies depending on your available trees.")
+			.add(" seconds. Additionally, the beam will apply status effects to allies and enemies depending on your available trees.")
 			.addCooldown(COOLDOWN_TICKS)
 			.addConditionalTree(DepthsTree.FROSTBORN, getFrostbornDescription(color))
 			.addConditionalTree(DepthsTree.FLAMECALLER, getFlamecallerDescription(color))

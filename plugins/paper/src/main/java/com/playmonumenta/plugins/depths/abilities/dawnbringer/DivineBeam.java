@@ -40,16 +40,15 @@ public class DivineBeam extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Divine Beam";
 	public static final double HEAL_HITBOX_SIZE = 1.4;
-	public static final double STUN_HITBOX_SIZE = 1.1;
-	public static final double[] HEAL = {0.2, 0.3, 0.4, 0.5, 0.6, 1.0};
-	public static final int[] STUN_DURATION = {10, 12, 14, 16, 20, 30};
+	public static final double STUN_HITBOX_SIZE = 1.4;
+	public static final double[] HEAL = {0.4, 0.5, 0.6, 0.7, 0.8, 1.2};
+	public static final int[] STUN_DURATION = {20, 22, 24, 26, 30, 40};
 	public static double HEAL_INCREASE_PER_TARGET = 0.2;
 	public static int STUN_INCREASE_PER_TARGET = 5;
 	public static int ABSORPTION_DURATION = 6 * 20;
 	public static double MAX_ABSORPTION = 4;
 	public static int MAX_TARGET_BONUS = 4;
-	public static int COOLDOWN_REDUCTION = 4 * 20;
-	public static final int COOLDOWN = 20 * 20;
+	public static final int COOLDOWN = 16 * 20;
 	private static final int MAX_DISTANCE = 50;
 
 	public static final String CHARM_COOLDOWN = "Divine Beam Cooldown";
@@ -65,7 +64,6 @@ public class DivineBeam extends DepthsAbility {
 	private final double mHeal;
 	private final int mStunDuration;
 	private final int mMaxTargetBonus;
-	private final int mCDR;
 	private final double mMaxAbsorption;
 	private final int mAbsorptionDuration;
 
@@ -74,7 +72,6 @@ public class DivineBeam extends DepthsAbility {
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.DIVINE_BEAM_HEALING.mEffectName, HEAL[mRarity - 1]);
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.DIVINE_BEAM_STUN_DURATION.mEffectName, STUN_DURATION[mRarity - 1]);
 		mMaxTargetBonus = MAX_TARGET_BONUS + (int) CharmManager.getLevel(mPlayer, CharmEffects.DIVINE_BEAM_MAX_TARGETS_BONUS.mEffectName);
-		mCDR = CharmManager.getDuration(mPlayer, CharmEffects.DIVINE_BEAM_COOLDOWN_REDUCTION.mEffectName, COOLDOWN_REDUCTION);
 		mMaxAbsorption = MAX_ABSORPTION + CharmManager.getLevel(mPlayer, CharmEffects.DIVINE_BEAM_MAX_ABSORPTION.mEffectName);
 		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CharmEffects.DIVINE_BEAM_ABSORPTION_DURATION.mEffectName, ABSORPTION_DURATION);
 	}
@@ -162,11 +159,6 @@ public class DivineBeam extends DepthsAbility {
 			new PartialParticle(Particle.HEART, player.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
 		}
 
-		// Do not change with charms
-		if (targetsHit >= MAX_TARGET_BONUS) {
-			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.DIVINE_BEAM, mCDR);
-		}
-
 		return true;
 	}
 
@@ -182,9 +174,7 @@ public class DivineBeam extends DepthsAbility {
 			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION)
 			.add(", that lasts for ")
 			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
-			.add(" seconds. If at least " + MAX_TARGET_BONUS + " targets were hit, also reduce the cooldown of this ability by ")
-			.addDuration(a -> a.mCDR, COOLDOWN_REDUCTION)
-			.add("s.")
+			.add(" seconds.")
 			.addCooldown(COOLDOWN);
 	}
 

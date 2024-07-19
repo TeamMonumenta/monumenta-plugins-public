@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -67,7 +68,7 @@ public class ColoredGlowingEffect extends Effect {
 		if (!(entity instanceof LivingEntity le)) {
 			entity.setGlowing(true);
 		} else {
-			PotionUtils.applyPotion(null, le, new PotionEffect(PotionEffectType.GLOWING, getDuration(), 0));
+			PotionUtils.applyPotion(null, le, new PotionEffect(PotionEffectType.GLOWING, getDuration(), 0, true));
 		}
 		if (mTeam != null) {
 			mTeam.addToTeam(entity);
@@ -170,7 +171,12 @@ public class ColoredGlowingEffect extends Effect {
 		}
 
 		public void addToTeam(Entity entity) {
-			loadTeam().addEntry(entity.getUniqueId().toString());
+			if (entity instanceof Player player) {
+				loadTeam().addEntry(player.getName());
+			} else {
+				loadTeam().addEntry(entity.getUniqueId().toString());
+			}
+
 		}
 
 		public void removeFromTeam(Entity entity) {
@@ -178,9 +184,18 @@ public class ColoredGlowingEffect extends Effect {
 			if (team == null) {
 				return;
 			}
-			if (team.hasEntry(entity.getUniqueId().toString())) {
-				team.removeEntry(entity.getUniqueId().toString());
+
+			if (entity instanceof Player player) {
+				if (team.hasEntry(player.getName())) {
+					team.removeEntry(player.getName());
+				}
+			} else {
+				if (team.hasEntry(entity.getUniqueId().toString())) {
+					team.removeEntry(entity.getUniqueId().toString());
+				}
 			}
+
+
 		}
 
 		public void clean() {

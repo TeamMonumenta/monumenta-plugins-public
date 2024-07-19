@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enums.Masterwork;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -62,7 +63,67 @@ public class CharmFactory {
 		Map.entry("Slipstream Knockback", "Aeroblast Knockback"),
 		Map.entry("Slipstream Duration", "Aeroblast Speed Duration"),
 		Map.entry("Slipstream Speed Amplifier", "Aeroblast Speed Amplifier"),
-		Map.entry("Slipstream Radius", "Aeroblast Size")
+		Map.entry("Slipstream Radius", "Aeroblast Size"),
+
+		Map.entry("Divine Beam Cooldown Reduction", ""),
+
+		Map.entry("Totem of Salvation Cooldown", "Spark of Inspiration Cooldown"),
+		Map.entry("Totem of Salvation Radius", "Spark of Inspiration Cast Range"),
+		Map.entry("Totem of Salvation Healing", "Spark of Inspiration Cooldown Reduction Rate"),
+		Map.entry("Totem of Salvation Max Absorption", "Spark of Inspiration Strength Amplifier"),
+		Map.entry("Totem of Salvation Duration", "Spark of Inspiration Buff Duration"),
+		Map.entry("Totem of Salvation Absorption Duration", "Spark of Inspiration Resistance Duration"),
+
+		Map.entry("Stone Skin Cooldown", "Iron Grip Cooldown"),
+		Map.entry("Stone Skin Resistance Amplifier", "Iron Grip Resistance Amplifier"),
+		Map.entry("Stone Skin Knockback Resistance", "Iron Grip Damage"),
+		Map.entry("Stone Skin Duration", "Iron Grip Resistance Duration"),
+
+		Map.entry("Howling Winds Cooldown", "Thundercloud Form Cooldown"),
+		Map.entry("Howling Winds Radius", "Thundercloud Form Radius"),
+		Map.entry("Howling Winds Duration", "Thundercloud Form Flight Duration"),
+		Map.entry("Howling Winds Velocity", "Thundercloud Form Flight Speed"),
+		Map.entry("Howling Winds Cast Range", ""),
+		Map.entry("Howling Winds Vulnerability Amplifier", "Thundercloud Form Damage"),
+
+		Map.entry("Metalmancy Cooldown", "Gravity Bomb Cooldown"),
+		Map.entry("Metalmancy Damage", "Gravity Bomb Damage"),
+		Map.entry("Metalmancy Duration", "Gravity Bomb Radius"),
+
+		Map.entry("Projectile Mastery Damage Multiplier", "Sharpshooter Damage Multiplier"),
+
+		Map.entry("Volcanic Combos Hit Requirement", "Volcanic Combos Cooldown"),
+		Map.entry("Frigid Combos Hit Requirement", "Frigid Combos Cooldown")
+	);
+
+	public static final Map<String, CharmEffectActions> charmLevelCapMap = Map.ofEntries(
+		Map.entry("Bottled Sunlight Bottle Velocity", CharmEffectActions.EPIC),
+		Map.entry("Ward of Light Cone Angle", CharmEffectActions.EPIC),
+		Map.entry("Fireball Velocity", CharmEffectActions.EPIC),
+		Map.entry("Fireball Fire Duration", CharmEffectActions.RARE),
+		Map.entry("Flame Spirit Fire Duration", CharmEffectActions.RARE),
+		Map.entry("Flamestrike Cone Angle", CharmEffectActions.EPIC),
+		Map.entry("Flamestrike Fire Duration", CharmEffectActions.RARE),
+		Map.entry("Flamestrike Knockback", CharmEffectActions.EPIC),
+		Map.entry("Igneous Rune Fire Duration", CharmEffectActions.RARE),
+		Map.entry("Pyroblast Fire Duration", CharmEffectActions.RARE),
+		Map.entry("Volcanic Combos Fire Duration", CharmEffectActions.RARE),
+		Map.entry("Volcanic Meteor Fire Duration", CharmEffectActions.RARE),
+		Map.entry("Cryobox Ice Duration", CharmEffectActions.RARE),
+		Map.entry("Frost Nova Ice Duration", CharmEffectActions.RARE),
+		Map.entry("Ice Barrier Cast Range", CharmEffectActions.EPIC),
+		Map.entry("Ice Barrier Max Length", CharmEffectActions.EPIC),
+		Map.entry("Ice Barrier Ice Duration", CharmEffectActions.RARE),
+		Map.entry("Ice Lance Ice Duration", CharmEffectActions.RARE),
+		Map.entry("Piercing Cold Ice Duration", CharmEffectActions.RARE),
+		Map.entry("Chaos Dagger Velocity", CharmEffectActions.EPIC),
+		Map.entry("Focused Combos Bleed Amplifier", CharmEffectActions.EPIC),
+		Map.entry("Focused Combos Bleed Duration", CharmEffectActions.RARE),
+		Map.entry("Scrapshot Recoil Velocity", CharmEffectActions.EPIC),
+		Map.entry("Scrapshot Shrapnel Cone Angle", CharmEffectActions.EPIC),
+		Map.entry("Steel Stallion Horse Speed", CharmEffectActions.EPIC),
+		Map.entry("Steel Stallion Jump Strength", CharmEffectActions.EPIC),
+		Map.entry("Wind Walk Velocity", CharmEffectActions.EPIC)
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
@@ -87,14 +148,6 @@ public class CharmFactory {
 			List<Double> charmRollsOrder = new ArrayList<>();
 
 			int count = 1;
-			while (playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count) != null
-				&& !playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count).isEmpty()) {
-				charmActionOrder.add(playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count));
-				MMLog.fine("retrieved nbt " + charmActionOrder.get(count - 1) + " " + count);
-				count++;
-			}
-
-			count = 1;
 			while (playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count) != null
 				&& !playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count).isEmpty()) {
 
@@ -120,8 +173,57 @@ public class CharmFactory {
 				MMLog.fine("retrieved nbt " + charmRollsOrder.get(i - 1) + " " + i);
 			}
 
+			count = 1;
+			while (playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count) != null
+				&& !playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count).isEmpty()) {
+
+				// de-level stat rarity according to map
+				String actionName = playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count);
+				CharmEffectActions action = CharmEffectActions.getEffect(actionName);
+				CharmEffectActions downgrade = charmLevelCapMap.get(charmEffectOrder.get(count));
+
+				// if the action is higher than it should, and it isn't negative, downgrade it.
+				String newActionName = actionName;
+				if (action != null && downgrade != null && action.mRarity > downgrade.mRarity && !action.mIsNegative) {
+					newActionName = downgrade.mAction;
+					MMLog.fine("changed action from " + actionName + " to " + newActionName + " " + count);
+				}
+
+				charmActionOrder.add(newActionName);
+				MMLog.fine("retrieved nbt " + charmActionOrder.get(count - 1) + " " + count);
+				count++;
+			}
+
+			// de-level stat edge case: if we're trying to downgrade the 1st stat of a charm, it doesn't have an action with it.
+			// to do this, swap its rarity with another effect, so the budget stays the same.
+			CharmEffectActions downgrade = charmLevelCapMap.get(charmEffectOrder.get(0));
+			if (downgrade != null) {
+				List<String> possibleActions = new ArrayList<>(charmActionOrder);
+				int i = 0;
+				for (String actionName : possibleActions) {
+					CharmEffectActions action = CharmEffectActions.getEffect(actionName);
+					if (action != null && !action.mIsNegative && action.mRarity <= downgrade.mRarity) {
+						MMLog.fine("swapping " + charmEffectOrder.get(0) + " and " + charmEffectOrder.get(i + 1) + " for a downgrade!");
+						Collections.swap(charmEffectOrder, 0, i + 1);
+						Collections.swap(charmRollsOrder, 0, i + 1);
+						break;
+					}
+					i++;
+				}
+			}
+
+			MMLog.finer("updateCharm final review:");
+			MMLog.finer("charmEffectOrder:");
+			for (String effect : charmEffectOrder) {
+				MMLog.finer(effect);
+			}
+			MMLog.finer("charmRollsOrder:");
+			for (Double roll : charmRollsOrder) {
+				MMLog.finer(roll.toString());
+			}
+			MMLog.finer("charmActionOrder:");
 			for (String action : charmActionOrder) {
-				MMLog.fine("" + action);
+				MMLog.finer(action);
 			}
 
 			return CharmFactory.generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item);
@@ -254,6 +356,7 @@ public class CharmFactory {
 			List<CharmEffectActions> potentialActions = Arrays.asList(CharmEffectActions.values());
 			Collections.shuffle(potentialActions, r);
 
+			// frozen: if loading an existing charm
 			if (actionOrder != null && actionOrder.size() >= activeEffects.size()) {
 				String actionName = actionOrder.get(activeEffects.size() - 1);
 				CharmEffectActions action = CharmEffectActions.getEffect(actionName);
@@ -274,11 +377,11 @@ public class CharmFactory {
 							hasNegative = true;
 						}
 						MMLog.fine("action success- " + action.mAction);
-
 					}
-					continue;
 				}
 			}
+
+			// frozen: if creating a new charm
 			if (!success) {
 				//Iterate through the potential actions until we find a match
 				for (CharmEffectActions action : potentialActions) {
@@ -304,7 +407,6 @@ public class CharmFactory {
 
 					// Finally, attempt the action. If successful, subtract budget, otherwise try next action
 					DepthsTree lockedTree = isTreeLocked ? chosenTree : null;
-
 					CharmEffects effect = applyRandomCharmEffect(chosenAbility, lockedTree, action.mRarity, item, r, activeEffects, action.mIsNegative, false, effectOrder, rollsOrder, charmTextLines);
 					if (effect == null) {
 						MMLog.fine("action failed- " + action.mAction);
@@ -331,6 +433,54 @@ public class CharmFactory {
 			//End loop if we couldn't give a new effect
 			if (!success) {
 				break;
+			}
+		}
+
+		// frozen: if we still have budget, attempt to upgrade stats at random to use that budget
+		if (budget > 0) {
+			for (int i = 0; i < 100; i++) {
+				// choose a random action
+				int index = FastUtils.randomIntInRange(1, activeEffects.size() - 1);
+				CharmEffectActions action = CharmEffectActions.getEffect(NBT.get(item, nbt -> {
+					ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+					if (playerModified == null) {
+						return null;
+					}
+					return playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + index);
+				}));
+				CharmEffectActions upgraded = CharmEffectActions.upgradeAction(action);
+				if (action == null || upgraded == null) {
+					continue;
+				}
+				MMLog.fine("upgrade: action " + action.mAction);
+				MMLog.fine("upgrade: upgraded " + upgraded.mAction);
+				// check if we have enough budget
+				int budgetDifference = upgraded.mBudget - action.mBudget;
+				if (budget + budgetDifference < 0) {
+					continue;
+				}
+				budget += budgetDifference;
+
+				CharmEffects effect = CharmEffects.getEffect(activeEffects.get(index));
+				if (effect != null && effect.isValidAtLevel(upgraded.mRarity)) { // check if valid at the new rarity
+					MMLog.fine("upgrade: effect " + effect.mAbility);
+					// update the action NBT to the new action
+					NBT.modify(item, nbt -> {
+						ItemStatUtils.addPlayerModified(nbt).setString(CHARM_ACTIONS_KEY + index, upgraded.mAction);
+					});
+
+					// update the text to the new stat
+					double roll = NBT.get(item, nbt -> {
+						ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+						if (playerModified == null) {
+							return null;
+						}
+						return playerModified.getDouble(CharmFactory.CHARM_ROLLS_KEY + (index + 1));
+					});
+					MMLog.fine("upgrade: roll " + roll);
+					Component newText = generateCharmText(effect, effect.mRarityValues[upgraded.mRarity - 1], roll, upgraded.mIsNegative, upgraded.mRarity);
+					charmTextLines.set(index, newText);
+				}
 			}
 		}
 
@@ -433,8 +583,10 @@ public class CharmFactory {
 			}
 		}
 
+
 		if (chosenEffect == null) {
-			//Out of viable charm effects- report failure
+			return null;
+		} else if (!chosenEffect.isValidAtLevel(level)) {
 			return null;
 		}
 
@@ -455,10 +607,21 @@ public class CharmFactory {
 		});
 		MMLog.fine("added nbt- " + nbtDouble + " " + effectHistory.size());
 
+		Component text = generateCharmText(chosenEffect, value, nbtDouble, isNegative, level);
+
+		// Add to history
+		effectHistory.add(chosenEffect.mEffectName);
+		charmTextOrder.add(text);
+		MMLog.fine("chosen effect- " + chosenEffect.mEffectName + " " + effectHistory.size());
+
+		return chosenEffect;
+	}
+
+	public static Component generateCharmText(CharmEffects chosenEffect, double value, double roll, boolean isNegative, int level) {
 		//Turn roll into stat
 		if (chosenEffect.mVariance != 0) {
 			boolean roundToInt = value >= 5;
-			value = value + chosenEffect.mVariance * (2 * pastRoll - 1);
+			value = value + chosenEffect.mVariance * (2 * roll - 1);
 			if (roundToInt) {
 				value = Math.round(value);
 			} else {
@@ -480,14 +643,10 @@ public class CharmFactory {
 			text = Component.text(lore, DepthsUtils.getRarityTextColor(level)).decoration(TextDecoration.ITALIC, false);
 		}
 
-		// Add to history
-		effectHistory.add(chosenEffect.mEffectName);
-		charmTextOrder.add(text);
-		MMLog.fine("chosen effect- " + chosenEffect.mEffectName + " " + effectHistory.size());
+		MMLog.fine("generated charm text " + lore);
 
-		return chosenEffect;
+		return text;
 	}
-
 
 	/**
 	 * Generates a random name to apply to a charm item

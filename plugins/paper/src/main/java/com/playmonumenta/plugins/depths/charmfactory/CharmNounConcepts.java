@@ -127,7 +127,21 @@ public enum CharmNounConcepts {
 	SLOTH("Sloth", null),
 	WRATH("Wrath", null),
 	ENVY("Envy", null),
-	PRIDE("Pride", null);
+	PRIDE("Pride", null),
+	THE_STARS("the Stars", null),
+	THE_DEPTHS("the Depths", null),
+	SUMMER("Summer", DepthsTree.FLAMECALLER),
+	WINTER("Winter", DepthsTree.FROSTBORN),
+	AUTUMN("Autumn", DepthsTree.WINDWALKER),
+	SPRING("Spring", DepthsTree.EARTHBOUND),
+	MEDICINE("Medicine", DepthsTree.DAWNBRINGER),
+	DIRT("Dirt", DepthsTree.EARTHBOUND),
+	PYROMANIA("Pyromania", DepthsTree.FLAMECALLER),
+	STILLNESS("Stillness", DepthsTree.FROSTBORN),
+	REGICIDE("Regicide", DepthsTree.SHADOWDANCER),
+	NIGHT("Night", DepthsTree.SHADOWDANCER),
+	ARTILLERY("Artillery", DepthsTree.STEELSAGE),
+	THE_WIND("the Wind", DepthsTree.WINDWALKER);
 
 
 

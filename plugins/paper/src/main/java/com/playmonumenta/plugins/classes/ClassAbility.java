@@ -201,7 +201,7 @@ public enum ClassAbility {
 	PYROBLAST("Pyroblast"),
 
 	// STEELSAGE
-	METALMANCY("Metalmancy"),
+	GRAVITY_BOMB("Gravity Bomb"),
 	FIREWORK_BLAST("Firework Blast"),
 	PRECISION_STRIKE("Precision Strike"),
 	RAPIDFIRE("Rapid Fire"),
@@ -216,7 +216,7 @@ public enum ClassAbility {
 	SKYHOOK("Skyhook"),
 	AEROBLAST("Aeroblast"),
 	WHIRLWIND("Whirlwind"),
-	HOWLINGWINDS("Howling Winds"),
+	THUNDERCLOUD_FORM("Thundercloud Form"),
 	WIND_WALK_DEPTHS("Wind Walk"),
 
 	// SHADOW
@@ -226,15 +226,16 @@ public enum ClassAbility {
 	CHAOS_DAGGER("Chaos Dagger"),
 	DUMMY_DECOY("Dummy Decoy"),
 	ESCAPE_ARTIST("Escape Artist"),
+	PHANTOM_FORCE("Phantom Force"),
 
 	// SUNLIGHT
 	BOTTLED_SUNLIGHT("Bottled Sunlight"),
 	LIGHTNING_BOTTLE("Lightning Bottle"),
 	RADIANT_BLESSING("Radiant Blessing"),
-	TOTEM_OF_SALVATION("Totem of Salvation"),
 	WARD_OF_LIGHT("Ward of Light"),
 	DIVINE_BEAM("Divine Beam"),
 	ETERNAL_SAVIOR("Eternal Savior"),
+	SPARK_OF_INSPIRATION("Spark of Inspiration"),
 
 	// FROSTBORN
 	ICE_LANCE("Ice Lance"),
@@ -251,7 +252,7 @@ public enum ClassAbility {
 	CRUSHING_EARTH("Crushing Earth"),
 	EARTHEN_WRATH("Earthen Wrath"),
 	EARTHQUAKE("Earthquake"),
-	STONE_SKIN("Stone Skin"),
+	IRON_GRIP("Iron Grip"),
 	TAUNT("Taunt"),
 
 	//PRISMATIC

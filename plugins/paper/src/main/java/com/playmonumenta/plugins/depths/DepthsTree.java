@@ -19,7 +19,8 @@ public enum DepthsTree {
 	SHADOWDANCER("Shadowdancer", DepthsUtils.SHADOWDANCER, Material.IRON_SWORD, "Skilled in single target melee damage, especially against bosses and elites."),
 	STEELSAGE("Steelsage", DepthsUtils.STEELSAGE, Material.CROSSBOW, "Master of ranged abilities with dual AOE and single target damage capabilities."),
 	WINDWALKER("Windwalker", DepthsUtils.WINDWALKER, Material.FEATHER, "An arsenal of movement abilities and crowd control, allowing precise maneuvers and quick escapes."),
-	PRISMATIC("Prismatic", DepthsTree::prismaticColor, Material.AMETHYST_SHARD, "I don't think this will be displayed anywhere?");
+	PRISMATIC("Prismatic", DepthsTree::prismaticColor, Material.AMETHYST_SHARD, "You should not see this. Please report this bug."),
+	CURSE("Zenith Curse", DepthsTree::curseColor, Material.NETHER_WART, "You should not see this. Please report this bug.");
 
 	private final String mDisplayName;
 	private final Function<String, Component> mColorer;
@@ -62,7 +63,11 @@ public enum DepthsTree {
 		return MessagingUtils.addGradient(s, "e2ff9c", "25f6f5", "ff9cf0");
 	}
 
-	public static final DepthsTree[] OWNABLE_TREES = Arrays.stream(values()).filter(t -> t != PRISMATIC).toArray(DepthsTree[]::new);
+	private static Component curseColor(String s) {
+		return MessagingUtils.addGradient(s, "c41300", "a9112b", "8e013e");
+	}
+
+	public static final DepthsTree[] OWNABLE_TREES = Arrays.stream(values()).filter(t -> t != PRISMATIC && t != CURSE).toArray(DepthsTree[]::new);
 
 	public ItemStack createItemWithDescription(String description) {
 		return GUIUtils.createBasicItem(mMaterial, 1, getNameComponent(), description, NamedTextColor.GRAY, 30, true);

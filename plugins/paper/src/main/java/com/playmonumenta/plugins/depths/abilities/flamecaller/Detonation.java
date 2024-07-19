@@ -31,7 +31,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 public class Detonation extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Detonation";
-	public static final double[] DAMAGE = {3, 3.5, 4.0, 4.5, 5, 6};
+	public static final double[] DAMAGE = {2.0, 2.5, 3.0, 3.5, 4.0, 5.0};
 	public static final int DEATH_RADIUS = 8;
 	public static final int DAMAGE_RADIUS = 2;
 

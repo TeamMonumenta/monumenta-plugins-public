@@ -7,8 +7,9 @@ import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.guis.AbilityTriggersGui;
+import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,21 +18,21 @@ import java.util.Map;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
-public class DepthsSummaryGUI extends CustomInventory {
+public class DepthsSummaryGUI extends Gui {
 	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(47, 48, 50, 51, 46, 52, 45, 53));
 	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<>(Arrays.asList(2, 3, 5, 6, 1, 7, 0, 8));
 	private static final int START_OF_PASSIVES = 27;
-	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
+	private static final int PASSIVES_PER_PAGE = 18;
 	private static final int REWARD_LOCATION = 49;
 	private static final int TRIGGER_GUI_LOCATION = 53;
 	private boolean mDebugVersion = false;
 	private @Nullable DepthsParty mDepthsParty;
 	private final DepthsPlayer mRequestingPlayer;
+	private DepthsPlayer mTargetPlayer;
+	private int mPage = 0;
 
 	public static final Map<Integer, DepthsTrigger> TRIGGER_MAP = new HashMap<>();
 
@@ -55,7 +56,6 @@ public class DepthsSummaryGUI extends CustomInventory {
 		TRIGGER_MAP.put(16, DepthsTrigger.SWAP);
 		TRIGGER_MAP.put(17, DepthsTrigger.LIFELINE);
 
-		GUIUtils.fillWithFiller(mInventory, true);
 		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(targetPlayer);
 
 		if (depthsPlayer != null) {
@@ -67,44 +67,20 @@ public class DepthsSummaryGUI extends CustomInventory {
 			throw new IllegalArgumentException("Player " + targetPlayer.getName() + " not in depths system!");
 		}
 		mRequestingPlayer = depthsPlayer;
-
-		setAbilities(targetPlayer);
+		mTargetPlayer = depthsPlayer; // Is changed later, but always starts as the viewer
 	}
 
 	@Override
-	protected void inventoryClick(InventoryClickEvent event) {
-		event.setCancelled(true);
-		GUIUtils.refreshOffhand(event);
-		if (event.getClickedInventory() != mInventory ||
-			    event.getCurrentItem() == null ||
-			    event.getCurrentItem().getType() == FILLER) {
+	public void setup() {
+		Player targetPlayer = mTargetPlayer.getPlayer();
+		if (targetPlayer == null) {
 			return;
 		}
-		Player clicker = (Player) event.getWhoClicked();
-		if (event.getCurrentItem().getItemMeta() instanceof SkullMeta skullMeta && skullMeta.getOwningPlayer() instanceof Player chosenPlayer && chosenPlayer.isOnline()) {
-			setAbilities(chosenPlayer);
-			return;
-		}
-		if (event.getSlot() == REWARD_LOCATION && !mDebugVersion) {
-			DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(clicker);
-			if (depthsPlayer != null && depthsPlayer.mEarnedRewards.size() > 0) {
-				clicker.closeInventory();
-				DepthsManager.getInstance().getRoomReward(clicker, null, true);
-			}
-		}
-		if (event.getSlot() == TRIGGER_GUI_LOCATION) {
-			new AbilityTriggersGui(clicker, false).open();
-		}
-	}
-
-	public boolean setAbilities(Player targetPlayer) {
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(targetPlayer);
-
-		if (items == null || items.size() == 0) {
-			return false;
+		if (items == null || items.isEmpty()) {
+			// This shouldn't happen - the abilities are checked before creating the GUI
+			return;
 		}
-
-		GUIUtils.fillWithFiller(mInventory, true);
 
 		//First- check if the player has any rewards to open
 		ItemStack rewardItem;
@@ -115,7 +91,12 @@ public class DepthsSummaryGUI extends CustomInventory {
 		} else {
 			rewardItem = GUIUtils.createBasicItem(Material.GOLD_NUGGET, "All Room Rewards Claimed!", NamedTextColor.YELLOW);
 		}
-		mInventory.setItem(REWARD_LOCATION, rewardItem);
+		setItem(REWARD_LOCATION, new GuiItem(rewardItem).onClick(event -> {
+			if (!mDebugVersion && !mRequestingPlayer.mEarnedRewards.isEmpty()) {
+				close();
+				DepthsManager.getInstance().getRoomReward(mPlayer, null, true);
+			}
+		}));
 
 		//Set actives, save passives for future
 		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
@@ -125,55 +106,57 @@ public class DepthsSummaryGUI extends CustomInventory {
 			} else {
 				for (Map.Entry<Integer, DepthsTrigger> slot : TRIGGER_MAP.entrySet()) {
 					if (slot.getValue() == item.mTrigger) {
-						mInventory.setItem(slot.getKey(), item.mItem);
+						setItem(slot.getKey(), item.mItem);
 						break;
 					}
 				}
 			}
 		}
 
-		//Lay out all passives
-		for (int i = 0; i < passiveItems.size() && i < 18; i++) {
-			mInventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
+		int startIndex = mPage * PASSIVES_PER_PAGE;
+		for (int i = 0; i < passiveItems.size() - startIndex && i < PASSIVES_PER_PAGE; i++) {
+			setItem(i + START_OF_PASSIVES, passiveItems.get(i + startIndex).mItem);
 		}
 
-		//all for mystery box
-		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(targetPlayer);
-		ItemStack weaponAspectItem = mInventory.getItem(9);
-		if (depthsPlayer != null && depthsPlayer.mHasWeaponAspect &&
-				weaponAspectItem != null && weaponAspectItem.getType() == FILLER) {
-			//TODO this probably never triggers - the lore text isn't what it should be and no one has ever reported it
-			ItemStack mysteryBox = GUIUtils.createBasicItem(Material.BARREL, "Mystery Box", NamedTextColor.WHITE, true, "Obtain a random ability.", NamedTextColor.WHITE);
-			mInventory.setItem(9, mysteryBox);
+		if (mPage > 0) {
+			ItemStack backItem = GUIUtils.createBasicItem(Material.ARROW, "Previous", NamedTextColor.GRAY);
+			setItem(START_OF_PASSIVES - 9, new GuiItem(backItem).onClick(event -> {
+				mPage--;
+				update();
+			}));
+		}
+
+		if (passiveItems.size() > PASSIVES_PER_PAGE + startIndex) {
+			ItemStack forwardItem = GUIUtils.createBasicItem(Material.ARROW, "Next", NamedTextColor.GRAY);
+			setItem(START_OF_PASSIVES - 1, new GuiItem(forwardItem).onClick(event -> {
+				mPage++;
+				update();
+			}));
 		}
 
 		//Tree info
-		if (depthsPlayer != null) {
-			int i = 0;
-			for (DepthsTree tree : depthsPlayer.mEligibleTrees) {
-				mInventory.setItem(TREE_LOCATIONS.get(i++), tree.createItem());
-			}
+		int treeIndex = 0;
+		for (DepthsTree tree : mTargetPlayer.mEligibleTrees) {
+			setItem(TREE_LOCATIONS.get(treeIndex++), tree.createItem());
 		}
 
 		//Place the "no active" glass panes
 		for (int i = 9; i <= 17; i++) {
-			ItemStack triggerItem = mInventory.getItem(i);
-			if (triggerItem != null && triggerItem.getType() == FILLER) {
+			if (getItem(i) == null) {
 				DepthsTrigger trigger = TRIGGER_MAP.get(i);
 				if (trigger != null) {
-					mInventory.setItem(i, trigger.getNoAbilityItem());
+					setItem(i, trigger.getNoAbilityItem());
 				}
 			}
 		}
-		updatePlayerHeads(targetPlayer);
+		updatePlayerHeads();
 
 		ItemStack triggersItem = GUIUtils.createBasicItem(Material.JIGSAW, "Change Ability Triggers", NamedTextColor.WHITE, false,
 			"Click here to change which key combinations are used to cast abilities.", NamedTextColor.LIGHT_PURPLE);
-		mInventory.setItem(TRIGGER_GUI_LOCATION, triggersItem);
-		return true;
+		setItem(TRIGGER_GUI_LOCATION, new GuiItem(triggersItem).onClick(event -> new AbilityTriggersGui(mPlayer, false).open()));
 	}
 
-	private void updatePlayerHeads(Player targetPlayer) {
+	private void updatePlayerHeads() {
 		if (mDepthsParty == null) {
 			return;
 		}
@@ -188,13 +171,16 @@ public class DepthsSummaryGUI extends CustomInventory {
 				ItemStack playerHead = GUIUtils.createBasicItem(Material.PLAYER_HEAD, itemName, NamedTextColor.YELLOW);
 				GUIUtils.setSkullOwner(playerHead, player);
 
-				if (player == targetPlayer) {
+				if (dp == mTargetPlayer) {
 					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, itemName, NamedTextColor.YELLOW, false, "Currently Shown", NamedTextColor.GRAY);
-					mInventory.setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
-
-					mInventory.setItem(4, playerHead);
+					setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
+					setItem(4, playerHead);
 				} else {
-					mInventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
+					setItem(HEAD_LOCATIONS.get(i), new GuiItem(playerHead).onClick(event -> {
+						mTargetPlayer = dp;
+						mPage = 0;
+						update();
+					}));
 				}
 			}
 		}

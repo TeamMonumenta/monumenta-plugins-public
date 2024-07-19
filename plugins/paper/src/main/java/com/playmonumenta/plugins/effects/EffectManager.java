@@ -326,7 +326,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
 		mEffectDeserializer.put(HealingSickness.effectID, HealingSickness::deserialize);
 		mEffectDeserializer.put(HealPlayerOnDeath.effectID, HealPlayerOnDeath::deserialize);
-		mEffectDeserializer.put(IceLanceMark.effectID, IceLanceMark::deserialize);
 		mEffectDeserializer.put(PermafrostMark.effectID, PermafrostMark::deserialize);
 		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
 		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);

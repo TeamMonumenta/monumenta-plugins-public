@@ -184,7 +184,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 				// Apply custom effects from potion
 				if (isBoonPotion) {
-					ItemStatUtils.changeDurationAndStrengths(p, potion.getItem(), mDurationChange, mPotStrengthChange);
+					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false, 1, mDurationChange, mPotStrengthChange);
 				} else {
 					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false);
 				}

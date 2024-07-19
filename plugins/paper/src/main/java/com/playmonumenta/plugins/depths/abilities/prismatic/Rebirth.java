@@ -108,7 +108,7 @@ public class Rebirth extends DepthsAbility {
 
 		int[] chances = {80, 15, 5, 0, 0};
 		for (int i = 0; i < EXTRA_ABILITIES[mRarity - 1]; i++) {
-			DepthsManager.getInstance().getRandomAbility(mPlayer, dp, chances, false, false, false);
+			DepthsManager.getInstance().getRandomAbility(mPlayer, dp, chances, null, false, false);
 		}
 
 		UUID uuid = mPlayer.getUniqueId();

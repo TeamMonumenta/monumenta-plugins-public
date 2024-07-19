@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.HashSet;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -86,12 +85,27 @@ public class PiercingCold extends DepthsAbility {
 		world.playSound(startLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1f, 1f);
 		world.playSound(startLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1f, 0.75f);
 
-		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, MAX_DIST, (hitBlockLoc) -> {
-			new PartialParticle(Particle.SMOKE_LARGE, hitBlockLoc, 80, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CLOUD, hitBlockLoc, 80, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.FIREWORKS_SPARK, hitBlockLoc, 50, 0.1, 0.1, 0.1, 0.3).spawnAsPlayerActive(mPlayer);
-			world.playSound(hitBlockLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
-		});
+		Location endLoc = startLoc.clone();
+		Location checkLoc = startLoc.clone();
+		for (int i = 0; i < 90; i++) {
+			if (startLoc.distance(checkLoc) > MAX_DIST) {
+				endLoc = checkLoc.clone();
+				break;
+			}
+			if ((checkLoc.getBlock().isSolid() && !DepthsUtils.isIce(checkLoc.getBlock().getType()))) {
+				endLoc = checkLoc.clone();
+
+				// if we hit a solid (non ice block, also play particles too
+				new PartialParticle(Particle.SMOKE_LARGE, endLoc, 80, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CLOUD, endLoc, 80, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FIREWORKS_SPARK, endLoc, 50, 0.1, 0.1, 0.1, 0.3).spawnAsPlayerActive(mPlayer);
+				world.playSound(endLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
+
+				break;
+			}
+
+			checkLoc.add(dir.clone().multiply(0.5));
+		}
 
 		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
 			new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
@@ -143,7 +157,8 @@ public class PiercingCold extends DepthsAbility {
 				blocksToIce.add(centerBlock.getRelative(BlockFace.WEST));
 			}
 
-			if (block.getType().isSolid() || block.getType() == Material.WATER) {
+			// allow it to pass through ice
+			if ((block.getType().isSolid() || block.getType() == Material.WATER) && !DepthsUtils.isIce(block.getType())) {
 				break;
 			}
 
@@ -164,7 +179,7 @@ public class PiercingCold extends DepthsAbility {
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage and leaves a trail of ice below it that lasts for ")
 			.addDuration(a -> a.mIceDuration, ICE_TICKS)
-			.add(" seconds.")
+			.add(" seconds. The beam can pass through ice blocks.")
 			.addCooldown(COOLDOWN);
 	}
 

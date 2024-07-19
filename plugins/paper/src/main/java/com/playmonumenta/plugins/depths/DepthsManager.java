@@ -14,6 +14,17 @@ import com.playmonumenta.plugins.depths.abilities.aspects.RandomAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfAnchoring;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDeath;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDependency;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfGluttony;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfGreed;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfImpatience;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfLust;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfObscurity;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfRuin;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfSloth;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfSobriety;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.BottledSunlight;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.DepthsRejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.DivineBeam;
@@ -22,8 +33,8 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.EternalSavior;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.RadiantBlessing;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.SparkOfInspiration;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
-import com.playmonumenta.plugins.depths.abilities.dawnbringer.TotemOfSalvation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.WardOfLight;
 import com.playmonumenta.plugins.depths.abilities.earthbound.BrambleShell;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Bulwark;
@@ -33,7 +44,7 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenCombos;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Earthquake;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Entrench;
-import com.playmonumenta.plugins.depths.abilities.earthbound.StoneSkin;
+import com.playmonumenta.plugins.depths.abilities.earthbound.IronGrip;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Taunt;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Apocalypse;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Detonation;
@@ -56,6 +67,7 @@ import com.playmonumenta.plugins.depths.abilities.frostborn.IceLance;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Icebreaker;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.abilities.frostborn.PiercingCold;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Abnormality;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Charity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.ChromaBlade;
 import com.playmonumenta.plugins.depths.abilities.prismatic.ColorSplash;
@@ -66,6 +78,7 @@ import com.playmonumenta.plugins.depths.abilities.prismatic.Encore;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Flexibility;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Generosity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Multiplicity;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Opportunity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Prosperity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Rebirth;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Refraction;
@@ -80,15 +93,15 @@ import com.playmonumenta.plugins.depths.abilities.shadow.DepthsAdvancingShadows;
 import com.playmonumenta.plugins.depths.abilities.shadow.DepthsDethroner;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.depths.abilities.shadow.EscapeArtist;
+import com.playmonumenta.plugins.depths.abilities.shadow.PhantomForce;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowSlam;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSharpshooter;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSplitArrow;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FocusedCombos;
-import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
+import com.playmonumenta.plugins.depths.abilities.steelsage.GravityBomb;
 import com.playmonumenta.plugins.depths.abilities.steelsage.PrecisionStrike;
-import com.playmonumenta.plugins.depths.abilities.steelsage.ProjectileMastery;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
@@ -98,11 +111,11 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsWindWalk;
 import com.playmonumenta.plugins.depths.abilities.windwalker.GuardingBolt;
-import com.playmonumenta.plugins.depths.abilities.windwalker.HowlingWinds;
 import com.playmonumenta.plugins.depths.abilities.windwalker.LastBreath;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
+import com.playmonumenta.plugins.depths.abilities.windwalker.ThundercloudForm;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.WindsweptCombos;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
@@ -111,10 +124,13 @@ import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.rooms.RoomRepository;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -141,6 +157,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -165,6 +182,8 @@ public class DepthsManager {
 
 	//The percentage of spawners that must be broken in a room in order to give the reward
 	public static final double ROOM_SPAWNER_PERCENT = 0.85;
+	//The amount of mobs that should be killed in order to open the next room (anti speedrun)
+	public static final double MOBS_PER_SPAWNER = 1.75;
 
 	//Tag to check for endless mode
 	public static final String ENDLESS_MODE_STRING = "DepthsEndlessMode";
@@ -465,7 +484,7 @@ public class DepthsManager {
 			}
 
 			DepthsParty party = getPartyFromId(dp);
-			if (party != null) {
+			if (announceToTeam && party != null) {
 				//Tell their party that someone has selected an ability and is eligible for upgrade rooms
 				Component message = null;
 				Component playerName = p.displayName();
@@ -475,9 +494,16 @@ public class DepthsManager {
 					if (level == 0) {
 						message = playerName.append(Component.text(" has lost ability: ").append(abilityName).append(Component.text("!")));
 					} else if (previousLevel > 0) {
-						message = playerName.append(Component.text(" upgraded ability: ")).append(abilityName).append(Component.text(" to ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
+						String direction = previousLevel <= level ? "upgraded" : "downgraded";
+						message = playerName.append(Component.text(" " + direction + " ability: ")).append(abilityName).append(Component.text(" to ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
 					} else {
-						message = playerName.append(Component.text(" now has ability: ")).append(abilityName).append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
+						message = playerName.append(Component.text(" now has ability: ")).append(abilityName);
+						DepthsAbilityInfo<?> info = getAbility(name);
+						if (info != null && info.getHasLevels()) {
+							message = message.append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
+						} else {
+							message = message.append(Component.text("!"));
+						}
 					}
 				} else {
 					if (level == 1) {
@@ -487,7 +513,7 @@ public class DepthsManager {
 					}
 				}
 
-				if (message != null && announceToTeam) {
+				if (message != null) {
 					UUID uuid = p.getUniqueId();
 					party.sendMessage(message, o -> !uuid.equals(o.mPlayerId));
 				}
@@ -524,9 +550,8 @@ public class DepthsManager {
 			//Steelsage abilities
 			FireworkBlast.INFO,
 			FocusedCombos.INFO,
-			Metalmancy.INFO,
+			GravityBomb.INFO,
 			PrecisionStrike.INFO,
-			ProjectileMastery.INFO,
 			RapidFire.INFO,
 			Scrapshot.INFO,
 			Sidearm.INFO,
@@ -540,7 +565,7 @@ public class DepthsManager {
 			Aeromancy.INFO,
 			DepthsDodging.INFO,
 			GuardingBolt.INFO,
-			HowlingWinds.INFO,
+			ThundercloudForm.INFO,
 			LastBreath.INFO,
 			OneWithTheWind.INFO,
 			RestoringDraft.INFO,
@@ -561,6 +586,7 @@ public class DepthsManager {
 			CloakOfShadows.INFO,
 			ShadowSlam.INFO,
 			EscapeArtist.INFO,
+			PhantomForce.INFO,
 
 			//Dawnbringer abilities
 			BottledSunlight.INFO,
@@ -570,10 +596,10 @@ public class DepthsManager {
 			DepthsRejuvenation.INFO,
 			SoothingCombos.INFO,
 			Sundrops.INFO,
-			TotemOfSalvation.INFO,
 			WardOfLight.INFO,
 			DivineBeam.INFO,
 			EternalSavior.INFO,
+			SparkOfInspiration.INFO,
 
 			//Flamecaller abilities
 			Apocalypse.INFO,
@@ -609,10 +635,11 @@ public class DepthsManager {
 			EarthenWrath.INFO,
 			Earthquake.INFO,
 			Entrench.INFO,
-			StoneSkin.INFO,
+			IronGrip.INFO,
 			Taunt.INFO,
 
 			// Prismatic abilities
+			Abnormality.INFO,
 			Encore.INFO,
 			DiscoBall.INFO,
 			Generosity.INFO,
@@ -626,7 +653,21 @@ public class DepthsManager {
 			Rebirth.INFO,
 			ColorSplash.INFO,
 			Diversity.INFO,
-			ChromaBlade.INFO
+			ChromaBlade.INFO,
+			Opportunity.INFO,
+
+			// Curses
+			CurseOfAnchoring.INFO,
+			CurseOfDeath.INFO,
+			CurseOfDependency.INFO,
+			CurseOfGluttony.INFO,
+			CurseOfGreed.INFO,
+			CurseOfObscurity.INFO,
+			CurseOfImpatience.INFO,
+			CurseOfLust.INFO,
+			CurseOfRuin.INFO,
+			CurseOfSloth.INFO,
+			CurseOfSobriety.INFO
 		);
 	}
 
@@ -671,12 +712,20 @@ public class DepthsManager {
 			BowAspect.INFO);
 	}
 
-	public static List<DepthsAbilityInfo<?>> getPrismaticAbilities() {
-		return getAbilities().stream().filter(info -> info.getDepthsTree() == DepthsTree.PRISMATIC).toList();
+	public static List<DepthsAbilityInfo<?>> getAbilitiesOfTree(DepthsTree tree) {
+		return getAbilities().stream().filter(info -> info.getDepthsTree() == tree).toList();
 	}
 
-	private void initItems(List<DepthsTree> filter, boolean isElite, Player p) {
-		initItems(filter, isElite, p, List.of());
+	public static List<DepthsAbilityInfo<?>> getPrismaticAbilities() {
+		return getAbilitiesOfTree(DepthsTree.PRISMATIC);
+	}
+
+	public static List<DepthsAbilityInfo<?>> getCurseAbilities() {
+		return getAbilitiesOfTree(DepthsTree.CURSE);
+	}
+
+	private void initItems(List<DepthsTree> filter, Player p) {
+		initItems(filter, false, p, List.of());
 	}
 
 	/**
@@ -759,17 +808,22 @@ public class DepthsManager {
 		List<DepthsAbilityItem> offeredItems = mAbilityOfferings.get(p.getUniqueId());
 		if (offeredItems == null || offeredItems.size() == 0) {
 			//Filter the item offerings by the player's eligible trees for that run
-			if (dp.mEarnedRewards.peek() == DepthsRewardType.PRISMATIC) {
+			DepthsRewardType reward = dp.mEarnedRewards.peek();
+			if (reward == DepthsRewardType.PRISMATIC) {
 				List<DepthsTree> prismaticFilter = new ArrayList<>();
 				prismaticFilter.add(DepthsTree.PRISMATIC);
-				initItems(prismaticFilter, false, p);
+				initItems(prismaticFilter, p);
+			} else if (reward == DepthsRewardType.CURSE) {
+				List<DepthsTree> curseFilter = new ArrayList<>();
+				curseFilter.add(DepthsTree.CURSE);
+				initItems(curseFilter, p);
 			} else {
 				List<DepthsTree> cappedTrees = new ArrayList<>();
 				if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
 					List<DepthsTree> trees = getActiveAbilityTrees(dp);
 					cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
 				}
-				initItems(dp.mEligibleTrees, dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY_ELITE, p, cappedTrees);
+				initItems(dp.mEligibleTrees, reward == DepthsRewardType.ABILITY_ELITE, p, cappedTrees);
 			}
 		} else {
 			return offeredItems;
@@ -784,12 +838,14 @@ public class DepthsManager {
 		}
 		offeredItems = new ArrayList<>();
 		Collections.shuffle(mItems);
+
 		// Add the first 3 items the player is eligible for to the thing
 		int options = 3;
 		Prosperity prosperity = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, Prosperity.class);
 		if (prosperity != null) {
 			options += prosperity.getExtraChoices();
 		}
+
 		for (DepthsAbilityItem item : mItems) {
 			if (offeredItems.size() >= options) {
 				break;
@@ -868,7 +924,7 @@ public class DepthsManager {
 			//Roll random ability if they selected mystery box
 			int[] chances = {40, 40, 20, 0, 0};
 			boolean twisted = DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH;
-			getRandomAbility(p, dp, chances, false, twisted);
+			getRandomAbility(p, dp, chances, null, twisted);
 		}
 		setPlayerLevelInAbility(displayName, p, 1);
 	}
@@ -988,6 +1044,14 @@ public class DepthsManager {
 		DepthsParty party = getDepthsParty(p);
 		if (party != null && l.getX() >= party.getRoomX()) {
 			party.partyBrokeSpawner(l);
+		}
+	}
+
+	// Anti-speedrun: count mob kills
+	public void playerKilledMob(Player p) {
+		DepthsParty party = getDepthsParty(p);
+		if (party != null) {
+			party.playerKilledMob();
 		}
 	}
 
@@ -1221,11 +1285,23 @@ public class DepthsManager {
 		}
 
 		if (dp != null && party != null) {
-
 			// Check that spawner count is zero
 			if (party.mSpawnersToBreak > 0) {
 				dp.sendMessage("There " + (party.mSpawnersToBreak > 1 ? "are" : "is") + " still " + party.mSpawnersToBreak + " spawner" + (party.mSpawnersToBreak > 1 ? "s" : "") + " left to break!");
 				return;
+			}
+
+			if (party.mMobsToKill > 0 && p.hasPermission("monumenta.depths.mobanticheese")) {
+				Location hitboxLoc = l.clone();
+				hitboxLoc.setDirection(new Vector(-1, 0, 0)); // rooms have the room at the +X axis end of the room, so we face -X to face into the room
+				Hitbox hitbox = Hitbox.approximateCylinderSegment(l.clone().add(0, -6, 0), 12, 6, Math.PI / 2);
+				List<LivingEntity> mobs = hitbox.getHitMobs();
+				mobs.removeIf(mob -> ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG));
+				if (!mobs.isEmpty()) {
+					mobs.forEach(mob -> PotionUtils.applyColoredGlowing("DepthsMobsRemaining", mob, NamedTextColor.WHITE, 100));
+					dp.sendMessage("There are enemies blocking you from opening the next room!");
+					return;
+				}
 			}
 
 			// Store the location to spawn the next room from
@@ -1257,7 +1333,7 @@ public class DepthsManager {
 	 * @param p player who opened the chest
 	 * @return the appropriate GUI to open for their current room reward
 	 */
-	public Boolean getRoomReward(Player p, @Nullable Location l, boolean fromSummaryGUI) {
+	public boolean getRoomReward(Player p, @Nullable Location l, boolean fromSummaryGUI) {
 		DepthsPlayer dp = getDepthsPlayer(p);
 		DepthsParty party = getPartyFromId(dp);
 		if (dp == null || party == null) {
@@ -1267,14 +1343,14 @@ public class DepthsManager {
 		//First - check if the player has any rewards to open
 		if (!dp.mEarnedRewards.isEmpty()) {
 			DepthsRewardType reward = dp.mEarnedRewards.peek();
-			if (reward == DepthsRewardType.ABILITY || reward == DepthsRewardType.ABILITY_ELITE || reward == DepthsRewardType.PRISMATIC) {
-				DepthsGUICommands.ability(Plugin.getInstance(), p, fromSummaryGUI);
+			if (reward == DepthsRewardType.ABILITY || reward == DepthsRewardType.ABILITY_ELITE || reward == DepthsRewardType.PRISMATIC || reward == DepthsRewardType.CURSE) {
+				DepthsGUICommands.ability(p, fromSummaryGUI);
 				return true;
 			} else if (reward == DepthsRewardType.UPGRADE || reward == DepthsRewardType.UPGRADE_ELITE || reward == DepthsRewardType.TWISTED) {
-				DepthsGUICommands.upgrade(Plugin.getInstance(), p, fromSummaryGUI);
+				DepthsGUICommands.upgrade(p, fromSummaryGUI);
 				return true;
 			} else if (reward == DepthsRewardType.GENEROSITY) {
-				DepthsGUICommands.generosity(Plugin.getInstance(), p, fromSummaryGUI);
+				DepthsGUICommands.generosity(p, fromSummaryGUI);
 				return true;
 			}
 		}
@@ -1342,6 +1418,7 @@ public class DepthsManager {
 		}
 		// Return up to 3 random choices of items that are one level above the current level
 		ArrayList<DepthsAbilityInfo<?>> abilities = new ArrayList<>(getAbilities());
+		abilities.removeIf(info -> !info.getHasLevels());
 		Collections.shuffle(abilities);
 		offeredItems = new ArrayList<>();
 
@@ -1354,6 +1431,7 @@ public class DepthsManager {
 		if (prosperity != null) {
 			options += prosperity.getExtraChoices();
 		}
+
 		for (DepthsAbilityInfo<?> da : abilities) {
 			if (offeredItems.size() >= options) {
 				break;
@@ -1414,7 +1492,7 @@ public class DepthsManager {
 			String test = abilityList.get(index);
 			//Make sure the player has the ability AND it's not a weapon aspect
 			int testLevel = getPlayerLevelInAbility(test, p);
-			if (testLevel > 0 && !DepthsUtils.isWeaponAspectAbility(test) && !DepthsUtils.isPrismaticAbility(test)) {
+			if (testLevel > 0 && !DepthsUtils.isWeaponAspectAbility(test) && !DepthsUtils.isPrismaticAbility(test) && !DepthsUtils.isCurseAbility(test)) {
 				removedAbility = test;
 				removedLevel = testLevel;
 			}
@@ -1566,6 +1644,10 @@ public class DepthsManager {
 				}
 			}
 		} else if (party.mContent == DepthsContent.CELESTIAL_ZENITH) {
+			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_FLOOR) {
+				party.mPlayersInParty.forEach(dp2 -> dp2.mEarnedRewards.add(DepthsRewardType.CURSE));
+				party.sendMessage("You have been laden with an additional curse after clearing the floor!");
+			}
 			//Give twisted reward for beating boss in depths 2
 			party.mPlayersInParty.forEach(dp2 -> dp2.mEarnedRewards.add(DepthsRewardType.TWISTED));
 			party.sendMessage("You received a celestial gift for clearing the floor! Check your trinket to see the upgrade.");
@@ -1661,8 +1743,8 @@ public class DepthsManager {
 		return chance;
 	}
 
-	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances, boolean isPrismatic, boolean isTwisted) {
-		getRandomAbility(p, dp, chances, isPrismatic, isTwisted, true);
+	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances, @Nullable DepthsTree filterTree, boolean isTwisted) {
+		getRandomAbility(p, dp, chances, filterTree, isTwisted, true);
 	}
 
 	/**
@@ -1672,15 +1754,14 @@ public class DepthsManager {
 	 * @param dp      depths player
 	 * @param chances the array of odds for each rarity, length 5
 	 */
-	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances, boolean isPrismatic, boolean isTwisted, boolean sendMessage) {
+	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances, @Nullable DepthsTree filterTree, boolean isTwisted, boolean sendMessage) {
 		//Give random ability
 
 		List<DepthsAbilityInfo<?>> abilities;
-
-		if (isPrismatic) {
-			List<DepthsTree> prismaticFilter = new ArrayList<>();
-			prismaticFilter.add(DepthsTree.PRISMATIC);
-			abilities = getFilteredAbilities(prismaticFilter);
+		if (filterTree != null) {
+			List<DepthsTree> filterList = new ArrayList<>();
+			filterList.add(filterTree);
+			abilities = getFilteredAbilities(filterList);
 		} else {
 			abilities = getFilteredAbilities(dp.mEligibleTrees);
 		}
@@ -1703,20 +1784,32 @@ public class DepthsManager {
 		Collections.shuffle(abilities);
 		for (DepthsAbilityInfo<?> da : abilities) {
 			if (da.canBeOffered(p)) {
-				int roll = mRandom.nextInt(100) + 1;
-				for (int i = 0; i < 5; i++) {
-					if (roll < addUpChances(i, chances)) {
-						int rarity = isTwisted ? 6 : i + 1;
-						setPlayerLevelInAbility(da.getDisplayName(), p, rarity);
-						if (sendMessage) {
-							dp.sendMessage(Component.text("You gained ability ")
-								.append(da.getNameWithHover(rarity, p))
-								.append(Component.text(" at "))
-								.append(DepthsUtils.getRarityComponent(rarity))
-								.append(Component.text(" level!")));
+
+				int rarity = 1;
+				if (isTwisted) {
+					rarity = 6;
+				} else if (da.getHasLevels()) {
+					int roll = mRandom.nextInt(100) + 1;
+					for (int i = 0; i < 5; i++) {
+						if (roll < addUpChances(i, chances)) {
+							rarity = i + 1;
+							break;
 						}
-						break;
 					}
+				}
+
+				setPlayerLevelInAbility(da.getDisplayName(), p, rarity);
+				if (sendMessage) {
+					Component message = Component.text("You gained ability ")
+						.append(da.getNameWithHover(rarity, p));
+					if (da.getHasLevels()) {
+						message = message.append(Component.text(" at "))
+							.append(DepthsUtils.getRarityComponent(rarity))
+							.append(Component.text(" level!"));
+					} else {
+						message = message.append(Component.text("!"));
+					}
+					dp.sendMessage(message);
 				}
 				break;
 			}
@@ -1824,7 +1917,7 @@ public class DepthsManager {
 		switch (arg) {
 			case 1:
 				int[] chances = {70, 25, 4, 1, 0};
-				getRandomAbility(player, dp, chances, true, false);
+				getRandomAbility(player, dp, chances, DepthsTree.PRISMATIC, false);
 				validateOfferings(dp);
 				break;
 			case 2:
@@ -1850,8 +1943,11 @@ public class DepthsManager {
 				break;
 			case 3:
 				dp.mAbilities.forEach((ability, level) -> {
-					if (level < 5 && level > 0 && !DepthsUtils.isWeaponAspectAbility(ability)) {
-						setPlayerLevelInAbility(ability, player, Math.min(5, level + 2), false);
+					if (level < 5 && level > 0) {
+						DepthsAbilityInfo<?> info = getAbility(ability);
+						if (info != null && info.getHasLevels()) {
+							setPlayerLevelInAbility(ability, player, Math.min(5, level + 2), false);
+						}
 					}
 
 				});
@@ -1860,27 +1956,40 @@ public class DepthsManager {
 				validateOfferings(dp);
 				break;
 			case 4:
-				//Upgrade random ability to twisted
-				List<String> abilityList = new ArrayList<>(dp.mAbilities.keySet());
-				Collections.shuffle(abilityList);
-				String abilityToUpgrade = null;
-				int index = 0;
-				while (abilityToUpgrade == null) {
-					if (index >= abilityList.size()) {
-						return;
+				if (party.getFloor() == 1) {
+					dp.mRerolls += 2;
+					dp.sendMessage("You gained 2 rerolls!");
+					party.sendMessage(playerName + " gained 2 rerolls!", o -> o != dp);
+				} else if (party.getFloor() == 2) {
+					dp.mRerolls += 3;
+					dp.sendMessage("You gained 3 rerolls!");
+					party.sendMessage(playerName + " gained 3 rerolls!", o -> o != dp);
+				} else {
+					//Upgrade random ability to twisted
+					List<String> abilityList = new ArrayList<>(dp.mAbilities.keySet());
+					Collections.shuffle(abilityList);
+					String abilityToUpgrade = null;
+					int index = 0;
+					while (abilityToUpgrade == null) {
+						if (index >= abilityList.size()) {
+							return;
+						}
+						String test = abilityList.get(index);
+						//Make sure the player has the ability AND it's not a weapon aspect
+						int testLevel = getPlayerLevelInAbility(test, player);
+						if (testLevel > 0 && testLevel < 6) {
+							DepthsAbilityInfo<?> info = getAbility(test);
+							if (info != null && info.getHasLevels()) {
+								abilityToUpgrade = test;
+							}
+						}
+						index++;
 					}
-					String test = abilityList.get(index);
-					//Make sure the player has the ability AND it's not a weapon aspect
-					int testLevel = getPlayerLevelInAbility(test, player);
-					if (testLevel > 0 && testLevel < 6 && !DepthsUtils.isWeaponAspectAbility(test)) {
-						abilityToUpgrade = test;
-					}
-					index++;
-				}
 
-				setPlayerLevelInAbility(abilityToUpgrade, player, 6);
-				dp.sendMessage(Component.text("Upgraded ability to ").append(DepthsRarity.TWISTED.getDisplay()).append(Component.text(": ")).append(DepthsManager.getInstance().colorAbilityWithHover(abilityToUpgrade, 6, player)));
-				validateOfferings(dp, abilityToUpgrade);
+					setPlayerLevelInAbility(abilityToUpgrade, player, 6);
+					dp.sendMessage(Component.text("Upgraded ability to ").append(DepthsRarity.TWISTED.getDisplay()).append(Component.text(": ")).append(DepthsManager.getInstance().colorAbilityWithHover(abilityToUpgrade, 6, player)));
+					validateOfferings(dp, abilityToUpgrade);
+				}
 				break;
 			case 5:
 				DepthsTree randomTree = null;
@@ -1904,7 +2013,10 @@ public class DepthsManager {
 			case 6:
 				dp.mAbilities.forEach((ability, level) -> {
 					if (level > 1 && level < 6) {
-						setPlayerLevelInAbility(ability, player, Math.max(1, level - 1));
+						DepthsAbilityInfo<?> info = getAbility(ability);
+						if (info != null && info.getHasLevels()) {
+							setPlayerLevelInAbility(ability, player, Math.max(1, level - 1));
+						}
 					}
 				});
 				dp.sendMessage("Unlucky! You downgraded all your abilities by a level.");

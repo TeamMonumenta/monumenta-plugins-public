@@ -53,7 +53,14 @@ public enum CharmNounItems {
 	SHARD("Shard", null, Material.ECHO_SHARD),
 	ROSE("Rose", null, Material.WITHER_ROSE),
 	WART("Wart", null, Material.NETHER_WART),
-	ORB("Orb", null, Material.CLAY_BALL);
+	ORB("Orb", null, Material.CLAY_BALL),
+	RING("Ring", DepthsTree.DAWNBRINGER, Material.GOLD_NUGGET),
+	INGOT("Ingot", DepthsTree.EARTHBOUND, Material.IRON_INGOT),
+	EMBER("Ember", DepthsTree.FLAMECALLER, Material.REDSTONE_TORCH),
+	ICE("Ice", DepthsTree.FROSTBORN, Material.ICE),
+	DAGGER("Dagger", DepthsTree.SHADOWDANCER, Material.NETHERITE_SWORD),
+	AMMUNITION("Ammunition", DepthsTree.STEELSAGE, Material.GUNPOWDER),
+	WINGS("Wings", DepthsTree.WINDWALKER, Material.PHANTOM_MEMBRANE);
 
 
 	public final String mName;

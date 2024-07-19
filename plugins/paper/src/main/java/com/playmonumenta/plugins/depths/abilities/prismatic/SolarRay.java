@@ -48,7 +48,7 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 	public static final String ABILITY_NAME = "Solar Ray";
 	public static final double[] BASE_DAMAGE = {12, 14, 16, 18, 20, 24};
 	public static final int COOLDOWN = 9 * 20;
-	public static final double DAMAGE_INCREASE = 0.25;
+	public static final double DAMAGE_INCREASE = 0.33;
 	public static final double TRAVEL_SPEED = 2;
 	public static final int MAX_LIFETIME = 4 * 20;
 	public static final float BEAM_RADIUS = 0.75f;

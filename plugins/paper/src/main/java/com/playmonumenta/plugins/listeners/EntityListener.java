@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
-import com.playmonumenta.plugins.itemstats.infusions.Quench;
 import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -641,8 +640,7 @@ public class EntityListener implements Listener {
 			if (entity instanceof Player player) {
 				double distance = Math.min(player.getLocation().distance(event.getEntity().getLocation()), player.getEyeLocation().distance(event.getEntity().getLocation()));
 				distance = Math.min(Math.max(-0.1 * distance + 1, 0), 1);
-				distance *= Quench.getDurationScaling(mPlugin, player);
-				ItemStatUtils.changeEffectsDurationSplash(player, item, distance);
+				ItemStatUtils.applyCustomEffects(Plugin.getInstance(), player, item, true, distance);
 			}
 		}
 

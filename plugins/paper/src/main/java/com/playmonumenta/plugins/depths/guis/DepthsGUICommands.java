@@ -26,7 +26,7 @@ public class DepthsGUICommands {
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((sender, args) -> {
 					Player player = args.getUnchecked("player");
-					summary(plugin, player);
+					summary(player);
 				}))
 			.withSubcommand(new CommandAPICommand("roomchoice")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
@@ -38,13 +38,13 @@ public class DepthsGUICommands {
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player player = args.getUnchecked("player");
-						upgrade(plugin, player, false);
+						upgrade(player, false);
 					}))
 			.withSubcommand(new CommandAPICommand("ability")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player player = args.getUnchecked("player");
-						ability(plugin, player, false);
+						ability(player, false);
 					}))
 			.withSubcommand(new CommandAPICommand("weaponaspect")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
@@ -108,47 +108,47 @@ public class DepthsGUICommands {
 		new DepthsRoomChoiceGUI(player).openInventory(player, plugin);
 	}
 
-	public static void upgrade(Plugin plugin, Player player, boolean fromSummaryGUI) {
+	public static void upgrade(Player player, boolean fromSummaryGUI) {
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getAbilityUpgradeOptions(player);
 
-		if (items == null || items.size() == 0) {
+		if (items == null || items.isEmpty()) {
 			MessagingUtils.sendActionBarMessage(player, "No ability upgrade options to show.");
-			DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+			DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
 			if (depthsPlayer != null) {
 				depthsPlayer.mEarnedRewards.poll();
 			}
 			return;
 		}
-		new DepthsUpgradeGUI(player, fromSummaryGUI).openInventory(player, plugin);
+		new DepthsUpgradeGUI(player, fromSummaryGUI).open();
 	}
 
-	public static void ability(Plugin plugin, Player player, boolean fromSummaryGUI) {
+	public static void ability(Player player, boolean fromSummaryGUI) {
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getAbilityUnlocks(player);
 
-		if (items == null || items.size() == 0) {
+		if (items == null || items.isEmpty()) {
 			MessagingUtils.sendActionBarMessage(player, "No abilities to choose from.");
-			DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+			DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
 			if (depthsPlayer != null) {
 				depthsPlayer.mEarnedRewards.poll();
 			}
 			return;
 		}
-		new DepthsAbilitiesGUI(player, fromSummaryGUI).openInventory(player, plugin);
+		new DepthsAbilitiesGUI(player, fromSummaryGUI).open();
 	}
 
-	public static void generosity(Plugin plugin, Player player, boolean fromSummaryGUI) {
+	public static void generosity(Player player, boolean fromSummaryGUI) {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
 		if (dp == null || dp.mGenerosityGifts.isEmpty()) {
-			MessagingUtils.sendActionBarMessage(player, "No abilities to choose from.");
+			MessagingUtils.sendActionBarMessage(player, "No Generosity gift available.");
 			if (dp != null) {
 				dp.mEarnedRewards.poll();
 			}
 			return;
 		}
-		new DepthsGenerosityGUI(player, fromSummaryGUI).openInventory(player, plugin);
+		new DepthsGenerosityGUI(player, fromSummaryGUI).open();
 	}
 
-	public static void summary(Plugin plugin, Player player) {
+	public static void summary(Player player) {
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(player);
 
 		if (items == null || items.size() == 0) {
@@ -156,6 +156,6 @@ public class DepthsGUICommands {
 			player.closeInventory();
 			return;
 		}
-		new DepthsSummaryGUI(player).openInventory(player, plugin);
+		new DepthsSummaryGUI(player).open();
 	}
 }

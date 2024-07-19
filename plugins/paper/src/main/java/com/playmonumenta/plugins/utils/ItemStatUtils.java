@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Alchemist;
@@ -8,6 +7,7 @@ import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -32,12 +32,14 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -134,6 +136,14 @@ public class ItemStatUtils {
 	}
 
 	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item, boolean applySickness) {
+		applyCustomEffects(plugin, player, item, applySickness, 1);
+	}
+
+	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item, boolean applySickness, double durationScale) {
+		applyCustomEffects(plugin, player, item, applySickness, durationScale, 0, Map.of());
+	}
+
+	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item, boolean applySickness, double durationScale, int durationAdd, Map<String, Double> strengthChanges) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
@@ -170,13 +180,22 @@ public class ItemStatUtils {
 
 			for (ReadWriteNBT effect : effects) {
 				String type = effect.getString(EFFECT_TYPE_KEY);
-				int duration = effect.getInteger(EFFECT_DURATION_KEY);
-				double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+				int duration = (int) (effect.getInteger(EFFECT_DURATION_KEY) * durationScale) + durationAdd;
+				double strength = effect.getDouble(EFFECT_STRENGTH_KEY) + strengthChanges.getOrDefault(type, 0.0);
 
 				int modifiedDuration = (int) (duration * quenchScale);
 
 				EffectType effectType = EffectType.fromType(type);
 				if (effectType != null) {
+					// In the future this event could be used to process Quench and sicknesses to make this code a bit cleaner
+					EffectTypeApplyFromPotionEvent event = new EffectTypeApplyFromPotionEvent(player, effectType, strength, modifiedDuration, item);
+					Bukkit.getPluginManager().callEvent(event);
+					if (event.isCancelled()) {
+						break;
+					}
+					modifiedDuration = event.getDuration();
+					strength = event.getStrength();
+
 					if (effectType == EffectType.ABSORPTION) {
 						double sicknessPenalty = 0;
 						NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
@@ -196,81 +215,6 @@ public class ItemStatUtils {
 					} else {
 						EffectType.applyEffect(effectType, player, modifiedDuration, strength, null, applySickness);
 					}
-				}
-			}
-		});
-	}
-
-	public static void changeEffectsDuration(Player player, ItemStack item, int durationChange) {
-		if (item == null || item.getType() == Material.AIR) {
-			return;
-		}
-
-		NBT.get(item, nbt -> {
-			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
-
-			if (effects == null || effects.isEmpty()) {
-				return;
-			}
-
-			for (ReadWriteNBT effect : effects) {
-				String type = effect.getString(EFFECT_TYPE_KEY);
-				EffectType effectType = EffectType.fromType(type);
-				if (effectType != null) {
-					int duration = effect.getInteger(EFFECT_DURATION_KEY);
-					double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-					EffectType.applyEffect(effectType, player, duration + durationChange, strength, null, false);
-				}
-			}
-		});
-	}
-
-	public static void changeDurationAndStrengths(Player player, ItemStack item, int durationChange, ImmutableMap<String, Double> strengthChanges) {
-		if (item == null || item.getType() == Material.AIR) {
-			return;
-		}
-
-		NBT.get(item, nbt -> {
-			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
-
-			if (effects == null || effects.isEmpty()) {
-				return;
-			}
-
-
-			for (ReadWriteNBT effect : effects) {
-				String type = effect.getString(EFFECT_TYPE_KEY);
-				int duration = effect.getInteger(EFFECT_DURATION_KEY);
-				double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-				double strengthChange = strengthChanges.getOrDefault(type, 0.0);
-
-				EffectType effectType = EffectType.fromType(type);
-				if (effectType != null) {
-					EffectType.applyEffect(effectType, player, duration + durationChange, strength + strengthChange, null, false);
-				}
-			}
-		});
-	}
-
-	public static void changeEffectsDurationSplash(Player player, ItemStack item, double scale) {
-		if (item == null || item.getType() == Material.AIR) {
-			return;
-		}
-
-		NBT.get(item, nbt -> {
-			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
-
-			if (effects == null || effects.isEmpty()) {
-				return;
-			}
-
-			for (ReadWriteNBT effect : effects) {
-				String type = effect.getString(EFFECT_TYPE_KEY);
-				EffectType effectType = EffectType.fromType(type);
-				if (effectType != null) {
-					int duration = effect.getInteger(EFFECT_DURATION_KEY);
-					double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-					EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, null, false);
 				}
 			}
 		});

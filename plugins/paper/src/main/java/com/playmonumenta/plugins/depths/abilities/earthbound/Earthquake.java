@@ -195,9 +195,9 @@ public class Earthquake extends DepthsAbility {
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs in a ")
 			.add(a -> a.mRadius, RADIUS)
-			.add(" block radius, silencing for ")
+			.add(" block radius, silencing them for ")
 			.addDuration(a -> a.mSilenceDuration, SILENCE_DURATION[rarity - 1], false, true)
-			.add(" seconds and knocking upward.")
+			.add(" seconds and knocking them upward.")
 			.addCooldown(COOLDOWN);
 	}
 

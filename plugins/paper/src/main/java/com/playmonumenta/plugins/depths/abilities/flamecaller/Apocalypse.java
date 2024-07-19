@@ -108,6 +108,7 @@ public class Apocalypse extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 0.1f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.0f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 1.2f, 0.1f);
 
 		sendActionBarMessage("Apocalypse has been activated!");
 		event.setCancelled(true);

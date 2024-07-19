@@ -142,7 +142,9 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
@@ -731,6 +733,14 @@ public class AbilityManager {
 
 	public void potionEffectApplyEvent(Player player, PotionEffectApplyEvent event) {
 		conditionalCast(player, (ability) -> ability.potionApplyEvent(event));
+	}
+
+	public void customEffectApplyEvent(Player player, CustomEffectApplyEvent event) {
+		conditionalCast(player, ability -> ability.customEffectApplyEvent(event));
+	}
+
+	public void effectTypeApplyFromPotionEvent(Player player, EffectTypeApplyFromPotionEvent event) {
+		conditionalCast(player, ability -> ability.effectTypeApplyFromPotionEvent(event));
 	}
 
 	public void playerDeathEvent(Player player, PlayerDeathEvent event) {

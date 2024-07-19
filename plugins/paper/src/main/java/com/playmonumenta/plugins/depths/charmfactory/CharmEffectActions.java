@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.depths.charmfactory;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public enum CharmEffectActions {
 
@@ -34,5 +34,24 @@ public enum CharmEffectActions {
 			}
 		}
 		return null;
+	}
+
+	public static @Nullable CharmEffectActions upgradeAction(@Nullable CharmEffectActions action) {
+		if (action == null) {
+			return null;
+		}
+
+		return switch (action) {
+			case N_LEGENDARY -> N_EPIC;
+			case N_EPIC -> N_RARE;
+			case N_RARE -> N_UNCOMMON;
+			case N_UNCOMMON -> N_COMMON;
+			case N_COMMON -> COMMON;
+			case COMMON -> UNCOMMON;
+			case UNCOMMON -> RARE;
+			case RARE -> EPIC;
+			case EPIC -> LEGENDARY;
+			default -> null;
+		};
 	}
 }

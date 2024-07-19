@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -25,10 +26,14 @@ public class DepthsEndlessDifficulty {
 	public static final int ASCENSION_BOSS_COOLDOWN = 8;
 	public static final int ASCENSION_ABILITY_PURGE = 10;
 	public static final int ASCENSION_REVIVE_TIME = 12;
+	public static final int ASCENSION_TWISTED = 13;
 	public static final int ASCENSION_ACTIVE_TREE_CAP = 14;
 	public static final int ASCENSION_FINAL_BOSS = 15;
+	public static final int ASCENSION_CURSE_START = 16;
+	public static final int ASCENSION_CHRONOLOGY = 17;
+	public static final int ASCENSION_CURSE_FLOOR = 18;
 
-	public static void applyDelvePointsToParty(DepthsParty party, int pointsToAssign, Map<DelvesModifier, Integer> delvePointsForParty, boolean twisted) {
+	private static void assignDelvePoints(DepthsParty party, BiConsumer<Player, String> action) {
 		//First, take an available player and assign points to them based on the party's current assignment
 		List<Player> players = new ArrayList<>();
 		party.mPlayersInParty.forEach(dp -> players.add(Bukkit.getPlayer(dp.mPlayerId)));
@@ -40,31 +45,34 @@ public class DepthsEndlessDifficulty {
 		players.remove(playerToUse);
 
 		String shard = ServerProperties.getShardName();
-		//Get delve info for that player
-		if (delvePointsForParty != null && !delvePointsForParty.isEmpty()) {
 
+		if (!party.mDelveModifiers.isEmpty()) {
 			for (DelvesModifier m : DelvesModifier.values()) {
-				DelvesUtils.setDelvePoint(null, playerToUse, shard, m, delvePointsForParty.getOrDefault(m, 0));
+				DelvesUtils.setDelvePoint(null, playerToUse, shard, m, party.mDelveModifiers.getOrDefault(m, 0));
 			}
 		}
 
-		//Assign twisted and entropy if they are on the last floor
-		if (twisted) {
-			DelvesUtils.setDelvePoint(null, playerToUse, shard, DelvesModifier.TWISTED, 5);
-		} else {
-			//Assign random points to that player on top of what they currently have
-			DelvesUtils.assignRandomDelvePoints(playerToUse, shard, pointsToAssign);
-		}
+		action.accept(playerToUse, shard);
 
 		//Store player's modifiers in the party index
 		for (DelvesModifier m : DelvesModifier.values()) {
-			delvePointsForParty.put(m, DelvesUtils.getDelveModLevel(playerToUse, shard, m));
+			party.mDelveModifiers.put(m, DelvesUtils.getDelveModLevel(playerToUse, shard, m));
 		}
 
 		//Assign the scores to all other active players
 		players.forEach(p -> DelvesUtils.copyDelvePoint(null, playerToUse, p, shard));
-		if (!twisted) {
-			party.sendMessage("Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths trinket to view all delve modifiers.");
-		}
+	}
+
+	public static void applyDelvePointsToParty(DepthsParty party, int pointsToAssign, Map<DelvesModifier, Integer> delvePointsForParty, boolean twisted) {
+		assignDelvePoints(party, (player, shard) -> DelvesUtils.assignRandomDelvePoints(player, shard, pointsToAssign));
+		party.sendMessage("Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths trinket to view all delve modifiers.");
+	}
+
+	public static void applyTwisted(DepthsParty party) {
+		assignDelvePoints(party, (player, shard) -> DelvesUtils.setDelvePoint(null, player, shard, DelvesModifier.TWISTED, 5));
+	}
+
+	public static void applyChronology(DepthsParty party) {
+		assignDelvePoints(party, (player, shard) -> DelvesUtils.setDelvePoint(null, player, shard, DelvesModifier.CHRONOLOGY, 1));
 	}
 }

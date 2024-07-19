@@ -24,10 +24,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
@@ -114,6 +116,8 @@ public class DiscoBall extends DepthsAbility {
 
 			int mTicks = 1;
 			int mTimesShot = 0;
+			double mAngle = 5;
+			final ArrayList<LivingEntity> mAlreadyHitMobs = new ArrayList<>();
 
 			@Override
 			public void run() {
@@ -122,12 +126,14 @@ public class DiscoBall extends DepthsAbility {
 				}
 
 				if (mTicks % SHOOT_INTERVAL == 0) {
+					mAlreadyHitMobs.clear();
 					mTimesShot++;
 					if (mTimesShot == mMaxShots && mFinalBlast) {
 						doFinalBlast();
 					} else {
 						shoot(SPOTLIGHT_PROJECTILES);
 					}
+					mAngle += 5;
 				}
 
 				mTicks++;
@@ -144,16 +150,15 @@ public class DiscoBall extends DepthsAbility {
 			}
 
 			public void shoot(int amount) {
-				ArrayList<LivingEntity> alreadyHitMobs = new ArrayList<>();
 				for (int shot = 0; shot < amount; shot++) {
 					// Try to target mobs under the cone of the disco ball first.
-					List<LivingEntity> hitMobs = Hitbox.approximateCone(mBallLoc, mDistanceFromGround, Math.PI).getHitMobs();
+					List<LivingEntity> hitMobs = Hitbox.approximateCone(mBallLoc, mDistanceFromGround, Math.toRadians(mAngle)).getHitMobs();
 					hitMobs.removeIf(mob -> !LocationUtils.hasLineOfSight(mBallLoc, LocationUtils.getHalfHeightLocation(mob)));
-					hitMobs.removeIf(alreadyHitMobs::contains);
-					if (hitMobs.size() > 0) {
+					hitMobs.removeIf(mAlreadyHitMobs::contains);
+					if (!hitMobs.isEmpty()) {
 						Collections.shuffle(hitMobs);
 						impactLocation(hitMobs.get(0).getLocation());
-						alreadyHitMobs.add(hitMobs.get(0));
+						mAlreadyHitMobs.add(hitMobs.get(0));
 					} else {
 						shootRandomly();
 					}
@@ -161,8 +166,9 @@ public class DiscoBall extends DepthsAbility {
 			}
 
 			public void shootRandomly() {
-				double angle = FastUtils.randomDoubleInRange(0, Math.PI * 2);
-				Vector dir = new Vector(FastUtils.cos(angle) * FastUtils.randomDoubleInRange(0.1, 0.75), -1, FastUtils.sin(angle) * FastUtils.randomDoubleInRange(0.1, 0.75)).normalize();
+				Vector dir = new Vector(0, -1, 0);
+				dir = VectorUtils.rotateXAxis(dir, FastUtils.randomDoubleInRange(0, mAngle));
+				dir = VectorUtils.rotateYAxis(dir, FastUtils.randomDoubleInRange(0, 360));
 				LocationUtils.rayTraceToBlock(mBallLoc, dir, 50, this::impactLocation);
 			}
 
@@ -186,9 +192,11 @@ public class DiscoBall extends DepthsAbility {
 			public void damageLocation(Location loc, boolean quadruple) {
 				double damage = DAMAGE[mRarity - 1] * (quadruple ? 4 : 1);
 				Hitbox hitbox = new Hitbox.SphereHitbox(loc, BLAST_RADIUS);
-				hitbox.getHitMobs().forEach(mob -> {
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
-				});
+				for (LivingEntity mob : hitbox.getHitMobs()) {
+					if (!mAlreadyHitMobs.contains(mob)) {
+						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
+					}
+				}
 			}
 
 			public boolean checkFinalBlast() {
@@ -202,8 +210,10 @@ public class DiscoBall extends DepthsAbility {
 					List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer.getPlayer());
 					Set<DepthsTree> activeTrees = abilities.stream()
 						.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
-						.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT))
-						.map(DepthsAbilityInfo::getDepthsTree).collect(Collectors.toSet());
+						.map(DepthsAbilityInfo::getDepthsTree)
+						.filter(Objects::nonNull) // Weapon Aspects have null tree
+						.filter(tree -> tree != DepthsTree.CURSE)
+						.collect(Collectors.toSet());
 					globalDepthsTrees.addAll(activeTrees);
 				});
 				// If there are 8 different trees in the Set, it means at least one active ability in each of them
@@ -221,7 +231,7 @@ public class DiscoBall extends DepthsAbility {
 						// Try to target mobs under the cone of the disco ball first.
 						List<LivingEntity> hitMobs = Hitbox.approximateCone(mBallLoc, mDistanceFromGround, Math.PI).getHitMobs();
 						hitMobs.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
-						if (hitMobs.size() > 0) {
+						if (!hitMobs.isEmpty()) {
 							Collections.shuffle(hitMobs);
 							impactLocationSpecial(hitMobs.get(0).getLocation(), mRuns);
 						} else {
@@ -305,7 +315,7 @@ public class DiscoBall extends DepthsAbility {
 			.addDuration(DURATION)
 			.add(" seconds, and rains ")
 			.addDepthsDamage(a -> DAMAGE[rarity - 1], DAMAGE[rarity - 1], true)
-			.add(" magic damage in the spotlight. If your party has an active trigger ability " +
+			.add(" magic damage onto 3 targets every 0.5 seconds. The disco ball starts out with a narrow targeting angle and expands over time. If your party has an active trigger ability " +
 				"from all eight trees, the final pulse of the ball will heat up the dance floor with a color show that " +
 				"deals quadruple damage.")
 			.addCooldown(COOLDOWN);

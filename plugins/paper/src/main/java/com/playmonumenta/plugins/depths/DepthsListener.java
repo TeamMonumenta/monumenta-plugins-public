@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDeath;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.EternalSavior;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
@@ -15,7 +16,6 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Charity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.ColorSplash;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Rebirth;
-import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.depths.bosses.Broodmother;
 import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
@@ -63,7 +63,6 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -73,6 +72,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -152,6 +152,21 @@ public class DepthsListener implements Listener {
 					roll -= chance;
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void entityDeathEvent(EntityDeathEvent event) {
+		LivingEntity entity = event.getEntity();
+		Player player = event.getEntity().getKiller();
+		DepthsManager dm = DepthsManager.getInstance();
+
+		if (!dm.isInSystem(player)) {
+			return;
+		}
+
+		if (!ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG) && EntityUtils.isHostileMob(entity)) {
+			dm.playerKilledMob(player);
 		}
 	}
 
@@ -247,21 +262,21 @@ public class DepthsListener implements Listener {
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
 		Entity damagee = event.getHitEntity();
-		if (proj instanceof Firework firework && FireworkBlast.isDamaging(firework) && damagee instanceof Player) {
-			// Firework Blast fireworks go through players
-			event.setCancelled(true);
-		} else if (damagee instanceof Slime && damagee.getName().contains("Eye") && shooter instanceof Player player) {
+		if (damagee instanceof Slime && damagee.getName().contains("Eye") && shooter instanceof Player player) {
 			// Sound on shooting an eye
 			player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, SoundCategory.PLAYERS, 0.4f, 0.2f);
 		}
 	}
 
-	public int getGraveDuration(DepthsParty party, DepthsPlayer dp, boolean allowPermadeath) {
+	public int getGraveDuration(DepthsParty party, DepthsPlayer dp, Player player, boolean allowPermadeath) {
 		int baseGraveDuration = party.getAscension() < DepthsEndlessDifficulty.ASCENSION_REVIVE_TIME ? GRAVE_DURATION : GRAVE_DURATION - ASCENSION_GRAVE_DURATION_DECREASE;
 		int duration = baseGraveDuration - (int) (Math.sqrt(dp.mNumDeaths) * 7 * 20);
 
 		if (allowPermadeath) {
 			return Math.max(1, duration);
+		}
+		if (duration > 61 && AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, CurseOfDeath.class) != null) {
+			return 61;
 		}
 		return Math.max(61, duration);
 	}
@@ -317,7 +332,7 @@ public class DepthsListener implements Listener {
 
 					Location deathLocation = player.getLocation();
 					MMLog.finer(player.getName() + " died. mNumDeaths = " + dp.mNumDeaths);
-					int graveDuration = getGraveDuration(party, dp, false);
+					int graveDuration = getGraveDuration(party, dp, player, false);
 					dp.mNumDeaths++;
 					if (graveDuration > GRAVE_REVIVE_DURATION) {
 						Location waitingRoomLocation = party.mDeathWaitingRoomPoint.toLocation(player.getWorld());
@@ -397,16 +412,16 @@ public class DepthsListener implements Listener {
 								nearbyPlayers.removeIf(player -> {
 									// if a player is within range due to any one of their abilities, ensure they won't be removed
 
-									ColorSplash colorSplash = AbilityManager.getManager().getPlayerAbility(player, ColorSplash.class);
+									ColorSplash colorSplash = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ColorSplash.class);
 									if (colorSplash != null && colorSplash.hasIncreasedReviveRadius()) {
 										if (player.getLocation().distanceSquared(grave.getLocation()) <= mBaseReviveRadiusSquared + Math.pow(ColorSplash.DAWNBRINGER_EXTRA_REVIVE_RADIUS, 2)) {
 											return false;
 										}
 									}
 
-									EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbility(player, EternalSavior.class);
-									if (eternalSavior != null && eternalSavior.hasIncreasedReviveRadius()) {
-										if (eternalSavior.getSaviorLocation().distanceSquared(grave.getLocation()) <= Math.pow(eternalSavior.getIncreasedReviveRadius(), 2)) {
+									EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EternalSavior.class);
+									if (eternalSavior != null && eternalSavior.isActive()) {
+										if (eternalSavior.getSaviorLocation().distance(grave.getLocation()) <= eternalSavior.getIncreasedReviveRadius()) {
 											return false;
 										}
 									}
@@ -415,14 +430,11 @@ public class DepthsListener implements Listener {
 								});
 
 								if (!nearbyPlayers.isEmpty()) {
-									int maxCharityLevel = nearbyPlayers.stream().map(DepthsManager.getInstance()::getDepthsPlayer).filter(Objects::nonNull).mapToInt(dp -> dp.mAbilities.getOrDefault(Charity.ABILITY_NAME, 0)).max().orElse(0);
-
 									dp.mCurrentlyReviving = true;
-									if (maxCharityLevel > 0) {
-										dp.mReviveTicks += Charity.REVIVE_POWER[maxCharityLevel - 1];
-									} else {
-										dp.mReviveTicks++;
-									}
+
+									double maxRevivePower = nearbyPlayers.stream().map(DepthsManager.getInstance()::getDepthsPlayer).filter(Objects::nonNull).mapToDouble(dp -> getGraveRevivePower(dp)).max().orElse(1);
+									dp.mReviveTicks += maxRevivePower;
+
 									if (dp.mReviveTicks > 3 && mReviveBar == null) {
 										mReviveBar = BossBar.bossBar(Component.text("Reviving " + player.getName(), NamedTextColor.GREEN),
 											1f * (int) dp.mReviveTicks / GRAVE_REVIVE_DURATION, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, Set.of());
@@ -436,7 +448,7 @@ public class DepthsListener implements Listener {
 										if (!dp.doOfflineTeleport()) {
 											player.teleport(grave.getLocation());
 										}
-										Charity.onCharityRevive(player, nearbyPlayers, maxCharityLevel);
+										Charity.onCharityRevive(player, nearbyPlayers);
 										dp.sendMessage("You have been revived!");
 										party.sendMessage(player.getName() + " has been revived!", d -> d != dp);
 										dp.mDead = false;
@@ -525,6 +537,18 @@ public class DepthsListener implements Listener {
 				}
 			}
 		}
+	}
+
+	private double getGraveRevivePower(DepthsPlayer dp) {
+		double power = 1;
+		int charityLevel = dp.mAbilities.getOrDefault(Charity.ABILITY_NAME, 0);
+		if (charityLevel > 0) {
+			power = Charity.REVIVE_POWER[charityLevel];
+		}
+		if (dp.mAbilities.getOrDefault(CurseOfDeath.ABILITY_NAME, 0) > 0) {
+			power *= 0.5;
+		}
+		return power;
 	}
 
 	public boolean attemptRebirth(Player player, DepthsPlayer dp, Location teleportTo) {
@@ -716,7 +740,7 @@ public class DepthsListener implements Listener {
 					MMLog.finer(player.getName() + " logged in with anticheese boss tag. mNumDeaths = " + dp.mNumDeaths);
 				}
 
-				if (disconnectAnticheese && getGraveDuration(party, dp, true) < GRAVE_REVIVE_DURATION) {
+				if (disconnectAnticheese && getGraveDuration(party, dp, player, true) < GRAVE_REVIVE_DURATION) {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
 					shouldOfflineTeleport = false;
