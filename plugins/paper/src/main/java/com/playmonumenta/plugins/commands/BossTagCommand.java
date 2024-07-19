@@ -166,6 +166,13 @@ public class BossTagCommand {
 			)
 
 			.withSubcommand(
+				new CommandAPICommand("sortAlpha")
+					.executesPlayer((player, args) -> {
+						sortBossTags(player);
+					})
+			)
+
+			.withSubcommand(
 				new CommandAPICommand("los_errors")
 					.executesPlayer((player, args) -> {
 						checkAllLos(player, true);
@@ -1007,6 +1014,35 @@ public class BossTagCommand {
 		);
 	}
 
+	/**
+	 * Sorts a book of souls according to Java's default sorting comparator for Strings
+	 *
+	 * @param player player holding the Book of Souls
+	 */
+	private static void sortBossTags(Player player) throws WrapperCommandSyntaxException {
+		BookOfSouls bos = getBos(player);
+		ListVariable tags = (ListVariable) bos.getEntityNBT().getVariable("Tags");
+		Object[] nbtTagsList = bos.getEntityNBT().getData().getList("Tags").getAsArray();
+
+		player.sendMessage(Component.empty()
+									.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+									.append(Component.text("Sorting bosstags...", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+		tags.clear();
+		Arrays.stream(nbtTagsList)
+			  .map(Object::toString)
+			  .sorted()
+			  .forEach(tag -> tags.add(tag, player));
+
+		bos.saveBook();
+
+		player.sendMessage(Component.empty()
+									.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+									.append(Component.text("Sort completed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+	}
+
 	private static List<String> checkEntity(Component description, String soulLabel, NBTTagCompound entityNBT, Player sender) {
 
 		List<String> errors = new ArrayList<>();
@@ -1215,6 +1251,11 @@ public class BossTagCommand {
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag get <search_id>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag get ")))
 			                   .append(Component.text(" Get the first Book of Souls returned by /bosstag search <boss_tag[...]>.", NamedTextColor.GRAY))
+		);
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("/bosstag sortAlpha", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag sortAlpha ")))
+			                   .append(Component.text(" Sorts tags on this Book of Souls according to Java's default String comparator", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
