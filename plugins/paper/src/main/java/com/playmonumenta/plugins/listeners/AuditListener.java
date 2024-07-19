@@ -290,6 +290,13 @@ public class AuditListener implements Listener {
 		}
 	}
 
+	public static void logChatMod(String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendAuditLogChatModMessage(createLocationData() + " " + message);
+		}
+	}
+
 	public static void logDeath(String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + createLocationData() + " " + message);

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.listeners.AuditListener;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import org.bukkit.entity.Player;
 
@@ -37,6 +38,13 @@ public class AuditLogCommand {
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
 				AuditListener.logSevere(((String) args.getUnchecked("message")).replaceAll("@S", ((Player) args.getUnchecked("player")).getName()));
+			})
+			.register();
+		new CommandAPICommand("auditlogchatmod")
+			.withPermission(CommandPermission.fromString("monumenta.command.auditlog"))
+			.withArguments(new GreedyStringArgument("message"))
+			.executes((sender, args) -> {
+				AuditListener.logSevere(args.getUnchecked("message"));
 			})
 			.register();
 	}

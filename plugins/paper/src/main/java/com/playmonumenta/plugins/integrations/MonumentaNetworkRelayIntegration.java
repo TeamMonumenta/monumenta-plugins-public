@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 public class MonumentaNetworkRelayIntegration {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
 	public static final String AUDIT_LOG_SEVERE_CHANNEL = "Monumenta.Automation.AuditLogSevere";
+	public static final String AUDIT_LOG_CHAT_MOD_CHANNEL = "Monumenta.Automation.ChatModAuditLog";
 	public static final String AUDIT_LOG_DEATH_CHANNEL = "Monumenta.Automation.DeathAuditLog";
 	public static final String AUDIT_LOG_PLAYERS_CHANNEL = "Monumenta.Automation.PlayerAuditLog";
 	public static final String AUDIT_LOG_MARKET_CHANNEL = "Monumenta.Automation.MarketAuditLog";
@@ -130,6 +131,10 @@ public class MonumentaNetworkRelayIntegration {
 
 	public static void sendAuditLogSevereMessage(String message) {
 		sendAuditLogMessage(message, AUDIT_LOG_SEVERE_CHANNEL);
+	}
+
+	public static void sendAuditLogChatModMessage(String message) {
+		sendAuditLogMessage(message, AUDIT_LOG_CHAT_MOD_CHANNEL);
 	}
 
 	public static void sendModAuditLogMessage(String message) {
