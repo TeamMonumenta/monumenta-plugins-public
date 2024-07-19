@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
@@ -127,108 +126,8 @@ public class CharmFactory {
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
-		if (!item.getType().isAir()) {
-			NBTItem nbt = new NBTItem(item);
-			ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
-			if (playerModified == null) {
-				return null;
-			}
-
-			int power = ItemStatUtils.getCharmPower(item);
-			int rarity = playerModified.getInteger(CharmFactory.CHARM_RARITY_KEY);
-			long seed = playerModified.getLong(CharmFactory.CHARM_UUID_KEY);
-
-			if (power == 0 || rarity == 0 || seed == 0) {
-				//Invalid charm
-				return null;
-			}
-			//Iterate through ability effect data to create a list
-			List<String> charmEffectOrder = new ArrayList<>();
-			List<String> charmActionOrder = new ArrayList<>();
-			List<Double> charmRollsOrder = new ArrayList<>();
-
-			int count = 1;
-			while (playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count) != null
-				&& !playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count).isEmpty()) {
-
-				// replace charm effects according to map
-				String effect = playerModified.getString(CharmFactory.CHARM_EFFECTS_KEY + count);
-				MMLog.fine("retrieved nbt " + effect + " " + count);
-
-				String newEffect = effect;
-				if (charmConversionMap.get(effect) != null) {
-					newEffect = charmConversionMap.get(effect);
-					MMLog.fine("changed charm effect from " + effect + " to " + newEffect + " " + count);
-				}
-
-				charmEffectOrder.add(newEffect);
-				count++;
-			}
-
-			// we can't use the previous method because getDouble returns 0.0 for rolls past the end-of-list
-			// which is indistinguishable from a roll that was actually rolled as 0.0.
-			// effects and rolls should always come in the same amount, so this should work instead
-			for (int i = 1; i < count; i++) {
-				charmRollsOrder.add(playerModified.getDouble(CharmFactory.CHARM_ROLLS_KEY + i));
-				MMLog.fine("retrieved nbt " + charmRollsOrder.get(i - 1) + " " + i);
-			}
-
-			count = 1;
-			while (playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count) != null
-				&& !playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count).isEmpty()) {
-
-				// de-level stat rarity according to map
-				String actionName = playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + count);
-				CharmEffectActions action = CharmEffectActions.getEffect(actionName);
-				CharmEffectActions downgrade = charmLevelCapMap.get(charmEffectOrder.get(count));
-
-				// if the action is higher than it should, and it isn't negative, downgrade it.
-				String newActionName = actionName;
-				if (action != null && downgrade != null && action.mRarity > downgrade.mRarity && !action.mIsNegative) {
-					newActionName = downgrade.mAction;
-					MMLog.fine("changed action from " + actionName + " to " + newActionName + " " + count);
-				}
-
-				charmActionOrder.add(newActionName);
-				MMLog.fine("retrieved nbt " + charmActionOrder.get(count - 1) + " " + count);
-				count++;
-			}
-
-			// de-level stat edge case: if we're trying to downgrade the 1st stat of a charm, it doesn't have an action with it.
-			// to do this, swap its rarity with another effect, so the budget stays the same.
-			CharmEffectActions downgrade = charmLevelCapMap.get(charmEffectOrder.get(0));
-			if (downgrade != null) {
-				List<String> possibleActions = new ArrayList<>(charmActionOrder);
-				int i = 0;
-				for (String actionName : possibleActions) {
-					CharmEffectActions action = CharmEffectActions.getEffect(actionName);
-					if (action != null && !action.mIsNegative && action.mRarity <= downgrade.mRarity) {
-						MMLog.fine("swapping " + charmEffectOrder.get(0) + " and " + charmEffectOrder.get(i + 1) + " for a downgrade!");
-						Collections.swap(charmEffectOrder, 0, i + 1);
-						Collections.swap(charmRollsOrder, 0, i + 1);
-						break;
-					}
-					i++;
-				}
-			}
-
-			MMLog.finer("updateCharm final review:");
-			MMLog.finer("charmEffectOrder:");
-			for (String effect : charmEffectOrder) {
-				MMLog.finer(effect);
-			}
-			MMLog.finer("charmRollsOrder:");
-			for (Double roll : charmRollsOrder) {
-				MMLog.finer(roll.toString());
-			}
-			MMLog.finer("charmActionOrder:");
-			for (String action : charmActionOrder) {
-				MMLog.finer(action);
-			}
-
-			return CharmFactory.generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item);
-		}
-		return null;
+		ItemUpdateHelper.generateItemStats(item);
+		return item;
 	}
 
 	public static ItemStack generateCharm(int level, int power, long seed, @Nullable List<String> effectOrder, @Nullable List<String> actionOrder, @Nullable List<Double> rollsOrder, @Nullable Component fixedName, @Nullable ItemStack oldItem) {
