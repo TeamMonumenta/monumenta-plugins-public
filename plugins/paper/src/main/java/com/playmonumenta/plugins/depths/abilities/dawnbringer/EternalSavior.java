@@ -78,7 +78,6 @@ public class EternalSavior extends DepthsAbility {
 	private final int mStunDuration;
 
 	private boolean mStasisActive;
-	private @Nullable Location mStasisLocation;
 
 	public EternalSavior(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -90,7 +89,6 @@ public class EternalSavior extends DepthsAbility {
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.ETERNAL_SAVIOR_STUN_DURATION.mEffectName, STUN_DURATION);
 
 		mStasisActive = false;
-		mStasisLocation = null;
 	}
 
 	@Override
@@ -125,7 +123,6 @@ public class EternalSavior extends DepthsAbility {
 			int mTicks = 0;
 			@Override
 			public void run() {
-				mStasisLocation = mPlayer.getLocation().clone();
 				Location loc = mPlayer.getLocation();
 				World world = mPlayer.getWorld();
 
@@ -336,10 +333,6 @@ public class EternalSavior extends DepthsAbility {
 
 	public double getIncreasedReviveRadius() {
 		return mRadius;
-	}
-
-	public Location getSaviorLocation() {
-		return mStasisLocation;
 	}
 
 	private static Description<EternalSavior> getDescription(int rarity, TextColor color) {

@@ -182,19 +182,23 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 					currLoc.add(dir.clone().multiply(0.25));
 					vec.rotateAroundAxis(dir, Math.PI / 24);
 				}
-
 				Vector dir2 = dir.clone().multiply(0.5);
+
+				PPPeriodic spark1 = new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc).count(1).extra(0.10).delta(0.10);
+				PPPeriodic spark2 = new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc.clone().add(dir2)).count(1).extra(0.15).delta(0.15);
+				PPPeriodic redstone = new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(vec)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f));
+
 				for (int i = 0; i < DISTANCE; i++) {
 					Vector vec2 = vec.clone().rotateAroundAxis(dir, Math.PI / 12);
 
 					currLoc.add(dir);
 
-					new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc).count(1).extra(0.10).delta(0.10).spawnAsPlayerActive(mPlayer);
-					new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc.clone().add(dir2)).count(1).extra(0.15).delta(0.15).spawnAsPlayerActive(mPlayer);
-					new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(vec)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
-					new PPPeriodic(Particle.REDSTONE, currLoc.clone().subtract(vec)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
-					new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(dir2).add(vec2)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
-					new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(dir2).subtract(vec2)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f)).spawnAsPlayerActive(mPlayer);
+					spark1.location(currLoc).spawnAsPlayerActive(mPlayer);
+					spark2.location(currLoc.clone().add(dir2)).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().add(vec)).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().subtract(vec)).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().add(dir2).add(vec2)).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().add(dir2).subtract(vec2)).spawnAsPlayerActive(mPlayer);
 
 					mHue += 0.05f;
 

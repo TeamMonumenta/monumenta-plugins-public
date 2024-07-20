@@ -172,8 +172,7 @@ public class GuardingBolt extends DepthsAbility {
 	private static Description<GuardingBolt> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<GuardingBolt>(color)
 			.add("Left click while sneaking and looking directly at a player")
-			.addConditionalDepthsContent(DepthsContent.DARKEST_DEPTHS, " or Steel Construct")
-			.addConditionalDepthsContent(DepthsContent.CELESTIAL_ZENITH, ", Steel Construct, or grave")
+			.addConditionalDepthsContent(DepthsContent.CELESTIAL_ZENITH, " or grave")
 			.add(" within ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks to dash to their location. Mobs within ")

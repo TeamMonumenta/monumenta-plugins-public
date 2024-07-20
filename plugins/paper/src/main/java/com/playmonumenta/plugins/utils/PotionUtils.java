@@ -47,7 +47,7 @@ public class PotionUtils {
 	private static final int MINUTES_5 = MINUTES_1 * 5;
 	private static final int MINUTES_8 = MINUTES_1 * 8;
 
-	private static final ImmutableSet<PotionEffectType> POSITIVE_EFFECTS = ImmutableSet.of(
+	public static final ImmutableSet<PotionEffectType> POSITIVE_EFFECTS = ImmutableSet.of(
 			PotionEffectType.ABSORPTION,
 			PotionEffectType.DAMAGE_RESISTANCE,
 			PotionEffectType.FAST_DIGGING,

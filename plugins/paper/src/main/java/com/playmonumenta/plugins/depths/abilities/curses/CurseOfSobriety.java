@@ -10,9 +10,12 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.itemstats.EffectType;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 public class CurseOfSobriety extends DepthsAbility {
 	public static final String ABILITY_NAME = "Curse of Sobriety";
@@ -32,6 +35,12 @@ public class CurseOfSobriety extends DepthsAbility {
 					pair.mEffect.setDuration(0);
 				}
 			}
+		}
+		for (PotionEffectType type : PotionUtils.POSITIVE_EFFECTS) {
+			if (Objects.equals(type, PotionEffectType.GLOWING)) {
+				continue;
+			}
+			mPlugin.mPotionManager.clearPotionEffectType(mPlayer, type);
 		}
 	}
 

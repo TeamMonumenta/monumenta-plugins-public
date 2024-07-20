@@ -159,6 +159,9 @@ public class DepthsListener implements Listener {
 	public void entityDeathEvent(EntityDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		Player player = event.getEntity().getKiller();
+		if (player == null) {
+			return;
+		}
 		DepthsManager dm = DepthsManager.getInstance();
 
 		if (!dm.isInSystem(player)) {
@@ -421,7 +424,7 @@ public class DepthsListener implements Listener {
 
 									EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EternalSavior.class);
 									if (eternalSavior != null && eternalSavior.isActive()) {
-										if (eternalSavior.getSaviorLocation().distance(grave.getLocation()) <= eternalSavior.getIncreasedReviveRadius()) {
+										if (player.getLocation().distance(grave.getLocation()) <= eternalSavior.getIncreasedReviveRadius()) {
 											return false;
 										}
 									}

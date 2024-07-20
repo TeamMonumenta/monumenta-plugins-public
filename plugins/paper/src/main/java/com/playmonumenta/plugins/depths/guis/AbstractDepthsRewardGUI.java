@@ -69,10 +69,12 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 				playerClickedItem(slot);
 				close();
 
-				// Trigger Curse of Ruin - we could disable this on generosity, but I think it's probably fine
-				CurseOfRuin ruin = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, CurseOfRuin.class);
-				if (ruin != null) {
-					ruin.downgrade(depthsPlayer);
+				if (dai != null) {
+					// Trigger Curse of Ruin - we could disable this on generosity, but I think it's probably fine
+					CurseOfRuin ruin = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, CurseOfRuin.class);
+					if (ruin != null) {
+						ruin.downgrade(depthsPlayer);
+					}
 				}
 
 				if (!depthsPlayer.mEarnedRewards.isEmpty()) {

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -34,33 +35,35 @@ public class CurseOfGluttony extends DepthsAbility {
 			return;
 		}
 		dp.mGluttonyTriggered = true;
-		Map<Integer, List<String>> sortedAbilities = new HashMap<>();
-		dp.mAbilities.forEach((ability, rarity) -> {
-			List<String> rarityAbilities = sortedAbilities.computeIfAbsent(rarity, i -> new ArrayList<>());
-			rarityAbilities.add(ability);
-		});
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			Map<Integer, List<String>> sortedAbilities = new HashMap<>();
+			dp.mAbilities.forEach((ability, rarity) -> {
+				List<String> rarityAbilities = sortedAbilities.computeIfAbsent(rarity, i -> new ArrayList<>());
+				rarityAbilities.add(ability);
+			});
 
-		int removed = 0;
-		int highestRarity = 6;
-		List<String> abilities = sortedAbilities.get(highestRarity);
-		outer: while (removed < 3) {
-			while (abilities == null || abilities.isEmpty()) {
-				highestRarity--;
-				if (highestRarity <= 0) {
-					break outer;
+			int removed = 0;
+			int highestRarity = 6;
+			List<String> abilities = sortedAbilities.get(highestRarity);
+			outer: while (removed < 3) {
+				while (abilities == null || abilities.isEmpty()) {
+					highestRarity--;
+					if (highestRarity <= 0) {
+						break outer;
+					}
+					abilities = sortedAbilities.get(highestRarity);
 				}
-				abilities = sortedAbilities.get(highestRarity);
+				String ability = FastUtils.getRandomElement(abilities);
+				abilities.remove(ability);
+				DepthsAbilityInfo<?> info = DepthsManager.getInstance().getAbility(ability);
+				if (info == null || !info.getHasLevels()) {
+					continue;
+				}
+				DepthsManager.getInstance().setPlayerLevelInAbility(ability, player, 0);
+				dp.sendMessage(Component.text("Removed ability: ").append(info.getNameWithHover(highestRarity, player)));
+				removed++;
 			}
-			String ability = FastUtils.getRandomElement(abilities);
-			abilities.remove(ability);
-			DepthsAbilityInfo<?> info = DepthsManager.getInstance().getAbility(ability);
-			if (info == null || !info.getHasLevels()) {
-				continue;
-			}
-			DepthsManager.getInstance().setPlayerLevelInAbility(ability, player, 0);
-			dp.sendMessage(Component.text("Removed ability: ").append(info.getNameWithHover(highestRarity, player)));
-			removed++;
-		}
+		});
 	}
 
 	private static Description<CurseOfGluttony> getDescription() {
