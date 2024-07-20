@@ -33,7 +33,7 @@ public class PassiveStarBlight extends Spell {
 
 	@Override
 	public void run() {
-		Set<Player> mPlayers = mSirius.getPlayers();
+		Set<Player> mPlayers = mSirius.getPlayersInArena(false);
 		EffectManager manager = Plugin.getInstance().mEffectManager;
 		for (Player p : mPlayers) {
 			int x = (int) p.getLocation().getX();
@@ -42,6 +42,9 @@ public class PassiveStarBlight extends Spell {
 			double realZ = Math.abs(mConverter.mCornerOne.z() - z);
 			realX = Math.floor(realX);
 			realZ = Math.floor(realZ);
+			if (realX >= mConverter.mBlighted.length || realZ >= mConverter.mBlighted[0].length || realX < 0 || realZ < 0) {
+				continue;
+			}
 			if (mConverter.mBlighted[(int) realX][(int) realZ]) {
 				applyStarBlight(p);
 				//already applied starblight to them this tick

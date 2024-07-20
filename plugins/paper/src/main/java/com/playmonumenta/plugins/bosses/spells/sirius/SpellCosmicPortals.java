@@ -42,7 +42,7 @@ public class SpellCosmicPortals extends Spell {
 	@Override
 	public void run() {
 		//teleports players 15 blocks behind sirius in the balcony row.
-		List<Player> mTargets = new ArrayList<>(mSirius.getPlayers());
+		List<Player> mTargets = new ArrayList<>(mSirius.getPlayersInArena(false));
 		double mPortalCount = mTargets.size() * PORTALSPERPLAYER;
 		Collections.shuffle(mTargets);
 		for (int i = 0; i < mPortalCount; i++) {

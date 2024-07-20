@@ -132,7 +132,7 @@ public class DeclarationTp extends Spell {
 					mManager.setTitle(Component.text("Channeling Power Behind the Tomb", NamedTextColor.DARK_PURPLE));
 					mManager.setChargeTime(DURATION - 20);
 					mManager.update();
-					var pList = mSirius.getPlayers();
+					var pList = mSirius.getPlayersInArena(false);
 					for (Player p : pList) {
 						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("There is no time, woolbearer! Come behind the tomb and be cleansed!", NamedTextColor.GRAY, TextDecoration.BOLD));
 					}
