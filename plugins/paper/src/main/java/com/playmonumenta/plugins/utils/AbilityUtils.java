@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Cleric;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.cosmetics.skills.StealthCosmeticSkill;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -51,6 +53,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
@@ -716,5 +719,15 @@ public class AbilityUtils {
 
 	public static boolean hasSpecialProjSkillScaling(@Nullable ClassAbility classAbility) {
 		return classAbility == ClassAbility.HUNTING_COMPANION || classAbility == ClassAbility.HALLOWED_BEAM;
+	}
+
+	public static boolean isVolley(Player player, Projectile proj) {
+		if (ServerProperties.getDepthsEnabled()) {
+			DepthsVolley volley = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DepthsVolley.class);
+			return volley != null && volley.mDepthsVolley.contains(proj);
+		} else {
+			Volley volley = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Volley.class);
+			return volley != null && volley.mVolley.contains(proj);
+		}
 	}
 }

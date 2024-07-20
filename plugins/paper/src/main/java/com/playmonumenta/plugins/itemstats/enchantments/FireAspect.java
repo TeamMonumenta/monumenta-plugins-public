@@ -85,11 +85,13 @@ public class FireAspect implements Enchantment {
 				// This fire is overwritten by the fire from the enchant, which is equal but applies inferno, etc. properly
 				projectile.setFireTicks((int) (FIRE_ASPECT_DURATION * value));
 			}
-			World world = player.getWorld();
-			Location loc = player.getLocation();
-			world.playSound(loc, Sound.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 5.0f, 0.9f);
-			world.playSound(loc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.4f, 0.9f);
-			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.3f, 1.1f);
+			if (!AbilityUtils.isVolley(player, projectile)) {
+				World world = player.getWorld();
+				Location loc = player.getLocation();
+				world.playSound(loc, Sound.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 5.0f, 0.9f);
+				world.playSound(loc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.4f, 0.9f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.3f, 1.1f);
+			}
 		}
 	}
 }

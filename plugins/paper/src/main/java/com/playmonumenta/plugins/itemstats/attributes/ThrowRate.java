@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import org.bukkit.GameMode;
@@ -62,11 +63,7 @@ public class ThrowRate implements Attribute {
 			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0 && value > 0) {
 				event.setCancelled(true);
 				// If a trident made from the volley skill, don't run sound/unbreaking
-				Volley volley = AbilityManager.getManager().getPlayerAbility(player, Volley.class);
-				DepthsVolley depthsVolley = AbilityManager.getManager().getPlayerAbility(player, DepthsVolley.class);
-				boolean isVolley = (volley != null && volley.mVolley.contains(trident))
-					|| (depthsVolley != null && depthsVolley.mDepthsVolley.contains(trident));
-
+				boolean isVolley = AbilityUtils.isVolley(player, trident);
 				if (isVolley) {
 					return;
 				}
