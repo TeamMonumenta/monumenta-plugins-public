@@ -189,7 +189,7 @@ public class LightningBottle extends DepthsAbility {
 				if (item != null && isLightningBottle(item)) { // if the player has a bottle.
 					int amt;
 					if ((amt = getLightningBottleAmount(item)) >= mMaxStack) {
-						break; // no need to give any more.
+						return; // no need to give any more.
 					}
 					int newAmount;
 					setLightningBottleAmount(item, newAmount = Math.min(mMaxStack, amt + mBottlesGiven)); // give it a new amount.
