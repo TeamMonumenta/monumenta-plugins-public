@@ -143,7 +143,12 @@ public class MovementUtils {
 			return;
 		}
 		BossManager.getInstance().entityKnockedAway(target, speed);
-		Vector dir = target.getLocation().subtract(towardsEntity.getLocation()).toVector().normalize().multiply(-speed);
+		Vector dir = target.getLocation().subtract(towardsEntity.getLocation()).toVector();
+		if (dir.length() < 0.001) {
+			// Avoid dividing by 0
+			return;
+		}
+		dir = dir.normalize().multiply(-speed);
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
 		}
