@@ -211,7 +211,7 @@ public class SpellBlightWall extends Spell {
 						}
 					}
 				}
-				var pList = mSirius.getPlayers();
+				var pList = new ArrayList<>(mSirius.getPlayers());
 				if (mTicks % 5 == 0) {
 					for (Player p : pList) {
 						p.playSound(p, Sound.ENTITY_WARDEN_AMBIENT, SoundCategory.HOSTILE, 0.6f, 1.5f);

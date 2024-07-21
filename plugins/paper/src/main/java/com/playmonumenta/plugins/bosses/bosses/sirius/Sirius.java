@@ -196,7 +196,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		spawnGate();
 		//Teleport players out of the roof
 		for (Player p : getPlayersInArena(false)) {
-			if (p.getLocation().getY() > 90) {
+			if (p.getLocation().getY() > mStartLocation.getY() + 20) {
 				switch (FastUtils.randomIntInRange(0, 1)) {
 					case 0:
 						p.teleport(mAuroraLocation);
@@ -442,12 +442,12 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	}
 
 	public Set<Player> getPlayers() {
-		return mPlayers;
+		return Set.copyOf(mPlayers);
 	}
 
 	public Set<Player> getValidDeclarationPlayersInArena() {
 		Set<Player> valid = new HashSet<>();
-		for (Player p : mPlayers) {
+		for (Player p : getPlayers()) {
 			Effect declarationParticipation = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
 			if (declarationParticipation == null || declarationParticipation.getMagnitude() < 3) {
 				valid.add(p);
@@ -457,7 +457,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void applyDeclerationFail(boolean pass) {
-		for (Player p : mPlayers) {
+		for (Player p : getPlayers()) {
 			Effect declarationParticipation = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, PARTICIPATION_TAG);
 			Effect fail = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
 			if (declarationParticipation == null) {
@@ -624,7 +624,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				checkHitboxArea(6, loc, Material.AIR, Material.BARRIER);
 			}
 			List<Entity> entities = new ArrayList<>();
-			for (Player p : PlayerUtils.playersInRange(mPlayers, mBoss.getLocation(), 5, true, true)) {
+			for (Player p : PlayerUtils.playersInRange(getPlayers(), mBoss.getLocation(), 5, true, true)) {
 				if (p.getLocation().getBlock().getType().equals(Material.BARRIER)) {
 					entities.add(p);
 				}
@@ -2601,6 +2601,12 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
-		mPlayers.remove(event.getPlayer()); // remove players that die
+		Player p = event.getPlayer();
+		mPlayers.remove(p); // remove players that die
+		EffectManager.getInstance().clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
+		EffectManager.getInstance().clearEffects(p, SpellBlightedBolts.BLIGHTEDBOLTTAG);
+		if (mDamagePhaseHPBar != null) {
+			p.hideBossBar(mDamagePhaseHPBar);
+		}
 	}
 }
