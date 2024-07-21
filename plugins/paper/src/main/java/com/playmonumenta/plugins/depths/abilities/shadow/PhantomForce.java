@@ -202,7 +202,7 @@ public class PhantomForce extends DepthsAbility {
 	private static Description<PhantomForce> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<PhantomForce>(color)
 			.add("Breaking a spawner spawns ")
-			.add(a -> a.mSpawnCount, rarity == 6 ? TWISTED_SPAWN_COUNT : SPAWN_COUNT)
+			.add(a -> a.mSpawnCount, rarity == 6 ? TWISTED_SPAWN_COUNT : SPAWN_COUNT, false, null, rarity == 6)
 			.add(" vexes that target your enemies, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" melee damage on contact and applying ")

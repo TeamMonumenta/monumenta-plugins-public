@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Bulwark;
+import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import java.util.Objects;
@@ -37,6 +38,7 @@ public class CurseOfImpatience extends DepthsAbility {
 		}
 		UUID uuid = mPlayer.getUniqueId();
 		mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities().stream()
+			.filter(ability -> !(ability instanceof EarthenWrath wrath && wrath.isWrathing())) // If we change the cooldown while it's active bad things happen
 			.map(Ability::getInfo)
 			.filter(AbilityInfo::hasCooldown)
 			.map(AbilityInfo::getLinkedSpell)

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfAnchoring;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -74,6 +75,7 @@ public class Rebirth extends DepthsAbility {
 
 	public void rerollAbilities(DepthsPlayer dp) {
 		List<DepthsAbilityInfo<?>> playerAbilities = DepthsManager.getInstance().getPlayerAbilities(mPlayer);
+		boolean hasSwap = playerAbilities.stream().anyMatch(info -> info.getDepthsTrigger() == DepthsTrigger.SWAP && info != CurseOfAnchoring.INFO);
 
 		ArrayList<DepthsAbilityInfo<?>> eligibleAbilities = new ArrayList<>(
 			DepthsManager.getAbilities().stream().filter(info ->
@@ -91,7 +93,15 @@ public class Rebirth extends DepthsAbility {
 			// Filter to keep the eligible ones that have the same trigger as the ability being replaced
 			DepthsTrigger trigger = abilityInfo.getDepthsTrigger();
 			ArrayList<DepthsAbilityInfo<?>> eligibleCopy = new ArrayList<>(eligibleAbilities);
-			eligibleCopy.removeIf(info -> !info.getDepthsTrigger().equals(trigger));
+			if (abilityInfo.getDepthsTree() == DepthsTree.CURSE) {
+				eligibleCopy.removeIf(info -> info.getDepthsTree() != DepthsTree.CURSE);
+				if (hasSwap) {
+					eligibleCopy.remove(CurseOfAnchoring.INFO);
+				}
+			} else {
+				eligibleCopy.removeIf(info -> !info.getDepthsTrigger().equals(trigger));
+				eligibleCopy.removeIf(info -> info.getDepthsTree() == DepthsTree.CURSE);
+			}
 			if (eligibleCopy.isEmpty()) {
 				return;
 			}

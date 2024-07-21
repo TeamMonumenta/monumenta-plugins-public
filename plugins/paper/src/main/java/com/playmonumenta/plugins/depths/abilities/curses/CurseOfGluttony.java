@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.guis.AbstractDepthsRewardGUI;
+import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +64,10 @@ public class CurseOfGluttony extends DepthsAbility {
 				DepthsManager.getInstance().setPlayerLevelInAbility(ability, player, 0);
 				dp.sendMessage(Component.text("Removed ability: ").append(info.getNameWithHover(highestRarity, player)));
 				removed++;
+			}
+
+			if (Gui.getOpenGui(player) instanceof AbstractDepthsRewardGUI gui) {
+				gui.update();
 			}
 		});
 	}
