@@ -187,10 +187,10 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 		}
 
 		private void delete() {
-			if (!mBanner.getLocation().isChunkLoaded()) {
+			if (mBanner.getLocation().isChunkLoaded()) {
 				mBanner.remove();
 			}
-			if (!mText.getLocation().isChunkLoaded()) {
+			if (mText.getLocation().isChunkLoaded()) {
 				mText.remove();
 			}
 		}
