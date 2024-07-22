@@ -167,7 +167,7 @@ public class SpellSummonTheStars extends Spell {
 
 	public void mobDecleration(int duration, double summonsPerPlayer) {
 		mActiveMobs = new ArrayList<>();
-		List<Player> pList = new ArrayList<>(mSirius.getPlayers());
+		List<Player> pList = mSirius.getPlayers();
 		mMobsAlive = (int) (pList.size() * summonsPerPlayer + 1.5);
 		Collections.shuffle(pList);
 		mMobsAlive = Math.min(21, mMobsAlive);

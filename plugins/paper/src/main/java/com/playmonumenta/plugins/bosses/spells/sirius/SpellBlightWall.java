@@ -211,7 +211,7 @@ public class SpellBlightWall extends Spell {
 						}
 					}
 				}
-				var pList = new ArrayList<>(mSirius.getPlayers());
+				List<Player> pList = mSirius.getPlayers();
 				if (mTicks % 5 == 0) {
 					for (Player p : pList) {
 						p.playSound(p, Sound.ENTITY_WARDEN_AMBIENT, SoundCategory.HOSTILE, 0.6f, 1.5f);
@@ -223,8 +223,8 @@ public class SpellBlightWall extends Spell {
 				//in case displays fail
 				new PPLine(Particle.REDSTONE, mLocOne, mLocOneClone.clone().add(0, 0, 10 * mGapPos)).countPerMeter(1).data(new Particle.DustOptions(Color.fromRGB(0, 242, 242), 1.0f)).spawnAsBoss();
 				new PPLine(Particle.REDSTONE, mLocOneClone.clone().add(0, 0, 10 + 10 * mGapPos), mLocTwo).countPerMeter(1).data(new Particle.DustOptions(Color.fromRGB(0, 242, 242), 1.0f)).spawnAsBoss();
-				BoundingBox boxOne = BoundingBox.of(mLocOneClone, mLocOneClone.clone().add(0.25, 30, 10 * mGapPos));
-				BoundingBox boxTwo = BoundingBox.of(mLocOneClone.clone().add(0, 0, 10 + 10 * mGapPos), mLocTwoClone.add(0.25, 30, 0));
+				BoundingBox boxOne = BoundingBox.of(mLocOneClone, mLocOneClone.clone().add(0.5, 30, 10 * mGapPos));
+				BoundingBox boxTwo = BoundingBox.of(mLocOneClone.clone().add(0, 0, 10 + 10 * mGapPos), mLocTwoClone.add(0.5, 30, 0));
 				for (Player p : pList) {
 					if (!StasisListener.isInStasis(p) && (p.getBoundingBox().overlaps(boxOne) || p.getBoundingBox().overlaps(boxTwo))) {
 						DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, "Blight Wave");

@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Color;
@@ -42,7 +41,7 @@ public class SpellCosmicPortals extends Spell {
 	@Override
 	public void run() {
 		//teleports players 15 blocks behind sirius in the balcony row.
-		List<Player> mTargets = new ArrayList<>(mSirius.getPlayersInArena(false));
+		List<Player> mTargets = mSirius.getPlayers();
 		double mPortalCount = mTargets.size() * PORTALSPERPLAYER;
 		Collections.shuffle(mTargets);
 		for (int i = 0; i < mPortalCount; i++) {
@@ -97,7 +96,7 @@ public class SpellCosmicPortals extends Spell {
 				}
 
 				if (mTicks > DURATION) {
-					var pList = mSirius.getPlayers();
+					List<Player> pList = mSirius.getPlayers();
 					for (Player p : mPortalLoc.getNearbyPlayers(finalMRadius)) {
 						if (pList.contains(p) && !StasisListener.isInStasis(p)) {
 							int rand = FastUtils.randomIntInRange(0, 1);

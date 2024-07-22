@@ -56,10 +56,11 @@ public class DeclarationPoints extends Spell {
 				}
 				if (mTicks >= DURATION) {
 					mManager.remove();
-					List<Player> mProtectedPlayers = PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mTuulenLocation, RADIUS, true, true);
-					mProtectedPlayers.addAll(PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mAuroraLocation, RADIUS, true, true));
-					List<Player> mAttemptPlayers = PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mTuulenLocation, RADIUS + 3, true, true);
-					mAttemptPlayers.addAll(PlayerUtils.playersInRange(mSirius.getPlayers(), mSirius.mAuroraLocation, RADIUS + 3, true, true));
+					List<Player> pList = mSirius.getPlayers();
+					List<Player> mProtectedPlayers = PlayerUtils.playersInRange(pList, mSirius.mTuulenLocation, RADIUS, true, true);
+					mProtectedPlayers.addAll(PlayerUtils.playersInRange(pList, mSirius.mAuroraLocation, RADIUS, true, true));
+					List<Player> mAttemptPlayers = PlayerUtils.playersInRange(pList, mSirius.mTuulenLocation, RADIUS + 3, true, true);
+					mAttemptPlayers.addAll(PlayerUtils.playersInRange(pList, mSirius.mAuroraLocation, RADIUS + 3, true, true));
 					for (Player p : mAttemptPlayers) {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(2 * 60 * 20, 1, "").displays(false).deleteOnLogout(true));
 					}

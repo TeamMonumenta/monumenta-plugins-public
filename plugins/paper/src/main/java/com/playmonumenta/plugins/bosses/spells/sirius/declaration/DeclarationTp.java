@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -132,7 +133,7 @@ public class DeclarationTp extends Spell {
 					mManager.setTitle(Component.text("Channeling Power Behind the Tomb", NamedTextColor.DARK_PURPLE));
 					mManager.setChargeTime(DURATION - 20);
 					mManager.update();
-					var pList = mSirius.getPlayersInArena(false);
+					List<Player> pList = mSirius.getPlayersInArena(false);
 					for (Player p : pList) {
 						MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("There is no time, woolbearer! Come behind the tomb and be cleansed!", NamedTextColor.GRAY, TextDecoration.BOLD));
 					}
@@ -174,7 +175,7 @@ public class DeclarationTp extends Spell {
 				if (mTicks >= DURATION) {
 					int passers = 0;
 					//cleanse all people in radius
-					var pList = mSirius.getValidDeclarationPlayersInArena();
+					List<Player> pList = mSirius.getValidDeclarationPlayersInArena();
 					for (Player p : PlayerUtils.playersInRange(pList, mMidPoint, RADIUS, true, true)) {
 						passers++;
 						EffectManager.getInstance().clearEffects(p, PassiveStarBlight.STARBLIGHTAG);

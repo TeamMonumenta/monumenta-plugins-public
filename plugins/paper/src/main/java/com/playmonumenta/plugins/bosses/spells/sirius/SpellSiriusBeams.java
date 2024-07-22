@@ -45,7 +45,7 @@ public class SpellSiriusBeams {
 
 	private void run() {
 		List<Location> mTargetLocs = new ArrayList<>();
-		var mPList = new ArrayList<>(mSirius.getPlayers());
+		List<Player> mPList = mSirius.getPlayers();
 		Collections.shuffle(mPList);
 		if (!mPList.isEmpty()) {
 			for (int i = 0; i < Math.min(mPList.size() / 4.0, 4); i++) {

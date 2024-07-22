@@ -66,7 +66,7 @@ public class DeclarationBarrage extends Spell {
 					//stop more than 15 players getting meteored per time to prevent lag
 					//also players will bunch up more.
 					int mPlayerCount = 15;
-					List<Player> mPList = new ArrayList<>(mSirius.getPlayersInArena(false));
+					List<Player> mPList = mSirius.getPlayers();
 					Collections.shuffle(mPList);
 					for (Player p : mPList) {
 						if (mPlayerCount > 0) {

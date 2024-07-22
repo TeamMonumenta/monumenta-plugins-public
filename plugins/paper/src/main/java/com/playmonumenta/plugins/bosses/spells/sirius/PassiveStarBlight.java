@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -33,9 +32,8 @@ public class PassiveStarBlight extends Spell {
 
 	@Override
 	public void run() {
-		Set<Player> mPlayers = mSirius.getPlayersInArena(false);
 		EffectManager manager = Plugin.getInstance().mEffectManager;
-		for (Player p : mPlayers) {
+		for (Player p : mSirius.getPlayers()) {
 			int x = (int) p.getLocation().getX();
 			int z = (int) p.getLocation().getZ();
 			double realX = Math.abs(mConverter.mCornerOne.x() - x);
