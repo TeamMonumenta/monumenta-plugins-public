@@ -36,8 +36,6 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
 import org.jetbrains.annotations.Nullable;
 
-
-
 public class AuditListener implements Listener {
 	private static final List<Pattern> IGNORED_COMMAND_REGEX = Arrays.asList(
 		// ScriptedQuests
@@ -90,22 +88,28 @@ public class AuditListener implements Listener {
 			JunkItemListener.ALIAS
 		)),
 		exactOptionalArguments("(minecraft:)?(blockinteractions|bi)"),
+		exactOptionalArguments("(minecraft:)?claimraffle"),
 		exactOptionalArguments("(minecraft:)?(disabledrop|dd)"),
 		exactOptionalArguments("(minecraft:)?glowing"),
 		exactNoArguments("(minecraft:)?grave list"),
+		exactOptionalArguments("(minecraft:)?guild"),
 		exactOptionalArguments("(minecraft:)?particles"),
-		exactOptionalArguments("(playerstats|ps)"),
-		exactOptionalArguments("(minecraft:)?player"),
 		exactOptionalArguments("peb"),
+		exactOptionalArguments("(minecraft:)?player"),
+		exactOptionalArguments("(playerstats|ps)"),
+		exactOptionalArguments("(minecraft:)?plot access"),
 		exactOptionalArguments("(minecraft:)?race leaderboard"),
 		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
 		exactOptionalArguments("(minecraft:)?toggleswap"),
 		exactOptionalArguments("(minecraft:)?toggleworldnames"),
 		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
 		exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
-		exactOptionalArguments("(minecraft:)?plot access (help|add|remove|info$)"),
-		exactOptionalArguments("(minecraft:)?claimraffle"),
 		exactOptionalArguments("(spark:)?tps")
+	);
+
+	private static final List<Pattern> NEVER_IGNORED_COMMAND_REGEX = Arrays.asList(
+		exactOptionalArguments("(minecraft:)?guild mod"),
+		exactOptionalArguments("(minecraft:)?plot access [^ ]+_other")
 	);
 
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<>();
@@ -373,9 +377,19 @@ public class AuditListener implements Listener {
 		}
 
 		String command = event.getMessage();
-		for (Pattern pattern : IGNORED_COMMAND_REGEX) {
+		boolean canIgnore = true;
+		for (Pattern pattern : NEVER_IGNORED_COMMAND_REGEX) {
 			if (pattern.matcher(command).find()) {
-				return;
+				canIgnore = false;
+				break;
+			}
+		}
+
+		if (canIgnore) {
+			for (Pattern pattern : IGNORED_COMMAND_REGEX) {
+				if (pattern.matcher(command).find()) {
+					return;
+				}
 			}
 		}
 
