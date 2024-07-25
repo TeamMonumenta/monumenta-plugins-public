@@ -20,6 +20,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.time.Duration;
@@ -47,7 +48,8 @@ import org.jetbrains.annotations.Nullable;
 public class PlotManager {
 	@SuppressWarnings("unchecked")
 	public static void registerCommands() {
-		IntegerArgument regionArg = new IntegerArgument("region", 1, 3);
+		IntegerArgument regionArg = new IntegerArgument("regionNum", 1, 3);
+		MultiLiteralArgument multiRegionArg = new MultiLiteralArgument("region", "valley", "isles", "ring");
 
 		new CommandAPICommand("plot")
 			.withPermission(CommandPermission.NONE)
@@ -255,15 +257,20 @@ public class PlotManager {
 				.withArguments(regionArg)
 				.executesPlayer((player, args) -> {
 					int region = args.getByArgument(regionArg);
-					OptionalInt oldRegion = getPlotRegion(player);
-					if (oldRegion.isPresent() && oldRegion.getAsInt() == region) {
-						player.sendMessage(Component.text("Your plot region was already " + region + "!", NamedTextColor.GOLD));
-						return;
-					}
-					ScoreboardUtils.setScoreboardValue(player, "PlotRegion", region);
-					AbilityUtils.refreshClass(player);
-					Plugin.getInstance().mItemStatManager.updateStats(player);
-					player.sendMessage(Component.text("Set your plot region to " + region + "!", NamedTextColor.GOLD));
+					setPlotRegion(player, region);
+				}))
+			.withSubcommand(new CommandAPICommand("region")
+				.withPermission(CommandPermission.fromString("monumenta.plot.region"))
+				.withArguments(multiRegionArg)
+				.executesPlayer((player, args) -> {
+					String regionString = args.getByArgument(multiRegionArg);
+					int region = switch (regionString) {
+						case "valley" -> 1;
+						case "isles" -> 2;
+						case "ring" -> 3;
+						default -> 3;
+					};
+					setPlotRegion(player, region);
 				}))
 			.register();
 	}
@@ -636,5 +643,17 @@ public class PlotManager {
 
 	public static OptionalInt getPlotRegion(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, "PlotRegion");
+	}
+
+	public static void setPlotRegion(Player player, int region) {
+		OptionalInt oldRegion = getPlotRegion(player);
+		if (oldRegion.isPresent() && oldRegion.getAsInt() == region) {
+			player.sendMessage(Component.text("Your plot region was already " + region + "!", NamedTextColor.GOLD));
+			return;
+		}
+		ScoreboardUtils.setScoreboardValue(player, "PlotRegion", region);
+		AbilityUtils.refreshClass(player);
+		Plugin.getInstance().mItemStatManager.updateStats(player);
+		player.sendMessage(Component.text("Set your plot region to " + region + "!", NamedTextColor.GOLD));
 	}
 }
