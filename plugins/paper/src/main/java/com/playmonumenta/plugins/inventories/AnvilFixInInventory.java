@@ -82,7 +82,7 @@ public class AnvilFixInInventory implements Listener {
 		}
 
 		// Put anvils into lime tess
-		if (!isUpgradedLimeTesseract && ItemStatUtils.isUpgradedLimeTesseract(item)) {
+		if (!unshattered && !isUpgradedLimeTesseract && ItemStatUtils.isUpgradedLimeTesseract(item)) {
 			ItemStatUtils.setCharges(item, ItemStatUtils.getCharges(item) + anvilOrTess.getAmount());
 			ItemUpdateHelper.generateItemStats(item);
 			anvilOrTess.setAmount(0);
