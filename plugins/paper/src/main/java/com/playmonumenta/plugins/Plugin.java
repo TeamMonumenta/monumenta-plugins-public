@@ -249,6 +249,7 @@ public class Plugin extends JavaPlugin {
 		GiveSoulbound.register();
 		GlowingCommand.register();
 		GraveCommand.register();
+		HasBadWordCommand.register();
 		ItemStatCommands.registerAttrCommand();
 		ItemStatCommands.registerCharmCommand();
 		ItemStatCommands.registerColorCommand();

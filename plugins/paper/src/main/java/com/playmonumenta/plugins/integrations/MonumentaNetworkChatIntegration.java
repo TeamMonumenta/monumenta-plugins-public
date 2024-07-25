@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.integrations;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.playmonumenta.networkchat.ChannelManager;
 import com.playmonumenta.networkchat.ChatFilter;
 import com.playmonumenta.networkchat.DefaultChannels;
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
@@ -29,14 +31,23 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.BlockInventoryHolder;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,7 +104,7 @@ public class MonumentaNetworkChatIntegration {
 				List<ItemStack> charms = mCharmType.mPlayerCharms.get(player.getUniqueId());
 				List<Component> lore = new ArrayList<>();
 
-				if (charms == null || charms.size() == 0) {
+				if (charms == null || charms.isEmpty()) {
 					return Component.text("<charms>");
 				} else {
 					for (ItemStack charm : charms) {
@@ -294,14 +305,116 @@ public class MonumentaNetworkChatIntegration {
 		channelSettings.messagesPlaySound(notificationsEnabled);
 	}
 
-	public static boolean hasBadWord(CommandSender sender, String text) {
+	public static boolean hasBadWord(CommandSender sender, @Nullable ItemStack item, boolean recursive) {
+		if (ItemUtils.isNullOrAir(item) || !item.hasItemMeta()) {
+			return false;
+		}
+
+		if (hasBadWord(sender, ItemStatUtils.getPlayerCustomName(item))) {
+			return true;
+		}
+
+		ItemMeta meta = item.getItemMeta();
+
+		if (hasBadWord(sender, meta.displayName())) {
+			return true;
+		}
+
+		List<Component> lore = meta.lore();
+		if (lore != null) {
+			for (Component loreLine : lore) {
+				if (hasBadWord(sender, loreLine)) {
+					return true;
+				}
+			}
+		}
+
+		if (
+			meta instanceof BlockStateMeta blockStateMeta
+				&& blockStateMeta.hasBlockState()
+		) {
+			BlockState blockState = blockStateMeta.getBlockState();
+
+			if (recursive && blockState instanceof BlockInventoryHolder inventoryHolder) {
+				Inventory inventory = inventoryHolder.getInventory();
+
+				for (ItemStack content : inventory) {
+					if (hasBadWord(sender, content, true)) {
+						return true;
+					}
+				}
+			}
+
+			if (blockState instanceof Sign sign) {
+				for (Component line : sign.lines()) {
+					if (hasBadWord(sender, line)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		if (meta instanceof BookMeta bookMeta) {
+			if (hasBadWord(sender, bookMeta.title())) {
+				return true;
+			}
+
+			if (hasBadWord(sender, bookMeta.author())) {
+				return true;
+			}
+
+			// NOTE: pageNumber is 1-indexed, not 0-indexed - it should go from 1 to pageCount inclusive!
+			for (int pageNumber = 1; pageNumber <= bookMeta.getPageCount(); pageNumber++) {
+				Component page = bookMeta.page(pageNumber);
+				if (hasBadWord(sender, page)) {
+					return true;
+				}
+			}
+		}
+
+		if (recursive && meta instanceof CrossbowMeta crossbowMeta) {
+			for (ItemStack subItem : crossbowMeta.getChargedProjectiles()) {
+				if (hasBadWord(sender, subItem, true)) {
+					return true;
+				}
+			}
+		}
+
+		if (meta instanceof SkullMeta skullMeta) {
+			PlayerProfile playerProfile = skullMeta.getPlayerProfile();
+			if (playerProfile != null) {
+				String playerName = playerProfile.getName();
+				if (hasBadWord(sender, playerName)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean hasBadWord(CommandSender sender, @Nullable String text) {
+		if (text == null || text.isBlank()) {
+			return false;
+		}
 		return hasBadWord(sender, Component.text(text));
 	}
 
-	public static boolean hasBadWord(CommandSender sender, Component text) {
+	public static boolean hasBadWord(CommandSender sender, @Nullable Component text) {
 		if (!ENABLED) {
 			return false;
 		}
+
+		if (text == null) {
+			return false;
+		}
+
+		text = text.replaceText(
+			TextReplacementConfig.builder()
+				.matchLiteral("\n")
+				.replacement(" \\n ")
+				.build()
+		);
 
 		ChatFilter chatFilter = NetworkChatPlugin.globalBadWordFilter();
 		return chatFilter.hasBadWord(sender, text);

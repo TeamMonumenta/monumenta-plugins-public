@@ -154,7 +154,7 @@ public class ItemStatUtils {
 
 		// Ensure other effects don't apply
 		if (item.getItemMeta() instanceof PotionMeta potionMeta) {
-			if (ItemStatUtils.hasConsumeEffect(item)) {
+			if (hasConsumeEffect(item)) {
 				// If it's a custom potion, remove all effects
 				potionMeta.clearCustomEffects();
 				potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
@@ -700,7 +700,7 @@ public class ItemStatUtils {
 			return false;
 		}
 		return NBT.get(item, nbt -> {
-			ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
+			ReadableNBT enchantments = getEnchantments(nbt);
 			return enchantments != null;
 		});
 	}
@@ -710,7 +710,7 @@ public class ItemStatUtils {
 			return 0;
 		}
 		return NBT.get(item, nbt -> {
-			ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
+			ReadableNBT enchantments = getEnchantments(nbt);
 			return getEnchantmentLevel(enchantments, type);
 		});
 	}
@@ -836,6 +836,20 @@ public class ItemStatUtils {
 		return newItem;
 	}
 
+	public static @Nullable String getPlayerCustomName(final @Nullable ItemStack item) {
+		if (ItemUtils.isNullOrAir(item)) {
+			return null;
+		}
+
+		return NBT.get(item, nbt -> {
+			ReadableNBT playerModified = getPlayerModified(nbt);
+			if (playerModified != null) {
+				return playerModified.getString(PLAYER_CUSTOM_NAME_KEY);
+			}
+			return null;
+		});
+	}
+
 	public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 		ReadWriteNBT modified = getPlayerModified(nbt);
 		if (modified == null) {
@@ -857,7 +871,7 @@ public class ItemStatUtils {
 			return 0;
 		}
 		return NBT.get(item, nbt -> {
-			ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
+			ReadableNBT infusions = getInfusions(nbt);
 			return getInfusionLevel(infusions, type);
 		});
 	}
@@ -1356,15 +1370,15 @@ public class ItemStatUtils {
 
 	// get item list (read/write)
 	public static ReadWriteNBTCompoundList getItemList(ReadWriteNBT nbt) {
-		return ItemStatUtils.addPlayerModified(nbt).getCompoundList(ItemStatUtils.ITEMS_KEY);
+		return addPlayerModified(nbt).getCompoundList(ITEMS_KEY);
 	}
 
 	// get item list (read only)
 	public static @Nullable ReadableNBTList<ReadWriteNBT> getItemList(ReadableNBT nbt) {
-		ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+		ReadableNBT playerModified = getPlayerModified(nbt);
 		if (playerModified == null) {
 			return null;
 		}
-		return playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
+		return playerModified.getCompoundList(ITEMS_KEY);
 	}
 }

@@ -465,16 +465,11 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void signChangeEvent(SignChangeEvent event) {
 		Player player = event.getPlayer();
-		if (!(event.getBlock() instanceof Sign sign)) {
-			return;
-		}
-		Location loc = sign.getLocation();
-		List<Component> lines = sign.getSide(event.getSide()).lines();
-		Component allSignLines = MessagingUtils.concatenateComponents(lines, Component.newline());
+		Location loc = event.getBlock().getLocation();
+		Component allSignLines = MessagingUtils.concatenateComponents(event.lines(), Component.newline());
 		if (MonumentaNetworkChatIntegration.hasBadWord(player, allSignLines)) {
 			AuditListener.logSevere(player.getName()
 				+ " attempted to place a sign with a bad word: `/s "
@@ -486,6 +481,13 @@ public class PlayerListener implements Listener {
 				+ "`"
 			);
 			event.setCancelled(true);
+			if (event.getBlock().getState() instanceof Sign sign) {
+				int lineNum = 0;
+				for (Component oldLine : sign.lines()) {
+					event.line(lineNum, oldLine);
+					lineNum++;
+				}
+			}
 		}
 	}
 
@@ -850,6 +852,7 @@ public class PlayerListener implements Listener {
 					+ "`"
 				);
 				event.setCancelled(true);
+				event.setNewBookMeta(event.getPreviousBookMeta());
 				return;
 			}
 		}
@@ -866,6 +869,7 @@ public class PlayerListener implements Listener {
 					+ "`"
 				);
 				event.setCancelled(true);
+				event.setNewBookMeta(event.getPreviousBookMeta());
 				return;
 			}
 		}

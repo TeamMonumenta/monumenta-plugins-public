@@ -74,8 +74,7 @@ public class RenameItemCommand {
 					Player player = CommandUtils.getPlayerFromSender(sender);
 					checkItem(player);
 					ItemStack itemStack = player.getInventory().getItemInMainHand();
-					String existingName = ItemStatUtils.addPlayerModified(new NBTItem(itemStack))
-						.getString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
+					String existingName = ItemStatUtils.getPlayerCustomName(itemStack);
 					if (existingName == null) {
 						existingName = "";
 					}

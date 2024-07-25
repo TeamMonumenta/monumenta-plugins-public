@@ -165,13 +165,7 @@ public class LoadoutManager implements Listener {
 		}
 
 		static Set<EquipmentCaseTag> getTags(ItemStack item) {
-			String caseName = NBT.get(item, nbt -> {
-				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
-				if (playerModified != null) {
-					return playerModified.getString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
-				}
-				return null;
-			});
+			String caseName = ItemStatUtils.getPlayerCustomName(item);
 			if (caseName == null) {
 				return Set.of();
 			}

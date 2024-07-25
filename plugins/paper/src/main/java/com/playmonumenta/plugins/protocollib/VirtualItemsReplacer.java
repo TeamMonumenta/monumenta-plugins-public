@@ -275,13 +275,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		if (ItemUtils.isShulkerBox(itemStack.getType())) {
 			// add back if people are somehow getting themselves inventory banned with shulkers again
 			// nestedContainerCheck(itemStack);
-			String customName = NBT.get(itemStack, nbt -> {
-				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
-				if (playerModified != null) {
-					return playerModified.getString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
-				}
-				return null;
-			});
+			String customName = ItemStatUtils.getPlayerCustomName(itemStack);
 			if (customName != null) {
 				String prefix;
 				String suffix;
