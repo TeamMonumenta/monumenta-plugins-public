@@ -98,13 +98,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private @Nullable Crusade mCrusade;
 
 	private enum Mode {
-		DEFAULT("Default"),
-		HEALING("Healing"),
-		ATTACK("Attack");
+		DEFAULT(0, "Default"),
+		HEALING(1, "Healing"),
+		ATTACK(2, "Attack");
 
+		public final int mScore;
 		private final String mLabel;
 
-		Mode(String label) {
+		Mode(int score, String label) {
+			mScore = score;
 			mLabel = label;
 		}
 	}
@@ -123,9 +125,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 			mMode = Mode.values()[Math.max(0, Math.min(modeIndex, Mode.values().length - 1))];
 		}
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
-		});
+		Bukkit.getScheduler().runTask(plugin,
+			() -> mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
 	public double getPercentHealth(LivingEntity le) {
@@ -148,7 +149,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			case ATTACK -> e = EntityUtils.getEntityAtCursor(mPlayer, range, hostileFilter);
 			case HEALING -> {
 				ArrayList<LivingEntity> entities = new ArrayList<>(EntityUtils.getEntitiesAtCursor(mPlayer, range, playerFilter));
-				if (entities.size() != 0) {
+				if (!entities.isEmpty()) {
 					// Sort by lower %hp
 					entities.sort((a, b) -> Double.compare(getPercentHealth(a), getPercentHealth(b)));
 					e = entities.get(0);
@@ -265,7 +266,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			mMode = Mode.DEFAULT;
 		}
 		sendActionBarMessage(ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + mMode.mLabel);
-		ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode.ordinal());
+		ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode.mScore);
 		ClientModHandler.updateAbility(mPlayer, this);
 		return true;
 	}

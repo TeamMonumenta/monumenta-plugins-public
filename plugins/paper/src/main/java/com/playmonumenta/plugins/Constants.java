@@ -266,6 +266,7 @@ public class Constants {
 		}
 
 		// 0-indexed to match inventories; index 0 is hotbar slot 1
+		@SuppressWarnings("EnumOrdinal")
 		public static Keybind hotbar(int index) {
 			if (index < 0 || index > 8) {
 				throw new RuntimeException("Invalid hotbar keybind index " + index);

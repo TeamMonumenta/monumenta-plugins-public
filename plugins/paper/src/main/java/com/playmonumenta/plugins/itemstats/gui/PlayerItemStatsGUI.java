@@ -49,14 +49,14 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	enum InfusionSetting {
-		DISABLED("Ignore all infusions in calculations", null),
-		ENABLED("Respect existing infusions on items", null),
-		ENABLED_FULL("Existing infusions + delve infusions fully active", null),
-		VITALITY("20 Vitality + 4 Tenacity", InfusionType.VITALITY),
-		TENACITY("24 Tenacity", InfusionType.TENACITY),
-		VIGOR("24 Vigor", InfusionType.VIGOR),
-		FOCUS("24 Focus", InfusionType.FOCUS),
-		PERSPICACITY("24 Perspicacity", InfusionType.PERSPICACITY),
+		DISABLED(0, "Ignore all infusions in calculations", null),
+		ENABLED(1, "Respect existing infusions on items", null),
+		ENABLED_FULL(2, "Existing infusions + delve infusions fully active", null),
+		VITALITY(3, "20 Vitality + 4 Tenacity", InfusionType.VITALITY),
+		TENACITY(4, "24 Tenacity", InfusionType.TENACITY),
+		VIGOR(5, "24 Vigor", InfusionType.VIGOR),
+		FOCUS(6, "24 Focus", InfusionType.FOCUS),
+		PERSPICACITY(7, "24 Perspicacity", InfusionType.PERSPICACITY),
 		;
 
 		/**
@@ -74,12 +74,19 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			InfusionType.VENGEFUL
 		);
 
+		public final int mScore;
 		private final String mDescription;
 		final @Nullable InfusionType mInfusionType;
 
-		InfusionSetting(String description, @Nullable InfusionType infusionType) {
-			this.mDescription = description;
-			this.mInfusionType = infusionType;
+		InfusionSetting(int score, String description, @Nullable InfusionType infusionType) {
+			mScore = score;
+			mDescription = description;
+			mInfusionType = infusionType;
+		}
+
+		@SuppressWarnings("EnumOrdinal")
+		InfusionSetting next(boolean reverse) {
+			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];
 		}
 	}
 
@@ -203,7 +210,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private void doSetInfusionSetting(PSGUIStats target, InfusionSetting setting) {
 		target.mInfusionSetting = setting;
 		final var score = target == mLeftStats ? LEFT_INFUSION_SETTING_SCORE : RIGHT_INFUSION_SETTING_SCORE;
-		ScoreboardUtils.setScoreboardValue(mViewer, score, setting.ordinal());
+		ScoreboardUtils.setScoreboardValue(mViewer, score, setting.mScore);
 	}
 
 	private void setEquipmentFromPlayer(boolean right, Player player) {
@@ -327,7 +334,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 			if (slot == INFUSION_SETTINGS_LEFT_SLOT || slot == INFUSION_SETTINGS_RIGHT_SLOT) {
 				PSGUIStats stats = (slot == INFUSION_SETTINGS_LEFT_SLOT ? mLeftStats : mRightStats);
-				doSetInfusionSetting(stats, InfusionSetting.values()[(stats.mInfusionSetting.ordinal() + (event.getClick().isLeftClick() ? 1 : InfusionSetting.values().length - 1)) % InfusionSetting.values().length]);
+				doSetInfusionSetting(stats, stats.mInfusionSetting.next(event.getClick().isRightClick()));
 				generateInventory();
 				return;
 			}

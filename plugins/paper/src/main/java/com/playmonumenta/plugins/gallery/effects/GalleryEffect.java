@@ -89,6 +89,7 @@ public abstract class GalleryEffect implements DisplayableEffect {
 
 	// These effects should always be first, and be in a consistent order based on the order in GalleryEffectType
 	@Override
+	@SuppressWarnings("EnumOrdinal")
 	public int getDisplayPriority() {
 		return 1000000000 + mType.ordinal();
 	}

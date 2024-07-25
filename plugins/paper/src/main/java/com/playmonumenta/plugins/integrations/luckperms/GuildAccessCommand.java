@@ -213,12 +213,12 @@ public class GuildAccessCommand {
 			GuildAccessLevel targetCurrentAccess = LuckPermsIntegration.getAccessLevel(guildRoot, target);
 
 			boolean canAgentSetPermission =
-				(agentAccess.ordinal() < targetCurrentAccess.ordinal() &&
-					agentAccess.ordinal() <= targetAccess.ordinal() &&
-					agentAccess.ordinal() <= GuildAccessLevel.MANAGER.ordinal()) || //Apply on other
+				(agentAccess.compareTo(targetCurrentAccess) < 0 &&
+					agentAccess.compareTo(targetAccess) <= 0 &&
+					agentAccess.compareTo(GuildAccessLevel.MANAGER) <= 0) || // Apply on other
 
 					(player.getUniqueId().equals(target.getUniqueId()) &&
-						agentAccess.ordinal() < targetAccess.ordinal()) || //Apply on self
+						agentAccess.compareTo(targetAccess) < 0) || // Apply on self
 
 					isOperator; //Operator bypass
 
@@ -236,7 +236,7 @@ public class GuildAccessCommand {
 					return;
 				}
 
-				if (targetCurrentAccess.ordinal() > GuildAccessLevel.MEMBER.ordinal() && !isOperator) {
+				if (targetCurrentAccess.compareTo(GuildAccessLevel.MEMBER) > 0 && !isOperator) {
 					Bukkit.getScheduler().runTask(plugin, ()
 						-> sender.sendMessage(Component.text("If you want to invite someone to your guild use ", NamedTextColor.RED).append(Component.text("/guild invite", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/guild invite ")))));
 					return;
@@ -280,8 +280,8 @@ public class GuildAccessCommand {
 					sender.sendMessage(Component.text(String.format("Successfully removed %s from the guild", target.getUsername()), NamedTextColor.GOLD));
 					return;
 				}
-				if (targetAccess.ordinal() != targetCurrentAccess.ordinal()) {
-					boolean promoted = targetAccess.ordinal() < targetCurrentAccess.ordinal();
+				if (targetAccess != targetCurrentAccess) {
+					boolean promoted = targetAccess.compareTo(targetCurrentAccess) < 0;
 					sender.sendMessage(Component.text(String.format("Successfully %s %s to %s", (promoted ? "promoted" : "demoted"), target.getUsername(), targetAccess.mLabel), NamedTextColor.GOLD));
 				} else {
 					sender.sendMessage(Component.text(String.format("Could not modify rank because %s is already a %s", target.getUsername(), targetAccess.mLabel), NamedTextColor.RED));

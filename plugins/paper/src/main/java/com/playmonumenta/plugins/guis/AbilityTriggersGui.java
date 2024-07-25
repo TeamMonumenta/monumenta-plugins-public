@@ -194,7 +194,7 @@ public class AbilityTriggersGui extends Gui {
 				case SWAP -> Material.TORCH;
 				case DROP -> Material.DROPPER;
 			}, () -> {
-				mNewTrigger.setKey(AbilityTrigger.Key.values()[(mNewTrigger.getKey().ordinal() + 1) % AbilityTrigger.Key.values().length]);
+				mNewTrigger.setKey(mNewTrigger.getKey().next());
 				mNewTrigger.getKeyOptions().clear();
 				if (mSelectedTrigger.getRestriction() == null) {
 					if (mNewTrigger.getKey() == AbilityTrigger.Key.LEFT_CLICK) {

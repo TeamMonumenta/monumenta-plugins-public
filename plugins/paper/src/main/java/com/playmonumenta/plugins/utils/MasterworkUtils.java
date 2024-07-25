@@ -186,7 +186,7 @@ public class MasterworkUtils {
 		}
 
 		protected void put(Masterwork masterwork, String item1, int amount1, String item2, int amount2, @Nullable String item3, int amount3) {
-			if (mMinLevel.lessThanOrEqualTo(masterwork)) {
+			if (mMinLevel.compareTo(masterwork) <= 0) {
 				mLevelMap.put(masterwork, new MasterworkCostLevel(item1, amount1, item2, amount2, item3, amount3));
 			}
 		}

@@ -468,7 +468,7 @@ public class GuildGui extends Gui {
 		if (LuckPermsIntegration.isLocked(guild)) {
 			lore.add(Component.text("CURRENTLY ON LOCKDOWN", NamedTextColor.DARK_GRAY, TextDecoration.BOLD));
 		} else {
-			if (accessLevel.ordinal() <= GuildAccessLevel.MEMBER.ordinal()) {
+			if (accessLevel.compareTo(GuildAccessLevel.MEMBER) <= 0) {
 				lore.add(Component.text("", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false)
 					.append(Component.keybind(Constants.Keybind.HOTBAR_9))
@@ -547,7 +547,7 @@ public class GuildGui extends Gui {
 				refresh();
 				return;
 			}
-			if (accessLevel.ordinal() <= GuildAccessLevel.MEMBER.ordinal()) {
+			if (accessLevel.compareTo(GuildAccessLevel.MEMBER) <= 0) {
 				if (event.getHotbarButton() == 8) {
 					GuildAccessLevel currentAccessLevel = LuckPermsIntegration.getAccessLevel(guild, mTargetUser);
 					if (!currentAccessLevel.equals(accessLevel)) {

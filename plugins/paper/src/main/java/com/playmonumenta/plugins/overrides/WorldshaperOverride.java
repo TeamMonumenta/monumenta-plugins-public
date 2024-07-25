@@ -372,7 +372,7 @@ public class WorldshaperOverride {
 			String line = lore.get(i);
 			for (Mode mode : Mode.values()) {
 				if (line.equals(mode.mPlainMessage)) {
-					Mode newMode = Mode.values()[(mode.ordinal() + (reverse ? -1 : 1) + Mode.values().length) % Mode.values().length];
+					Mode newMode = mode.next(reverse);
 					ItemStatUtils.removeLore(item, i);
 					ItemStatUtils.addLore(item, i, newMode.mMessage);
 					player.sendMessage(newMode.mMessage);
@@ -433,6 +433,11 @@ public class WorldshaperOverride {
 				.append(Component.text(name, color).decoration(TextDecoration.ITALIC, false));
 			mPlainMessage = MessagingUtils.plainText(mMessage);
 			mPitch = pitch;
+		}
+
+		@SuppressWarnings("EnumOrdinal")
+		Mode next(boolean reverse) {
+			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];
 		}
 	}
 }

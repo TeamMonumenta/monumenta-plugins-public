@@ -136,6 +136,7 @@ public class ChestSortIntegration implements Listener {
 		}
 	}
 
+	@SuppressWarnings("EnumOrdinal")
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void chestSortEvent(ChestSortEvent event) {
 		for (Map.Entry<ItemStack, Map<String, String>> itemSortMapPair : event.getSortableMaps().entrySet()) {

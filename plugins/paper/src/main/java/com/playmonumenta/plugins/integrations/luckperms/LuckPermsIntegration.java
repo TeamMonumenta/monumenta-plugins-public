@@ -370,7 +370,7 @@ public class LuckPermsIntegration implements Listener {
 				continue;
 			}
 
-			if (level.ordinal() > groupInviteLevel.ordinal()) {
+			if (level.compareTo(groupInviteLevel) > 0) {
 				level = groupInviteLevel;
 			}
 		}
@@ -393,7 +393,7 @@ public class LuckPermsIntegration implements Listener {
 				continue;
 			}
 
-			if (level.ordinal() > groupAccessLevel.ordinal()) {
+			if (level.compareTo(groupAccessLevel) > 0) {
 				level = groupAccessLevel;
 			}
 		}

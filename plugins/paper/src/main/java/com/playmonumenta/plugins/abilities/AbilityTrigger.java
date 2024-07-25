@@ -55,6 +55,11 @@ public class AbilityTrigger {
 			mDisplay = display;
 		}
 
+		@SuppressWarnings("EnumOrdinal")
+		public Key next() {
+			return values()[Math.floorMod(ordinal() + 1, values().length)];
+		}
+
 		@Override
 		public String toString() {
 			return mDisplay;

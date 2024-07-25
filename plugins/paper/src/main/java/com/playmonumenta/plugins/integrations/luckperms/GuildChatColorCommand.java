@@ -86,7 +86,7 @@ public class GuildChatColorCommand {
 			sender.sendMessage(Component.text("You are not in a guild", NamedTextColor.RED));
 			return;
 		}
-		if (GuildAccessLevel.MANAGER.ordinal() < GuildAccessLevel.byGroup(guild).ordinal()) {
+		if (GuildAccessLevel.MANAGER.compareTo(GuildAccessLevel.byGroup(guild)) < 0) {
 			sender.sendMessage(Component.text("You must be a manager or founder to manage guild chat color", NamedTextColor.RED));
 			return;
 		}

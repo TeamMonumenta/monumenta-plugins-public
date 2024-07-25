@@ -88,6 +88,11 @@ public class QuiverListener implements Listener {
 			mItemStack = item;
 		}
 
+		@SuppressWarnings("EnumOrdinal")
+		ArrowTransformMode next(boolean reverse) {
+			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];
+		}
+
 		public String getArrowName() {
 			return mArrowName;
 		}
@@ -174,8 +179,7 @@ public class QuiverListener implements Listener {
 							}
 							if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.RIGHT) {
 								// Left or right click: cycle through transformation modes
-								ArrowTransformMode[] allModes = ArrowTransformMode.values();
-								ArrowTransformMode newMode = allModes[(mode.ordinal() + (event.getClick() == ClickType.LEFT ? 1 : -1) + allModes.length) % allModes.length];
+								ArrowTransformMode newMode = mode.next(event.getClick() == ClickType.RIGHT);
 								ItemStatUtils.setArrowTransformMode(quiver, newMode);
 								ItemUpdateHelper.generateItemStats(quiver);
 								gui.mPlayer.playSound(gui.mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 1, 1);

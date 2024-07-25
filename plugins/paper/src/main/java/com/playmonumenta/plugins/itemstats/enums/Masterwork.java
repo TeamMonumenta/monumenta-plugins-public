@@ -69,10 +69,6 @@ public enum Masterwork {
 		return Masterwork.NONE;
 	}
 
-	public boolean lessThanOrEqualTo(Masterwork other) {
-		return ordinal() <= other.ordinal();
-	}
-
 	// Only use for 0-5
 	public Masterwork next() {
 		return switch (this) {
