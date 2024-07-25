@@ -17,7 +17,10 @@ enum Bait {
 	SOUL_GRUBS("Soul Grubs", 0, 0, 0.2, FishLootTable.MECHANICAL_MONKFISH, 0.5),
 	TINY_SHELLFISH("Tiny Shellfish", 0, 0, 0.2, FishLootTable.FOREST_FLOUNDER, 0.5),
 	FRUIT_MEAL("Odorous Fruit Meal", 0, 0, 0.2, FishLootTable.MUNGFISH, 0.5),
-	BLUE_CRYSTAL("Smoky Blue Crystal", 0, 0, 0.2, FishLootTable.SHROOMFISH, 0.5);
+	BLUE_CRYSTAL("Smoky Blue Crystal", 0, 0, 0.2, FishLootTable.SHROOMFISH, 0.5),
+	THRICE_SLICED_STARFISH("Thrice-Sliced Starfish", 0, 0, 0.2, FishLootTable.STARTOUCHED_SWORDFISH, 0.5),
+	INFECTED_SHRIMP("Infected Shrimp", 0, 0, 0.2, FishLootTable.NORVIGUT_TUNA, 0.5),
+	CRYSTALLIZED_COD("Crystallized Cod", 0, 0, 0.2, FishLootTable.CRYSTALLIZED_COD, 0.5);
 
 	final String mItemName;
 	final double mCombatOdds;

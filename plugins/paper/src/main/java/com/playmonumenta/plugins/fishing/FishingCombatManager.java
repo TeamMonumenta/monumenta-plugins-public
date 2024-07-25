@@ -57,9 +57,13 @@ public class FishingCombatManager implements Listener {
 		// Difficulty 1
 		{ 0, 1, 1, 1, 1, 0, 1, 0 },
 		{ 0, 1, 1, 2, 0, 0, 1, 1, 0, 1, 0},
-		{ 0, 1, 1, 1, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0}
+		{ 0, 1, 1, 1, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0},
+		// Difficulty 2
+		{ 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 2 },
+		{ 0, 1, 1, 1, 2, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0},
+		{ 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 0, 0, 0 }
 	};
-	private static final int[] MOB_SPAWN_DELAYS = new int[] { 25, 18 };
+	private static final int[] MOB_SPAWN_DELAYS = new int[] { 25, 18, 18 };
 	private static final String FISH_TABLE = "epic:r3/world/fishing/ring_fish_full";
 	private final LoSPool POOL_COMMON = new LoSPool.LibraryPool("~FishingCommonMobs");
 	private final LoSPool POOL_UNCOMMON = new LoSPool.LibraryPool("~FishingUncommonMobs");

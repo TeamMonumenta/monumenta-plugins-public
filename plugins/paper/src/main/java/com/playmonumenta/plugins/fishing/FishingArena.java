@@ -64,6 +64,26 @@ enum FishingArena {
 			new Vector(-2348.5, 253, -1881.5),
 			new Vector(-2342.5, 253, -1879.5),
 			new Vector(-2336.5, 253, -1880.5)
+		)),
+	ARENA_4(48, new Vector(-2932.5, 85, -1901.5),
+		ImmutableList.of(
+			new Vector(-2947.5, 85, -1895.5),
+			new Vector(-2945.5, 86, -1892.5),
+			new Vector(-2942.5, 84, -1889.5),
+			new Vector(-2939.5, 84, -1885.5),
+			new Vector(-2933.5, 85, -1883.5),
+			new Vector(-2925.5, 85, -1886.5),
+			new Vector(-2920.5, 85, -1889.5),
+			new Vector(-2916.5, 85, -1899.5),
+			new Vector(-2917.5, 84, -1907.5),
+			new Vector(-2917.5, 85, -1912.5),
+			new Vector(-2922.5, 84, -1912.5),
+			new Vector(-2932.5, 85, -1914.5),
+			new Vector(-2941.5, 85, -1913.5),
+			new Vector(-2944.5, 84, -1910.5),
+			new Vector(-2946.5, 84, -1908.5),
+			new Vector(-2949.5, 85, -1904.5),
+			new Vector(-2952.5, 85, -1900.5)
 		));
 
 	final Vector mCoordinates;

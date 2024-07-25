@@ -9,7 +9,10 @@ enum FishLootTable {
 	SHADE_SEABASS("epic:r3/world/fishing/custom_fishing/fish/shade_seabass", "epic:r3/world/fishing/custom_fishing/fish/shade_seabass_greater"),
 	SHROOMFISH("epic:r3/world/fishing/custom_fishing/fish/shroomfish", "epic:r3/world/fishing/custom_fishing/fish/shroomfish_greater"),
 	TROUT_OF_THE_ARCHITECT("epic:r3/world/fishing/custom_fishing/fish/trout_of_the_architect", "epic:r3/world/fishing/custom_fishing/fish/trout_of_the_architect_greater"),
-	WOLFSWOOD_CARP("epic:r3/world/fishing/custom_fishing/fish/wolfswood_carp", "epic:r3/world/fishing/custom_fishing/fish/wolfswood_carp_greater");
+	WOLFSWOOD_CARP("epic:r3/world/fishing/custom_fishing/fish/wolfswood_carp", "epic:r3/world/fishing/custom_fishing/fish/wolfswood_carp_greater"),
+	STARTOUCHED_SWORDFISH("epic:r3/world/fishing/custom_fishing/fish/startouched_swordfish", "epic:r3/world/fishing/custom_fishing/fish/startouched_swordfish_greater"),
+	NORVIGUT_TUNA("epic:r3/world/fishing/custom_fishing/fish/norvigut_tuna", "epic:r3/world/fishing/custom_fishing/fish/norvigut_tuna_greater"),
+	CRYSTALLIZED_COD("epic:r3/world/fishing/custom_fishing/fish/crystallized_cod", "epic:r3/world/fishing/custom_fishing/fish/crystallized_cod_greater");
 
 	// The path to the regular loot table, containing tiers 1-5 of the fish.
 	final String mPath;

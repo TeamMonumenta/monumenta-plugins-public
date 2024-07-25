@@ -35,7 +35,8 @@ public class FishingDifficultyGui extends Gui {
 			.append(Component.text(DIFFICULTY_NAMES[0]).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
 		Component.text("Pray for a ").decoration(TextDecoration.ITALIC, false)
 			.append(Component.text(DIFFICULTY_NAMES[1]).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true).color(TextColor.fromHexString("#ed8e2f"))),
-		Component.text("???").decoration(TextDecoration.ITALIC, true).decoration(TextDecoration.BOLD, true).color(NamedTextColor.DARK_GRAY),
+		Component.text("Pray for a ").decoration(TextDecoration.ITALIC, false)
+			.append(Component.text(DIFFICULTY_NAMES[2]).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true).color(TextColor.fromHexString("#ed2f2f"))),
 		Component.text("???").decoration(TextDecoration.ITALIC, true).decoration(TextDecoration.BOLD, true).color(NamedTextColor.DARK_GRAY)
 	};
 	private static final List<List<Component>> DIFFICULTY_DESCRIPTIONS = List.of(
@@ -43,20 +44,24 @@ public class FishingDifficultyGui extends Gui {
 			Component.text("The waters seem calm...").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY)
 		)),
 		new ArrayList<>(Arrays.asList(
-			Component.text("Mobs from fishing combat events").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY),
-			Component.text("become empowered, are greater in").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY),
+			Component.text("Mobs from fishing combat events become").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY),
+			Component.text("empowered, are greater in numbers, and").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY),
+			Component.text("will spawn faster.").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY)
+		)),
+		new ArrayList<>(Arrays.asList(
+			Component.text("Mobs from fishing combat events become").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY),
+			Component.text("greatly empowered, are far greater in").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY),
 			Component.text("numbers, and will spawn faster.").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY)
 		)),
-		new ArrayList<>(List.of(Component.text("Not yet available.").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY))),
 		new ArrayList<>(List.of(Component.text("Not yet available.").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY)))
 	);
 	private static final Material[] DIFFICULTY_MATERIALS = {
 		Material.WHITE_CONCRETE_POWDER,
 		Material.ORANGE_CONCRETE_POWDER,
-		Material.GRAY_CONCRETE_POWDER,
+		Material.RED_CONCRETE_POWDER,
 		Material.GRAY_CONCRETE_POWDER
 	};
-	private static final int[] DIFFICULTY_SAND_DOLLAR_COSTS = {0, 12, 36, 84};
+	private static final int[] DIFFICULTY_SAND_DOLLAR_COSTS = {0, 12, 24, 36};
 
 	public FishingDifficultyGui(Player player) {
 		super(player, 3 * 9, TITLE);
@@ -209,7 +214,7 @@ public class FishingDifficultyGui extends Gui {
 	}
 
 	private void tryAppendPurchaseInformation(List<Component> lore, int difficulty) {
-		if (isDifficultyUnlocked(difficulty) || difficulty != 1) {
+		if (isDifficultyUnlocked(difficulty) || difficulty == 0 || difficulty == 3) {
 			return;
 		}
 
@@ -219,7 +224,7 @@ public class FishingDifficultyGui extends Gui {
 	}
 
 	private boolean tryUnlockDifficulty(int difficulty) {
-		if (difficulty > 1) {
+		if (difficulty > 2) {
 			mPlayer.playSound(mPlayer, Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1f, 1.5f);
 			mPlayer.sendMessage(Component.text("This difficulty is not yet purchasable.").color(NamedTextColor.RED));
 			return false;
