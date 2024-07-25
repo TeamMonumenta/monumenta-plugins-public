@@ -37,6 +37,7 @@ public class ZoneUtils {
 		BIG_DOOR_DOWN_CCW("Big Door Down is CCW"),
 		BIG_DOOR_DOWN_CW("Big Door Down is CW"),
 		NO_VEHICLES("No Vehicles"),
+		NO_PLAYER_VEHICLES("No Player Vehicles"),
 		ADVENTURE_MODE("Adventure Mode"),
 		NO_EXPLOSIONS("No Explosions"),
 		WINTER_SNOWBALLS_ONLY("Winter Snowballs Only"),

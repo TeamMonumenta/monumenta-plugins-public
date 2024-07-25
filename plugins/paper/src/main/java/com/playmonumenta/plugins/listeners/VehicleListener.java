@@ -51,6 +51,18 @@ public class VehicleListener implements Listener {
 		Entity entity = event.getEntity();
 		Vehicle vehicle = event.getVehicle();
 
+		if ((entity instanceof Player) && ZoneUtils.hasZoneProperty(vehicle, ZoneProperty.NO_PLAYER_VEHICLES)
+			&& !vehicle.getType().equals(entity.getType())) {
+			/*
+			 * Vehicles are removed if they:
+			 *
+			 * Collide with a player entity
+			 * AND
+			 * are inside a safezone
+			 */
+			vehicle.remove();
+		}
+
 		if (!(entity instanceof Player) && ZoneUtils.hasZoneProperty(vehicle, ZoneProperty.NO_VEHICLES)
 			&& !vehicle.getType().equals(entity.getType())) {
 			/*
@@ -76,6 +88,19 @@ public class VehicleListener implements Listener {
 			return;
 		}
 
+		if (entity instanceof Player && ZoneUtils.hasZoneProperty(vehicle, ZoneProperty.NO_PLAYER_VEHICLES)) {
+			/*
+			 * Vehicles cannot be entered if:
+			 *
+			 * The entity entering is a player
+			 * AND
+			 * the zone does not allow players in vehicles
+			 */
+			Location loc = entity.getLocation();
+			entity.teleport(loc);
+			event.setCancelled(true);
+		}
+
 		if (!(vehicle instanceof AbstractHorse) && !(entity instanceof Player) && ZoneUtils.hasZoneProperty(vehicle, ZoneProperty.NO_VEHICLES)) {
 			/*
 			 * Vehicles cannot be entered if:
@@ -84,7 +109,7 @@ public class VehicleListener implements Listener {
 			 * AND
 			 * The entity entering is not a player
 			 * AND
-			 * the vehicle is inside of a safezone
+			 * the vehicle is inside a safezone
 			 */
 			Location loc = entity.getLocation();
 			entity.teleport(loc);
