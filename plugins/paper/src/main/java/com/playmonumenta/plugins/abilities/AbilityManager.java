@@ -145,6 +145,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
+import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
@@ -761,6 +762,10 @@ public class AbilityManager {
 
 	public void playerRegainHealthEvent(Player player, EntityRegainHealthEvent event) {
 		conditionalCast(player, (ability) -> ability.playerRegainHealthEvent(event));
+	}
+
+	public void playerGainAbsorptionEvent(Player player, EntityGainAbsorptionEvent event) {
+		conditionalCast(player, (ability) -> ability.playerGainAbsorptionEvent(event));
 	}
 
 	public void playerTeleportEvent(Player player, PlayerTeleportEvent event) {

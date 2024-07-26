@@ -56,17 +56,21 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 		for (int i = 0; i < slotsUsed.size(); i++) {
 			DepthsAbilityItem dai = items.get(i);
 			ItemStack item;
+			boolean obscure;
 			if (dai == null) {
 				item = GUIUtils.createBasicItem(Material.BARRIER, "Do not accept the gift", NamedTextColor.RED, true);
+				obscure = false;
 			} else if (i == slotsUsed.size() - 1 && depthsPlayer.mAbilities.getOrDefault(CurseOfObscurity.ABILITY_NAME, 0) > 0) {
 				item = GUIUtils.createBasicItem(Material.ROTTEN_FLESH, DepthsTree.CURSE.color("UnknownChoice").decorate(TextDecoration.OBFUSCATED));
+				obscure = true;
 			} else {
 				item = dai.mItem;
+				obscure = false;
 			}
 
 			int slot = i;
 			setItem(slotsUsed.get(i), new GuiItem(item).onLeftClick(() -> {
-				playerClickedItem(slot);
+				playerClickedItem(slot, obscure);
 				close();
 
 				if (dai != null) {
@@ -103,5 +107,5 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 
 	protected abstract @Nullable List<@Nullable DepthsAbilityItem> getOptions();
 
-	protected abstract void playerClickedItem(int slot);
+	protected abstract void playerClickedItem(int slot, boolean sendMessage);
 }

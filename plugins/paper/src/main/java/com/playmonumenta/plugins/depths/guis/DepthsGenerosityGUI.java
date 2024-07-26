@@ -27,7 +27,7 @@ public class DepthsGenerosityGUI extends AbstractDepthsRewardGUI {
 	}
 
 	@Override
-	protected void playerClickedItem(int slot) {
+	protected void playerClickedItem(int slot, boolean sendMessage) {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
 		if (dp == null) {
 			return;

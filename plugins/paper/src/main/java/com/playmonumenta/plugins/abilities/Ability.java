@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
+import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
@@ -300,6 +301,10 @@ public abstract class Ability {
 	}
 
 	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
+
+	}
+
+	public void playerGainAbsorptionEvent(EntityGainAbsorptionEvent event) {
 
 	}
 

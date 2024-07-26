@@ -548,9 +548,6 @@ public class DepthsListener implements Listener {
 		if (charityLevel > 0) {
 			power = Charity.REVIVE_POWER[charityLevel];
 		}
-		if (dp.mAbilities.getOrDefault(CurseOfDeath.ABILITY_NAME, 0) > 0) {
-			power *= 0.5;
-		}
 		return power;
 	}
 

@@ -9,15 +9,11 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.guis.AbstractDepthsRewardGUI;
-import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -28,48 +24,44 @@ public class CurseOfGluttony extends DepthsAbility {
 		new DepthsAbilityInfo<>(CurseOfGluttony.class, ABILITY_NAME, CurseOfGluttony::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)
 			.displayItem(Material.FERMENTED_SPIDER_EYE)
 			.canBeOfferedFloor1(false)
+			.gain(CurseOfGluttony::gain)
 			.descriptions(CurseOfGluttony::getDescription);
 
 	public CurseOfGluttony(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+	}
+
+	public static void gain(Player player) {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
-		if (dp == null || dp.mGluttonyTriggered) {
+		if (dp == null) {
 			return;
 		}
-		dp.mGluttonyTriggered = true;
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			Map<Integer, List<String>> sortedAbilities = new HashMap<>();
-			dp.mAbilities.forEach((ability, rarity) -> {
-				List<String> rarityAbilities = sortedAbilities.computeIfAbsent(rarity, i -> new ArrayList<>());
-				rarityAbilities.add(ability);
-			});
-
-			int removed = 0;
-			int highestRarity = 6;
-			List<String> abilities = sortedAbilities.get(highestRarity);
-			outer: while (removed < 3) {
-				while (abilities == null || abilities.isEmpty()) {
-					highestRarity--;
-					if (highestRarity <= 0) {
-						break outer;
-					}
-					abilities = sortedAbilities.get(highestRarity);
-				}
-				String ability = FastUtils.getRandomElement(abilities);
-				abilities.remove(ability);
-				DepthsAbilityInfo<?> info = DepthsManager.getInstance().getAbility(ability);
-				if (info == null || !info.getHasLevels()) {
-					continue;
-				}
-				DepthsManager.getInstance().setPlayerLevelInAbility(ability, player, 0);
-				dp.sendMessage(Component.text("Removed ability: ").append(info.getNameWithHover(highestRarity, player)));
-				removed++;
-			}
-
-			if (Gui.getOpenGui(player) instanceof AbstractDepthsRewardGUI gui) {
-				gui.update();
-			}
+		Map<Integer, List<String>> sortedAbilities = new HashMap<>();
+		dp.mAbilities.forEach((ability, rarity) -> {
+			List<String> rarityAbilities = sortedAbilities.computeIfAbsent(rarity, i -> new ArrayList<>());
+			rarityAbilities.add(ability);
 		});
+
+		int removed = 0;
+		int highestRarity = 6;
+		List<String> abilities = sortedAbilities.get(highestRarity);
+		outer: while (removed < 3) {
+			while (abilities == null || abilities.isEmpty()) {
+				highestRarity--;
+				if (highestRarity <= 0) {
+					break outer;
+				}
+				abilities = sortedAbilities.get(highestRarity);
+			}
+			String ability = FastUtils.getRandomElement(abilities);
+			abilities.remove(ability);
+			DepthsAbilityInfo<?> info = DepthsManager.getInstance().getAbility(ability);
+			if (info == null || !info.getHasLevels()) {
+				continue;
+			}
+			DepthsManager.getInstance().setPlayerLevelInAbility(ability, player, 0, true, true);
+			removed++;
+		}
 	}
 
 	private static Description<CurseOfGluttony> getDescription() {

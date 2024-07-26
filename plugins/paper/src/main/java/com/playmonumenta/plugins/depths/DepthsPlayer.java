@@ -74,10 +74,8 @@ public class DepthsPlayer {
 	// Whether the prismatic given by Diversity has been given
 	public boolean mDiversityGift = false;
 
-	// Whether the player has triggered Curse of Gluttony
-	public boolean mGluttonyTriggered = false;
 	// Whether the player is currently processing Abnormality
-	public boolean mCurrentAbnormality = false;
+	public int mAbnormalityLevel = 0;
 
 	// Abilities that the player can receive from Generosity
 	public final List<DepthsAbilityItem> mGenerosityGifts = new ArrayList<>();

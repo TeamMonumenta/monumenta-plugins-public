@@ -11,10 +11,8 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.guis.AbstractDepthsRewardGUI;
-import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -24,48 +22,40 @@ public class Abnormality extends DepthsAbility {
 	public static final DepthsAbilityInfo<Abnormality> INFO =
 		new DepthsAbilityInfo<>(Abnormality.class, ABILITY_NAME, Abnormality::new, DepthsTree.PRISMATIC, DepthsTrigger.PASSIVE)
 			.displayItem(Material.GLOW_INK_SAC)
+			.gain(Abnormality::gain)
 			.descriptions(Abnormality::getDescription);
 
 	public Abnormality(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+	}
+
+	public static void gain(Player player) {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
-		if (dp == null || dp.mCurrentAbnormality) {
+		// Weird things might happen if you get abnormality again from a second source (wheel) before choosing the prismatic but the safest thing to do is just do nothing
+		if (dp == null || dp.mAbnormalityLevel > 0) {
 			return;
 		}
-		dp.mCurrentAbnormality = true;
-		// Delay to end of tick to avoid potential CME - not sure if this is actually an issue but want to be careful
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			// Give abilities first - in particular, we don't want to give the prismatic before taking away abnormality
-			int[] chances = {0, 0, 0, 0, 0};
-			chances[mRarity - 1] = 100;
-			DepthsManager.getInstance().getRandomAbility(player, dp, chances, DepthsTree.PRISMATIC, false);
+		dp.mAbnormalityLevel = dp.mAbilities.getOrDefault(ABILITY_NAME, 0);
 
-			int[] placeholder = {100, 0, 0, 0, 0};
-			DepthsManager.getInstance().getRandomAbility(player, dp, placeholder, null, true);
-			DepthsManager.getInstance().getRandomAbility(player, dp, placeholder, DepthsTree.CURSE, false);
-			dp.mRerolls++;
+		int[] placeholder = {100, 0, 0, 0, 0};
+		DepthsManager.getInstance().getRandomAbility(player, dp, placeholder, null, true);
+		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.PRISMATIC);
+		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.CURSE);
+		dp.mRerolls++;
 
-			DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
-			dp.mCurrentAbnormality = false;
-
-			if (Gui.getOpenGui(player) instanceof AbstractDepthsRewardGUI gui) {
-				// If they just got Curse of Obscurity, this should make the item hidden. Might be visible for a moment but not much we can do.
-				// Might also fix potential issues with getting items that were just upgraded/given an item in the slot for since we have now validated the offerings
-				gui.update();
-			}
-		});
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
 	}
 
 	public static Description<Abnormality> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Abnormality>(color)
-			.add("Gain a random ")
-			.add(DepthsTree.PRISMATIC.getNameComponent())
-			.add(" ability at ")
-			.add(DepthsUtils.getRarityComponent(rarity))
-			.add(" level, a random ability at ")
+			.add("Gain a random ability at ")
 			.add(DepthsRarity.TWISTED.getDisplay())
-			.add(" level, a random ")
+			.add(" rarity, a selection of ")
+			.add(DepthsTree.PRISMATIC.getNameComponent())
+			.add(" abilities at ")
+			.add(DepthsUtils.getRarityComponent(rarity))
+			.add(" rarity, a selection of ")
 			.add(DepthsTree.CURSE.getNameComponent())
-			.add(", and 1 reroll. Remove this ability.");
+			.add(" abilities, and 1 reroll. Remove this ability");
 	}
 }

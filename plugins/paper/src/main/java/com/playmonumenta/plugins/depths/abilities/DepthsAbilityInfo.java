@@ -40,6 +40,8 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	private boolean mHasLevels;
 	private boolean mOfferableFloor1;
 	private boolean mOfferablePastFloor1;
+	private Consumer<Player> mGain = player -> {
+	};
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
 	                         @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
@@ -125,6 +127,11 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return this;
 	}
 
+	public DepthsAbilityInfo<T> gain(Consumer<Player> gain) {
+		mGain = gain;
+		return this;
+	}
+
 	@Override
 	public DepthsAbilityInfo<T> descriptions(IntFunction<Description<T>> supplier, int levels) {
 		super.descriptions(supplier, levels);
@@ -196,6 +203,10 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 
 	public boolean getHasLevels() {
 		return mHasLevels;
+	}
+
+	public void onGain(Player player) {
+		mGain.accept(player);
 	}
 
 	//Whether the player is eligible to have this ability offered

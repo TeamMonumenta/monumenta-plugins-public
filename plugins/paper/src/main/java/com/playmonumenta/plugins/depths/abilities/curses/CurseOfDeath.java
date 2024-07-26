@@ -24,6 +24,6 @@ public class CurseOfDeath extends DepthsAbility {
 
 	private static Description<CurseOfDeath> getDescription() {
 		return new DescriptionBuilder<CurseOfDeath>()
-			.add("Your revive timer is reduced to the minimum, and you take twice as long when reviving teammates.");
+			.add("Your revive timer is reduced to the minimum.");
 	}
 }

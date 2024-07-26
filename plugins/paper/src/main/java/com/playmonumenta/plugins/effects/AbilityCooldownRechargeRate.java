@@ -27,10 +27,10 @@ public class AbilityCooldownRechargeRate extends SingleArgumentEffect {
 			int reduction = (int) Math.floor(Constants.HALF_TICKS_PER_SECOND * mAmount);
 
 			// handle overflow: we can't reduce by decimal ticks, so sum up the overflow each time and reduce by an additional tick when overflow > 1.
-			double overflow = Constants.HALF_TICKS_PER_SECOND * mAmount - Math.floor(Constants.HALF_TICKS_PER_SECOND * mAmount);
+			double overflow = Constants.HALF_TICKS_PER_SECOND * mAmount - reduction;
 			mOverflow += overflow;
 
-			if (mOverflow > 1) {
+			if (mOverflow >= 1) {
 				mOverflow -= 1;
 				reduction += 1;
 			}
@@ -51,7 +51,7 @@ public class AbilityCooldownRechargeRate extends SingleArgumentEffect {
 
 	@Override
 	public boolean isBuff() {
-		return true;
+		return mAmount >= 0;
 	}
 
 	public static AbilityCooldownRechargeRate deserialize(JsonObject object, Plugin plugin) {

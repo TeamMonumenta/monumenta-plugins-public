@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -35,7 +34,7 @@ public class CurseOfRuin extends DepthsAbility {
 		while (!abilities.isEmpty()) {
 			String ability = abilities.remove(0);
 			int level = dp.mAbilities.getOrDefault(ability, 0);
-			if (level <= 1) {
+			if (level <= 1 || level >= 6) {
 				continue;
 			}
 			DepthsAbilityInfo<?> info = DepthsManager.getInstance().getAbility(ability);
@@ -43,8 +42,7 @@ public class CurseOfRuin extends DepthsAbility {
 				continue;
 			}
 			int newRarity = level - 1;
-			DepthsManager.getInstance().setPlayerLevelInAbility(ability, mPlayer, newRarity);
-			dp.sendMessage(Component.text("Downgraded ability: ").append(info.getNameWithHover(newRarity, mPlayer)));
+			DepthsManager.getInstance().setPlayerLevelInAbility(ability, mPlayer, newRarity, true, true);
 			return;
 		}
 	}

@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
+import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
@@ -1527,6 +1528,13 @@ public class PlayerListener implements Listener {
 		if (event.getEntity() instanceof Player player) {
 			mPlugin.mItemStatManager.playerRegainHealthEvent(mPlugin, player, event);
 			mPlugin.mAbilityManager.playerRegainHealthEvent(player, event);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onGainAbsorption(EntityGainAbsorptionEvent event) {
+		if (event.getEntity() instanceof Player player) {
+			mPlugin.mAbilityManager.playerGainAbsorptionEvent(player, event);
 		}
 	}
 

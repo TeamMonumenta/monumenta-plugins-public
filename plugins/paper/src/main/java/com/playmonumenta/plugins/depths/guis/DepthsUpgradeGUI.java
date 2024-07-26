@@ -18,7 +18,7 @@ public class DepthsUpgradeGUI extends AbstractDepthsRewardGUI {
 	}
 
 	@Override
-	protected void playerClickedItem(int slot) {
-		DepthsManager.getInstance().playerUpgradedItem(mPlayer, slot);
+	protected void playerClickedItem(int slot, boolean sendMessage) {
+		DepthsManager.getInstance().playerUpgradedItem(mPlayer, slot, sendMessage);
 	}
 }
