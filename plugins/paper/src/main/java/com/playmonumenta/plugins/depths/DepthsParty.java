@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -670,8 +671,10 @@ public class DepthsParty {
 
 			if (victory && getContent() == DepthsContent.DARKEST_DEPTHS) {
 				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "depths"));
+				AdvancementUtils.grantAdvancement(p, "monumenta:dungeons/depths/complete");
 			} else if (victory && getContent() == DepthsContent.CELESTIAL_ZENITH) {
 				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "zenith"));
+				AdvancementUtils.grantAdvancement(p, "monumenta:dungeons/zenith/complete");
 			}
 
 
