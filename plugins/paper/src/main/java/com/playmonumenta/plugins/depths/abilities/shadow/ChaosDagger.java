@@ -16,7 +16,10 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -83,6 +86,7 @@ public class ChaosDagger extends DepthsAbility {
 		Location loc = mPlayer.getEyeLocation();
 		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.CHAOS_DAGGER_VELOCITY.mEffectName, VELOCITY);
 		Item dagger = AbilityUtils.spawnAbilityItem(world, loc, Material.NETHERITE_SWORD, "Chaos Dagger", false, velocity, true, true);
+		ScoreboardUtils.addEntityToTeam(dagger, "ChaosDagger", NamedTextColor.DARK_PURPLE);
 
 		world.playSound(loc, Sound.ENTITY_WARDEN_HEARTBEAT, SoundCategory.PLAYERS, 2.0f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0f, 0.1f);
@@ -141,14 +145,9 @@ public class ChaosDagger extends DepthsAbility {
 					} else {
 						EntityUtils.applyStun(mPlugin, mStunDuration, mTarget);
 					}
-					mTarget.setGlowing(true);
+					PotionUtils.applyColoredGlowing("ChaosDaggerGlowing", mTarget, NamedTextColor.DARK_PURPLE, DAMAGE_DURATION);
 
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						if (mHitMob != null && !mHitMob.getScoreboardTags().contains(NO_GLOWING_CLEAR_TAG)) {
-							mHitMob.setGlowing(false);
-						}
-						mHitMob = null;
-					}, DAMAGE_DURATION);
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mHitMob = null, DAMAGE_DURATION);
 
 					dagger.remove();
 					this.cancel();
@@ -185,9 +184,7 @@ public class ChaosDagger extends DepthsAbility {
 		if (enemy == mHitMob && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)) {
 			event.setDamage(event.getFlatDamage() * (1 + mDamageMultiplier));
 			mHitMob = null;
-			if (!enemy.isInvisible()) {
-				enemy.setGlowing(false);
-			}
+			mPlugin.mEffectManager.clearEffects(enemy, "ChaosDaggerGlowing");
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				if (enemy.isDead() || enemy.getHealth() < 0) {
 					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);

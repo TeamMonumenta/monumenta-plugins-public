@@ -81,8 +81,12 @@ public class ColoredGlowingEffect extends Effect {
 			entity.setGlowing(false);
 		}
 
-		if (mOldEffectSpoilTicks != -1 && mOldEffectSpoilTicks - getDuration() > 0) {
-			PotionUtils.applyPotion(null, (LivingEntity) entity, new PotionEffect(PotionEffectType.GLOWING, mOldEffectSpoilTicks - getDuration(), 0));
+		if (entity instanceof LivingEntity le) {
+			if (mOldEffectSpoilTicks != -1 && mOldEffectSpoilTicks - getDuration() > 0) {
+				PotionUtils.applyPotion(null, le, new PotionEffect(PotionEffectType.GLOWING, mOldEffectSpoilTicks - getDuration(), 0));
+			} else if (getDuration() > 0) {
+				le.removePotionEffect(PotionEffectType.GLOWING);
+			}
 		}
 
 		if (mTeam != null) {

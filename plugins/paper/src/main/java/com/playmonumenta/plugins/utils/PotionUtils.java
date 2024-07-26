@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -534,6 +535,10 @@ public class PotionUtils {
 	 * Apply the glowing effect along with a color to a given entity.
 	 */
 	public static void applyColoredGlowing(String source, Entity entity, @Nullable NamedTextColor color, int duration) {
+		Component name = entity.customName();
+		if (name != null) {
+			entity.customName(name.colorIfAbsent(NamedTextColor.WHITE));
+		}
 		Plugin.getInstance().mEffectManager.addEffect(entity, source, new ColoredGlowingEffect(duration, color));
 	}
 
