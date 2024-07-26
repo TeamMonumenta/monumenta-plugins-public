@@ -57,7 +57,7 @@ public class AstralOmenCS implements CosmeticSkill {
 	public void thunderStack(Player player, Entity entity) {
 		Location location = entity.getLocation().add(0, 1, 0);
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, location, 8, 0, 0, 0, 4).spawnAsEnemyBuff();
-		new PartialParticle(Particle.REDSTONE, location, 8, 0.2, 0.2, 0.2, 0.1, Color.fromRGB(255, 255, 0)).spawnAsEnemyBuff();
+		new PartialParticle(Particle.REDSTONE, location, 8, 0.2, 0.2, 0.2, 0.1, new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1)).spawnAsEnemyBuff();
 	}
 
 	public void bonusDamage(Player player, Entity entity, Particle.DustOptions color) {
