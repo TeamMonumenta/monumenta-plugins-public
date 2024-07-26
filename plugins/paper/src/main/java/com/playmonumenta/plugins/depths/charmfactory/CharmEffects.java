@@ -91,6 +91,7 @@ public enum CharmEffects {
 	BOTTLED_SUNLIGHT_ABSORPTION_DURATION("Bottled Sunlight Absorption Duration", BottledSunlight.INFO, true, false, 2.0, 20.0, new double[] {2.0, 4.0, 6.0, 8.0, 10.0}),
 	BOTTLED_SUNLIGHT_BOTTLE_VELOCITY("Bottled Sunlight Bottle Velocity", BottledSunlight.INFO, true, true, 0.0, 100.0, new double[] {0.0, 0.0, 20.0, 40.0, 60.0}),
 	DIVINE_BEAM_COOLDOWN(DivineBeam.CHARM_COOLDOWN, DivineBeam.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
+	DIVINE_BEAM_SIZE("Divine Beam Size", DivineBeam.INFO, true, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	DIVINE_BEAM_HEALING("Divine Beam Healing", DivineBeam.INFO, true, true, 5, 50, new double[] {5, 10, 15, 20, 25}),
 	DIVINE_BEAM_STUN_DURATION("Divine Beam Stun Duration", DivineBeam.INFO, true, false, 0.25, 2.0, new double[] {0.25, 0.5, 0.75, 1.0, 1.25}),
 	DIVINE_BEAM_MAX_TARGETS_BONUS("Divine Beam Max Targets Bonus", DivineBeam.INFO, true, false, 0.0, 5.0, new double[] {0.0, 0.0, 1.0, 2.0, 3.0}),
@@ -398,8 +399,9 @@ public enum CharmEffects {
 	THUNDERCLOUD_FORM_COOLDOWN(ThundercloudForm.CHARM_COOLDOWN, ThundercloudForm.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
 	THUNDERCLOUD_FORM_DAMAGE("Thundercloud Form Damage", ThundercloudForm.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	THUNDERCLOUD_FORM_RADIUS("Thundercloud Form Radius", ThundercloudForm.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	THUNDERCLOUD_FORM_FLIGHT_SPEED("Thundercloud Form Flight Speed", ThundercloudForm.INFO, true, true, 0.0, 50.0, new double[] {0.0, 0.0, 0.0, 10.0, 20.0}),
-	THUNDERCLOUD_FORM_FLIGHT_DURATION("Thundercloud Form Flight Duration", ThundercloudForm.INFO, true, false, 0.0, 4.0, new double[] {0.0, 0.0, 0.0, 1.0, 2.0}),
+	THUNDERCLOUD_FORM_KNOCKBACK("Thundercloud Form Knockback", ThundercloudForm.INFO, true, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
+	THUNDERCLOUD_FORM_FLIGHT_SPEED("Thundercloud Form Flight Speed", ThundercloudForm.INFO, true, true, 0.0, 40.0, new double[] {5.0, 10.0, 15.0, 20.0, 25.0}),
+	THUNDERCLOUD_FORM_FLIGHT_DURATION("Thundercloud Form Flight Duration", ThundercloudForm.INFO, true, false, 0.0, 4.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
 	WHIRLWIND_RADIUS("Whirlwind Radius", Whirlwind.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	WHIRLWIND_KNOCKBACK("Whirlwind Knockback", Whirlwind.INFO, true, true, 0.0, 40, new double[] {0.0, 0.0, 0.0, 10, 20}),
 	WHIRLWIND_SPEED_AMPLIFIER("Whirlwind Speed Amplifier", Whirlwind.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
@@ -477,11 +479,14 @@ public enum CharmEffects {
 	}
 
 	// certain "useless" stats should be restricted from appearing at high rarities
-	public boolean isNotRestrictedAtLevel(int level) {
-		if (extraRarityCaps.get(mEffectName) != null && level > extraRarityCaps.get(mEffectName)) {
-			return false;
+	public boolean isNotRestrictedAtLevel(int level, boolean isNegative) {
+		if (isNegative) {
+			return true; // allow stats to be fine at negative legendary
 		}
-		return true;
+		if (extraRarityCaps.get(mEffectName) != null && level > extraRarityCaps.get(mEffectName)) {
+			return false; // disallow it if it's something like Legendary Fire Duration
+		}
+		return true; // if it's not in the map, it's allowed
 	}
 
 	public static @Nullable CharmEffects getEffect(String effectName) {

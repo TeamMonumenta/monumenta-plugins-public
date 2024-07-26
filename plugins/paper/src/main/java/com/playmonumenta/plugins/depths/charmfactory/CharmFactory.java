@@ -65,7 +65,7 @@ public class CharmFactory {
 		Map.entry("Slipstream Speed Amplifier", "Aeroblast Speed Amplifier"),
 		Map.entry("Slipstream Radius", "Aeroblast Size"),
 
-		Map.entry("Divine Beam Cooldown Reduction", ""),
+		Map.entry("Divine Beam Cooldown Reduction", "Divine Beam Size"),
 
 		Map.entry("Totem of Salvation Cooldown", "Spark of Inspiration Cooldown"),
 		Map.entry("Totem of Salvation Radius", "Spark of Inspiration Cast Range"),
@@ -83,7 +83,7 @@ public class CharmFactory {
 		Map.entry("Howling Winds Radius", "Thundercloud Form Radius"),
 		Map.entry("Howling Winds Duration", "Thundercloud Form Flight Duration"),
 		Map.entry("Howling Winds Velocity", "Thundercloud Form Flight Speed"),
-		Map.entry("Howling Winds Cast Range", ""),
+		Map.entry("Howling Winds Cast Range", "Thundercloud Form Knockback"),
 		Map.entry("Howling Winds Vulnerability Amplifier", "Thundercloud Form Damage"),
 
 		Map.entry("Metalmancy Cooldown", "Gravity Bomb Cooldown"),
@@ -456,7 +456,7 @@ public class CharmFactory {
 				MMLog.fine("upgrade: upgraded " + upgraded.mAction);
 
 				CharmEffects effect = CharmEffects.getEffect(activeEffects.get(index));
-				if (effect != null && effect.isValidAtLevel(upgraded.mRarity) && effect.isNotRestrictedAtLevel(upgraded.mRarity)) { // check if valid at the new rarity
+				if (effect != null && effect.isValidAtLevel(upgraded.mRarity) && effect.isNotRestrictedAtLevel(upgraded.mRarity, upgraded.mIsNegative)) { // check if valid at the new rarity
 					MMLog.fine("upgrade: effect " + effect.mAbility);
 					// update the action NBT to the new action
 					NBT.modify(item, nbt -> {
@@ -536,7 +536,7 @@ public class CharmFactory {
 					if (isNegative && ce.mIsOnlyPositive) {
 						continue;
 					}
-					if (ce.mAbility.equals(ability) && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level)) {
+					if (ce.mAbility.equals(ability) && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level, isNegative)) {
 						chosenEffect = ce;
 						break;
 					}
@@ -544,7 +544,7 @@ public class CharmFactory {
 			} else if (tree != null) {
 				//We have to pick within the specified tree
 				for (CharmEffects ce : charmEffects) {
-					if (ce.mTree == tree && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level) && !isNegative) {
+					if (ce.mTree == tree && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level, isNegative) && !isNegative) {
 						chosenEffect = ce;
 						break;
 					}
@@ -561,7 +561,7 @@ public class CharmFactory {
 					}
 				}
 				for (CharmEffects ce : charmEffects) {
-					if (!effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level) && !isNegative) {
+					if (!effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level, isNegative) && !isNegative) {
 						//Skip if it's the first effect of a single ability charm and the ability doesn't support it
 						if (isFirstSingleAbilityCharm && !ce.mInfo.getSingleAbilityCharm()) {
 							continue;
