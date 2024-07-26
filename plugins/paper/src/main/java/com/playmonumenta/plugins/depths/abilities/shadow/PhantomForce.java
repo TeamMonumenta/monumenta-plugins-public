@@ -45,8 +45,8 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class PhantomForce extends DepthsAbility {
-	public static final int SPAWN_COUNT = 3;
-	public static final int TWISTED_SPAWN_COUNT = 5;
+	public static final int SPAWN_COUNT = 2;
+	public static final int TWISTED_SPAWN_COUNT = 4;
 	public static final double MOVEMENT_SPEED = 5;
 	public static final int DURATION = 15 * 20;
 	public static final double[] DAMAGE = {5, 6.5, 8, 9.5, 11, 14};

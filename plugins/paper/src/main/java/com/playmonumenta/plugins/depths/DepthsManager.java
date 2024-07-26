@@ -1294,7 +1294,8 @@ public class DepthsManager {
 			if (party.mMobsToKill > 0 && p.hasPermission("monumenta.depths.mobanticheese")) {
 				Location hitboxLoc = l.clone();
 				hitboxLoc.setDirection(new Vector(-1, 0, 0)); // rooms have the room at the +X axis end of the room, so we face -X to face into the room
-				Hitbox hitbox = Hitbox.approximateCylinderSegment(l.clone().add(0, -6, 0), 12, 6, Math.PI / 2);
+				double anticheeseRadius = 16;
+				Hitbox hitbox = Hitbox.approximateCylinderSegment(l.clone().add(0, -anticheeseRadius, 0), anticheeseRadius, anticheeseRadius, Math.PI / 2);
 				List<LivingEntity> mobs = hitbox.getHitMobs();
 				mobs.removeIf(mob -> ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG));
 				if (!mobs.isEmpty()) {

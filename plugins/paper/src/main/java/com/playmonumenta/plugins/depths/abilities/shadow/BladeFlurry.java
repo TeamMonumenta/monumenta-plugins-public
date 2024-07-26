@@ -38,7 +38,7 @@ public class BladeFlurry extends DepthsAbility {
 	public static final String ABILITY_NAME = "Blade Flurry";
 	public static final int COOLDOWN = 20 * 6;
 	public static final int[] DAMAGE = {8, 10, 12, 14, 16, 20};
-	public static final int RADIUS = 3;
+	public static final int RADIUS = 4;
 	public static final int[] SILENCE_DURATION = {20, 25, 30, 35, 40, 50};
 	public static final Color SLASH_COLOR_TIP = Color.fromRGB(40, 19, 102);
 	public static final Color SLASH_COLOR_BASE = Color.fromRGB(83, 60, 153);

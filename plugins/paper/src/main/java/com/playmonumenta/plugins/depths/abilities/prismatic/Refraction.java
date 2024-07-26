@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -184,21 +183,22 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 				}
 				Vector dir2 = dir.clone().multiply(0.5);
 
-				PPPeriodic spark1 = new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc).count(1).extra(0.10).delta(0.10);
-				PPPeriodic spark2 = new PPPeriodic(Particle.ELECTRIC_SPARK, currLoc.clone().add(dir2)).count(1).extra(0.15).delta(0.15);
-				PPPeriodic redstone = new PPPeriodic(Particle.REDSTONE, currLoc.clone().add(vec)).count(1).data(new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f));
+				PartialParticle spark1 = new PartialParticle(Particle.ELECTRIC_SPARK, currLoc).count(1).extra(0.10).delta(0.10);
+				PartialParticle spark2 = new PartialParticle(Particle.ELECTRIC_SPARK, currLoc.clone().add(dir2)).count(1).extra(0.15).delta(0.15);
+				PartialParticle redstone = new PartialParticle(Particle.REDSTONE, currLoc.clone().add(vec)).count(1);
 
 				for (int i = 0; i < DISTANCE; i++) {
 					Vector vec2 = vec.clone().rotateAroundAxis(dir, Math.PI / 12);
 
 					currLoc.add(dir);
 
+					Particle.DustOptions color = new Particle.DustOptions(Color.fromARGB(HSBtoRGB(mHue, 0.4f, 1.0f)), 1f);
 					spark1.location(currLoc).spawnAsPlayerActive(mPlayer);
 					spark2.location(currLoc.clone().add(dir2)).spawnAsPlayerActive(mPlayer);
-					redstone.location(currLoc.clone().add(vec)).spawnAsPlayerActive(mPlayer);
-					redstone.location(currLoc.clone().subtract(vec)).spawnAsPlayerActive(mPlayer);
-					redstone.location(currLoc.clone().add(dir2).add(vec2)).spawnAsPlayerActive(mPlayer);
-					redstone.location(currLoc.clone().add(dir2).subtract(vec2)).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().add(vec)).data(color).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().subtract(vec)).data(color).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().add(dir2).add(vec2)).data(color).spawnAsPlayerActive(mPlayer);
+					redstone.location(currLoc.clone().add(dir2).subtract(vec2)).data(color).spawnAsPlayerActive(mPlayer);
 
 					mHue += 0.05f;
 
@@ -215,7 +215,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 					vec.rotateAroundAxis(dir, Math.PI / 6);
 				}
 
-				Hitbox hitbox = Hitbox.approximateCylinder(loc, endLoc, 0.75, true).accuracy(0.5);
+				Hitbox hitbox = Hitbox.approximateCylinder(loc, endLoc, 1.25, true).accuracy(0.5);
 
 				if (mCurrDuration % 5 == 0) {
 					List<LivingEntity> hitMobs = hitbox.getHitMobs();

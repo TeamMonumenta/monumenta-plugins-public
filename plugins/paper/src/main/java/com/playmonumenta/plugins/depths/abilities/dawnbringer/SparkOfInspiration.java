@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -20,6 +22,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
@@ -43,7 +46,6 @@ public class SparkOfInspiration extends DepthsAbility {
 	public static final String ABILITY_NAME = "Spark of Inspiration";
 	public static final int COOLDOWN = 50 * 20;
 	private static final int CAST_RANGE = 16;
-	private static final int INSTANT_REFRESH = 40;
 	private static final int[] BUFF_DURATION = {100, 110, 120, 130, 140, 160};
 	private static final double[] CD_RECHARGE_BUFF = {0.60, 0.75, 0.90, 1.05, 1.20, 1.50};
 	private static final double[] STRENGTH_BUFF = {0.15, 0.20, 0.25, 0.30, 0.35, 0.45};
@@ -73,7 +75,6 @@ public class SparkOfInspiration extends DepthsAbility {
 	private final double mStrength;
 	private final int mResistDuration;
 
-	private @Nullable Player mLastPlayer;
 	private @Nullable BukkitRunnable mInspireRunnable;
 
 	public SparkOfInspiration(Plugin plugin, Player player) {
@@ -84,7 +85,6 @@ public class SparkOfInspiration extends DepthsAbility {
 		mStrength = STRENGTH_BUFF[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SPARK_OF_INSPIRATION_STRENGTH.mEffectName);
 		mResistDuration = CharmManager.getDuration(mPlayer, CharmEffects.SPARK_OF_INSPIRATION_RESIST_DURATION.mEffectName, RESIST_DURATION);
 
-		mLastPlayer = null;
 		mInspireRunnable = null;
 	}
 
@@ -93,14 +93,17 @@ public class SparkOfInspiration extends DepthsAbility {
 			return false;
 		}
 
-		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, mRange, 1.5);
-		if (targetPlayer == null) {
-			return false;
-		} else if (targetPlayer == mLastPlayer) {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1f, 1f);
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+		if (party == null) {
 			return false;
 		}
-		mLastPlayer = targetPlayer;
+
+		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, mRange, 1.5);
+		if (party.getPlayers().size() == 1) {
+			targetPlayer = mPlayer; // grant to self if solo
+		} else if (targetPlayer == null) {
+			return false;
+		}
 
 		double red = ORANGE.getRed() / 255.0;
 		double green = ORANGE.getGreen() / 255.0;
@@ -117,8 +120,8 @@ public class SparkOfInspiration extends DepthsAbility {
 
 		putOnCooldown();
 
-		mPlugin.mTimers.updateCooldowns(targetPlayer, INSTANT_REFRESH);
-		mPlugin.mTimers.updateCooldowns(mPlayer, INSTANT_REFRESH);
+		PlayerUtils.healPlayer(mPlugin, targetPlayer, EntityUtils.getMaxHealth(targetPlayer), mPlayer);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(targetPlayer), mPlayer);
 
 		mPlugin.mEffectManager.addEffect(targetPlayer, CD_RECHARGE_EFFECT_NAME, new AbilityCooldownRechargeRate(mBuffDuration, mBuffCDRecharge));
 		mPlugin.mEffectManager.addEffect(mPlayer, STRENGTH_EFFECT_NAME, new PercentDamageDealt(mBuffDuration, mStrength));
@@ -129,9 +132,11 @@ public class SparkOfInspiration extends DepthsAbility {
 		if (mInspireRunnable != null) {
 			mInspireRunnable.cancel();
 		}
+
+		Player finalTargetPlayer = targetPlayer;
 		mInspireRunnable = new BukkitRunnable() {
 			int mTicks = 0;
-			final Player mTarget = targetPlayer;
+			final Player mTarget = finalTargetPlayer;
 			final World mWorld = mTarget.getWorld();
 			@Override
 			public void run() {
@@ -203,7 +208,7 @@ public class SparkOfInspiration extends DepthsAbility {
 	}
 
 	private void createLink(Player source, Player target) {
-		Vector dir = VectorUtils.randomUnitVector().multiply(1.5);
+		Vector dir = VectorUtils.randomUnitVector().multiply(1.2);
 
 		new BukkitRunnable() {
 			final Location mL = LocationUtils.varyInUniform(source.getEyeLocation(), 1);
@@ -261,9 +266,7 @@ public class SparkOfInspiration extends DepthsAbility {
 		return new DescriptionBuilder<SparkOfInspiration>(color)
 			.add("Swap hands while looking at a player within ")
 			.add(a -> a.mRange, CAST_RANGE)
-			.add(" blocks to instantly refresh both of your ability cooldowns by ")
-			.addDuration(INSTANT_REFRESH)
-			.add("s and empower both of you for the next ")
+			.add(" blocks to instantly heal both of you for 100% of your max HP and empower both of you for the next ")
 			.addDuration(a -> a.mBuffDuration, BUFF_DURATION[rarity - 1], false, true)
 			.add(" seconds, giving them ")
 			.add(Component.text("+", Style.style(color)))
@@ -274,7 +277,7 @@ public class SparkOfInspiration extends DepthsAbility {
 			.addPercent(HEALTH_THRESHOLD)
 			.add(" during this time, the effect immediately ends for both players and both are granted 100% Resistance for ")
 			.addDuration(a -> a.mResistDuration, RESIST_DURATION)
-			.add("s. Cannot be used on the same player twice in a row.")
+			.add("s. If there are no other players in your party, you may activate this ability on yourself instead.")
 			.addCooldown(COOLDOWN);
 	}
 }

@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
@@ -95,39 +96,87 @@ public class CharmFactory {
 		Map.entry("Frigid Combos Hit Requirement", "Frigid Combos Cooldown")
 	);
 
-	public static final Map<String, CharmEffectActions> charmLevelCapMap = Map.ofEntries(
-		Map.entry("Bottled Sunlight Bottle Velocity", CharmEffectActions.EPIC),
-		Map.entry("Ward of Light Cone Angle", CharmEffectActions.EPIC),
-		Map.entry("Fireball Velocity", CharmEffectActions.EPIC),
-		Map.entry("Fireball Fire Duration", CharmEffectActions.RARE),
-		Map.entry("Flame Spirit Fire Duration", CharmEffectActions.RARE),
-		Map.entry("Flamestrike Cone Angle", CharmEffectActions.EPIC),
-		Map.entry("Flamestrike Fire Duration", CharmEffectActions.RARE),
-		Map.entry("Flamestrike Knockback", CharmEffectActions.EPIC),
-		Map.entry("Igneous Rune Fire Duration", CharmEffectActions.RARE),
-		Map.entry("Pyroblast Fire Duration", CharmEffectActions.RARE),
-		Map.entry("Volcanic Combos Fire Duration", CharmEffectActions.RARE),
-		Map.entry("Volcanic Meteor Fire Duration", CharmEffectActions.RARE),
-		Map.entry("Cryobox Ice Duration", CharmEffectActions.RARE),
-		Map.entry("Frost Nova Ice Duration", CharmEffectActions.RARE),
-		Map.entry("Ice Barrier Cast Range", CharmEffectActions.EPIC),
-		Map.entry("Ice Barrier Max Length", CharmEffectActions.EPIC),
-		Map.entry("Ice Barrier Ice Duration", CharmEffectActions.RARE),
-		Map.entry("Ice Lance Ice Duration", CharmEffectActions.RARE),
-		Map.entry("Piercing Cold Ice Duration", CharmEffectActions.RARE),
-		Map.entry("Chaos Dagger Velocity", CharmEffectActions.EPIC),
-		Map.entry("Focused Combos Bleed Amplifier", CharmEffectActions.EPIC),
-		Map.entry("Focused Combos Bleed Duration", CharmEffectActions.RARE),
-		Map.entry("Scrapshot Recoil Velocity", CharmEffectActions.EPIC),
-		Map.entry("Scrapshot Shrapnel Cone Angle", CharmEffectActions.EPIC),
-		Map.entry("Steel Stallion Horse Speed", CharmEffectActions.EPIC),
-		Map.entry("Steel Stallion Jump Strength", CharmEffectActions.EPIC),
-		Map.entry("Wind Walk Velocity", CharmEffectActions.EPIC)
-	);
-
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
-		ItemUpdateHelper.generateItemStats(item);
-		return item;
+		if (!item.getType().isAir()) {
+			NBTItem nbt = new NBTItem(item);
+			ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+			if (playerModified == null) {
+				return null;
+			}
+
+			int power = ItemStatUtils.getCharmPower(item);
+			int rarity = playerModified.getInteger(CHARM_RARITY_KEY);
+			long seed = playerModified.getLong(CHARM_UUID_KEY);
+
+			if (power == 0 || rarity == 0 || seed == 0) {
+				//Invalid charm
+				return null;
+			}
+			//Iterate through ability effect data to create a list
+			List<String> charmEffectOrder = new ArrayList<>();
+			List<String> charmActionOrder = new ArrayList<>();
+			List<Double> charmRollsOrder = new ArrayList<>();
+
+			int count = 1;
+			while (playerModified.getString(CHARM_EFFECTS_KEY + count) != null
+				&& !playerModified.getString(CHARM_EFFECTS_KEY + count).isEmpty()) {
+
+				// replace charm effects according to map
+				String effect = playerModified.getString(CHARM_EFFECTS_KEY + count);
+				MMLog.fine("retrieved nbt " + effect + " " + count);
+
+				String newEffect = effect;
+				if (charmConversionMap.get(effect) != null) {
+					newEffect = charmConversionMap.get(effect);
+					MMLog.fine("changed charm effect from " + effect + " to " + newEffect + " " + count);
+				}
+
+				charmEffectOrder.add(newEffect);
+				count++;
+			}
+
+			// we can't use the previous method because getDouble returns 0.0 for rolls past the end-of-list
+			// which is indistinguishable from a roll that was actually rolled as 0.0.
+			// effects and rolls should always come in the same amount, so this should work instead
+			for (int i = 1; i < count; i++) {
+				charmRollsOrder.add(playerModified.getDouble(CHARM_ROLLS_KEY + i));
+				MMLog.fine("retrieved nbt " + charmRollsOrder.get(i - 1) + " " + i);
+			}
+
+			count = 1;
+			while (playerModified.getString(CHARM_ACTIONS_KEY + count) != null
+				&& !playerModified.getString(CHARM_ACTIONS_KEY + count).isEmpty()) {
+
+				String actionName = playerModified.getString(CHARM_ACTIONS_KEY + count);
+
+				charmActionOrder.add(actionName);
+				MMLog.fine("retrieved nbt " + charmActionOrder.get(count - 1) + " " + count);
+				count++;
+			}
+
+			MMLog.finer("updateCharm final review:");
+			MMLog.finer("charmEffectOrder:");
+			for (String effect : charmEffectOrder) {
+				MMLog.finer(effect);
+			}
+			MMLog.finer("charmRollsOrder:");
+			for (Double roll : charmRollsOrder) {
+				MMLog.finer(roll.toString());
+			}
+			MMLog.finer("charmActionOrder:");
+			for (String action : charmActionOrder) {
+				MMLog.finer(action);
+			}
+
+			try {
+				return generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item);
+			} catch (Exception e) {
+				MMLog.warning("CharmFactory failed to update a charm! Returning the same charm...");
+				ItemUpdateHelper.generateItemStats(item);
+				return item;
+			}
+		}
+		return null;
 	}
 
 	public static ItemStack generateCharm(int level, int power, long seed, @Nullable List<String> effectOrder, @Nullable List<String> actionOrder, @Nullable List<Double> rollsOrder, @Nullable Component fixedName, @Nullable ItemStack oldItem) {
@@ -335,6 +384,51 @@ public class CharmFactory {
 			}
 		}
 
+		// frozen debug: if there are actions that are above the rarity of the charm for some reason, downgrade them
+		if (level < 5) {
+			for (int i = 1; i < activeEffects.size(); i++) {
+				// iterate through each action to make sure they don't exceed the rarity of the charm
+				int index = i;
+				CharmEffectActions action = CharmEffectActions.getEffect(NBT.get(item, nbt -> {
+					ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+					if (playerModified == null) {
+						return null;
+					}
+					return playerModified.getString(CHARM_ACTIONS_KEY + index);
+				}));
+				CharmEffectActions newAction = CharmEffectActions.getActionFromInt(level);
+				if (action == null || newAction == null || action.mIsNegative || action.mRarity <= level) {
+					continue;
+				}
+				MMLog.fine("downgrade to rarity: action " + action.mAction);
+				MMLog.fine("downgrade to rarity: newAction " + newAction.mAction);
+				// check if we have enough budget
+				int budgetDifference = newAction.mBudget - action.mBudget;
+				budget += budgetDifference;
+
+				CharmEffects effect = CharmEffects.getEffect(activeEffects.get(index));
+				if (effect != null && effect.isValidAtLevel(newAction.mRarity)) { // check if valid at the new rarity
+					MMLog.fine("downgrade to rarity: effect " + effect.mAbility);
+					// update the action NBT to the new action
+					NBT.modify(item, nbt -> {
+						ItemStatUtils.addPlayerModified(nbt).setString(CHARM_ACTIONS_KEY + index, newAction.mAction);
+					});
+
+					// update the text to the new stat
+					double roll = NBT.get(item, nbt -> {
+						ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+						if (playerModified == null) {
+							return null;
+						}
+						return playerModified.getDouble(CHARM_ROLLS_KEY + (index + 1));
+					});
+					MMLog.fine("downgrade to rarity: roll " + roll);
+					Component newText = generateCharmText(effect, effect.mRarityValues[newAction.mRarity - 1], roll, newAction.mIsNegative, newAction.mRarity);
+					charmTextLines.set(index, newText);
+				}
+			}
+		}
+
 		// frozen: if we still have budget, attempt to upgrade stats at random to use that budget
 		if (budget > 0) {
 			for (int i = 0; i < 100; i++) {
@@ -345,23 +439,24 @@ public class CharmFactory {
 					if (playerModified == null) {
 						return null;
 					}
-					return playerModified.getString(CharmFactory.CHARM_ACTIONS_KEY + index);
+					return playerModified.getString(CHARM_ACTIONS_KEY + index);
 				}));
 				CharmEffectActions upgraded = CharmEffectActions.upgradeAction(action);
-				if (action == null || upgraded == null) {
+				if (action == null || upgraded == null || upgraded.mRarity > level) {
 					continue;
 				}
-				MMLog.fine("upgrade: action " + action.mAction);
-				MMLog.fine("upgrade: upgraded " + upgraded.mAction);
+
 				// check if we have enough budget
 				int budgetDifference = upgraded.mBudget - action.mBudget;
 				if (budget + budgetDifference < 0) {
 					continue;
 				}
 				budget += budgetDifference;
+				MMLog.fine("upgrade: action " + action.mAction);
+				MMLog.fine("upgrade: upgraded " + upgraded.mAction);
 
 				CharmEffects effect = CharmEffects.getEffect(activeEffects.get(index));
-				if (effect != null && effect.isValidAtLevel(upgraded.mRarity)) { // check if valid at the new rarity
+				if (effect != null && effect.isValidAtLevel(upgraded.mRarity) && effect.isNotRestrictedAtLevel(upgraded.mRarity)) { // check if valid at the new rarity
 					MMLog.fine("upgrade: effect " + effect.mAbility);
 					// update the action NBT to the new action
 					NBT.modify(item, nbt -> {
@@ -374,7 +469,7 @@ public class CharmFactory {
 						if (playerModified == null) {
 							return null;
 						}
-						return playerModified.getDouble(CharmFactory.CHARM_ROLLS_KEY + (index + 1));
+						return playerModified.getDouble(CHARM_ROLLS_KEY + (index + 1));
 					});
 					MMLog.fine("upgrade: roll " + roll);
 					Component newText = generateCharmText(effect, effect.mRarityValues[upgraded.mRarity - 1], roll, upgraded.mIsNegative, upgraded.mRarity);
@@ -441,7 +536,7 @@ public class CharmFactory {
 					if (isNegative && ce.mIsOnlyPositive) {
 						continue;
 					}
-					if (ce.mAbility.equals(ability) && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level)) {
+					if (ce.mAbility.equals(ability) && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level)) {
 						chosenEffect = ce;
 						break;
 					}
@@ -449,7 +544,7 @@ public class CharmFactory {
 			} else if (tree != null) {
 				//We have to pick within the specified tree
 				for (CharmEffects ce : charmEffects) {
-					if (ce.mTree == tree && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && !isNegative) {
+					if (ce.mTree == tree && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level) && !isNegative) {
 						chosenEffect = ce;
 						break;
 					}
@@ -466,7 +561,7 @@ public class CharmFactory {
 					}
 				}
 				for (CharmEffects ce : charmEffects) {
-					if (!effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && !isNegative) {
+					if (!effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level) && !isNegative) {
 						//Skip if it's the first effect of a single ability charm and the ability doesn't support it
 						if (isFirstSingleAbilityCharm && !ce.mInfo.getSingleAbilityCharm()) {
 							continue;
@@ -484,8 +579,6 @@ public class CharmFactory {
 
 
 		if (chosenEffect == null) {
-			return null;
-		} else if (!chosenEffect.isValidAtLevel(level)) {
 			return null;
 		}
 
@@ -599,7 +692,7 @@ public class CharmFactory {
 			// Not a Zenith charm/no rarity
 			return 0;
 		}
-		return playerModified.getInteger(CharmFactory.CHARM_RARITY_KEY);
+		return playerModified.getInteger(CHARM_RARITY_KEY);
 	}
 
 	public static @Nullable Component getZenithCharmRarityComponent(ReadableItemNBT nbt) {
@@ -607,7 +700,7 @@ public class CharmFactory {
 		if (playerModified == null) {
 			return null;
 		}
-		int rarity = playerModified.getInteger(CharmFactory.CHARM_RARITY_KEY);
+		int rarity = playerModified.getInteger(CHARM_RARITY_KEY);
 		if (rarity <= 0 || rarity > 6) {
 			return null;
 		}
@@ -622,11 +715,11 @@ public class CharmFactory {
 
 	public static int getWildcardTreeCap(ReadableItemNBT nbt) {
 		ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
-		if (playerModified == null || !playerModified.hasTag(CharmFactory.CHARM_WILDCARD_TREE_CAP_KEY)) {
+		if (playerModified == null || !playerModified.hasTag(CHARM_WILDCARD_TREE_CAP_KEY)) {
 			// Not a Zenith charm/no rarity
 			return 0;
 		}
-		return playerModified.getInteger(CharmFactory.CHARM_WILDCARD_TREE_CAP_KEY);
+		return playerModified.getInteger(CHARM_WILDCARD_TREE_CAP_KEY);
 	}
 
 }

@@ -54,4 +54,15 @@ public enum CharmEffectActions {
 			default -> null;
 		};
 	}
+
+	public static @Nullable CharmEffectActions getActionFromInt(int level) {
+		return switch (level) {
+			case 1 -> COMMON;
+			case 2 -> UNCOMMON;
+			case 3 -> RARE;
+			case 4 -> EPIC;
+			case 5 -> LEGENDARY;
+			default -> null;
+		};
+	}
 }
