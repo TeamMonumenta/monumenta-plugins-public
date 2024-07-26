@@ -708,7 +708,7 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getDepthsEnabled()) {
 			new DepthsManager(this, getLogger(), getDataFolder() + File.separator + "depths");
 			DepthsCommand.register(this);
-			DepthsGUICommands.register(this);
+			DepthsGUICommands.register();
 		}
 	}
 

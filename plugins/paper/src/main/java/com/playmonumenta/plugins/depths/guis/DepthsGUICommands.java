@@ -13,91 +13,46 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class DepthsGUICommands {
-	public static void register(Plugin plugin) {
-		final String command = "opendepthsgui";
 
-		new CommandAPICommand(command)
-			.withPermission(CommandPermission.fromString("monumenta.command.opendepthsgui"))
-			.withSubcommand(new CommandAPICommand("summary")
-				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
-				.executes((sender, args) -> {
-					Player player = args.getUnchecked("player");
-					summary(player);
+	private static final String COMMAND = "opendepthsgui";
+	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.opendepthsgui");
+	private static final EntitySelectorArgument.OnePlayer playerArg = new EntitySelectorArgument.OnePlayer("player");
+
+	public static void register() {
+		registerCommand("summary", DepthsGUICommands::summary);
+		registerCommand("roomchoice", DepthsGUICommands::roomChoice);
+		registerCommand("upgrade", player -> upgrade(player, false));
+		registerCommand("ability", player -> ability(player, false));
+		registerCommand("weaponaspect", DepthsGUICommands::weaponAspect);
+		registerCommand("removeability", DepthsGUICommands::remove);
+		registerCommand("mutateability", DepthsGUICommands::mutate);
+	}
+
+	private static void registerCommand(String subcommand, Consumer<Player> action) {
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withSubcommand(new CommandAPICommand(subcommand)
+				.executesPlayer((player, args) -> {
+					action.accept(player);
 				}))
-			.withSubcommand(new CommandAPICommand("roomchoice")
-					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
-					.executes((sender, args) -> {
-						Player player = args.getUnchecked("player");
-						roomChoice(plugin, player);
-					}))
-			.withSubcommand(new CommandAPICommand("upgrade")
-					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
-					.executes((sender, args) -> {
-						Player player = args.getUnchecked("player");
-						upgrade(player, false);
-					}))
-			.withSubcommand(new CommandAPICommand("ability")
-					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
-					.executes((sender, args) -> {
-						Player player = args.getUnchecked("player");
-						ability(player, false);
-					}))
-			.withSubcommand(new CommandAPICommand("weaponaspect")
-					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
-					.executes((sender, args) -> {
-						Player player = args.getUnchecked("player");
-						//If the player is not in the system or they already have selected a weapon aspect, return
-						DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
-						if (depthsPlayer == null || depthsPlayer.mHasWeaponAspect) {
-							return;
-						}
+			.register();
 
-						List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = depthsPlayer.mWeaponOfferings;
-
-						if (weapons == null || weapons.size() == 0) {
-							return;
-						}
-
-						new DepthsWeaponAspectGUI(player).openInventory(player, plugin);
-					}))
-			.withSubcommand(new CommandAPICommand("removeability")
-					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
-					.executes((sender, args) -> {
-						Player player = args.getUnchecked("player");
-
-						DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
-						if (depthsPlayer == null || depthsPlayer.mUsedAbilityDeletion) {
-							MessagingUtils.sendActionBarMessage(player, "You've already removed your ability for this floor!");
-							return;
-						}
-						DepthsParty party = DepthsManager.getInstance().getPartyFromId(depthsPlayer);
-						if (party == null) {
-							return;
-						}
-
-						new DepthsRemoveAbilityGUI(player, player.getLocation().getX() < party.mNoPassiveRemoveRoomStartX).openInventory(player, plugin);
-					}))
-			.withSubcommand(new CommandAPICommand("mutateability")
-				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withSubcommand(new CommandAPICommand(subcommand)
+				.withArguments(playerArg)
 				.executes((sender, args) -> {
-					Player player = args.getUnchecked("player");
-
-					DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
-					if (depthsPlayer == null || depthsPlayer.mUsedAbilityMutation) {
-						MessagingUtils.sendActionBarMessage(player, "You've already mutated an ability on this floor!");
-						return;
-					}
-
-					new DepthsMutateAbilityGUI(player).openInventory(player, plugin);
+					Player player = args.getByArgument(playerArg);
+					action.accept(player);
 				}))
 			.register();
 	}
 
-	public static void roomChoice(Plugin plugin, Player player) {
+	public static void roomChoice(Player player) {
 		EnumSet<DepthsRoomType> roomChoices = DepthsManager.getInstance().generateRoomOptions(player);
 
 		if (roomChoices == null) {
@@ -105,7 +60,7 @@ public class DepthsGUICommands {
 			player.closeInventory();
 			return;
 		}
-		new DepthsRoomChoiceGUI(player).openInventory(player, plugin);
+		new DepthsRoomChoiceGUI(player).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
 	}
 
 	public static void upgrade(Player player, boolean fromSummaryGUI) {
@@ -157,5 +112,45 @@ public class DepthsGUICommands {
 			return;
 		}
 		new DepthsSummaryGUI(player).open();
+	}
+
+	public static void weaponAspect(Player player) {
+		//If the player is not in the system or they already have selected a weapon aspect, return
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (depthsPlayer == null || depthsPlayer.mHasWeaponAspect) {
+			return;
+		}
+
+		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = depthsPlayer.mWeaponOfferings;
+
+		if (weapons == null || weapons.isEmpty()) {
+			return;
+		}
+
+		new DepthsWeaponAspectGUI(player).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
+	}
+
+	public static void remove(Player player) {
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (depthsPlayer == null || depthsPlayer.mUsedAbilityDeletion) {
+			MessagingUtils.sendActionBarMessage(player, "You've already removed your ability for this floor!");
+			return;
+		}
+		DepthsParty party = DepthsManager.getInstance().getPartyFromId(depthsPlayer);
+		if (party == null) {
+			return;
+		}
+
+		new DepthsRemoveAbilityGUI(player, player.getLocation().getX() < party.mNoPassiveRemoveRoomStartX).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
+	}
+
+	public static void mutate(Player player) {
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (depthsPlayer == null || depthsPlayer.mUsedAbilityMutation) {
+			MessagingUtils.sendActionBarMessage(player, "You've already mutated an ability on this floor!");
+			return;
+		}
+
+		new DepthsMutateAbilityGUI(player).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
 	}
 }
