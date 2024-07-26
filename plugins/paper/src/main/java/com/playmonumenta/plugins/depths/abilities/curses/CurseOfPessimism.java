@@ -43,9 +43,7 @@ public class CurseOfPessimism extends DepthsAbility {
 		if (party == null) {
 			return;
 		}
-		if (party.getPlayers().stream().filter(Objects::nonNull).filter(p -> p != mPlayer).anyMatch(p -> p.getHealth() < HEALTH_THRESHOLD * EntityUtils.getMaxHealth(p))) {
-			mActive = true;
-		}
+		mActive = party.getPlayers().stream().filter(Objects::nonNull).filter(p -> p != mPlayer).anyMatch(p -> p.getHealth() < HEALTH_THRESHOLD * EntityUtils.getMaxHealth(p));
 
 		if (wasActive != mActive) {
 			ClientModHandler.updateAbility(mPlayer, this);
