@@ -546,7 +546,7 @@ public class DepthsListener implements Listener {
 		double power = 1;
 		int charityLevel = dp.mAbilities.getOrDefault(Charity.ABILITY_NAME, 0);
 		if (charityLevel > 0) {
-			power = Charity.REVIVE_POWER[charityLevel];
+			power = Charity.REVIVE_POWER[charityLevel - 1];
 		}
 		return power;
 	}
