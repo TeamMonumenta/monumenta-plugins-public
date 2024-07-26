@@ -75,7 +75,7 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
-		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
+		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.1f, 2.0f);
 		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorSpeed).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
@@ -93,7 +93,7 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
-		player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_SNIFF, SoundCategory.PLAYERS, 1.3f, 1.8f);
+		player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_SNIFF, SoundCategory.PLAYERS, 1.4f, 1.8f);
 		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorStrength).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
@@ -111,7 +111,7 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
-		player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, SoundCategory.PLAYERS, 1.8f, 0.9f);
+		player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, SoundCategory.PLAYERS, 2.0f, 0.9f);
 		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorResistance).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
@@ -129,7 +129,7 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 		Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
 		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
-		player.playSound(player.getLocation(), Sound.ENTITY_STRIDER_HAPPY, SoundCategory.PLAYERS, 1.5f, 1.0f);
+		player.playSound(player.getLocation(), Sound.ENTITY_STRIDER_HAPPY, SoundCategory.PLAYERS, 1.8f, 1.0f);
 		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorAbsorption).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
 		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
@@ -141,7 +141,7 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 	@Override
 	public void enhanceCDR(Player player) {
 		Location loc = player.getLocation();
-		player.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.PLAYERS, 0.9f, 1.75f);
+		player.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.PLAYERS, 1.0f, 1.75f);
 	}
 
 	private void createOrb(Vector dir, Location loc, Player player, LivingEntity target, Particle.DustOptions color) {

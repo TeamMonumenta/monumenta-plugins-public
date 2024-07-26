@@ -116,7 +116,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 				if (isEnhanced()) {
 					for (Player player : mCleansedPlayers) {
 						if (!rainPlayers.contains(player) && player != mPlayer) {
-							mCosmetic.rainEnhancement(mPlayer, smallRatio, mRadius);
+							mCosmetic.rainEnhancement(player, smallRatio, mRadius);
 						}
 
 						PotionUtils.clearNegatives(mPlugin, player);

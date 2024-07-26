@@ -1,14 +1,9 @@
 package com.playmonumenta.plugins.cosmetics.skills.cleric;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,8 +39,8 @@ public class ContortingBoltCS extends HandOfLightCS {
 		return NAME;
 	}
 
-	private static final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 180, 200), 1.1f);
-	private static final Particle.DustOptions PINK = new Particle.DustOptions(Color.fromRGB(200, 100, 200), 1.1f);
+	private static final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 220, 220), 1.2f);
+	private static final Particle.DustOptions PINK = new Particle.DustOptions(Color.fromRGB(255, 200, 200), 1.2f);
 
 	@Override
 	public void lightHealEffect(Player player, Location loc, Player mTarget) {
@@ -62,37 +57,24 @@ public class ContortingBoltCS extends HandOfLightCS {
 			case 4 -> delay = 2;
 			default -> delay = 1;
 		}
+		players.add(player);
+		Vector dir = player.getEyeLocation().getDirection();
+		createOrb(dir, LocationUtils.getHalfHeightLocation(player), player, players.get(0), PINK, Particle.CRIT, radius);
+		world.playSound(userLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.2f, 0.9f);
+		world.playSound(userLoc, Sound.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 2f);
+		world.playSound(userLoc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1.2f, 2f);
 		new BukkitRunnable() {
-			int NUMBER = -1;
+			int mInt = 0;
 			@Override
 			public void run() {
-				LivingEntity target = players.get(NUMBER + 1);
-				if (NUMBER == -1) {
-					// Chain from caster to first player
-					new PPLine(Particle.REDSTONE, player.getLocation().add(0, 1, 0), players.get(0).getEyeLocation().add(0, -0.5, 0), 0.1).countPerMeter(12).groupingDistance(0).data(PINK).spawnAsPlayerActive(player);
-					new PartialParticle(Particle.HEART, players.get(0).getEyeLocation().add(0, -0.5, 0)).count(12).delta(0.4, 0.8, 0.4).spawnAsPlayerActive(player);
-					player.getWorld().playSound(players.get(0).getLocation(), Sound.BLOCK_SHROOMLIGHT_STEP, SoundCategory.PLAYERS, 1.0f + 0.5f / players.size(), 1.6f);
-					player.getWorld().playSound(players.get(0).getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.4f + 0.5f / players.size(), 1.0f);
-				} else if (NUMBER < players.size() - 1) {
-					// Chain from player to player
-					new PPLine(Particle.REDSTONE, players.get(NUMBER).getEyeLocation().add(0, -0.5, 0), target.getEyeLocation().add(0, -0.5, 0), 0.1).countPerMeter(12).groupingDistance(0).data(PINK).spawnAsPlayerActive(player);
-					new PartialParticle(Particle.HEART, target.getEyeLocation().add(0, -0.5, 0)).count(12).delta(0.4, 0.8, 0.4).spawnAsPlayerActive(player);
-					player.getWorld().playSound(target.getLocation(), Sound.BLOCK_SHROOMLIGHT_STEP, SoundCategory.PLAYERS, 1.0f + 0.5f / players.size(), 1.5f);
-					player.getWorld().playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.4f + 0.5f / players.size(), 0.9f);
+				if (mInt < players.size()) {
+					createOrb(dir, LocationUtils.getHalfHeightLocation(players.get(mInt)), player, players.get(mInt + 1), PINK, Particle.CRIT, radius);
+				} else {
+					this.cancel();
 				}
-				if (NUMBER == players.size() - 2) {
-					// Chain from last player to caster
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-						new PPLine(Particle.REDSTONE, player.getLocation().add(0, 1, 0), players.get(NUMBER).getEyeLocation().add(0, -0.5, 0), 0.1).countPerMeter(12).groupingDistance(0).data(PINK).spawnAsPlayerActive(player);
-						new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0)).count(8).delta(0.6, 1.0, 0.6).spawnAsPlayerActive(player);
-						player.getWorld().playSound(player.getLocation().add(0, 1, 0), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.9f, 2.0f);
-						player.getWorld().playSound(player.getLocation().add(0, 1, 0), Sound.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 1.5f, 1.0f);
-						this.cancel();
-					}, delay);
-				}
-				NUMBER++;
+				mInt++;
 			}
-		}.runTaskTimer(Plugin.getInstance(), 0, delay);
+		}.runTaskTimer(Plugin.getInstance(), delay, delay);
 	}
 
 	@Override
@@ -110,60 +92,65 @@ public class ContortingBoltCS extends HandOfLightCS {
 			case 4 -> delay = 2;
 			default -> delay = 1;
 		}
+		mobs.add(player);
+		Vector dir = player.getEyeLocation().getDirection();
+		createOrb(dir, LocationUtils.getHalfHeightLocation(player), player, mobs.get(0), CYAN, Particle.CRIT_MAGIC, radius);
+		world.playSound(userLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.2f, 0.9f);
+		world.playSound(userLoc, Sound.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 2f);
+		world.playSound(userLoc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1.2f, 2f);
 		new BukkitRunnable() {
-			int mInt = -1;
+			int mInt = 0;
 			@Override
 			public void run() {
-				LivingEntity target = mobs.get(mInt + 1);
-				if (mInt == -1) {
-					// Chain from caster to first mob
-					new PPLine(Particle.REDSTONE, player.getLocation().add(0, 1, 0), mobs.get(0).getEyeLocation().add(0, -0.5, 0), 0.1).countPerMeter(12).groupingDistance(0).data(CYAN).spawnAsPlayerActive(player);
-					new PartialParticle(Particle.ELECTRIC_SPARK, mobs.get(0).getEyeLocation().add(0, -0.5, 0)).count(12).delta(0.4, 0.8, 0.4).spawnAsPlayerActive(player);
-					player.getWorld().playSound(mobs.get(0).getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1.0f + 0.5f / mobs.size(), 1.6f);
-					player.getWorld().playSound(mobs.get(0).getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.4f + 0.5f / mobs.size(), 1.0f);
-					player.getWorld().playSound(mobs.get(0).getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.PLAYERS, 1.2f + 0.5f / mobs.size(), 1.1f);
-					// Hieroglyph for "Pierce"
-					Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
-					Vector front = player.getEyeLocation().getDirection().setY(0).normalize();
-					Vector left90 = VectorUtils.rotateTargetDirection(front, -90, 0);
-					Vector right90 = VectorUtils.rotateTargetDirection(front, 90, 0);
-					Location loc1 = loc.clone().add(left90);
-					Location loc2 = loc.clone().add(right90);
-					for (int i = 0; i < 2; i++) {
-						double delta = 0.1 * i;
-						final Particle.DustOptions BLUE = new Particle.DustOptions(Color.fromRGB(50 - 10 * i, 100 - 20 * i, 200 - 40 * i), 1.2f - i * 0.2f);
-						new PPLine(Particle.REDSTONE, loc.clone().add(front.clone().multiply(0.5)), loc.clone().subtract(front.clone().multiply(2))).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc.clone().add(front.clone().multiply(0.5)), loc1).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc.clone().add(front.clone().multiply(0.5)), loc2).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc.clone().add(front.clone().multiply(2)), loc1.clone().add(front.clone().multiply(1.5))).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc.clone().add(front.clone().multiply(2)), loc2.clone().add(front.clone().multiply(1.5))).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc1, loc1.clone().add(front.clone().multiply(1.5))).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc2, loc2.clone().add(front.clone().multiply(1.5))).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc.clone().add(front).add(left90), loc.clone().add(front).add(left90.clone().multiply(1.7))).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-						new PPLine(Particle.REDSTONE, loc.clone().add(front).add(right90), loc.clone().add(front).add(right90.clone().multiply(1.7))).data(BLUE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-					}
-					new PPCircle(Particle.ENCHANTMENT_TABLE, loc, 2).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
-						.directionalMode(true).delta(1, 0.2, -4).rotateDelta(true).spawnAsPlayerActive(player);
-				} else if (mInt < mobs.size() - 1) {
-					// Chain from mob to mob
-					new PPLine(Particle.REDSTONE, mobs.get(mInt).getEyeLocation().add(0, -0.5, 0), target.getEyeLocation().add(0, -0.5, 0), 0.1).countPerMeter(12).groupingDistance(0).data(CYAN).spawnAsPlayerActive(player);
-					new PartialParticle(Particle.ELECTRIC_SPARK, target.getEyeLocation().add(0, -0.5, 0)).count(12).delta(0.4, 0.8, 0.4).spawnAsPlayerActive(player);
-					player.getWorld().playSound(target.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1.0f + 0.5f / mobs.size(), 1.5f);
-					player.getWorld().playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.4f + 0.5f / mobs.size(), 0.9f);
-					player.getWorld().playSound(target.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.PLAYERS, 1.2f + 0.5f / mobs.size(), 1.0f);
-				}
-				if (mInt == mobs.size() - 2) {
-					// Chain from last mob to caster
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-						new PPLine(Particle.REDSTONE, player.getLocation().add(0, 1, 0), mobs.get(mInt).getEyeLocation().add(0, -0.5, 0), 0.1).countPerMeter(12).groupingDistance(0).data(CYAN).spawnAsPlayerActive(player);
-						new PartialParticle(Particle.END_ROD, player.getLocation().add(0, 1, 0)).count(8).delta(0.6, 1.0, 0.6).spawnAsPlayerActive(player);
-						player.getWorld().playSound(player.getLocation().add(0, 1, 0), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.9f, 1.6f);
-						player.getWorld().playSound(player.getLocation().add(0, 1, 0), Sound.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 1.5f, 0.8f);
-						this.cancel();
-						}, delay);
+				if (mInt < mobs.size() - 1) {
+					createOrb(dir, LocationUtils.getHalfHeightLocation(mobs.get(mInt)), player, mobs.get(mInt + 1), CYAN, Particle.CRIT_MAGIC, radius);
+				} else {
+					this.cancel();
 				}
 				mInt++;
 			}
-		}.runTaskTimer(Plugin.getInstance(), 0, delay);
+		}.runTaskTimer(Plugin.getInstance(), delay, delay);
+	}
+
+	private void createOrb(Vector dir, Location loc, Player player, LivingEntity target, Particle.DustOptions color, Particle chainParticle, double radius) {
+		World world = loc.getWorld();
+		int mT = 0;
+		double mArcCurve = 0;
+		for (int i = 0; i < 10 * radius; i++) {
+			mT++;
+			Location to = LocationUtils.getHalfHeightLocation(target);
+
+			mArcCurve += 0.005;
+			dir.add(LocationUtils.getDirectionTo(to, loc).multiply(mArcCurve));
+
+			if (dir.length() > 0.2) {
+				dir.normalize().multiply(0.2);
+			}
+
+			loc.add(dir);
+			new PartialParticle(Particle.REDSTONE, loc, 2, 0.1, 0.1, 0.1).data(color).spawnAsPlayerActive(player);
+			new PartialParticle(chainParticle, loc.clone().add(0, 0.1, 0), 2, 0.1, 0.1, 0.1).spawnAsPlayerActive(player);
+
+			if (mT > 5 && loc.distance(to) < 0.35) {
+				if (target != player) {
+					if (target instanceof Player) {
+						new PartialParticle(Particle.HEART, target.getEyeLocation().add(0, -0.5, 0)).count(8).delta(0.4, 0.8, 0.4).spawnAsPlayerActive(player);
+						world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.5f, 1.3f);
+						world.playSound(target.getLocation(), Sound.BLOCK_SHROOMLIGHT_STEP, SoundCategory.PLAYERS, 1.6f, 1.2f);
+						world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.6f, 0.9f);
+					} else {
+						new PartialParticle(Particle.BUBBLE_POP, to).count(12).delta(0.3, 0.6, 0.3).spawnAsPlayerActive(player);
+						world.playSound(target.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1.2f, 1.6f);
+						world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.6f, 0.9f);
+						world.playSound(target.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.PLAYERS, 1.4f, 1.0f);
+					}
+				} else {
+					new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0)).count(8).delta(0.6, 1.0, 0.6).spawnAsPlayerActive(player);
+					world.playSound(player.getLocation().add(0, 1, 0), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.8f, 1.7f);
+					world.playSound(player.getLocation().add(0, 1, 0), Sound.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 1.9f, 0.8f);
+				}
+				break;
+			}
+		}
 	}
 }

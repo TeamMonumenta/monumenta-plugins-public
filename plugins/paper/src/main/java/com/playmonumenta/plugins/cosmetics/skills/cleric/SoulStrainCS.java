@@ -50,7 +50,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 		return NAME;
 	}
 
-	private static final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 235, 235), 0.75f);
+	private static final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 235, 235), 0.8f);
 	private static final double[] ANGLE = {200, -22.5, -95};
 
 	@Override
@@ -70,7 +70,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 
 	@Override
 	public void justiceAshPickUp(Player player, Location loc) {
-		player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1f, 1.3f);
+		player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1f, 1.4f);
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.8f, 2f);
 
 		Location particleLocation = loc.add(0, 0.2, 0);
@@ -85,7 +85,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 		world.playSound(enemyLoc, Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.PLAYERS, 1.6f, 0.8f);
 		world.playSound(enemyLoc, Sound.BLOCK_SHROOMLIGHT_FALL, SoundCategory.PLAYERS, 1.7f, 0.7f);
 		world.playSound(enemyLoc, Sound.BLOCK_SCULK_BREAK, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.1f, 0.8f);
+		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 		new PartialParticle(Particle.SCULK_CHARGE_POP, LocationUtils.getHalfHeightLocation(enemy), 20, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.GLOW, LocationUtils.getHalfHeightLocation(enemy), 12, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
 		enemyLoc.setDirection(dir);
@@ -124,7 +124,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 	@Override
 	public void justiceKill(Player player, Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_WARDEN_LISTENING_ANGRY, SoundCategory.PLAYERS, 1.2f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_WARDEN_LISTENING_ANGRY, SoundCategory.PLAYERS, 1.25f, 1.2f);
 		new PartialParticle(Particle.SOUL, loc, 20, 0.5, 0.8, 0.5, 0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SHRIEK, loc.clone().add(0, 1.5, 0), 3, 0.0, 0.0, 0.0, 0.0).data(0).spawnAsPlayerActive(player);
 	}

@@ -102,7 +102,7 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 						(Location lineLoc, double middleProgress, double endProgress, boolean middle) ->
 							new PartialParticle(Particle.REDSTONE, lineLoc, 1, 0.0, 0.0, 0.0, 0.0).data(colorTransition).spawnAsPlayerActive(player));
 				}
-				new PartialParticle(Particle.SWEEP_ATTACK, loc, 2, 1.35f, 1.8f, 1.35f, 0.3).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 1.35f, 1.8f, 1.35f, 0.3).spawnAsPlayerActive(player);
 				world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1.75f, 0.8f);
 				mTicks++;
 				if (mTicks > 5) {

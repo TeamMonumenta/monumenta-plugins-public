@@ -49,10 +49,10 @@ public class AnimatingAuraCS extends ThuribleProcessionCS {
 	public void endBuildupEffect(Player player) {
 		Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
 		World world = player.getWorld();
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1.2f, 1.1f);
-		world.playSound(loc, Sound.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, SoundCategory.PLAYERS, 1.3f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1.4f, 0.8f);
-		world.playSound(loc, Sound.BLOCK_CONDUIT_DEACTIVATE, SoundCategory.PLAYERS, 0.75f, 0.9f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1.35f, 1.1f);
+		world.playSound(loc, Sound.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, SoundCategory.PLAYERS, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1.6f, 0.8f);
+		world.playSound(loc, Sound.BLOCK_CONDUIT_DEACTIVATE, SoundCategory.PLAYERS, 0.85f, 0.9f);
 		new PartialParticle(Particle.SPELL_INSTANT, loc, 75, 1, 1, 1, 0.5).spawnAsPlayerActive(player);
 		// Hieroglyph for "Blessing"
 		Vector front = loc.getDirection().clone().setY(0).normalize().multiply(4);

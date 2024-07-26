@@ -69,10 +69,9 @@ public class AwakeningCS extends CelestialBlessingCS {
 	@Override
 	public void startEffectTargets(Player player) {
 		Location locPlayer = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
-		World world = player.getWorld();
-		world.playSound(locPlayer, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.3f, 0.7f);
-		world.playSound(locPlayer, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.3f, 0.6f);
-		world.playSound(locPlayer, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 1.1f);
+		player.playSound(locPlayer, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.3f, 0.7f);
+		player.playSound(locPlayer, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.3f, 0.6f);
+		player.playSound(locPlayer, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 1.1f);
 		// Hieroglyph for "Mind"
 		Vector front = locPlayer.getDirection().setY(0).normalize().multiply(3);
 		Vector left = VectorUtils.rotateTargetDirection(front, -120, 0);

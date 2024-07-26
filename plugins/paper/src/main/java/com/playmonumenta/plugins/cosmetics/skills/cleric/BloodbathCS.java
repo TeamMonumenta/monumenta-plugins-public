@@ -44,7 +44,7 @@ public class BloodbathCS extends IlluminateCS {
 		return NAME;
 	}
 
-	Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(160, 0, 20), 1.1f);
+	Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(160, 20, 20), 1.1f);
 	private int mProjectileTransition = 0;
 
 	@Override
@@ -119,7 +119,7 @@ public class BloodbathCS extends IlluminateCS {
 		new PartialParticle(Particle.FALLING_DUST, loc, 80, 2.25, 2.25, 2.25, 0.5, Material.NETHER_WART_BLOCK.createBlockData()).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.LAVA, loc, 18, 1.25, 1.5, 1.25, 0.5).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 2, 2, 2, 0.5).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 4, 2, 2, 2, 0.5).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, loc, 50, 0.5f, 0.75f, 0.5f, 1.0).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.5f, 1.4f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1.3f, 0.6f);
@@ -181,8 +181,8 @@ public class BloodbathCS extends IlluminateCS {
 			new PartialParticle(Particle.CRIMSON_SPORE, loc, 1, 0.5 * radius, 0, 0.5 * radius, 0).spawnAsPlayerActive(player);
 			if (ticks % 2 == 0 && ticks % 20 < 10) {
 				double pulseRadius = radius / 10 * (ticks % 10 + 1);
-				final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(200 - 10 * (ticks % 10), 0, 20), 1.2f);
-				new PPCircle(Particle.REDSTONE, loc, pulseRadius).countPerMeter(10).delta(0.15).rotateDelta(true).data(RED).spawnAsPlayerActive(player);
+				final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(240 - 16 * (ticks % 10), 20, 20), 1.0f);
+				new PPCircle(Particle.REDSTONE, loc, pulseRadius).countPerMeter(10).delta(0.07).data(RED).spawnAsPlayerActive(player);
 			}
 		}
 	}
