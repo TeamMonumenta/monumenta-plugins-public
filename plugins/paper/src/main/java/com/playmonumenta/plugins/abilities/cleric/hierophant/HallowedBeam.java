@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -78,16 +79,27 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.scoreboardId("HallowedBeam")
 			.shorthandName("HB")
 			.descriptions(
-				"Left-click with a projectile weapon while looking directly at a player or mob to shoot a beam of light. " +
-					"If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. " +
-					"If aimed at an Undead, it instantly deals magic damage equal to your projectile damage to the target, and stuns them for one second. " +
-					"If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. " +
+				("Left-click with a projectile weapon while looking directly at a player or mob within %s blocks to shoot a beam of light. " +
+					"If aimed at a player, the beam instantly heals them for %s%% of their max health, knocking back enemies within %s blocks. " +
+					"If aimed at an Undead, it instantly deals magic damage equal to your projectile damage to the target, and stuns them for %ss. " +
+					"If aimed at a non-undead mob, it instantly stuns them for %ss. %s charges. " +
 					"Swap hands while holding a projectile weapon will change the mode of Hallowed Beam between 'Default' (default), " +
 					"'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). " +
-					"This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.",
-				"Hallowed Beam gains a third charge (and can apply Recoil three times before touching the ground), " +
-					"the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.")
-			.simpleDescription("Heal the targeted player, damage the targeted Undead, or stun the targeted non-Undead.")
+					"This skill can only apply Recoil twice before touching the ground. Cooldown: %ss each charge.")
+					.formatted((long) CAST_RANGE,
+						StringUtils.multiplierToPercentage(HALLOWED_HEAL_PERCENT),
+						(long) HALLOWED_RADIUS,
+						StringUtils.ticksToSeconds(HALLOWED_UNDEAD_STUN),
+						StringUtils.ticksToSeconds(HALLOWED_LIVING_STUN),
+						(long) HALLOWED_1_MAX_CHARGES,
+						StringUtils.ticksToSeconds(HALLOWED_1_COOLDOWN)),
+				("Hallowed Beam has %s charges (and can apply Recoil three times before touching the ground), " +
+					"the cooldown is reduced to %ss, and players healed by it gain +%s damage resistance for %ss.")
+					.formatted((long) HALLOWED_2_MAX_CHARGES,
+						StringUtils.ticksToSeconds(HALLOWED_2_COOLDOWN),
+						StringUtils.multiplierToPercentageWithSign(Math.abs(HALLOWED_DAMAGE_REDUCTION_PERCENT)),
+						StringUtils.ticksToSeconds(HALLOWED_DAMAGE_REDUCTION_DURATION)))
+			.simpleDescription("Heal a targeted player, damage a targeted Undead, or stun a targeted non-Undead from a distance.")
 			.cooldown(HALLOWED_1_COOLDOWN, HALLOWED_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HallowedBeam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
@@ -201,8 +213,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 					double damage = ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
 					damage += Sniper.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.SNIPER));
 					damage += PointBlank.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.POINT_BLANK));
-					// Must be multiplicative since getAttributeAmount returns the attribute as a decimal
-					damage *= mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
+					// Hallowed Beam has special case for proj damage scaling in ProjectileDamageMultiply. See AbilityUtils for more info
 					damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 					DamageUtils.damage(mPlayer, targetedEntity, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 
