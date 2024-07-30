@@ -763,10 +763,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			@Override
 			public void run() {
 				Objects.requireNonNull(mBoss.getEquipment()).clear();
-				List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
-				for (Player p : players) {
-					p.removePotionEffect(PotionEffectType.GLOWING);
-				}
 				new BukkitRunnable() {
 					int mT = 0;
 
