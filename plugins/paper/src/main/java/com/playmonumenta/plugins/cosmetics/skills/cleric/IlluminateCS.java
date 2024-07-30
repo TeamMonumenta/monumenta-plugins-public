@@ -7,7 +7,13 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -65,10 +71,13 @@ public class IlluminateCS implements CosmeticSkill {
 		vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 90);
 		vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
-		PPLine line1 = new PPLine(Particle.REDSTONE, loc.clone().add(vec), increment, radius).data(ORANGE_SMALL);
-		PPLine line2 = new PPLine(Particle.REDSTONE, loc.clone().subtract(vec), increment, radius).data(ORANGE_SMALL);
-		line1.delta(0.05).shift(-radius * 0.5).offset(Math.random()).count(1).spawnAsPlayerActive(player);
-		line2.delta(0.05).shift(-radius * 0.5).offset(Math.random()).count(1).spawnAsPlayerActive(player);
+		if (ticks % 2 == 0) {
+			double length = increment.length();
+			PPLine line1 = new PPLine(Particle.REDSTONE, loc.clone().add(vec), increment, length).data(ORANGE_SMALL);
+			PPLine line2 = new PPLine(Particle.REDSTONE, loc.clone().subtract(vec), increment, length).data(ORANGE_SMALL);
+			line1.delta(0.05).offset(Math.random()).count(1).minimumCount(0).spawnAsPlayerActive(player);
+			line2.delta(0.05).offset(Math.random()).count(1).minimumCount(0).spawnAsPlayerActive(player);
+		}
 
 
 		if ((ticks != 0 && ticks % 40 == 0) || ticks == maxTicks - 1) {

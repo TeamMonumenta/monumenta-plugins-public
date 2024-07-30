@@ -84,10 +84,13 @@ public class BloodbathCS extends IlluminateCS {
 		vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 90);
 		vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
-		PPLine line1a = new PPLine(Particle.REDSTONE, loc.clone().add(vec), increment, radius).data(RED);
-		PPLine line2a = new PPLine(Particle.REDSTONE, loc.clone().subtract(vec), increment, radius).data(RED);
-		line1a.delta(0.05).shift(-radius * 0.5).offset(Math.random()).count(1).spawnAsPlayerActive(player);
-		line2a.delta(0.05).shift(-radius * 0.5).offset(Math.random()).count(1).spawnAsPlayerActive(player);
+		if (ticks % 2 == 0) {
+			double length = increment.length();
+			PPLine line1a = new PPLine(Particle.REDSTONE, loc.clone().add(vec), increment, length).data(RED);
+			PPLine line2a = new PPLine(Particle.REDSTONE, loc.clone().subtract(vec), increment, length).data(RED);
+			line1a.delta(0.05).offset(Math.random()).count(1).minimumCount(0).spawnAsPlayerActive(player);
+			line2a.delta(0.05).offset(Math.random()).count(1).minimumCount(0).spawnAsPlayerActive(player);
+		}
 
 		if ((ticks != 0 && ticks % 40 == 0) || ticks == maxTicks - 1) {
 			Location spark1 = loc.clone().add(vec);
