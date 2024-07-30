@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.WalletUtils;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -59,8 +61,9 @@ class VanityBuyScreen extends Gui {
 			ItemStack confirm = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 			ItemMeta meta = confirm.getItemMeta();
 			meta.displayName(Component.text("Confirm", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(getTwistedStrandStack(), mPlayer, true);
 			meta.lore(List.of(Component.text("Pay " + VanityGUI.STRAND_COST_PER_VANITY_UNLOCK + " Twisted Strands to unlock", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
-				Component.text("this item for vanity use.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
+				Component.text("this item for vanity use (" + (debt.mNumInWallet + debt.mNumInInventory) + " owned).", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
 				Component.text("All items of the same type as this item", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("(base material + name) will permanently be", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("unlocked for you for use as vanity.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
@@ -80,24 +83,26 @@ class VanityBuyScreen extends Gui {
 	}
 
 	private void confirm() {
-		if (mTwistedStrand == null) {
-			mTwistedStrand = InventoryUtils.getItemFromLootTable(mPlayer, TWISTED_STRAND_LOOT_TABLE);
-		}
-		if (!mPlayer.getInventory().containsAtLeast(mTwistedStrand, VanityGUI.STRAND_COST_PER_VANITY_UNLOCK)) {
+		if (WalletUtils.tryToPayFromInventoryAndWallet(mPlayer, getTwistedStrandStack())) {
+			mPlugin.mVanityManager.unlockVanity(mPlayer, mItem);
+			EquipmentSlot slot = ItemUtils.getEquipmentSlot(mItem);
+			if (slot == EquipmentSlot.HAND) {
+				slot = EquipmentSlot.OFF_HAND;
+			}
+			mPlugin.mVanityManager.getData(mPlayer).equip(slot, mItem, null);
+		} else {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 			mPlayer.sendMessage(Component.text("You don't have enough Twisted Strands to pay for this!", NamedTextColor.RED));
-			close();
-			return;
 		}
-		mTwistedStrand.setAmount(VanityGUI.STRAND_COST_PER_VANITY_UNLOCK);
-		mPlayer.getInventory().removeItem(mTwistedStrand);
-		mPlugin.mVanityManager.unlockVanity(mPlayer, mItem);
-		EquipmentSlot slot = ItemUtils.getEquipmentSlot(mItem);
-		if (slot == EquipmentSlot.HAND) {
-			slot = EquipmentSlot.OFF_HAND;
-		}
-		mPlugin.mVanityManager.getData(mPlayer).equip(slot, mItem, null);
 		close();
+	}
+
+	private ItemStack getTwistedStrandStack() {
+		if (mTwistedStrand == null) {
+			mTwistedStrand = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(mPlayer, TWISTED_STRAND_LOOT_TABLE));
+			mTwistedStrand.setAmount(VanityGUI.STRAND_COST_PER_VANITY_UNLOCK);
+		}
+		return mTwistedStrand;
 	}
 
 	@Override
