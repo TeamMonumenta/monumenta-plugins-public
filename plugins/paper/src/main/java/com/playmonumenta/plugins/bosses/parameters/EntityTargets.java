@@ -364,7 +364,10 @@ public class EntityTargets implements Cloneable {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
-						return (int) (loc.distance(((Entity)e1).getLocation()) - loc.distance(((Entity)e2).getLocation()));
+						return Double.compare(
+							loc.distance(e1.getLocation()),
+							loc.distance(e2.getLocation())
+						);
 					});
 				}
 			},
@@ -372,7 +375,10 @@ public class EntityTargets implements Cloneable {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
-						return (int) ((loc.distance(((Entity)e1).getLocation()) - loc.distance(((Entity)e2).getLocation())) * -1);
+						return Double.compare(
+							loc.distance(e2.getLocation()),
+							loc.distance(e1.getLocation())
+						);
 					});
 				}
 			},
@@ -380,10 +386,17 @@ public class EntityTargets implements Cloneable {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
-						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
-							return (int) (((LivingEntity)e1).getHealth() - ((LivingEntity)e2).getHealth());
+						// Entities with no health are counted as 0 health,
+						// for satisfying comparator contract.
+						double e1Health = 0;
+						double e2Health = 0;
+						if (e1 instanceof LivingEntity livingE1) {
+							e1Health = livingE1.getHealth();
 						}
-						return 0;
+						if (e2 instanceof LivingEntity livingE2) {
+							e2Health = livingE2.getHealth();
+						}
+						return Double.compare(e1Health, e2Health);
 					});
 				}
 			},
@@ -391,10 +404,17 @@ public class EntityTargets implements Cloneable {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
-						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
-							return (int) ((((LivingEntity) e1).getHealth() - ((LivingEntity) e2).getHealth()) * -1);
+						// Entities with no health are counted as 0 health,
+						// for satisfying comparator contract.
+						double e1Health = 0;
+						double e2Health = 0;
+						if (e1 instanceof LivingEntity livingE1) {
+							e1Health = livingE1.getHealth();
 						}
-						return 0;
+						if (e2 instanceof LivingEntity livingE2) {
+							e2Health = livingE2.getHealth();
+						}
+						return Double.compare(e2Health, e1Health);
 					});
 				}
 			};
