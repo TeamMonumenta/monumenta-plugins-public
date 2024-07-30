@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -21,6 +22,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -102,7 +105,11 @@ public class Shattered implements Infusion {
 		if (oneHz) {
 			int shatterLevel = getShatteredLevelsEquipped(player);
 			if (shatterLevel > 0 && !plugin.mEffectManager.hasEffect(player, RespawnStasis.class) && !ScoreboardUtils.checkTag(player, MESSAGE_DISABLE_TAG)) {
-				MessagingUtils.sendActionBarMessage(player, "Your armor, offhand, or held item are Shattered!", NamedTextColor.RED);
+				if (DateUtils.getSecond() % 12 < 6) {
+					MessagingUtils.sendActionBarMessage(player, "Some of your gear is Shattered, giving you " + (hasMaxShatteredItemEquipped(player) ? "Mining Fatigue and " : "") + getMultiplier(shatterLevel) * 100 + "% Weakness and Vulnerability!", NamedTextColor.RED);
+				} else {
+					MessagingUtils.sendActionBarMessage(player, "Retrieve a Grave, or use Repair Anvils to remove Shattered.", NamedTextColor.RED);
+				}
 			}
 			updateEffects(plugin, player, shatterLevel);
 		}
@@ -173,7 +180,8 @@ public class Shattered implements Infusion {
 	 */
 	public static boolean unshatterOneLevel(ItemStack item) {
 		int oldLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
-		if (oldLevel <= 0) {
+		ItemMeta meta = item.getItemMeta();
+		if (oldLevel <= 0 || (meta instanceof Damageable damageableMeta && damageableMeta.getDamage() == item.getType().getMaxDurability())) {
 			return false;
 		}
 		if (oldLevel == 1) {
