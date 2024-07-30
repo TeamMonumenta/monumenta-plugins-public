@@ -135,6 +135,23 @@ public class MonumentaNetworkChatIntegration {
 		NetworkChatPlugin.getReplacementsManagerInstance().mReplacements.add(new CharmsHover());
 	}
 
+	public static void setPauseChat(Player player, boolean pause) {
+		if (!ENABLED) {
+			return;
+		}
+
+		PlayerState playerState = PlayerStateManager.getPlayerState(player);
+		if (playerState == null) {
+			return;
+		}
+
+		if (pause) {
+			playerState.pauseChat();
+		} else {
+			playerState.unpauseChat();
+		}
+	}
+
 	public static void refreshPlayer(Player player) {
 		if (!ENABLED) {
 			return;
