@@ -315,6 +315,39 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
+				new LiteralArgument("tellspawner"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				new FloatArgument("percentage", 0, 100),
+				new GreedyStringArgument("message")
+			).executes((commandSender, args) -> {
+				Player player = args.getUnchecked("player");
+				float percentage = args.getUnchecked("percentage");
+				World world = player.getWorld();
+				int broken = DelvesManager.getSpawnersBroken(world);
+				int total = DelvesManager.getSpawnersTotal(world);
+				int required = (int) Math.ceil((percentage / 100.0) * total);
+				if (broken < 0) {
+					broken = 0;
+				}
+				if (total < 0) {
+					player.sendMessage(
+						Component.text("Failed to count total spawners. Please report this as a bug! (" + broken + " broken)")
+								 .color(NamedTextColor.RED)
+					);
+					return;
+				}
+				String message = args.getUnchecked("message");
+				player.sendMessage(
+					Component.text(message)
+							 .color(NamedTextColor.RED)
+							 .appendSpace()
+							 .append(Component.text("(" + broken + " broken / " + required + " required)").color(NamedTextColor.YELLOW))
+				);
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
 				new LiteralArgument("setbrokenspawners"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				new IntegerArgument("broken", 0)
