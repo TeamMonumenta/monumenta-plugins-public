@@ -208,9 +208,7 @@ public class SalieriTheSwordsage extends SerializedLocationBossAbilityGroup {
 
 	public void sendMessage(String message) {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			String finalMessage = MessagingUtils.translatePlayerName(player, message);
-			Component formattedMessage = Component.text(finalMessage);
-			MessagingUtils.sendNPCMessage(player, "Salieri", formattedMessage);
+			MessagingUtils.sendNPCMessage(player, "Salieri", message);
 		}
 	}
 }
