@@ -141,7 +141,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		return true;
 	}
 
-	private void activate(boolean soundAndParticles) {
+	private void activate(boolean manualCast) {
 
 		if (isEnhanced()) {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
@@ -152,9 +152,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 
 		applyEffects();
 
-		if (soundAndParticles) {
-			mCosmetic.activate(mPlayer);
-		}
+		mCosmetic.activate(mPlayer, mStacks, manualCast);
 	}
 
 	private boolean toggleRecast() {
@@ -222,11 +220,11 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			if (toggled) {
 				if (mStacks < 4) {
 					mStacks = Math.min(mMaxStacks, mStacks + 1);
-					mCosmetic.stackEffect(mPlayer);
+					mCosmetic.activate(mPlayer, mStacks, false);
 				}
 			} else {
 				mStacks--;
-				mCosmetic.stackEffect(mPlayer);
+				mCosmetic.stackDecayEffect(mPlayer, mStacks);
 			}
 			if (mStacks > 0) {
 				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(mDuration, mStacks));

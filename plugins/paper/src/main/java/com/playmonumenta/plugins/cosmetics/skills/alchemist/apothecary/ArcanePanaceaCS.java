@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
@@ -44,8 +45,9 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		return NAME;
 	}
 
-	private static final double RING_DISTANCE = 1;
-	private static final double RING_RADIUS = 1.15;
+	private static final double CAST_RING_DISTANCE = 1;
+	private static final double CAST_RING_RADIUS = 1.15;
+	private static final double RADIUS_FOR_DOUBLING = Panacea.PANACEA_RADIUS * 1.75;
 
 	@Override
 	public void castEffects(Player player, double radius) {
@@ -53,52 +55,73 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		Location loc = player.getLocation();
 		sounds(world, loc);
 
+		castCircle(player, CAST_RING_RADIUS, CAST_RING_RADIUS * 0.4, false);
+		if (radius >= RADIUS_FOR_DOUBLING) {
+			castCircle(player, CAST_RING_RADIUS * 2, CAST_RING_RADIUS * 0.6, true);
+		}
+
+	}
+
+	private void castCircle(Player player, double radius, double smallRadius, boolean invert) {
+		Location loc = player.getLocation();
+
 		// big circle
 		Vector up = VectorUtils.rotationToVector(loc.getYaw(), loc.getPitch() - 90);
 		Vector right = loc.getDirection().crossProduct(up);
-		Location centerLocation = player.getEyeLocation().add(loc.getDirection().multiply(RING_DISTANCE));
-		double smallRadius = RING_RADIUS * 0.4;
-		double arcCut = Math.toDegrees(2 * Math.asin(smallRadius / RING_RADIUS / 2));
-		new PPCircle(Particle.ENCHANTMENT_TABLE, centerLocation, RING_RADIUS)
+		Location centerLocation = player.getEyeLocation().add(loc.getDirection().multiply(CAST_RING_DISTANCE));
+		double arcCut = Math.toDegrees(2 * Math.asin(smallRadius / radius / 2));
+		new PPCircle(Particle.ENCHANTMENT_TABLE, centerLocation, radius)
 			.axes(right, up).arcDegree(180 + arcCut, 360 - arcCut)
 			.includeStart(false).includeEnd(false)
 			.countPerMeter(6).spawnAsPlayerActive(player);
-		new PPCircle(Particle.ENCHANTMENT_TABLE, centerLocation, RING_RADIUS)
+		new PPCircle(Particle.ENCHANTMENT_TABLE, centerLocation, radius)
 			.axes(right, up).arcDegree(arcCut, 180 - arcCut)
 			.includeStart(false).includeEnd(false)
 			.countPerMeter(6).spawnAsPlayerActive(player);
 
 		// small circles
-		Location fireRingLoc = centerLocation.clone().subtract(right.clone().multiply(RING_RADIUS));
+		Location fireRingLoc = centerLocation.clone().subtract(right.clone().multiply(radius));
 		new PPCircle(Particle.ENCHANTMENT_TABLE, fireRingLoc, smallRadius)
 			.axes(right, up)
 			.countPerMeter(6).spawnAsPlayerActive(player);
-		Location waterRingLoc = centerLocation.clone().add(right.clone().multiply(RING_RADIUS));
+		Location waterRingLoc = centerLocation.clone().add(right.clone().multiply(radius));
 		new PPCircle(Particle.ENCHANTMENT_TABLE, waterRingLoc, smallRadius)
 			.axes(right, up)
 			.countPerMeter(6).spawnAsPlayerActive(player);
 
 		// fire/water symbols in the small circles
 		double symbolRadius = smallRadius * 0.8;
-		ArcanePotionsCS.FIRE.draw(new ArcanePotionsCS.Transform(fireRingLoc, symbolRadius, 0, right, up), Particle.WAX_ON, player);
-		ArcanePotionsCS.WATER.draw(new ArcanePotionsCS.Transform(waterRingLoc, symbolRadius, 0, right, up), Particle.SCRAPE, player);
+		ArcanePotionsCS.FIRE.draw(new ArcanePotionsCS.Transform(invert ? waterRingLoc : fireRingLoc, symbolRadius, 0, right, up), Particle.WAX_ON, player);
+		ArcanePotionsCS.WATER.draw(new ArcanePotionsCS.Transform(invert ? fireRingLoc : waterRingLoc, symbolRadius, 0, right, up), Particle.SCRAPE, player);
 
 	}
 
 	@Override
 	public void projectileEffects(Player player, Location loc, double radius, int totalTicks, double moveSpeed, Vector increment) {
-		totalTicks -= (int) Math.floor(RING_DISTANCE / moveSpeed);
+		totalTicks -= (int) Math.floor(CAST_RING_DISTANCE / moveSpeed);
 		if (totalTicks < 0) {
 			// Don't show particles behind the ring, just make them appear a bit later.
 			// Subtracting from totalTicks ensures that they appear exactly left and right behind the ring and not in some random orientation.
 			return;
 		}
 
+		if (radius >= RADIUS_FOR_DOUBLING) {
+			trailEffect(player, loc, radius / 2, CAST_RING_RADIUS, totalTicks, increment, false);
+			trailEffect(player, loc, radius, CAST_RING_RADIUS * 2, totalTicks, increment, true);
+		} else {
+			trailEffect(player, loc, radius, CAST_RING_RADIUS, totalTicks, increment, false);
+		}
+	}
+
+	private void trailEffect(Player player, Location loc, double radius, double initialRadius, int totalTicks, Vector increment, boolean invert) {
 		// the cast circle is a fixed size, approach the real radius smoothly after casting
-		radius -= (radius - RING_RADIUS) * Math.exp(-totalTicks * 0.25);
+		radius -= (radius - initialRadius) * Math.exp(-totalTicks * 0.25);
 
 		// main, coloured particles
 		double degrees = totalTicks * 12;
+		if (invert) {
+			degrees = 180 - degrees;
+		}
 		Vector vec = new Vector(FastUtils.cosDeg(degrees) * radius, 0, FastUtils.sinDeg(degrees) * radius);
 		vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 90);
 		vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
@@ -106,7 +129,7 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		new PPPeriodic(Particle.SCRAPE, loc.clone().subtract(vec)).manualTimeOverride(totalTicks).spawnAsPlayerActive(player);
 
 		// secondary enchantment particles, one half-step behind
-		double degreesHalfStep = (totalTicks - 0.5) * 12;
+		double degreesHalfStep = degrees + (invert ? 6 : -6);
 		Vector vecHalfStep = new Vector(FastUtils.cosDeg(degreesHalfStep) * radius, 0, FastUtils.sinDeg(degreesHalfStep) * radius);
 		vecHalfStep = VectorUtils.rotateXAxis(vecHalfStep, loc.getPitch() - 90);
 		vecHalfStep = VectorUtils.rotateYAxis(vecHalfStep, loc.getYaw());
@@ -125,6 +148,13 @@ public class ArcanePanaceaCS extends PanaceaCS {
 			.axes(vec1, vec2)
 			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 			.spawnAsPlayerActive(player);
+
+		if (radius >= RADIUS_FOR_DOUBLING) {
+			new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius / 2)
+				.axes(vec1, vec2)
+				.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+				.spawnAsPlayerActive(player);
+		}
 	}
 
 	@Override

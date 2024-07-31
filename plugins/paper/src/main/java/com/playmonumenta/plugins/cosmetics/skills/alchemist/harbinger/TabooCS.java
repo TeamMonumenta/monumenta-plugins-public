@@ -25,8 +25,10 @@ public class TabooCS implements CosmeticSkill {
 		return Material.DRAGON_BREATH;
 	}
 
-	public void periodicEffects(Player player, World world, Location loc, boolean twoHertz, boolean oneSecond, int ticks, boolean inBurst) {
+	public void periodicEffects(Player player, boolean twoHertz, boolean oneSecond, int ticks, boolean inBurst) {
 		if (oneSecond) {
+			World world = player.getWorld();
+			Location loc = player.getLocation();
 			new PartialParticle(Particle.FALLING_DUST, loc.clone().add(0, player.getHeight() / 2, 0), 5, 0.25, 0.2, 0.25, 0).data(Material.WARPED_HYPHAE.createBlockData()).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, loc.clone().add(0, player.getHeight() / 2, 0), 10, 0.25, 0.2, 0.25, 0).spawnAsPlayerBuff(player);
 			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
@@ -38,7 +40,9 @@ public class TabooCS implements CosmeticSkill {
 		}
 	}
 
-	public void burstEffects(Player player, World world, Location loc) {
+	public void burstEffects(Player player) {
+		World world = player.getWorld();
+		Location loc = player.getLocation();
 		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 2.0f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.5f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 2.0f, 0.1f);
@@ -51,7 +55,9 @@ public class TabooCS implements CosmeticSkill {
 		new PPCircle(Particle.FLAME, loc.clone().add(0, 0.1, 0), 2).count(50).ringMode(false).spawnAsPlayerBuff(player);
 	}
 
-	public void unburstEffects(Player player, World world, Location loc) {
+	public void unburstEffects(Player player) {
+		World world = player.getWorld();
+		Location loc = player.getLocation();
 		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 2.0f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_BREATH, SoundCategory.PLAYERS, 1.5f, 0.1f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 2.0f, 1.0f);
@@ -60,11 +66,11 @@ public class TabooCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 2.0f, 0.7f);
 	}
 
-	public void toggle(World world, Location loc, boolean active) {
+	public void toggle(Player player, boolean active) {
 		if (active) {
-			world.playSound(loc, Sound.ENTITY_WANDERING_TRADER_DRINK_POTION, SoundCategory.PLAYERS, 1, 0.9f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WANDERING_TRADER_DRINK_POTION, SoundCategory.PLAYERS, 1, 0.9f);
 		} else {
-			world.playSound(loc, Sound.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.8f, 1.2f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.8f, 1.2f);
 		}
 	}
 

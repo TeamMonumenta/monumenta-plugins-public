@@ -3,13 +3,15 @@ package com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.World;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +20,6 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 
 	public static final String NAME = "Prestigious Enhancements";
 
-	private static final String ABERRATION_LOS = "PrestigiousAberration";
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(255, 224, 48), 1.0f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 	private static final Particle.DustOptions BURN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 180, 0), 1.0f);
@@ -62,17 +63,18 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 	}
 
 	@Override
-	public String getLos() {
-		return ABERRATION_LOS;
+	public String getAberrationName() {
+		return "Prestigious Aberration";
 	}
 
 	@Override
-	public void esotericSummonEffect(World world, Player mPlayer, Location mLoc) {
+	public void esotericSummonEffect(Player player, Creeper aberration) {
 		final double radius = 3.6;
 		final double theta = FastUtils.RANDOM.nextDouble(120);
 		final double dRadius = -1.2;
 		final double dTheta = 30;
 		final long interval = 3;
+		final Location loc = aberration.getLocation();
 
 		for (int i = 0; i < DATA.length; i++) {
 			final double mRadius = radius + i * dRadius;
@@ -82,19 +84,34 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 				@Override
 				public void run() {
 					new PPLine(Particle.REDSTONE,
-						mLoc.clone().add(mRadius * FastUtils.cosDeg(mTheta), 0.25, mRadius * FastUtils.sinDeg(mTheta)),
-						mLoc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 120), 0.25, mRadius * FastUtils.sinDeg(mTheta + 120)))
-						.data(DATA[iter]).countPerMeter(16).spawnAsPlayerActive(mPlayer);
+						loc.clone().add(mRadius * FastUtils.cosDeg(mTheta), 0.25, mRadius * FastUtils.sinDeg(mTheta)),
+						loc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 120), 0.25, mRadius * FastUtils.sinDeg(mTheta + 120)))
+						.data(DATA[iter]).countPerMeter(16).spawnAsPlayerActive(player);
 					new PPLine(Particle.REDSTONE,
-						mLoc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 120), 0.25, mRadius * FastUtils.sinDeg(mTheta + 120)),
-						mLoc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 240), 0.25, mRadius * FastUtils.sinDeg(mTheta + 240)))
-						.data(DATA[iter]).countPerMeter(16).spawnAsPlayerActive(mPlayer);
+						loc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 120), 0.25, mRadius * FastUtils.sinDeg(mTheta + 120)),
+						loc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 240), 0.25, mRadius * FastUtils.sinDeg(mTheta + 240)))
+						.data(DATA[iter]).countPerMeter(16).spawnAsPlayerActive(player);
 					new PPLine(Particle.REDSTONE,
-						mLoc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 240), 0.25, mRadius * FastUtils.sinDeg(mTheta + 240)),
-						mLoc.clone().add(mRadius * FastUtils.cosDeg(mTheta), 0.25, mRadius * FastUtils.sinDeg(mTheta)))
-						.data(DATA[iter]).countPerMeter(16).spawnAsPlayerActive(mPlayer);
+						loc.clone().add(mRadius * FastUtils.cosDeg(mTheta + 240), 0.25, mRadius * FastUtils.sinDeg(mTheta + 240)),
+						loc.clone().add(mRadius * FastUtils.cosDeg(mTheta), 0.25, mRadius * FastUtils.sinDeg(mTheta)))
+						.data(DATA[iter]).countPerMeter(16).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), interval * i);
 		}
 	}
+
+	@Override
+	public void periodicEffects(Player player, Creeper aberration, int ticks) {
+		if (ticks % 2 == 0) {
+			new PartialParticle(Particle.REDSTONE, LocationUtils.getEntityCenter(aberration), 2)
+				.delta(0.4, 0.7, 0.4)
+				.data(new Particle.DustOptions(Color.WHITE, 1.2f))
+				.spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, LocationUtils.getEntityCenter(aberration), 1)
+				.delta(0.4, 0.7, 0.4)
+				.data(new Particle.DustOptions(Color.YELLOW, 1.5f))
+				.spawnAsPlayerActive(player);
+		}
+	}
+
 }

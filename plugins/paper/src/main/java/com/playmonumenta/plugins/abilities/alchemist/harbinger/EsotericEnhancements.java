@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
+import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -22,6 +23,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,9 +46,9 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private static final int ABERRATION_BLEED_DURATION = 4 * 20;
 	private static final int ABERRATION_COOLDOWN = 5 * 20;
 	private static final double ABERRATION_TARGET_RADIUS = 8;
+	private static final double MAX_TARGET_Y = 6;
 	private static final int ABERRATION_LIFETIME = 15 * 20;
 	private static final int TICK_INTERVAL = 5;
-	private static final double MAX_TARGET_Y = 4;
 
 	public static final String CHARM_DAMAGE = "Esoteric Enhancements Damage";
 	public static final String CHARM_RADIUS = "Esoteric Enhancements Radius";
@@ -118,7 +120,6 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
 				for (int i = 0; i < num; i++) {
 					summonAberration(mob.getLocation(), playerItemStats);
-					mCosmetic.esotericSummonEffect(mob.getWorld(), mPlayer, mob.getLocation());
 				}
 				putOnCooldown();
 			}
@@ -127,12 +128,13 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 
 	private void summonAberration(Location loc, ItemStatManager.PlayerItemStats playerItemStats) {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, mCosmetic.getLos());
+			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, "Alchemicalaberration");
 			if (aberration == null) {
 				MMLog.warning("Failed to spawn Alchemical Aberration from Library of Souls");
 				return;
 			}
 			EntityUtils.setRemoveEntityOnUnload(aberration);
+			aberration.customName(Component.text(mCosmetic.getAberrationName()));
 
 			AlchemicalAberrationBoss alchemicalAberrationBoss = BossUtils.getBossOfClass(aberration, AlchemicalAberrationBoss.class);
 			if (alchemicalAberrationBoss == null) {
@@ -143,7 +145,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamageMultiplier * playerItemStats.getItemStats().get(AttributeType.POTION_DAMAGE.getItemStat()));
 			damage += mDamageRaw;
-			alchemicalAberrationBoss.spawn(mPlayer, damage, radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), playerItemStats);
+			alchemicalAberrationBoss.spawn(mPlayer, damage, radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), playerItemStats, mCosmetic);
 
 			aberration.setMaxFuseTicks(CharmManager.getDuration(mPlayer, CHARM_FUSE, aberration.getMaxFuseTicks()));
 			aberration.setExplosionRadius((int) radius);
@@ -152,63 +154,85 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 				aberration.setPowered(true);
 			}
 
+			mCosmetic.esotericSummonEffect(mPlayer, aberration);
+
 			new BukkitRunnable() {
 				int mTicks = 0;
 				@Nullable LivingEntity mTarget = null;
 				@Override
 				public void run() {
 					if (mTicks >= ABERRATION_LIFETIME || !mPlayer.isOnline() || mPlayer.isDead() || !aberration.isValid()) {
+						mCosmetic.expireEffects(mPlayer, aberration);
 						aberration.remove();
 						this.cancel();
 						return;
 					}
 
-					List<LivingEntity> inRadiusMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), radius, aberration).stream()
-						.filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
-						.filter(mob -> isValidTarget(aberration, mob)).toList();
-					if (!inRadiusMobs.isEmpty()) {
-						mTarget = inRadiusMobs.stream().max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
-					}
+					if (mTicks % TICK_INTERVAL == 0) {
+						if (!isValidTarget(aberration, mTarget, true)) {
+							LivingEntity newTarget = findTarget(aberration);
+							if (newTarget != null) {
+								mTarget = newTarget;
+							}
+						}
 
-					if (!isValidTarget(aberration, mTarget)) {
-						LivingEntity newTarget = findTarget(aberration);
-						if (newTarget != null) {
-							mTarget = newTarget;
+						if (mTarget != null && mTarget.isValid()) {
+							aberration.setTarget(mTarget);
+						} else if (aberration.getTarget() == null && aberration.getWorld() == mPlayer.getWorld()) {
+							// If there's no target to be found, and the aberration has no old target either, follow the player (but keep some distance)
+							double distanceSquared = aberration.getLocation().distanceSquared(mPlayer.getLocation());
+							if (distanceSquared > 4 * 4) {
+								// Slow down a bit near the player to get less jerky movement
+								aberration.getPathfinder().moveTo(mPlayer, distanceSquared > 6 * 6 ? 1 : 0.66);
+							} else {
+								aberration.getPathfinder().stopPathfinding();
+							}
 						}
 					}
 
-					if (mTarget != null && mTarget.isValid()) {
-						aberration.setTarget(mTarget);
-					}
+					mCosmetic.periodicEffects(mPlayer, aberration, mTicks);
 
-					mTicks += TICK_INTERVAL;
+					mTicks += 1;
 				}
-			}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+			}.runTaskTimer(mPlugin, 0, 1);
 
 		}, 1);
 	}
 
-	private boolean isValidTarget(LivingEntity aberration, @Nullable LivingEntity mob) {
+	private boolean isValidTarget(Creeper aberration, @Nullable LivingEntity mob, boolean withPathfinding) {
 		return mob != null
 			       && mob.isValid()
 			       && mob.getLocation().distance(aberration.getLocation()) <= 1.5 * ABERRATION_TARGET_RADIUS
-			       && Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= 2 * MAX_TARGET_Y
+			       && Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= 1.5 * MAX_TARGET_Y
 			       && !DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC)
-			       && !mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG);
+			       && !mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)
+			       && (!withPathfinding || canPathfind(aberration, mob));
 	}
 
-	private @Nullable LivingEntity findTarget(LivingEntity aberration) {
+	private boolean canPathfind(Creeper aberration, LivingEntity mob) {
+		Pathfinder.PathResult path = aberration.getPathfinder().findPath(mob);
+		return path != null && path.getFinalPoint() != null && path.getFinalPoint().distanceSquared(mob.getLocation()) < 1;
+	}
+
+	/**
+	 * Finds a target for the aberration. Prioritizes targets that it can see and pathfind to within 1.5 meters, then ones it cannot see but pathfind to,
+	 * followed by ones it can only see,and finally any within the targeting radius, always prioritizing the highest-health targets among those groups.
+	 */
+	private @Nullable LivingEntity findTarget(Creeper aberration) {
 
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration).stream()
-			.filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
-			.filter(mob -> isValidTarget(aberration, mob)).toList();
+			                                .filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
+			                                .filter(mob -> isValidTarget(aberration, mob, false))
+			                                .sorted(Comparator.comparingDouble(Damageable::getHealth).reversed())
+			                                .toList();
 
 		List<LivingEntity> lineOfSightNearbyMobs = nearbyMobs.stream().filter(mob -> mob.hasLineOfSight(aberration)).toList();
 
-		if (lineOfSightNearbyMobs.size() > 0) {
-			return lineOfSightNearbyMobs.stream().max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
-		}
-		return nearbyMobs.stream().max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
+		LivingEntity fallback = (lineOfSightNearbyMobs.isEmpty() ? nearbyMobs : lineOfSightNearbyMobs).stream().findFirst().orElse(null);
+
+		return (lineOfSightNearbyMobs.isEmpty() ? nearbyMobs : lineOfSightNearbyMobs).stream()
+			       .filter(le -> canPathfind(aberration, le))
+			       .findFirst().orElse(fallback);
 	}
 
 }

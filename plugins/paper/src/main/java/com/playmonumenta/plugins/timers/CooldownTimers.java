@@ -48,7 +48,7 @@ public class CooldownTimers {
 		return true;
 	}
 
-	public void addCooldown(Player player, ClassAbility spell, Integer cooldownTime) {
+	public void setCooldown(Player player, ClassAbility spell, Integer cooldownTime) {
 		if (!player.isOnline()) {
 			return;
 		}

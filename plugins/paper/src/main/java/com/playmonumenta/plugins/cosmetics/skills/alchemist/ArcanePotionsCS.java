@@ -75,7 +75,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		List<Symbol> symbols = new ArrayList<>(LARGE_SYMBOLS);
 		symbols.remove(mLastSymbol);
 		mLastSymbol = FastUtils.getRandomElement(symbols);
-		drawAlchemyCircle(player, location, radius, 3, isGruesome, mLastSymbol, false);
+		drawAlchemyCircle(player, location, radius, 3, isGruesome, mLastSymbol, false, true, false);
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 	/**
 	 * Draws an alchemy circle with a big symbol in the center, 3 small circles with fire or water symbols in them and connected by a triangle, and optionally 3 side symbols in the space between the triangle and big circle
 	 */
-	public static void drawAlchemyCircle(Player player, Location loc, double radius, int numSmallCircles, boolean gruesome, Symbol centerSymbol, boolean withSideSymbols) {
+	public static void drawAlchemyCircle(Player player, Location loc, double radius, int numSmallCircles, boolean gruesome, Symbol centerSymbol, boolean withSideSymbols, boolean connectCircles, boolean rotateCircleSymbols) {
 		Particle symbolParticle = gruesome ? Particle.SCRAPE : Particle.WAX_ON;
 		float rotation = loc.getYaw();
 		double startAngle = rotation + (gruesome ? -90 : 90);
@@ -110,7 +110,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 			Collections.shuffle(symbols, FastUtils.RANDOM);
 		}
 
-		drawSimpleAlchemyCircle(player, loc, radius, gruesome ? -90 : 90, numSmallCircles, 0.2, gruesome ? WATER : FIRE, gruesome ? Particle.SCRAPE : Particle.WAX_ON, false, true);
+		drawSimpleAlchemyCircle(player, loc, radius, gruesome ? -90 : 90, numSmallCircles, 0.2, gruesome ? WATER : FIRE, gruesome ? Particle.SCRAPE : Particle.WAX_ON, rotateCircleSymbols, connectCircles);
 
 		// side symbols
 		if (symbols != null) {
@@ -161,14 +161,25 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 					.spawnAsPlayerActive(player);
 			}
 
-			// smaller circles
-			new PPCircle(Particle.ENCHANTMENT_TABLE, lineStartLoc.clone().add(0, enchantParticleDelta, 0), smallRadius)
-				.countPerMeter(ENCHANT_PARTICLE_PER_METER)
-				.directionalMode(true).delta(0, -enchantParticleDelta, 0).extra(1)
-				.spawnAsPlayerActive(player);
+			// smaller circles with accent symbols
+			lineStartLoc.setYaw((float) (rotateSymbols ? currentAngle - 90 : rotation) + 180);
+			drawSingleCircle(player, lineStartLoc, smallRadius, circleSymbol, symbolParticle);
+		}
+	}
 
-			// accent symbol in small circle
-			circleSymbol.draw(new Transform(lineStartLoc, smallRadius * 0.8, (rotateSymbols ? currentAngle - 90 : rotation) + 180), symbolParticle, player);
+	/**
+	 * Draws only a single alchemical circle, optionally with a symbol in it.
+	 */
+	public static void drawSingleCircle(Player player, Location loc, double radius, @Nullable Symbol symbol, Particle symbolParticle) {
+		double enchantParticleDelta = 0.25;
+
+		new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, enchantParticleDelta, 0), radius)
+			.countPerMeter(ENCHANT_PARTICLE_PER_METER)
+			.directionalMode(true).delta(0, -enchantParticleDelta, 0).extra(1)
+			.spawnAsPlayerActive(player);
+
+		if (symbol != null) {
+			symbol.draw(new Transform(loc, radius * 0.8, loc.getYaw()), symbolParticle, player);
 		}
 	}
 
@@ -424,6 +435,22 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		drawArc(particle, player, transform, d / 2 + 3 * d * COS_30, -1, 2 * d, 180 - 30, 180, false);
 	};
 
+	// Oxygen
+	public static final Symbol OXYGEN = (transform, particle, player) -> {
+		// cross
+		drawLine(particle, player, transform, transform.apply(0, -1), transform.apply(0, 1));
+		drawLine(particle, player, transform, transform.apply(-1, 0), transform.apply(1, 0));
+
+		// serifs
+		drawLine(particle, player, transform, transform.apply(-0.1, -1), transform.apply(0.1, -1));
+		drawLine(particle, player, transform, transform.apply(-0.1, 1), transform.apply(0.1, 1));
+		drawLine(particle, player, transform, transform.apply(-1, -0.1), transform.apply(-1, 0.1));
+		drawLine(particle, player, transform, transform.apply(1, -0.1), transform.apply(1, 0.1));
+
+		// circle
+		drawCircle(particle, player, transform, 0, 0, 0.6);
+	};
+
 	// Phlogiston - reserved for Scorched Earth
 	public static final Symbol PHLOGISTON = (transform, particle, player) -> {
 		double s = 1.0 / 4; // circle radius
@@ -499,7 +526,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		drawLine(particle, player, transform, transform.apply(0.85, 0.85), transform.apply(0.7, 0.7));
 	};
 
-	public static ImmutableList<Symbol> LARGE_SYMBOLS = ImmutableList.of(SULPHUR, PHILOSOPHERS_SULPHUR, AQUA_VITAE, SALT_OF_ANTIMONY, CROCUS_OF_IRON, AIR, EARTH, VINEGAR_ALT, GOLD_SUN, TIN, LEAD);
+	public static ImmutableList<Symbol> LARGE_SYMBOLS = ImmutableList.of(SULPHUR, PHILOSOPHERS_SULPHUR, AQUA_VITAE, SALT_OF_ANTIMONY, CROCUS_OF_IRON, AIR, EARTH, VINEGAR_ALT, GOLD_SUN, TIN, LEAD, OXYGEN);
 	public static ImmutableList<Symbol> SMALL_SYMBOLS = ImmutableList.of(SULPHUR, PHILOSOPHERS_SULPHUR, AQUA_VITAE, SALT_OF_ANTIMONY, AIR, EARTH, VINEGAR, GOLD_COMET, TIN, LEAD);
 
 	// endregion

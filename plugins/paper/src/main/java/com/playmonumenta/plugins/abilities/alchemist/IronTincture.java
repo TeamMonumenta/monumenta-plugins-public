@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -118,7 +117,7 @@ public class IronTincture extends Ability {
 				Location l = tincture.getLocation();
 				mCosmetic.onGroundEffect(l, mPlayer, mTinctureDecay / IRON_TINCTURE_TICK_PERIOD);
 
-				for (Player p : PlayerUtils.playersInRange(l, 1, true)) {
+				for (Player p : new Hitbox.UprightCylinderHitbox(l, 0.7, 0.7).getHitPlayers(true)) {
 					// Prevent players from picking up their own tincture instantly
 					if (p == mPlayer && tincture.getTicksLived() < 12) {
 						continue;
@@ -154,7 +153,7 @@ public class IronTincture extends Ability {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.IRON_TINCTURE, 0);
+					mPlugin.mTimers.setCooldown(mPlayer, ClassAbility.IRON_TINCTURE, 0);
 				}
 			}
 

@@ -47,7 +47,7 @@ public class CurseOfImpatience extends DepthsAbility {
 			.forEach(ca -> {
 				// Modify cooldown directly - we don't want any effects, enchants, etc. messing with this
 				int cooldown = mPlugin.mTimers.getCooldown(uuid, ca);
-				mPlugin.mTimers.addCooldown(mPlayer, ca, cooldown + 20);
+				mPlugin.mTimers.setCooldown(mPlayer, ca, cooldown + 20);
 			});
 		return true;
 	}

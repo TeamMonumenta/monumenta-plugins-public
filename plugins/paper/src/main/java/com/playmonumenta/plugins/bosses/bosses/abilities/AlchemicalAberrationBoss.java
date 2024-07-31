@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses.abilities;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.EsotericEnhancementsCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -27,6 +28,7 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 	private int mBleedDuration = 0;
 	private double mBleedAmount = 0;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
+	private EsotericEnhancementsCS mCosmetic;
 
 	public AlchemicalAberrationBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -36,13 +38,14 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, double radius, int bleedDuration, double bleedAmount, ItemStatManager.PlayerItemStats playerItemStats) {
+	public void spawn(Player player, double damage, double radius, int bleedDuration, double bleedAmount, ItemStatManager.PlayerItemStats playerItemStats, EsotericEnhancementsCS cosmetic) {
 		mPlayer = player;
 		mDamage = damage;
 		mRadius = radius;
 		mBleedDuration = bleedDuration;
 		mBleedAmount = bleedAmount;
 		mPlayerItemStats = playerItemStats;
+		mCosmetic = cosmetic;
 	}
 
 	@Override
@@ -50,6 +53,7 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 		for (LivingEntity entity : EntityUtils.getNearbyMobs(mBoss.getLocation(), mRadius, mBoss)) {
 			DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.ESOTERIC_ENHANCEMENTS, mPlayerItemStats), mDamage, true, false, false);
 			EntityUtils.applyBleed(com.playmonumenta.plugins.Plugin.getInstance(), mBleedDuration, mBleedAmount, entity);
+			mCosmetic.explosionEffects(mPlayer, mBoss, mRadius);
 		}
 	}
 

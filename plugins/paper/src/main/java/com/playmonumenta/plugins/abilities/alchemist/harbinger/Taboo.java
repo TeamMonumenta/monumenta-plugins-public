@@ -126,8 +126,6 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	private int mBurstTimer = 0;
 	private final TabooCS mCosmetic;
 
-	private int mCurrDuration = -1;
-
 	public Taboo(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
@@ -170,7 +168,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		applySicknessEffects();
 		double absorptionLostMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PENALTY, PERCENT_ABSORPTION_PENALTY);
 		AbsorptionUtils.subtractAbsorption(mPlayer, AbsorptionUtils.getAbsorption(mPlayer) * absorptionLostMultiplier);
-		mCosmetic.toggle(mPlayer.getWorld(), mPlayer.getLocation(), true);
+		mCosmetic.toggle(mPlayer, true);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
@@ -182,17 +180,16 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		mBurstTimer = 0;
 		mCurrentState = TabooState.INACTIVE;
 		mAlchemistPotions.increaseChargeTime(mRechargeRateDecrease);
-		mCosmetic.toggle(mPlayer.getWorld(), mPlayer.getLocation(), false);
+		mCosmetic.toggle(mPlayer, false);
 		clearSicknessEffects();
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	public boolean burst() {
 		if (!isOnCooldown() && mCurrentState == TabooState.ACTIVE && mAlchemistPotions != null && mAlchemistPotions.decrementCharges(1)) {
-			mBurstTimer = BURST_SECONDS;
+			mBurstTimer = BURST_SECONDS * 20;
 			mCurrentState = TabooState.BURST;
-			mCosmetic.burstEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
-			mCurrDuration = 0;
+			mCosmetic.burstEffects(mPlayer);
 			ClientModHandler.updateAbility(mPlayer, this);
 			return true;
 		}
@@ -201,37 +198,37 @@ public class Taboo extends Ability implements AbilityWithDuration {
 
 	public void unburst() {
 		mBurstTimer = 0;
-		mCurrDuration = -1;
 		mCurrentState = TabooState.ACTIVE;
 		putOnCooldown(getModifiedCooldown(BURST_COOLDOWN));
-		mCosmetic.unburstEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
+		mCosmetic.unburstEffects(mPlayer);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (oneSecond && mCurrentState != TabooState.INACTIVE) {
-			if (mCurrentState == TabooState.BURST) {
+		if (mCurrentState != TabooState.INACTIVE) {
+			mCosmetic.periodicEffects(mPlayer, twoHertz, oneSecond, ticks, mCurrentState == TabooState.BURST);
+		}
+
+		if (mCurrentState == TabooState.BURST) {
+			mBurstTimer -= 5;
+			if (mBurstTimer % 20 == 0) {
 				double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 				double selfDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, maxHealth * PERCENT_HEALTH_DAMAGE);
 				if (mPlayer.getHealth() > selfDamage) {
-					mPlayer.setHealth(Math.min(mPlayer.getHealth(), maxHealth) - selfDamage); // Health is sometimes lower than max for whatever reason, raising an exception
+					mPlayer.setHealth(Math.min(mPlayer.getHealth(), maxHealth) - selfDamage); // Health is sometimes higher than max for whatever reason, raising an exception
 					mPlayer.damage(0);
 				}
-				mBurstTimer--;
-				sendActionBarMessage("Taboo Burst: %s".formatted(mBurstTimer));
-				if (mBurstTimer <= 0) {
-					unburst();
-				}
+				sendActionBarMessage("Taboo Burst: %s".formatted(mBurstTimer / 20));
 			}
+			if (mBurstTimer <= 0) {
+				unburst();
+			}
+		}
 
+		if (oneSecond && mCurrentState != TabooState.INACTIVE) {
 			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
-			mCosmetic.periodicEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation(), twoHertz, true, ticks, mCurrentState == TabooState.BURST);
 			applySicknessEffects();
-
-			if (mCurrDuration >= 0) {
-				mCurrDuration += 5;
-			}
 		}
 	}
 
@@ -273,7 +270,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 
 	@Override
 	public int getRemainingAbilityDuration() {
-		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+		return mCurrentState == TabooState.BURST ? mBurstTimer : 0;
 	}
 
 	@Override

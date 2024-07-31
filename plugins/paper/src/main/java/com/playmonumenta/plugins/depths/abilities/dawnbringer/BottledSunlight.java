@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -85,7 +85,7 @@ public class BottledSunlight extends DepthsAbility {
 				Location l = bottle.getLocation();
 				new PartialParticle(Particle.SPELL, l, 3, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 
-				for (Player p : PlayerUtils.playersInRange(l, 1, true)) {
+				for (Player p : new Hitbox.UprightCylinderHitbox(l, 0.7, 0.7).getHitPlayers(true)) {
 					// Prevent players from picking up their own tincture instantly
 					if (p == mPlayer && bottle.getTicksLived() < 12) {
 						continue;
@@ -114,7 +114,7 @@ public class BottledSunlight extends DepthsAbility {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.BOTTLED_SUNLIGHT, 0);
+					mPlugin.mTimers.setCooldown(mPlayer, ClassAbility.BOTTLED_SUNLIGHT, 0);
 				}
 			}
 

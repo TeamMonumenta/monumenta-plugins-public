@@ -196,7 +196,7 @@ public class Encore extends DepthsAbility {
 			action.run();
 			// Earthen Wrath cooldown starts later - let the ability handle all of the cooldown stuff
 			if (!(ability instanceof EarthenWrath)) {
-				mPlugin.mTimers.addCooldown(mPlayer, spell, prevCooldown);
+				mPlugin.mTimers.setCooldown(mPlayer, spell, prevCooldown);
 			}
 		}, DELAY));
 		mActive = false;

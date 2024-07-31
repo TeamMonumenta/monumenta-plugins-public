@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneAmalgamCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneArtilleryCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneBezoarCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneElixirCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneOdorCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneTinctureCS;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcaneRem
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcaneTransmutationCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.PrestigiousRemedyCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.RitualRingCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneEnhancementsCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneScorchedEarthCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneTabooCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.PrestigiousEsotericCS;
@@ -100,7 +102,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CosmeticSkills {
 
-	private static final ImmutableList<Supplier<CosmeticSkill>> COSMETIC_SKILLS = ImmutableList.of(
+	private static final ImmutableList<Supplier<CosmeticSkill>> COSMETIC_SKILLS = ImmutableList.<Supplier<CosmeticSkill>>of(
 		//Alchemist
 		SunriseBrewCS::new,
 		GruesomeEchoesCS::new,
@@ -118,6 +120,8 @@ public class CosmeticSkills {
 		ArcaneOdorCS::new,
 		ArcaneTabooCS::new,
 		ArcaneArtilleryCS::new,
+		ArcaneElixirCS::new,
+		ArcaneEnhancementsCS::new,
 
 		//Cleric
 		DarkPunishmentCS::new,

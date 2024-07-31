@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -140,7 +141,7 @@ public class Bezoar extends Ability {
 				mT++;
 				Location itemLoc = item.getLocation();
 				mCosmetic.periodicBezoarEffects(mPlayer, itemLoc, mT, false);
-				for (Player p : PlayerUtils.playersInRange(itemLoc, 1, true)) {
+				for (Player p : new Hitbox.UprightCylinderHitbox(itemLoc, 0.7, 0.7).getHitPlayers(true)) {
 					if (p != mPlayer) {
 						applyEffects(p, false);
 						mCosmetic.targetEffects(p, itemLoc, false);
@@ -223,7 +224,7 @@ public class Bezoar extends Ability {
 					mCosmetic.pickupEffects(mPlayer, itemLoc, true);
 
 					this.cancel();
-					break;
+					return;
 				}
 
 				if (mT >= mLingerTime || item.isDead()) {

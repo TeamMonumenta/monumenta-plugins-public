@@ -94,7 +94,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	@Override
 	public void putOnCooldown() {
 		if (!isOnCooldown()) {
-			mPlugin.mTimers.addCooldown(mPlayer, mLinkedSpell, getModifiedCooldown());
+			mPlugin.mTimers.setCooldown(mPlayer, mLinkedSpell, getModifiedCooldown());
 		}
 	}
 

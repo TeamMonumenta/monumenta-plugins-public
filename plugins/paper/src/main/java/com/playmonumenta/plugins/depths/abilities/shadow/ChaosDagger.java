@@ -104,7 +104,7 @@ public class ChaosDagger extends DepthsAbility {
 				if (mExpire >= 10 * 20) {
 					dagger.remove();
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.CHAOS_DAGGER, 0);
+					mPlugin.mTimers.setCooldown(mPlayer, ClassAbility.CHAOS_DAGGER, 0);
 					this.cancel();
 				}
 				Location tLoc = dagger.getLocation();

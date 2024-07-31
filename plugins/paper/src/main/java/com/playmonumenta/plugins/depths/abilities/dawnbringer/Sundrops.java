@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -72,7 +72,7 @@ public class Sundrops extends DepthsAbility {
 				Location l = sundrop.getLocation();
 				new PartialParticle(Particle.FALLING_DUST, l, 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsOtherPlayerActive();
 				//Other player
-				for (Player p : PlayerUtils.playersInRange(l, 1.25, true)) {
+				for (Player p : new Hitbox.UprightCylinderHitbox(l, 0.7, 0.7).getHitPlayers(true)) {
 					Plugin plugin = Plugin.getInstance();
 					//Give speed and resistance
 					plugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(mEffectDuration, -mDamageReduction));

@@ -118,7 +118,7 @@ public class IceBarrier extends DepthsAbility {
 						mPrimedLoc = null;
 						world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.5f);
 						//Reset cd
-						mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.ICE_BARRIER, 0);
+						mPlugin.mTimers.setCooldown(mPlayer, ClassAbility.ICE_BARRIER, 0);
 					}
 				}
 

@@ -714,6 +714,7 @@ public class AbilityUtils {
 		if (invulnerable) {
 			EntityUtils.makeItemInvulnereable(droppedItem);
 		}
+		EntityUtils.setRemoveEntityOnUnload(droppedItem);
 		return droppedItem;
 	}
 
