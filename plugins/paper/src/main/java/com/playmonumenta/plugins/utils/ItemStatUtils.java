@@ -41,6 +41,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -131,24 +132,24 @@ public class ItemStatUtils {
 		return getOrCreateStockFromMonumenta(getOrCreateMonumenta(nbt));
 	}
 
-	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item) {
-		applyCustomEffects(plugin, player, item, true);
+	public static void applyCustomEffects(Plugin plugin, LivingEntity entity, ItemStack item) {
+		applyCustomEffects(plugin, entity, item, true);
 	}
 
-	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item, boolean applySickness) {
-		applyCustomEffects(plugin, player, item, applySickness, 1);
+	public static void applyCustomEffects(Plugin plugin, LivingEntity entity, ItemStack item, boolean applySickness) {
+		applyCustomEffects(plugin, entity, item, applySickness, 1);
 	}
 
-	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item, boolean applySickness, double durationScale) {
-		applyCustomEffects(plugin, player, item, applySickness, durationScale, 0, Map.of());
+	public static void applyCustomEffects(Plugin plugin, LivingEntity entity, ItemStack item, boolean applySickness, double durationScale) {
+		applyCustomEffects(plugin, entity, item, applySickness, durationScale, 0, Map.of());
 	}
 
-	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item, boolean applySickness, double durationScale, int durationAdd, Map<String, Double> strengthChanges) {
+	public static void applyCustomEffects(Plugin plugin, LivingEntity entity, ItemStack item, boolean applySickness, double durationScale, int durationAdd, Map<String, Double> strengthChanges) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
 
-		if (player.isDead() || !player.isOnline()) {
+		if (!entity.isValid() || (entity instanceof Player player && !player.isOnline())) {
 			return;
 		}
 
@@ -176,7 +177,7 @@ public class ItemStatUtils {
 				return;
 			}
 
-			double quenchScale = Quench.getDurationScaling(plugin, player);
+			double quenchScale = entity instanceof Player player ? Quench.getDurationScaling(plugin, player) : 1;
 
 			for (ReadWriteNBT effect : effects) {
 				String type = effect.getString(EFFECT_TYPE_KEY);
@@ -187,33 +188,39 @@ public class ItemStatUtils {
 
 				EffectType effectType = EffectType.fromType(type);
 				if (effectType != null) {
-					// In the future this event could be used to process Quench and sicknesses to make this code a bit cleaner
-					EffectTypeApplyFromPotionEvent event = new EffectTypeApplyFromPotionEvent(player, effectType, strength, modifiedDuration, item);
-					Bukkit.getPluginManager().callEvent(event);
-					if (event.isCancelled()) {
-						break;
+					if (entity instanceof Player player) {
+						// In the future this event could be used to process Quench and sicknesses to make this code a bit cleaner
+						EffectTypeApplyFromPotionEvent event = new EffectTypeApplyFromPotionEvent(player, effectType, strength, modifiedDuration, item);
+						Bukkit.getPluginManager().callEvent(event);
+						if (event.isCancelled()) {
+							break;
+						}
+						modifiedDuration = event.getDuration();
+						strength = event.getStrength();
 					}
-					modifiedDuration = event.getDuration();
-					strength = event.getStrength();
 
 					if (effectType == EffectType.ABSORPTION) {
 						double sicknessPenalty = 0;
-						NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
-						if (sicks != null) {
-							Effect sick = sicks.last();
-							sicknessPenalty = sick.getMagnitude();
+						if (entity instanceof Player player) {
+							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
+							if (sicks != null) {
+								Effect sick = sicks.last();
+								sicknessPenalty = sick.getMagnitude();
+							}
 						}
-						EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
+						EffectType.applyEffect(effectType, entity, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
 					} else if (effectType == EffectType.INSTANT_HEALTH) {
 						double sicknessPenalty = 0;
-						NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
-						if (sicks != null) {
-							Effect sick = sicks.last();
-							sicknessPenalty = sick.getMagnitude();
+						if (entity instanceof Player player) {
+							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
+							if (sicks != null) {
+								Effect sick = sicks.last();
+								sicknessPenalty = sick.getMagnitude();
+							}
 						}
-						EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
+						EffectType.applyEffect(effectType, entity, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
 					} else {
-						EffectType.applyEffect(effectType, player, modifiedDuration, strength, null, applySickness);
+						EffectType.applyEffect(effectType, entity, modifiedDuration, strength, null, applySickness);
 					}
 				}
 			}

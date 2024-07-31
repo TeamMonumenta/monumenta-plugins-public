@@ -339,9 +339,12 @@ public enum EffectType {
 			}
 			return;
 		} else if (effectType == INSTANT_HEALTH) {
+			double maxHealth = EntityUtils.getMaxHealth(entity);
 			if (entity instanceof Player player) {
-				PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(entity) * strength);
+				PlayerUtils.healPlayer(plugin, player, maxHealth * strength);
 				applyHealingSickness(entity, applySickness, plugin);
+			} else {
+				entity.setHealth(Math.min(maxHealth, entity.getHealth() + maxHealth * strength));
 			}
 			return;
 		} else if (effectType == INSTANT_DAMAGE) {

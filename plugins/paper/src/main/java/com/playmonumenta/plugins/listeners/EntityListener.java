@@ -596,9 +596,11 @@ public class EntityListener implements Listener {
 		// Don't apply effects to invulnerable entities
 		affectedEntities.removeIf(Entity::isInvulnerable);
 
+		boolean allowEffectsOnFriendlyMobs = ServerProperties.getShardName().contains("plot");
+
 		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
 		if (source instanceof Player && (PotionUtils.hasNegativeEffects(potion.getItem()) || ItemStatUtils.hasNegativeEffect(potion.getItem()))) {
-			affectedEntities.removeIf(entity -> (entity instanceof Player && entity != source));
+			affectedEntities.removeIf(entity -> ((entity instanceof Player && entity != source) || (allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity))));
 		}
 
 		if (source instanceof Player && item.getItemMeta() instanceof PotionMeta potionMeta) {
@@ -637,10 +639,10 @@ public class EntityListener implements Listener {
 
 		// Run each custom effect on each afflicted entity
 		for (LivingEntity entity : affectedEntities) {
-			if (entity instanceof Player player) {
-				double distance = Math.min(player.getLocation().distance(event.getEntity().getLocation()), player.getEyeLocation().distance(event.getEntity().getLocation()));
+			if (entity instanceof Player || (allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity))) {
+				double distance = Math.min(entity.getLocation().distance(event.getEntity().getLocation()), entity.getEyeLocation().distance(event.getEntity().getLocation()));
 				distance = Math.min(Math.max(-0.1 * distance + 1, 0), 1);
-				ItemStatUtils.applyCustomEffects(Plugin.getInstance(), player, item, true, distance);
+				ItemStatUtils.applyCustomEffects(Plugin.getInstance(), entity, item, true, distance);
 			}
 		}
 
@@ -698,6 +700,8 @@ public class EntityListener implements Listener {
 		// Don't apply invisibility type lingering potions to players if created by an (invisible) creeper exploding
 		affectedEntities.removeIf(entity -> ((cloud.hasCustomEffect(PotionEffectType.INVISIBILITY) || cloud.hasCustomEffect(PotionEffectType.SLOW_FALLING)) && entity instanceof Player && cloud.getSource() instanceof Creeper));
 
+		boolean allowEffectsOnFriendlyMobs = ServerProperties.getShardName().contains("plot");
+
 		PotionData data = cloud.getBasePotionData();
 		PotionInfo info = PotionUtils.getPotionInfo(data, 4);
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
@@ -717,6 +721,9 @@ public class EntityListener implements Listener {
 				if (potion != null) {
 					ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
 				}
+			} else if (potion != null && allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity) && !PotionUtils.hasNegativeEffects(potion) && !ItemStatUtils.hasNegativeEffect(potion)) {
+				// only affect friendly mobs on plots, and only with beneficial potions
+				ItemStatUtils.applyCustomEffects(mPlugin, entity, potion);
 			}
 		}
 
