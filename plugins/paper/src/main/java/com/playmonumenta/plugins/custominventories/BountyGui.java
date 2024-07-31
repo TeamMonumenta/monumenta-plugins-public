@@ -222,7 +222,7 @@ public class BountyGui extends Gui {
 						false, "Delve preset of level " + preset.mLevel + ".\nClick to view delve modifiers in this preset.", NamedTextColor.WHITE))
 						.onLeftClick(() -> {
 							close();
-							new DelveCustomInventory(mPlayer, "ring", false, mPresetChoices.get(finalI)).openInventory(mPlayer, mPlugin);
+							new DelveCustomInventory(mPlayer, "ring", new DelveCustomInventory.Config().preset(mPresetChoices.get(finalI))).openInventory(mPlayer, mPlugin);
 						});
 				}
 			}

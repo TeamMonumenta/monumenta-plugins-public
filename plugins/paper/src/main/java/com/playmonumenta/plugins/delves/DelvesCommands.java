@@ -46,7 +46,6 @@ public class DelvesCommands {
 			ArgumentSuggestions.strings(info -> DelvesManager.DUNGEONS.toArray(new String[0])));
 		Argument<?> delveModArg = new MultiLiteralArgument("mod", delveModNames);
 
-		//this command is the old used to open Delve GUI
 		new CommandAPICommand("opendmsgui")
 			.withPermission(perms)
 			.withArguments(
@@ -54,7 +53,24 @@ public class DelvesCommands {
 				dungeonArg)
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
-				new DelveCustomInventory(player, args.getUnchecked("dungeon"), true).openInventory(player, plugin);
+				new DelveCustomInventory(player, args.getUnchecked("dungeon"), new DelveCustomInventory.Config().editable(true).startable(true)).openInventory(player, plugin);
+			}).register();
+
+		new CommandAPICommand("openchallgui")
+			.withPermission(perms)
+			.withArguments(
+				new EntitySelectorArgument.OnePlayer("player"),
+				dungeonArg)
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				DelveCustomInventory.Config config = new DelveCustomInventory.Config()
+																			 .editable(false)
+																			 .startable(true);
+				DelvePreset preset = DelvePreset.getChall(args.getUnchecked("dungeon"));
+				if (preset != null) {
+					config = config.preset(preset);
+				}
+				new DelveCustomInventory(player, args.getUnchecked("dungeon"), config).openInventory(player, plugin);
 			}).register();
 
 		new CommandAPICommand("openmoderatordmsgui")
@@ -64,7 +80,7 @@ public class DelvesCommands {
 				new EntitySelectorArgument.OnePlayer("playerToDebug"),
 				dungeonArg)
 			.executes((sender, args) -> {
-				new DelveCustomInventory(args.getUnchecked("playerToDebug"), args.getUnchecked("dungeon"), true).openInventory(args.getUnchecked("moderator"), plugin);
+				new DelveCustomInventory(args.getUnchecked("playerToDebug"), args.getUnchecked("dungeon"), new DelveCustomInventory.Config().editable(true).startable(true)).openInventory(args.getUnchecked("moderator"), plugin);
 			}).register();
 
 		new CommandAPICommand("opendpsgui")
@@ -85,7 +101,7 @@ public class DelvesCommands {
 				dungeonArg)
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
-				new DelveCustomInventory(player, args.getUnchecked("dungeon"), false).openInventory(player, plugin);
+				new DelveCustomInventory(player, args.getUnchecked("dungeon"), new DelveCustomInventory.Config()).openInventory(player, plugin);
 			}).register();
 
 		new CommandAPICommand(COMMAND)

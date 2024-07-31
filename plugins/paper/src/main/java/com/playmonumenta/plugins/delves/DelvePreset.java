@@ -381,4 +381,16 @@ public enum DelvePreset {
 		}
 		return true;
 	}
+
+	/**
+	 * Returns the corresponding challenge delve preset
+	 * to the dungeon name provided. If no such preset exists,
+	 * returns null.
+	 */
+	public static @Nullable DelvePreset getChall(String dungeonName) {
+		return Arrays.stream(values())
+					 .filter(preset -> dungeonName.startsWith(preset.mName))
+					 .findFirst()
+					 .orElse(null);
+	}
 }
