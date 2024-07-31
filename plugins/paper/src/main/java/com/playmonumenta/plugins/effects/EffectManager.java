@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,12 +83,13 @@ public final class EffectManager implements Listener {
 			mPriorityMap.put(EffectPriority.LATE, new ConcurrentHashMap<>());
 		}
 
-		public void addEffect(String source, Effect effect) {
+		public boolean addEffect(String source, Effect effect) {
+			boolean wasUpdated = false;
 			if (effect.mUsed) {
 				// Each entity must have their own instance of an effect, they cannot be shared
 				MMLog.severe("Attempted to add an effect multiple times or to multiple entities! source="
 					+ source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
-				return;
+				return false;
 			}
 			effect.mUsed = true;
 
@@ -104,6 +106,7 @@ public final class EffectManager implements Listener {
 						if (effectIter == currentEffect) {
 							effectIter.entityLoseEffect(mEntity);
 							effectIter.entityGainEffect(mEntity);
+							wasUpdated = true;
 						}
 						effectIter.setDuration(effect.getDuration());
 						foundEffect = true;
@@ -119,11 +122,14 @@ public final class EffectManager implements Listener {
 				if (effectGroup.last() == effect) {
 					currentEffect.entityLoseEffect(mEntity);
 					effect.entityGainEffect(mEntity);
+					wasUpdated = true;
 				}
 			} else {
 				effectGroup.add(effect);
 				effect.entityGainEffect(mEntity);
+				wasUpdated = true;
 			}
+			return wasUpdated;
 		}
 
 		public @Nullable NavigableSet<Effect> getEffects(String source) {
@@ -396,7 +402,7 @@ public final class EffectManager implements Listener {
 	private final HashMap<Entity, Effects> mEntities = new HashMap<>();
 	private final BukkitRunnable mTimer;
 	private static @Nullable EffectManager INSTANCE = null;
-	private static final String PLAYEREFFECTDEATHKEY = "player_effect_death_key";
+	private static final String PLAYER_EFFECT_DEATH_KEY = "player_effect_death_key";
 
 	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {
@@ -428,7 +434,7 @@ public final class EffectManager implements Listener {
 									}
 								} catch (Exception ex) {
 									MMLog.severe("Error in effect manager entityTickEffect: " + ex.getMessage());
-									ex.printStackTrace();
+									MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 								}
 							}
 						}
@@ -474,7 +480,7 @@ public final class EffectManager implements Listener {
 											ClientModHandler.updateEffect(entity, effect, effectGroup.getKey(), false);
 										} catch (Exception ex) {
 											MMLog.severe("Error in effect manager entityGainEffect: " + ex.getMessage());
-											ex.printStackTrace();
+											MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 										}
 										currentEffectRemoved = false;
 									}
@@ -487,7 +493,7 @@ public final class EffectManager implements Listener {
 											tickResult = effect.tick(PERIOD);
 										} catch (Exception ex) {
 											MMLog.severe("Error in effect manager tick: " + ex.getMessage());
-											ex.printStackTrace();
+											MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 											/* If ticking throws an exception (e.g. NPE) remove it */
 											tickResult = false;
 										}
@@ -500,7 +506,7 @@ public final class EffectManager implements Listener {
 												ClientModHandler.updateEffect(entity, effect, effectGroup.getKey(), true);
 											} catch (Exception ex) {
 												MMLog.severe("Error in effect manager entityLoseEffect: " + ex.getMessage());
-												ex.printStackTrace();
+												MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 											}
 											currentEffectRemoved = true;
 										}
@@ -519,7 +525,7 @@ public final class EffectManager implements Listener {
 					}
 				} catch (Exception ex) {
 					MMLog.severe("Error in effect manager ticking task that caused many pieces to be skipped: " + ex.getMessage());
-					ex.printStackTrace();
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 				}
 			}
 		};
@@ -551,8 +557,9 @@ public final class EffectManager implements Listener {
 			effect = event.getEffect();
 
 			Effects effects = mEntities.computeIfAbsent(entity, Effects::new);
-			effects.addEffect(source, effect);
-			ClientModHandler.updateEffect(entity, effect, source, false);
+			if (effects.addEffect(source, effect)) {
+				ClientModHandler.updateEffect(entity, effect, source, false);
+			}
 		}
 	}
 
@@ -636,7 +643,7 @@ public final class EffectManager implements Listener {
 
 	public <T extends Effect> @Nullable T getActiveEffect(Entity entity, Class<T> cls) {
 		NavigableSet<T> effects = getEffects(entity, cls);
-		if (effects != null && effects.size() > 0) {
+		if (effects != null && !effects.isEmpty()) {
 			return effects.last();
 		}
 
@@ -880,7 +887,7 @@ public final class EffectManager implements Listener {
 			}
 		}
 
-		if (killed instanceof Player player && MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, PLAYEREFFECTDEATHKEY, 5)) {
+		if (killed instanceof Player player && MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, PLAYER_EFFECT_DEATH_KEY, 5)) {
 			// Default phylactery level is 10 (should already be accounted for).
 			double phylactery = Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.PHYLACTERY);
 
@@ -1052,7 +1059,7 @@ public final class EffectManager implements Listener {
 		// 1s after the player leaves, remove them from the map to avoid leaking memory
 		// If the player happens to log back in immediately, still remove them - they will get a new entity object which will be tracked again
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			// NOTE: If the Entity map is ever changed to key'd by Entity UUID, this will need a guard to check that the player didn't log back in
+			// NOTE: If the Entity map is ever changed to keyed by Entity UUID, this will need a guard to check that the player didn't log back in
 			mEntities.remove(player);
 		}, 20);
 	}
