@@ -6,22 +6,24 @@
 #
 ############################################
 
+plugins/paper/src/main/java/com/playmonumenta/plugins/abilities/AbilityHotbar.java @PikaTheLeg
+plugins/paper/src/main/java/com/playmonumenta/plugins/abilities/scout/HuntingCompanion.java @Nobody314159
 plugins/paper/src/main/java/com/playmonumenta/plugins/abilities/shaman/* @dmdinnc
+plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/bosses/bluestrike/* @PikaTheLeg
+plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/bosses/sirius/* @MistHelix
+plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/spells/bluestrike/* @PikaTheLeg
+plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/spells/sirius/* @MistHelix
 plugins/paper/src/main/java/com/playmonumenta/plugins/classes/Shaman.java @dmdinnc
 plugins/paper/src/main/java/com/playmonumenta/plugins/classes/MonumentaClasses.java @dmdinnc
+plugins/paper/src/main/java/com/playmonumenta/plugins/commands/CustomEffect.java @Nobody314159
 plugins/paper/src/main/java/com/playmonumenta/plugins/commands/PlayerCommand.java @dmdinnc
 plugins/paper/src/main/java/com/playmonumenta/plugins/custominventories/* @dmdinnc
 plugins/paper/src/main/java/com/playmonumenta/plugins/depths/abilities/* @Nobody314159
-plugins/paper/src/main/java/com/playmonumenta/plugins/abilities/scout/HuntingCompanion.java @Nobody314159
-plugins/paper/src/main/java/com/playmonumenta/plugins/effects/* @Nobody314159
-plugins/paper/src/main/java/com/playmonumenta/plugins/commands/CustomEffect.java @Nobody314159
-plugins/paper/src/main/java/com/playmonumenta/plugins/itemstats/EffectType.java @Nobody314159
-plugins/paper/src/main/java/com/playmonumenta/plugins/abilities/AbilityHotbar.java @PikaTheLeg
-plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/bosses/bluestrike/* @PikaTheLeg
-plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/spells/bluestrike/* @PikaTheLeg
 plugins/paper/src/main/java/com/playmonumenta/plugins/depths/bosses/Vesperidys.java @PikaTheLeg
 plugins/paper/src/main/java/com/playmonumenta/plugins/depths/bosses/vesperidys/* @PikaTheLeg
 plugins/paper/src/main/java/com/playmonumenta/plugins/depths/spells/vesperidys/* @PikaTheLeg
-plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/bosses/sirius/* @MistHelix
-plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/spells/sirius/* @MistHelix
+plugins/paper/src/main/java/com/playmonumenta/plugins/effects/* @Nobody314159
+plugins/paper/src/main/java/com/playmonumenta/plugins/integrations/luckperms/* @NickNackGus
+plugins/paper/src/main/java/com/playmonumenta/plugins/integrations/MonumentaNetworkChatIntegration.java @NickNackGus
+plugins/paper/src/main/java/com/playmonumenta/plugins/itemstats/EffectType.java @Nobody314159
 plugins/paper/src/main/java/com/playmonumenta/plugins/market/* @rayman520

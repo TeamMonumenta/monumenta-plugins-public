@@ -229,7 +229,6 @@ public class CreateGuildCommand {
 			Group guildGuestGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildGuestGroupId).join();
 			NodeMap guildGuestGroupData = guildGuestGroup.data();
 			guildGuestGroupData.add(InheritanceNode.builder(guildRootGroup).build());
-			LuckPermsIntegration.GM.saveGroup(guildGuestGroup).join();
 
 			Group guildMemberGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildMemberGroupId).join();
 			NodeMap guildMemberGroupData = guildMemberGroup.data();
@@ -241,21 +240,23 @@ public class CreateGuildCommand {
 			guildMemberGroupData.add(PrefixNode.builder(guildTagPrefix, 1).build());
 			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_HOVER_PREFIX_MK, guildName).build());
 			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_GUILD_NAME_MK, guildName).build());
-			LuckPermsIntegration.GM.saveGroup(guildMemberGroup).join();
 
 			Group guildManagerGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildManagerGroupId).join();
 			NodeMap guildManagerGroupData = guildManagerGroup.data();
 			guildManagerGroupData.add(InheritanceNode.builder(guildMemberGroup).build());
-			LuckPermsIntegration.GM.saveGroup(guildManagerGroup).join();
 
 			Group guildFounderGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildFounderGroupId).join();
 			NodeMap guildFounderGroupData = guildFounderGroup.data();
 			guildFounderGroupData.add(InheritanceNode.builder(guildManagerGroup).build());
-			LuckPermsIntegration.GM.saveGroup(guildFounderGroup).join();
 
 			for (GuildPermission guildPermission : GuildPermission.values()) {
 				guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true);
 			}
+
+			LuckPermsIntegration.GM.saveGroup(guildGuestGroup).join();
+			LuckPermsIntegration.GM.saveGroup(guildMemberGroup).join();
+			LuckPermsIntegration.GM.saveGroup(guildManagerGroup).join();
+			LuckPermsIntegration.GM.saveGroup(guildFounderGroup).join();
 
 			for (Player founder : founders) {
 				User user = LuckPermsIntegration.UM.getUser(founder.getUniqueId());
