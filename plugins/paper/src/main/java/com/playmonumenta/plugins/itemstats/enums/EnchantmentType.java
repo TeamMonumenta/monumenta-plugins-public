@@ -69,6 +69,7 @@ public enum EnchantmentType {
 	APTITUDE(new Aptitude(), true, false, false, true),
 	ARCANE_THRUST(new ArcaneThrust(), true, false, false, true),
 	ASHES_OF_ETERNITY(new AshesOfEternity(), false, false, false, true),
+	ASHES_OF_ETERNITY_USED(new AshesOfEternityUsed(), false, true, false, false),
 	BLEEDING(new Bleeding(), true, false, false, true),
 	BROOMSTICK(new Broomstick(), false, false, false, false),
 	CHAOTIC(new Chaotic(), true, false, false, true),

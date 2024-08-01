@@ -30,6 +30,7 @@ public class DailyReset {
 		60 * 15,
 		0));
 	private static final String DAILY_PLAYER_CHANGES_COMMAND = "execute as @S at @s run function monumenta:mechanisms/daily_player_changes";
+	public static final String DAILY_VERSION_OBJECTIVE = "DailyVersion";
 	static ScheduledThreadPoolExecutor mRealTimePool = new ScheduledThreadPoolExecutor(1);
 	private static @MonotonicNonNull TimerTask mRealTimeRunnable = null;
 	private static int mLastDailyVersion;
@@ -213,7 +214,7 @@ public class DailyReset {
 	}
 
 	public static void handle(Player player) {
-		int dailyVersion = ScoreboardUtils.getScoreboardValue(player, "DailyVersion").orElse(0);
+		int dailyVersion = ScoreboardUtils.getScoreboardValue(player, DAILY_VERSION_OBJECTIVE).orElse(0);
 		handle(player, dailyVersion);
 	}
 
@@ -237,7 +238,7 @@ public class DailyReset {
 			POIManager.handlePlayerDailyChange(player);
 		}
 
-		ScoreboardUtils.setScoreboardValue(player, "DailyVersion", currentDailyVersion);
+		ScoreboardUtils.setScoreboardValue(player, DAILY_VERSION_OBJECTIVE, currentDailyVersion);
 
 		String message = getNewDayMessage(dailyVersion);
 		Component component = Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD);
