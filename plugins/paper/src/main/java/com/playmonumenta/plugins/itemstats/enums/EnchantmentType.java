@@ -153,6 +153,8 @@ public enum EnchantmentType {
 	DIVINE_AURA(new DivineAura(), false, false, false, false),
 	OINKING(new Oinking(), false, true, true, false),
 	MATERIAL(new MaterialEnch(), false, false, false, false),
+	MEOWING(new Meowing(), false, true, true, false),
+	MOOING(new Mooing(), false, true, true, false),
 
 	//Random Stuff
 	PESTILENCE_TESSERACT(new PestilenceTesseract(), false, false, true, false),
