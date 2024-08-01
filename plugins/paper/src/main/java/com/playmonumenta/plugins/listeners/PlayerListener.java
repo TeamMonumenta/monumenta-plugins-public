@@ -1104,21 +1104,21 @@ public class PlayerListener implements Listener {
 		int oldDamage = event.getDamage();
 		int newDamage = oldDamage;
 
-		if (ItemUtils.isArmor(item)) {
-			// Players that get resistance from safe zones don't take armor damage
+		// Vanilla hoes and axes take 2 durability, we only want them to take 1
+		if ((ItemUtils.isHoe(item) || ItemUtils.isAxe(item)) && oldDamage > 1) {
+			newDamage = oldDamage / 2;
+		}
+
+		if (ItemUtils.isArmor(item) || item.getType() == Material.TRIDENT) {
+			// Armor and tridents do not take durability damage in No Equipment Damage zones
 			if (oldDamage < 0 || ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 				newDamage = 0;
 			}
 		}
 
-		//Tridents do not take damage in safe zones
-		if (item.getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
+		// All durability damage is disabled in town worlds
+		if (ServerProperties.getIsTownWorld() && oldDamage < 0) {
 			newDamage = 0;
-		}
-
-		// Vanilla hoes and axes take 2 durability, we only want them to take 1
-		if ((ItemUtils.isHoe(item) || ItemUtils.isAxe(item)) && oldDamage > 1) {
-			newDamage = oldDamage / 2;
 		}
 
 		event.setDamage(newDamage);
