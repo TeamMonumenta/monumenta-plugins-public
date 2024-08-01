@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
 import org.apache.commons.math3.util.FastMath;
@@ -54,7 +55,9 @@ public class ColossalBruteCS extends BruteForceCS {
 		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, PITCHES[combo]);
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 1f, 0.65f);
 		Location pLoc = player.getLocation().add(0, 1, 0);
-		ParticleUtils.drawHalfArc(pLoc, 2.15, ANGLE[combo], -40, 140, 8, 0.2,
+		Vector dir = LocationUtils.getDirectionTo(loc, pLoc).multiply(2.15);
+		loc.setDirection(dir);
+		ParticleUtils.drawHalfArc(loc.clone().subtract(dir), 2.15, ANGLE[combo], -40, 140, 8, 0.2,
 			(Location l, int ring) -> {
 				new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 					new Particle.DustOptions(
