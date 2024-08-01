@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LichDemiseBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_demise";
-	public static final int detectionRange = 50;
+	public static final int detectionRange = Lich.detectionRange;
 
 	Location mCenter;
 

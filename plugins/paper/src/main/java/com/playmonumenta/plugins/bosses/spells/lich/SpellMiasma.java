@@ -48,7 +48,7 @@ public class SpellMiasma extends Spell {
 					DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, "Miasma");
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 0));
 					Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
-						new PercentDamageDealt(6 * 20, 0.2));
+						new PercentDamageDealt(6 * 20, -0.2));
 					if (!mWarnedPlayers.contains(player)) {
 						mWarnedPlayers.add(player);
 						player.sendMessage(Component.text("BEGONE THEN! FLY AWAY LITTLE BIRD!", NamedTextColor.LIGHT_PURPLE));
@@ -62,5 +62,4 @@ public class SpellMiasma extends Spell {
 	public int cooldownTicks() {
 		return 0;
 	}
-
 }

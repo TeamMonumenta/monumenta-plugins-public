@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LichConquestBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_conquest";
-	public static final int detectionRange = 67;
+	public static final int detectionRange = Lich.detectionRange;
 
 	Location mCenter;
 

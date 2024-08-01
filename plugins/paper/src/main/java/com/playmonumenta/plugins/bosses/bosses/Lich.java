@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -110,7 +111,7 @@ import org.jetbrains.annotations.Nullable;
 public final class Lich extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_lich";
 	public static final String curseSource = "LichCurse";
-	public static final int detectionRange = 55;
+	public static final int detectionRange = 80;
 	public static final int mShieldMin = 5;
 	private static final int mCeiling = 35;
 	private int mCounter = 0;
@@ -305,9 +306,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				// invulnerable crystals if ghast is present
 				for (Location loc : mCrystalLoc) {
 					Collection<EnderCrystal> c = loc.getNearbyEntitiesByType(EnderCrystal.class, 3);
-					if (c.size() > 0) {
+					if (!c.isEmpty()) {
 						Collection<Ghast> g = loc.getNearbyEntitiesByType(Ghast.class, 3);
-						if (g.size() > 0) {
+						if (!g.isEmpty()) {
 							for (EnderCrystal e : c) {
 								e.setInvulnerable(true);
 							}
@@ -332,7 +333,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		/*
 		 * Active starts here
 		 */
-
 		SpellManager phase1Spells = new SpellManager(
 			Arrays.asList(
 				new SpellGraspingHands(mPlugin, mBoss),
@@ -357,10 +357,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			));
 
 		/*
-		 * Passive starts here
+		 * Passives starts here
+		 * Same dd instance in each spell list, so that it stays on the same 45-second cycle
 		 */
-
-		// Same dd instance in each spell list, so that it stays on the same 45-second cycle
 		SpellDimensionDoor dimensionDoor = new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange);
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
@@ -401,7 +400,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		});
 
 		events.put(75, mBoss -> {
-			// dialogue?
 			forceCastSpell(SpellRaiseDead.class);
 		});
 
@@ -469,6 +467,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 													+ vec.getZ() * distance / 9.5 + "]}");
 											((WitherSkull) mSkull).setCharged(true);
 										} catch (Exception e) {
+											MMLog.warning("[Hekawt] Failed to spawn a wither skull during the 66% health phase transition animation!");
 											e.printStackTrace();
 										}
 									}
@@ -550,8 +549,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 		events.put(50, mBoss -> {
 			forceCastSpell(SpellDiesIrae.class);
-			//prevent overkilling before ability is cast
-			// Phase 3 starts here
 		});
 
 		events.put(33, mBoss -> {
@@ -680,19 +677,17 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
-						// Phase 4 starts here
+						// Phase 3 starts here
 						changePhase(phase3Spells, phase3PassiveSpells, null);
 						mCutscene = false;
 						this.cancel();
 
 						//disallow dies irae instant cast
 						new BukkitRunnable() {
-
 							@Override
 							public void run() {
 								mPhaseCD = false;
 							}
-
 						}.runTaskLater(mPlugin, 5 * 20);
 					}
 					mT++;
@@ -864,9 +859,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		if (e != null) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				EntityEquipment equip = e.getEquipment();
-				Objects.requireNonNull(mBoss.getEquipment())
-					.setArmorContents(Objects.requireNonNull(equip)
-										  .getArmorContents());
+				Objects.requireNonNull(mBoss.getEquipment()).setArmorContents(Objects.requireNonNull(equip).getArmorContents());
 				mBoss.getEquipment().setItemInMainHand(equip.getItemInMainHand());
 				mBoss.getEquipment().setItemInOffHand(equip.getItemInOffHand());
 				e.remove();
@@ -880,7 +873,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		for (Player player : playersInRange(mBoss.getLocation(), radius, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, PercentSpeed.GENERIC_NAME,
-				new PercentSpeed(20 * 5, 0.3, PercentSpeed.GENERIC_NAME));
+				new PercentSpeed(20 * 5, -0.3, PercentSpeed.GENERIC_NAME));
 		}
 	}
 
@@ -943,7 +936,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			if (!mActivated) {
 				if (mKey != null && mKey.isValid()) {
 					mBoss.setHealth(MAX_HEALTH * 0.15);
-
 
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5.0f, 0.75f);
 					SpellManager phase3Spells = new SpellManager(
@@ -1197,14 +1189,14 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		for (Location l : crystalLoc) {
 			Collection<Entity> e = l.getWorld().getNearbyEntities(l, 1.5, 1.5, 1.5);
 			e.removeIf(en -> !en.getType().equals(EntityType.ENDER_CRYSTAL));
-			if (e.size() == 0) {
+			if (e.isEmpty()) {
 				missing.add(l);
 			}
 		}
 		// spawn crystals
 		while (count > 0) {
 			// stop trying if all crystals are present
-			if (missing.size() == 0) {
+			if (missing.isEmpty()) {
 				count = 0;
 			} else {
 				// spawn crystal on random tower without crystal
@@ -1731,7 +1723,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					mTrigger = false;
 					return;
 				}
-				if (mCrystal.size() == 0 && !mCrystalTrigger) {
+				if (mCrystal.isEmpty() && !mCrystalTrigger) {
 					mCrystalTrigger = true;
 					spawnCrystal(tower, 2, mFinalCrystal);
 
@@ -1743,7 +1735,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 						p.sendMessage(Component.text("The crystals moved into the big tower. Destroy them before it's too late!", NamedTextColor.AQUA));
 					}
-				} else if (mCrystal.size() == 0) {
+				} else if (mCrystal.isEmpty()) {
 					this.cancel();
 					mCounter++;
 					// find higher tower location index
@@ -1979,8 +1971,8 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		return mDead;
 	}
 
-	public static List<Player> playersInRange(Location bossLoc, double range, boolean stealth) {
-		List<Player> players = PlayerUtils.playersInRange(bossLoc, range, stealth);
+	public static List<Player> playersInRange(Location bossLoc, double range, boolean includeStealthed) {
+		List<Player> players = PlayerUtils.playersInRange(bossLoc, range, includeStealthed);
 		List<Player> toRemove = new ArrayList<>();
 		for (Player p : players) {
 			Location playerLoc = p.getLocation();

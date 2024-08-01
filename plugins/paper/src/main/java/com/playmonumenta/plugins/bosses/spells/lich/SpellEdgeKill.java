@@ -75,5 +75,4 @@ public class SpellEdgeKill extends Spell {
 	public int cooldownTicks() {
 		return 0;
 	}
-
 }
