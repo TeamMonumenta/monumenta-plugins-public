@@ -1377,7 +1377,8 @@ public class CharmManager {
 
 		for (String s : orderedEffects) {
 			final var normalized = s.replace("%", "");
-			double value = getValueOrCap(summary.getOrDefault(s, 0.0), normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
+			double baseValue = summary.getOrDefault(s, 0.0);
+			double value = getValueOrCap(baseValue, normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
 			if (value != 0) {
 
 				// Strip .0s and calm down floating point lengths by restricting to 3 decimal places.
@@ -1395,7 +1396,21 @@ public class CharmManager {
 					if (effect != null) {
 						if (value == effect.mEffectCap) {
 							charmColor = TextColor.fromHexString("#e49b20");
-							desc += " (MAX)";
+
+							if (baseValue != value) {
+								// always display positive overflow value, even if the diff is negative
+								// such as in -cooldown charms
+								desc += " (MAX; " + valueFormatter.format(Math.abs(baseValue - value));
+
+								if (s.contains("%")) {
+									desc += "%";
+								}
+
+								desc += " overflow)";
+							} else {
+								// not sure if it's possible for this case to even happen - adding fallback regardless.
+								desc += " (MAX)";
+							}
 						}
 					}
 				}
