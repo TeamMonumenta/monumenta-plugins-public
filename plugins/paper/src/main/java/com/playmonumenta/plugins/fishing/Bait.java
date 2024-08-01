@@ -20,7 +20,7 @@ enum Bait {
 	BLUE_CRYSTAL("Smoky Blue Crystal", 0, 0, 0.2, FishLootTable.SHROOMFISH, 0.5),
 	THRICE_SLICED_STARFISH("Thrice-Sliced Starfish", 0, 0, 0.2, FishLootTable.STARTOUCHED_SWORDFISH, 0.5),
 	INFECTED_SHRIMP("Infected Shrimp", 0, 0, 0.2, FishLootTable.NORVIGUT_TUNA, 0.5),
-	CRYSTALLIZED_COD("Crystallized Cod", 0, 0, 0.2, FishLootTable.CRYSTALLIZED_COD, 0.5);
+	CRYSTALLIZED_COD("Fractal Fish Food", 0, 0, 0.2, FishLootTable.CRYSTALLIZED_COD, 0.5);
 
 	final String mItemName;
 	final double mCombatOdds;
