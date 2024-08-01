@@ -22,7 +22,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,10 +60,7 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 		mBoss.setRemoveWhenFarAway(false);
 
 		//Possible summons
-		List<String> mSummonableMobs = new ArrayList<>();
-		mSummonableMobs.add("SeaWolf");
-		mSummonableMobs.add("PirateGunner");
-		mSummonableMobs.add("DrownedCrewman");
+		List<String> mSummonableMobs = List.of("SeaWolf", "PirateGunner", "DrownedCrewman");
 
 		for (LivingEntity e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, detectionRange, detectionRange, detectionRange)) {
 			if (e.getScoreboardTags().contains("varcosa_center")) {
@@ -145,7 +141,7 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(11.5, 0, 0));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(-11.5, 0, 0));
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		for (Player player : getPlayers()) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa's", NamedTextColor.RED), Component.text("Last Breath", NamedTextColor.DARK_RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
@@ -156,25 +152,30 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		List<Player> players = getPlayers();
 
-		if (players.size() <= 0) {
+		if (players.isEmpty()) {
 			return;
 		}
 
+		for (Player player : players) {
+			player.sendMessage(Component.text("Yarr... why be this hurtin'? I shan't go!", NamedTextColor.RED));
+		}
+
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-		String dio = "Yarr... why be this hurtin'? I shan't go!";
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio + "\",\"color\":\"red\"}]");
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (!PlayerUtils.playersInRange(mCenter, detectionRange, true).isEmpty()) {
+				if (!players.isEmpty()) {
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 				}
 			}
-		}.runTaskLater(mPlugin, 20 * 1);
+		}.runTaskLater(mPlugin, 20);
+	}
 
+	private List<Player> getPlayers() {
+		return PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 	}
 
 	private void summonArmorStandIfNoneAreThere(Location loc) {

@@ -75,7 +75,8 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(11.5, 0, 0));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(-11.5, 0, 0));
 
-		List<Spell> passiveSpells = Arrays.asList(new SpellSummonConstantly(summonableMobs, mSummonPeriod, 50, 6, 2, mCenter, this),
+		List<Spell> passiveSpells = Arrays.asList(
+			new SpellSummonConstantly(summonableMobs, mSummonPeriod, 50, 6, 2, mCenter, this),
 			new SpellJibberJabber(mBoss, speak, radius),
 			action, tooHighAction);
 		SpellManager activeSpells = new SpellManager(List.of(new SpellPurgeNegatives(mBoss, 100)));
@@ -90,17 +91,19 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 		mActive = false;
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
-		String dio = "Fine! Ye make me do this meself!";
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio + "\",\"color\":\"red\"}]");
+		List<Player> players = getPlayers();
+		for (Player player : players) {
+			player.sendMessage(Component.text("Fine! Ye make me do this meself!", NamedTextColor.RED));
+		}
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (!PlayerUtils.playersInRange(mCenter, detectionRange, true).isEmpty()) {
+				if (!players.isEmpty()) {
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 				}
 			}
-		}.runTaskLater(mPlugin, 20 * 1);
+		}.runTaskLater(mPlugin, 20);
 
 	}
 
@@ -125,11 +128,16 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 
 		mBoss.setHealth(bossTargetHp);
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		for (Player player : getPlayers()) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa", NamedTextColor.RED), Component.text("Mighty Pirate Captain", NamedTextColor.DARK_RED));
 		}
 
 		mActive = true;
+	}
+
+	private List<Player> getPlayers() {
+		// Use mCenter instead of mSpawnLoc because Varcosa (the summoner version) is outside the arena
+		return PlayerUtils.playersInRange(mCenter, detectionRange, true);
 	}
 
 	public void onSummonKilled() {

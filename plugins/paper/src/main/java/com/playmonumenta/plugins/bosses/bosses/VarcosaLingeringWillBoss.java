@@ -53,7 +53,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 	public static final String identityTag = "boss_varcosa_will";
 	public static final int detectionRange = 50;
 	private Location mCenter;
-	private String[] mSpeak = {"The cold beyond be takin' me. It'll be takin' ye too...", "The veil be partin'... I won't go... not without me treasure..."};
+	private static final String[] mSpeak = {"The cold beyond be takin' me. It'll be takin' ye too...", "The veil be partin'... I won't go... not without me treasure..."};
 
 	public VarcosaLingeringWillBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
@@ -86,9 +86,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 
 		//Passive Spells
 		SpellPlayerAction action = SpellActions.getTooLowAction(mBoss, mCenter);
-
 		SpellPlayerAction tooHighAction = SpellActions.getTooHighAction(mBoss, mCenter);
-
 		BukkitRunnable runnable = SpellActions.getTeleportEntityRunnable(mBoss, mCenter);
 
 		runnable.runTaskTimer(plugin, 20, 20 * 2);
@@ -127,13 +125,13 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-		BossUtils.endBossFightEffects(mBoss, players, 20 * 10, true, false);
+		List<Player> players = getPlayers();
+		BossUtils.endBossFightEffects(mBoss, players);
 		sendMessage("I feel it... partin'... the beyond calls... and I answer...");
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (!PlayerUtils.playersInRange(mCenter, detectionRange, true).isEmpty()) {
+				if (!players.isEmpty()) {
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 				}
 			}
@@ -152,7 +150,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(finalHp);
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		for (Player player : getPlayers()) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Lingering Will", NamedTextColor.DARK_RED), null);
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
@@ -177,7 +175,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 20 * 1, 20 * 2);
+		}.runTaskTimer(mPlugin, 20, 20 * 2);
 	}
 
 	private void summonArmorStandIfNoneAreThere(Location loc) {
@@ -190,11 +188,11 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 		}
 	}
 
-	public List<Player> getPlayers() {
+	private List<Player> getPlayers() {
 		return PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 	}
 
-	public void sendMessage(String message) {
+	private void sendMessage(String message) {
 		Component component = Component.text(message, NamedTextColor.RED);
 		for (Player player : getPlayers()) {
 			player.sendMessage(component);
