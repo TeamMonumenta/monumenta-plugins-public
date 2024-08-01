@@ -261,6 +261,13 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 		return mDeleteOnLogout;
 	}
 
+	public boolean pauseInSpectatorMode() {
+		return true;
+	}
+
+	public boolean skipInRespawnRefresh() {
+		return false;
+	}
 
 	/* Must implement this method to print info about what the effect does for debug */
 	@Override

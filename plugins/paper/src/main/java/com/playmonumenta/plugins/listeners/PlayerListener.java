@@ -86,7 +86,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Powerable;
-import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -986,57 +985,8 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		World world = event.getRespawnLocation().getWorld();
 
-		Location realRespawnLocation = player.getPotentialBedLocation();
-		boolean mightBeBedSpawn = false;
-		if (realRespawnLocation == null || realRespawnLocation.getWorld() != world) {
-			realRespawnLocation = world.getSpawnLocation();
-		} else {
-			mightBeBedSpawn = realRespawnLocation.getBlock().getBlockData() instanceof Bed;
-			if (mightBeBedSpawn) {
-				// Add some y value to not break the bed on respawn (and respawn on top of it instead),
-				// except if the block above is unbreakable.
-				if (realRespawnLocation.clone().add(0, 1, 0).getBlock().getType().getHardness() >= 0) {
-					realRespawnLocation.add(0, 0.6, 0);
-				}
-			}
-			realRespawnLocation.setPitch(event.getRespawnLocation().getPitch());
-			realRespawnLocation.setYaw(event.getRespawnLocation().getYaw());
-		}
-		// spawn locations are stored as ints, need to add (0.5, 0, 0.5) to get the center of the block
-		realRespawnLocation.add(0.5, 0, 0.5);
-
-		// If vanilla moved the respawn location, move it back to the real location, as long as that location is in a survival zone,
-		// and break blocks around the respawn location as if broken with an iron pickaxe.
-		// Only breaks block on play for non-creative/spectator players.
-		// (does not check for whether the player is in adventure mode, as a player's game mode is not yet updated)
-		int distanceToCheck = mightBeBedSpawn ? 3 : 1; // bed spawn point may be up to 2 blocks away from the bed
-		if (Math.abs(event.getRespawnLocation().getX() - realRespawnLocation.getX()) < distanceToCheck
-			    && Math.abs(event.getRespawnLocation().getZ() - realRespawnLocation.getZ()) < distanceToCheck
-			    && ZoneUtils.isMineable(realRespawnLocation)) {
-			event.setRespawnLocation(realRespawnLocation);
-			if (Plugin.IS_PLAY_SERVER
-				    && player.getGameMode() != GameMode.CREATIVE
-				    && player.getGameMode() != GameMode.SPECTATOR) {
-				boolean couldNotBreakBlock = false;
-				BoundingBox playerBox = BoundingBox.of(realRespawnLocation.clone().add(-0.3, 0, -0.3), realRespawnLocation.clone().add(0.3, 1.8, 0.3));
-				ItemStack ironPick = new ItemStack(Material.IRON_PICKAXE);
-				for (Block collidingBlock : NmsUtils.getVersionAdapter().getCollidingBlocks(world, playerBox, true)) {
-					if (ZoneUtils.isMineable(collidingBlock.getLocation())
-						    && collidingBlock.getType().getHardness() >= 0) {
-						collidingBlock.breakNaturally(ironPick);
-					} else {
-						couldNotBreakBlock = true;
-					}
-				}
-				if (couldNotBreakBlock) {
-					// Warn about respawning inside solid blocks, but check if the player can crawl in the space first because that won't cause issues
-					BoundingBox crawlingBox = BoundingBox.of(realRespawnLocation.clone().add(-0.3, 0, -0.3), realRespawnLocation.clone().add(0.3, 0.6, 0.3));
-					if (NmsUtils.getVersionAdapter().hasCollisionWithBlocks(player.getWorld(), crawlingBox, true)) {
-						AuditListener.log("Player " + player.getName() + " respawned inside unbreakable blocks at " + realRespawnLocation + "!");
-					}
-				}
-			}
-		}
+		Location respawnLocation = PlayerUtils.getRespawnLocationAndClear(player, world, event.getRespawnLocation());
+		event.setRespawnLocation(respawnLocation);
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			if (player.isOnline()) {
@@ -1050,7 +1000,8 @@ public class PlayerListener implements Listener {
 		Phylactery.applyStoredEffects(mPlugin, player);
 		mPlugin.mEffectManager.applyEffectsOnRespawn(mPlugin, player);
 
-		mPlugin.mEffectManager.addEffect(player, RespawnStasis.NAME, new RespawnStasis());
+		mPlugin.mEffectManager.addEffect(player, RespawnStasis.NAME,
+			new RespawnStasis(player.getLocation(), event.getRespawnLocation()));
 		player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1, 0.75f);
 	}
 
@@ -1251,6 +1202,11 @@ public class PlayerListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
+		if (cause == TeleportCause.SPECTATE && !player.isOp()) {
+			event.setCancelled(true);
+			return;
+		}
+
 		mPlugin.mAbilityManager.playerTeleportEvent(player, event);
 
 		// If the teleport wasn't cancelled by anything, update their gamemode and other location-based info

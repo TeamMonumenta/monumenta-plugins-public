@@ -63,6 +63,8 @@ public class ZoneUtils {
 		PRECIOUS_BLOCK_DROPS_DISABLED("Precious Block Drops Disabled"),
 		ITEM_FRAMES_EDITABLE("Item Frames Editable"),
 		NO_VIRTUAL_INVENTORIES("No Virtual Inventories"),
+		NO_SPECTATOR_ON_RESPAWN("No Spectator On Respawn"),
+		NO_SPECTATOR_ON_DEATH("No Spectator On Death"),
 		;
 
 		private final String mPropertyName;

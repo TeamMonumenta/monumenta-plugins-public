@@ -5,19 +5,29 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.time.Duration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class RespawnStasis extends Stasis {
@@ -28,18 +38,26 @@ public class RespawnStasis extends Stasis {
 	public static final int DURATION = 20 * 60;
 
 	public static final int MINIMUM_DURATION = 10;
+	public static final int SPECTATE_DURATION = 3 * 20;
 
 	int mShatter;
 	int mShatterLevel;
 
 	private boolean mRemoveActionbar = false;
+	private final @Nullable Location mDeathLocation;
+	private final @Nullable Location mRespawnLocation;
+	public boolean mCanStopSpectating = false;
 
-	public RespawnStasis() {
+	public RespawnStasis(@Nullable Location deathLocation, @Nullable Location respawnLocation) {
 		super(DURATION, effectID);
+		mDeathLocation = deathLocation;
+		mRespawnLocation = respawnLocation;
 	}
 
 	private RespawnStasis(int duration) {
 		super(duration, effectID);
+		mDeathLocation = null;
+		mRespawnLocation = null;
 	}
 
 	@Override
@@ -48,39 +66,117 @@ public class RespawnStasis extends Stasis {
 			mShatter = Shattered.getHighestShatterLevelEquipped(player);
 			mShatterLevel = Shattered.getShatteredLevelsEquipped(player);
 
-			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, getDuration(), 0, false, false, false));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, getDuration(), 0, false, false, false));
+			if (mDeathLocation != null && mRespawnLocation != null
+				&& mDeathLocation.getWorld().equals(mRespawnLocation.getWorld())
+				&& mDeathLocation.getY() > 0
+				&& player.hasPermission("monumenta.deathspectate")
+				&& !ZoneUtils.hasZoneProperty(mDeathLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_DEATH)
+				&& !ZoneUtils.hasZoneProperty(mRespawnLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_RESPAWN)
+			) {
+				Location spectateLocation = findSpectateLocation(mDeathLocation);
+				ArmorStand stand = spectateLocation.getWorld().spawn(spectateLocation, ArmorStand.class, s -> {
+					s.setInvisible(true);
+					s.setMarker(true);
+					s.setInvulnerable(true);
+					s.setGravity(false);
+				});
+				EntityUtils.setRemoveEntityOnUnload(stand);
+
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					player.setGameMode(GameMode.SPECTATOR);
+					player.setSpectatorTarget(stand);
+				});
+
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					if (player.isOnline() && getDuration() > 0) {
+						removeSpectator(player);
+					}
+					if (stand.isValid()) {
+						stand.remove();
+					}
+				}, SPECTATE_DURATION);
+			} else {
+				if (player.getGameMode() == GameMode.SPECTATOR) {
+					Location respawnLocation = PlayerUtils.getRespawnLocationAndClear(player, player.getWorld(), player.getBedSpawnLocation());
+					player.teleport(respawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
+					player.setGameMode(GameMode.SURVIVAL);
+				}
+				startEffects(player);
+			}
 
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> showMessages(player, false));
 
-			// The following lines are from base Stasis with sound, glowing, and action bar message removed; and also potion effects' icons and particles removed
-			Plugin.getInstance().mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(getDuration(), -1, SPEED_EFFECT_NAME).displays(false));
 			AbilityManager.getManager().updateSilence(player, true);
 		}
 	}
 
+	private void startEffects(Player player) {
+		player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, getDuration(), 0, false, false, false));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, getDuration(), 0, false, false, false));
+		// The following lines are from base Stasis with sound, glowing, and action bar message removed; and also potion effects' icons and particles removed
+		Plugin.getInstance().mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(getDuration(), -1, SPEED_EFFECT_NAME).displays(false));
+	}
+
+	private static Location findSpectateLocation(Location deathLocation) {
+		Vector dir = deathLocation.getDirection();
+		dir = dir.setY(0);
+		if (dir.lengthSquared() < 0.001) {
+			return deathLocation;
+		}
+		dir = dir.normalize();
+		dir.setY(-0.66);
+		dir = dir.normalize().multiply(0.25);
+		Location loc = deathLocation.clone().add(0, 1.6, 0);
+		for (int i = 0; i < 30; i++) {
+			loc.subtract(dir);
+			if (loc.getBlock().isSolid() || loc.getBlock().getRelative(BlockFace.UP).isSolid()) {
+				loc.add(dir);
+				return loc;
+			}
+		}
+
+		return loc;
+	}
+
 	@Override
 	public void entityLoseEffect(Entity entity) {
+		mCanStopSpectating = true;
 		if (entity instanceof Player player) {
 			player.removePotionEffect(PotionEffectType.BLINDNESS);
 			player.removePotionEffect(PotionEffectType.INVISIBILITY);
 			player.removePotionEffect(PotionEffectType.SLOW);
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			showMessages(player, true);
+			if (player.getGameMode() == GameMode.SPECTATOR) {
+				if (mRespawnLocation != null) {
+					player.teleport(mRespawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
+				}
+				player.setGameMode(GameMode.SURVIVAL);
+			}
 		}
 		super.entityLoseEffect(entity);
 	}
 
-	// This is overridden from Statis to remove action bar message and particles
+	// This is overridden from Stasis to remove action bar message and particles
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		new PartialParticle(Particle.SMOKE_NORMAL, entity.getLocation().add(0, 0.5, 0), 25)
+		if (!(entity instanceof Player player)) {
+			return;
+		}
+		if (player.getGameMode() != GameMode.SPECTATOR) {
+			new PartialParticle(Particle.SMOKE_NORMAL, entity.getLocation().add(0, 0.5, 0), 25)
 				.delta(0.2, 0.5, 0.2)
 				.spawnAsEntityActive(entity);
-		new PartialParticle(Particle.SOUL, entity.getLocation().add(0, 1, 0), 1)
+			new PartialParticle(Particle.SOUL, entity.getLocation().add(0, 1, 0), 1)
 				.delta(0.3, 0.5, 0.3)
 				.spawnAsEntityActive(entity);
-		if (oneHertz && entity instanceof Player player) {
+		} else {
+			Block block = player.getLocation().getBlock();
+			if (block.isSolid() || block.getRelative(BlockFace.UP).isSolid()) {
+				removeSpectator(player);
+			}
+		}
+		if (oneHertz) {
 			showMessages(player, false);
 		}
 	}
@@ -130,6 +226,26 @@ public class RespawnStasis extends Stasis {
 			player.sendActionBar(Component.text("You will be forcibly respawned in " + (getDuration() / 20) + " seconds!", NamedTextColor.WHITE));
 			mRemoveActionbar = true;
 		}
+	}
+
+	private void removeSpectator(Player player) {
+		mCanStopSpectating = true;
+		// Zones should handle setting to adventure when we teleport
+		player.setGameMode(GameMode.SURVIVAL);
+		if (mRespawnLocation != null) {
+			player.teleport(mRespawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
+		}
+		startEffects(player);
+	}
+
+	@Override
+	public boolean pauseInSpectatorMode() {
+		return false;
+	}
+
+	@Override
+	public boolean skipInRespawnRefresh() {
+		return true;
 	}
 
 	public static Stasis deserialize(JsonObject object, Plugin plugin) {

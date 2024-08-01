@@ -486,7 +486,7 @@ public final class EffectManager implements Listener {
 									}
 
 									boolean tickResult;
-									if (spectator) {
+									if (spectator && effect.pauseInSpectatorMode()) {
 										tickResult = false;
 									} else {
 										try {
@@ -1081,6 +1081,10 @@ public final class EffectManager implements Listener {
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			List<Effect> activeEffects = getAllEffects(player);
 			for (Effect effect : activeEffects) {
+				if (effect.skipInRespawnRefresh()) {
+					continue;
+				}
+
 				String source = getSource(player, effect);
 				// Recall Effect Gain Function to regain buffs one tick later.
 				effect.entityLoseEffect(player);

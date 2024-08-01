@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackHealingDone;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.structures.StructuresPlugin;
@@ -38,9 +39,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -50,6 +54,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -604,5 +609,61 @@ public class PlayerUtils {
 
 	public static boolean hasUnlockedRing(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) >= 1;
+	}
+
+	public static Location getRespawnLocationAndClear(Player player, World world, @Nullable Location originalRespawnLocation) {
+		Location realRespawnLocation = player.getPotentialBedLocation();
+		boolean mightBeBedSpawn = false;
+		if (realRespawnLocation == null || realRespawnLocation.getWorld() != world) {
+			realRespawnLocation = world.getSpawnLocation();
+		} else {
+			mightBeBedSpawn = realRespawnLocation.getBlock().getBlockData() instanceof Bed;
+			if (mightBeBedSpawn) {
+				// Add some y value to not break the bed on respawn (and respawn on top of it instead),
+				// except if the block above is unbreakable.
+				if (realRespawnLocation.clone().add(0, 1, 0).getBlock().getType().getHardness() >= 0) {
+					realRespawnLocation.add(0, 0.6, 0);
+				}
+			}
+			if (originalRespawnLocation != null) {
+				realRespawnLocation.setPitch(originalRespawnLocation.getPitch());
+				realRespawnLocation.setYaw(originalRespawnLocation.getYaw());
+			}
+		}
+		// spawn locations are stored as ints, need to add (0.5, 0, 0.5) to get the center of the block
+		realRespawnLocation.add(0.5, 0, 0.5);
+
+		// If vanilla moved the respawn location, move it back to the real location, as long as that location is in a survival zone,
+		// and break blocks around the respawn location as if broken with an iron pickaxe.
+		// Only breaks block on play for non-creative/spectator players.
+		// (does not check for whether the player is in adventure mode, as a player's game mode is not yet updated)
+		int distanceToCheck = mightBeBedSpawn ? 3 : 1; // bed spawn point may be up to 2 blocks away from the bed
+		boolean useRealLocation = originalRespawnLocation == null || (Math.abs(originalRespawnLocation.getX() - realRespawnLocation.getX()) < distanceToCheck && Math.abs(originalRespawnLocation.getZ() - realRespawnLocation.getZ()) < distanceToCheck);
+		if (useRealLocation && ZoneUtils.isMineable(realRespawnLocation)) {
+			if (Plugin.IS_PLAY_SERVER
+				    && player.getGameMode() != GameMode.CREATIVE
+				    && player.getGameMode() != GameMode.SPECTATOR) {
+				boolean couldNotBreakBlock = false;
+				BoundingBox playerBox = BoundingBox.of(realRespawnLocation.clone().add(-0.3, 0, -0.3), realRespawnLocation.clone().add(0.3, 1.8, 0.3));
+				ItemStack ironPick = new ItemStack(Material.IRON_PICKAXE);
+				for (Block collidingBlock : NmsUtils.getVersionAdapter().getCollidingBlocks(world, playerBox, true)) {
+					if (ZoneUtils.isMineable(collidingBlock.getLocation())
+						    && collidingBlock.getType().getHardness() >= 0) {
+						collidingBlock.breakNaturally(ironPick);
+					} else {
+						couldNotBreakBlock = true;
+					}
+				}
+				if (couldNotBreakBlock) {
+					// Warn about respawning inside solid blocks, but check if the player can crawl in the space first because that won't cause issues
+					BoundingBox crawlingBox = BoundingBox.of(realRespawnLocation.clone().add(-0.3, 0, -0.3), realRespawnLocation.clone().add(0.3, 0.6, 0.3));
+					if (NmsUtils.getVersionAdapter().hasCollisionWithBlocks(player.getWorld(), crawlingBox, true)) {
+						AuditListener.log("Player " + player.getName() + " respawned inside unbreakable blocks at " + realRespawnLocation + "!");
+					}
+				}
+			}
+			return realRespawnLocation;
+		}
+		return originalRespawnLocation != null ? originalRespawnLocation : world.getSpawnLocation();
 	}
 }

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.effects.Stasis;
@@ -26,7 +27,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -51,6 +51,13 @@ public class StasisListener implements Listener {
 		return entity instanceof Player && Plugin.getInstance().mEffectManager.hasEffect(entity, RespawnStasis.class);
 	}
 
+	public static @Nullable RespawnStasis getRespawnStasis(@Nullable Entity entity) {
+		if (!(entity instanceof Player)) {
+			return null;
+		}
+		return Plugin.getInstance().mEffectManager.getActiveEffect(entity, RespawnStasis.class);
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
@@ -59,9 +66,17 @@ public class StasisListener implements Listener {
 			if (Math.abs(event.getTo().getX() - event.getFrom().getX()) < 0.00001
 				    && Math.abs(event.getTo().getZ() - event.getFrom().getZ()) < 0.00001
 				    && event.getTo().getY() < event.getFrom().getY()
-				    && isInRespawnStasis(player)) {
+				    && isInRespawnStasis(player)
+				    && player.getGameMode() != GameMode.SPECTATOR) {
 				return;
 			}
+
+			RespawnStasis rs = Plugin.getInstance().mEffectManager.getActiveEffect(player, RespawnStasis.class);
+			if (rs != null && rs.getDuration() < RespawnStasis.DURATION - RespawnStasis.SPECTATE_DURATION) {
+				endRespawnStasis(player);
+				return;
+			}
+
 			Location to = event.getFrom();
 			to.setPitch(event.getTo().getPitch());
 			to.setYaw(event.getTo().getYaw());
@@ -184,9 +199,9 @@ public class StasisListener implements Listener {
 		}
 	}
 
-	private void endRespawnStasis(Player player, boolean ignoreTimeCheck) {
+	private void endRespawnStasis(Player player) {
 		RespawnStasis respawnStasis = Plugin.getInstance().mEffectManager.getActiveEffect(player, RespawnStasis.class);
-		if (respawnStasis != null && (ignoreTimeCheck || respawnStasis.getDuration() < RespawnStasis.DURATION - RespawnStasis.MINIMUM_DURATION)) {
+		if (respawnStasis != null && (respawnStasis.getDuration() < RespawnStasis.DURATION - RespawnStasis.MINIMUM_DURATION)) {
 			respawnStasis.setDuration(0);
 		}
 	}
@@ -199,7 +214,7 @@ public class StasisListener implements Listener {
 		if (isInRespawnStasis(event.getPlayer())) {
 			event.setCancelled(true);
 			// Allow "respawning" after 1 second (to prevent accidental instant respawns)
-			endRespawnStasis(event.getPlayer(), false);
+			endRespawnStasis(event.getPlayer());
 		}
 	}
 
@@ -207,14 +222,7 @@ public class StasisListener implements Listener {
 	public void playerAnimationEvent(PlayerAnimationEvent event) {
 		if (isInRespawnStasis(event.getPlayer())) {
 			event.setCancelled(true);
-			endRespawnStasis(event.getPlayer(), false);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
-		if (event.getNewGameMode() == GameMode.SPECTATOR) {
-			endRespawnStasis(event.getPlayer(), true);
+			endRespawnStasis(event.getPlayer());
 		}
 	}
 
@@ -222,6 +230,16 @@ public class StasisListener implements Listener {
 	public void entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		if (isInStasis(event.getEntity())) {
 			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void playerStopSpectatingEntityEvent(PlayerStopSpectatingEntityEvent event) {
+		Player player = event.getPlayer();
+		RespawnStasis rs = Plugin.getInstance().mEffectManager.getActiveEffect(player, RespawnStasis.class);
+		if (rs != null && !rs.mCanStopSpectating) {
+			// For some reason cancelling the event softlocks you, but this works
+			player.setSpectatorTarget(event.getSpectatorTarget());
 		}
 	}
 
