@@ -4,14 +4,26 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.cosmetics.Cosmetic;
+import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.poses.GravePose;
+import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import java.time.Instant;
@@ -130,7 +142,7 @@ public final class Grave {
 		mShardName = ServerProperties.getShardName();
 		mLocation = mPlayer.getLocation().clone();
 		if (mLocation.getY() < 1) {
-			mLocation.setY(1);
+			mLocation.setY(2);
 			for (int i = 0; i < 100; i++) {
 				if (ZoneUtils.hasZoneProperty(mLocation, ZoneUtils.ZoneProperty.RAISE_GRAVE_ABOVE_ZONE)) {
 					mLocation.add(0, 1, 0);
@@ -147,7 +159,7 @@ public final class Grave {
 		mEquipment.put(KEY_EQUIPMENT_HAND, equipment.get(EquipmentSlot.HAND));
 		mEquipment.put(KEY_EQUIPMENT_OFF_HAND, equipment.get(EquipmentSlot.OFF_HAND));
 		mPose = new HashMap<>();
-		generateNewPose();
+		setPose();
 		mItems = new HashSet<>();
 		mGhostGrave = true;
 		mAlertedSpawned = true;
@@ -160,18 +172,17 @@ public final class Grave {
 		mPlayer = item.mPlayer;
 		mUuid = UUID.randomUUID();
 		mDeathTime = Instant.now();
+		mSmall = true;
 		mShardName = item.mShardName;
 		mLocation = item.mLocation.clone();
 		if (mLocation.getY() < 1) {
 			mLocation.setY(1);
 		}
 		mEquipment = new HashMap<>();
-		mEquipment.put(KEY_EQUIPMENT_HAND, item.mItem);
+		boolean switchHand = GravePoses.getEquippedGravePose(mPlayer).switchHeldItemHand();
+		mEquipment.put(!switchHand ? KEY_EQUIPMENT_HAND : KEY_EQUIPMENT_OFF_HAND, item.mItem);
 		mPose = new HashMap<>();
-		generateNewPose();
-		setPoseDegrees(KEY_POSE_LEFT_ARM, 260d, 45d, 0d);
-		setPoseDegrees(KEY_POSE_RIGHT_ARM, 270d, 330d, 0d);
-		mSmall = true;
+		setPose();
 		mItems = new HashSet<>();
 		mItems.add(new GraveItem(item));
 		item.delete();
@@ -223,26 +234,25 @@ public final class Grave {
 				stand.setRightArmPose(mPose.get(KEY_POSE_RIGHT_ARM));
 				stand.setLeftLegPose(mPose.get(KEY_POSE_LEFT_LEG));
 				stand.setRightLegPose(mPose.get(KEY_POSE_RIGHT_LEG));
-				// TODO: remove stats of equipment here or earlier - usb
 				stand.setItem(EquipmentSlot.HEAD, mEquipment.get(KEY_EQUIPMENT_HEAD));
 				stand.setItem(EquipmentSlot.CHEST, mEquipment.get(KEY_EQUIPMENT_BODY));
 				stand.setItem(EquipmentSlot.LEGS, mEquipment.get(KEY_EQUIPMENT_LEGS));
 				stand.setItem(EquipmentSlot.FEET, mEquipment.get(KEY_EQUIPMENT_FEET));
 				stand.setItem(EquipmentSlot.HAND, mEquipment.get(KEY_EQUIPMENT_HAND));
 				stand.setItem(EquipmentSlot.OFF_HAND, mEquipment.get(KEY_EQUIPMENT_OFF_HAND));
-				// TODO: ssetDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
-				// PlayerArmorStandManipulateEvent is used here
 				stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 				stand.setGravity(false);
 				stand.setCanMove(false);
 				stand.setSilent(true);
+				stand.setBasePlate(GravePoses.getEquippedGravePose(mPlayer).basePlate(mSmall));
 				stand.customName(Component.text(mPlayer.getName() + (mPlayer.getName().endsWith("s") ? "' Grave" : "'s Grave")));
 				stand.setCustomNameVisible(!mSmall);
 				stand.addScoreboardTag(GraveManager.GRAVE_TAG);
+				stand.addScoreboardTag(EntityListener.PROJECTILE_PASSTHROUGH_TAG);
 				mManager.addGrave(stand, this);
+				mManager.removeUnloadedGrave(Chunk.getChunkKey(mLocation), this);
+				startTracking();
 			});
-			mManager.removeUnloadedGrave(Chunk.getChunkKey(mLocation), this);
-			startTracking();
 			if (!mAlertedSpawned) {
 				mAlertedSpawned = true;
 				Component message = Component.text("You have a grave at ", NamedTextColor.AQUA)
@@ -277,6 +287,8 @@ public final class Grave {
 
 	private void startTracking() {
 		if (mRunnable == null) {
+			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getActiveCosmetic(mPlayer, CosmeticType.GRAVE_POSE);
+			GravePose gravePose = GravePoses.getGravePose(activeCosmetic);
 			mRunnable = new BukkitRunnable() {
 				int mGlowingSeconds = 0;
 				@Override
@@ -291,8 +303,8 @@ public final class Grave {
 							mEntity.setGlowing(false);
 						}
 
-						if (ScoreboardUtils.getScoreboardValue(mPlayer, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) > 0) {
-							doPhylacteryParticles();
+						if (mEntity != null) {
+							gravePose.passiveParticles(mPlayer, mEntity, ScoreboardUtils.getScoreboardValue(mPlayer, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) > 0);
 						}
 
 						if (mEntity.getScoreboardTags().contains("Delete")) {
@@ -513,7 +525,9 @@ public final class Grave {
 					          .append(Component.text("Click here to delete this grave permanently.", NamedTextColor.RED)
 						                  .hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
 						                  .clickEvent(ClickEvent.runCommand("/grave delete " + mUuid)));
-
+				if (mEntity != null) {
+					GravePoses.getEquippedGravePose(mPlayer).playAnimation(mEntity);
+				}
 				mPlayer.sendMessage(message);
 				mGraveMessageCooldown.add(mUuid);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
@@ -523,27 +537,14 @@ public final class Grave {
 		}
 	}
 
-	private void generateNewPose() {
-		mPose.put(KEY_POSE_HEAD, new EulerAngle(0, 0, 0));
-		mPose.put(KEY_POSE_BODY, new EulerAngle(0, 0, 0));
-		mPose.put(KEY_POSE_LEFT_ARM, new EulerAngle(0, 0, 0));
-		mPose.put(KEY_POSE_RIGHT_ARM, new EulerAngle(0, 0, 0));
-		mPose.put(KEY_POSE_LEFT_LEG, new EulerAngle(0, 0, 0));
-		mPose.put(KEY_POSE_RIGHT_LEG, new EulerAngle(0, 0, 0));
-		//TODO Actually generate a randomized pose
-	}
-
-	private void setPoseRadians(String key, Double x, Double y, Double z) {
-		EulerAngle old = mPose.getOrDefault(key, EulerAngle.ZERO);
-		mPose.put(key, new EulerAngle(x == null ? old.getX() : x, y == null ? old.getY() : y, z == null ? old.getZ() : z));
-	}
-
-	private void setPoseDegrees(String key, Double x, Double y, Double z) {
-		EulerAngle old = mPose.getOrDefault(key, EulerAngle.ZERO);
-		x = x == null ? old.getX() : Math.toRadians(x);
-		y = y == null ? old.getY() : Math.toRadians(y);
-		z = z == null ? old.getZ() : Math.toRadians(z);
-		setPoseRadians(key, x, y, z);
+	private void setPose() {
+		GravePose.Pose pose = GravePoses.getEquippedGravePose(mPlayer).getPose(mSmall);
+		mPose.put(KEY_POSE_HEAD, pose.head());
+		mPose.put(KEY_POSE_BODY, pose.body());
+		mPose.put(KEY_POSE_LEFT_ARM, pose.leftArm());
+		mPose.put(KEY_POSE_RIGHT_ARM, pose.rightArm());
+		mPose.put(KEY_POSE_LEFT_LEG, pose.leftLeg());
+		mPose.put(KEY_POSE_RIGHT_LEG, pose.rightLeg());
 	}
 
 	private void update() {

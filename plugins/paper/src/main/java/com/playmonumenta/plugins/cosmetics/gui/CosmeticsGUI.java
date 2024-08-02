@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillGUIConfig;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillShopGUI;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -39,11 +40,12 @@ public class CosmeticsGUI extends CustomInventory {
 	private static final int PREV_PAGE_LOC = 45;
 	private static final int NEXT_PAGE_LOC = 53;
 	static final int BACK_LOC = 49;
-	private static final int TITLE_LOC = 2 * 9 + 1;
-	private static final int ELITE_FINISHER_LOC = 2 * 9 + 3;
-	private static final int COSMETIC_SKILL_LOC = 2 * 9 + 5;
-	private static final int VANITY_LOC = 2 * 9 + 7;
-	private static final int UNLOCKED_VANITY_LOC = 3 * 9 + 7;
+	private static final int TITLE_LOC = 1 * 9 + 2;
+	private static final int ELITE_FINISHER_LOC = 1 * 9 + 4;
+	private static final int COSMETIC_SKILL_LOC = 1 * 9 + 6;
+	private static final int GRAVE_POSE_LOC = 3 * 9 + 2;
+	private static final int VANITY_LOC = 3 * 9 + 4;
+	private static final int UNLOCKED_VANITY_LOC = 3 * 9 + 6;
 	private static final int SUMMARY_LOC = 0;
 	private static final int SKILL_ICON_LOC = 8;
 	private static final int COSMETICS_START = 9;
@@ -92,6 +94,22 @@ public class CosmeticsGUI extends CustomInventory {
 			playBookSound(player);
 			setUpCosmetics(player);
 			return;
+		} else if (mDisplayPage == null && slot == COSMETIC_SKILL_LOC) {
+			mDisplayPage = CosmeticType.COSMETIC_SKILL;
+			playBookSound(player);
+			setUpClassSelectionPage();
+			return;
+		} else if (mDisplayPage == null && slot == GRAVE_POSE_LOC) {
+			if (GravePoses.canAccess(player)) {
+				mDisplayPage = CosmeticType.GRAVE_POSE;
+				playBookSound(player);
+				setUpCosmetics(player);
+			} else {
+				close();
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.PLAYERS, 1, 1);
+				player.sendMessage(Component.text("Grave Poses are only accessible to ", NamedTextColor.RED).append(Component.text("Patrons", NamedTextColor.GOLD)).append(Component.text("!", NamedTextColor.RED)));
+			}
+			return;
 		} else if (mDisplayPage == null && slot == VANITY_LOC) {
 			new VanityGUI(player).open();
 			return;
@@ -99,11 +117,6 @@ public class CosmeticsGUI extends CustomInventory {
 			mDisplayPage = CosmeticType.VANITY;
 			playBookSound(player);
 			setUpCosmetics(player);
-			return;
-		} else if (mDisplayPage == null && slot == COSMETIC_SKILL_LOC) {
-			mDisplayPage = CosmeticType.COSMETIC_SKILL;
-			playBookSound(player);
-			setUpClassSelectionPage();
 			return;
 		}
 
@@ -367,6 +380,9 @@ public class CosmeticsGUI extends CustomInventory {
 		ItemStack cosmeticSkillItem = GUIUtils.createBasicItem(CosmeticType.COSMETIC_SKILL.getDisplayItem(null), "Cosmetic Skills", NamedTextColor.GOLD, true, "Select cosmetic effects for ability casts.", NamedTextColor.GRAY);
 		mInventory.setItem(COSMETIC_SKILL_LOC, cosmeticSkillItem);
 
+		ItemStack gravePoseItem = GUIUtils.createBasicItem(CosmeticType.GRAVE_POSE.getDisplayItem(null), "Grave Poses", NamedTextColor.GOLD, true, "Select a pose for your graves to take on. Only accessible to Patrons.", NamedTextColor.GRAY);
+		mInventory.setItem(GRAVE_POSE_LOC, gravePoseItem);
+
 		ItemStack vanityItem = GUIUtils.createBasicItem(CosmeticType.VANITY.getDisplayItem(null), "Vanity Manager", NamedTextColor.GOLD, true, "Control your equipped vanity items.", NamedTextColor.GRAY);
 		mInventory.setItem(VANITY_LOC, vanityItem);
 
@@ -375,7 +391,7 @@ public class CosmeticsGUI extends CustomInventory {
 	}
 
 	/**
-	 * Sets up the dispaly page for the cosmetic skill main page
+	 * Sets up the display page for the cosmetic skill main page
 	 * with items to click to choose a class then browse skills or spec
 	 */
 	private void setUpClassSelectionPage() {

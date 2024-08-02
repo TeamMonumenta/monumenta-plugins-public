@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.finishers.PlayingFinisher;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
+import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -385,7 +386,8 @@ public class CosmeticsManager implements Listener {
 		}
 		// call the "event listener" of the vanity manager after the cosmetics manager loaded cosmetics
 		Plugin.getInstance().mVanityManager.playerJoinEvent(event);
-		//reloadSkillCosmetics(p);
+
+		GravePoses.handleLogin(p);
 	}
 
 	// Elite Finisher handler

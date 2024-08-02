@@ -137,6 +137,8 @@ public class EntityListener implements Listener {
 
 	private static final String AREA_EFFECT_CLOUD_POTION_METAKEY = "MonumentaAreaEffectCloudPotion";
 
+	public static final String PROJECTILE_PASSTHROUGH_TAG = "projectile_passthrough";
+
 	Plugin mPlugin;
 	AbilityManager mAbilities;
 
@@ -866,7 +868,7 @@ public class EntityListener implements Listener {
 		ProjectileSource source = proj.getShooter();
 
 		// Make projectiles shot by players pass through players and specified mobs
-		if (source instanceof Player && entity != null && (entity instanceof Player || ScoreboardUtils.checkTag(entity, "projectile_passthrough")) && EntityUtils.isAbilityTriggeringProjectile(proj, false)) {
+		if (source instanceof Player && entity != null && (entity instanceof Player || ScoreboardUtils.checkTag(entity, PROJECTILE_PASSTHROUGH_TAG)) && EntityUtils.isAbilityTriggeringProjectile(proj, false)) {
 			event.setCancelled(true);
 		}
 	}
