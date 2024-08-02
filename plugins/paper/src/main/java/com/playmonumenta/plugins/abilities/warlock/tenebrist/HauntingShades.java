@@ -127,8 +127,9 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 
 	private void placeShade(Location bLoc) {
 		World world = mPlayer.getWorld();
-		bLoc.setDirection(mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize());
 		ArmorStand stand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, mCosmetic.getAsName());
+		Vector v = mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize();
+		float f = (float) (-180 * (Math.atan2(v.getX(), v.getZ()) / Math.PI));
 		if (stand == null) {
 			return;
 		}
@@ -141,6 +142,7 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 		stand.setVisible(false);
 		stand.setCustomNameVisible(false);
 		stand.setSmall(true);
+		stand.setRotation(f, 0);
 		mCurrDuration = 0;
 
 		ClientModHandler.updateAbility(mPlayer, this);
