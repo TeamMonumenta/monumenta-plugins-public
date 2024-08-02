@@ -45,8 +45,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -675,8 +673,11 @@ public class LoadoutManager implements Listener {
 			YellowTesseractOverride.setCooldown(player, 0);
 		}
 
-		if (YellowTesseractOverride.getCooldown(player) > 0) {
-			player.sendMessage(Component.text("Warning: Swapping skills is on cooldown! You will be silenced if you perform any changes to your class or abilities.", NamedTextColor.YELLOW));
+		int yellowCooldown = YellowTesseractOverride.getCooldown(player);
+		if (yellowCooldown > 0) {
+			player.sendMessage(Component.text("Warning: Swapping skills is on cooldown! You will be silenced if you perform any changes to your class or abilities in the next ", NamedTextColor.YELLOW)
+				.append(Component.text("" + yellowCooldown, NamedTextColor.RED, TextDecoration.BOLD))
+				.append(Component.text(yellowCooldown == 1 ? " minute." : " minutes.", NamedTextColor.YELLOW)));
 		}
 
 		new LoadoutManagerGui(player).open();
