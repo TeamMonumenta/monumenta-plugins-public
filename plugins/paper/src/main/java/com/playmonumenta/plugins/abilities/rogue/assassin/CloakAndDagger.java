@@ -51,9 +51,11 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			.scoreboardId("CloakAndDagger")
 			.shorthandName("CnD")
 			.descriptions(
-				String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to them in R2; every %s damage to them in R3). Stacks are capped at %s. " +
-					              "When you press the drop key with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth " +
-					              "and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. This attack ends stealth. You must have at least %s stacks to activate this.",
+				String.format("Killing an enemy grants a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks " +
+					          "(every %s damage to them in R2; every %s damage to them in R3 excluding damage from this skill). Stack cap: %s. " +
+					          "Pressing the drop key while dual wielding swords removes all cloak stacks for %s seconds of Stealth " +
+					          "and (%s * X) melee damage on your next Stealthed melee attack, where X is the number of stacks you had at activation. " +
+					          "Performing a successful melee attack or switching from your held swords ends Stealth. You must have at least %s stacks for activation.",
 					CLOAK_STACKS_ON_ELITE_KILL,
 					BOSS_DAMAGE_THRESHOLD_R2,
 					BOSS_DAMAGE_THRESHOLD_R3,
@@ -61,10 +63,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 					STEALTH_DURATION / 20.0,
 					(int) CLOAK_1_DAMAGE_MULTIPLIER,
 					CLOAK_MIN_STACKS),
-				String.format("Cloak stacks are now capped at %s and bonus damage is increased to (%s * X) where X is the number of stacks you have upon activating this skill.",
+				String.format("The Cloak stack cap is now %s and the melee damage is increased to (%s * X).",
 					CLOAK_2_MAX_STACKS,
 					(int) CLOAK_2_DAMAGE_MULTIPLIER))
-			.simpleDescription("Killing mobs gains cloak stacks, which can be consumed to enter stealth mode and buff the next melee attack.")
+			.simpleDescription("Killing mobs grants cloak stacks, which can be consumed to enter Stealth and buff your next melee attack.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakAndDagger::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(Material.IRON_SWORD);

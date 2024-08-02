@@ -586,6 +586,7 @@ public class CharmManager {
 			GloriousBattle.CHARM_KNOCKBACK,
 			GloriousBattle.CHARM_DAMAGE_MODIFIER,
 			GloriousBattle.CHARM_BONUS_DAMAGE,
+			GloriousBattle.CHARM_MOB_CAP,
 			MeteorSlam.CHARM_COOLDOWN,
 			MeteorSlam.CHARM_DAMAGE,
 			MeteorSlam.CHARM_RADIUS,

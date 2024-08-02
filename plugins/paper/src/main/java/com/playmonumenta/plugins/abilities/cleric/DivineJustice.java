@@ -40,14 +40,14 @@ public class DivineJustice extends Ability {
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
 
 	public static final int DAMAGE = 5;
-	public static final double DAMAGE_MULTIPLIER = 0.25;
+	public static final double DAMAGE_MULTIPLIER = 0.2;
 	public static final double HEALING_MULTIPLIER_OWN = 0.1;
 	public static final double HEALING_MULTIPLIER_OTHER = 0.05;
 	public static final int RADIUS = 12;
 	public static final double ENHANCEMENT_ASH_CHANCE = 0.33;
 	public static final int ENHANCEMENT_ASH_DURATION = 10 * 20;
-	public static final double ENHANCEMENT_ASH_BONUS_DAMAGE = 0.05;
-	public static final double ENHANCEMENT_BONUS_DAMAGE_MAX = 0.4;
+	public static final double ENHANCEMENT_ASH_BONUS_DAMAGE = 0.04;
+	public static final double ENHANCEMENT_BONUS_DAMAGE_MAX = 0.32;
 	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = 20 * 20;
 	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = 4 * 60 * 20;
 	public static final String ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME = "DivineJusticeBonusDamageEffect";

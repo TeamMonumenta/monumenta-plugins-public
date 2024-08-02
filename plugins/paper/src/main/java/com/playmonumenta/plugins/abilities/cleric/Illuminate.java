@@ -93,7 +93,7 @@ public class Illuminate extends Ability {
 					StringUtils.ticksToSeconds(COOLDOWN_2)
 				),
 				String.format("A sanctified area is placed wherever Illuminate explodes, granting the same effects as the trail within a %s-block radius and lasting for the same duration. " +
-					"Enemies within Illuminate's trail take %s magic damage every 0.5s.",
+					"Enemies within Illuminate's trail take %s magic damage every 2s.",
 					StringUtils.formatDecimal(ILLUMINATE_ENHANCE_RADIUS),
 					StringUtils.formatDecimal(ILLUMINATE_ENHANCE_DAMAGE)
 				))
@@ -213,7 +213,7 @@ public class Illuminate extends Ability {
 					}
 				}
 
-				if (isEnhanced() && mTicks % 10 == 0) {
+				if (isEnhanced() && mTicks % 40 == 0) {
 					for (LivingEntity mob : mMobsInZone) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mEnhanceDamage, mInfo.getLinkedSpell(), true);
 						mCosmetic.enhanceTickDamageEffect(mPlayer, mob);
