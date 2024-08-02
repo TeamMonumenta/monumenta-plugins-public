@@ -181,7 +181,11 @@ public class Shattered implements Infusion {
 	public static boolean unshatterOneLevel(ItemStack item) {
 		int oldLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
 		ItemMeta meta = item.getItemMeta();
-		if (oldLevel <= 0 || (meta instanceof Damageable damageableMeta && damageableMeta.getDamage() == item.getType().getMaxDurability())) {
+		int maxDurability = item.getType().getMaxDurability();
+		boolean canRepairDurability = maxDurability != 0
+			&& meta instanceof Damageable damageableMeta
+			&& damageableMeta.getDamage() == maxDurability;
+		if (oldLevel <= 0 || canRepairDurability) {
 			return false;
 		}
 		if (oldLevel == 1) {
