@@ -37,7 +37,7 @@ import org.bukkit.util.Vector;
 public class PiercingCold extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Piercing Cold";
-	public static final int[] DAMAGE = {14, 17, 20, 23, 26, 32};
+	public static final double[] DAMAGE = {18, 21, 24, 27, 30, 36};
 	public static final int ICE_TICKS = 8 * 20;
 	public static final int COOLDOWN = 11 * 20;
 	private static final Particle.DustOptions ENCHANTED_ARROW_COLOR = new Particle.DustOptions(Color.fromRGB(80, 32, 140), 2.0f);

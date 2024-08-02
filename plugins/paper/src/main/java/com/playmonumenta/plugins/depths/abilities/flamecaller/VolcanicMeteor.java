@@ -31,10 +31,10 @@ import org.bukkit.util.Vector;
 
 public class VolcanicMeteor extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Meteor";
-	public static final int[] DAMAGE = {40, 50, 60, 70, 80, 100};
+	public static final int[] DAMAGE = {36, 45, 54, 63, 72, 90};
 	public static final int COOLDOWN_TICKS = 25 * 20;
 	public static final int DISTANCE = 25;
-	public static final int SIZE = 6;
+	public static final int SIZE = 5;
 	public static final int FIRE_TICKS = 3 * 20;
 
 	public static final String CHARM_COOLDOWN = "Volcanic Meteor Cooldown";
@@ -117,7 +117,7 @@ public class VolcanicMeteor extends DepthsAbility {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, mRadius, mPlayer)) {
 								double distance = loc.distance(e.getLocation());
-								double multiplier = Math.min(Math.max(0, (mRadius - distance) / 4), 1);
+								double multiplier = Math.min(Math.max(0.5, (8 - (5 / mRadius * distance)) / 6), 1);
 
 								EntityUtils.applyFire(mPlugin, mFireDuration, e, mPlayer, playerItemStats);
 								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage * multiplier, true, true, false);

@@ -41,9 +41,9 @@ import org.jetbrains.annotations.Nullable;
 public class IceBarrier extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ice Barrier";
-	public static final double[] DAMAGE = {13, 16, 19, 22, 25, 30};
-	public static final int ICE_TICKS = 14 * 20;
-	public static final int COOLDOWN = 14 * 20;
+	public static final double[] DAMAGE = {15, 18, 21, 24, 27, 33};
+	public static final int ICE_TICKS = 12 * 20;
+	public static final int COOLDOWN = 12 * 20;
 	public static final int CAST_RANGE = 30;
 	public static final int[] MAX_LENGTH = {20, 25, 30, 35, 40, 50};
 	public static final int CAST_TIME = 5 * 20;

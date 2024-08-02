@@ -241,7 +241,7 @@ public enum ClassAbility {
 	ICE_LANCE("Ice Lance"),
 	ICE_BARRIER("Ice Barrier"),
 	FRIGID_COMBOS("Frigid Combos"),
-	FROST_NOVA_DEPTHS("Frost Nova"),
+	SNOWSTORM("Snowstorm"),
 	AVALANCHE("Avalanche"),
 	PIERCING_COLD("Piercing Cold"),
 	CRYOBOX("Cryobox"),

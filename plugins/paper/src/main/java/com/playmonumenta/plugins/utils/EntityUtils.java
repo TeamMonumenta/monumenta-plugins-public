@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.effects.DisableAI;
 import com.playmonumenta.plugins.effects.DisableGravity;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.Frozen;
 import com.playmonumenta.plugins.effects.Paralyze;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -1280,8 +1281,24 @@ public class EntityUtils {
 		plugin.mEffectManager.addEffect(entity, DISABLE_GRAVITY_SOURCE, new DisableGravity(duration));
 	}
 
+	public static void applyFreeze(Plugin plugin, int ticks, LivingEntity mob) {
+		if (isCCImmuneMob(mob)) {
+			return;
+		}
+
+		plugin.mEffectManager.addEffect(mob, "Frozen", new Frozen(ticks));
+	}
+
+	public static boolean isFrozen(LivingEntity mob) {
+		return Plugin.getInstance().mEffectManager.hasEffect(mob, "Frozen");
+	}
+
+	public static void removeFreeze(Plugin plugin, LivingEntity mob) {
+		plugin.mEffectManager.clearEffects(mob, "Frozen");
+	}
+
 	public static boolean shouldCancelSpells(@Nullable LivingEntity entity) {
-		return entity == null || !entity.isValid() || entity.isDead() || isSilenced(entity) || isStunned(entity);
+		return entity == null || !entity.isValid() || entity.isDead() || isSilenced(entity) || isStunned(entity) || isFrozen(entity);
 	}
 
 	public static void summonEntityAt(Location loc, EntityType type, String nbt) {

@@ -93,7 +93,14 @@ public class CharmFactory {
 		Map.entry("Projectile Mastery Damage Multiplier", "Sharpshooter Damage Multiplier"),
 
 		Map.entry("Volcanic Combos Hit Requirement", "Volcanic Combos Cooldown"),
-		Map.entry("Frigid Combos Hit Requirement", "Frigid Combos Cooldown")
+		Map.entry("Frigid Combos Hit Requirement", "Frigid Combos Cooldown"),
+
+		Map.entry("Frost Nova Cooldown", "Snowstorm Cooldown"),
+		Map.entry("Frost Nova Damage", "Snowstorm Damage"),
+		Map.entry("Frost Nova Radius", "Snowstorm Radius"),
+		Map.entry("Frost Nova Slowness Amplifier", "Snowstorm Slowness per Stack"),
+		Map.entry("Frost Nova Slow Duration", "Snowstorm Slowness Duration"),
+		Map.entry("Frost Nova Ice Duration", "Snowstorm Ice Duration")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
@@ -517,6 +524,12 @@ public class CharmFactory {
 		if (charmEffectOrder != null && charmEffectOrder.size() > effectHistory.size()) {
 			String effectName = charmEffectOrder.get(effectHistory.size());
 			chosenEffect = CharmEffects.getEffect(effectName);
+
+			// no duplicate charm stats!
+			if (effectHistory.contains(effectName)) {
+				MMLog.warning("CharmFactory tried to apply effect " + chosenEffect + " that was already on the charm!");
+				chosenEffect = null;
+			}
 		}
 		if (charmEffectOrder != null && charmRollsOrder != null && charmRollsOrder.size() > effectHistory.size()) {
 			pastRoll = charmRollsOrder.get(effectHistory.size());

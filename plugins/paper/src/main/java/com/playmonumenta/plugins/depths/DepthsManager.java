@@ -62,7 +62,7 @@ import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicCombos;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicMeteor;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Avalanche;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Cryobox;
-import com.playmonumenta.plugins.depths.abilities.frostborn.DepthsFrostNova;
+import com.playmonumenta.plugins.depths.abilities.frostborn.Snowstorm;
 import com.playmonumenta.plugins.depths.abilities.frostborn.FrigidCombos;
 import com.playmonumenta.plugins.depths.abilities.frostborn.FrozenDomain;
 import com.playmonumenta.plugins.depths.abilities.frostborn.IceBarrier;
@@ -647,7 +647,7 @@ public class DepthsManager {
 			Avalanche.INFO,
 			Cryobox.INFO,
 			FrigidCombos.INFO,
-			DepthsFrostNova.INFO,
+			Snowstorm.INFO,
 			FrozenDomain.INFO,
 			IceBarrier.INFO,
 			Icebreaker.INFO,

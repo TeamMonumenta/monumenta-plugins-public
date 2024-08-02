@@ -115,8 +115,7 @@ public class FrostNova extends Ability {
 				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier, mob);
 				if (isEnhanced()) {
 					int frozenDuration = CharmManager.getDuration(mPlayer, CHARM_FROZEN, ENHANCED_FROZEN_DURATION);
-					EntityUtils.disableAI(mPlugin, mob, frozenDuration);
-					EntityUtils.disableGravity(mPlugin, mob, frozenDuration);
+					EntityUtils.applyFreeze(mPlugin, frozenDuration, mob);
 				}
 			}
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);

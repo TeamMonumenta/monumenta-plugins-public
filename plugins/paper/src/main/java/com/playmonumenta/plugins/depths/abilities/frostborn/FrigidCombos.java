@@ -48,7 +48,7 @@ public class FrigidCombos extends DepthsAbility {
 	public static final int DURATION = 2 * 20;
 	public static final double[] SLOW_AMPLIFIER = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
 	public static final int[] DAMAGE = {2, 3, 4, 5, 6, 8};
-	public static final int[] SHATTER_DAMAGE = {8, 10, 12, 14, 16, 20};
+	public static final int[] SHATTER_DAMAGE = {12, 14, 16, 18, 20, 24};
 	public static final int RADIUS = 4;
 	public static final int SHATTER_RADIUS = 6;
 	public static final Color TIP_COLOR = Color.fromRGB(184, 216, 242);

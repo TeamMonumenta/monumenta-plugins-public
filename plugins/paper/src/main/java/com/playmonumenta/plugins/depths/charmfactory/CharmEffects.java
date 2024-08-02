@@ -36,7 +36,6 @@ import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicCombos;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicMeteor;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Avalanche;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Cryobox;
-import com.playmonumenta.plugins.depths.abilities.frostborn.DepthsFrostNova;
 import com.playmonumenta.plugins.depths.abilities.frostborn.FrigidCombos;
 import com.playmonumenta.plugins.depths.abilities.frostborn.FrozenDomain;
 import com.playmonumenta.plugins.depths.abilities.frostborn.IceBarrier;
@@ -44,6 +43,7 @@ import com.playmonumenta.plugins.depths.abilities.frostborn.IceLance;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Icebreaker;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.abilities.frostborn.PiercingCold;
+import com.playmonumenta.plugins.depths.abilities.frostborn.Snowstorm;
 import com.playmonumenta.plugins.depths.abilities.shadow.BladeFlurry;
 import com.playmonumenta.plugins.depths.abilities.shadow.Brutalize;
 import com.playmonumenta.plugins.depths.abilities.shadow.ChaosDagger;
@@ -237,12 +237,13 @@ public enum CharmEffects {
 	CRYOBOX_ABSORPTION_DURATION("Cryobox Absorption Duration", Cryobox.INFO, true, false, 2.0, 20.0, new double[] {2.0, 4.0, 6.0, 8.0, 10.0}),
 	CRYOBOX_ICE_DURATION("Cryobox Ice Duration", Cryobox.INFO, false, false, 0.0, 0.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	CRYOBOX_FROZEN_DURATION("Cryobox Frozen Duration", Cryobox.INFO, false, false, 1, 6, new double[] {1, 1.5, 2, 2.5, 3}),
-	FROST_NOVA_COOLDOWN(DepthsFrostNova.CHARM_COOLDOWN, DepthsFrostNova.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
-	FROST_NOVA_DAMAGE("Frost Nova Damage", DepthsFrostNova.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	FROST_NOVA_RADIUS("Frost Nova Radius", DepthsFrostNova.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	FROST_NOVA_SLOW_AMPLIFIER("Frost Nova Slowness Amplifier", DepthsFrostNova.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
-	FROST_NOVA_SLOW_DURATION("Frost Nova Slow Duration", DepthsFrostNova.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
-	FROST_NOVA_ICE_DURATION("Frost Nova Ice Duration", DepthsFrostNova.INFO, false, false, 0.0, 0.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
+	SNOWSTORM_COOLDOWN(Snowstorm.CHARM_COOLDOWN, Snowstorm.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
+	SNOWSTORM_DAMAGE("Snowstorm Damage", Snowstorm.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
+	SNOWSTORM_RADIUS("Snowstorm Radius", Snowstorm.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
+	SNOWSTORM_SLOW_AMPLIFIER("Snowstorm Slowness per Stack", Snowstorm.INFO, false, true, 0, 20, new double[] {2, 4, 6, 8, 10}),
+	SNOWSTORM_SLOW_DURATION("Snowstorm Slowness Duration", Snowstorm.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
+	SNOWSTORM_FREEZE_DURATION("Snowstorm Freeze Duration", Snowstorm.INFO, false, false, 0.0, 2, new double[] {0.0, 0.0, 0.0, 0.5, 1.0}),
+	SNOWSTORM_ICE_DURATION("Snowstorm Ice Duration", Snowstorm.INFO, false, false, 0.0, 0.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	FRIGID_COMBOS_COOLDOWN(FrigidCombos.CHARM_COOLDOWN, FrigidCombos.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
 	FRIGID_COMBOS_DAMAGE("Frigid Combos Damage", FrigidCombos.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	FRIGID_COMBOS_RADIUS("Frigid Combos Radius", FrigidCombos.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
@@ -354,7 +355,7 @@ public enum CharmEffects {
 	SIDEARM_COOLDOWN(Sidearm.CHARM_COOLDOWN, Sidearm.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
 	SIDEARM_DAMAGE("Sidearm Damage", Sidearm.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	SIDEARM_RANGE("Sidearm Range", Sidearm.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	SIDEARM_KILL_CDR("Sidearm Kill Cooldown Reduction", Sidearm.INFO, true, false, 0.0, 2.0, new double[] {0.0, 0.0, 0.0, 0.0, 2.0}),
+	SIDEARM_KILL_CDR("Sidearm Kill Cooldown Reduction", Sidearm.INFO, true, false, 0.0, 1.0, new double[] {0.0, 0.0, 0.0, 0.0, 1.0}),
 	SPLIT_ARROW_DAMAGE("Split Arrow Damage", DepthsSplitArrow.INFO, true, true, 10, 40, new double[] {5, 10, 15, 20, 25}),
 	SPLIT_ARROW_BOUNCES("Split Arrow Bounces", DepthsSplitArrow.INFO, true, false, 0.0, 1.0, new double[] {0.0, 0.0, 0.0, 0.0, 1.0}),
 	SPLIT_ARROW_RANGE("Split Arrow Range", DepthsSplitArrow.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
@@ -364,7 +365,7 @@ public enum CharmEffects {
 	STEEL_STALLION_JUMP_STRENGTH("Steel Stallion Jump Strength", SteelStallion.INFO, true, false, 0.1, 0.0, new double[] {0.05, 0.1, 0.15, 0.2, 0.25}),
 	STEEL_STALLION_DURATION("Steel Stallion Duration", SteelStallion.INFO, true, false, 2.0, 10.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	VOLLEY_COOLDOWN(DepthsVolley.CHARM_COOLDOWN, DepthsVolley.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
-	VOLLEY_DAMAGE_MULTIPLIER("Volley Damage Multiplier", DepthsVolley.INFO, true, true, 5, 30, new double[] {0.0, 0.0, 11.5, 23, 34.5}),
+	VOLLEY_DAMAGE_MULTIPLIER("Volley Damage Multiplier", DepthsVolley.INFO, true, true, 5, 60, new double[] {0.0, 0.0, 11.5, 23, 34.5}),
 	VOLLEY_ARROWS("Volley Arrows", DepthsVolley.INFO, true, false, 3.0, 0.0, new double[] {2.0, 4.0, 6.0, 8.0, 10.0}),
 	VOLLEY_PIERCING("Volley Piercing", DepthsVolley.INFO, true, false, 0.0, 2.0, new double[] {0.0, 0.0, 0.0, 0.0, 1.0}),
 

@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class VolcanicCombos extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Combos";
 	public static final int COOLDOWN = 6 * 20;
-	public static final int[] DAMAGE = {6, 8, 10, 12, 14, 18};
+	public static final int[] DAMAGE = {8, 10, 12, 14, 16, 20};
 	public static final int RADIUS = 4;
 	public static final int FIRE_TICKS = 3 * 20;
 	private static final Particle.DustOptions YELLOW_COLOR = new Particle.DustOptions(Color.fromRGB(250, 180, 0), 1.0f);

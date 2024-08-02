@@ -33,7 +33,7 @@ public class WindsweptCombos extends DepthsCombosAbility {
 
 	public static final String ABILITY_NAME = "Windswept Combos";
 	private static final double[] COOLDOWN_REDUCTION = {0.05, 0.075, 0.1, 0.125, 0.15, 0.2};
-	private static final int HIT_REQUIREMENT = 4;
+	private static final int HIT_REQUIREMENT = 3;
 	private static final int RADIUS = 4;
 	private static final double PULL_STRENGTH = 0.5;
 	public static final int CAP_TICKS = 5 * Constants.TICKS_PER_SECOND;

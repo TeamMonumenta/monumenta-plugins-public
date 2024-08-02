@@ -39,7 +39,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Avalanche extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Avalanche";
-	public static final double[] DAMAGE = {30, 35, 40, 45, 50, 60};
+	public static final double[] DAMAGE = {28, 35, 42, 49, 56, 70};
 	public static final int COOLDOWN_TICKS = 20 * 20;
 	public static final int SLOW_DURATION = 2 * 20;
 	public static final double SLOW_MODIFIER = 1;

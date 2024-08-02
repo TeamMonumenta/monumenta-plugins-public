@@ -395,6 +395,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(CholericFlamesAntiHeal.effectID, CholericFlamesAntiHeal::deserialize);
 		mEffectDeserializer.put(SoulRendLifeSteal.effectID, SoulRendLifeSteal::deserialize);
 		mEffectDeserializer.put(GrapplingFallDR.effectID, GrapplingFallDR::deserialize);
+		mEffectDeserializer.put(SnowstormStacks.effectID, SnowstormStacks::deserialize);
+		mEffectDeserializer.put(Frozen.effectID, Frozen::deserialize);
 	}
 
 	private static final int PERIOD = 5;

@@ -63,7 +63,7 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 						}
 					}
 				}
-				PlayerUtils.healPlayer(mPlugin, mPlayer, 0.5 / Math.sqrt(attackSpeed * multiplier) * mPlayer.getCooledAttackStrength(0));
+				PlayerUtils.healPlayer(mPlugin, mPlayer, 1 / Math.sqrt(attackSpeed * multiplier) * mPlayer.getCooledAttackStrength(0));
 			}
 		}
 		return false;

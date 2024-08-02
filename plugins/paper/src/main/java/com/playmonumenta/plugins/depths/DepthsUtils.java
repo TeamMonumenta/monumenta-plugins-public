@@ -154,16 +154,16 @@ public class DepthsUtils {
 		return colors[rarity - 1];
 	}
 
-	public static void spawnIceTerrain(Block block, int ticks, Player p) {
-		spawnIceTerrain(block, ticks, p, false);
+	public static boolean spawnIceTerrain(Block block, int ticks, Player p) {
+		return spawnIceTerrain(block, ticks, p, false);
 	}
 
-	public static void spawnIceTerrain(Block block, int ticks, Player p, boolean isBarrier) {
+	public static boolean spawnIceTerrain(Block block, int ticks, Player p, boolean isBarrier) {
 		Location l = block.getLocation();
 
 		//Check if the block is valid, or if the location is already active in the system
 		if (IGNORED_MATS.contains(l.getWorld().getBlockAt(l).getType()) || iceActive.get(l) != null) {
-			return;
+			return false; // return whether we placed ice or not
 		}
 
 		Material iceMaterial = ICE_MATERIAL;
@@ -197,6 +197,8 @@ public class DepthsUtils {
 				}
 			}
 		}.runTaskLater(Plugin.getInstance(), ticks);
+
+		return true;
 	}
 
 	public static boolean isIce(Material material) {
@@ -301,11 +303,11 @@ public class DepthsUtils {
 		};
 	}
 
-	public static void iceExposedBlock(Block b, int iceTicks, Player p) {
-		iceExposedBlock(b, iceTicks, p, true);
+	public static boolean iceExposedBlock(Block b, int iceTicks, Player p) {
+		return iceExposedBlock(b, iceTicks, p, true);
 	}
 
-	public static void iceExposedBlock(Block b, int iceTicks, Player p, boolean withParticles) {
+	public static boolean iceExposedBlock(Block b, int iceTicks, Player p, boolean withParticles) {
 		// Try the block above and below the desired block for a block that is near the surface
 		Block converted;
 		if (canConvertToIce(b.getRelative(BlockFace.UP)) && !canConvertToIce(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP))) {
@@ -315,14 +317,14 @@ public class DepthsUtils {
 		} else if (canConvertToIce(b.getRelative(BlockFace.DOWN))) {
 			converted = b.getRelative(BlockFace.DOWN);
 		} else {
-			return;
+			return false;
 		}
-		DepthsUtils.spawnIceTerrain(converted, iceTicks, p, false);
+		return spawnIceTerrain(converted, iceTicks, p, false);
 	}
 
 	public static boolean isOnIce(Entity entity) {
 		Location loc = entity.getLocation();
-		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
+		return isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
 	public static void explodeEvent(EntityExplodeEvent event) {

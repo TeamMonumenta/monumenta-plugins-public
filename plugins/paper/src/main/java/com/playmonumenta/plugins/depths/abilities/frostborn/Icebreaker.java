@@ -22,8 +22,8 @@ import org.bukkit.entity.Player;
 public class Icebreaker extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Icebreaker";
-	public static final double[] ICE_DAMAGE = {0.20, 0.265, 0.33, 0.395, 0.46, 0.59};
-	public static final double[] EFFECT_DAMAGE = {0.10, 0.133, 0.165, 0.198, 0.23, 0.295};
+	public static final double[] ICE_DAMAGE = {0.20, 0.27, 0.33, 0.40, 0.46, 0.60};
+	public static final double[] EFFECT_DAMAGE = {0.10, 0.135, 0.165, 0.20, 0.23, 0.30};
 
 	public static final DepthsAbilityInfo<Icebreaker> INFO =
 		new DepthsAbilityInfo<>(Icebreaker.class, ABILITY_NAME, Icebreaker::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
@@ -56,7 +56,7 @@ public class Icebreaker extends DepthsAbility {
 
 	private double getDebuffMultiplier(LivingEntity entity) {
 		if (!PotionUtils.getNegativeEffects(mPlugin, entity).isEmpty() || EntityUtils.isStunned(entity) || EntityUtils.isParalyzed(mPlugin, entity) || EntityUtils.isBleeding(mPlugin, entity)
-			     || EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.vulnerabilityMult(entity) > 1
+			     || EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.isVulnerable(mPlugin, entity)
 			     || entity.getFireTicks() > 0 || Inferno.hasInferno(mPlugin, entity) || EntityUtils.hasDamageOverTime(mPlugin, entity)) {
 			return 1 + mDebuffMultiplier;
 		}
