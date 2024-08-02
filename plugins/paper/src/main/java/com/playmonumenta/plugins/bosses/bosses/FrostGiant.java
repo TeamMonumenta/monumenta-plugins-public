@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.SpellRemoveLevitation;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.ArmorOfFrost;
@@ -11,7 +12,6 @@ import com.playmonumenta.plugins.bosses.spells.frostgiant.GiantStomp;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.RingOfFrost;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.Shatter;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellAirGolemStrike;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostGiantBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostRift;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostbite;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostedIceBreak;
@@ -411,7 +411,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase1PassiveSpells = Arrays.asList(
 			new ArmorOfFrost(mPlugin, mBoss, this, 2),
 			new SpellPurgeNegatives(mBoss, 20 * 4),
-			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellBossBlockBreak(mBoss, 75, 4, 15, 4, true, true, false),
 			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 			new GiantStomp(mPlugin, mBoss),
@@ -421,7 +421,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase2PassiveSpells = Arrays.asList(
 			new ArmorOfFrost(mPlugin, mBoss, this, 2),
 			new SpellPurgeNegatives(mBoss, 20 * 3),
-			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellBossBlockBreak(mBoss, 75, 4, 15, 4, true, true, false),
 			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 			new SpellFrostedIceBreak(mBoss),
@@ -431,7 +431,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 			new ArmorOfFrost(mPlugin, mBoss, this, 1),
 			new SpellPurgeNegatives(mBoss, 20 * 2),
-			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellBossBlockBreak(mBoss, 75, 4, 15, 4, true, true, false),
 			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 			new SpellFrostedIceBreak(mBoss),
@@ -442,7 +442,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase4PassiveSpells = Arrays.asList(
 			new ArmorOfFrost(mPlugin, mBoss, this, 1, false),
 			new SpellPurgeNegatives(mBoss, 20 * 2),
-			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellBossBlockBreak(mBoss, 75, 4, 15, 4, true, true, false),
 			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 			new SpellFrostedIceBreak(mBoss),

@@ -34,8 +34,8 @@ public class SpellBossBlockBreak extends Spell {
 	private final int mZBreak;
 	private final boolean mBreakArena;
 	private final boolean mCreateStair;
-	private List<Material> mNoBreak;
-
+	private final boolean mBreakOverheadBlocks;
+	private final List<Material> mNoBreak;
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 		Material.AIR,
 		Material.CAVE_AIR,
@@ -52,16 +52,30 @@ public class SpellBossBlockBreak extends Spell {
 		Material.LIGHT
 	);
 
-	/*
-	 * for world bosses only
-	 * manually input arena height to prevent cheese pillars, use <Spawn Location>.getY()
-	 */
+	private final EnumSet<Material> mAlwaysBreakMats = EnumSet.of(
+		Material.COBWEB,
+		Material.SLIME_BLOCK,
+		Material.HONEY_BLOCK,
+		Material.SOUL_SAND,
+		Material.RAIL,
+		Material.POWERED_RAIL,
+		Material.DETECTOR_RAIL
+	);
 
+	/**
+	 * For world bosses only
+	 * <p>
+	 * Manually input arena height to prevent cheese pillars, use Spawn Location.getY()
+	 */
 	public SpellBossBlockBreak(Entity launcher, double height, int xBreak, int yBreak, int zBreak, boolean canBreakArena, boolean createStair) {
-		this(launcher, height, xBreak, yBreak, zBreak, canBreakArena, createStair, Material.AIR);
+		this(launcher, height, xBreak, yBreak, zBreak, canBreakArena, createStair, true, Material.AIR);
 	}
 
-	public SpellBossBlockBreak(Entity launcher, double height, int xBreak, int yBreak, int zBreak, boolean canBreakArena, boolean createStair, Material... noBreak) {
+	public SpellBossBlockBreak(Entity launcher, double height, int xBreak, int yBreak, int zBreak, boolean canBreakArena, boolean createStair, boolean breakOverheadBlocks) {
+		this(launcher, height, xBreak, yBreak, zBreak, canBreakArena, createStair, breakOverheadBlocks, Material.AIR);
+	}
+
+	public SpellBossBlockBreak(Entity launcher, double height, int xBreak, int yBreak, int zBreak, boolean canBreakArena, boolean createStair, boolean breakOverheadBlocks, Material... noBreak) {
 		mBoss = launcher;
 		mDepth = height;
 		mXBreak = xBreak;
@@ -69,12 +83,18 @@ public class SpellBossBlockBreak extends Spell {
 		mZBreak = zBreak;
 		mBreakArena = canBreakArena;
 		mCreateStair = createStair;
+		mBreakOverheadBlocks = breakOverheadBlocks;
 		mNoBreak = Arrays.asList(noBreak);
 	}
 
 	@Override
 	public void run() {
+		final Location bossLoc = mBoss.getLocation();
+		Location l = mBoss.getLocation();
 		LivingEntity target = null;
+		List<Block> badBlockList = new ArrayList<>();
+		int shift = 0;
+
 		if (mBoss instanceof Mob m) {
 			target = m.getTarget();
 		}
@@ -82,13 +102,9 @@ public class SpellBossBlockBreak extends Spell {
 			return;
 		}
 
-		Location l = mBoss.getLocation();
-
 		if (ZoneUtils.hasZoneProperty(l, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 			return;
 		}
-
-		int shift = 0;
 
 		// if boss can create stairs while under ground to tunnel to target above ground
 		if (target.getLocation().getY() > mBoss.getLocation().getY() + 0.9 && mCreateStair) {
@@ -111,7 +127,6 @@ public class SpellBossBlockBreak extends Spell {
 		Location testloc = new Location(l.getWorld(), 0, 0, 0);
 
 		/* Get a list of all blocks that impede the boss's movement */
-		List<Block> badBlockList = new ArrayList<Block>();
 		for (int x = -mXBreak; x <= mXBreak; x++) {
 			testloc.setX(l.getX() + x);
 			for (int z = -mZBreak; z <= mZBreak; z++) {
@@ -122,16 +137,37 @@ public class SpellBossBlockBreak extends Spell {
 						continue;
 					}
 					Block block = testloc.getBlock();
-					if (!mIgnoredMats.contains(block.getType()) && !mNoBreak.contains(block.getType())) {
+					// If the block (is not an ignored block and is not a no break block) or (is an always break block), add to list
+					if ((!mIgnoredMats.contains(block.getType()) && !mNoBreak.contains(block.getType()))
+							|| mAlwaysBreakMats.contains(block.getType())) {
 						badBlockList.add(block);
 					}
 				}
 			}
 		}
 
-		/* Destroy all blocks */
-		if (badBlockList.size() > 0) {
+		/* Special case for where a boss should stair up but a player has created a 1 block deep pit of environmental
+		hazard blocks. Culls mAlwaysBreakMats blocks around the boss on the X-Z plane and 1 Y-level below */
+		if (mCreateStair) {
+			int y = 0;
+			while (y >= -1) {
+				testloc.setY(bossLoc.getY() + y);
+				for (int x = -mXBreak; x <= mXBreak; x++) {
+					testloc.setX(bossLoc.getX() + x);
+					for (int z = -mZBreak; z <= mZBreak; z++) {
+						testloc.setZ(bossLoc.getZ() + z);
+						Block currentBossBlock = testloc.getBlock();
+						if (mAlwaysBreakMats.contains(currentBossBlock.getType())) {
+							badBlockList.add(currentBossBlock);
+						}
+					}
+				}
+				y--;
+			}
+		}
 
+		/* Destroy all blocks */
+		if (!badBlockList.isEmpty()) {
 			/* Call an event with these exploding blocks to give plugins a chance to modify it */
 			EntityExplodeEvent event = new EntityExplodeEvent(mBoss, l, badBlockList, 0f);
 			Bukkit.getServer().getPluginManager().callEvent(event);
@@ -141,6 +177,12 @@ public class SpellBossBlockBreak extends Spell {
 
 			/* Remove any remaining blocks, which might have been modified by the event */
 			for (Block block : badBlockList) {
+				/* Special case for big boy Eldrask who can crunch the blocks over his head when doing Giant Stomp.
+				  If (don't break overhead blocks) and (difference between current block and arena floor >= 15), skip */
+				if (!mBreakOverheadBlocks && block.getLocation().getY() - mDepth >= mYBreak) {
+					continue;
+				}
+
 				if (block.getState() instanceof Container) {
 					block.breakNaturally();
 				} else {
