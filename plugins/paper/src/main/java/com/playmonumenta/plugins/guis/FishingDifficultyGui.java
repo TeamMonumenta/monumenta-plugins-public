@@ -77,8 +77,6 @@ public class FishingDifficultyGui extends Gui {
 
 		setItem(1, 1, GUIUtils.createBasicItem(DIFFICULTY_MATERIALS[0], 1, DIFFICULTY_TITLES[0], baseDescriptions.get(0), true))
 			.onClick((clickEvent) -> {
-				mPlayer.playSound(mPlayer, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.PLAYERS, 1f, 2f);
-				mPlayer.sendMessage(Component.text("Clear Skies selected.").color(NamedTextColor.GRAY));
 				selectDifficulty(0);
 				close();
 			});
@@ -88,8 +86,6 @@ public class FishingDifficultyGui extends Gui {
 			.onLeftClick(() -> {
 				if (isDifficultyUnlocked(1)) {
 					// Select the difficulty
-					mPlayer.sendMessage(Component.text("Rainstorm selected.").color(NamedTextColor.GRAY));
-					mPlayer.playSound(mPlayer, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 0.5f);
 					selectDifficulty(1);
 				} else {
 					// Send error message
@@ -101,12 +97,11 @@ public class FishingDifficultyGui extends Gui {
 			.onRightClick(() -> {
 				if (isDifficultyUnlocked(1)) {
 					// Select the difficulty
-					mPlayer.sendMessage(Component.text("Rainstorm selected.").color(NamedTextColor.GRAY));
-					mPlayer.playSound(mPlayer, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 0.5f);
 					selectDifficulty(1);
 					close();
 				} else {
 					if (tryUnlockDifficulty(1)) {
+						selectDifficulty(1);
 						update();
 					}
 				}
@@ -117,8 +112,7 @@ public class FishingDifficultyGui extends Gui {
 			.onLeftClick(() -> {
 				if (isDifficultyUnlocked(2)) {
 					// Select the difficulty
-					mPlayer.sendMessage(Component.text("Monsoon selected.").color(NamedTextColor.GRAY));
-					mPlayer.playSound(mPlayer, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 0.5f);
+					selectDifficulty(2);
 				} else {
 					// Send error message
 					mPlayer.sendMessage(Component.text("You do not have this difficulty unlocked.").color(NamedTextColor.RED));
@@ -129,11 +123,11 @@ public class FishingDifficultyGui extends Gui {
 			.onRightClick(() -> {
 				if (isDifficultyUnlocked(2)) {
 					// Select the difficulty
-					mPlayer.sendMessage(Component.text("Monsoon selected.").color(NamedTextColor.GRAY));
-					mPlayer.playSound(mPlayer, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 0.5f);
+					selectDifficulty(2);
 					close();
 				} else {
 					if (tryUnlockDifficulty(2)) {
+						selectDifficulty(2);
 						update();
 					}
 				}
@@ -144,8 +138,7 @@ public class FishingDifficultyGui extends Gui {
 			.onLeftClick(() -> {
 				if (isDifficultyUnlocked(3)) {
 					// Select the difficulty
-					mPlayer.sendMessage(Component.text("Typhoon selected.").color(NamedTextColor.GRAY));
-					mPlayer.playSound(mPlayer, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 0.5f);
+					selectDifficulty(3);
 				} else {
 					// Send error message
 					mPlayer.sendMessage(Component.text("You do not have this difficulty unlocked.").color(NamedTextColor.RED));
@@ -156,11 +149,11 @@ public class FishingDifficultyGui extends Gui {
 			.onRightClick(() -> {
 				if (isDifficultyUnlocked(3)) {
 					// Select the difficulty
-					mPlayer.sendMessage(Component.text("Typhoon selected.").color(NamedTextColor.GRAY));
-					mPlayer.playSound(mPlayer, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 0.5f);
+					selectDifficulty(3);
 					close();
 				} else {
 					if (tryUnlockDifficulty(3)) {
+						selectDifficulty(3);
 						update();
 					}
 				}
@@ -177,6 +170,12 @@ public class FishingDifficultyGui extends Gui {
 
 	private void selectDifficulty(int difficulty) {
 		ScoreboardUtils.setScoreboardValue(mPlayer, DIFFICULTY_SELECTED_SCOREBOARD, difficulty);
+		if (difficulty == 0) {
+			mPlayer.playSound(mPlayer, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.PLAYERS, 1f, 2f);
+		} else {
+			mPlayer.playSound(mPlayer, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 0.5f);
+		}
+		mPlayer.sendMessage(Component.text(DIFFICULTY_NAMES[difficulty] + " selected.").color(NamedTextColor.GRAY));
 	}
 
 	private boolean isDifficultyUnlocked(int difficulty) {
