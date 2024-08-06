@@ -45,8 +45,8 @@ public class MarketRedisManager {
 
 		// increment the unique listingId in redis, and get it
 		long listingID = getNextListingID();
-		long itemToSellDatabaseID = MarketItemDatabase.getIDFromItemStack(itemToSell);
-		long currencyDatabaseID = MarketItemDatabase.getIDFromItemStack(currencyItemStack);
+		long itemToSellDatabaseID = RedisItemDatabase.getIDFromItemStack(itemToSell);
+		long currencyDatabaseID = RedisItemDatabase.getIDFromItemStack(currencyItemStack);
 
 		// build the listing
 		MarketListing listing = new MarketListing(listingID, MarketListingType.BAZAAR, itemToSellDatabaseID, amountOfTrades, itemsPerTrade, pricePerTrade, currencyDatabaseID, player);

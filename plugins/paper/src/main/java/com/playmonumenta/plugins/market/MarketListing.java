@@ -121,14 +121,14 @@ public class MarketListing {
 
 	public void recalculateListingIndexValues() {
 
-		ItemStack itemToSell = MarketItemDatabase.getItemStackFromID(this.mItemToSellID);
+		ItemStack itemToSell = RedisItemDatabase.getItemStackFromID(this.mItemToSellID);
 		this.mRegion = ItemStatUtils.getRegion(itemToSell);
 		this.mLocation = ItemStatUtils.getLocation(itemToSell);
 		this.mItemName = ItemUtils.getPlainNameOrDefault(itemToSell);
 		this.mItemType = ItemUtils.getItemType(itemToSell);
 		this.mItemTier = ItemStatUtils.getTier(itemToSell);
 
-		ItemStack currencyToBuy = MarketItemDatabase.getItemStackFromID(this.mCurrencyToBuyID);
+		ItemStack currencyToBuy = RedisItemDatabase.getItemStackFromID(this.mCurrencyToBuyID);
 		this.mCurrencyName = convertCurrencyItemStackToSmallestCurrencyName(currencyToBuy);
 
 	}
@@ -209,7 +209,7 @@ public class MarketListing {
 	}
 
 	public ItemStack getItemToSell() {
-		return MarketItemDatabase.getItemStackFromID(this.mItemToSellID);
+		return RedisItemDatabase.getItemStackFromID(this.mItemToSellID);
 	}
 
 	public int getAmountToSellRemaining() {
@@ -442,7 +442,7 @@ public class MarketListing {
 	}
 
 	public ItemStack getCurrencyToBuy() {
-		return MarketItemDatabase.getItemStackFromID(mCurrencyToBuyID);
+		return RedisItemDatabase.getItemStackFromID(mCurrencyToBuyID);
 	}
 
 	public int getAmountToBuy() {

@@ -1,24 +1,39 @@
 package com.playmonumenta.plugins.market;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TimerTask;
+import java.util.TreeMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class MarketItemDatabase {
+public class RedisItemDatabase {
+	private static final int MAX_CACHE_ENTRIES = 10240;
+	private static final int CACHE_EXPIRY_MINUTES = 30;
+
+	static ScheduledThreadPoolExecutor mRealTimePool = new ScheduledThreadPoolExecutor(1);
+	private static @Nullable TimerTask mRealTimeRunnable = null;
+
+	static HashMap<Long, LocalDateTime> mLocalCacheIdToExpiry = new HashMap<>();
+	static TreeMap<LocalDateTime, Long> mLocalCacheExpiryToId = new TreeMap<>();
 	static HashMap<Long, ItemStack> mLocalCacheIDToItem = new HashMap<>();
 	static HashMap<ItemStack, Long> mLocalCacheItemToID = new HashMap<>();
 
 	private static final String mPathIDBCurrentID = ConfigAPI.getServerDomain() + ":market:ItemDBCurrentID";
 	private static final String mPathIDBItemToID = ConfigAPI.getServerDomain() + ":market:ItemDBItemToID";
 	private static final String mPathIDBIDToItem = ConfigAPI.getServerDomain() + ":market:ItemDBIDToItem";
-
-	static long maxCacheAgeTimestamp = 0;
 
 	private static long createItemEntryInRedis(ItemStack item) {
 		long id = getNextItemID();
@@ -35,31 +50,31 @@ public class MarketItemDatabase {
 	}
 
 	public static long getIDFromItemStack(ItemStack item) {
-		resetCacheIfTooOld();
-
 		// attempt to fetch from cache
 		Long id = mLocalCacheItemToID.get(item.asOne());
 		if (id != null) {
+			touchCacheTimestamp(id);
 			return id;
 		}
 
 		// attempt to fetch from redis
 		id = fetchIDFromRedis(item.asOne());
 		if (id != null) {
+			touchCacheTimestamp(id);
 			return id;
 		}
 
 		// create a new entry in redis
 		id = createItemEntryInRedis(item.asOne());
+		touchCacheTimestamp(id);
 		return id;
 	}
 
 	public static ItemStack getItemStackFromID(long id) {
-		resetCacheIfTooOld();
-
 		// attempt to fetch from cache
 		ItemStack item = mLocalCacheIDToItem.get(id);
 		if (item != null) {
+			touchCacheTimestamp(id);
 			return item.asOne();
 		}
 
@@ -95,14 +110,77 @@ public class MarketItemDatabase {
 	private static void saveToCache(long id, ItemStack item) {
 		mLocalCacheIDToItem.put(id, item.asOne());
 		mLocalCacheItemToID.put(item.asOne(), id);
+		touchCacheTimestamp(id);
 	}
 
-	private static void resetCacheIfTooOld() {
-		if (System.currentTimeMillis() > maxCacheAgeTimestamp) {
-			MMLog.info("Reseting Market Item Database Cache");
-			maxCacheAgeTimestamp = System.currentTimeMillis() + 1000 * 60 * 60; /*reset cache in 1h*/
-			mLocalCacheIDToItem = new HashMap<>();
-			mLocalCacheItemToID = new HashMap<>();
+	private static void touchCacheTimestamp(long id) {
+		LocalDateTime expiry = mLocalCacheIdToExpiry.get(id);
+		if (expiry != null) {
+			mLocalCacheExpiryToId.remove(expiry);
+		}
+
+		expiry = DateUtils.trueUtcDateTime().plusMinutes(CACHE_EXPIRY_MINUTES);
+		mLocalCacheIdToExpiry.put(id, expiry);
+		mLocalCacheExpiryToId.put(expiry, id);
+
+		if (mLocalCacheExpiryToId.size() > MAX_CACHE_ENTRIES) {
+			removeOldestEntry();
+		}
+
+		removeExpiredEntries();
+	}
+
+	private static void removeOldestEntry() {
+		Map.Entry<LocalDateTime, Long> entry = mLocalCacheExpiryToId.firstEntry();
+		if (entry == null) {
+			return;
+		}
+		LocalDateTime expiry = entry.getKey();
+		Long id = entry.getValue();
+
+		mLocalCacheExpiryToId.remove(expiry);
+		mLocalCacheIdToExpiry.remove(id);
+		ItemStack item = mLocalCacheIDToItem.get(id);
+		if (item != null) {
+			mLocalCacheItemToID.remove(item);
+		}
+	}
+
+	private static void removeExpiredEntries() {
+		LocalDateTime now = DateUtils.trueUtcDateTime();
+		while (true) {
+			Map.Entry<LocalDateTime, Long> entry = mLocalCacheExpiryToId.firstEntry();
+			if (entry == null) {
+				return;
+			}
+			LocalDateTime expiry = entry.getKey();
+			if (now.isBefore(expiry)) {
+				break;
+			}
+			Long id = entry.getValue();
+
+			mLocalCacheExpiryToId.remove(expiry);
+			mLocalCacheIdToExpiry.remove(id);
+			ItemStack item = mLocalCacheIDToItem.get(id);
+			if (item != null) {
+				mLocalCacheItemToID.remove(item);
+			}
+		}
+
+		Map.Entry<LocalDateTime, Long> entry = mLocalCacheExpiryToId.firstEntry();
+		LocalDateTime expiry = entry == null ? null : entry.getKey();
+		if (mRealTimeRunnable == null && expiry != null) {
+			mRealTimeRunnable = new TimerTask() {
+				@Override
+				public void run() {
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+						mRealTimeRunnable = null;
+						removeExpiredEntries();
+					});
+				}
+			};
+			long remainingSeconds = Math.max(now.until(expiry, ChronoUnit.SECONDS), 0) + 1;
+			mRealTimePool.schedule(mRealTimeRunnable, remainingSeconds, TimeUnit.SECONDS);
 		}
 	}
 }
