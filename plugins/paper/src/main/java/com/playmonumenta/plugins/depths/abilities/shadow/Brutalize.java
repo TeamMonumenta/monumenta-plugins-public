@@ -36,7 +36,8 @@ public class Brutalize extends DepthsAbility {
 		new DepthsAbilityInfo<>(Brutalize.class, ABILITY_NAME, Brutalize::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(Material.STONE_SWORD)
 			.descriptions(Brutalize::getDescription)
-			.singleCharm(false);
+			.singleCharm(false)
+			.priorityAmount(1050);
 
 	private final double mDamage;
 	private final double mRadius;
@@ -50,9 +51,9 @@ public class Brutalize extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
-			double originalDamage = event.getFlatDamage();
+			double originalDamage = event.getDamage();
 			double brutalizeDamage = mDamage * originalDamage;
-			event.setDamage(event.getFlatDamage() + brutalizeDamage);
+			event.updateDamageWithMultiplier(1 + mDamage);
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, 1.65f);

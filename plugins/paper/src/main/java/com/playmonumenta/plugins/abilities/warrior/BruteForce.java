@@ -75,11 +75,11 @@ public class BruteForce extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
-			double originalDamage = event.getFlatDamage();
+			// Need to get this value before changing the damage
+			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
+
 			event.addUnmodifiableDamage(mFlatDamage);
 			event.updateDamageWithMultiplier(1 + mMultiplier);
-
-			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
 
 			// TODO this might be unnecessary or bugged but it's not the main issue right now
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
