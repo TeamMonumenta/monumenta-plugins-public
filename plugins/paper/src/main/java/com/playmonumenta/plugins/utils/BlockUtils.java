@@ -46,7 +46,19 @@ public class BlockUtils {
 		Material.BEDROCK,
 		Material.BARRIER,
 		Material.SPAWNER,
-		Material.LIGHT
+		Material.LIGHT,
+		Material.END_PORTAL
+	);
+
+	private static final EnumSet<Material> ENV_HAZARDS_FOR_MOBS = EnumSet.of(
+		Material.COBWEB,
+		Material.SLIME_BLOCK,
+		Material.HONEY_BLOCK,
+		Material.SOUL_SAND,
+		Material.RAIL,
+		Material.POWERED_RAIL,
+		Material.DETECTOR_RAIL,
+		Material.POWDER_SNOW
 	);
 
 	public static final EnumSet<Material> VALUABLES = EnumSet.of(
@@ -177,6 +189,10 @@ public class BlockUtils {
 
 	public static boolean isMechanicalBlock(Material material) {
 		return MECHANICAL_BLOCKS.contains(material);
+	}
+
+	public static boolean isEnvHazardForMobs(Material material) {
+		return ENV_HAZARDS_FOR_MOBS.contains(material);
 	}
 
 	public static boolean isValuableBlock(Material material) {

@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -36,31 +36,6 @@ public class SpellBossBlockBreak extends Spell {
 	private final boolean mCreateStair;
 	private final boolean mBreakOverheadBlocks;
 	private final List<Material> mNoBreak;
-	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-		Material.AIR,
-		Material.CAVE_AIR,
-		Material.VOID_AIR,
-		Material.COMMAND_BLOCK,
-		Material.CHAIN_COMMAND_BLOCK,
-		Material.REPEATING_COMMAND_BLOCK,
-		Material.BEDROCK,
-		Material.BARRIER,
-		Material.SPAWNER,
-		Material.WATER,
-		Material.LAVA,
-		Material.END_PORTAL,
-		Material.LIGHT
-	);
-
-	private final EnumSet<Material> mAlwaysBreakMats = EnumSet.of(
-		Material.COBWEB,
-		Material.SLIME_BLOCK,
-		Material.HONEY_BLOCK,
-		Material.SOUL_SAND,
-		Material.RAIL,
-		Material.POWERED_RAIL,
-		Material.DETECTOR_RAIL
-	);
 
 	/**
 	 * For world bosses only
@@ -137,9 +112,10 @@ public class SpellBossBlockBreak extends Spell {
 						continue;
 					}
 					Block block = testloc.getBlock();
+					Material blockMat = block.getType();
 					// If the block (is not an ignored block and is not a no break block) or (is an always break block), add to list
-					if ((!mIgnoredMats.contains(block.getType()) && !mNoBreak.contains(block.getType()))
-							|| mAlwaysBreakMats.contains(block.getType())) {
+					if ((!BlockUtils.isMechanicalBlock(blockMat) && !mNoBreak.contains(blockMat))
+							|| BlockUtils.isEnvHazardForMobs(blockMat)) {
 						badBlockList.add(block);
 					}
 				}
@@ -157,7 +133,7 @@ public class SpellBossBlockBreak extends Spell {
 					for (int z = -mZBreak; z <= mZBreak; z++) {
 						testloc.setZ(bossLoc.getZ() + z);
 						Block currentBossBlock = testloc.getBlock();
-						if (mAlwaysBreakMats.contains(currentBossBlock.getType())) {
+						if (BlockUtils.isEnvHazardForMobs(currentBossBlock.getType())) {
 							badBlockList.add(currentBossBlock);
 						}
 					}
@@ -196,6 +172,6 @@ public class SpellBossBlockBreak extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 0;
+		return 1;
 	}
 }

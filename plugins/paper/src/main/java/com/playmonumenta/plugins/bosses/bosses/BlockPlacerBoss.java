@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,7 +18,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -29,8 +27,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 /**
- * Copy-pasted from SpellSapper.java made for imperial construct
- * <a href="https://github.com/TeamMonumenta/monumenta-plugins/blob/qoo-skt-construct/plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/spells/imperialconstruct/SpellSapper.java">...</a>
+ * Places and destroys blocks to reach a target player.
+ * @author G3m1n1Boy
  */
 public class BlockPlacerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockplacer";
@@ -42,38 +40,11 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 
 	private static final int BEELINE_DISTANCE = 8;
 
-	private static final EnumSet<Material> IGNORED_MATERIALS = EnumSet.of(
-		Material.COMMAND_BLOCK,
-		Material.CHAIN_COMMAND_BLOCK,
-		Material.REPEATING_COMMAND_BLOCK,
-		Material.BEDROCK,
-		Material.BARRIER,
-		Material.SPAWNER
-	);
-
-	private static final EnumSet<Material> AUTO_DESTROYED_MATERIALS = EnumSet.of(
-		Material.COBWEB,
-		Material.WHITE_CARPET,
-		Material.ORANGE_CARPET,
-		Material.MAGENTA_CARPET,
-		Material.LIGHT_BLUE_CARPET,
-		Material.YELLOW_CARPET,
-		Material.LIME_CARPET,
-		Material.PINK_CARPET,
-		Material.GRAY_CARPET,
-		Material.LIGHT_GRAY_CARPET,
-		Material.CYAN_CARPET,
-		Material.PURPLE_CARPET,
-		Material.BLUE_CARPET,
-		Material.BROWN_CARPET,
-		Material.GREEN_CARPET,
-		Material.RED_CARPET,
-		Material.BLACK_CARPET
-	);
-
 	public BlockPlacerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
+		/* TODO: Encoding all of the boss logic into one big spell like this is bad. This should be separated into 2
+		    spells, one for block placement and remove current block destruction code in favor of SpellBlockBreak */
 		List<Spell> spells = List.of(
 			new Spell() {
 
@@ -174,7 +145,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 								Block block = testloc.getBlock();
 								Material material = block.getType();
 
-								if (AUTO_DESTROYED_MATERIALS.contains(material) || block.getBlockData() instanceof TrapDoor) {
+								if (BlockUtils.isEnvHazardForMobs(material)) {
 									/* Break these blocks immediately, don't add them to the bad block list */
 									EntityExplodeEvent event = new EntityExplodeEvent(mBoss, mBoss.getLocation(), new ArrayList<>(List.of(block)), 0f);
 									Bukkit.getServer().getPluginManager().callEvent(event);
@@ -205,7 +176,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 						for (Block block : badBlockList) {
 							block.setType(Material.AIR);
 						}
-						if (badBlockList.size() > 0) {
+						if (!badBlockList.isEmpty()) {
 							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 0.3f, 0.9f);
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(boss);
 							destroyedBlock = true;
@@ -216,7 +187,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 				}
 
 				private void bridge(Pathfinder pathfinder, Location bossLocation, Location targetLocation) {
-					List<Location> bridgeLocations = new ArrayList<Location>();
+					List<Location> bridgeLocations = new ArrayList<>();
 					Vector direction = targetLocation.clone().subtract(bossLocation).toVector().normalize();
 
 					if (Math.abs(direction.getX()) > Math.abs(direction.getZ())) {
@@ -248,7 +219,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 					for (Location loc : bridgeLocations) {
 						Block block = loc.getBlock();
 						Material material = block.getType();
-						if (IGNORED_MATERIALS.contains(material) || block.isSolid() || BlockUtils.containsWater(block)) {
+						if (BlockUtils.isMechanicalBlock(material) || block.isSolid() || BlockUtils.containsWater(block)) {
 							continue;
 						}
 
@@ -265,11 +236,10 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 						pathfinder.moveTo(loc.clone().add(0, 1, 0));
 						Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> pathfinder.moveTo(loc.clone().add(0, 1, 0)), 5);
 					}
-
 				}
 
 				private static boolean isBreakable(Block block, Material material) {
-					return !IGNORED_MATERIALS.contains(material) && material.isSolid() &&
+					return !BlockUtils.isMechanicalBlock(material) && material.isSolid() &&
 						       (!(block.getState() instanceof Lootable) || !((Lootable) block.getState()).hasLootTable());
 				}
 			}
@@ -277,6 +247,4 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 
 		super.constructBoss(SpellManager.EMPTY, spells, NEW_TARGET_RANGE * 2, null);
 	}
-
-
 }

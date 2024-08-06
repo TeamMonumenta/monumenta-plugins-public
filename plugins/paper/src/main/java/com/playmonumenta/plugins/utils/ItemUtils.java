@@ -461,6 +461,28 @@ public class ItemUtils {
 		Material.POTTED_CHERRY_SAPLING
 	);
 
+	/**
+	 * For some silly reason, none of these blocks are considered Solids by Material.isSolid() despite having collision.
+	 * Used by SpellBlockBreak to prevent player cheese
+	 */
+	public static final Set<Material> HEADS = EnumSet.of(
+		Material.CREEPER_HEAD,
+		Material.CREEPER_WALL_HEAD,
+		Material.DRAGON_HEAD,
+		Material.DRAGON_WALL_HEAD,
+		Material.PIGLIN_HEAD,
+		Material.PIGLIN_WALL_HEAD,
+		Material.PLAYER_HEAD,
+		Material.PLAYER_WALL_HEAD,
+		// Bad to the bone riff
+		Material.SKELETON_SKULL,
+		Material.SKELETON_WALL_SKULL,
+		Material.WITHER_SKELETON_SKULL,
+		Material.WITHER_SKELETON_WALL_SKULL,
+		Material.ZOMBIE_HEAD,
+		Material.ZOMBIE_WALL_HEAD
+	);
+
 	// list of blocks that are supposedly used as limits to player movements
 	public static final Set<Material> noPassthrough = EnumSet.of(
 		Material.BARRIER,
