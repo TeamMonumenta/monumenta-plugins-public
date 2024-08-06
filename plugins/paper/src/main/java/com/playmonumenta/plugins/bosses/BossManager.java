@@ -548,10 +548,12 @@ public class BossManager implements Listener {
 			/* For performance reasons this check is only enabled when there is a loaded
 			 * boss that is using this feature
 			 */
-			for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), 12.0)) {
-				Boss boss = mBosses.get(m.getUniqueId());
-				if (boss != null) {
-					boss.nearbyEntityDeath(event);
+			if (!entity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
+				for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), 12.0)) {
+					Boss boss = mBosses.get(m.getUniqueId());
+					if (boss != null) {
+						boss.nearbyEntityDeath(event);
+					}
 				}
 			}
 		}

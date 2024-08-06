@@ -135,13 +135,13 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			return false;
 		}
 
-		activate(true);
+		activate(true, true);
 
 		putOnCooldown();
 		return true;
 	}
 
-	private void activate(boolean manualCast) {
+	private void activate(boolean manualCast, boolean showParticles) {
 
 		if (isEnhanced()) {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
@@ -152,7 +152,9 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 
 		applyEffects();
 
-		mCosmetic.activate(mPlayer, mStacks, manualCast);
+		if (showParticles) {
+			mCosmetic.activate(mPlayer, mStacks, manualCast);
+		}
 	}
 
 	private boolean toggleRecast() {
@@ -165,7 +167,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			mPlayer.sendActionBar(Component.text("Energizing Elixir automatic recast has been enabled"));
 			mPlayer.getScoreboardTags().add(TOGGLE_TAG);
 			mCosmetic.toggleRecastOn(mPlayer);
-			activate(true);
+			activate(true, true);
 			putOnCooldown();
 		}
 		return true;
@@ -218,7 +220,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		}
 		if (mStacks > 0 && !mPlugin.mEffectManager.hasEffect(mPlayer, EnergizingElixirStacks.class)) {
 			if (toggled) {
-				if (mStacks < 4) {
+				if (mStacks < mMaxStacks) {
 					mStacks = Math.min(mMaxStacks, mStacks + 1);
 					mCosmetic.activate(mPlayer, mStacks, false);
 				}
@@ -234,7 +236,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		} else if (toggled) {
 			Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME);
 			if (activeEffect == null || activeEffect.getDuration() <= 5) {
-				activate(false);
+				activate(false, activeEffect == null);
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}

@@ -251,10 +251,6 @@ public class Bezoar extends Ability {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (event.getEntity().getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
-			return;
-		}
-
 		mKills++;
 		if (shouldDrop()) {
 			dropBezoar(event);

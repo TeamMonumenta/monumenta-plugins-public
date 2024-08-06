@@ -204,6 +204,10 @@ public class EntityUtils {
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
 	private static final String IGNORE_TAUNT_TAG = "taunt_ignore";
 	private static final String SILENCE_IMMUNE_TAG = "boss_silenceimmune";
+	/**
+	 * Mobs with this tag don't trigger 'on death' effects from other mobs and players
+	 */
+	public static final String IGNORE_DEATH_TRIGGERS_TAG = "boss_no_death_triggers";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();
@@ -1497,7 +1501,7 @@ public class EntityUtils {
 		return ratio * (baseDamage - 1) + 1;
 	}
 
-	// Adds a Tag which Removes the entity on unload.
+	// Adds a tag which removes the entity on unload.
 	// See EntityListener, EntityRemoveFromWorldEvent
 	public static void setRemoveEntityOnUnload(Entity e) {
 		e.getScoreboardTags().add(Constants.Tags.REMOVE_ON_UNLOAD);
@@ -1507,17 +1511,9 @@ public class EntityUtils {
 		fallingBlock.getScoreboardTags().add("DisableBlockPlacement");
 	}
 
-	public static float getCounterclockwiseAngle(Entity e1, Entity e2) {
-		Vector loc1 = e1.getLocation().toVector();
-		Vector loc2 = e2.getLocation().toVector();
-		Vector lineOfSight = loc2.clone().subtract(loc1);
-		lineOfSight.setY(0).normalize();
-		// Treat it as a giant unit circle with axes (z, -x)
-		double angleCounterclockwise = Math.acos(lineOfSight.getZ());
-		if (lineOfSight.getX() > 0) {
-			angleCounterclockwise = -angleCounterclockwise;
-		}
-		return (float) angleCounterclockwise;
+	public static double getCounterclockwiseAngle(Entity e1, Entity e2) {
+		Vector lineOfSight = e2.getLocation().toVector().subtract(e1.getLocation().toVector());
+		return Math.atan2(-lineOfSight.getX(), lineOfSight.getZ());
 	}
 
 	public static boolean isAbilityTriggeringProjectile(Projectile proj, boolean requireCritical) {
