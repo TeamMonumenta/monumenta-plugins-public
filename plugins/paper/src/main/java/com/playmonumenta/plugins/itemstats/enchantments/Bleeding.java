@@ -70,10 +70,9 @@ public class Bleeding implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ENTITY_SQUID_HURT, SoundCategory.PLAYERS, 0.4f, 0.4f);
-			world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.4f, 0.8f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_SQUID_HURT, 0.4f, 0.4f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 0.4f, 0.8f);
 		}
 	}
 }

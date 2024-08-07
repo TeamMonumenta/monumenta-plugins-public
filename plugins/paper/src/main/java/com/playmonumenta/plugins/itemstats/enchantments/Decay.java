@@ -78,10 +78,9 @@ public class Decay implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.05f, 0.7f);
-			world.playSound(loc, Sound.ENTITY_WARDEN_ATTACK_IMPACT, SoundCategory.PLAYERS, 0.4f, 0.7f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_WITHER_SHOOT, 0.05f, 0.7f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 0.4f, 0.7f);
 		}
 	}
 }

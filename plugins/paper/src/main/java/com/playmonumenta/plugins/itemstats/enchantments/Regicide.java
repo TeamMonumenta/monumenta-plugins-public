@@ -79,10 +79,9 @@ public class Regicide implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 2.0f, 0.8f);
-			world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.7f, 0.8f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_AXE_SCRAPE, 1.5f, 0.8f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_TRIDENT_RETURN, 0.7f, 0.8f);
 		}
 	}
 }

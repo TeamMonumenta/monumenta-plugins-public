@@ -151,11 +151,10 @@ public class ThunderAspect implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.5f, 2.0f);
-			world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 0.9f, 2.0f);
-			world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.35f, 2.0f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.4f, 2.0f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, 0.6f, 2.0f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.25f, 2.0f);
 		}
 	}
 }

@@ -92,12 +92,11 @@ public class WindAspect implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.5f, 0.8f);
-			world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.4f, 2.0f);
-			world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0f, 0.4f);
-			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.0f, 2.0f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_HORSE_BREATHE, 1.2f, 0.8f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, 0.4f, 2.0f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_WITCH_THROW, 1.0f, 0.4f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, 0.8f, 2.0f);
 		}
 	}
 

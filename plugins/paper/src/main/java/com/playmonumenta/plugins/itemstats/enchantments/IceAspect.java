@@ -127,12 +127,11 @@ public class IceAspect implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ENTITY_TURTLE_HURT_BABY, SoundCategory.PLAYERS, 0.8f, 0.7f);
-			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.8f, 0.7f);
-			world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 5.5f, 0.6f);
-			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 0.7f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_TURTLE_HURT_BABY, 0.6f, 0.7f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_TRIDENT_HIT, 0.6f, 0.7f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_VEX_HURT, 2.0f, 0.6f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_GLASS_BREAK, 0.4f, 0.7f);
 		}
 	}
 }

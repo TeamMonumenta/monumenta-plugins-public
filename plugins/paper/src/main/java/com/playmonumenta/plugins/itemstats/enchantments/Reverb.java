@@ -184,10 +184,10 @@ public class Reverb implements Enchantment {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
 			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 2.0f, 0.7f);
-			world.playSound(loc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.4f, 0.4f);
-			world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 5.0f, 0.6f);
-			world.playSound(loc, Sound.ENTITY_ALLAY_HURT, SoundCategory.PLAYERS, 0.2f, 0.6f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ALLAY_ITEM_TAKEN, 1.5f, 0.7f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ENDER_EYE_DEATH, 0.4f, 0.4f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_VEX_HURT, 2.0f, 0.6f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ALLAY_HURT, 0.2f, 0.6f);
 			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 0.5f, 0.7f);
 		}
 	}

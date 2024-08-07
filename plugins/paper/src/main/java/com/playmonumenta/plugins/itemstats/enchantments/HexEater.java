@@ -127,11 +127,10 @@ public class HexEater implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (projectile instanceof Trident && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.6f, 1.1f);
-			world.playSound(loc, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 5.0f, 0.4f);
-			world.playSound(loc, Sound.BLOCK_SCULK_BREAK, SoundCategory.PLAYERS, 1.3f, 1.0f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 1.1f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_VEX_HURT, 1.5f, 0.4f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_SCULK_BREAK, 1.0f, 1.0f);
 		}
 	}
 }

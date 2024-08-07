@@ -86,11 +86,10 @@ public class FireAspect implements Enchantment {
 				projectile.setFireTicks((int) (FIRE_ASPECT_DURATION * value));
 			}
 			if (!AbilityUtils.isVolley(player, projectile)) {
-				World world = player.getWorld();
 				Location loc = player.getLocation();
-				world.playSound(loc, Sound.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 5.0f, 0.9f);
-				world.playSound(loc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.4f, 0.9f);
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.3f, 1.1f);
+				AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_CANDLE_EXTINGUISH, 1.5f, 0.9f);
+				AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_FIRECHARGE_USE, 0.4f, 0.9f);
+				AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.3f, 1.1f);
 			}
 		}
 	}

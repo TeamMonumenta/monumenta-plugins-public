@@ -118,9 +118,8 @@ public class EarthAspect implements Enchantment {
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			World world = player.getWorld();
 			Location loc = player.getLocation();
-			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.6f, 1.1f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, 0.5f, 1.1f);
 		}
 	}
 

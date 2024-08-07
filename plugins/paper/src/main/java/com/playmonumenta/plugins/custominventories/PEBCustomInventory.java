@@ -231,7 +231,7 @@ public class PEBCustomInventory extends CustomInventory {
 				"Click to choose your preferences across a wide variety of music", NamedTextColor.LIGHT_PURPLE,
 				Material.JUKEBOX, false).switchToPage(PebPage.SOUND_CONTROLS),
 			new PebItem(23, "Passive ability sounds",
-				"Click to toggle whether buffs and other long-lasting ability effects will play sounds.", NamedTextColor.LIGHT_PURPLE,
+				"Click to toggle whether some sounds from long-lasting ability effects and enchantments are played.", NamedTextColor.LIGHT_PURPLE,
 				Material.NOTE_BLOCK, false).action((pebCustomInventory, event) -> {
 				boolean disabled = ScoreboardUtils.toggleTag((Player) event.getWhoClicked(), AbilityUtils.PASSIVE_SOUNDS_DISABLED_TAG);
 				event.getWhoClicked().sendMessage(Component.text("Passive ability sounds are now " + (disabled ? "disabled" : "enabled"), NamedTextColor.GOLD, TextDecoration.BOLD));
