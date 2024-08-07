@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.cosmetics.poses.GravePose;
+import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDeath;
@@ -87,6 +89,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
 
 public class DepthsListener implements Listener {
 	public static final String GRAVE_TAG = "DepthsGrave";
@@ -345,7 +348,6 @@ public class DepthsListener implements Listener {
 
 						ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class, g -> {
 							g.setInvulnerable(true);
-							// TODO: setDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
 							g.setDisabledSlots(EquipmentSlot.values());
 							g.setCollidable(false);
 							g.setBasePlate(false);
@@ -357,8 +359,14 @@ public class DepthsListener implements Listener {
 							ScoreboardUtils.addEntityToTeam(g, "GraveGreen", NamedTextColor.GREEN);
 							g.addScoreboardTag(GRAVE_TAG);
 							g.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
+							GravePose mGravePose = GravePoses.getEquippedGravePose(player);
+							g.setHeadPose(mGravePose.getHeadAngle(false));
+							g.setBodyPose(mGravePose.getBodyAngle(false));
+							g.setLeftArmPose(mGravePose.getLeftArmAngle(false));
+							g.setRightArmPose(mGravePose.getRightArmAngle(false));
+							g.setLeftLegPose(mGravePose.getLeftLegAngle(false));
+							g.setRightLegPose(mGravePose.getRightLegAngle(false));
 
-							// TODO: steal this code to be used in other graves or standardize graves across content - usb
 							VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
 							for (EquipmentSlot slot : EquipmentSlot.values()) {
 								ItemStack item;
@@ -380,6 +388,11 @@ public class DepthsListener implements Listener {
 								}
 								g.setItem(slot, item);
 							}
+							ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+							SkullMeta meta = (SkullMeta) skull.getItemMeta();
+							meta.setPlayerProfile(player.getPlayerProfile());
+							skull.setItemMeta(meta);
+							g.setItem(EquipmentSlot.HEAD, skull);
 						});
 
 						BossBar graveBar = BossBar.bossBar(Component.text(player.getName() + "'s Grave", NamedTextColor.RED),

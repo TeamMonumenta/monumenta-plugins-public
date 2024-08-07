@@ -7,12 +7,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.cosmetics.poses.GravePose;
 import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -53,6 +55,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
@@ -234,12 +237,32 @@ public final class Grave {
 				stand.setRightArmPose(mPose.get(KEY_POSE_RIGHT_ARM));
 				stand.setLeftLegPose(mPose.get(KEY_POSE_LEFT_LEG));
 				stand.setRightLegPose(mPose.get(KEY_POSE_RIGHT_LEG));
-				stand.setItem(EquipmentSlot.HEAD, mEquipment.get(KEY_EQUIPMENT_HEAD));
-				stand.setItem(EquipmentSlot.CHEST, mEquipment.get(KEY_EQUIPMENT_BODY));
-				stand.setItem(EquipmentSlot.LEGS, mEquipment.get(KEY_EQUIPMENT_LEGS));
-				stand.setItem(EquipmentSlot.FEET, mEquipment.get(KEY_EQUIPMENT_FEET));
-				stand.setItem(EquipmentSlot.HAND, mEquipment.get(KEY_EQUIPMENT_HAND));
-				stand.setItem(EquipmentSlot.OFF_HAND, mEquipment.get(KEY_EQUIPMENT_OFF_HAND));
+				VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(mPlayer);
+				for (EquipmentSlot slot : EquipmentSlot.values()) {
+					ItemStack item;
+					if (slot != EquipmentSlot.HEAD) {
+						item = ItemUtils.clone(mPlayer.getInventory().getItem(slot).clone());
+						if (ItemUtils.isNullOrAir(item)) {
+							continue;
+						}
+						VanityManager.applyVanity(item, vanityData, slot, false);
+						// usb: remove stats from item before adding to armorstand in case of dupe
+						// this should happen after applying vanity
+						ItemUpdateHelper.removeStats(item);
+					} else {
+						item = new ItemStack(Material.PLAYER_HEAD);
+						if (item.getItemMeta() instanceof SkullMeta skullMeta) {
+							skullMeta.setOwningPlayer(mPlayer);
+							item.setItemMeta(skullMeta);
+						}
+					}
+					stand.setItem(slot, item);
+				}
+				ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+				SkullMeta meta = (SkullMeta) skull.getItemMeta();
+				meta.setPlayerProfile(mPlayer.getPlayerProfile());
+				skull.setItemMeta(meta);
+				stand.setItem(EquipmentSlot.HEAD, skull);
 				stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 				stand.setGravity(false);
 				stand.setCanMove(false);
@@ -486,6 +509,9 @@ public final class Grave {
 						}
 					}
 					if (unshattered == 0) {
+						if (mEntity != null) {
+							GravePoses.getEquippedGravePose(mPlayer).playAnimation(mEntity, player);
+						}
 						player.sendMessage(Component.text("You do not have any items on you that this grave could unshatter. ", NamedTextColor.AQUA)
 							                   .append(Component.text("Click here to delete this grave.", NamedTextColor.RED)
 								                           .hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
@@ -526,7 +552,7 @@ public final class Grave {
 						                  .hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
 						                  .clickEvent(ClickEvent.runCommand("/grave delete " + mUuid)));
 				if (mEntity != null) {
-					GravePoses.getEquippedGravePose(mPlayer).playAnimation(mEntity);
+					GravePoses.getEquippedGravePose(mPlayer).playAnimation(mEntity, player);
 				}
 				mPlayer.sendMessage(message);
 				mGraveMessageCooldown.add(mUuid);

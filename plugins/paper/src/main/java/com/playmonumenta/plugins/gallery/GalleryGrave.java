@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.gallery;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.cosmetics.poses.GravePose;
+import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
 import com.playmonumenta.plugins.gallery.effects.GalleryReviveTimeEffect;
 import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -145,41 +151,61 @@ public class GalleryGrave {
 	}
 
 	public static GalleryGrave createGrave(GalleryPlayer player, Player bukkitPlayer, Location location, GalleryGame game) {
-		ArmorStand lIndicator = location.getWorld().spawn(location.clone().add(0, 0.5, 0), ArmorStand.class, indicator -> {
+		ArmorStand lIndicator = location.getWorld().spawn(location.clone().add(0, 1, 0), ArmorStand.class, indicator -> {
 			indicator.setMarker(true);
 			indicator.setGravity(false);
 			indicator.setInvulnerable(true);
 			indicator.setCustomNameVisible(true);
 			indicator.setInvisible(true);
-			// TODO: setDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
 			indicator.addDisabledSlots(EquipmentSlot.values());
 			indicator.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
 		});
 
-		PlayerInventory playerInventory = bukkitPlayer.getInventory();
-		ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-		SkullMeta meta = (SkullMeta) skull.getItemMeta();
-		meta.setPlayerProfile(bukkitPlayer.getPlayerProfile());
-		skull.setItemMeta(meta);
-
-		ArmorStand lGrave = location.getWorld().spawn(location, ArmorStand.class, grave -> {
-			grave.setGravity(false);
-			grave.setInvulnerable(true);
-			grave.setArms(true);
-			grave.setBasePlate(false);
-			grave.setItem(EquipmentSlot.HEAD, skull);
-			// TODO: remove stats of equipment here - usb
-			grave.setItem(EquipmentSlot.CHEST, playerInventory.getItem(EquipmentSlot.CHEST));
-			grave.setItem(EquipmentSlot.LEGS, playerInventory.getItem(EquipmentSlot.LEGS));
-			grave.setItem(EquipmentSlot.FEET, playerInventory.getItem(EquipmentSlot.FEET));
-			grave.setItem(EquipmentSlot.HAND, playerInventory.getItem(EquipmentSlot.HAND));
-			grave.setItem(EquipmentSlot.OFF_HAND, playerInventory.getItem(EquipmentSlot.OFF_HAND));
-			// TODO: setDisabledSlots/addDisabledSlots DOES NOT WORK FOR OFFHANDS - cancel PlayerArmorStandManipulateEvent (or use GraveManager.DISABLE_INTERACTION_TAG) instead - usb
-			grave.setDisabledSlots(EquipmentSlot.values());
-			grave.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
-			//TODO - set grave position like it is all on the floor
-			grave.setCustomNameVisible(true);
-			grave.customName(Component.text(bukkitPlayer.getName() + "'s grave"));
+		ArmorStand lGrave = location.getWorld().spawn(location, ArmorStand.class, g -> {
+			g.setInvulnerable(true);
+			g.setDisabledSlots(EquipmentSlot.values());
+			g.setCollidable(false);
+			g.setBasePlate(false);
+			g.customName(Component.text(bukkitPlayer.getName() + "'s Grave", NamedTextColor.RED));
+			g.setCustomNameVisible(true);
+			g.setGlowing(true);
+			g.setArms(true);
+			g.setGravity(false);
+			ScoreboardUtils.addEntityToTeam(g, "GraveGreen", NamedTextColor.GREEN);
+			g.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
+			GravePose mGravePose = GravePoses.getEquippedGravePose(bukkitPlayer);
+			g.setHeadPose(mGravePose.getHeadAngle(false));
+			g.setBodyPose(mGravePose.getBodyAngle(false));
+			g.setLeftArmPose(mGravePose.getLeftArmAngle(false));
+			g.setRightArmPose(mGravePose.getRightArmAngle(false));
+			g.setLeftLegPose(mGravePose.getLeftLegAngle(false));
+			g.setRightLegPose(mGravePose.getRightLegAngle(false));
+			VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(bukkitPlayer);
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				ItemStack item;
+				if (slot != EquipmentSlot.HEAD) {
+					item = ItemUtils.clone(bukkitPlayer.getInventory().getItem(slot).clone());
+					if (ItemUtils.isNullOrAir(item)) {
+						continue;
+					}
+					VanityManager.applyVanity(item, vanityData, slot, false);
+					// usb: remove stats from item before adding to armorstand in case of dupe
+					// this should happen after applying vanity
+					ItemUpdateHelper.removeStats(item);
+				} else {
+					item = new ItemStack(Material.PLAYER_HEAD);
+					if (item.getItemMeta() instanceof SkullMeta skullMeta) {
+						skullMeta.setOwningPlayer(bukkitPlayer);
+						item.setItemMeta(skullMeta);
+					}
+				}
+				g.setItem(slot, item);
+			}
+			ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+			SkullMeta meta = (SkullMeta) skull.getItemMeta();
+			meta.setPlayerProfile(bukkitPlayer.getPlayerProfile());
+			skull.setItemMeta(meta);
+			g.setItem(EquipmentSlot.HEAD, skull);
 		});
 
 		return new GalleryGrave(lGrave, lIndicator, player, game);

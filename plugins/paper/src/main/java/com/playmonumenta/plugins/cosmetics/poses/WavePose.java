@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.cosmetics.poses;
 import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
 
 import static com.playmonumenta.plugins.cosmetics.poses.GravePoses.copyPos;
 import static com.playmonumenta.plugins.cosmetics.poses.GravePoses.posToPos;
@@ -44,7 +46,7 @@ public class WavePose implements GravePose {
 	}
 
 	@Override
-	public void playAnimation(ArmorStand grave) {
+	public void playAnimation(ArmorStand grave, Player player) {
 		Pose startKeyframe = new Pose(
 			new EulerAngle(Math.toRadians(0), Math.toRadians(0), Math.toRadians(0)),
 			new EulerAngle(Math.toRadians(0), Math.toRadians(0), Math.toRadians(0)),
@@ -71,6 +73,8 @@ public class WavePose implements GravePose {
 			new EulerAngle(Math.toRadians(10), Math.toRadians(347), Math.toRadians(351)),
 			new EulerAngle(Math.toRadians(353), Math.toRadians(26), Math.toRadians(0))
 		);
+		Vector v = player.getLocation().toVector().subtract(grave.getLocation().toVector());
+		float f = (float) -Math.toDegrees(Math.atan2(v.getX(), v.getZ()));
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -79,6 +83,7 @@ public class WavePose implements GravePose {
 			public void run() {
 				switch (mTicks) {
 					case 0:
+						grave.setRotation(f, 0);
 						copyPos(grave, startKeyframe);
 						break;
 					case 5:

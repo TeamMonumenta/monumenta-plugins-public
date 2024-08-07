@@ -80,7 +80,7 @@ public interface GravePose {
 		}.runTaskTimer(Plugin.getInstance(), 0, 2);
 	}
 
-	void playAnimation(ArmorStand grave);
+	void playAnimation(ArmorStand grave, Player player);
 
 	Material getDisplayItem();
 }

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.poses;
 
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 
 public class DefaultGravePose implements GravePose {
 
@@ -13,6 +14,6 @@ public class DefaultGravePose implements GravePose {
 	}
 
 	@Override
-	public void playAnimation(ArmorStand grave) {
+	public void playAnimation(ArmorStand grave, Player player) {
 	}
 }

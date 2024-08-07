@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.poses;
 import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 
@@ -48,7 +49,7 @@ public class GangnamStylePose implements GravePose {
 	}
 
 	@Override
-	public void playAnimation(ArmorStand grave) {
+	public void playAnimation(ArmorStand grave, Player player) {
 		Pose startKeyframe = new Pose(
 			new EulerAngle(Math.toRadians(0), Math.toRadians(0), Math.toRadians(0)),
 			new EulerAngle(Math.toRadians(0), Math.toRadians(347), Math.toRadians(0)),
