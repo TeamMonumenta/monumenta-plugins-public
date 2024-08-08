@@ -347,9 +347,10 @@ public class DelvesManager implements Listener {
 				//check if this mob is summoned by command or by spawners
 				if (NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE != null) {
 					// faked normal spawn - used for lospool spawners
+					CreatureSpawner temp = NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE;
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
-					Riftborn.applyModifiers(NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE.getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
-					Chronology.applyModifiers(NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE, delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
+					Riftborn.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
+					Chronology.applyModifiers(temp, delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent) {
 					// normal spawn - handle all the mods
 					Riftborn.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
