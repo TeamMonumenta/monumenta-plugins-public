@@ -61,11 +61,11 @@ public class Volley extends Ability {
 				String.format("When you shoot a projectile while sneaking, you shoot a volley consisting of %d projectiles instead. " +
 					              "Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: %ds.",
 					VOLLEY_1_ARROW_COUNT,
-					(int) (VOLLEY_1_DAMAGE_MULTIPLIER * 100),
+					(int) ((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100),
 					VOLLEY_COOLDOWN / 20),
-				String.format("Increases the number of projectiles to %d and enhances the damage to %d%%.",
+				String.format("Increases the number of projectiles to %d and enhances the damage bonus to %d%%.",
 					VOLLEY_2_ARROW_COUNT,
-					(int) (VOLLEY_2_DAMAGE_MULTIPLIER * 100)),
+					(int) ((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)),
 				String.format("Volley now fires in a 360 degree arc. The projectiles inflict %d%% Bleed for %ds.", (int) (ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20))
 			.simpleDescription("Fire a volley of projectiles in front of you.")
 			.cooldown(VOLLEY_COOLDOWN, CHARM_COOLDOWN)
