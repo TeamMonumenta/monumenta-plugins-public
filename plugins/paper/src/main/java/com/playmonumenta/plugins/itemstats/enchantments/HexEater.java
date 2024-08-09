@@ -22,7 +22,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.potion.PotionEffectType;
 
@@ -54,14 +53,12 @@ public class HexEater implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.HEX_EATER);
-		if (event.getType() == DamageType.MELEE) {
-			applyHexDamage(plugin, false, player, level, enemy, event);
-		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-			applyHexDamage(plugin, true, player, level, enemy, event);
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) {
+			applyHexDamage(plugin, event.getDamager() instanceof Projectile, player, level, enemy, event);
 		}
 	}
 
-	public static void applyHexDamage(Plugin plugin, boolean tridentThrow, Player player, int level, LivingEntity target, DamageEvent event) {
+	public static void applyHexDamage(Plugin plugin, boolean isProjectile, Player player, int level, LivingEntity target, DamageEvent event) {
 		List<PotionEffectType> e = PotionUtils.getNegativeEffects(plugin, target);
 		int effects = e.size();
 
@@ -107,9 +104,9 @@ public class HexEater implements Enchantment {
 		}
 
 		if (effects > 0) {
-			//Trident throw does not rely on player attack strength
+			//Projectiles do not rely on player attack strength
 			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * effects * DAMAGE);
-			if (tridentThrow) {
+			if (isProjectile) {
 				event.setDamage(event.getFlatDamage() + damage);
 			} else {
 				event.setDamage(event.getFlatDamage() + damage * player.getCooledAttackStrength(0));
@@ -118,7 +115,7 @@ public class HexEater implements Enchantment {
 
 			World world = target.getWorld();
 			Location loc = target.getLocation();
-			if (!tridentThrow) {
+			if (!isProjectile) {
 				world.playSound(loc, Sound.BLOCK_SCULK_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 		}
@@ -126,7 +123,7 @@ public class HexEater implements Enchantment {
 
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
-		if (projectile instanceof Trident && !AbilityUtils.isVolley(player, projectile)) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
 			Location loc = player.getLocation();
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 1.1f);
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_VEX_HURT, 1.5f, 0.4f);
