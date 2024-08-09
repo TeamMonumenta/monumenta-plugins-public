@@ -632,10 +632,13 @@ public class EntityListener implements Listener {
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player player) {
 				affectedPlayers.add(player);
-				if (!mAbilities.playerSplashedByPotionEvent(player, affectedEntities, potion, event)) {
-					event.setCancelled(true);
-					return;
-				}
+			}
+		}
+
+		for (Player player : affectedPlayers) {
+			if (!mAbilities.playerSplashedByPotionEvent(player, affectedEntities, potion, event)) {
+				event.setCancelled(true);
+				return;
 			}
 		}
 
