@@ -8,6 +8,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.google.common.collect.ImmutableMap;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.commands.VirtualFirmament;
@@ -42,6 +43,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -192,8 +194,17 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				}
 			}
 
-			// Vanity
 			if (isArmorOrOffhandSlot) {
+				// Depth Strider disabled while holding or using a riptide trident
+				if (slot != 45
+					    && itemStack.containsEnchantment(Enchantment.DEPTH_STRIDER)
+					    && player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.RIPTIDE)
+					    && (!player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) || player.isHandRaised() || player.isRiptiding())) {
+					itemStack.removeEnchantment(Enchantment.DEPTH_STRIDER);
+					markVirtual(itemStack);
+				}
+
+				// Vanity
 				VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
 				if (vanityData != null && vanityData.mSelfVanityEnabled) {
 					EquipmentSlot equipmentSlot = switch (slot) {

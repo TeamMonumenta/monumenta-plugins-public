@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -256,7 +257,13 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
 			new PebItem(33, "Cloned Finisher Elites Visibility",
 				"Click to toggle whether cloned elites in finishers glow and are visible.", NamedTextColor.LIGHT_PURPLE,
-				Material.ZOMBIE_HEAD, false).switchToPage(PebPage.FINISHER_VISIBILTY)
+				Material.ZOMBIE_HEAD, false).switchToPage(PebPage.FINISHER_VISIBILTY),
+			new PebItem(4 * 9 + 4, "Disable Depth Strider while Riptiding",
+				"Click to toggle whether depth strider is disabled constantly while holding a riptide trident, or only while riptiding.", NamedTextColor.LIGHT_PURPLE,
+				Material.TRIDENT, false).action((pebCustomInventory, event) -> {
+				boolean onlyDuringRiptide = ScoreboardUtils.toggleTag((Player) event.getWhoClicked(), Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING);
+				event.getWhoClicked().sendMessage(Component.text("Depth Strider is now " + (onlyDuringRiptide ? "only disabled while riptiding." : "constantly disabled while holding a Riptide trident."), NamedTextColor.GOLD, TextDecoration.BOLD));
+			})
 		);
 
 		definePage(PebPage.TECHNICAL_OPTIONS,

@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -411,6 +412,18 @@ public class PlayerListener implements Listener {
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
+
+		// Update inventory to handle virtual removal of depth strider while riptiding
+		if (player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING)
+			    && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
+			    && event.useItemInHand() != Event.Result.DENY
+			    && item != null
+			    && item.getType() == Material.TRIDENT
+			    && item.containsEnchantment(Enchantment.RIPTIDE)
+			    && playerHasDepthStrider(player)) {
+			Bukkit.getScheduler().runTask(mPlugin, player::updateInventory);
+		}
+
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -597,7 +610,21 @@ public class PlayerListener implements Listener {
 	// The Player swapped their current selected item.
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerItemHeldEvent(PlayerItemHeldEvent event) {
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
+		Player player = event.getPlayer();
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+
+		// Update inventory if switching to or from a riptide trident while having depth strider to virtually remove that depth strider
+		ItemStack previousItem = player.getInventory().getItem(event.getPreviousSlot());
+		ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
+		if (((previousItem != null && previousItem.containsEnchantment(Enchantment.RIPTIDE)) || (newItem != null && newItem.containsEnchantment(Enchantment.RIPTIDE)))
+			    && playerHasDepthStrider(player)) {
+			Bukkit.getScheduler().runTask(mPlugin, player::updateInventory);
+		}
+	}
+
+	private boolean playerHasDepthStrider(Player player) {
+		return (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)
+			       && Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD).anyMatch(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER));
 	}
 
 	// The player dropped an item.
@@ -1168,6 +1195,23 @@ public class PlayerListener implements Listener {
 		}
 
 		mPlugin.mItemStatManager.onRiptide(mPlugin, player, event);
+
+		// Update inventory after riptiding to re-add the virtually removed depth strider while riptiding
+		if (player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) && playerHasDepthStrider(player)) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (!player.isOnline() || player.isDead()) {
+						cancel();
+						return;
+					}
+					if (!player.isRiptiding()) {
+						player.updateInventory();
+						cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 1, 1);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
