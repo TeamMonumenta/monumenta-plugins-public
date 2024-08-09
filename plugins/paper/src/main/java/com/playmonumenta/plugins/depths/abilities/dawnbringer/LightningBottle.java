@@ -242,7 +242,6 @@ public class LightningBottle extends DepthsAbility {
 
 		itemMeta.displayName(DepthsTree.DAWNBRINGER.color(POTION_NAME_BASE.formatted(amount)).decoration(TextDecoration.ITALIC, false));
 		item.setItemMeta(itemMeta);
-		item.setAmount(Math.max(1, amount));
 		NBT.modify(item, nbt -> {
 			nbt.setInteger("bottle_amount", amount);
 		});
