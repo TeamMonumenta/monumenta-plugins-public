@@ -83,18 +83,21 @@ public class RespawnStasis extends Stasis {
 				EntityUtils.setRemoveEntityOnUnload(stand);
 
 				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					if (player.getWorld() != stand.getWorld()) {
+						return;
+					}
 					player.setGameMode(GameMode.SPECTATOR);
 					player.setSpectatorTarget(stand);
-				});
 
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-					if (player.isOnline() && getDuration() > 0) {
-						removeSpectator(player);
-					}
-					if (stand.isValid()) {
-						stand.remove();
-					}
-				}, SPECTATE_DURATION);
+					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+						if (player.isOnline() && getDuration() > 0) {
+							removeSpectator(player);
+						}
+						if (stand.isValid()) {
+							stand.remove();
+						}
+					}, SPECTATE_DURATION);
+				});
 			} else {
 				if (player.getGameMode() == GameMode.SPECTATOR) {
 					Location respawnLocation = PlayerUtils.getRespawnLocationAndClear(player, player.getWorld(), player.getBedSpawnLocation());

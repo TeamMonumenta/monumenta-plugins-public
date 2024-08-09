@@ -32,6 +32,7 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -91,10 +92,16 @@ public class GraveListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerInteractEntity(PlayerInteractEntityEvent event) {
+		Player player = event.getPlayer();
+		if (event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (GraveManager.isGrave(event.getRightClicked())) {
 			event.setCancelled(true);
-			if (MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
-				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			if (MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
+				GraveManager.onInteract(player, event.getRightClicked());
 			}
 		}
 
