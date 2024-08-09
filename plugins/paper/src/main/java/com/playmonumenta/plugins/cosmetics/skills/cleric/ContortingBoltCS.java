@@ -67,7 +67,7 @@ public class ContortingBoltCS extends HandOfLightCS {
 			int mInt = 0;
 			@Override
 			public void run() {
-				if (mInt < players.size()) {
+				if (mInt < players.size() - 1) {
 					createOrb(dir, LocationUtils.getHalfHeightLocation(players.get(mInt)), player, players.get(mInt + 1), PINK, Particle.CRIT, radius);
 				} else {
 					this.cancel();
