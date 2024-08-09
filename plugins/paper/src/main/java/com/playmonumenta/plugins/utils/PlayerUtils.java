@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -15,7 +16,9 @@ import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDependency;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.RespawnStasis;
+import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
@@ -47,6 +50,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -665,5 +669,41 @@ public class PlayerUtils {
 			return realRespawnLocation;
 		}
 		return originalRespawnLocation != null ? originalRespawnLocation : world.getSpawnLocation();
+	}
+
+	/**
+	 * Kills the player regardless of stasis or invulnerability
+	 * @param player the player to kill
+	 * @param damager the entity responsible for the kill
+	 * @param cause the cause of the kill
+	 */
+
+	public static void killPlayer(Player player, @Nullable LivingEntity damager, @Nullable String cause) {
+		killPlayer(player, damager, cause, true, true);
+	}
+
+	/**
+	 * Kills the player
+	 * @param player the player to kill
+	 * @param damager the entity responsible for the kill
+	 * @param cause the cause of the kill
+	 * @param bypassStasis whether the kill should bypass the stasis effect
+	 * @param bypassInvuln whether the kill should bypass the player's invulnerability status
+	 */
+	public static void killPlayer(Player player, @Nullable LivingEntity damager, @Nullable String cause, boolean bypassStasis, boolean bypassInvuln) {
+		if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
+			Plugin plugin = Plugin.getInstance();
+			plugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
+			if (bypassStasis) {
+				plugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
+			}
+			if (bypassInvuln && player.isInvulnerable()) {
+				player.setInvulnerable(false);
+			}
+			DamageUtils.damage(damager, player, DamageEvent.DamageType.TRUE, 999999, null, true, false, cause);
+			if (player.getHealth() > 0) {
+				player.setHealth(0);
+			}
+		}
 	}
 }

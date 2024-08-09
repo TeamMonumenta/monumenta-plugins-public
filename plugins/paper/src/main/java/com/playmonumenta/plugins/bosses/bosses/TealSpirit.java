@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -103,7 +104,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new TealSpiritSummon(mSpawnLoc, 40 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 25),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> LocationUtils.xzDistance(mSpawnLoc, mBoss.getLocation()) > 26),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
@@ -120,8 +121,8 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 			mHealth = 24500;
 
 			mRewriteHistory = new RewriteHistory(mPlugin, mBoss, 20 * 5, 30, mSpawnLoc);
-			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 80, 40, mSpawnLoc);
-			MidnightToll finalMidnightToll = new MidnightToll(mPlugin, mBoss, 20 * 15, 99999999, 40, mSpawnLoc);
+			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 80, 40, mSpawnLoc, false);
+			MidnightToll finalMidnightToll = new MidnightToll(mPlugin, mBoss, 20 * 15, 999999, 40, mSpawnLoc, true);
 			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
 			MarchingFate mMarchingFates = new MarchingFate(mBoss, this, true);
 
@@ -139,7 +140,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new TealSpiritSummon(mSpawnLoc, 30 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 25),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> LocationUtils.xzDistance(mSpawnLoc, mBoss.getLocation()) > 26),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
@@ -237,9 +238,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new TealSpiritSummon(mSpawnLoc, 30 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> {
-					return mBoss.getLocation().distance(mSpawnLoc) > 25;
-				}),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> LocationUtils.xzDistance(mSpawnLoc, mBoss.getLocation()) > 26),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 

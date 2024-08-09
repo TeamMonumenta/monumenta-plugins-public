@@ -17,9 +17,10 @@ public class TealAntiCheat extends Spell {
 	private static final double HEIGHT_UP = 6;
 	private static final double HEIGHT_DOWN = 3;
 	private static final int RANGE = 50;
+
 	private LivingEntity mBoss;
-	private Location mSpawnLoc;
 	private int mDuration;
+	private Location mSpawnLoc;
 	private int mTimer = 0;
 
 	public TealAntiCheat(LivingEntity boss, int duration, Location spawnLoc) {
@@ -41,9 +42,8 @@ public class TealAntiCheat extends Spell {
 					player.sendMessage(Component.text("You are too far from the fight!", NamedTextColor.RED));
 				}
 			}
-
 			for (Entity e : EntityUtils.getNearbyMobs(mSpawnLoc, 100)) {
-				if (e.getScoreboardTags().contains("Boss") && !e.getName().contains("Marching Fate") && e.getLocation().distance(mSpawnLoc) > RADIUS) {
+				if (e.getScoreboardTags().contains("Boss") && !e.getName().contains("Marching Fate") && LocationUtils.xzDistance(mSpawnLoc, e.getLocation()) > RADIUS) {
 					e.teleport(mSpawnLoc);
 				}
 			}

@@ -1,16 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.effects.Stasis;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -33,8 +28,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public class MarchingFate extends Spell {
@@ -44,21 +37,20 @@ public class MarchingFate extends Spell {
 	private static final String LOS = "MarchingFate";
 	private static final String SPELL_NAME = "Marching Fates";
 
-
 	private final LivingEntity mBoss;
-	private final Location mCenter;
 	private final TealSpirit mTealSpirit;
+	private final Location mCenter;
 	private final List<Entity> mMarchers = new ArrayList<>();
+	private final HashMap<Entity, Location> mSpawnIndex = new HashMap<>();
 	private final ChargeUpManager mBossBar;
 	private boolean mSentMessage = false;
-	private final HashMap<Entity, Location> mSpawnIndex = new HashMap<>();
 	private int mT = 0;
 	private boolean mHasRun = false;
 
 	public MarchingFate(LivingEntity boss, TealSpirit tealSpirit, boolean isHard) {
 		mBoss = boss;
-		mCenter = tealSpirit.mSpawnLoc;
 		mTealSpirit = tealSpirit;
+		mCenter = tealSpirit.mSpawnLoc;
 
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(DISTANCE, HEIGHT, 0), LOS));
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(-DISTANCE, HEIGHT, 0), LOS));
@@ -106,17 +98,8 @@ public class MarchingFate extends Spell {
 				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 0.5f);
 				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 1.0f);
 
-				Plugin plugin = Plugin.getInstance();
 				for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {
-					plugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
-					plugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
-					PotionEffect resist = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-					if (resist != null && resist.getAmplifier() >= 4) {
-						player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-					}
-					player.setInvulnerable(false);
-					player.setHealth(0);
-					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 10000, null, true, false, SPELL_NAME);
+					PlayerUtils.killPlayer(player, mBoss, SPELL_NAME + " (☠)");
 				}
 
 				mTealSpirit.killMarchers();
@@ -124,7 +107,6 @@ public class MarchingFate extends Spell {
 				mBossBar.reset();
 				return;
 			}
-
 			newLoc = LocationUtils.fallToGround(newLoc, mCenter.getBlockY());
 			marcher.teleport(newLoc);
 		}
@@ -160,13 +142,12 @@ public class MarchingFate extends Spell {
 						}
 
 						obfuscation = 4;
-
 						break outer;
 					}
 				}
 			}
 
-			if (mMarchers.size() > 0) {
+			if (!mMarchers.isEmpty()) {
 				double minDistance = 25;
 				for (Entity e : mMarchers) {
 					if (e.getLocation().distance(mCenter) < minDistance) {
