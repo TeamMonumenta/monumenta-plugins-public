@@ -16,13 +16,14 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -152,6 +153,16 @@ public class RenameItemCommand {
 		String baseName = ItemUtils.getPlainNameIfExists(itemStack);
 		if (!name.isEmpty()) {
 			AuditListener.logPlayer("Item rename: " + player.getName() + " renamed a " + (baseName.isEmpty() ? "Shulker Box" : baseName) + " to '" + name + "'");
+		}
+
+		if (!name.isEmpty() && LoadoutManager.isEquipmentStorageBox(itemStack)) {
+			Set<LoadoutManager.EquipmentCaseTag> tags = LoadoutManager.EquipmentCaseTag.getTags(itemStack);
+			if (tags.isEmpty()) {
+				player.sendMessage(Component.text("No tags recognized in the name of this " + LoadoutManager.STORAGE_SHULKER_NAME + ".", NamedTextColor.GRAY));
+			} else {
+				player.sendMessage(Component.text(LoadoutManager.STORAGE_SHULKER_NAME + " tags recognized in name: ", NamedTextColor.GOLD)
+					                   .append(Component.text(tags.stream().sorted().map(LoadoutManager.EquipmentCaseTag::getName).collect(Collectors.joining(", ")), NamedTextColor.WHITE)));
+			}
 		}
 	}
 

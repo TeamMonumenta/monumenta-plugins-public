@@ -20,10 +20,14 @@ import com.playmonumenta.plugins.guis.LoadoutManagerGui;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
@@ -124,45 +128,92 @@ public class LoadoutManager implements Listener {
 		Location.RUSH, Location.TREASURE, Location.INTELLECT
 	);
 
-	private enum EquipmentCaseTag {
-		R1("r1|valley", 0, (item) -> ItemStatUtils.getRegion(item) == Region.VALLEY),
-		R2("r2|isles", 0, (item) -> ItemStatUtils.getRegion(item) == Region.ISLES),
-		R3("r3|ring", 0, (item) -> ItemStatUtils.getRegion(item) == Region.RING),
+	public enum EquipmentCaseTag {
+		R1("valley", "r1|valley", 0, (item) -> ItemStatUtils.getRegion(item) == Region.VALLEY),
+		R2("isles", "r2|isles", 0, (item) -> ItemStatUtils.getRegion(item) == Region.ISLES),
+		R3("ring", "r3|ring", 0, (item) -> ItemStatUtils.getRegion(item) == Region.RING),
 
-		ARMOR("armou?rs?", 1, item -> ItemUtils.isArmorOrWearable(item) || ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
-		WEAPON("weapons?|mainhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.MAINHAND) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
-		OFFHAND("offhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
-		HELMET("helmets?|hats?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.HEAD),
-		CHEST("chest(?:plate)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.CHEST),
-		LEGS("leg(?:ging)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.LEGS),
-		BOOTS("boots?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.FEET),
+		LEGENDARY("legendary", "legendar(?:ys?|ies)", 1, item -> ItemStatUtils.getTier(item) == Tier.LEGENDARY),
+		EPIC("epic", "epics?", 1, item -> List.of(Tier.EPIC, Tier.EPIC_CHARM).contains(ItemStatUtils.getTier(item))),
+		ARTIFACT("artifact", "artifacts?", 1, item -> ItemStatUtils.getTier(item) == Tier.ARTIFACT),
+		RARE("rare", "rares?", 1, item -> List.of(Tier.RARE, Tier.RARE_CHARM).contains(ItemStatUtils.getTier(item))),
+		UNIQUE("unique", "uniques?", 1, item -> ItemStatUtils.getTier(item) == Tier.UNIQUE),
+		UNCOMMON("uncommon", "uncommons?", 1, item -> ItemStatUtils.getTier(item) == Tier.UNCOMMON),
+		TIERED("tiered", "tiereds?", 1, item -> List.of(Tier.ZERO, Tier.I, Tier.II, Tier.III, Tier.IV, Tier.V, Tier.COMMON).contains(ItemStatUtils.getTier(item))),
+
+		ARMOR("armor", "armou?rs?", 1, item -> ItemUtils.isArmorOrWearable(item) || ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
+
+		SWORD("sword", "swords?", 2, item -> ItemUtils.isSword(item)),
+		AXE("axe", "axes?", 2, item -> ItemUtils.isAxe(item)),
+		PICKAXE("pickaxe", "pickaxes?", 2, item -> ItemUtils.isPickaxe(item)),
+		SCYTHE("scythe", "hoes?|scythes?", 2, item -> ItemUtils.isHoe(item)),
+		WAND("wand", "wands?", 2, item -> ItemUtils.isWand(item)),
+		RANGED("ranged", "ranged|projectiles?|(?:cross|x)?bows?|tridents?|(?:snow)?balls?", 2, item -> ItemUtils.isProjectileWeapon(item)),
+		WEAPON("weapon", "weapons?|mainhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.MAINHAND) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
+		SHIELD("shield", "shields?", 2, item -> item.getType() == Material.SHIELD),
+
+		OFFHAND("offhand", "offhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
+		HELMET("helmet", "helmets?|hats?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.HEAD),
+		CHEST("chestplate", "chest(?:plate)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.CHEST),
+		LEGS("legs", "leg(?:ging)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.LEGS),
+		BOOTS("boots", "boots?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.FEET),
+
+		// higher priority than region + weapon
+		TOOL("tool", "tools?|util(?:s?|it(?:ys?|ies))", 104,
+			item -> ItemUtils.isShovel(item)
+				        || ItemUtils.isPickaxe(item)
+				        // assume silk touch axes are considered tools, as are axes with no damage added
+				        || (ItemUtils.isAxe(item) && (ItemStatUtils.hasEnchantment(item, EnchantmentType.SILK_TOUCH) || ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1))
+				        // similarly, non-offhand swords with no attack damage are tools
+				        || (ItemUtils.isSword(item) && ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1 && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND))
+				        || item.getType() == Material.SHEARS
+				        || item.getType() == Material.COMPASS
+				        || ItemUtils.isShulkerBox(item.getType())
+				        || ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
+				        || ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
+				        || ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)),
 
 		// Consumables are (mostly) region-independent, and charms always R3, so their priority includes the priority a region tag would add
 		// this for example makes 'consumables' higher priority than 'r2 weapons', thus sorting Fruit of Life into 'consumables' rather than 'weapons'
-		CHARM("charms?", 103, item -> ItemStatUtils.isCharm(item)),
-		CONSUMABLE("consumables?|foods?|potions?", 103, item -> ItemStatUtils.isConsumable(item)
-			                                                        || (item.getType().isEdible() && !ItemStatUtils.isCharm(item))
-			                                                        || ItemUtils.isSomePotion(item)
-			                                                        || ShulkerEquipmentListener.isPotionInjectorItem(item)),
+		CHARM("charm", "charms?", 104, item -> ItemStatUtils.isCharm(item)),
+		ZENITH("zenith", "zenith", 1, item -> ItemStatUtils.isZenithCharm(item)),
+		CONSUMABLE("consumable", "consumables?|foods?|potions?", 104,
+			item -> ItemStatUtils.isConsumable(item)
+				        || (item.getType().isEdible() && !ItemStatUtils.isCharm(item))
+				        || (ItemUtils.isSomePotion(item) && !ItemUtils.isAlchemistItem(item))
+				        || ShulkerEquipmentListener.isPotionInjectorItem(item)),
 		;
 
+		private final String mName;
 		private final Pattern mTagPattern;
 		private final int mPriority;
 		private final Predicate<ItemStack> mPredicate;
 
 		// groupings for case tag matching - for each group, either none of the tags must be on the case or at least one tag must apply to an item for it to go into that case
-		private static final List<Set<EquipmentCaseTag>> TAG_GROUPS = List.of(
+		private static final List<Set<EquipmentCaseTag>> TAG_GROUPS = new ArrayList<>(List.of(
 			Set.of(R1, R2, R3),
-			Set.of(ARMOR, WEAPON, OFFHAND, HELMET, CHEST, LEGS, BOOTS, CHARM, CONSUMABLE)
-		);
+			Set.of(LEGENDARY, EPIC, ARTIFACT, RARE, UNIQUE, UNCOMMON, TIERED)
+			// everything else is added as a last group by the static {} below
+		));
 
-		EquipmentCaseTag(String tagPattern, int priority, Predicate<ItemStack> predicate) {
+		static {
+			Set<EquipmentCaseTag> miscGroup = new HashSet<>(List.of(values()));
+			miscGroup.removeIf(tag -> TAG_GROUPS.stream().anyMatch(group -> group.contains(tag)));
+			TAG_GROUPS.add(miscGroup);
+		}
+
+		EquipmentCaseTag(String name, String tagPattern, int priority, Predicate<ItemStack> predicate) {
+			mName = name;
 			mTagPattern = Pattern.compile("\\b(?:" + tagPattern + ")\\b", Pattern.CASE_INSENSITIVE);
 			mPriority = priority;
 			mPredicate = predicate;
 		}
 
-		static Set<EquipmentCaseTag> getTags(ItemStack item) {
+		public String getName() {
+			return mName;
+		}
+
+		public static Set<EquipmentCaseTag> getTags(ItemStack item) {
 			String caseName = ItemStatUtils.getPlayerCustomName(item);
 			if (caseName == null) {
 				return Set.of();
