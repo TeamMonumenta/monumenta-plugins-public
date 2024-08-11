@@ -80,16 +80,16 @@ public class SpellGravityWell extends Spell {
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 		players.removeAll(SpellDimensionDoor.getShadowed());
-		if (players.size() < 1) {
+		if (players.isEmpty()) {
 			return;
 		}
 		Collections.shuffle(players);
 		Player p = players.get(0);
-		world.playSound(p.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 2.0f, 0.5f);
-		world.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 2.0f, 1.0f);
+		p.playSound(p, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 0.75f, 0.5f);
+		p.playSound(p, Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 0.75f, 1.0f);
 
 		BukkitRunnable runA = new BukkitRunnable() {
-			Location mLoc = p.getLocation().add(0, 0.2, 0);
+			final Location mLoc = p.getLocation().add(0, 0.2, 0);
 
 			@Override
 			public void run() {

@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
@@ -32,7 +33,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 /*
-Desecrate - After a 1.5 second delay, each player within 12 blocks of the lich are dealt 20 damage, knockbacked,
+Desecrate - After a 1.5 second delay, each player within 12 blocks of the lich are dealt 20 damage, knocked back,
 and stunned for 3 seconds (Slowness 10, Weakness 10, Negative Jump Boost, Silenced, Potentially put all items on CD?)
 
 A secondary ring will grow from lich to a radius of 15. If marked player(s) are within the secondary circle,
@@ -80,10 +81,12 @@ public class SpellDesecrate extends Spell {
 			public void run() {
 				float fTick = mChargeUp.getTime();
 				float ft = fTick / 25;
+				Location loc = mBoss.getLocation();
 				mSmoke.location(mBoss.getLocation()).spawnAsBoss();
 				mWitch.location(mBoss.getLocation().add(0, 1, 0)).spawnAsBoss();
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 7, 0.5f + ft);
-				Location loc = mBoss.getLocation();
+				for (Player player : PlayerUtils.playersInRange(loc, 12, true)) {
+					player.playSound(player, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.6f, 0.5f + ft);
+				}
 
 				indicator.radius(mRadius).location(loc).spawnAsBoss();
 				indicator2.radius(mRadius).location(loc).spawnAsBoss();

@@ -596,7 +596,10 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						switchArmor("LichThree");
 					}
 					if (mT == 20 * 2.5) {
-						world.playSound(mBoss.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 3.0f, 1.0f);
+						List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
+						for (Player player : players) {
+							player.playSound(player, Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 0.9f, 1.0f);
+						}
 					}
 					if (mT >= 20 * 2.5 && mT < 64 * 2 + 20 * 2.5 && mT % 2 == 0) {
 						// blue flame from small pillar
@@ -1975,8 +1978,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		List<Player> players = PlayerUtils.playersInRange(bossLoc, range, includeStealthed);
 		List<Player> toRemove = new ArrayList<>();
 		for (Player p : players) {
-			Location playerLoc = p.getLocation();
-			playerLoc.setY(mStart.getLocation().getY());
 			if (p.getLocation().getY() > mStart.getLocation().getY() + mCeiling) {
 				toRemove.add(p);
 			}
