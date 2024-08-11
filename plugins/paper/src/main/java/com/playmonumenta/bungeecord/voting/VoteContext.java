@@ -155,22 +155,24 @@ public class VoteContext {
 			}
 
 			builder.append(Component.text("\n"));
+			Component component;
 
 			Long offCooldownTime = mOffCooldownTimes.get(site);
 			if (offCooldownTime == null) {
 				/* Off cooldown */
-				builder.append(Component.text(displaySite, NamedTextColor.GREEN));
+				component = Component.text(displaySite, NamedTextColor.GREEN);
 			} else {
 				/* Still on cooldown */
 				long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
 				long totalSecondsLeft = offCooldownTime - currentTime;
 
-				builder.append(Component.text(displaySite + ": " + timeDeltaStr(totalSecondsLeft), NamedTextColor.RED));
+				component = Component.text(displaySite + ": " + timeDeltaStr(totalSecondsLeft), NamedTextColor.RED);
 			}
 
 			if (withClickEvents) {
-				builder.clickEvent(ClickEvent.openUrl(site));
+				component = component.clickEvent(ClickEvent.openUrl(site));
 			}
+			builder.append(component);
 		}
 
 		mLock.readLock().unlock();
