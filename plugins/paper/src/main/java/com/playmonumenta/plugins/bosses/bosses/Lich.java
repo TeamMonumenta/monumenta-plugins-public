@@ -111,7 +111,8 @@ import org.jetbrains.annotations.Nullable;
 public final class Lich extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_lich";
 	public static final String curseSource = "LichCurse";
-	public static final int detectionRange = 80;
+	/* TODO: Setting this too high causes problems with some spells but it's currently too low to cover the whole arena */
+	public static final int detectionRange = 55;
 	public static final int mShieldMin = 5;
 	private static final int mCeiling = 35;
 	private int mCounter = 0;
