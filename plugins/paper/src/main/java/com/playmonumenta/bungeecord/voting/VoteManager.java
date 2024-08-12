@@ -2,8 +2,6 @@ package com.playmonumenta.bungeecord.voting;
 
 import com.google.common.base.Ascii;
 import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.redissync.RedisAPI;
 import com.vexsoftware.votifier.bungee.events.VotifierEvent;
 import com.vexsoftware.votifier.model.Vote;
@@ -16,7 +14,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -87,7 +87,7 @@ public class VoteManager implements Listener {
 
 		VoteContext.getVoteContext(mPlugin, uuid).whenComplete((context, ex) -> {
 			if (ex != null) {
-				MMLog.warning("Exception getting vote context after login: " + ex.getMessage());
+				mPlugin.getLogger().warning("Exception getting vote context after login: " + ex.getMessage());
 			} else {
 				/* Tick the task to make sure times are current */
 				long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
@@ -131,7 +131,7 @@ public class VoteManager implements Listener {
 			}
 		}
 		if (matchingSite == null) {
-			MMLog.severe("Got vote with no matching site : " + vote);
+			mPlugin.getLogger().severe("Got vote with no matching site : " + vote);
 			return;
 		}
 
@@ -144,10 +144,10 @@ public class VoteManager implements Listener {
 		// MonumentaRedisSyncAPI.nameToUUID(playerName).whenComplete((uuid, ex) -> {
 		RedisAPI.getInstance().async().hget("name2uuid", playerName).thenApply((uuid) -> (uuid == null || uuid.isEmpty()) ? null : UUID.fromString(uuid)).toCompletableFuture().whenComplete((uuid, ex) -> {
 			if (ex != null) {
-				MMLog.warning("Failed to look up name2uuid for " + playerName + "': " + ex.getMessage());
+				mPlugin.getLogger().warning("Failed to look up name2uuid for " + playerName + "': " + ex.getMessage());
 			} else {
 				if (uuid == null) {
-					MMLog.warning("Got vote for unknown player '" + playerName + "'");
+					mPlugin.getLogger().warning("Got vote for unknown player '" + playerName + "'");
 				} else {
 					VoteContext context = mContexts.get(uuid);
 					if (context != null) {
@@ -159,7 +159,7 @@ public class VoteManager implements Listener {
 						/* Player is not online on this proxy - load their vote context or create & initialize a new one */
 						VoteContext.getVoteContext(mPlugin, uuid).whenComplete((ctx, e) -> {
 							if (e != null) {
-								MMLog.warning("Exception getting vote context for offline vote: " + e.getMessage());
+								mPlugin.getLogger().warning("Exception getting vote context for offline vote: " + e.getMessage());
 							} else {
 								// Intentionally don't add the context to mContexts - they're (probably) not online.
 								ctx.voteReceived(finalMatchingSite, finalCooldown); // Note that this will save internally
@@ -193,8 +193,8 @@ public class VoteManager implements Listener {
 			// This is weird, they're online, but they don't have a vote context. Might as well just load it and add to the map
 			VoteContext.getVoteContext(mPlugin, uuid).whenComplete((ctx, e) -> {
 				if (e != null) {
-					MMLog.warning("Exception getting vote context for /vote command: " + e.getMessage());
-					MessagingUtils.sendProxiedMessage(player, "Encountered an unexpected error while running this command.", NamedTextColor.RED);
+					mPlugin.getLogger().warning("Exception getting vote context for /vote command: " + e.getMessage());
+					player.sendMessage(BungeeComponentSerializer.get().serialize(Component.text("Encountered an unexpected error while running this command.", NamedTextColor.RED)));
 				} else {
 					mContexts.put(uuid, ctx);
 					ctx.sendVoteInfoLong(player);

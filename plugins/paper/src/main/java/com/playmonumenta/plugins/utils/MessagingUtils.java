@@ -24,9 +24,6 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -272,17 +269,6 @@ public class MessagingUtils {
 	private static Duration ticks(int t) {
 		// 50 milliseconds per tick
 		return Duration.ofMillis(t * 50L);
-	}
-
-	// This method exists just to sequester deprecation warnings that I believe we can't do anything about
-	// It should be easy to convert any uses of this to a new non-deprecated method if it is found
-	@SuppressWarnings("deprecation")
-	public static void sendProxiedMessage(ProxiedPlayer player, String message, @Nullable NamedTextColor color) {
-		ComponentBuilder builder = new ComponentBuilder(message);
-		if (color != null) {
-			builder.color(ChatColor.of(color.asHexString()));
-		}
-		player.sendMessage(builder.create());
 	}
 
 	public static Component concatenateComponents(List<Component> components) {

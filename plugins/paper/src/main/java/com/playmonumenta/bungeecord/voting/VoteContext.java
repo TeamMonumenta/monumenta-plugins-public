@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.redissync.RemoteDataAPI;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -199,8 +197,8 @@ public class VoteContext {
 	protected void sendVoteInfoLong(ProxiedPlayer player) {
 		RemoteDataAPI.getMulti(player.getUniqueId(), VOTES_TOTAL, VOTES_THIS_WEEK, VOTES_UNCLAIMED, RAFFLE_ENTRIES, RAFFLE_WINS_TOTAL, RAFFLE_WINS_UNCLAIMED).whenComplete((data, ex) -> {
 			if (ex != null) {
-				MMLog.warning("Exception getting vote data in sendVoteInfoLong: " + ex.getMessage());
-				MessagingUtils.sendProxiedMessage(player, "Encountered an unexpected error getting vote information.", NamedTextColor.RED);
+				mPlugin.getLogger().warning("Exception getting vote data in sendVoteInfoLong: " + ex.getMessage());
+				player.sendMessage(BungeeComponentSerializer.get().serialize(Component.text("Encountered an unexpected error getting vote information.", NamedTextColor.RED)));
 			}
 
 			int unclaimedRaffleWins = Integer.parseInt(data.getOrDefault(RAFFLE_WINS_UNCLAIMED, "0"));
@@ -231,22 +229,22 @@ public class VoteContext {
 		/* Fire and forget increments */
 		RemoteDataAPI.increment(mUUID, VOTES_THIS_WEEK, 1).whenComplete((unused, ex) -> {
 			if (ex != null) {
-				MMLog.warning("Failed to increment " + VOTES_THIS_WEEK + " for player " + mUUID);
+				mPlugin.getLogger().warning("Failed to increment " + VOTES_THIS_WEEK + " for player " + mUUID);
 			}
 		});
 		RemoteDataAPI.increment(mUUID, VOTES_TOTAL, 1).whenComplete((unused, ex) -> {
 			if (ex != null) {
-				MMLog.warning("Failed to increment " + VOTES_TOTAL + " for player " + mUUID);
+				mPlugin.getLogger().warning("Failed to increment " + VOTES_TOTAL + " for player " + mUUID);
 			}
 		});
 		RemoteDataAPI.increment(mUUID, VOTES_UNCLAIMED, 1).whenComplete((unused, ex) -> {
 			if (ex != null) {
-				MMLog.warning("Failed to increment " + VOTES_UNCLAIMED + " for player " + mUUID);
+				mPlugin.getLogger().warning("Failed to increment " + VOTES_UNCLAIMED + " for player " + mUUID);
 			}
 		});
 		RemoteDataAPI.increment(mUUID, RAFFLE_ENTRIES, 1).whenComplete((unused, ex) -> {
 			if (ex != null) {
-				MMLog.warning("Failed to increment " + RAFFLE_ENTRIES + " for player " + mUUID);
+				mPlugin.getLogger().warning("Failed to increment " + RAFFLE_ENTRIES + " for player " + mUUID);
 			}
 		});
 
@@ -267,7 +265,7 @@ public class VoteContext {
 
 		ProxiedPlayer player = mPlugin.getProxy().getPlayer(mUUID);
 		if (player != null) {
-			MessagingUtils.sendProxiedMessage(player, "Thanks for voting at " + matchingSite + "!", NamedTextColor.GOLD);
+			player.sendMessage(BungeeComponentSerializer.get().serialize(Component.text("Thanks for voting at " + matchingSite + "!", NamedTextColor.GOLD)));
 			sendVoteInfoShort(player);
 		}
 
