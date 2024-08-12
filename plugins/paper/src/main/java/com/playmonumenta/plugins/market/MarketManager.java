@@ -607,6 +607,14 @@ public class MarketManager {
 		// give items to player
 		int amountToGive = tradeMultAmount * oldListing.getBundleSize();
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(), () -> {
+			int inInventory = InventoryUtils.numInInventory(player.getInventory(), debt.mItem);
+			long inWallet = WalletManager.getWallet(player).count(debt.mItem);
+			if (debt.mInventoryDebt > inInventory || debt.mWalletDebt > inWallet) {
+				AuditListener.logSevere("Player " + player.getName() + " paid for a '" + oldListing.getItemName() + "' in the market, " +
+					                        "but did not have enough currency when the transaction completed. A total of "
+					                        + (Math.max(0, debt.mInventoryDebt - inInventory) + Math.max(0, debt.mWalletDebt - inWallet)) + " "
+					                        + ItemUtils.getPlainNameOrDefault(debt.mItem) + " have been duped! Check market logs for more transaction details.");
+			}
 			WalletUtils.payDebt(debt, player, true);
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				InventoryUtils.giveItemWithStacksizeCheck(player, oldListing.getItemToSell().asQuantity(amountToGive));
