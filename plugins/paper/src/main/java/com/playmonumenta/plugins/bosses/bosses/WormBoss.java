@@ -134,6 +134,8 @@ public class WormBoss extends BossAbilityGroup {
 				part.customName(customName.append(Component.text(tail ? " Tail" : " Body")));
 			}
 		}
+		part.setSilent(true);
+		part.getPassengers().forEach(p -> p.setSilent(true));
 		mParts.add(part);
 
 		if (tail || index % params.BODY_PASSENGER_INTERVAL == 0) {
