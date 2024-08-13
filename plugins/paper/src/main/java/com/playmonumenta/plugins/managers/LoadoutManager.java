@@ -160,18 +160,19 @@ public class LoadoutManager implements Listener {
 
 		// higher priority than region + weapon
 		TOOL("tool", "tools?|util(?:s?|it(?:ys?|ies))", 104,
-			item -> ItemUtils.isShovel(item)
-				        || ItemUtils.isPickaxe(item)
-				        // assume silk touch axes are considered tools, as are axes with no damage added
-				        || (ItemUtils.isAxe(item) && (ItemStatUtils.hasEnchantment(item, EnchantmentType.SILK_TOUCH) || ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1))
-				        // similarly, non-offhand swords with no attack damage are tools
-				        || (ItemUtils.isSword(item) && ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1 && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND))
-				        || item.getType() == Material.SHEARS
-				        || item.getType() == Material.COMPASS
-				        || ItemUtils.isShulkerBox(item.getType())
-				        || ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
-				        || ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
-				        || ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)),
+			item -> (ItemUtils.isShovel(item)
+				         || ItemUtils.isPickaxe(item)
+				         // assume silk touch axes are considered tools, as are axes with no damage added
+				         || (ItemUtils.isAxe(item) && (ItemStatUtils.hasEnchantment(item, EnchantmentType.SILK_TOUCH) || ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1))
+				         // similarly, non-offhand swords with no attack damage are tools
+				         || (ItemUtils.isSword(item) && ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1 && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND))
+				         || item.getType() == Material.SHEARS
+				         || item.getType() == Material.COMPASS
+				         || ItemUtils.isShulkerBox(item.getType())
+				         || ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
+				         || ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
+				         || ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE))
+				        && !ItemStatUtils.isCharm(item)),
 
 		// Consumables are (mostly) region-independent, and charms always R3, so their priority includes the priority a region tag would add
 		// this for example makes 'consumables' higher priority than 'r2 weapons', thus sorting Fruit of Life into 'consumables' rather than 'weapons'
@@ -545,7 +546,7 @@ public class LoadoutManager implements Listener {
 				if (success) {
 					if (yellowCooldown != 0) {
 						player.sendMessage(Component.text("Swapping skills is still on cooldown. You have been silenced for 30s.", NamedTextColor.RED)
-							.append(Component.text(" (Swap CD: ", NamedTextColor.AQUA)).append(Component.text(yellowCooldown, NamedTextColor.YELLOW)).append(Component.text(" mins)", NamedTextColor.AQUA)));
+							                   .append(Component.text(" (Swap CD: ", NamedTextColor.AQUA)).append(Component.text(yellowCooldown, NamedTextColor.YELLOW)).append(Component.text(" mins)", NamedTextColor.AQUA)));
 						Plugin.getInstance().mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 					} else if (!safeZone) {
 						YellowTesseractOverride.setCooldown(player, 3);
@@ -727,8 +728,8 @@ public class LoadoutManager implements Listener {
 		int yellowCooldown = YellowTesseractOverride.getCooldown(player);
 		if (yellowCooldown > 0) {
 			player.sendMessage(Component.text("Warning: Swapping skills is on cooldown! You will be silenced if you perform any changes to your class or abilities in the next ", NamedTextColor.YELLOW)
-				.append(Component.text("" + yellowCooldown, NamedTextColor.RED, TextDecoration.BOLD))
-				.append(Component.text(yellowCooldown == 1 ? " minute." : " minutes.", NamedTextColor.YELLOW)));
+				                   .append(Component.text("" + yellowCooldown, NamedTextColor.RED, TextDecoration.BOLD))
+				                   .append(Component.text(yellowCooldown == 1 ? " minute." : " minutes.", NamedTextColor.YELLOW)));
 		}
 
 		new LoadoutManagerGui(player).open();
@@ -810,8 +811,8 @@ public class LoadoutManager implements Listener {
 							if (!ItemUtils.isNullOrAir(item)
 								    && data.mLoadouts.stream()
 									       .noneMatch(loadout -> loadout.mEquipment.stream().anyMatch(loadoutItem -> isLoadoutItem(loadoutItem, false, item))
-											   || loadout.mCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false))
-											   || loadout.mZenithCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false)))) {
+										                             || loadout.mCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false))
+										                             || loadout.mZenithCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false)))) {
 								if (InventoryUtils.canFitInInventory(item, player.getInventory())) {
 									player.getInventory().addItem(ItemUtils.clone(item));
 									item.setAmount(0);
@@ -1202,9 +1203,9 @@ public class LoadoutManager implements Listener {
 				return null;
 			}
 			return Component.text("Quick-Swap Loadout for ", NamedTextColor.GOLD, TextDecoration.ITALIC)
-				.append(MessagingUtils.concatenateComponentsWithAnd(mQuickSwaps.stream()
-					.map(Component::keybind)
-					.collect(Collectors.toUnmodifiableList())));
+				       .append(MessagingUtils.concatenateComponentsWithAnd(mQuickSwaps.stream()
+					                                                           .map(Component::keybind)
+					                                                           .collect(Collectors.toUnmodifiableList())));
 		}
 	}
 
