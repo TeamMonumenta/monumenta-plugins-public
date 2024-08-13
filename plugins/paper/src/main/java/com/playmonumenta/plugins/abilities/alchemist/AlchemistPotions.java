@@ -49,6 +49,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -457,6 +458,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private void updateAlchemistItem() {
 		// Display is handled virtually, just need to update the player's inventory to show changes
 		mPlayer.updateInventory();
+
+		// Also send an update to all nearby players if an alchemist's potion is held
+		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+			for (Player otherPlayer : mPlayer.getTrackedPlayers()) {
+				otherPlayer.sendEquipmentChange(mPlayer, EquipmentSlot.HAND, mPlayer.getInventory().getItemInMainHand());
+			}
+		}
 	}
 
 	@Override

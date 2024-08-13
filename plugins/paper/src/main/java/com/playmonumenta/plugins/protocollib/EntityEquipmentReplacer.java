@@ -10,6 +10,7 @@ import com.comphenix.protocol.wrappers.Pair;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import org.bukkit.Material;
@@ -53,14 +54,27 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 		for (Pair<EnumWrappers.ItemSlot, ItemStack> pair : items) {
 			if (shouldClear) {
 				pair.setSecond(new ItemStack(Material.AIR));
-			} else if (vanityData != null && pair.getSecond() != null && pair.getSecond().getType() != Material.AIR) {
-				ItemStack vanity = vanityData.getEquipped(itemSlotToEquipmentSlot(pair.getFirst()));
-				if (vanity != null && vanity.getType() != Material.AIR) {
-					if (VanityManager.isInvisibleVanityItem(vanity)) {
-						pair.setSecond(new ItemStack(Material.AIR));
-					} else {
-						pair.setSecond(ItemUtils.clone(vanity));
+			} else {
+				ItemStack itemStack = pair.getSecond();
+				if (vanityData != null && itemStack != null && itemStack.getType() != Material.AIR) {
+					ItemStack vanity = vanityData.getEquipped(itemSlotToEquipmentSlot(pair.getFirst()));
+					if (vanity != null && vanity.getType() != Material.AIR) {
+						if (VanityManager.isInvisibleVanityItem(vanity)) {
+							pair.setSecond(new ItemStack(Material.AIR));
+						} else {
+							pair.setSecond(ItemUtils.clone(vanity));
+						}
 					}
+				}
+				if (entity instanceof Player player
+					    && pair.getFirst() == EnumWrappers.ItemSlot.MAINHAND
+					    && itemStack != null
+					    && PlayerUtils.isAlchemist(player)
+					    && ItemUtils.isAlchemistItem(itemStack)) {
+					// Alchemical Utensils
+					itemStack = ItemUtils.clone(itemStack);
+					VirtualItemsReplacer.handleAlchemistPotion(player, itemStack);
+					pair.setSecond(itemStack);
 				}
 			}
 			pair.setSecond(VanityManager.cleanCopyForDisplay(pair.getSecond()));

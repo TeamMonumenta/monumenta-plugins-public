@@ -253,31 +253,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 
 			// Alchemical Utensils
 			if (isHotbarOrOffhandSlot && PlayerUtils.isAlchemist(player) && ItemUtils.isAlchemistItem(itemStack)) {
-				AlchemistPotions potionsAbility = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-
-				if (potionsAbility == null) {
-					return;
-				}
-
-				int count = potionsAbility.getCharges();
-				itemStack.setAmount(Math.max(1, count));
-
-				NBT.modify(itemStack, nbt -> {
-					nbt.modifyMeta((nbtr, meta) -> {
-						if (meta instanceof PotionMeta potionMeta) {
-							double ratio = ((double) count) / potionsAbility.getMaxCharges();
-							int color = (int) (ratio * 255);
-							if (potionsAbility.isGruesomeMode()) {
-								potionMeta.setColor(Color.fromRGB(color, 0, 0));
-							} else {
-								potionMeta.setColor(Color.fromRGB(0, color, 0));
-							}
-						}
-						meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
-					});
-					nbt.setInteger("CHARGES", count);
-					markVirtual(nbt);
-				});
+				handleAlchemistPotion(player, itemStack);
 				return;
 			}
 		}
@@ -328,6 +304,34 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			}
 
 		}
+	}
+
+	public static void handleAlchemistPotion(Player player, ItemStack itemStack) {
+		AlchemistPotions potionsAbility = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+
+		if (potionsAbility == null) {
+			return;
+		}
+
+		int count = potionsAbility.getCharges();
+		itemStack.setAmount(Math.max(1, count));
+
+		NBT.modify(itemStack, nbt -> {
+			nbt.modifyMeta((nbtr, meta) -> {
+				if (meta instanceof PotionMeta potionMeta) {
+					double ratio = ((double) count) / potionsAbility.getMaxCharges();
+					int color = (int) (ratio * 255);
+					if (potionsAbility.isGruesomeMode()) {
+						potionMeta.setColor(Color.fromRGB(color, 0, 0));
+					} else {
+						potionMeta.setColor(Color.fromRGB(0, color, 0));
+					}
+				}
+				meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
+			});
+			nbt.setInteger("CHARGES", count);
+			markVirtual(nbt);
+		});
 	}
 
 	/**
