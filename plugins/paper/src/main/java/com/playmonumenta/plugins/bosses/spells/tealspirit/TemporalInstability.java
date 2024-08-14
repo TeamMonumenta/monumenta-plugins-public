@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -19,22 +20,15 @@ import org.bukkit.scoreboard.Team;
 
 public class TemporalInstability extends Spell {
 	private static final double RADIUS = 11;
-	private static final String INVULNERABLE_TEAM = "TealSpiritInvulnerable";
 
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 
-	private final Team mVulnerableTeam;
-	private final Team mInvulnerableTeam;
-
 	private final PPCircle mCircle;
 
-	public TemporalInstability(LivingEntity boss, Location center, Team team) {
+	public TemporalInstability(LivingEntity boss, Location center) {
 		mBoss = boss;
 		mCenter = center;
-
-		mVulnerableTeam = team;
-		mInvulnerableTeam = ScoreboardUtils.getExistingTeamOrCreate(INVULNERABLE_TEAM, NamedTextColor.WHITE);
 
 		mCircle = new PPCircle(Particle.REDSTONE, mCenter, RADIUS).data(new Particle.DustOptions(Color.AQUA, 2)).count(50);
 	}
@@ -43,9 +37,9 @@ public class TemporalInstability extends Spell {
 	public void run() {
 		Team team = ScoreboardUtils.getEntityTeam(mBoss);
 		if (isVulnerable()) {
-			mVulnerableTeam.addEntity(mBoss);
+			GlowingManager.clear(mBoss, "TemporalInstability");
 		} else if (team != null && team.color().equals(NamedTextColor.AQUA)) {
-			mInvulnerableTeam.addEntity(mBoss);
+			GlowingManager.startGlowing(mBoss, NamedTextColor.WHITE, -1, GlowingManager.BOSS_SPELL_PRIORITY, null, "TemporalInstability");
 		}
 		mCircle.spawnAsBoss();
 	}

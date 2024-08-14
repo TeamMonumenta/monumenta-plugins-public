@@ -13,10 +13,10 @@ import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -145,7 +145,7 @@ public class ChaosDagger extends DepthsAbility {
 					} else {
 						EntityUtils.applyStun(mPlugin, mStunDuration, mTarget);
 					}
-					PotionUtils.applyColoredGlowing("ChaosDaggerGlowing", mTarget, NamedTextColor.DARK_PURPLE, DAMAGE_DURATION);
+					GlowingManager.startGlowing(mTarget, NamedTextColor.DARK_PURPLE, DAMAGE_DURATION, GlowingManager.PLAYER_ABILITY_PRIORITY);
 
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mHitMob = null, DAMAGE_DURATION);
 

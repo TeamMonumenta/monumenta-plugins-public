@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -212,8 +213,8 @@ public class DivineJustice extends Ability {
 	}
 
 	private void spawnAsh(Location loc) {
-		Item item = AbilityUtils.spawnAbilityItem(loc.getWorld(), loc, mCosmetic.justiceAsh(), mCosmetic.justiceAshName(), true, 0.3, true, true);
-		mCosmetic.justiceAshColor(item);
+		Item item = AbilityUtils.spawnAbilityItem(loc.getWorld(), loc, mCosmetic.justiceAsh(), mCosmetic.justiceAshName(), true, 0.3, false, true);
+		GlowingManager.startGlowing(item, mCosmetic.justiceAshColor(), -1, 0, DivineJustice::canPickUpAsh, null);
 
 		new BukkitRunnable() {
 			int mT = 0;

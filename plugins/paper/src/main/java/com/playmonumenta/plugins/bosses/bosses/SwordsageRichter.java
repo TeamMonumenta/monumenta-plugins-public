@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -23,7 +24,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +70,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 				(Entity entity, int tick) -> {
 					float t = tick / 10f;
 					if (tick == 1) {
-						PotionUtils.applyColoredGlowing(identityTag, mBoss, NamedTextColor.RED, (int) (20 * 2.5));
+						GlowingManager.startGlowing(mBoss, NamedTextColor.RED, (int) (20 * 2.5), GlowingManager.BOSS_SPELL_PRIORITY);
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);

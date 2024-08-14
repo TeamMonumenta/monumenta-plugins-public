@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -369,6 +370,9 @@ public class SpellDimensionDoor extends Spell {
 		EntityUtils.setMaxHealthAndHealth(spectre, health);
 		spectre.setGlowing(true);
 		ScoreboardUtils.addEntityToTeam(spectre, "Hekawt");
+		// Glow a different color for the player themselves
+		GlowingManager.startGlowing(spectre, NamedTextColor.GOLD, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, pl -> pl == p, null);
+
 		((Creature) spectre).setTarget(p);
 
 		BossBar bar = BossBar.bossBar(Component.text("Soul dissipating in " + tick / 20 + " seconds!", NamedTextColor.YELLOW), 1, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));

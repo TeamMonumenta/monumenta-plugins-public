@@ -1,8 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
-import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffectType;
 
@@ -23,11 +22,7 @@ public class SpellPurgeGlowing extends Spell {
 		if (mCooldown <= 0) {
 			mCooldown = mTimer;
 			mBoss.removePotionEffect(PotionEffectType.GLOWING);
-			//clear colored glowing effect for this entity.
-			ColoredGlowingEffect effect = EffectManager.getInstance().getActiveEffect(mBoss, ColoredGlowingEffect.class);
-			if (effect != null) {
-				effect.setDuration(0);
-			}
+			GlowingManager.clearAll(mBoss);
 			mBoss.addScoreboardTag("HiddenMob");
 		}
 	}

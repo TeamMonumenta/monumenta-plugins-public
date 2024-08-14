@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
+import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
@@ -652,36 +653,51 @@ public class PEBCustomInventory extends CustomInventory {
 				"Choose for which entity types the glowing effect may be shown. " +
 					"If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", NamedTextColor.LIGHT_PURPLE,
 				Material.SPECTRAL_ARROW, false),
-			new PebItem(22, "Enable All",
-				"Enable glowing for all entities (default).", NamedTextColor.LIGHT_PURPLE,
-				Material.GOLD_INGOT, false).playerCommand("glowing enable all"),
-			new PebItem(28, "Other Players",
+			new PebItem(2 * 9 + 1, "Other Players",
 				"Toggle glowing for other players.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_WALL_HEAD, false).playerCommand("glowing toggle other_players"),
-			new PebItem(29, "Yourself",
+			new PebItem(2 * 9 + 2, "Yourself",
 				"Toggle glowing for yourself (visible in third-person). Disable this if glowing causes rendering issues.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false).playerCommand("glowing toggle self"),
-			new PebItem(30, "Mobs",
+			new PebItem(2 * 9 + 3, "Mobs",
 				"Toggle glowing for mobs.", NamedTextColor.LIGHT_PURPLE,
 				Material.ZOMBIE_HEAD, false).playerCommand("glowing toggle mobs"),
-			new PebItem(31, "Elite Mobs",
+			new PebItem(2 * 9 + 4, "Elite Mobs",
 				"Toggle glowing for elite mobs.", NamedTextColor.LIGHT_PURPLE,
 				Material.WITHER_SKELETON_SKULL, false).playerCommand("glowing toggle elites"),
-			new PebItem(32, "Bosses",
+			new PebItem(2 * 9 + 5, "Bosses",
 				"Toggle glowing for bosses. Note that pretty much all bosses are mobs, so are affected by that option as well.", NamedTextColor.LIGHT_PURPLE,
 				Material.DRAGON_HEAD, false).playerCommand("glowing toggle bosses"),
-			new PebItem(33, "Invisible Entities",
+			new PebItem(2 * 9 + 6, "Invisible Entities",
 				"Toggle glowing for invisible entities.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS, false).playerCommand("glowing toggle invisible"),
-			new PebItem(34, "Items",
+			new PebItem(2 * 9 + 7, "Items",
 				"Toggle glowing for items (including items from abilities like Iron Tincture).", NamedTextColor.LIGHT_PURPLE,
 				Material.IRON_INGOT, false).playerCommand("glowing toggle items"),
-			new PebItem(35, "Miscellaneous",
+			new PebItem(2 * 9 + 8, "Miscellaneous",
 				"Toggle glowing for miscellaneous entities, i.e. entities that don't fit into any other category.", NamedTextColor.LIGHT_PURPLE,
 				Material.IRON_NUGGET, false).playerCommand("glowing toggle misc"),
-			new PebItem(40, "Disable All",
+			new PebItem(3 * 9 + 3, "Enable All",
+				"Enable glowing for all entities (default).", NamedTextColor.LIGHT_PURPLE,
+				Material.GOLD_INGOT, false).playerCommand("glowing enable all"),
+			new PebItem(3 * 9 + 5, "Disable All",
 				"Disable glowing for all entities.", NamedTextColor.LIGHT_PURPLE,
-				Material.DIRT, false).playerCommand("glowing disable all")
+				Material.DIRT, false).playerCommand("glowing disable all"),
+			new PebItem(4 * 9 + 4, "Eagle Eye",
+				"Cycle through Eagle Eye options. These options are in addition to any general options set above.", NamedTextColor.LIGHT_PURPLE,
+				Material.BOW, false).action((inv, event) -> {
+				if (event.getWhoClicked() instanceof Player player) {
+					int option = ScoreboardUtils.getScoreboardValue(player, EagleEye.GLOWING_OPTION_SCOREBOARD_NAME).orElse(0);
+					if (event.isLeftClick()) {
+						option++;
+					} else {
+						option--;
+					}
+					option = (option + EagleEye.GlowingOption.values().length) % EagleEye.GlowingOption.values().length;
+					ScoreboardUtils.setScoreboardValue(player, EagleEye.GLOWING_OPTION_SCOREBOARD_NAME, option);
+					player.sendMessage(Component.text(EagleEye.GlowingOption.values()[option].mDescription, NamedTextColor.GOLD));
+				}
+			})
 		);
 
 		// Rocket Jump Option
@@ -1032,10 +1048,11 @@ public class PEBCustomInventory extends CustomInventory {
 	}
 
 	private ItemStack createCustomItem(PebItem item, Player player) {
-		// Not sure why this wall head thing exists
 		Material type = item.mType == Material.PLAYER_WALL_HEAD ? Material.PLAYER_HEAD : item.mType;
 		ItemStack newItem = GUIUtils.createBasicItem(type, 1, item.mName.apply(this), NamedTextColor.WHITE, false, item.mLore.apply(this), 30, true);
-		GUIUtils.setSkullOwner(newItem, player);
+		if (item.mType == Material.PLAYER_HEAD) {
+			GUIUtils.setSkullOwner(newItem, player);
+		}
 		return newItem;
 	}
 

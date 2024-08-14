@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -16,7 +15,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Team;
 
 public class JudgementChainCS implements CosmeticSkill {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(217, 217, 217), 1.0f);
@@ -78,7 +76,7 @@ public class JudgementChainCS implements CosmeticSkill {
 		world.playSound(targetLoc, Sound.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.PLAYERS, 0.6f, 0.7f);
 	}
 
-	public Team createTeam() {
-		return ScoreboardUtils.getExistingTeamOrCreate("chainColor", NamedTextColor.DARK_GRAY);
+	public NamedTextColor glowColor() {
+		return NamedTextColor.DARK_GRAY;
 	}
 }

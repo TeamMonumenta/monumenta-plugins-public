@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -18,7 +19,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
@@ -266,7 +266,7 @@ public class Grappling implements Enchantment {
 			default -> NamedTextColor.LIGHT_PURPLE;
 		};
 
-		PotionUtils.applyColoredGlowing("GrapplingEnchantHookGlow", hook.getDisplay(), glowColor, COOLDOWN);
+		GlowingManager.startGlowing(hook.getDisplay(), glowColor, COOLDOWN, 0);
 
 		Effect cooldownEffect = Plugin.getInstance().mEffectManager.getActiveEffect(player, ItemCooldown.toSource(EnchantmentType.GRAPPLING));
 		int cooldownRemaining = cooldownEffect != null ? cooldownEffect.getDuration() : COOLDOWN;

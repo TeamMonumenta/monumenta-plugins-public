@@ -21,7 +21,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -170,7 +169,7 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	}
 
 	@Override
-	public Team createTeams() {
-		return ScoreboardUtils.getExistingTeamOrCreate("everseeingEyeColor", NamedTextColor.RED);
+	public NamedTextColor enhancementGlowColor() {
+		return NamedTextColor.RED;
 	}
 }

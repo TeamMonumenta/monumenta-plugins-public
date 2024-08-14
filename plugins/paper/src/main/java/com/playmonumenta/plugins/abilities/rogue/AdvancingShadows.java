@@ -11,11 +11,11 @@ import com.playmonumenta.plugins.cosmetics.skills.rogue.AdvancingShadowsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
@@ -29,10 +29,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,7 +85,6 @@ public class AdvancingShadows extends Ability {
 	private final double mActivationRange;
 	private final int mRecastTimer;
 	private final float mKnockback;
-	private final Team mColorTeam;
 
 	private int mEnhancementKillTick = -999;
 	private int mEnhancementChain;
@@ -104,7 +100,6 @@ public class AdvancingShadows extends Ability {
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS());
-		mColorTeam = ScoreboardUtils.getExistingTeamOrCreate("advancingShadowsColor", NamedTextColor.BLACK);
 		mEnhancementChain = 0;
 	}
 
@@ -211,11 +206,8 @@ public class AdvancingShadows extends Ability {
 		}
 
 		if (isEnhanced()) {
-			// Create a Timer which checks every tick for the next second if Advancing Shadows is still up.
-			if (Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(entity.getUniqueId().toString()) == null) {
-				mColorTeam.addEntry(entity.getUniqueId().toString());
-			}
-			entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, mRecastTimer, 0));
+			GlowingManager.ActiveGlowingEffect glowingEffect = GlowingManager.startGlowing(entity, NamedTextColor.BLACK, mRecastTimer, GlowingManager.PLAYER_ABILITY_PRIORITY);
+
 			cancelOnDeath(new BukkitRunnable() {
 				int mT = 0;
 
@@ -223,10 +215,7 @@ public class AdvancingShadows extends Ability {
 				public void run() {
 					if (mT > mRecastTimer) {
 						mEnhancementChain = 0;
-						// Revert glowing color to normal white
-						if (mColorTeam.hasEntry(entity.getUniqueId().toString())) {
-							mColorTeam.removeEntry(entity.getUniqueId().toString());
-						}
+						glowingEffect.clear();
 
 						cancel();
 						return;

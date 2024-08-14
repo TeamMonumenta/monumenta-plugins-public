@@ -13,10 +13,10 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.effects.AbilityCooldownRechargeRate;
-import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -126,8 +126,8 @@ public class SparkOfInspiration extends DepthsAbility {
 		mPlugin.mEffectManager.addEffect(targetPlayer, CD_RECHARGE_EFFECT_NAME, new AbilityCooldownRechargeRate(mBuffDuration, mBuffCDRecharge));
 		mPlugin.mEffectManager.addEffect(mPlayer, STRENGTH_EFFECT_NAME, new PercentDamageDealt(mBuffDuration, mStrength));
 
-		mPlugin.mEffectManager.addEffect(targetPlayer, GLOWING_EFFECT_NAME, new ColoredGlowingEffect(mBuffDuration, NamedTextColor.YELLOW));
-		mPlugin.mEffectManager.addEffect(mPlayer, GLOWING_EFFECT_NAME, new ColoredGlowingEffect(mBuffDuration, NamedTextColor.YELLOW));
+		GlowingManager.startGlowing(targetPlayer, NamedTextColor.YELLOW, mBuffDuration, GlowingManager.PLAYER_ABILITY_PRIORITY);
+		GlowingManager.startGlowing(mPlayer, NamedTextColor.YELLOW, mBuffDuration, GlowingManager.PLAYER_ABILITY_PRIORITY);
 
 		if (mInspireRunnable != null) {
 			mInspireRunnable.cancel();

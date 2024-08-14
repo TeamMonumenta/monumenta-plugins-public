@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.sirius.miniboss;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -47,24 +47,19 @@ public class SpellGhostWalk extends Spell {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			final Team mPrevious = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(mBoss.getUniqueId().toString());
-			final Team mPurple = ScoreboardUtils.getExistingTeamOrCreate("light_purple", NamedTextColor.LIGHT_PURPLE);
-			final boolean mGlowingBefore = mBoss.isGlowing();
 
 			@Override
 			public void run() {
 				if (mTicks == 0) {
 					mGhost = true;
-					mPurple.addEntity(mBoss);
+					GlowingManager.startGlowing(mBoss, NamedTextColor.LIGHT_PURPLE, DURATION, GlowingManager.BOSS_SPELL_PRIORITY);
 					World world = mBoss.getWorld();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.HOSTILE, 1f, 0.4f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.2f, 0.4f);
-					mBoss.setGlowing(true);
 					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, DURATION, 1, false, true));
 				}
 				if (mTicks >= DURATION) {
 					mGhost = false;
-					mBoss.setGlowing(mGlowingBefore);
-					mPurple.removeEntity(mBoss);
 					World world = mBoss.getWorld();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 0.4f, 1.2f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ALLAY_DEATH, SoundCategory.HOSTILE, 0.2f, 0.4f);

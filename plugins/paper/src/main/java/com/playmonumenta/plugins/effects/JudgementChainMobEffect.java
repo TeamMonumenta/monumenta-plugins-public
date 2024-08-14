@@ -1,24 +1,26 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.Nullable;
 
 public class JudgementChainMobEffect extends Effect {
 	public static final String effectID = "JudgementChainMobEffect";
 
 	private final Player mPlayer;
-	private final Team mChainTeam;
+	private final NamedTextColor mGlowColor;
+	private @Nullable GlowingManager.ActiveGlowingEffect mGlowingEffect;
 
-	public JudgementChainMobEffect(int duration, Player player, Team team) {
+	public JudgementChainMobEffect(int duration, Player player, NamedTextColor glowColor) {
 		super(duration, effectID);
 		mPlayer = player;
-		mChainTeam = team;
+		mGlowColor = glowColor;
 	}
 
 	@Override
@@ -28,17 +30,13 @@ public class JudgementChainMobEffect extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		// Only change glowing color if:
-		// mob not in a team
-		if (Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(entity.getUniqueId().toString()) == null) {
-			mChainTeam.addEntry(entity.getUniqueId().toString());
-		}
+		mGlowingEffect = GlowingManager.startGlowing(entity, mGlowColor, getDuration(), GlowingManager.PLAYER_ABILITY_PRIORITY + 2);
 	}
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		if (mChainTeam.hasEntry(entity.getUniqueId().toString())) {
-			mChainTeam.removeEntry(entity.getUniqueId().toString());
+		if (mGlowingEffect != null) {
+			mGlowingEffect.clear();
 		}
 	}
 

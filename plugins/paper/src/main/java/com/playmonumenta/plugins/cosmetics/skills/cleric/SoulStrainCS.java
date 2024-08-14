@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,7 +17,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -59,8 +57,8 @@ public class SoulStrainCS extends DivineJusticeCS {
 	}
 
 	@Override
-	public void justiceAshColor(Item item) {
-		ScoreboardUtils.addEntityToTeam(item, "GlowingAqua", NamedTextColor.AQUA);
+	public NamedTextColor justiceAshColor() {
+		return NamedTextColor.AQUA;
 	}
 
 	@Override

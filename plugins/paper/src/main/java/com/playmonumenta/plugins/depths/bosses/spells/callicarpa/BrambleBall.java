@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -14,7 +15,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -32,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,8 +75,7 @@ public class BrambleBall extends Spell {
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_DEATH, SoundCategory.HOSTILE, 10f, 0.7f);
 
 		// Make the boss glow a different color for an extra indication.
-		Team redTeam = ScoreboardUtils.getExistingTeamOrCreate("red", NamedTextColor.RED);
-		redTeam.addEntity(mBoss);
+		GlowingManager.startGlowing(mBoss, NamedTextColor.RED, CAST_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 
 		BukkitRunnable brambleRunnable = new BukkitRunnable() {
 			final ChargeUpManager mChargeUp = new ChargeUpManager(mBoss, CAST_DELAY,
@@ -92,9 +90,6 @@ public class BrambleBall extends Spell {
 				}
 
 				if (mChargeUp.nextTick()) {
-					// Restore the original glowing.
-					Team darkGreenTeam = ScoreboardUtils.getExistingTeamOrCreate("dark_green", NamedTextColor.DARK_GREEN);
-					darkGreenTeam.addEntity(mBoss);
 					// Launch the projectile.
 					launchBramble();
 					this.cancel();

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -17,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -529,17 +526,6 @@ public class PotionUtils {
 		} else {
 			new PartialParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1).spawnAsPlayerActive(player);
 		}
-	}
-
-	/**
-	 * Apply the glowing effect along with a color to a given entity.
-	 */
-	public static void applyColoredGlowing(String source, Entity entity, @Nullable NamedTextColor color, int duration) {
-		Component name = entity.customName();
-		if (name != null) {
-			entity.customName(name.colorIfAbsent(NamedTextColor.WHITE));
-		}
-		Plugin.getInstance().mEffectManager.addEffect(entity, source, new ColoredGlowingEffect(duration, color));
 	}
 
 	private static boolean compareDurations(PotionEffect effect1, PotionEffect effect2) {

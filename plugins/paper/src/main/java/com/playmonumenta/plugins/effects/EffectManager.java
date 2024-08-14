@@ -373,7 +373,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(VoodooBondsCurse.effectID, VoodooBondsCurse::deserialize);
 		mEffectDeserializer.put(VoodooBondsOtherPlayer.effectID, VoodooBondsOtherPlayer::deserialize);
 		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
-		mEffectDeserializer.put(ColoredGlowingEffect.effectID, ColoredGlowingEffect::deserialize);
 		mEffectDeserializer.put(FishQualityIncrease.effectID, FishQualityIncrease::deserialize);
 		mEffectDeserializer.put(DisableAI.effectID, DisableAI::deserialize);
 		mEffectDeserializer.put(DisableGravity.effectID, DisableGravity::deserialize);

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -12,7 +13,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -76,8 +76,7 @@ public class LavaCannonBoss extends BossAbilityGroup {
 
 	private LavaCannonBoss(Plugin plugin, LivingEntity boss, Samwell samwell) {
 		super(plugin, identityTag, boss);
-		ScoreboardUtils.addEntityToTeam(boss, "DarkRed", NamedTextColor.DARK_RED);
-		boss.setGlowing(true);
+		GlowingManager.startGlowing(boss, NamedTextColor.DARK_RED, -1, GlowingManager.BOSS_SPELL_PRIORITY);
 
 		mSamwell = samwell;
 

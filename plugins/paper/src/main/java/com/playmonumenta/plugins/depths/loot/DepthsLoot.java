@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.depths.loot;
 
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.Random;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -171,7 +171,7 @@ public class DepthsLoot {
 			if (!loot.isEmpty()) {
 				for (ItemStack item : loot) {
 					Item lootOnGround = loc.getWorld().dropItem(loc, item);
-					PotionUtils.applyColoredGlowing("DepthsLootRoom", lootOnGround, NamedTextColor.LIGHT_PURPLE, 10000);
+					GlowingManager.startGlowing(lootOnGround, NamedTextColor.LIGHT_PURPLE, 10000, 0);
 				}
 			}
 		}
@@ -194,7 +194,7 @@ public class DepthsLoot {
 					for (ItemStack item : loot) {
 						Item lootOnGround = loc.getWorld().dropItem(loc, item);
 						lootOnGround.setGlowing(true);
-						PotionUtils.applyColoredGlowing("DepthsLootRoom", lootOnGround, NamedTextColor.RED, 10000);
+						GlowingManager.startGlowing(lootOnGround, NamedTextColor.RED, 10000, 0);
 						p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					}
 				}

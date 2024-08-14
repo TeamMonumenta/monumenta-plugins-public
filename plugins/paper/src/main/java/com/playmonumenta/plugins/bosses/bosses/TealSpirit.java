@@ -127,7 +127,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 			MarchingFate mMarchingFates = new MarchingFate(mBoss, this, true);
 
 			activeSpells = new SpellManager(Arrays.asList(
-				new SandsOfTime(mBoss, mSpawnLoc, team, 24 * 20, 120, 20),
+				new SandsOfTime(mBoss, mSpawnLoc, 24 * 20, 120, 20),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
@@ -225,7 +225,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 			MarchingFate mMarchingFates = new MarchingFate(mBoss, this, false);
 
 			activeSpells = new SpellManager(Arrays.asList(
-				new SandsOfTime(mBoss, mSpawnLoc, team, 25 * 20, 80, 40),
+				new SandsOfTime(mBoss, mSpawnLoc, 25 * 20, 80, 40),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 80),
 				new SundialSlash(mBoss, 7 * 20),

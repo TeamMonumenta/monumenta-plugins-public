@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -76,7 +76,7 @@ public class SpellFireball extends Spell {
 			@Override
 			public void run() {
 				mBoss.setAI(false);
-				PotionUtils.applyColoredGlowing(mBoss.getName(), mBoss, NamedTextColor.RED, 40);
+				GlowingManager.startGlowing(mBoss, NamedTextColor.RED, 40, GlowingManager.BOSS_SPELL_PRIORITY);
 				for (Player player : mPlayers) {
 					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
 				}

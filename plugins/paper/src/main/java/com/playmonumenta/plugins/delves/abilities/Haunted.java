@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.delves.abilities;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -10,6 +11,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -146,16 +148,17 @@ public class Haunted {
 		}.runTaskTimer(Plugin.getInstance(), 0L, 1L);
 	}
 
-	private static void summonBeast(Player p, Location loc) {
+	private static void summonBeast(Player player, Location loc) {
 		String phantomName = DelvesManager.PHANTOM_NAME;
-		for (Entity nearbyEntity : p.getLocation().getNearbyEntities(100, 100, 100)) {
-			if (nearbyEntity instanceof ArmorStand && nearbyEntity.getScoreboardTags().contains(phantomName + p.getUniqueId())) {
+		for (Entity nearbyEntity : player.getLocation().getNearbyEntities(100, 100, 100)) {
+			if (nearbyEntity instanceof ArmorStand && nearbyEntity.getScoreboardTags().contains(phantomName + player.getUniqueId())) {
 				return;
 			}
 		}
 		ArmorStand armorStand = Objects.requireNonNull((ArmorStand) LibraryOfSoulsIntegration.summon(loc, "LoomingConsequence"));
-		armorStand.addScoreboardTag(phantomName + p.getUniqueId());
-		followPlayer(p, armorStand);
+		armorStand.addScoreboardTag(phantomName + player.getUniqueId());
+		GlowingManager.startGlowing(armorStand, NamedTextColor.WHITE, -1, 0, p -> p == player, null);
+		followPlayer(player, armorStand);
 	}
 
 	public static void moveBackwards(Player player, int multiplier) {

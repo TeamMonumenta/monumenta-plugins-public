@@ -74,7 +74,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 
 public class Vesperidys extends SerializedLocationBossAbilityGroup {
@@ -103,7 +102,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	public List<Player> mInvinicibleWarned = new ArrayList<>();
 	public List<ArmorStand> mEyes = new ArrayList<>();
 	public List<BukkitRunnable> mEyesRunnable = new ArrayList<>();
-	public final Team mCastTeam;
 
 	private final Plugin mMonuPlugin;
 	public final PlatformList mPlatformList;
@@ -148,7 +146,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		mMonuPlugin = plugin;
 		mParty = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		mPlatformList = new PlatformList();
-		mCastTeam = createTeams();
 
 		if (mParty != null && mParty.getAscension() >= 15) {
 			mSpellCooldowns -= 4 * 20;
@@ -1644,10 +1641,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			}
 		}
 		return 1 / (1 + 0.1 * count);
-	}
-
-	public Team createTeams() {
-		return ScoreboardUtils.getExistingTeamOrCreate("vesperidysCasting", NamedTextColor.DARK_RED);
 	}
 
 	public void voiceOfVesperidys(int voiceID) {

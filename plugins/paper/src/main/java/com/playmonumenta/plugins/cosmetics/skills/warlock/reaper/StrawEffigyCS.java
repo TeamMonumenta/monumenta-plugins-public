@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -18,7 +17,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class StrawEffigyCS extends JudgementChainCS {
@@ -104,8 +102,8 @@ public class StrawEffigyCS extends JudgementChainCS {
 	}
 
 	@Override
-	public Team createTeam() {
-		return ScoreboardUtils.getExistingTeamOrCreate("strawEffigy", NamedTextColor.YELLOW);
+	public NamedTextColor glowColor() {
+		return NamedTextColor.YELLOW;
 	}
 
 	private void drawChain(Player player, Location playerLoc, Location targetLoc, boolean isBreak) {

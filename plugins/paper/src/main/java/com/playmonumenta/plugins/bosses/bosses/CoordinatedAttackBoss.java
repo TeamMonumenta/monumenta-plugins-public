@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.delves.DelvesManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -91,7 +91,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 						if (le instanceof Mob mob && mob.hasLineOfSight(playerTarget) && !AbilityUtils.isStealthed(playerTarget) && !mob.isInsideVehicle()) {
 							Set<String> tags = mob.getScoreboardTags();
 							if (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG) && !EntityUtils.isBoss(mob)) {
-								PotionUtils.applyColoredGlowing(identityTag, mob, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.WINDUP);
+								GlowingManager.startGlowing(mob, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.WINDUP, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 								// make mob immune to other coordinated attacks for a short time
 								mob.addScoreboardTag(IGNORE_TAG);

@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.bosses.bosses.bluestrike;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -35,8 +35,7 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 
 	public BlueStrikeTurretBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		ScoreboardUtils.addEntityToTeam(boss, "Red", NamedTextColor.RED);
-		mBoss.setGlowing(true);
+		GlowingManager.startGlowing(boss, NamedTextColor.RED, -1, GlowingManager.BOSS_SPELL_PRIORITY);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.VILLAGER));
 		Collections.shuffle(mobs);

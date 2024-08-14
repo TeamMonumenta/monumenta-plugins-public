@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.protocollib.GlowingReplacer;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
@@ -17,11 +18,13 @@ import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 public class GlowingCommand {
 
@@ -202,10 +205,14 @@ public class GlowingCommand {
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_OBJECTIVE, value);
 
+		int viewDistance = Bukkit.getServer().getViewDistance() * 16;
+		player.getWorld().getNearbyEntities(player.getLocation(), viewDistance, viewDistance, viewDistance,
+			e -> (e.isGlowing() || (e instanceof LivingEntity le && le.hasPotionEffect(PotionEffectType.GLOWING)))
+				     && e.getTrackedPlayers().contains(player)).forEach(e -> GlowingReplacer.resendEntityMetadataFlags(e, player));
+
 		player.sendMessage(Component.text("Glowing " + operation + "d"
 			+ " for " + StringUtils.join(options, ", ") + ". Your new options are:", NamedTextColor.GOLD));
 		showConfig(player, false);
-		player.sendMessage(Component.text(" You may need to leave and re-enter the current area for all entities to be updated.", NamedTextColor.GRAY));
 
 	}
 

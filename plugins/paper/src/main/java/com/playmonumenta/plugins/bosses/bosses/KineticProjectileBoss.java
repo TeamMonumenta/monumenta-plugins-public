@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,7 +47,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyColoredGlowing(identityTag, boss, COLOR, DELAY);
+					GlowingManager.startGlowing(boss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {

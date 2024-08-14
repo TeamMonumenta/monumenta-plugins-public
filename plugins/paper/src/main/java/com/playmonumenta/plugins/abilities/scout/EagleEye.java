@@ -10,24 +10,21 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.EagleEyeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 
 public class EagleEye extends Ability {
 
-	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
 	private static final int EAGLE_EYE_COOLDOWN = 24 * 20;
 	private static final int EAGLE_EYE_REFRESH = 2 * 20;
@@ -41,6 +38,20 @@ public class EagleEye extends Ability {
 	public static final String CHARM_VULN = "Eagle Eye Vulnerability Amplifier";
 	public static final String CHARM_RADIUS = "Eagle Eye Radius";
 	public static final String CHARM_REFRESH = "Eagle Eye Refresh";
+
+	public static final String GLOWING_OPTION_SCOREBOARD_NAME = "EagleEyeGlowingOption";
+
+	public enum GlowingOption {
+		ALL("Mobs affected by any player's Eagle Eye will glow (default)"),
+		OWN("Only mobs affected by your own Eagle Eye will glow"),
+		NEVER("No mobs affected by Eagle Eye will glow");
+
+		public final String mDescription;
+
+		GlowingOption(String description) {
+			this.mDescription = description;
+		}
+	}
 
 	public static final AbilityInfo<EagleEye> INFO =
 		new AbilityInfo<>(EagleEye.class, "Eagle Eye", EagleEye::new)
@@ -62,7 +73,6 @@ public class EagleEye extends Ability {
 			.displayItem(Material.ENDER_EYE);
 
 	private final double mVulnLevel;
-	private final Team mEagleEyeTeam;
 	private List<LivingEntity> mEntitiesAffected = new ArrayList<>(); // Used for tracking Entities on a first hit.
 	private final EagleEyeCS mCosmetic;
 
@@ -70,7 +80,6 @@ public class EagleEye extends Ability {
 		super(plugin, player, INFO);
 		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS());
-		mEagleEyeTeam = mCosmetic.createTeams();
 	}
 
 
@@ -90,16 +99,14 @@ public class EagleEye extends Ability {
 				continue;
 			}
 
-			// Only change glowing color if:
-			// isEnhanced
-			// mob not in a team
-			if (isEnhanced() && Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(mob.getUniqueId().toString()) == null) {
-				mEagleEyeTeam.addEntry(mob.getUniqueId().toString());
-			}
-
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EAGLE_EYE_DURATION);
-			PotionUtils.applyPotion(mPlayer, mob,
-				new PotionEffect(PotionEffectType.GLOWING, duration, EAGLE_EYE_EFFECT_LVL, true, false));
+
+			// If enhanced, add two glowing instances and remove the enhancement bonus glow on the first hit
+			if (isEnhanced()) {
+				GlowingManager.startGlowing(mob, mCosmetic.enhancementGlowColor(), duration, GlowingManager.PLAYER_ABILITY_PRIORITY + 1, p -> canSeeGlowing(p, mPlayer), "EagleEyeEnhancement-" + mPlayer.name());
+			}
+			GlowingManager.startGlowing(mob, NamedTextColor.WHITE, duration, GlowingManager.PLAYER_ABILITY_PRIORITY, p -> canSeeGlowing(p, mPlayer), null);
+
 			EntityUtils.applyVulnerability(mPlugin, duration, mVulnLevel, mob);
 
 			new BukkitRunnable() {
@@ -112,11 +119,7 @@ public class EagleEye extends Ability {
 						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, CharmManager.getDuration(mPlayer, CHARM_REFRESH, EAGLE_EYE_REFRESH));
 						this.cancel();
 					}
-					if (mTicks >= EAGLE_EYE_DURATION) {
-						if (mEagleEyeTeam.hasEntry(mob.getUniqueId().toString())) {
-							mEagleEyeTeam.removeEntry(mob.getUniqueId().toString());
-						}
-
+					if (mTicks >= duration) {
 						this.cancel();
 						mEntitiesAffected.clear();
 					}
@@ -132,6 +135,12 @@ public class EagleEye extends Ability {
 		return false;
 	}
 
+	private static boolean canSeeGlowing(Player player, Player sourcePlayer) {
+		int value = Math.min(Math.max(0, ScoreboardUtils.getScoreboardValue(player, GLOWING_OPTION_SCOREBOARD_NAME).orElse(0)), GlowingOption.values().length);
+		GlowingOption option = GlowingOption.values()[value];
+		return option == GlowingOption.ALL || (option == GlowingOption.OWN && player == sourcePlayer);
+	}
+
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		DamageEvent.DamageType type = event.getType();
@@ -145,9 +154,7 @@ public class EagleEye extends Ability {
 			mCosmetic.eyeFirstStrike(enemy.getWorld(), mPlayer, enemy);
 
 			// Revert glowing color to normal white
-			if (mEagleEyeTeam.hasEntry(enemy.getUniqueId().toString())) {
-				mEagleEyeTeam.removeEntry(enemy.getUniqueId().toString());
-			}
+			GlowingManager.clear(enemy, "EagleEyeEnhancement-" + mPlayer.name());
 		}
 
 		return false;

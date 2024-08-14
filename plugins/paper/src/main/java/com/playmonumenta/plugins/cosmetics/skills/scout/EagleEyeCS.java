@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.skills.scout;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,7 +12,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Team;
 
 public class EagleEyeCS implements CosmeticSkill {
 
@@ -43,7 +41,7 @@ public class EagleEyeCS implements CosmeticSkill {
 		//Nope!
 	}
 
-	public Team createTeams() {
-		return ScoreboardUtils.getExistingTeamOrCreate("eagleEyeColor", NamedTextColor.YELLOW);
+	public NamedTextColor enhancementGlowColor() {
+		return NamedTextColor.YELLOW;
 	}
 }

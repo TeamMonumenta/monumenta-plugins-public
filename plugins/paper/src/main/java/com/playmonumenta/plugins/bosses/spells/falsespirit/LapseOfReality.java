@@ -4,11 +4,11 @@ import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -54,7 +54,7 @@ public class LapseOfReality extends Spell {
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyColoredGlowing(mBoss.getName(), mBoss, COLOR, DELAY);
+					GlowingManager.startGlowing(mBoss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {

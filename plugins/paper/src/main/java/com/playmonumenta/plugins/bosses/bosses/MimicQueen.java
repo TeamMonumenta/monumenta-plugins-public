@@ -10,12 +10,12 @@ import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
 import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellMultihitHeal;
 import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellSummonMiniboss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -65,7 +65,7 @@ public final class MimicQueen extends SerializedLocationBossAbilityGroup {
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(COLOR, NamedTextColor.RED), DELAY);
+					GlowingManager.startGlowing(boss, NamedTextColor.NAMES.valueOr(COLOR, NamedTextColor.RED), DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Launch Aesthetic

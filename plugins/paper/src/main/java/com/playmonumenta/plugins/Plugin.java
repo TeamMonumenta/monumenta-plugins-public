@@ -22,7 +22,6 @@ import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.discoveries.DiscoveryManager;
-import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.explosions.ExplosionManager;
 import com.playmonumenta.plugins.fishing.FishingCombatManager;
@@ -427,9 +426,6 @@ public class Plugin extends JavaPlugin {
 		PlayerSaturationTracker.startTracking(this);
 
 		DailyReset.startTimer(this);
-
-		//TODO move that to somewhere else.
-		ColoredGlowingEffect.registerCleanerTask(this);
 
 		SpawnerCommand.register();
 

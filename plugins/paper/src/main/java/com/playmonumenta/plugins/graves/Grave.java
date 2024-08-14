@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -312,23 +313,27 @@ public final class Grave {
 		if (mRunnable == null) {
 			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getActiveCosmetic(mPlayer, CosmeticType.GRAVE_POSE);
 			GravePose gravePose = GravePoses.getGravePose(activeCosmetic);
+			// Main grave glows for the player
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				if (mEntity != null && !mSmall) {
+					GlowingManager.startGlowing(mEntity, NamedTextColor.WHITE, -1, 0, p -> p == mPlayer, null);
+				}
+			});
 			mRunnable = new BukkitRunnable() {
-				int mGlowingSeconds = 0;
 				@Override
 				public void run() {
 					if (mEntity != null && mEntity.isValid()) {
+						// While holding a compass, the main grave glows golden, and white for other players, and small graves glow for the owner only.
 						if (mPlayer.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
-							mEntity.setGlowing(true);
-							mGlowingSeconds = 5;
-						} else if (mGlowingSeconds > 0) {
-							mGlowingSeconds--;
-						} else {
-							mEntity.setGlowing(false);
+							if (mSmall) {
+								GlowingManager.startGlowing(mEntity, NamedTextColor.WHITE, 5 * 20, 1, p -> p == mPlayer, null);
+							} else {
+								GlowingManager.startGlowing(mEntity, NamedTextColor.WHITE, 5 * 20, 1);
+								GlowingManager.startGlowing(mEntity, NamedTextColor.GOLD, 5 * 20, 2, p -> p == mPlayer, null);
+							}
 						}
 
-						if (mEntity != null) {
-							gravePose.passiveParticles(mPlayer, mEntity, ScoreboardUtils.getScoreboardValue(mPlayer, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) > 0);
-						}
+						gravePose.passiveParticles(mPlayer, mEntity, ScoreboardUtils.getScoreboardValue(mPlayer, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) > 0);
 
 						if (mEntity.getScoreboardTags().contains("Delete")) {
 							delete();
@@ -351,6 +356,7 @@ public final class Grave {
 			int mTicks = 0;
 			double mY = 0;
 			double mTheta = 0;
+
 			@Override
 			public void run() {
 				new PartialParticle(Particle.TOTEM, loc.clone().add(FastUtils.cos(mTheta), mY, FastUtils.sin(mTheta)), 1, 0, 0, 0, 0).spawnAsPlayerPassive(mPlayer);
@@ -454,12 +460,12 @@ public final class Grave {
 
 			if (collected > 0) {
 				player.sendMessage(Component.text("You collected ", NamedTextColor.AQUA)
-					.append(Component.text(collected == 1 ? "1 item from the grave" : collected + " items from the grave."))
+					                   .append(Component.text(collected == 1 ? "1 item from the grave" : collected + " items from the grave."))
 				);
 			}
 			if (remaining > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
-					.append(Component.text(remaining == 1 ? "is 1 item remaining in the grave" : "are " + remaining + " items remaining in the grave."))
+					                   .append(Component.text(remaining == 1 ? "is 1 item remaining in the grave" : "are " + remaining + " items remaining in the grave."))
 				);
 			}
 			if (mItems.isEmpty()) {
@@ -480,8 +486,8 @@ public final class Grave {
 							for (int i = contents.length - 1; i >= 0; i--) { // loop from high to low to check equipment first
 								ItemStack playerItem = contents[i];
 								if (playerItem != null
-										&& playerItem.getAmount() == 1
-										&& identifier.isIdentifierFor(playerItem, true)
+									    && playerItem.getAmount() == 1
+									    && identifier.isIdentifierFor(playerItem, true)
 									    && Shattered.unshatterOneLevel(playerItem)) {
 									unshattered++;
 									continue equipmentLoop;
@@ -495,8 +501,8 @@ public final class Grave {
 									    && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
 									for (ItemStack shulkerItem : shulkerBox.getInventory().getContents()) {
 										if (shulkerItem != null
-												&& shulkerItem.getAmount() == 1
-												&& identifier.isIdentifierFor(shulkerItem, true)
+											    && shulkerItem.getAmount() == 1
+											    && identifier.isIdentifierFor(shulkerItem, true)
 											    && Shattered.unshatterOneLevel(shulkerItem)) {
 											unshattered++;
 											meta.setBlockState(shulkerBox);

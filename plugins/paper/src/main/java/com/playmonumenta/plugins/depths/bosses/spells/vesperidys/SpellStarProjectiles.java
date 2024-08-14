@@ -4,9 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -62,7 +64,7 @@ public class SpellStarProjectiles extends Spell {
 		}, cooldownTicks() + 20);
 
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WOLF_GROWL, 5, 1);
-		mVesperidys.mCastTeam.addEntry(mBoss.getUniqueId().toString());
+		GlowingManager.ActiveGlowingEffect glowingEffect = GlowingManager.startGlowing(mBoss, NamedTextColor.DARK_RED, -1, GlowingManager.BOSS_SPELL_PRIORITY);
 
 		BukkitRunnable runnableA = new BukkitRunnable() {
 			private int mVolley = 0;
@@ -71,7 +73,7 @@ public class SpellStarProjectiles extends Spell {
 			@Override
 			public synchronized void cancel() throws IllegalStateException {
 				super.cancel();
-				mVesperidys.mCastTeam.removeEntry(mBoss.getUniqueId().toString());
+				glowingEffect.clear();
 			}
 
 			@Override

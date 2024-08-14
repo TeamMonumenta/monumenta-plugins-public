@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
@@ -71,8 +72,7 @@ public class TelekinesisCS extends EnchantedPrayerCS {
 		ItemDisplay display = loc.getWorld().spawn(loc.clone().add(0, 4, 0), ItemDisplay.class);
 		display.setItemStack(DisplayEntityUtils.generateRPItem(Material.TUFF, "Telekinesis Boulder"));
 		EntityUtils.setRemoveEntityOnUnload(display);
-		display.setGlowing(true);
-		display.setGlowColorOverride(Color.fromRGB(0, 180, 180));
+		GlowingManager.startGlowing(display, Color.fromRGB(0, 180, 180), -1, 0, p -> p == player);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), display::remove, 300);
 		telekinesisBoulder(player, display);
 	}

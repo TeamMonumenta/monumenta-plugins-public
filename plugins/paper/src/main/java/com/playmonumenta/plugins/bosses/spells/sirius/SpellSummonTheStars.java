@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PPPillar;
@@ -13,7 +14,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 
 public class SpellSummonTheStars extends Spell {
 	private List<Entity> mActiveMobs;
@@ -198,6 +197,8 @@ public class SpellSummonTheStars extends Spell {
 						spawn.addScoreboardTag(Sirius.MOB_TAG);
 						mActiveMobs.add(spawn);
 						summoned.add(spawn);
+						// make sure player abilities don't override the mobs' glow colour
+						GlowingManager.startGlowing(spawn, NamedTextColor.AQUA, duration, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 						spawned++;
 					}
 				}
@@ -207,10 +208,7 @@ public class SpellSummonTheStars extends Spell {
 			}
 		}
 		mobSpawnAnimation(summoned);
-		Team mAqua = ScoreboardUtils.getExistingTeamOrCreate("Aqua", NamedTextColor.AQUA);
 		for (Entity mob : mActiveMobs) {
-			mAqua.addEntity(mob);
-			mob.setGlowing(true);
 			mob.getWorld().playSound(mob.getLocation(), Sound.ENTITY_WARDEN_DIG, SoundCategory.HOSTILE, 1, 1);
 		}
 		new BukkitRunnable() {
@@ -252,10 +250,6 @@ public class SpellSummonTheStars extends Spell {
 					mSirius.changeHp(true, -5);
 					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("The starlight will shine brighter while they live. You have failed, conquerers.", NamedTextColor.AQUA));
-					}
-					for (Entity entity : mActiveMobs) {
-						mAqua.removeEntity(entity);
-						entity.setGlowing(false);
 					}
 					mManager.remove();
 					this.cancel();

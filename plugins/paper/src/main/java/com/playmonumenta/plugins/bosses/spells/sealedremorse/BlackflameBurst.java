@@ -5,12 +5,12 @@ import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -56,7 +56,7 @@ public class BlackflameBurst extends Spell {
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyColoredGlowing(BeastOfTheBlackFlame.identityTag, boss, COLOR, DELAY);
+					GlowingManager.startGlowing(boss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 
 					if (ticks % 4 == 0) {
 						new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
@@ -134,7 +134,7 @@ public class BlackflameBurst extends Spell {
 					this.cancel();
 				}
 
-				PotionUtils.applyColoredGlowing(mBossClass.getIdentityTag(), mBoss, COLOR, DELAY);
+				GlowingManager.startGlowing(mBoss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 
 				if (mTicks % 4 == 0) {
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 4, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);

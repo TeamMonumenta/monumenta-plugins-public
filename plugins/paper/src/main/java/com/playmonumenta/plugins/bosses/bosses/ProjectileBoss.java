@@ -11,10 +11,10 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -188,7 +188,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 			// Initiate Aesthetic
 			(World world, Location loc, int ticks) -> {
 				if (p.SPELL_DELAY > 0) {
-					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY);
+					GlowingManager.startGlowing(boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 				}
 				p.SOUND_START.play(loc);
 			},

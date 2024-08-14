@@ -7,7 +7,13 @@ import com.playmonumenta.plugins.bosses.spells.sirius.SpellSummonTheStars;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.SiriusSetTargetEffect;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.managers.GlowingManager;
+import com.playmonumenta.plugins.utils.DisplayEntityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +23,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -25,7 +36,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.joml.AxisAngle4f;
@@ -78,7 +88,6 @@ public class DeclerationTuulen extends Spell {
 	public void run() {
 		mSpawnedMobs = new ArrayList<>();
 		List<DisplayEntityUtils.DisplayAnimation> mDisplays = new ArrayList<>();
-		Team mRed = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
 		mTarget.setGlowing(true);
 		for (Player p : mSirius.getPlayers()) {
 			MessagingUtils.sendNPCMessage(p, "Tuulen", Component.text("Sirius has turned his eye to me. Protect my position as I gather my strength!", NamedTextColor.GRAY, TextDecoration.BOLD));
@@ -110,14 +119,13 @@ public class DeclerationTuulen extends Spell {
 						if (spawn != null) {
 							spawn.getWorld().playSound(loc, Sound.ENTITY_WARDEN_DIG, SoundCategory.HOSTILE, 1, 1);
 							spawn.addScoreboardTag(Sirius.MOB_TAG);
-							mRed.addEntity(spawn);
 							//Scale the entities for people helping fight them
 							mSpawner.scaleMob(spawn, Math.max(PlayerUtils.playersInRange(mSirius.mTuulenLocation, 20, true, true).size(), 1));
 							mobs.add(spawn);
 							mSpawnedMobs.add(spawn);
-							spawn.setGlowing(true);
 							spawn.setTarget(mTarget);
 							EffectManager.getInstance().addEffect(spawn, mSirius.getIdentityTag(), new SiriusSetTargetEffect(DURATION - mTicks + 5, mSirius, mTarget));
+							GlowingManager.startGlowing(spawn, NamedTextColor.RED, -1, GlowingManager.BOSS_SPELL_PRIORITY, null, "DeclarationTuulen");
 						}
 					}
 				}
@@ -227,7 +235,7 @@ public class DeclerationTuulen extends Spell {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mSirius.mAnimationLock = false, 55);
 				endBehavior(mSpawnedMobs);
 				for (Mob mob : mSpawnedMobs) {
-					mRed.removeEntity(mob);
+					GlowingManager.clear(mob, "DeclarationTuulen");
 				}
 				mTarget.setGlowing(false);
 				mActiveRunnables.remove(this);

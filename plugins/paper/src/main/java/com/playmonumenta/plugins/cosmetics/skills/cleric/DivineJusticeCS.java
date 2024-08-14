@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -15,7 +14,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -46,8 +44,8 @@ public class DivineJusticeCS implements CosmeticSkill {
 		return Material.SUGAR;
 	}
 
-	public void justiceAshColor(Item item) {
-		ScoreboardUtils.addEntityToTeam(item, "GlowingWhite", NamedTextColor.WHITE);
+	public NamedTextColor justiceAshColor() {
+		return NamedTextColor.WHITE;
 	}
 
 	public String justiceAshName() {

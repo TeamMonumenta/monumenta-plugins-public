@@ -3,9 +3,9 @@ package com.playmonumenta.plugins.depths.loot;
 import com.playmonumenta.plugins.depths.DepthsContent;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -243,7 +243,7 @@ public class ZenithLoot {
 			if (!loot.isEmpty()) {
 				for (ItemStack item : loot) {
 					Item lootOnGround = loc.getWorld().dropItem(loc, item);
-					PotionUtils.applyColoredGlowing("ZenithLootRoom", lootOnGround, NamedTextColor.DARK_PURPLE, 10000);
+					GlowingManager.startGlowing(lootOnGround, NamedTextColor.DARK_PURPLE, 10000, 0);
 				}
 			}
 		}
@@ -277,7 +277,7 @@ public class ZenithLoot {
 					for (ItemStack item : loot) {
 						Item lootOnGround = loc.getWorld().dropItem(loc, item);
 						lootOnGround.setGlowing(true);
-						PotionUtils.applyColoredGlowing("ZenithLootRoom", lootOnGround, NamedTextColor.RED, 10000);
+						GlowingManager.startGlowing(lootOnGround, NamedTextColor.RED, 10000, 0);
 						p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					}
 				}
@@ -295,7 +295,7 @@ public class ZenithLoot {
 				ItemStack item = CharmFactory.generateCharm(level, power, 0, null, null, null, null, null);
 				Item lootOnGround = loc.getWorld().dropItem(loc, item);
 				lootOnGround.setGlowing(true);
-				PotionUtils.applyColoredGlowing("ZenithLootRoom", lootOnGround, DepthsUtils.getRarityNamedTextColor(level), 10000);
+				GlowingManager.startGlowing(lootOnGround, DepthsUtils.getRarityNamedTextColor(level), 10000, 0);
 			}
 		}
 	}

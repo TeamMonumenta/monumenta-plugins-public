@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -157,8 +157,7 @@ public class CharmsCommand extends GenericCommand {
 				ItemStack charm = CharmFactory.generateCharm(rarity, power, 0, null, null, null, null, null);
 				Item lootOnGround = loc.getWorld().dropItem(loc, charm);
 				lootOnGround.setGlowing(true);
-				PotionUtils.applyColoredGlowing("ZenithCharmgen", lootOnGround, DepthsUtils.getRarityNamedTextColor(rarity), 10000);
-
+				GlowingManager.startGlowing(lootOnGround, DepthsUtils.getRarityNamedTextColor(rarity), 10000, 0);
 			}).register();
 
 		//CHARM GUI COMMAND

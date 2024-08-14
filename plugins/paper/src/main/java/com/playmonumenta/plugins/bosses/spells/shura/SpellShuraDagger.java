@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.CShura;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -54,7 +55,7 @@ public class SpellShuraDagger extends Spell {
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyColoredGlowing(CShura.identityTag, mBoss, NamedTextColor.RED, DELAY);
+					GlowingManager.startGlowing(mBoss, NamedTextColor.RED, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 					world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.HOSTILE, 3.0f, 0.5f);
 					world.playSound(loc, Sound.ENTITY_EVOKER_CELEBRATE, SoundCategory.HOSTILE, 2.0f, 0.7f);
 
@@ -119,7 +120,7 @@ public class SpellShuraDagger extends Spell {
 					this.cancel();
 				}
 
-				PotionUtils.applyColoredGlowing(CShura.identityTag, mBoss, NamedTextColor.RED, DELAY);
+				GlowingManager.startGlowing(mBoss, NamedTextColor.RED, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 
 				if (mTicks % 4 == 0) {
 					new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 4, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);

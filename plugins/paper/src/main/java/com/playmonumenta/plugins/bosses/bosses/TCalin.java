@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -16,7 +17,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,7 +85,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 			(Entity entity, int tick) -> {
 				float t = tick / 15.0f;
 				if (tick == 1) {
-					PotionUtils.applyColoredGlowing(identityTag, mBoss, NamedTextColor.RED, (int) (20 * 2.25));
+					GlowingManager.startGlowing(mBoss, NamedTextColor.RED, (int) (20 * 2.25), GlowingManager.BOSS_SPELL_PRIORITY);
 				}
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.05).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation().add(0, 1, 0), 5, 0.25, 0.45, 0.25,

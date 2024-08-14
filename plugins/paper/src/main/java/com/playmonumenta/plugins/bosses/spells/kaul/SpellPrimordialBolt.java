@@ -6,12 +6,12 @@ import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,7 +43,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				float t = tick / 15f;
 				World world = boss.getWorld();
 				if (tick == 1) {
-					PotionUtils.applyColoredGlowing(PrimordialElementalKaulBoss.identityTag, boss, NamedTextColor.RED, 20 * 2);
+					GlowingManager.startGlowing(boss, NamedTextColor.RED, 20 * 2, GlowingManager.BOSS_SPELL_PRIORITY);
 					world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.HOSTILE, 5f, 0.5f);
 					world.playSound(boss.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_AMBIENT, SoundCategory.HOSTILE, 5f, 0.5f);
 				}
