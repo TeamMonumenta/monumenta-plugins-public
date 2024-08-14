@@ -50,7 +50,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	List<MarketFilter> mLoadedMarketFilters = new ArrayList<>();
 	@Nullable String mQuicksearchValue;
 
-	List<MarketListingIndex> mLoadedSortbyIndexes;
+	List<MarketListingIndex> mLoadedSortbyIndexes = MarketListingIndex.getAllPlayerSortable();
 	int mSelectedSortByIndex;
 	boolean mSortByDesc;
 

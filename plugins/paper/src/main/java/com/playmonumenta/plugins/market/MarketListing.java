@@ -604,7 +604,7 @@ public class MarketListing {
 	}
 
 	private String convertCurrencyItemStackToSmallestCurrencyName(ItemStack currencyToBuy) {
-		WalletManager.CompressionInfo info = WalletManager.getAsMaxUncompressed(currencyToBuy);
+		WalletManager.CompressionInfo info = WalletManager.getCompressionInfo(currencyToBuy);
 		if (info != null) {
 			return ItemUtils.getPlainNameOrDefault(info.mBase);
 		}

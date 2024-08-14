@@ -207,12 +207,12 @@ public class MarketManager {
 		}
 
 		if (currency != null) {
-			WalletManager.CompressionInfo infoCurrentItem = WalletManager.getAsMaxUncompressed(currentItem);
+			WalletManager.CompressionInfo infoCurrentItem = WalletManager.getCompressionInfo(currentItem);
 			ItemStack tmpCurrentItem = currentItem.asOne();
 			if (infoCurrentItem != null) {
 				tmpCurrentItem = infoCurrentItem.mBase.asOne();
 			}
-			WalletManager.CompressionInfo infoCurrencyItem = WalletManager.getAsMaxUncompressed(currency);
+			WalletManager.CompressionInfo infoCurrencyItem = WalletManager.getCompressionInfo(currency);
 			ItemStack tmpCurrencyItem = currency.asOne();
 			if (infoCurrencyItem != null) {
 				tmpCurrencyItem = infoCurrencyItem.mBase.asOne();

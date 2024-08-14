@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.inventories.Wallet;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class WalletUtils {
 	 * @param prioritizeWallet  whether to take from the wallet first (true) or the inventory first (false)
 	 * @return a Debt object with the relevant information.
 	 */
-	public static Debt calculateInventoryAndWalletDebt(ItemStack requirement, ItemStack[] inventoryContents, @Nullable WalletManager.Wallet wallet, boolean prioritizeWallet) {
+	public static Debt calculateInventoryAndWalletDebt(ItemStack requirement, ItemStack[] inventoryContents, @Nullable Wallet wallet, boolean prioritizeWallet) {
 		// Find the requirement amounts in inventory and wallet:
 		int reqAmount = requirement.getAmount();
 		int numInInventory = InventoryUtils.numInInventory(inventoryContents, requirement);
@@ -108,7 +109,7 @@ public class WalletUtils {
 
 	public static boolean tryToPayFromInventoryAndWallet(Player player, List<ItemStack> costs, boolean prioritizeWallet, boolean notify) {
 		PlayerInventory playerInventory = player.getInventory();
-		WalletManager.Wallet wallet = WalletManager.getWallet(player);
+		Wallet wallet = WalletManager.getWallet(player);
 		List<Debt> debts = new ArrayList<>(costs.size());
 		for (ItemStack cost : costs) {
 			if (ItemUtils.isNullOrAir(cost)) {
@@ -128,7 +129,7 @@ public class WalletUtils {
 
 	public static boolean tryToPayFromInventoryAndWallet(Player player, ItemStack cost, boolean prioritizeWallet, boolean notify) {
 		PlayerInventory playerInventory = player.getInventory();
-		WalletManager.Wallet wallet = WalletManager.getWallet(player);
+		Wallet wallet = WalletManager.getWallet(player);
 		Debt debt = calculateInventoryAndWalletDebt(cost, playerInventory.getStorageContents(), wallet, prioritizeWallet);
 		if (!debt.mMeetsRequirement) {
 			return false;

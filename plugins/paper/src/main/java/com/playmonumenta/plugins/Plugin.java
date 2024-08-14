@@ -325,7 +325,7 @@ public class Plugin extends JavaPlugin {
 		UpdateStrikeChests.register();
 		ViewActivity.register();
 		VirtualFirmament.register();
-		WalletManager.registerCommand();
+		WalletCommand.register();
 		WeaponDash.register();
 		WorldNameCommand.register();
 		BlockDisplayCommand.register();

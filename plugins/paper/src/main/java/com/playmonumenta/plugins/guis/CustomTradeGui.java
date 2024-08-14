@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.guis;
 
+import com.playmonumenta.plugins.inventories.Wallet;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -183,7 +184,7 @@ public class CustomTradeGui extends Gui {
 			}
 			// Copy of player's inventory and wallet (if enabled):
 			ItemStack[] inventoryShallowClone = player.getInventory().getStorageContents().clone();
-			WalletManager.Wallet walletClone = (mPebTradeGUIWallet == 1) ? null : WalletManager.getWallet(player).deepClone();
+			Wallet walletClone = (mPebTradeGUIWallet == 1) ? null : WalletManager.getWallet(player).deepClone();
 			// Check each requirement, constructing lore and updating mHasRequirements:
 			for (ItemStack requirement : mRequirements) {
 				// Calculate amount to remove:
@@ -252,7 +253,7 @@ public class CustomTradeGui extends Gui {
 		public void removeRequirements() {
 			// Remove requirements from actual inventory and wallet:
 			Inventory inventory = mPlayer.getInventory();
-			WalletManager.Wallet wallet = (mPebTradeGUIWallet == 1) ? null : WalletManager.getWallet(mPlayer);
+			Wallet wallet = (mPebTradeGUIWallet == 1) ? null : WalletManager.getWallet(mPlayer);
 			for (ItemStack requirement : requirements()) {
 				// Calculate amount to remove:
 				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, inventory.getStorageContents(), wallet, mPebTradeGUIWallet != 0);
