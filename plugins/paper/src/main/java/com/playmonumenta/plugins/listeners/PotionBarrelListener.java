@@ -89,7 +89,7 @@ public class PotionBarrelListener implements Listener {
 						if (ItemUtils.isSomePotion(clickedItem)) {
 							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 							if (barrelPotion == null || barrelPotion.isSimilar(clickedItem)) {
-								if (!addToBarrel(barrelInventory, clickedItem)) {
+								if (addToBarrel(barrelInventory, clickedItem) == 0) {
 									errorSound(player);
 								}
 							} else {
@@ -107,7 +107,7 @@ public class PotionBarrelListener implements Listener {
 						if (ItemUtils.isSomePotion(clickedItem)) {
 							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 							if (barrelPotion == null || barrelPotion.isSimilar(clickedItem)) {
-								if (addToBarrel(barrelInventory, clickedItem)) {
+								if (addToBarrel(barrelInventory, clickedItem) != 0) {
 									for (ItemStack playerItem : player.getInventory()) {
 										if (playerItem != null && playerItem.isSimilar(barrelPotion)) {
 											addToBarrel(barrelInventory, playerItem);
@@ -143,7 +143,7 @@ public class PotionBarrelListener implements Listener {
 						if (ItemUtils.isSomePotion(cursorItem)) {
 							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 							if (barrelPotion == null || barrelPotion.isSimilar(cursorItem)) {
-								if (!addToBarrel(barrelInventory, cursorItem)) {
+								if (addToBarrel(barrelInventory, cursorItem) == 0) {
 									errorSound(player);
 								}
 							} else {
@@ -186,7 +186,7 @@ public class PotionBarrelListener implements Listener {
 						if (ItemUtils.isSomePotion(hotbarItem)) {
 							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 							if (barrelPotion == null || barrelPotion.isSimilar(hotbarItem)) {
-								if (!addToBarrel(barrelInventory, hotbarItem)) {
+								if (addToBarrel(barrelInventory, hotbarItem) == 0) {
 									errorSound(player);
 								}
 							} else {
@@ -251,7 +251,7 @@ public class PotionBarrelListener implements Listener {
 				if (ItemUtils.isSomePotion(cursor)) {
 					ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 					if (barrelPotion == null || barrelPotion.isSimilar(cursor)) {
-						if (addToBarrel(barrelInventory, cursor)) {
+						if (addToBarrel(barrelInventory, cursor) != 0) {
 							player.setItemOnCursor(cursor);
 						} else {
 							errorSound(player);
@@ -363,9 +363,9 @@ public class PotionBarrelListener implements Listener {
 	}
 
 	private static class BarrelInstance {
-		private Block mBlock;
-		private Inventory mInventory;
-		private ItemStack mPotion;
+		private final Block mBlock;
+		private final Inventory mInventory;
+		private final ItemStack mPotion;
 
 		private BarrelInstance(Block block, Inventory inventory, ItemStack potion) {
 			mBlock = block;
@@ -454,7 +454,7 @@ public class PotionBarrelListener implements Listener {
 		ItemStack barrelPotion = b.getPotion();
 		if (barrelPotion != null) {
 			CoreProtectIntegration.logContainerTransaction(player, b.getBlock());
-			int added = 0;
+			int totalAdded = 0;
 			int injectorRefilled = 0;
 			String injectorName = null;
 			String potionName = ItemUtils.getPlainName(barrelPotion);
@@ -463,9 +463,8 @@ public class PotionBarrelListener implements Listener {
 					continue;
 				}
 				if (playerItem.isSimilar(barrelPotion)) {
-					if (addToBarrel(barrelInventory, playerItem)) {
-						added++;
-					}
+					int added = addToBarrel(barrelInventory, playerItem);
+					totalAdded += added;
 				} else if (ShulkerEquipmentListener.isPotionInjectorItem(playerItem)
 						&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
 						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
@@ -486,11 +485,12 @@ public class PotionBarrelListener implements Listener {
 						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 					boolean changed = false;
 					for (ItemStack shulkerItem : shulkerBox.getInventory()) {
-						if (shulkerItem != null
-								&& shulkerItem.isSimilar(barrelPotion)
-								&& addToBarrel(barrelInventory, shulkerItem)) {
-							added++;
-							changed = true;
+						if (shulkerItem != null && shulkerItem.isSimilar(barrelPotion)) {
+							int added = addToBarrel(barrelInventory, shulkerItem);
+							totalAdded += added;
+							if (added != 0) {
+								changed = true;
+							}
 						}
 					}
 					if (changed) {
@@ -512,14 +512,14 @@ public class PotionBarrelListener implements Listener {
 					}
 				}
 			}
-			if (added > 0) {
-				player.sendMessage(Component.text("Deposited " + added + " " + potionName + ".", NamedTextColor.GRAY));
+			if (totalAdded > 0) {
+				player.sendMessage(Component.text("Deposited " + totalAdded + " " + potionName + ".", NamedTextColor.GRAY));
 			}
 			if (injectorRefilled > 0) {
 				player.sendMessage(Component.text("Removed " + injectorRefilled + " " + potionName + " to refill your " + injectorName + ".", NamedTextColor.WHITE));
 			}
 
-			return added > 0 || injectorRefilled > 0;
+			return totalAdded > 0 || injectorRefilled > 0;
 		}
 		return false;
 	}
@@ -545,7 +545,16 @@ public class PotionBarrelListener implements Listener {
 		return null;
 	}
 
-	private boolean addToBarrel(Inventory barrelInventory, ItemStack potion) {
+	/**
+	 * Tries to add the given potion to the given barrel. Edits the passed-in item stack to hold the number of items not added.
+	 * <p>
+	 * NB: Does not check if the given potion is a potion or even whether it's the correct potion for this barrel,
+	 * but does still make sure to not add together stacks of different items.
+	 *
+	 * @return How many potions were added
+	 */
+	private int addToBarrel(Inventory barrelInventory, ItemStack potion) {
+		int originalAmount = potion.getAmount();
 		for (int i = 0; i < barrelInventory.getSize(); i++) {
 			ItemStack item = barrelInventory.getItem(i);
 			if (ItemUtils.isNullOrAir(item)) {
@@ -560,7 +569,7 @@ public class PotionBarrelListener implements Listener {
 				}
 			}
 		}
-		return potion.getAmount() == 0;
+		return originalAmount - potion.getAmount();
 	}
 
 	private int takeAll(Inventory barrelInventory, Inventory targetInventory) {
