@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.listeners.GraveListener;
 import com.playmonumenta.plugins.listeners.QuiverListener;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -407,9 +408,12 @@ public class InventoryUtils {
 		} else {
 			if (inventory.getType().equals(InventoryType.PLAYER)) {
 				// drop if inventory is the player's inventory
-				dropTempOwnedItem(item, player.getLocation(), player);
+				Item itemEntity = dropTempOwnedItem(item, player.getLocation(), player);
 				if (!silent) {
-					player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
+					if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "DroppedItemMessage")) {
+						player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
+					}
+					GlowingManager.startGlowing(itemEntity, NamedTextColor.RED, 60 * 20, 0, p -> p == player, null);
 				}
 			} else {
 				// otherwise attempt to give it to the player's inventory
