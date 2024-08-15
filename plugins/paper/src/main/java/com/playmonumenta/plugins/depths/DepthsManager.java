@@ -146,6 +146,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -2042,6 +2043,7 @@ public class DepthsManager {
 				});
 				dp.sendMessage("Unlucky! You downgraded all your abilities by a level.");
 				party.sendMessage(playerName + " downgraded all their abilities by a level!", o -> o != dp);
+				validateOfferings(dp);
 
 				break;
 			default:
@@ -2073,7 +2075,24 @@ public class DepthsManager {
 			if (removedAbility != null) {
 				upgradeOfferings.removeIf(dai -> dai.mAbility.equals(removedAbility));
 			}
-			upgradeOfferings.removeIf(dai -> dai.mRarity <= dp.mAbilities.getOrDefault(dai.mAbility, 0));
+			ListIterator<DepthsAbilityItem> iter = upgradeOfferings.listIterator();
+			while (iter.hasNext()) {
+				DepthsAbilityItem dai = iter.next();
+				int actualRarity = dp.mAbilities.getOrDefault(dai.mAbility, 0);
+				if (dai.mRarity <= actualRarity) {
+					iter.remove();
+					continue;
+				}
+				if (dai.mPreviousRarity != actualRarity) {
+					DepthsAbilityInfo<?> info = getAbility(dai.mAbility);
+					if (info != null) {
+						DepthsAbilityItem newItem = info.getAbilityItem(dai.mRarity, actualRarity);
+						if (newItem != null) {
+							iter.set(newItem);
+						}
+					}
+				}
+			}
 			if (upgradeOfferings.isEmpty()) {
 				mUpgradeOfferings.remove(dp.mPlayerId);
 			}
