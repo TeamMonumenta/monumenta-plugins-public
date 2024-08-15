@@ -39,11 +39,12 @@ public class ChainHealingWave extends MultipleChargeAbility {
 	public static final int BOUNCE_RANGE_2 = 15;
 	public static final double HEAL_PERCENT_1 = 0.3;
 	public static final double HEAL_PERCENT_2 = 0.4;
-	public static final int CDR_ON_KILL = 20;
+	public static final int CDR_ON_KILL = 1;
 	public static final int CHARGES = 2;
 
 	public static final String CHARM_COOLDOWN = "Chain Healing Wave Cooldown";
 	public static final String CHARM_HEALING = "Chain Healing Wave Healing";
+	public static final String CHARM_CDR = "Chain Healing Wave Cooldown Reduction";
 	public static final String CHARM_RADIUS = "Chain Healing Wave Bounce Radius";
 	public static final String CHARM_TARGETS = "Chain Healing Wave Targets";
 	public static final String CHARM_CHARGES = "Chain Healing Wave Charges";
@@ -59,7 +60,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 					TARGETS_1,
 					BOUNCE_RANGE_1,
 					StringUtils.multiplierToPercentage(HEAL_PERCENT_1),
-					StringUtils.ticksToSeconds(CDR_ON_KILL),
+					CDR_ON_KILL,
 					CHARGES,
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),
@@ -78,6 +79,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 	public final double mHealPercent;
 	private final List<LivingEntity> mHitTargets = new ArrayList<>();
 	private int mLastCastTicks = 0;
+	private final int mCooldownReduction;
 	private final ChainHealingWaveCS mCosmetic;
 
 	public ChainHealingWave(Plugin plugin, Player player) {
@@ -89,6 +91,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? BOUNCE_RANGE_2 : BOUNCE_RANGE_1);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mHealPercent = CharmManager.getExtraPercent(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
+		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, 20 * CDR_ON_KILL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainHealingWaveCS());
 	}
 
@@ -163,7 +166,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 					&& totemAbility.mDisplayName.equalsIgnoreCase(stand.getName())) {
 					ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
 					if (linkedSpell != null) {
-						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, CDR_ON_KILL);
+						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, mCooldownReduction);
 					}
 				}
 			}

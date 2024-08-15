@@ -29,11 +29,14 @@ public class Skirmisher extends Ability {
 	private static final double GROUPED_PERCENT_DAMAGE_2 = 0.15;
 	private static final double SKIRMISHER_FRIENDLY_RADIUS = 2.5;
 	private static final int MOB_COUNT_CUTOFF = 1;
+	private static final int ENHANCEMENT_SPLASH_TARGETS = 1;
 	private static final double ENHANCEMENT_SPLASH_RADIUS = 3;
 	private static final double ENHANCEMENT_SPLASH_PERCENT_DAMAGE = 0.3;
 
 	public static final String CHARM_DAMAGE = "Skirmisher Damage Multiplier";
 	public static final String CHARM_RADIUS = "Skirmisher Damage Radius";
+	public static final String CHARM_ENHANCEMENT_DAMAGE = "Skirmisher Enhancement Damage Multiplier";
+	public static final String CHARM_TARGETS = "Skirmisher Enhancement Targets";
 
 	public static final AbilityInfo<Skirmisher> INFO =
 		new AbilityInfo<>(Skirmisher.class, "Skirmisher", Skirmisher::new)
@@ -58,12 +61,16 @@ public class Skirmisher extends Ability {
 	private final double mIsolatedFlatDamage;
 	private final double mFriendlyRadius;
 	private final double mSplashRadius;
+	private final double mSplashDamage;
+	private final int mSplashTargets;
 	private final SkirmisherCS mCosmetic;
 
 	public Skirmisher(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mFriendlyRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, SKIRMISHER_FRIENDLY_RADIUS);
 		mSplashRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_SPLASH_RADIUS);
+		mSplashDamage = CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCEMENT_DAMAGE) + ENHANCEMENT_SPLASH_PERCENT_DAMAGE;
+		mSplashTargets = (int) CharmManager.getLevel(mPlayer, CHARM_TARGETS) + ENHANCEMENT_SPLASH_TARGETS;
 		mIsolatedPercentDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2);
 		mIsolatedFlatDamage = isLevelOne() ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SkirmisherCS());
@@ -78,13 +85,17 @@ public class Skirmisher extends Ability {
 			// If Enhanced and triggers on a melee strike,
 			if (isEnhanced() && event.getType() == DamageType.MELEE) {
 				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(loc, mSplashRadius, enemy);
-				nearbyEntities.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
-				LivingEntity selectedEnemy = EntityUtils.getNearestMob(loc, nearbyEntities);
+				for (int i = 0; i < mSplashTargets; i++) {
+					nearbyEntities.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+					LivingEntity selectedEnemy = EntityUtils.getNearestMob(loc, nearbyEntities);
 
-				if (selectedEnemy != null) {
-					DamageUtils.damage(mPlayer, selectedEnemy, DamageType.OTHER, event.getDamage() * ENHANCEMENT_SPLASH_PERCENT_DAMAGE, mInfo.getLinkedSpell(), true);
-					Location eLoc = selectedEnemy.getLocation();
-					mCosmetic.aesthetics(mPlayer, eLoc, world, enemy);
+					if (selectedEnemy != null) {
+						DamageUtils.damage(mPlayer, selectedEnemy, DamageType.OTHER, event.getDamage() * mSplashDamage, mInfo.getLinkedSpell(), true);
+						Location eLoc = selectedEnemy.getLocation();
+						mCosmetic.aesthetics(mPlayer, eLoc, world, enemy);
+					}
+
+					nearbyEntities.remove(selectedEnemy);
 				}
 			}
 

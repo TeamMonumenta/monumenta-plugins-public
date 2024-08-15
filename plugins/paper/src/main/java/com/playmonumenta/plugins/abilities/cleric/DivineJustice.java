@@ -56,6 +56,7 @@ public class DivineJustice extends Ability {
 	public static final String CHARM_DAMAGE = "Divine Justice Damage";
 	public static final String CHARM_SELF = "Divine Justice Self Heal";
 	public static final String CHARM_ALLY = "Divine Justice Ally Heal";
+	public static final String CHARM_HEAL_RADIUS = "Divine Justice Ally Heal Radius";
 	public static final String CHARM_ENHANCE_DAMAGE = "Divine Justice Enhancement Damage Modifier";
 	public static final String CHARM_ENHANCE_DURATION = "Divine Justice Enhancement Duration";
 
@@ -176,7 +177,7 @@ public class DivineJustice extends Ability {
 				mPlayer,
 				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN)
 			);
-			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true);
+			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS), true);
 			for (Player otherPlayer : players) {
 				PlayerUtils.healPlayer(
 					mPlugin,

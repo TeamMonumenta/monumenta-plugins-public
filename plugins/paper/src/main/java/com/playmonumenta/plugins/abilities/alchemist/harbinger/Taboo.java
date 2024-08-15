@@ -52,6 +52,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	public static final String CHARM_SELF_DAMAGE = "Taboo Self Damage";
 	public static final String CHARM_KNOCKBACK_RESISTANCE = "Taboo Knockback Resistance";
 	public static final String CHARM_DAMAGE = "Taboo Damage Modifier";
+	public static final String CHARM_BURST_DURATION = "Taboo Burst Mode Duration";
 	public static final String CHARM_HEALING_PENALTY = "Taboo Healing Penalty";
 	public static final String CHARM_ABSORPTION_PENALTY = "Taboo Absorption Penalty";
 	public static final String CHARM_RECHARGE = "Taboo Potion Recharge Rate";
@@ -187,7 +188,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 
 	public boolean burst() {
 		if (!isOnCooldown() && mCurrentState == TabooState.ACTIVE && mAlchemistPotions != null && mAlchemistPotions.decrementCharges(1)) {
-			mBurstTimer = BURST_SECONDS * 20;
+			mBurstTimer = CharmManager.getDuration(mPlayer, CHARM_BURST_DURATION, 20 * BURST_SECONDS);
 			mCurrentState = TabooState.BURST;
 			mCosmetic.burstEffects(mPlayer);
 			ClientModHandler.updateAbility(mPlayer, this);
