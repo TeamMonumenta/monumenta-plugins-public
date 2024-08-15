@@ -149,6 +149,7 @@ public class ExplosionManager implements Listener {
 		}
 
 		// Attempt to store items in existing carriers if possible
+		existingCarriers = existingCarriers.stream().filter(i -> PickupFilterResult.getFilterResult(i.getItemStack()) == filterResult).toList();
 		for (Map.Entry<ItemStack, List<Item>> itemTypeEntry : itemsByType.entrySet()) {
 			Iterator<Item> carrierIterator = existingCarriers.iterator();
 			Item existingCarrier = carrierIterator.hasNext() ? carrierIterator.next() : null;
