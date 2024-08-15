@@ -83,13 +83,13 @@ public class ZenithRoomRepository extends RoomRepository {
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r8", DepthsRoomType.ABILITY, new Vector(90, 43, 66), new Vector(1.0, -13.0, -38.0), 30, DepthsRoom.RoomDirection.UP));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r9", DepthsRoomType.ABILITY, new Vector(57, 57, 62), new Vector(1.0, -3.0, -21.0), 37, DepthsRoom.RoomDirection.UP));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r10", DepthsRoomType.ABILITY, new Vector(56, 48, 34), new Vector(1.0, -3.0, -17.0), 16, DepthsRoom.RoomDirection.UP));
-		mF2EliteRooms.add(new DepthsRoom("depths2/f2r20", DepthsRoomType.ABILITY, new Vector(71, 43, 74), new Vector(1.0, -29.0, -41.0), 32, DepthsRoom.RoomDirection.DOWN));
+		mF2EliteRooms.add(new DepthsRoom("depths2/f2r20", DepthsRoomType.ABILITY, new Vector(71, 43, 74), new Vector(1.0, -29.0, -41.0), 26, DepthsRoom.RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r22", DepthsRoomType.ABILITY, new Vector(80, 60, 129), new Vector(1.0, -45.0, -105.0), 33, DepthsRoom.RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r23", DepthsRoomType.ABILITY, new Vector(107, 65, 80), new Vector(1.0, -48.0, -45.0), 34, DepthsRoom.RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r24", DepthsRoomType.ABILITY, new Vector(37, 36, 49), new Vector(1.0, -13.0, -15.0), 15, DepthsRoom.RoomDirection.UP));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r28", DepthsRoomType.ABILITY, new Vector(81, 47, 43), new Vector(1.0, -17.0, -23.0), 22, DepthsRoom.RoomDirection.UP));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r29", DepthsRoomType.ABILITY, new Vector(95, 76, 140), new Vector(1.0, -34.0, -42.0), 25, DepthsRoom.RoomDirection.DOWN));
-		mF2EliteRooms.add(new DepthsRoom("depths2/f2r31", DepthsRoomType.ABILITY, new Vector(73, 71, 72), new Vector(1.0, -4.0, -36.0), 27, DepthsRoom.RoomDirection.UP));
+		mF2EliteRooms.add(new DepthsRoom("depths2/f2r31", DepthsRoomType.ABILITY, new Vector(73, 71, 72), new Vector(1.0, -4.0, -36.0), 23, DepthsRoom.RoomDirection.UP));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r32", DepthsRoomType.ABILITY, new Vector(53, 90, 60), new Vector(1.0, -58.0, -32.0), 24, DepthsRoom.RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths2/f2r33", DepthsRoomType.ABILITY, new Vector(67, 41, 67), new Vector(1.0, -18.0, -32.0), 27, DepthsRoom.RoomDirection.DOWN));
 
