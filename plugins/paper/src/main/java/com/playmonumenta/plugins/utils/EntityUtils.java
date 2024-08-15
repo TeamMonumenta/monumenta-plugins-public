@@ -366,27 +366,29 @@ public class EntityUtils {
 	}
 
 	public static boolean isHostileMob(@Nullable Entity entity) {
-		if (entity == null) {
+		if (!(entity instanceof Mob mob)) {
 			return false;
 		}
 		if (entity.getScoreboardTags().contains("SkillImmune")) {
 			return false;
 		}
-		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
-			    || entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-			    || entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
-			    || entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
+
+		if (mob instanceof Enemy || mob instanceof PolarBear || mob instanceof PufferFish || mob instanceof SkeletonHorse || mob instanceof ZombieHorse || entity instanceof Bee) {
 			return true;
-		} else if (entity instanceof Wolf) {
-			return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
-		} else if (entity instanceof Rabbit) {
-			return ((Rabbit) entity).getRabbitType().equals(Rabbit.Type.THE_KILLER_BUNNY);
-		} else if (entity instanceof Mob) {
-			LivingEntity target = ((Mob) entity).getTarget();
-			return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer") || entity.getScoreboardTags().contains("boss_hostile") || entity.getScoreboardTags().contains("Hostile");
+		} else if (mob instanceof Wolf wolf) {
+			if (wolf.isAngry() && wolf.getOwner() == null) {
+				return true;
+			}
+		} else if (mob instanceof Rabbit rabbit) {
+			if (rabbit.getRabbitType() == Rabbit.Type.THE_KILLER_BUNNY) {
+				return true;
+			}
 		}
 
-		return false;
+		if (mob.getTarget() instanceof Player) {
+			return true;
+		}
+		return mob.getScoreboardTags().contains("Hostile");
 	}
 
 	public static boolean isFireResistant(LivingEntity mob) {

@@ -27,6 +27,8 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
 
+		boss.addScoreboardTag("Hostile");
+
 		if (boss instanceof Wolf || boss instanceof Golem || boss instanceof Dolphin || boss instanceof Ocelot) {
 			boss.setRemoveWhenFarAway(true);
 		}
