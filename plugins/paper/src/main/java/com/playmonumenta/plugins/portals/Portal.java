@@ -229,6 +229,10 @@ public class Portal {
 			return;
 		}
 
+		if (mLocation1.getWorld() != mLocation2.getWorld()) {
+			return;
+		}
+
 		double halfHeight = entity.getHeight() / 2;
 		Location location = entity.getLocation().clone();
 		Vector direction = location.getDirection();
