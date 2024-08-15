@@ -49,7 +49,9 @@ public class DungeonUtils {
 		PORTAL(Location.SCIENCE, "portal", "DPSAccess", "DPSFinished", null, -1, null, null, "ring"),
 		GALLERY(Location.GALLERYOFFEAR, "gallery", "DGAccess", "DGFinished", null, -1, "DGType", null, "ring"),
 		GODSPORE(Location.GODSPORE, null, "GodsporeAccess", null, null, -1, null, null, "ring"),
-		ZENITH(Location.ZENITH, "zenith", "DCZAccess", "DCZFinished", null, -1, null, null, "ring");
+		ZENITH(Location.ZENITH, "zenith", "DCZAccess", "DCZFinished", null, -1, null, null, "ring"),
+		HEXFALL(Location.HEXFALL, "hexfall", "DHFAccess", "DHFFinished", "DHFStartDate", -1, null, null, "ring"),
+		;
 
 		private final Location mLocation;
 		private final @Nullable String mShardName;

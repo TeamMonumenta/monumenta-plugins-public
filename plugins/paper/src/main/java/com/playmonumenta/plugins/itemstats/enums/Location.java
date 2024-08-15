@@ -126,6 +126,7 @@ public enum Location {
 	MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
 	ZENITH("zenith", "The Celestial Zenith", TextColor.fromHexString("#FF9CF0")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
+	HEXFALL("hexfall", "Hexfall", TextColor.fromHexString("#A930DA")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
 	// bosses
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
