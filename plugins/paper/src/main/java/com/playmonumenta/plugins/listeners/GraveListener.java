@@ -113,10 +113,14 @@ public class GraveListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+		Player player = event.getPlayer();
+		if (player.getGameMode() == GameMode.SPECTATOR) {
+			return;
+		}
 		if (GraveManager.isGrave(event.getRightClicked())) {
 			event.setCancelled(true);
-			if (MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
-				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			if (MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
+				GraveManager.onInteract(player, event.getRightClicked());
 			}
 		}
 
@@ -128,10 +132,14 @@ public class GraveListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerInteractAtEntity(PlayerInteractAtEntityEvent event) {
+		Player player = event.getPlayer();
+		if (player.getGameMode() == GameMode.SPECTATOR) {
+			return;
+		}
 		if (GraveManager.isGrave(event.getRightClicked())) {
 			event.setCancelled(true);
-			if (MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
-				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			if (MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
+				GraveManager.onInteract(player, event.getRightClicked());
 			}
 		}
 	}
@@ -139,8 +147,10 @@ public class GraveListener implements Listener {
 	// handle cancelled events as we're only interested in the act of clicking/attacking the grave, and not whether the attack was successful
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void entityDamageByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player player
-			    && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
+		if (!(event.getDamager() instanceof Player player) || player.getGameMode() == GameMode.SPECTATOR) {
+			return;
+		}
+		if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
 			    && GraveManager.isGrave(event.getEntity())
 			    && MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
 			event.setCancelled(true);
