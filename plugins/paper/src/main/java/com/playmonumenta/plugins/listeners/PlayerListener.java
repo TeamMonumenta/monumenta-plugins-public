@@ -421,7 +421,33 @@ public class PlayerListener implements Listener {
 			    && item.getType() == Material.TRIDENT
 			    && item.containsEnchantment(Enchantment.RIPTIDE)
 			    && playerHasDepthStrider(player)) {
-			Bukkit.getScheduler().runTask(mPlugin, player::updateInventory);
+
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				PlayerUtils.resendItems(player,
+					Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD)
+						.filter(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER))
+						.toArray(EquipmentSlot[]::new));
+			});
+
+			// Update inventory again after riptiding (or aborting) to re-add the removed depth strider
+			if (player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) && playerHasDepthStrider(player)) {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (!player.isOnline() || player.isDead()) {
+							cancel();
+							return;
+						}
+						if (!player.isHandRaised() && !player.isRiptiding()) {
+							PlayerUtils.resendItems(player,
+								Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD)
+									.filter(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER))
+									.toArray(EquipmentSlot[]::new));
+							cancel();
+						}
+					}
+				}.runTaskTimer(mPlugin, 2, 1);
+			}
 		}
 
 	}
@@ -1196,22 +1222,6 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mItemStatManager.onRiptide(mPlugin, player, event);
 
-		// Update inventory after riptiding to re-add the virtually removed depth strider while riptiding
-		if (player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) && playerHasDepthStrider(player)) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (!player.isOnline() || player.isDead()) {
-						cancel();
-						return;
-					}
-					if (!player.isRiptiding()) {
-						player.updateInventory();
-						cancel();
-					}
-				}
-			}.runTaskTimer(mPlugin, 1, 1);
-		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

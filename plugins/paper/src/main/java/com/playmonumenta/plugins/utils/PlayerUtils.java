@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.utils;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -54,6 +57,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -706,4 +710,22 @@ public class PlayerUtils {
 			}
 		}
 	}
+
+	/**
+	 * Forces an update of specific items in the player's inventory. Similar to {@link Player#updateInventory()}, but offers better performance when only a few items should be updated.
+	 */
+	public static void resendItems(Player player, EquipmentSlot... slots) {
+		for (EquipmentSlot slot : slots) {
+			int packetSlotId = switch (slot) {
+				case HAND, OFF_HAND -> 45;
+				case FEET -> 8;
+				case LEGS -> 7;
+				case CHEST -> 6;
+				case HEAD -> 5;
+			};
+			PacketPlayOutSetSlotHandle packet = PacketPlayOutSetSlotHandle.createNew(0, packetSlotId, ItemUtils.clone(player.getInventory().getItem(slot)));
+			ProtocolLibrary.getProtocolManager().sendServerPacket(player, PacketContainer.fromPacket(packet.getRaw()), true);
+		}
+	}
+
 }
