@@ -171,7 +171,7 @@ public class MarketCommands {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				MarketListingIndex.resyncAllIndexes(player);
+				MarketListingIndex.resyncAllIndexes();
 				player.sendMessage("Synced all indexes");
 			})
 			.register();

@@ -164,14 +164,17 @@ public class TabBuyListing implements MarketGuiTab {
 					if (MarketGui.initiatePlayerAction(mGui.mPlayer)) {
 						return;
 					}
-					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-						if (mGui.mFocusedListing != null) {
-							MarketManager.performPurchase(mGui.mPlayer, mGui.mFocusedListing, mBuyListingMultiplier);
-						}
+					Runnable endAction = () -> {
 						mGui.mIsLoadingData = 2;
 						MarketGui.endPlayerAction(mGui.mPlayer);
 						mGui.update();
-					});
+					};
+					if (mGui.mFocusedListing != null) {
+						Runnable cancelAction = () -> MarketGui.endPlayerAction(mGui.mPlayer);
+						MarketManager.performPurchase(mGui.mPlayer, mGui.mFocusedListing, mBuyListingMultiplier, cancelAction, endAction);
+					} else {
+						endAction.run();
+					}
 				});
 		} else {
 			mGui.setItem(4, 5, new GuiItem(GUIUtils.createExclamation(errorLoreLines), false));
@@ -192,7 +195,9 @@ public class TabBuyListing implements MarketGuiTab {
 					.onClick((clickEvent) -> {
 						Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 							if (mGui.mFocusedListing != null) {
-								MarketManager.unexpireListing(mGui.mPlayer, mGui.mFocusedListing);
+								if (!MarketManager.unexpireListing(mGui.mPlayer, mGui.mFocusedListing)) {
+									mGui.mPlayer.sendMessage(Component.text("Failed to un-expire listing, please retry momentarily.", NamedTextColor.RED));
+								}
 							}
 							mGui.mIsLoadingData = 2;
 							mGui.update();
@@ -209,7 +214,9 @@ public class TabBuyListing implements MarketGuiTab {
 						.onClick((clickEvent) -> {
 							Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 								if (mGui.mFocusedListing != null) {
-									MarketManager.unlockListing(mGui.mPlayer, mGui.mFocusedListing);
+									if (!MarketManager.unlockListing(mGui.mPlayer, mGui.mFocusedListing)) {
+										mGui.mPlayer.sendMessage(Component.text("Failed to unlock listing, please retry momentarily.", NamedTextColor.RED));
+									}
 								}
 								mGui.mIsLoadingData = 2;
 								mGui.update();
@@ -224,7 +231,9 @@ public class TabBuyListing implements MarketGuiTab {
 						.onClick((clickEvent) -> {
 							Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 								if (mGui.mFocusedListing != null) {
-									MarketManager.lockListing(mGui.mPlayer, mGui.mFocusedListing);
+									if (!MarketManager.lockListing(mGui.mPlayer, mGui.mFocusedListing)) {
+										mGui.mPlayer.sendMessage(Component.text("Failed to lock listing, please retry momentarily.", NamedTextColor.RED));
+									}
 								}
 								mGui.mIsLoadingData = 2;
 								mGui.update();
@@ -241,7 +250,9 @@ public class TabBuyListing implements MarketGuiTab {
 					.onClick((clickEvent) -> {
 						Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 							if (mGui.mFocusedListing != null) {
-								MarketManager.expireListing(mGui.mPlayer, mGui.mFocusedListing, "manual expiry");
+								if (!MarketManager.expireListing(mGui.mPlayer, mGui.mFocusedListing, "manual expiry")) {
+									mGui.mPlayer.sendMessage(Component.text("Failed to expire listing, please retry momentarily.", NamedTextColor.RED));
+								}
 							}
 							mGui.mIsLoadingData = 2;
 							mGui.update();
@@ -263,7 +274,9 @@ public class TabBuyListing implements MarketGuiTab {
 					}
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 						if (mGui.mFocusedListing != null) {
-							MarketManager.claimEverythingAndDeleteListing(mGui.mPlayer, mGui.mFocusedListing);
+							if (!MarketManager.claimEverythingAndDeleteListing(mGui.mPlayer, mGui.mFocusedListing.getId())) {
+								mGui.mPlayer.sendMessage(Component.text("Failed to delete listing, please retry momentarily.", NamedTextColor.RED));
+							}
 						}
 						MarketGui.endPlayerAction(mGui.mPlayer);
 					});

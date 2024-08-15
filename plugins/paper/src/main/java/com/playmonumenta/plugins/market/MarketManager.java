@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -44,6 +45,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class MarketManager {
 
@@ -79,86 +81,98 @@ public class MarketManager {
 		return MarketManager.getInstance().mConfig;
 	}
 
-	public static void claimClaimable(Player player, MarketListing listing) {
+	public static boolean claimClaimable(Player player, long id) {
 		// WARNING: Call this in an async thread
-		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
+		MarketListing oldListing = MarketRedisManager.getListing(id);
 		if (oldListing.getAmountToClaim() == 0) {
 			// nothing to claim
-			return;
+			return false;
 		}
-		MarketListing newListing = new MarketListing(oldListing);
-		int amountToGive = oldListing.getAmountToClaim() * oldListing.getAmountToBuy();
-		newListing.setAmountToClaim(0);
-		if (!MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
-			return;
+		if (oldListing.getEditLocked() != null) {
+			return false;
 		}
+		MarketRedisManager.EditedListing editedListing = MarketRedisManager.atomicEditListing2(id, l -> l.setAmountToClaim(0));
+		if (editedListing == null) {
+			return false;
+		}
+		MarketListing listingBeforeUpdate = editedListing.mBeforeEdit();
+		int amountToGive = listingBeforeUpdate.getAmountToClaim() * listingBeforeUpdate.getAmountToBuy();
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			WalletManager.giveCurrencyToPlayer(player, listing.getCurrencyToBuy().asQuantity(amountToGive), true);
+			WalletManager.giveCurrencyToPlayer(player, listingBeforeUpdate.getCurrencyToBuy().asQuantity(amountToGive), true);
 		});
-		MarketAudit.logClaim(player, listing, amountToGive);
+		MarketAudit.logClaim(player, listingBeforeUpdate, amountToGive);
+		return true;
 	}
 
-	public static void unlockListing(Player player, MarketListing listing) {
+	public static boolean unlockListing(Player player, MarketListing listing) {
 		// WARNING: Call this in an async thread
-		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
-		MarketListing newListing = new MarketListing(oldListing);
-		newListing.setLocked(false);
-		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
+		MarketListing newListing = MarketRedisManager.atomicEditListing(listing.getId(), l -> l.setLocked(false));
+		if (newListing == null) {
+			return false;
+		}
 		MarketListingIndex.ACTIVE_LISTINGS.addListingToIndexIfMatching(newListing);
 		MarketAudit.logUnlockAction(player, listing);
+		return true;
 	}
 
-	public static void lockListing(Player player, MarketListing listing) {
+	public static boolean lockListing(Player player, MarketListing listing) {
 		// WARNING: Call this in an async thread
-		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
-		MarketListing newListing = new MarketListing(oldListing);
-		newListing.setLocked(true);
-		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
+		MarketListing newListing = MarketRedisManager.atomicEditListing(listing.getId(), l -> l.setLocked(true));
+		if (newListing == null) {
+			return false;
+		}
 		MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(newListing);
 		MarketAudit.logLockAction(player, listing);
+		return true;
 	}
 
-	public static void claimEverythingAndDeleteListing(Player player, MarketListing listing) {
+	public static boolean claimEverythingAndDeleteListing(Player player, long id) {
 		// WARNING: Call this in an async thread
-		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
-		MarketListing newListing = new MarketListing(oldListing);
-		int currencyToGive = oldListing.getAmountToClaim() * oldListing.getAmountToBuy();
-		int itemsToGive = oldListing.getAmountToSellRemaining() * oldListing.getBundleSize();
-		newListing.setAmountToClaim(0);
-		newListing.setAmountToSellRemaining(0);
-		if (MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
-			MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(player);
-			if (marketPlayerData != null) {
-				marketPlayerData.removeListingIDFromPlayer(newListing.getId());
-			}
-			MarketRedisManager.deleteListing(newListing);
-			MarketManager.getInstance().unlinkListingFromPlayerData(player, newListing.getId());
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				WalletManager.giveCurrencyToPlayer(player, newListing.getCurrencyToBuy().asQuantity(currencyToGive), true);
-				InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToSell().asQuantity(itemsToGive));
-			});
-			MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
+		MarketRedisManager.EditedListing editedListing = MarketRedisManager.atomicEditListing2(id, l -> {
+			l.setAmountToClaim(0);
+			l.setAmountToSellRemaining(0);
+		});
+		if (editedListing == null) {
+			return false;
 		}
+		MarketListing listingBeforeUpdate = editedListing.mBeforeEdit();
+		MarketListing newListing = editedListing.mAfterEdit();
+		int currencyToGive = listingBeforeUpdate.getAmountToClaim() * listingBeforeUpdate.getAmountToBuy();
+		int itemsToGive = listingBeforeUpdate.getAmountToSellRemaining() * listingBeforeUpdate.getBundleSize();
+		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(player);
+		if (marketPlayerData != null) {
+			marketPlayerData.removeListingIDFromPlayer(newListing.getId());
+		}
+		MarketRedisManager.deleteListing(newListing);
+		getInstance().unlinkListingFromPlayerData(player, newListing.getId());
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			WalletManager.giveCurrencyToPlayer(player, newListing.getCurrencyToBuy().asQuantity(currencyToGive), true);
+			InventoryUtils.giveItemWithStacksizeCheck(player, newListing.getItemToSell().asQuantity(itemsToGive));
+		});
+		MarketAudit.logClaimAndDelete(player, newListing, itemsToGive, currencyToGive);
+		return true;
 	}
 
-	public static void expireListing(Player player, MarketListing listing, String reason) {
+	public static boolean expireListing(Player player, MarketListing listing, String reason) {
 		// WARNING: Call this in an async thread
-		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
-		MarketListing newListing = new MarketListing(oldListing);
-		newListing.setExpired(true);
-		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
+		MarketListing newListing = MarketRedisManager.atomicEditListing(listing.getId(), l -> l.setExpired(true));
+		if (newListing == null) {
+			return false;
+		}
 		MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(newListing);
 		MarketAudit.logExpire(player, listing, reason);
+		return true;
 	}
 
-	public static void unexpireListing(Player player, MarketListing listing) {
+	public static boolean unexpireListing(Player player, MarketListing listing) {
 		// WARNING: Call this in an async thread
-		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
-		MarketListing newListing = new MarketListing(oldListing);
-		newListing.setExpired(false);
-		MarketRedisManager.updateListingSafe(player, oldListing, newListing);
+		MarketListing newListing = MarketRedisManager.atomicEditListing(listing.getId(), l -> l.setExpired(false));
+		if (newListing == null) {
+			return false;
+		}
 		MarketListingIndex.ACTIVE_LISTINGS.addListingToIndexIfMatching(newListing);
 		MarketAudit.logUnexpire(player, listing);
+		return true;
 	}
 
 	public static List<String> itemIsSellable(Player mPlayer, ItemStack currentItem, ItemStack currency) {
@@ -258,24 +272,26 @@ public class MarketManager {
 	public static void lockAllListings(Player player) {
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			player.sendMessage("Resyncing all indexes");
-			MarketListingIndex.resyncAllIndexes(player);
+			MarketListingIndex.resyncAllIndexes();
 			player.sendMessage("Fetching listing list");
 			List<Long> listings = MarketListingIndex.ACTIVE_LISTINGS.getListingsFromIndex(false);
 			player.sendMessage("Going through the " + listings.size() + "active listings");
 			int amountLocked = 0;
 			int amountErrors = 0;
 			for (Long id : listings) {
-				MarketListing oldListing = MarketRedisManager.getListing(id);
+				String oldListingRaw = MarketRedisManager.getListingRaw(id);
+				MarketListing oldListing = MarketRedisManager.parseListing(oldListingRaw);
 				MarketListing newListing = new MarketListing(oldListing);
 				newListing.setLocked(true);
-				if (MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
+				if (oldListing.getEditLocked() == null
+					    && MarketRedisManager.atomicCompareAndSwapListing(oldListingRaw, newListing)) {
 					amountLocked++;
 				} else {
 					amountErrors++;
 				}
 			}
 			player.sendMessage("Resyncing all indexes");
-			MarketListingIndex.resyncAllIndexes(player);
+			MarketListingIndex.resyncAllIndexes();
 			player.sendMessage(Component.text("LockAll action finished", NamedTextColor.GREEN));
 			player.sendMessage(amountLocked + " listings locked");
 			MarketAudit.logLockAllAction(player, amountLocked);
@@ -357,11 +373,13 @@ public class MarketManager {
 			// get a fresh version of the listing
 			listing = MarketRedisManager.getListing(listing.getId());
 			if (listing.isExpired()) {
-				claimEverythingAndDeleteListing(player, listing);
-				listingsExpired++;
+				if (claimEverythingAndDeleteListing(player, listing.getId())) {
+					listingsExpired++;
+				}
 			} else if (listing.getAmountToClaim() > 0) {
-				claimClaimable(player, listing);
-				listingsClaimed++;
+				if (claimClaimable(player, listing.getId())) {
+					listingsClaimed++;
+				}
 			}
 		}
 
@@ -566,63 +584,82 @@ public class MarketManager {
 		MarketAudit.logCreate(player, createdListing, taxDebt);
 	}
 
-	public static void performPurchase(Player player, MarketListing listing, int tradeMultAmount) {
-		// WARNING: Call this in an async thread
-
-		MarketListing oldListing = MarketRedisManager.getListing(listing.getId());
-		MarketListing newListing = new MarketListing(oldListing);
-
-		// buyability checks
-		MarketListingStatus purchasableStatus = oldListing.getPurchasableStatus(tradeMultAmount);
-		if (purchasableStatus.isError()) {
-			player.sendMessage(purchasableStatus.getFormattedAssociatedMessage());
-			return;
-		}
-
-		ItemStack currency = oldListing.getCurrencyToBuy().clone();
-		currency.setAmount(oldListing.getAmountToBuy() * tradeMultAmount);
+	private static @Nullable WalletUtils.Debt checkCanAfford(Player player, MarketListing listing, int tradeMultAmount) {
+		ItemStack currency = listing.getCurrencyToBuy().clone();
+		currency.setAmount(listing.getAmountToBuy() * tradeMultAmount);
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, player, true);
-
 		if (!debt.mMeetsRequirement) {
 			player.sendMessage(Component.text("You don't have enough currency to purchase this."));
+			return null;
+		}
+		return debt;
+	}
+
+	public static void performPurchase(Player player, MarketListing originalListing, int tradeMultAmount, Runnable onCancel, Runnable afterComplete) {
+
+		// Initial inventory + wallet check (on main thread)
+		// A second check is run just before the payment is actually deducted from the player
+		if (checkCanAfford(player, originalListing, tradeMultAmount) == null) {
+			onCancel.run();
 			return;
 		}
 
-		// update the listing in redis
-		newListing.setAmountToSellRemaining(oldListing.getAmountToSellRemaining() - tradeMultAmount);
-		newListing.setAmountToClaim(oldListing.getAmountToClaim() + tradeMultAmount);
-		if (!MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
-			player.sendMessage(Component.text("Impossible to buy listing: Update failed"));
-			return;
-		}
-
-		if (newListing.getPurchasableStatus(1).isError()) {
-			// the new listing values makes it so the listing is not able to be bought anymore
-			// remove it from the active_listings index, does not need to be instant.
-			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(listing);
-			});
-		}
-
-		// give items to player
-		int amountToGive = tradeMultAmount * oldListing.getBundleSize();
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(), () -> {
-			int inInventory = InventoryUtils.numInInventory(player.getInventory(), debt.mItem);
-			long inWallet = WalletManager.getWallet(player).count(debt.mItem);
-			if (debt.mInventoryDebt > inInventory || debt.mWalletDebt > inWallet) {
-				AuditListener.logSevere("Player " + player.getName() + " paid for a '" + oldListing.getItemName() + "' in the market, " +
-					                        "but did not have enough currency when the transaction completed. A total of "
-					                        + (Math.max(0, debt.mInventoryDebt - inInventory) + Math.max(0, debt.mWalletDebt - inWallet)) + " "
-					                        + ItemUtils.getPlainNameOrDefault(debt.mItem) + " have been duped! Check market logs for more transaction details.");
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			// Grab an up-to-date edit-locked listing from Redis asynchronously
+			long startTimestamp = System.currentTimeMillis();
+			String editLockedString = player.getName() + "-" + startTimestamp;
+			MarketListing lockedListing = MarketRedisManager.atomicEditListing(originalListing.getId(), l -> l.setEditLocked(editLockedString));
+			if (lockedListing == null) {
+				player.sendMessage(Component.text("Failed to purchase from this listing, please retry momentarily.", NamedTextColor.RED));
+				onCancel.run();
+				return;
 			}
-			WalletUtils.payDebt(debt, player, true);
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				InventoryUtils.giveItemWithStacksizeCheck(player, oldListing.getItemToSell().asQuantity(amountToGive));
-			});
-			player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.7f);
-			MarketAudit.logBuyAction(player, oldListing, amountToGive, debt.mTotalRequiredAmount, debt.mItem);
-		});
 
+			// Check if the listing can still be bought, unlock and abort if not
+			MarketListingStatus purchasableStatus = lockedListing.getPurchasableStatus(tradeMultAmount);
+			if (purchasableStatus.isError()) {
+				MarketRedisManager.removeEditLockAndUpdateListing(lockedListing);
+				player.sendMessage(purchasableStatus.getFormattedAssociatedMessage());
+				onCancel.run();
+				return;
+			}
+
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(), () -> {
+				// Pay cost and give items to player on main thread
+
+				WalletUtils.Debt debt = checkCanAfford(player, lockedListing, tradeMultAmount);
+				if (debt == null) {
+					// If the player doesn't have enough currency anymore, unlock the listing and abort
+					MarketRedisManager.removeEditLockAndUpdateListing(lockedListing);
+					onCancel.run();
+					return;
+				}
+				WalletUtils.payDebt(debt, player, true);
+
+				int amountToGive = tradeMultAmount * lockedListing.getBundleSize();
+				InventoryUtils.giveItemWithStacksizeCheck(player, lockedListing.getItemToSell().asQuantity(amountToGive));
+
+				player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.7f);
+
+				MarketAudit.logBuyAction(player, lockedListing, amountToGive, debt.mTotalRequiredAmount, debt.mItem);
+
+				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+					// Finally, update and unlock the listing async
+					lockedListing.setAmountToSellRemaining(lockedListing.getAmountToSellRemaining() - tradeMultAmount);
+					lockedListing.setAmountToClaim(lockedListing.getAmountToClaim() + tradeMultAmount);
+					MarketRedisManager.removeEditLockAndUpdateListing(lockedListing);
+
+					Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(), afterComplete);
+
+					// If the new listing values makes it so that the listing cannot be bought anymore,
+					// remove it from the active_listings index. This does not need to be instant and thus is done at the end.
+					if (lockedListing.getPurchasableStatus(1).isError()) {
+						MarketListingIndex.ACTIVE_LISTINGS.removeListingFromIndex(lockedListing);
+					}
+
+				});
+			});
+		});
 	}
 
 	public void linkListingToPlayerData(Player player, long listingID) {
@@ -683,16 +720,17 @@ public class MarketManager {
 		return debt;
 	}
 
-	public boolean editListing(Player player, boolean delete, MarketListing oldListing, MarketListing newListing) {
+	public boolean editListing(Player player, MarketListing oldListing, boolean delete, Consumer<MarketListing> updater) {
 		// WARNING: Call this in an async thread
 
 		if (delete) {
-			claimEverythingAndDeleteListing(player, oldListing);
-			return true;
+			return claimEverythingAndDeleteListing(player, oldListing.getId());
 		}
 
 		List<String> errors = new ArrayList<>();
 
+		MarketListing newListing = new MarketListing(oldListing);
+		updater.accept(newListing);
 		if (oldListing.isSimilar(newListing)) {
 			errors.add("No edits detected! Make some changes!");
 		}
@@ -706,12 +744,11 @@ public class MarketManager {
 			return false;
 		} else {
 			// no errors found, proceed with the edit
-			if (!MarketRedisManager.updateListingSafe(player, oldListing, newListing)) {
-				player.sendMessage("Listing " + newListing.getId() + " failed to be edited. This shouldn't happen.");
-				MMLog.severe("Listing " + newListing.getId() + " failed to be edited. This shouldn't happen.");
-				AuditListener.logMarket("Listing " + newListing.getId() + " failed to be edited. This shouldn't happen.");
-				return false;
 
+			newListing = MarketRedisManager.atomicEditListing(oldListing.getId(), updater);
+			if (newListing == null) {
+				player.sendMessage("Failed to edit listing, please retry momentarily.");
+				return false;
 			}
 
 			// redis edit ok

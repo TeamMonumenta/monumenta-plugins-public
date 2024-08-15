@@ -212,14 +212,18 @@ public class TabPlayerListings implements MarketGuiTab {
 			case RIGHT:
 				if (listing.getAmountToClaim() != 0) {
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-						MarketManager.claimClaimable(mPlayer, listing);
+						if (!MarketManager.claimClaimable(mPlayer, listing.getId())) {
+							mPlayer.sendMessage(Component.text("Failed to claim from listing, please retry momentarily.", NamedTextColor.RED));
+						}
 						mLoadingStatus = 0;
 						MarketGui.endPlayerAction(mPlayer);
 						mGui.update();
 					});
 				} else if (listing.isExpired() || (listing.getAmountToClaim() == 0 && listing.getAmountToSellRemaining() == 0)) {
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-						MarketManager.claimEverythingAndDeleteListing(mPlayer, listing);
+						if (!MarketManager.claimEverythingAndDeleteListing(mPlayer, listing.getId())) {
+							mPlayer.sendMessage(Component.text("Failed to delete listing, please retry momentarily.", NamedTextColor.RED));
+						}
 						mLoadingStatus = 0;
 						MarketGui.endPlayerAction(mPlayer);
 						mGui.update();

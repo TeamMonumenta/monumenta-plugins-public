@@ -29,15 +29,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class TabBazaarBrowser implements MarketGuiTab {
 
-	MarketGui mGui;
-
 	static final Component TAB_TITLE = Component.text("Market Browser - Bazaar");
 	static final int TAB_SIZE = 6 * 9;
 
-	public TabBazaarBrowser(MarketGui marketGUI) {
-		this.mGui = marketGUI;
-		this.mPlayer = mGui.mPlayer;
-	}
+	MarketGui mGui;
 
 	Player mPlayer;
 	int mLoadingStatus;
@@ -53,6 +48,11 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	List<MarketListingIndex> mLoadedSortbyIndexes = MarketListingIndex.getAllPlayerSortable();
 	int mSelectedSortByIndex;
 	boolean mSortByDesc;
+
+	public TabBazaarBrowser(MarketGui marketGUI) {
+		this.mGui = marketGUI;
+		this.mPlayer = mGui.mPlayer;
+	}
 
 	@Override
 	public void setup() {
@@ -354,7 +354,6 @@ public class TabBazaarBrowser implements MarketGuiTab {
 
 		mQuicksearchValue = null;
 
-		mLoadedSortbyIndexes = MarketListingIndex.getAllPlayerSortable();
 		mSortByDesc = true;
 
 		mLoadingStatus = 0;

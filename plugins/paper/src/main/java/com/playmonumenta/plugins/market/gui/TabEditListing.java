@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.market.MarketListing;
 import com.playmonumenta.plugins.market.MarketManager;
-import com.playmonumenta.plugins.market.MarketRedisManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
@@ -18,28 +17,23 @@ import org.bukkit.inventory.ItemStack;
 
 public class TabEditListing implements MarketGuiTab {
 
-	MarketGui mGui;
-
 	static final Component TAB_TITLE = Component.text("Edit Listing");
 	static final int TAB_SIZE = 6 * 9;
+
+	MarketGui mGui;
+
+	MarketListing mOldListing;
+
+	boolean mMarkedForDeletion;
+	boolean mLocked;
 
 	public TabEditListing(MarketGui marketGUI) {
 		this.mGui = marketGUI;
 		this.mOldListing = new MarketListing(0L);
-		this.mNewListing = new MarketListing(0L);
 	}
-
-	MarketListing mOldListing;
-	MarketListing mNewListing;
-
-	boolean mMarkedForDeletion;
 
 	@Override
 	public void setup() {
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			mOldListing = MarketRedisManager.getListing(mOldListing.getId());
-		});
-
 		mGui.setItem(0, 0, MarketGuiIcons.BACK_TO_MAIN_MENU).onClick((clickEvent) -> mGui.switchToTab(mGui.TAB_MAIN_MENU));
 
 		mGui.setItem(0, 4, mOldListing.getItemToSell());
@@ -49,7 +43,7 @@ public class TabEditListing implements MarketGuiTab {
 
 		if (!mOldListing.isExpired()) {
 			mGui.setItem(2, 1, buildEditListingToggleVisibility())
-				.onClick((clickEvent) -> actionSetLocked());
+				.onClick((clickEvent) -> actionToggleLocked());
 		}
 
 		mGui.setItem(4, 1, buildToggleMarkedForDeletion())
@@ -63,7 +57,7 @@ public class TabEditListing implements MarketGuiTab {
 			Component.text("Click to toggle the listing's visibility.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		));
 
-		if (mNewListing.isLocked()) {
+		if (mLocked) {
 			lore.addAll(
 				List.of(
 					Component.text("This listing is currently ", NamedTextColor.GRAY).append(Component.text("Invisible", NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false),
@@ -93,11 +87,11 @@ public class TabEditListing implements MarketGuiTab {
 			lore.addAll(calculateMarkedForDeletionLoreLines());
 		} else {
 
-			if (mOldListing.isLocked() != mNewListing.isLocked()) {
+			if (mOldListing.isLocked() != mLocked) {
 				lore.add(
 					mOldListing.getVisibilityAsDisplayableComponent()
 						.append(MarketGuiIcons.GRAY_ARROW)
-						.append(mNewListing.getVisibilityAsDisplayableComponent())
+						.append(MarketListing.getVisibilityAsDisplayableComponent(mLocked))
 				);
 			}
 
@@ -157,7 +151,7 @@ public class TabEditListing implements MarketGuiTab {
 					.decoration(TextDecoration.ITALIC, false));
 			}
 		} else {
-			lore.add(Component.text("There is no items left to claim", NamedTextColor.GRAY));
+			lore.add(Component.text("There are no items left to claim", NamedTextColor.GRAY));
 		}
 		lore.add(Component.text("This will then delete the listing", NamedTextColor.GRAY));
 		return lore;
@@ -168,7 +162,8 @@ public class TabEditListing implements MarketGuiTab {
 			return;
 		}
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			boolean editOk = MarketManager.getInstance().editListing(mGui.mPlayer, mMarkedForDeletion, mOldListing, mNewListing);
+			boolean editOk = MarketManager.getInstance().editListing(mGui.mPlayer, mOldListing, mMarkedForDeletion,
+				listing -> listing.setLocked(mLocked));
 			if (editOk) {
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 					MarketGui.endPlayerAction(mGui.mPlayer);
@@ -181,8 +176,8 @@ public class TabEditListing implements MarketGuiTab {
 		});
 	}
 
-	private void actionSetLocked() {
-		mNewListing.setLocked(!mNewListing.isLocked());
+	private void actionToggleLocked() {
+		mLocked = !mLocked;
 		mGui.update();
 	}
 
@@ -195,10 +190,7 @@ public class TabEditListing implements MarketGuiTab {
 			return;
 		}
 		mOldListing = new MarketListing(mGui.mFocusedListing);
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			mOldListing = MarketRedisManager.getListing(mOldListing.getId());
-		});
-		mNewListing = new MarketListing(mGui.mFocusedListing);
+		mLocked = mGui.mFocusedListing.isLocked();
 
 		mMarkedForDeletion = false;
 	}

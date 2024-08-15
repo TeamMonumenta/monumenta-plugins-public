@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public enum MarketListingIndex {
@@ -262,7 +261,7 @@ public enum MarketListingIndex {
 
 	}
 
-	public static void resyncAllIndexes(Player player) {
+	public static void resyncAllIndexes() {
 
 		// init
 		HashMap<MarketListingIndex, HashMap<String, ArrayList<Long>>> indexValuesMap = new HashMap<>();
@@ -284,11 +283,13 @@ public enum MarketListingIndex {
 			for (String json : map.values()) {
 				MarketListing listing = new Gson().fromJson(json, MarketListing.class);
 				// maybe some indexed fields changed their definition. recalculate, and update on the redis side if something got changed
-				MarketListing updatedListing = new MarketListing(listing);
-				updatedListing.recalculateListingIndexValues();
-				if (!listing.isSimilar(updatedListing)) {
-					if (MarketRedisManager.updateListingSafe(player, listing, updatedListing)) {
-						listing = updatedListing;
+				if (listing.getEditLocked() == null) {
+					MarketListing updatedListing = new MarketListing(listing);
+					updatedListing.recalculateListingIndexValues();
+					if (!listing.isSimilar(updatedListing)) {
+						if (MarketRedisManager.atomicCompareAndSwapListing(json, updatedListing)) {
+							listing = updatedListing;
+						}
 					}
 				}
 

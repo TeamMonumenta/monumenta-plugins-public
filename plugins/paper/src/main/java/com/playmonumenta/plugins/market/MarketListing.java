@@ -522,7 +522,7 @@ public class MarketListing {
 		return mEditLocked;
 	}
 
-	public void setEditLocked(String checkKey) {
+	public void setEditLocked(@Nullable String checkKey) {
 		this.mEditLocked = checkKey;
 	}
 
@@ -535,7 +535,12 @@ public class MarketListing {
 	}
 
 	public Component getVisibilityAsDisplayableComponent() {
-		return (this.isLocked() ? Component.text("Invisible", NamedTextColor.RED) : Component.text("Visible", NamedTextColor.GREEN)).decoration(TextDecoration.ITALIC, false);
+		return getVisibilityAsDisplayableComponent(this.isLocked());
+	}
+
+	public static Component getVisibilityAsDisplayableComponent(boolean locked) {
+		return (locked ? Component.text("Invisible", NamedTextColor.RED) : Component.text("Visible", NamedTextColor.GREEN))
+			       .decoration(TextDecoration.ITALIC, false);
 	}
 
 	public LocalDateTime getExpirationDateTime() {

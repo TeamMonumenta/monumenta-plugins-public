@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.KeyValue;
+import io.lettuce.core.ScriptOutputType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,8 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -81,8 +81,10 @@ public class MarketRedisManager {
 		return RedisAPI.getInstance().sync().incr(getListingCurrentIDRedisPath());
 	}
 
-	// updates (or creates) a listing in redis
-	public static boolean updateListing(MarketListing listing) {
+	/**
+	 * Updates (or creates) a listing in redis. Does not check if the listing is currently locked!
+	 */
+	private static boolean updateListing(MarketListing listing) {
 
 		String json = listing.toJsonString();
 		String id = String.valueOf(listing.getId());
@@ -91,46 +93,93 @@ public class MarketRedisManager {
 		return true;
 	}
 
-	public static boolean updateListingSafe(Player player, MarketListing oldListing, MarketListing newListing) {
-		long startTimestamp = System.currentTimeMillis();
-		String editLockedString = player.getName() + "-" + startTimestamp;
-		// fetch the listing
-		MarketListing tempListing = getListing(oldListing.getId());
-		// we expect the fetched listing to exactly equal the listing before update, and that its not editlocked
-		if (!tempListing.isSimilar(oldListing)) {
-			player.sendMessage(Component.text("Update was not possible: listing is different than expected", NamedTextColor.RED));
-			return false;
+	private static @Nullable String mAtomicUpdateScriptHash = null;
+
+	/**
+	 * Performs an atomic compare-and-swap operation on a listing.
+	 *
+	 * @param expectedListing The raw value of the listing before any changes that is expected to be present in Redis
+	 * @param newListing      The new value of the listing with changes
+	 * @return Whether the swap was successful
+	 */
+	public static boolean atomicCompareAndSwapListing(String expectedListing, MarketListing newListing) {
+		if (mAtomicUpdateScriptHash == null) {
+			mAtomicUpdateScriptHash = RedisAPI.getInstance().sync().scriptLoad("""
+				local map = KEYS[1];
+				local id = ARGV[1];
+				local expectedJson = ARGV[2];
+				local newJson = ARGV[3];
+				if redis.call('HGET', map, id) == expectedJson then
+				    redis.call('HSET', map, id, newJson);
+				    return true;
+				end;
+				return false;
+				""");
 		}
-		if (tempListing.getEditLocked() != null) {
-			player.sendMessage(Component.text("Update was not possible: listing is editlocked by: " + tempListing.getEditLocked(), NamedTextColor.RED));
-			return false;
+
+		String newJson = newListing.toJsonString();
+		String id = String.valueOf(newListing.getId());
+
+		return RedisAPI.getInstance().sync().evalsha(mAtomicUpdateScriptHash, ScriptOutputType.BOOLEAN, new String[] {pathListingHashMap}, id, expectedListing, newJson);
+
+	}
+
+	/**
+	 * Atomically edits a listing and returns it. Waits up to a second for an existing lock to be released.
+	 *
+	 * @return The updated listing or {@code null} if the listing could not be edited
+	 */
+	public static @Nullable MarketListing atomicEditListing(long id, Consumer<MarketListing> updater) {
+		EditedListing editedListing = atomicEditListing2(id, updater);
+		return editedListing != null ? editedListing.mAfterEdit : null;
+	}
+
+	public record EditedListing(MarketListing mBeforeEdit, MarketListing mAfterEdit) {
+	}
+
+	/**
+	 * Same as {@link #atomicEditListing(long, Consumer)}, but returns both the listing from just before and after editing it.
+	 */
+	public static @Nullable EditedListing atomicEditListing2(long id, Consumer<MarketListing> updater) {
+
+		// try up to 5 times to edit the listing
+		for (int i = 0; i < 5; i++) {
+			String expectedListing = getListingRaw(id);
+			if (expectedListing == null) {
+				return null;
+			}
+			MarketListing newListing = parseListing(expectedListing);
+			if (newListing.getEditLocked() != null) {
+				// locked by someone else, try again shortly, but a maximum of twice
+				if (i >= 2) {
+					return null;
+				}
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					return null;
+				}
+				continue;
+			}
+			updater.accept(newListing);
+			if (atomicCompareAndSwapListing(expectedListing, newListing)) {
+				return new EditedListing(parseListing(expectedListing), newListing);
+			}
 		}
-		// editlock the listing
-		tempListing.setEditLocked(editLockedString);
-		updateListing(tempListing);
-		// refetch, to verify that It's still editlocked by the same player
-		MarketListing tempListing2 = getListing(oldListing.getId());
-		if (!tempListing2.isSimilar(tempListing)) {
-			player.sendMessage(Component.text("Update was not possible: value post-locking differs: " + tempListing2.getEditLocked(), NamedTextColor.RED));
-			return false;
-		}
-		// push the new listings, with the same editlocked
-		MarketListing tempListing3 = new MarketListing(newListing);
-		tempListing3.setEditLocked(editLockedString);
-		updateListing(tempListing3);
-		// refetch, to verify that It's still editlocked by the same player
-		MarketListing tempListing4 = getListing(oldListing.getId());
-		if (!tempListing4.isSimilar(tempListing3)) {
-			player.sendMessage(Component.text("Update was not possible: listing post-update is different than expected: " + tempListing2.getEditLocked(), NamedTextColor.RED));
-			return false;
-		}
-		// push the new listing, without the editlock
-		updateListing(newListing);
-		return true;
+
+		return null;
+	}
+
+	public static void removeEditLockAndUpdateListing(MarketListing listing) {
+		listing.setEditLocked(null);
+		updateListing(listing);
 	}
 
 	public static MarketListing getListing(long id) {
-		String json = getListingRaw(id);
+		return parseListing(getListingRaw(id));
+	}
+
+	public static MarketListing parseListing(String json) {
 		return new Gson().fromJson(json, MarketListing.class);
 	}
 
