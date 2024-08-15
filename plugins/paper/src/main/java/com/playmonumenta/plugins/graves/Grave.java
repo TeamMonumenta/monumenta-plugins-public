@@ -515,8 +515,12 @@ public final class Grave {
 						}
 					}
 					if (unshattered == 0) {
-						if (mEntity != null) {
+						if (mEntity != null && !mGraveMessageCooldown.contains(mUuid)) {
 							GravePoses.getEquippedGravePose(mPlayer).playAnimation(mEntity, player);
+							mGraveMessageCooldown.add(mUuid);
+							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+								mGraveMessageCooldown.remove(mUuid);
+							}, 60);
 						}
 						player.sendMessage(Component.text("You do not have any items on you that this grave could unshatter. ", NamedTextColor.AQUA)
 							                   .append(Component.text("Click here to delete this grave.", NamedTextColor.RED)
