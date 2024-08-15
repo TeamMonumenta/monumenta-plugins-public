@@ -17,8 +17,8 @@ import org.bukkit.entity.Player;
 
 public class CurseOfLust extends DepthsAbility {
 	public static final String ABILITY_NAME = "Curse of Lust";
-	public static final double MIN_BLOCKS = 5;
-	public static final double MAX_BLOCKS = 10;
+	public static final int MIN_BLOCKS = 5;
+	public static final int MAX_BLOCKS = 10;
 	public static final double DAMAGE_REDUCTION_PER_BLOCK = 0.08;
 
 	public static final DepthsAbilityInfo<CurseOfLust> INFO =
