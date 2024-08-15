@@ -359,12 +359,17 @@ public class AuditListener implements Listener {
 			return;
 		}
 
-		log(String.format(
+		boolean respawnStasis = StasisListener.isInRespawnStasis(player);
+		String msg = String.format(
 			"GameMode: %s | %s -> %s",
 			player.getName(),
 			oldGameMode,
 			newGameMode
-		));
+		);
+		if (respawnStasis) {
+			msg += " (In Respawn Stasis)";
+		}
+		log(msg);
 
 		checkDestroy(player);
 	}
