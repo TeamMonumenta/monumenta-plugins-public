@@ -401,9 +401,11 @@ public class DelvesManager implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
-		if (event.getEntity().getKiller() == null || !(getRank(event.getEntity().getKiller(), DelvesModifier.HAUNTED) > 0)) {
+		if (event.getEntity().getKiller() == null
+			    || !(getRank(event.getEntity().getKiller(), DelvesModifier.HAUNTED) > 0)
+			    || event.getEntity().getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			return;
 		}
 

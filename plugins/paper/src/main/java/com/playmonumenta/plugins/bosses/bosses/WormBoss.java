@@ -125,6 +125,7 @@ public class WormBoss extends BossAbilityGroup {
 			part = EntityUtils.copyMob(mBoss, spawnLocation);
 			part.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
 			part.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
+			part.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
 			int size = tail ? params.TAIL_SIZE : params.BODY_SIZE;
 			if (size >= 0) {
 				EntityUtils.setSize(part, size);

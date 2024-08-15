@@ -80,7 +80,8 @@ public class LootingLimiter implements Listener {
 			return;
 		}
 		LivingEntity entity = event.getEntity();
-		if (!EntityUtils.isHostileMob(entity)) {
+		if (!EntityUtils.isHostileMob(entity)
+			    || entity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			return;
 		}
 		Player player = entity.getKiller();

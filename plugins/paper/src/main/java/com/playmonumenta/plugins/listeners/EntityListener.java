@@ -97,6 +97,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.event.entity.EntityDismountEvent;
+import org.spigotmc.event.entity.EntityMountEvent;
 
 public class EntityListener implements Listener {
 	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
@@ -1007,6 +1008,14 @@ public class EntityListener implements Listener {
 	public void entityDismountEvent(EntityDismountEvent event) {
 		if (event.getDismounted() instanceof ArmorStand) {
 			event.getDismounted().remove();
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void entityMountEvent(EntityMountEvent event) {
+		if (event.getEntity().getScoreboardTags().contains(EntityUtils.DONT_ENTER_BOATS_TAG)
+			    && event.getMount() instanceof Boat) {
+			event.setCancelled(true);
 		}
 	}
 

@@ -208,6 +208,7 @@ public class EntityUtils {
 	 * Mobs with this tag don't trigger 'on death' effects from other mobs and players
 	 */
 	public static final String IGNORE_DEATH_TRIGGERS_TAG = "boss_no_death_triggers";
+	public static final String DONT_ENTER_BOATS_TAG = "boss_no_boat_riding";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();

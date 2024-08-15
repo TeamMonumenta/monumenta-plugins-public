@@ -36,6 +36,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -70,7 +71,7 @@ public class FishingCombatManager implements Listener {
 	private final LoSPool POOL_ELITE = new LoSPool.LibraryPool("~FishingEliteMobs");
 	private final HashMap<Player, FishingArena> mPlayerArenaMap = new HashMap<>();
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player player && mPlayerArenaMap.containsKey(player)) {

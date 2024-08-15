@@ -171,7 +171,9 @@ public class DepthsListener implements Listener {
 			return;
 		}
 
-		if (!ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG) && EntityUtils.isHostileMob(entity)) {
+		if (!ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG)
+			    && !ScoreboardUtils.checkTag(entity, EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)
+			    && EntityUtils.isHostileMob(entity)) {
 			dm.playerKilledMob(player);
 		}
 	}

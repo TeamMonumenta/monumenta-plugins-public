@@ -6,6 +6,7 @@ import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -397,12 +398,16 @@ public class MobListener implements Listener {
 		}
 
 		Player player = livingEntity.getKiller();
-		if (player != null && EntityUtils.isHostileMob(livingEntity)) {
+		if (player != null
+			    && EntityUtils.isHostileMob(livingEntity)
+			    && !livingEntity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			//  Player kills a mob
 			mPlugin.mItemStatManager.onKill(mPlugin, player, event, livingEntity);
-			AbilityManager.getManager().entityDeathEvent(player, event, shouldGenDrops);
-			for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true)) {
-				AbilityManager.getManager().entityDeathRadiusEvent(p, event, shouldGenDrops);
+			if (!livingEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+				AbilityManager.getManager().entityDeathEvent(player, event, shouldGenDrops);
+				for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true)) {
+					AbilityManager.getManager().entityDeathRadiusEvent(p, event, shouldGenDrops);
+				}
 			}
 		}
 

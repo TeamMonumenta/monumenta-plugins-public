@@ -396,7 +396,9 @@ public class CosmeticsManager implements Listener {
 		LivingEntity mob = event.getEntity();
 		Player player = mob.getKiller();
 
-		if (player != null && EntityUtils.isElite(mob)) {
+		if (player != null
+			    && EntityUtils.isElite(mob)
+			    && !mob.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			PlayingFinisher playingFinisher = mPlayingFinishers.get(player.getUniqueId());
 			if (playingFinisher != null) {
 				playingFinisher.registerKill(mob, mob.getLocation());
