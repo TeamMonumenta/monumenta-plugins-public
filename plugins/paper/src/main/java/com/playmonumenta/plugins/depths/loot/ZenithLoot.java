@@ -36,10 +36,12 @@ public class ZenithLoot {
 	public static final NamespacedKey POME_KEY = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_pome");
 	public static final NamespacedKey TROPHY_KEY = NamespacedKeyUtils.fromString("epic:r3/depths2/uriddans_eternal_call_a18");
 	public static final NamespacedKey HALLOWEEN_KEY = NamespacedKey.fromString("epic:event/halloween2019/creepers_delight");
+	public static final NamespacedKey GEM_KEY = NamespacedKeyUtils.fromString("epic:r3/depths2/shattered_gem");
 
 	public static final String DAILY_TAG = "zenith_daily";
 
 	public static final int RELIC_CHANCE = 250;
+	public static final int SHATTERED_GEM_CHANCE = 270;
 	//Scales the currency drops by x per ascension level
 	public static final double CURRENCY_PER_ASC_LEVEL = 0.1;
 	//Scales the dungeon mats and relics by x per ascension level
@@ -165,15 +167,13 @@ public class ZenithLoot {
 				}
 			}
 			if (!ScoreboardUtils.checkTag(p, DAILY_TAG) && victory) {
-				//drop two mats for daily bonus and add tag
+				//drop two mats for daily bonus
 				for (ItemStack item : loot) {
 					loc.getWorld().dropItem(loc, item);
 				}
 				for (ItemStack item : loot) {
 					loc.getWorld().dropItem(loc, item);
 				}
-				p.addScoreboardTag(DAILY_TAG);
-				DepthsUtils.sendFormattedMessage(p, DepthsContent.CELESTIAL_ZENITH, "You received your daily Zenith clear bonus!");
 			}
 		}
 
@@ -284,19 +284,45 @@ public class ZenithLoot {
 			}
 		}
 
-		//Generate depths 2 charms - treasure score / ascension chance (if above level odds, guaranteed drop and subtract)
-
+		// Generate depths 2 charms - treasure score / ascension chance (if above level odds, guaranteed drop and subtract)
 		for (int score = treasureScore; score > 0; score -= ASCENSION_CHARM_ROLLS_SCORE[ascensionLevel]) {
 			int roll = r.nextInt(ASCENSION_CHARM_ROLLS_SCORE[ascensionLevel]);
 			if (roll < score) {
 				//Drop charm
 				int power = r.nextInt(5) + 1;
 				int level = getCharmRarityByAscensionLevel(r, ascensionLevel);
-				ItemStack item = CharmFactory.generateCharm(level, power, 0, null, null, null, null, null);
+				ItemStack item = CharmFactory.generateCharm(level, power, 0, null, null, null, null, null, 0, false);
 				Item lootOnGround = loc.getWorld().dropItem(loc, item);
 				lootOnGround.setGlowing(true);
 				GlowingManager.startGlowing(lootOnGround, DepthsUtils.getRarityNamedTextColor(level), 10000, 0);
 			}
+		}
+
+		LootTable gemTable = Bukkit.getLootTable(GEM_KEY);
+		Collection<ItemStack> gemLoot = gemTable.populateLoot(FastUtils.RANDOM, context);
+		// Generate Celestial Gems!
+		int score = (int) (treasureScore * ((CURRENCY_PER_ASC_LEVEL * ascensionLevel) + 1));
+		if (!ScoreboardUtils.checkTag(p, DAILY_TAG) && victory) {
+			score += 162; // if daily bonus, gives you another +0.60 chance of getting a gem
+		}
+		for (; score > 0; score -= SHATTERED_GEM_CHANCE) {
+			int roll = r.nextInt(SHATTERED_GEM_CHANCE);
+
+			if (roll < score) {
+				for (ItemStack item : gemLoot) {
+					Item lootOnGround = loc.getWorld().dropItem(loc, item);
+					lootOnGround.setGlowing(true);
+					GlowingManager.startGlowing(lootOnGround, NamedTextColor.DARK_PURPLE, 10000, 0);
+					p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.0f, 0.5f);
+					p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				}
+			}
+		}
+
+		if (victory) {
+			p.addScoreboardTag(DAILY_TAG);
+			DepthsUtils.sendFormattedMessage(p, DepthsContent.CELESTIAL_ZENITH, "You received your daily Zenith clear bonus!");
 		}
 	}
 

@@ -38,6 +38,7 @@ public class DepthsCommand extends GenericCommand {
 		IntegerArgument amountArg = new IntegerArgument("amount");
 		IntegerArgument wheelResultArg = new IntegerArgument("result", 1, 6);
 		IntegerArgument charmRarityArg = new IntegerArgument("rarity", 1, 5);
+		IntegerArgument treeArg = new IntegerArgument("tree");
 
 		List<Argument<?>> arguments = new ArrayList<>();
 
@@ -202,11 +203,12 @@ public class DepthsCommand extends GenericCommand {
 			.withArguments(new LiteralArgument("create"))
 			.withArguments(playerArg)
 			.withArguments(charmRarityArg)
+			.withArguments(treeArg)
 			.executes((sender, args) -> {
 				Player player = args.getByArgument(playerArg);
 				Location loc = player.getLocation();
 				int power = new Random().nextInt(5) + 1;
-				ItemStack charm = CharmFactory.generateCharm(args.getByArgument(charmRarityArg), power, 0, null, null, null, null, null);
+				ItemStack charm = CharmFactory.generateCharm(args.getByArgument(charmRarityArg), power, 0, null, null, null, null, null, args.getByArgument(treeArg), false);
 				player.sendMessage("DEBUG SEED " + Objects.requireNonNull(ItemStatUtils.getPlayerModified(new NBTItem(charm))).getLong(CharmFactory.CHARM_UUID_KEY));
 				loc.getWorld().dropItem(loc, charm);
 			}).register();

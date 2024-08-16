@@ -146,6 +146,7 @@ public class CharmsCommand extends GenericCommand {
 		arguments.add(new LiteralArgument("zenithfactory"));
 		arguments.add(new IntegerArgument("rarity"));
 		arguments.add(new LocationArgument("loc", LocationType.BLOCK_POSITION));
+		arguments.add(new IntegerArgument("tree"));
 
 		new CommandAPICommand("charm")
 			.withPermission(charmFactoryPerms)
@@ -154,7 +155,8 @@ public class CharmsCommand extends GenericCommand {
 				Location loc = args.getUnchecked("loc");
 				int rarity = args.getUnchecked("rarity");
 				int power = new Random().nextInt(5) + 1;
-				ItemStack charm = CharmFactory.generateCharm(rarity, power, 0, null, null, null, null, null);
+				int tree = args.getUnchecked("tree");
+				ItemStack charm = CharmFactory.generateCharm(rarity, power, 0, null, null, null, null, null, tree, false);
 				Item lootOnGround = loc.getWorld().dropItem(loc, charm);
 				lootOnGround.setGlowing(true);
 				GlowingManager.startGlowing(lootOnGround, DepthsUtils.getRarityNamedTextColor(rarity), 10000, 0);

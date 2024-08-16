@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.depths.charmfactory;
 
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
-import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.listeners.CelestialGemListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -29,6 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -45,9 +47,12 @@ public class CharmFactory {
 	public static final String CHARM_ACTIONS_KEY = "DEPTHS_CHARM_ACTIONS";
 	public static final String CHARM_ROLLS_KEY = "DEPTHS_CHARM_ROLLS";
 	public static final String CHARM_WILDCARD_TREE_CAP_KEY = "DEPTHS_CHARM_WILDCARD_TREE_CAP";
+	public static final String CHARM_TYPE_KEY = "DEPTHS_CHARM_TYPE_ROLL";
+	public static final String CHARM_TYPE_NAME_KEY = "DEPTHS_CHARM_TYPE_NAME";
+	public static final String BUDGET_KEY = "DEPTHS_CHARM_BUDGET";
 	public static final double TREE_BUDGET_MODIFIER = 1.35;
 	public static final double WILDCARD_BUDGET_MODIFIER = 1.8;
-	public static final int[] WILDCARD_TREE_CAP_CHANCES = {0, 33, 33, 17, 8, 5, 4};
+	public static final int[] WILDCARD_TREE_CAP_CHANCES = {0, 50, 30, 12, 5, 2, 1};
 
 	public static final Map<String, String> charmConversionMap = Map.ofEntries(
 		Map.entry("Precision Strike Range", "Precision Strike Range Requirement"),
@@ -116,7 +121,7 @@ public class CharmFactory {
 			long seed = playerModified.getLong(CHARM_UUID_KEY);
 
 			if (power == 0 || rarity == 0 || seed == 0) {
-				//Invalid charm
+				// Invalid charm
 				return null;
 			}
 			//Iterate through ability effect data to create a list
@@ -176,7 +181,7 @@ public class CharmFactory {
 			}
 
 			try {
-				return generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item);
+				return generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item, 0, false);
 			} catch (Exception e) {
 				MMLog.warning("CharmFactory failed to update a charm! Returning the same charm...");
 				ItemUpdateHelper.generateItemStats(item);
@@ -186,14 +191,25 @@ public class CharmFactory {
 		return null;
 	}
 
-	public static ItemStack generateCharm(int level, int power, long seed, @Nullable List<String> effectOrder, @Nullable List<String> actionOrder, @Nullable List<Double> rollsOrder, @Nullable Component fixedName, @Nullable ItemStack oldItem) {
+	public static ItemStack generateCharm(int level, int power, long seed, @Nullable List<String> effectOrder, @Nullable List<String> actionOrder, @Nullable List<Double> rollsOrder, @Nullable Component fixedName, @Nullable ItemStack oldItem, int tree, boolean isUpgrade) {
 		// Keeps track of which effect names are already in the charm
 		List<String> activeEffects = new ArrayList<>();
 		// Keep track of text components to put them in sorted order later
 		List<Component> charmTextLines = new ArrayList<>();
 
 		String chosenAbility = null;
-		DepthsTree chosenTree = null;
+		DepthsTree chosenTree;
+		switch (tree) {
+			case 1 -> chosenTree = DepthsTree.DAWNBRINGER;
+			case 2 -> chosenTree = DepthsTree.EARTHBOUND;
+			case 3 -> chosenTree = DepthsTree.FLAMECALLER;
+			case 4 -> chosenTree = DepthsTree.FROSTBORN;
+			case 5 -> chosenTree = DepthsTree.SHADOWDANCER;
+			case 6 -> chosenTree = DepthsTree.STEELSAGE;
+			case 7 -> chosenTree = DepthsTree.WINDWALKER;
+			default -> chosenTree = null;
+		}
+
 		boolean isTreeLocked = false;
 		int budget = 0;
 		boolean hasNegative = false;
@@ -210,61 +226,86 @@ public class CharmFactory {
 		ItemStack item = new ItemStack(Material.STONE);
 		if (oldItem != null) {
 			item.setType(oldItem.getType());
-			/*
+
 			NBT.modify(item, nbt -> {
-				ReadableNBT infusions = NBT.get(oldItem, rnbt -> {
-					return ItemStatUtils.getInfusions(rnbt);
-				});
+				// transfer HAS_USED_KEY from old item to new item
+				NBTItem oldNBT = new NBTItem(oldItem);
+				ReadWriteNBT oldPlayerModified = ItemStatUtils.getPlayerModified(oldNBT);
+				if (oldPlayerModified != null && oldPlayerModified.getBoolean(CelestialGemListener.HAS_USED_KEY)) {
+					ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
+					playerModified.setBoolean(CelestialGemListener.HAS_USED_KEY, true);
+				}
+
+				// transfer infusions from old item to new item
+				ReadableNBT infusions = ItemStatUtils.getInfusions(oldNBT);
 				if (infusions != null) {
 					ReadWriteNBT newInfusions = ItemStatUtils.addPlayerModified(nbt).getOrCreateCompound(InfusionType.KEY);
 					newInfusions.mergeCompound(infusions);
 				}
 			});
-			*/
 		}
 
-		// Add seed
-		long finalSeed = seed;
-		NBT.modify(item, nbt -> {
-			ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
-			playerModified.setLong(CHARM_UUID_KEY, finalSeed);
-			playerModified.setInteger(CHARM_RARITY_KEY, level);
-		});
 		ItemStatUtils.setCharmPower(item, power);
 		ItemStatUtils.editItemInfo(item, Region.RING, Tier.ZENITH_CHARM, Masterwork.NONE, Location.ZENITH);
 
-
 		// Split between types of charms
 		int charmType = r.nextInt(10);
+		String charmTypeName = "";
 		if (power > 3) {
 			charmType = Math.max(charmType + 2, 4);
 		}
-		// First- single ability charm
+		// 1-3 charm power = 40% single ability, 50% single tree, 10% wildcard
+		// 4-5 charm power = 70% single tree, 30% wildcard
 
-		if (charmType < 4) { //40% chance
+		// guaranteed tree charms can't be wildcard
+		if (chosenTree != null) {
+			charmType = Math.min(charmType, 8);
+		}
+
+		// if we have a stored CHARM_TYPE_KEY on the old charm, use that instead
+		if (oldItem != null) {
+			int oldCharmType = NBT.get(oldItem, nbt -> {
+				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+				if (playerModified == null || !playerModified.hasTag(CHARM_TYPE_KEY)) {
+					return -1;
+				}
+				return playerModified.getInteger(CHARM_TYPE_KEY);
+			});
+			if (oldCharmType != -1) {
+				charmType = oldCharmType;
+			}
+		}
+
+		if (charmType < 4) {
 			// Single ability charm
 			budget = (int) Math.floor(CHARM_BUDGET_PER_POWER[power - 1] * CHARM_BUDGET_PER_LEVEL[level - 1]);
 
 			// Generate starter ability at level of charm
-			CharmEffects effect = applyRandomCharmEffect(null, null, level, item, r, activeEffects, false, true, effectOrder, rollsOrder, charmTextLines);
+			CharmEffects effect = applyRandomCharmEffect(null, chosenTree, level, item, r, activeEffects, false, true, effectOrder, rollsOrder, charmTextLines);
 			if (effect != null) {
 				chosenTree = effect.mTree;
 				chosenAbility = effect.mAbility;
+
+				charmTypeName = chosenTree.getDisplayName() + ", " + chosenAbility;
 			}
+
 		} else if (charmType < 9) {
-			//Tree locked charm- 50% chance
+			// Tree locked charm
 			budget = (int) Math.floor(CHARM_BUDGET_PER_POWER[power - 1] * CHARM_BUDGET_PER_LEVEL[level - 1] * TREE_BUDGET_MODIFIER);
 			// Generate starter ability at level of charm
-			CharmEffects effect = applyRandomCharmEffect(null, null, level, item, r, activeEffects, false, false, effectOrder, rollsOrder, charmTextLines);
+			CharmEffects effect = applyRandomCharmEffect(null, chosenTree, level, item, r, activeEffects, false, false, effectOrder, rollsOrder, charmTextLines);
 			if (effect != null) {
 				chosenTree = effect.mTree;
 				isTreeLocked = true;
+
+				charmTypeName = chosenTree.getDisplayName();
 			}
+
 		} else {
-			//10% chance of wildcard charm- this one doesn't care about locked tree or ability
+			// Multi-tree charm
 			budget = (int) Math.floor(CHARM_BUDGET_PER_POWER[power - 1] * CHARM_BUDGET_PER_LEVEL[level - 1] * WILDCARD_BUDGET_MODIFIER);
 			// Generate starter ability at level of charm
-			CharmEffects effect = applyRandomCharmEffect(null, null, level, item, r, activeEffects, false, false, effectOrder, rollsOrder, charmTextLines);
+			CharmEffects effect = applyRandomCharmEffect(null, chosenTree, level, item, r, activeEffects, false, false, effectOrder, rollsOrder, charmTextLines);
 			if (effect != null) {
 				chosenTree = effect.mTree;
 			}
@@ -285,13 +326,31 @@ public class CharmFactory {
 				});
 				MMLog.finest("tree cap: " + cap);
 			}
-
+			charmTypeName = "Wildcard";
 		}
-		ItemMeta itemMeta = item.getItemMeta();
 
-		//Edit name based on chosen tree
+		// Add seed
+		long finalSeed = seed;
+		int finalBudget = budget;
+		int finalCharmType = charmType;
+		String finalCharmTypeName = charmTypeName;
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
+			playerModified.setLong(CHARM_UUID_KEY, finalSeed);
+			playerModified.setInteger(CHARM_RARITY_KEY, level);
+			playerModified.setInteger(BUDGET_KEY, finalBudget);
+			playerModified.setInteger(CHARM_TYPE_KEY, finalCharmType);
+			playerModified.setString(CHARM_TYPE_NAME_KEY, finalCharmTypeName);
+
+			if (isUpgrade) {
+				playerModified.setBoolean(CelestialGemListener.HAS_USED_KEY, true);
+			}
+		});
+
+		// Edit name based on chosen tree
+		ItemMeta itemMeta = item.getItemMeta();
 		if (fixedName != null) {
-			itemMeta.displayName(fixedName);
+			itemMeta.displayName(fixedName.color(DepthsUtils.getRarityTextColor(level)));
 			item.setItemMeta(itemMeta);
 			randomCharmName(r, chosenTree, new ItemStack(Material.STONE)); //Still run randomizer for seed purposes
 		} else {
@@ -301,10 +360,8 @@ public class CharmFactory {
 			ItemUtils.setPlainName(item, generatedName);
 		}
 
-		//Now apply additional effects depending on remaining budget
-
+		// now apply additional effects depending on remaining budget
 		while (budget > 0) {
-
 			MMLog.fine("budget is " + budget);
 
 			boolean success = false;
@@ -336,8 +393,21 @@ public class CharmFactory {
 				}
 			}
 
+			// only for Celestial Gem upgraded charms: if we've run out of pre-loaded effects
+			// skip adding new ones and just go straight to budget upgrading
+			if (isUpgrade && effectOrder != null && activeEffects.size() >= effectOrder.size()) {
+				break;
+			}
+
 			// frozen: if creating a new charm
 			if (!success) {
+
+				// old charms with 10+ effects can keep them. if we're adding new effects or making a new charm, don't go above 10
+				if (activeEffects.size() >= 10) {
+					MMLog.fine("reached 10 effects, won't add more! breaking budget loop");
+					break;
+				}
+
 				//Iterate through the potential actions until we find a match
 				for (CharmEffectActions action : potentialActions) {
 					//Skip action if it's rarity is above the budget for this charm, common and uncommon are always fine
@@ -381,7 +451,6 @@ public class CharmFactory {
 
 						break;
 					}
-
 				}
 			}
 
@@ -439,8 +508,8 @@ public class CharmFactory {
 		// frozen: if we still have budget, attempt to upgrade stats at random to use that budget
 		if (budget > 0) {
 			for (int i = 0; i < 100; i++) {
-				// choose a random action
-				int index = FastUtils.randomIntInRange(1, activeEffects.size() - 1);
+				// iterate over all actions
+				int index = i % activeEffects.size();
 				CharmEffectActions action = CharmEffectActions.getEffect(NBT.get(item, nbt -> {
 					ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
 					if (playerModified == null) {
@@ -558,6 +627,11 @@ public class CharmFactory {
 				//We have to pick within the specified tree
 				for (CharmEffects ce : charmEffects) {
 					if (ce.mTree == tree && !effectHistory.contains(ce.mEffectName) && ce.isValidAtLevel(level) && ce.isNotRestrictedAtLevel(level, isNegative) && !isNegative) {
+						// skip if it's the first effect of a single ability charm and the ability doesn't support it
+						if (isFirstSingleAbilityCharm && !ce.mInfo.getSingleAbilityCharm()) {
+							continue;
+						}
+
 						chosenEffect = ce;
 						break;
 					}
@@ -717,7 +791,13 @@ public class CharmFactory {
 		if (rarity <= 0 || rarity > 6) {
 			return null;
 		}
-		return DepthsUtils.getRarityComponent(rarity);
+
+		Component component = DepthsUtils.getRarityComponent(rarity);
+		if (playerModified.getBoolean(CelestialGemListener.HAS_USED_KEY)) {
+			component = component.append(Component.text(" (❃)", TextColor.color(147, 116, 255)));
+		}
+
+		return component;
 	}
 
 	public static int getWildcardTreeCap(ItemStack item) {
@@ -735,4 +815,49 @@ public class CharmFactory {
 		return playerModified.getInteger(CHARM_WILDCARD_TREE_CAP_KEY);
 	}
 
+	public static ItemStack upgradeCharm(ItemStack item) {
+		NBTItem nbt = new NBTItem(item);
+		ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+		if (playerModified == null) {
+			return item;
+		}
+
+		int power = ItemStatUtils.getCharmPower(item);
+		int rarity = playerModified.getInteger(CHARM_RARITY_KEY);
+		long seed = playerModified.getLong(CHARM_UUID_KEY);
+
+
+		//Iterate through ability effect data to create a list
+		List<String> charmEffectOrder = new ArrayList<>();
+		List<String> charmActionOrder = new ArrayList<>();
+		List<Double> charmRollsOrder = new ArrayList<>();
+
+		int count = 1;
+		while (playerModified.getString(CHARM_EFFECTS_KEY + count) != null
+			&& !playerModified.getString(CHARM_EFFECTS_KEY + count).isEmpty()) {
+			String effect = playerModified.getString(CHARM_EFFECTS_KEY + count);
+			charmEffectOrder.add(effect);
+			count++;
+		}
+
+		for (int i = 1; i < count; i++) {
+			charmRollsOrder.add(playerModified.getDouble(CHARM_ROLLS_KEY + i));
+		}
+
+		count = 1;
+		while (playerModified.getString(CHARM_ACTIONS_KEY + count) != null
+			&& !playerModified.getString(CHARM_ACTIONS_KEY + count).isEmpty()) {
+			String actionName = playerModified.getString(CHARM_ACTIONS_KEY + count);
+			charmActionOrder.add(actionName);
+			count++;
+		}
+
+		try {
+			return generateCharm(Math.min(rarity + 1, 5), power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item, 0, true);
+		} catch (Exception e) {
+			MMLog.warning("CharmFactory failed to upgrade a charm! Returning the same charm...");
+			ItemUpdateHelper.generateItemStats(item);
+			return item;
+		}
+	}
 }

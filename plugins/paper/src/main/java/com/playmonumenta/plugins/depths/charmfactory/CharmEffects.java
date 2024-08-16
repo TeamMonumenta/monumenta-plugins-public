@@ -435,6 +435,7 @@ public enum CharmEffects {
 		Map.entry("Volcanic Meteor Fire Duration", 3),
 		Map.entry("Cryobox Ice Duration", 3),
 		Map.entry("Frost Nova Ice Duration", 3),
+		Map.entry("Snowstorm Ice Duration", 3),
 		Map.entry("Ice Barrier Cast Range", 4),
 		Map.entry("Ice Barrier Max Length", 4),
 		Map.entry("Ice Barrier Ice Duration", 3),

@@ -533,6 +533,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new IchorListener(), this);
 		manager.registerEvents(new DiscoveryManager(), this);
 		manager.registerEvents(mGrapplingListener, this);
+		manager.registerEvents(new CelestialGemListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);
