@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.IndependentIframeTracker;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -14,24 +16,21 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.iface.ReadableItemNBT;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -43,17 +42,14 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class LightningBottle extends DepthsAbility {
+public class LightningBottle extends DepthsAbility implements AbilityWithChargesOrStacks {
 	public static final String ABILITY_NAME = "Lightning Bottle";
-	public static final String POTION_NAME_BASE = ABILITY_NAME + " [%d]";
+	public static final NamespacedKey LIGHTNING_BOTTLE_PATH = NamespacedKey.fromString("epic:r2/depths/utility/lightning_bottle");
+	public static final String LIGHTNING_BOTTLE_SCOREBOARD = "LightningBottleCharges";
 	public static final double[] DAMAGE = {6, 7.5, 9, 10.5, 12, 15};
 	public static final double[] VULNERABILITY = {0.1, 0.13, 0.16, 0.19, 0.22, 0.28};
 	public static final double SLOWNESS = 0.2;
@@ -85,16 +81,19 @@ public class LightningBottle extends DepthsAbility {
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 	private int mCount = 0;
 	private @Nullable ProjectileHitEvent mLastHitEvent;
+	private int mCharges;
 
 	public LightningBottle(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mIframeTracker = new IndependentIframeTracker(IFRAME_BETWEEN_POT);
-
 		mPlayerItemStatsMap = new WeakHashMap<>();
+
+		mMaxStack = MAX_STACK + (int) CharmManager.getLevel(mPlayer, CharmEffects.LIGHTNING_BOTTLE_MAX_STACKS.mEffectName);
+		mCharges = Math.min(ScoreboardUtils.getScoreboardValue(player, LIGHTNING_BOTTLE_SCOREBOARD).orElse(0), mMaxStack);
+
 		mKillsPer = KILLS_PER + (int) CharmManager.getLevel(mPlayer, CharmEffects.LIGHTNING_BOTTLE_KILLS_PER_BOTTLE.mEffectName);
 		mBottlesGiven = BOTTLES_GIVEN;
 		mDeathRadius = DEATH_RADIUS;
-		mMaxStack = MAX_STACK + (int) CharmManager.getLevel(mPlayer, CharmEffects.LIGHTNING_BOTTLE_MAX_STACKS.mEffectName);
 		mSlow = SLOWNESS + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.LIGHTNING_BOTTLE_SLOW_AMPLIFIER.mEffectName);
 		mVuln = VULNERABILITY[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.LIGHTNING_BOTTLE_VULN_AMPLIFIER.mEffectName);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.LIGHTNING_BOTTLE_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
@@ -104,13 +103,14 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion, ProjectileLaunchEvent event) {
-		int amt;
 		final var item = potion.getItem();
 		if (isLightningBottle(item)) {
 			event.setCancelled(true); // regardless, we don't allow the normal event to go through.
 		}
-		if (0 != (amt = getLightningBottleAmount(item))) {
-			// we copy the alchemist bag mech here
+
+		if (mCharges > 0) {
+			mCharges--;
+			ScoreboardUtils.setScoreboardValue(mPlayer, LIGHTNING_BOTTLE_SCOREBOARD, mCharges);
 
 			ThrownPotion potionClone = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
 			ItemStack newPotion = item.clone();
@@ -122,17 +122,8 @@ public class LightningBottle extends DepthsAbility {
 			mPlugin.mProjectileEffectTimers.addEntity(potionClone, Particle.SPELL);
 			mPlayerItemStatsMap.put(potionClone, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
-			// Trying to use setLightningBottleAmount(potion.getItem(), amt - 1); for some reason doesn't work by the way.
-			final var contents = mPlayer.getInventory().getContents(); // here we iterate through the hotbar to find the lightning bottle(s) and update them.
-			for (int i = 0; i < 9; i++) {
-				final var itemstack = contents[i];
-				if (null != itemstack && isLightningBottle(itemstack)) {
-					setLightningBottleAmount(itemstack, amt - 1);
-				}
-			}
-
+			ClientModHandler.updateAbility(mPlayer, this);
 			mPlayer.updateInventory();
-
 		}
 		return true;
 	}
@@ -184,27 +175,25 @@ public class LightningBottle extends DepthsAbility {
 		if (mCount >= mKillsPer) {
 			mCount = 0;
 			Inventory inv = mPlayer.getInventory();
-			boolean flag = true;
+			boolean hasBottle = false;
 			for (ItemStack item : inv.getContents()) {
 				if (item != null && isLightningBottle(item)) { // if the player has a bottle.
-					int amt;
-					if ((amt = getLightningBottleAmount(item)) >= mMaxStack) {
-						return; // no need to give any more.
-					}
-					int newAmount;
-					setLightningBottleAmount(item, newAmount = Math.min(mMaxStack, amt + mBottlesGiven)); // give it a new amount.
-					mPlayer.sendActionBar(Component.text("+%d Lightning Bottle Charges [%d/%d]!".formatted(newAmount - amt, newAmount, mMaxStack), NamedTextColor.GOLD)); // inform the player
-					flag = false;
+					hasBottle = true;
 					break;
 				}
 			}
-			// otherwise give them a new one.
-			if (flag) {
-				ItemStack newPotions = getBaseLightningBottle();
-				setLightningBottleAmount(newPotions, mBottlesGiven);
-				inv.addItem(newPotions);
+
+			mCharges = Math.min(mCharges + mBottlesGiven, mMaxStack);
+			mPlayer.sendActionBar(Component.text("+%d Lightning Bottle Charges!".formatted(mBottlesGiven), NamedTextColor.GOLD));
+			ScoreboardUtils.setScoreboardValue(mPlayer, LIGHTNING_BOTTLE_SCOREBOARD, mCharges);
+
+			// give a new bottle if they don't have one already
+			if (!hasBottle) {
+				InventoryUtils.giveItemFromLootTable(mPlayer, LIGHTNING_BOTTLE_PATH, 1);
 				mPlayer.sendActionBar(Component.text("You have received a Lightning Bottle!", NamedTextColor.GOLD));
 			}
+
+			ClientModHandler.updateAbility(mPlayer, this);
 			mPlayer.updateInventory();
 		}
 	}
@@ -214,45 +203,13 @@ public class LightningBottle extends DepthsAbility {
 		return mDeathRadius;
 	}
 
-
-	final Style STYLE = Style.style().color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).build();
-	public ItemStack getBaseLightningBottle() {
-		ItemStack itemStack = new ItemStack(Material.SPLASH_POTION, 1);
-		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
-
-		potionMeta.setBasePotionData(new PotionData(PotionType.MUNDANE));
-		potionMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // Hide "No Effects" vanilla potion effect lore
-		potionMeta.setColor(Color.YELLOW);
-		potionMeta.lore(List.of(Component.text("A unique potion used by Dawnbringers.", STYLE),
-			Component.text("Taking this item outside of the dungeon", STYLE),
-			Component.text("will instead drop it in the dungeon.", STYLE)));
-		itemStack.setItemMeta(potionMeta);
-		setLightningBottleAmount(itemStack, 1);
-
-		ItemUtils.setPlainTag(itemStack); // Support for resource pack textures like with other items & mechanisms
-		return itemStack;
+	public double getDamage() {
+		return mDamage * DepthsUtils.getDamageMultiplier();
 	}
 
-	/*
-	 * Also updates the displayName.
-	 * Sets the amount contained in a lightning bottle.
-	 */
-	private void setLightningBottleAmount(ItemStack item, int amount) {
-		final var itemMeta = Objects.requireNonNull(item.getItemMeta()); // this really isn't needed; it's to appease the dog. This is never null since Lightning Bottles always have ItemMeta.
-
-		itemMeta.displayName(DepthsTree.DAWNBRINGER.color(POTION_NAME_BASE.formatted(amount)).decoration(TextDecoration.ITALIC, false));
-		item.setItemMeta(itemMeta);
-		NBT.modify(item, nbt -> {
-			nbt.setInteger("bottle_amount", amount);
-		});
+	public double getRadius() {
+		return mRadius;
 	}
-
-
-
-	private int getLightningBottleAmount(ItemStack item) {
-		return NBT.get(item, (ReadableItemNBT n) -> n.getInteger("bottle_amount"));
-	}
-
 
 	public static boolean isLightningBottle(ItemStack item) {
 		return item.getType() == Material.SPLASH_POTION && ItemUtils.hasPlainName(item) && ItemUtils.getPlainName(item).contains(ABILITY_NAME);
@@ -281,4 +238,13 @@ public class LightningBottle extends DepthsAbility {
 			.add(" seconds.");
 	}
 
+	@Override
+	public int getCharges() {
+		return mCharges;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return mMaxStack;
+	}
 }

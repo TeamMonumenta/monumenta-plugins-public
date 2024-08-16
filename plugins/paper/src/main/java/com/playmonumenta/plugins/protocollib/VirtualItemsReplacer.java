@@ -13,6 +13,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.commands.VirtualFirmament;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
@@ -21,8 +24,12 @@ import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
@@ -39,6 +46,7 @@ import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -254,6 +262,36 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			// Alchemical Utensils
 			if (isHotbarOrOffhandSlot && PlayerUtils.isAlchemist(player) && ItemUtils.isAlchemistItem(itemStack)) {
 				handleAlchemistPotion(player, itemStack);
+				return;
+			}
+
+			// lightning bottles
+			if (isHotbarOrOffhandSlot && DepthsManager.getInstance().isInSystem(player) && LightningBottle.isLightningBottle(itemStack)) {
+				LightningBottle lightningBottle = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LightningBottle.class);
+
+				if (lightningBottle == null) {
+					return;
+				}
+
+				int count = lightningBottle.getCharges();
+				itemStack.setAmount(Math.max(1, count));
+
+				Component rarityLine = Component.text("Dawnbringer", TextColor.color(DepthsUtils.DAWNBRINGER))
+					.append(Component.text(" : ", NamedTextColor.DARK_GRAY))
+					.append(DepthsUtils.getRarityComponent(lightningBottle.mRarity))
+					.decoration(TextDecoration.ITALIC, false);
+				ItemStatUtils.addLore(itemStack, 0, rarityLine);
+				ItemStatUtils.addAttribute(itemStack, AttributeType.PROJECTILE_SPEED, 1, Operation.MULTIPLY, Slot.MAINHAND);
+				ItemStatUtils.addAttribute(itemStack, AttributeType.POTION_DAMAGE, lightningBottle.getDamage(), Operation.ADD, Slot.MAINHAND);
+				ItemStatUtils.addAttribute(itemStack, AttributeType.POTION_RADIUS, lightningBottle.getRadius(), Operation.ADD, Slot.MAINHAND);
+				ItemUpdateHelper.generateItemStats(itemStack);
+
+				NBT.modify(itemStack, nbt -> {
+					nbt.modifyMeta((nbtr, meta) -> {
+						meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
+					});
+					markVirtual(nbt);
+				});
 				return;
 			}
 		}
