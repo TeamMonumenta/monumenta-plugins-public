@@ -223,6 +223,14 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	@Override
 	public void unload() {
 		super.unload();
+		ArmorStand hologram = mHologram;
+		if (hologram != null && hologram.isValid()) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				if (hologram.isValid()) {
+					hologram.remove();
+				}
+			});
+		}
 		mHologram = null;
 		mDPSCounter = -1;
 		mDPSCounter10s = -1;
