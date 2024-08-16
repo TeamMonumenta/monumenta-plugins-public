@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,6 +34,12 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 	private static final int AOE_HIT_DEBUFF_DURATION = 20 * 10;
 	private static final double SLOWNESS_POTENCY = -0.3;
 	private static final double WEAKNESS_POTENCY = -0.1;
+	private static final List<Material> ARENA_MATS = List.of(
+		Material.SMOOTH_SANDSTONE,
+		Material.SMOOTH_RED_SANDSTONE,
+		Material.NETHERRACK,
+		Material.MAGMA_BLOCK
+	);
 
 	public SpellPrimordialBolt(Plugin plugin, LivingEntity boss) {
 		super(plugin, boss, 20 * 2, 20 * 5, 1.1, PrimordialElementalKaulBoss.detectionRange, 0.5, false, true, 1, 1,
@@ -75,10 +82,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 1)) {
 					if (block.getType().isSolid()) {
 						Material material = block.getType();
-						if (material == Material.SMOOTH_SANDSTONE
-							    || material == Material.SMOOTH_RED_SANDSTONE
-							    || material == Material.NETHERRACK
-							    || material == Material.MAGMA_BLOCK) {
+						if (ARENA_MATS.contains(material)) {
 							block.setType(Material.AIR);
 						}
 					}

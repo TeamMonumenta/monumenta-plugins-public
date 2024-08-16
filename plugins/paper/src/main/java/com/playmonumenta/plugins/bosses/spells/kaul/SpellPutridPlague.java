@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -110,118 +111,120 @@ public class SpellPutridPlague extends Spell {
 				points.add(as);
 			}
 		}
-		if (!points.isEmpty()) {
-			ArmorStand point = points.get(FastUtils.RANDOM.nextInt(points.size()));
-			Pillar pillar = Stream.of(Pillar.values()).filter(p -> ScoreboardUtils.checkTag(point, p.mTag)).findAny().orElse(null);
-			if (pillar == null) {
-				MMLog.warning("[Kaul] Could not find a pillar for Putrid Plague");
-				return;
-			}
 
-			Team team = ScoreboardUtils.getEntityTeam(mBoss);
-			if (team == null) {
-				MMLog.warning("[Kaul] Could not find Kaul's team");
-				return;
-			}
+		if (points.isEmpty()) {
+			MMLog.warning(() -> "[Kaul] The armor stands to determine the pillar locations for Putrid Plague are missing!" +
+				"The list of nearby entities is: " + mBoss.getNearbyEntities(Kaul.detectionRange, Kaul.detectionRange, Kaul.detectionRange));
+			return;
+		}
 
-			team.color(pillar.mTextColor);
+		ArmorStand point = points.get(FastUtils.RANDOM.nextInt(points.size()));
+		Pillar pillar = Stream.of(Pillar.values()).filter(p -> ScoreboardUtils.checkTag(point, p.mTag)).findAny().orElse(null);
+		if (pillar == null) {
+			MMLog.warning(() -> "[Kaul] Could not find a suitable pillar for Putrid Plague! The Pillar enum contains: " + Arrays.toString(Pillar.values()));
+			return;
+		}
 
-			mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", pillar.mDarkTextColor)));
-			mChargeUp.setColor(pillar.mBarColor);
+		Team team = ScoreboardUtils.getEntityTeam(mBoss);
+		if (team == null) {
+			MMLog.warning(() -> "[Kaul] Could not find Kaul's team! The mBoss object is: " + mBoss);
+			return;
+		}
 
-			Collection<Player> players = mKaul.getArenaParticipants();
-			Component message = Component.text(pillar.mMessage, mPhase3 ? pillar.mDarkTextColor : pillar.mTextColor);
-			players.forEach(p -> p.sendMessage(message));
+		team.color(pillar.mTextColor);
 
-			BukkitRunnable runnable = new BukkitRunnable() {
-				final Location mPoint1 = point.getLocation().add(4, 6, 4);
-				final Location mPoint2 = point.getLocation().add(-4, 6, -4);
-				final Location mPoint3 = point.getLocation().add(4, 6, -4);
-				final Location mPoint4 = point.getLocation().add(-4, 6, 4);
+		mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", pillar.mDarkTextColor)));
+		mChargeUp.setColor(pillar.mBarColor);
 
-				@Override
-				public void run() {
+		Collection<Player> players = mKaul.getArenaParticipants();
+		Component message = Component.text(pillar.mMessage, mPhase3 ? pillar.mDarkTextColor : pillar.mTextColor);
+		players.forEach(p -> p.sendMessage(message));
 
-					for (Player player : players) {
-						// Spawn the particles for players so that way there
-						// isn't as much particle lag
-						new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation(), 60, 15, 0, 15, 0)
-							.spawnForPlayer(ParticleCategory.BOSS, player);
-					}
+		BukkitRunnable runnable = new BukkitRunnable() {
+			final Location mPoint1 = point.getLocation().add(4, 6, 4);
+			final Location mPoint2 = point.getLocation().add(-4, 6, -4);
+			final Location mPoint3 = point.getLocation().add(4, 6, -4);
+			final Location mPoint4 = point.getLocation().add(-4, 6, 4);
 
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint1, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint2, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint3, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7).spawnAsEntityActive(mBoss);
+			@Override
+			public void run() {
+				for (Player player : players) {
+					// Spawn the particles for players so that way there isn't as much particle lag
+					new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation(), 60, 15, 0, 15, 0)
+						.spawnForPlayer(ParticleCategory.BOSS, player);
+				}
 
-					new PPCircle(Particle.SPELL_INSTANT, point.getLocation(), 7).count(60).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPELL_INSTANT, mPoint1, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPELL_INSTANT, mPoint2, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPELL_INSTANT, mPoint3, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7).spawnAsEntityActive(mBoss);
+				new PPCircle(Particle.SPELL_INSTANT, point.getLocation(), 7).count(60).spawnAsEntityActive(mBoss);
 
-					if (mChargeUp.nextTick(2)) {
-						this.cancel();
-						mChargeUp.reset();
-						team.color(NamedTextColor.WHITE);
-						Location base = point.getLocation();
-						base.setY(0);
-						List<Player> safe = new Hitbox.UprightCylinderHitbox(base, Kaul.ARENA_MAX_Y, 8).getHitPlayers(true);
-						Collection<Player> ps = mKaul.getArenaParticipants();
-						for (Player player : ps) {
-							if (!safe.contains(player)) {
-								PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-								if ((resistance == null || resistance.getAmplifier() < 4)
-									    && !StasisListener.isInStasis(player)) {
-									player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
-									new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
-									new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
-										Material.LIME_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
-									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, DEBUFF_DURATION, 1));
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,
-										SLOWNESS_SRC, new PercentSpeed(DEBUFF_DURATION, -0.3, SLOWNESS_SRC));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, DEBUFF_DURATION, 1));
-									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
-								}
+				if (mChargeUp.nextTick(2)) {
+					this.cancel();
+					mChargeUp.reset();
+					team.color(NamedTextColor.WHITE);
+					Location base = point.getLocation();
+					base.setY(0);
+					List<Player> safe = new Hitbox.UprightCylinderHitbox(base, Kaul.ARENA_MAX_Y, 8).getHitPlayers(true);
+					Collection<Player> ps = mKaul.getArenaParticipants();
+					for (Player player : ps) {
+						if (!safe.contains(player)) {
+							PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+							if ((resistance == null || resistance.getAmplifier() < 4)
+									&& !StasisListener.isInStasis(player)) {
+								player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
+								new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
+									Material.LIME_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
+								player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, DEBUFF_DURATION, 1));
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,
+									SLOWNESS_SRC, new PercentSpeed(DEBUFF_DURATION, -0.3, SLOWNESS_SRC));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, DEBUFF_DURATION, 1));
+								DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
+							}
+						} else {
+							new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
+							player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
+							if (!mPhase3) {
+								player.removePotionEffect(PotionEffectType.WITHER);
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, SLOWNESS_SRC);
+								player.removePotionEffect(PotionEffectType.POISON);
+								player.removePotionEffect(PotionEffectType.WEAKNESS);
 							} else {
-								new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
-								new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
-								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
-								if (!mPhase3) {
-									player.removePotionEffect(PotionEffectType.WITHER);
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, SLOWNESS_SRC);
-									player.removePotionEffect(PotionEffectType.POISON);
-									player.removePotionEffect(PotionEffectType.WEAKNESS);
-								} else {
-									for (PotionEffect effect : player.getActivePotionEffects()) {
-										if (effect.getType().equals(PotionEffectType.WITHER)
-											    || effect.getType().equals(PotionEffectType.SLOW)
-											    || effect.getType().equals(PotionEffectType.POISON)
-											    || effect.getType().equals(PotionEffectType.WEAKNESS)) {
-											int duration = effect.getDuration() - (20 * 80);
-											if (duration <= 0) {
-												continue;
-											}
-											int amp = effect.getAmplifier() - 1;
-											if (amp <= 0) {
-												continue;
-											}
-											player.removePotionEffect(effect.getType());
-											player.addPotionEffect(new PotionEffect(effect.getType(), duration, amp));
+								for (PotionEffect effect : player.getActivePotionEffects()) {
+									if (effect.getType().equals(PotionEffectType.WITHER)
+											|| effect.getType().equals(PotionEffectType.SLOW)
+											|| effect.getType().equals(PotionEffectType.POISON)
+											|| effect.getType().equals(PotionEffectType.WEAKNESS)) {
+										int duration = effect.getDuration() - (20 * 80);
+										if (duration <= 0) {
+											continue;
 										}
+										int amp = effect.getAmplifier() - 1;
+										if (amp <= 0) {
+											continue;
+										}
+										player.removePotionEffect(effect.getType());
+										player.addPotionEffect(new PotionEffect(effect.getType(), duration, amp));
 									}
 								}
 							}
 						}
 					}
 				}
+			}
 
-				@Override
-				public synchronized void cancel() {
-					mActiveRunnables.remove(this);
-					super.cancel();
-				}
-			};
-			runnable.runTaskTimer(mPlugin, 0, 2);
-			mActiveRunnables.add(runnable);
-		}
+			@Override
+			public synchronized void cancel() {
+				mActiveRunnables.remove(this);
+				super.cancel();
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 
 	@Override
@@ -233,5 +236,4 @@ public class SpellPutridPlague extends Spell {
 	public int castTicks() {
 		return mTime;
 	}
-
 }

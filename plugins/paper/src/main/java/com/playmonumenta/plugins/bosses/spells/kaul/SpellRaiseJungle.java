@@ -38,7 +38,6 @@ import org.bukkit.scheduler.BukkitRunnable;
  * in the ground. (The number of elementals spawned is equivalent to 2*
  * the number of players.)
  */
-
 public class SpellRaiseJungle extends Spell {
 	private static final String SPELL_NAME = "Raise Jungle";
 	private static final BlockData PARTICLE_DATA = Material.COARSE_DIRT.createBlockData();
@@ -90,11 +89,10 @@ public class SpellRaiseJungle extends Spell {
 		} else if (players.size() < 11) {
 			num += 12 + (2 * (players.size() - 4));
 		} else {
-			num += 24 + (1 * (players.size() - 10));
+			num += 24 + (players.size() - 10);
 		}
 		int amt = num;
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
 				for (int i = 0; i < amt; i++) {
@@ -151,7 +149,7 @@ public class SpellRaiseJungle extends Spell {
 								if (ele.isDead() || !ele.isValid()) {
 									this.cancel();
 									mSummoned.remove(ele.getUniqueId());
-									if (mSummoned.size() <= 0) {
+									if (mSummoned.isEmpty()) {
 										Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mCooldown);
 									}
 								}
@@ -161,7 +159,6 @@ public class SpellRaiseJungle extends Spell {
 					}
 				}
 				new BukkitRunnable() {
-
 					@Override
 					public synchronized void cancel() {
 						super.cancel();
@@ -184,11 +181,7 @@ public class SpellRaiseJungle extends Spell {
 							this.cancel();
 						}
 
-						if (mSummoned.isEmpty()) {
-							this.cancel();
-						}
-
-						if (mBoss.isDead() || !mBoss.isValid()) {
+						if (mSummoned.isEmpty() || mBoss.isDead() || !mBoss.isValid()) {
 							this.cancel();
 						}
 					}
@@ -201,7 +194,7 @@ public class SpellRaiseJungle extends Spell {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		if (mSummoned.size() > 0) {
+		if (!mSummoned.isEmpty()) {
 			event.setDamage(event.getFlatDamage() * 0.4);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 1, 0.5f);
 			new PartialParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA).spawnAsEntityActive(mBoss);
@@ -210,7 +203,7 @@ public class SpellRaiseJungle extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mSummoned.size() <= 0 && !mOnCooldown;
+		return mSummoned.isEmpty() && !mOnCooldown;
 	}
 
 	@Override
@@ -222,5 +215,4 @@ public class SpellRaiseJungle extends Spell {
 	public int castTicks() {
 		return mSummonTime;
 	}
-
 }

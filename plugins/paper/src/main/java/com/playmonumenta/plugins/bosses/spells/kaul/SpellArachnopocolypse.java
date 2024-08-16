@@ -88,7 +88,6 @@ public class SpellArachnopocolypse extends Spell {
 					}
 
 					this.cancel();
-					return;
 				}
 			}
 

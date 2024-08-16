@@ -118,11 +118,9 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		}, 50);
 
 		/* Clear Judgement mobs at end of cast */
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			world.getEntities().stream()
-				.filter(e -> ScoreboardUtils.checkTag(e, KAULS_JUDGEMENT_MOB_TAG))
-				.forEach(Entity::remove);
-		}, KAULS_JUDGEMENT_TOTAL_TIME);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> world.getEntities().stream()
+			.filter(e -> ScoreboardUtils.checkTag(e, KAULS_JUDGEMENT_MOB_TAG))
+			.forEach(Entity::remove), KAULS_JUDGEMENT_TOTAL_TIME);
 
 		List<Player> players = PlayerUtils.playersInRange(mBossLoc, KAULS_JUDGEMENT_RANGE, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61); //Get rid of spectators

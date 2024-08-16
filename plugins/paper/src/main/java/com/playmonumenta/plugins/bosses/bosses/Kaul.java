@@ -34,6 +34,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -160,8 +161,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 	private static final String PUTRID_PLAGUE_TAG_GREEN = "KaulPutridPlagueGreen";
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
-	// At the centre of the Kaul shrine,
-	// upon the height of most of the arena's surface
+	// At the centre of the Kaul shrine, upon the height of most of the arena's surface
 	private LivingEntity mShrineMarker;
 	private boolean mDefeated = false;
 	private boolean mCooldown = false;
@@ -318,10 +318,17 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			players.forEach(p -> p.sendMessage(message));
 		});
 
-		events.put(75, mBoss -> forceCastSpell(SpellArachnopocolypse.class));
+		events.put(75, mBoss -> {
+			if (getActiveSpells().isEmpty()) {
+				MMLog.warning(() -> "[Kaul] Kaul somehow had no active spells when attempting to force cast Arachnopocolypse at 75% health! Overriding with phase 1 spells");
+				changePhase(phase1Spells, phase1PassiveSpells, null);
+			}
+			forceCastSpell(SpellArachnopocolypse.class);
+		});
 
 		// Phase 2
 		events.put(66, mBoss -> {
+			MMLog.info(() -> "[Kaul] A Kaul fight got to 66% health");
 			sendDialogue("THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
@@ -427,10 +434,17 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		});
 
 		// Forcecast Raise Jungle
-		events.put(60, mBoss -> forceCastSpell(SpellRaiseJungle.class));
+		events.put(60, mBoss -> {
+			if (getActiveSpells().isEmpty()) {
+				MMLog.warning(() -> "[Kaul] Kaul somehow had no active spells when attempting to force cast Raise Jungle at 60% health! Overriding with phase 2 spells");
+				changePhase(phase2Spells, phase2PassiveSpells, null);
+			}
+			forceCastSpell(SpellRaiseJungle.class);
+		});
 
 		// Phase 2.5
 		events.put(50, mBoss -> {
+			MMLog.info(() -> "[Kaul] A Kaul fight got to 50% health");
 			sendDialogue("THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
@@ -467,12 +481,15 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						new PartialParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
 							Material.DIRT.createBlockData()).spawnAsBoss();
 						LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, primordial);
+						MMLog.info(() -> "[Kaul] Kaul has summoned the Primordial Elemental");
 						new BukkitRunnable() {
 							@Override
 							public void run() {
 								if (miniboss == null) {
+									MMLog.warning(() -> "[Kaul] Kaul tried to summon the Primordial Elemental, but the miniboss is null!");
 									this.cancel();
 								} else if (miniboss.isDead() || !miniboss.isValid()) {
+									MMLog.info(() -> "[Kaul] Kaul's Primordial Elemental is dead or no longer valid. Entering next phase");
 									this.cancel();
 									mBoss.setInvulnerable(false);
 									mBoss.setAI(true);
@@ -482,18 +499,20 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 									new BukkitRunnable() {
 										@Override
 										public void run() {
-											changePhase(phase2Spells, phase1PassiveSpells, null);
+											changePhase(phase2Spells, phase2PassiveSpells, null);
 										}
 									}.runTaskLater(mPlugin, 20 * 10);
 								}
 
 								if (mBoss.isDead() || !mBoss.isValid()) {
+									MMLog.warning(() -> "[Kaul] Kaul is somehow dead or no longer valid after summoning the Primordial Elemental! This is very bad!");
 									this.cancel();
 								}
 							}
 						}.runTaskTimer(mPlugin, 0, 20);
 					}
 					if (mBoss.isDead()) {
+						MMLog.warning(() -> "[Kaul] Kaul is somehow dead after summoning the Primordial Elemental! This is very bad!");
 						this.cancel();
 					}
 				}
@@ -501,10 +520,17 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		});
 
 		// Force-cast Kaul's Judgement if it hasn't been cast yet.
-		events.put(40, mBoss -> forceCastSpell(kaulsJudgement.getClass()));
+		events.put(40, mBoss -> {
+			if (getActiveSpells().isEmpty()) {
+				MMLog.warning(() -> "[Kaul] Kaul somehow had no active spells when attempting to force cast Kaul's Judgement " + kaulsJudgement + " at 40% health! Overriding with phase 2 spells");
+				changePhase(phase2Spells, phase2PassiveSpells, null);
+			}
+			forceCastSpell(kaulsJudgement.getClass());
+		});
 
 		// Phase 3
 		events.put(33, mBoss -> {
+			MMLog.info(() -> "[Kaul] A Kaul fight got to 33% health");
 			sendDialogue("YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
@@ -571,6 +597,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 									}
 
 									if (mBoss.isDead() || !mBoss.isValid()) {
+										MMLog.warning(() -> "[Kaul] Kaul is somehow dead or not valid after running the aesthetics for his final phase! This is very bad!");
 										this.cancel();
 									}
 
@@ -621,7 +648,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 										}.runTaskTimer(mPlugin, 0, 1);
 										new BukkitRunnable() {
-
 											@Override
 											public void run() {
 												mBoss.setInvulnerable(false);
@@ -629,7 +655,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 												teleport(mSpawnLoc);
 												com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 												new BukkitRunnable() {
-
 													@Override
 													public void run() {
 														// If the next phase change has already happened, don't do anything!
@@ -637,19 +662,15 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 															changePhase(phase3Spells, phase3PassiveSpells, null);
 														}
 													}
-
 												}.runTaskLater(mPlugin, 20 * 10);
 											}
-
 										}.runTaskLater(mPlugin, 20 * 3);
 									}
 								}
-
 							}.runTaskTimer(mPlugin, 40, 1);
 						}
 					}
 				}
-
 			}.runTaskLater(mPlugin, 20 * 2);
 		});
 
@@ -665,12 +686,14 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		events.put(25, mBoss -> {
 			// If we get here really fast, we might not actually have the active spells yet
 			if (getActiveSpells().isEmpty()) {
+				MMLog.warning(() -> "[Kaul] Kaul somehow had no active spells when attempting to force cast Kaul's Judgement " + kaulsJudgement + " at 25% health! Overriding with phase 3 spells");
 				changePhase(phase3Spells, phase3PassiveSpells, null);
 			}
 			forceCastSpell(kaulsJudgement.getClass());
 		});
 
 		events.put(10, mBoss -> {
+			MMLog.info(() -> "[Kaul] A Kaul fight got to 10% health");
 			sendDialogue("THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.");
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			// Force casting Volcanic Demise teleports Kaul back to his camp spot on top of the shrine and whatnot
@@ -725,6 +748,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
 					new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsBoss();
 					LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, immortal);
+					MMLog.info(() -> "[Kaul] Kaul has summoned the Immortal Elemental");
 					if (miniboss != null) {
 						new BukkitRunnable() {
 							@Override
@@ -875,8 +899,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
+		MMLog.info(() -> "[Kaul] Kaul's death method has been called. If the logs don't contain messages for health events and Primordial/Immortal Elemental, this is a problem!");
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() == 0) {
+		if (players.isEmpty()) {
 			return;
 		}
 		mDefeated = true;
@@ -985,6 +1010,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
+		MMLog.info(() -> "[Kaul] A Kaul fight has been initialized.");
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

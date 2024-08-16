@@ -67,15 +67,9 @@ public class SpellVolcanicDemise extends Spell {
 		mRange = range;
 		mCenter = center;
 
-		mChargeUp = new ChargeUpManager(
-			mBoss,
-			20 * 2,
-			Component.text("Charging ", NamedTextColor.GREEN)
-					 .append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)),
-			BossBar.Color.RED,
-			BossBar.Overlay.NOTCHED_10,
-			60
-		);
+		mChargeUp = new ChargeUpManager(mBoss, 20 * 2, Component.text("Charging ", NamedTextColor.GREEN)
+			.append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)),
+			BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 60);
 	}
 
 	class ChargeUpThenCastRunnable extends BukkitRunnable {
@@ -111,7 +105,6 @@ public class SpellVolcanicDemise extends Spell {
 	}
 
 	class CastRunnable extends BukkitRunnable {
-
 		// If cancelled, return to charging
 		@Override
 		public synchronized void cancel() {
@@ -136,8 +129,7 @@ public class SpellVolcanicDemise extends Spell {
 				List<Player> players = getValidTargetPlayers();
 
 				// Punish players on outer edges/in water; 10tick meteors
-				players.stream()
-					   .map(player -> player.getLocation())
+				players.stream().map(player -> player.getLocation())
 					   .filter(loc -> loc.getBlock().isLiquid() || loc.distanceSquared(mCenter) > 42 * 42)
 					   .forEach((loc) -> {
 							loc.setY(mCenter.getY());
@@ -186,39 +178,30 @@ public class SpellVolcanicDemise extends Spell {
 			if (mCurrentRelY % TICKS_PER_EMANATING_CIRCLE == 0) {
 				new PPCircle(Particle.FLAME, mLoc.clone().add(0, 0.2, 0), DEATH_RADIUS)
 					// RotateDelta originates from positive X
-					.delta(1, 0, 0)
-					.rotateDelta(true)
+					.delta(1, 0, 0).rotateDelta(true)
 					// 1 particle per 2 degrees; 90 particles per pi radians.
 					// 1 radian per radius meters circumference
 					// 90/(pi * radius) particles per meter
-					.countPerMeter(90.0 / (Math.PI * DEATH_RADIUS))
-					.extra(0.15)
-					.directionalMode(true)
-					.distanceFalloff(15)
+					.countPerMeter(90.0 / (Math.PI * DEATH_RADIUS)).extra(0.15).directionalMode(true).distanceFalloff(15)
 					.spawnAsBoss();
 
 				new PPCircle(Particle.REDSTONE, mLoc.clone().add(0, 0.2, 0), 2)
 					// 1 particle per 6 degrees; 30 particles per pi radians.
 					// 1 radian per radius meters circumference
 					// 30/(pi * radius) particles per meter
-					.countPerMeter(30.0 / (Math.PI * 2))
-					.extra(0)
-					.data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1))
-					.distanceFalloff(15)
+					.countPerMeter(30.0 / (Math.PI * 2)).extra(0)
+					.data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1)).distanceFalloff(15)
 					.spawnAsBoss();
 			}
-			new PartialParticle(Particle.LAVA, mLoc, 3, 2.5, 0, 2.5, 0.05)
-				.distanceFalloff(20)
+			new PartialParticle(Particle.LAVA, mLoc, 3, 2.5, 0, 2.5, 0.05).distanceFalloff(20)
 				.spawnAsBoss();
 
 			// Particles: Meteor Trail
 			Location meteorTrailLoc = mLoc.clone().add(0, mCurrentRelY, 0);
 			new PartialParticle(Particle.FLAME, meteorTrailLoc, 10, 0.2f, 0.2f, 0.2f, 0.1)
-				.distanceFalloff(20)
-				.spawnAsBoss();
+				.distanceFalloff(20).spawnAsBoss();
 			new PartialParticle(Particle.SMOKE_LARGE, meteorTrailLoc, 5, 0, 0, 0, 0.05)
-				.distanceFalloff(20)
-				.spawnAsBoss();
+				.distanceFalloff(20).spawnAsBoss();
 			mWorld.playSound(meteorTrailLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 
 			// Impact
@@ -228,11 +211,9 @@ public class SpellVolcanicDemise extends Spell {
 
 				// Particles: Impact
 				new PartialParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175)
-					.distanceFalloff(20)
-					.spawnAsBoss();
+					.distanceFalloff(20).spawnAsBoss();
 				new PartialParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25)
-					.distanceFalloff(20)
-					.spawnAsBoss();
+					.distanceFalloff(20).spawnAsBoss();
 				mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 
 				Hitbox deathBox = new Hitbox.UprightCylinderHitbox(mLoc, 7, DEATH_RADIUS);
@@ -273,7 +254,7 @@ public class SpellVolcanicDemise extends Spell {
 		public synchronized void cancel() {
 			super.cancel();
 			if (mCurrentRelY > 0) {
-				MMLog.warning("Volcanic Demise cancelled early!");
+				MMLog.warning(() -> "[Kaul] A Volcanic Demise cast was cancelled early!");
 			}
 		}
 	}
@@ -299,8 +280,7 @@ public class SpellVolcanicDemise extends Spell {
 		}
 
 		// For the advancement "Such Devastation"
-		NmsUtils.getVersionAdapter()
-				.runConsoleCommandSilently("function monumenta:kaul/volcanic_demise_count");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("function monumenta:kaul/volcanic_demise_count");
 
 		BukkitRunnable chargeRunnable = new ChargeUpThenCastRunnable();
 		chargeRunnable.runTaskTimer(mPlugin, 0, 2);
@@ -322,5 +302,4 @@ public class SpellVolcanicDemise extends Spell {
 	public int cooldownTicks() {
 		return 20 * 35;
 	}
-
 }
