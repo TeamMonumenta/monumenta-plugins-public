@@ -135,8 +135,8 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 	private void placeTotem(Location bLoc, ItemStatManager.PlayerItemStats stats) {
 		World world = mPlayer.getWorld();
-		Vector v = mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize();
-		float f = (float) (-180 * (Math.atan2(v.getX(), v.getZ()) / Math.PI));
+		Vector v = mPlayer.getLocation().toVector().subtract(bLoc.toVector());
+		float f = (float) -Math.toDegrees(Math.atan2(v.getX(), v.getZ()));
 		ArmorStand stand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, mTotemName);
 		if (stand == null || stand.isDead() || !stand.isValid()) {
 			return;
