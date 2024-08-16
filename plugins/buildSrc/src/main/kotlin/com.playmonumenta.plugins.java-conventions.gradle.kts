@@ -13,7 +13,6 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://maven.playpro.com/")
-    maven("https://repo.dmulloy2.net/nexus/repository/public/")
     maven("https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
     maven("https://ci.mg-dev.eu/plugin/repository/everything")
     maven("https://maven.enginehub.org/repo/")
