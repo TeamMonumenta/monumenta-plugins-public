@@ -1679,7 +1679,9 @@ public class EntityUtils {
 		BlockDisplay display = world.spawn(loc, BlockDisplay.class);
 		display.setBlock(blockData);
 		scaleDisplay(display, width, height);
-		lightDisplay(display);
+		if (fullBrightness) {
+			lightDisplay(display);
+		}
 		return display;
 	}
 

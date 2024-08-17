@@ -164,14 +164,6 @@ public class GlowingManager {
 	}
 
 	private static void update(Entity entity, GlowingEntityData data) {
-
-		if (entity instanceof Display display) {
-			// TODO handle color of display entities if different between players once this is something we need
-			GlowingInstance active = data.mInstances.get(0);
-			display.setGlowColorOverride(active.mDisplayColor);
-			return;
-		}
-
 		for (Player player : entity.getTrackedPlayers()) {
 			GlowingInstance activeInstance = data.getActiveInstance(player);
 			NamedTextColor sentColor = data.mSentPlayerData.get(player.getUniqueId());
@@ -183,9 +175,16 @@ public class GlowingManager {
 				} else {
 					data.mSentPlayerData.put(player.getUniqueId(), activeInstance.mTeamColor);
 				}
-				GlowingReplacer.sendTeamUpdate(entity, player,
-					sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity instanceof Player) : null,
-					activeInstance != null ? activeInstance.mTeamColor : null);
+				if (entity instanceof Display display) {
+					// TODO handle color of display entities if different between players once this is something we need
+					if (activeInstance != null) {
+						display.setGlowColorOverride(activeInstance.mDisplayColor);
+					}
+				} else {
+					GlowingReplacer.sendTeamUpdate(entity, player,
+						sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity instanceof Player) : null,
+						activeInstance != null ? activeInstance.mTeamColor : null);
+				}
 
 				// if glowing also has changed (glowing from manager only and previous != current), send a glowing update
 				if (!data.mOriginallyGlowing

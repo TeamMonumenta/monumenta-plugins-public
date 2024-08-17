@@ -11,9 +11,9 @@ import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -32,16 +32,15 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -131,6 +130,9 @@ public class DepthsParty {
 
 	//A flag for if the forced cleansing room has already been spawned in A10+. This is to prevent players from just spamming cleanse rooms (they do nothing, but still).
 	public boolean mSpawnedForcedCleansingRoom = false;
+
+	//The BlockDisplay used to mark the most recent chest, no need to store when serializing
+	public transient @Nullable BlockDisplay mRewardDisplay = null;
 
 	/**
 	 * Creates a new depths party with the given players
@@ -316,22 +318,20 @@ public class DepthsParty {
 	}
 
 	// Spawns the chest in the location of the final spawner
-	private void spawnRoomReward(Location l, boolean spawnSlime) {
+	private void spawnRoomReward(Location l, boolean spawnDisplay) {
 
-		BukkitRunnable itemEffects = new ItemEffects(l, null);
-		if (spawnSlime) {
-			Entity e = l.getWorld().spawnEntity(l.clone().add(0.5, 0.25, 0.5), EntityType.SLIME);
-			if (e instanceof Slime slime) {
-				slime.setSize(1);
-				slime.setAI(false);
-				slime.setGlowing(true);
-				slime.setInvulnerable(true);
-				slime.setInvisible(true);
-				slime.addScoreboardTag(AbilityUtils.IGNORE_TAG);
-				slime.addScoreboardTag("boss_delveimmune");
+		if (spawnDisplay) {
+			if (mRewardDisplay != null && mRewardDisplay.isValid()) {
+				mRewardDisplay.remove();
 			}
-			itemEffects = new ItemEffects(l, e);
+			mRewardDisplay = EntityUtils.spawnBlockDisplay(l.getWorld(), l.clone().add(0.25, 0.25, 0.25), Material.GOLD_BLOCK, 0.5f, 0.5f, true);
+			EntityUtils.setRemoveEntityOnUnload(mRewardDisplay);
+			GlowingManager.startGlowing(mRewardDisplay, Color.fromRGB(228, 155, 32), -1, GlowingManager.BOSS_SPELL_PRIORITY + 1, p -> {
+				DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(p);
+				return dp != null && !dp.mEarnedRewards.isEmpty();
+			});
 		}
+		BukkitRunnable itemEffects = new ItemEffects(l);
 		itemEffects.runTaskTimer(Plugin.getInstance(), 0, 20);
 
 		BukkitRunnable placeChest = new PlaceChest(l);
@@ -512,17 +512,14 @@ public class DepthsParty {
 		}
 	}
 
-	//Slime chest runnable
 	public static class ItemEffects extends BukkitRunnable {
 
 		Location mLocation;
 		int mSeconds;
-		@Nullable Entity mSlime;
 
-		public ItemEffects(Location l, @Nullable Entity e) {
+		public ItemEffects(Location l) {
 			mLocation = l;
 			mSeconds = 0;
-			mSlime = e;
 		}
 
 		@Override
@@ -536,9 +533,7 @@ public class DepthsParty {
 			if (mSeconds == 2 || mSeconds == 4 || mSeconds == 6) {
 				world.playSound(mLocation, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.8f, 1.0f);
 			}
-
-			if (mSeconds >= 60 && mSlime != null) {
-				mSlime.remove();
+			if (mSeconds >= 6) {
 				this.cancel();
 			}
 
