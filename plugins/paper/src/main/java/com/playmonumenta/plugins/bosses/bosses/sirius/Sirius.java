@@ -8,7 +8,18 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBasePassiveAbility;
-import com.playmonumenta.plugins.bosses.spells.sirius.*;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveDeclaration;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlight;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveStarBlightConversion;
+import com.playmonumenta.plugins.bosses.spells.sirius.PassiveTentacleManager;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightBomb;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightWall;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedBolts;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellBlightedPods;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellCosmicPortals;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellFromTheStars;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellSiriusBeams;
+import com.playmonumenta.plugins.bosses.spells.sirius.SpellSummonTheStars;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -884,7 +895,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 
 				if (mTicks == 22) {
-					for (Player p : PlayerUtils.playersInRange(getPlayers(), mBoss.getLocation(), 12, true, false)) {
+					for (Player p : getPlayers()) {
 						double maxOriginalDamage = 1000;
 						Vector vec = LocationUtils.getVectorTo(mBoss.getLocation().clone(), p.getLocation().clone());
 						vec.setY(0); //remove y
@@ -900,10 +911,16 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 								p.setHealth(0); // For good measure
 							}
 							AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r3/sirius/starfall");
-							getPlayers().remove(p); // get rid of them early on.
-						} else {
+							continue;
+						} else if (ratio > 0) {
 							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, maxOriginalDamage * ratio, null, true, true, "crushing weight.");
+						} else {
+							// small amount of damage for flavor
+							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, 0.001, null, true, true, "crushing weight.");
 						}
+						// throw players a bit into the air for flavor (give the impact some oomph)
+						Vector fromSiriusDir = p.getLocation().toVector().subtract(mBoss.getLocation().toVector()).setY(0).normalize();
+						p.setVelocity(p.getVelocity().add(fromSiriusDir.multiply(0.4)).add(new Vector(0, 0.7, 0)));
 					}
 					for (int i = 0; i < mStoredTransformations.size(); i++) {
 						Display mDisplay = mDisplays.get(i);
@@ -970,10 +987,13 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						int r = FastUtils.randomIntInRange(3, 12);
 						new PartialParticle(Particle.LAVA, mBoss.getLocation().add(r * Math.cos(theta), 0, r * Math.sin(theta)), 5).delta(0, 3, 0).spawnAsBoss();
 					}
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1.0f, 0.1f);
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.6f, 2.0f);
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 0.1f);
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2.0f, 0.1f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.HOSTILE, 1.0f, 0.1f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 0.6f, 2.0f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 2, 1);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 2, 0.75f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 2, 0.75f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 2.0f, 0.1f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 0.1f);
 					for (Player p : getPlayers()) {
 						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Sirius", NamedTextColor.AQUA), Component.text("The Final Herald", NamedTextColor.DARK_AQUA));
 
