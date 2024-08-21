@@ -97,13 +97,14 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("peb"),
 		exactOptionalArguments("(minecraft:)?player"),
 		exactOptionalArguments("(playerstats|ps)"),
-		exactOptionalArguments("(minecraft:)?plot access"),
+		exactOptionalArguments("(minecraft:)?plot (access|region)"),
 		exactOptionalArguments("(minecraft:)?race leaderboard"),
 		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
 		exactOptionalArguments("(minecraft:)?toggleswap"),
 		exactOptionalArguments("(minecraft:)?toggleworldnames"),
 		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
 		exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
+		exactOptionalArguments("(minecraft:)?wallet withdraw"),
 		exactOptionalArguments("(spark:)?tps")
 	);
 
