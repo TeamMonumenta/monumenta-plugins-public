@@ -64,7 +64,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		mSettings = new ExperiencinatorSettings(mConfig.getScoreboardConfig(), owner);
 
 		mConversions = mConfig.getConversions().stream()
-			.filter(c -> c.conversionAllowedInGeneral(mPlayer, experiencinatorItem))
+			               .filter(c -> c.getSettingsId() > 0 && c.conversionAllowedInGeneral(mPlayer, experiencinatorItem))
 			.collect(Collectors.groupingBy(Conversion::getSettingsId))
 			.entrySet().stream()
 			.sorted(Entry.comparingByKey())
@@ -160,9 +160,6 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 			return;
 		}
 		ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(player.getLocation());
-		if (config == null) {
-			return;
-		}
 		new ExperiencinatorSelectiveConvertGui(player, experiencinator, experiencinatorItem, config).openInventory(player, plugin);
 	}
 
@@ -231,7 +228,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		if (!conversion.conversionAllowed(mPlayer, region, tier, mExperiencinatorItem)) {
 			return false;
 		}
-		return ExperiencinatorUtils.convertSingleItem(mPlayer, item, conversion, conversionRateName);
+		return ExperiencinatorUtils.convertSingleItem(item, mPlayer, conversion, conversionRateName);
 	}
 
 }

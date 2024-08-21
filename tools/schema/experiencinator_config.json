@@ -1,6 +1,72 @@
 {
     "title": "Experiencinator Config",
     "additionalProperties": false,
+	"definitions": {
+		"conversionRateResult": {
+			"title": "result",
+			"oneOf": [
+				{
+					"title": "simple (default) result",
+					"type": "integer",
+					"minimum": 1
+				},
+				{
+					"title": "specific result",
+					"type": "object",
+					"properties": {
+						"count": {
+							"type": "integer",
+							"minimum": 1
+						},
+						"result": {
+							"name": "result id",
+							"type": "string"
+						}
+					}
+				}
+			]
+		},
+		"conversionResults": {
+			"title": "Conversion Results",
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"value": {
+						"required": true,
+						"propertyOrder": 1,
+						"title": "Value",
+						"description": "Value of this result. At least one result must have value 1. Results with value > 1 are used to give compressed result items if the total value of converted items allows (useful for currencies).",
+						"type": "integer",
+						"minimum": 1
+					},
+					"name": {
+						"required": false,
+						"propertyOrder": 2,
+						"title": "Name",
+						"description": "Name of this result. Plural name if singular differs.",
+						"type": "string"
+					},
+					"name_singular": {
+						"required": false,
+						"propertyOrder": 3,
+						"title": "Name (singular)",
+						"description": "Name of a single piece of this result, if different from the name.",
+						"type": "string"
+					},
+					"loot_table": {
+						"required": true,
+						"propertyOrder": 4,
+						"title": "Loot Table",
+						"description": "Loot table where this item can be found. Should be a loot table containing only a single item.",
+						"type": "string"
+					}
+				}
+			}
+		}
+	},
     "properties": {
 		"experiencinators": {
 			"required": true,
@@ -63,7 +129,7 @@
             "type": "object",
 			"patternProperties": {
 				".*": {
-					"title": "Conversion",
+					"headerTemplate": "Conversion '{{i}}'",
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
@@ -98,17 +164,36 @@
 							"type": "object",
 							"patternProperties": {
 								".*": {
-									"headerTemplate": "{{i}}",
+									"headerTemplate": "Region '{{i}}'",
 									"type": "object",
 									"patternProperties": {
 										".*": {
-											"headerTemplate": "{{i}}",
+											"headerTemplate": "Conversion '{{i}}'",
 											"type": "object",
 											"patternProperties": {
 												".*": {
-													"headerTemplate": "{{i}}",
-													"type": "integer",
-													"minimum": 1
+													"headerTemplate": "Itemm tier '{{i}}'",
+													"oneOf": [
+														{
+															"$ref": "#/definitions/conversionRateResult"
+														},
+														{
+															"title": "further refine by tag",
+															"type": "object",
+															"patternProperties": {
+																".*": {
+																	"headerTemplate": "NBT tag path '{{i}}'",
+																	"type": "object",
+																	"patternProperties": {
+																		".*": {
+																			"headerTemplate": "NBT tag value '{{i}}'",
+																			"$ref": "#/definitions/conversionRateResult"
+																		}
+																	}
+																}
+															}
+														}
+													]
 												}
 											}
 										}
@@ -124,46 +209,23 @@
 							"type": "object",
 							"patternProperties": {
 								".*": {
-									"headerTemplate": "{{i}}",
-									"type": "array",
-									"minItems": 1,
-									"items": {
-										"title": "Conversion Results",
-										"description": "Map of region to list of conversion results",
-										"type": "object",
-										"additionalProperties": false,
-										"properties": {
-											"value": {
-												"required": true,
-												"propertyOrder": 1,
-												"title": "Value",
-												"description": "Value of this result. At least one result must have value 1. Results with value > 1 are used to give compressed result items if the total value of converted items allows (useful for currencies).",
-												"type": "integer",
-												"minimum": 1
-											},
-											"name": {
-												"required": true,
-												"propertyOrder": 2,
-												"title": "Name",
-												"description": "Name of this result. Plural name if singular differs.",
-												"type": "string"
-											},
-											"name_singular": {
-												"required": false,
-												"propertyOrder": 3,
-												"title": "Name (singular)",
-												"description": "Name of a single piece of this result, if different from the name.",
-												"type": "string"
-											},
-											"loot_table": {
-												"required": true,
-												"propertyOrder": 4,
-												"title": "Loot Table",
-												"description": "Loot table where this item can be found. Should be a loot table containing only a single item.",
-												"type": "string"
+									"headerTemplate": "Region '{{i}}'",
+									"oneOf": [
+										{
+											"title": "simple (default) results",
+											"$ref": "#/definitions/conversionResults"
+										},
+										{
+											"title": "specific results",
+											"type": "object",
+											"patternProperties": {
+												".*": {
+													"headerTemplate": "Result '{{i}}'",
+													"$ref": "#/definitions/conversionResults"
+												}
 											}
 										}
-									}
+									]
 								}
 							}
 						},

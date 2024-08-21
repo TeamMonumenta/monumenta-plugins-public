@@ -81,10 +81,10 @@ public class LimeTesseractOverride extends BaseOverride {
 			}
 			player.sendMessage(Component.text("Convert all available experience into anvils?", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
 			player.sendMessage(Component.text("[Convert All]", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)
-				.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, MonumentaTrigger.makeTrigger(player, LimeTesseractOverride::makeAllAnvils)))
-				.append(Component.text("  "))
-				.append(Component.text("[Select levels to keep]", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)
-					.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, MonumentaTrigger.makeTrigger(player, PickLevelAfterAnvils::run)))));
+				                   .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, MonumentaTrigger.makeTrigger(player, true, LimeTesseractOverride::makeAllAnvils)))
+				                   .append(Component.text("  "))
+				                   .append(Component.text("[Select levels to keep]", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false)
+					                           .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, MonumentaTrigger.makeTrigger(player, true, PickLevelAfterAnvils::run)))));
 		} else {
 			makeOneAnvil(player, item);
 		}

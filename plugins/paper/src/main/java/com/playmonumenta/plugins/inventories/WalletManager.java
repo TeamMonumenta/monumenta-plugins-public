@@ -283,7 +283,7 @@ public class WalletManager implements Listener {
 						String undoCommand = "/wallet withdraw " + depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey()).collect(Collectors.joining(", "));
 						Component undoTooltip = Component.text("Click to retrieve these items again", NamedTextColor.GRAY);
 						if (undoCommand.length() >= 255) {
-							undoCommand = MonumentaTrigger.makeTrigger(player, p -> {
+							undoCommand = MonumentaTrigger.makeTrigger(player, false, p -> {
 								try {
 									WalletCommand.withdrawFromWallet(p, depositedItems.entrySet().stream().map(e -> new WalletCommand.WalletCommandItem(e.getKey(), e.getValue())).toList());
 								} catch (WrapperCommandSyntaxException e) {

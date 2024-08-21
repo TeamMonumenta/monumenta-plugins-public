@@ -16,9 +16,8 @@ import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -48,7 +47,7 @@ public class ExperiencinatorCommand {
 			.withPermission(PERMISSION_OTHERS)
 			.withArguments(new LiteralArgument("menu"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>) args.get("players")) {
+				for (Player player : Objects.requireNonNull((Collection<Player>) args.get("players"))) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorMainGui.show(player, Plugin.getInstance(), experiencinator, item));
 				}
 			})
@@ -67,7 +66,7 @@ public class ExperiencinatorCommand {
 			.withPermission(PERMISSION_OTHERS)
 			.withArguments(new LiteralArgument("convert"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>) args.get("players")) {
+				for (Player player : Objects.requireNonNull((Collection<Player>) args.get("players"))) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorUtils.useExperiencinator(experiencinator, item, player));
 				}
 			})
@@ -86,7 +85,7 @@ public class ExperiencinatorCommand {
 			.withPermission(PERMISSION_OTHERS)
 			.withArguments(new LiteralArgument("configure"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
-				for (Player player : (Collection<Player>) args.get("players")) {
+				for (Player player : Objects.requireNonNull((Collection<Player>) args.get("players"))) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorSettingsGui.showConfig(player, Plugin.getInstance(), experiencinator, item));
 				}
 			})
@@ -94,33 +93,43 @@ public class ExperiencinatorCommand {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION_ITEMS)
-			.withArguments(new LiteralArgument("convert_items"),
-			               new EntitySelectorArgument.OnePlayer("player"),
-			               new EntitySelectorArgument.ManyEntities("items"),
-			               new StringArgument("conversionName")
-				               .replaceSuggestions(ArgumentSuggestions.strings(info -> {
-					               Location lootTableLocation = info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
-					               ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(lootTableLocation);
-					               return config != null ? config.getConversionNames().toArray(new String[0]) : new String[0];
-				               })),
-			               new StringArgument("conversionResultName")
-				               .replaceSuggestions(ArgumentSuggestions.strings(info -> {
-					               String conversionName = info.previousArgs() != null ? (String) info.previousArgs().get("conversionName") : null;
-					               if (conversionName == null) {
-						               return new String[0];
-					               }
-					               Location lootTableLocation = info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
-					               ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(lootTableLocation);
-					               if (config == null) {
-						               return new String[0];
-					               }
-					               ExperiencinatorConfig.Conversion conversion = config.getConversion(conversionName);
-					               return conversion != null ? conversion.getConversionRateNames().toArray(new String[0]) : new String[0];
-				               })),
-			               new BooleanArgument("giveToPlayerOnFail"))
+			.withArguments(
+				new LiteralArgument("convert_items"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				new EntitySelectorArgument.ManyEntities("items"),
+				new StringArgument("conversionName")
+					.replaceSuggestions(ArgumentSuggestions.strings(info -> {
+						Location lootTableLocation = info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+						ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(lootTableLocation);
+						return config.getConversionNames().toArray(new String[0]);
+					})),
+				new StringArgument("conversionResultName")
+					.replaceSuggestions(ArgumentSuggestions.strings(info -> {
+						String conversionName = info.previousArgs() != null ? (String) info.previousArgs().get("conversionName") : null;
+						if (conversionName == null) {
+							return new String[0];
+						}
+						Location lootTableLocation = info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+						ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(lootTableLocation);
+						ExperiencinatorConfig.Conversion conversion = config.getConversion(conversionName);
+						return conversion != null ? conversion.getConversionRateNames().toArray(new String[0]) : new String[0];
+					})),
+				new BooleanArgument("askToConfirmConversion"))
 			.executes((sender, args) -> {
-				for (Entity entity : (Collection<Entity>) args.get("items")) {
-					ExperiencinatorUtils.convertItemEntity(args.getUnchecked("player"), entity, args.getUnchecked("conversionName"), args.getUnchecked("conversionResultName"), args.getUnchecked("giveToPlayerOnFail"));
+				Player player = Objects.requireNonNull(args.getUnchecked("player"));
+				Collection<Entity> items = Objects.requireNonNull(args.getUnchecked("items"));
+				String conversionName = args.getUnchecked("conversionName");
+				String conversionResultName = args.getUnchecked("conversionResultName");
+				boolean askToConfirmConversion = Objects.requireNonNull(args.getUnchecked("askToConfirmConversion"));
+				if (askToConfirmConversion) {
+					ExperiencinatorUtils.convertItemEntitiesWithConfirmation(player, items, conversionName, conversionResultName, false);
+					return 1;
+				} else {
+					boolean success = false;
+					for (Entity entity : items) {
+						success |= ExperiencinatorUtils.convertItemEntity(player, entity, conversionName, conversionResultName);
+					}
+					return success ? 1 : 0;
 				}
 			})
 			.register();
@@ -133,10 +142,6 @@ public class ExperiencinatorCommand {
 		}
 
 		ExperiencinatorConfig experiencinatorConfig = ExperiencinatorUtils.getConfig(player.getLocation());
-		if (experiencinatorConfig == null) {
-			player.sendMessage(Component.text("There's a problem with the server's Experiencinator configuration. Please contact a moderator.", NamedTextColor.RED));
-			return;
-		}
 
 		// Try SQ's "used item" first
 		QuestContext questContext = QuestContext.getCurrentContext();

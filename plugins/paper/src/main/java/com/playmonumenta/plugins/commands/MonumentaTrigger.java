@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -37,7 +38,7 @@ public class MonumentaTrigger {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static String makeTrigger(Player player, Consumer<Player> callback) {
+	public static String makeTrigger(Player player, boolean withSound, Consumer<Player> callback) {
 		Map<Integer, Consumer<Player>> triggers;
 		List<MetadataValue> metadata = player.getMetadata(METADATA_KEY);
 		if (!metadata.isEmpty()) {
@@ -46,6 +47,13 @@ public class MonumentaTrigger {
 			triggers = new HashMap<>();
 		}
 		int id = nextId.getAndIncrement();
+		if (withSound) {
+			Consumer<Player> originalCallback = callback;
+			callback = (p) -> {
+				player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.7f, 0.3f);
+				originalCallback.accept(p);
+			};
+		}
 		triggers.put(id, callback);
 		player.setMetadata(METADATA_KEY, new FixedMetadataValue(Plugin.getInstance(), triggers));
 		return "/monumentatrigger " + id;

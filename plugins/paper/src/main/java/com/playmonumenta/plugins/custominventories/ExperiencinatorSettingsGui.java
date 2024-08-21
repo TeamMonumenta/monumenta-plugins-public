@@ -81,9 +81,6 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 	public static void showConfig(Player player, Plugin plugin, ExperiencinatorConfig.Experiencinator experiencinator, ItemStack experiencinatorItem) {
 
 		ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(player.getLocation());
-		if (config == null) {
-			return;
-		}
 		if (!ExperiencinatorUtils.checkExperiencinator(experiencinator, experiencinatorItem, player)) {
 			return;
 		}
@@ -175,7 +172,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 				if (conversion == null) {
 					continue;
 				}
-				List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
+				List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region, ExperiencinatorConfig.DEFAULT_RESULT); // GUI doesn't need to handle non-default results (yet)
 				if (conversionResults == null || conversionResults.isEmpty()) {
 					continue;
 				}
@@ -274,7 +271,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		// go through the list of conversions and find the first valid one after the currently active one
 		boolean currentFound = currentConversion == 0; // If currently disabled, switch to the first one
 		for (Conversion conversion : conversions) {
-			if (!isValidConversion(conversion, region, tier)) {
+			if (!isValidConversion(conversion, region, tier) || conversion.getSettingsId() <= 0) {
 				continue;
 			}
 			if (conversion.getSettingsId() == currentConversion) {

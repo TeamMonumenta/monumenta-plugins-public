@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
@@ -38,6 +39,8 @@ import org.jetbrains.annotations.Nullable;
  * Configuration for Experiencinators, stored in a JSON file for quick & easy changes.
  */
 public final class ExperiencinatorConfig {
+
+	public static final String DEFAULT_RESULT = "default";
 
 	private final List<Experiencinator> mExperiencinators = new ArrayList<>();
 	private final Map<String, Conversion> mConversions = new LinkedHashMap<>(); // LinkedHashMap to preserve iteration order
@@ -66,9 +69,9 @@ public final class ExperiencinatorConfig {
 		if (conversionsElement != null) {
 			JsonObject conversionObject = conversionsElement.getAsJsonObject();
 			for (Entry<String, JsonElement> entry : conversionObject.entrySet()) {
-				String conversionName = entry.getKey();
-				Conversion conversion = new Conversion(entry.getValue(), lootTableLocation);
-				mConversions.put(conversionName, conversion);
+				String conversionId = entry.getKey();
+				Conversion conversion = new Conversion(conversionId, entry.getValue(), lootTableLocation);
+				mConversions.put(conversionId, conversion);
 			}
 		} else {
 			throw new Exception("Experiencinator config missing conversions value!");
@@ -128,6 +131,9 @@ public final class ExperiencinatorConfig {
 	}
 
 	public @Nullable Conversion findConversion(int conversionSettingsId, Region region) {
+		if (conversionSettingsId <= 0) {
+			return null;
+		}
 		for (Conversion conversion : mConversions.values()) {
 			if (conversion.getSettingsId() == conversionSettingsId
 				    && conversion.getConversionRates(region) != null) {
@@ -219,7 +225,7 @@ public final class ExperiencinatorConfig {
 
 		public boolean checkPrerequisites(Player player, ItemStack experiencinatorItem) {
 			if (mPrerequisites != null && !new QuestContext(Plugin.getInstance(), player, null, false, mPrerequisites, experiencinatorItem).prerequisitesMet()) {
-				player.sendMessage(Component.text(mPrerequisitesFailureMessage, NamedTextColor.RED));
+				player.sendMessage(Component.text(Objects.requireNonNull(mPrerequisitesFailureMessage), NamedTextColor.RED)); // message is not null if mPrerequisites is not null
 				return false;
 			}
 			return true;
@@ -237,17 +243,20 @@ public final class ExperiencinatorConfig {
 
 	public static class Conversion {
 
+		private final String mId;
 		private final String mName;
 		private final @Nullable String mCombinedName;
 		private final int mSettingsId;
 		private final Map<Region, ConversionRates> mRates = new EnumMap<>(Region.class);
-		private final Map<Region, List<ConversionResult>> mResults = new EnumMap<>(Region.class);
+		private final Map<Region, Map<String, List<ConversionResult>>> mResults = new EnumMap<>(Region.class);
 		private final boolean mCompressExistingResults;
 		private final @Nullable QuestPrerequisites mPrerequisites;
 		private final Map<Region, QuestPrerequisites> mRegionPrerequisites = new EnumMap<>(Region.class);
 		private final Map<Tier, QuestPrerequisites> mTierPrerequisites = new EnumMap<>(Tier.class);
 
-		private Conversion(JsonElement element, Location lootTableLocation) throws Exception {
+		private Conversion(String id, JsonElement element, Location lootTableLocation) throws Exception {
+			mId = id;
+
 			JsonObject object = element.getAsJsonObject();
 
 			JsonElement nameElement = object.get("name");
@@ -281,14 +290,29 @@ public final class ExperiencinatorConfig {
 			JsonElement resultsElement = object.get("results");
 			if (resultsElement != null) {
 				JsonObject ratesObject = resultsElement.getAsJsonObject();
-				for (Entry<String, JsonElement> entry : ratesObject.entrySet()) {
-					Region region = parseItemRegion(entry.getKey());
-					JsonArray resultsArray = entry.getValue().getAsJsonArray();
-					List<ConversionResult> conversionResults = new ArrayList<>();
-					for (JsonElement resultElement : resultsArray) {
-						conversionResults.add(new ConversionResult(resultElement, lootTableLocation));
+				for (Entry<String, JsonElement> ratesEntry : ratesObject.entrySet()) {
+					Region region = parseItemRegion(ratesEntry.getKey());
+					if (ratesEntry.getValue().isJsonArray()) {
+						JsonArray resultsArray = ratesEntry.getValue().getAsJsonArray();
+						List<ConversionResult> conversionResults = new ArrayList<>();
+						for (JsonElement resultElement : resultsArray) {
+							conversionResults.add(new ConversionResult(resultElement, lootTableLocation));
+						}
+						mResults.put(region, Map.of(DEFAULT_RESULT, conversionResults));
+					} else {
+						JsonObject resultsObject = ratesEntry.getValue().getAsJsonObject();
+						Map<String, List<ConversionResult>> results = new HashMap<>();
+						for (Entry<String, JsonElement> resultEntry : resultsObject.entrySet()) {
+							String tag = resultEntry.getKey();
+							JsonArray resultsArray = resultEntry.getValue().getAsJsonArray();
+							List<ConversionResult> conversionResults = new ArrayList<>();
+							for (JsonElement resultElement : resultsArray) {
+								conversionResults.add(new ConversionResult(resultElement, lootTableLocation));
+							}
+							results.put(tag, conversionResults);
+						}
+						mResults.put(region, results);
 					}
-					mResults.put(region, conversionResults);
 				}
 			} else {
 				throw new Exception("conversion missing rates value!");
@@ -330,6 +354,10 @@ public final class ExperiencinatorConfig {
 
 		}
 
+		public String getId() {
+			return mId;
+		}
+
 		public String getName() {
 			return mName;
 		}
@@ -350,12 +378,13 @@ public final class ExperiencinatorConfig {
 			return mRates.values().stream().flatMap(rates -> rates.mRates.keySet().stream()).collect(Collectors.toSet());
 		}
 
-		public @Nullable List<ConversionResult> getConversionResults(Region region) {
-			return mResults.get(region);
+		public @Nullable List<ConversionResult> getConversionResults(Region region, String resultId) {
+			Map<String, List<ConversionResult>> conversionResults = mResults.get(region);
+			return conversionResults == null ? null : conversionResults.get(resultId);
 		}
 
 		public @Nullable List<ConversionResult> getAnyConversionResult() {
-			return mResults.values().stream().findFirst().orElse(null);
+			return mResults.values().stream().findFirst().flatMap(m -> m.values().stream().findFirst()).orElse(null);
 		}
 
 		public boolean getCompressExistingResults() {
@@ -383,15 +412,15 @@ public final class ExperiencinatorConfig {
 			if (!mRates.keySet().equals(mResults.keySet())) {
 				throw new Exception("missing rates or result mapping in experiencinator conversions!");
 			}
-			if (mSettingsId <= 0 || mSettingsId > 9) {
-				throw new Exception("settingsId must be a single-digit number not equal to zero!");
+			if (!(mSettingsId == -1 || (1 <= mSettingsId && mSettingsId <= 9))) {
+				throw new Exception("settingsId must be a single-digit number greater than zero, or -1!");
 			}
-			if (config.getConversions().stream().anyMatch(c -> c != this
+			if (mSettingsId > 0 && config.getConversions().stream().anyMatch(c -> c != this
 				                                                   && c.mSettingsId == mSettingsId
 				                                                   && c.mRates.keySet().stream().anyMatch(mRates::containsKey))) {
 				throw new Exception("settingsId must be unique per region!");
 			}
-			if (mResults.values().stream().anyMatch(results -> results.stream().noneMatch(result -> result.mValue == 1))) {
+			if (mResults.values().stream().anyMatch(results -> results.values().stream().anyMatch(r -> r.stream().noneMatch(result -> result.mValue == 1)))) {
 				throw new Exception("Conversion " + mName + " does not have a result with value 1");
 			}
 		}
@@ -402,7 +431,7 @@ public final class ExperiencinatorConfig {
 
 		private final Map<String, Map<Tier, ConversionRate>> mRates = new HashMap<>();
 
-		private ConversionRates(JsonElement element) throws IllegalStateException {
+		private ConversionRates(JsonElement element) throws Exception {
 			JsonObject object = element.getAsJsonObject();
 			for (Entry<String, JsonElement> entry : object.entrySet()) {
 				String conversionName = entry.getKey();
@@ -446,7 +475,7 @@ public final class ExperiencinatorConfig {
 	public interface ConversionRate {
 		String getDescription();
 
-		int getValue(ItemStack item);
+		ConversionRateResult getValue(ItemStack item);
 	}
 
 	public static class StaticConversionRate implements ConversionRate {
@@ -462,44 +491,67 @@ public final class ExperiencinatorConfig {
 		}
 
 		@Override
-		public int getValue(ItemStack item) {
-			return mRate;
+		public ConversionRateResult getValue(ItemStack item) {
+			return new ConversionRateResult(mRate, DEFAULT_RESULT);
 		}
 	}
 
 	public static class DynamicConversionRate implements ConversionRate {
 		private final String[] mTagPath;
-		private final Map<String, Integer> mRates = new HashMap<>();
+		private final Map<String, ConversionRateResult> mRates = new HashMap<>();
 
-		private DynamicConversionRate(String tagPath, JsonObject json) {
+		private DynamicConversionRate(String tagPath, JsonObject json) throws Exception {
 			mTagPath = tagPath.split("\\.");
 			for (Entry<String, JsonElement> e : json.entrySet()) {
-				mRates.put(e.getKey(), e.getValue().getAsInt());
+				mRates.put(e.getKey(), new ConversionRateResult(e.getValue()));
 			}
 		}
 
 		@Override
 		public String getDescription() {
-			return mRates.values().stream().mapToInt(i -> i).min().orElse(0) + " to " + mRates.values().stream().mapToInt(i -> i).max().orElse(0);
+			return mRates.values().stream().mapToInt(i -> i.mCount).min().orElse(0) + " to " + mRates.values().stream().mapToInt(i -> i.mCount).max().orElse(0);
 		}
 
 		@Override
-		public int getValue(ItemStack item) {
+		public ConversionRateResult getValue(ItemStack item) {
 			NBTCompound nbt = new NBTItem(item);
 			for (int i = 0; i < mTagPath.length - 1; i++) {
 				String tag = mTagPath[i];
 				nbt = nbt.getCompound(tag);
 				if (nbt == null) {
-					return 0;
+					return ConversionRateResult.EMPTY;
 				}
 			}
 			String leaf = mTagPath[mTagPath.length - 1];
 			NBTType type = nbt.getType(leaf);
 			if (type == null) {
-				return 0;
+				return ConversionRateResult.EMPTY;
 			}
 			String tagValue = type == NBTType.NBTTagString ? nbt.getString(leaf) : "" + nbt.getInteger(leaf);
-			return mRates.getOrDefault(tagValue, 0);
+			return mRates.getOrDefault(tagValue, ConversionRateResult.EMPTY);
+		}
+	}
+
+	public static class ConversionRateResult {
+
+		public static final ConversionRateResult EMPTY = new ConversionRateResult(0, DEFAULT_RESULT);
+
+		public final int mCount;
+		public final String mResult;
+
+		private ConversionRateResult(JsonElement element) throws Exception {
+			if (element.isJsonPrimitive()) {
+				mCount = element.getAsInt();
+				mResult = DEFAULT_RESULT;
+			} else {
+				mCount = JsonUtils.getInt((JsonObject) element, "count");
+				mResult = Objects.requireNonNull(JsonUtils.getString((JsonObject) element, "result", DEFAULT_RESULT));
+			}
+		}
+
+		private ConversionRateResult(int count, String result) {
+			mCount = count;
+			mResult = result;
 		}
 	}
 
@@ -520,20 +572,6 @@ public final class ExperiencinatorConfig {
 				throw new Exception("conversion result missing value value!");
 			}
 
-			JsonElement nameElement = object.get("name");
-			if (nameElement != null) {
-				mName = nameElement.getAsString();
-			} else {
-				throw new Exception("conversion result missing name value!");
-			}
-
-			JsonElement nameSingularElement = object.get("name_singular");
-			if (nameSingularElement != null) {
-				mNameSingular = nameSingularElement.getAsString();
-			} else {
-				mNameSingular = mName;
-			}
-
 			JsonElement lootTableElement = object.get("loot_table");
 			if (lootTableElement != null) {
 				String lootTable = lootTableElement.getAsString();
@@ -544,6 +582,26 @@ public final class ExperiencinatorConfig {
 				mItem = item;
 			} else {
 				throw new Exception("conversion result missing loot_table value!");
+			}
+
+			String itemName = ItemUtils.getPlainNameIfExists(mItem);
+
+			JsonElement nameElement = object.get("name");
+			if (nameElement != null) {
+				mName = nameElement.getAsString();
+			} else if (itemName != null) {
+				mName = itemName + "s";
+			} else {
+				throw new Exception("conversion result missing name value!");
+			}
+
+			JsonElement nameSingularElement = object.get("name_singular");
+			if (nameSingularElement != null) {
+				mNameSingular = nameSingularElement.getAsString();
+			} else if (nameElement == null) {
+				mNameSingular = itemName;
+			} else {
+				mNameSingular = mName;
 			}
 
 		}
@@ -678,20 +736,14 @@ public final class ExperiencinatorConfig {
 
 	private static Tier parseItemTier(String tier) throws IllegalArgumentException {
 		tier = tier.toUpperCase(Locale.ROOT);
-		switch (tier) {
-		case "TIER_1":
-			return Tier.I;
-		case "TIER_2":
-			return Tier.II;
-		case "TIER_3":
-			return Tier.III;
-		case "TIER_4":
-			return Tier.IV;
-		case "TIER_5":
-			return Tier.V;
-		default:
-			return Tier.valueOf(tier);
-		}
+		return switch (tier) {
+			case "TIER_1" -> Tier.I;
+			case "TIER_2" -> Tier.II;
+			case "TIER_3" -> Tier.III;
+			case "TIER_4" -> Tier.IV;
+			case "TIER_5" -> Tier.V;
+			default -> Tier.valueOf(tier);
+		};
 	}
 
 }
