@@ -134,9 +134,9 @@ class PSGUIStats {
 
 	int getRegionScaling(Player player, boolean mainhand) {
 		return (mainhand ? Stream.of(PSGUIEquipment.MAINHAND) : Arrays.stream(PSGUIEquipment.values()).filter(slot -> slot != PSGUIEquipment.MAINHAND))
-			       .mapToInt(slot -> (int) ItemStatManager.getEffectiveRegionScaling(player, getItem(slot), mPlayerItemStats.getRegion(), 0, 1, 2))
-			       .max()
-			       .orElse(0);
+				.mapToInt(slot -> (int) ItemStatManager.getEffectiveRegionScaling(player, getItem(slot), mPlayerItemStats.getRegion(), false, 0, 1, 2))
+				.max()
+				.orElse(0);
 	}
 
 	int getShatteredItemEquipped() {

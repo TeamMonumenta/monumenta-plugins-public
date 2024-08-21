@@ -109,13 +109,13 @@ public class ServerProperties {
 		}
 
 		String shard = getShardName();
-		if (shard.contains("plots")) {
+		if (shard.startsWith("dev") || shard.equals("mobs") || shard.contains("plots")) {
 			// Default to highest region unlocked
-			int plotRegion = PlotManager.getPlotRegion(player).orElse(3);
-			if (PlayerUtils.hasUnlockedRing(player)) {
+			int plotRegion = PlotManager.getPlotRegion(player);
+			if (PlayerUtils.hasUnlockedRing(player) || shard.startsWith("dev") || shard.equals("mobs")) {
 				return plotRegion;
 			} else if (PlayerUtils.hasUnlockedIsles(player)) {
-				return Math.max(plotRegion, 2);
+				return plotRegion == 0 ? 2 : Math.max(plotRegion, 2);
 			} else {
 				return 1;
 			}
@@ -138,7 +138,7 @@ public class ServerProperties {
 		if (effectiveRegion == null) {
 			return INSTANCE.mClassSpecializationsEnabled;
 		}
-		return effectiveRegion >= 2;
+		return effectiveRegion == 0 || effectiveRegion >= 2;
 	}
 
 	public static boolean getAbilityEnhancementsEnabled(@Nullable Player player) {
@@ -146,7 +146,7 @@ public class ServerProperties {
 		if (effectiveRegion == null) {
 			return INSTANCE.mAbilityEnhancementsEnabled;
 		}
-		return effectiveRegion >= 3;
+		return effectiveRegion == 0 || effectiveRegion >= 3;
 	}
 
 	public static String getGameplayDataExportPath() {

@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -211,7 +212,8 @@ public class ItemStatManager implements Listener {
 		public void updateStats(Player player, boolean updateAll, boolean checkHealth) {
 			double priorHealth = EntityUtils.getMaxHealth(player);
 			PlayerInventory inventory = player.getInventory();
-			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), player, updateAll, null);
+			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(),
+					player, updateAll, null, true);
 			// Tell the ItemStats that there has been an update
 			Plugin plugin = Plugin.getInstance();
 			for (ItemStat stat : ITEM_STATS) {
@@ -232,7 +234,8 @@ public class ItemStatManager implements Listener {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> recalculateAntiSpeed(player), 1);
 		}
 
-		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll, @Nullable Region region) {
+		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet,
+		                        Player player, boolean updateAll, @Nullable Region region, boolean withShardSpecificRegion) {
 			mMainhand = mainhand;
 			mRegion = region != null ? region : ServerProperties.getRegion(player);
 
@@ -246,7 +249,8 @@ public class ItemStatManager implements Listener {
 			Set<InfusionType> delveInfusionsWithRevelation = new HashSet<>();
 
 			if (!updateAll && mMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) != ItemStatUtils.getInfusionLevel(mainhand, InfusionType.UNDERSTANDING)) {
-				updateStats(mainhand, player.getInventory().getItemInOffHand(), player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots(), player, true, region);
+				updateStats(mainhand, player.getInventory().getItemInOffHand(), player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots(),
+						player, true, region, withShardSpecificRegion);
 				return;
 			}
 
@@ -279,7 +283,7 @@ public class ItemStatManager implements Listener {
 						ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
 						ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
 
-						double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.33, 0.165);
+						double regionScaling = getEffectiveRegionScaling(player, item, mRegion, withShardSpecificRegion, 1, 0.33, 0.165);
 						boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
 						boolean appliedUnderstanding = false;
 
@@ -297,7 +301,7 @@ public class ItemStatManager implements Listener {
 									newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 								}
 								if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
-									newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getEffectiveRegionScaling(player, item, mRegion, 0, 1, 2)));
+									newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getEffectiveRegionScaling(player, item, mRegion, withShardSpecificRegion, 0, 1, 2)));
 								}
 							} else if (stat instanceof Infusion infusion) {
 								if (!(infusion.getInfusionType().isDisabledByShatter() && shattered)) {
@@ -333,7 +337,7 @@ public class ItemStatManager implements Listener {
 					ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
 					ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
 
-					double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.33, 0.165);
+					double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, withShardSpecificRegion, 1, 0.33, 0.165);
 					boolean appliedUnderstanding = false;
 
 					if (!ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) ||
@@ -358,7 +362,7 @@ public class ItemStatManager implements Listener {
 									newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 								}
 								if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
-									newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
+									newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, withShardSpecificRegion, 0, 1, 2));
 								}
 							} else if (stat instanceof Infusion infusion) {
 								int revelation = 0;
@@ -555,7 +559,7 @@ public class ItemStatManager implements Listener {
 		ItemStack oldItem = inv.getItem(event.getPreviousSlot());
 		ItemStack newItem = inv.getItem(event.getNewSlot());
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(newItem, null, null, null, null, null, player, false, null);
+			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(newItem, null, null, null, null, null, player, false, null, true);
 			for (ItemStat stat : ITEM_STATS) {
 				stat.onEquipmentUpdate(mPlugin, player);
 			}
@@ -909,16 +913,21 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public static double getRegionScaling(Player player, Region itemRegion, Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+	public static double getRegionScaling(Player player, Region itemRegion, Region serverRegion, boolean withShardSpecific, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
 		if (itemRegion == Region.RING) {
 			return serverRegion == Region.VALLEY ? twoRegionScaling
 				       : serverRegion == Region.ISLES ? oneRegionScaling
 					         : baseScaling;
 		} else if (itemRegion == Region.ISLES) {
 			// TODO Remove this if-statement after we get rid of R2 in R3 penalty
-			if (serverRegion == Region.RING
-				    && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))
-				    && !(ServerProperties.getShardName().startsWith("dev") || ServerProperties.getShardName().contains("plots") || ServerProperties.getShardName().equals("mobs") || player.getGameMode() == GameMode.CREATIVE)) {
+			if (serverRegion == Region.RING) {
+				String shardName = ServerProperties.getShardName();
+				if (withShardSpecific
+						&& ((player.getScoreboardTags().contains("SKTQuest") && shardName.startsWith("skt"))
+						|| ((shardName.startsWith("dev") || shardName.equals("mobs") || shardName.contains("plots")) && PlotManager.getPlotRegion(player) == 0)
+						|| player.getGameMode() == GameMode.CREATIVE)) {
+					return baseScaling;
+				}
 				return oneRegionScaling;
 			}
 			return serverRegion == Region.VALLEY ? oneRegionScaling : baseScaling;
@@ -926,14 +935,14 @@ public class ItemStatManager implements Listener {
 		return baseScaling;
 	}
 
-	public static double getEffectiveRegionScaling(Player player, @Nullable ItemStack item, Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+	public static double getEffectiveRegionScaling(Player player, @Nullable ItemStack item, Region serverRegion, boolean withShardSpecific, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
 		Region region;
 		if (item == null || ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)) {
 			region = Region.VALLEY;
 		} else {
 			region = ItemStatUtils.getRegion(item);
 		}
-		return getRegionScaling(player, region, serverRegion, baseScaling, oneRegionScaling, twoRegionScaling);
+		return getRegionScaling(player, region, serverRegion, withShardSpecific, baseScaling, oneRegionScaling, twoRegionScaling);
 	}
 
 	/**

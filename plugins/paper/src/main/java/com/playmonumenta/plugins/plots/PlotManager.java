@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.RBoardAPI;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
@@ -48,8 +48,8 @@ import org.jetbrains.annotations.Nullable;
 public class PlotManager {
 	@SuppressWarnings("unchecked")
 	public static void registerCommands() {
-		IntegerArgument regionArg = new IntegerArgument("regionNum", 1, 3);
-		MultiLiteralArgument multiRegionArg = new MultiLiteralArgument("region", "valley", "isles", "ring");
+		IntegerArgument regionArg = new IntegerArgument("regionNum", 0, 3);
+		MultiLiteralArgument multiRegionArg = new MultiLiteralArgument("region", "all", "valley", "isles", "ring");
 
 		new CommandAPICommand("plot")
 			.withPermission(CommandPermission.NONE)
@@ -265,10 +265,11 @@ public class PlotManager {
 				.executesPlayer((player, args) -> {
 					String regionString = args.getByArgument(multiRegionArg);
 					int region = switch (regionString) {
+						case "all" -> 0;
 						case "valley" -> 1;
 						case "isles" -> 2;
 						case "ring" -> 3;
-						default -> 3;
+						default -> 0;
 					};
 					setPlotRegion(player, region);
 				}))
@@ -641,19 +642,28 @@ public class PlotManager {
 		}
 	}
 
-	public static OptionalInt getPlotRegion(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "PlotRegion");
+	public static int getPlotRegion(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, "PlotRegion").orElse(0);
 	}
 
-	public static void setPlotRegion(Player player, int region) {
-		OptionalInt oldRegion = getPlotRegion(player);
-		if (oldRegion.isPresent() && oldRegion.getAsInt() == region) {
-			player.sendMessage(Component.text("Your plot region was already " + region + "!", NamedTextColor.GOLD));
+	public static void setPlotRegion(Player player, int region) throws WrapperCommandSyntaxException {
+		String[] regionNames = {"all", "King's Valley", "Celsian Isles", "Architect's Ring"};
+		region = Math.max(0, Math.min(region, regionNames.length - 1));
+		String regionName = regionNames[region];
+		int oldRegion = getPlotRegion(player);
+		if (oldRegion == region) {
+			player.sendMessage(Component.text("Your plot region was already " + regionName + "!", NamedTextColor.GOLD));
 			return;
+		}
+		if (region == 3 && !PlayerUtils.hasUnlockedRing(player)) {
+			throw CommandAPI.failWithString("Cannot set plot to Architect's Ring before unlocking it!");
+		}
+		if (region == 2 && !PlayerUtils.hasUnlockedIsles(player)) {
+			throw CommandAPI.failWithString("Cannot set plot to Celsian Isles before unlocking them!");
 		}
 		ScoreboardUtils.setScoreboardValue(player, "PlotRegion", region);
 		AbilityUtils.refreshClass(player);
 		Plugin.getInstance().mItemStatManager.updateStats(player);
-		player.sendMessage(Component.text("Set your plot region to " + region + "!", NamedTextColor.GOLD));
+		player.sendMessage(Component.text("Set your plot region to " + regionName + "!", NamedTextColor.GOLD));
 	}
 }
