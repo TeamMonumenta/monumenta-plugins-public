@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.shadow.ChaosDagger;
 import com.playmonumenta.plugins.depths.bosses.spells.callicarpa.BrambleBall;
 import com.playmonumenta.plugins.depths.bosses.spells.callicarpa.EvolutionSeeds;
 import com.playmonumenta.plugins.depths.bosses.spells.callicarpa.FlowerPower;
@@ -29,7 +28,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -92,14 +90,14 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
-		mBoss.addScoreboardTag(ChaosDagger.NO_GLOWING_CLEAR_TAG);
 
 		// Health is scaled by party ascension
 		mParty = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		EntityUtils.setMaxHealthAndHealth(mBoss, DepthsParty.getAscensionScaledHealth(HEALTH, mParty));
 
-		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
+		if (mParty != null) {
+			mParty.playBossSong(MUSIC_TITLE, MUSIC_DURATION, mBoss);
+		}
 
 		spawnAnimation();
 
@@ -270,7 +268,6 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 					Entity menace = LibraryOfSoulsIntegration.summon(mSpawnLoc, "HoglinMenace");
 					if (menace instanceof Hoglin hoglin) {
 						mMenace = hoglin;
-						mMenace.addScoreboardTag(ChaosDagger.NO_GLOWING_CLEAR_TAG);
 						mBoss.getWorld().playSound(mSpawnLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 10f, 1f);
 						mBoss.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 2f);
 

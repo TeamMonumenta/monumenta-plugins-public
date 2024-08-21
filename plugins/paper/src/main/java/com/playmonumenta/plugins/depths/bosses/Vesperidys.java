@@ -37,7 +37,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -444,7 +443,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 					voiceOfVesperidys(sounds[finalI]);
 				}, dioDelay[i]);
 			}
-			SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE_2, SoundCategory.RECORDS, MUSIC_DURATION_2, true, 1.0f, 1.0f, false), true, mBoss, true, 0, 5);
+			if (mParty != null) {
+				mParty.playBossSong(MUSIC_TITLE_2, MUSIC_DURATION_2, mBoss);
+			}
 		});
 		events.put(25, (mBoss) -> {
 			for (Platform platform : mPlatformList.getAllPlatforms()) {
@@ -516,9 +517,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 		mBoss.teleport(mSpawnLoc.clone().add(0, 4, 0));
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 1.0f, 1.0f, false), true, mBoss, true, 0, 5);
+		if (mParty != null) {
+			mParty.playBossSong(MUSIC_TITLE, MUSIC_DURATION, mBoss);
+		}
 
 		TextComponent[] dio = new TextComponent[]{
 			obfuscate("Yet still does the filthy dirtspawn limps in.", 0, NamedTextColor.DARK_AQUA),
@@ -563,6 +564,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 					mBoss.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2f, 1f);
 
+					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 					for (int i = 0; i < dio.length; i++) {
 						TextComponent dialogue = dio[i];
 						int finalI = i;

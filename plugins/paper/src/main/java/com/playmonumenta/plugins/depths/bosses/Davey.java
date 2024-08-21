@@ -25,7 +25,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,7 +39,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
@@ -72,6 +70,7 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 	private final List<LivingEntity> mVexes = new ArrayList<>();
 
 	public int mCooldownTicks;
+	private final @Nullable DepthsParty mParty;
 
 	public Davey(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
@@ -83,12 +82,13 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 			spawnLoc.getBlock().setType(Material.AIR);
 		}
 
-		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		if (party == null || party.getFloor() == 2) {
+		mParty = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
+		int floor = mParty != null ? mParty.getFloor() : 2;
+		if (floor == 2) {
 			mCooldownTicks = 7 * 20;
-		} else if (party.getFloor() == 5) {
+		} else if (floor == 5) {
 			mCooldownTicks = 6 * 20;
-		} else if (party.getFloor() % 3 == 2) {
+		} else if (floor % 3 == 2) {
 			mCooldownTicks = 4 * 20;
 		} else {
 			mCooldownTicks = 7 * 20;
@@ -138,7 +138,7 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 
 		// Added to a SpellManager later, once the vexes are properly added in
 		List<Spell> spells = new ArrayList<>(Arrays.asList(
-			new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party == null ? 0 : party.getFloor() - 1) / 3) + 1),
+			new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((floor - 1) / 3) + 1),
 			new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
 			new SpellAbyssalCharge(mBoss, mCooldownTicks),
 			new SpellVoidGrenades(mPlugin, mBoss, detectionRange, mCooldownTicks)
@@ -207,14 +207,14 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void init() {
 		// Health is scaled by 1.15 times each time you fight the boss
-		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.15, party == null ? 0.0 : party.getFloor() / 3.0));
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
-		mBoss.setHealth(modifiedHealth);
+		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.15, mParty == null ? 0.0 : mParty.getFloor() / 3.0));
+		EntityUtils.setMaxHealthAndHealth(mBoss, modifiedHealth);
+
+		if (mParty != null) {
+			mParty.playBossSong(MUSIC_TITLE, MUSIC_DURATION, mBoss);
+		}
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
-
 		for (Player player : players) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Lieutenant Davey", NamedTextColor.DARK_GRAY), Component.text("Void Herald", NamedTextColor.GRAY));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));

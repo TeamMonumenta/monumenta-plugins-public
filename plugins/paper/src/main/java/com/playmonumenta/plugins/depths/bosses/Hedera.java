@@ -22,7 +22,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,7 +37,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
@@ -70,6 +68,7 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 	private final Map<Location, String> mPlantTypes = new HashMap<>();
 
 	private int mTimesHealed = 0;
+	private final @Nullable DepthsParty mParty;
 
 	public Hedera(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
@@ -78,12 +77,13 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 
 		// Switch cooldownTicks depending on floor of party
 		int cooldownTicks;
-		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		if (party == null || party.getFloor() == 1) {
+		mParty = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
+		int floor = mParty != null ? mParty.getFloor() : 1;
+		if (floor == 1) {
 			cooldownTicks = 8 * 20;
-		} else if (party.getFloor() == 4) {
+		} else if (floor == 4) {
 			cooldownTicks = 6 * 20;
-		} else if (party.getFloor() % 3 == 1) {
+		} else if (floor % 3 == 1) {
 			cooldownTicks = 5 * 20;
 		} else {
 			cooldownTicks = 8 * 20;
@@ -138,13 +138,13 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 			new SpellEvolutionSeeds(plugin, cooldownTicks, mPlants, mPlantTypes)
 		));
 		//Extra summon ability if fighting on f4 or higher
-		if (party != null && party.getFloor() != 1) {
+		if (floor != 1) {
 			activeSpells = new SpellManager(Arrays.asList(
 					//new SpellEarthshake(plugin, mBoss, 5, 80),
 					new SpellLeafNova(plugin, mBoss, cooldownTicks),
 					new SpellIvyGarden(plugin, cooldownTicks, mPlants),
 					new SpellEvolutionSeeds(plugin, cooldownTicks, mPlants, mPlantTypes),
-					new SpellEndlessHederaSummons(mBoss, cooldownTicks, ((party.getFloor() - 1) / 3) + 1)
+					new SpellEndlessHederaSummons(mBoss, cooldownTicks, ((floor - 1) / 3) + 1)
 			));
 		}
 
@@ -162,14 +162,14 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void init() {
 		// Health is scaled by 1.15 times each time you fight the boss
-		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.15, party == null ? 0.0 : party.getFloor() / 3.0));
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
-		mBoss.setHealth(modifiedHealth);
+		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.15, mParty == null ? 0.0 : mParty.getFloor() / 3.0));
+		EntityUtils.setMaxHealthAndHealth(mBoss, modifiedHealth);
+
+		if (mParty != null) {
+			mParty.playBossSong(MUSIC_TITLE, MUSIC_DURATION, mBoss);
+		}
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
-
 		for (Player player : players) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Hedera", NamedTextColor.DARK_GRAY), Component.text("Venom of the Waves", NamedTextColor.GRAY));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));

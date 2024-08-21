@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.shadow.ChaosDagger;
 import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellPassiveEyes;
 import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellPassiveSummons;
 import com.playmonumenta.plugins.depths.bosses.spells.nucleus.SpellRisingTides;
@@ -23,7 +22,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,6 +72,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 	public int mEyesKilled = 0;
 	public boolean mIsHidden;
 	public boolean mCanSpawnMobs = true;
+	private final @Nullable DepthsParty mParty;
 
 	public Nucleus(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
@@ -82,7 +81,6 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
-		mBoss.addScoreboardTag(ChaosDagger.NO_GLOWING_CLEAR_TAG);
 
 		//Set/remove blocks
 		if (spawnLoc.isChunkLoaded()) {
@@ -95,18 +93,19 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 		}
 
 		//Switch mCooldownTicks depending on floor of party
-		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
+		mParty = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		int surroundingDeathCooldown = 14 * 20;
-		if (party == null || party.getFloor() == 3) {
+		int floor = mParty != null ? mParty.getFloor() : 3;
+		if (floor == 3) {
 			mCooldownTicks = 8 * 20;
 			//Disable passive mob spawning until 90% hp if fighting for the first time
 			mCanSpawnMobs = false;
-		} else if (party.getFloor() == 6) {
+		} else if (floor == 6) {
 			mCooldownTicks = 7 * 20;
 			surroundingDeathCooldown = 10 * 20;
-		} else if (party.getFloor() % 3 == 0) {
+		} else if (floor % 3 == 0) {
 			mCooldownTicks = 6 * 20;
-			if (party.getFloor() == 9) {
+			if (floor == 9) {
 				surroundingDeathCooldown = 6 * 20;
 			} else {
 				surroundingDeathCooldown = 4 * 20;
@@ -164,7 +163,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase1Passives = Arrays.asList(
 				new SpellBlockBreak(mBoss, 2, 3, 2),
 				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this)
+				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
 		);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
@@ -175,7 +174,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase2Passives = Arrays.asList(
 				new SpellBlockBreak(mBoss, 2, 3, 2),
 				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this)
+				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
@@ -187,7 +186,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 				new SpellBlockBreak(mBoss, 2, 3, 2),
 				new SpellVolcanicDeepmise(mBoss, mSpawnLoc),
 				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this)
+				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -321,14 +320,14 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 		mBoss.setAI(false);
 
 		// Health is scaled by 1.15 times each time you fight the boss
-		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, party == null ? 0 : (party.getFloor() - 1) / 3.0));
+		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, mParty == null ? 0 : (mParty.getFloor() - 1) / 3.0));
 		EntityUtils.setMaxHealthAndHealth(mBoss, modifiedHealth);
 
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, false), true, mBoss, true, 0, 5);
+		if (mParty != null) {
+			mParty.playBossSong(MUSIC_TITLE, MUSIC_DURATION, mBoss);
+		}
 
 		new BukkitRunnable() {
 

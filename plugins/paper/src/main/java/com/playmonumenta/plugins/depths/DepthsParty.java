@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -40,6 +41,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -749,5 +751,9 @@ public class DepthsParty {
 
 	public List<Player> getPlayers() {
 		return mPlayersInParty.stream().map(DepthsPlayer::getPlayer).filter(Objects::nonNull).toList();
+	}
+
+	public void playBossSong(String track, int duration, LivingEntity boss) {
+		SongManager.playBossSong(getPlayers(), new SongManager.Song(track, SoundCategory.RECORDS, duration, true, 1.0f, 1.0f, false), true, boss, true, 0, 5);
 	}
 }

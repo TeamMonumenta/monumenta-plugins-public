@@ -49,7 +49,6 @@ public class ChaosDagger extends DepthsAbility {
 	private static final int TARGET_RADIUS = 20;
 	private static final int ELITE_RADIUS = 5;
 	private static final int STEALTH_DURATION = 30;
-	public static final String NO_GLOWING_CLEAR_TAG = "ChaosDaggerNoGlowingClear";
 
 	public static final String CHARM_COOLDOWN = "Chaos Dagger Cooldown";
 

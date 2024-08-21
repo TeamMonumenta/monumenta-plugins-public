@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.shadow.ChaosDagger;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassiveBite;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassiveLaserCores;
 import com.playmonumenta.plugins.depths.bosses.spells.broodmother.PassiveLaserEyes;
@@ -35,7 +34,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.managers.SongManager;
 import com.playmonumenta.structures.StructuresAPI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,7 +112,6 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
-		mBoss.addScoreboardTag(ChaosDagger.NO_GLOWING_CLEAR_TAG);
 
 		// Teleport the boss because depths bossfight command only accepts integer coordinates
 		mBoss.teleport(mBoss.getLocation().add(0, 0, 0.5));
@@ -126,8 +123,9 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		StructuresAPI.loadAndPasteStructure("BikeSpiderBase", mBoss.getLocation().clone().add(-8, -1, -12), false, false);
 		startEffects();
 
-		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 1.0f, 1.0f, false), true, mBoss, true, 0, 5);
+		if (mParty != null) {
+			mParty.playBossSong(MUSIC_TITLE, MUSIC_DURATION, mBoss);
+		}
 
 		PassiveSpider passiveSpider = new PassiveSpider(mBoss);
 		PassivePoisonousSkin passivePoisonousSkin = new PassivePoisonousSkin(mBoss, mParty);
@@ -235,8 +233,9 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			makeBossInvulnerable();
 			mVulnerableTicks = 0;
 			mLimbsDied = false;
-			List<Player> p = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-			SongManager.playBossSong(p, new SongManager.Song(MUSIC_TITLE_2, SoundCategory.RECORDS, MUSIC_DURATION_2, true, 1.0f, 1.0f, false), true, mBoss, true, 0, 5);
+			if (mParty != null) {
+				mParty.playBossSong(MUSIC_TITLE_2, MUSIC_DURATION_2, mBoss);
+			}
 		});
 		events.put(25, mBoss -> {
 			changePhase(phase4Spells, passives, null);
