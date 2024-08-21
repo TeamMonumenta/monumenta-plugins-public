@@ -4,12 +4,12 @@ import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -122,11 +122,9 @@ public class SpellDiesIrae extends Spell {
 				mBoss.teleport(mCenter.clone().add(0, 10, 0));
 				//glowy crystal to tell players to break
 				if (mT == 0) {
-					ScoreboardUtils.modifyTeamColor("crystal", NamedTextColor.WHITE);
 					for (EnderCrystal e : mCrystal) {
-						e.setGlowing(true);
 						e.setBeamTarget(mBoss.getLocation().add(0, 0, 0));
-						ScoreboardUtils.addEntityToTeam(e, "crystal");
+						GlowingManager.startGlowing(e, NamedTextColor.WHITE, -1, GlowingManager.BOSS_SPELL_PRIORITY, null, "crystal");
 					}
 				}
 				//exit function
@@ -144,12 +142,16 @@ public class SpellDiesIrae extends Spell {
 				//warning 1
 				if (mT == 20 * 2) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
-					ScoreboardUtils.modifyTeamColor("crystal", NamedTextColor.YELLOW);
+					for (EnderCrystal e : mCrystal) {
+						GlowingManager.startGlowing(e, NamedTextColor.YELLOW, -1, GlowingManager.BOSS_SPELL_PRIORITY, null, "crystal");
+					}
 				}
 				//warning 2
 				if (mT == 20 * 4) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
-					ScoreboardUtils.modifyTeamColor("crystal", NamedTextColor.RED);
+					for (EnderCrystal e : mCrystal) {
+						GlowingManager.startGlowing(e, NamedTextColor.RED, -1, GlowingManager.BOSS_SPELL_PRIORITY, null, "crystal");
+					}
 				}
 				//execute order 66
 				if (mT >= 20 * 6) {

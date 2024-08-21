@@ -20,12 +20,12 @@ import com.playmonumenta.plugins.bosses.spells.tealspirit.TealSpiritSummon;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.TemporalRift;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,7 +50,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
 public class TealSpirit extends SerializedLocationBossAbilityGroup {
@@ -67,8 +66,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 	public TealSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
-		Team team = ScoreboardUtils.getExistingTeamOrCreate("TealSpiritVulnerable", NamedTextColor.AQUA);
-		team.addEntity(mBoss);
+		GlowingManager.startGlowing(mBoss, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 		mEncounterType = "Normal";
@@ -258,9 +256,9 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 
 			events.put(50, getSummonEchoAction());
 
-			events.put(40, rewindAction);
-
 			events.put(45, rewindAction);
+
+			events.put(40, rewindAction);
 
 			events.put(30, mBoss -> {
 				rewindAction.run(mBoss);
@@ -323,7 +321,6 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 		}
 
 		mBoss.setAI(true);
-		mBoss.setGlowing(true);
 	}
 
 	@Override

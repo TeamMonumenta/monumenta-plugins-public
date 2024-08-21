@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPrimordialBolt;
 import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,6 +50,8 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0) + 0.01);
+
+		GlowingManager.startGlowing(mBoss, NamedTextColor.GOLD, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseCharge(plugin, mBoss, 40, 65, 60, false,

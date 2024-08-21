@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.StarBlight;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -69,7 +70,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
@@ -235,15 +235,15 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 		}, 6 * 20);
 
+		GlowingManager.makeGlowImmune(mBoss, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "sirius");
 	}
 
 	public void changeHp(boolean declerationFail, int distance) {
 		if (declerationFail) {
 			applyDeclerationFail(distance > 0);
 		}
-		//glowing sometimes doesnt get removed so confirming it does
 		if (!mDamagePhase) {
-			mBoss.setGlowing(false);
+			GlowingManager.makeGlowImmune(mBoss, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "sirius");
 		}
 		int mDistance = (int) (distance * mDeclerationScaleAmount);
 		mBlocks -= mDistance;
@@ -328,7 +328,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			for (Player p : getPlayers()) {
 				p.showBossBar(mDamagePhaseHPBar);
 			}
-			mBoss.setGlowing(true);
+			GlowingManager.startGlowing(mBoss, NamedTextColor.DARK_AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "sirius");
 			mDamagePhase = true;
 			//tp creates a transformation so this one needs to be delayed.
 			Bukkit.getScheduler().runTaskLater(mPlugin, this::makeDamageVisual, 1);
@@ -359,7 +359,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						for (Player p : getPlayers()) {
 							p.hideBossBar(mDamagePhaseHPBar);
 						}
-						mBoss.setGlowing(false);
+						GlowingManager.makeGlowImmune(mBoss, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "sirius");
 						mDamagePhase = false;
 						startCollision();
 						undoDamageVisual();
@@ -376,14 +376,14 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 								MessagingUtils.sendNPCMessage(p, failNpc, failMessage);
 							}
 						}
-						mBoss.setGlowing(false);
+						GlowingManager.makeGlowImmune(mBoss, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "sirius");
 						mDamagePhase = false;
 						undoDamageVisual();
 						startCollision();
 						this.cancel();
 					}
 					if (mCheeseLock) {
-						mBoss.setGlowing(false);
+						GlowingManager.makeGlowImmune(mBoss, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "sirius");
 						mDamagePhase = false;
 						undoDamageVisual();
 						startCollision();
@@ -412,13 +412,6 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			}
 		}
 		if (event.getType() != DamageEvent.DamageType.TRUE || event.getDamager() != null) {
-			event.setCancelled(true);
-		}
-	}
-
-	@Override
-	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
-		if (event.getAction() == EntityPotionEffectEvent.Action.ADDED && event.getNewEffect() != null && event.getNewEffect().getType().equals(PotionEffectType.GLOWING) && !mDamagePhase) {
 			event.setCancelled(true);
 		}
 	}

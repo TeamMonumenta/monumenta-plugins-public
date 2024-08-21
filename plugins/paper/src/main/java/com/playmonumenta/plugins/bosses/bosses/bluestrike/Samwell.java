@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.bosses.spells.bluestrike.SpellSummonBlueStrikeT
 import com.playmonumenta.plugins.bosses.spells.bluestrike.SpellSummonLavaTitan;
 import com.playmonumenta.plugins.effects.SamwellBlackbloodDagger;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -272,8 +273,7 @@ public class Samwell extends BossAbilityGroup {
 		EntityUtils.setMaxHealthAndHealth(mBoss, HEALTH);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
 
-		ScoreboardUtils.addEntityToTeam(mBoss, "Blue", NamedTextColor.BLUE);
-		mBoss.setGlowing(true);
+		GlowingManager.startGlowing(mBoss, NamedTextColor.BLUE, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "samwell");
 
 		mShardsReq = (int) (3 + Math.floor(getPlayers().size() / 2.0));
 		refreshGatheringBar();
@@ -339,7 +339,7 @@ public class Samwell extends BossAbilityGroup {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (1.0 / 4.0));
 						sendMessage("I'm done with you! That dagger is too much. I don't get why Blue can't heal from it? Is it another wool?!");
 						mPhase = 4;
-						ScoreboardUtils.addEntityToTeam(mBoss, "Black", NamedTextColor.BLACK);
+						GlowingManager.startGlowing(mBoss, NamedTextColor.BLACK, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "samwell");
 						changePhaseNormal();
 					}
 				}

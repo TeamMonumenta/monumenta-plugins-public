@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
@@ -38,7 +39,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -79,7 +79,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -1016,9 +1015,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(MAX_HEALTH);
 
-		Team team = ScoreboardUtils.getExistingTeamOrCreate("kaul");
-		team.color(NamedTextColor.WHITE);
-		team.addEntity(mBoss);
+		GlowingManager.startGlowing(mBoss, NamedTextColor.DARK_GREEN, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 		EntityEquipment equips = mBoss.getEquipment();
 		ItemStack[] armorc = equips.getArmorContents();
@@ -1071,7 +1068,6 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							mBoss.setAI(true);
 							mBoss.setSilent(false);
 							mBoss.setInvulnerable(false);
-							ScoreboardUtils.modifyTeamColor("kaul", NamedTextColor.WHITE);
 							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,

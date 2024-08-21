@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.listeners.StasisListener;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -38,7 +39,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 
 /*
  * Putrid Plague (Holds one of four colored wools reflecting a pillar):
@@ -125,13 +125,7 @@ public class SpellPutridPlague extends Spell {
 			return;
 		}
 
-		Team team = ScoreboardUtils.getEntityTeam(mBoss);
-		if (team == null) {
-			MMLog.warning(() -> "[Kaul] Could not find Kaul's team! The mBoss object is: " + mBoss);
-			return;
-		}
-
-		team.color(pillar.mTextColor);
+		GlowingManager.startGlowing(mBoss, pillar.mTextColor, mTime, GlowingManager.BOSS_SPELL_PRIORITY);
 
 		mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", pillar.mDarkTextColor)));
 		mChargeUp.setColor(pillar.mBarColor);
@@ -164,7 +158,6 @@ public class SpellPutridPlague extends Spell {
 				if (mChargeUp.nextTick(2)) {
 					this.cancel();
 					mChargeUp.reset();
-					team.color(NamedTextColor.WHITE);
 					Location base = point.getLocation();
 					base.setY(0);
 					List<Player> safe = new Hitbox.UprightCylinderHitbox(base, Kaul.ARENA_MAX_Y, 8).getHitPlayers(true);

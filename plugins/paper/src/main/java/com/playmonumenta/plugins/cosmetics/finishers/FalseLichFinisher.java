@@ -23,7 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-public class FalseLich implements EliteFinisher {
+public class FalseLichFinisher implements EliteFinisher {
 	public static final String NAME = "False Lich";
 
 	public static final double RANGE = 32.0;

@@ -26,7 +26,7 @@ public class EliteFinishers {
 			.put(DragonsBreathFinisher.NAME, new DragonsBreathFinisher())
 			.put(EntombFinisher.NAME, new EntombFinisher())
 			.put(ExcaliburFinisher.NAME, new ExcaliburFinisher())
-			.put(FalseLich.NAME, new FalseLich())
+			.put(FalseLichFinisher.NAME, new FalseLichFinisher())
 			.put(FishedUpFinisher.NAME, new FishedUpFinisher())
 			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
 			.put(GongFinisher.NAME, new GongFinisher())

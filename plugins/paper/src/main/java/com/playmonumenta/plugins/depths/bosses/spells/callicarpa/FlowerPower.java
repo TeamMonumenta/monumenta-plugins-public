@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.bosses.Callicarpa;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -16,7 +17,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.bossbar.BossBar;
@@ -36,7 +36,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -330,8 +329,7 @@ public class FlowerPower extends Spell {
 	}
 
 	private void animateEnergyParticle(Entity flower, Location accumulationPoint) {
-		Team yellowTeam = ScoreboardUtils.getExistingTeamOrCreate("yellow", NamedTextColor.YELLOW);
-		yellowTeam.addEntity(flower);
+		GlowingManager.startGlowing(flower, NamedTextColor.YELLOW, mFinalDuration, GlowingManager.BOSS_SPELL_PRIORITY);
 
 		BukkitRunnable energyAnimationRunnable = new BukkitRunnable() {
 			final Entity mFlower = flower;
@@ -369,7 +367,6 @@ public class FlowerPower extends Spell {
 
 				// Check if spell has finished casting.
 				if (mTicks >= mFinalDuration) {
-					yellowTeam.removeEntity(mFlower);
 					this.cancel();
 				}
 				mTicks++;

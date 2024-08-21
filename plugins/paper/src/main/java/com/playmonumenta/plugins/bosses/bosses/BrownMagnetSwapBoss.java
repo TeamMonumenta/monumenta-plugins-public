@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.effects.BrownPolarityDisplay;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
@@ -27,7 +28,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Team;
 
 public class BrownMagnetSwapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_brown_magnetswap";
@@ -56,9 +56,6 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 	private final double mPlayerResist;
 	private double mLastDamageTick;
 
-	private Team mRedTeam;
-	private Team mBlueTeam;
-
 	public BrownMagnetSwapBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		BrownMagnetSwapBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new BrownMagnetSwapBoss.Parameters());
@@ -66,18 +63,11 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 		mPlayerResist = p.PLAYER_DAMAGE_RESIST;
 		mBossVuln = p.ENEMY_DAMAGE_VULN;
 		mLastDamageTick = mBoss.getTicksLived();
-		mRedTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
-		mBlueTeam = ScoreboardUtils.getExistingTeamOrCreate("Blue", NamedTextColor.BLUE);
 
-		mBoss.setGlowing(true);
+		mIsPositive = !p.INITIAL_CHARGE.equalsIgnoreCase("minus");
 
-		if (p.INITIAL_CHARGE.equalsIgnoreCase("minus")) {
-			mIsPositive = false;
-			mBlueTeam.addEntry(mBoss.getUniqueId().toString());
-		} else {
-			mIsPositive = true;
-			mRedTeam.addEntry(mBoss.getUniqueId().toString());
-		}
+		// glow with low priority (so that player abilities can override)
+		GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE, -1, 0, null, "magnet");
 
 		BossBarManager bossBar = new BossBarManager(boss, 40, mIsPositive ? BarColor.RED : BarColor.BLUE, BarStyle.SEGMENTED_20, null);
 
@@ -115,12 +105,11 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 					}
 
 					if (mIsPositive) {
-						mRedTeam.addEntry(mBoss.getUniqueId().toString());
 						bossBar.setColor(BarColor.RED);
 					} else {
-						mBlueTeam.addEntry(mBoss.getUniqueId().toString());
 						bossBar.setColor(BarColor.BLUE);
 					}
+					GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE, -1, 0, null, "magnet");
 
 					mBoss.customName(Component.text(name));
 

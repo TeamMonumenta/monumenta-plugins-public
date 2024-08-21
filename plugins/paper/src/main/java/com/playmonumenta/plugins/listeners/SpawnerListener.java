@@ -7,21 +7,38 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.actions.ParticleHaloTask;
-import com.playmonumenta.plugins.utils.*;
-
+import com.playmonumenta.plugins.utils.BlockUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.lang.ref.WeakReference;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Marker;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -270,8 +287,7 @@ public class SpawnerListener implements Listener {
 
 			// make mob invulnerable if the spawner is protected
 			if (getProtector(spawnerBlock) && !(mob instanceof Player)) {
-				ScoreboardUtils.addEntityToTeam(mob, "protectedMob", NamedTextColor.AQUA);
-				mob.setGlowing(true);
+				GlowingManager.startGlowing(mob, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
 				mob.setInvulnerable(true);
 				if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
@@ -476,9 +492,8 @@ public class SpawnerListener implements Listener {
 				for (MobInfo mobInfo : spawnerInfo) {
 					LivingEntity mob = mobInfo.getMob();
 					if (mob != null) {
-						mob.setGlowing(false);
 						mob.setInvulnerable(false);
-						ScoreboardUtils.removeEntityToTeam(mob, "protectedMob");
+						GlowingManager.clear(mob, "protectedMob");
 					}
 				}
 			}

@@ -5,12 +5,12 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.CustomTimerEffect;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 
 public class DeclarationAurora extends Spell {
 	private final Location mCenter;
@@ -38,7 +37,6 @@ public class DeclarationAurora extends Spell {
 	private final Sirius mSirius;
 	private List<Location> mPowerLocation;
 	private List<Entity> mPowerEntities;
-	private final Team mMagenta;
 	private static final int DURATION = 10 * 20;
 	private static final int RADIUS = 3;
 
@@ -49,7 +47,6 @@ public class DeclarationAurora extends Spell {
 		mCenter = center;
 		mPlugin = plugin;
 		mSirius = sirius;
-		mMagenta = ScoreboardUtils.getExistingTeamOrCreate("dark_purple", NamedTextColor.DARK_PURPLE);
 
 		//will be reset but gets rid of null warnings
 		mPowerLocation = new ArrayList<>();
@@ -247,7 +244,7 @@ public class DeclarationAurora extends Spell {
 			Entity mSpawn = LibraryOfSoulsIntegration.summon(loc, "StarEnergy");
 			if (mSpawn != null) {
 				mPowerEntities.add(mSpawn);
-				mMagenta.addEntity(mSpawn);
+				GlowingManager.startGlowing(mSpawn, NamedTextColor.DARK_PURPLE, -1, GlowingManager.BOSS_SPELL_PRIORITY);
 				World world = mSpawn.getWorld();
 				world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 2, 0.1f);
 				world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 0.4f, 1f);

@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryManager;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -25,7 +26,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,7 +53,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,8 +96,6 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 	private final Map<Player, Integer> mDeathValues = new HashMap<>();
 	private final Map<Player, BossBar> mDeathBossBars = new HashMap<>();
 	private final Map<Player, Integer> mTicksSinceLastDeathChange = new HashMap<>();
-
-	private final Team mColorTeam;
 
 	private final BossBarManager mBossBar;
 
@@ -162,9 +159,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 		Bukkit.getScheduler().runTaskLater(plugin, () -> sendDialogueMessage("FORFEIT YERSELF TO THE CURSE"), 210);
 
 		// make the boss glow a gray color
-		mColorTeam = ScoreboardUtils.getExistingTeamOrCreate("Xenotopsis", NamedTextColor.DARK_GRAY);
-		mColorTeam.addEntity(boss);
-		mBoss.setGlowing(true);
+		GlowingManager.startGlowing(mBoss, NamedTextColor.DARK_GRAY, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 		// Create spells
 		SpellManager emptySpells = SpellManager.EMPTY;
@@ -424,8 +419,6 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		mColorTeam.unregister();
-
 		mWorld.playSound(mBoss.getLocation(), Sound.PARTICLE_SOUL_ESCAPE, SoundCategory.HOSTILE, 5f, 0.5f);
 		mWorld.playSound(mBoss.getLocation(), Sound.PARTICLE_SOUL_ESCAPE, SoundCategory.HOSTILE, 5f, 0.7f);
 		mWorld.playSound(mBoss.getLocation(), Sound.PARTICLE_SOUL_ESCAPE, SoundCategory.HOSTILE, 5f, 0.9f);
