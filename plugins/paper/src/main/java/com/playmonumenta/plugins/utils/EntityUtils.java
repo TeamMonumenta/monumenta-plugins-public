@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.bosses.bosses.GenericTargetBoss;
+import com.playmonumenta.plugins.bosses.bosses.HostileBoss;
 import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.effects.Aesthetics;
@@ -366,6 +367,10 @@ public class EntityUtils {
 	}
 
 	public static boolean isHostileMob(@Nullable Entity entity) {
+		return isHostileMob(entity, false);
+	}
+
+	public static boolean isHostileMob(@Nullable Entity entity, boolean checkingOnSpawn) {
 		if (!(entity instanceof Mob mob)) {
 			return false;
 		}
@@ -387,8 +392,12 @@ public class EntityUtils {
 
 		if (mob.getTarget() instanceof Player) {
 			return true;
+		} else if (mob.getScoreboardTags().contains("Hostile")) {
+			return true;
+		} else if (checkingOnSpawn && (mob.getScoreboardTags().contains(PlayerTargetBoss.identityTag) || mob.getScoreboardTags().contains(HostileBoss.identityTag))) {
+			return true;
 		}
-		return mob.getScoreboardTags().contains("Hostile");
+		return false;
 	}
 
 	public static boolean isFireResistant(LivingEntity mob) {

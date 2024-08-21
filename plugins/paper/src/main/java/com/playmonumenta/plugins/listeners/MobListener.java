@@ -171,7 +171,7 @@ public class MobListener implements Listener {
 			    spawnReason != CreatureSpawnEvent.SpawnReason.DEFAULT &&
 			    spawnReason != CreatureSpawnEvent.SpawnReason.COMMAND &&
 			    spawnReason != CreatureSpawnEvent.SpawnReason.BEEHIVE &&
-			    EntityUtils.isHostileMob(entity) &&
+			    EntityUtils.isHostileMob(entity, true) &&
 			    ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
 			event.setCancelled(true);
 			return;

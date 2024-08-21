@@ -331,15 +331,18 @@ public class DelvesManager implements Listener {
 			return;
 		}
 
-		if (entity instanceof LivingEntity livingEntity) {
-			PotionEffect resistance = livingEntity.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			if (resistance != null && (resistance.getAmplifier() > 4 || resistance.getDuration() > 20 * 7)) {
-				setForcedReferenceToSpawner(null);
-				return;
-			}
+		if (!(entity instanceof LivingEntity livingEntity)) {
+			setForcedReferenceToSpawner(null);
+			return;
 		}
 
-		if (EntityUtils.isHostileMob(entity) && entity instanceof LivingEntity livingEntity) {
+		PotionEffect resistance = livingEntity.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+		if (resistance != null && (resistance.getAmplifier() > 4 || resistance.getDuration() > 20 * 7)) {
+			setForcedReferenceToSpawner(null);
+			return;
+		}
+
+		if (EntityUtils.isHostileMob(entity, true)) {
 			List<Player> playerParty = getParty(entity.getLocation());
 
 			if (!playerParty.isEmpty()) {
