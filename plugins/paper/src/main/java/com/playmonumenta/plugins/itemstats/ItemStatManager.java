@@ -142,6 +142,17 @@ public class ItemStatManager implements Listener {
 				return get(stat);
 			}
 
+			public double get(@Nullable AttributeType type) {
+				if (type == null) {
+					return 0;
+				}
+				ItemStat stat = type.getItemStat();
+				if (stat == null) {
+					return 0;
+				}
+				return get(stat);
+			}
+
 			public void setTo(ItemStatsMap other) {
 				mMap.clear();
 				mMap.putAll(other.mMap);

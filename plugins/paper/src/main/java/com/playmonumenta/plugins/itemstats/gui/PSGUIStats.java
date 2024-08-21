@@ -8,7 +8,12 @@ import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.WorldlyProtection;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.infusions.Carapace;
 import com.playmonumenta.plugins.itemstats.infusions.Choler;
 import com.playmonumenta.plugins.itemstats.infusions.Decapitation;
@@ -145,8 +150,18 @@ class PSGUIStats {
 		return totalLevel;
 	}
 
-	double getDamageDealtMultiplier() {
+	double getAdditiveDamageDealtMultiplier() {
+		double result = 1.0;
 
+		result += Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER)) - 1;
+		result += Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION)) - 1;
+		result += Vengeful.getDamageDealtMultiplier(getInfusion(InfusionType.VENGEFUL)) - 1;
+		result += Decapitation.getDamageDealtMultiplier(getInfusion(InfusionType.DECAPITATION)) - 1;
+
+		return result;
+	}
+
+	double getMultiplicativeDamageDealtMultiplier() {
 		double result = 1.0;
 
 		if (getInfusion(InfusionType.SHATTERED) > 0) {
@@ -154,11 +169,6 @@ class PSGUIStats {
 		}
 
 		result *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER[getRegionScaling(mPlayer, true)];
-
-		result += Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER)) - 1;
-		result += Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION)) - 1;
-		result += Vengeful.getDamageDealtMultiplier(getInfusion(InfusionType.VENGEFUL)) - 1;
-		result += Decapitation.getDamageDealtMultiplier(getInfusion(InfusionType.DECAPITATION)) - 1;
 
 		return result;
 	}

@@ -1047,13 +1047,13 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {
 		if (event.getEntity() instanceof ItemFrame frame
-			&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())
-			&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
+				&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())
+				&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			Location centeredLocation = frame.getLocation().toCenterLocation();
 			frame.getWorld().dropItem(centeredLocation, InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE));
 			if (!ItemUtils.isNullOrAir(frame.getItem())
-				&& frame.getItemDropChance() > FastUtils.RANDOM.nextFloat()) {
+					&& frame.getItemDropChance() >= FastUtils.RANDOM.nextFloat()) {
 				frame.getWorld().dropItem(centeredLocation, frame.getItem());
 			}
 			frame.remove();
