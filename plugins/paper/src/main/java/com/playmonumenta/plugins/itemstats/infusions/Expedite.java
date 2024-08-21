@@ -6,10 +6,10 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.NavigableSet;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -52,7 +52,7 @@ public class Expedite implements Infusion {
 			} else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed, PERCENT_SPEED_EFFECT_NAME));
 			}
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.1f, 1.0f);
+			AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 		}
 	}
 
