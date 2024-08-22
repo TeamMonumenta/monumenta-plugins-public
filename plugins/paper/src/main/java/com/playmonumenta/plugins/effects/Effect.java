@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,6 +16,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -142,6 +144,14 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	}
 
 	public void onTargetSwap(EntityTargetEvent event) {
+
+	}
+
+	public void onPotionEffectApply(LivingEntity entity, PotionEffectApplyEvent event) {
+
+	}
+
+	public void onPotionEffectModify(Entity entity, EntityPotionEffectEvent event) {
 
 	}
 

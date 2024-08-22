@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -38,6 +39,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -396,6 +398,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(GrapplingFallDR.effectID, GrapplingFallDR::deserialize);
 		mEffectDeserializer.put(SnowstormStacks.effectID, SnowstormStacks::deserialize);
 		mEffectDeserializer.put(Frozen.effectID, Frozen::deserialize);
+		mEffectDeserializer.put(PoisonImmunity.effectID, PoisonImmunity::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -1073,6 +1076,32 @@ public final class EffectManager implements Listener {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 					effectGroup.last().onTargetSwap(event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
+		LivingEntity entity = event.getApplied();
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onPotionEffectApply(entity, event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
+		Entity entity = event.getEntity();
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onPotionEffectModify(entity, event);
 				}
 			}
 		}

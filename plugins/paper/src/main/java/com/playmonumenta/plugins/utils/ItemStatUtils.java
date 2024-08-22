@@ -252,7 +252,7 @@ public class ItemStatUtils {
 		});
 	}
 
-	public static boolean hasNegativeEffect(ItemStack item) {
+	public static boolean hasNegativeEffect(ItemStack item, boolean allowClucking) {
 		if (item == null || item.getType() == Material.AIR) {
 			return false;
 		}
@@ -268,7 +268,7 @@ public class ItemStatUtils {
 				String type = effect.getString(EFFECT_TYPE_KEY);
 
 				EffectType effectType = EffectType.fromType(type);
-				if (effectType != null && !effectType.isPositive() && effectType != EffectType.CLUCKING) {
+				if (effectType != null && !effectType.isPositive() && (effectType != EffectType.CLUCKING || !allowClucking)) {
 					return true;
 				}
 			}

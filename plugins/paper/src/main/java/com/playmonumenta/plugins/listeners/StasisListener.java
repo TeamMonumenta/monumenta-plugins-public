@@ -141,6 +141,7 @@ public class StasisListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		if (isInStasis(event.getApplied()) || isInStasis(event.getApplier())) {
 			event.setCancelled(true);

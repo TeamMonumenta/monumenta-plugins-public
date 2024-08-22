@@ -602,7 +602,7 @@ public class EntityListener implements Listener {
 		boolean allowEffectsOnFriendlyMobs = ServerProperties.getShardName().contains("plot");
 
 		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
-		if (source instanceof Player && (PotionUtils.hasNegativeEffects(potion.getItem()) || ItemStatUtils.hasNegativeEffect(potion.getItem()))) {
+		if (source instanceof Player && (PotionUtils.hasNegativeEffects(potion.getItem()) || ItemStatUtils.hasNegativeEffect(potion.getItem(), true))) {
 			affectedEntities.removeIf(entity -> ((entity instanceof Player && entity != source) || (allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity))));
 		}
 
@@ -727,7 +727,7 @@ public class EntityListener implements Listener {
 				if (potion != null) {
 					ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
 				}
-			} else if (potion != null && allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity) && !PotionUtils.hasNegativeEffects(potion) && !ItemStatUtils.hasNegativeEffect(potion)) {
+			} else if (potion != null && allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity) && !PotionUtils.hasNegativeEffects(potion) && !ItemStatUtils.hasNegativeEffect(potion, true)) {
 				// only affect friendly mobs on plots, and only with beneficial potions
 				ItemStatUtils.applyCustomEffects(mPlugin, entity, potion);
 			}

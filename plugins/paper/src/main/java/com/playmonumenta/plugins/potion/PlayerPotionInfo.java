@@ -34,6 +34,13 @@ public class PlayerPotionInfo {
 		}
 	}
 
+	protected void removeLowerPotionInfos(Player player, PotionID id, PotionEffectType type, int amplifier) {
+		PotionMap potionMap = mPotionInfo.get(type);
+		if (potionMap != null) {
+			potionMap.removeLowerPotions(player, id, amplifier);
+		}
+	}
+
 	protected void clearPotionInfo(Player player, PotionID id, PotionEffectType type) {
 		PotionMap potionMap = mPotionInfo.get(type);
 		if (potionMap != null) {

@@ -123,6 +123,18 @@ public class PotionMap {
 		applyBestPotionEffect(player);
 	}
 
+	protected void removeLowerPotions(Player player, PotionID id, int amplifier) {
+		TreeMap<Integer, PotionInfo> map = mPotionMap.get(id);
+		if (map != null) {
+			map.keySet().removeIf(a -> a < amplifier);
+			if (map.isEmpty()) {
+				mPotionMap.remove(id);
+			}
+		}
+
+		applyBestPotionEffect(player);
+	}
+
 	protected Collection<PotionInfo> getPotionInfos(PotionID id) {
 		TreeMap<Integer, PotionInfo> tree = mPotionMap.get(id);
 		if (tree != null) {

@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Item;
@@ -28,13 +28,9 @@ public class Clucking implements Enchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		if (PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
-			return;
-		}
-
-		if (oneHz && mRun) {
+		if (oneHz && mRun && FastUtils.RANDOM.nextBoolean()) {
 			mRun = false;
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_CHICKEN_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.8f);
+			player.playSound(player.getLocation(), Sound.ENTITY_CHICKEN_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 		} else if (oneHz) {
 			mRun = true;
 		}

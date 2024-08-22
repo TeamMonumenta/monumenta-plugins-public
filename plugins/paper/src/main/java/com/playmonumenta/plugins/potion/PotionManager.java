@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.ToIntFunction;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -85,6 +87,16 @@ public class PotionManager {
 			&& !info.mType.equals(PotionEffectType.HARM)
 			&& !info.mType.equals(PotionEffectType.HEAL)) {
 
+			// addPotion is called before Bukkit gets to process an EntityPotionEffectEvent, so we do that ourselves
+			// (we need the potion item, thus use the potion splash and area cloud apply events for potion handling)
+			EntityPotionEffectEvent event = new EntityPotionEffectEvent(player, null,
+					new PotionEffect(info.mType, info.mDuration, info.mAmplifier, info.mAmbient, info.mShowParticles, info.mShowIcon),
+					EntityPotionEffectEvent.Cause.UNKNOWN, EntityPotionEffectEvent.Action.ADDED, false);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				return;
+			}
+
 			mPlayerPotions.computeIfAbsent(player.getUniqueId(), key -> new PlayerPotionInfo())
 				.addPotionInfo(player, id, info);
 		}
@@ -111,6 +123,13 @@ public class PotionManager {
 		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.removePotionInfo(player, id, type, amplifier);
+		}
+	}
+
+	public void removeLowerPotions(Player player, PotionID id, PotionEffectType type, int amplifier) {
+		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
+		if (potionInfo != null) {
+			potionInfo.removeLowerPotionInfos(player, id, type, amplifier);
 		}
 	}
 

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -162,6 +163,8 @@ public enum EffectType {
 	BOON_OF_THE_FRACTURED_TREE("BoonOfTheFracturedTree", "Boon of the Fractured Tree", true, false, true),
 	SKY_SEEKERS_GRACE("SkySeekersGrace", "Sky Seeker's Grace", true, false, true),
 
+	POISON_IMMUNITY("PoisonImmunity", "Poison Immunity", true, true, false),
+
 	CLUCKING("Clucking", "Clucking", false, true, true),
 
 	STEALTH("Stealth", "Stealth", true, true, false),
@@ -283,7 +286,7 @@ public enum EffectType {
 			if (effectType == CLUCKING) {
 				includeTime = false;
 			}
-		} else if (effectType.getPotionEffectType() != null) {
+		} else if (effectType.getPotionEffectType() != null || effectType == POISON_IMMUNITY) {
 			text = effectType.mName + " " + StringUtils.toRoman((int) strength);
 		} else if (effectType.getType().contains("Instant")) {
 			text = (int) (strength * 100) + "% " + effectType.mName;
@@ -356,6 +359,9 @@ public enum EffectType {
 			return;
 		} else if (effectType == CLUCKING) {
 			if (entity instanceof Player player) {
+				if (plugin.mItemStatManager.getPlayerItemStats(player).getItemStats().get(EnchantmentType.CLUCKING) > 0) {
+					return;
+				}
 				List<ItemStack> cluckingCandidates = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
 				cluckingCandidates.add(player.getInventory().getItemInOffHand());
 				cluckingCandidates.removeIf(item -> item == null || item.getType() == Material.AIR || ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CLUCKING) > 0);
@@ -367,10 +373,17 @@ public enum EffectType {
 					new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(player);
 				}
 			}
+			return;
+		} else if (effectType == POISON_IMMUNITY) {
+			if (entity instanceof Player player) {
+				plugin.mPotionManager.removeLowerPotions(player, PotionManager.PotionID.APPLIED_POTION, PotionEffectType.POISON, (int) strength);
+			}
+			// don't return yet, this also has an effect
 		} else if (effectType == STEALTH) {
 			if (entity instanceof Player player) {
 				AbilityUtils.applyStealth(plugin, player, duration);
 			}
+			return;
 		}
 
 		String sourceString = source != null ? source : effectType.mType;
@@ -462,6 +475,8 @@ public enum EffectType {
 			case GIFT_OF_THE_STARS -> new GiftOfTheStars(duration);
 			case BOON_OF_THE_FRACTURED_TREE -> new BoonOfTheFracturedTree(duration);
 			case SKY_SEEKERS_GRACE -> new SkySeekersGrace(duration);
+
+			case POISON_IMMUNITY -> new PoisonImmunity(duration, strength);
 
 			default -> null;
 		};
