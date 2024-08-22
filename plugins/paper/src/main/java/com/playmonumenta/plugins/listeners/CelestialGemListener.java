@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import java.util.Arrays;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -35,9 +37,49 @@ public class CelestialGemListener implements Listener {
 		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
-		if (event.getClick() != ClickType.RIGHT) {
+		if (event.getClickedInventory() == null) {
 			return;
 		}
+		if (event.getClick() != ClickType.RIGHT) {
+			// preview charm upgrade functionality: swap hands on charm w/ a gem in inventory to see upgrade
+			if (event.getClick() == ClickType.SWAP_OFFHAND) {
+				if (!ItemStatUtils.isZenithCharm(item)) {
+					return;
+				}
+				if (CharmFactory.getZenithCharmRarity(item) >= 5) {
+					player.sendMessage(Component.text("Legendary charms cannot be upgraded!", NamedTextColor.RED));
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.2f);
+					event.setCancelled(true);
+					return;
+				}
+				if (hasUsedBefore(item)) {
+					player.sendMessage(Component.text("Charms cannot be upgraded twice!", NamedTextColor.RED));
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.2f);
+					event.setCancelled(true);
+					return;
+				}
+				// only do this if you have a celestial gem in inventory
+				if (Arrays.stream(event.getClickedInventory().getContents()).noneMatch(CelestialGemListener::isCelestialGem)) {
+					return;
+				}
+
+				ItemStack newCharm = CharmFactory.upgradeCharm(item);
+				player.sendMessage(Component.text("Your ", TextColor.fromHexString("#9374ff"))
+					.append(item.displayName().hoverEvent(item))
+					.append(Component.text(" would be upgraded to ", TextColor.fromHexString("#9374ff")))
+					.append(newCharm.displayName().hoverEvent(newCharm))
+					.append(Component.text(".", TextColor.fromHexString("#9374ff"))));
+
+				player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1.0f, 0.75f);
+				player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1.0f, 0.75f);
+				player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 1.0f, 0.5f);
+				player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 1.0f, 0.5f);
+
+				event.setCancelled(true);
+			}
+			return;
+		}
+
 		// only run if the item is in the player's inventory
 		if (!(event.getClickedInventory() instanceof PlayerInventory)) {
 			return;

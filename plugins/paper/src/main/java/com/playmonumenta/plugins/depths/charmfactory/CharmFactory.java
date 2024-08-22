@@ -473,7 +473,7 @@ public class CharmFactory {
 					return playerModified.getString(CHARM_ACTIONS_KEY + index);
 				}));
 				CharmEffectActions newAction = CharmEffectActions.getActionFromInt(level);
-				if (action == null || newAction == null || action.mIsNegative || action.mRarity <= level) {
+				if (action == null || newAction == null || action.mIsNegative || action.mRarity <= level || action.mRarity <= 2) {
 					continue;
 				}
 				MMLog.fine("downgrade to rarity: action " + action.mAction);
@@ -527,13 +527,14 @@ public class CharmFactory {
 				if (budget + budgetDifference < 0) {
 					continue;
 				}
-				budget += budgetDifference;
-				MMLog.fine("upgrade: action " + action.mAction);
-				MMLog.fine("upgrade: upgraded " + upgraded.mAction);
-
 				CharmEffects effect = CharmEffects.getEffect(activeEffects.get(index));
 				if (effect != null && effect.isValidAtLevel(upgraded.mRarity) && effect.isNotRestrictedAtLevel(upgraded.mRarity, upgraded.mIsNegative)) { // check if valid at the new rarity
 					MMLog.fine("upgrade: effect " + effect.mAbility);
+					MMLog.fine("upgrade: from " + action.mAction);
+					MMLog.fine("upgrade: to " + upgraded.mAction);
+
+					budget += budgetDifference;
+
 					// update the action NBT to the new action
 					NBT.modify(item, nbt -> {
 						ItemStatUtils.addPlayerModified(nbt).setString(CHARM_ACTIONS_KEY + index, upgraded.mAction);
