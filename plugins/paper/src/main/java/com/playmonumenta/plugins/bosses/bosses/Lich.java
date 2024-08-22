@@ -1384,6 +1384,10 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
 							Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
 							10, 80, 10);
+
+						if (ScoreboardUtils.getScoreboardValue(p, "LichWins").orElse(0) == 0) {
+							p.sendMessage(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC).append(Component.text(" has defeated Hekawt, the Eternal...", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+						}
 					}
 
 					Bukkit.getScheduler().runTaskLater(mPlugin, Lich.this::surprise, 4 * 20);
@@ -1424,6 +1428,10 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendTitle(p, title, subtitle, 0, 80, 20);
+
+			if (ScoreboardUtils.getScoreboardValue(p, "LichWins").orElse(0) == 0) {
+				p.sendMessage(Component.text("...or have they?", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD, TextDecoration.ITALIC));
+			}
 		}
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
