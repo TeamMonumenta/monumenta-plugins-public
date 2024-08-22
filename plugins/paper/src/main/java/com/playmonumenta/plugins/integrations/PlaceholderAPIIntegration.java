@@ -232,7 +232,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			int index = Integer.parseInt(identifier.substring("boss_details_".length())) - 1;
 
 			List<BroadcastedEvents.Event> events = BroadcastedEvents.getPerceptibleEvents(player);
-			if (events.size() > index) {
+			if (index >= 0 && events.size() > index) {
 				BroadcastedEvents.Event event = events.get(index);
 
 				String display = event.getDisplay();
@@ -286,7 +286,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			} else {
 				try {
 					int index = Integer.parseInt(identifier.substring("effect_".length())) - 1;
-					if (effectDisplays.size() > index) {
+					if (index >= 0 && effectDisplays.size() > index) {
 						return effectDisplays.get(index);
 					} else {
 						return "";

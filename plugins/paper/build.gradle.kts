@@ -40,7 +40,7 @@ dependencies {
 	compileOnly("com.playmonumenta:scripted-quests:7.0:all")
 	compileOnly("com.playmonumenta:redissync:5.0:all")
 	compileOnly("com.playmonumenta:monumenta-network-chat:2.13")
-	compileOnly("com.playmonumenta:monumenta-network-relay:1.1")
+	compileOnly("com.playmonumenta:monumenta-network-relay:2.9")
 	compileOnly("com.playmonumenta:structures:10.2")
 	compileOnly("com.playmonumenta:worlds:2.3.1")
 	compileOnly("com.playmonumenta:libraryofsouls:5.3.1")
@@ -50,12 +50,15 @@ dependencies {
 	compileOnly("de.tr7zw:item-nbt-api-plugin:2.12.0-SNAPSHOT")
 	compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
 	compileOnly("io.prometheus:simpleclient:0.11.0")
-	compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
+	compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.9.0-4")
+  compileOnly("me.neznamy:tab-api:4.0.2")
 	errorprone("com.google.errorprone:error_prone_core:2.29.1")
 	errorprone("com.uber.nullaway:nullaway:0.10.18")
 
 	// Bungeecord deps
 	compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")
+  compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
+  annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
 	compileOnly("com.google.code.gson:gson:2.8.5")
 	compileOnly("com.playmonumenta:monumenta-network-relay:2.7")
 	compileOnly("com.vexsoftware:nuvotifier-universal:3.0.0:all")
@@ -88,7 +91,8 @@ bukkit {
 		"ProtocolLib",
 		"PrometheusExporter",
 		"MonumentaStructureManagement",
-		"MonumentaWorldManagement"
+		"MonumentaWorldManagement",
+		"TAB"
 	)
 }
 

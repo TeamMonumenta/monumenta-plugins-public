@@ -38,6 +38,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.integrations.TABIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
@@ -637,7 +638,7 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into Monumenta Network Relay for message brokering if available
 		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaNetworkRelay")) {
-			new MonumentaNetworkRelayIntegration(this.getLogger());
+			manager.registerEvents(new MonumentaNetworkRelayIntegration(this.getLogger()), this);
 
 			//relies on it, so only register if the plugin is available.
 			BroadcastedEvents.registerCommand(this);
@@ -674,6 +675,10 @@ public class Plugin extends JavaPlugin {
 		// Hook into PremiumVanish if present
 		if (Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
 			PremiumVanishIntegration.enable(this.getLogger());
+		}
+
+		if (Bukkit.getPluginManager().isPluginEnabled("TAB")) {
+			manager.registerEvents(new TABIntegration(), this);
 		}
 
 		// Hook into ProtocolLib if present

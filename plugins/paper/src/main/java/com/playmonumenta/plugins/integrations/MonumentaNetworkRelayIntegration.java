@@ -1,17 +1,25 @@
 package com.playmonumenta.plugins.integrations;
 
 import com.google.gson.JsonObject;
+import com.playmonumenta.networkrelay.GatherRemotePlayerDataEvent;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
+import com.playmonumenta.networkrelay.RemotePlayerLoadedEvent;
+import com.playmonumenta.networkrelay.RemotePlayerUnloadedEvent;
+import com.playmonumenta.networkrelay.RemotePlayerUpdatedEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class MonumentaNetworkRelayIntegration {
+public class MonumentaNetworkRelayIntegration implements Listener {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
 	public static final String AUDIT_LOG_SEVERE_CHANNEL = "Monumenta.Automation.AuditLogSevere";
 	public static final String AUDIT_LOG_CHAT_MOD_CHANNEL = "Monumenta.Automation.ChatModAuditLog";
@@ -169,5 +177,29 @@ public class MonumentaNetworkRelayIntegration {
 
 	public static void sendReportAuditLogMessage(String message) {
 		sendAuditLogMessage(message, AUDIT_LOG_REPORT_CHANNEL);
+	}
+
+	// TAB stuff
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+	public void gatherPluginDataEvent(GatherRemotePlayerDataEvent event) {
+		JsonObject data = LuckPermsIntegration.getPluginData(event.mRemotePlayer.getUuid());
+		if (data != null) {
+			event.setPluginData("monumenta", data);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	public void remotePlayerLoad(RemotePlayerLoadedEvent event) {
+		TABIntegration.loadRemotePlayer(event.mRemotePlayer);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	public void remotePlayerUnload(RemotePlayerUnloadedEvent event) {
+		TABIntegration.unloadRemotePlayer(event.mRemotePlayer);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	public void remotePlayerUpdated(RemotePlayerUpdatedEvent event) {
+		TABIntegration.loadRemotePlayer(event.mRemotePlayer);
 	}
 }

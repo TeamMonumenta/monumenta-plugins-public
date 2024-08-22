@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
+import com.google.gson.JsonObject;
 import com.playmonumenta.networkchat.channel.Channel;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
@@ -37,6 +39,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.messaging.MessagingService;
 import net.luckperms.api.model.data.NodeMap;
@@ -50,6 +54,7 @@ import net.luckperms.api.node.matcher.NodeMatcher;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.node.types.PrefixNode;
+import net.luckperms.api.platform.PlayerAdapter;
 import net.luckperms.api.query.Flag;
 import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
@@ -130,6 +135,7 @@ public class LuckPermsIntegration implements Listener {
 	protected static @MonotonicNonNull LuckPerms LP = null;
 	protected static @MonotonicNonNull UserManager UM = null;
 	protected static @MonotonicNonNull GroupManager GM = null;
+	protected static @MonotonicNonNull PlayerAdapter<Player> PA = null;
 
 	public static class GroupChildrenAndMembers {
 		String mName;
@@ -151,6 +157,7 @@ public class LuckPermsIntegration implements Listener {
 		LP = luckPermsProvider.getProvider();
 		UM = LP.getUserManager();
 		GM = LP.getGroupManager();
+		PA = LP.getPlayerAdapter(Player.class);
 
 		BulkGuildBanners.register(plugin);
 		CreateGuildCommand.register(plugin);
@@ -1510,5 +1517,38 @@ public class LuckPermsIntegration implements Listener {
 			Player player = event.getPlayer();
 			updatePlayerGuildChat(player);
 		}, 1L);
+	}
+
+	public static @Nullable JsonObject getPluginData(UUID uuid) {
+		if (UM == null) {
+			return null;
+		}
+		@Nullable User user = UM.getUser(uuid);
+		if (user == null) {
+			return null;
+		}
+		JsonObject pluginData = new JsonObject();
+		CachedPermissionData permissionData = user.getCachedData().getPermissionData();
+		CachedMetaData metaData = user.getCachedData().getMetaData();
+
+		@Nullable String metaGuild = metaData.getMetaValue("guild:member:root:plain_tag");
+		boolean isMod = permissionData.checkPermission("monumenta.mod").asBoolean();
+		boolean isAdmin = permissionData.checkPermission("group.devlead").asBoolean();
+		@Nullable String prefix = metaData.getPrefix();
+		@Nullable String suffix = metaData.getSuffix();
+		pluginData.addProperty("guild", metaGuild);
+		pluginData.addProperty("isMod", isMod);
+		pluginData.addProperty("isAdmin", isAdmin);
+		pluginData.addProperty("prefix", prefix);
+		pluginData.addProperty("suffix", suffix);
+		// skin stuff
+		@Nullable PlayerProfile profile = Bukkit.createProfile(uuid);
+		if (profile != null) {
+			ProfileProperty skin = profile.getProperties().stream().filter(p -> p.getName().equals("textures")).findFirst().orElse(null);
+			if (skin != null) {
+				pluginData.addProperty("signed_texture", skin.getValue() + ";" + skin.getSignature());
+			}
+		}
+		return pluginData;
 	}
 }

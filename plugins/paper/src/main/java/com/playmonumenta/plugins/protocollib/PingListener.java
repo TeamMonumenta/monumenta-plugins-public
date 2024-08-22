@@ -2,10 +2,13 @@ package com.playmonumenta.plugins.protocollib;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ConnectionSide;
 import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.NetworkMarker;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.events.PacketPostListener;
 import com.playmonumenta.plugins.Plugin;
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -24,6 +27,24 @@ public class PingListener extends PacketAdapter {
 		super(plugin, ListenerPriority.NORMAL, PacketType.Play.Client.PONG);
 	}
 
+	public static class PingPostListener implements PacketPostListener {
+		private final Runnable mRun;
+
+		@Override
+		public Plugin getPlugin() {
+			return Plugin.getInstance();
+		}
+
+		@Override
+		public void onPostEvent(PacketEvent event) {
+			mRun.run();
+		}
+
+		public PingPostListener(Runnable runnable) {
+			mRun = runnable;
+		}
+	}
+
 	/**
 	 * Sends a ping to a player, then performs an action using the player's ping. May be preferable to player.getPing(), as it doesn't use a weighted average.
 	 * Please note the action is performed <u>asynchronously</u>.
@@ -37,10 +58,13 @@ public class PingListener extends PacketAdapter {
 	public static void submitPingAction(Player player, Consumer<Integer> onPongReceived, int timeout, boolean runOnTimeout, @Nullable Runnable onTimeout) {
 		int id = BASE_ID + itemCounter;
 		itemCounter += 1;
-		mActionMap.put(id, Triple.of(player, onPongReceived, System.currentTimeMillis()));
 		PacketContainer ping = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PING);
 		ping.getIntegers().write(0, id);
-		ProtocolLibrary.getProtocolManager().sendServerPacket(player, ping);
+		NetworkMarker marker = new NetworkMarker(ConnectionSide.SERVER_SIDE, PacketType.Play.Server.PING);
+		marker.addPostListener(new PingPostListener(() -> {
+			mActionMap.put(id, Triple.of(player, onPongReceived, System.currentTimeMillis()));
+		}));
+		ProtocolLibrary.getProtocolManager().sendServerPacket(player, ping, marker, true);
 		// Check for timeout
 		new BukkitRunnable() {
 			@Override

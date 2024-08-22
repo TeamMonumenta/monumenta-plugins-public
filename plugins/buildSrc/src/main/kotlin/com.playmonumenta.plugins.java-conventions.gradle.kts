@@ -23,6 +23,9 @@ repositories {
 	maven("https://libraries.minecraft.net/")
 	maven("https://repo.codemc.org/repository/maven-public/")
 	maven("https://maven.playmonumenta.com/releases/")
+    // Velocity dependencies
+    maven("https://repo.kryptonmc.org/releases")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 group = "com.playmonumenta.plugins"
