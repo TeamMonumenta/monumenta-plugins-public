@@ -6,7 +6,14 @@ import com.playmonumenta.plugins.utils.SpawnerUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.SuggestionInfo;
-import dev.jorel.commandapi.arguments.*;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import dev.jorel.commandapi.arguments.BooleanArgument;
+import dev.jorel.commandapi.arguments.FunctionArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +24,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.playmonumenta.plugins.spawners.types.ProtectorSpawner.setProtector;
+import static com.playmonumenta.plugins.spawners.types.RallySpawner.setRally;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.CAT_ATTRIBUTE;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.CAT_ATTRIBUTE_RADIUS;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.DECAYING_ATTRIBUTE;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.ENSNARED_ATTRIBUTE;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.GUARDED_ATTRIBUTE;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.SEQUENCE_ATTRIBUTE;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.SEQUENCE_ATTRIBUTE_RADIUS;
+import static com.playmonumenta.plugins.utils.SpawnerUtils.setSpawnerType;
 
 public class SpawnerCommand {
 
@@ -46,7 +64,7 @@ public class SpawnerCommand {
 									}
 
 									int guardBlock = args.getUnchecked("guarded");
-									SpawnerUtils.setGuarded(item, guardBlock);
+									setSpawnerType(item, GUARDED_ATTRIBUTE, guardBlock);
 								}),
 							new CommandAPICommand("ensnared")
 								.withArguments(new IntegerArgument("ensnared"))
@@ -57,7 +75,7 @@ public class SpawnerCommand {
 									}
 
 									int ensnaredBlock = args.getUnchecked("ensnared");
-									SpawnerUtils.setEnsnared(item, ensnaredBlock);
+									setSpawnerType(item, ENSNARED_ATTRIBUTE, ensnaredBlock);
 								}),
 							new CommandAPICommand("decaying")
 								.withArguments(new IntegerArgument("decaying"))
@@ -68,7 +86,7 @@ public class SpawnerCommand {
 									}
 
 									int decayingBlock = args.getUnchecked("decaying");
-									SpawnerUtils.setDecaying(item, decayingBlock);
+									setSpawnerType(item, DECAYING_ATTRIBUTE, decayingBlock);
 								}),
 							new CommandAPICommand("protector")
 								.withArguments(new BooleanArgument("protector"))
@@ -79,7 +97,7 @@ public class SpawnerCommand {
 									}
 
 									boolean protector = args.getUnchecked("protector");
-									SpawnerUtils.setProtector(item, protector);
+									setProtector(item, protector);
 								}),
 							new CommandAPICommand("rally")
 								.withArguments(new IntegerArgument("rally"))
@@ -90,7 +108,7 @@ public class SpawnerCommand {
 									}
 
 									int rallyBlock = args.getUnchecked("rally");
-									SpawnerUtils.setRally(item, rallyBlock);
+									setRally(item, rallyBlock);
 								}),
 							new CommandAPICommand("cat")
 								.withArguments(new IntegerArgument("cat"))
@@ -104,8 +122,8 @@ public class SpawnerCommand {
 									int catBlock = args.getUnchecked("cat");
 									int catRadius = args.getUnchecked("catRadius");
 
-									SpawnerUtils.setCat(item, catBlock);
-									SpawnerUtils.setCatRadius(item, catRadius);
+									setSpawnerType(item, CAT_ATTRIBUTE, catBlock);
+									setSpawnerType(item, CAT_ATTRIBUTE_RADIUS, catRadius);
 								}),
 							new CommandAPICommand("sequential")
 								.withArguments(new IntegerArgument("sequence"))
@@ -119,8 +137,13 @@ public class SpawnerCommand {
 									int sequenceBlock = args.getUnchecked("sequence");
 									int sequenceRadius = args.getUnchecked("radius");
 
-									SpawnerUtils.setSequence(item, sequenceBlock);
-									SpawnerUtils.setSequenceRadius(item, sequenceRadius);
+									if (sequenceRadius >= 100) {
+										player.sendMessage("The command needs the radius to be under 100.");
+										return;
+									}
+
+									setSpawnerType(item, SEQUENCE_ATTRIBUTE, sequenceBlock);
+									setSpawnerType(item, SEQUENCE_ATTRIBUTE_RADIUS, sequenceRadius);
 								})
 						),
 						new CommandAPICommand("function")

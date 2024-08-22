@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
 import com.playmonumenta.plugins.spawners.actions.CustomFunctionAction;
+import com.playmonumenta.plugins.spawners.types.ProtectorSpawner;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTContainer;
@@ -21,10 +22,28 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTTileEntity;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
-import java.util.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -35,7 +54,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Marker;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -45,6 +63,8 @@ import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.listeners.SpawnerListener.spawnerCatMap;
+import static com.playmonumenta.plugins.spawners.types.RallySpawner.getRally;
+import static com.playmonumenta.plugins.spawners.types.RallySpawner.triggerRallyEffect;
 
 /* How Spawner Break Actions are stored in NBT:
 BreakActions [
@@ -96,7 +116,7 @@ public class SpawnerUtils {
 	private static final int MAX_TORCH_TAXICAB_DISTANCE = 8;
 	private static final double SPAWNER_DELAY_MULTIPLIER_CAP = 10;
 	public static final Set<Location> spawnersWithCat = new HashSet<>();
-	private static final Map<Location, BukkitRunnable> ensnarementTasks = new HashMap<>();
+	public static final Map<Location, BukkitRunnable> ensnarementTasks = new HashMap<>();
 
 	/**
 	 * Returns true if the damage is enough to break the spawner.
@@ -107,8 +127,8 @@ public class SpawnerUtils {
 	 */
 	public static boolean tryBreakSpawner(Block block, int damage, boolean tryBreak) {
 		// start ensnare if needed
-		if (getEnsnared(block) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
-			List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getEnsnared(block), getEnsnared(block), getEnsnared(block));
+		if (getSpawnerType(block, ENSNARED_ATTRIBUTE) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
+			List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE));
 			boolean hasNearbyMobs = nearbyEntities.stream()
 				.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
 			if (hasNearbyMobs) {
@@ -117,10 +137,10 @@ public class SpawnerUtils {
 			}
 		}
 
-		if (!hasShieldsAttribute(block) && !hasGuardedAttribute(block) && !hasCatAttribute(block) && !hasSequenceAttribute(block)) {
+		if (!hasShieldsAttribute(block) && !(getSpawnerType(block, GUARDED_ATTRIBUTE) > 0) && !(getSpawnerType(block, CAT_ATTRIBUTE) > 0) && !(getSpawnerType(block, SEQUENCE_ATTRIBUTE) > 0)) {
 			return true;
 		}
-		int guarded = getGuarded(block);
+		int guarded = getSpawnerType(block, GUARDED_ATTRIBUTE);
 		int shields = getShields(block);
 
 		// see if cat's alive
@@ -128,10 +148,10 @@ public class SpawnerUtils {
 		if (catUUID != null) {
 			Cat cat = (Cat) Bukkit.getEntity(catUUID);
 			if (cat != null && cat.isValid()) {
-				int catRadius = SpawnerUtils.getCatRadius(block);
+				int catRadius = getSpawnerType(block, CAT_ATTRIBUTE_RADIUS);
 				if (cat.getLocation().distanceSquared(block.getLocation()) > catRadius * catRadius) {
 					Location location = block.getLocation().add(0.5, 1, 0.5);
-					Location catLocation = findValidCatSpawn(location, getCatRadius(block));
+					Location catLocation = findValidCatSpawn(location, getSpawnerType(block, CAT_ATTRIBUTE_RADIUS));
 					cat.teleport(catLocation);
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatVuln", new PercentDamageReceived(30, -1.0));
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatSpeed", new PercentSpeed(20, 1, "PercentSpeed"));
@@ -145,10 +165,10 @@ public class SpawnerUtils {
 
 		// spawn cat if first attempt at break
 		if (!spawnersWithCat.contains(block.getLocation())) {
-			int catHealth = SpawnerUtils.getCat(block);
+			int catHealth = getSpawnerType(block, CAT_ATTRIBUTE);
 			if (catHealth > 0) {
 				Location location = block.getLocation().add(0.5, 1, 0.5);
-				Location catLocation = findValidCatSpawn(location, getCatRadius(block));
+				Location catLocation = findValidCatSpawn(location, getSpawnerType(block, CAT_ATTRIBUTE_RADIUS));
 				Cat cat = (Cat) block.getWorld().spawnEntity(catLocation, EntityType.CAT);
 				cat.setPersistent(true);
 				// set health to specified
@@ -163,8 +183,8 @@ public class SpawnerUtils {
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_CAT_AMBIENT, SoundCategory.HOSTILE, 1f, 1f);
 
 				// ensure ensnared is checked when a cat spawns
-				if (getEnsnared(block) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
-					List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getEnsnared(block), getEnsnared(block), getEnsnared(block));
+				if (getSpawnerType(block, ENSNARED_ATTRIBUTE) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
+					List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE));
 					boolean hasNearbyMobs = nearbyEntities.stream()
 						.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
 					if (hasNearbyMobs) {
@@ -181,7 +201,8 @@ public class SpawnerUtils {
 		if (spawnerInfo != null && !spawnerInfo.isEmpty()) {
 			boolean hasNearbyMobs = spawnerInfo.stream().anyMatch(mobInfo -> {
 				LivingEntity mob = mobInfo.getMob();
-				return mob != null && mob.isValid() && mob.getLocation().distance(block.getLocation()) <= guarded;
+				double guardedSquared = guarded * guarded;
+				return mob != null && mob.isValid() && mob.getLocation().distanceSquared(block.getLocation()) <= guardedSquared;
 			});
 			if (hasNearbyMobs) {
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_CHAIN_FALL, SoundCategory.HOSTILE, 0.5f, 1f);
@@ -203,7 +224,7 @@ public class SpawnerUtils {
 		}
 
 		// sequence check
-		if (getSequence(block) > 0 && !checkSequence(block, getSequenceRadius(block))) {
+		if (getSpawnerType(block, SEQUENCE_ATTRIBUTE) > 0 && !checkSequence(block, getSpawnerType(block, SEQUENCE_ATTRIBUTE_RADIUS))) {
 			block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_BARREL_CLOSE, SoundCategory.HOSTILE, 0.75f, 1f);
 			return false;
 		}
@@ -220,7 +241,7 @@ public class SpawnerUtils {
 		// make sure it's not a pickaxe enchant method call
 		if (tryBreak) {
 			setShields(block, shields - damage);
-			if (getSequence(block) > 0) {
+			if (getSpawnerType(block, SEQUENCE_ATTRIBUTE) > 0) {
 				SpawnerListener.doShieldBreakAnimation(block.getLocation().clone().add(0.5, 0.5, 0.5), getShields(block));
 			}
 		}
@@ -285,7 +306,7 @@ public class SpawnerUtils {
 						wrapper.save();
 					}
 				}
-				int decay = SpawnerUtils.getDecaying(spawnerBlock);
+				int decay = getSpawnerType(spawnerBlock, DECAYING_ATTRIBUTE);
 				if (decay > 0) {
 					Location centerLoc = BlockUtils.getCenterBlockLocation(spawnerBlock);
 					Particle.DustOptions mBROWN = new Particle.DustOptions(Color.fromRGB(125, 80, 9), 1.0f);
@@ -300,7 +321,7 @@ public class SpawnerUtils {
 					new PartialParticle(Particle.REDSTONE, centerLoc.clone().add(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(-1, 1)), 1).data(mBROWN).spawnFull();
 				}
 
-				if (getProtector(spawnerBlock)) {
+				if (ProtectorSpawner.getProtector(spawnerBlock)) {
 					Particle.DustOptions mYELLOW = new Particle.DustOptions(Color.fromRGB(237, 198, 26), 1.0f);
 					new PPCircle(Particle.REDSTONE, spawnerBlock.getLocation().clone().add(0.5, 1.2, 0.5), 0.5).data(mYELLOW).countPerMeter(8).spawnAsEnemy();
 				}
@@ -844,542 +865,89 @@ public class SpawnerUtils {
 		}
 	}
 
-	public static boolean hasGuardedAttribute(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return false;
-		}
-
-		return new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer().getKeys().contains(GUARDED_ATTRIBUTE);
-	}
-
-	public static int getGuarded(ItemStack spawnerItem) {
+	public static int getSpawnerType(ItemStack spawnerItem, String attribute) {
 		if (!isSpawner(spawnerItem)) {
 			return 0;
 		}
 
 		NBTItem item = new NBTItem(spawnerItem);
 
-		if (!item.hasTag(GUARDED_ATTRIBUTE)) {
+		if (!item.hasTag(attribute)) {
 			return 0;
 		}
 
-		return item.getInteger(GUARDED_ATTRIBUTE);
+		return item.getInteger(attribute);
 	}
 
-	public static int getGuarded(Block spawnerBlock) {
+	public static int getSpawnerType(Block spawnerBlock, String attribute) {
 		if (!isSpawner(spawnerBlock)) {
 			return 0;
 		}
 
 		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
 
-		if (!dataContainer.hasTag(GUARDED_ATTRIBUTE)) {
+		if (!dataContainer.hasTag(attribute)) {
 			return 0;
 		}
 
-		return dataContainer.getInteger(GUARDED_ATTRIBUTE);
+		return dataContainer.getInteger(attribute);
 	}
 
-	public static void setGuarded(ItemStack spawnerItem, int guarded) {
-		if (guarded < 0 || !isSpawner(spawnerItem)) {
+	public static void setSpawnerType(ItemStack spawnerItem, String attribute, int attribute1) {
+		if (attribute1 < 0 || !isSpawner(spawnerItem)) {
 			return;
 		}
 
 		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(GUARDED_ATTRIBUTE, guarded);
+		item.setInteger(attribute, attribute1);
 		spawnerItem.setItemMeta(item.getItem().getItemMeta());
 	}
 
-	public static void setGuarded(Block spawnerBlock, int guarded) {
-		if (guarded < 0 || !isSpawner(spawnerBlock)) {
+	public static void setSpawnerType(Block spawnerBlock, String attribute, int attribute1) {
+		if (attribute1 < 0 || !isSpawner(spawnerBlock)) {
 			return;
 		}
 
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(GUARDED_ATTRIBUTE, guarded);
+		tileEntity.getPersistentDataContainer().setInteger(attribute, attribute1);
 	}
 
-	public static boolean hasCatAttribute(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return false;
-		}
-
-		return new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer().getKeys().contains(CAT_ATTRIBUTE);
-	}
-
-	public static int getCat(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return 0;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(CAT_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return item.getInteger(CAT_ATTRIBUTE);
-	}
-
-	public static int getCat(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return 0;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(CAT_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(CAT_ATTRIBUTE);
-	}
-
-	public static void setCat(ItemStack spawnerItem, int cat) {
-		if (cat < 0 || !isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(CAT_ATTRIBUTE, cat);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setCat(Block spawnerBlock, int cat) {
-		if (cat < 0 || !isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(CAT_ATTRIBUTE, cat);
-	}
-
-	public static int getCatRadius(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return 0;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(CAT_ATTRIBUTE_RADIUS)) {
-			return 0;
-		}
-
-		return item.getInteger(CAT_ATTRIBUTE_RADIUS);
-	}
-
-	public static int getCatRadius(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return 0;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(CAT_ATTRIBUTE_RADIUS)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(CAT_ATTRIBUTE_RADIUS);
-	}
-
-	public static void setCatRadius(ItemStack spawnerItem, int catRadius) {
-		if (catRadius < 0 || !isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(CAT_ATTRIBUTE_RADIUS, catRadius);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setCatRadius(Block spawnerBlock, int catRadius) {
-		if (catRadius < 0 || !isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(CAT_ATTRIBUTE_RADIUS, catRadius);
-	}
-
-	// hi
-	public static boolean hasSequenceAttribute(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return false;
-		}
-
-		return new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer().getKeys().contains(SEQUENCE_ATTRIBUTE);
-	}
-
-	public static int getSequence(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return 0;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(SEQUENCE_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return item.getInteger(SEQUENCE_ATTRIBUTE);
-	}
-
-	public static int getSequence(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return 0;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(SEQUENCE_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(SEQUENCE_ATTRIBUTE);
-	}
-
-	public static void setSequence(ItemStack spawnerItem, int sequence) {
-		if (sequence < 0 || !isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(SEQUENCE_ATTRIBUTE, sequence);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setSequence(Block spawnerBlock, int sequence) {
-		if (sequence < 0 || !isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(SEQUENCE_ATTRIBUTE, sequence);
-	}
-
-	public static int getSequenceRadius(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return 0;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(SEQUENCE_ATTRIBUTE_RADIUS)) {
-			return 0;
-		}
-
-		return item.getInteger(SEQUENCE_ATTRIBUTE_RADIUS);
-	}
-
-	public static int getSequenceRadius(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return 0;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(SEQUENCE_ATTRIBUTE_RADIUS)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(SEQUENCE_ATTRIBUTE_RADIUS);
-	}
-
-	public static void setSequenceRadius(ItemStack spawnerItem, int sequenceRadius) {
-		if (sequenceRadius < 0 || !isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(SEQUENCE_ATTRIBUTE_RADIUS, sequenceRadius);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setSequenceRadius(Block spawnerBlock, int sequenceRadius) {
-		if (sequenceRadius < 0 || !isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(SEQUENCE_ATTRIBUTE_RADIUS, sequenceRadius);
-	}
-
-	public static int getDecaying(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return 0;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(DECAYING_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return item.getInteger(DECAYING_ATTRIBUTE);
-	}
-
-	public static int getDecaying(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return 0;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(DECAYING_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(DECAYING_ATTRIBUTE);
-	}
-
-	public static void setDecaying(ItemStack spawnerItem, int decaying) {
-		if (decaying < 0 || !isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(DECAYING_ATTRIBUTE, decaying);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setDecaying(Block spawnerBlock, int decaying) {
-		if (decaying < 0 || !isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(DECAYING_ATTRIBUTE, decaying);
-	}
-
-	public static int getRally(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return 0;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(RALLY_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return item.getInteger(RALLY_ATTRIBUTE);
-	}
-
-	public static int getRally(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return 0;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(RALLY_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(RALLY_ATTRIBUTE);
-	}
-
-	public static void setRally(ItemStack spawnerItem, int rally) {
-		if (rally < 0 || !isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(RALLY_ATTRIBUTE, rally);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setRally(Block spawnerBlock, int rally) {
-		if (rally < 0 || !isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(RALLY_ATTRIBUTE, rally);
-	}
-
-	public static int getEnsnared(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return 0;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(ENSNARED_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return item.getInteger(ENSNARED_ATTRIBUTE);
-	}
-
-	public static int getEnsnared(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return 0;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(ENSNARED_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(ENSNARED_ATTRIBUTE);
-	}
-
-	public static void setEnsnared(ItemStack spawnerItem, int ensnared) {
-		if (ensnared < 0 || !isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(ENSNARED_ATTRIBUTE, ensnared);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setEnsnared(Block spawnerBlock, int ensnared) {
-		if (ensnared < 0 || !isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(ENSNARED_ATTRIBUTE, ensnared);
-	}
-
-
-	public static boolean getProtector(ItemStack spawnerItem) {
-		if (!isSpawner(spawnerItem)) {
-			return false;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(PROTECTOR_ATTRIBUTE)) {
-			return false;
-		}
-
-		return item.getBoolean(PROTECTOR_ATTRIBUTE);
-	}
-
-	public static boolean getProtector(Block spawnerBlock) {
-		if (!isSpawner(spawnerBlock)) {
-			return false;
-		}
-
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(PROTECTOR_ATTRIBUTE)) {
-			return false;
-		}
-
-		return dataContainer.getBoolean(PROTECTOR_ATTRIBUTE);
-	}
-
-	public static void setProtector(ItemStack spawnerItem, boolean protector) {
-		if (!isSpawner(spawnerItem)) {
-			return;
-		}
-
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setBoolean(PROTECTOR_ATTRIBUTE, protector);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
-	}
-
-	public static void setProtector(Block spawnerBlock, boolean protector) {
-		if (!isSpawner(spawnerBlock)) {
-			return;
-		}
-
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setBoolean(PROTECTOR_ATTRIBUTE, protector);
-	}
-
-
-	public static void triggerRallyEffect(Block spawnerBlock, int rally) {
-
-		// box to look for spawners
-		Location center = spawnerBlock.getLocation();
-		BoundingBox searchBox = new BoundingBox(
-			center.getX() - rally, center.getY() - rally, center.getZ() - rally,
-			center.getX() + rally, center.getY() + rally, center.getZ() + rally
-		);
-		for (int x = (int) searchBox.getMinX(); x <= searchBox.getMaxX(); x++) {
-			for (int y = (int) searchBox.getMinY(); y <= searchBox.getMaxY(); y++) {
-				for (int z = (int) searchBox.getMinZ(); z <= searchBox.getMaxZ(); z++) {
-					Block block = center.getWorld().getBlockAt(x, y, z);
-					if (block.getType() == Material.SPAWNER) {
-						// found spawners
-						CreatureSpawner spawner = (CreatureSpawner) block.getState();
-
-						Player spawnPlayer = null;
-						double closestDistanceSquared = Double.MAX_VALUE;
-						for (Player player : center.getWorld().getPlayers()) {
-							double distanceSquared = player.getLocation().distanceSquared(spawner.getLocation());
-							if (distanceSquared < closestDistanceSquared) {
-								closestDistanceSquared = distanceSquared;
-								spawnPlayer = player;
-							}
-						}
-
-						// fix yellow line
-						if (spawnPlayer == null) {
-							continue;
-						}
-						PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, spawnerBlock.getLocation().clone().add(0.5, 0.5, 0.5), spawner.getLocation().clone().add(0.5, 0.5, 0.5));
-						line.countPerMeter(10).spawnAsEnemy();
-						spawnPlayer.sendMessage(Component.text("hello chat", NamedTextColor.GOLD));
-						// make event work hopefully
-						SpawnerSpawnEvent event = new SpawnerSpawnEvent(spawnPlayer, spawner);
-						Bukkit.getPluginManager().callEvent(event);
-
-
+	public static void startEnsnarementCheck(Block block) {
+		Location spawnerLocation = block.getLocation().clone().add(0.5, 0.5, 0.5);
+		int ensnareRadius = getSpawnerType(block, ENSNARED_ATTRIBUTE);
+		BukkitRunnable task = new BukkitRunnable() {
+			@Override
+			public void run() {
+				List<Entity> nearbyEntities = (List<Entity>) spawnerLocation.getWorld().getNearbyEntities(spawnerLocation, ensnareRadius, ensnareRadius, ensnareRadius);
+				boolean hasNearbyMobs = nearbyEntities.stream()
+					.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
+
+				if (!hasNearbyMobs) {
+					block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_DESTROY, SoundCategory.HOSTILE, 0.75f, 2f);
+					ensnarementTasks.remove(block.getLocation());
+					this.cancel();
+				}
+
+				for (Player player : spawnerLocation.getWorld().getPlayers()) {
+					if (player.getLocation().distance(spawnerLocation) > ensnareRadius && player.getLocation().distance(spawnerLocation) < ensnareRadius + 5) {
+						MovementUtils.pullTowardsNormalized(spawnerLocation, player, 0.8f, false);
 					}
 				}
+
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 0, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 1, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 2, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 3, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 4, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 5, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 6, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
 			}
-		}
+		};
+		task.runTaskTimer(Plugin.getInstance(), 0, 1);
+		ensnarementTasks.put(block.getLocation(), task);
 	}
 
-	public static boolean checkSequence(Block spawnerBlock, int sequenceRadius) {
-		// box to look for spawners
-		boolean canBreak = true;
-		Location center = spawnerBlock.getLocation();
-		BoundingBox searchBox = new BoundingBox(
-			center.getX() - sequenceRadius, center.getY() - sequenceRadius, center.getZ() - sequenceRadius,
-			center.getX() + sequenceRadius, center.getY() + sequenceRadius, center.getZ() + sequenceRadius
-		);
-		for (int x = (int) searchBox.getMinX(); x <= searchBox.getMaxX(); x++) {
-			for (int y = (int) searchBox.getMinY(); y <= searchBox.getMaxY(); y++) {
-				for (int z = (int) searchBox.getMinZ(); z <= searchBox.getMaxZ(); z++) {
-					Block block = center.getWorld().getBlockAt(x, y, z);
-					if (block.getType() == Material.SPAWNER) {
-						// spawner being broken needs to be the lowest number
-						if (getSequence(block) < getSequence(spawnerBlock) && getSequence(block) > 0) {
-							PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, block.getLocation().clone().add(0.5, 0.5, 0.5), spawnerBlock.getLocation().clone().add(0.5, 0.5, 0.5));
-							line.countPerMeter(10).spawnAsEnemy();
-							spawnerBlock.getLocation().getNearbyPlayers(15).forEach(player ->
-								ParticleUtils.drawSevenSegmentNumber(
-									getSequence(block), block.getLocation().clone().add(0.5, 2, 0.5),
-									player, 0.65, 0.5, Particle.REDSTONE, new Particle.DustOptions(Color.MAROON, 1f)
-								)
-							);
-							canBreak = false;
-
-						}
-					}
-				}
-			}
-		}
-		if (!canBreak) {
-			spawnerBlock.getLocation().getNearbyPlayers(15).forEach(player ->
-				ParticleUtils.drawSevenSegmentNumber(
-					getSequence(spawnerBlock), spawnerBlock.getLocation().clone().add(0.5, 2, 0.5),
-					player, 0.65, 0.5, Particle.REDSTONE, new Particle.DustOptions(Color.MAROON, 1f)
-				)
-			);
-		}
-		return canBreak;
-	}
-
-	private static Location findValidCatSpawn(Location location, int catRadius) {
+	public static Location findValidCatSpawn(Location location, int catRadius) {
 		// breadth first search algorithm to find the closest valid spot lol
 		World world = location.getWorld();
 		Queue<Location> queue = new ArrayDeque<>();
@@ -1420,38 +988,45 @@ public class SpawnerUtils {
 		return location;
 	}
 
-	private static void startEnsnarementCheck(Block block) {
-		Location spawnerLocation = block.getLocation().clone().add(0.5, 0.5, 0.5);
-		int ensnareRadius = getEnsnared(block);
-		BukkitRunnable task = new BukkitRunnable() {
-			@Override
-			public void run() {
-				List<Entity> nearbyEntities = (List<Entity>) spawnerLocation.getWorld().getNearbyEntities(spawnerLocation, ensnareRadius, ensnareRadius, ensnareRadius);
-				boolean hasNearbyMobs = nearbyEntities.stream()
-					.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
+	public static boolean checkSequence(Block spawnerBlock, int sequenceRadius) {
+		// box to look for spawners
+		boolean canBreak = true;
+		Location center = spawnerBlock.getLocation();
+		BoundingBox searchBox = new BoundingBox(
+			center.getX() - sequenceRadius, center.getY() - sequenceRadius, center.getZ() - sequenceRadius,
+			center.getX() + sequenceRadius, center.getY() + sequenceRadius, center.getZ() + sequenceRadius
+		);
+		for (int x = (int) searchBox.getMinX(); x <= searchBox.getMaxX(); x++) {
+			for (int y = (int) searchBox.getMinY(); y <= searchBox.getMaxY(); y++) {
+				for (int z = (int) searchBox.getMinZ(); z <= searchBox.getMaxZ(); z++) {
+					Block block = center.getWorld().getBlockAt(x, y, z);
+					if (block.getType() == Material.SPAWNER) {
+						// spawner being broken needs to be the lowest number
+						if (getSpawnerType(block, SEQUENCE_ATTRIBUTE) < getSpawnerType(spawnerBlock, SEQUENCE_ATTRIBUTE) && getSpawnerType(block, SEQUENCE_ATTRIBUTE) > 0) {
+							PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, block.getLocation().clone().add(0.5, 0.5, 0.5), spawnerBlock.getLocation().clone().add(0.5, 0.5, 0.5));
+							line.countPerMeter(10).spawnAsEnemy();
+							spawnerBlock.getLocation().getNearbyPlayers(15).forEach(player ->
+								ParticleUtils.drawSevenSegmentNumber(
+									getSpawnerType(block, SEQUENCE_ATTRIBUTE), block.getLocation().clone().add(0.5, 2, 0.5),
+									player, 0.65, 0.5, Particle.REDSTONE, new Particle.DustOptions(Color.MAROON, 1f)
+								)
+							);
+							canBreak = false;
 
-				if (!hasNearbyMobs) {
-					block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_DESTROY, SoundCategory.HOSTILE, 0.75f, 2f);
-					ensnarementTasks.remove(block.getLocation());
-					this.cancel();
-				}
-
-				for (Player player : spawnerLocation.getWorld().getPlayers()) {
-					if (player.getLocation().distance(spawnerLocation) > ensnareRadius && player.getLocation().distance(spawnerLocation) < ensnareRadius + 5) {
-						MovementUtils.pullTowardsNormalized(spawnerLocation, player, 0.8f, false);
+						}
 					}
 				}
-
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 0, 0), ensnareRadius).countPerMeter(1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 1, 0), ensnareRadius).countPerMeter(1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 2, 0), ensnareRadius).countPerMeter(1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 3, 0), ensnareRadius).countPerMeter(1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 4, 0), ensnareRadius).countPerMeter(1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 5, 0), ensnareRadius).countPerMeter(1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 6, 0), ensnareRadius).countPerMeter(1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
 			}
-		};
-		task.runTaskTimer(Plugin.getInstance(), 0, 1);
-		ensnarementTasks.put(block.getLocation(), task);
+		}
+		if (!canBreak) {
+			spawnerBlock.getLocation().getNearbyPlayers(15).forEach(player ->
+				ParticleUtils.drawSevenSegmentNumber(
+					getSpawnerType(spawnerBlock, SEQUENCE_ATTRIBUTE), spawnerBlock.getLocation().clone().add(0.5, 2, 0.5),
+					player, 0.65, 0.5, Particle.REDSTONE, new Particle.DustOptions(Color.MAROON, 1f)
+				)
+			);
+		}
+		return canBreak;
 	}
+
 }
