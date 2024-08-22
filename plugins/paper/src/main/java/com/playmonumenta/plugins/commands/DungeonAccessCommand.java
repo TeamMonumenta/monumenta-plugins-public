@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.RBoardAPI;
@@ -317,6 +318,9 @@ public class DungeonAccessCommand extends GenericCommand {
 			}
 		}
 		for (Player player : players) {
+			// Get the shard to return players to before resetting their access scores
+			String abandonShardName = mapping.getAbandonShardName(player);
+
 			if (mapping.getFinishedName() != null) {
 				ScoreboardUtils.setScoreboardValue(player, mapping.getFinishedName(), 0);
 			}
@@ -328,26 +332,21 @@ public class DungeonAccessCommand extends GenericCommand {
 			}
 			ScoreboardUtils.setScoreboardValue(player, mapping.getAccessName(), 0);
 
+			// Send players to the overworld of the shard, usually the sort box
+			try {
+				MonumentaWorldManagementAPI.sortWorld(player);
+			} catch (Exception ex) {
+				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
+			}
+
 			// boot them out if they are on this shard
-			String abandonShardName = mapping.getAbandonShardName();
 			if (shardName != null && ServerProperties.getShardName().contains(shardName)) {
 				try {
 					ShardSorterCommand.sortToShard(player, abandonShardName, null);
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 				}
 			}
-			/*
-			 * usb: Strikes call their own teleport function: leaving code here in case it is needed for the future (according to Crondis)
-			else if (shardName == null && ServerProperties.getShardName().contains(abandonShardName)) {
-				try {
-					// this hack needs to be changed whenever we change the primary worldname from Project_Epic-<shardname>
-					NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + player.getUniqueId() + " run world Project_Epic-" + abandonShardName);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-			*/
 		}
 	}
 
