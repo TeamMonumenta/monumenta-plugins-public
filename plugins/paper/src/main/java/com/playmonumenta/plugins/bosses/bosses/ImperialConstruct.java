@@ -604,7 +604,6 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 
 	private void setSpellLocations(Location loc) {
 		mCurrentLoc = loc;
-		mRush.setLocation(loc);
 		mRecover.setLocation(loc);
 		mSpawner.setLocation(loc);
 		mFloor.setLocation(loc);

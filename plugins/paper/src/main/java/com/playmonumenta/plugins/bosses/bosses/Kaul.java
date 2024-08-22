@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
-import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
@@ -264,7 +264,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 		// These spells need to be shared between phases in this manner to prevent double casting on phase change
 		SpellLightningStorm lightningStorm = new SpellLightningStorm(boss, this);
-		SpellBossBlockBreak bossBlockBreak = new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true);
+		SpellBlockBreak bossBlockBreak = new SpellBlockBreak(mBoss, 1, 3, 1, 8, false, true, false);
 		SpellShieldStun shieldStun = new SpellShieldStun(30 * 20);
 		SpellBaseParticleAura greenParticleAura = new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
 			new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0),

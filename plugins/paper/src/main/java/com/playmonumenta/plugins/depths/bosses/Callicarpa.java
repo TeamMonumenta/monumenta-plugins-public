@@ -125,13 +125,13 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		if (mParty != null && mParty.getAscension() >= 15) {
 			passives = List.of(
 				garden,
-				new SpellBlockBreak(mBoss, 2, 3, 2, true, Material.AIR),
+				new SpellBlockBreak(mBoss, true, true),
 				new PassiveFloralInsignia(mBoss, mFloorY)
 			);
 		} else {
 			passives = List.of(
 				garden,
-				new SpellBlockBreak(mBoss, 2, 3, 2, true, Material.AIR)
+				new SpellBlockBreak(mBoss, true, true)
 			);
 		}
 

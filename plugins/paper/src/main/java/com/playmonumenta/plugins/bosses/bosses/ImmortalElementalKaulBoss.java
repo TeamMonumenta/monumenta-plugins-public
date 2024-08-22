@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
-import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthenRupture;
@@ -92,7 +92,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
 				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss)),
-			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
+			new SpellBlockBreak(mBoss, 1, 3, 1, 8, false, true, false),
 			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK

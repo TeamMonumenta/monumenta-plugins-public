@@ -149,7 +149,7 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 		}
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBlockBreak(mBoss, 2, 3, 2, true, Material.AIR),
+			new SpellBlockBreak(mBoss, true, true),
 			new SpellHederaAnticheese(mBoss, mSpawnLoc),
 			new SpellPassiveGarden(mBoss, mPlantSpawns, mPlants, mPlantTypes, mSpawnLoc)
 		);

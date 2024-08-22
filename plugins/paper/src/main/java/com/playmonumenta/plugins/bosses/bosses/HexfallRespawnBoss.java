@@ -60,7 +60,7 @@ public class HexfallRespawnBoss extends BossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		List<Block> blocks = BlockUtils.getBlocksInSphere(loc, mParams.RESPAWN_LOCATION_RADIUS);
+		List<Block> blocks = BlockUtils.getBlocksInCylinder(loc, mParams.RESPAWN_LOCATION_RADIUS);
 		blocks.removeIf(block -> !block.getType().equals(mParams.RESPAWN_LOCATION_MATERIAL));
 		Collections.shuffle(blocks);
 		if (!blocks.isEmpty()) {

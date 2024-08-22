@@ -19,6 +19,10 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.block.data.type.Fence;
+import org.bukkit.block.data.type.Gate;
+import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.util.Vector;
@@ -58,6 +62,7 @@ public class BlockUtils {
 		Material.RAIL,
 		Material.POWERED_RAIL,
 		Material.DETECTOR_RAIL,
+		Material.ACTIVATOR_RAIL,
 		Material.POWDER_SNOW
 	);
 
@@ -193,6 +198,16 @@ public class BlockUtils {
 
 	public static boolean isEnvHazardForMobs(Material material) {
 		return ENV_HAZARDS_FOR_MOBS.contains(material);
+	}
+
+	/**
+	 * Special list of blocks that mobs either cannot jump or pathfind over
+	 * @param blockData BlockData of a block to test
+	 * @return True if a mob cannot jump or pathfind over the block
+	 */
+	public static boolean mobCannotPathfindOver(BlockData blockData) {
+		return blockData instanceof TrapDoor || blockData instanceof Fence
+			|| blockData instanceof Gate || blockData instanceof Wall;
 	}
 
 	public static boolean isValuableBlock(Material material) {
@@ -360,7 +375,7 @@ public class BlockUtils {
 		return -1;
 	}
 
-	public static List<Block> getBlocksInSphere(Location loc, double radius) {
+	public static List<Block> getBlocksInCylinder(Location loc, double radius) {
 		World world = loc.getWorld();
 		double bx = loc.getX();
 		double by = loc.getY();
@@ -376,6 +391,29 @@ public class BlockUtils {
 				}
 			}
 		}
+		return blocks;
+	}
+
+	/**
+	 * Gets blocks in a cube around a central block
+	 * @param loc Center of cube
+	 * @param radius Distance around center to check (it's not really a radius because cube but whatever)
+	 * @return List of blocks around center
+	 */
+	public static List<Block> getBlocksInCube(Location loc, double radius) {
+		World world = loc.getWorld();
+		double bx = loc.getX();
+		double by = loc.getY();
+		double bz = loc.getZ();
+		List<Block> blocks = new ArrayList<>();
+		for (double x = bx - radius; x <= bx + radius; x++) {
+			for (double y = by - radius; y <= by + radius; y++) {
+				for (double z = bz - radius; z <= bz + radius; z++) {
+					blocks.add(new Location(world, x, y, z).getBlock());
+				}
+			}
+		}
+
 		return blocks;
 	}
 }

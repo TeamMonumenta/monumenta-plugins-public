@@ -3,16 +3,17 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,41 +29,22 @@ import org.bukkit.util.Vector;
 
 
 public class SpellRush extends Spell {
-
-	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-		Material.AIR,
-		Material.CAVE_AIR,
-		Material.VOID_AIR,
-		Material.COMMAND_BLOCK,
-		Material.CHAIN_COMMAND_BLOCK,
-		Material.REPEATING_COMMAND_BLOCK,
-		Material.BEDROCK,
-		Material.BARRIER,
-		Material.SPAWNER,
-		Material.LIGHT
-	);
-
-	//private static final int MAX_DISTANCE = 15;
-	private static final float VELOCITY = 0.9f;
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	//private Location mCurrentLoc;
-
-	private PassiveRushBlockBreak mBlockBreak;
-
-	private static final int RESPAWN_DURATION = 20 * 10;
-
 	public Location mStartLoc;
-	private int mRange;
+
+	private static final float VELOCITY = 0.9f;
+	private static final int RESPAWN_DURATION = 20 * 10;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final SpellBlockBreak mBlockBreak;
+	private final int mRange;
 
 	public SpellRush(Plugin plugin, LivingEntity boss, Location startLoc, int range) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mStartLoc = startLoc;
 		mRange = range;
-		//mCurrentLoc = middleLoc.clone();
 
-		mBlockBreak = new PassiveRushBlockBreak(mBoss, 5, 5, 5);
+		mBlockBreak = new SpellBlockBreak(mBoss, 5, 5, 5, -65, false, true, true, true, false, Material.AIR);
 	}
 
 	@Override
@@ -74,7 +56,7 @@ public class SpellRush extends Spell {
 		}
 		Location endLoc = players.get(FastUtils.RANDOM.nextInt(players.size())).getLocation();
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 100f, 1f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 10f, 1f);
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -114,7 +96,7 @@ public class SpellRush extends Spell {
 						for (int x = -2; x <= 2; x++) {
 							for (int z = -2; z <= 2; z++) {
 								tempLoc.set(loc.getX() + x, loc.getY() + y, loc.getZ() + z);
-								if (!mIgnoredMats.contains(tempLoc.getBlock().getType())) {
+								if (!BlockUtils.isMechanicalBlock(tempLoc.getBlock().getType())) {
 									blocksToRegen.add(tempLoc.clone());
 									tempLoc.getBlock().setType(Material.AIR);
 								}
@@ -147,7 +129,7 @@ public class SpellRush extends Spell {
 	}
 
 	private void runBlockRespawn(List<Location> blocksToRegen) {
-		if (blocksToRegen.size() > 0) {
+		if (!blocksToRegen.isEmpty()) {
 			BukkitRunnable runnable = new BukkitRunnable() {
 				int mTicks = 0;
 				int mCount = 0;
@@ -168,10 +150,6 @@ public class SpellRush extends Spell {
 			runnable.runTaskTimer(mPlugin, 20 * 2, 1);
 			mActiveRunnables.add(runnable);
 		}
-	}
-
-	public void setLocation(Location loc) {
-		//mCurrentLoc = loc;
 	}
 
 	@Override

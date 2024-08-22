@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
@@ -93,7 +93,7 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 			new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getBlock().getType() == Material.WATER),
 			new SpellJibberJabber(mBoss, mSpeak, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 3),
-			new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
+			new SpellBlockBreak(mBoss, 1, 3, 1, 175, false, true, false),
 			new SpellShieldStun(6 * 20),
 			action, tooHighAction
 		);

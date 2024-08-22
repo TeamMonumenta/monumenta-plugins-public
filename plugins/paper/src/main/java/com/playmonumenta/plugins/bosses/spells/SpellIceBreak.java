@@ -1,10 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -15,42 +16,29 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 public class SpellIceBreak extends Spell {
-	private Entity mLauncher;
+	private final Entity mLauncher;
+	private List<Block> mIceBlocks = new ArrayList<>();
+	private List<Block> mFrostedBlocks = new ArrayList<>();
+	private List<Block> mBrokenBlocks = new ArrayList<>();
 
 	public SpellIceBreak(Entity launcher) {
 		mLauncher = launcher;
 	}
-
-	private Set<Block> mIceBlocks = new HashSet<Block>();
-	private Set<Block> mFrostedBlocks = new HashSet<Block>();
-	private Set<Block> mBrokenBlocks = new HashSet<Block>();
 
 	@Override
 	public void run() {
 		Location loc = mLauncher.getLocation();
 
 		// Get a list of all ice blocks around the boss.
-		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
-		for (int x = -1; x <= 1; x++) {
-			testloc.setX(loc.getX() + x);
-			for (int y = -1; y <= 1; y++) {
-				testloc.setY(loc.getY() + y);
-				for (int z = -1; z <= 1; z++) {
-					testloc.setZ(loc.getZ() + z);
-					Block block = testloc.getBlock();
-					Material material = block.getType();
-					if (material == Material.ICE || material == Material.BLUE_ICE || material == Material.PACKED_ICE) {
-						mIceBlocks.add(testloc.getBlock());
-					}
-				}
-			}
-		}
+		mIceBlocks = BlockUtils.getBlocksInCube(loc, 1);
+		mIceBlocks.removeIf(block -> block.getType() != Material.ICE
+			&& block.getType() != Material.BLUE_ICE
+			&& block.getType() != Material.PACKED_ICE);
 
 		Location locationBelow = new Location(loc.getWorld(), loc.getX(), loc.getY() - 1, loc.getZ());
 
 		// If the mob is on top of frosted ice, dont break yet.
 		if (!mFrostedBlocks.contains(locationBelow.getBlock())) {
-
 			// Break the frosted blocks
 			for (Block block : mFrostedBlocks) {
 				// Dont break a block when its right around an icebreak boss's feet.

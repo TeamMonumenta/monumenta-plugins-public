@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellAutoAttack;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellCrystalRespawn;
@@ -361,7 +361,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		 */
 		SpellDimensionDoor dimensionDoor = new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+			new SpellBlockBreak(mBoss, 1, 3, 1, (int) mStart.getLocation().getY(), false, false, true),
 			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
 			dimensionDoor,
 			new SpellPurgeNegatives(mBoss, 4 * 20),
@@ -370,7 +370,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 1));
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+			new SpellBlockBreak(mBoss, 1, 3, 1, (int) mStart.getLocation().getY(), false, false, true),
 			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
 			dimensionDoor,
 			new SpellPurgeNegatives(mBoss, 3 * 20),
@@ -380,7 +380,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+			new SpellBlockBreak(mBoss, 1, 3, 1, (int) mStart.getLocation().getY(), false, false, true),
 			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
 			dimensionDoor,
 			new SpellPurgeNegatives(mBoss, 2 * 20),
@@ -958,7 +958,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						));
 
 					List<Spell> phase3PassiveSpells = Arrays.asList(
-						new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+						new SpellBlockBreak(mBoss, 1, 3, 1, (int) mStart.getLocation().getY(), false, false, true),
 						new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
 						new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
 						new SpellPurgeNegatives(mBoss, 2 * 20),

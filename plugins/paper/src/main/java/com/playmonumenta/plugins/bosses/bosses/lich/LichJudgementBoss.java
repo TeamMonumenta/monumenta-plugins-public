@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGrenade;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -38,7 +38,7 @@ public class LichJudgementBoss extends BossAbilityGroup {
 		));
 
 		List<Spell> passives = Arrays.asList(
-			new SpellBossBlockBreak(mBoss, mCenter.getY(), 1, 3, 1, false, false),
+			new SpellBlockBreak(mBoss, 1, 3, 1, (int) mCenter.getY(), false, false, true),
 			// Teleport the boss to spawnLoc if he gets too far away from where he spawned
 			new SpellConditionalTeleport(mBoss.getVehicle(), mCenter, b -> loc.distance(b.getLocation()) > 80),
 			// Teleport the boss to spawnLoc if he is stuck in bedrock
