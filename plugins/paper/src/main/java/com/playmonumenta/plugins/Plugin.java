@@ -308,6 +308,7 @@ public class Plugin extends JavaPlugin {
 		SimulateLoot.register(this);
 		SpawnerCountCommand.register();
 		Spawn.register();
+		SpawnPointReset.register();
 		SpellDetectionCircle.registerCommand(this);
 		StatTrackItem.register();
 		Stuck.register();
