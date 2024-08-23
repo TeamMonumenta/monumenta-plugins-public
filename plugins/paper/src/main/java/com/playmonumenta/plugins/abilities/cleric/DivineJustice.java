@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
@@ -12,11 +13,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.managers.GlowingManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -35,7 +38,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 
-public class DivineJustice extends Ability {
+public class DivineJustice extends Ability implements AbilityWithChargesOrStacks {
 
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
@@ -207,9 +210,14 @@ public class DivineJustice extends Ability {
 		Effect existingEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 		if (existingEffect != null && existingEffect.getMagnitude() > 0) {
 			mPriorAmount = existingEffect.getMagnitude();
-		} else if (existingEffect == null && mPriorAmount - mEnhanceDamage > 0) {
+		}
+		if ((existingEffect == null || existingEffect.getDuration() < 10) && mPriorAmount - mEnhanceDamage > 0) {
+			mPlugin.mEffectManager.clearEffects(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 			addEnhancementEffect(mPlayer, mEnhanceDuration, mPriorAmount - mEnhanceDamage);
 			mPriorAmount -= mEnhanceDamage;
+		} else if (existingEffect == null && mPriorAmount > 0) {
+			mPriorAmount = 0;
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
 
@@ -223,7 +231,7 @@ public class DivineJustice extends Ability {
 			@Override
 			public void run() {
 				mT++;
-				for (Player player : PlayerUtils.playersInRange(item.getLocation(), 1, true)) {
+				for (Player player : new Hitbox.UprightCylinderHitbox(item.getLocation(), 0.7, 0.7).getHitPlayers(true)) {
 					if (!canPickUpAsh(player)) {
 						continue;
 					}
@@ -261,7 +269,7 @@ public class DivineJustice extends Ability {
 			existingEffectAmount = existingEffect.getMagnitude();
 		}
 
-		int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, mEnhanceDuration);
+		int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, mEnhanceDuration + 10);
 		double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + mEnhanceDamage, ENHANCEMENT_BONUS_DAMAGE_MAX);
 
 		addEnhancementEffect(player, duration, bonusDamage);
@@ -270,6 +278,7 @@ public class DivineJustice extends Ability {
 	private void addEnhancementEffect(Player player, int duration, double bonusDamage) {
 		mPlugin.mEffectManager.addEffect(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
 			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
+		ClientModHandler.updateAbility(player, this);
 	}
 
 	public static void remove(Player p) {
@@ -282,4 +291,14 @@ public class DivineJustice extends Ability {
 		}, 5);
 	}
 
+	@Override
+	public int getCharges() {
+		Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
+		return activeEffect == null ? 0 : (int) Math.round(100 * activeEffect.getMagnitude());
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return isEnhanced() ? (int) Math.round(100 * ENHANCEMENT_BONUS_DAMAGE_MAX) : 0;
+	}
 }
