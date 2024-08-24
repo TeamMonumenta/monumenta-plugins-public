@@ -219,7 +219,7 @@ public class TABIntegration implements Listener {
 	}
 
 	public void playerLoadEvent(PlayerLoadEvent event) {
-		refreshOnlinePlayer(event.getPlayer().getUniqueId(), true);
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> refreshOnlinePlayer(event.getPlayer().getUniqueId(), true));
 	}
 
 	public static void loadRemotePlayer(RemotePlayerAbstraction player) {

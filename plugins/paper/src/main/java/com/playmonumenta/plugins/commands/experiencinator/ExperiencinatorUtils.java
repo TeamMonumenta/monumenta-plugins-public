@@ -23,6 +23,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -111,7 +112,7 @@ public abstract class ExperiencinatorUtils {
 		}
 
 		// only sell from inventory (not equipment) excluding hotbar
-		List<ItemStack> items = List.of(player.getInventory().getStorageContents());
+		List<ItemStack> items = Arrays.asList(player.getInventory().getStorageContents());
 		items = items.subList(9, items.size());
 
 		ConversionValues conversionValues = calculateOrConvert(items, player, experiencinator, experiencinatorItem, true);
