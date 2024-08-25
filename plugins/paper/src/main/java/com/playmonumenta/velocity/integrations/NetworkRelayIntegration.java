@@ -37,7 +37,7 @@ public class NetworkRelayIntegration {
 	public void proxyPingEvent(ProxyPingEvent event) {
 		int count = getCachedPlayerCount();
 		ServerPing ping = event.getPing();
-		event.setPing(ping.asBuilder().onlinePlayers(count).maximumPlayers(count + 1).build());
+		event.setPing(ping.asBuilder().onlinePlayers(count).maximumPlayers(mMain.mConfig.mMaxPlayerCount).build());
 	}
 
 	public void gatherPlayerDataEvent(GatherRemotePlayerDataEventVelocity event) {

@@ -5,9 +5,9 @@ import com.playmonumenta.redissync.RedisAPI;
 import com.playmonumenta.velocity.MonumentaVelocity;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
+import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -83,24 +83,21 @@ public class MonumentaReconnectHandler {
 		}
 	}
 
-	// ReconnectHandler.setServer
-	@Subscribe
+	// Fix for kicks from the server
+	@Subscribe(order = PostOrder.EARLY)
 	public void kickedFromServerEvent(KickedFromServerEvent event) {
-		if (!event.getResult().isAllowed()) {
-			return;
-		}
-		Player player = event.getPlayer();
-		String reconnectServer = event.getServer().getServerInfo().getName();
+		@Nullable Component kickReason = event.getServerKickReason().orElse(null);
 		// exclude servers such as purgatory
-		if (reconnectServer == null || mExcludedServers.contains(reconnectServer)) {
-			return;
+		if (!event.kickedDuringServerConnect() && kickReason != null &&
+			// We assume that if there is a message component inside RedirectPlayer, it is being done by a proxy plugin
+			event.getResult() instanceof KickedFromServerEvent.RedirectPlayer redirectResult && redirectResult.getMessageComponent() == null) {
+			event.setResult(KickedFromServerEvent.DisconnectPlayer.create(kickReason));
 		}
-		RedisAPI.getInstance().async().hset(locationsKey(), player.getUniqueId().toString(), reconnectServer);
 	}
 
-	// Dangerous! this event can fire before PlayerChooseInitialServerEvent
+	// ReconnectHandler.setServer
 	@Subscribe
-	public void disconnectEvent(DisconnectEvent event) {
+	public void serverConnectEvent(ServerPostConnectEvent event) {
 		Player player = event.getPlayer();
 		ServerConnection server = player.getCurrentServer().orElse(null);
 		if (server == null) {

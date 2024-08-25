@@ -10,24 +10,28 @@ import com.playmonumenta.networkrelay.RemotePlayerMinecraft;
 import com.playmonumenta.networkrelay.RemotePlayerProxy;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.commands.TablistCommand;
 import com.playmonumenta.plugins.protocollib.PingListener;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
 import me.neznamy.tab.api.event.player.PlayerLoadEvent;
 import me.neznamy.tab.api.tablist.layout.Layout;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -39,13 +43,12 @@ import org.jetbrains.annotations.Nullable;
 public class TABIntegration implements Listener {
 	public static @MonotonicNonNull TABIntegration INSTANCE;
 	final TabAPI mTab;
-	boolean mFirstLoad = false;
 	boolean mIsRefreshing = false;
 	long mLastRefresh = System.currentTimeMillis();
 
 	String mGlobalFooter = "%monumenta_boss_details_1% | &7Total players:&f -1 | %monumenta_boss_details_2%";
 
-	private static class Slot {
+	public static class Slot {
 		public final int mId;
 		public final String mText;
 		public final @Nullable String mSkin;
@@ -79,7 +82,7 @@ public class TABIntegration implements Listener {
 		}
 
 		public Layout toLayout() {
-			Layout layout = TabAPI.getInstance().getLayoutManager().createNewLayout(UUID.randomUUID().toString());
+			Layout layout = Objects.requireNonNull(TabAPI.getInstance().getLayoutManager()).createNewLayout(UUID.randomUUID().toString());
 			for (Slot slot : mLayout) {
 				if (slot.mSkin != null && !slot.mSkin.isEmpty() && slot.mPing != null) {
 					layout.addFixedSlot(slot.mId, slot.mText, slot.mSkin, slot.mPing);
@@ -114,16 +117,23 @@ public class TABIntegration implements Listener {
 		public @Nullable String mSuffix;
 		public @Nullable String mGuild;
 		public @Nullable String mSkin;
-		public String mShardId = "null";
-		public String mProxyId = "null";
+		public String mShardId = "";
+		public String mProxyShardId = "";
+		public String mProxyId = "";
 		public int mPing = -1;
 		public @Nullable CachedLayout mLastLayout = null;
 
 		public MonumentaPlayer(RemotePlayerAbstraction player) {
-			this.mUuid = player.getUuid();
-			this.mName = player.getName();
+			mUuid = player.getUuid();
+			mName = player.getName();
 			// fallback skin
-			this.set(player);
+			set(player);
+		}
+
+		public MonumentaPlayer(String name, UUID uuid, String shard) {
+			mUuid = uuid;
+			mName = name;
+			mShardId = shard;
 		}
 
 		public static void setPing(UUID uuid, int ping) {
@@ -133,11 +143,16 @@ public class TABIntegration implements Listener {
 			});
 		}
 
+		public String getShardId() {
+			return this.mShardId.isEmpty() ? this.mProxyShardId : this.mShardId;
+		}
+
 		public void set(RemotePlayerAbstraction player) {
 			if (player instanceof RemotePlayerMinecraft playerShard) {
-				this.mShardPlayer = playerShard;
-				this.mIsHidden = player.isHidden() == null || player.isHidden();
-				this.mShardId = player.getServerId();
+				mShardPlayer = playerShard;
+				Boolean isHidden = player.isHidden();
+				mIsHidden = isHidden == null || isHidden;
+				mShardId = player.getServerId();
 				JsonObject pluginData = playerShard.getPluginData("monumenta");
 				if (pluginData != null) {
 					if (pluginData.has("ping")) {
@@ -181,8 +196,12 @@ public class TABIntegration implements Listener {
 					}
 				}
 			} else if (player instanceof RemotePlayerProxy playerProxy) {
-				this.mProxyPlayer = playerProxy;
-				this.mProxyId = playerProxy.getServerId();
+				mProxyPlayer = playerProxy;
+				mProxyId = playerProxy.getServerId();
+				mProxyShardId = playerProxy.targetShard();
+				if (mShardId.isEmpty()) {
+					mShardId = playerProxy.targetShard();
+				}
 				JsonObject pluginData = playerProxy.getPluginData("monumenta-velocity");
 				if (pluginData != null) {
 					if (pluginData.has("signed_texture")) {
@@ -199,16 +218,16 @@ public class TABIntegration implements Listener {
 		}
 	}
 
-	private static Map<UUID, MonumentaPlayer> mPlayers = new ConcurrentHashMap<>();
+	private static final Map<UUID, MonumentaPlayer> mPlayers = new ConcurrentHashMap<>();
 
 	public TABIntegration() {
 		INSTANCE = this;
-		this.mTab = TabAPI.getInstance();
-		mTab.getEventBus().register(PlayerLoadEvent.class, this::playerLoadEvent);
+		TablistCommand.register();
+		mTab = TabAPI.getInstance();
+		Objects.requireNonNull(mTab.getEventBus()).register(PlayerLoadEvent.class, this::playerLoadEvent);
 		// Refresh for latency
-		Bukkit.getScheduler().runTaskTimerAsynchronously(Plugin.getInstance(), () -> {
-			onRefreshRequest(true);
-		}, 0, 600);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(Plugin.getInstance(),
+			() -> onRefreshRequest(true), 0, 600);
 	}
 
 	public static TABIntegration getInstance() {
@@ -255,6 +274,23 @@ public class TABIntegration implements Listener {
 		});
 	}
 
+	private static final Set<UUID> fakePlayers = new HashSet<>();
+
+	// adds a fake player for testing - doesn't affect other shards
+	public static void addFakePlayer(String name, String shard) {
+		UUID fakeUuid = UUID.randomUUID();
+		fakePlayers.add(fakeUuid);
+		MonumentaPlayer fakePlayer = new MonumentaPlayer(name, fakeUuid, shard);
+		mPlayers.put(fakeUuid, fakePlayer);
+	}
+
+	public static void removeFakePlayers() {
+		for (UUID fake : fakePlayers) {
+			mPlayers.remove(fake);
+		}
+		fakePlayers.clear();
+	}
+
 	public void refreshOnlinePlayer(UUID uuid, boolean latency) {
 		if (latency) {
 			Player bukkitPlayer = Bukkit.getPlayer(uuid);
@@ -263,7 +299,7 @@ public class TABIntegration implements Listener {
 			}
 			refreshPing(bukkitPlayer).join();
 		}
-		TabPlayer viewer = this.mTab.getPlayer(uuid);
+		TabPlayer viewer = mTab.getPlayer(uuid);
 		if (viewer == null || !viewer.isLoaded()) {
 			return;
 		}
@@ -282,19 +318,19 @@ public class TABIntegration implements Listener {
 			return value;
 		});
 		setHeaderAndFooter(viewer, monuPlayer);
-		this.mTab.getLayoutManager().sendLayout(viewer, finalLayout.toLayout());
+		Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout());
 	}
 
 	private long mNextRefreshLatencyTime = 0L;
 	private long mNextRefreshTime = 0L;
 	private @Nullable BukkitTask mRefreshTimer = null;
 
+	// this should be run async
 	private void onRefreshRequest(boolean latency) {
 		long now = System.currentTimeMillis();
 		if (now >= mNextRefreshTime) {
 			if (latency && now >= mNextRefreshLatencyTime) {
 				mNextRefreshLatencyTime = now + 15000;
-				latency = true;
 			} else {
 				latency = false;
 			}
@@ -303,7 +339,8 @@ public class TABIntegration implements Listener {
 				mRefreshTimer.cancel();
 			}
 			mRefreshTimer = null;
-			refresh(latency);
+			final boolean finalLatency = latency;
+			refresh(finalLatency);
 		} else {
 			if (mRefreshTimer != null) {
 				return;
@@ -314,6 +351,7 @@ public class TABIntegration implements Listener {
 		}
 	}
 
+	// this should be run async
 	private void refresh(boolean latency) {
 		if (latency) {
 			refreshPingForLocalPlayersAndBroadcast();
@@ -325,7 +363,7 @@ public class TABIntegration implements Listener {
 		mIsRefreshing = true;
 		try {
 			mGlobalFooter = "%monumenta_boss_details_1% | &7Total players:&f " + NetworkRelayAPI.getVisiblePlayerNames().size() + " | %monumenta_boss_details_2%";
-			TabPlayer[] tabPlayers = this.mTab.getOnlinePlayers();
+			TabPlayer[] tabPlayers = mTab.getOnlinePlayers();
 			for (TabPlayer viewer : tabPlayers) {
 				refreshOnlinePlayer(viewer.getUniqueId(), false);
 			}
@@ -355,13 +393,23 @@ public class TABIntegration implements Listener {
 	}
 
 	private static class MonumentaPlayerComparator implements Comparator<MonumentaPlayer> {
+		private final String mLocalShard;
+
+		private MonumentaPlayerComparator(MonumentaPlayer viewer) {
+			mLocalShard = viewer.mShardId == null ? "" : viewer.mShardId;
+		}
+
 		@Override
 		public int compare(MonumentaPlayer a, MonumentaPlayer b) {
 			String aShard = a.mShardId == null ? "" : a.mShardId;
 			String bShard = b.mShardId == null ? "" : b.mShardId;
-			int result = 0;
+			int result;
 			if (aShard.equals(bShard)) {
 				result = 0;
+			} else if (aShard.equals(mLocalShard)) {
+				result = -1;
+			} else if (bShard.equals(mLocalShard)) {
+				result = 1;
 			} else if (aShard.isEmpty()) {
 				result = 1;
 			} else if (bShard.isEmpty()) {
@@ -391,16 +439,16 @@ public class TABIntegration implements Listener {
 	}
 
 	private CachedLayout calculateLayout(CachedLayout layout, MonumentaPlayer monuPlayer) {
-		// not optimized at all, store permission/meta somewhere when initally fetching the player
+		// not optimized at all, store permission/meta somewhere when initially fetching the player
 		int layoutIndex = 21;
 
 		// sort by shard
 		Collection<MonumentaPlayer> players = mPlayers.values().stream()
-			.sorted(new MonumentaPlayerComparator())
-			.collect(Collectors.toList());
+			.sorted(new MonumentaPlayerComparator(monuPlayer))
+			.toList();
 
 		boolean isAdminOrMod = (monuPlayer.mIsMod || monuPlayer.mIsAdmin);
-		// modlist
+		// mod list
 		boolean modHasHeader = false;
 		for (MonumentaPlayer modPlayer : players) {
 			if (!modPlayer.mIsMod) {
@@ -413,9 +461,7 @@ public class TABIntegration implements Listener {
 				modHasHeader = true;
 				layout.addFixedSlot(layoutIndex, "&c&lModerators", "mineskin:1160568696");
 				layoutIndex++;
-				if (layoutIndex >= 81) {
-					return layout;
-				}
+				// layoutIndex is 22, never >= 81 here
 			}
 			layout.addFixedSlot(layoutIndex, formatPlayer(modPlayer, isAdminOrMod), modPlayer.mSkin, modPlayer.mPing);
 			layoutIndex++;
@@ -458,7 +504,7 @@ public class TABIntegration implements Listener {
 			}
 		}
 
-		// playerlist
+		// player list
 		boolean regularHasHeader = false;
 		for (MonumentaPlayer regularPlayer : players) {
 			// hide check
@@ -495,8 +541,8 @@ public class TABIntegration implements Listener {
 
 	private void setHeaderAndFooter(TabPlayer viewer, MonumentaPlayer player) {
 		String header = "Connected to proxy: &7<" + player.mProxyId + ">&r shard: &7<" + player.mShardId + ">";
-		// String footer = "%monumenta_boss_details_1% &7 Total players:&f %online% %monumenta_boss_details_2%")
-		this.mTab.getHeaderFooterManager().setHeaderAndFooter(viewer, header, mGlobalFooter);
+		// String footer = "%monumenta_boss_details_1% &7 Total players:&f %online% %monumenta_boss_details_2%"
+		Objects.requireNonNull(mTab.getHeaderFooterManager()).setHeaderAndFooter(viewer, header, mGlobalFooter);
 	}
 
 	private String formatPlayer(MonumentaPlayer player, boolean canSeeVanished) {
@@ -504,8 +550,7 @@ public class TABIntegration implements Listener {
 		String suffix = player.mSuffix != null ? player.mSuffix : ""; // luckperm suffixes are just color codes
 		String vanished = (canSeeVanished && player.mIsHidden) ? "&b[V]&r " : "";
 		// &7<${player server}>${vanish_suffix}${adminOrNoGuild}${hexColorTag}${player luckpermsbungee_prefix}${isAdmin}&r${player luckpermsbungee_suffix}${player display_name}
-		String finished = MessageFormat.format("&7<{0}> {1}{2}&r{3}{4}", player.mShardId, vanished, prefix, suffix, player.mName);
-		return finished;
+		return MessageFormat.format("&7<{0}> {1}{2}&r{3}{4}", player.mShardId, vanished, prefix, suffix, player.mName);
 	}
 
 	// Ping handling
@@ -532,7 +577,7 @@ public class TABIntegration implements Listener {
 			for (Player player : players) {
 				futures.add(refreshPing(player));
 			}
-			final List<UUID> uuids = players.stream().map(x -> x.getUniqueId()).toList();
+			final List<UUID> uuids = players.stream().map(Entity::getUniqueId).toList();
 			CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).whenCompleteAsync((a, ex) -> {
 				if (ex != null) {
 					// cry
@@ -551,9 +596,9 @@ public class TABIntegration implements Listener {
 				try {
 					NetworkRelayAPI.sendBroadcastMessage("monumenta.ping", data);
 				} catch (Exception eex) {
-					MMLog.warning("Failed to send global ping message: ", ex);
+					MMLog.warning("Failed to send global ping message: ", eex);
 				}
-				onRefreshRequest(false);
+				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
 			});
 		});
 	}
@@ -573,7 +618,7 @@ public class TABIntegration implements Listener {
 						MMLog.warning("Failed to process global ping message: ", ex);
 					}
 				}
-				onRefreshRequest(false);
+				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
 			}
 		}
 	}

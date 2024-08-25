@@ -149,6 +149,9 @@ public class MonumentaVelocity {
 
 		@Setting(value = "excluded_servers")
 		public List<String> mExcludedServers = new ArrayList<>();
+
+		@Setting(value = "max_player_count")
+		public int mMaxPlayerCount = 400;
 	}
 
 	@ConfigSerializable
