@@ -104,9 +104,6 @@ public class GlowingManager {
 	}
 
 	public static ActiveGlowingEffect startGlowing(Entity entity, NamedTextColor color, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers, @Nullable String reference) {
-		if (reference != null) {
-			clear(entity, reference);
-		}
 		return startGlowing(entity, new GlowingInstance(true, color, Color.fromRGB(color.red(), color.green(), color.blue()),
 			duration < 0 ? Integer.MAX_VALUE : Bukkit.getCurrentTick() + duration, visibleToPlayers, priority, reference));
 	}
@@ -121,6 +118,9 @@ public class GlowingManager {
 	}
 
 	private static ActiveGlowingEffect startGlowing(Entity entity, GlowingInstance instance) {
+		if (instance.mReference != null) {
+			clear(entity, instance.mReference);
+		}
 		GlowingEntityData data = mData.computeIfAbsent(ScoreboardUtils.getScoreHolderName(entity), k -> new GlowingEntityData(entity));
 		data.addData(instance);
 		if (instance.mGlowing) {
