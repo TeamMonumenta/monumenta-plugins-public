@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.regex.Pattern;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
 import me.neznamy.tab.api.event.player.PlayerLoadEvent;
@@ -41,6 +41,8 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TABIntegration implements Listener {
+	private static final Pattern RE_SHARD_INSTANCE_SUFFIX = Pattern.compile("-?[0-9]*$");
+
 	public static @MonotonicNonNull TABIntegration INSTANCE;
 	final TabAPI mTab;
 	boolean mIsRefreshing = false;
@@ -394,46 +396,56 @@ public class TABIntegration implements Listener {
 
 	private static class MonumentaPlayerComparator implements Comparator<MonumentaPlayer> {
 		private final String mLocalShard;
+		private final String mBaseShard;
 
 		private MonumentaPlayerComparator(MonumentaPlayer viewer) {
 			mLocalShard = viewer.mShardId == null ? "" : viewer.mShardId;
+			mBaseShard = RE_SHARD_INSTANCE_SUFFIX
+				.matcher(mLocalShard)
+				.replaceAll("");
 		}
 
 		@Override
 		public int compare(MonumentaPlayer a, MonumentaPlayer b) {
-			String aShard = a.mShardId == null ? "" : a.mShardId;
-			String bShard = b.mShardId == null ? "" : b.mShardId;
-			int result;
-			if (aShard.equals(bShard)) {
-				result = 0;
-			} else if (aShard.equals(mLocalShard)) {
-				result = -1;
-			} else if (bShard.equals(mLocalShard)) {
-				result = 1;
-			} else if (aShard.isEmpty()) {
-				result = 1;
-			} else if (bShard.isEmpty()) {
-				result = -1;
-			} else {
-				result = aShard.compareToIgnoreCase(bShard);
+			// Prefix of 0 for set shards and 9 for null shards
+			// ensures null shards go last without affecting displayed name
+			String aShard = a.mShardId == null ? "9" : ("0" + a.mShardId);
+			String bShard = b.mShardId == null ? "9" : ("0" + b.mShardId);
+
+			String aBaseShard = RE_SHARD_INSTANCE_SUFFIX
+				.matcher(aShard)
+				.replaceAll("");
+			String bBaseShard = RE_SHARD_INSTANCE_SUFFIX
+				.matcher(bShard)
+				.replaceAll("");
+
+			int result = aBaseShard.compareToIgnoreCase(bBaseShard);
+			if (result != 0) {
+				if (aBaseShard.equals(mBaseShard)) {
+					return -1;
+				} else if (bBaseShard.equals(mBaseShard)) {
+					return 1;
+				}
+				return result;
 			}
+
+			result = aShard.compareToIgnoreCase(bShard);
+			if (result != 0) {
+				if (aShard.equals(mLocalShard)) {
+					result = -1;
+				} else if (bShard.equals(mLocalShard)) {
+					result = 1;
+				}
+				return result;
+			}
+
+			String aGuild = a.mGuild == null ? "9" : ("0" + a.mGuild);
+			String bGuild = b.mGuild == null ? "9" : ("0" + b.mGuild);
+			result = aGuild.compareToIgnoreCase(bGuild);
 			if (result != 0) {
 				return result;
 			}
-			String aGuild = a.mGuild == null ? "" : a.mGuild;
-			String bGuild = b.mGuild == null ? "" : b.mGuild;
-			if (aGuild.equals(bGuild)) {
-				result = 0;
-			} else if (aGuild.isEmpty()) {
-				result = 1;
-			} else if (bGuild.isEmpty()) {
-				result = -1;
-			} else {
-				result = aGuild.compareToIgnoreCase(bGuild);
-			}
-			if (result != 0) {
-				return result;
-			}
+
 			return a.mName.compareToIgnoreCase(b.mName);
 		}
 	}
