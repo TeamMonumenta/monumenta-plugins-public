@@ -46,16 +46,23 @@ public class DataCollectionManager {
 	private @Nullable BukkitTask mDataCollectionTask;
 
 	public DataCollectionManager() {
-		resumeDataCollection();
+		if (Plugin.IS_PLAY_SERVER) {
+			resumeDataCollection();
+		}
 	}
 
 	private void addDataPoint(List<World> worlds) {
 		DataPoint dataPoint = new DataPoint();
 		worlds.forEach(world -> dataPoint.addAllPlayerInformation(processWorld(world)));
 
+		long timestamp = dataPoint.getTimestamp();
+		String finalPath = EXPORT_PATH + "%s - %s.json".formatted(timestamp, dataPoint.getShardName());
+		if (dataPoint.getPlayerInformation().isEmpty()) {
+			MMLog.info("Skipping writing gameplay data to %s - 0 players found".formatted(finalPath));
+			return;
+		}
+
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			long timestamp = dataPoint.getTimestamp();
-			String finalPath = EXPORT_PATH + "%s - %s.json".formatted(timestamp, dataPoint.getShardName());
 			try {
 				MMLog.info("Writing gameplay data of %s players to %s".formatted(dataPoint.getPlayerInformation().size(), finalPath));
 				FileUtils.writeJson(finalPath, dataPoint.toJson(), false);
