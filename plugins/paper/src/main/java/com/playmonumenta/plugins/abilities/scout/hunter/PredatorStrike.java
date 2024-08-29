@@ -112,7 +112,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	private final double mDistanceScale;
 	private final double mExplodeRadius;
 	private @Nullable SwiftCuts mSwiftCuts;
-	private int mCurrDuration = 0;
+	private int mCurrDuration = -1;
 
 	private final PredatorStrikeCS mCosmetic;
 
