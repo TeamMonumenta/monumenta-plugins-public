@@ -152,7 +152,10 @@ public class LoadoutManager implements Listener {
 		WEAPON("weapon", "weapons?|mainhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.MAINHAND) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
 		SHIELD("shield", "shields?", 2, item -> item.getType() == Material.SHIELD),
 
-		OFFHAND("offhand", "offhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
+		OFFHAND("offhand", "offhands?", 2,
+				item -> ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)
+						// weightless items are offhands even without stats, except for the tesseract of light
+						|| (ItemStatUtils.hasEnchantment(item, EnchantmentType.WEIGHTLESS) && item.getType() != Material.LIGHT_GRAY_STAINED_GLASS)),
 		HELMET("helmet", "helmets?|hats?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.HEAD),
 		CHEST("chestplate", "chest(?:plate)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.CHEST),
 		LEGS("legs", "leg(?:ging)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.LEGS),
@@ -177,7 +180,7 @@ public class LoadoutManager implements Listener {
 		// Consumables are (mostly) region-independent, and charms always R3, so their priority includes the priority a region tag would add
 		// this for example makes 'consumables' higher priority than 'r2 weapons', thus sorting Fruit of Life into 'consumables' rather than 'weapons'
 		CHARM("charm", "charms?", 104, item -> ItemStatUtils.isCharm(item)),
-		ZENITH("zenith", "zenith", 1, item -> ItemStatUtils.isZenithCharm(item)),
+		ZENITH("zenith", "zenith", 105, item -> ItemStatUtils.isZenithCharm(item)),
 		CONSUMABLE("consumable", "consumables?|foods?|potions?", 104,
 			item -> ItemStatUtils.isConsumable(item)
 				        || (item.getType().isEdible() && !ItemStatUtils.isCharm(item))
