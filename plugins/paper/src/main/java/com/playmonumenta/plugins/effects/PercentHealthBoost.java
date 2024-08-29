@@ -42,15 +42,15 @@ public class PercentHealthBoost extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		// in theory this should not affect anything
-		// this somehow fixes sskt's double death
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			if (entity instanceof LivingEntity le && !le.isDead()) {
-				double oldMaxHealth = EntityUtils.getMaxHealth(le);
-				EntityUtils.replaceAttribute(le, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-				le.setHealth(Math.min(Math.max(0.1, le.getHealth() + oldMaxHealth * mAmount), EntityUtils.getMaxHealth(le)));
+		if (entity instanceof LivingEntity le) {
+			if (isDebuff() && le.getHealth() != 0) {
+				double maxHealth = EntityUtils.getMaxHealth(le);
+				double newHealth = maxHealth + (maxHealth * mAmount);
+				newHealth = Math.min(newHealth, le.getHealth());
+				le.setHealth(newHealth);
 			}
-		}, 1);
+			EntityUtils.replaceAttribute(le, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		}
 	}
 
 	@Override
