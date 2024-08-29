@@ -58,10 +58,6 @@ public class CelestialGemListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-				// only do this if you have a celestial gem in inventory
-				if (Arrays.stream(event.getClickedInventory().getContents()).noneMatch(CelestialGemListener::isCelestialGem)) {
-					return;
-				}
 
 				ItemStack newCharm = CharmFactory.upgradeCharm(item);
 				player.sendMessage(Component.text("Your ", TextColor.fromHexString("#9374ff"))
