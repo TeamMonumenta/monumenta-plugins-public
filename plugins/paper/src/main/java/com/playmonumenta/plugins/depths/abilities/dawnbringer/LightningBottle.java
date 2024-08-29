@@ -104,9 +104,10 @@ public class LightningBottle extends DepthsAbility implements AbilityWithCharges
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion, ProjectileLaunchEvent event) {
 		final var item = potion.getItem();
-		if (isLightningBottle(item)) {
-			event.setCancelled(true); // regardless, we don't allow the normal event to go through.
+		if (!isLightningBottle(item)) {
+			return true;
 		}
+		event.setCancelled(true);
 
 		if (mCharges > 0) {
 			mCharges--;
