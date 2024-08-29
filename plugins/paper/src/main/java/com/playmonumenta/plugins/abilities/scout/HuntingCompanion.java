@@ -238,15 +238,22 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 						} else {
 							summon.setTarget(specifiedTarget);
 						}
-					} else {
-						if (!EntityUtils.isHostileMob(summon.getTarget())) {
-							summon.setTarget(null);
-						}
-						if (summon.getTarget() == null || summon.getTarget().isDead()) {
-							LivingEntity nearestMob = findNearestNonTargetedMob(summon);
-							if (nearestMob != null) {
-								summon.setTarget(nearestMob);
-								mCosmetic.onAggroSounds(world, nearestMob.getLocation(), summon);
+					} else if (!EntityUtils.isHostileMob(summon.getTarget())) {
+						summon.setTarget(null);
+					}
+					if (summon.getTarget() == null || summon.getTarget().isDead()) {
+						LivingEntity nearestMob = findNearestNonTargetedMob(summon);
+						if (nearestMob != null) {
+							summon.setTarget(nearestMob);
+							mCosmetic.onAggroSounds(world, nearestMob.getLocation(), summon);
+						} else {
+							// Follow player if there's no valid targets around
+							double distanceSquared = summon.getLocation().distanceSquared(mPlayer.getLocation());
+							if (distanceSquared > 4 * 4) {
+								// Slow down a bit near the player to get less jerky movement
+								summon.getPathfinder().moveTo(summon instanceof Parrot ? mPlayer.getLocation().add(0, 3, 0) : mPlayer.getLocation(), distanceSquared > 6 * 6 ? 1 : 0.66);
+							} else {
+								summon.getPathfinder().stopPathfinding();
 							}
 						}
 					}
