@@ -85,6 +85,14 @@ public class DelveCustomInventory extends CustomInventory {
 			"Selecting at least one will result in 25% increased XP."
 		}
 	);
+	private static final ItemStack EXPERIMENTAL_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(
+		Material.CYAN_GLAZED_TERRACOTTA,
+		Component.text("Expiremental Modifier", NamedTextColor.AQUA, TextDecoration.BOLD)
+			.decoration(TextDecoration.ITALIC, false),
+		new String[] {
+			"This is a one-time event modifier that will not be coming back."
+		}
+	);
 	private static final ItemStack LEFT_ARROW_ITEM = GUIUtils.createBasicItem(
 		Material.ARROW,
 		"Previous Page",
@@ -343,6 +351,9 @@ public class DelveCustomInventory extends CustomInventory {
 			if (DelvesModifier.rotatingDelveModifiers().contains(mod)) {
 				mInventory.setItem(rowColToIndex(0, i + 1), ROTATING_DELVE_MODIFIER_INFO);
 			}
+			if (DelvesModifier.experimentalDelveModifiers().contains(mod)) {
+				mInventory.setItem(rowColToIndex(0, i + 1), EXPERIMENTAL_DELVE_MODIFIER_INFO);
+			}
 
 			int level = mPointSelected.getOrDefault(mod, 0);
 
@@ -432,6 +443,13 @@ public class DelveCustomInventory extends CustomInventory {
 				mods.remove(rotating);
 			}
 		}
+		List<DelvesModifier> experimentalMods = DelvesUtils.getExperimentalDelveModifier();
+		for (DelvesModifier experimental : DelvesModifier.experimentalDelveModifiers()) {
+			if (!experimentalMods.contains(experimental)) {
+				mods.remove(experimental);
+			}
+		}
+
 
 		if (mDungeonName.startsWith("portal") || mDungeonName.startsWith("ruin")) {
 			mods.remove(DelvesModifier.FRAGILE);
@@ -439,12 +457,14 @@ public class DelveCustomInventory extends CustomInventory {
 
 		if (mDungeonName.startsWith("depths")) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.removeAll(DelvesModifier.experimentalDelveModifiers());
 			mods.remove(DelvesModifier.ENTROPY);
 			mods.remove(DelvesModifier.TWISTED);
 		}
 
 		if (mDungeonName.startsWith("zenith")) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.removeAll(DelvesModifier.experimentalDelveModifiers());
 			mods.remove(DelvesModifier.ENTROPY);
 		}
 
@@ -588,6 +608,31 @@ public class DelveCustomInventory extends CustomInventory {
 					mPointSelected.put(mod, finalPoint);
 					playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.BLOCK_STONE_PLACE, SoundCategory.PLAYERS, 1f, 1.5f);
 				}
+				if (mPointSelected.get(DelvesModifier.COLOSSAL) != null) {
+					if (mod == DelvesModifier.CHANCECUBES && mPointSelected.get(DelvesModifier.COLOSSAL) > 0) {
+						mPointSelected.put(DelvesModifier.COLOSSAL, 0);
+						playerWhoClicked.sendMessage(Component.text("This modifier is not compatible with Colossal! Colossal has been unselected.", NamedTextColor.RED));
+					}
+				}
+				if (mPointSelected.get(DelvesModifier.CHANCECUBES) != null) {
+					if (mod == DelvesModifier.COLOSSAL && mPointSelected.get(DelvesModifier.CHANCECUBES) > 0) {
+						mPointSelected.put(DelvesModifier.CHANCECUBES, 0);
+						playerWhoClicked.sendMessage(Component.text("This modifier is not compatible with Chance Cubes! Chance Cubes has been unselected.", NamedTextColor.RED));
+					}
+				}
+				if (mPointSelected.get(DelvesModifier.ENTROPY) != null) {
+					if (mod == DelvesModifier.CHANCECUBES && mPointSelected.get(DelvesModifier.ENTROPY) > 0) {
+						mPointSelected.put(DelvesModifier.ENTROPY, 0);
+						playerWhoClicked.sendMessage(Component.text("This modifier is not compatible with Entropy! Entropy has been unselected.", NamedTextColor.RED));
+					}
+				}
+				if (mPointSelected.get(DelvesModifier.CHANCECUBES) != null) {
+					if (mod == DelvesModifier.ENTROPY && mPointSelected.get(DelvesModifier.CHANCECUBES) > 0) {
+						mPointSelected.put(DelvesModifier.CHANCECUBES, 0);
+						playerWhoClicked.sendMessage(Component.text("This modifier is not compatible with Chance Cubes! Chance Cubes has been unselected.", NamedTextColor.RED));
+					}
+				}
+
 				// Editing the entropy mod at all should mean
 				// that existing already rolled mods are left
 				// on purposefully and you want more random rolls
@@ -604,8 +649,13 @@ public class DelveCustomInventory extends CustomInventory {
 			} else if (mConfig.editable()) {
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 				mAlreadyRolledEntropy = 0;
+				List<DelvesModifier> experimentalModifiers = DelvesModifier.experimentalDelveModifiers();
 				for (DelvesModifier mod : getAvailableModifiers()) {
-					mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
+					if (experimentalModifiers.contains(mod)) {
+						mPointSelected.put(mod, 0);
+					} else {
+						mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
+					}
 				}
 			}
 		}

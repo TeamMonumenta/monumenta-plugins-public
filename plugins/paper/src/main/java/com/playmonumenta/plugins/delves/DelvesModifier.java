@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.delves.abilities.Assassins;
 import com.playmonumenta.plugins.delves.abilities.Astral;
 import com.playmonumenta.plugins.delves.abilities.Bloodthirsty;
 import com.playmonumenta.plugins.delves.abilities.Carapace;
+import com.playmonumenta.plugins.delves.abilities.ChanceCubes;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
@@ -59,12 +60,14 @@ public enum DelvesModifier {
 	UNYIELDING(18, Unyielding::applyModifiers, createIcon(Material.NETHERITE_CHESTPLATE, Component.text("Unyielding", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Unyielding.DESCRIPTION), Unyielding::rankDescription, 23, 5),
 	CHRONOLOGY(19, null, createIcon(Material.CLOCK, Component.text("Chronology", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chronology.DESCRIPTION), Chronology::rankDescription, 24, 5),
 	RIFTBORN(20, null, createIcon(Material.END_PORTAL_FRAME, Component.text("Riftborn", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Riftborn.DESCRIPTION), Riftborn::rankDescription, 25, 5),
-	HAUNTED(21, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted::rankDescription, 26, 5)
-	;
+	HAUNTED(21, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted::rankDescription, 26, 5),
+    // Keep experimental modifiers after here
+	CHANCECUBES(22, null, createIcon(Material.GOLD_BLOCK, Component.text("Chance Cubes", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), ChanceCubes.DESCRIPTION), ChanceCubes::rankDescription, 27, 6);
 
 	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL);
 	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED, FRAGILE);
 	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ASSASSINS, VENGEANCE, UNYIELDING);
+	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES);
 
 	private final int mIndex;
 	private final @Nullable BiConsumer<LivingEntity, Integer> mApplyFunc;
@@ -144,12 +147,17 @@ public enum DelvesModifier {
 		return new ArrayList<>(ROTATING_DELVE_MODIFIERS);
 	}
 
+	public static List<DelvesModifier> experimentalDelveModifiers() {
+		return new ArrayList<>(EXPERIMENTAL_DELVE_MODIFIERS);
+	}
+
 	public static List<DelvesModifier> entropyAssignable() {
 		List<DelvesModifier> mods = valuesList();
 		mods.remove(ENTROPY);
 		mods.remove(TWISTED);
 		mods.remove(FRAGILE);
 		mods.removeAll(ROTATING_DELVE_MODIFIERS);
+		mods.removeAll(EXPERIMENTAL_DELVE_MODIFIERS);
 		return mods;
 	}
 

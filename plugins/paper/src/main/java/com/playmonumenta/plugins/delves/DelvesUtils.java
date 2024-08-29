@@ -70,6 +70,7 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CHRONOLOGY, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.RIFTBORN, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.CHANCECUBES, 1);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")
@@ -92,8 +93,9 @@ public class DelvesUtils {
 
 		int maxDepthPoints = 0;
 		for (Map.Entry<DelvesModifier, Integer> entry : MODIFIER_RANK_CAPS.entrySet()) {
-			if (!DelvesModifier.rotatingDelveModifiers().contains(entry.getKey())
-				|| getWeeklyRotatingModifier().contains(entry.getKey())) {
+			if ((!DelvesModifier.rotatingDelveModifiers().contains(entry.getKey())
+				|| getWeeklyRotatingModifier().contains(entry.getKey()))
+				&& !DelvesModifier.experimentalDelveModifiers().contains(entry.getKey())) {
 				maxDepthPoints += entry.getValue() * entry.getKey().getPointsPerLevel();
 			}
 		}
@@ -118,6 +120,16 @@ public class DelvesUtils {
 		long week = DateUtils.getWeeklyVersion() + nextWeek;
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(week / nWeekRotation.size()));
 		return nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+	}
+
+	public static List<DelvesModifier> getExperimentalDelveModifier() {
+		List<DelvesModifier> experimentalMods = DelvesModifier.experimentalDelveModifiers();
+		// week starting friday august 30, 2024
+		if (DateUtils.getWeeklyVersion() == 2853) {
+			return List.of(experimentalMods.get(0));
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	public static @Nullable ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
@@ -298,6 +310,7 @@ public class DelvesUtils {
 			mods.remove(DelvesModifier.ENTROPY);
 			mods.remove(DelvesModifier.TWISTED);
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.removeAll(DelvesModifier.experimentalDelveModifiers());
 
 			while (pointsToAssign > 0) {
 				if (mods.isEmpty()) {

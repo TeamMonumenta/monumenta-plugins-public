@@ -73,8 +73,11 @@ public class SpawnerCommand {
 									if (item == null) {
 										return;
 									}
-
 									int ensnaredBlock = args.getUnchecked("ensnared");
+									if (ensnaredBlock < 4) {
+										player.sendMessage("The command needs the radius to be greater than 3.");
+										return;
+									}
 									setSpawnerType(item, ENSNARED_ATTRIBUTE, ensnaredBlock);
 								}),
 							new CommandAPICommand("decaying")

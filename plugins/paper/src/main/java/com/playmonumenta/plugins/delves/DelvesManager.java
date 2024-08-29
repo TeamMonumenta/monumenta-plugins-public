@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.SpawnerCountCommand;
 import com.playmonumenta.plugins.delves.abilities.Astral;
+import com.playmonumenta.plugins.delves.abilities.ChanceCubes;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
@@ -545,7 +546,7 @@ public class DelvesManager implements Listener {
 		}
 		Location loc = block.getLocation();
 		Colossal.applyModifiers(loc, DelvesUtils.getModifierLevel(loc, DelvesModifier.COLOSSAL));
-
+		ChanceCubes.applyModifiers(loc, DelvesUtils.getModifierLevel(loc, DelvesModifier.CHANCECUBES));
 		World world = loc.getWorld();
 
 		// Shifting generates spawners randomly. Modifying the shifting plugin would be a lot of effort, so just count spawners on play for this case.

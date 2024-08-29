@@ -48,12 +48,14 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Marker;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -916,13 +918,17 @@ public class SpawnerUtils {
 		Location spawnerLocation = block.getLocation().clone().add(0.5, 0.5, 0.5);
 		int ensnareRadius = getSpawnerType(block, ENSNARED_ATTRIBUTE);
 		BukkitRunnable task = new BukkitRunnable() {
+			private static final int TIME_LIMIT_TICKS = 5 * 60 * 20;
+			private int mTicks = 0;
 			@Override
 			public void run() {
-				List<Entity> nearbyEntities = (List<Entity>) spawnerLocation.getWorld().getNearbyEntities(spawnerLocation, ensnareRadius, ensnareRadius, ensnareRadius);
+				List<Entity> nearbyEntities = (List<Entity>) spawnerLocation.getWorld().getNearbyEntities(spawnerLocation, ensnareRadius - 2, ensnareRadius - 2, ensnareRadius - 2);
 				boolean hasNearbyMobs = nearbyEntities.stream()
-					.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
+					.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof Villager) && !(entity instanceof ArmorStand) && entity.isValid());
+				boolean hasPlayersInRange = spawnerLocation.getWorld().getPlayers().stream()
+					.anyMatch(player -> player.getLocation().distance(spawnerLocation) <= 10 + 5);
 
-				if (!hasNearbyMobs) {
+				if (!hasNearbyMobs || !hasPlayersInRange || mTicks >= TIME_LIMIT_TICKS) {
 					block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_DESTROY, SoundCategory.HOSTILE, 0.75f, 2f);
 					ensnarementTasks.remove(block.getLocation());
 					this.cancel();
@@ -934,13 +940,14 @@ public class SpawnerUtils {
 					}
 				}
 
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 0, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 1, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 2, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 3, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 4, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 5, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
-				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 6, 0), ensnareRadius).countPerMeter(0.1).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 0, 0), ensnareRadius).countPerMeter(0.05).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 1, 0), ensnareRadius).countPerMeter(0.05).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 2, 0), ensnareRadius).countPerMeter(0.05).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 3, 0), ensnareRadius).countPerMeter(0.05).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 4, 0), ensnareRadius).countPerMeter(0.05).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 5, 0), ensnareRadius).countPerMeter(0.05).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				new PPCircle(Particle.END_ROD, spawnerLocation.clone().add(0, 6, 0), ensnareRadius).countPerMeter(0.05).directionalMode(false).rotateDelta(true).spawnAsEnemy();
+				mTicks++;
 			}
 		};
 		task.runTaskTimer(Plugin.getInstance(), 0, 1);
