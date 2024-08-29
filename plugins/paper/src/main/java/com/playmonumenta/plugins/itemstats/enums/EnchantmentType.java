@@ -147,6 +147,7 @@ public enum EnchantmentType {
 	FIRE_FRAGILITY(new FireFragility(), true, true, false, false),
 	FALL_FRAGILITY(new FallFragility(), true, true, false, false),
 	CUMBERSOME(new Cumbersome(), false, true, false, false),
+	OVERSIZED(new Oversized(), false, true, false, false),
 
 	// Cosmetic Item Enchants
 	BAAING(new Baaing(), false, true, true, false),
