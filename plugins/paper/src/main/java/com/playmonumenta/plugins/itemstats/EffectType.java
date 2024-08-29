@@ -377,6 +377,10 @@ public enum EffectType {
 		} else if (effectType == POISON_IMMUNITY) {
 			if (entity instanceof Player player) {
 				plugin.mPotionManager.removeLowerPotions(player, PotionManager.PotionID.APPLIED_POTION, PotionEffectType.POISON, (int) strength);
+				PotionEffect potionEffect = player.getPotionEffect(PotionEffectType.POISON);
+				if (potionEffect != null && potionEffect.getAmplifier() < strength) {
+					player.removePotionEffect(PotionEffectType.POISON);
+				}
 			}
 			// don't return yet, this also has an effect
 		} else if (effectType == STEALTH) {

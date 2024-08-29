@@ -30,7 +30,7 @@ public class PoisonImmunity extends SingleArgumentEffect {
 		if (event.getModifiedType().equals(PotionEffectType.POISON)
 				&& event.getNewEffect() != null
 				&& event.getNewEffect().getAmplifier() < mAmount
-				&& event.getOldEffect() == null) {
+				&& (event.getOldEffect() == null || event.getOldEffect().getAmplifier() <= event.getNewEffect().getAmplifier())) {
 			event.setCancelled(true);
 		}
 	}
