@@ -25,7 +25,7 @@ public class Celestial implements Infusion {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		if (enemy.getLocation().getY() > player.getLocation().getY()) {
-			event.updateDamageWithMultiplier(1 + DAMAGE_BONUS_PER_LEVEL * level);
+			event.updateGearDamageWithMultiplier(1 + DAMAGE_BONUS_PER_LEVEL * level);
 
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 0.4f, 2f);
 			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 0.6f, 0.8f);
