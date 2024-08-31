@@ -87,7 +87,7 @@ public class DelveCustomInventory extends CustomInventory {
 	);
 	private static final ItemStack EXPERIMENTAL_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(
 		Material.CYAN_GLAZED_TERRACOTTA,
-		Component.text("Expiremental Modifier", NamedTextColor.AQUA, TextDecoration.BOLD)
+		Component.text("Experimental Modifier", NamedTextColor.AQUA, TextDecoration.BOLD)
 			.decoration(TextDecoration.ITALIC, false),
 		new String[] {
 			"This is a one-time event modifier that will not be coming back."
@@ -157,7 +157,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 	private static final int TOTAL_POINT_SLOT = 0;
 	private static final int START_SLOT = 8;
-	private static final int PRESET_SLOT = 52;
+	private static final int PRESET_SLOT = 18;
 	private static final int PAGE_LEFT_SLOT = 45;
 	private static final int PAGE_RIGHT_SLOT = 53;
 	private static final int GUI_IDENTIFIER_LOC_L = 36;

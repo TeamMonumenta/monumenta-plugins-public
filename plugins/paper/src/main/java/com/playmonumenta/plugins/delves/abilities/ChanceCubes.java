@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import io.papermc.paper.entity.LookAnchor;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +32,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -147,11 +149,11 @@ public class ChanceCubes {
 		switch (diceRoll) {
 			case 1 -> {
 				BukkitRunnable task = new BukkitRunnable() {
-					private static final int TIME_LIMIT_TICKS = 2 * 60 * 20;
+					private static final int TIME_LIMIT_TICKS = 60 * 20;
 					private int mTicks = 0;
 					@Override
 					public void run() {
-						List<Entity> nearbyEntities = (List<Entity>) loc.getWorld().getNearbyEntities(loc, 8, 8, 8);
+						List<Entity> nearbyEntities = (List<Entity>) loc.getWorld().getNearbyEntities(loc, 8, 7, 8);
 						boolean hasNearbyMobs = nearbyEntities.stream()
 							.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && !entity.isInvulnerable() && !(entity instanceof Villager) && !(entity instanceof ArmorStand) && entity.isValid());
 						boolean hasPlayersInRange = loc.getWorld().getPlayers().stream()
@@ -160,6 +162,7 @@ public class ChanceCubes {
 							Horse horse = (Horse) loc.getWorld().spawnEntity(loc, EntityType.HORSE);
 							horse.customName(Component.text("Juan"));
 							horse.setCustomNameVisible(true);
+							horse.addScoreboardTag("Hostile");
 							Objects.requireNonNull(horse.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(50.0);
 							horse.setHealth(50.0);
 							nearbyEntities = (List<Entity>) loc.getWorld().getNearbyEntities(loc, 10, 10, 10);
@@ -180,7 +183,13 @@ public class ChanceCubes {
 							this.cancel();
 						}
 						for (Player player : loc.getWorld().getPlayers()) {
-							if (player.getLocation().distance(loc) > 10 && player.getLocation().distance(loc) < 10 + 5) {
+							if (player.getGameMode() == GameMode.SPECTATOR) {
+								continue;
+							}
+							Location playerLoc = player.getLocation().clone();
+							playerLoc.setY(loc.getY());
+							double horizontalDistance = playerLoc.distance(loc);
+							if (horizontalDistance > 10 && horizontalDistance < 10 + 5) {
 								MovementUtils.pullTowardsNormalized(loc, player, 0.8f, false);
 							}
 						}
@@ -249,7 +258,7 @@ public class ChanceCubes {
 								twistedMob.setGravity(true);
 								twistedMob.setInvulnerable(false);
 								Objects.requireNonNull(twistedMob.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(twistedMob.getHealth());
-								twistedMob.setHealth(Objects.requireNonNull(twistedMob.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue() / 1.75);
+								twistedMob.setHealth(Objects.requireNonNull(twistedMob.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue() / 1.9);
 							}, 20 * 2 / 2);
 						}
 					}
@@ -280,7 +289,14 @@ public class ChanceCubes {
 			}
 			case 5 -> {
 				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(15);
+				Map<Player, Entity> lockedEnemies = new HashMap<>();
 				for (Player player : nearbyPlayers) {
+					if (player.getGameMode() == GameMode.SPECTATOR) {
+						continue;
+					}
+					if (lockedEnemies.containsKey(player)) {
+						continue;
+					}
 					List<Entity> potentialEnemies = (List<Entity>) loc.getWorld().getNearbyEntities(player.getLocation(), 7, 7, 7);
 					Entity randomEnemy = potentialEnemies.stream()
 						.filter(entity -> entity instanceof LivingEntity &&
@@ -297,16 +313,19 @@ public class ChanceCubes {
 						Horse horse = (Horse) loc.getWorld().spawnEntity(loc, EntityType.HORSE);
 						horse.customName(Component.text("Juan"));
 						horse.setCustomNameVisible(true);
+						horse.addScoreboardTag("Hostile");
 						Objects.requireNonNull(horse.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(50.0);
 						horse.setHealth(50.0);
 						randomEnemy = horse;
 					}
+					lockedEnemies.put(player, randomEnemy);
 					loc.getWorld().playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1f, 0.75f);
 					Entity finalRandomEnemy = randomEnemy;
 					new BukkitRunnable() {
 						@Override
 						public void run() {
 							if (!finalRandomEnemy.isValid() || finalRandomEnemy.isDead() || !player.isOnline() || player.getLocation().distance(finalRandomEnemy.getLocation()) > 20) {
+								lockedEnemies.remove(player);
 								this.cancel();
 								return;
 							}
@@ -320,6 +339,7 @@ public class ChanceCubes {
 					}.runTaskTimer(Plugin.getInstance(), 0, 15);
 				}
 			}
+
 			case 6 -> {
 				int range = 10;
 				int radius = 5;
@@ -341,7 +361,7 @@ public class ChanceCubes {
 				if (!players.isEmpty()) {
 					Player target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 					final int PHASE1_TICKS = 20;
-					final int PHASE2_TICKS = 600;
+					final int PHASE2_TICKS = 300;
 					new BukkitRunnable() {
 						int mTicks = 0;
 						final List<BlockState> mBlocksToRestore = new ArrayList<>();
