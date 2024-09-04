@@ -28,6 +28,8 @@ public class BulletHellBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Amount of damage a bullet will deal")
 		public int DAMAGE = 0;
+		@BossParam(help = "Damage type for the DAMAGE parameter. Defaults to Magic")
+		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MAGIC;
 		@BossParam(help = "Amount of true damage a bullet will deal, in %")
 		public int DAMAGE_PERCENTAGE = 0;
 		@BossParam(help = "The name of the spell.")
@@ -100,10 +102,10 @@ public class BulletHellBoss extends BossAbilityGroup {
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (player != null && !blocked) {
 						if (p.DAMAGE > 0) {
-							DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, null, null, p.SPELL_NAME), p.DAMAGE, false, true, false);
+							DamageUtils.damage(boss, player, new DamageEvent.Metadata(p.DAMAGE_TYPE, null, null, p.SPELL_NAME), p.DAMAGE, false, true, false);
 						}
 						if (p.DAMAGE_PERCENTAGE > 0) {
-							DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, false);
+							DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(player) / 100.0, true, true, false);
 						}
 						p.EFFECTS.apply(player, mBoss);
 					}
