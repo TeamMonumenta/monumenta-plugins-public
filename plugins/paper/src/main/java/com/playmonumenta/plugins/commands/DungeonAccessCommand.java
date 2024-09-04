@@ -332,15 +332,15 @@ public class DungeonAccessCommand extends GenericCommand {
 			}
 			ScoreboardUtils.setScoreboardValue(player, mapping.getAccessName(), 0);
 
-			// Send players to the overworld of the shard, usually the sort box
-			try {
-				MonumentaWorldManagementAPI.sortWorld(player);
-			} catch (Exception ex) {
-				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
-			}
-
 			// boot them out if they are on this shard
 			if (shardName != null && ServerProperties.getShardName().contains(shardName)) {
+				// Send players to the overworld of the shard, usually the sort box
+				try {
+					MonumentaWorldManagementAPI.sortWorld(player);
+				} catch (Exception ex) {
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
+				}
+
 				try {
 					ShardSorterCommand.sortToShard(player, abandonShardName, null);
 				} catch (Exception ex) {
