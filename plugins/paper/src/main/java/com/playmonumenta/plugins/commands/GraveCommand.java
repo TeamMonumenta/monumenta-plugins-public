@@ -390,8 +390,12 @@ public class GraveCommand {
 			player.sendMessage(Component.text("Grave has been deleted.", NamedTextColor.GREEN));
 		} else {
 			player.sendMessage(Component.text("Are you sure you want to fully delete this grave? This cannot be undone!", NamedTextColor.RED, TextDecoration.BOLD));
-			player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
-					.append(grave.getItemList(true)));
+			if (grave.isGhostGrave()) {
+				player.sendMessage(Component.text("You will have to use anvils to unshatter your items.", NamedTextColor.AQUA));
+			} else {
+				player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
+						.append(grave.getItemList(true)));
+			}
 			player.sendMessage(Component.text()
 					.append(Component.text("[DELETE]", NamedTextColor.RED)
 					.hoverEvent(HoverEvent.showText(Component.text("Delete the grave. Cannot be undone!", NamedTextColor.RED)))

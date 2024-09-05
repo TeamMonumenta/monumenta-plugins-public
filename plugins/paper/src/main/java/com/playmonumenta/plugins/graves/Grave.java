@@ -742,4 +742,7 @@ public final class Grave {
 		return output;
 	}
 
+	public boolean isGhostGrave() {
+		return mGhostGrave;
+	}
 }

@@ -69,7 +69,7 @@ public class SpawnerCountCommand {
 					})
 			)
 			.withSubcommand(
-				new CommandAPICommand("count")
+					new CommandAPICommand("countAndUpdate")
 					.withArguments(new StringArgument("world")
 						.replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
 					.withOptionalArguments(new IntegerArgument("chunk radius"))
