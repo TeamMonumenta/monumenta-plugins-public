@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class DataCollectionManager {
 
-	public static final List<String> EXCLUDED_SHARDS = List.of("build", "plots", "playerplots");
+	public static final List<String> EXCLUDED_SHARDS = List.of("build", "plots", "playerplots", "tutorial", "purgatory");
 	public static final List<InfusionType> INTERESTING_INFUSIONS = Arrays.stream(InfusionType.values()).filter(InfusionType::isDataCollected).toList();
 	private static final int RUN_INTERVAL = Constants.ONE_HOUR;
 	private static final String EXPORT_PATH = ServerProperties.getGameplayDataExportPath();
@@ -110,15 +110,24 @@ public class DataCollectionManager {
 		}
 	}
 
+	private void examineEquipmentItem(ItemStack item, String slotName, JsonObject gearObject, JsonObject infusionObject) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+
+		gearObject.addProperty(slotName, MessagingUtils.plainText(ItemUtils.getDisplayName(item)));
+		NBT.get(item, nbt -> {
+			ReadableNBT infusionNbt = ItemStatUtils.getInfusions(nbt);
+			if (infusionNbt != null) {
+				INTERESTING_INFUSIONS.forEach(infusionType -> {
+					addOrSumInfusionLevel(infusionType, infusionNbt, infusionObject);
+				});
+			}
+		});
+	}
+
 	private JsonObject getPlayerGear(Player player) {
 		PlayerInventory inventory = player.getInventory();
-
-		ArrayList<ItemStack> equipmentToExamine = new ArrayList<>();
-		equipmentToExamine.add(inventory.getItemInOffHand());
-		equipmentToExamine.add(inventory.getHelmet());
-		equipmentToExamine.add(inventory.getChestplate());
-		equipmentToExamine.add(inventory.getLeggings());
-		equipmentToExamine.add(inventory.getBoots());
 		ItemStack mainhandItem = inventory.getItemInMainHand();
 
 		ArrayList<ItemStack> hotbarToExamine = new ArrayList<>();
@@ -126,22 +135,15 @@ public class DataCollectionManager {
 			hotbarToExamine.add(inventory.getItem(i));
 		}
 
-		JsonArray gearNames = new JsonArray();
+		JsonObject gearNames = new JsonObject();
 		JsonArray hotbarNames = new JsonArray();
 		JsonObject activeInfusions = new JsonObject();
 
-		equipmentToExamine.stream().filter(item -> item != null && item.getType() != Material.AIR)
-			.forEach(item -> {
-				gearNames.add(MessagingUtils.plainText(ItemUtils.getDisplayName(item)));
-				NBT.get(item, nbt -> {
-					INTERESTING_INFUSIONS.forEach(infusionType -> {
-						ReadableNBT infusionNbt = ItemStatUtils.getInfusions(nbt);
-						if (infusionNbt != null) {
-							addOrSumInfusionLevel(infusionType, infusionNbt, activeInfusions);
-						}
-					});
-				});
-			});
+		examineEquipmentItem(inventory.getItemInOffHand(), "offhand", gearNames, activeInfusions);
+		examineEquipmentItem(inventory.getHelmet(), "helmet", gearNames, activeInfusions);
+		examineEquipmentItem(inventory.getChestplate(), "chestplate", gearNames, activeInfusions);
+		examineEquipmentItem(inventory.getLeggings(), "leggings", gearNames, activeInfusions);
+		examineEquipmentItem(inventory.getBoots(), "boots", gearNames, activeInfusions);
 
 		String selectedItemName = "none";
 		if (mainhandItem.getType() != Material.AIR) {
@@ -222,6 +224,7 @@ public class DataCollectionManager {
 		private final String mPlayerName;
 		private final String mClass;
 		private final String mSpec;
+		private final String mRegionName;
 
 		public PlayerInformation(String worldName, Player player) {
 			mGearData = getPlayerGear(player);
@@ -233,6 +236,7 @@ public class DataCollectionManager {
 			mPlayerName = player.getName();
 			mClass = AbilityUtils.getClass(player);
 			mSpec = AbilityUtils.getSpec(player);
+			mRegionName = ServerProperties.getRegion(player).getName();
 		}
 
 		public JsonObject toJson() {
@@ -248,6 +252,7 @@ public class DataCollectionManager {
 			obj.addProperty("world_name", mWorldName);
 			obj.addProperty("class_name", mClass);
 			obj.addProperty("spec_name", mSpec);
+			obj.addProperty("region_name", mRegionName);
 			obj.addProperty("selected_item", mGearData.get("selected_item").getAsString());
 			obj.addProperty("charm_type", mCharmType.name());
 			obj.add("skills", skills);
