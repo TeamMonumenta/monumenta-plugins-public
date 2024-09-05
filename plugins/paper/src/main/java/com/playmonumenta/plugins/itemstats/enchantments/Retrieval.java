@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 
 public class Retrieval implements Enchantment {
 	private static final float RETRIEVAL_CHANCE = 0.1f;
-	public static final String CHARM_CHANCE = "Retrieval Chance";
 
 	@Override
 	public String getName() {
@@ -27,7 +26,7 @@ public class Retrieval implements Enchantment {
 
 	@Override
 	public void onConsumeArrow(Plugin plugin, Player player, double level, ArrowConsumeEvent event) {
-		double chance = (RETRIEVAL_CHANCE * level) + CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE);
+		double chance = RETRIEVAL_CHANCE * level;
 		if (FastUtils.RANDOM.nextDouble() < chance) {
 			player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.3f, 1.0f);
 			event.setCancelled(true);

@@ -33,6 +33,7 @@ public enum Tier {
 	OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
 	SHULKER_BOX("shulker", "Invalid Type", TextColor.fromHexString("#EEE6D6")),
 	CHARM("charm", "Charm", TextColor.fromHexString("#FFFA75")),
+	LEGACY_CHARM("legacycharm", "Legacy Charm", TextColor.fromHexString("#EEE6D6")),
 	RARE_CHARM("rarecharm", "Rare Charm", TextColor.fromHexString("#4AC2E5")),
 	EPIC_CHARM("epiccharm", Component.text("Epic Charm", TextColor.fromHexString("#B314E3")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
 	ZENITH_CHARM("zenithcharm", Component.text("Zenith Charm", TextColor.fromHexString("#FF9CF0")).decoration(TextDecoration.ITALIC, false)),

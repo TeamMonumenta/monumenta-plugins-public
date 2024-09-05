@@ -18,8 +18,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class Sapper implements Enchantment {
 
-	public static final String CHARM_HEAL = "Sapper Heal";
-
 	@Override
 	public String getName() {
 		return "Sapper";
@@ -38,7 +36,6 @@ public class Sapper implements Enchantment {
 			if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 				return;
 			}
-			value = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, value);
 			PlayerUtils.healPlayer(plugin, player, value);
 			new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1).spawnAsPlayerActive(player);
 		}

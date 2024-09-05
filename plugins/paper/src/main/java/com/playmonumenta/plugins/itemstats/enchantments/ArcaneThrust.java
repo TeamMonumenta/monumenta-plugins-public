@@ -28,8 +28,6 @@ import org.bukkit.util.Vector;
 public class ArcaneThrust implements Enchantment {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(24, 216, 224), 1.0f);
-	public static final String CHARM_DAMAGE = "Arcane Thrust Damage";
-	public static final String CHARM_KNOCKBACK = "Arcane Thrust Knockback";
 
 	@Override
 	public String getName() {
@@ -55,7 +53,7 @@ public class ArcaneThrust implements Enchantment {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			if (player.getCooledAttackStrength(0.5f) > 0.9) {
-				double damageMult = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, (value / (value + 1)));
+				double damageMult = (value / (value + 1));
 				double damage = 1 + (event.getDamage() * damageMult);
 
 				Location loc = player.getEyeLocation();
@@ -79,8 +77,7 @@ public class ArcaneThrust implements Enchantment {
 						if (box.overlaps(mob.getBoundingBox())) {
 							if (mob != enemy) {
 								DamageUtils.damage(player, mob, DamageType.MELEE_ENCH, damage);
-								float knockback = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_KNOCKBACK, 0.25);
-								MovementUtils.knockAway(player.getLocation(), mob, knockback, knockback);
+								MovementUtils.knockAway(player.getLocation(), mob, 0.25f, 0.25f);
 							}
 							iter.remove();
 						}

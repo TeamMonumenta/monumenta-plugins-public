@@ -15,7 +15,6 @@ import org.bukkit.entity.Trident;
 
 public class Smite implements Enchantment {
 	private static final double DAMAGE_PER_LEVEL = 2;
-	public static final String CHARM_DAMAGE = "Smite Damage";
 
 	@Override
 	public String getName() {
@@ -40,7 +39,7 @@ public class Smite implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		if (EntityUtils.isUndead(enemy)) {
-			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PER_LEVEL);
+			double damage = level * DAMAGE_PER_LEVEL;
 			if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
 				event.setDamage(event.getFlatDamage() + damage);
 			} else if (event.getType() == DamageType.MELEE) {

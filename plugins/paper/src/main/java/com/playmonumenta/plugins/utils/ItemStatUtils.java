@@ -1358,7 +1358,7 @@ public class ItemStatUtils {
 
 	public static boolean isNormalCharm(@Nullable ItemStack item) {
 		Tier tier = getTier(item);
-		return tier == Tier.CHARM || tier == Tier.RARE_CHARM || tier == Tier.EPIC_CHARM;
+		return tier == Tier.CHARM || tier == Tier.RARE_CHARM || tier == Tier.EPIC_CHARM || tier == Tier.LEGACY_CHARM;
 	}
 
 	public static boolean isZenithCharm(@Nullable ItemStack item) {

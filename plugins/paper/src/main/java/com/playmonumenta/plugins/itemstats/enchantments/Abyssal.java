@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 public class Abyssal implements Enchantment {
 
 	private static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
-	public static final String CHARM_DAMAGE = "Abyssal Damage";
 
 	@Override
 	public String getName() {
@@ -43,7 +42,7 @@ public class Abyssal implements Enchantment {
 			return;
 		}
 		if (EntityUtils.isInWater(enemy) || EntityUtils.isInWater(player) || ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ABYSSAL_FORCED)) {
-			double multiplier = 1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * value);
+			double multiplier = 1 + DAMAGE_BONUS_PER_LEVEL * value;
 			event.updateGearDamageWithMultiplier(multiplier);
 		}
 	}

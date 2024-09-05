@@ -34,8 +34,6 @@ public class Quake implements Enchantment {
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 	private static final String MELEE_DAMAGE_DEALT_METADATA = "QuakeMeleeDamageDealt";
 	private static final String MELEED_THIS_TICK_METADATA = "QuakeMeleeThisTick";
-	public static final String CHARM_DAMAGE = "Quake Damage";
-	public static final String CHARM_RADIUS = "Quake Radius";
 
 	@Override
 	public String getName() {
@@ -71,8 +69,7 @@ public class Quake implements Enchantment {
 				return;
 			}
 
-			double radius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), radius);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), RADIUS);
 
 			//Get enchant levels on weapon
 			int fire = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_ASPECT);
@@ -82,7 +79,7 @@ public class Quake implements Enchantment {
 			int bleed = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
 			int wind = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
 
-			double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
+			double finalDamage = damage * DAMAGE_MODIFIER_PER_LEVEL * level;
 			for (LivingEntity mob : mobs) {
 				DamageUtils.damage(player, mob, DamageType.TRUE, finalDamage, ClassAbility.QUAKE, false, true);
 			}

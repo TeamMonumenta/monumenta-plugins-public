@@ -36,8 +36,6 @@ public class ThunderAspect implements Enchantment {
 	public static final int DURATION_MELEE_ELITE = 10;
 	public static final float BONUS_DAMAGE = 1;
 
-	public static final String CHARM_STUN_CHANCE = "Thunder Aspect Stun Chance";
-
 	private static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.fromRGB(251, 231, 30), 1f);
 	private static final Particle.DustOptions COLOR_FAINT_YELLOW = new Particle.DustOptions(Color.fromRGB(255, 241, 110), 1f);
 
@@ -80,7 +78,7 @@ public class ThunderAspect implements Enchantment {
 			} else if (!(type == DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE || event.getAbility() == ClassAbility.PREDATOR_STRIKE)) {
 				apply(plugin, player, level, enemy, type == DamageType.MELEE);
 			} else {
-				double chance = (CHANCE + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE)) * level;
+				double chance = CHANCE * level;
 				if (FastUtils.RANDOM.nextDouble() < chance) {
 					if (!EntityUtils.isElite(enemy) && !EntityUtils.isCCImmuneMob(enemy)) {
 						EntityUtils.applyStun(plugin, DURATION_PROJ, enemy);
@@ -130,7 +128,7 @@ public class ThunderAspect implements Enchantment {
 			world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.2f, 2.0f);
 		}
 
-		double chance = (CHANCE + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE)) * level * (particles ? player.getCooledAttackStrength(0) : 1);
+		double chance = CHANCE * level * (particles ? player.getCooledAttackStrength(0) : 1);
 		if (FastUtils.RANDOM.nextDouble() < chance) {
 			if (EntityUtils.isElite(enemy)) {
 				EntityUtils.applyStun(plugin, DURATION_MELEE_ELITE, enemy);

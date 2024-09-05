@@ -21,7 +21,6 @@ import org.bukkit.entity.Trident;
 public class Sniper implements Enchantment {
 	public static final int DISTANCE = 12;
 	public static final int DAMAGE_PER_LEVEL = 2;
-	public static final String CHARM_DAMAGE = "Sniper Damage";
 
 	@Override
 	public String getName() {
@@ -61,7 +60,7 @@ public class Sniper implements Enchantment {
 	public static double apply(Player player, Location target, double level) {
 		if (level > 0 && player.getEyeLocation().distance(target) > DISTANCE) {
 			particles(target, player);
-			return CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PER_LEVEL);
+			return (level * DAMAGE_PER_LEVEL);
 		}
 		return 0;
 	}

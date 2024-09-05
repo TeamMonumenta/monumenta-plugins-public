@@ -252,25 +252,7 @@ public class CharmManager {
 	// If it is a "debuff" (i.e. a greater number is worse), then ALSO list it in the next method
 	private void loadCharmEffects() {
 		mCharmEffectList = Stream.concat(Arrays.stream(CharmEffects.values()).map(effect -> effect.mEffectName), Stream.of(
-			// Custom Enchantments
-			Inferno.CHARM_DAMAGE,
-			ThunderAspect.CHARM_STUN_CHANCE,
-			IceAspect.CHARM_DURATION,
-			IceAspect.CHARM_SLOW,
-			Decay.CHARM_DAMAGE,
-			Decay.CHARM_DURATION,
-			Sapper.CHARM_HEAL,
-			HexEater.CHARM_DAMAGE,
-			LifeDrain.CHARM_HEAL,
-			Retrieval.CHARM_CHANCE,
-			Regicide.CHARM_DAMAGE,
-			SecondWind.CHARM_RESISTANCE,
-			SecondWind.CHARM_THRESHOLD,
-			Sniper.CHARM_DAMAGE,
-			PointBlank.CHARM_DAMAGE,
-			Adrenaline.CHARM_SPEED,
-			Quake.CHARM_DAMAGE,
-			Quake.CHARM_RADIUS,
+			// Custom Enchantments (Only Epic Enchantments Allowed)
 			JunglesNourishment.CHARM_COOLDOWN,
 			JunglesNourishment.CHARM_HEALTH,
 			JunglesNourishment.CHARM_RESISTANCE,
@@ -289,20 +271,6 @@ public class CharmManager {
 			LiquidCourage.CHARM_DURATION,
 			LiquidCourage.CHARM_COOLDOWN,
 			LiquidCourage.CHARM_RESISTANCE,
-			Regeneration.CHARM_HEAL,
-			Smite.CHARM_DAMAGE,
-			Slayer.CHARM_DAMAGE,
-			Duelist.CHARM_DAMAGE,
-			ArcaneThrust.CHARM_DAMAGE,
-			ArcaneThrust.CHARM_KNOCKBACK,
-			Abyssal.CHARM_DAMAGE,
-			Eruption.CHARM_DAMAGE,
-			Eruption.CHARM_RADIUS,
-			Explosive.CHARM_DAMAGE,
-			Explosive.CHARM_RADIUS,
-			Reverb.CHARM_DAMAGE,
-			Reverb.CHARM_RADIUS,
-			FirstStrike.CHARM_DAMAGE,
 
 			// Classes
 			// Mage

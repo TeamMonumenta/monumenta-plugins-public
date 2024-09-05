@@ -30,8 +30,6 @@ public class IceAspect implements Enchantment {
 	public static final double SLOW_PER_LEVEL = 0.1;
 	public static final float BONUS_DAMAGE = 1.0f;
 	private static final Particle.DustOptions COLOR_LIGHT_BLUE = new Particle.DustOptions(Color.fromRGB(85, 170, 255), 0.75f);
-	public static final String CHARM_SLOW = "Ice Aspect Slow Amplifier";
-	public static final String CHARM_DURATION = "Ice Aspect Slow Duration";
 
 	@Override
 	public String getName() {
@@ -114,7 +112,7 @@ public class IceAspect implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, int duration, LivingEntity enemy, boolean particles) {
-		EntityUtils.applySlow(plugin, CharmManager.getDuration(player, CHARM_DURATION, duration), (level * SLOW_PER_LEVEL) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW), enemy);
+		EntityUtils.applySlow(plugin, duration, level * SLOW_PER_LEVEL, enemy);
 		if (particles) {
 			new PartialParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerBuff(player);
 			World world = enemy.getWorld();

@@ -23,7 +23,6 @@ public class Regicide implements Enchantment {
 
 	private static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
 	private static final double BOSS_BONUS_PER_LEVEL = 0.05;
-	public static final String CHARM_DAMAGE = "Regicide Damage";
 
 	@Override
 	public String getName() {
@@ -47,9 +46,9 @@ public class Regicide implements Enchantment {
 
 	public static double calculateDamageMultiplier(double level, Player player, LivingEntity target) {
 		if (EntityUtils.isElite(target)) {
-			return (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level));
+			return (1 + DAMAGE_BONUS_PER_LEVEL * level);
 		} else if (EntityUtils.isBoss(target)) {
-			return (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, BOSS_BONUS_PER_LEVEL * level));
+			return (1 + BOSS_BONUS_PER_LEVEL * level);
 		} else {
 			return 1;
 		}

@@ -15,7 +15,6 @@ import org.bukkit.entity.Trident;
 
 public class Slayer implements Enchantment {
 	private static final double DAMAGE_PER_LEVEL = 2;
-	public static final String CHARM_DAMAGE = "Slayer Damage";
 
 	@Override
 	public String getName() {
@@ -40,7 +39,7 @@ public class Slayer implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		if (EntityUtils.isBeast(enemy)) {
-			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PER_LEVEL);
+			double damage = level * DAMAGE_PER_LEVEL;
 			if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
 				event.setDamage(event.getFlatDamage() + damage);
 			} else if (event.getType() == DamageType.MELEE) {

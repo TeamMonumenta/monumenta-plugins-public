@@ -39,9 +39,6 @@ public class Explosive implements Enchantment {
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 
-	public static final String CHARM_DAMAGE = "Explosive Damage";
-	public static final String CHARM_RADIUS = "Explosive Radius";
-
 	@Override
 	public String getName() {
 		return "Explosive";
@@ -87,12 +84,11 @@ public class Explosive implements Enchantment {
 
 		Location location = EntityUtils.getProjectileHitLocation(event);
 
-		double radius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
-		particles(location, player, radius);
+		particles(location, player, RADIUS);
 
 		// Using bounding box because otherwise it is a bit inconsistent.
-		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, radius);
-		BoundingBox box = BoundingBox.of(location, radius / 2, radius / 2, radius / 2);
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, RADIUS);
+		BoundingBox box = BoundingBox.of(location, RADIUS / 2, RADIUS / 2, RADIUS / 2);
 
 		Entity hitEntity = event.getHitEntity();
 		if (hitEntity instanceof LivingEntity le) {
@@ -100,7 +96,7 @@ public class Explosive implements Enchantment {
 		}
 
 		double rawDamage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-		double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PERCENTAGE_PER_LEVEL * rawDamage);
+		double damage = level * DAMAGE_PERCENTAGE_PER_LEVEL * rawDamage;
 		for (LivingEntity mob : nearbyMobs) {
 			if (mob.getBoundingBox().overlaps(box)) {
 				DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, ClassAbility.EXPLOSIVE, playerItemStats), damage, true, true, false);

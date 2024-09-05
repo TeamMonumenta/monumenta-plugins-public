@@ -16,8 +16,6 @@ import org.jetbrains.annotations.Nullable;
 public class SecondWind implements Enchantment {
 	private static final double DAMAGE_RESIST = 0.1;
 	private static final double HEALTH_LIMIT = 0.5;
-	public static final String CHARM_RESISTANCE = "Second Wind Resistance";
-	public static final String CHARM_THRESHOLD = "Second Wind Threshold";
 
 	@Override
 	public String getName() {
@@ -39,25 +37,21 @@ public class SecondWind implements Enchantment {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		double healthThreshold = HEALTH_LIMIT + CharmManager.getLevelPercentDecimal(player, CHARM_THRESHOLD);
+		double healthThreshold = HEALTH_LIMIT;
 		double currHealth = player.getHealth();
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		double hpAfterHit = currHealth - event.getFinalDamage(true);
 		if (currHealth / maxHealth <= healthThreshold) {
-			event.setDamage(event.getDamage() * getCharmDamageMultiplier(player, level));
+			event.setDamage(event.getDamage() * Math.pow(1 - DAMAGE_RESIST, level));
 		} else if (hpAfterHit / maxHealth <= healthThreshold) {
 			double hpLostBelowHalf = maxHealth * healthThreshold - hpAfterHit;
 			double proportion = hpLostBelowHalf / event.getFinalDamage(false);
-			event.setDamage(event.getDamage() * (1 - proportion) + event.getDamage() * proportion * getCharmDamageMultiplier(player, level));
+			event.setDamage(event.getDamage() * (1 - proportion) + event.getDamage() * proportion * Math.pow(1 - DAMAGE_RESIST, level));
 		}
 	}
 
 	public static double getDamageMultiplier(double level) {
 		return Math.pow(1 - DAMAGE_RESIST, level);
-	}
-
-	public static double getCharmDamageMultiplier(Player player, double level) {
-		return Math.pow(1 - CharmManager.calculateFlatAndPercentValue(player, CHARM_RESISTANCE, DAMAGE_RESIST), level);
 	}
 
 }

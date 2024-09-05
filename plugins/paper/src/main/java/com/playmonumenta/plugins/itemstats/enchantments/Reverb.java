@@ -32,8 +32,6 @@ public class Reverb implements Enchantment {
 	private static final int DETECTION_RADIUS = 8;
 	private static final double OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL = 0.1;
 	private static final double HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL = 0.05;
-	public static final String CHARM_RADIUS = "Reverb Radius";
-	public static final String CHARM_DAMAGE = "Reverb Damage";
 
 	private double mDamageThisTick = 0;
 	private double mHighestDamageThisTick = 0;
@@ -99,7 +97,7 @@ public class Reverb implements Enchantment {
 				}
 
 				final Location enemyLocation = enemy.getEyeLocation().clone();
-				LivingEntity hitMob = EntityUtils.getNearestHostileTargetable(enemyLocation, CharmManager.getRadius(player, CHARM_RADIUS, DETECTION_RADIUS));
+				LivingEntity hitMob = EntityUtils.getNearestHostileTargetable(enemyLocation, DETECTION_RADIUS);
 				if (hitMob == null) {
 					return;
 				}
@@ -131,7 +129,7 @@ public class Reverb implements Enchantment {
 							world.playSound(targetLocation, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 0.6f);
 
 							double finalDamage = value * (overkill * OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL + highestDamage * HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL);
-							DamageUtils.damage(player, hitMob, DamageEvent.DamageType.OTHER, (double) Math.round(CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, finalDamage)), ClassAbility.REVERB, true, false);
+							DamageUtils.damage(player, hitMob, DamageEvent.DamageType.OTHER, finalDamage, ClassAbility.REVERB, true, false);
 
 							this.cancel();
 							return;

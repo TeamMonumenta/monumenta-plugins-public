@@ -34,8 +34,6 @@ public class Eruption implements Enchantment {
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
-	public static final String CHARM_DAMAGE = "Eruption Damage";
-	public static final String CHARM_RADIUS = "Eruption Radius";
 
 	@Override
 	public String getName() {
@@ -54,7 +52,7 @@ public class Eruption implements Enchantment {
 			if (!SpawnerUtils.tryBreakSpawner(event.getBlock(), 1 + Plugin.getInstance().mItemStatManager.getEnchantmentLevel(event.getPlayer(), EnchantmentType.DRILLING), false)) {
 				return;
 			}
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), CharmManager.getRadius(player, CHARM_RADIUS, RADIUS));
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), RADIUS);
 
 			//Get enchant levels on pickaxe
 			int fire = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FIRE_ASPECT);
@@ -66,7 +64,7 @@ public class Eruption implements Enchantment {
 			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
 			int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
 
-			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_PER_LEVEL * level);
+			double damage = DAMAGE_PER_LEVEL * level;
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
 				DamageUtils.damage(player, mob, DamageType.OTHER, damage, ClassAbility.ERUPTION, false, true);
@@ -82,8 +80,7 @@ public class Eruption implements Enchantment {
 					if (p == player) {
 						continue;
 					}
-					double heal = CharmManager.calculateFlatAndPercentValue(player, Sapper.CHARM_HEAL, sapper);
-					PlayerUtils.healPlayer(plugin, p, heal, player);
+					PlayerUtils.healPlayer(plugin, p, sapper, player);
 				}
 			}
 
@@ -94,8 +91,9 @@ public class Eruption implements Enchantment {
 						continue;
 					}
 					new PartialParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR).spawnAsPlayerActive(player);
-					double speed = CharmManager.calculateFlatAndPercentValue(player, Adrenaline.CHARM_SPEED, Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline);
-					int duration = (int) CharmManager.calculateFlatAndPercentValue(player, Adrenaline.CHARM_DURATION, Adrenaline.SPAWNER_DURATION);
+					// on block break adrenaline is reduced by 50%
+					double speed = Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline * 0.5;
+					int duration = Adrenaline.SPAWNER_DURATION;
 					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, speed, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
 				}
 			}

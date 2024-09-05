@@ -15,7 +15,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Inferno implements Enchantment {
 
-	public static final String CHARM_DAMAGE = "Inferno Damage";
 	public static final String INFERNO_EFFECT_NAME = "Inferno";
 
 	@Override

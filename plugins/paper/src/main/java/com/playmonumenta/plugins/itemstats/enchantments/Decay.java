@@ -23,9 +23,8 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 public class Decay implements Enchantment {
 
 	public static final int DURATION = 20 * 4;
+	public static final double DAMAGE = 2;
 	public static final String DOT_EFFECT_NAME = "DecayDamageOverTimeEffect";
-	public static final String CHARM_DURATION = "Decay Duration";
-	public static final String CHARM_DAMAGE = "Decay Damage";
 
 	@Override
 	public String getName() {
@@ -57,16 +56,15 @@ public class Decay implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, LivingEntity enemy, int duration, double decayLevel, Player player, DamageType type) {
-		int finalDuration = CharmManager.getDuration(player, CHARM_DURATION, duration);
 		double desiredPeriod = 40 / decayLevel;
-		if (desiredPeriod > finalDuration) { // Can happen with enchantment reductions from region scaling
+		if (desiredPeriod > DURATION) { // Can happen with enchantment reductions from region scaling
 			return;
 		}
 		// The DoT effect only runs every 5 ticks, so select the period as a multiple of 5 ticks and adjust damage instead to match expected DPS
 		int adjustedPeriod = (int) Math.ceil(desiredPeriod / 5) * 5;
-		double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, 1) * adjustedPeriod / desiredPeriod;
+		double damage = DAMAGE * adjustedPeriod / desiredPeriod;
 		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME,
-			new CustomDamageOverTime(finalDuration, damage, adjustedPeriod, player, plugin.mItemStatManager.getPlayerItemStatsCopy(player), null, DamageType.AILMENT));
+			new CustomDamageOverTime(DURATION, damage, adjustedPeriod, player, plugin.mItemStatManager.getPlayerItemStatsCopy(player), null, DamageType.AILMENT));
 
 		if (type == DamageType.MELEE) {
 			World world = enemy.getWorld();
