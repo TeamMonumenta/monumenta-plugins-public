@@ -11,6 +11,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.ServerPing;
+import com.velocitypowered.api.proxy.server.ServerPing.SamplePlayer;
 import com.velocitypowered.api.util.GameProfile;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -24,6 +25,7 @@ public class NetworkRelayIntegration {
 	private final Logger mLogger;
 	private static @MonotonicNonNull NetworkRelayIntegration INSTANCE = null;
 	private static int mCachedPlayerCount = 0;
+	private static String mCachedShardName = "";
 	private static long mNextFetchedTime = System.currentTimeMillis();
 
 	public NetworkRelayIntegration(MonumentaVelocity main) {
@@ -33,15 +35,22 @@ public class NetworkRelayIntegration {
 		INSTANCE = this;
 	}
 
-	@Subscribe(order = PostOrder.LAST)
+	@Subscribe(order = PostOrder.LATE)
 	public void proxyPingEvent(ProxyPingEvent event) {
 		int count = getCachedPlayerCount();
-		ServerPing ping = event.getPing();
-		event.setPing(ping.asBuilder().onlinePlayers(count).maximumPlayers(mMain.mConfig.mMaxPlayerCount).build());
+		ServerPing oldPing = event.getPing();
+		ServerPing.Version oldVersion = oldPing.getVersion();
+		ServerPing newPing = oldPing.asBuilder()
+			.onlinePlayers(count)
+			.maximumPlayers(mMain.mConfig.mMaxPlayerCount)
+			.version(new ServerPing.Version(oldVersion.getProtocol(), mMain.mConfig.mVersionString))
+			.samplePlayers(new SamplePlayer("<" + getProxyName() + ">: " + mMain.mServer.getPlayerCount(), UUID.randomUUID()))
+			.build();
+		event.setPing(newPing);
 	}
 
 	public void gatherPlayerDataEvent(GatherRemotePlayerDataEventVelocity event) {
-		Player player = mMain.mServer.getPlayer(event.mRemotePlayer.getUuid()).orElse(null);
+		@Nullable Player player = mMain.mServer.getPlayer(event.mRemotePlayer.getUuid()).orElse(null);
 		if (player == null) {
 			return;
 		}
@@ -106,18 +115,18 @@ public class NetworkRelayIntegration {
 	}
 
 	public static String getProxyName() {
-		if (INSTANCE != null) {
-			@Nullable String shardName;
-			try {
-				shardName = NetworkRelayAPI.getShardName();
-			} catch (Exception exception) {
-				shardName = null;
-			}
-			if (shardName == null) {
-				return "Unknown";
-			}
-			return shardName;
+		if (!mCachedShardName.isEmpty()) {
+			return mCachedShardName;
 		}
+		if (INSTANCE != null) {
+			try {
+				mCachedShardName = NetworkRelayAPI.getShardName();
+			} catch (Exception exception) {
+				mCachedShardName = "unknown";
+			}
+			return mCachedShardName;
+		}
+		mCachedShardName = "unknown";
 		return "No NetworkRelay integration";
 	}
 
@@ -129,7 +138,7 @@ public class NetworkRelayIntegration {
 		if (mCachedPlayerCount != 0 && mNextFetchedTime >= now) {
 			return mCachedPlayerCount;
 		}
-		mNextFetchedTime = System.currentTimeMillis() + 1000;
+		mNextFetchedTime = now + 1000;
 		try {
 			mCachedPlayerCount = NetworkRelayAPI.getVisiblePlayerNames().size();
 		} catch (Exception ex) {

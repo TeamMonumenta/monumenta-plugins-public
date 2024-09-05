@@ -83,8 +83,8 @@ public class TABIntegration implements Listener {
 			mLayout.add(new Slot(id, text, null, ping));
 		}
 
-		public Layout toLayout() {
-			Layout layout = Objects.requireNonNull(TabAPI.getInstance().getLayoutManager()).createNewLayout(UUID.randomUUID().toString());
+		public Layout toLayout(UUID uuid) {
+			Layout layout = Objects.requireNonNull(TabAPI.getInstance().getLayoutManager()).createNewLayout(uuid.toString());
 			for (Slot slot : mLayout) {
 				if (slot.mSkin != null && !slot.mSkin.isEmpty() && slot.mPing != null) {
 					layout.addFixedSlot(slot.mId, slot.mText, slot.mSkin, slot.mPing);
@@ -320,7 +320,7 @@ public class TABIntegration implements Listener {
 			return value;
 		});
 		setHeaderAndFooter(viewer, monuPlayer);
-		Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout());
+		Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout(viewer.getUniqueId()));
 	}
 
 	private long mNextRefreshLatencyTime = 0L;
@@ -394,7 +394,7 @@ public class TABIntegration implements Listener {
 		return layout;
 	}
 
-	private static class MonumentaPlayerComparator implements Comparator<MonumentaPlayer> {
+	private static final class MonumentaPlayerComparator implements Comparator<MonumentaPlayer> {
 		private final String mLocalShard;
 		private final String mBaseShard;
 
@@ -409,8 +409,8 @@ public class TABIntegration implements Listener {
 		public int compare(MonumentaPlayer a, MonumentaPlayer b) {
 			// Prefix of 0 for set shards and 9 for null shards
 			// ensures null shards go last without affecting displayed name
-			String aShard = a.mShardId == null ? "9" : ("0" + a.mShardId);
-			String bShard = b.mShardId == null ? "9" : ("0" + b.mShardId);
+			String aShard = a.mShardId == null ? "zzznull" : a.mShardId;
+			String bShard = b.mShardId == null ? "zzznull" : b.mShardId;
 
 			String aBaseShard = RE_SHARD_INSTANCE_SUFFIX
 				.matcher(aShard)
@@ -439,8 +439,8 @@ public class TABIntegration implements Listener {
 				return result;
 			}
 
-			String aGuild = a.mGuild == null ? "9" : ("0" + a.mGuild);
-			String bGuild = b.mGuild == null ? "9" : ("0" + b.mGuild);
+			String aGuild = a.mGuild == null ? "zzznull" : a.mGuild;
+			String bGuild = b.mGuild == null ? "zzznull" : b.mGuild;
 			result = aGuild.compareToIgnoreCase(bGuild);
 			if (result != 0) {
 				return result;

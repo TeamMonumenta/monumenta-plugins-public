@@ -152,6 +152,9 @@ public class MonumentaVelocity {
 
 		@Setting(value = "max_player_count")
 		public int mMaxPlayerCount = 400;
+
+		@Setting(value = "version_string")
+		public String mVersionString = "Monumenta 1.19.4-1.20.2";
 	}
 
 	@ConfigSerializable
