@@ -146,6 +146,7 @@ public class RestlessSouls extends Ability {
 				@Nullable LivingEntity mTarget;
 				final Vex mBoss = Objects.requireNonNull(vex);
 				double mRadian = FastUtils.randomDoubleInRange(0, Math.PI);
+				final int mNumber = mVexList.size() - 1;
 
 				@Override
 				public void run() {
@@ -188,8 +189,8 @@ public class RestlessSouls extends Ability {
 					// haunted move boss method
 					// movement
 					Location vexLoc = mBoss.getLocation();
+					mBoss.setCharging(true);
 					if (mTarget != null && !mTarget.isDead()) {
-						mBoss.setCharging(true);
 						Vector direction = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(mTarget), vexLoc);
 						//0.2x distance for vertical movement for flying mobs
 						double yDiff = (mTarget.getLocation().getY() - mBoss.getLocation().getY()) * 0.2;
@@ -205,7 +206,20 @@ public class RestlessSouls extends Ability {
 							mBoss.attack(mTarget);
 						}
 					} else {
-						mBoss.setCharging(false);
+						// Follow player if there's no valid targets around
+						Location playerLoc = mPlayer.getLocation();
+						playerLoc.setPitch(0);
+						Vector front = playerLoc.getDirection();
+						Vector up = new Vector(0, 1, 0);
+						Vector right = front.getCrossProduct(up);
+						Vector behind = front.clone().multiply(-1);
+
+						// will place vexes in a circle behind the player
+						Vector circle = up.clone().multiply(FastUtils.sinDeg(90 + mNumber * 360.0 / mVexCap)).add(right.clone().multiply(FastUtils.cosDeg(90 + mNumber * 360.0 / mVexCap)));
+						Location finalPlayerLoc = mPlayer.getEyeLocation().add(behind).add(circle);
+						Vector direction = LocationUtils.getDirectionTo(finalPlayerLoc, vexLoc);
+						vexLoc.add(direction.multiply(mMoveSpeed * TICK_INTERVAL / 20 * Math.max(Math.min(vexLoc.distance(finalPlayerLoc) / 3, 1), 0)));
+						vexLoc.setDirection(direction.setY(0));
 					}
 					// bobbing
 					mBoss.teleport(vexLoc.clone().add(0, FastMath.sin(mRadian) * 0.05, 0));
