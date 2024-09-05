@@ -53,6 +53,7 @@ public class MagmaShield extends Ability {
 	public static final String CHARM_DURATION = "Magma Shield Fire Duration";
 	public static final String CHARM_KNOCKBACK = "Magma Shield Knockback";
 	public static final String CHARM_CONE = "Magma Shield Cone";
+	public static final String CHARM_ABILITY_BONUS = "Magma Shield Fire Ability Damage Bonus";
 
 	public static final AbilityInfo<MagmaShield> INFO =
 		new AbilityInfo<>(MagmaShield.class, NAME, MagmaShield::new)
@@ -110,6 +111,7 @@ public class MagmaShield extends Ability {
 			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0), 2 * HEIGHT, radius, Math.toRadians(angle));
 
 		int fireDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, FIRE_TICKS);
+		double fireAbilityBonusDamage = ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ABILITY_BONUS);
 		for (LivingEntity target : hitbox.getHitMobs()) {
 			EntityUtils.applyFire(mPlugin, fireDuration, target, mPlayer);
 			DamageUtils.damage(mPlayer, target, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
@@ -120,7 +122,7 @@ public class MagmaShield extends Ability {
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_INFERNO_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(ClassAbility.INFERNO)));
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
-					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS,
+					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, fireAbilityBonusDamage,
 						EnumSet.of(ClassAbility.MAGMA_SHIELD, ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.ELEMENTAL_SPIRIT_FIRE,
 							ClassAbility.STARFALL, ClassAbility.CHOLERIC_FLAMES, ClassAbility.FLAME_TOTEM)));
 			}

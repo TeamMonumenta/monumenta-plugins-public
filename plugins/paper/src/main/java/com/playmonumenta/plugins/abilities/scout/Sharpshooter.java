@@ -36,6 +36,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	public static final String CHARM_STACKS = "Sharpshooter Max Stacks";
 	public static final String CHARM_RETRIEVAL = "Sharpshooter Arrow Save Chance";
 	public static final String CHARM_DECAY = "Sharpshooter Stack Decay Time";
+	public static final String CHARM_DISTANCE = "Sharpshooter Enhancement Max Distance";
 
 	public static final AbilityInfo<Sharpshooter> INFO =
 		new AbilityInfo<>(Sharpshooter.class, "Sharpshooter", Sharpshooter::new)
@@ -75,7 +76,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 					multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE));
 				}
 				if (isEnhanced()) {
-					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), MAX_DISTANCE) * DAMAGE_PER_BLOCK;
+					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE, MAX_DISTANCE)) * DAMAGE_PER_BLOCK;
 				}
 			} else {
 				// half stack bonus for hunting companion

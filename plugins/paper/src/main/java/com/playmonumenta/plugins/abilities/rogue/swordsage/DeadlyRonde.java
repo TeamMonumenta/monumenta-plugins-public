@@ -45,6 +45,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	public static final String CHARM_ANGLE = "Deadly Ronde Angle";
 	public static final String CHARM_KNOCKBACK = "Deadly Ronde Knockback";
 	public static final String CHARM_STACKS = "Deadly Ronde Max Stacks";
+	public static final String CHARM_SPEED = "Deadly Ronde Speed Amplifier";
 
 	public static final AbilityInfo<DeadlyRonde> INFO =
 		new AbilityInfo<>(DeadlyRonde.class, "Deadly Ronde", DeadlyRonde::new)
@@ -86,6 +87,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		/* Re-up the duration every time an ability is cast */
+		double speed = RONDE_SPEED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		if (mActiveRunnable != null) {
 			mActiveRunnable.cancel();
 		} else {
@@ -96,7 +98,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				public void run() {
 					mTicks++;
 					mCosmetic.rondeTickEffect(mPlayer, getCharges(), mTicks);
-					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(6, RONDE_SPEED_BONUS, "DeadlyRondeMod"));
+					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(6, speed, "DeadlyRondeMod"));
 					if (mActiveRunnable == null) {
 						this.cancel();
 					}

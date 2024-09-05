@@ -38,11 +38,13 @@ public class Starfall extends Ability {
 	public static final float KNOCKBACK = 0.7f;
 	public static final int COOLDOWN_SECONDS = 18;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
+	public static final double FALL_INCREMENT = 0.25;
 	public static final String CHARM_DAMAGE = "Starfall Damage";
 	public static final String CHARM_RANGE = "Starfall Range";
 	public static final String CHARM_COOLDOWN = "Starfall Cooldown";
 	public static final String CHARM_RADIUS = "Starfall Radius";
 	public static final String CHARM_FIRE = "Starfall Fire Duration";
+	public static final String CHARM_FALL_SPEED = "Starfall Fall Speed";
 
 	public static final AbilityInfo<Starfall> INFO =
 		new AbilityInfo<>(Starfall.class, NAME, Starfall::new)
@@ -101,10 +103,10 @@ public class Starfall extends Ability {
 			mCosmetic.starfallCastTrail(loc, mPlayer);
 			int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
 			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= dist - 1 || size > 0) {
-				launchMeteor(loc, playerItemStats, damage);
 				break;
 			}
 		}
+		launchMeteor(loc, playerItemStats, damage);
 
 		return true;
 	}
@@ -121,7 +123,7 @@ public class Starfall extends Ability {
 				mT += 1;
 				World world = mPlayer.getWorld();
 				for (int i = 0; i < 8; i++) {
-					loc.subtract(0, 0.25, 0);
+					loc.subtract(0, CharmManager.getExtraPercent(mPlayer, CHARM_FALL_SPEED, FALL_INCREMENT), 0);
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
 							mCosmetic.starfallLandEffect(world, mPlayer, loc);

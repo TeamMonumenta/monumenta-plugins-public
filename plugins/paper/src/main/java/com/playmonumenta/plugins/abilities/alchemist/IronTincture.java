@@ -34,6 +34,8 @@ public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_2_ABSORPTION = 10;
 	private static final int IRON_TINCTURE_ABSORPTION_DURATION = 20 * 50;
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
+	private static final int IRON_TINCTURE_POTION_REFILL = 1;
+	private static final int IRON_TINCTURE_ALLY_POTION_REFILL = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
 	private static final double IRON_TINCTURE_ENHANCEMENT_RESISTANCE = 0.05;
@@ -45,6 +47,8 @@ public class IronTincture extends Ability {
 	public static final String CHARM_DURATION = "Iron Tincture Duration";
 	public static final String CHARM_VELOCITY = "Iron Tincture Velocity";
 	public static final String CHARM_RESISTANCE = "Iron Tincture Enhancement Resistance Amplifier";
+	public static final String CHARM_REFILL = "Iron Tincture Potion Refill";
+	public static final String CHARM_ALLY_REFILL = "Iron Tincture Ally Potion Refill";
 
 	public static final AbilityInfo<IronTincture> INFO =
 		new AbilityInfo<>(IronTincture.class, "Iron Tincture", IronTincture::new)
@@ -127,15 +131,15 @@ public class IronTincture extends Ability {
 
 					tincture.remove();
 
-					execute(mPlayer, l);
-					if (mAlchemistPotions != null) {
-						mAlchemistPotions.incrementCharge();
-					}
-
 					if (p != mPlayer) {
 						execute(p, l);
 						if (mAlchemistPotions != null) {
-							mAlchemistPotions.incrementCharge();
+							mAlchemistPotions.incrementCharges(IRON_TINCTURE_ALLY_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_ALLY_REFILL));
+						}
+					} else {
+						execute(mPlayer, l);
+						if (mAlchemistPotions != null) {
+							mAlchemistPotions.incrementCharges(IRON_TINCTURE_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_REFILL));
 						}
 					}
 

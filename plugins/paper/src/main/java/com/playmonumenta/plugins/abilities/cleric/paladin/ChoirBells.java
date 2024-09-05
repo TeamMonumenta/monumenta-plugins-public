@@ -42,6 +42,7 @@ public class ChoirBells extends Ability {
 	public static final String CHARM_VULN = "Choir Bells Vulnerability Amplifier";
 	public static final String CHARM_WEAKEN = "Choir Bells Weakness Amplifier";
 	public static final String CHARM_RANGE = "Choir Bells Range";
+	public static final String CHARM_DURATION = "Choir Bells Debuff Duration";
 
 	public static final AbilityInfo<ChoirBells> INFO =
 		new AbilityInfo<>(ChoirBells.class, "Choir Bells", ChoirBells::new)
@@ -79,6 +80,7 @@ public class ChoirBells extends Ability {
 	private final double mSlownessAmount;
 	private final double mWeakenEffect;
 	private final double mVulnerabilityEffect;
+	private final int mDuration;
 	private final ChoirBellsCS mCosmetic;
 
 	private @Nullable Crusade mCrusade;
@@ -88,6 +90,7 @@ public class ChoirBells extends Ability {
 		mSlownessAmount = CharmManager.getLevelPercentDecimal(player, CHARM_SLOW) + (isLevelOne() ? SLOWNESS_AMPLIFIER_1 : SLOWNESS_AMPLIFIER_2);
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKEN) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
 		mVulnerabilityEffect = CharmManager.getLevelPercentDecimal(player, CHARM_VULN) + (isLevelOne() ? VULNERABILITY_EFFECT_1 : VULNERABILITY_EFFECT_2);
+		mDuration = CharmManager.getDuration(player, CHARM_DURATION, DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChoirBellsCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -104,14 +107,14 @@ public class ChoirBells extends Ability {
 		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RANGE, CHOIR_BELLS_RANGE));
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			mCosmetic.bellsApplyEffect(mPlayer, mob);
-			EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
+			EntityUtils.applySlow(mPlugin, mDuration, mSlownessAmount, mob);
 
 			if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
 				// Infusion
 				EntityUtils.applyTaunt(mob, mPlayer);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE), mInfo.getLinkedSpell(), true, true);
-				EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);
-				EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
+				EntityUtils.applyVulnerability(mPlugin, mDuration, mVulnerabilityEffect, mob);
+				EntityUtils.applyWeaken(mPlugin, mDuration, mWeakenEffect, mob);
 			}
 			Crusade.addCrusadeTag(mob, mCrusade);
 		}

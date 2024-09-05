@@ -41,6 +41,8 @@ public class ByMyBlade extends Ability {
 	public static final String CHARM_COOLDOWN = "By My Blade Cooldown";
 	public static final String CHARM_HASTE_AMPLIFIER = "By My Blade Haste Amplifier";
 	public static final String CHARM_HASTE_DURATION = "By My Blade Haste Duration";
+	public static final String CHARM_HEALTH = "By My Blade Enhancement Health";
+	public static final String CHARM_ELITE_HEALTH = "By My Blade Enhancement Elite Health";
 
 	public static final AbilityInfo<ByMyBlade> INFO =
 		new AbilityInfo<>(ByMyBlade.class, "By My Blade", ByMyBlade::new)
@@ -108,9 +110,9 @@ public class ByMyBlade extends Ability {
 						if (enemy.isDead() || !enemy.isValid()) {
 							// Heal Player - 5% normal, 15% elite or boss
 							if (EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy)) {
-								PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * ENHANCEMENT_HEAL_PERCENT_ELITE);
+								PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ELITE_HEALTH) + ENHANCEMENT_HEAL_PERCENT_ELITE));
 							} else {
-								PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * ENHANCEMENT_HEAL_PERCENT);
+								PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH) + ENHANCEMENT_HEAL_PERCENT));
 							}
 							mCosmetic.bmbHeal(mPlayer, loc);
 						}
