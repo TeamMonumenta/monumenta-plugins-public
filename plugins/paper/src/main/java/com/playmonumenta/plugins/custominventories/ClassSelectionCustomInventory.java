@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.guis.AbilityTriggersGui;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -112,6 +113,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 						if (clickedItem.getType() == oneClass.mDisplayItem) {
 							ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, oneClass.mClass);
 							makeSkillSelectPage(oneClass, player);
+							MonumentaNetworkRelayIntegration.refreshPlayer(player);
 							break;
 						}
 					}

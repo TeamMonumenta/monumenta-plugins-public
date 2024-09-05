@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillGUIConfig;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillShopGUI;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
@@ -236,7 +236,7 @@ public class CosmeticsGUI extends CustomInventory {
 			toggleCosmetic(player, mDisplayPage, mCurrentAbility, index);
 
 			if (mDisplayPage == CosmeticType.TITLE) {
-				MonumentaNetworkChatIntegration.refreshPlayer(player);
+				MonumentaNetworkRelayIntegration.refreshPlayer(player);
 			}
 			if (mDisplayPage == CosmeticType.COSMETIC_SKILL && mCurrentAbility != null) {
 				mCosmeticSkillChanged = true;

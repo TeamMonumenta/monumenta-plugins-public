@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.integrations;
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.GatherRemotePlayerDataEvent;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
+import com.playmonumenta.networkrelay.RemotePlayerAPI;
 import com.playmonumenta.networkrelay.RemotePlayerLoadedEvent;
 import com.playmonumenta.networkrelay.RemotePlayerUnloadedEvent;
 import com.playmonumenta.networkrelay.RemotePlayerUpdatedEvent;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -186,6 +188,11 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		if (data != null) {
 			event.setPluginData("monumenta", data);
 		}
+	}
+
+	// Updates RemotePlayer information for other shards
+	public static void refreshPlayer(Player player) {
+		RemotePlayerAPI.refreshPlayer(player.getUniqueId());
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)

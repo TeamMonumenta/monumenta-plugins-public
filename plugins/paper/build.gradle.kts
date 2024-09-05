@@ -51,16 +51,16 @@ dependencies {
 	compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
 	compileOnly("io.prometheus:simpleclient:0.11.0")
 	compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.9.0-4")
-  compileOnly("me.neznamy:tab-api:4.0.2")
+	compileOnly("me.neznamy:tab-api:4.0.2")
 	errorprone("com.google.errorprone:error_prone_core:2.29.1")
 	errorprone("com.uber.nullaway:nullaway:0.10.18")
 
-	// Bungeecord deps
+	// Bungeecord/Velocity deps
 	compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")
-  compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
-  annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
+	compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
+	annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
 	compileOnly("com.google.code.gson:gson:2.8.5")
-	compileOnly("com.playmonumenta:monumenta-network-relay:2.7")
+	// NetworkRelay already included for compile only above
 	compileOnly("com.vexsoftware:nuvotifier-universal:3.0.0:all")
 }
 

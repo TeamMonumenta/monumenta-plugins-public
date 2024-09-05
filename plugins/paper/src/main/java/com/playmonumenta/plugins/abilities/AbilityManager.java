@@ -148,7 +148,7 @@ import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -529,7 +529,7 @@ public class AbilityManager {
 		});
 
 		GalleryManager.refreshEffects(player);
-		MonumentaNetworkChatIntegration.refreshPlayer(player);
+		MonumentaNetworkRelayIntegration.refreshPlayer(player);
 		ClientModHandler.updateAbilities(player);
 
 		updateSilence(player, collection, false);

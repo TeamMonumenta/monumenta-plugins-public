@@ -152,14 +152,6 @@ public class MonumentaNetworkChatIntegration {
 		}
 	}
 
-	public static void refreshPlayer(Player player) {
-		if (!ENABLED) {
-			return;
-		}
-
-		RemotePlayerManager.refreshLocalPlayer(player);
-	}
-
 	public static @Nullable ChannelGlobal createGuildChannel(CommandSender sender, String guildTag, String permission) {
 		if (!ENABLED) {
 			return null;

@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.integrations.luckperms.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.TeleportGuildGui;
@@ -256,7 +256,7 @@ public class RefreshChat {
 		}
 
 		MMLog.fine("[Chat Refresh Listener] Refreshing chat state for " + player.getName());
-		MonumentaNetworkChatIntegration.refreshPlayer(player);
+		MonumentaNetworkRelayIntegration.refreshPlayer(player);
 		LuckPermsIntegration.updatePlayerGuildChat(player);
 		if (Gui.getOpenGui(player) instanceof TeleportGuildGui teleportGuildGui) {
 			teleportGuildGui.refresh();

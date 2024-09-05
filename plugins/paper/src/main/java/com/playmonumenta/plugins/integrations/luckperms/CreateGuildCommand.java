@@ -306,7 +306,7 @@ public class CreateGuildCommand {
 					if (guildChannel != null) {
 						MonumentaNetworkChatIntegration.setPlayerDefaultGuildChat(founder, guildChannel);
 					}
-					MonumentaNetworkChatIntegration.refreshPlayer(founder);
+					MonumentaNetworkRelayIntegration.refreshPlayer(founder);
 
 					// fireworks!
 					Location location = founder.getLocation();
