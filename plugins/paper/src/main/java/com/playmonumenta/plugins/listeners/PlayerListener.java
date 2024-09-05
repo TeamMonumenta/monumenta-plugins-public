@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
@@ -151,7 +152,6 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -1743,48 +1743,13 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(
-		DamageCause.CONTACT,
-		DamageCause.FALL,
-		DamageCause.FIRE,
-		DamageCause.FIRE_TICK,
-		DamageCause.LAVA,
-		DamageCause.VOID,
-		DamageCause.STARVATION,
-		DamageCause.POISON,
-		DamageCause.WITHER,
-		DamageCause.HOT_FLOOR);
-
 	private static final Set<DamageCause> SCALABLE_REGION_DAMAGE_CAUSES = Set.of(
 		DamageCause.FIRE_TICK,
 		DamageCause.LAVA
 	);
 
-	private final Set<UUID> mIgnoreKnockbackThisTick = new HashSet<>();
-	private final Set<UUID> mIgnoreKnockbackNextTick = new HashSet<>();
-	private int mKnockbackTaskId = -1;
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	public void entityDamageEvent(EntityDamageEvent event) {
-		if (event.getEntity() instanceof Player player
-			&& player.getNoDamageTicks() <= player.getMaximumNoDamageTicks() / 2.0f // can only take knockback again after half the iframes are over
-			&& DISABLE_KNOCKBACK_DAMAGE_CAUSES.contains(event.getCause())) {
-			mIgnoreKnockbackNextTick.add(player.getUniqueId());
-
-			// NB: The two sets are required because this task runs after the damage event, but before the velocity change event.
-			if (mKnockbackTaskId < 0 || !Bukkit.getScheduler().isQueued(mKnockbackTaskId)) {
-				mKnockbackTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(mPlugin, () -> {
-					mIgnoreKnockbackThisTick.clear();
-					mIgnoreKnockbackThisTick.addAll(mIgnoreKnockbackNextTick);
-					mIgnoreKnockbackNextTick.clear();
-					if (mIgnoreKnockbackThisTick.isEmpty()) {
-						Bukkit.getScheduler().cancelTask(mKnockbackTaskId);
-						mKnockbackTaskId = -1;
-					}
-				}, 0, 1);
-			}
-		}
-
 		// For Fire / Fall damage in R2 and R3, take more damage.
 		if (event.getEntity() instanceof Player player
 			&& SCALABLE_REGION_DAMAGE_CAUSES.contains(event.getCause())) {
@@ -1798,11 +1763,22 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	// Handles cancelled events to properly remove the player from the mIgnoreNextKnockback set even if the event has already been cancelled by another listener
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
-	public void playerVelocityEvent(PlayerVelocityEvent event) {
-		if (mIgnoreKnockbackThisTick.remove(event.getPlayer().getUniqueId())) {
-			event.setCancelled(true);
+	// Workaround to apply Y velocity after a jump due to stupid mojank (mainly for recoil) - usb
+	// See LivingEntity.jumpFromGround (this.setDeltaMovement) - https://discord.com/channels/313066655494438922/320923526133579776/1280335416905699422
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void playerJumpEvent(PlayerJumpEvent event) {
+		final Player player = event.getPlayer();
+		final Vector oldVelocity = player.getVelocity();
+		// Only reapply velocity in the same direction if it is greater than a normal player's jump
+		if (oldVelocity.getY() > NmsUtils.getVersionAdapter().getJumpVelocity(player)) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				if (player == null || !player.isOnline()) {
+					return;
+				}
+				Vector velocityNow = player.getVelocity();
+				velocityNow.setY(oldVelocity.getY());
+				player.setVelocity(velocityNow);
+			});
 		}
 	}
 

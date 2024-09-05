@@ -51,6 +51,10 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		return entity.getLocation().getDirection();
 	}
 
+	public double getJumpVelocity(LivingEntity entity) {
+		return 0.42;
+	}
+
 	public int getAttackCooldown(LivingEntity entity) {
 		return 0;
 	}

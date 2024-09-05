@@ -68,9 +68,15 @@ public class Recoil implements Enchantment {
 		}
 	}
 
-	public static void applyRecoil(Player player, double level) {
+	public static void applyRecoil(Player player, final double level) {
+		if (player == null || !player.isOnline()) {
+			return;
+		}
 		Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(CharmManager.calculateFlatAndPercentValue(player, CHARM_VELOCITY, level)));
-		velocity.setY(Math.max(0.1, velocity.getY()));
+		if (velocity.getY() >= -0.1) {
+			velocity.setY(Math.max(0.1, velocity.getY()));
+		}
+		player.setFallDistance(0);
 		player.setVelocity(velocity);
 	}
 }

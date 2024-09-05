@@ -2,10 +2,15 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import java.lang.ref.WeakReference;
 import org.bukkit.entity.Entity;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 public class RecoilDisable extends Effect {
 	public static final String effectID = "RecoilDisable";
+	public @Nullable BukkitTask mTask = null;
 
 	private final double mAmount;
 
@@ -43,11 +48,33 @@ public class RecoilDisable extends Effect {
 	}
 
 	@Override
-	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		if (fourHertz) {
-			if (entity.isOnGround() || entity.isInWater()) {
-				setDuration(0);
+	public void entityGainEffect(Entity entity) {
+		if (mTask != null) {
+			mTask.cancel();
+		}
+		mTask = new BukkitRunnable() {
+			WeakReference<Entity> mRefEntity = new WeakReference<Entity>(entity);
+			@Override
+			public void run() {
+				Entity realEntity = mRefEntity.get();
+				if (realEntity == null || !realEntity.isValid()) {
+					this.cancel();
+					mTask = null;
+					return;
+				}
+				if (realEntity.isOnGround() || realEntity.isInWater()) {
+					setDuration(0);
+					this.cancel();
+				}
 			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+	}
+
+	@Override
+	public void entityLoseEffect(Entity entity) {
+		if (mTask != null) {
+			mTask.cancel();
+			mTask = null;
 		}
 	}
 }

@@ -44,6 +44,12 @@ public interface VersionAdapter {
 	 */
 	Vector getActualDirection(Entity entity);
 
+	/**
+	 * Gets the jump velocity of an player. Based on LivingEntity.getJumpPower + getJumpBoostPower in LivingEntity.jumpFromGround
+	 */
+	double getJumpVelocity(LivingEntity entity);
+
+
 	int getAttackCooldown(LivingEntity entity);
 
 	void setAttackCooldown(LivingEntity entity, int newCooldown);

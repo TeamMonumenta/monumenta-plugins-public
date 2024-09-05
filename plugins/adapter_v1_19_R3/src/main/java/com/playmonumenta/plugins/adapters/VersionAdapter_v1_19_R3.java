@@ -257,6 +257,17 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		}
 	}
 
+
+	private static final Method getJumpPowerMethod = getMethod(net.minecraft.world.entity.LivingEntity.class, "eQ");
+
+	@Override
+	public double getJumpVelocity(LivingEntity entity) {
+		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
+		float getJumpPower = (float) invokeMethod(getJumpPowerMethod, e);
+		// getJumpFactor + getJumpBoostPower
+		return getJumpPower + e.getJumpBoostPower();
+	}
+
 	@Override
 	public void cancelStrafe(Mob mob) {
 		((CraftMob) mob).getHandle().setXxa(0);
