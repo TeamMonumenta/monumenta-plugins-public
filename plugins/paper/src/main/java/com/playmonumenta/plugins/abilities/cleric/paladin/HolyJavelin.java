@@ -54,7 +54,7 @@ public class HolyJavelin extends Ability {
 			.descriptions(
 				("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to %d blocks or until it hits a solid block. " +
 					"It deals %d magic damage to all undead enemies in a %s-block cube around it along its path, and %d magic damage to non-undead, and sets them all on fire for %ss. " +
-					"Attacking an undead enemy with that left-click transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Cooldown: %ss.")
+					"Attacking an undead enemy with that left-click transmits any passive Divine Justice damage to other enemies pierced by the spear. Cooldown: %ss.")
 					.formatted(
 						RANGE,
 						UNDEAD_DAMAGE_1,
@@ -104,12 +104,6 @@ public class HolyJavelin extends Ability {
 		if (event.getType() == DamageType.MELEE
 			&& mCustomTriggers.get(0).check(mPlayer, AbilityTrigger.Key.LEFT_CLICK)) {
 			double sharedPassiveDamage = 0;
-			if (mLuminousInfusion != null) {
-				sharedPassiveDamage += mLuminousInfusion.mLastPassiveMeleeDamage;
-				sharedPassiveDamage += mLuminousInfusion.mLastPassiveDJDamage;
-				mLuminousInfusion.mLastPassiveMeleeDamage = 0;
-				mLuminousInfusion.mLastPassiveDJDamage = 0;
-			}
 			if (mDivineJustice != null) {
 				sharedPassiveDamage += mDivineJustice.mLastPassiveDamage;
 				mDivineJustice.mLastPassiveDamage = 0;
