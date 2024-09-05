@@ -2,10 +2,7 @@ package com.playmonumenta.plugins.spawners.actions;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
-import com.playmonumenta.plugins.utils.BlockUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.*;
 import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -27,6 +24,9 @@ public class HealerAction extends SpawnerBreakAction {
 
 	@Override
 	public void run(Player player, Block spawner, Map<String, Object> parameters, @Nullable String losPool) {
+		if (!AdvancementUtils.checkAdvancement(player, "monumenta:handbook/spawners_/healer_spawner")) {
+			AdvancementUtils.grantAdvancement(player, "monumenta:handbook/spawners_/healer_spawner");
+		}
 		double radius = (double) getParameter(parameters, "radius");
 		double healing = (double) getParameter(parameters, "healing_amount");
 		Location spawnerLoc = BlockUtils.getCenterBlockLocation(spawner);

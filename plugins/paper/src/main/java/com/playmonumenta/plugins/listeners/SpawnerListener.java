@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.actions.ParticleHaloTask;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -85,6 +86,7 @@ public class SpawnerListener implements Listener {
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_RADIUS = 20;
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_TICKS = Constants.TEN_MINUTES;
 	public static final Map<Location, UUID> spawnerCatMap = new HashMap<>();
+
 
 	public static class MobInfo {
 		private WeakReference<LivingEntity> mMob;
@@ -452,6 +454,11 @@ public class SpawnerListener implements Listener {
 		if (hasShieldsAttribute(block)) {
 			if (shieldsBefore != 0 && shieldsAfter == 0) {
 				doShieldFullBreakAnimation(blockLoc);
+				// This is a shielded spawner - grant the shield spawner advancement, if not had already
+				Player thisPlayer = event.getPlayer();
+				if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner")) {
+					AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner");
+				}
 			} else if (!brokeSpawner && getSpawnerType(block, SEQUENCE_ATTRIBUTE) <= 0) {
 				doShieldBreakAnimation(blockLoc, shieldsAfter);
 			}
@@ -468,9 +475,12 @@ public class SpawnerListener implements Listener {
 		}
 
 		if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+			removeEffectsDisplayMarker(block);
 			return;
 		}
-
+		if (getLosPool(block) != null && !AdvancementUtils.checkAdvancement(event.getPlayer(), "monumenta:handbook/spawners_/random_spawner")) {
+			AdvancementUtils.grantAdvancement(event.getPlayer(), "monumenta:handbook/spawners_/random_spawner");
+		}
 		removeEffectsDisplayMarker(block);
 		SpawnerActionManager.triggerActions(getBreakActionIdentifiers(block), event.getPlayer(), block, mRecentlyBrokenSpawnerLosPool);
 	}

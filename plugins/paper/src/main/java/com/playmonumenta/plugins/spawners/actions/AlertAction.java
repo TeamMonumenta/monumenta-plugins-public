@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.spawners.actions;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.Map;
@@ -29,6 +30,9 @@ public class AlertAction extends SpawnerBreakAction {
 
 	@Override
 	public void run(Player player, Block spawner, Map<String, Object> parameters, @Nullable String losPool) {
+		if (!AdvancementUtils.checkAdvancement(player, "monumenta:handbook/spawners_/alert_spawner")) {
+			AdvancementUtils.grantAdvancement(player, "monumenta:handbook/spawners_/alert_spawner");
+		}
 		double radius = (double) getParameter(parameters, "radius");
 		Location spawnerLoc = BlockUtils.getCenterBlockLocation(spawner);
 		new Hitbox.SphereHitbox(spawnerLoc, radius)

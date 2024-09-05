@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -37,6 +38,9 @@ public class EarthquakeAction extends SpawnerBreakAction {
 
 	@Override
 	public void run(Player player, Block spawner, Map<String, Object> parameters, @Nullable String losPool) {
+		if (!AdvancementUtils.checkAdvancement(player, "monumenta:handbook/spawners_/earthquake_spawner")) {
+			AdvancementUtils.grantAdvancement(player, "monumenta:handbook/spawners_/earthquake_spawner");
+		}
 		double radius = (double) getParameter(parameters, "radius");
 		int delay = (int) getParameter(parameters, "delay");
 		double damage = (double) getParameter(parameters, "damage");

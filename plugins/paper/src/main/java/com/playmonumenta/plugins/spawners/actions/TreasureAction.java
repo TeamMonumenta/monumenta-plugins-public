@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.Map;
@@ -26,6 +27,9 @@ public class TreasureAction extends SpawnerBreakAction {
 
 	@Override
 	public void run(Player player, Block spawner, Map<String, Object> parameters, @Nullable String losPool) {
+		if (!AdvancementUtils.checkAdvancement(player, "monumenta:handbook/spawners_/treasure_spawner")) {
+			AdvancementUtils.grantAdvancement(player, "monumenta:handbook/spawners_/treasure_spawner");
+		}
 		int treasureCount = (int) getParameter(parameters, "score");
 		if (ServerProperties.getDepthsEnabled()) {
 			DepthsManager.getInstance().incrementTreasure(spawner.getLocation(), player, treasureCount);

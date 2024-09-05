@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.spawners.actions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -33,6 +34,9 @@ public class FireworksAction extends SpawnerBreakAction {
 
 	@Override
 	public void run(Player player, Block spawner, Map<String, Object> parameters, @Nullable String losPool) {
+		if (!AdvancementUtils.checkAdvancement(player, "monumenta:handbook/spawners_/firework_spawner")) {
+			AdvancementUtils.grantAdvancement(player, "monumenta:handbook/spawners_/firework_spawner");
+		}
 		Location spawnerLoc = BlockUtils.getCenterBlockLocation(spawner);
 		int sideCount = (int) getParameter(parameters, "side_count");
 		double launchVel = (double) getParameter(parameters, "launch_velocity");
