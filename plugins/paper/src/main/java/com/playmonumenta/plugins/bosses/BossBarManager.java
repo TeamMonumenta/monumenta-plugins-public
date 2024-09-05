@@ -45,15 +45,15 @@ public class BossBarManager {
 			mEventCursor--;
 		}
 
-		mBar = Bukkit.getServer().createBossBar(boss.getName(), color, style, BarFlag.PLAY_BOSS_MUSIC);
+		mBar = Bukkit.getServer().createBossBar(mBoss.getName(), color, style, BarFlag.PLAY_BOSS_MUSIC);
 		if (bossFog) {
 			mBar.addFlag(BarFlag.CREATE_FOG);
 			mBar.addFlag(BarFlag.DARKEN_SKY);
 		}
 		mBar.setVisible(true);
 
-		for (Player player : boss.getWorld().getPlayers()) {
-			if (player.getLocation().distance(boss.getLocation()) < range) {
+		for (Player player : mBoss.getWorld().getPlayers()) {
+			if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
 				mBar.addPlayer(player);
 			}
 		}
@@ -64,8 +64,8 @@ public class BossBarManager {
 			mBar.setVisible(false);
 		}
 
-		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-			if (player.getWorld().equals(mBoss.getWorld()) && player.getLocation().distance(mBoss.getLocation()) < mRange) {
+		for (Player player : mBoss.getWorld().getPlayers()) {
+			if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
 				mBar.addPlayer(player);
 			} else {
 				mBar.removePlayer(player);
