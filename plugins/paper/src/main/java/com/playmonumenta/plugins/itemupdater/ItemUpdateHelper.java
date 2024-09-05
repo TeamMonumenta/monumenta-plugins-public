@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.QuiverListener;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -288,7 +289,14 @@ public class ItemUpdateHelper {
 						infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), name));
 						continue;
 					}
-					infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY)));
+					Component display = type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY));
+					if (type.isDelveInfusion()) { // delve infusion symbol addition
+						DelveInfusionUtils.DelveInfusionMaterial materialUsed = DelveInfusionUtils.getDelveInfusionMaterial(item);
+						if (materialUsed != null) {
+							display = display.append(materialUsed.getIcon());
+						}
+					}
+					infusionMap.put(type, display);
 				}
 				if (!infusionMap.isEmpty()) {
 					lore.addAll(infusionMap.values());

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
@@ -12,8 +13,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -169,6 +172,13 @@ public class DelveInfusionUtils {
 				case INDIGO_BLIGHTDUST -> DelveInfusionMaterial.VOIDSTAINED_GEODE;
 			};
 		}
+
+		public Component getIcon() {
+			return switch (this) {
+				case VOIDSTAINED_GEODE -> Component.text(" ≈", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false);
+				case INDIGO_BLIGHTDUST -> Component.text(" ✵", TextColor.fromHexString("#FF9CF0")).decoration(TextDecoration.ITALIC, false);
+			};
+		}
 	}
 
 	public static void infuseItem(Player player, ItemStack item, DelveInfusionSelection selection, DelveInfusionMaterial delveInfusionMaterial) {
@@ -187,8 +197,8 @@ public class DelveInfusionUtils {
 		if (prevLvl > 0) {
 			ItemStatUtils.removeInfusion(item, infusionType, false);
 		}
-		ItemStatUtils.addInfusion(item, infusionType, prevLvl + 1, player.getUniqueId());
 		setDelveInfusionMaterial(item, delveInfusionMaterial);
+		ItemStatUtils.addInfusion(item, infusionType, prevLvl + 1, player.getUniqueId());
 
 		EntityUtils.fireworkAnimation(player);
 	}
@@ -344,6 +354,7 @@ public class DelveInfusionUtils {
 		NBT.modify(item, nbt -> {
 			ItemStatUtils.addPlayerModified(nbt).setString(DelveInfusionMaterial.KEY, material.mLabel);
 		});
+		ItemUpdateHelper.generateItemStats(item);
 	}
 
 	public static DelveInfusionMaterial getDelveInfusionMaterial(ItemStack item) {
