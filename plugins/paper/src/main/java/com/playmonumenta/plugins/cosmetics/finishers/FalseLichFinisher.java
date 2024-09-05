@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Objects;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,7 +19,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.Lootable;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class FalseLichFinisher implements EliteFinisher {
@@ -271,9 +269,7 @@ public class FalseLichFinisher implements EliteFinisher {
 						case 8 -> {
 							switch (quarterNote) {
 								case 0 -> {
-									mMob = EliteFinishers.createClonedMob(le, p);
-									ScoreboardUtils.addEntityToTeam(mMob, "lichfinisher", NamedTextColor.LIGHT_PURPLE)
-									.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+									mMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.LIGHT_PURPLE);
 									if (mMob instanceof Lootable lootable) {
 										lootable.setLootTable(Bukkit.getLootTable(EMPTY_LOOTTABLE));
 									}

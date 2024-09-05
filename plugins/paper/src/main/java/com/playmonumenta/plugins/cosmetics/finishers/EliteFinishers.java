@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.google.common.collect.ImmutableMap;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Set;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -66,21 +69,31 @@ public class EliteFinishers {
 		}
 	}
 
-	public static LivingEntity createClonedMob(LivingEntity killedMob, Player p) {
+	public static LivingEntity createClonedMob(LivingEntity killedMob, Player p, NamedTextColor color) {
 		LivingEntity mClonedKilledMob = EntityUtils.copyMob(killedMob);
 		if (p.getScoreboardTags().contains(FINISHER_GLOW_TAG)) {
-			mClonedKilledMob.setGlowing(true);
+			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
+			p.showEntity(Plugin.getInstance(), mClonedKilledMob);
 			mClonedKilledMob.setInvisible(true);
 			EntityEquipment equipment = mClonedKilledMob.getEquipment();
 			if (equipment != null) {
 				equipment.clear();
 			}
 		} else if (p.getScoreboardTags().contains(FINISHER_SHOW_TAG)) {
-			mClonedKilledMob.setGlowing(false);
-			mClonedKilledMob.setInvisible(false);
+			GlowingManager.clearAll(mClonedKilledMob);
+			p.showEntity(Plugin.getInstance(), mClonedKilledMob);
+		} else if (p.getScoreboardTags().contains(FINISHER_GLOW_TAG) && p.getScoreboardTags().contains(FINISHER_SHOW_TAG)) {
+			// both tags hide everything and no tags hide nothing (reversed) because i didn't want to create another tag and wanted
+			// show all by default (no tags)
+			GlowingManager.clearAll(mClonedKilledMob);
+			p.hideEntity(Plugin.getInstance(), mClonedKilledMob);
+			EntityEquipment equipment = mClonedKilledMob.getEquipment();
+			if (equipment != null) {
+				equipment.clear();
+			}
 		} else {
-			mClonedKilledMob.setGlowing(true);
-			mClonedKilledMob.setInvisible(false);
+			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
+			p.showEntity(Plugin.getInstance(), mClonedKilledMob);
 		}
 		mClonedKilledMob.setHealth(1);
 		mClonedKilledMob.setInvulnerable(true);

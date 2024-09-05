@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -16,7 +15,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,9 +56,7 @@ public class FishedUpFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					mFishingRodTopLocation.getWorld().playSound(mFishingRodTopLocation, Sound.ENTITY_FISHING_BOBBER_THROW, 2, 1);
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "fishedfinisher", NamedTextColor.DARK_BLUE)
-						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_BLUE);
 				}
 				new PPLine(Particle.REDSTONE, mFishingRodTopLocation, mHookLocation).data(LINE_COLOR).count(15).spawnAsPlayerActive(p);
 				if (mTicks < 20) {

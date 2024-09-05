@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,7 +18,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -44,9 +42,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "frozenfinisher", NamedTextColor.BLUE)
-						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.BLUE);
 					// Figure out where and when to generate ice
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					for (double x = box.getMinX(); x <= box.getMaxX(); x += 0.6) {

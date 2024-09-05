@@ -727,15 +727,18 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(4, "Elite Finisher Visibility Settings",
 				"Choose how cloned mobs in your elite finishers are visible.", NamedTextColor.LIGHT_PURPLE,
 				Material.ZOMBIE_HEAD, false),
-			new PebItem(20, "Show and Glow",
+			new PebItem(19, "Show and Glow",
 				"Cloned Elites from your elite finisher are visible and glow.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLOW_INK_SAC, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_show_glow"),
-			new PebItem(22, "Hide and Glow",
+			new PebItem(21, "Hide and Glow",
 				"Cloned Elites from your elite finisher are hidden but still glow.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLOWSTONE_DUST, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_glow"),
-			new PebItem(24, "Show and Don't Glow",
+			new PebItem(23, "Show and Don't Glow",
 				"Cloned Elites from your elite finisher are visible and do not glow.", NamedTextColor.LIGHT_PURPLE,
-				Material.SKELETON_SKULL, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_show")
+				Material.SKELETON_SKULL, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_show"),
+			new PebItem(25, "Hide and Don't Glow",
+				"Cloned Elites from your elite finisher are hidden and do not glow.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_hide")
 		);
 
 		// Partial particle settings

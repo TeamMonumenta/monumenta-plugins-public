@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
@@ -65,10 +63,7 @@ public class ChainedFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// summon
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "chainedfinisher", NamedTextColor.DARK_AQUA)
-						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_AQUA);
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					loc1.add((box.getWidthX() / 2) + 3 + 0.35, 1, 0.6);
 					loc2.add(-(box.getWidthX() / 2) - 2.25 + 0.35, 1, 0.6);

@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -25,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
@@ -65,9 +63,7 @@ public class ExcaliburFinisher implements EliteFinisher {
 				playSong(p.getWorld(), p.getLocation(), mTicks, mobsKilled);
 				if (mTicks == 0) {
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "excaliburfinisher", NamedTextColor.GRAY)
-						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.GRAY);
 				}
 				if (mTicks <= 20) {
 					mExcalibur.setRightArmPose(new EulerAngle(-Math.PI / 2.0 + 0.75 * Math.PI / 20.0 * mTicks, EntityUtils.getCounterclockwiseAngle(mExcalibur, killedMob), mSlashAngle));

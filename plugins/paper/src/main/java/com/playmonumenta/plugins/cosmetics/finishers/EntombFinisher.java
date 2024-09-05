@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +15,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
@@ -55,9 +53,7 @@ public class EntombFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p);
-					ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "chainedfinisher", NamedTextColor.DARK_AQUA)
-						.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_AQUA);
 				}
 				if (mLayer < LAYERMAX) {
 					mLayer++;
