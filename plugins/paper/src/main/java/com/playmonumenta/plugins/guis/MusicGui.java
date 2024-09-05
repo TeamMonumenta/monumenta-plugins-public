@@ -7,7 +7,9 @@ import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.managers.PlaylistManager;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -26,15 +28,18 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class MusicGui extends Gui {
 	public enum MusicPage {
 		VANILLA("vanilla", 36, "Minecraft Music Discs"),
 		VALLEY("valley", 36, "Monumenta Soundtrack: King's Valley"),
-		ISLES("isles", 54, "Monuementa Soundtrack: Celsian Isles"),
-		RING("ring", 36, "Monuementa Soundtrack: Architect's Ring"),
+		ISLES("isles", 54, "Monumenta Soundtrack: Celsian Isles"),
+		RING("ring", 36, "Monumenta Soundtrack: Architect's Ring"),
 		DUNGEONS("dungeons", 27, "Monumenta Soundtrack: Dungeons"),
+		PLAYLIST("playlist", 54, "Music Playlist"),
 		LABS("labs", 27, "Monumenta Soundtrack: Alchemy Labs"),
 		WHITE("white", 27, "Monumenta Soundtrack: Halls of Wind and Blood"),
 		ORANGE("orange", 27, "Monumenta Soundtrack: Fallen Menagerie"),
@@ -61,36 +66,40 @@ public class MusicGui extends Gui {
 	public MusicPage mPage;
 	public final boolean mReturnToRecordPlayer;
 	public final boolean mPlayToOthers;
+	public PlaylistManager.PlaylistData mPlaylistData;
+	private @Nullable BukkitRunnable mPlaylistRunnable;
+	private final int mMaxPlaylistTracks = 28;
 
 	public MusicGui(Player player, MusicPage page, boolean returnToRecordPlayer, boolean playToOthers) {
 		super(player, page.mSize, page.mTitle);
 		mPage = page;
 		mReturnToRecordPlayer = returnToRecordPlayer;
 		mPlayToOthers = playToOthers;
+		mPlaylistData = com.playmonumenta.plugins.Plugin.getInstance().mPlaylistManager.getData(player);
 	}
 
 	@Override
 	public void setup() {
 		switch (mPage) {
 			case VANILLA -> {
-				addVanillaMusicItem(1, 1, Material.MUSIC_DISC_13, "13", Sound.MUSIC_DISC_13, 178);
-				addVanillaMusicItem(1, 2, Material.MUSIC_DISC_CAT, "Cat", Sound.MUSIC_DISC_CAT, 185);
-				addVanillaMusicItem(1, 3, Material.MUSIC_DISC_BLOCKS, "Blocks", Sound.MUSIC_DISC_BLOCKS, 345);
-				addVanillaMusicItem(1, 4, Material.MUSIC_DISC_CHIRP, "Chirp", Sound.MUSIC_DISC_CHIRP, 185);
-				addVanillaMusicItem(1, 5, Material.MUSIC_DISC_FAR, "Far", Sound.MUSIC_DISC_FAR, 174);
-				addVanillaMusicItem(1, 6, Material.MUSIC_DISC_MALL, "Mall", Sound.MUSIC_DISC_MALL, 197);
-				addVanillaMusicItem(1, 7, Material.MUSIC_DISC_MELLOHI, "Mellohi", Sound.MUSIC_DISC_MELLOHI, 96);
+				addVanillaMusicItem(1, 1, Material.MUSIC_DISC_13, "13", "C418", Sound.MUSIC_DISC_13, 178);
+				addVanillaMusicItem(1, 2, Material.MUSIC_DISC_CAT, "Cat", "C418", Sound.MUSIC_DISC_CAT, 185);
+				addVanillaMusicItem(1, 3, Material.MUSIC_DISC_BLOCKS, "Blocks", "C418", Sound.MUSIC_DISC_BLOCKS, 345);
+				addVanillaMusicItem(1, 4, Material.MUSIC_DISC_CHIRP, "Chirp", "C418", Sound.MUSIC_DISC_CHIRP, 185);
+				addVanillaMusicItem(1, 5, Material.MUSIC_DISC_FAR, "Far", "C418", Sound.MUSIC_DISC_FAR, 174);
+				addVanillaMusicItem(1, 6, Material.MUSIC_DISC_MALL, "Mall", "C418", Sound.MUSIC_DISC_MALL, 197);
+				addVanillaMusicItem(1, 7, Material.MUSIC_DISC_MELLOHI, "Mellohi", "C418", Sound.MUSIC_DISC_MELLOHI, 96);
 
-				addVanillaMusicItem(2, 1, Material.MUSIC_DISC_STAL, "Stal", Sound.MUSIC_DISC_STAL, 150);
-				addVanillaMusicItem(2, 2, Material.MUSIC_DISC_STRAD, "Strad", Sound.MUSIC_DISC_STRAD, 251);
-				addVanillaMusicItem(2, 3, Material.MUSIC_DISC_WARD, "Ward", Sound.MUSIC_DISC_WARD, 251);
-				addVanillaMusicItem(2, 4, Material.MUSIC_DISC_WAIT, "Wait", Sound.MUSIC_DISC_WAIT, 238);
-				addVanillaMusicItem(2, 5, Material.MUSIC_DISC_PIGSTEP, "Pigstep", Sound.MUSIC_DISC_PIGSTEP, 148);
-				addVanillaMusicItem(2, 6, Material.MUSIC_DISC_OTHERSIDE, "Otherside", Sound.MUSIC_DISC_OTHERSIDE, 195);
-				addVanillaMusicItem(2, 7, Material.MUSIC_DISC_11, "11", Sound.MUSIC_DISC_11, 71);
+				addVanillaMusicItem(2, 1, Material.MUSIC_DISC_STAL, "Stal", "C418", Sound.MUSIC_DISC_STAL, 150);
+				addVanillaMusicItem(2, 2, Material.MUSIC_DISC_STRAD, "Strad", "C418", Sound.MUSIC_DISC_STRAD, 251);
+				addVanillaMusicItem(2, 3, Material.MUSIC_DISC_WARD, "Ward", "C418", Sound.MUSIC_DISC_WARD, 251);
+				addVanillaMusicItem(2, 4, Material.MUSIC_DISC_WAIT, "Wait", "C418", Sound.MUSIC_DISC_WAIT, 238);
+				addVanillaMusicItem(2, 5, Material.MUSIC_DISC_PIGSTEP, "Pigstep", "Lena Raine", Sound.MUSIC_DISC_PIGSTEP, 148);
+				addVanillaMusicItem(2, 6, Material.MUSIC_DISC_OTHERSIDE, "Otherside", "Lena Raine", Sound.MUSIC_DISC_OTHERSIDE, 195);
+				addVanillaMusicItem(2, 7, Material.MUSIC_DISC_11, "11", "C418", Sound.MUSIC_DISC_11, 71);
 
-				addVanillaMusicItem(3, 1, Material.MUSIC_DISC_5, "5", Sound.MUSIC_DISC_5, 178);
-				//addVanillaMusicItem(3, 2, Material.MUSIC_DISC_RELIC, "Relic", Sound.MUSIC_DISC_RELIC, 218);
+				addVanillaMusicItem(3, 1, Material.MUSIC_DISC_5, "5", "Samuel Åberg", Sound.MUSIC_DISC_5, 178);
+				//addVanillaMusicItem(3, 2, Material.MUSIC_DISC_RELIC, "Relic", "Aaron Cherof", Sound.MUSIC_DISC_RELIC, 218);
 			}
 
 			case VALLEY -> {
@@ -132,6 +141,7 @@ public class MusicGui extends Gui {
 
 				addMusicItem(2, 5, Material.MUSIC_DISC_PIGSTEP, "The Celsian Isles", Location.AMBER, "Celsian Isles", "Corpe_", "epic:music.isles", 90, true);
 				addMusicItem(2, 6, Material.MUSIC_DISC_13, "Sacred Temple - Steelmeld", Location.AMBER, "Celsian Monument", "Whitebeard_OP", "epic:music.monumentisles", 246, checkAdvance("monumenta:handbook/important_sites/r2/monument"));
+				addMusicItem(2, 7, Material.MUSIC_DISC_MALL, "The Parting Veil", Location.MIST, "The Black Mist", "Fangride", "epic:music.partingveil", 158, checkAdvance("monumenta:challenges/r2/mist/find"));
 
 				addMusicItem(3, 1, Material.MUSIC_DISC_BLOCKS, "Horsey", Location.HORSEMAN, "Headless Horseman", "Whitebeard_OP", "epic:music.horseman", 187, checkScore("HorsemanWins"));
 				addMusicItem(3, 2, Material.MUSIC_DISC_STRAD, "Colossus' Song", Location.FROSTGIANT, "Eldrask", "BobbyJonesSr", "epic:music.eldrask", 246, checkScore("FGWins"));
@@ -185,6 +195,40 @@ public class MusicGui extends Gui {
 				addDungeonItem(2, 4, Material.FIRE_CORAL, Location.REVERIE, MusicPage.REVERIE, "Corrupted");
 				addDungeonItem(2, 5, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
 				addDungeonItem(2, 6, Material.BROWN_WOOL, Location.BROWN, MusicPage.BROWN, "Brown");
+			}
+
+			case PLAYLIST -> {
+				int[] row = {1, 2, 3, 4};
+				int[] column = {1, 2, 3, 4, 5, 6, 7};
+				for (int i = 0; i < mPlaylistData.mPlaylistTracks.size(); i++) {
+					PlaylistManager.PlaylistData.PlaylistTrack track = mPlaylistData.mPlaylistTracks.get(i);
+					addMusicItem(row[(int) Math.floor((double) i / 7)], column[i % 7], track.mMaterial, track.mName, track.mColor, track.mLocation, track.mComposer, track.mTrack, track.mDuration, true);
+				}
+				ItemStack playlist = GUIUtils.createBasicItem(Material.PAINTING, "Music Playlist", TextColor.fromCSSHexString("#E8C392"), true);
+				List<Component> lore = new ArrayList<>();
+				lore.add(Component.text("Left click this item to play songs in order, hold shift to skip.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Right click this item to play songs in randomized order.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Left click discs to play songs in order, starting at that disc.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Right click discs to remove them from the playlist.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				ItemMeta meta = playlist.getItemMeta();
+				meta.lore(lore);
+				playlist.setItemMeta(meta);
+				setItem(4, playlist).onClick(event -> {
+					if (event.isRightClick()) {
+						playFromPlaylist(-1, true);
+					} else if (event.isLeftClick()) {
+						playFromPlaylist(event.isShiftClick() ? mPlaylistData.mCurrentTrackIndex : -1, false);
+					}
+				});
+
+				ItemStack clear = GUIUtils.createBasicItem(Material.MUSIC_DISC_11, "Stop all music", NamedTextColor.WHITE);
+				setItem(8, clear).onClick(event -> {
+					SongManager.stopSong(mPlayer, true);
+					if (mPlaylistRunnable != null) {
+						mPlaylistRunnable.cancel();
+					}
+					close();
+				});
 			}
 
 			case LABS -> {
@@ -249,10 +293,21 @@ public class MusicGui extends Gui {
 
 			case PLOTS -> {
 				addMusicItem(1, 3, Material.MUSIC_DISC_OTHERSIDE, "Well-Deserved Rest", Location.AMBER, "Plots", "Casiel368", "epic:music.plots", 195, true);
-				addMusicItem(1, 5, Material.MUSIC_DISC_PIGSTEP, "Custom Plots Music", Location.AMBER, "Plots", null, "epic:music.plotscustom", 240, true);
+				addMusicItem(1, 5, Material.MUSIC_DISC_PIGSTEP, "Custom Plots Music", Location.AMBER, "Plots", "RP Customizable", "epic:music.plotscustom", 240, true);
 			}
 
 			default -> close();
+		}
+
+		if (mPage != MusicPage.PLAYLIST) {
+			ItemStack info = GUIUtils.createBasicItem(Material.JUNGLE_SIGN, "Music Discs", NamedTextColor.WHITE, true);
+			List<Component> lore = new ArrayList<>();
+			lore.add(Component.text("Left click discs to play them once, hold shift to loop.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("Right click discs to add them to your playlist.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			ItemMeta meta = info.getItemMeta();
+			meta.lore(lore);
+			info.setItemMeta(meta);
+			setItem(4, info);
 		}
 
 		if (mReturnToRecordPlayer) {
@@ -269,29 +324,29 @@ public class MusicGui extends Gui {
 		}
 	}
 
-	public void addVanillaMusicItem(int row, int col, Material material, String name, Sound track, double duration) {
-		addMusicItem(row, col, material, name, NamedTextColor.WHITE, false, List.of(), track.key().asString(), duration, true);
+	public void addVanillaMusicItem(int row, int col, Material material, String name, String composer, Sound track, double duration) {
+		addMusicItem(row, col, material, name, NamedTextColor.WHITE, "Minecraft", composer, track.key().asString(), duration, true);
 	}
 
-	public void addMusicItem(int row, int col, Material material, String name, Location location, @Nullable String composer, String track, double duration) {
+	public void addMusicItem(int row, int col, Material material, String name, Location location, String composer, String track, double duration) {
 		addMusicItem(row, col, material, name, location, location.getDisplayName(), composer, track, duration, true);
 	}
 
-	public void addMusicItem(int row, int col, Material material, String name, Location color, String location, @Nullable String composer, String track, double duration, boolean unlocked) {
+	public void addMusicItem(int row, int col, Material material, String name, Location color, String location, String composer, String track, double duration, boolean unlocked) {
 		addMusicItem(row, col, material, name, color.getColor(), location, composer, track, duration, unlocked);
 	}
 
-	public void addMusicItem(int row, int col, Material material, String name, TextColor color, String location, @Nullable String composer, String track, double duration, boolean unlocked) {
+	public void addMusicItem(int row, int col, Material material, String name, TextColor color, String location, String composer, String track, double duration, boolean unlocked) {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Component.text(location));
 		if (composer != null) {
 			lore.add(Component.text("Artist: " + composer, NamedTextColor.GRAY, TextDecoration.ITALIC));
 		}
 
-		addMusicItem(row, col, material, name, color, true, lore, track, duration, unlocked);
+		addMusicItem(row, col, material, name, color, true, lore, location, composer, track, duration, unlocked);
 	}
 
-	public void addMusicItem(int row, int col, Material material, String name, TextColor color, boolean bold, List<Component> lore, String track, double duration, boolean unlocked) {
+	public void addMusicItem(int row, int col, Material material, String name, TextColor color, boolean bold, List<Component> lore, String location, String composer, String track, double duration, boolean unlocked) {
 		if (!unlocked) {
 			setItem(row, col, GUIUtils.createBasicItem(Material.MUSIC_DISC_11, "Undiscovered Track", NamedTextColor.GRAY));
 			return;
@@ -299,10 +354,85 @@ public class MusicGui extends Gui {
 
 		ItemStack item = GUIUtils.createBasicItem(material, 1, Component.text(name, color).decoration(TextDecoration.BOLD, bold).decoration(TextDecoration.ITALIC, false), lore, true);
 		setItem(row, col, item).onClick(event -> {
-			List<Player> players = mPlayToOthers ? PlayerUtils.playersInRange(mPlayer.getLocation(), 48, true) : List.of(mPlayer);
-			SongManager.playSong(players, new SongManager.Song(track, SoundCategory.RECORDS, duration, true, 1.0f, 1.0f), true);
-			close();
+			// Get the playlist index of the record
+			int index = event.getSlot() - 8 - 2 * (int) Math.floor((double) event.getSlot() / 9);
+			if (event.getClick().isLeftClick()) {
+				List<Player> players = mPlayToOthers ? PlayerUtils.playersInRange(mPlayer.getLocation(), 48, true) : List.of(mPlayer);
+				if (mPage != MusicPage.PLAYLIST) {
+					SongManager.playSong(players, new SongManager.Song(track, SoundCategory.RECORDS, duration, event.isShiftClick(), 1.0f, 1.0f, false), true);
+
+					// Reset playlist status since it's not being used
+					mPlaylistData.mCurrentTrackIndex = -1;
+					if (mPlaylistRunnable != null) {
+						mPlaylistRunnable.cancel();
+					}
+				} else {
+					playFromPlaylist(index - 1, false);
+				}
+				close();
+			} else if (event.getClick().isRightClick()) {
+				if (mPage != MusicPage.PLAYLIST) {
+					if (mPlaylistData.mPlaylistTracks.size() < mMaxPlaylistTracks) {
+						mPlaylistData.mPlaylistTracks.add(new PlaylistManager.PlaylistData.PlaylistTrack(material, name, color, location, composer, track, duration));
+						mPlayer.sendMessage(name + " has been added to your playlist. (" + mPlaylistData.mPlaylistTracks.size() + "/" + mMaxPlaylistTracks + ")");
+					} else {
+						mPlayer.sendMessage("Your playlist is too large! Remove songs in order to add new ones. (" + mPlaylistData.mPlaylistTracks.size() + "/" + mMaxPlaylistTracks + ")");
+					}
+				} else {
+					mPlaylistData.mPlaylistTracks.remove(index);
+					mPlayer.sendMessage(name + " has been removed from your playlist. (" + mPlaylistData.mPlaylistTracks.size() + "/" + mMaxPlaylistTracks + ")");
+					update();
+				}
+			}
 		});
+	}
+
+	public void playFromPlaylist(int oldTrackIndex, boolean randomized) {
+		if (mPlaylistData.mPlaylistTracks.isEmpty()) {
+			mPlayer.sendMessage("There are no tracks in your playlist to play!");
+			return;
+		}
+
+		// Allows the song to restart, which avoids asynchronous timing issues that would cancel the runnable.
+		SongManager.stopSong(mPlayer, true);
+
+		if (randomized && mPlaylistData.mPlaylistTracks.size() != 1) {
+			do {
+				oldTrackIndex = FastUtils.randomIntInRange(0, mPlaylistData.mPlaylistTracks.size() - 1);
+			} while (oldTrackIndex == mPlaylistData.mCurrentTrackIndex);
+		} else {
+			oldTrackIndex++;
+			if (oldTrackIndex >= mPlaylistData.mPlaylistTracks.size()) {
+				oldTrackIndex = 0;
+			}
+		}
+
+		mPlaylistData.mCurrentTrackIndex = oldTrackIndex;
+		SongManager.playSong(mPlayer, new SongManager.Song(mPlaylistData.mPlaylistTracks.get(mPlaylistData.mCurrentTrackIndex).mTrack, SoundCategory.RECORDS, mPlaylistData.mPlaylistTracks.get(mPlaylistData.mCurrentTrackIndex).mDuration, false, 1.0f, 1.0f, false), true);
+		SongManager.Song currentSong = SongManager.getCurrentSong(mPlayer);
+		mPlayer.sendActionBar(Component.text("Now playing: " + mPlaylistData.mPlaylistTracks.get(mPlaylistData.mCurrentTrackIndex).mName + " by " + mPlaylistData.mPlaylistTracks.get(mPlaylistData.mCurrentTrackIndex).mComposer, NamedTextColor.GREEN));
+
+		if (mPlaylistRunnable != null) {
+			mPlaylistRunnable.cancel();
+		}
+
+		mPlaylistRunnable = new BukkitRunnable() {
+			double mTicks = 0;
+			final double mDuration = mPlaylistData.mPlaylistTracks.get(mPlaylistData.mCurrentTrackIndex).mDuration * 20;
+			@Override
+			public void run() {
+				mTicks++;
+				if (mTicks > mDuration || SongManager.getCurrentSong(mPlayer) != currentSong || !mPlayer.isOnline()) {
+					if (mTicks > mDuration) {
+						// Stop song again to prevent multiple tracks starting at once
+						SongManager.stopSong(mPlayer, true);
+						playFromPlaylist(mPlaylistData.mCurrentTrackIndex, randomized);
+					}
+					this.cancel();
+				}
+			}
+		};
+		mPlaylistRunnable.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	public void addDungeonItem(int row, int col, Material material, Location location, MusicPage page, @Nullable String objective) {

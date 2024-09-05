@@ -57,6 +57,7 @@ import com.playmonumenta.plugins.managers.DataCollectionManager;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.managers.PlayerSkinManager;
+import com.playmonumenta.plugins.managers.PlaylistManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.market.MarketCommands;
 import com.playmonumenta.plugins.market.MarketListener;
@@ -179,6 +180,7 @@ public class Plugin extends JavaPlugin {
 	public CosmeticsManager mCosmeticsManager;
 	public VanityManager mVanityManager;
 	public LoadoutManager mLoadoutManager;
+	public PlaylistManager mPlaylistManager;
 	public DataCollectionManager mDataCollectionManager;
 	public PzeroManager mPzeroManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
@@ -416,6 +418,7 @@ public class Plugin extends JavaPlugin {
 		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
 		mLoadoutManager = new LoadoutManager();
+		mPlaylistManager = new PlaylistManager();
 		mDataCollectionManager = new DataCollectionManager();
 		mPzeroManager = new PzeroManager();
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
@@ -518,6 +521,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ToggleTrail(), this);
 		manager.registerEvents(mVanityManager, this);
 		manager.registerEvents(mLoadoutManager, this);
+		manager.registerEvents(mPlaylistManager, this);
 		manager.registerEvents(POIManager.getInstance(), this);
 		manager.registerEvents(new BrokenEquipmentListener(), this);
 		manager.registerEvents(PortalManager.getInstance(), this);

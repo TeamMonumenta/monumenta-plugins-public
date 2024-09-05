@@ -57,6 +57,7 @@ public class PEBCustomInventory extends CustomInventory {
 		SOUND_CATEGORIES,
 		SOUND_OVERWORLD_PLOTS,
 		SOUND_DELAYS,
+		SOUND_TP_CUTOFFS,
 		FINISHER_VISIBILTY,
 	}
 
@@ -765,7 +766,7 @@ public class PEBCustomInventory extends CustomInventory {
 		// Sound Controls
 		definePage(PebPage.SOUND_CONTROLS,
 			new PebItem(4, "Sound Options",
-				"Use the menus below to customize your audio experience within Monumenta.", NamedTextColor.LIGHT_PURPLE,
+				"Use the menus and options below to customize your audio experience within Monumenta.", NamedTextColor.LIGHT_PURPLE,
 				Material.JUKEBOX, false),
 			new PebItem(20, "Sound Categories",
 				"Control the settings related to categories such as boss music, strike music, and city music.", NamedTextColor.LIGHT_PURPLE,
@@ -775,7 +776,15 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.COMPASS, false).switchToPage(PebPage.SOUND_OVERWORLD_PLOTS),
 			new PebItem(24, "Sound Delays",
 				"Toggle whether music constantly plays in certain areas.", NamedTextColor.LIGHT_PURPLE,
-				Material.CLOCK, true).switchToPage(PebPage.SOUND_DELAYS)
+				Material.CLOCK, true).switchToPage(PebPage.SOUND_DELAYS),
+
+			new PebItem(40, "Enable Teleporter Cutoffs",
+				"Using teleporters will stop the currently playing song.", NamedTextColor.LIGHT_PURPLE,
+				Material.ENDER_PEARL, false).serverCommand("scoreboard players set @S MusicStopResetTpToggle 0").playerMessage("Using teleporters will now stop the currently playing song."),
+			new PebItem(49, "Disable Teleporter Cutoffs",
+				"Using teleporters will not stop the currently playing song.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicStopResetTpToggle 1").playerMessage("Using teleporters will no longer stop the currently playing song.")
+
 		);
 
 		// Sound Categories
@@ -944,9 +953,6 @@ public class PEBCustomInventory extends CustomInventory {
 				"There will be no delay between loops of the official track. There will be 4 minutes between the start of each play of a custom theme. ", NamedTextColor.LIGHT_PURPLE,
 				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicPlotsDelay 1").playerMessage("There will now be no delay between loops of the plots music.")
 		);
-
-
-
 	}
 
 	private static boolean isEmojiCategory(ParticleCategory category) {
