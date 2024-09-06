@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
+import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class DataCollectionManager {
 		worlds.forEach(world -> dataPoint.addAllPlayerInformation(processWorld(world)));
 
 		long timestamp = dataPoint.getTimestamp();
-		String finalPath = EXPORT_PATH + "%s - %s.json".formatted(timestamp, dataPoint.getShardName());
+		String finalPath = EXPORT_PATH + File.separator + "%s - %s.json".formatted(timestamp, dataPoint.getShardName());
 		if (dataPoint.getPlayerInformation().isEmpty()) {
 			MMLog.info("Skipping writing gameplay data to %s - 0 players found".formatted(finalPath));
 			return;
