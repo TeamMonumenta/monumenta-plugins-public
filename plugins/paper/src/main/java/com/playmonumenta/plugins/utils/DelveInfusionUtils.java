@@ -63,6 +63,7 @@ public class DelveInfusionUtils {
 		GALVANIC("galvanic", InfusionType.GALVANIC, Location.SCIENCE, Material.IRON_BLOCK, "Corrupted Circuits", NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
 		DECAPITATION("decapitation", InfusionType.DECAPITATION, Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
 		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		FERVOR("fervor", InfusionType.FERVOR, Location.HEXFALL, Material.DRAGON_BREATH, "Fragrant Branch of Fen", NamespacedKeyUtils.fromString("epic:r3/items/currency/fragrant_branch_of_fen"), "Ruten"),
 
 		REFUND("refund", null, null, Material.GRINDSTONE, null, null, (String[]) null);
 

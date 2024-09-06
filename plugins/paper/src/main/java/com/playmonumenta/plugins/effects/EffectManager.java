@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -15,6 +16,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -393,6 +395,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(SiriusContagion.effectID, SiriusContagion::deserialize);
 		mEffectDeserializer.put(SiriusSetTargetEffect.effectID, SiriusSetTargetEffect::deserialize);
 		mEffectDeserializer.put(TemporalFlux.effectID, TemporalFlux::deserialize);
+		mEffectDeserializer.put(Reincarnation.effectId, Reincarnation::deserialize);
 		mEffectDeserializer.put(CholericFlamesAntiHeal.effectID, CholericFlamesAntiHeal::deserialize);
 		mEffectDeserializer.put(SoulRendLifeSteal.effectID, SoulRendLifeSteal::deserialize);
 		mEffectDeserializer.put(GrapplingFallDR.effectID, GrapplingFallDR::deserialize);
@@ -894,11 +897,14 @@ public final class EffectManager implements Listener {
 		if (killed instanceof Player player && MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, PLAYER_EFFECT_DEATH_KEY, 5)) {
 			// Default phylactery level is 10 (should already be accounted for).
 			double phylactery = Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.PHYLACTERY);
+			boolean buffDurationProtectZone = ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.NO_BUFF_DURATION_LOSS_ON_DEATH);
 
 			// Set durations of Custom Effects for all player effects (including hidden ones)
 			List<EffectManager.EffectPair> effectPairs = getAllEffectPairs(player);
 
-			if (effectPairs != null) {
+			// If one of the effect's onDeath or onKill cancel the event, don't modify duration, i.e. Reincarnation
+			//noinspection IsCancelled
+			if (effectPairs != null && !event.isCancelled() && !buffDurationProtectZone) {
 				for (EffectManager.EffectPair pair : effectPairs) {
 					Effect effect = pair.mEffect;
 					String source = pair.mSource;

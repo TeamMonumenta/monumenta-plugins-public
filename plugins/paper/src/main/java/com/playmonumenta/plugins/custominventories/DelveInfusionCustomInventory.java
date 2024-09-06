@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Empowered;
 import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.itemstats.infusions.Execution;
 import com.playmonumenta.plugins.itemstats.infusions.Expedite;
+import com.playmonumenta.plugins.itemstats.infusions.Fervor;
 import com.playmonumenta.plugins.itemstats.infusions.Fueled;
 import com.playmonumenta.plugins.itemstats.infusions.Galvanic;
 import com.playmonumenta.plugins.itemstats.infusions.Grace;
@@ -122,6 +123,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.GALVANIC, (i, perLevel) -> "Gain a " + StringUtils.multiplierToPercentage(Galvanic.STUN_CHANCE_PER_LVL * i) + "% chance" + perLevel + " to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.");
 		addItems(DelveInfusionSelection.DECAPITATION, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Decapitation.DAMAGE_MLT_PER_LVL * i) + "% additional damage" + perLevel + " on a critical melee strike.");
 		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
+		addItems(DelveInfusionSelection.FERVOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Fervor.PERCENT_DAMAGE_PER_LEVEL * i) + "% additional damage" + perLevel + " for 3s after gaining a buff that lasts at least 5s.");
 
 		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
 			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be infused.", NamedTextColor.DARK_GRAY)).toList();

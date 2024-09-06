@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
@@ -28,7 +29,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -188,7 +188,7 @@ public class AdvancingShadows extends Ability {
 		}
 
 		if (loc.distance(entity.getLocation()) <= origDistance && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			mPlayer.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
+			PlayerUtils.playerTeleport(mPlayer, loc);
 		}
 
 		if (mEnhancementChain == 0) {

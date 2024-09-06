@@ -36,6 +36,7 @@ public enum InfusionType {
 	EPOCH(new Epoch(), "", true, false, false, false, true, true, true, false),
 	EXECUTION(new Execution(), "", true, false, false, false, true, true, true, false),
 	EXPEDITE(new Expedite(), "", true, false, false, false, true, true, true, false),
+	FERVOR(new Fervor(), "", true, false, false, false, true, true, true, false),
 	FUELED(new Fueled(), "", true, false, false, false, true, true, true, false),
 	GALVANIC(new Galvanic(), "", true, false, false, false, true, true, true, false),
 	GRACE(new Grace(), "", true, false, false, false, true, true, true, false),

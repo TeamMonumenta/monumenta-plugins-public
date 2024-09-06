@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,6 +34,8 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 		{1, 9, 36, 84, 126, 126, 84, 36, 9, 1},
 		{1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1}
 	};
+	private int mAnimationTicks = 1;
+	private Plugin mPlugin;
 
 	/**
 	 * An n-point Bezier curve, with an upper bound of {@value MAX_CONTROL_POINTS}
@@ -74,27 +78,74 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 		mLocation = startLocation;
 	}
 
+	public PPBezier delay(Plugin plugin, int animationTicks) {
+		if (animationTicks < 1) {
+			animationTicks = 1;
+		}
+		mPlugin = plugin;
+		mAnimationTicks = animationTicks;
+		return this;
+	}
+
 	@Override
 	protected void doSpawn(ParticleBuilder packagedValues) {
 		int count = packagedValues.count();
+		int n = mControlPoints.size() - 1;
 
-		for (int i = 0; i <= count; i++) {
+		if (mAnimationTicks > 1) {
+			new BukkitRunnable() {
+				int mT = 0;
+				int mCountPerTick = (int) Math.ceil((float) count / mAnimationTicks);
+				int mI = 0;
 
-			double t = 1.0 * i / count;
-			int n = mControlPoints.size() - 1;
-			double x = 0f;
-			double y = 0f;
-			double z = 0f;
+				@Override
+				public void run() {
+					for (int j = 0; j <= mCountPerTick; j++) {
+						if (mI > count) {
+							break;
+						}
 
-			for (int j = 0; j <= n; j++) {
-				double blend = bernstein(n, j, t);
-				x += blend * mControlPoints.get(j).getX();
-				y += blend * mControlPoints.get(j).getY();
-				z += blend * mControlPoints.get(j).getZ();
+						double t = 1.0 * mI / count;
+						double x = 0f;
+						double y = 0f;
+						double z = 0f;
+
+						for (int k = 0; k <= n; k++) {
+							double blend = bernstein(n, k, t);
+							x += blend * mControlPoints.get(k).getX();
+							y += blend * mControlPoints.get(k).getY();
+							z += blend * mControlPoints.get(k).getZ();
+						}
+
+						packagedValues.location(mLocation.clone().set(x, y, z));
+						spawnUsingSettings(packagedValues);
+
+						mI++;
+					}
+
+					mT++;
+					if (mT >= mAnimationTicks || mI > count) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+		} else {
+			for (int i = 0; i <= count; i++) {
+				double t = 1.0 * i / count;
+				double x = 0f;
+				double y = 0f;
+				double z = 0f;
+
+				for (int j = 0; j <= n; j++) {
+					double blend = bernstein(n, j, t);
+					x += blend * mControlPoints.get(j).getX();
+					y += blend * mControlPoints.get(j).getY();
+					z += blend * mControlPoints.get(j).getZ();
+				}
+
+				packagedValues.location(mLocation.clone().set(x, y, z));
+				spawnUsingSettings(packagedValues);
 			}
-
-			packagedValues.location(mLocation.clone().set(x, y, z));
-			spawnUsingSettings(packagedValues);
 		}
 	}
 

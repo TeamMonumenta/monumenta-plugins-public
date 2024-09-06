@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.List;
@@ -135,7 +136,7 @@ public class ThunderStep extends Ability {
 
 			doDamage(mPlayer.getLocation(), spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
 			mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
-			mPlayer.teleport(mLastCastLocation);
+			PlayerUtils.playerTeleport(mPlayer, mLastCastLocation);
 			doDamage(mLastCastLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
 
 			// prevent further back teleports as well as paralyze of any further casts
@@ -183,7 +184,7 @@ public class ThunderStep extends Ability {
 			return true;
 		}
 
-		mPlayer.teleport(playerEndLocation);
+		PlayerUtils.playerTeleport(mPlayer, playerEndLocation);
 		doDamage(playerEndLocation, spellDamage, doParalyze);
 
 		return true;

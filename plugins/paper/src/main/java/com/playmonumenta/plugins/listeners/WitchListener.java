@@ -44,6 +44,11 @@ public class WitchListener implements Listener {
 	public void witchThrowPotionEvent(WitchThrowPotionEvent event) {
 		Witch witch = event.getEntity();
 		ItemStack potion = event.getPotion();
+
+		if (event.getEntity().getScoreboardTags().contains("boss_witch_nothrow")) {
+			event.setCancelled(true);
+		}
+
 		EntityEquipment equipment = witch.getEquipment();
 		if (equipment == null) {
 			return;

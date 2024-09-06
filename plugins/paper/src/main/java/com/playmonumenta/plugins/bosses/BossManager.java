@@ -23,6 +23,12 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
+import com.playmonumenta.plugins.bosses.bosses.hexfall.BlueDamageIncreaseBoss;
+import com.playmonumenta.plugins.bosses.bosses.hexfall.HarrakfarGodOfLife;
+import com.playmonumenta.plugins.bosses.bosses.hexfall.HyceneaRageOfTheWolf;
+import com.playmonumenta.plugins.bosses.bosses.hexfall.Ruten;
+import com.playmonumenta.plugins.bosses.bosses.hexfall.TotemPlatformBoss;
+import com.playmonumenta.plugins.bosses.bosses.hexfall.VoodooTotemBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
@@ -85,6 +91,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -124,7 +131,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.jetbrains.annotations.Nullable;
 
 //@SuppressWarnings("deprecation") // we have to use deprecated boss tags here still
 public class BossManager implements Listener {
@@ -380,6 +386,10 @@ public class BossManager implements Listener {
 		registerStatelessBoss(SiriusMob.identityTag, SiriusMob::new);
 		registerStatelessBoss(GuildDisplayBoss.identityTag, GuildDisplayBoss::new, new GuildDisplayBoss.Parameters());
 		registerStatelessBoss(GroundSeekerBoss.identityTag, GroundSeekerBoss::new, new GroundSeekerBoss.Parameters());
+		registerStatelessBoss(TotemPlatformBoss.identityTag, TotemPlatformBoss::new, new TotemPlatformBoss.Parameters());
+		registerStatelessBoss(VoodooTotemBoss.identityTag, VoodooTotemBoss::new, new VoodooTotemBoss.Parameters());
+		registerStatelessBoss(HarrakfarGodOfLife.identityTag, HarrakfarGodOfLife::new, new HarrakfarGodOfLife.Parameters());
+		registerStatelessBoss(BlueDamageIncreaseBoss.identityTag, BlueDamageIncreaseBoss::new);
 		registerStatelessBoss(DescriptionBoss.identityTag, DescriptionBoss::new, new DescriptionBoss.Parameters());
 		registerStatelessBoss(HexfallRespawnBoss.identityTag, HexfallRespawnBoss::new, new HexfallRespawnBoss.Parameters());
 		registerStatelessBoss(HexfallFloramancerBoss.identityTag, HexfallFloramancerBoss::new, new HexfallFloramancerBoss.Parameters());
@@ -427,12 +437,13 @@ public class BossManager implements Listener {
 		registerStatefulBoss(ImperialConstruct.identityTag, ImperialConstruct::new);
 		registerStatefulBoss(Samwell.identityTag, Samwell::new);
 		registerStatefulBoss(TealSpirit.identityTag, TealSpirit::new);
+		registerStatefulBoss(Ruten.identityTag, Ruten::new);
+		registerStatefulBoss(HyceneaRageOfTheWolf.identityTag, HyceneaRageOfTheWolf::new);
 		registerStatefulBoss(SalieriTheSwordsage.identityTag, SalieriTheSwordsage::new);
 		registerStatefulBoss(Xenotopsis.identityTag, Xenotopsis::new);
 		registerStatefulBoss(ExaltedCAxtal.identityTag, ExaltedCAxtal::new);
 		registerStatefulBoss(Sirius.identityTag, Sirius::new);
 	}
-
 	private static void registerStatelessBoss(String identityTag, StatelessBossConstructor constructor) {
 		registerStatelessBoss(identityTag, constructor, constructor::construct);
 	}
@@ -470,6 +481,7 @@ public class BossManager implements Listener {
 	private boolean mNearbyEntityDeathEnabled = false;
 	private boolean mNearbyBlockBreakEnabled = false;
 	private boolean mNearbyPlayerDeathEnabled = false;
+	private double mMaximumEntityDeathRange = 12.0;
 
 	public BossManager(Plugin plugin) {
 		INSTANCE = this;
@@ -550,7 +562,7 @@ public class BossManager implements Listener {
 			 * boss that is using this feature
 			 */
 			if (!entity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
-				for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), 12.0)) {
+				for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), mMaximumEntityDeathRange)) {
 					Boss boss = mBosses.get(m.getUniqueId());
 					if (boss != null) {
 						boss.nearbyEntityDeath(event);
@@ -1064,6 +1076,10 @@ public class BossManager implements Listener {
 
 		if (ability.hasNearbyPlayerDeathTrigger()) {
 			mNearbyPlayerDeathEnabled = true;
+		}
+
+		if (ability.maxEntityDeathRange() > 0) {
+			mMaximumEntityDeathRange = ability.maxEntityDeathRange();
 		}
 	}
 

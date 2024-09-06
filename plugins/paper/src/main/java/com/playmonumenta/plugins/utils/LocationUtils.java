@@ -663,6 +663,14 @@ public class LocationUtils {
 		return flat1.distance(loc2);
 	}
 
+	public static Location randomLocationInDonut(Location center, double minRadius, double maxRadius) {
+		double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
+		double diff = Math.abs(maxRadius - minRadius);
+		double ratio = diff / maxRadius;
+		double r = Math.sqrt(FastUtils.randomDoubleInRange(ratio * ratio, 1)) * maxRadius;
+		return center.clone().add(r * FastUtils.cos(theta), 0, r * FastUtils.sin(theta));
+	}
+
 	public static Location randomLocationInCircle(Location center, double radius) {
 		double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 		double r = Math.sqrt(FastUtils.RANDOM.nextDouble()) * radius;

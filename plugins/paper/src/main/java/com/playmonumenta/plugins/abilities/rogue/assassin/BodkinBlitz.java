@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Bukkit;
@@ -153,7 +154,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				mTick++;
 				if (mTick >= TELEPORT_TICKS) {
 					tpLoc.setDirection(mPlayer.getLocation().getDirection());
-					mPlayer.teleport(tpLoc);
+					PlayerUtils.playerTeleport(mPlayer, tpLoc);
 
 					mTeleporting = false;
 

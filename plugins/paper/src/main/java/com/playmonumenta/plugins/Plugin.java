@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.fishing.FishingCombatManager;
 import com.playmonumenta.plugins.fishing.FishingManager;
 import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
+import com.playmonumenta.plugins.hexfall.HexfallListener;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
@@ -558,6 +559,11 @@ public class Plugin extends JavaPlugin {
 			FishingCombatManager fishingCombatManager = new FishingCombatManager();
 			manager.registerEvents(fishingCombatManager, this);
 			manager.registerEvents(new FishingManager(fishingCombatManager), this);
+		}
+
+		if (ServerProperties.getShardName().contains("hexfall")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			manager.registerEvents(new HexfallListener(), this);
 		}
 
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.

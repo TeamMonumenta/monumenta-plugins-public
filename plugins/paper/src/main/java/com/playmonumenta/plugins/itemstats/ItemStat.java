@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import org.bukkit.entity.Entity;
@@ -340,6 +341,18 @@ public interface ItemStat {
 	 * @param enemy  the LivingEntity being damaged
 	 */
 	default void onDamageDelayed(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+
+	}
+
+	/**
+	 * Player gains a custom effect
+	 *
+	 * @param plugin monumenta plguin
+	 * @param player the Player gaining the custom effect
+	 * @param value the value of ItemStat possessed by the Player
+	 * @param event the associated CustomEffectApplyEvent
+	 */
+	default void onCustomEffectApply(Plugin plugin, Player player, double value, CustomEffectApplyEvent event) {
 
 	}
 }

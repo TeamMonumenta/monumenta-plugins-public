@@ -281,6 +281,7 @@ public final class ItemOverrides {
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
 		mItems.put(Material.END_CRYSTAL, new EndCrystalOverride());
 		mItems.put(Material.QUARTZ, new QuartzOverride());
+		mItems.put(Material.FIRE_CHARGE, new FireChargeOverride());
 
 		BaseOverride sculkOverride = new SculkOverride();
 		mItems.put(Material.SCULK, sculkOverride);

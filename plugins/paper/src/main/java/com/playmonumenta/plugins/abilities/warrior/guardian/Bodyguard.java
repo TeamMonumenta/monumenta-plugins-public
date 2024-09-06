@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
@@ -97,7 +98,7 @@ public class Bodyguard extends Ability {
 			if (userLoc.distance(targetLoc) > 1
 				    && !ZoneUtils.hasZoneProperty(userLoc, ZoneProperty.NO_MOBILITY_ABILITIES)
 				    && !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-				mPlayer.teleport(targetLoc);
+				PlayerUtils.playerTeleport(mPlayer, targetLoc);
 			}
 		} else if (!allowSelfCast) {
 			return false;

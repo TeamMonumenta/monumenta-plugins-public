@@ -65,6 +65,8 @@ public class ZoneUtils {
 		NO_VIRTUAL_INVENTORIES("No Virtual Inventories"),
 		NO_SPECTATOR_ON_RESPAWN("No Spectator On Respawn"),
 		NO_SPECTATOR_ON_DEATH("No Spectator On Death"),
+		NO_BUFF_DURATION_LOSS_ON_DEATH("No Buff Duration Loss On Death"),
+		NO_PLACING_CONTAINERS("No Placing Containers"),
 		;
 
 		private final String mPropertyName;

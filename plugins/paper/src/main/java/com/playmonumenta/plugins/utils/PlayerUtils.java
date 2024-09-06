@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDependency;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
@@ -31,6 +32,7 @@ import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.structures.StructuresPlugin;
 import com.playmonumenta.structures.managers.RespawningStructure;
+import io.papermc.paper.entity.TeleportFlag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -186,6 +188,25 @@ public class PlayerUtils {
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
 		return playersInRange(loc, range, includeNonTargetable, false);
+	}
+
+	public static List<Player> playersInXZRange(Location loc, double range, boolean includeNonTargetable, boolean includeDead) {
+		List<Player> players = new ArrayList<>();
+
+		for (Player player : loc.getWorld().getPlayers()) {
+			if (LocationUtils.xzDistance(player.getLocation(), loc) <= range
+				&& player.getGameMode() != GameMode.SPECTATOR
+				&& (includeNonTargetable || !AbilityUtils.isStealthed(player))
+				&& (includeDead || !Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class))) {
+				players.add(player);
+			}
+		}
+
+		return players;
+	}
+
+	public static List<Player> playersInXZRange(Location loc, double range, boolean includeNonTargetable) {
+		return playersInXZRange(loc, range, includeNonTargetable, false);
 	}
 
 	public static List<Player> otherPlayersInRange(Player player, double radius, boolean includeNonTargetable) {
@@ -611,6 +632,10 @@ public class PlayerUtils {
 		return StringUtils.sortedStrings(players.stream().map(Player::getName).toList());
 	}
 
+	public static void playerTeleport(Player player, Location location) {
+		player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+	}
+
 	public static boolean hasUnlockedIsles(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, "Quest101").orElse(0) >= 12;
 	}
@@ -681,9 +706,8 @@ public class PlayerUtils {
 	 * @param damager the entity responsible for the kill
 	 * @param cause the cause of the kill
 	 */
-
 	public static void killPlayer(Player player, @Nullable LivingEntity damager, @Nullable String cause) {
-		killPlayer(player, damager, cause, true, true);
+		killPlayer(player, damager, cause, true, true, false);
 	}
 
 	/**
@@ -693,21 +717,22 @@ public class PlayerUtils {
 	 * @param cause the cause of the kill
 	 * @param bypassStasis whether the kill should bypass the stasis effect
 	 * @param bypassInvuln whether the kill should bypass the player's invulnerability status
+	 * @param bypassReincarn whether the kill should bypass the player's reincarnation effect
 	 */
-	public static void killPlayer(Player player, @Nullable LivingEntity damager, @Nullable String cause, boolean bypassStasis, boolean bypassInvuln) {
+	public static void killPlayer(Player player, @Nullable LivingEntity damager, @Nullable String cause, boolean bypassStasis, boolean bypassInvuln, boolean bypassReincarn) {
 		if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-			Plugin plugin = Plugin.getInstance();
-			plugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
+			Plugin monumentaPlugin = Plugin.getInstance();
+			monumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
 			if (bypassStasis) {
-				plugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
+				monumentaPlugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
 			}
 			if (bypassInvuln && player.isInvulnerable()) {
 				player.setInvulnerable(false);
 			}
-			DamageUtils.damage(damager, player, DamageEvent.DamageType.TRUE, 999999, null, true, false, cause);
-			if (player.getHealth() > 0) {
-				player.setHealth(0);
+			if (bypassReincarn) {
+				monumentaPlugin.mEffectManager.clearEffects(player, Reincarnation.GENERIC_NAME);
 			}
+			DamageUtils.damage(damager, player, DamageEvent.DamageType.TRUE, 1000000, null, true, false, cause);
 		}
 	}
 

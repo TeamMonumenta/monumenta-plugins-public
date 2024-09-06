@@ -2,6 +2,14 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.*;
+import com.playmonumenta.plugins.effects.hexfall.CreepingDeath;
+import com.playmonumenta.plugins.effects.hexfall.DeathImmunity;
+import com.playmonumenta.plugins.effects.hexfall.DeathVulnerability;
+import com.playmonumenta.plugins.effects.hexfall.InfusedLife;
+import com.playmonumenta.plugins.effects.hexfall.LifeImmunity;
+import com.playmonumenta.plugins.effects.hexfall.LifeVulnerability;
+import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
+import com.playmonumenta.plugins.effects.hexfall.VoodooBindings;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -148,6 +156,17 @@ public enum EffectType {
 
 	STASIS("Stasis", "Stasis", true, false, true),
 	PARADOX("Paradox", "Paradox", false, false, true),
+	INFUSED_LIFE("InfusedLife", "Infusion of Life", false, false, true),
+	REINCARNATION("Reincarnation", "Reincarnation", false, false, true),
+	VOODOO_BINDINGS("VooodooBindings", "Voodoo Bindings", false, false, true),
+	LIFE_VULNERABILITY("LifeVulnerability", "Life Vulnerability", false, false, true),
+	DEATH_VULNERABILITY("DeathVulnerability", "Death Vulnerability", false, false, true),
+	CREEPING_DEATH("CreepingDeath", "Creeping Death", false, false, true),
+	LIFE_SEED("LifeSeed", "Life Seed", false, false, false),
+	DEATH_SEED("DeathSeed", "Death Seed", false, false, false),
+	SEED_EXHAUSTION("SeedExhaustion", "Seed Exhaustion", false, false, false),
+	LIFE_IMMUNITY("LifeImmortality", "Life Immortality", false, false, false),
+	DEATH_IMMUNITY("DeathImmortality", "Death Immortality", false, false, false),
 
 	BOON_OF_THE_PIT("BoonOfThePit", "Boon of the Pit", true, false, true),
 	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true),
@@ -465,6 +484,14 @@ public enum EffectType {
 
 			case STASIS -> new Stasis(duration);
 			case PARADOX -> new TemporalFlux(duration);
+			case INFUSED_LIFE -> new InfusedLife(duration);
+			case REINCARNATION -> new Reincarnation(duration, strength);
+			case VOODOO_BINDINGS -> new VoodooBindings(duration);
+			case LIFE_VULNERABILITY -> new LifeVulnerability(duration);
+			case DEATH_VULNERABILITY -> new DeathVulnerability(duration);
+			case CREEPING_DEATH -> new CreepingDeath(duration, plugin);
+			case LIFE_IMMUNITY -> new LifeImmunity(duration);
+			case DEATH_IMMUNITY -> new DeathImmunity(duration);
 
 			case BOON_OF_THE_PIT -> new BoonOfThePit(duration);
 			case BOON_OF_SILVER_SCALES -> new AbilityCooldownDecrease(duration, 0.05);

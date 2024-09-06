@@ -27,6 +27,8 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.overrides.FirmamentOverride;
+import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.EnderPearlTracker;
@@ -279,7 +281,6 @@ public class PlayerListener implements Listener {
 		//TODO: Remove this when custom effects logout handling is better dealt with
 		EntityUtils.applyRecoilDisable(mPlugin, 9999, 99, player);
 
-
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			if (ClientModHandler.playerHasClientMod(player)) {
 				ClientModHandler.updateEffects(player);
@@ -502,6 +503,13 @@ public class PlayerListener implements Listener {
 		if (player.getGameMode() == GameMode.ADVENTURE && ItemUtils.isWool(block.getType()) && !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.MONUMENT)) {
 			event.setCancelled(true);
 			return;
+		}
+
+		if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_PLACING_CONTAINERS)) {
+			Material material = block.getType();
+			if (material == Material.CHEST || material == Material.BARREL || (ItemUtils.isShulkerBox(material) && !FirmamentOverride.isFirmamentItem(item) && !WorldshaperOverride.isWorldshaperItem(item))) {
+				event.setCancelled(true);
+			}
 		}
 	}
 
@@ -1867,6 +1875,7 @@ public class PlayerListener implements Listener {
 	public void customEffectApplyEvent(CustomEffectApplyEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			mPlugin.mAbilityManager.customEffectApplyEvent(player, event);
+			mPlugin.mItemStatManager.onCustomEffectApply(mPlugin, player, event);
 		}
 	}
 

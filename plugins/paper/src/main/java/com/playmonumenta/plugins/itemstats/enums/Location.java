@@ -103,6 +103,7 @@ public enum Location {
 
 	// R3 dungeons, strikes, bosses
 	SILVER("silver", "Silver Knight's Tomb", TextColor.fromHexString("#C0C0C0")),
+	HEXFALL("hexfall", "Hexfall", TextColor.fromHexString("#A930DA")),
 	BLUE("blue", "Coven's Gambit", TextColor.fromHexString("#0C2CA2")),
 	BROWN("brown", "Cradle of the Broken God", TextColor.fromHexString("#703608")),
 	GREEN("green", "Green Dungeon", TextColor.fromHexString("#4D6E23")),
@@ -126,7 +127,6 @@ public enum Location {
 	MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
 	ZENITH("zenith", "The Celestial Zenith", TextColor.fromHexString("#FF9CF0")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
-	HEXFALL("hexfall", "Hexfall", TextColor.fromHexString("#A930DA")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
 	// bosses
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),

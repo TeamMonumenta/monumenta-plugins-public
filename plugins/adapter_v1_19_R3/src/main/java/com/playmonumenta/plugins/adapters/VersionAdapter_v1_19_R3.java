@@ -527,6 +527,12 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 				);
 			}
 		}
+
+		// Prevent certain creepers from exploding
+		if (mob instanceof Creeper && mob.getScoreboardTags().contains("boss_creeper_no_swell")) {
+			availableGoals.removeIf(goal -> goal.getGoal() instanceof SwellGoal);
+		}
+
 		// prevent all mobs from attacking iron golems and turtles
 		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 			&& (getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.IronGolem.class

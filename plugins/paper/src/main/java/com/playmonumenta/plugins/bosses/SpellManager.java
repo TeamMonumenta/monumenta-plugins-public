@@ -28,11 +28,11 @@ import org.jetbrains.annotations.Nullable;
 public class SpellManager {
 	public static final SpellManager EMPTY = new SpellManager(Collections.emptyList());
 
-	private final Map<Class<? extends Spell>, Spell> mReadySpells;
-	private final Queue<Spell> mCooldownSpells;
-	private final int mCooldown;
-	private final boolean mIsEmpty;
-	private @Nullable Spell mLastCasted = null;
+	protected Map<Class<? extends Spell>, Spell> mReadySpells;
+	protected final Queue<Spell> mCooldownSpells;
+	protected final int mCooldown;
+	protected final boolean mIsEmpty;
+	protected @Nullable Spell mLastCasted = null;
 
 	public boolean isEmpty() {
 		return mIsEmpty;

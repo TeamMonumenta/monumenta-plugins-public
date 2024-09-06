@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 /**
@@ -18,6 +20,8 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 	private double mParticlesPerMeter = -1;
 	private double mMinParticlesPerMeter = 1;
 	private double mGroupingDistance = 0.15;
+	private Plugin mPlugin;
+	private int mAnimationTicks = 1;
 
 	private boolean mIncludeStart = true;
 	private boolean mIncludeEnd = true;
@@ -77,6 +81,16 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 
 	public PPLine scaleLength(double scale) {
 		mLength *= scale;
+		return this;
+	}
+
+	public PPLine delay(Plugin plugin, int animationTicks) {
+
+		if (animationTicks < 1) {
+			animationTicks = 1;
+		}
+		mPlugin = plugin;
+		mAnimationTicks = animationTicks;
 		return this;
 	}
 
@@ -160,11 +174,35 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 		if (!mIncludeStart) {
 			loc.add(step);
 		}
-		for (int i = 0; i < count; i++) {
-			packagedValues.location(loc);
-			spawnUsingSettings(packagedValues);
-			loc.add(step);
+
+		if (mAnimationTicks > 1) {
+			int finalCount = count;
+			new BukkitRunnable() {
+				int mT = 0;
+				final int mCountPerTick = (int) Math.ceil((float) finalCount / mAnimationTicks);
+				int mI = 0;
+
+				@Override
+				public void run() {
+					for (int j = 0; j <= mCountPerTick; j++) {
+						packagedValues.location(loc);
+						spawnUsingSettings(packagedValues);
+						loc.add(step);
+						mI++;
+					}
+
+					mT++;
+					if (mT >= mAnimationTicks || mI > finalCount) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+		} else {
+			for (int i = 0; i < count; i++) {
+				packagedValues.location(loc);
+				spawnUsingSettings(packagedValues);
+				loc.add(step);
+			}
 		}
 	}
-
 }

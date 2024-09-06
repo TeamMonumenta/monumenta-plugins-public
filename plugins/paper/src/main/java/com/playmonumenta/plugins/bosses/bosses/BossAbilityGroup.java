@@ -34,7 +34,7 @@ public abstract class BossAbilityGroup {
 	private final String mIdentityTag;
 
 	private @Nullable BossBarManager mBossBar;
-	private SpellManager mActiveSpells;
+	public SpellManager mActiveSpells;
 	private List<Spell> mPassiveSpells;
 	private boolean mPreventSameSpellTwiceInARow;
 	private @Nullable BukkitRunnable mTaskPassive = null;
@@ -63,6 +63,10 @@ public abstract class BossAbilityGroup {
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 		MMLog.fine("Changed phase for " + mIdentityTag + ". Boss's health is currently at " + 100 * mBoss.getHealth() / EntityUtils.getMaxHealth(mBoss) + "%. " + mActiveSpells.toString());
+	}
+
+	public void changePassivePhase(List<Spell> passiveSpells) {
+		mPassiveSpells = passiveSpells;
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange) {
@@ -393,6 +397,10 @@ public abstract class BossAbilityGroup {
 
 	public boolean hasNearbyEntityDeathTrigger() {
 		return false;
+	}
+
+	public double maxEntityDeathRange() {
+		return 0;
 	}
 
 	/*

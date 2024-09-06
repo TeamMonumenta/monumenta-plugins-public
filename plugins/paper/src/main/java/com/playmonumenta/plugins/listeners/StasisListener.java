@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.Nullable;
 
@@ -230,6 +231,13 @@ public class StasisListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		if (isInStasis(event.getEntity())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerToggleSneakEvent(PlayerToggleSneakEvent event) {
+		if (isInStasis(event.getPlayer())) {
 			event.setCancelled(true);
 		}
 	}
