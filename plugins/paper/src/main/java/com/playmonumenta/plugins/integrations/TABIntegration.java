@@ -320,7 +320,7 @@ public class TABIntegration implements Listener {
 			return value;
 		});
 		setHeaderAndFooter(viewer, monuPlayer);
-		Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout(viewer.getUniqueId()));
+		Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout(UUID.randomUUID()));
 	}
 
 	private long mNextRefreshLatencyTime = 0L;
