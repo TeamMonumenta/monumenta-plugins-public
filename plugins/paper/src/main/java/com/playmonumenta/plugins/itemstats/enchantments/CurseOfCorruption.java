@@ -7,8 +7,9 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -16,7 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class CurseOfCorruption implements Enchantment {
 
-	private static List<Player> mCorruptionPlayers = new ArrayList<>();
+	private static final Set<Player> mCorruptionPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 	private static final String SLOWNESS_SOURCE = "Curse of Corruption";
 	private static final double SLOWNESS_AMOUNT_PER_LEVEL = -0.15;
 

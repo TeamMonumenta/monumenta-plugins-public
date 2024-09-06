@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
 import org.apache.commons.lang3.RandomUtils;
@@ -298,12 +299,19 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				new BukkitRunnable() {
 					int mLobsLaunched = 0;
 					final Location mBossLocation = bossLocation;
-					final Entity mTarget = target;
+					final WeakReference<Entity> mTarget = new WeakReference<Entity>(target);
+					final WeakReference<LivingEntity> mBossRef = new WeakReference<LivingEntity>(mBoss);
 					@Override
 					public void run() {
-						if (!mBoss.isDead()) {
-							mAestheticsBoss.launch(mBoss, bossLocation);
-							launchGrenade(mBossLocation, mTarget, additionalParameters);
+						Entity target = mTarget.get();
+						LivingEntity boss = mBossRef.get();
+						if (target == null || boss == null || boss.isDead() || !boss.isValid() || !target.isValid()) {
+							cancel();
+							return;
+						}
+						if (!boss.isDead() && boss.isValid() && target.isValid()) {
+							mAestheticsBoss.launch(boss, bossLocation);
+							launchGrenade(mBossLocation, target, additionalParameters);
 							mLobsLaunched++;
 							if (mLobsLaunched >= mLobs) {
 								cancel();

@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.itemstats.infusions.StatTrackHealingDone;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.structures.StructuresPlugin;
 import com.playmonumenta.structures.managers.RespawningStructure;
 import io.papermc.paper.entity.TeleportFlag;
@@ -251,10 +252,12 @@ public class PlayerUtils {
 		}
 
 		EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
-		if (sourceIsNotTarget) {
+		if (ServerProperties.getDepthsEnabled() && sourceIsNotTarget) {
 			CurseOfDependency.OTHER_PLAYER_EVENT = event;
 		}
 		Bukkit.getPluginManager().callEvent(event);
+		// TODO: terrible hack to prevent a memory leak for players that don't have this curse - usb
+		CurseOfDependency.OTHER_PLAYER_EVENT = null;
 		if (!event.isCancelled()) {
 			double oldHealth = player.getHealth();
 			double newHealth = Math.min(oldHealth + event.getAmount(), EntityUtils.getMaxHealth(player));

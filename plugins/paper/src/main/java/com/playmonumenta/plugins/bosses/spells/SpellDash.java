@@ -54,8 +54,8 @@ public class SpellDash extends Spell {
 			return;
 		}
 		LivingEntity dashTarget = targets.get(0);
-		if (mPreferTarget) {
-			dashTarget = ((Mob) mBoss).getTarget();
+		if (mPreferTarget && mBoss instanceof Mob bossMob) {
+			dashTarget = bossMob.getTarget();
 		}
 		if (dashTarget != null && mBoss.getLocation().distance(dashTarget.getLocation()) >= Math.max(0.05, mMinRange)) {
 			Vector velocity = bossLoc.toVector().subtract(dashTarget.getLocation().toVector()).normalize();
@@ -68,6 +68,10 @@ public class SpellDash extends Spell {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
+					if (mBoss == null || !mBoss.isValid() || mBoss.isDead()) {
+						this.cancel();
+						return;
+					}
 					if (mBoss.isOnGround()) {
 						playLandingAesthetics();
 						this.cancel();
