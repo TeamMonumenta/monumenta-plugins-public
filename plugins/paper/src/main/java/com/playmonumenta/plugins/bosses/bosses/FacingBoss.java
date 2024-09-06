@@ -18,7 +18,7 @@ public final class FacingBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 
-		@BossParam(help = "prefers aggro target")
+		@BossParam(help = "continuously faces aggro target")
 		public boolean PREFER_TARGET = true;
 		@BossParam(help = "targets of the spell")
 		public EntityTargets TARGET = EntityTargets.GENERIC_PLAYER_TARGET;
@@ -40,8 +40,17 @@ public final class FacingBoss extends BossAbilityGroup {
 
 		LivingEntity finalFacingTarget = facingTarget;
 		List<Spell> passiveSpells = List.of(new SpellRunAction(() -> {
+			LivingEntity target = null;
+			if (!p.PREFER_TARGET) {
+				target = finalFacingTarget;
+			} else if (boss instanceof Mob mob && mob.getTarget() != null) {
+				target = mob.getTarget();
+			}
+			if (target == null) {
+				return;
+			}
 			Location loc = boss.getLocation();
-			Vector targetDir = finalFacingTarget.getLocation().toVector().subtract(loc.toVector());
+			Vector targetDir = target.getLocation().toVector().subtract(loc.toVector());
 			double[] targetYawPitch = VectorUtils.vectorToRotation(targetDir);
 			boss.setRotation((float) targetYawPitch[0], (float) targetYawPitch[1]);
 		}));

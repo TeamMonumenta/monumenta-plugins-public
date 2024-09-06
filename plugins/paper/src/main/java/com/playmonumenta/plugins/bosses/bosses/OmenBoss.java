@@ -137,6 +137,9 @@ public class OmenBoss extends BossAbilityGroup {
 
 					@Override
 					public void run() {
+						if (mBoss.isDead() || !mBoss.isValid()) {
+							this.cancel();
+						}
 						if ((!p.INSTANT && mT == 0) || (p.INSTANT && mT % p.TEL_INTERVAL == 0 && mT < p.TEL_DURATION)) {
 							mBasevec.add(new Vector(0, 0, 1 + p.BLADE_HEAD_OFFSET));
 							mBasevec.add(new Vector(-4, 0, -2 - p.BLADE_TAIL_OFFSET).normalize());
@@ -207,7 +210,7 @@ public class OmenBoss extends BossAbilityGroup {
 										this.cancel();
 									}
 									//play sounds
-									if (mT % 4 == 0) {
+									if (!warning && mT % 4 == 0) {
 										p.SOUND_WAVE.play(anchor);
 									}
 									//construct blade

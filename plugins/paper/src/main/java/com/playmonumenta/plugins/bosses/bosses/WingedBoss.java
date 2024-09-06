@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.google.common.collect.Lists;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
@@ -56,6 +57,12 @@ public final class WingedBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Banner pattern")
 		public int BANNER_PATTERN = 1;
+
+		@BossParam(help = "Manual Y offset for wing position relative to the entity")
+		public double WING_Y_OFFSET = 0;
+
+		@BossParam(help = "Ignore blocks and be able to move through walls")
+		public boolean IGNORE_BLOCKS = false;
 	}
 
 	public WingedBoss(Plugin plugin, LivingEntity boss) {
@@ -65,17 +72,23 @@ public final class WingedBoss extends BossAbilityGroup {
 		final double[] distanceThresholds = {0, p.SAFE_DISTANCE + 0.01, p.SAFE_DISTANCE + 0.25, p.SAFE_DISTANCE + 5.25, p.SAFE_DISTANCE + 10.25, p.SAFE_DISTANCE + 20.25, 9999};
 		final double[] speedValues = {0, 0, 0.125, 0.15, 0.2125, 0.5, 0.5};
 
-		// Offset the boss' spawn location and disable gravity
+		// Offset the boss' spawn location unless it would be inside a block
 		Location spawnLoc = boss.getLocation();
-		boss.teleport(spawnLoc.add(0, 1.5, 0));
-		mBoss.setGravity(false);
+		if (!LocationUtils.collidesWithBlocks(boss.getBoundingBox().shift(0, 2, 0), boss.getWorld())) {
+			boss.teleport(spawnLoc.add(0, 2, 0));
+		}
+		boss.setGravity(false);
 
 		// Spawn wings
-		ItemStack[] armor = banner(p.BANNER_PATTERN);
 		Collection<Entity> wings = createWings(spawnLoc);
+		List<ItemStack[]> armorList = banner(p.BANNER_PATTERN);
 		wings.forEach(e -> {
 			if (e instanceof ArmorStand stand) {
-				stand.getEquipment().setArmorContents(armor);
+				if (stand.getScoreboardTags().contains("left")) {
+					stand.getEquipment().setArmorContents(armorList.get(0));
+				} else {
+					stand.getEquipment().setArmorContents(armorList.get(1));
+				}
 				stand.removeScoreboardTag("winged_wing");
 			}
 		});
@@ -102,11 +115,11 @@ public final class WingedBoss extends BossAbilityGroup {
 					return;
 				}
 
-				// Temporarily stop flying if silenced/stunned
-				if (EntityUtils.isSilenced(mBoss) || EntityUtils.isStunned(mBoss)) {
+				// Temporarily stop flying if stunned
+				if (EntityUtils.isStunned(mBoss)) {
 					wings.forEach(e -> {
 						if (e instanceof ArmorStand stand) {
-							stand.teleport(mBoss);
+							stand.teleport(mBoss.getLocation().add(0, p.WING_Y_OFFSET, 0));
 						}
 					});
 					return;
@@ -114,16 +127,17 @@ public final class WingedBoss extends BossAbilityGroup {
 
 				// Make the target detection more accurate by ignoring oscillation
 				Location loc = mBoss.getLocation();
-				Location middleLoc = mBoss.getLocation().clone().add(0, FastUtils.cosDeg(mVerticalOscillation * 6), 0);
+				Location middleLoc = loc.clone().add(0, FastUtils.cosDeg(mVerticalOscillation * 6), 0);
 
-				oscillateY(loc, FastUtils.sinDeg(mVerticalOscillation * 6) * 0.1, p.VERTICAL);
+				oscillateY(loc, FastUtils.sinDeg(mVerticalOscillation * 6) * 0.1, p.VERTICAL, p.IGNORE_BLOCKS);
 
 				LivingEntity target = ((Mob) mBoss).getTarget();
-				if (target != null) {
-					moveEntity(loc, target, middleLoc, p.VERTICAL, mFunction);
+				double mobSpeed = EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.2);
+				if (target != null && mobSpeed != 0) {
+					moveEntity(loc, target, middleLoc, p.VERTICAL, mFunction, mobSpeed, p.IGNORE_BLOCKS);
 				}
 
-				flapWings(wings, mReverseWingOscillation);
+				flapWings(wings, mReverseWingOscillation, p.WING_Y_OFFSET);
 
 				mWingOscillation++;
 				if (mWingOscillation == 27) {
@@ -141,10 +155,10 @@ public final class WingedBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), p.DETECTION, null);
 	}
 
-	private void flapWings(Collection<Entity> wings, boolean reverse) {
+	private void flapWings(Collection<Entity> wings, boolean reverse, double yOffset) {
 		wings.forEach(e -> {
 			if (e instanceof ArmorStand stand) {
-				stand.teleport(mBoss);
+				stand.teleport(mBoss.getLocation().add(0, yOffset, 0));
 				if (!reverse) {
 					stand.setHeadPose(stand.getHeadPose().add(WingedBoss.headMovement, 0, 0));
 				} else {
@@ -154,10 +168,10 @@ public final class WingedBoss extends BossAbilityGroup {
 		});
 	}
 
-	private void oscillateY(Location loc, double movementY, boolean vertical) {
-		// Oscillate the boss' Y position
-		if (!LocationUtils.collidesWithSolid(loc.clone().add(0, movementY, 0))) {
-			loc.add(0, movementY, 0);
+	private void oscillateY(Location loc, double movementY, boolean vertical, boolean ignoreBlocks) {
+		// Return if the boss would move into a block
+		if (!ignoreBlocks && LocationUtils.collidesWithBlocks(mBoss.getBoundingBox().shift(0, movementY, 0), loc.getWorld())) {
+			return;
 		}
 
 		// Teleport entity while keeping velocity, remove vertical knockback in non-vertical mode so that it can't offset the Y position
@@ -165,38 +179,55 @@ public final class WingedBoss extends BossAbilityGroup {
 		if (!vertical) {
 			v.setY(0);
 		}
-		mBoss.teleport(loc);
+		EntityUtils.teleportStack(mBoss, loc.add(0, movementY, 0));
 		mBoss.setVelocity(v);
 	}
 
-	private void moveEntity(Location loc, LivingEntity target, Location middleLoc, boolean verticalMovement, PolynomialSplineFunction function) {
+	private void moveEntity(Location loc, LivingEntity target, Location middleLoc, boolean verticalMovement, PolynomialSplineFunction function, double mobSpeed, boolean ignoreBlocks) {
 		// Make the boss face the target
 		Vector targetDir = target.getLocation().toVector().subtract(loc.toVector());
 		double[] targetYawPitch = VectorUtils.vectorToRotation(targetDir);
+		if (!Double.isFinite(targetYawPitch[0]) || !Double.isFinite(targetYawPitch[1])) {
+			targetYawPitch = new double[] {0, 0};
+		}
 		mBoss.setRotation((float) targetYawPitch[0], (float) targetYawPitch[1]);
 
 		// Move the boss towards the target, use middleLoc (location in the middle of the Y oscillation) for a more accurate distanceToTarget
-		double distanceToTarget = middleLoc.distance(target.getLocation());
+		double distanceToTarget = middleLoc.distance(target.getEyeLocation());
 		double speed = function.value(distanceToTarget);
 		Location eyeLocation = mBoss.getEyeLocation();
 		eyeLocation.setY(middleLoc.getY() + 0.5);
 		Vector forwards = eyeLocation.getDirection().multiply(speed);
+
+		double yDifference = middleLoc.getY() - target.getEyeLocation().getY();
+		// If entity isn't level enough with the player, increase vertical movement by assuming the boss is further than it is in reality
+		if (verticalMovement && (yDifference <= -2.5 || yDifference >= 1.5)) {
+			forwards.setY(eyeLocation.getDirection().getY() * function.value(distanceToTarget + Math.abs(yDifference)));
+		}
+
 		if (!verticalMovement) {
 			forwards.setY(0);
 		}
 
-		double mobSpeed = EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.2);
 		forwards.multiply(mobSpeed * 5);
-		NmsUtils.getVersionAdapter().moveEntity(mBoss, forwards);
+		if (!ignoreBlocks) {
+			NmsUtils.getVersionAdapter().moveEntity(mBoss, forwards);
+		} else {
+			// Teleport entity while keeping velocity
+			Vector v = mBoss.getVelocity();
+			Location endLoc = new Location(loc.getWorld(), loc.getX() + forwards.getX(), loc.getY() + forwards.getY(), loc.getZ() + forwards.getZ(), (float) targetYawPitch[0], (float) targetYawPitch[1]);
+			EntityUtils.teleportStack(mBoss, endLoc);
+			mBoss.setVelocity(v);
+		}
 	}
 
 	private Collection<Entity> createWings(Location loc) {
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,15.0f,-60.0f]},Silent:1b,Tags:[\"winged_wing\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[15.0f,0.0f,-90.0f]},Silent:1b,Tags:[\"winged_wing\",\"REMOVE_ON_UNLOAD\",\"effect_player\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,-15.0f,-120.0f]},Silent:1b,Tags:[\"winged_wing\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,-15.0f,60.0f]},Silent:1b,Tags:[\"winged_wing\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[15.0f,0.0f,90.0f]},Silent:1b,Tags:[\"winged_wing\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,15.0f,120.0f]},Silent:1b,Tags:[\"winged_wing\",\"REMOVE_ON_UNLOAD\"]}");
+		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,15.0f,-60.0f]},Silent:1b,Tags:[\"winged_wing\",\"left\",\"REMOVE_ON_UNLOAD\"]}");
+		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[15.0f,0.0f,-90.0f]},Silent:1b,Tags:[\"winged_wing\",\"left\",\"REMOVE_ON_UNLOAD\",\"effect_player\"]}");
+		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,-15.0f,-120.0f]},Silent:1b,Tags:[\"winged_wing\",\"left\",\"REMOVE_ON_UNLOAD\"]}");
+		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,-15.0f,60.0f]},Silent:1b,Tags:[\"winged_wing\",\"right\",\"REMOVE_ON_UNLOAD\"]}");
+		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[15.0f,0.0f,90.0f]},Silent:1b,Tags:[\"winged_wing\",\"right\",\"REMOVE_ON_UNLOAD\"]}");
+		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,15.0f,120.0f]},Silent:1b,Tags:[\"winged_wing\",\"right\",\"REMOVE_ON_UNLOAD\"]}");
 
 		Collection<Entity> wings = loc.getNearbyEntities(0.01, 0.01, 0.01);
 		wings.removeIf((Entity entity) ->
@@ -204,9 +235,12 @@ public final class WingedBoss extends BossAbilityGroup {
 		return wings;
 	}
 
-	public static ItemStack[] banner(int pattern) {
+	public static List<ItemStack[]> banner(int pattern) {
 		@Nullable ItemStack banner = new ItemStack(Material.WHITE_BANNER);
+		@Nullable ItemStack banner1 = new ItemStack(Material.WHITE_BANNER);
 		ItemMeta im = banner.getItemMeta();
+		ItemMeta im1 = banner1.getItemMeta();
+		boolean differentHalves = false;
 		if (im instanceof BannerMeta bannerMeta) {
 			switch (pattern) {
 				case 1:
@@ -243,12 +277,42 @@ public final class WingedBoss extends BossAbilityGroup {
 					bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.GRADIENT_UP));
 					bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.CIRCLE_MIDDLE));
 					break;
+				case 5:
+					differentHalves = true;
+					// Left half
+					banner = new ItemStack(Material.RED_BANNER);
+					bannerMeta.addPattern(new Pattern(DyeColor.MAGENTA, PatternType.GRADIENT_UP));
+					bannerMeta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CROSS));
+					bannerMeta.addPattern(new Pattern(DyeColor.YELLOW, PatternType.FLOWER));
+					bannerMeta.addPattern(new Pattern(DyeColor.RED, PatternType.GRADIENT));
+					bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.DIAGONAL_LEFT_MIRROR));
+					bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_CENTER));
+					// Right half
+					banner1 = new ItemStack(Material.RED_BANNER);
+					if (im1 instanceof BannerMeta bannerMeta1) {
+						bannerMeta1.addPattern(new Pattern(DyeColor.MAGENTA, PatternType.GRADIENT_UP));
+						bannerMeta1.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CROSS));
+						bannerMeta1.addPattern(new Pattern(DyeColor.YELLOW, PatternType.FLOWER));
+						bannerMeta1.addPattern(new Pattern(DyeColor.RED, PatternType.GRADIENT));
+						bannerMeta1.addPattern(new Pattern(DyeColor.BLACK, PatternType.DIAGONAL_RIGHT));
+						bannerMeta1.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_CENTER));
+					}
 			}
 		}
 		banner.setItemMeta(im);
 		banner.setAmount(1);
+		if (!differentHalves) {
+			banner1 = banner;
+		} else {
+			banner1.setItemMeta(im1);
+			banner1.setAmount(1);
+		}
 
-		return new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), banner};
+		List<ItemStack[]> armorList = Lists.newArrayList();
+		armorList.add(new ItemStack[] {new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), banner});
+		armorList.add(new ItemStack[] {new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), banner1});
+		return armorList;
+
 	}
 
 	@Override

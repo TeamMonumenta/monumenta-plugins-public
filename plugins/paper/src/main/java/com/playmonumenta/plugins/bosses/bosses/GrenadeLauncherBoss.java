@@ -111,6 +111,9 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "will deviate off of the target location by a random amount, up to this many blocks away")
 		public double LOB_VARIANCE = 0.0;
 
+		@BossParam(help = "minimum possible value for lob variance")
+		public double LOB_MIN_VARIANCE = 0.0;
+
 		@BossParam(help = "knockback dealt by the grenade")
 		public float KNOCKBACK = 0f;
 
@@ -194,7 +197,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 
 				p.LINGERING_EFFECTS.apply(target, boss);
 			},
-			p.SPAWNED_MOB_POOL, p.Y_VELOCITY, p.LOB_VARIANCE, null, null
+			p.SPAWNED_MOB_POOL, p.Y_VELOCITY, p.LOB_VARIANCE, p.LOB_MIN_VARIANCE, null, null
 		);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 

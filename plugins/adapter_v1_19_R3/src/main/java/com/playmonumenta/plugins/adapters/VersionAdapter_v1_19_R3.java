@@ -465,13 +465,21 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 	public void mobAIChanges(Mob mob) {
 		Set<WrappedGoal> availableGoals = ((CraftMob) mob).getHandle().goalSelector.getAvailableGoals();
 		Set<WrappedGoal> availableTargetGoals = ((CraftMob) mob).getHandle().targetSelector.getAvailableGoals();
-		if (mob instanceof Fox || mob instanceof AbstractSkeleton) {
-			// prevent foxes running from players, wolves, and polar bears, and skeletons running away from wolves
+		if (mob instanceof Fox) {
+			// prevent foxes running from players, wolves, and polar bears
+			availableGoals.removeIf(goal -> goal.getGoal() instanceof AvoidEntityGoal);
+		} else if (mob instanceof AbstractSkeleton) {
+			// prevent skeletons running away from wolves
 			availableGoals.removeIf(goal -> goal.getGoal() instanceof AvoidEntityGoal);
 			if (mob instanceof WitherSkeleton) {
 				// prevent wither skeletons from attacking piglins
 				availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 					&& AbstractPiglin.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
+			}
+			if (mob.getScoreboardTags().contains("boss_winged")) {
+				// prevent skeletons from strafing if using boss_winged
+				availableGoals.removeIf(goal -> goal.getGoal() instanceof RangedBowAttackGoal);
+				availableGoals.add(new WrappedGoal(2, new CustomNoStrafeRangedBowAttackGoal((PathfinderMob) ((CraftMob) mob).getHandle(), 0, 20, 32)));
 			}
 		} else if (mob instanceof IronGolem) {
 			// prevent iron golems defending villages and attacking mobs

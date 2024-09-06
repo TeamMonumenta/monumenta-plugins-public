@@ -53,6 +53,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	private final LoSPool mSummonPool;
 	private final float mGrenadeYVelocity;
 	private final double mThrowVariance;
+	private final double mMinThrowVariance;
 
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -83,7 +84,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0, null, null);
+			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0, 0.0, null, null);
 	}
 
 	public SpellBaseGrenadeLauncher(
@@ -118,7 +119,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, new LoSPool.InlinePool(spawnedmob), yVelocity, 0.0, null, null);
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, new LoSPool.InlinePool(spawnedmob), yVelocity, 0.0, 0.0, null, null);
 	}
 
 	public SpellBaseGrenadeLauncher(
@@ -154,7 +155,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0f, additionalParameters, telegraphAesthetics);
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0f, 0.0f, additionalParameters, telegraphAesthetics);
 	}
 
 	/*
@@ -199,6 +200,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	 * @param lingeringHitAction  action called for each LivingEntity that explosionTargets returns if inside lingeringRadius
 	 * @param mobPool             the mob pool to be spawned when the grenade explodes
 	 * @param throwVariance       variance of where the grenade will be thrown
+	 * @param minThrowVariance    minimum variance for throwVariance param
 	 */
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -230,6 +232,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		LoSPool mobPool,
 		float yVelocity,
 		double throwVariance,
+		double minThrowVariance,
 
 		// Additional parameters
 		@Nullable AdditionalParameters additionalParameters,
@@ -261,6 +264,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		mSummonPool = mobPool;
 		mGrenadeYVelocity = yVelocity;
 		mThrowVariance = throwVariance;
+		mMinThrowVariance = minThrowVariance;
 
 		mAdditionalParameters = additionalParameters;
 		mTelegraphAesthetics = telegraphAesthetics;
@@ -363,7 +367,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 			// apply throw variance
 			if (mThrowVariance != 0) {
-				double r = FastUtils.randomDoubleInRange(0, mThrowVariance);
+				double r = FastUtils.randomDoubleInRange(mMinThrowVariance, mThrowVariance);
 				double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 				double x = r * Math.cos(theta);
 				double z = r * Math.sin(theta);
