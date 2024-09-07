@@ -52,9 +52,7 @@ public class SpellTotemicDestruction extends Spell {
 	@Override
 	public void run() {
 
-		List<Player> players = HexfallUtils.getPlayersInHycenea(mSpawnLoc);
 		List<Entity> totems = new ArrayList<>();
-
 		for (Entity e : mBoss.getNearbyEntities(mRange, mRange, mRange)) {
 			if (e.getScoreboardTags().contains("Hycenea_Island")) {
 				e.addScoreboardTag("Hycenea_TotemicDestruction_Target");
@@ -66,7 +64,7 @@ public class SpellTotemicDestruction extends Spell {
 		}
 
 		int balance = 0;
-		for (Player player : players) {
+		for (Player player : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
 			boolean life = balance > 0;
 			if (balance == 0) {
 				life = Math.random() < 0.5;
@@ -90,7 +88,7 @@ public class SpellTotemicDestruction extends Spell {
 				float progress = (float) mChargeUp.getTime() / mCastTime;
 
 				if (mChargeUp.getTime() % 40 == 0) {
-					for (Player viewer : players) {
+					for (Player viewer : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
 						viewer.playSound(viewer, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, progress + 0.5f, progress + 1f);
 						viewer.playSound(viewer, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, progress + 0.5f, progress + 1f);
 					}
@@ -132,7 +130,7 @@ public class SpellTotemicDestruction extends Spell {
 					mChargeUp.remove();
 					this.cancel();
 
-					for (Player player : players) {
+					for (Player player : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
 						player.playSound(player, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
 
 						if ((mPlugin.mEffectManager.hasEffect(player, DeathVulnerability.class) && !mPlugin.mEffectManager.hasEffect(player, DeathImmunity.class))
