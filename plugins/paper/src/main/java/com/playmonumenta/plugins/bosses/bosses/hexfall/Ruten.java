@@ -69,7 +69,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 	public static final int matrixCoordsFromCenterOffset = 28;
 	public static final int lifeTemplateYOffset = 50;
 	public static final int deathTemplateYOffset = 40;
-	public static final int mHealth = 80000;
+	public static final int mHealth = 77000;
 	private final SequentialSpellManager mSpellQueue;
 	private final Plugin mMonumentaPlugin;
 	private final List<Player> mPlayersStartingFight;
@@ -409,7 +409,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				 */
 
 				List<Spell> fillerSpellsFinal = new ArrayList<>();
-				fillerSpellsFinal.add(new SpellRingOfThorns(mMonumentaPlugin, mBoss, 3, 120, 20 * 7, 4, detectionRange, 20 * 12, mSpawnLoc));
+				fillerSpellsFinal.add(new SpellRazorVine(mMonumentaPlugin, mBoss, detectionRange, 12 * 20, 500, 6 * 20, 6, mSpawnLoc));
 				fillerSpellsFinal.add(new SpellVileBloom(mMonumentaPlugin, mBoss, 20 * 2, 20 * 12, 24, 500, 20 * 8, mSpawnLoc));
 				Collections.shuffle(fillerSpellsFinal);
 				List<Spell> phase3Casts = new ArrayList<>();
@@ -421,9 +421,13 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				phase3Casts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 3, 20 * 2, 20 * 3, 20 * 12));
 				phase3Casts.add(fillerSpellsFinal.get(1));
 				addGrenadeAbility(phase3Casts);
-				phase3Casts.add(new SpellRagingRoots(mMonumentaPlugin, mBoss, detectionRange, 20 * 18, 30, 20, 20 * 2, 0.65f, 20 * 8, mSpawnLoc, 0));
+				phase3Casts.add(new SpellRagingRoots(mMonumentaPlugin, mBoss, detectionRange, 20 * 90, 30, 20 * 2, 20 * 2, 0.65f, 20 * 8, mSpawnLoc, 0));
 				phase3Casts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 3, 20 * 2, 20 * 3, 20 * 12));
-				addGrenadeAbility(phase3Casts);
+				phase3Casts.add(summons);
+				for (int mEnrageSurges = 0; mEnrageSurges < 8; mEnrageSurges++) {
+					phase3Casts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 3, 20 * 2, 20 * 3, 20 * 12));
+					phase3Casts.add(summons);
+				}
 				for (Spell spell : phase3Casts) {
 					mSpellQueue.addSpellToQueue(spell);
 				}
@@ -436,8 +440,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				mPhase = 2;
 
 				List<Spell> surgingFiller = new ArrayList<>();
-
-				surgingFiller.add(new SpellRazorVine(mMonumentaPlugin, mBoss, detectionRange, 12 * 20, 500, 6 * 20, 6, mSpawnLoc));
+				surgingFiller.add(new SpellRingOfThorns(mMonumentaPlugin, mBoss, 3, 120, 20 * 7, 4, detectionRange, 20 * 12, mSpawnLoc));
 				surgingFiller.add(new SpellAnimaExpulsion(mMonumentaPlugin, mBoss, detectionRange, 2.5f, 20 * 7, 20 * 12, mSpawnLoc));
 				Collections.shuffle(surgingFiller);
 				List<Spell> surgingDeathCasts = new ArrayList<>();

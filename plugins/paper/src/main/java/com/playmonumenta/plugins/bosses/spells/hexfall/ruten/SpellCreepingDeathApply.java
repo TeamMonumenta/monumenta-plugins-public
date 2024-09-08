@@ -35,7 +35,7 @@ public class SpellCreepingDeathApply extends Spell {
 		if (mTicks >= APPLY_EFFECT_INTERVAL) {
 			for (Player player : HexfallUtils.getPlayersInRuten(mSpawnLoc)) {
 				if (Ruten.getTendencyAtPlayer(player).equals(Ruten.AnimaTendency.DEATH) || LocationUtils.xzDistance(player.getLocation(), mSpawnLoc) > Ruten.arenaRadius) {
-					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 2, null, true, false, CreepingDeath.GENERIC_NAME);
+					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 1, null, true, false, CreepingDeath.GENERIC_NAME);
 					CreepingDeath creepingDeath = mPlugin.mEffectManager.getActiveEffect(player, CreepingDeath.class);
 					if (creepingDeath != null) {
 						int stacks = (int) creepingDeath.getMagnitude();

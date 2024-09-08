@@ -46,7 +46,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_hycenea";
 	public static final int detectionRange = 52;
 	public static final double centerArenaRadius = 17.5;
-	public static final int mHealth = 325000;
+	public static final int mHealth = 260000;
 	public boolean mSteelAdvancement;
 	public boolean mSpellAdvancement;
 	public final List<Player> mPlayersStartingFight;

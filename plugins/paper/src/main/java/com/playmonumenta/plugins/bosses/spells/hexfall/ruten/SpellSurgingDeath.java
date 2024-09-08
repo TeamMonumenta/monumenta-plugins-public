@@ -85,6 +85,9 @@ public class SpellSurgingDeath extends Spell {
 
 						@Override
 						public void run() {
+							if (mCount <= 0) {
+								mChargeUp.remove();
+							}
 							mChargeUp.setProgress(((double) mCount / (double) mPulseCount));
 							if (mT % (mPulseCastTime + mPulseDelayTime) == 0 && mCount > 0) {
 								mCount--;
