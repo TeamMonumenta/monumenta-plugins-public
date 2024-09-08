@@ -8,10 +8,10 @@ import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TimerTask;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
@@ -26,10 +26,10 @@ public class RedisItemDatabase {
 	static ScheduledThreadPoolExecutor mRealTimePool = new ScheduledThreadPoolExecutor(1);
 	private static @Nullable TimerTask mRealTimeRunnable = null;
 
-	static HashMap<Long, LocalDateTime> mLocalCacheIdToExpiry = new HashMap<>();
-	static TreeMap<LocalDateTime, Long> mLocalCacheExpiryToId = new TreeMap<>();
-	static HashMap<Long, ItemStack> mLocalCacheIDToItem = new HashMap<>();
-	static HashMap<ItemStack, Long> mLocalCacheItemToID = new HashMap<>();
+	static ConcurrentHashMap<Long, LocalDateTime> mLocalCacheIdToExpiry = new ConcurrentHashMap<>();
+	static ConcurrentSkipListMap<LocalDateTime, Long> mLocalCacheExpiryToId = new ConcurrentSkipListMap<>();
+	static ConcurrentHashMap<Long, ItemStack> mLocalCacheIDToItem = new ConcurrentHashMap<>();
+	static ConcurrentHashMap<ItemStack, Long> mLocalCacheItemToID = new ConcurrentHashMap<>();
 
 	private static final String mPathIDBCurrentID = ConfigAPI.getServerDomain() + ":market:ItemDBCurrentID";
 	private static final String mPathIDBItemToID = ConfigAPI.getServerDomain() + ":market:ItemDBItemToID";
