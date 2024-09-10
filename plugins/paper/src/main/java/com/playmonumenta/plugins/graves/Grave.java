@@ -104,7 +104,7 @@ public final class Grave {
 	HashSet<GraveItem> mItems;
 	private @Nullable ArmorStand mEntity;
 	private final HashSet<UUID> mGraveMessageCooldown = new HashSet<>();
-	private boolean mLoggedOut = false;
+	public boolean mLoggedOut = false;
 	boolean mAlertedSpawned = false;
 	/**
 	 * Whether this is a grave that holds no items and instead gives one free unshatter to equipped items if collected.

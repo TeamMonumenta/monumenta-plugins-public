@@ -136,6 +136,37 @@ public class GraveManager {
 		}
 	}
 
+	// Remove graves on server transfer to prevent ghost items
+	public static void onPlayerTransfer(Player player) {
+		GraveManager manager = INSTANCES.get(player.getUniqueId());
+		if (manager != null) {
+			for (Grave grave : manager.mGraves) {
+				grave.onLogout();
+			}
+			for (ThrownItem item : manager.mThrownItems) {
+				item.onLogout();
+			}
+
+			manager.mLoggedOut = true;
+		}
+	}
+
+	// Restore graves on transfer fail
+	public static void onPlayerTransferFail(Player player) {
+		GraveManager manager = INSTANCES.get(player.getUniqueId());
+		if (manager != null) {
+			for (Grave grave : manager.mGraves) {
+				grave.mLoggedOut = false;
+				grave.onLogin();
+			}
+			for (ThrownItem item : manager.mThrownItems) {
+				item.mLoggedOut = false;
+				item.onLogin();
+			}
+			manager.mLoggedOut = false;
+		}
+	}
+
 	public static void onSave(PlayerSaveEvent event) {
 		Player player = event.getPlayer();
 		GraveManager manager = INSTANCES.get(player.getUniqueId());

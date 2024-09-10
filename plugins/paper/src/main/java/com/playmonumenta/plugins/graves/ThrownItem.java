@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.graves;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTContainer;
@@ -39,7 +40,7 @@ public class ThrownItem {
 	private Vector mVelocity;
 	private Short mAge;
 	private boolean mValid;
-	private boolean mLoggedOut = false;
+	public boolean mLoggedOut = false;
 
 	// Full ThrownItem from deserialization
 	public ThrownItem(GraveManager manager, Player player, ItemStack item, String shard, Location location, Vector velocity, Short age) {
@@ -192,6 +193,12 @@ public class ThrownItem {
 	}
 
 	public void onAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
+		// hack that doesn't seem to work that often, but is a last resort
+		if (MonumentaRedisSyncIntegration.isPlayerTransfering(mPlayer)) {
+			// Don't allow pickup of items that were dropped by a player who has logged out
+			event.setCancelled(true);
+			return;
+		}
 		// Any player is allowed to pick up a thrown item
 		if (event.getRemaining() <= 0) {
 			// Stack was fully picked up
@@ -201,7 +208,7 @@ public class ThrownItem {
 		}
 	}
 
-	private void update() {
+	public void update() {
 		if (mEntity != null) {
 			if (mEntity.isValid()) {
 				mLocation = mEntity.getLocation();

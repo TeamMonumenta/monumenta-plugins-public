@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.integrations;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -13,6 +14,7 @@ import com.playmonumenta.redissync.LeaderboardAPI;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
+import com.playmonumenta.redissync.event.PlayerTransferFailEvent;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +60,10 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		mEnabled = true;
 	}
 
+	public static boolean isPlayerTransfering(Player player) {
+		return mEnabled && (!player.isOnline() || MonumentaRedisSyncAPI.isPlayerTransferring(player));
+	}
+
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		Player player = event.getPlayer();
@@ -78,6 +84,14 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		} else {
 			InventoryUtils.removeSpecialItems(player, true, true);
 		}
+
+		GraveManager.onPlayerTransfer(player);
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void playerTransferFailEvent(PlayerTransferFailEvent event) {
+		Player player = event.getPlayer();
+		GraveManager.onPlayerTransferFail(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -38,7 +38,7 @@ dependencies {
 		exclude(group = "org.bukkit")
 	}
 	compileOnly("com.playmonumenta:scripted-quests:7.0:all")
-	compileOnly("com.playmonumenta:redissync:5.0:all")
+	compileOnly("com.playmonumenta:redissync:5.2:all")
 	compileOnly("com.playmonumenta:monumenta-network-chat:2.13")
 	compileOnly("com.playmonumenta:monumenta-network-relay:2.9")
 	compileOnly("com.playmonumenta:structures:10.2")
