@@ -452,13 +452,13 @@ public class SpawnerListener implements Listener {
 		Location blockLoc = BlockUtils.getCenterBlockLocation(block);
 
 		if (hasShieldsAttribute(block)) {
+			// This is a shielded spawner - grant the shield spawner advancement, if not had already
+			Player thisPlayer = event.getPlayer();
+			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner")) {
+				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner");
+			}
 			if (shieldsBefore != 0 && shieldsAfter == 0) {
 				doShieldFullBreakAnimation(blockLoc);
-				// This is a shielded spawner - grant the shield spawner advancement, if not had already
-				Player thisPlayer = event.getPlayer();
-				if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner")) {
-					AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner");
-				}
 			} else if (!brokeSpawner && getSpawnerType(block, SEQUENCE_ATTRIBUTE) <= 0) {
 				doShieldBreakAnimation(blockLoc, shieldsAfter);
 			}
