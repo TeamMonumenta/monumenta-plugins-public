@@ -131,13 +131,13 @@ public class IronTincture extends Ability {
 
 					tincture.remove();
 
+					execute(mPlayer, l);
 					if (p != mPlayer) {
 						execute(p, l);
 						if (mAlchemistPotions != null) {
 							mAlchemistPotions.incrementCharges(IRON_TINCTURE_ALLY_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_ALLY_REFILL));
 						}
 					} else {
-						execute(mPlayer, l);
 						if (mAlchemistPotions != null) {
 							mAlchemistPotions.incrementCharges(IRON_TINCTURE_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_REFILL));
 						}
