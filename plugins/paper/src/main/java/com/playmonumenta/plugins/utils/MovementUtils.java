@@ -64,6 +64,9 @@ public class MovementUtils {
 	}
 
 	public static void knockAwayRealistic(Location loc, LivingEntity target, float speed, float y, boolean useKnockbackRes) {
+		if (speed == 0 && y == 0) {
+			return;
+		}
 		if (EntityUtils.isBoss(target)) {
 			speed /= 2;
 		}
