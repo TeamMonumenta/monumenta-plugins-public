@@ -7,10 +7,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,6 +93,11 @@ public class GearDamageIncrease extends Effect {
 			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			event.updateGearDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
+	}
+
+	@Override
+	public @Nullable Component getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
 	}
 
 	@Override
