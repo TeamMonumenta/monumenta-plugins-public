@@ -231,6 +231,15 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	/**
+	 * Helper function for doCharge which checks if the charge is allowed to
+	 * pass through a block. Needed because block.isSolid includes carpets
+	 * @param block The block being checked
+	 */
+	public static boolean passable(Block block) {
+		return block.isPassable() || !block.isSolid();
+	}
+
+	/**
 	 * Does a charge attack - which may not do anything, depending on parameters passed
 	 * Returns whether the charge hit a player or not
 	 *
@@ -293,7 +302,7 @@ public class SpellBaseCharge extends Spell {
 				}
 			}
 
-			if (!cancel && (endLoc.getBlock().getType().isSolid() || endLoc1.getBlock().getType().isSolid())) {
+			if (!cancel && (!passable(endLoc.getBlock()) || !passable(endLoc1.getBlock()))) {
 				// No longer air - need to go back a bit so we don't tele the boss into a block
 				endLoc.subtract(baseVect.multiply(1));
 				// Charge terminated at a block

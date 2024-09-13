@@ -35,7 +35,7 @@ public class Infernal {
 
 	public static Component[] rankDescription(int level) {
 			return new Component[]{
-				Component.text("Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to spawn Embers."),
+				Component.text("For each mob a spawner produces, there is a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to spawn an Ember."),
 				Component.text("Players take +" + Math.round(BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Burning Damage"),
 				Component.text("and +" + Math.round(ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Environmental Damage.")
 			};

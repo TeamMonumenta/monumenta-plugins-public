@@ -360,7 +360,7 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 				NmsUtils.getVersionAdapter().setHuntingCompanion(summon, target -> {
 					DamageUtils.damage(mPlayer, target, new DamageEvent.Metadata(DamageType.MELEE_SKILL, ClassAbility.HUNTING_COMPANION, playerItemStats), damage, true, true, false);
 
-					if (!eagle) {
+					if (!eagle && !EntityUtils.isElite(target) && !EntityUtils.isBoss(target)) {
 						UUID uuid = target.getUniqueId();
 						if (!stunnedMobs.contains(uuid)) {
 							EntityUtils.applyStun(mPlugin, mStunDuration, target);
