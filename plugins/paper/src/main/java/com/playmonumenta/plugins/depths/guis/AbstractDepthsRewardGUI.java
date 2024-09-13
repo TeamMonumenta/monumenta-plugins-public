@@ -60,7 +60,7 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 			if (dai == null) {
 				item = GUIUtils.createBasicItem(Material.BARRIER, "Do not accept the gift", NamedTextColor.RED, true);
 				obscure = false;
-			} else if (i == slotsUsed.size() - 1 && depthsPlayer.mAbilities.getOrDefault(CurseOfObscurity.ABILITY_NAME, 0) > 0) {
+			} else if (i == slotsUsed.size() - 1 && depthsPlayer.getLevelInAbility(CurseOfObscurity.ABILITY_NAME) > 0) {
 				item = GUIUtils.createBasicItem(Material.ROTTEN_FLESH, DepthsTree.CURSE.color("UnknownChoice").decorate(TextDecoration.OBFUSCATED));
 				obscure = true;
 			} else {

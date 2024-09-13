@@ -294,272 +294,265 @@ public class DepthsListener implements Listener {
 		DepthsManager dm = DepthsManager.getInstance();
 		Player player = event.getPlayer();
 		DepthsPlayer dp = dm.getDepthsPlayer(player);
+		if (dp == null) {
+			return;
+		}
 
-		if (dp != null) {
-			if (dp.mGraveRunnable != null) {
-				// Died in death waiting room (e.g. used the exit button): send player to loot room
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-					if (dp.mGraveRunnable != null) {
-						dp.mGraveRunnable.cancel();
-					}
-					sendPlayerToLootRoom(player, true);
-				});
-				event.setCancelled(true);
-				return;
-			}
+		if (dp.mGraveRunnable != null) {
+			// Died in death waiting room (e.g. used the exit button): send player to loot room
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				if (dp.mGraveRunnable != null) {
+					dp.mGraveRunnable.cancel();
+				}
+				sendPlayerToLootRoom(player, true);
+			});
+			event.setCancelled(true);
+			return;
+		}
 
-			DepthsParty party = dm.getPartyFromId(dp);
+		DepthsParty party = dm.getPartyFromId(dp);
+		if (party == null) {
+			return;
+		}
 
-			if (party != null) {
+		// Check if any other teammate is alive or has rebirth
+		boolean teammateAlive = party.mPlayersInParty.stream().anyMatch(depthsPlayer -> depthsPlayer != dp && (depthsPlayer.mGraveRunnable == null || depthsPlayer.getLevelInAbility(Rebirth.ABILITY_NAME) > 0));
+		if (teammateAlive && party.mDeathWaitingRoomPoint != null) {
+			event.setCancelled(true);
 
-				// Check how many players on team don't have an active grave. If it's less than 1 (current player), we can skip and send to loot room
-				int partyAliveCount = 0;
-				for (DepthsPlayer depthsPlayer : party.mPlayersInParty) {
-					if (depthsPlayer.mGraveRunnable == null) {
-						partyAliveCount++;
+			// Handle death message, as we cancel the event
+			Component deathMessage = event.deathMessage();
+			if (deathMessage != null) {
+				if (ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
+					player.sendMessage(deathMessage);
+					player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
+				} else {
+					for (Player p : player.getWorld().getPlayers()) {
+						p.sendMessage(deathMessage);
 					}
 				}
+			}
 
-				if (party.mDeathWaitingRoomPoint != null && partyAliveCount > 1) {
-					// If a death waiting room exists (DD2), send the player there and spawn a grave that allows others to revive the player
+			Location deathLocation = player.getLocation();
+			MMLog.finer(player.getName() + " died. mNumDeaths = " + dp.mNumDeaths);
+			int graveDuration = getGraveDuration(party, dp, player, false);
+			dp.mNumDeaths++;
+			if (graveDuration > GRAVE_REVIVE_DURATION) {
+				Location waitingRoomLocation = party.mDeathWaitingRoomPoint.toLocation(player.getWorld());
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(waitingRoomLocation));
+				MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED),
+					Component.text("Please wait to be revived!", NamedTextColor.RED));
 
-					event.setCancelled(true);
+				ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class, g -> {
+					g.setInvulnerable(true);
+					g.setDisabledSlots(EquipmentSlot.values());
+					g.setCollidable(false);
+					g.setBasePlate(false);
+					g.customName(Component.text(player.getName() + "'s Grave", NamedTextColor.RED));
+					g.setCustomNameVisible(true);
+					g.setGlowing(true);
+					g.setArms(true);
+					g.setGravity(true);
+					ScoreboardUtils.addEntityToTeam(g, "GraveGreen", NamedTextColor.GREEN);
+					g.addScoreboardTag(GRAVE_TAG);
+					g.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
+					GravePose mGravePose = GravePoses.getEquippedGravePose(player);
+					g.setHeadPose(mGravePose.getHeadAngle(false));
+					g.setBodyPose(mGravePose.getBodyAngle(false));
+					g.setLeftArmPose(mGravePose.getLeftArmAngle(false));
+					g.setRightArmPose(mGravePose.getRightArmAngle(false));
+					g.setLeftLegPose(mGravePose.getLeftLegAngle(false));
+					g.setRightLegPose(mGravePose.getRightLegAngle(false));
 
-					// Handle death message, as we cancel the event
-					Component deathMessage = event.deathMessage();
-					if (deathMessage != null) {
-						if (ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
-							player.sendMessage(deathMessage);
-							player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
+					VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
+					for (EquipmentSlot slot : EquipmentSlot.values()) {
+						ItemStack item;
+						if (slot != EquipmentSlot.HEAD) {
+							item = ItemUtils.clone(player.getInventory().getItem(slot).clone());
+							if (ItemUtils.isNullOrAir(item)) {
+								continue;
+							}
+							VanityManager.applyVanity(item, vanityData, slot, false);
+							// usb: remove stats from item before adding to armorstand in case of dupe
+							// this should happen after applying vanity
+							ItemUpdateHelper.removeStats(item);
 						} else {
-							for (Player p : player.getWorld().getPlayers()) {
-								p.sendMessage(deathMessage);
+							item = new ItemStack(Material.PLAYER_HEAD);
+							if (item.getItemMeta() instanceof SkullMeta skullMeta) {
+								skullMeta.setOwningPlayer(player);
+								item.setItemMeta(skullMeta);
 							}
 						}
+						g.setItem(slot, item);
 					}
+					ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+					SkullMeta meta = (SkullMeta) skull.getItemMeta();
+					meta.setPlayerProfile(player.getPlayerProfile());
+					skull.setItemMeta(meta);
+					g.setItem(EquipmentSlot.HEAD, skull);
+				});
 
-					Location deathLocation = player.getLocation();
-					MMLog.finer(player.getName() + " died. mNumDeaths = " + dp.mNumDeaths);
-					int graveDuration = getGraveDuration(party, dp, player, false);
-					dp.mNumDeaths++;
-					if (graveDuration > GRAVE_REVIVE_DURATION) {
-						Location waitingRoomLocation = party.mDeathWaitingRoomPoint.toLocation(player.getWorld());
-						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(waitingRoomLocation));
-						MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED),
-							Component.text("Please wait to be revived!", NamedTextColor.RED));
+				BossBar graveBar = BossBar.bossBar(Component.text(player.getName() + "'s Grave", NamedTextColor.RED),
+					1, BossBar.Color.RED, BossBar.Overlay.PROGRESS, Set.of());
 
-						ArmorStand grave = player.getWorld().spawn(deathLocation, ArmorStand.class, g -> {
-							g.setInvulnerable(true);
-							g.setDisabledSlots(EquipmentSlot.values());
-							g.setCollidable(false);
-							g.setBasePlate(false);
-							g.customName(Component.text(player.getName() + "'s Grave", NamedTextColor.RED));
-							g.setCustomNameVisible(true);
-							g.setGlowing(true);
-							g.setArms(true);
-							g.setGravity(true);
-							ScoreboardUtils.addEntityToTeam(g, "GraveGreen", NamedTextColor.GREEN);
-							g.addScoreboardTag(GRAVE_TAG);
-							g.addScoreboardTag(GraveManager.DISABLE_INTERACTION_TAG);
-							GravePose mGravePose = GravePoses.getEquippedGravePose(player);
-							g.setHeadPose(mGravePose.getHeadAngle(false));
-							g.setBodyPose(mGravePose.getBodyAngle(false));
-							g.setLeftArmPose(mGravePose.getLeftArmAngle(false));
-							g.setRightArmPose(mGravePose.getRightArmAngle(false));
-							g.setLeftLegPose(mGravePose.getLeftLegAngle(false));
-							g.setRightLegPose(mGravePose.getRightLegAngle(false));
+				for (Player p : player.getWorld().getPlayers()) {
+					p.showBossBar(graveBar);
+				}
+				dp.mDead = true;
+				dp.mGraveTicks = 0;
+				dp.mReviveTicks = 0;
+				dp.mCurrentlyReviving = false;
+				dp.mGraveRunnable = new BukkitRunnable() {
+					final double mBaseReviveRadiusSquared = 2;
+					@Nullable BossBar mReviveBar;
 
-							VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
-							for (EquipmentSlot slot : EquipmentSlot.values()) {
-								ItemStack item;
-								if (slot != EquipmentSlot.HEAD) {
-									item = ItemUtils.clone(player.getInventory().getItem(slot).clone());
-									if (ItemUtils.isNullOrAir(item)) {
-										continue;
-									}
-									VanityManager.applyVanity(item, vanityData, slot, false);
-									// usb: remove stats from item before adding to armorstand in case of dupe
-									// this should happen after applying vanity
-									ItemUpdateHelper.removeStats(item);
-								} else {
-									item = new ItemStack(Material.PLAYER_HEAD);
-									if (item.getItemMeta() instanceof SkullMeta skullMeta) {
-										skullMeta.setOwningPlayer(player);
-										item.setItemMeta(skullMeta);
-									}
+					@Override
+					public void run() {
+						dp.mGraveTicks++;
+						if (!player.isOnline()
+							    || !player.getWorld().equals(grave.getWorld())
+							    || player.getLocation().toVector().distanceSquared(party.mDeathWaitingRoomPoint) > 20 * 20) {
+							// Player logged off, somehow switched worlds, or exited the waiting room:
+							cancel();
+							return;
+						}
+
+						ArrayList<Player> nearbyPlayers = new ArrayList<>(party.mPlayersInParty.stream()
+							.map(DepthsPlayer::getPlayer)
+							.filter(Objects::nonNull)
+							.toList());
+
+						nearbyPlayers.removeIf(player -> {
+							// if a player is within range due to any one of their abilities, ensure they won't be removed
+
+							ColorSplash colorSplash = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ColorSplash.class);
+							if (colorSplash != null && colorSplash.hasIncreasedReviveRadius()) {
+								if (player.getLocation().distanceSquared(grave.getLocation()) <= mBaseReviveRadiusSquared + Math.pow(ColorSplash.DAWNBRINGER_EXTRA_REVIVE_RADIUS, 2)) {
+									return false;
 								}
-								g.setItem(slot, item);
 							}
-							ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-							SkullMeta meta = (SkullMeta) skull.getItemMeta();
-							meta.setPlayerProfile(player.getPlayerProfile());
-							skull.setItemMeta(meta);
-							g.setItem(EquipmentSlot.HEAD, skull);
+
+							EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EternalSavior.class);
+							if (eternalSavior != null && eternalSavior.isActive()) {
+								if (player.getLocation().distance(grave.getLocation()) <= eternalSavior.getIncreasedReviveRadius()) {
+									return false;
+								}
+							}
+
+							return player.getLocation().distanceSquared(grave.getLocation()) > mBaseReviveRadiusSquared;
 						});
 
-						BossBar graveBar = BossBar.bossBar(Component.text(player.getName() + "'s Grave", NamedTextColor.RED),
-							1, BossBar.Color.RED, BossBar.Overlay.PROGRESS, Set.of());
+						if (!nearbyPlayers.isEmpty()) {
+							dp.mCurrentlyReviving = true;
 
-						for (Player p : player.getWorld().getPlayers()) {
-							p.showBossBar(graveBar);
-						}
-						dp.mDead = true;
-						dp.mGraveTicks = 0;
-						dp.mReviveTicks = 0;
-						dp.mCurrentlyReviving = false;
-						dp.mGraveRunnable = new BukkitRunnable() {
-							final double mBaseReviveRadiusSquared = 2;
-							@Nullable BossBar mReviveBar;
+							double maxRevivePower = nearbyPlayers.stream().map(DepthsManager.getInstance()::getDepthsPlayer).filter(Objects::nonNull).mapToDouble(dp -> getGraveRevivePower(dp)).max().orElse(1);
+							dp.mReviveTicks += maxRevivePower;
 
-							@Override
-							public void run() {
-								dp.mGraveTicks++;
-								if (!player.isOnline()
-									    || !player.getWorld().equals(grave.getWorld())
-									    || player.getLocation().toVector().distanceSquared(party.mDeathWaitingRoomPoint) > 20 * 20) {
-									// Player logged off, somehow switched worlds, or exited the waiting room:
-									cancel();
-									return;
+							if (dp.mReviveTicks > 3 && mReviveBar == null) {
+								mReviveBar = BossBar.bossBar(Component.text("Reviving " + player.getName(), NamedTextColor.GREEN),
+									1f * (int) dp.mReviveTicks / GRAVE_REVIVE_DURATION, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, Set.of());
+								for (Player p : player.getWorld().getPlayers()) {
+									p.showBossBar(mReviveBar);
 								}
-
-								ArrayList<Player> nearbyPlayers = new ArrayList<>(party.mPlayersInParty.stream()
-									.map(DepthsPlayer::getPlayer)
-									.filter(Objects::nonNull)
-									.toList());
-
-								nearbyPlayers.removeIf(player -> {
-									// if a player is within range due to any one of their abilities, ensure they won't be removed
-
-									ColorSplash colorSplash = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ColorSplash.class);
-									if (colorSplash != null && colorSplash.hasIncreasedReviveRadius()) {
-										if (player.getLocation().distanceSquared(grave.getLocation()) <= mBaseReviveRadiusSquared + Math.pow(ColorSplash.DAWNBRINGER_EXTRA_REVIVE_RADIUS, 2)) {
-											return false;
-										}
-									}
-
-									EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EternalSavior.class);
-									if (eternalSavior != null && eternalSavior.isActive()) {
-										if (player.getLocation().distance(grave.getLocation()) <= eternalSavior.getIncreasedReviveRadius()) {
-											return false;
-										}
-									}
-
-									return player.getLocation().distanceSquared(grave.getLocation()) > mBaseReviveRadiusSquared;
-								});
-
-								if (!nearbyPlayers.isEmpty()) {
-									dp.mCurrentlyReviving = true;
-
-									double maxRevivePower = nearbyPlayers.stream().map(DepthsManager.getInstance()::getDepthsPlayer).filter(Objects::nonNull).mapToDouble(dp -> getGraveRevivePower(dp)).max().orElse(1);
-									dp.mReviveTicks += maxRevivePower;
-
-									if (dp.mReviveTicks > 3 && mReviveBar == null) {
-										mReviveBar = BossBar.bossBar(Component.text("Reviving " + player.getName(), NamedTextColor.GREEN),
-											1f * (int) dp.mReviveTicks / GRAVE_REVIVE_DURATION, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS, Set.of());
-										for (Player p : player.getWorld().getPlayers()) {
-											p.showBossBar(mReviveBar);
-										}
-									}
-									if (dp.mReviveTicks >= GRAVE_REVIVE_DURATION) {
-										// Successfully revived the player
-										Plugin.getInstance().mEffectManager.addEffect(player, "ZenithReviveResistance", new PercentDamageReceived(20, -1));
-										if (!dp.doOfflineTeleport()) {
-											player.teleport(grave.getLocation());
-										}
-										Charity.onCharityRevive(player, nearbyPlayers);
-										dp.sendMessage("You have been revived!");
-										party.sendMessage(player.getName() + " has been revived!", d -> d != dp);
-										dp.mDead = false;
-										MMLog.info(player.getName() + " was revived.");
-										cancel();
-										return;
-									}
-								} else {
-									dp.mCurrentlyReviving = false;
-									dp.mReviveTicks = Math.max(0, dp.mReviveTicks - 3);
-									if (dp.mReviveTicks <= 0) {
-										if (mReviveBar != null) {
-											for (Player p : player.getWorld().getPlayers()) {
-												p.hideBossBar(mReviveBar);
-											}
-											mReviveBar = null;
-										}
-									}
+							}
+							if (dp.mReviveTicks >= GRAVE_REVIVE_DURATION) {
+								// Successfully revived the player
+								Plugin.getInstance().mEffectManager.addEffect(player, "ZenithReviveResistance", new PercentDamageReceived(20, -1));
+								if (!dp.doOfflineTeleport()) {
+									player.teleport(grave.getLocation());
 								}
-								if (dp.mGraveTicks > graveDuration && !dp.mCurrentlyReviving) {
-									cancel();
-									if (!attemptRebirth(player, dp, grave.getLocation())) {
-										sendPlayerToLootRoom(player, true);
-									}
-									return;
-								}
-								float remaining = 1 - 1f * dp.mGraveTicks / graveDuration;
-								float oldRemaining = graveBar.progress();
-								graveBar.progress(remaining >= 0 ? remaining : 0);
-								int durationRemaining = Math.max(0, (graveDuration - dp.mGraveTicks) / 20);
-								TextComponent titleName = Component.text(player.getName() + "'s Grave | " + durationRemaining + "s", NamedTextColor.RED);
-								graveBar.name(titleName);
-								grave.customName(titleName);
+								Charity.onCharityRevive(player, nearbyPlayers);
+								dp.sendMessage("You have been revived!");
+								party.sendMessage(player.getName() + " has been revived!", d -> d != dp);
+								dp.mDead = false;
+								MMLog.info(player.getName() + " was revived.");
+								cancel();
+								return;
+							}
+						} else {
+							dp.mCurrentlyReviving = false;
+							dp.mReviveTicks = Math.max(0, dp.mReviveTicks - 3);
+							if (dp.mReviveTicks <= 0) {
 								if (mReviveBar != null) {
-									mReviveBar.progress(1f * (int) dp.mReviveTicks / GRAVE_REVIVE_DURATION);
-								}
-
-								if (oldRemaining > 0.66 && remaining <= 0.66) {
-									ScoreboardUtils.addEntityToTeam(grave, "GraveYellow", NamedTextColor.YELLOW);
-								} else if (oldRemaining > 0.33 && remaining <= 0.33) {
-									ScoreboardUtils.addEntityToTeam(grave, "GraveRed", NamedTextColor.RED);
-								}
-							}
-
-							@Override
-							public synchronized void cancel() throws IllegalStateException {
-								if (!isCancelled()) {
-									grave.remove();
 									for (Player p : player.getWorld().getPlayers()) {
-										p.hideBossBar(graveBar);
-										if (mReviveBar != null) {
-											p.hideBossBar(mReviveBar);
-										}
+										p.hideBossBar(mReviveBar);
 									}
-									dp.mGraveRunnable = null;
+									mReviveBar = null;
 								}
-								super.cancel();
 							}
-						};
-						dp.mGraveRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
-					} else {
-						if (!attemptRebirth(player, dp, player.getLocation())) {
-							// died too often: immediately send to loot room
-							dp.sendMessage("You have died too often and have been sent directly to the loot room!");
-							Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> sendPlayerToLootRoom(player, true));
+						}
+						if (dp.mGraveTicks > graveDuration && !dp.mCurrentlyReviving) {
+							cancel();
+							if (!attemptRebirth(player, dp, grave.getLocation())) {
+								sendPlayerToLootRoom(player, true);
+							}
+							return;
+						}
+						float remaining = 1 - 1f * dp.mGraveTicks / graveDuration;
+						float oldRemaining = graveBar.progress();
+						graveBar.progress(remaining >= 0 ? remaining : 0);
+						int durationRemaining = Math.max(0, (graveDuration - dp.mGraveTicks) / 20);
+						TextComponent titleName = Component.text(player.getName() + "'s Grave | " + durationRemaining + "s", NamedTextColor.RED);
+						graveBar.name(titleName);
+						grave.customName(titleName);
+						if (mReviveBar != null) {
+							mReviveBar.progress(1f * (int) dp.mReviveTicks / GRAVE_REVIVE_DURATION);
+						}
+
+						if (oldRemaining > 0.66 && remaining <= 0.66) {
+							ScoreboardUtils.addEntityToTeam(grave, "GraveYellow", NamedTextColor.YELLOW);
+						} else if (oldRemaining > 0.33 && remaining <= 0.33) {
+							ScoreboardUtils.addEntityToTeam(grave, "GraveRed", NamedTextColor.RED);
 						}
 					}
-				} else if (!attemptRebirth(player, dp, player.getLocation())) {
-					// else send to loot room on death
-					//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
-					dp.mFinalTreasureScore = party.mTreasureScore;
-					dp.setDeathRoom(party.getRoomNumber());
-					dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
-					dp.sendMessage("You reached room " + party.mRoomNumber + "!");
 
-					if (!party.mEndlessMode && party.mAscension == 0) {
-						event.setKeepLevel(false);
-						event.setDroppedExp(0);
-						int keptXp = (int) (0.5 * ExperienceUtils.getTotalExperience(player));
-						int keptLevel = ExperienceUtils.getLevel(keptXp);
-						event.setNewLevel(keptLevel);
-						event.setNewExp(keptXp - ExperienceUtils.getTotalExperience(keptLevel));
+					@Override
+					public synchronized void cancel() throws IllegalStateException {
+						if (!isCancelled()) {
+							grave.remove();
+							for (Player p : player.getWorld().getPlayers()) {
+								p.hideBossBar(graveBar);
+								if (mReviveBar != null) {
+									p.hideBossBar(mReviveBar);
+								}
+							}
+							dp.mGraveRunnable = null;
+						}
+						super.cancel();
 					}
-				} else {
-					event.setCancelled(true);
+				};
+				dp.mGraveRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
+			} else {
+				if (!attemptRebirth(player, dp, player.getLocation())) {
+					// died too often: immediately send to loot room
+					dp.sendMessage("You have died too often and have been sent directly to the loot room!");
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> sendPlayerToLootRoom(player, true));
 				}
 			}
+		} else if (!attemptRebirth(player, dp, player.getLocation())) {
+			// else send to loot room on death
+			//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
+			dp.mFinalTreasureScore = party.mTreasureScore;
+			dp.setDeathRoom(party.getRoomNumber());
+			dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
+			dp.sendMessage("You reached room " + party.mRoomNumber + "!");
+
+			if (!party.mEndlessMode && party.mAscension == 0) {
+				event.setKeepLevel(false);
+				event.setDroppedExp(0);
+				int keptXp = (int) (0.5 * ExperienceUtils.getTotalExperience(player));
+				int keptLevel = ExperienceUtils.getLevel(keptXp);
+				event.setNewLevel(keptLevel);
+				event.setNewExp(keptXp - ExperienceUtils.getTotalExperience(keptLevel));
+			}
+		} else {
+			event.setCancelled(true);
 		}
 	}
 
 	private double getGraveRevivePower(DepthsPlayer dp) {
 		double power = 1;
-		int charityLevel = dp.mAbilities.getOrDefault(Charity.ABILITY_NAME, 0);
+		int charityLevel = dp.getLevelInAbility(Charity.ABILITY_NAME);
 		if (charityLevel > 0) {
 			power = Charity.REVIVE_POWER[charityLevel - 1];
 		}
@@ -572,7 +565,11 @@ public class DepthsListener implements Listener {
 			rebirth.activationEffects();
 			rebirth.rerollAbilities(dp);
 			rebirth.applyResistance();
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(teleportTo));
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				if (!dp.doOfflineTeleport()) {
+					player.teleport(teleportTo);
+				}
+			});
 			dp.mDead = false;
 			dp.mCurrentlyReviving = false;
 			dp.mNumDeaths--;

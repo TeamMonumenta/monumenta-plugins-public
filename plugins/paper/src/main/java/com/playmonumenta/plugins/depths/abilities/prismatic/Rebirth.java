@@ -109,7 +109,7 @@ public class Rebirth extends DepthsAbility {
 			// Remove the chosen ability from the original list so that it can't get chosen again
 			eligibleAbilities.remove(chosenOne);
 			// Get the upgraded level, capped at Legendary (or keep Twisted level if the ability was Twisted level)
-			int level = DepthsManager.getInstance().getPlayerLevelInAbility(abilityInfo.getDisplayName(), mPlayer);
+			int level = dp.getLevelInAbility(abilityInfo.getDisplayName());
 			int finalLevel = level == 6 ? 6 : Math.min(5, level + UPGRADE_LEVELS);
 			// Remove the old ability, and add the new chosen ability
 			DepthsManager.getInstance().setPlayerLevelInAbility(abilityInfo.getDisplayName(), mPlayer, 0, false);

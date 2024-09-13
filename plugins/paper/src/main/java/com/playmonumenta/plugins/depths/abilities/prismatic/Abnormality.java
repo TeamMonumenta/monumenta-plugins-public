@@ -35,7 +35,7 @@ public class Abnormality extends DepthsAbility {
 		if (dp == null || dp.mAbnormalityLevel > 0) {
 			return;
 		}
-		dp.mAbnormalityLevel = dp.mAbilities.getOrDefault(ABILITY_NAME, 0);
+		dp.mAbnormalityLevel = dp.getLevelInAbility(ABILITY_NAME);
 
 		int[] placeholder = {100, 0, 0, 0, 0};
 		DepthsManager.getInstance().getRandomAbility(player, dp, placeholder, null, true);

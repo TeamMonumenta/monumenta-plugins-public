@@ -381,20 +381,14 @@ public class DepthsManager {
 	 * @return the level in the ability
 	 */
 	public int getPlayerLevelInAbility(@Nullable String name, @Nullable Player p) {
-
-		if (p == null || name == null) {
+		if (p == null) {
 			return 0;
 		}
-
 		DepthsPlayer dp = getDepthsPlayer(p);
-
-		if (dp != null) {
-			Integer i = dp.mAbilities.get(name);
-			if (i != null) {
-				return i;
-			}
+		if (dp == null) {
+			return 0;
 		}
-		return 0;
+		return dp.getLevelInAbility(name);
 	}
 
 	/**
@@ -476,7 +470,7 @@ public class DepthsManager {
 		}
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp != null) {
-			int previousLevel = dp.mAbilities.getOrDefault(name, 0);
+			int previousLevel = dp.getLevelInAbility(name);
 			int displayLevel = level == 0 ? previousLevel : level;
 			if (level > 0) {
 				dp.mAbilities.put(name, level);
@@ -1037,7 +1031,7 @@ public class DepthsManager {
 		// For each ability they have a score for, return the item that says what that ability does
 
 		for (DepthsAbilityInfo<?> da : getAbilities()) {
-			int rarity = dp.mAbilities.getOrDefault(da.getDisplayName(), 0);
+			int rarity = dp.getLevelInAbility(da.getDisplayName());
 			if (rarity > 0) {
 				abilities.add(da.getAbilityItem(rarity, p));
 			}
@@ -1069,7 +1063,7 @@ public class DepthsManager {
 		// For each ability they have a score for, return the item that says what that ability does
 
 		for (DepthsAbilityInfo<?> da : getAbilities()) {
-			Integer rarity = dp.mAbilities.getOrDefault(da.getDisplayName(), 0);
+			int rarity = dp.getLevelInAbility(da.getDisplayName());
 			if (rarity > 0) {
 				abilities.add(da);
 			}
@@ -1486,7 +1480,7 @@ public class DepthsManager {
 			if (offeredItems.size() >= options) {
 				break;
 			}
-			int level = getPlayerLevelInAbility(da.getDisplayName(), p);
+			int level = dp.getLevelInAbility(da.getDisplayName());
 			if (level == 0 || (level >= 5 && !(dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED)) || level >= 6 || WeaponAspectDepthsAbility.class.isAssignableFrom(da.getAbilityClass())) {
 				continue;
 			} else {
@@ -1499,8 +1493,7 @@ public class DepthsManager {
 				} else {
 					newRarity = Math.min(5, level + 1 + depths2UpgradeBonus);
 				}
-				int oldRarity = getPlayerLevelInAbility(da.getDisplayName(), p);
-				DepthsAbilityItem item = da.getAbilityItem(newRarity, oldRarity);
+				DepthsAbilityItem item = da.getAbilityItem(newRarity, level);
 
 				offeredItems.add(item);
 			}
@@ -1541,7 +1534,7 @@ public class DepthsManager {
 			}
 			String test = abilityList.get(index);
 			//Make sure the player has the ability AND it's not a weapon aspect
-			int testLevel = getPlayerLevelInAbility(test, p);
+			int testLevel = dp.getLevelInAbility(test);
 			if (testLevel > 0 && !DepthsUtils.isWeaponAspectAbility(test) && !DepthsUtils.isPrismaticAbility(test) && !DepthsUtils.isCurseAbility(test)) {
 				removedAbility = test;
 				removedLevel = testLevel;
@@ -1675,7 +1668,7 @@ public class DepthsManager {
 						continue;
 					}
 					//Transform mystery box if applicable
-					if (getPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player) > 0) {
+					if (dp.getLevelInAbility(RandomAspect.ABILITY_NAME) > 0) {
 						transformMysteryBox(player);
 					}
 					//Set score
@@ -1950,10 +1943,7 @@ public class DepthsManager {
 				for (DepthsAbilityInfo<?> da : getAbilities()) {
 					String name = da.getDisplayName();
 					DepthsTree tree = da.getDepthsTree();
-					if (name == null || tree == null) {
-						continue;
-					}
-					if (tree.equals(chosenTree) && getPlayerLevelInAbility(name, player) > 0) {
+					if (tree == chosenTree && dp.getLevelInAbility(name) > 0) {
 						setPlayerLevelInAbility(name, player, 0, true, true);
 						validateOfferings(dp, name);
 						removed = true;
@@ -1999,7 +1989,7 @@ public class DepthsManager {
 						}
 						String test = abilityList.get(index);
 						//Make sure the player has the ability AND it's not a weapon aspect
-						int testLevel = getPlayerLevelInAbility(test, player);
+						int testLevel = dp.getLevelInAbility(test);
 						if (testLevel > 0 && testLevel < 6) {
 							DepthsAbilityInfo<?> info = getAbility(test);
 							if (info != null && info.getHasLevels()) {
@@ -2078,7 +2068,7 @@ public class DepthsManager {
 			ListIterator<DepthsAbilityItem> iter = upgradeOfferings.listIterator();
 			while (iter.hasNext()) {
 				DepthsAbilityItem dai = iter.next();
-				int actualRarity = dp.mAbilities.getOrDefault(dai.mAbility, 0);
+				int actualRarity = dp.getLevelInAbility(dai.mAbility);
 				if (dai.mRarity <= actualRarity) {
 					iter.remove();
 					continue;

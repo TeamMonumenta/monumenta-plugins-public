@@ -218,10 +218,6 @@ public class EarthenWrath extends DepthsAbility {
 		Collections.shuffle(playersInParty);
 
 		for (DepthsPlayer dp : playersInParty) {
-			if (dp == null || dp.mAbilities == null || dp.mAbilities.size() == 0) {
-				continue;
-			}
-
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			try {
 				if (p != null && p.isOnline() && !p.equals(damagee)) {

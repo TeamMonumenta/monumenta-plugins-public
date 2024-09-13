@@ -272,6 +272,13 @@ public class DepthsPlayer {
 		return true;
 	}
 
+	public int getLevelInAbility(@Nullable String abilityName) {
+		if (abilityName == null) {
+			return 0;
+		}
+		return mAbilities.getOrDefault(abilityName, 0);
+	}
+
 	public List<String> getSolarRayUniqueMobNames() {
 		return mSolarRayUniqueMobNames;
 	}

@@ -41,7 +41,7 @@ public class CurseOfGreed extends DepthsAbility {
 		}
 		int abilities = 0;
 		for (String ability : dp.mAbilities.keySet()) {
-			if (dp.mAbilities.getOrDefault(ability, 0) >= 5) {
+			if (dp.getLevelInAbility(ability) >= 5) {
 				DepthsAbilityInfo<?> info = DepthsManager.getInstance().getAbility(ability);
 				if (info != null && info.getHasLevels()) {
 					abilities++;

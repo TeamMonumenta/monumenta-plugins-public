@@ -211,8 +211,13 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 
 	//Whether the player is eligible to have this ability offered
 	public boolean canBeOffered(Player player) {
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (dp == null) {
+			return false;
+		}
+
 		// Make sure the player doesn't have this ability already
-		if (DepthsManager.getInstance().getPlayerLevelInAbility(getDisplayName(), player) > 0) {
+		if (dp.getLevelInAbility(getDisplayName()) > 0) {
 			return false;
 		}
 
@@ -222,20 +227,16 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		}
 
 		// Make sure player doesn't already have an ability with the same trigger
-		if (mDepthsTrigger != DepthsTrigger.PASSIVE && DepthsManager.getInstance().isInSystem(player)) {
+		if (mDepthsTrigger != DepthsTrigger.PASSIVE) {
 			for (DepthsAbilityInfo<?> ability : DepthsManager.getAbilities()) {
 				// Iterate over abilities and return false if the player has an ability with the same trigger already
-				if (DepthsManager.getInstance().getPlayerLevelInAbility(ability.getDisplayName(), player) > 0 && ability.getDepthsTrigger() == mDepthsTrigger) {
+				if (ability.getDepthsTrigger() == mDepthsTrigger && dp.getLevelInAbility(ability.getDisplayName()) > 0) {
 					return false;
 				}
 			}
 		}
 
 		//Skip passive abilities if they have wand aspect charges
-		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
-		if (dp == null) {
-			return false;
-		}
 		if (dp.mWandAspectCharges > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC && mDepthsTree != DepthsTree.CURSE) {
 			return false;
 		}

@@ -33,7 +33,7 @@ public class CurseOfRuin extends DepthsAbility {
 		Collections.shuffle(abilities);
 		while (!abilities.isEmpty()) {
 			String ability = abilities.remove(0);
-			int level = dp.mAbilities.getOrDefault(ability, 0);
+			int level = dp.getLevelInAbility(ability);
 			if (level <= 1 || level >= 6) {
 				continue;
 			}
