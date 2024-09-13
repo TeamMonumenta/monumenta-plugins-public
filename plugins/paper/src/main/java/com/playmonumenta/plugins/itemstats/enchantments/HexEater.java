@@ -28,6 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 public class HexEater implements Enchantment {
 
 	private static final double DAMAGE = 0.5;
+	public static final String CHARM_DAMAGE = "Hex Eater Damage";
 
 	@Override
 	public String getName() {
@@ -104,7 +105,7 @@ public class HexEater implements Enchantment {
 
 		if (effects > 0) {
 			//Projectiles do not rely on player attack strength
-			double damage = level * effects * DAMAGE;
+			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * effects * DAMAGE);
 			if (isProjectile) {
 				event.setDamage(event.getFlatDamage() + damage);
 			} else {

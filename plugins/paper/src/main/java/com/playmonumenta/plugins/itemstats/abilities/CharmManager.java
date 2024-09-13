@@ -271,6 +271,7 @@ public class CharmManager {
 			LiquidCourage.CHARM_DURATION,
 			LiquidCourage.CHARM_COOLDOWN,
 			LiquidCourage.CHARM_RESISTANCE,
+			HexEater.CHARM_DAMAGE,
 
 			// Classes
 			// Mage
