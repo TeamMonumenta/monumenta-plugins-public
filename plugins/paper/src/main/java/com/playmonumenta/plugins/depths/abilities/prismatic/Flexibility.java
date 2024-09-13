@@ -56,6 +56,6 @@ public class Flexibility extends DepthsAbility {
 			.add("Gain ")
 			.addPercent(a -> DAMAGE[rarity - 1], DAMAGE[rarity - 1], false, true)
 			.add(" damage for each unique tree featured in your active ability slots.")
-			.addConditional(a -> a != null ? Component.text("\nCurrent damage increase: " + StringUtils.multiplierToPercentageWithSign(a.mDamage - 1)) : Component.empty());
+			.add((a, p) -> a != null ? Component.text("\nCurrent damage increase: " + StringUtils.multiplierToPercentageWithSign(a.mDamage - 1)) : Component.empty());
 	}
 }

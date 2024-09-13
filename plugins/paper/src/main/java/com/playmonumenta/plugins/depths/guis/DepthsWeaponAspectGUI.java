@@ -113,7 +113,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 		}
 
 		for (DepthsAbilityInfo<? extends WeaponAspectDepthsAbility> weapon : weapons) {
-			items.add(weapon.getAbilityItem(1));
+			items.add(weapon.getAbilityItem(1, null));
 		}
 
 		Material payButton = paid ? PURCHASED_MAT : BUY_ITEM;

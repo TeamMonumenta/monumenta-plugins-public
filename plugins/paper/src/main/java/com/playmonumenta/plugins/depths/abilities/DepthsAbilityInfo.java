@@ -253,16 +253,12 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return true;
 	}
 
-	public @Nullable DepthsAbilityItem getAbilityItem(int rarity) {
-		return getAbilityItem(rarity, null);
-	}
-
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {
 		return getAbilityItem(rarity, player, 0);
 	}
 
-	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, int oldRarity) {
-		return getAbilityItem(rarity, null, oldRarity);
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity) {
+		return getAbilityItem(rarity, player, oldRarity, false);
 	}
 
 	/**
@@ -271,7 +267,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	 * @param rarity the rarity to put on the item
 	 * @return the item to display
 	 */
-	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity) {
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity, boolean useAbility) {
 		if (rarity <= 0) {
 			//This should never happen
 			return null;
@@ -304,7 +300,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 				}
 				meta.lore(lore);
 			}
-			Component description = getDescription(mHasLevels ? rarity : 1, getPlayerAbility(Plugin.getInstance(), player));
+			Component description = getDescription(mHasLevels ? rarity : 1, player, useAbility);
 			GUIUtils.splitLoreLine(meta, description, 30, false);
 			stack.setItemMeta(meta);
 			ItemUtils.setPlainName(stack, name);

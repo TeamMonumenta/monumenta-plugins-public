@@ -829,7 +829,7 @@ public class DepthsManager {
 				}
 			}
 
-			DepthsAbilityItem item = da.getAbilityItem(rarity);
+			DepthsAbilityItem item = da.getAbilityItem(rarity, p);
 			if (item != null) {
 				mItems.add(item);
 			}
@@ -1529,7 +1529,7 @@ public class DepthsManager {
 				} else {
 					newRarity = Math.min(5, level + 1 + depths2UpgradeBonus);
 				}
-				DepthsAbilityItem item = da.getAbilityItem(newRarity, level);
+				DepthsAbilityItem item = da.getAbilityItem(newRarity, p, level);
 
 				offeredItems.add(item);
 			}
@@ -2112,7 +2112,7 @@ public class DepthsManager {
 				if (dai.mPreviousRarity != actualRarity) {
 					DepthsAbilityInfo<?> info = getAbility(dai.mAbility);
 					if (info != null) {
-						DepthsAbilityItem newItem = info.getAbilityItem(dai.mRarity, actualRarity);
+						DepthsAbilityItem newItem = info.getAbilityItem(dai.mRarity, dp.getPlayer(), actualRarity);
 						if (newItem != null) {
 							iter.set(newItem);
 						}

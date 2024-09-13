@@ -115,20 +115,19 @@ public class Convergence extends DepthsAbility {
 			.add("Breaking a spawner or killing an Elite mob triggers each of your living teammates' spawner break abilities at ")
 			.add(DepthsUtils.getRarityComponent(rarity))
 			.add(" level.")
-			.add(ability -> {
-					if (ability == null) {
-						return Component.empty();
-					}
-					Player player = ability.getPlayer();
-					Set<AbilityInfo<?>> spawnerAbilities = getSpawnerAbilities(Plugin.getInstance(), player);
-					if (spawnerAbilities.isEmpty()) {
-						return Component.empty();
-					}
-					List<Component> names = spawnerAbilities.stream()
-						.map(info -> info instanceof DepthsAbilityInfo dInfo ? dInfo.getColoredName() : null)
-						.filter(Objects::nonNull).toList();
-					Component namesComp = MessagingUtils.concatenateComponents(names, Component.text(", "));
-					return Component.text("\n\nCurrent abilities: ").append(namesComp);
+			.add((a, p) -> {
+				if (p == null) {
+					return Component.empty();
+				}
+				Set<AbilityInfo<?>> spawnerAbilities = getSpawnerAbilities(Plugin.getInstance(), p);
+				if (spawnerAbilities.isEmpty()) {
+					return Component.empty();
+				}
+				List<Component> names = spawnerAbilities.stream()
+					.map(info -> info instanceof DepthsAbilityInfo dInfo ? dInfo.getColoredName() : null)
+					.filter(Objects::nonNull).toList();
+				Component namesComp = MessagingUtils.concatenateComponents(names, Component.text(", "));
+				return Component.text("\n\nCurrent abilities: ").append(namesComp);
 			 });
 	}
 }

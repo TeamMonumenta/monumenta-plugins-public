@@ -45,7 +45,7 @@ public class AbilityInfo<T extends Ability> {
 	// Ability Abbreviated Name for AbilityHotbar
 	private @Nullable String mHotbarName;
 	// Description provider
-	private List<Description<T>> mDescriptions = List.of(t -> Component.empty());
+	private List<Description<T>> mDescriptions = List.of((a, p) -> Component.empty());
 	// Simplified description
 	private @Nullable String mSimpleDescription = null;
 	// Color used by action bar messages
@@ -162,12 +162,12 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public AbilityInfo<T> descriptions(String level1, String level2) {
-		mDescriptions = Stream.of(level1, level2).map(Component::text).map(c -> (Description<T>) a -> c).toList();
+		mDescriptions = Stream.of(level1, level2).map(Component::text).map(c -> (Description<T>) (a, p) -> c).toList();
 		return this;
 	}
 
 	public AbilityInfo<T> descriptions(String level1, String level2, String enhancement) {
-		mDescriptions = Stream.of(level1, level2, enhancement).map(Component::text).map(c -> (Description<T>) a -> c).toList();
+		mDescriptions = Stream.of(level1, level2, enhancement).map(Component::text).map(c -> (Description<T>) (a, p) -> c).toList();
 		return this;
 	}
 
@@ -182,7 +182,7 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public AbilityInfo<T> description(String description) {
-		mDescriptions = List.of(a -> Component.text(description));
+		mDescriptions = List.of((a, p) -> Component.text(description));
 		return this;
 	}
 
@@ -332,19 +332,23 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public List<Component> getDescriptions() {
-		return getDescriptions(null);
+		return getDescriptions(null, null);
 	}
 
-	public List<Component> getDescriptions(@Nullable T ability) {
-		return mDescriptions.stream().map(d -> d.get(ability)).toList();
+	public List<Component> getDescriptions(@Nullable Player player, @Nullable T ability) {
+		return mDescriptions.stream().map(d -> d.get(ability, player)).toList();
 	}
 
 	public Component getDescription(int level) {
-		return getDescription(level, null);
+		return getDescription(level, null, false);
 	}
 
-	public Component getDescription(int level, @Nullable T ability) {
-		return mDescriptions.get(level - 1).get(ability);
+	public Component getDescription(int level, @Nullable Player player, boolean useAbility) {
+		return getDescription(level, player, useAbility ? getPlayerAbility(Plugin.getInstance(), player) : null);
+	}
+
+	public Component getDescription(int level, @Nullable Player player, @Nullable T ability) {
+		return mDescriptions.get(level - 1).get(ability, player);
 	}
 
 	public Component getFormattedDescription(@Nullable Player player, int skillLevel, boolean enabled) throws IndexOutOfBoundsException {

@@ -107,6 +107,6 @@ public class Diversity extends DepthsAbility {
 			.add(" speed permanently, and your chances of finding better abilities are increased by ")
 			.addPercent(a -> RARITY_INCREASE[rarity - 1], RARITY_INCREASE[rarity - 1], false, true)
 			.add(". The first time you reach this goal, you will receive a selection of other Prismatics.")
-			.addConditional(a -> a != null ? Component.text("\nCurrent status: " + (a.mActive ? "Active" : a.mTreeCount + "/" + TREES_REQUIRED)) : Component.empty());
+			.add((a, p) -> a != null ? Component.text("\nCurrent status: " + (a.mActive ? "Active" : a.mTreeCount + "/" + TREES_REQUIRED)) : Component.empty());
 	}
 }

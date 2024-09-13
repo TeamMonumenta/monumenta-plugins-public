@@ -59,11 +59,11 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 			.add("You deal " + DAMAGE + " extra melee damage while holding a wand, and all ability damage is increased by ")
 			.addPercent(SPELL_MOD)
 			.add(" of the wand's Spell Power. The next three abilities you find are guaranteed to be in active trigger slots.")
-			.addConditional(a -> {
-				if (a == null) {
+			.add((a, p) -> {
+				if (p == null) {
 					return Component.empty();
 				}
-				DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(a.getPlayer());
+				DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(p);
 				if (dp == null) {
 					return Component.empty();
 				}

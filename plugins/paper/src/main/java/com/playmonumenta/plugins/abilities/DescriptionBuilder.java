@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
@@ -35,7 +34,7 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 	}
 
 	public DescriptionBuilder<T> add(Component component) {
-		return add(a -> component);
+		return add((a, p) -> component);
 	}
 
 	public DescriptionBuilder<T> add(String string) {
@@ -43,7 +42,7 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 	}
 
 	public DescriptionBuilder<T> add(Function<T, ? extends Number> getter, double baseValue, boolean invertColor, @Nullable Function<Double, String> formatter, boolean useBaseColor) {
-		return add(a -> {
+		return add((a, p) -> {
 			Function<Double, String> f = formatter == null ? StringUtils::to2DP : formatter;
 			Component base = Component.text(f.apply(baseValue));
 			if (useBaseColor && mBaseColor != null) {
@@ -128,42 +127,36 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 		return add(getter.andThen(d -> d * DepthsUtils.getDamageMultiplier()), baseDamage * DepthsUtils.getDamageMultiplier(), false, null, useBaseColor);
 	}
 
-	public DescriptionBuilder<T> addConditional(Predicate<T> condition, Description<T> description) {
-		return add(a -> a != null && condition.test(a) ? description.get(a) : Component.empty());
-	}
-
-	public DescriptionBuilder<T> addConditional(Description<T> description) {
-		return addConditional(a -> true, description);
-	}
-
-	public DescriptionBuilder<T> addConditionalPlayer(Predicate<Player> condition, Description<T> description) {
-		return addConditional(a -> condition.test(a.getPlayer()), description);
-	}
-
 	public DescriptionBuilder<T> addConditionalTree(DepthsTree tree, Description<T> description) {
-		return addConditionalPlayer(p -> DepthsManager.getInstance().hasTreeUnlocked(p, tree), description);
+		return add((a, p) -> {
+			if (p != null && DepthsManager.getInstance().hasTreeUnlocked(p, tree)) {
+				return description.get(a, p);
+			} else {
+				return Component.empty();
+			}
+		});
 	}
 
 	public DescriptionBuilder<T> addConditionalTreeOrAbility(DepthsTree tree, Description<T> description) {
-		return addConditionalPlayer(p -> {
-			if (DepthsManager.getInstance().hasTreeUnlocked(p, tree)) {
-				return true;
+		return add((a, p) -> {
+			if (p != null && (DepthsManager.getInstance().hasTreeUnlocked(p, tree)
+				|| DepthsManager.getInstance().getPlayerAbilities(p).stream().filter(da -> da.getDepthsTree() == tree).anyMatch(AbilityInfo::hasCooldown))) {
+				return description.get(a, p);
+			} else {
+				return Component.empty();
 			}
-			return DepthsManager.getInstance().getPlayerAbilities(p).stream()
-				.filter(da -> da.getDepthsTree() == tree)
-				.anyMatch(AbilityInfo::hasCooldown);
-		}, description);
+		});
 	}
 
 	public DescriptionBuilder<T> addConditionalDepthsContent(DepthsContent content, String s) {
-		return addConditional(a -> DepthsUtils.getDepthsContent() == content, a -> Component.text(s));
+		return add((a, p) -> DepthsUtils.getDepthsContent() == content ? Component.text(s) : Component.empty());
 	}
 
 	@Override
-	public Component get(@Nullable T ability) {
+	public Component get(@Nullable T ability, @Nullable Player player) {
 		Component output = Component.empty();
 		for (Description<T> desc : mDescriptions) {
-			output = output.append(desc.get(ability));
+			output = output.append(desc.get(ability, player));
 		}
 		return output;
 	}

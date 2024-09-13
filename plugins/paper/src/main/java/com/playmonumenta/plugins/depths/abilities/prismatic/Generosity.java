@@ -62,10 +62,11 @@ public class Generosity extends DepthsAbility {
 			DepthsAbilityInfo<?> finalRemovedAbilityInfo = removedAbilityInfo;
 			for (DepthsPlayer dp : party.mPlayersInParty) {
 				Player otherPlayer = dp.getPlayer();
-				if (
-					otherPlayer != null &&
-					dp != depthsPlayer &&
-					dp.getLevelInAbility(removedAbility) < generosityLevel &&
+				if (otherPlayer == null || dp == depthsPlayer) {
+					continue;
+				}
+				int currentLevel = dp.getLevelInAbility(removedAbility);
+				if (currentLevel < generosityLevel &&
 					DepthsManager.getInstance().getPlayerAbilities(otherPlayer).stream()
 						.filter(abilityInfo -> abilityInfo != finalRemovedAbilityInfo)
 						.filter(abilityInfo -> !abilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
@@ -73,7 +74,7 @@ public class Generosity extends DepthsAbility {
 				) {
 					foundPlayer = true;
 					dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.GENEROSITY);
-					dp.mGenerosityGifts.add(removedAbilityInfo.getAbilityItem(generosityLevel));
+					dp.mGenerosityGifts.add(removedAbilityInfo.getAbilityItem(generosityLevel, otherPlayer, currentLevel));
 					otherPlayer.playSound(otherPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					Component abilityName = DepthsManager.getInstance().colorAbilityWithHover(removedAbility, generosityLevel, otherPlayer);
 					dp.sendMessage(removedPlayer.displayName().append(Component.text(" has generously gifted you: ")).append(abilityName).append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(generosityLevel)).append(Component.text(" level! You can accept the gift in the rewards in your trinket.")));

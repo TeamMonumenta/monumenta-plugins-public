@@ -60,6 +60,6 @@ public class CurseOfGreed extends DepthsAbility {
 			.add(" max health for each ability you have at ")
 			.add(DepthsRarity.LEGENDARY.getDisplay())
 			.add(" rarity or higher.")
-			.addConditional(a -> a != null ? Component.text("\nCurrent: " + StringUtils.multiplierToPercentageWithSign(a.mPercentMaxHealth) + " health") : Component.empty());
+			.add((a, p) -> a != null ? Component.text("\nCurrent: " + StringUtils.multiplierToPercentageWithSign(a.mPercentMaxHealth) + " health") : Component.empty());
 	}
 }
