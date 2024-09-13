@@ -230,6 +230,7 @@ public class Plugin extends JavaPlugin {
 		CharmsCommand.register();
 		ClaimRaffle.register(this);
 		ClearPortals.register();
+		ConfirmationGUICommand.register();
 		CooldownsCommand.register(this);
 		CoreProtectLogCommand.register();
 		CosmeticsCommand.register(this);
