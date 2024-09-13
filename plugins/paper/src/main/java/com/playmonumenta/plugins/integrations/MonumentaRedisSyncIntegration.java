@@ -60,7 +60,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		mEnabled = true;
 	}
 
-	public static boolean isPlayerTransfering(Player player) {
+	public static boolean isPlayerTransferring(Player player) {
 		return mEnabled && (!player.isOnline() || MonumentaRedisSyncAPI.isPlayerTransferring(player));
 	}
 

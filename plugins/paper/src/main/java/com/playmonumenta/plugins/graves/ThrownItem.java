@@ -194,7 +194,7 @@ public class ThrownItem {
 
 	public void onAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
 		// hack that doesn't seem to work that often, but is a last resort
-		if (MonumentaRedisSyncIntegration.isPlayerTransfering(mPlayer)) {
+		if (MonumentaRedisSyncIntegration.isPlayerTransferring(mPlayer)) {
 			// Don't allow pickup of items that were dropped by a player who has logged out
 			event.setCancelled(true);
 			return;
