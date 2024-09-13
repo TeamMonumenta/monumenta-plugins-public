@@ -75,7 +75,7 @@ public class MusicGui extends Gui {
 		mPage = page;
 		mReturnToRecordPlayer = returnToRecordPlayer;
 		mPlayToOthers = playToOthers;
-		mPlaylistData = com.playmonumenta.plugins.Plugin.getInstance().mPlaylistManager.getData(player);
+		mPlaylistData = mPlugin.mPlaylistManager.getData(player);
 	}
 
 	@Override
@@ -422,8 +422,8 @@ public class MusicGui extends Gui {
 			@Override
 			public void run() {
 				mTicks++;
-				if (mTicks > mDuration || SongManager.getCurrentSong(mPlayer) != currentSong || !mPlayer.isOnline()) {
-					if (mTicks > mDuration) {
+				if (mTicks >= mDuration || SongManager.getCurrentSong(mPlayer) != currentSong || !mPlayer.isOnline()) {
+					if (mTicks >= mDuration) {
 						// Stop song again to prevent multiple tracks starting at once
 						SongManager.stopSong(mPlayer, true);
 						playFromPlaylist(mPlaylistData.mCurrentTrackIndex, randomized);
