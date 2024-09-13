@@ -17,8 +17,10 @@ import dev.jorel.commandapi.executors.CommandArguments;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Function;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -29,7 +31,14 @@ public class CustomEffect {
 	private static final String PERMISSION = "monumenta.commands.customeffect";
 
 	private static final EntitySelectorArgument.ManyEntities entitiesArgument = new EntitySelectorArgument.ManyEntities("entities");
-	private static final StringArgument sourceArgument = new StringArgument("source");
+	private static final Argument<String> sourceArgument = new StringArgument("source").replaceSuggestions(ArgumentSuggestions.strings(info -> {
+		Collection<Entity> entities = info.previousArgs().getByArgument(entitiesArgument);
+		Set<String> sources = new HashSet<>();
+		for (Entity entity : entities) {
+			sources.addAll(Plugin.getInstance().mEffectManager.getSources(entity));
+		}
+		return sources.toArray(new String[0]);
+	}));
 	private static final StringArgument sourceArgumentOptional = new StringArgument("source");
 	private static final DoubleArgument amountArg = new DoubleArgument("amount");
 	private static final MultiLiteralArgument effectArg = new MultiLiteralArgument("effect", Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase(Locale.getDefault())).toArray(String[]::new));

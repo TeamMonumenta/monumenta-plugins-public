@@ -687,6 +687,14 @@ public final class EffectManager implements Listener {
 		return false;
 	}
 
+	public List<String> getSources(Entity entity) {
+		List<EffectPair> effectPairs = getEffectPairs(entity);
+		if (effectPairs == null) {
+			return List.of();
+		}
+		return effectPairs.stream().map(pair -> pair.mSource).toList();
+	}
+
 	public Map<String, Effect> getPriorityEffects(Entity entity) {
 		EffectManager.Effects effects = mEntities.get(entity);
 		HashMap<String, Effect> output = new HashMap<>();
