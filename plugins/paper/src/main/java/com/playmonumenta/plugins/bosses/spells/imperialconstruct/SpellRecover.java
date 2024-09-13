@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,13 +15,15 @@ import org.bukkit.entity.Player;
 public class SpellRecover extends Spell {
 
 	private final LivingEntity mBoss;
+	private final ImperialConstruct mConstruct;
 	private Location mTeleLoc;
 
 	private int mTimer = 0;
 	private final int mDuration = 20;
 
-	public SpellRecover(LivingEntity boss, Location currentLoc) {
+	public SpellRecover(LivingEntity boss, ImperialConstruct construct, Location currentLoc) {
 		mBoss = boss;
+		mConstruct = construct;
 		mTeleLoc = currentLoc.clone();
 	}
 
@@ -35,7 +36,7 @@ public class SpellRecover extends Spell {
 		if (mTimer >= mDuration) {
 			mTimer = 0;
 
-			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), ImperialConstruct.detectionRange, true);
+			List<Player> players = mConstruct.getArenaPlayers();
 			if (players.isEmpty()) {
 				return;
 			}
@@ -50,8 +51,6 @@ public class SpellRecover extends Spell {
 			if (jump) {
 				mTimer = 0;
 			}
-
-
 		}
 	}
 

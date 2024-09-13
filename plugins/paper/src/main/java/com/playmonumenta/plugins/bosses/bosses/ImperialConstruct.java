@@ -37,6 +37,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -50,9 +51,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("NullAway") // so many...
@@ -65,6 +68,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	private static final String PHASE_THREE_TAG = "Construct_PhaseThree";
 	private LivingEntity mStart;
 	private final int mHealth;
+	private final BoundingBox mArenaBox;
 
 	//Changes based on the current phase
 	private Location mCurrentLoc;
@@ -99,8 +103,10 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			}
 		}
 
+		mArenaBox = BoundingBox.of(mSpawnLoc.clone().add(63, -58, 45), mSpawnLoc.clone().add(-36, 76, -50));
+
 		String mEncounterType = "Normal";
-		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, 75, true)) {
+		for (Player p : getArenaPlayers()) {
 			if (p.getScoreboardTags().contains("SKTQuest")) {
 				mEncounterType = "Story";
 				break;
@@ -119,29 +125,29 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			case "Hard" -> {
 				mHealth = 27225;
 				// Hard Mode Abilities
-				mParadox = new SpellLingeringParadox(boss, mSpawnLoc);
-				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc);
-				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc);
-				mCrash = new SpellCrash(boss, plugin, mCurrentLoc);
+				mParadox = new SpellLingeringParadox(boss, this, mSpawnLoc);
+				mParadox2 = new SpellLingeringParadox(boss, this, mPhase2Loc);
+				mParadox3 = new SpellLingeringParadox(boss, this, mPhase3Loc);
+				mCrash = new SpellCrash(boss, this, plugin, mCurrentLoc);
 				mRush = new SpellRush(plugin, boss, mSpawnLoc, 30);
 				mRush2 = new SpellRush(plugin, boss, mSpawnLoc, 30);
-				mRecover = new SpellRecover(boss, mCurrentLoc);
-				mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
-				mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
+				mRecover = new SpellRecover(boss, this, mCurrentLoc);
+				mSpawner = new MinionSpawn(boss, this, mCurrentLoc, 20 * 8, 2);
+				mFloor = new SpellFloor(plugin, boss, this, 5, mCurrentLoc);
 				mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 				SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 					mRush,
 					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 110),
 					new SilverBolts(boss, plugin),
-					new SpellEchoCharge(plugin, boss, 20 * 7, 20 * 3, 300)
+					new SpellEchoCharge(plugin, boss, this, 20 * 7, 20 * 3, 300)
 				));
 
 				SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
 					mRush2,
 					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 110),
 					new SilverBolts(boss, plugin),
-					new SpellEchoCharge(plugin, boss, 20 * 7, 20 * 3, 300)
+					new SpellEchoCharge(plugin, boss, this, 20 * 7, 20 * 3, 300)
 				));
 
 				SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
@@ -154,7 +160,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss)
+					new SpellConstructAggro(boss, this)
 				);
 
 				List<Spell> passiveSpellsPhase3 = Arrays.asList(
@@ -162,8 +168,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 16, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 16, mPhase3Loc)
 				);
 
 				List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
@@ -171,8 +177,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 12, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 12, mPhase3Loc)
 				);
 
 				List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
@@ -180,8 +186,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 8, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 8, mPhase3Loc)
 				);
 
 				Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -238,7 +244,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					getDialogueAction2().run(mob);
 					mCrash.setLocation(mPhase2Loc);
 					mCrash.run();
-					PlayerUtils.playersInRange(spawnLoc, detectionRange, true).forEach(this::clearParadox);
+					clearAllParadox();
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
 					}
@@ -253,7 +259,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 				});
 
 				events.put(25, (mob) -> {
-					PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true).forEach(this::clearParadox);
+					clearAllParadox();
 					getDialogueAction3().run(mob);
 					if (mParadox3 != null) {
 						mParadox3.run();
@@ -290,29 +296,29 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			case "Normal" -> {
 				mHealth = 19000;
 				// Normal Mode Abilities
-				mParadox = new SpellLingeringParadox(boss, mSpawnLoc);
-				mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc);
-				mParadox3 = new SpellLingeringParadox(boss, mPhase3Loc);
-				mCrash = new SpellCrash(boss, plugin, mCurrentLoc);
+				mParadox = new SpellLingeringParadox(boss, this, mSpawnLoc);
+				mParadox2 = new SpellLingeringParadox(boss, this, mPhase2Loc);
+				mParadox3 = new SpellLingeringParadox(boss, this, mPhase3Loc);
+				mCrash = new SpellCrash(boss, this, plugin, mCurrentLoc);
 				mRush = new SpellRush(plugin, boss, mSpawnLoc, 30);
 				mRush2 = new SpellRush(plugin, boss, mSpawnLoc, 30);
-				mRecover = new SpellRecover(boss, mCurrentLoc);
-				mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
-				mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
+				mRecover = new SpellRecover(boss, this, mCurrentLoc);
+				mSpawner = new MinionSpawn(boss, this, mCurrentLoc, 20 * 8, 2);
+				mFloor = new SpellFloor(plugin, boss, this, 5, mCurrentLoc);
 				mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 				SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 					mRush,
 					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
 					new SilverBolts(boss, plugin),
-					new SpellEchoCharge(plugin, boss, 20 * 7, 20 * 3, 110)
+					new SpellEchoCharge(plugin, boss, this, 20 * 7, 20 * 3, 110)
 				));
 
 				SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
 					mRush2,
 					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
 					new SilverBolts(boss, plugin),
-					new SpellEchoCharge(plugin, boss, 20 * 7, 20 * 3, 110)
+					new SpellEchoCharge(plugin, boss, this, 20 * 7, 20 * 3, 110)
 				));
 
 				SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
@@ -325,7 +331,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss)
+					new SpellConstructAggro(boss, this)
 				);
 
 				List<Spell> passiveSpellsPhase3 = Arrays.asList(
@@ -333,8 +339,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 16, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 16, mPhase3Loc)
 				);
 
 				List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
@@ -342,8 +348,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 12, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 12, mPhase3Loc)
 				);
 
 				List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
@@ -351,8 +357,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 8, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 8, mPhase3Loc)
 				);
 
 				Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -404,7 +410,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					getDialogueAction2().run(mob);
 					mCrash.setLocation(mPhase2Loc);
 					mCrash.run();
-					PlayerUtils.playersInRange(spawnLoc, detectionRange, true).forEach(this::clearParadox);
+					clearAllParadox();
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
 					}
@@ -419,7 +425,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 				});
 
 				events.put(25, (mob) -> {
-					PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true).forEach(this::clearParadox);
+					clearAllParadox();
 					getDialogueAction3().run(mob);
 					if (mParadox3 != null) {
 						mParadox3.run();
@@ -450,26 +456,26 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			default -> {
 				mHealth = 10000;
 				// Story Mode Abilities
-				mCrash = new SpellCrash(boss, plugin, mCurrentLoc);
+				mCrash = new SpellCrash(boss, this, plugin, mCurrentLoc);
 				mRush = new SpellRush(plugin, boss, mSpawnLoc, 30);
 				mRush2 = new SpellRush(plugin, boss, mSpawnLoc, 30);
-				mRecover = new SpellRecover(boss, mCurrentLoc);
-				mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 12, 2);
-				mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
+				mRecover = new SpellRecover(boss, this, mCurrentLoc);
+				mSpawner = new MinionSpawn(boss, this, mCurrentLoc, 20 * 12, 2);
+				mFloor = new SpellFloor(plugin, boss, this, 5, mCurrentLoc);
 				mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 				SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 					mRush,
 					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
 					new SilverBolts(boss, plugin),
-					new SpellEchoCharge(plugin, boss, 20 * 10, (int) (20 * 4.5), 110)
+					new SpellEchoCharge(plugin, boss, this, 20 * 10, (int) (20 * 4.5), 110)
 				));
 
 				SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
 					mRush2,
 					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
 					new SilverBolts(boss, plugin),
-					new SpellEchoCharge(plugin, boss, 20 * 10, (int) (20 * 4.5), 110)
+					new SpellEchoCharge(plugin, boss, this, 20 * 10, (int) (20 * 4.5), 110)
 				));
 
 				SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
@@ -482,7 +488,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss)
+					new SpellConstructAggro(boss, this)
 				);
 
 				List<Spell> passiveSpellsPhase3 = Arrays.asList(
@@ -490,8 +496,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 16, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 16, mPhase3Loc)
 				);
 
 				List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
@@ -499,8 +505,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 12, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 12, mPhase3Loc)
 				);
 
 				List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
@@ -508,8 +514,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					mFloor,
 					mRecover,
 					mSpawner,
-					new SpellConstructAggro(boss),
-					new SpellFinalStandPassive(boss, 8, mPhase3Loc)
+					new SpellConstructAggro(boss, this),
+					new SpellFinalStandPassive(boss, this, 8, mPhase3Loc)
 				);
 
 				Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -533,7 +539,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 					getDialogueAction2().run(mob);
 					mCrash.setLocation(mPhase2Loc);
 					mCrash.run();
-					PlayerUtils.playersInRange(spawnLoc, detectionRange, true).forEach(this::clearParadox);
+					clearAllParadox();
 					changePhase(finalStandActiveSpells, passiveSpells, null);
 				});
 
@@ -544,7 +550,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 				});
 
 				events.put(25, (mob) -> {
-					PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true).forEach(this::clearParadox);
+					clearAllParadox();
 					getDialogueAction3().run(mob);
 				});
 
@@ -573,7 +579,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	private BossBarManager.BossHealthAction getSteelboreAction(Plugin plugin, boolean savage, boolean phase3) {
 		double damage = savage ? 1 : 0.6;
 		int radius = savage ? (phase3 ? 6 : 11) : (phase3 ? 3 : 7);
-		return boss -> new SpellSteelboreSpread(plugin, boss, radius, mCurrentLoc, 40, damage).run();
+		return boss -> new SpellSteelboreSpread(plugin, boss, this, radius, mCurrentLoc, damage).run();
 	}
 
 	private Component getMessageComponent(String text) {
@@ -583,7 +589,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	}
 
 	private BossBarManager.BossHealthAction getDialogueAction(String text) {
-		return mBoss -> PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange).sendMessage(getMessageComponent(text));
+		return mBoss -> sendMessage(getMessageComponent(text));
 	}
 
 	private BossBarManager.BossHealthAction getDialogueAction1() {
@@ -624,7 +630,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	public void init() {
 		EntityUtils.setMaxHealthAndHealth(mBoss, mHealth);
 
-		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+		for (Player player : getArenaPlayers()) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Silver Construct", NamedTextColor.GOLD), Component.text("Forgotten Defender", NamedTextColor.RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
@@ -636,7 +642,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 		if (event == null) {
 			return;
 		}
-		List<Player> players = PlayerUtils.playersInRange(event.getEntity().getLocation(), detectionRange, true);
+		List<Player> players = getArenaPlayers();
 		players.forEach(this::clearParadox);
 		World world = mBoss.getWorld();
 		if (event.getEntity().getKiller() != null) {
@@ -671,6 +677,38 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			mParadox.deleteExchangers();
 		}
 
+	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		clearParadox(event.getPlayer());
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return false;
+	}
+
+	public boolean isInArena(Player player) {
+		return mArenaBox.contains(player.getLocation().toVector())
+			&& player.getGameMode() != GameMode.SPECTATOR
+			&& !PlayerUtils.isDead(player);
+	}
+
+	public List<Player> getArenaPlayers() {
+		return mBoss.getWorld().getPlayers().stream().filter(this::isInArena).toList();
+	}
+
+	public void clearAllParadox() {
+		for (Player player : getArenaPlayers()) {
+			clearParadox(player);
+		}
+	}
+
+	public void sendMessage(Component message) {
+		for (Player player : getArenaPlayers()) {
+			player.sendMessage(message);
+		}
 	}
 
 	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String abilityName) {

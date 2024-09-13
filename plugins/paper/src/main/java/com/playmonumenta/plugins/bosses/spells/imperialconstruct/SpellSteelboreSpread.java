@@ -26,24 +26,24 @@ public class SpellSteelboreSpread extends Spell {
 	private final int mRadius;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
+	private final ImperialConstruct mConstruct;
 	private final ChargeUpManager mChargeUp;
 	private final Location mStartLoc;
-	private final int mRange;
 	private final double mDamage;
 
-	public SpellSteelboreSpread(Plugin plugin, LivingEntity boss, int radius, Location startLoc, int range, double damage) {
+	public SpellSteelboreSpread(Plugin plugin, LivingEntity boss, ImperialConstruct construct, int radius, Location startLoc, double damage) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mConstruct = construct;
 		mRadius = radius;
 		mStartLoc = startLoc;
-		mRange = range;
 		mDamage = damage;
-		mChargeUp = ImperialConstruct.defaultChargeUp(mBoss, CAST_TIME, ABILITY_NAME, mRange);
+		mChargeUp = ImperialConstruct.defaultChargeUp(mBoss, CAST_TIME, ABILITY_NAME, ImperialConstruct.detectionRange);
 	}
 
 	@Override
 	public void run() {
-		List<Player> plays = PlayerUtils.playersInRange(mStartLoc, mRange, true);
+		List<Player> plays = mConstruct.getArenaPlayers();
 
 		for (Player p : plays) {
 			mBoss.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 1, 2);
@@ -58,7 +58,7 @@ public class SpellSteelboreSpread extends Spell {
 					return;
 				}
 
-				List<Player> players = PlayerUtils.playersInRange(mStartLoc, mRange, true);
+				List<Player> players = mConstruct.getArenaPlayers();
 
 				if (mChargeUp.nextTick(2)) {
 					int maxSelectionHeight = 30;

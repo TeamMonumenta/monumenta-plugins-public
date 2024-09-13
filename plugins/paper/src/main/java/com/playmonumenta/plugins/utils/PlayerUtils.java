@@ -756,4 +756,8 @@ public class PlayerUtils {
 		}
 	}
 
+	public static boolean isDead(Player player) {
+		return player.isDead() || Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class);
+	}
+
 }

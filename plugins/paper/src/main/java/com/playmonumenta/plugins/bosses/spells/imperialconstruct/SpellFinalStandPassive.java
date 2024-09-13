@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
+import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,11 +21,13 @@ public class SpellFinalStandPassive extends Spell {
 	private final int mMaxRadius = 30;
 
 	private final LivingEntity mBoss;
+	private final ImperialConstruct mConstruct;
 	private final int mRadius;
 	private final Location mCenter;
 
-	public SpellFinalStandPassive(LivingEntity boss, int radius, Location center) {
+	public SpellFinalStandPassive(LivingEntity boss, ImperialConstruct construct, int radius, Location center) {
 		mBoss = boss;
+		mConstruct = construct;
 		mRadius = radius;
 		mCenter = center;
 	}
@@ -56,8 +58,8 @@ public class SpellFinalStandPassive extends Spell {
 				}
 			}
 
-			for (Player p : PlayerUtils.playersInRange(mCenter, mMaxRadius, true)) {
-				if (!PlayerUtils.playersInRange(mCenter, mRadius, true).contains(p)) {
+			for (Player p : mConstruct.getArenaPlayers()) {
+				if (mCenter.distanceSquared(p.getLocation()) < mRadius * mRadius) {
 					DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE_PER_SECOND, null, true, true, "Instability");
 					MovementUtils.knockAway(mCenter, p, 0, .25f, false);
 				}

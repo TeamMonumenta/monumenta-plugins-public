@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,6 +38,7 @@ public class SpellEchoCharge extends Spell {
 	private static final int BOX_SIZE = 8;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
+	private final ImperialConstruct mConstruct;
 	private final int mCooldown = 20 * 10;
 	private final int mDamage;
 	private final ChargeUpManager mChargeUp;
@@ -47,9 +47,10 @@ public class SpellEchoCharge extends Spell {
 	private final Location[] mSpawnLocations = new Location[3];
 	private final Location[] mTargetLocations = new Location[3];
 
-	public SpellEchoCharge(Plugin plugin, LivingEntity boss, int castTime, int executionTime, int damage) {
+	public SpellEchoCharge(Plugin plugin, LivingEntity boss, ImperialConstruct construct, int castTime, int executionTime, int damage) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mConstruct = construct;
 		mCastTime = castTime;
 		mExecutionTime = executionTime;
 		mDamage = damage;
@@ -84,20 +85,20 @@ public class SpellEchoCharge extends Spell {
 		List<Location> lineKeysArray = new ArrayList<>(lines.keySet());
 		Collections.shuffle(lineKeysArray);
 
-		List<Player> nearbyPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), ImperialConstruct.detectionRange, true);
+		List<Player> players = mConstruct.getArenaPlayers();
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				int ticks = mChargeUp.getTime();
-				for (Player target : nearbyPlayers) {
+				for (Player target : players) {
 					if (ticks % 8 == 0) {
 						target.getWorld().playSound(target.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 80f) * 1.5f);
 					} else if (ticks % 8 == 2) {
-						mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 80f) * 1.5f);
+						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 80f) * 1.5f);
 					} else if (ticks % 8 == 4) {
 						target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 100f) * 1.5f);
 					} else if (ticks % 8 == 6) {
-						mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 100f) * 1.5f);
+						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 100f) * 1.5f);
 					}
 				}
 
@@ -122,7 +123,7 @@ public class SpellEchoCharge extends Spell {
 							double progress = 1 - ((double) mT / (double) mExecutionTime);
 							mChargeUp.setProgress(progress);
 							if (progress > 0.01 && progress < 0.95) {
-								for (Player target : nearbyPlayers) {
+								for (Player target : players) {
 									if (progress % 8 == 0) {
 										target.getWorld().playSound(target.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 80f) * 1.5f);
 									} else if (progress % 8 == 2) {
@@ -227,9 +228,9 @@ public class SpellEchoCharge extends Spell {
 
 	private void rush(Location startLoc, Location endLoc) {
 		World world = mBoss.getWorld();
-		List<Player> nearbyPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), 50, true);
+		List<Player> players = mConstruct.getArenaPlayers();
 		BoundingBox chargeBox = BoundingBox.of(startLoc, BOX_SIZE, 25, BOX_SIZE);
-		for (Player p : nearbyPlayers) {
+		for (Player p : players) {
 			p.playSound(startLoc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 1.2f, 0.6f);
 		}
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -245,7 +246,7 @@ public class SpellEchoCharge extends Spell {
 						chargeBox.shift(baseVector);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, chargeBox.getCenter().toLocation(world), 1, 4, 3, 4, 0.05).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.ELECTRIC_SPARK, chargeBox.getCenter().toLocation(world), 2, 4, 3, 4, 0.05).spawnAsEntityActive(mBoss);
-						for (Player player : nearbyPlayers) {
+						for (Player player : players) {
 							if (chargeBox.contains(player.getLocation().toVector())) {
 								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, mDamage, null, false, true);
 							}

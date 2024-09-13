@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,12 +19,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class SpellCrash extends Spell {
 
 	private final LivingEntity mBoss;
+	private final ImperialConstruct mConstruct;
 	private final Plugin mPlugin;
 
 	private Location mCurrentLoc;
 
-	public SpellCrash(LivingEntity boss, Plugin plugin, Location currentLoc) {
+	public SpellCrash(LivingEntity boss, ImperialConstruct construct, Plugin plugin, Location currentLoc) {
 		mBoss = boss;
+		mConstruct = construct;
 		mPlugin = plugin;
 		mCurrentLoc = currentLoc.clone();
 	}
@@ -33,7 +34,7 @@ public class SpellCrash extends Spell {
 	@Override
 	public void run() {
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 1f);
-		List<Player> players = PlayerUtils.playersInRange(mCurrentLoc, ImperialConstruct.detectionRange, true);
+		List<Player> players = mConstruct.getArenaPlayers();
 		for (Player p : players) {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 7, 0, false, true));
 		}

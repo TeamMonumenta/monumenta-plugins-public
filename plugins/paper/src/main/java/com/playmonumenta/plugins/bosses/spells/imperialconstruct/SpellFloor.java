@@ -28,14 +28,16 @@ public class SpellFloor extends Spell {
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
+	private final ImperialConstruct mConstruct;
 	private Location mCurrentLoc;
 
 	private final List<LivingEntity> mDamaged = new ArrayList<>();
 
 
-	public SpellFloor(Plugin plugin, LivingEntity boss, int duration, Location currentLoc) {
+	public SpellFloor(Plugin plugin, LivingEntity boss, ImperialConstruct construct, int duration, Location currentLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mConstruct = construct;
 		mDuration = duration;
 		mCurrentLoc = currentLoc.clone();
 	}
@@ -48,7 +50,7 @@ public class SpellFloor extends Spell {
 		if (mTimer >= mDuration) {
 			mTimer = 0;
 
-			List<Player> players = PlayerUtils.playersInRange(mCurrentLoc, ImperialConstruct.detectionRange, true);
+			List<Player> players = mConstruct.getArenaPlayers();
 
 			for (Player p : players) {
 				if (mDamaged.contains(p)) {

@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
-import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,13 +18,15 @@ public class MinionSpawn extends Spell {
 	private final int mMultiplier;
 
 	private final LivingEntity mBoss;
+	private final ImperialConstruct mConstruct;
 	private Location mCurrentLoc;
 
 	private final List<String> mMobs = Arrays.asList("AutomatedLyrata", "AutomatedVanguard");
 	private final List<Entity> mSpawnedMobs = new ArrayList<>();
 
-	public MinionSpawn(LivingEntity boss, Location currentLoc, int duration, int multiplier) {
+	public MinionSpawn(LivingEntity boss, ImperialConstruct construct, Location currentLoc, int duration, int multiplier) {
 		mBoss = boss;
+		mConstruct = construct;
 		mCurrentLoc = currentLoc.clone();
 		mDuration = duration;
 		mMultiplier = multiplier;
@@ -39,7 +40,7 @@ public class MinionSpawn extends Spell {
 
 			Location loc = new Location(mBoss.getWorld(), mCurrentLoc.getX() + FastUtils.randomDoubleInRange(-18, 18), mCurrentLoc.getY() + 5, mCurrentLoc.getZ() + FastUtils.randomDoubleInRange(-18, 18));
 
-			for (int i = 0; i < PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true).size() * mMultiplier; i++) {
+			for (int i = 0; i < mConstruct.getArenaPlayers().size() * mMultiplier; i++) {
 				mSpawnedMobs.add(LibraryOfSoulsIntegration.summon(loc.clone().add(FastUtils.randomDoubleInRange(-2, 2), 0, FastUtils.randomDoubleInRange(-2, 2)), mMobs.get(FastUtils.RANDOM.nextInt(mMobs.size()))));
 			}
 
