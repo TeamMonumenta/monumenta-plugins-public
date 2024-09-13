@@ -39,8 +39,8 @@ public class VoodooBindings extends Effect {
 		WHITE_DONUT(0, Component.text("⦾", NamedTextColor.WHITE), Component.text("⦾, conform.", Style.style(NamedTextColor.WHITE, TextDecoration.BOLD)), "white", "WD"),
 		GREEN_CIRCLE(1, Component.text("⦿", NamedTextColor.GREEN), Component.text("⦿, in solitude.", Style.style(NamedTextColor.GREEN, TextDecoration.BOLD)), "green", "GC"),
 		GREEN_DONUT(1, Component.text("⦾", NamedTextColor.GREEN), Component.text("⦾, in solitude.", Style.style(NamedTextColor.GREEN, TextDecoration.BOLD)), "green", "GD"),
-		YELLOW_CIRCLE(2, Component.text("⦿", NamedTextColor.YELLOW), Component.text("⦿, in tandem.", Style.style(NamedTextColor.YELLOW, TextDecoration.BOLD)), "yellow", "YC"),
-		YELLOW_DONUT(2, Component.text("⦾", NamedTextColor.YELLOW), Component.text("⦾, in tandem.", Style.style(NamedTextColor.YELLOW, TextDecoration.BOLD)), "yellow", "YD"),
+		BLUE_CIRCLE(2, Component.text("⦿", NamedTextColor.BLUE), Component.text("⦿, in tandem.", Style.style(NamedTextColor.BLUE, TextDecoration.BOLD)), "blue", "BC"),
+		BLUE_DONUT(2, Component.text("⦾", NamedTextColor.BLUE), Component.text("⦾, in tandem.", Style.style(NamedTextColor.BLUE, TextDecoration.BOLD)), "blue", "BD"),
 		RED_CIRCLE(4, Component.text("⦿", NamedTextColor.RED), Component.text("⦿, unified.", Style.style(NamedTextColor.RED, TextDecoration.BOLD)), "red", "RC"),
 		RED_DONUT(4, Component.text("⦾", NamedTextColor.RED), Component.text("⦾, unified.", Style.style(NamedTextColor.RED, TextDecoration.BOLD)), "red", "RD");
 
@@ -85,8 +85,8 @@ public class VoodooBindings extends Effect {
 				case "WD" -> WHITE_DONUT;
 				case "GC" -> GREEN_CIRCLE;
 				case "GD" -> GREEN_DONUT;
-				case "YC" -> YELLOW_CIRCLE;
-				case "YD" -> YELLOW_DONUT;
+				case "BC" -> BLUE_CIRCLE;
+				case "BD" -> BLUE_DONUT;
 				case "RC" -> RED_CIRCLE;
 				case "RD" -> RED_DONUT;
 				default -> null;
@@ -117,7 +117,7 @@ public class VoodooBindings extends Effect {
 		}
 
 		ScoreboardUtils.getExistingTeamOrCreate("red").removePlayer(player);
-		ScoreboardUtils.getExistingTeamOrCreate("yellow").removePlayer(player);
+		ScoreboardUtils.getExistingTeamOrCreate("blue").removePlayer(player);
 		ScoreboardUtils.getExistingTeamOrCreate("green").removePlayer(player);
 		ScoreboardUtils.getExistingTeamOrCreate("white").removePlayer(player);
 
@@ -162,7 +162,7 @@ public class VoodooBindings extends Effect {
 		}
 		ScoreboardUtils.getExistingTeamOrCreate("white").removePlayer(player);
 		ScoreboardUtils.getExistingTeamOrCreate("red").removePlayer(player);
-		ScoreboardUtils.getExistingTeamOrCreate("yellow").removePlayer(player);
+		ScoreboardUtils.getExistingTeamOrCreate("blue").removePlayer(player);
 		ScoreboardUtils.getExistingTeamOrCreate("green").removePlayer(player);
 		player.setGlowing(false);
 		player.getWorld().hideBossBar(mBossBar);
@@ -178,7 +178,7 @@ public class VoodooBindings extends Effect {
 		}
 		ScoreboardUtils.getExistingTeamOrCreate("white").removePlayer(player);
 		ScoreboardUtils.getExistingTeamOrCreate("red").removePlayer(player);
-		ScoreboardUtils.getExistingTeamOrCreate("yellow").removePlayer(player);
+		ScoreboardUtils.getExistingTeamOrCreate("blue").removePlayer(player);
 		ScoreboardUtils.getExistingTeamOrCreate("green").removePlayer(player);
 		entity.setGlowing(false);
 		player.getWorld().hideBossBar(mBossBar);

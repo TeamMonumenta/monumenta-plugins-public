@@ -38,7 +38,7 @@ public class SpellToxicFumes extends Spell {
 	public void run() {
 		if (mT++ % mDamageInterval == 0) {
 			for (Player player : HexfallUtils.getPlayersInRuten(mSpawnLoc)) {
-				if (LocationUtils.xzDistance(player.getLocation(), mSpawnLoc) > mRadius && player.getEyeLocation().getY() < mSpawnLoc.getY() - 1) {
+				if (LocationUtils.xzDistance(player.getLocation(), mSpawnLoc) > mRadius - 4 && player.getEyeLocation().getY() < mSpawnLoc.getY() - 1) {
 
 					PlayerUtils.killPlayer(player, mBoss, ABILITY_NAME);
 					PlayerUtils.playerTeleport(player, mSpawnLoc.clone().add(0, 8, 0));

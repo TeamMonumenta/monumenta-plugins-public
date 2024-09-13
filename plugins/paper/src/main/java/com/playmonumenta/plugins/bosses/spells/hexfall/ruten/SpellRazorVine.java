@@ -68,9 +68,10 @@ public class SpellRazorVine extends Spell {
 
 				if (mChargeUp.getTime() % 5 == 0) {
 					for (Player player : mPlayers) {
-						player.playSound(player.getLocation(), Sound.BLOCK_GRASS_FALL, SoundCategory.HOSTILE, 2f, 0f);
-						player.playSound(player.getLocation(), Sound.BLOCK_WART_BLOCK_PLACE, SoundCategory.HOSTILE, 2f, 1f);
-						player.playSound(player.getLocation(), Sound.BLOCK_WART_BLOCK_BREAK, SoundCategory.HOSTILE, 2f, 1.5f);
+						player.playSound(player, Sound.BLOCK_GRASS_FALL, SoundCategory.HOSTILE, 2f, 0f);
+						player.playSound(player, Sound.BLOCK_WART_BLOCK_PLACE, SoundCategory.HOSTILE, 2f, 1f);
+						player.playSound(player, Sound.BLOCK_WART_BLOCK_BREAK, SoundCategory.HOSTILE, 2f, 1.5f);
+						player.playSound(player, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.HOSTILE, 2f, 1f);
 					}
 				}
 
@@ -142,6 +143,11 @@ public class SpellRazorVine extends Spell {
 								}
 							}
 						}
+
+						player.playSound(player, Sound.BLOCK_GRASS_FALL, SoundCategory.HOSTILE, 2f, 0f);
+						player.playSound(player, Sound.BLOCK_WART_BLOCK_PLACE, SoundCategory.HOSTILE, 2f, 0f);
+						player.playSound(player, Sound.BLOCK_WART_BLOCK_BREAK, SoundCategory.HOSTILE, 2f, 0f);
+						player.playSound(player, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.HOSTILE, 2f, 0f);
 					}
 
 					for (Player toHitPlayer : hitPlayers) {

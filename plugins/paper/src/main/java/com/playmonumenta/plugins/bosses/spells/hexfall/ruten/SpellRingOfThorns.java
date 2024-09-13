@@ -66,12 +66,12 @@ public class SpellRingOfThorns extends Spell {
 						fixY.setY(mSpawnLoc.getY());
 						for (double height = 0; height < 1; height += 0.2) {
 							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, Math.min(fixY.clone().add(0, height, 0).distance(mSpawnLoc), Ruten.arenaRadius))
-								.count(70)
+								.countPerMeter(2)
 								.data(Material.DRIPSTONE_BLOCK.createBlockData())
 								.ringMode(true)
 								.spawnAsBoss();
 							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, Math.min(fixY.clone().add(0, height, 0).distance(mSpawnLoc), Ruten.arenaRadius))
-								.count(70)
+								.countPerMeter(2)
 								.data(Material.JUNGLE_LEAVES.createBlockData())
 								.ringMode(true)
 								.spawnAsBoss();

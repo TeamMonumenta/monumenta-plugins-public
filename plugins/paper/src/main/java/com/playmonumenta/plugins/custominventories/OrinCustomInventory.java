@@ -189,6 +189,7 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(21, 24, "Silver Knight's Tomb", "Click to teleport!", Material.DEEPSLATE, "DSKTAccess", 1, sendToDungeonAction(DungeonCommandMapping.SKT), null, 1));
 		ORIN_ITEMS.add(new TeleportEntry(21, 25, "Blue", "Click to teleport!", Material.BLUE_WOOL, "D12Access", 1, sendToDungeonAction(DungeonCommandMapping.BLUE), null, 1));
 		ORIN_ITEMS.add(new TeleportEntry(21, 26, "Brown", "Click to teleport!", Material.BROWN_WOOL, "D13Access", 1, sendToDungeonAction(DungeonCommandMapping.BROWN), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 33, "Hexfall", "Click to teleport!", Material.MOSSY_STONE_BRICKS, "DHFAccess", 1, sendToDungeonAction(DungeonCommandMapping.HEXFALL), null, 1));
 	}
 
 	private int mCurrentPage;

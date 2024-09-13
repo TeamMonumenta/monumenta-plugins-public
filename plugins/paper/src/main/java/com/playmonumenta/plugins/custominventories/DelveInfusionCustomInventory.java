@@ -202,6 +202,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		itemPlacements.put(DelveInfusionSelection.SOOTHING, 27);
 		itemPlacements.put(DelveInfusionSelection.FUELED, 28);
 		itemPlacements.put(DelveInfusionSelection.REFRESH, 29);
+		itemPlacements.put(DelveInfusionSelection.FERVOR, 30);
 
 		itemPlacements.put(DelveInfusionSelection.QUENCH, 36);
 		itemPlacements.put(DelveInfusionSelection.GRACE, 37);

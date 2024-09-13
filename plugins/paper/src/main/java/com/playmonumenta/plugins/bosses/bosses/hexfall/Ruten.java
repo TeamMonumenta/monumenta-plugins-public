@@ -69,7 +69,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 	public static final int matrixCoordsFromCenterOffset = 28;
 	public static final int lifeTemplateYOffset = 50;
 	public static final int deathTemplateYOffset = 40;
-	public static final int mHealth = 77000;
+	public static final int mHealth = 75000;
 	private final SequentialSpellManager mSpellQueue;
 	private final Plugin mMonumentaPlugin;
 	private final List<Player> mPlayersStartingFight;
@@ -118,7 +118,6 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 
 		events.put(66, mBoss -> {
 			mPhase = 4; // Phase 1->2 Transition
-			mMonumentaPlugin.mEffectManager.addEffect(mBoss, "RutenPhaseTransitionNegateDamage", new NegateDamage(27 * 20, 999999));
 			mSpellQueue.clearSpellQueue();
 			new SpellGenerateRutenSpells(this).run();
 		});
@@ -421,7 +420,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				phase3Casts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 3, 20 * 2, 20 * 3, 20 * 12));
 				phase3Casts.add(fillerSpellsFinal.get(1));
 				addGrenadeAbility(phase3Casts);
-				phase3Casts.add(new SpellRagingRoots(mMonumentaPlugin, mBoss, detectionRange, 20 * 90, 30, 20 * 2, 20 * 2, 0.65f, 20 * 8, mSpawnLoc, 0));
+				phase3Casts.add(new SpellRagingRoots(mMonumentaPlugin, mBoss, detectionRange, 20 * 75, 30, 20 * 2, 20 * 2, 0.65f, 20 * 8, mSpawnLoc, 0));
 				phase3Casts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 3, 20 * 2, 20 * 3, 20 * 12));
 				phase3Casts.add(summons);
 				for (int mEnrageSurges = 0; mEnrageSurges < 8; mEnrageSurges++) {
@@ -443,8 +442,20 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				surgingFiller.add(new SpellRingOfThorns(mMonumentaPlugin, mBoss, 3, 120, 20 * 7, 4, detectionRange, 20 * 12, mSpawnLoc));
 				surgingFiller.add(new SpellAnimaExpulsion(mMonumentaPlugin, mBoss, detectionRange, 2.5f, 20 * 7, 20 * 12, mSpawnLoc));
 				Collections.shuffle(surgingFiller);
+
 				List<Spell> surgingDeathCasts = new ArrayList<>();
 				surgingDeathCasts.add(new SpellRutenDialogue(Component.text("Death beget ye now, still!", NamedTextColor.WHITE), 0, mSpawnLoc));
+				surgingDeathCasts.add(new Spell() {
+					@Override
+					public void run() {
+						mMonumentaPlugin.mEffectManager.addEffect(mBoss, "RutenPhaseTransitionNegateDamage", new NegateDamage(27 * 20, 999999));
+					}
+
+					@Override
+					public int cooldownTicks() {
+						return 0;
+					}
+				});
 				surgingDeathCasts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 4, 20 * 2, 20 * 3, 20 * 3));
 				surgingDeathCasts.add(surgingFiller.get(0));
 				surgingDeathCasts.add(surgingFiller.get(1));

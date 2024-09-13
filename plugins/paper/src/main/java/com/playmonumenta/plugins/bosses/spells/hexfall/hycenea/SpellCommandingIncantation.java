@@ -96,7 +96,7 @@ public class SpellCommandingIncantation extends Spell {
 
 								boolean correct = switch (activeBinding) {
 									case GREEN_CIRCLE, GREEN_DONUT, RED_CIRCLE, RED_DONUT -> HexfallUtils.playersInBossInXZRange(pGround, mStackRad, true).size() == activeBinding.playerCount();
-									case YELLOW_CIRCLE, YELLOW_DONUT -> HexfallUtils.playersInBossInXZRange(pGround, mStackRad, true).stream().filter(player -> {
+									case BLUE_CIRCLE, BLUE_DONUT -> HexfallUtils.playersInBossInXZRange(pGround, mStackRad, true).stream().filter(player -> {
 										VoodooBindings otherBindings = mPlugin.mEffectManager.getActiveEffect(player, VoodooBindings.class);
 										return player.equals(p) || (otherBindings != null && (otherBindings.getCurrentBinding() == VoodooBindings.VoodooBinding.WHITE_CIRCLE || otherBindings.getCurrentBinding() == VoodooBindings.VoodooBinding.WHITE_DONUT));
 									}).toList().size() == activeBinding.playerCount();
@@ -129,8 +129,8 @@ public class SpellCommandingIncantation extends Spell {
 								Location pGround = LocationUtils.fallToGround(player.getLocation(), mSpawnLoc.getY());
 
 								boolean circleOrDonut = switch (activeBinding) {
-									case WHITE_CIRCLE, GREEN_CIRCLE, YELLOW_CIRCLE, RED_CIRCLE -> true;
-									case WHITE_DONUT, GREEN_DONUT, YELLOW_DONUT, RED_DONUT -> false;
+									case WHITE_CIRCLE, GREEN_CIRCLE, BLUE_CIRCLE, RED_CIRCLE -> true;
+									case WHITE_DONUT, GREEN_DONUT, BLUE_DONUT, RED_DONUT -> false;
 								};
 
 								Entity circle = LibraryOfSoulsIntegration.summon(pGround, "VoodooBindings");
@@ -144,7 +144,7 @@ public class SpellCommandingIncantation extends Spell {
 
 								boolean correct = switch (activeBinding) {
 									case GREEN_CIRCLE, GREEN_DONUT, RED_CIRCLE, RED_DONUT -> HexfallUtils.playersInBossInXZRange(pGround, mStackRad, true).size() == activeBinding.playerCount();
-									case YELLOW_CIRCLE, YELLOW_DONUT -> HexfallUtils.playersInBossInXZRange(pGround, mStackRad, true).stream().filter(p -> {
+									case BLUE_CIRCLE, BLUE_DONUT -> HexfallUtils.playersInBossInXZRange(pGround, mStackRad, true).stream().filter(p -> {
 										VoodooBindings otherBindings = mPlugin.mEffectManager.getActiveEffect(p, VoodooBindings.class);
 										return player.equals(p) || (otherBindings != null && (otherBindings.getCurrentBinding() == VoodooBindings.VoodooBinding.WHITE_CIRCLE || otherBindings.getCurrentBinding() == VoodooBindings.VoodooBinding.WHITE_DONUT));
 									}).toList().size() == activeBinding.playerCount();

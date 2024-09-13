@@ -44,8 +44,6 @@ public class Reincarnation extends Effect {
 					p.sendMessage(Component.text(player.getName(), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(Component.text(" has Reincarnated!", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 				}
 
-				player.sendMessage(Component.text("Reincarnation Stacks Remaining: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text((int) mStacks + "", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
-
 				player.setHealth(EntityUtils.getMaxHealth(player));
 				event.setCancelled(true);
 				player.setNoDamageTicks(20);

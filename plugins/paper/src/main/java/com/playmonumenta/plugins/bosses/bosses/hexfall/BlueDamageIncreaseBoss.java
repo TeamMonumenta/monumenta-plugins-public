@@ -31,21 +31,23 @@ public class BlueDamageIncreaseBoss extends BossAbilityGroup {
 	public void death(@Nullable EntityDeathEvent event) {
 		if (event != null) {
 			for (Player player : PlayerUtils.playersInRange(event.getEntity().getLocation(), BUFF_RANGE, true, false)) {
-				Effect currentIncrease = mMonumentaPlugin.mEffectManager.getActiveEffect(player, BluePercentDamageDealt.class);
+				if (player.getScoreboardTags().contains("HyceneaFighter")) {
+					Effect currentIncrease = mMonumentaPlugin.mEffectManager.getActiveEffect(player, BluePercentDamageDealt.class);
 
-				double amount = 1;
-				if (currentIncrease != null) {
-					amount = amount + currentIncrease.getMagnitude();
-					currentIncrease.clearEffect();
+					double amount = 1;
+					if (currentIncrease != null) {
+						amount = amount + currentIncrease.getMagnitude();
+						currentIncrease.clearEffect();
+					}
+
+					mMonumentaPlugin.mEffectManager.addEffect(player, BluePercentDamageDealt.GENERIC_NAME, new BluePercentDamageDealt(60 * 20, amount, null, 0, (entity, enemy) -> enemy.getScoreboardTags().contains("boss_harrakfar")));
+
+					new PPExplosion(Particle.SOUL_FIRE_FLAME, player.getLocation())
+						.count(5)
+						.directionalMode(true)
+						.delta(1, 1, 1)
+						.spawnAsBoss();
 				}
-
-				mMonumentaPlugin.mEffectManager.addEffect(player, BluePercentDamageDealt.GENERIC_NAME, new BluePercentDamageDealt(60 * 20, amount, null, 0, (entity, enemy) -> enemy.getScoreboardTags().contains("boss_harrakfar")));
-
-				new PPExplosion(Particle.SOUL_FIRE_FLAME, player.getLocation())
-					.count(5)
-					.directionalMode(true)
-					.delta(1, 1, 1)
-					.spawnAsBoss();
 			}
 		}
 	}

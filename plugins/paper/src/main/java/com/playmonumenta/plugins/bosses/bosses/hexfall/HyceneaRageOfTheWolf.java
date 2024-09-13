@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.SequentialSpellManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.*;
+import com.playmonumenta.plugins.effects.NegateDamage;
 import com.playmonumenta.plugins.effects.hexfall.BluePercentDamageDealt;
 import com.playmonumenta.plugins.effects.hexfall.DeathImmunity;
 import com.playmonumenta.plugins.effects.hexfall.DeathVulnerability;
@@ -46,7 +47,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_hycenea";
 	public static final int detectionRange = 52;
 	public static final double centerArenaRadius = 17.5;
-	public static final int mHealth = 260000;
+	public static final int mHealth = 275000;
 	public boolean mSteelAdvancement;
 	public boolean mSpellAdvancement;
 	public final List<Player> mPlayersStartingFight;
@@ -73,6 +74,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 		super.constructBoss(mSpellQueue, getPassiveSpellsByPhase(mPhase), detectionRange * 2, bossBar, 0, 1);
 
 		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).stream().filter(p -> p.getScoreboardTags().contains("HyceneaFighter")).forEach(p -> {
+				plugin.mEffectManager.clearEffects(p, BluePercentDamageDealt.GENERIC_NAME);
 				plugin.mEffectManager.addEffect(p, Reincarnation.GENERIC_NAME, new Reincarnation(20 * 6000, 1));
 				mPlayersStartingFight.add(p);
 			}
@@ -264,25 +266,38 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 				activeSpells.add(new SpellTotemicDestruction(mMonumentaPlugin, mBoss, detectionRange, 14 * 20, mSpawnLoc, 18 * 20));
 
 				// Strangling Rupture
-				activeSpells.add(new SpellHyceneaDialogue(Component.text("Gah... little... human. I have lived... eons. I have seen the Architect... fall into slumber... I have seen empires crumble into ash... I will not be slain by... someone of thy meager lot.", NamedTextColor.WHITE), 0, mSpawnLoc, true));
 				List<Spell> stranglingSequence1 = new ArrayList<>();
 				stranglingSequence1.add(new SpellMysticMaelstrom(mMonumentaPlugin, mBoss, 50, 8, 500, 20 * 8, 20 * 4, mSpawnLoc));
 				stranglingSequence1.add(new SpellAbyssalSigil(mMonumentaPlugin, mBoss, detectionRange, 500, 9, 20 * 8, 20 * 4, mSpawnLoc));
 				stranglingSequence1.add(new SpellMysticMaelstrom(mMonumentaPlugin, mBoss, 50, 8, 500, 20 * 8, 20 * 4, mSpawnLoc));
 				stranglingSequence1.add(new SpellAbyssalSigil(mMonumentaPlugin, mBoss, detectionRange, 500, 9, 20 * 8, 20 * 4, mSpawnLoc));
 				List<Spell> stranglingSequence2 = new ArrayList<>();
-				stranglingSequence2.add(new SpellAbyssalSigil(mMonumentaPlugin, mBoss, detectionRange, 500, 9, 20 * 8, 20 * 8, mSpawnLoc));
-				stranglingSequence2.add(new SpellMysticMaelstrom(mMonumentaPlugin, mBoss, 50, 8, 500, 20 * 8, 20 * 8, mSpawnLoc));
-				stranglingSequence2.add(new SpellAbyssalSigil(mMonumentaPlugin, mBoss, detectionRange, 500, 9, 20 * 8, 20 * 8, mSpawnLoc));
-				stranglingSequence2.add(new SpellMysticMaelstrom(mMonumentaPlugin, mBoss, 50, 8, 500, 20 * 8, 20 * 8, mSpawnLoc));
+				stranglingSequence2.add(new SpellAbyssalSigil(mMonumentaPlugin, mBoss, detectionRange, 500, 9, 20 * 8, 20 * 4, mSpawnLoc));
+				stranglingSequence2.add(new SpellMysticMaelstrom(mMonumentaPlugin, mBoss, 50, 8, 500, 20 * 8, 20 * 4, mSpawnLoc));
+				stranglingSequence2.add(new SpellAbyssalSigil(mMonumentaPlugin, mBoss, detectionRange, 500, 9, 20 * 8, 20 * 4, mSpawnLoc));
+				stranglingSequence2.add(new SpellMysticMaelstrom(mMonumentaPlugin, mBoss, 50, 8, 500, 20 * 8, 20 * 4, mSpawnLoc));
 				List<List<Spell>> stranglingSequences = new ArrayList<>();
 				stranglingSequences.add(stranglingSequence1);
 				stranglingSequences.add(stranglingSequence2);
 				Collections.shuffle(stranglingSequences);
+
+				activeSpells.add(new SpellHyceneaDialogue(Component.text("Gah... little... human. I have lived... eons. I have seen the Architect... fall into slumber... I have seen empires crumble into ash... I will not be slain by... someone of thy meager lot.", NamedTextColor.WHITE), 0, mSpawnLoc, true));
 				activeSpells.add(new SpellAllowTotemThrow(mBoss, false));
 				activeSpells.add(new SpellHyceneaSummonTotemPlatforms(detectionRange, 0, mSpawnLoc));
 				activeSpells.add(new SpellOrganicShock(mMonumentaPlugin, mBoss, 0, 18, 500, 20 * 7, 20 * 7, mSpawnLoc));
 				activeSpells.add(new SpellDestroyCenterPlatform(mSpawnLoc, 0, 18, 0));
+				activeSpells.add(new Spell() {
+					@Override
+					public void run() {
+						mMonumentaPlugin.mEffectManager.addEffect(mBoss, "HyceneaStranglingRuptureNegateDamage", new NegateDamage(58 * 20, 999999));
+					}
+
+					@Override
+					public int cooldownTicks() {
+						return 0;
+					}
+				});
+
 				activeSpells.add(stranglingSequences.get(0).get(0));
 				activeSpells.add(new SpellStranglingRupture(mMonumentaPlugin, mBoss, detectionRange, 20 * 8, 9, 9, 20 * 3, mSpawnLoc, 20 * 12));
 				activeSpells.add(stranglingSequences.get(0).get(1));
@@ -367,6 +382,18 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 				activeSpells.add(new SpellVoodooBindings(mMonumentaPlugin, mBoss, detectionRange, 20 * 5, 20 * 6, mSpawnLoc, getRandomVoodooSet(phase)));
 				activeSpells.add(new SpellOrganicShock(mMonumentaPlugin, mBoss, 0, 18, 500, 20 * 7, 20 * 7, mSpawnLoc));
 				activeSpells.add(new SpellDestroyCenterPlatform(mSpawnLoc, 0, 18, 0));
+
+				activeSpells.add(new Spell() {
+					@Override
+					public void run() {
+						mMonumentaPlugin.mEffectManager.addEffect(mBoss, "HyceneaStranglingRuptureNegateDamage", new NegateDamage(40 * 20, 999999));
+					}
+
+					@Override
+					public int cooldownTicks() {
+						return 0;
+					}
+				});
 				activeSpells.add(new SpellCommandingIncantation(mMonumentaPlugin, mBoss, detectionRange, 20 * 10, 20 * 5, 5, 20 * 2, mSpawnLoc, true));
 				activeSpells.add(new SpellStranglingRupture(mMonumentaPlugin, mBoss, detectionRange, 20 * 10, 9, 9, 20 * 3, mSpawnLoc, 20 * 6));
 				activeSpells.add(new SpellCommandingIncantation(mMonumentaPlugin, mBoss, detectionRange, 20 * 10, 20 * 5, 5, 20 * 2, mSpawnLoc, true));
@@ -644,55 +671,55 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 			case 1 -> {
 				List<String> voodooSetOneOne = new ArrayList<>();
 				voodooSetOneOne.add("GCWCRC");
-				voodooSetOneOne.add("GCYDWC");
-				voodooSetOneOne.add("WCYCWC");
-				voodooSetOneOne.add("YCWDWC");
+				voodooSetOneOne.add("GCBDWC");
+				voodooSetOneOne.add("WCBCWC");
+				voodooSetOneOne.add("BCWDWC");
 				phaseVoodooSets.add(voodooSetOneOne);
 				List<String> voodooSetOneTwo = new ArrayList<>();
 				voodooSetOneTwo.add("RCWCGD");
-				voodooSetOneTwo.add("WCYCGD");
+				voodooSetOneTwo.add("WCBCGD");
 				voodooSetOneTwo.add("WCWDGD");
-				voodooSetOneTwo.add("WCYDGD");
+				voodooSetOneTwo.add("WCBDGD");
 				phaseVoodooSets.add(voodooSetOneTwo);
 				List<String> voodooSetOneThree = new ArrayList<>();
 				voodooSetOneThree.add("GCWDRD");
-				voodooSetOneThree.add("GCYDWD");
-				voodooSetOneThree.add("WCYCWD");
-				voodooSetOneThree.add("YCWCWD");
+				voodooSetOneThree.add("GCBDWD");
+				voodooSetOneThree.add("WCBCWD");
+				voodooSetOneThree.add("BCWCWD");
 				phaseVoodooSets.add(voodooSetOneThree);
 				List<String> voodooSetOneFour = new ArrayList<>();
 				voodooSetOneFour.add("RDWDGC");
-				voodooSetOneFour.add("WDYDGC");
+				voodooSetOneFour.add("WDBDGC");
 				voodooSetOneFour.add("WDWCGC");
-				voodooSetOneFour.add("WDYCGC");
+				voodooSetOneFour.add("WDBCGC");
 				phaseVoodooSets.add(voodooSetOneFour);
 			}
 			case 3 -> {
 				List<String> voodooSetTwoOne = new ArrayList<>();
-				voodooSetTwoOne.add("YCWDGC");
-				voodooSetTwoOne.add("WCYDGC");
-				voodooSetTwoOne.add("WDYDGC");
-				voodooSetTwoOne.add("YDWDGC");
+				voodooSetTwoOne.add("BCWDGC");
+				voodooSetTwoOne.add("WCBDGC");
+				voodooSetTwoOne.add("WDBDGC");
+				voodooSetTwoOne.add("BDWDGC");
 				phaseVoodooSets.add(voodooSetTwoOne);
 				List<String> voodooSetTwoTwo = new ArrayList<>();
-				voodooSetTwoTwo.add("WCGCYC");
-				voodooSetTwoTwo.add("YCGCWC");
-				voodooSetTwoTwo.add("YDGCWC");
-				voodooSetTwoTwo.add("WDGCYC");
+				voodooSetTwoTwo.add("WCGCBC");
+				voodooSetTwoTwo.add("BCGCWC");
+				voodooSetTwoTwo.add("BDGCWC");
+				voodooSetTwoTwo.add("WDGCBC");
 				phaseVoodooSets.add(voodooSetTwoTwo);
 			}
 			case 5 -> {
 				List<String> voodooSetThreeOne = new ArrayList<>();
 				voodooSetThreeOne.add("RDGCWCGDWCGDWCGD");
 				voodooSetThreeOne.add("WDGCWDGDRCGDWDGD");
-				voodooSetThreeOne.add("WDGDYDGCWCGCYDGC");
-				voodooSetThreeOne.add("WDGDYCGCWCGCYCGC");
+				voodooSetThreeOne.add("WDGDBDGCWCGCBDGC");
+				voodooSetThreeOne.add("WDGDBCGCWCGCBCGC");
 				phaseVoodooSets.add(voodooSetThreeOne);
 				List<String> voodooSetThreeTwo = new ArrayList<>();
 				voodooSetThreeTwo.add("RCGDWCGDWDGCWCGD");
 				voodooSetThreeTwo.add("WCGDWDGDRDGCWDGD");
-				voodooSetThreeTwo.add("WCGCYDGCWDGDYDGC");
-				voodooSetThreeTwo.add("WCGCYCGCWDGDYCGC");
+				voodooSetThreeTwo.add("WCGCBDGCWDGDBDGC");
+				voodooSetThreeTwo.add("WCGCBCGCWDGDBCGC");
 				phaseVoodooSets.add(voodooSetThreeTwo);
 			}
 			default -> {

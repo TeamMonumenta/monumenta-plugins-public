@@ -126,12 +126,14 @@ public class SpellVileBloom extends Spell {
 							}
 
 							if (progress == 0.5) {
+								mChargeUp.setColor(BossBar.Color.BLUE);
+
 								for (LivingEntity entity : vileBloomSpawns) {
 									if (entity.getScoreboardTags().contains(RED_BLOOM_NAME)) {
 										new PPExplosion(Particle.EXPLOSION_LARGE, entity.getLocation())
 											.speed(1)
 											.delta(15)
-											.count(60)
+											.count(120)
 											.extraRange(0.15, 2)
 											.spawnAsBoss();
 
@@ -154,7 +156,7 @@ public class SpellVileBloom extends Spell {
 										new PPExplosion(Particle.EXPLOSION_LARGE, entity.getLocation())
 											.speed(1)
 											.delta(15)
-											.count(60)
+											.count(120)
 											.extraRange(0.15, 2)
 											.spawnAsBoss();
 

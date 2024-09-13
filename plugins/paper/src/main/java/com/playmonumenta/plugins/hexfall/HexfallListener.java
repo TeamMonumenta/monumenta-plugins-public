@@ -7,10 +7,15 @@ import com.playmonumenta.plugins.effects.hexfall.DeathVulnerability;
 import com.playmonumenta.plugins.effects.hexfall.InfusedLife;
 import com.playmonumenta.plugins.effects.hexfall.LifeImmunity;
 import com.playmonumenta.plugins.effects.hexfall.LifeVulnerability;
+import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
 import com.playmonumenta.plugins.effects.hexfall.VoodooBindings;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -74,6 +79,34 @@ public class HexfallListener implements Listener {
 				decayBlock(block);
 				break;
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void reincarnationTransferDeathEvent(PlayerDeathEvent event) {
+		Player player = event.getPlayer();
+		Plugin plugin = Plugin.getInstance();
+
+		if (HexfallUtils.playerInBoss(player) && !plugin.mEffectManager.hasEffect(player, Reincarnation.class)) {
+			List<Player> playersWithReincarnInBoss = player.getWorld().getPlayers().stream().filter(p -> {
+				Reincarnation reincarnation = plugin.mEffectManager.getActiveEffect(p, Reincarnation.class);
+				return reincarnation != null && reincarnation.getDuration() > 0;
+			}).collect(Collectors.toList());
+			if (!playersWithReincarnInBoss.isEmpty()) {
+				Collections.shuffle(playersWithReincarnInBoss);
+				Player otherPlayer = playersWithReincarnInBoss.get(0);
+				plugin.mEffectManager.clearEffects(otherPlayer, Reincarnation.GENERIC_NAME);
+				plugin.mEffectManager.addEffect(player, Reincarnation.GENERIC_NAME, new Reincarnation(20 * 6000, 1));
+
+				for (Player p : PlayerUtils.playersInRange(player.getLocation(), 80, true)) {
+					p.sendMessage(Component.text(player.getName(), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)
+						.append(Component.text(" borrowed ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
+						.append(Component.text(otherPlayer.getName(), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+						.append(Component.text("'s Reincarnation.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+				}
+
+			}
+
 		}
 	}
 
