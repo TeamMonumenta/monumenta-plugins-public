@@ -424,6 +424,12 @@ public class DelveCustomInventory extends CustomInventory {
 	 */
 	private List<DelvesModifier> getAvailableModifiers() {
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
+		List<DelvesModifier> experimentalMods = DelvesUtils.getExperimentalDelveModifier();
+		for (DelvesModifier experimental : DelvesModifier.experimentalDelveModifiers()) {
+			if (!experimentalMods.contains(experimental)) {
+				mods.remove(experimental);
+			}
+		}
 
 		if (mDungeonName.startsWith("ring")) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
@@ -443,13 +449,6 @@ public class DelveCustomInventory extends CustomInventory {
 				mods.remove(rotating);
 			}
 		}
-		List<DelvesModifier> experimentalMods = DelvesUtils.getExperimentalDelveModifier();
-		for (DelvesModifier experimental : DelvesModifier.experimentalDelveModifiers()) {
-			if (!experimentalMods.contains(experimental)) {
-				mods.remove(experimental);
-			}
-		}
-
 
 		if (mDungeonName.startsWith("portal") || mDungeonName.startsWith("ruin")) {
 			mods.remove(DelvesModifier.FRAGILE);
