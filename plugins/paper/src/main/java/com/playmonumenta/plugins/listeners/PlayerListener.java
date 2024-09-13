@@ -1184,7 +1184,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 
-		if (ItemStatUtils.isCharm(item)) {
+		if (ItemStatUtils.isCharm(item) || ServerProperties.getIsTownWorld()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1204,11 +1204,6 @@ public class PlayerListener implements Listener {
 			if (oldDamage < 0 || ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 				newDamage = 0;
 			}
-		}
-
-		// All durability damage is disabled in town worlds
-		if (ServerProperties.getIsTownWorld() && oldDamage < 0) {
-			newDamage = 0;
 		}
 
 		event.setDamage(newDamage);
