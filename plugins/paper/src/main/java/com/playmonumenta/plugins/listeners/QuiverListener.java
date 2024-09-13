@@ -311,30 +311,32 @@ public class QuiverListener implements Listener {
 			if (ItemStatUtils.isQuiver(quiver)) {
 				// Cancel the event as there's no way to change which projectile will be loaded
 				event.setCancelled(true);
-				if (crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta) {
-					int numProjectiles = 1 + ItemStatUtils.getEnchantmentLevel(crossbow, EnchantmentType.MULTILOAD);
+				int numProjectiles = 1 + ItemStatUtils.getEnchantmentLevel(crossbow, EnchantmentType.MULTILOAD);
 
-					// Crossbows refund arrows when being shot instead of not consuming arrows when being loaded
-					Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, numProjectiles, is -> true);
-					if (projectile == null) {
-						return;
-					}
-					ItemStack projectileItem = projectile.getLeft();
-					if (numProjectiles > 1) {
-						Multiload.afterLoad(player, crossbow, numProjectiles, projectileItem.getAmount());
-						projectileItem.setAmount(1);
-					}
-					crossbowMeta.addChargedProjectile(projectileItem);
-					if (ItemStatUtils.hasEnchantment(crossbow, EnchantmentType.MULTISHOT)) {
-						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
-						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
-					}
-					crossbow.setItemMeta(crossbowMeta);
-
-					// Sound copied from vanilla (won't play due to cancelled event)
-					player.getWorld().playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, SoundCategory.PLAYERS,
-						1.0F, 1.0F / (FastUtils.randomFloatInRange(0, 1) * 0.5F + 1.0F) + 0.2F);
+				// Crossbows refund arrows when being shot instead of not consuming arrows when being loaded
+				Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, numProjectiles, is -> true);
+				if (projectile == null) {
+					return;
 				}
+				ItemStack projectileItem = projectile.getLeft();
+				int amount = projectileItem.getAmount();
+				projectileItem.setAmount(1);
+				if (numProjectiles > 1) {
+					// multi-loading handles adding charged projectile
+					Multiload.loadCrossbow(player, crossbow, projectileItem, numProjectiles, amount);
+				} else {
+					if (crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta) {
+						crossbowMeta.addChargedProjectile(projectileItem);
+						if (ItemStatUtils.hasEnchantment(crossbow, EnchantmentType.MULTISHOT)) {
+							crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
+							crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
+						}
+						crossbow.setItemMeta(crossbowMeta);
+					}
+				}
+				// Sound copied from vanilla (won't play due to cancelled event)
+				player.getWorld().playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, SoundCategory.PLAYERS,
+					1.0F, 1.0F / (FastUtils.randomFloatInRange(0, 1) * 0.5F + 1.0F) + 0.2F);
 			}
 		}
 	}

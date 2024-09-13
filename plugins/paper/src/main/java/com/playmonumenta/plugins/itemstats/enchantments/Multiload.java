@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -8,14 +9,12 @@ import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.EnumSet;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 
@@ -39,20 +38,13 @@ public class Multiload implements Enchantment {
 	}
 
 	@Override
-	public double getPriorityAmount() {
-		return 1000;
-	}
-
-	@Override
-	public void onProjectileLaunch(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile projectile) {
+	public void onConsumeArrow(Plugin plugin, Player player, double level, ArrowConsumeEvent event) {
 		ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-
-		if (itemInMainHand.getType() == Material.CROSSBOW &&
-			projectile instanceof AbstractArrow arrow) {
+		ItemStack arrow = event.getArrow();
+		if (itemInMainHand.getType() == Material.CROSSBOW) {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				updateItemStack(itemInMainHand, arrow);
+				useCrossbow(player, itemInMainHand, arrow, (int) level + 1);
 				player.updateInventory();
-				player.sendActionBar(Component.text("Ammo: " + getAmmoCount(itemInMainHand) + " / " + ((int) level + 1), NamedTextColor.YELLOW));
 			}, 1);
 		}
 	}
@@ -62,76 +54,63 @@ public class Multiload implements Enchantment {
 		// When loading the crossbow, set level as ammo count.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			ItemStack crossbow = event.getCrossbow();
-			CrossbowMeta meta = (CrossbowMeta) crossbow.getItemMeta();
-			ItemStack arrowItem = meta.getChargedProjectiles().get(0);
-
-			int maxArrows = (int) level + 1;
-			int arrowsToAccount = maxArrows - 1;
-			for (ItemStack itemStack : player.getInventory()) {
-				// Loop through the player's inventory for the arrows that is the same.
-				if (itemStack != null && itemStack.isSimilar(arrowItem)) {
-					if (itemStack.getAmount() > arrowsToAccount) {
-						itemStack.setAmount(itemStack.getAmount() - arrowsToAccount);
-						arrowsToAccount = 0;
-					} else {
-						arrowsToAccount -= itemStack.getAmount();
-						itemStack.setAmount(0);
-					}
-
-					if (arrowsToAccount <= 0) {
-						break;
+			if (crossbow != null && crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta) {
+				ItemStack ammoItem = crossbowMeta.getChargedProjectiles().get(0);
+				int maxAmmo = (int) level + 1;
+				int ammoToAccount = maxAmmo - 1;
+				for (ItemStack itemStack : player.getInventory()) {
+					// Loop through the player's inventory for the arrows that is the same.
+					if (itemStack != null && itemStack.isSimilar(ammoItem)) {
+						if (itemStack.getAmount() > ammoToAccount) {
+							itemStack.setAmount(itemStack.getAmount() - ammoToAccount);
+							ammoToAccount = 0;
+						} else {
+							ammoToAccount -= itemStack.getAmount();
+							itemStack.setAmount(0);
+						}
+						if (ammoToAccount <= 0) {
+							break;
+						}
 					}
 				}
+				loadCrossbow(player, crossbow, ammoItem, maxAmmo, maxAmmo - ammoToAccount);
 			}
-
-			afterLoad(player, crossbow, maxArrows, maxArrows - arrowsToAccount);
 		}, 1);
 	}
 
-	public static void afterLoad(Player player, ItemStack crossbow, int maxArrows, int loadedArrows) {
-		player.sendActionBar(Component.text("Ammo: " + loadedArrows + " / " + maxArrows, NamedTextColor.YELLOW));
-		setAmmoCount(crossbow, loadedArrows);
-	}
-
-	private static void updateItemStack(ItemStack itemStack, AbstractArrow arrow) {
-		if (itemStack.getType() != Material.CROSSBOW) {
-			return;
-		}
-
-		CrossbowMeta meta = (CrossbowMeta) itemStack.getItemMeta();
-
-		int ammoCount = getAmmoCount(itemStack);
-
-		if (ammoCount > 1) {
-			// If there are more than 1 charge, reset crossbow.
-			// Issue: Custom Arrows that adds projectile damage probably doesn't work.
-			ItemStack arrowItem = arrow.getItemStack();
-			meta.addChargedProjectile(arrowItem);
-			itemStack.setItemMeta(meta);
-			setAmmoCount(itemStack, ammoCount - 1);
-		} else {
-			setAmmoCount(itemStack, 0);
+	public static void loadCrossbow(Player player, ItemStack crossbow, ItemStack ammoItem, int maxAmmo, int currentAmmo) {
+		if (crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta) {
+			if (currentAmmo > 0) {
+				// If there are more than 0 ammo, reset crossbow.
+				// Issue: Custom Arrows that adds projectile damage probably doesn't work.
+				crossbowMeta.setChargedProjectiles(List.of(ammoItem));
+				crossbow.setItemMeta(crossbowMeta);
+			}
+			player.sendActionBar(Component.text("Ammo: " + currentAmmo + " / " + maxAmmo, NamedTextColor.YELLOW));
+			setAmmoCount(crossbow, currentAmmo);
 		}
 	}
 
-	private static void setAmmoCount(ItemStack itemStack, int amount) {
-		if (itemStack == null || itemStack.getType().isAir()) {
-			return;
-		}
-
-		// Modifies the item directly to set amount of ammo
-		NBTItem nbtItem = new NBTItem(itemStack);
-		nbtItem.setInteger(AMMO_KEY, amount);
-
-		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
+	private static void useCrossbow(Player player, ItemStack crossbow, ItemStack ammoItem, int maxAmmo) {
+		loadCrossbow(player, crossbow, ammoItem, maxAmmo, getAmmoCount(crossbow) - 1);
 	}
 
-	private static int getAmmoCount(ItemStack itemStack) {
-		if (itemStack == null || itemStack.getType().isAir()) {
+	private static int getAmmoCount(ItemStack crossbow) {
+		if (crossbow == null || crossbow.getType() != Material.CROSSBOW) {
 			return 0;
 		}
-		return NBT.get(itemStack, nbt -> {
+		return NBT.get(crossbow, nbt -> {
 			return nbt.getOrDefault(AMMO_KEY, 0);
 		});
+	}
+
+	private static void setAmmoCount(ItemStack crossbow, int amount) {
+		if (crossbow == null || crossbow.getType() != Material.CROSSBOW) {
+			return;
+		}
+		// Modifies the item directly to set amount of ammo
+		NBTItem nbtItem = new NBTItem(crossbow);
+		nbtItem.setInteger(AMMO_KEY, amount);
+		crossbow.setItemMeta(nbtItem.getItem().getItemMeta());
 	}
 }
