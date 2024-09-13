@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -103,125 +104,33 @@ public final class ItemOverrides {
 
 	public void registerOverrides() {
 		BaseOverride monsterEggOverride = new MonsterEggOverride();
-		mItems.put(Material.ALLAY_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.AXOLOTL_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.BAT_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.BEE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.BLAZE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.CAT_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.CAVE_SPIDER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.CHICKEN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.COD_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.COW_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.CREEPER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.DOLPHIN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.DONKEY_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.DROWNED_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ELDER_GUARDIAN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ENDERMAN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ENDERMITE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.EVOKER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.FROG_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.FOX_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.GHAST_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.GLOW_SQUID_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.GOAT_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.GUARDIAN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.HOGLIN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.HORSE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.HUSK_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.LLAMA_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.MAGMA_CUBE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.MOOSHROOM_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.MULE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.OCELOT_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PANDA_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PARROT_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PHANTOM_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PIG_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PIGLIN_BRUTE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PIGLIN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PILLAGER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.POLAR_BEAR_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.PUFFERFISH_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.RABBIT_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.RAVAGER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SALMON_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SHEEP_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SHULKER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SILVERFISH_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SKELETON_HORSE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SKELETON_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SLIME_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SPIDER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.SQUID_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.STRAY_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.STRIDER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.TADPOLE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.TRADER_LLAMA_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.TROPICAL_FISH_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.TURTLE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.VEX_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.VILLAGER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.VINDICATOR_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.WANDERING_TRADER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.WARDEN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.WITCH_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.WITHER_SKELETON_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.WOLF_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ZOGLIN_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ZOMBIE_HORSE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ZOMBIE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ZOMBIE_VILLAGER_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ZOMBIFIED_PIGLIN_SPAWN_EGG, monsterEggOverride);
+		BaseOverride minecartOverride = new MinecartOverride();
+		BaseOverride bucketOverride = new BucketOverride();
+		// This is inefficient but it's only done once
+		for (Material mat : Material.values()) {
+			if (mat.name().contains("SPAWN_EGG")) {
+				mItems.put(mat, monsterEggOverride);
+			}
+			if (mat.name().contains("MINECART")) {
+				mItems.put(mat, minecartOverride);
+			}
+			if (mat.name().contains("BUCKET")) {
+				mItems.put(mat, bucketOverride);
+			}
+		}
 
 		BaseOverride bedOverride = new BedOverride();
-		mItems.put(Material.WHITE_BED, bedOverride);
-		mItems.put(Material.ORANGE_BED, bedOverride);
-		mItems.put(Material.MAGENTA_BED, bedOverride);
-		mItems.put(Material.LIGHT_BLUE_BED, bedOverride);
-		mItems.put(Material.YELLOW_BED, bedOverride);
-		mItems.put(Material.LIME_BED, bedOverride);
-		mItems.put(Material.PINK_BED, bedOverride);
-		mItems.put(Material.GRAY_BED, bedOverride);
-		mItems.put(Material.LIGHT_GRAY_BED, bedOverride);
-		mItems.put(Material.CYAN_BED, bedOverride);
-		mItems.put(Material.PURPLE_BED, bedOverride);
-		mItems.put(Material.BLUE_BED, bedOverride);
-		mItems.put(Material.BROWN_BED, bedOverride);
-		mItems.put(Material.GREEN_BED, bedOverride);
-		mItems.put(Material.RED_BED, bedOverride);
-		mItems.put(Material.BLACK_BED, bedOverride);
+		for (Material bed : Tag.BEDS.getValues()) {
+			mItems.put(bed, bedOverride);
+		}
 
 		RespawnAnchorOverride respawnAnchorOverride = new RespawnAnchorOverride();
 		mItems.put(Material.RESPAWN_ANCHOR, respawnAnchorOverride);
 
 		BaseOverride boatOverride = new BoatOverride();
-		mItems.put(Material.OAK_BOAT, boatOverride);
-		mItems.put(Material.OAK_CHEST_BOAT, boatOverride);
-		mItems.put(Material.ACACIA_BOAT, boatOverride);
-		mItems.put(Material.ACACIA_CHEST_BOAT, boatOverride);
-		mItems.put(Material.BIRCH_BOAT, boatOverride);
-		mItems.put(Material.BIRCH_CHEST_BOAT, boatOverride);
-		mItems.put(Material.DARK_OAK_BOAT, boatOverride);
-		mItems.put(Material.DARK_OAK_CHEST_BOAT, boatOverride);
-		mItems.put(Material.JUNGLE_BOAT, boatOverride);
-		mItems.put(Material.JUNGLE_CHEST_BOAT, boatOverride);
-		mItems.put(Material.SPRUCE_BOAT, boatOverride);
-		mItems.put(Material.SPRUCE_CHEST_BOAT, boatOverride);
-		mItems.put(Material.CHERRY_BOAT, boatOverride);
-		mItems.put(Material.CHERRY_CHEST_BOAT, boatOverride);
-		mItems.put(Material.MANGROVE_BOAT, boatOverride);
-		mItems.put(Material.MANGROVE_CHEST_BOAT, boatOverride);
-
-
-		BaseOverride minecartOverride = new MinecartOverride();
-		mItems.put(Material.MINECART, minecartOverride);
-		mItems.put(Material.CHEST_MINECART, minecartOverride);
-		mItems.put(Material.COMMAND_BLOCK_MINECART, minecartOverride);
-		mItems.put(Material.FURNACE_MINECART, minecartOverride);
-		mItems.put(Material.HOPPER_MINECART, minecartOverride);
-		mItems.put(Material.TNT_MINECART, minecartOverride);
+		for (Material boat : Tag.ITEMS_BOATS.getValues()) {
+			mItems.put(boat, boatOverride);
+		}
 
 		BaseOverride kelpOverride = new KelpOverride();
 		mItems.put(Material.KELP, kelpOverride);
@@ -232,19 +141,6 @@ public final class ItemOverrides {
 		mItems.put(Material.GRINDSTONE, new GrindstoneOverride());
 		mItems.put(Material.FILLED_MAP, new MapOverride());
 		mItems.put(Material.PUMPKIN_PIE, new PumpkinPieOverride());
-
-		BaseOverride bucketOverride = new BucketOverride();
-		mItems.put(Material.BUCKET, bucketOverride);
-		mItems.put(Material.WATER_BUCKET, bucketOverride);
-		mItems.put(Material.LAVA_BUCKET, bucketOverride);
-		mItems.put(Material.POWDER_SNOW_BUCKET, bucketOverride);
-		mItems.put(Material.COD_BUCKET, bucketOverride);
-		mItems.put(Material.MILK_BUCKET, bucketOverride);
-		mItems.put(Material.PUFFERFISH_BUCKET, bucketOverride);
-		mItems.put(Material.SALMON_BUCKET, bucketOverride);
-		mItems.put(Material.TROPICAL_FISH_BUCKET, bucketOverride);
-		mItems.put(Material.AXOLOTL_BUCKET, bucketOverride);
-		mItems.put(Material.TADPOLE_BUCKET, bucketOverride);
 
 		BaseOverride chestOverride = new ChestOverride();
 		mItems.put(Material.CHEST, chestOverride);
@@ -272,10 +168,12 @@ public final class ItemOverrides {
 		mItems.put(Material.BEACON, new BeaconOverride());
 		mItems.put(Material.TRIDENT, new TridentOverride());
 		mItems.put(Material.BONE, new BoneOverride());
-		mItems.put(Material.COOKED_SALMON, new FishOverride());
-		mItems.put(Material.COOKED_COD, new FishOverride());
-		mItems.put(Material.COD, new FishOverride());
-		mItems.put(Material.SALMON, new FishOverride());
+
+		BaseOverride fishOverride = new FishOverride();
+		for (Material fish : Tag.ITEMS_FISHES.getValues()) {
+			mItems.put(fish, fishOverride);
+		}
+
 		mItems.put(Material.SHEARS, new ShearsOverride());
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
@@ -290,38 +188,14 @@ public final class ItemOverrides {
 		mItems.put(Material.SCULK_SHRIEKER, sculkOverride);
 
 		BaseOverride signOverride = new SignOverride();
-		mItems.put(Material.ACACIA_SIGN, signOverride);
-		mItems.put(Material.ACACIA_WALL_SIGN, signOverride);
-		mItems.put(Material.BIRCH_SIGN, signOverride);
-		mItems.put(Material.BIRCH_WALL_SIGN, signOverride);
-		mItems.put(Material.DARK_OAK_SIGN, signOverride);
-		mItems.put(Material.DARK_OAK_WALL_SIGN, signOverride);
-		mItems.put(Material.JUNGLE_SIGN, signOverride);
-		mItems.put(Material.JUNGLE_WALL_SIGN, signOverride);
-		mItems.put(Material.OAK_SIGN, signOverride);
-		mItems.put(Material.OAK_WALL_SIGN, signOverride);
-		mItems.put(Material.SPRUCE_SIGN, signOverride);
-		mItems.put(Material.SPRUCE_WALL_SIGN, signOverride);
-		mItems.put(Material.WARPED_SIGN, signOverride);
-		mItems.put(Material.WARPED_WALL_SIGN, signOverride);
-		mItems.put(Material.CRIMSON_SIGN, signOverride);
-		mItems.put(Material.CRIMSON_WALL_SIGN, signOverride);
-		mItems.put(Material.MANGROVE_SIGN, signOverride);
-		mItems.put(Material.MANGROVE_WALL_SIGN, signOverride);
-		mItems.put(Material.CHERRY_SIGN, signOverride);
-		mItems.put(Material.CHERRY_WALL_SIGN, signOverride);
+		for (Material sign : Tag.SIGNS.getValues()) {
+			mItems.put(sign, signOverride);
+		}
 
 		BaseOverride trapdoorOverride = new TrapdoorOverride();
-		mItems.put(Material.ACACIA_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.BIRCH_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.CRIMSON_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.DARK_OAK_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.JUNGLE_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.OAK_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.SPRUCE_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.WARPED_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.MANGROVE_TRAPDOOR, trapdoorOverride);
-		mItems.put(Material.CHERRY_TRAPDOOR, trapdoorOverride);
+		for (Material trapdoor : Tag.WOODEN_TRAPDOORS.getValues()) {
+			mItems.put(trapdoor, trapdoorOverride);
+		}
 
 		BaseOverride berryBushOverride = new BerryBushOverride();
 		mItems.put(Material.SWEET_BERRY_BUSH, berryBushOverride);
@@ -329,72 +203,23 @@ public final class ItemOverrides {
 		mItems.put(Material.CAVE_VINES_PLANT, berryBushOverride);
 
 		BaseOverride doorOverride = new DoorOverride();
-		mItems.put(Material.ACACIA_DOOR, doorOverride);
-		mItems.put(Material.BIRCH_DOOR, doorOverride);
-		mItems.put(Material.CRIMSON_DOOR, doorOverride);
-		mItems.put(Material.DARK_OAK_DOOR, doorOverride);
-		mItems.put(Material.JUNGLE_DOOR, doorOverride);
-		mItems.put(Material.OAK_DOOR, doorOverride);
-		mItems.put(Material.SPRUCE_DOOR, doorOverride);
-		mItems.put(Material.WARPED_DOOR, doorOverride);
-		mItems.put(Material.MANGROVE_DOOR, doorOverride);
-		mItems.put(Material.CHERRY_DOOR, doorOverride);
+		for (Material door : Tag.WOODEN_DOORS.getValues()) {
+			mItems.put(door, doorOverride);
+		}
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);
 
 		BaseOverride flowerOverride = new FlowerPotOverride();
 		mItems.put(Material.FLOWER_POT, flowerOverride);
-		mItems.put(Material.POTTED_DANDELION, flowerOverride);
-		mItems.put(Material.POTTED_POPPY, flowerOverride);
-		mItems.put(Material.POTTED_BLUE_ORCHID, flowerOverride);
-		mItems.put(Material.POTTED_ALLIUM, flowerOverride);
-		mItems.put(Material.POTTED_AZURE_BLUET, flowerOverride);
-		mItems.put(Material.POTTED_RED_TULIP, flowerOverride);
-		mItems.put(Material.POTTED_ORANGE_TULIP, flowerOverride);
-		mItems.put(Material.POTTED_WHITE_TULIP, flowerOverride);
-		mItems.put(Material.POTTED_PINK_TULIP, flowerOverride);
-		mItems.put(Material.POTTED_OXEYE_DAISY, flowerOverride);
-		mItems.put(Material.POTTED_CORNFLOWER, flowerOverride);
-		mItems.put(Material.POTTED_LILY_OF_THE_VALLEY, flowerOverride);
-		mItems.put(Material.POTTED_WITHER_ROSE, flowerOverride);
-		mItems.put(Material.POTTED_OAK_SAPLING, flowerOverride);
-		mItems.put(Material.POTTED_SPRUCE_SAPLING, flowerOverride);
-		mItems.put(Material.POTTED_BIRCH_SAPLING, flowerOverride);
-		mItems.put(Material.POTTED_JUNGLE_SAPLING, flowerOverride);
-		mItems.put(Material.POTTED_ACACIA_SAPLING, flowerOverride);
-		mItems.put(Material.POTTED_DARK_OAK_SAPLING, flowerOverride);
-		mItems.put(Material.POTTED_AZALEA_BUSH, flowerOverride);
-		mItems.put(Material.POTTED_FLOWERING_AZALEA_BUSH, flowerOverride);
-		mItems.put(Material.POTTED_RED_MUSHROOM, flowerOverride);
-		mItems.put(Material.POTTED_BROWN_MUSHROOM, flowerOverride);
-		mItems.put(Material.POTTED_FERN, flowerOverride);
-		mItems.put(Material.POTTED_DEAD_BUSH, flowerOverride);
-		mItems.put(Material.POTTED_CACTUS, flowerOverride);
-		mItems.put(Material.POTTED_BAMBOO, flowerOverride);
-		mItems.put(Material.POTTED_CRIMSON_FUNGUS, flowerOverride);
-		mItems.put(Material.POTTED_CRIMSON_ROOTS, flowerOverride);
-		mItems.put(Material.POTTED_WARPED_FUNGUS, flowerOverride);
-		mItems.put(Material.POTTED_WARPED_ROOTS, flowerOverride);
+		for (Material flower : Tag.FLOWERS.getValues()) {
+			mItems.put(flower, flowerOverride);
+		}
 
 		BaseOverride shulkerBoxOverride = new ShulkerBoxOverride();
-		mItems.put(Material.SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.WHITE_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.ORANGE_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.MAGENTA_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.LIGHT_BLUE_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.YELLOW_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.LIME_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.PINK_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.GRAY_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.LIGHT_GRAY_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.CYAN_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.PURPLE_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.BLUE_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.BROWN_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.GREEN_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.RED_SHULKER_BOX, shulkerBoxOverride);
-		mItems.put(Material.BLACK_SHULKER_BOX, shulkerBoxOverride);
+		for (Material shulkerBox : Tag.SHULKER_BOXES.getValues()) {
+			mItems.put(shulkerBox, shulkerBoxOverride);
+		}
 
 		BaseOverride noAdventurePlaceOverride = new NoAdventureModePlacementOverride();
 		mItems.put(Material.LILY_PAD, noAdventurePlaceOverride);
