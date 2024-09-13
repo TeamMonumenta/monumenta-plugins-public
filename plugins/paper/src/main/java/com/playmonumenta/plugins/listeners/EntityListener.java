@@ -502,8 +502,10 @@ public class EntityListener implements Listener {
 					newBall.setVelocity(origBall.getVelocity());
 					player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.4f, 0.5f);
 					event.setCancelled(true);
+					clearSnowballProjectile(newBall); // clearing infinity non-weapon snowballs
 					return;
 				}
+				clearSnowballProjectile(origBall); // clearing plain snowballs
 			} else if (event.getEntityType() == EntityType.ENDER_PEARL) {
 				EnderPearl origPearl = (EnderPearl) proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
@@ -582,6 +584,16 @@ public class EntityListener implements Listener {
 				}, 10 * 20);
 			}
 		}
+	}
+
+	// Remove snowballs thrown by the player after 10 seconds.
+	// This is so they don't get stuck in water bubble columns forever.
+	public static void clearSnowballProjectile(Snowball snowball) {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			if (snowball.isValid()) {
+				snowball.remove();
+			}
+		}, 10 * 20);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

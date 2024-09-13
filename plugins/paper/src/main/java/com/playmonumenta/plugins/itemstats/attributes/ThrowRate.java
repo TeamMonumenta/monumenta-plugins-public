@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -115,6 +116,8 @@ public class ThrowRate implements Attribute {
 
 				player.setCooldown(Material.SNOWBALL, cooldown);
 				event.setCancelled(true);
+				// For clearing weapon snowballs after 10s (to prevent being stuck in bubble columns):
+				EntityListener.clearSnowballProjectile(snowball);
 			} else {
 				return;
 			}
