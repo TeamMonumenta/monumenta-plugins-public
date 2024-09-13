@@ -605,6 +605,7 @@ public class DepthsListener implements Listener {
 			if (dp.getContent() == DepthsContent.DARKEST_DEPTHS) {
 				return;
 			}
+			dp.mLastLogoutTime = System.currentTimeMillis();
 
 			// Check if in active bossfight
 			List<String> applicableBossTags = List.of(Callicarpa.identityTag, Broodmother.identityTag, Vesperidys.identityTag);
@@ -750,6 +751,13 @@ public class DepthsListener implements Listener {
 					disconnectAnticheese = true;
 					dp.mNumDeaths += 2;
 					MMLog.finer(player.getName() + " logged in with anticheese boss tag. mNumDeaths = " + dp.mNumDeaths);
+				}
+				if (dp.mZenithAbandonedByParty) {
+					MMLog.finer(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");
+					sendPlayerToLootRoom(player, true);
+					shouldOfflineTeleport = false;
+					player.sendMessage(Component.text("Your party has abandoned you...", NamedTextColor.DARK_AQUA));
+					AuditListener.logDeath(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");
 				}
 
 				if (disconnectAnticheese && getGraveDuration(party, dp, player, true) < GRAVE_REVIVE_DURATION) {

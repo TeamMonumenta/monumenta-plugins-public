@@ -74,8 +74,14 @@ public class DepthsPlayer {
 	// Whether the prismatic given by Diversity has been given
 	public boolean mDiversityGift = false;
 
+	// Whether the player should be killed on login. Currently used when the party abandons the player.
+	public boolean mZenithAbandonedByParty = false;
+
 	// Whether the player is currently processing Abnormality
 	public int mAbnormalityLevel = 0;
+
+	// The last time the player logged out. If 0, then they haven't logged out yet.
+	public long mLastLogoutTime = 0;
 
 	// Abilities that the player can receive from Generosity
 	public final List<DepthsAbilityItem> mGenerosityGifts = new ArrayList<>();

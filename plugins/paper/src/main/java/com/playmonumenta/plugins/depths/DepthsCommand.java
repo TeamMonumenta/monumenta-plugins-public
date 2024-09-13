@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GenericCommand;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.depths.guis.DepthsDebugGUI;
@@ -16,14 +17,17 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.arguments.TextArgument;
+import dev.jorel.commandapi.arguments.UUIDArgument;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 public class DepthsCommand extends GenericCommand {
 
@@ -255,6 +259,31 @@ public class DepthsCommand extends GenericCommand {
 				if (party != null) {
 					party.mIsLoadingRoom = false;
 				}
+			}).register();
+
+		String sacrificeBypass = "monumenta.command.depths.bypassnosacrifice";
+		new CommandAPICommand("zenithabandon")
+			.withArguments(new UUIDArgument("player uuid"))
+			.executes((sender, args) -> {
+				UUID player = (UUID) args.get("player uuid");
+				DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
+				if (dp == null) {
+					return;
+				}
+				if (sender instanceof Player playerSender) {
+
+					// This cast is guaranteed to succeed.
+					if (dp.mZenithAbandonedByParty || (!playerSender.hasMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY)
+						|| !((List<UUID>) playerSender.getMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY).get(0).value()).contains(player) && !playerSender.hasPermission(sacrificeBypass))) {
+						DepthsUtils.sendFormattedMessage(playerSender, dp.getContent(), "You cannot do this right now.");
+						return;
+					}
+					dp.mZenithAbandonedByParty = true;
+					DepthsUtils.sendFormattedMessage(playerSender, dp.getContent(), "It is done...");
+					playerSender.playSound(playerSender.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					playerSender.removeMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY, Plugin.getInstance());
+				}
+
 			}).register();
 	}
 }

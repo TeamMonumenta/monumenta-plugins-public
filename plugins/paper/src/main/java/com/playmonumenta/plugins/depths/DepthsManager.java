@@ -126,6 +126,7 @@ import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.rooms.RoomRepository;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -136,6 +137,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Type;
@@ -153,17 +155,21 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -219,6 +225,8 @@ public class DepthsManager {
 	public static final String DEATH_WAITING_ROOM_STAND_NAME = "DepthsDeathWaitingRoom";
 
 	public static final String PAID_SCOREBOARD_TAG = "DepthsWeaponAspectUpgradeBought";
+
+	public static final String ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY = "ZenithAbandonablePlayers";
 
 	// Singleton implementation
 	private static @Nullable DepthsManager mInstance;
@@ -437,7 +445,7 @@ public class DepthsManager {
 		// If the players need a new party, create one
 		// The constructor will also assign the players to this party
 
-		if (depthsPlayers.size() > 0) {
+		if (!depthsPlayers.isEmpty()) {
 			if (partyToAdd == null) {
 				mParties.add(new DepthsParty(depthsPlayers, player.getLocation()));
 			} else {
@@ -1229,6 +1237,34 @@ public class DepthsManager {
 		}
 		if (party.mSpawnedForcedCleansingRoom && !party.isAscensionPurgeMet()) {
 			party.sendMessage("Each player must remove an ability before moving on!");
+			List<UUID> offlines = new ArrayList<>(); // just in case there are multiple, we use a list.
+			for (DepthsPlayer pa : party.mPlayersInParty) {
+
+
+				int logoutTime = (int) (System.currentTimeMillis() - pa.mLastLogoutTime);
+				boolean canAbandon = logoutTime > 5 * 60 * 1000;
+				OfflinePlayer op = Bukkit.getOfflinePlayer(pa.mPlayerId);
+				// only applies to people who aren't online and weren't abandoned.
+				if (op.isOnline() || pa.mZenithAbandonedByParty) {
+					continue;
+				}
+				if (canAbandon) {
+					DepthsUtils.sendFormattedMessage(player, party.mContent,
+						Component.text(MonumentaRedisSyncIntegration.cachedUuidToName(pa.mPlayerId) + " is not online, so you cannot progress to the boss. Click this message to abandon them. They will be sent to the lootroom upon logging in. ", NamedTextColor.RED)
+							.append(Component.text("THIS ACTION CANNOT BE UNDONE.", NamedTextColor.DARK_RED)
+								.decorate(TextDecoration.BOLD))
+							.clickEvent(ClickEvent.runCommand("/zenithabandon " + pa.mPlayerId))
+							.hoverEvent(HoverEvent.showText(Component.text("(!) This action cannot be undone!", NamedTextColor.RED))));
+					offlines.add(op.getUniqueId());
+				} else {
+					DepthsUtils.sendFormattedMessage(player, party.mContent,
+						Component.text(MonumentaRedisSyncIntegration.cachedUuidToName(pa.mPlayerId) + " is not online, so you cannot progress to the boss. After they have been logged out for 5 minutes, you can abandon them and progress without them. They have been logged out for " + StringUtils.ticksToTime((int) (logoutTime * 0.02)), NamedTextColor.RED));
+				}
+			}
+			// These are the players that can now be abandoned.
+			if (!offlines.isEmpty()) {
+				player.setMetadata(ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY, new FixedMetadataValue(Plugin.getInstance(), offlines));
+			}
 			return;
 		}
 		party.mNextRoomChoices.clear();
