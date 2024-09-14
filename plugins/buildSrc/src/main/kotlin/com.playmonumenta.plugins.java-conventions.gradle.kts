@@ -11,7 +11,6 @@ repositories {
     maven("https://repo.maven.apache.org/maven2/")
     maven("https://jitpack.io")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://maven.playpro.com/")
     maven("https://repo.jeff-media.com/public/")
     maven("https://ci.mg-dev.eu/plugin/repository/everything")
