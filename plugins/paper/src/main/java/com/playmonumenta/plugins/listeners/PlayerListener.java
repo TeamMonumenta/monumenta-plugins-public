@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
@@ -207,7 +208,10 @@ public class PlayerListener implements Listener {
 				@Override
 				public void run() {
 					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getScoreboardTags().contains("MidTransfer") || player.hasPermission("group.devops")) {
+						if (
+							MonumentaRedisSyncIntegration.isPlayerTransferring(player)
+								|| player.hasPermission("group.devops")
+						) {
 							continue;
 						}
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1, false, false));
