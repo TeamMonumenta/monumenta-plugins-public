@@ -113,12 +113,12 @@ public class EarthenTremor extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobsInSphere(mPlayer.getLocation(), mRadius, null)) {
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
+			mHitEntities.add(mob);
 			if (!EntityUtils.isCCImmuneMob(mob)) {
 				MovementUtils.knockAway(mPlayer, mob, mKnockback);
 				if (isLevelTwo()) {
 					EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
 				}
-				mHitEntities.add(mob);
 			}
 		}
 		mCosmetic.earthenTremorEffect(mPlayer, mRadius);
@@ -136,12 +136,12 @@ public class EarthenTremor extends Ability {
 					mShockwaveHits.removeAll(mHitEntities);
 					for (LivingEntity mob : mShockwaveHits) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
+						mHitEntities.add(mob);
 						if (!EntityUtils.isCCImmuneMob(mob)) {
 							MovementUtils.knockAway(mPlayer, mob, mKnockback);
 							if (isLevelTwo()) {
 								EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
 							}
-							mHitEntities.add(mob);
 						}
 					}
 				}
