@@ -5,7 +5,10 @@ import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.tracking.TrackingManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +20,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Shulker;
 
 public class SpellLingeringParadox extends Spell {
 	private static final int RANGE = 30;
@@ -48,7 +52,16 @@ public class SpellLingeringParadox extends Spell {
 	}
 
 	public void spawnExchanger(Location loc) {
-		mSpawnedMobs.add(LibraryOfSoulsIntegration.summon(loc, "TemporalExchanger"));
+		Entity entity = LibraryOfSoulsIntegration.summon(loc, "TemporalExchanger");
+		if (entity instanceof Shulker shulker) {
+			// THIS DOESN'T WORK FOR PISTONS ;-;
+			shulker.setCollidable(false);
+			shulker.addScoreboardTag(AbilityUtils.IGNORE_TAG);
+			shulker.addScoreboardTag("UNPUSHABLE");
+			shulker.addScoreboardTag("SkillImmune");
+			ScoreboardUtils.addEntityToTeam(shulker, TrackingManager.UNPUSHABLE_TEAM);
+			mSpawnedMobs.add(shulker);
+		}
 	}
 
 	public void deleteExchangers() {

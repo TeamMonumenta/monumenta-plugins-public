@@ -59,7 +59,7 @@ public class SpellFinalStandPassive extends Spell {
 			}
 
 			for (Player p : mConstruct.getArenaPlayers()) {
-				if (mCenter.distanceSquared(p.getLocation()) < mRadius * mRadius) {
+				if (mCenter.distanceSquared(p.getLocation()) > mRadius * mRadius) {
 					DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE_PER_SECOND, null, true, true, "Instability");
 					MovementUtils.knockAway(mCenter, p, 0, .25f, false);
 				}

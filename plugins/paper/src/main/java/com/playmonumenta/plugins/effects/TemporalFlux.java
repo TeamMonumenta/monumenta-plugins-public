@@ -99,7 +99,11 @@ public class TemporalFlux extends ZeroArgumentEffect {
 
 	@Override
 	public void onDeath(EntityDeathEvent event) {
-		event.getEntity().hideBossBar(mBossBar);
+		Entity entity = event.getEntity();
+		if (entity instanceof Player player) {
+			player.hideBossBar(mBossBar);
+			setDuration(0);
+		}
 	}
 
 	@Override
@@ -108,15 +112,18 @@ public class TemporalFlux extends ZeroArgumentEffect {
 		entity.sendMessage(Component.text("You are no longer inflicted with Paradox; you are safe for now.", NamedTextColor.GRAY));
 	}
 
-	public static TemporalFlux deserialize(JsonObject object, Plugin plugin) {
-		int duration = object.get("duration").getAsInt();
-
-		return new TemporalFlux(duration);
+	public static @Nullable TemporalFlux deserialize(JsonObject object, Plugin plugin) {
+		return null;
 	}
 
 	@Override
 	public String toString() {
 		return String.format(GENERIC_NAME + ":%d", this.getDuration());
+	}
+
+	@Override
+	public boolean skipInRespawnRefresh() {
+		return true;
 	}
 
 }
