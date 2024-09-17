@@ -212,7 +212,7 @@ public class DamageListener implements Listener {
 		}
 
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
-		if (source instanceof Player player
+		if (!event.isCancelled() && source instanceof Player player
 			    && ((damager instanceof Projectile proj && !proj.hasMetadata(RapidFire.META_DATA_TAG)) || ElementalArrows.isElementalArrowDamage(event))
 			    && event.getType() != DamageEvent.DamageType.TRUE) {
 			double damage = event.getDamage();
