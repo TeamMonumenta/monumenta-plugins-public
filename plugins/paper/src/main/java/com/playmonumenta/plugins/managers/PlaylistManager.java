@@ -78,59 +78,59 @@ public class PlaylistManager implements Listener {
 		private JsonObject toJson() {
 			JsonObject json = new JsonObject();
 			JsonArray tracksJson = new JsonArray();
-			for (PlaylistData.PlaylistTrack track : mPlaylistTracks) {
+			for (PlaylistTrack track : mPlaylistTracks) {
 				tracksJson.add(track.toJson());
 			}
 			json.add("playlistTracks", tracksJson);
 			json.addProperty("currentTrackIndex", mCurrentTrackIndex);
 			return json;
 		}
+	}
 
-		public static class PlaylistTrack {
+	public static class PlaylistTrack {
 
-			public Material mMaterial;
-			public String mName;
-			public TextColor mColor;
-			public String mLocation;
-			public String mComposer;
-			public String mTrack;
-			public double mDuration;
+		public Material mMaterial;
+		public String mName;
+		public TextColor mColor;
+		public String mLocation;
+		public String mComposer;
+		public String mTrack;
+		public double mDuration;
 
-			public PlaylistTrack(Material material, String name, TextColor color, String location, @Nullable String composer, String track, double duration) {
-				mMaterial = material;
-				mName = name;
-				mColor = color;
-				mLocation = location;
-				mComposer = composer != null ? composer : "";
-				mTrack = track;
-				mDuration = duration;
-			}
+		public PlaylistTrack(Material material, String name, TextColor color, String location, @Nullable String composer, String track, double duration) {
+			mMaterial = material;
+			mName = name;
+			mColor = color;
+			mLocation = location;
+			mComposer = composer != null ? composer : "";
+			mTrack = track;
+			mDuration = duration;
+		}
 
-			public JsonObject toJson() {
-				JsonObject json = new JsonObject();
+		public JsonObject toJson() {
+			JsonObject json = new JsonObject();
 
-				json.addProperty("material", String.valueOf(mMaterial));
-				json.addProperty("name", mName);
-				json.addProperty("color", mColor.asHexString());
-				json.addProperty("location", mLocation);
-				json.addProperty("composer", mComposer);
-				json.addProperty("track", mTrack);
-				json.addProperty("duration", mDuration);
+			json.addProperty("material", String.valueOf(mMaterial));
+			json.addProperty("name", mName);
+			json.addProperty("color", mColor.asHexString());
+			json.addProperty("location", mLocation);
+			json.addProperty("composer", mComposer);
+			json.addProperty("track", mTrack);
+			json.addProperty("duration", mDuration);
 
-				return json;
-			}
+			return json;
+		}
 
-			private static PlaylistTrack fromJson(JsonObject json) {
-				Material material = Material.getMaterial(json.getAsJsonPrimitive("material").getAsString());
-				String name = json.getAsJsonPrimitive("name").getAsString();
-				TextColor color = TextColor.fromCSSHexString(json.getAsJsonPrimitive("color").getAsString());
-				String location = json.getAsJsonPrimitive("location").getAsString();
-				String composer = json.getAsJsonPrimitive("composer").getAsString();
-				String track = json.getAsJsonPrimitive("track").getAsString();
-				double duration = json.getAsJsonPrimitive("duration").getAsDouble();
+		private static PlaylistTrack fromJson(JsonObject json) {
+			Material material = Material.getMaterial(json.getAsJsonPrimitive("material").getAsString());
+			String name = json.getAsJsonPrimitive("name").getAsString();
+			TextColor color = TextColor.fromCSSHexString(json.getAsJsonPrimitive("color").getAsString());
+			String location = json.getAsJsonPrimitive("location").getAsString();
+			String composer = json.getAsJsonPrimitive("composer").getAsString();
+			String track = json.getAsJsonPrimitive("track").getAsString();
+			double duration = json.getAsJsonPrimitive("duration").getAsDouble();
 
-				return new PlaylistTrack(material, name, color, location, composer, track, duration);
-			}
+			return new PlaylistTrack(material, name, color, location, composer, track, duration);
 		}
 	}
 }

@@ -119,7 +119,7 @@ public class MusicGui extends Gui {
 				addMusicItem(2, 7, Material.MUSIC_DISC_CAT, "Heart of the Jungle", Location.KAUL, "Kaul", "Whitebeard_OP", "epic:music.kaul", 220, checkScore("KaulWins"));
 
 				addMusicItem(3, 1, Material.MUSIC_DISC_PIGSTEP, "Realm of Fate", Location.AMBER, "King's Valley", "Corpe_", "epic:music.valley", 174, true);
-				addMusicItem(3, 2, Material.MUSIC_DISC_FAR, "Jovial Jaunt", TextColor.fromHexString("d1e05c"), "Racing Theme", "Whitebeard_OP", "epic:music.racegeneric", 113, true);
+				addMusicItem(3, 2, Material.MUSIC_DISC_FAR, "Jovial Jaunt", Location.OVERWORLD1, "Racing Theme", "Whitebeard_OP", "epic:music.racegeneric", 113, true);
 				addMusicItem(3, 3, Material.MUSIC_DISC_MELLOHI, "Endless Tactics", Location.BLITZ, "Blitz", "Whitebeard_OP", "epic:music.blitz", 118, checkScore("Blitz", 10));
 
 				addMusicItem(3, 5, Material.MUSIC_DISC_13, "Sacred Temple", Location.AMBER, "The Monument", "Whitebeard_OP", "epic:music.monument", 244, checkAdvance("monumenta:handbook/important_sites/r1/monument"));
@@ -167,7 +167,7 @@ public class MusicGui extends Gui {
 				addMusicItem(1, 2, Material.MUSIC_DISC_STAL, "Argentum Lament", Location.KEEP, "New Antium", "Whitebeard_OP", "epic:music.newantium", 205, checkAdvance("monumenta:quests/r3/newantium"));
 				addMusicItem(1, 3, Material.MUSIC_DISC_MALL, "Resting Among the Stars", Location.STARPOINT, "Chantry of Repentance", "Xernial", "epic:music.chantry", 159, checkAdvance("monumenta:quests/r3/chantryofrepentance"));
 
-				addMusicItem(1, 5, Material.MUSIC_DISC_BLOCKS, "The Architect's Ring", TextColor.fromHexString("ff8f26"), "The Architect's Ring", "Corpe_", "epic:music.ring", 187, checkScore("R3Access"));
+				addMusicItem(1, 5, Material.MUSIC_DISC_BLOCKS, "The Architect's Ring", Location.OVERWORLD3, "The Architect's Ring", "Corpe_", "epic:music.ring", 187, checkScore("R3Access"));
 				addMusicItem(1, 6, Material.MUSIC_DISC_MALL, "Into the Star Verse", Location.STARPOINT, "Star Point", "CmdrGod", "epic:music.starpoint", 215, checkScore("R3Access"));
 
 				addMusicItem(2, 2, Material.MUSIC_DISC_WAIT, "Reckoning", Location.BLUESTRIKE, "Samwell", "CmdrGod", "epic:music.samwell", 267, checkScore("MasqueradersRuin"));
@@ -201,7 +201,7 @@ public class MusicGui extends Gui {
 				int[] row = {1, 2, 3, 4};
 				int[] column = {1, 2, 3, 4, 5, 6, 7};
 				for (int i = 0; i < mPlaylistData.mPlaylistTracks.size(); i++) {
-					PlaylistManager.PlaylistData.PlaylistTrack track = mPlaylistData.mPlaylistTracks.get(i);
+					PlaylistManager.PlaylistTrack track = mPlaylistData.mPlaylistTracks.get(i);
 					addMusicItem(row[(int) Math.floor((double) i / 7)], column[i % 7], track.mMaterial, track.mName, track.mColor, track.mLocation, track.mComposer, track.mTrack, track.mDuration, true);
 				}
 				ItemStack playlist = GUIUtils.createBasicItem(Material.PAINTING, "Music Playlist", TextColor.fromCSSHexString("#E8C392"), true);
@@ -373,7 +373,7 @@ public class MusicGui extends Gui {
 			} else if (event.getClick().isRightClick()) {
 				if (mPage != MusicPage.PLAYLIST) {
 					if (mPlaylistData.mPlaylistTracks.size() < mMaxPlaylistTracks) {
-						mPlaylistData.mPlaylistTracks.add(new PlaylistManager.PlaylistData.PlaylistTrack(material, name, color, location, composer, track, duration));
+						mPlaylistData.mPlaylistTracks.add(new PlaylistManager.PlaylistTrack(material, name, color, location, composer, track, duration));
 						mPlayer.sendMessage(name + " has been added to your playlist. (" + mPlaylistData.mPlaylistTracks.size() + "/" + mMaxPlaylistTracks + ")");
 					} else {
 						mPlayer.sendMessage("Your playlist is too large! Remove songs in order to add new ones. (" + mPlaylistData.mPlaylistTracks.size() + "/" + mMaxPlaylistTracks + ")");
