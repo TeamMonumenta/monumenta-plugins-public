@@ -97,7 +97,7 @@ public enum EnchantmentType {
 	JUNGLES_NOURISHMENT(new JunglesNourishment(), false, false, false, false),
 	LIFE_DRAIN(new LifeDrain(), true, false, false, true),
 	LIQUID_COURAGE(new LiquidCourage(), false, false, false, false),
-	MULTILOAD(new Multiload(), true, false, false, true),
+	MULTILOAD(new Multiload(), true, false, false, false),
 	MULTITOOL(new Multitool(), true, false, false, false),
 	RADIANT(new Radiant(), false, false, false, false),
 	REGENERATION(new Regeneration(), true, false, false, true),

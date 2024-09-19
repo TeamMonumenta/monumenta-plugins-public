@@ -107,7 +107,7 @@ public class Quickdraw extends Ability {
 		Projectile proj;
 		switch (inMainHand.getType()) {
 			case BOW, CROSSBOW -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);
-			case TRIDENT -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Trident.class);
+			case TRIDENT -> proj = world.spawnArrow(eyeLoc, direction, 2.5f, 0, Trident.class);
 			case SNOWBALL -> {
 				Snowball snowball = world.spawn(eyeLoc, Snowball.class);
 				ItemUtils.setSnowballItem(snowball, inMainHand);
@@ -115,8 +115,12 @@ public class Quickdraw extends Ability {
 				proj.setVelocity(direction.normalize().multiply(3.0f));
 			}
 			default -> {
-				// How did we get here?
-				return false;
+				if (ItemStatUtils.hasEnchantment(inMainHand, EnchantmentType.THROWING_KNIFE)) {
+					proj = world.spawnArrow(eyeLoc, direction, 3f, 0, Arrow.class);
+				} else {
+					// How did we get here?
+					return false;
+				}
 			}
 		}
 		mProjectile = proj;

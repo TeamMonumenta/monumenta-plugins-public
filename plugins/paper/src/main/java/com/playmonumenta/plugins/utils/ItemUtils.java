@@ -41,6 +41,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -51,6 +52,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrowableProjectile;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -752,7 +754,7 @@ public class ItemUtils {
 		if (mat == Material.TRIDENT) {
 			return !(excludeRiptide && item.containsEnchantment(Enchantment.RIPTIDE));
 		} else {
-			return SHOOTABLES.contains(mat);
+			return SHOOTABLES.contains(mat) || ItemStatUtils.hasEnchantment(item, EnchantmentType.THROWING_KNIFE);
 		}
 	}
 
@@ -863,6 +865,17 @@ public class ItemUtils {
 		//Chance to do damage (Unbreaking 0 = 1 or 100%, Unbreaking 1 = 1/2 or 50%, etc.)
 		//Colossal is also an extra 50% chance to not lose durability on top of unbreaking
 		//Need to add all enchantments to do with durability here
+		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
+		if (player.getGameMode() == GameMode.CREATIVE || meta == null) {
+			return;
+		}
+
+		PlayerItemDamageEvent eventDamage = new PlayerItemDamageEvent(player, item, 1, ((Damageable) meta).getDamage());
+		Bukkit.getPluginManager().callEvent(eventDamage);
+		if (eventDamage.isCancelled()) {
+			return;
+		}
+
 		double chance = 1.0 / ((item.getEnchantmentLevel(Enchantment.DURABILITY) + 1) * (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.COLOSSAL) + 1));
 		double rand = Math.random();
 		if (rand < chance) {
@@ -1230,8 +1243,8 @@ public class ItemUtils {
 	public static boolean isProjectileWeapon(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return isBowOrTrident(itemStack)
-				       || (itemStack.getType() == Material.SNOWBALL
-					           && ItemStatUtils.getAttributeAmount(itemStack, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0);
+				|| (itemStack.getType() == Material.SNOWBALL && ItemStatUtils.getAttributeAmount(itemStack, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0)
+				|| ItemStatUtils.hasEnchantment(itemStack, EnchantmentType.THROWING_KNIFE);
 		} else {
 			return false;
 		}

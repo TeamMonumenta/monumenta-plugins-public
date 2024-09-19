@@ -91,9 +91,8 @@ public class ThrowRate implements Attribute {
 				newProj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
-				if (player.getGameMode() != GameMode.CREATIVE) {
-					ItemUtils.damageItemWithUnbreaking(plugin, player, player.getInventory().getItemInMainHand(), 1, true);
-				}
+				ItemUtils.damageItemWithUnbreaking(plugin, player, player.getInventory().getItemInMainHand(), 1, true);
+
 				AbilityManager.getManager().playerShotProjectileEvent(player, newProj);
 			} else {
 				return;
