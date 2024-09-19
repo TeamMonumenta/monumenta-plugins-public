@@ -133,6 +133,11 @@ public class SpellGraspingHands extends Spell {
 						mLoc = player.getLocation();
 					}
 
+					// If the player dies, kill their Grasping
+					if (player.getScoreboardTags().contains("LichDead")) {
+						this.cancel();
+					}
+
 					indicator.radius(mRadius).location(mLoc).spawnAsBoss();
 					indicator2.radius(mRadius).location(mLoc).spawnAsBoss();
 
