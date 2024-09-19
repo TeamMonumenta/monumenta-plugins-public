@@ -402,6 +402,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(SnowstormStacks.effectID, SnowstormStacks::deserialize);
 		mEffectDeserializer.put(Frozen.effectID, Frozen::deserialize);
 		mEffectDeserializer.put(PoisonImmunity.effectID, PoisonImmunity::deserialize);
+		mEffectDeserializer.put(RejuvenationHealing.effectID, RejuvenationHealing::deserialize);
 	}
 
 	private static final int PERIOD = 5;

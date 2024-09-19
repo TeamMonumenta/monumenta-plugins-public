@@ -51,7 +51,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private static final String PERCENT_ATTACK_SPEED_EFFECT_NAME = "ThuribleProcessionPercentAttackSpeedEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ThuribleProcessionPercentSpeedEffect";
 	public static final String PERCENT_DAMAGE_EFFECT_NAME = "ThuribleProcessionPercentDamageEffect";
-	private static final String PERCENT_HEAL_EFFECT_NAME = "ThuribleProcessionPercentHealEffect";
+	public static final String PERCENT_HEAL_EFFECT_NAME = "ThuribleProcessionPercentHealEffect";
 	private static final String[] EFFECTS_NAMES = new String[] {PERCENT_ATTACK_SPEED_EFFECT_NAME, PERCENT_SPEED_EFFECT_NAME, PERCENT_DAMAGE_EFFECT_NAME, PERCENT_HEAL_EFFECT_NAME};
 
 	public static final String CHARM_DAMAGE = "Thurible Procession Damage Amplifier";

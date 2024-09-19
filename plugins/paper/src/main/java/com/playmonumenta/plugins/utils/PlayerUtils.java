@@ -246,8 +246,8 @@ public class PlayerUtils {
 		}
 
 		boolean sourceIsNotTarget = sourcePlayer != null && player != sourcePlayer;
-		if (sourceIsNotTarget) {
-			double healBonus = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TRIAGE) * 0.05;
+		if (sourceIsNotTarget && sourcePlayer != null /* needed to satisfy reviewdog */) {
+			double healBonus = plugin.mItemStatManager.getEnchantmentLevel(sourcePlayer, EnchantmentType.TRIAGE) * 0.05;
 			healAmount *= 1 + healBonus;
 		}
 
