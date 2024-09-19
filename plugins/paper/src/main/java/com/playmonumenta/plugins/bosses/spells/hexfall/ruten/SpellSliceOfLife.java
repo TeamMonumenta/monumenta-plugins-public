@@ -87,12 +87,12 @@ public class SpellSliceOfLife extends Spell {
 					}
 
 					new PPLine(Particle.BLOCK_DUST, mBoss.getLocation(), mVec.clone().rotateAroundY(Math.toRadians(-mAngle / 2)), mRange)
-						.countPerMeter(10)
+						.countPerMeter(3.5)
 						.data(Material.PUMPKIN.createBlockData())
 						.spawnAsBoss();
 
 					new PPLine(Particle.BLOCK_DUST, mBoss.getLocation(), mVec.clone().rotateAroundY(Math.toRadians(mAngle / 2)), mRange)
-						.countPerMeter(10)
+						.countPerMeter(3.5)
 						.data(Material.PUMPKIN.createBlockData())
 						.spawnAsBoss();
 
@@ -108,12 +108,12 @@ public class SpellSliceOfLife extends Spell {
 				if (mChargeUp.getTime() % 4 == 0 && mChargeUp.getTime() > mChargeUp.getChargeTime() * mLockInPercentage) {
 
 					new PPLine(Particle.BLOCK_DUST, mBoss.getLocation(), mVec.clone().rotateAroundY(Math.toRadians(-mAngle / 2)), mRange)
-						.countPerMeter(10)
+						.countPerMeter(2)
 						.data(Material.FIRE_CORAL_BLOCK.createBlockData())
 						.spawnAsBoss();
 
 					new PPLine(Particle.BLOCK_DUST, mBoss.getLocation(), mVec.clone().rotateAroundY(Math.toRadians(mAngle / 2)), mRange)
-						.countPerMeter(10)
+						.countPerMeter(2)
 						.data(Material.FIRE_CORAL_BLOCK.createBlockData())
 						.spawnAsBoss();
 
@@ -127,17 +127,17 @@ public class SpellSliceOfLife extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 1f, 1.5f);
 
 					new PPLine(Particle.BLOCK_DUST, mBoss.getLocation(), mVec.clone().rotateAroundY(Math.toRadians(-mAngle / 2)), mRange)
-						.countPerMeter(10)
+						.countPerMeter(2)
 						.data(Material.FIRE_CORAL_BLOCK.createBlockData())
 						.spawnAsBoss();
 
 					new PPLine(Particle.BLOCK_DUST, mBoss.getLocation(), mVec.clone().rotateAroundY(Math.toRadians(mAngle / 2)), mRange)
-						.countPerMeter(10)
+						.countPerMeter(2)
 						.data(Material.FIRE_CORAL_BLOCK.createBlockData())
 						.spawnAsBoss();
 
 					new PPCircle(Particle.BLOCK_DUST, mBoss.getLocation(), mRange)
-						.countPerMeter(5)
+						.countPerMeter(1)
 						.ringMode(true)
 						.data(Material.FIRE_CORAL_BLOCK.createBlockData())
 						.spawnAsBoss();
@@ -157,19 +157,18 @@ public class SpellSliceOfLife extends Spell {
 					mVec.rotateAroundY(Math.toRadians(mAngle / 2));
 
 					Location l = mBoss.getLocation();
-
+					world.playSound(l, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 2f);
 					for (double degree = mAngle; degree < 360; degree += 2) {
 						mVec.rotateAroundY(Math.toRadians(2));
 
 						if (degree % 10 == 0) {
 							new PPLine(Particle.SWEEP_ATTACK, mBoss.getLocation(), mBoss.getLocation().clone().add(mVec.clone().multiply(mRange).setY(0)))
-								.count(10)
+								.count(5)
 								.spawnAsBoss();
 							new PPLine(Particle.BLOCK_DUST, mBoss.getLocation(), mBoss.getLocation().clone().add(mVec.clone().multiply(mRange).setY(0)))
-								.count(10)
+								.count(5)
 								.data(Material.DIRT.createBlockData())
 								.spawnAsBoss();
-							world.playSound(l, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 2f);
 						}
 					}
 

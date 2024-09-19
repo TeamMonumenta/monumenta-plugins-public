@@ -64,19 +64,20 @@ public class SpellAbyssalSigil extends Spell {
 			public void run() {
 				if (mChargeUp.getTime() % 5 == 0) {
 					for (Location loc : locs) {
-						new PPCircle(Particle.REDSTONE, loc, mRadius).ringMode(true)
-							.count(40)
-							.data(new Particle.DustOptions(Color.fromRGB(127, 0, 255), 1.65f))
+						new PPCircle(Particle.DUST_COLOR_TRANSITION, loc, mRadius).ringMode(true)
+							.countPerMeter(0.5)
+							.data(new Particle.DustTransition(
+								Color.fromRGB(127, 0, 255),
+								Color.BLACK,
+								1.65f))
 							.spawnAsBoss();
-						for (int i = 0; i < mRadius; i += 1) {
-							if (mRadius < 1) {
-								break;
-							}
-							new PPCircle(Particle.REDSTONE, loc, i - 1)
-								.count(40)
-								.data(new Particle.DustOptions(Color.fromRGB(204, 153, 255), 1.65f))
-								.spawnAsBoss();
-						}
+						new PPCircle(Particle.DUST_COLOR_TRANSITION, loc, Math.max(1, mRadius - 1)).ringMode(false)
+							.countPerMeter(0.5) // reduce particles the more players there are
+							.data(new Particle.DustTransition(
+								Color.fromRGB(204, 153, 255),
+								Color.fromRGB(204, 153, 255),
+								3.0f))
+							.spawnAsBoss();
 					}
 				}
 				if (mChargeUp.getTime() % 10 == 0) {

@@ -17,6 +17,7 @@ import java.util.Set;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -111,12 +112,28 @@ public class SpellVileBloom extends Spell {
 									if (entity.getScoreboardTags().contains(RED_BLOOM_NAME) && progress < 0.5) {
 										new PPCircle(Particle.BLOCK_DUST, entity.getLocation(), mBloomRange)
 											.data(Material.ROSE_BUSH.createBlockData())
-											.countPerMeter(3)
+											.countPerMeter(1)
+											.spawnAsBoss();
+										new PPCircle(Particle.DUST_COLOR_TRANSITION, entity.getLocation(), mBloomRange)
+											.data(new Particle.DustTransition(
+												Color.fromRGB(166, 55, 101),
+												Color.RED,
+												1.5f
+											))
+											.countPerMeter(1)
 											.spawnAsBoss();
 									} else if (entity.getScoreboardTags().contains(BLUE_BLOOM_NAME) && progress < 1.0) {
 										new PPCircle(Particle.BLOCK_DUST, entity.getLocation(), mBloomRange)
 											.data(Material.BLUE_ORCHID.createBlockData())
-											.countPerMeter(3)
+											.countPerMeter(1)
+											.spawnAsBoss();
+										new PPCircle(Particle.DUST_COLOR_TRANSITION, entity.getLocation(), mBloomRange)
+											.data(new Particle.DustTransition(
+												Color.fromRGB(69, 100, 161),
+												Color.BLUE,
+												1.5f
+											))
+											.countPerMeter(1)
 											.spawnAsBoss();
 									}
 								}

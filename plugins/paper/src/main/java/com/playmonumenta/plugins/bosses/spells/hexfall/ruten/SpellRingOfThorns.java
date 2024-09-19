@@ -15,11 +15,13 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -36,6 +38,8 @@ public class SpellRingOfThorns extends Spell {
 	private final int mCooldown;
 	private final Location mSpawnLoc;
 	private final ChargeUpManager mChargeUp;
+	private final BlockData mDripStoneData = Material.DRIPSTONE_BLOCK.createBlockData();
+	private final BlockData mJungleLeavesData = Material.JUNGLE_LEAVES.createBlockData();
 
 	public SpellRingOfThorns(Plugin plugin, LivingEntity boss, int radius, int damage, int castTime, int targetCount, int range, int cooldown, Location centerLoc) {
 		mPlugin = plugin;
@@ -64,18 +68,20 @@ public class SpellRingOfThorns extends Spell {
 					for (Player target : mPlayers) {
 						Location fixY = target.getLocation().clone();
 						fixY.setY(mSpawnLoc.getY());
-						for (double height = 0; height < 1; height += 0.2) {
-							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, Math.min(fixY.clone().add(0, height, 0).distance(mSpawnLoc), Ruten.arenaRadius))
-								.countPerMeter(2)
-								.data(Material.DRIPSTONE_BLOCK.createBlockData())
-								.ringMode(true)
-								.spawnAsBoss();
-							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, Math.min(fixY.clone().add(0, height, 0).distance(mSpawnLoc), Ruten.arenaRadius))
-								.countPerMeter(2)
-								.data(Material.JUNGLE_LEAVES.createBlockData())
-								.ringMode(true)
-								.spawnAsBoss();
-						}
+						new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, Math.min(fixY.distance(mSpawnLoc), Ruten.arenaRadius))
+							.countPerMeter(1)
+							.data(mDripStoneData)
+							.ringMode(true)
+							.spawnAsBoss();
+						new PPCircle(Particle.DUST_COLOR_TRANSITION, mSpawnLoc, Math.min(fixY.distance(mSpawnLoc), Ruten.arenaRadius))
+							.countPerMeter(1)
+							.data(new Particle.DustTransition(
+								Color.fromRGB(77, 51, 44),
+								Color.BLACK,
+								1.5f
+							))
+							.ringMode(true)
+							.spawnAsBoss();
 						target.playSound(target, Sound.BLOCK_WOOD_FALL, SoundCategory.HOSTILE, 1f, 2f);
 					}
 				}
@@ -98,12 +104,12 @@ public class SpellRingOfThorns extends Spell {
 
 						for (double i = innerRad; i < outerRad; i += 0.25) {
 							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(0, 0.5, 0), i)
-								.data(Material.JUNGLE_LEAVES.createBlockData())
+								.data(mJungleLeavesData)
 								.ringMode(true)
 								.count(3)
 								.spawnAsBoss();
 							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(0, 0.5, 0), i)
-								.data(Material.DRIPSTONE_BLOCK.createBlockData())
+								.data(mDripStoneData)
 								.ringMode(true)
 								.count(3)
 								.spawnAsBoss();
