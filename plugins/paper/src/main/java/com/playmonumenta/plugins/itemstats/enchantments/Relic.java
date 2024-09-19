@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.Ruten;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.hexfall.InfusedLife;
+import com.playmonumenta.plugins.hexfall.HexfallUtils;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -12,7 +13,11 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -60,6 +65,17 @@ public class Relic implements Enchantment {
 			if (source != null) {
 				effect.setCurrentEnergy(0);
 				player.playSound(player, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1, 1);
+
+				List<Player> playersInRuten = new ArrayList<>();
+				for (Player p : player.getWorld().getPlayers()) {
+					if (HexfallUtils.playerInRuten(p)) {
+						playersInRuten.add(p);
+					}
+				}
+
+				for (Player p : playersInRuten) {
+					p.sendMessage(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.BOLD).append(Component.text(" has spent their Infusion of Life!", NamedTextColor.GREEN, TextDecoration.BOLD)));
+				}
 			}
 
 			BukkitRunnable runnable = new BukkitRunnable() {
@@ -147,12 +163,21 @@ public class Relic implements Enchantment {
 
 			if (source != null) {
 				plugin.mEffectManager.clearEffects(player, source);
+
+				List<Player> playersInRuten = new ArrayList<>();
+				for (Player p : world.getPlayers()) {
+					if (HexfallUtils.playerInRuten(p)) {
+						playersInRuten.add(p);
+					}
+				}
+
+				for (Player p : playersInRuten) {
+					p.sendMessage(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.BOLD).append(Component.text(" has spent their Infusion of Life!", NamedTextColor.GREEN, TextDecoration.BOLD)));
+				}
 			}
 			plugin.mEffectManager.addEffect(player, InfusedLife.GENERIC_NAME, new InfusedLife(20 * 6000));
 		}
 	}
-
-
 
 	@Override
 	public EnumSet<Slot> getSlots() {

@@ -488,16 +488,16 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				// Explosion targets
 				return explosionTarget.getTargetsListByLocation(mBoss, loc);
 			},
-			(LivingEntity bosss, Location loc) -> {
+			(LivingEntity boss, Location loc) -> {
 				// Launch aesthetics
 			},
-			(LivingEntity bosss, Location loc) -> {
+			(LivingEntity boss, Location loc) -> {
 				// grenade aesthetics
 				new PartialParticle(Particle.SMOKE_LARGE, loc)
 					.count(2)
 					.spawnAsBoss();
 			},
-			(LivingEntity bosss, Location loc) -> {
+			(LivingEntity boss, Location loc) -> {
 				// Explosion aesthetics
 				new PPExplosion(Particle.BLOCK_DUST, mBoss.getLocation())
 					.speed(1)
@@ -507,7 +507,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 					.spawnAsBoss();
 
 			},
-			(LivingEntity bosss, LivingEntity target, Location loc) -> {
+			(LivingEntity boss, LivingEntity target, Location loc) -> {
 				loc.setY(arenaHeightY);
 				// Hit action
 				for (double deg = 0; deg < 360; deg += 2) {
@@ -525,7 +525,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 			(Location loc, int ticks) -> {
 				// Ring center aesthetics
 			},
-			(LivingEntity bosss, LivingEntity target, Location loc) -> {
+			(LivingEntity boss, LivingEntity target, Location loc) -> {
 				// Lingering hit action
 			},
 			"",
