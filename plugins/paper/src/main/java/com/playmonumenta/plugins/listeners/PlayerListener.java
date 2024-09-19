@@ -1833,10 +1833,9 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void arrowConsumeEvent(ArrowConsumeEvent event) {
-		if (!mPlugin.mAbilityManager.playerConsumeArrowEvent(event.getPlayer())) {
+		mPlugin.mItemStatManager.onConsumeArrow(mPlugin, event.getPlayer(), event);
+		if (!event.isCancelled() && !mPlugin.mAbilityManager.playerConsumeArrowEvent(event.getPlayer())) {
 			event.setCancelled(true);
-		} else {
-			mPlugin.mItemStatManager.onConsumeArrow(mPlugin, event.getPlayer(), event);
 		}
 	}
 
