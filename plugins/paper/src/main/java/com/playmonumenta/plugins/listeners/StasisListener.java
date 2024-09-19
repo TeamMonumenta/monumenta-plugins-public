@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -73,7 +75,11 @@ public class StasisListener implements Listener {
 			}
 
 			RespawnStasis rs = Plugin.getInstance().mEffectManager.getActiveEffect(player, RespawnStasis.class);
-			if (rs != null && rs.getDuration() < RespawnStasis.DURATION - RespawnStasis.SPECTATE_DURATION) {
+			if (rs != null
+				    && rs.getDuration() < RespawnStasis.DURATION - RespawnStasis.SPECTATE_DURATION
+				    && MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "RespawnStasisNearbyMobsCheck", 5)
+				    && EntityUtils.getNearbyMobs(player.getLocation(), 8).isEmpty()
+			) {
 				endRespawnStasis(player);
 				return;
 			}
