@@ -105,7 +105,7 @@ public class RespawnStasis extends Stasis {
 				if (player.getGameMode() == GameMode.SPECTATOR) {
 					Location respawnLocation = PlayerUtils.getRespawnLocationAndClear(player, player.getWorld(), player.getBedSpawnLocation());
 					player.teleport(respawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
-					player.setGameMode(GameMode.SURVIVAL);
+					ZoneUtils.setExpectedGameMode(player);
 				}
 				startEffects(player);
 			}
@@ -157,7 +157,7 @@ public class RespawnStasis extends Stasis {
 				if (mRespawnLocation != null) {
 					player.teleport(mRespawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
 				}
-				player.setGameMode(GameMode.SURVIVAL);
+				ZoneUtils.setExpectedGameMode(player);
 			}
 		}
 		super.entityLoseEffect(entity);
@@ -236,8 +236,7 @@ public class RespawnStasis extends Stasis {
 
 	private void removeSpectator(Player player) {
 		mCanStopSpectating = true;
-		// Zones should handle setting to adventure when we teleport
-		player.setGameMode(GameMode.SURVIVAL);
+		ZoneUtils.setExpectedGameMode(player);
 		if (mRespawnLocation != null) {
 			player.teleport(mRespawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
 		}

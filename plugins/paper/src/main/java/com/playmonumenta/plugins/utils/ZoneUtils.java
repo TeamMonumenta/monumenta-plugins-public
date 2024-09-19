@@ -82,6 +82,50 @@ public class ZoneUtils {
 
 	public static List<Material> PRECIOUS_BLOCKS = List.of(Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK, Material.NETHERITE_BLOCK);
 
+	// Returns if the player is expected to be in Survival Mode or Adventure Mode for their given circumstances
+	public static GameMode expectedGameMode(Player player) {
+		GameMode currentGameMode = player.getGameMode();
+		Location location = player.getLocation();
+
+		/*
+		 * Checks for the plots shards, where plots may be present, but there isn't a zone for each plot.
+		 * This depends on the presence of sponge at y=10 and meeting the requirements to own a plot.
+		 * There's also an exception to allow building just outside a plot.
+		 */
+		if (hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
+			boolean isInPlot = inPlot(location, ServerProperties.getIsTownWorld());
+			if (!isInPlot) {
+				return GameMode.ADVENTURE;
+			} else if (
+				currentGameMode == GameMode.ADVENTURE
+					&& location.getY() > ServerProperties.getPlotSurvivalMinHeight()
+					&& ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0) >= 5
+			) {
+				return GameMode.SURVIVAL;
+			} else {
+				return currentGameMode;
+			}
+		}
+
+		/*
+		 * Everything after this point covers everywhere else in the game:
+		 * - Player plots have a zone covering the plot bounds
+		 * - Everything else uses the adventure mode zone property, or its absence
+		 */
+		if (
+			hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
+				&& !isInPlot(player)
+		) {
+			return GameMode.ADVENTURE;
+		}
+
+		return GameMode.SURVIVAL;
+	}
+
+	public static void setExpectedGameMode(Player player) {
+		player.setGameMode(expectedGameMode(player));
+	}
+
 	public static boolean isInPlot(Entity entity) {
 		return isInPlot(entity.getLocation());
 	}

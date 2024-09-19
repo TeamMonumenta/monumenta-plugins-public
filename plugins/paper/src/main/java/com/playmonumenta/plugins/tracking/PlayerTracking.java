@@ -45,13 +45,17 @@ public class PlayerTracking implements EntityTracking {
 	public void addEntity(Entity entity) {
 		if (entity instanceof Player player) {
 			/* Make sure the player is in the correct mode for where they logged in */
-			if (player.getGameMode().equals(GameMode.SURVIVAL)
-				&& ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-				&& !ZoneUtils.isInPlot(player)) {
+			GameMode currentGameMode = player.getGameMode();
+			GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
+			if (
+				GameMode.SURVIVAL.equals(currentGameMode)
+				&& GameMode.ADVENTURE.equals(expectedGameMode)
+			) {
 				player.setGameMode(GameMode.ADVENTURE);
-			} else if (player.getGameMode().equals(GameMode.ADVENTURE)
-				&& (!ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-					|| ZoneUtils.isInPlot(player))) {
+			} else if (
+				GameMode.ADVENTURE.equals(currentGameMode)
+					&& GameMode.SURVIVAL.equals(expectedGameMode)
+			) {
 				player.setGameMode(GameMode.SURVIVAL);
 			}
 
@@ -112,14 +116,11 @@ public class PlayerTracking implements EntityTracking {
 			}
 
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
-				boolean isInPlot = ZoneUtils.inPlot(location, ServerProperties.getIsTownWorld());
+				GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
 
-				if (mode == GameMode.SURVIVAL && !isInPlot) {
+				if (mode == GameMode.SURVIVAL && expectedGameMode == GameMode.ADVENTURE) {
 					player.setGameMode(GameMode.ADVENTURE);
-				} else if (mode == GameMode.ADVENTURE
-					&& isInPlot
-					&& loc.mY > ServerProperties.getPlotSurvivalMinHeight()
-					&& ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0) >= 5) {
+				} else if (mode == GameMode.ADVENTURE && expectedGameMode == GameMode.SPECTATOR) {
 					player.setGameMode(GameMode.SURVIVAL);
 				}
 			}

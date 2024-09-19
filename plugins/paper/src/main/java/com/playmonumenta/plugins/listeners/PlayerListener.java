@@ -246,8 +246,7 @@ public class PlayerListener implements Listener {
 		}
 
 		if (!player.isOp() && player.getGameMode() == GameMode.CREATIVE) {
-			// PlayerTracking#addEntity will handle setting the gamemode to survival based on zone
-			player.setGameMode(GameMode.ADVENTURE);
+			ZoneUtils.setExpectedGameMode(player);
 			MonumentaNetworkRelayIntegration.sendAdminMessage(player.getName() + " logged in in creative mode despite not being opped.");
 		}
 
@@ -1592,16 +1591,16 @@ public class PlayerListener implements Listener {
 	public void gamemodeCorrection(PlayerGameModeChangeEvent event) {
 		GameMode newGameMode = event.getNewGameMode();
 		Player player = event.getPlayer();
-		boolean shouldBeAdventure = (
-			ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-				&& !ZoneUtils.isInPlot(player)
-		);
+		GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
 
 		//NOTE Once we update Paper version more,
 		// replace the event's generic failure message via
 		// event.cancelMessage(),
 		// instead of doing player.sendMessage() separately
-		if (GameMode.SURVIVAL.equals(newGameMode) && shouldBeAdventure) {
+		if (
+			GameMode.SURVIVAL.equals(newGameMode)
+				&& GameMode.ADVENTURE.equals(expectedGameMode)
+		) {
 			event.setCancelled(true);
 			player.setGameMode(GameMode.ADVENTURE);
 			// Op check since listener also catches mechanisms putting players
@@ -1626,7 +1625,7 @@ public class PlayerListener implements Listener {
 						)
 				);
 			}
-		} else if (GameMode.ADVENTURE.equals(newGameMode) && !shouldBeAdventure) {
+		} else if (GameMode.ADVENTURE.equals(newGameMode) && GameMode.SURVIVAL.equals(expectedGameMode)) {
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SURVIVAL);
 			if (player.isOp()) {

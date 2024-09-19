@@ -48,6 +48,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
@@ -1962,8 +1963,11 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 										for (Player player : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											if (player.getGameMode() != GameMode.CREATIVE) {
-												player.setGameMode(GameMode.SURVIVAL);
+											if (
+												player.getGameMode() != GameMode.CREATIVE
+													&& player.getGameMode() != GameMode.SPECTATOR
+											) {
+												ZoneUtils.setExpectedGameMode(player);
 											}
 										}
 									}
