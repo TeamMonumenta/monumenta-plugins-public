@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -39,6 +40,7 @@ public class RespawnStasis extends Stasis {
 
 	public static final int MINIMUM_DURATION = 10;
 	public static final int SPECTATE_DURATION = 3 * 20;
+	public static final String SPECTATE_DISABLE_TAG = "RespawnStasisSpectateDisable";
 
 	int mShatter;
 	int mShatterLevel;
@@ -70,10 +72,11 @@ public class RespawnStasis extends Stasis {
 				&& mDeathLocation.getWorld().equals(mRespawnLocation.getWorld())
 				&& mDeathLocation.getY() > 0
 				&& player.hasPermission("monumenta.deathspectate")
+				&& !player.getScoreboardTags().contains(SPECTATE_DISABLE_TAG)
 				&& !ZoneUtils.hasZoneProperty(mDeathLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_DEATH)
 				&& !ZoneUtils.hasZoneProperty(mRespawnLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_RESPAWN)
 			) {
-				Location spectateLocation = findSpectateLocation(mDeathLocation);
+				Location spectateLocation = findSpectateLocation(mDeathLocation, player);
 				ArmorStand stand = spectateLocation.getWorld().spawn(spectateLocation, ArmorStand.class, s -> {
 					s.setInvisible(true);
 					s.setMarker(true);
@@ -120,7 +123,7 @@ public class RespawnStasis extends Stasis {
 		Plugin.getInstance().mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(getDuration(), -1, SPEED_EFFECT_NAME).displays(false));
 	}
 
-	private static Location findSpectateLocation(Location deathLocation) {
+	private static Location findSpectateLocation(Location deathLocation, Player player) {
 		Vector dir = deathLocation.getDirection();
 		dir = dir.setY(0);
 		if (dir.lengthSquared() < 0.001) {
@@ -132,7 +135,7 @@ public class RespawnStasis extends Stasis {
 		Location loc = deathLocation.clone().add(0, 1.6, 0);
 		for (int i = 0; i < 30; i++) {
 			loc.subtract(dir);
-			if (loc.getBlock().isSolid() || loc.getBlock().getRelative(BlockFace.UP).isSolid()) {
+			if (loc.getBlock().isSolid() || loc.getBlock().getRelative(BlockFace.UP).isSolid() || LocationUtils.collidesWithBlocks(player.getBoundingBox().shift(loc.clone().subtract(player.getLocation())), player.getWorld())) {
 				loc.add(dir);
 				return loc;
 			}

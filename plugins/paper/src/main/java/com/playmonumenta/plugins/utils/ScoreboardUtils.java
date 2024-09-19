@@ -108,7 +108,7 @@ public class ScoreboardUtils {
 	 *
 	 * @return Whether the tag is present after toggling it
 	 */
-	public static boolean toggleTag(Player player, String tag) {
+	public static boolean toggleTag(Entity player, String tag) {
 		boolean removed = player.getScoreboardTags().remove(tag);
 		if (!removed) {
 			player.getScoreboardTags().add(tag);

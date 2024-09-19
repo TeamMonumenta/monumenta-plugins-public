@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.custominventories;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
@@ -31,6 +32,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -113,6 +115,18 @@ public class PEBCustomInventory extends CustomInventory {
 				NmsUtils.getVersionAdapter().runConsoleCommandSilently(finalCommand);
 				if (mCloseAfter) {
 					gui.mPlayer.closeInventory();
+				}
+			});
+			return this;
+		}
+
+		public PebItem toggleTag(String tag, Component giveTagMessage, Component removeTagMessage) {
+			mActions.add((gui, event) -> {
+				HumanEntity player = event.getWhoClicked();
+				if (ScoreboardUtils.toggleTag(player, tag)) {
+					player.sendMessage(giveTagMessage);
+				} else {
+					player.sendMessage(removeTagMessage);
 				}
 			});
 			return this;
@@ -260,6 +274,12 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(33, "Cloned Finisher Elites Visibility",
 				"Click to toggle whether cloned elites in finishers glow and are visible.", NamedTextColor.LIGHT_PURPLE,
 				Material.ZOMBIE_HEAD, false).switchToPage(PebPage.FINISHER_VISIBILTY),
+			new PebItem(4 * 9 + 3, "Toggle Spectating After Death",
+				"Click to toggle whether you spectate the area in which you die for 3 seconds after dying.", NamedTextColor.LIGHT_PURPLE,
+				Material.ENDER_EYE, false).toggleTag(RespawnStasis.SPECTATE_DISABLE_TAG,
+				Component.text("Spectating after death is now disabled.", NamedTextColor.GOLD, TextDecoration.BOLD),
+				Component.text("Spectating after death is now enabled.", NamedTextColor.GOLD, TextDecoration.BOLD)
+			),
 			new PebItem(4 * 9 + 4, "Disable Depth Strider while Riptiding",
 				"Click to toggle whether depth strider is disabled constantly while holding a riptide trident, or only while riptiding.", NamedTextColor.LIGHT_PURPLE,
 				Material.TRIDENT, false).action((pebCustomInventory, event) -> {
