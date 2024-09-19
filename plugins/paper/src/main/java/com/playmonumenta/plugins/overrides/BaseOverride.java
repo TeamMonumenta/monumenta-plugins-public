@@ -31,6 +31,10 @@ public class BaseOverride {
 		return true;
 	}
 
+	public boolean physicalBlockInteraction(Plugin plugin, Player player, Action action, Block block, PlayerInteractEvent event) {
+		return true;
+	}
+
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack itemInHand) {
 		return true;
 	}

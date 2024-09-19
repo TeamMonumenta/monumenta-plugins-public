@@ -202,6 +202,9 @@ public final class ItemOverrides {
 		mItems.put(Material.CAVE_VINES, berryBushOverride);
 		mItems.put(Material.CAVE_VINES_PLANT, berryBushOverride);
 
+		BaseOverride turtleEggOverride = new TurtleEggOverride();
+		mItems.put(Material.TURTLE_EGG, turtleEggOverride);
+
 		BaseOverride doorOverride = new DoorOverride();
 		for (Material door : Tag.WOODEN_DOORS.getValues()) {
 			mItems.put(door, doorOverride);
@@ -293,6 +296,18 @@ public final class ItemOverrides {
 
 		if (block != null && blockOverride != null && event.useInteractedBlock() != Event.Result.DENY) {
 			if (!blockOverride.leftClickBlockInteraction(plugin, player, action, item, block)) {
+				event.setUseInteractedBlock(Event.Result.DENY);
+			}
+		}
+	}
+
+	public void physicalBlockInteraction(Plugin plugin, Player player, Action action,
+									   Block block, PlayerInteractEvent event) {
+		Material blockType = (block != null) ? block.getType() : Material.AIR;
+		BaseOverride blockOverride = mItems.get(blockType);
+
+		if (block != null && blockOverride != null && event.useInteractedBlock() != Event.Result.DENY) {
+			if (!blockOverride.physicalBlockInteraction(plugin, player, action, block, event)) {
 				event.setUseInteractedBlock(Event.Result.DENY);
 			}
 		}

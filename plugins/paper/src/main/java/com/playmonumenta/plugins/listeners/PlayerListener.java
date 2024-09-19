@@ -294,7 +294,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerChannelEvent(PlayerRegisterChannelEvent event) {
 		if (ClientModHandler.CHANNEL_ID.equals(event.getChannel())
-			    && event.getPlayer().isOnline()) {
+			&& event.getPlayer().isOnline()) {
 			// Check for isOnline() as this event sometimes gets called before the join event,
 			// and updating client mod state causes initialisation of player abilities, which must not happen before login or some abilities break.
 			// Also, cannot just remove this, as sometimes the channel is registered after login, so abilities are already instantiated and not sent to the player.
@@ -389,6 +389,11 @@ public class PlayerListener implements Listener {
 		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 			mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block, event);
 			if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
+				return;
+			}
+		} else if (action == Action.PHYSICAL) {
+			mPlugin.mItemOverrides.physicalBlockInteraction(mPlugin, player, action, block, event);
+				if (event.useInteractedBlock() == Event.Result.DENY) {
 				return;
 			}
 		}
