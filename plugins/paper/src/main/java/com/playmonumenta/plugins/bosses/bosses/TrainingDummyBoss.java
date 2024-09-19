@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.text.DecimalFormat;
+import java.util.ArrayDeque;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -41,12 +42,15 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
 		                                                .append(Component.text(")", NamedTextColor.YELLOW));
 
-	private double mDPSCounter = -1;
-	private double mDPSCounter10s = -1;
-	private double mDPSDisp = -1;
-	private double mDPSDisp10s = -1;
-	private double mMaxDPS = -1;
 	private @Nullable ArmorStand mHologram = null;
+
+	private boolean mSumMode = false;
+	private double mMaxDPS = -1;
+	private double mTotalDamage;
+	private final ArrayDeque<DamageInstance> mDamageInstances = new ArrayDeque<>();
+
+	private record DamageInstance(int mTick, double mDamage) {
+	}
 
 	public static class Parameters extends BossParameters {
 		public boolean REGEN = true;
@@ -97,17 +101,6 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			}
 			mNextTrueDamageReplacement = null;
 
-			Component hoverDamage = Component.text("Damage: " + damageString + "\n");
-			Component hoverType = Component.text("Type: " + type.getDisplay() + "\n");
-			Component hoverAbility = ability == null ? Component.empty() : Component.text("Source: " + ability.getName() + "\n");
-			Component hoverMob = mBoss.name().append(Component.newline());
-			Component hoverTimestamp = Component.text("Timestamp: " + Bukkit.getCurrentTick());
-			Component hover = hoverDamage.append(hoverType).append(hoverAbility).append(hoverMob).append(hoverTimestamp);
-
-			player.sendMessage(Component.text("Damage: ", NamedTextColor.GOLD)
-				.append(Component.text(damageString + " " + getTypeSymbol(type), NamedTextColor.RED))
-				.hoverEvent(HoverEvent.showText(hover)));
-
 			if (mHologram == null) {
 				mHologram = (ArmorStand) mBoss.getWorld().spawnEntity(mBoss.getEyeLocation().add(0, 0.5, 0), EntityType.ARMOR_STAND);
 				mHologram.setMarker(true);
@@ -122,72 +115,63 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				EntityUtils.setRemoveEntityOnUnload(mHologram);
 			}
 
-			if (mDPSCounter == -1) {
-				mDPSCounter = 0;
-
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					mDPSDisp = mDPSCounter;
-
-					if (mMaxDPS < mDPSCounter) {
-						mMaxDPS = mDPSCounter;
-					}
-
-					if (mHologram != null) {
-						Component hologramDisplay;
-
-						if (mDPSDisp10s >= 0) {
-							hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-								                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-								                  .append(Component.text(" (", NamedTextColor.YELLOW))
-								                  .append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
-								                  .append(Component.text("/", NamedTextColor.YELLOW))
-								                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-								                  .append(Component.text(")", NamedTextColor.YELLOW));
-						} else {
-							hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-								                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-								                  .append(Component.text(" (", NamedTextColor.YELLOW))
-								                  .append(Component.text("???", NamedTextColor.DARK_AQUA))
-								                  .append(Component.text("/", NamedTextColor.YELLOW))
-								                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-								                  .append(Component.text(")", NamedTextColor.YELLOW));
-						}
-
-						mHologram.customName(hologramDisplay);
-					}
-					mDPSCounter = -1;
-				}, 20);
-			}
-
-			if (mDPSCounter10s == -1) {
-				mDPSCounter10s = 0;
-
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					if (mHologram == null) {
-						return;
-					}
-					mDPSDisp10s = mDPSCounter10s / 10;
-					mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-						.append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-						.append(Component.text(" (", NamedTextColor.YELLOW))
-						.append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
-						.append(Component.text("/", NamedTextColor.YELLOW))
-						.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-						.append(Component.text(")", NamedTextColor.YELLOW)));
-
-					mDPSCounter10s = -1;
-				}, 200);
-			}
-
-			mDPSCounter += damage;
-			mDPSCounter10s += damage;
+			int currentTick = Bukkit.getCurrentTick();
 
 			if (type == DamageEvent.DamageType.MELEE && player.getInventory().getItemInMainHand().getType() == Material.AIR) {
-				List<Component> effects = DisplayableEffect.getSortedEffectDisplayComponents(com.playmonumenta.plugins.Plugin.getInstance(), mBoss);
-				Component effectHover = MessagingUtils.concatenateComponents(effects);
-				player.sendMessage(Component.text("Your punch clears the training dummy of all its status effects.", NamedTextColor.AQUA).hoverEvent(effectHover));
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss);
+				if (!player.isSneaking()) {
+					List<Component> effects = DisplayableEffect.getSortedEffectDisplayComponents(com.playmonumenta.plugins.Plugin.getInstance(), mBoss);
+					Component effectHover = MessagingUtils.concatenateComponents(effects);
+					player.sendMessage(Component.text("Your punch clears the training dummy of all its status effects.", NamedTextColor.AQUA).hoverEvent(effectHover));
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss);
+				} else {
+					mSumMode = !mSumMode;
+					mTotalDamage = 0;
+					mMaxDPS = 0;
+					player.sendMessage(Component.text("The training dummy now shows " + (mSumMode ? "sum of damage taken" : "damage taken per second") + ".", NamedTextColor.AQUA));
+				}
+			} else {
+				Component hoverDamage = Component.text("Damage: " + damageString + "\n");
+				Component hoverType = Component.text("Type: " + type.getDisplay() + "\n");
+				Component hoverAbility = ability == null ? Component.empty() : Component.text("Source: " + ability.getName() + "\n");
+				Component hoverMob = mBoss.name().append(Component.newline());
+				Component hoverTimestamp = Component.text("Timestamp: " + Bukkit.getCurrentTick());
+				Component hover = hoverDamage.append(hoverType).append(hoverAbility).append(hoverMob).append(hoverTimestamp);
+
+				player.sendMessage(Component.text("Damage: ", NamedTextColor.GOLD)
+						.append(Component.text(damageString + " " + getTypeSymbol(type), NamedTextColor.RED))
+						.hoverEvent(HoverEvent.showText(hover)));
+
+				mDamageInstances.add(new DamageInstance(currentTick, damage));
+				mTotalDamage += damage;
+				mDamageInstances.removeIf(di -> di.mTick + 10 * 20 <= currentTick);
 			}
+
+			if (mSumMode) {
+				double damage10s = mDamageInstances.stream().mapToDouble(di -> di.mDamage).sum();
+				if (mHologram != null) {
+					mHologram.customName(Component.text("Damage 10s / Total: ", NamedTextColor.YELLOW)
+							.append(Component.text(damageToString(damage10s, true), NamedTextColor.RED))
+							.append(Component.text(" / ", NamedTextColor.YELLOW))
+							.append(Component.text(damageToString(mTotalDamage, true), NamedTextColor.GOLD)));
+				}
+			} else {
+				double dps10s = mDamageInstances.stream().mapToDouble(di -> di.mDamage).sum() / 10;
+				double dps = mDamageInstances.stream().filter(di -> di.mTick + 20 > currentTick).mapToDouble(di -> di.mDamage).sum();
+
+				if (mMaxDPS < dps) {
+					mMaxDPS = dps;
+				}
+				if (mHologram != null) {
+					mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
+							.append(Component.text(damageToString(dps, true), NamedTextColor.RED))
+							.append(Component.text(" (", NamedTextColor.YELLOW))
+							.append(Component.text(damageToString(dps10s, true), NamedTextColor.GREEN))
+							.append(Component.text("/", NamedTextColor.YELLOW))
+							.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+							.append(Component.text(")", NamedTextColor.YELLOW)));
+				}
+			}
+
 		}
 
 		if (mRegen && mBoss.isValid() && !mBoss.isDead() && mBoss.getHealth() > 0) {
@@ -224,7 +208,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	public void unload() {
 		super.unload();
 		ArmorStand hologram = mHologram;
-		if (hologram != null && hologram.isValid()) {
+		if (hologram != null && hologram.isValid() && mPlugin.isEnabled()) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				if (hologram.isValid()) {
 					hologram.remove();
@@ -232,10 +216,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			});
 		}
 		mHologram = null;
-		mDPSCounter = -1;
-		mDPSCounter10s = -1;
-		mDPSDisp = -1;
-		mDPSDisp10s = -1;
+		mDamageInstances.clear();
 		mMaxDPS = -1;
 	}
 
