@@ -165,6 +165,7 @@ public class SpellEarthshake extends Spell {
 						double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 						double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 						FallingBlock block = world.spawnFallingBlock(b.getLocation(), b.getBlockData());
+						block.setDropItem(false);
 						block.setVelocity(new Vector(x, 1.0, z));
 					}
 					world.getBlockAt(b.getLocation()).setType(mParameters.REPLACE_BLOCKS);

@@ -283,6 +283,7 @@ public class ChanceCubes {
 							pointedDripstone.setVerticalDirection(BlockFace.DOWN);
 						}
 						FallingBlock fallingDripstone = player.getWorld().spawnFallingBlock(spawnLocation, dripstoneData);
+						fallingDripstone.setDropItem(false);
 						fallingDripstone.setDamagePerBlock(3F);
 					}
 				}
@@ -528,4 +529,3 @@ public class ChanceCubes {
 		};
 	}
 }
-

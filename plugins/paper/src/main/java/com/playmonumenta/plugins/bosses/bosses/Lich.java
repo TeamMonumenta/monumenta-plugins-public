@@ -1508,6 +1508,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		FallingBlock block = world.spawnFallingBlock(mBoss.getLocation().add(0, 3.5, 0), Bukkit.createBlockData(Material.OBSIDIAN));
 		block.setGravity(false);
 		block.setTicksLived(1);
+		block.setDropItem(false);
 		for (Player p : remaining) {
 			p.sendMessage(Component.text("AND I HAVE NO TIME FOR YOU AND YOUR MEDDLING!", NamedTextColor.LIGHT_PURPLE));
 		}
