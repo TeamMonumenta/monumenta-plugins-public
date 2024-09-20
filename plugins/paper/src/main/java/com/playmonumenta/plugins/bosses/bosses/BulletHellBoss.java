@@ -7,6 +7,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.HashSet;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,9 +24,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class BulletHellBoss extends BossAbilityGroup {
-
 	public static final String identityTag = "boss_bullet_hell";
-
 	@BossParam(help = "Bullets")
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Amount of damage a bullet will deal")
@@ -81,38 +82,44 @@ public class BulletHellBoss extends BossAbilityGroup {
 		public double ROTATION_SPEED = 480.0;
 	}
 
+	private final HashSet<UUID> mRecentlyHitPlayers = new HashSet<>();
+
 	public BulletHellBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		World world = boss.getWorld();
-		BulletHellBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new BulletHellBoss.Parameters());
+		World world = mBoss.getWorld();
+		BulletHellBoss.Parameters p = BossParameters.getParameters(mBoss, identityTag, new BulletHellBoss.Parameters());
 
 		super.constructBoss(
-			new SpellBullet(plugin, boss, new Vector(0, p.OFFSET_Y, 0), p.DURATION, p.DELAY, p.EMISSION_TICKS, p.VELOCITY, p.DETECTION, p.HITBOX_RADIUS, p.COOLDOWN, p.BULLET_DURATION, p.PATTERN,
-				p.ACCEL, p.ACCEL_START, p.ACCEL_END, p.PASS_THROUGH, p.ROTATION_SPEED,
+			new SpellBullet(plugin, mBoss, new Vector(0, p.OFFSET_Y, 0), p.DURATION, p.DELAY, p.EMISSION_TICKS, p.VELOCITY,
+				p.DETECTION, p.HITBOX_RADIUS, p.COOLDOWN, p.BULLET_DURATION, p.PATTERN, p.ACCEL, p.ACCEL_START, p.ACCEL_END,
+				p.PASS_THROUGH, p.ROTATION_SPEED,
 				(Entity entity, int tick) -> {
 					float t = tick / 10f;
 					if (tick % 5 == 0) {
 						world.playSound(mBoss.getLocation(), p.CHARGE_SOUND, SoundCategory.HOSTILE, p.CHARGE_VOLUME, t);
 					}
 				},
-				(Entity entity) -> {
-					world.playSound(mBoss.getLocation(), p.SHOOT_SOUND, SoundCategory.HOSTILE, p.SHOOT_VOLUME, 0);
-				},
+				(Entity entity) -> world.playSound(mBoss.getLocation(), p.SHOOT_SOUND, SoundCategory.HOSTILE, p.SHOOT_VOLUME, 0),
 				p.MATERIAL,
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
-					if (player != null && !blocked) {
-						if (p.DAMAGE > 0) {
-							DamageUtils.damage(boss, player, new DamageEvent.Metadata(p.DAMAGE_TYPE, null, null, p.SPELL_NAME), p.DAMAGE, false, true, false);
-						}
+					if (player != null && !blocked && !mRecentlyHitPlayers.contains(player.getUniqueId())) {
 						if (p.DAMAGE_PERCENTAGE > 0) {
-							DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(player) / 100.0, true, true, false);
+							DamageUtils.damage(mBoss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER,
+								null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(player) / 100.0,
+								true, true, false);
+						}
+						if (p.DAMAGE > 0) {
+							DamageUtils.damage(mBoss, player, new DamageEvent.Metadata(p.DAMAGE_TYPE, null,
+								null, p.SPELL_NAME), p.DAMAGE, true, true, false);
 						}
 						p.EFFECTS.apply(player, mBoss);
+
+						mRecentlyHitPlayers.add(player.getUniqueId());
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> mRecentlyHitPlayers.remove(player.getUniqueId()), 5);
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 5, 0, 0, 0, 0.175).spawnAsEnemy();
 				}
-			), p.DETECTION, null, 0);
-
+			),
+		p.DETECTION, null, 0);
 	}
-
 }
