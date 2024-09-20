@@ -1,11 +1,19 @@
 package com.playmonumenta.plugins.utils;
 
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,13 +41,13 @@ public class CommandUtils {
 	 *
 	 * @return sender's location or raises an exception
 	 */
-	public static Location getLocation(@Nullable CommandSender sender) throws Exception {
+	public static Location getLocation(@Nullable CommandSender sender) throws WrapperCommandSyntaxException {
 		return getLocation(sender, false);
 	}
 
-	public static Location getLocation(@Nullable CommandSender sender, boolean doSubtractEntityOffset) throws Exception {
+	public static Location getLocation(@Nullable CommandSender sender, boolean doSubtractEntityOffset) throws WrapperCommandSyntaxException {
 		if (sender == null) {
-			throw new Exception("sender is null!");
+			throw CommandAPI.failWithString("sender is null!");
 		} else if (sender instanceof Entity) {
 			Location senderLoc = ((Entity) sender).getLocation();
 			if (doSubtractEntityOffset) {
@@ -51,7 +59,7 @@ public class CommandUtils {
 		} else if (sender instanceof ProxiedCommandSender) {
 			return getLocation(((ProxiedCommandSender)sender).getCallee(), doSubtractEntityOffset);
 		} else {
-			throw new Exception("Failed to get required command sender coordinates");
+			throw CommandAPI.failWithString("Failed to get required command sender coordinates");
 		}
 	}
 
@@ -159,4 +167,197 @@ public class CommandUtils {
 			throw CommandAPI.failWithString("You do not have permission for this command.");
 		}
 	}
+
+	public static class ParseFailedException extends Exception {
+	}
+
+	/**
+	 * A scanner to help implement custom command arguments
+	 */
+	public static class CommandArgumentScanner {
+
+		final String mArg;
+		final int mOffset;
+		final @Nullable SuggestionsBuilder mInitialSuggestionsBuilder;
+		@Nullable SuggestionsBuilder mCurrentSuggestionsBuilder;
+		final @Nullable AtomicReference<SuggestionsBuilder> mSuggestionsBuilder;
+		final Set<Character> mDelimiters;
+		int mIndex;
+
+		public CommandArgumentScanner(String arg, int offset, String delimiters, @Nullable AtomicReference<SuggestionsBuilder> suggestionsBuilder) {
+			mArg = arg;
+			mOffset = offset;
+			mSuggestionsBuilder = suggestionsBuilder;
+			mInitialSuggestionsBuilder = suggestionsBuilder != null ? suggestionsBuilder.get() : null;
+			mDelimiters = new HashSet<>(delimiters.chars().mapToObj(i -> (char) i).toList());
+		}
+
+		public boolean hasMore() {
+			return mIndex < mArg.length();
+		}
+
+		private @Nullable SuggestionsBuilder getSuggestionsBuilder() {
+			return getSuggestionsBuilder(mIndex);
+		}
+
+		private @Nullable SuggestionsBuilder getSuggestionsBuilder(int index) {
+			if (mSuggestionsBuilder != null) {
+				if (mCurrentSuggestionsBuilder == null || mCurrentSuggestionsBuilder.getStart() != mOffset + index) {
+					mCurrentSuggestionsBuilder = Objects.requireNonNull(mInitialSuggestionsBuilder).createOffset(mOffset + index);
+					Objects.requireNonNull(mSuggestionsBuilder).set(mCurrentSuggestionsBuilder);
+				}
+				return mCurrentSuggestionsBuilder;
+			} else {
+				return null;
+			}
+		}
+
+		private void clearSuggestions() {
+			if (mSuggestionsBuilder != null) {
+				mCurrentSuggestionsBuilder = null;
+				mSuggestionsBuilder.set(mInitialSuggestionsBuilder);
+			}
+		}
+
+		private void suggest(String suggestion) {
+			SuggestionsBuilder builder = getSuggestionsBuilder();
+			if (builder != null) {
+				builder.suggest(suggestion);
+			}
+		}
+
+		public void next(char c) throws ParseFailedException {
+			if (mIndex < mArg.length() && mArg.charAt(mIndex) == c) {
+				mIndex++;
+				clearSuggestions();
+			} else {
+				if (c != ' ') {
+					suggest("" + c);
+				}
+				throw new ParseFailedException();
+			}
+		}
+
+		public boolean tryNext(char c) {
+			if (mIndex < mArg.length() && mArg.charAt(mIndex) == c) {
+				mIndex++;
+				clearSuggestions();
+				return true;
+			}
+			if (c != ' ') {
+				suggest("" + c);
+			}
+			return false;
+		}
+
+		public int scanInt() throws ParseFailedException {
+			return scanToken(s -> List.of("1"), s -> {
+				try {
+					return Integer.parseInt(s);
+				} catch (NumberFormatException e) {
+					return null;
+				}
+			});
+		}
+
+		public int scanInt(int min, int max, int suggestion) throws ParseFailedException {
+			return scanToken(s -> {
+				try {
+					int value = Integer.parseInt(s);
+					if (value < min) {
+						return List.of("" + min);
+					} else if (value > max) {
+						return List.of("" + max);
+					}
+					return List.of("" + value);
+				} catch (NumberFormatException e) {
+					return List.of("" + suggestion);
+				}
+			}, s -> {
+				try {
+					int value = Integer.parseInt(s);
+					if (value < min || value > max) {
+						return null;
+					}
+					return value;
+				} catch (NumberFormatException e) {
+					return null;
+				}
+			});
+		}
+
+		public long scanLong() throws ParseFailedException {
+			return scanToken(s -> List.of("1"), s -> {
+				try {
+					return Long.parseLong(s);
+				} catch (NumberFormatException e) {
+					return null;
+				}
+			});
+		}
+
+		public float scanFloat(float min, float max, float suggestion) throws ParseFailedException {
+			return scanToken(s -> {
+				try {
+					float value = Float.parseFloat(s);
+					if (value < min) {
+						return List.of("" + min);
+					} else if (value > max) {
+						return List.of("" + max);
+					}
+					return List.of("" + value);
+				} catch (NumberFormatException e) {
+					return List.of("" + suggestion);
+				}
+			}, s -> {
+				try {
+					float value = Float.parseFloat(s);
+					if (value < min || value > max) {
+						return null;
+					}
+					return value;
+				} catch (NumberFormatException e) {
+					return null;
+				}
+			});
+		}
+
+		public <T extends Enum<T>> T scanEnum(Class<T> enumClass) throws ParseFailedException {
+			return scanToken(p -> Arrays.stream(enumClass.getEnumConstants()).map(e -> e.name().toLowerCase(Locale.ROOT)).toList(), s -> {
+				try {
+					return Enum.valueOf(enumClass, s.toUpperCase(Locale.ROOT));
+				} catch (IllegalArgumentException e) {
+					return null;
+				}
+			});
+		}
+
+		public String scanWord() throws ParseFailedException {
+			return scanToken(s -> List.of(), s -> s);
+		}
+
+		public <T> T scanToken(Function<String, List<String>> suggestedValues, Function<String, @Nullable T> parser) throws ParseFailedException {
+			int start = mIndex;
+			while (mIndex < mArg.length() && !mDelimiters.contains(mArg.charAt(mIndex))) {
+				mIndex++;
+			}
+			T parsed = null;
+			if (mIndex != start && (mIndex == mArg.length() || mDelimiters.contains(mArg.charAt(mIndex)))) {
+				String value = mArg.substring(start, mIndex);
+				parsed = parser.apply(value);
+			}
+			SuggestionsBuilder builder = getSuggestionsBuilder(start);
+			if (builder != null) {
+				for (String value : suggestedValues.apply(mArg.substring(start, mIndex))) {
+					builder.suggest(value);
+				}
+			}
+			if (parsed != null) {
+				return parsed;
+			}
+			throw new ParseFailedException();
+		}
+
+	}
+
 }
