@@ -120,7 +120,7 @@ public class PlayerTracking implements EntityTracking {
 
 				if (mode == GameMode.SURVIVAL && expectedGameMode == GameMode.ADVENTURE) {
 					player.setGameMode(GameMode.ADVENTURE);
-				} else if (mode == GameMode.ADVENTURE && expectedGameMode == GameMode.SPECTATOR) {
+				} else if (mode == GameMode.ADVENTURE && expectedGameMode == GameMode.SURVIVAL) {
 					player.setGameMode(GameMode.SURVIVAL);
 				}
 			}
