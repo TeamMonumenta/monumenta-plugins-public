@@ -214,7 +214,9 @@ public final class ItemOverrides {
 		mItems.put(Material.SPAWNER, unbreakableOverride);
 
 		BaseOverride flowerOverride = new FlowerPotOverride();
-		mItems.put(Material.FLOWER_POT, flowerOverride);
+		for (Material flowerPot : Tag.FLOWER_POTS.getValues()) {
+			mItems.put(flowerPot, flowerOverride);
+		}
 		for (Material flower : Tag.FLOWERS.getValues()) {
 			mItems.put(flower, flowerOverride);
 		}
