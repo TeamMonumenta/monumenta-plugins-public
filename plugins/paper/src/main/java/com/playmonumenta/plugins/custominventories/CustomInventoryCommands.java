@@ -28,6 +28,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import static com.playmonumenta.plugins.custominventories.OrinCustomInventory.TeleporterPage;
+
 public class CustomInventoryCommands {
 	public static void register(Plugin plugin) {
 		//Avoid unused arguments, make sure you have a permission tied to the GUI command,
@@ -46,7 +48,7 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openteleportergui")
 			.withPermission("monumenta.command.openteleportergui")
 			.executesPlayer((player, args) -> {
-				new OrinCustomInventory(player, -1).openInventory(player, plugin);
+				new OrinCustomInventory(player, TeleporterPage.SELF_DETERMINED).openInventory(player, plugin);
 			})
 			.register();
 		new CommandAPICommand("openteleportergui")
@@ -54,7 +56,7 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
-				new OrinCustomInventory(player, -1).openInventory(player, plugin);
+				new OrinCustomInventory(player, TeleporterPage.SELF_DETERMINED).openInventory(player, plugin);
 			})
 			.register();
 
@@ -66,8 +68,14 @@ public class CustomInventoryCommands {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
+				for (TeleporterPage page : TeleporterPage.values()) {
+					if (page.mPage == 10 + (int) args.get("region #")) {
+						new OrinCustomInventory(player, page).openInventory(player, plugin);
+						break;
+					}
+				}
 
-				new OrinCustomInventory(player, (10 + (int) args.get("region #"))).openInventory(player, plugin);
+				new OrinCustomInventory(player, TeleporterPage.SELF_DETERMINED).openInventory(player, plugin);
 			})
 			.register();
 
