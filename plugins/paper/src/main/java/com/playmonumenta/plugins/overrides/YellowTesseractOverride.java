@@ -6,8 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
-import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
@@ -104,7 +104,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			if (getCooldown(player) > 0) {
 				player.sendMessage(Component.text("Warning: Your Yellow Tesseract is on cooldown! You will be silenced if you perform any changes to your skills.", NamedTextColor.YELLOW));
 			}
-			new ClassSelectionCustomInventory(player, true).openInventory(player, Plugin.getInstance());
+			new ClassSelectionGui(player, true).open();
 			return false;
 		}
 

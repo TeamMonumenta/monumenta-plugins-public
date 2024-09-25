@@ -50,6 +50,8 @@ public class AbilityInfo<T extends Ability> {
 	private @Nullable String mSimpleDescription = null;
 	// Color used by action bar messages
 	private TextColor mActionBarColor;
+	// Secret message during quest216, if this ability has one
+	private @Nullable String mQuest216Message = null;
 
 	// If the ability does not require a scoreboardID and just a classId, leave this as null.
 	private @Nullable String mScoreboardId = null;
@@ -188,6 +190,11 @@ public class AbilityInfo<T extends Ability> {
 
 	public AbilityInfo<T> simpleDescription(String desc) {
 		mSimpleDescription = desc;
+		return this;
+	}
+
+	public AbilityInfo<T> quest216Message(String message) {
+		mQuest216Message = message;
 		return this;
 	}
 
@@ -394,6 +401,10 @@ public class AbilityInfo<T extends Ability> {
 
 	public @Nullable String getSimpleDescription() {
 		return mSimpleDescription;
+	}
+
+	public @Nullable String getQuest216Message() {
+		return mQuest216Message;
 	}
 
 	/*

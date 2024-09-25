@@ -167,8 +167,8 @@ public class MusicGui extends Gui {
 				addMusicItem(1, 2, Material.MUSIC_DISC_STAL, "Argentum Lament", Location.KEEP, "New Antium", "Whitebeard_OP", "epic:music.newantium", 205, checkAdvance("monumenta:quests/r3/newantium"));
 				addMusicItem(1, 3, Material.MUSIC_DISC_MALL, "Resting Among the Stars", Location.STARPOINT, "Chantry of Repentance", "Xernial", "epic:music.chantry", 159, checkAdvance("monumenta:quests/r3/chantryofrepentance"));
 
-				addMusicItem(1, 5, Material.MUSIC_DISC_BLOCKS, "The Architect's Ring", Location.OVERWORLD3, "The Architect's Ring", "Corpe_", "epic:music.ring", 187, checkScore("R3Access"));
-				addMusicItem(1, 6, Material.MUSIC_DISC_MALL, "Into the Star Verse", Location.STARPOINT, "Star Point", "CmdrGod", "epic:music.starpoint", 215, checkScore("R3Access"));
+				addMusicItem(1, 5, Material.MUSIC_DISC_BLOCKS, "The Architect's Ring", Location.OVERWORLD3, "The Architect's Ring", "Corpe_", "epic:music.ring", 187, checkScore(PlayerUtils.SCOREBOARD_RING_UNLOCK));
+				addMusicItem(1, 6, Material.MUSIC_DISC_MALL, "Into the Star Verse", Location.STARPOINT, "Star Point", "CmdrGod", "epic:music.starpoint", 215, checkScore(PlayerUtils.SCOREBOARD_RING_UNLOCK));
 
 				addMusicItem(2, 2, Material.MUSIC_DISC_WAIT, "Reckoning", Location.BLUESTRIKE, "Samwell", "CmdrGod", "epic:music.samwell", 267, checkScore("MasqueradersRuin"));
 				addMusicItem(2, 3, Material.MUSIC_DISC_STRAD, "Misanthropic Circuitry", Location.SCIENCE, "Iota", "Okaye", "epic:music.misanthropic_circuitry", 234, checkScore("Portal"));

@@ -91,6 +91,7 @@ public class SanctifiedArmor extends Ability {
 					),
 				"If the most recently affected mob is killed by any means other than Sanctified Armor or Thorns damage, regain half the health lost from the last damage taken.")
 			.simpleDescription("When taking damage from an Undead enemy, deal damage back based on your current health.")
+			.quest216Message("-------h-------e-------")
 			.displayItem(Material.IRON_CHESTPLATE)
 			.priorityAmount(5000); // after all damage modifiers, but before lifelines, to get the proper final damage
 

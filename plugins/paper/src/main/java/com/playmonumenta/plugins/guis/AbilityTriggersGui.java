@@ -5,11 +5,10 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
 import com.playmonumenta.plugins.depths.guis.DepthsSummaryGUI;
+import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -59,7 +58,7 @@ public class AbilityTriggersGui extends Gui {
 					"Return to the class selection page.", NamedTextColor.GRAY, 40);
 				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
-					.onLeftClick(() -> new ClassSelectionCustomInventory(mPlayer).openInventory(mPlayer, mPlugin));
+					.onLeftClick(() -> new ClassSelectionGui(mPlayer, false).open());
 			} else {
 				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
 					"Return to the ability summary page.", NamedTextColor.GRAY, 40);

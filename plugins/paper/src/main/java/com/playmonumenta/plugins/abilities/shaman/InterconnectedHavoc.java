@@ -56,10 +56,11 @@ public class InterconnectedHavoc extends Ability {
 					DAMAGE_2,
 					RANGE_2),
 				String.format("Mobs are now knocked back from the player when coming in contact " +
-					"with the line for the first time and are stunned for %ss.",
+						"with the line for the first time and are stunned for %ss.",
 					StringUtils.ticksToSeconds(STUN_TIME))
 			)
 			.simpleDescription("Forms lines between your active totems, dealing damage to mobs crossing those lines.")
+			.quest216Message("-------e-------r-------")
 			.displayItem(Material.CHAIN);
 
 	private final InterconnectedHavocCS mCosmetic;

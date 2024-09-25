@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
@@ -58,11 +57,11 @@ public class DelveInfusionUtils {
 		SOOTHING("soothing", InfusionType.SOOTHING, Location.BLUE, Material.BLUE_WOOL, "Sorceress' Staves", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
 		FUELED("fueled", InfusionType.FUELED, Location.BROWN, Material.BROWN_WOOL, "Broken God Gearframes", NamespacedKeyUtils.fromString("epic:r3/items/currency/broken_god_gearframe"), "Brown"),
 		REFRESH("refresh", InfusionType.REFRESH, Location.SILVER, Material.POLISHED_DEEPSLATE, "Silver Remnants", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT", "SKTH"),
-		QUENCH("quench", InfusionType.QUENCH, Location.FOREST, Material.DARK_OAK_WOOD, "Fenian Flowers", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
-		GRACE("grace", InfusionType.GRACE, Location.KEEP, Material.CRACKED_STONE_BRICKS, "Iridium Catalysts", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		QUENCH("quench", InfusionType.QUENCH, Location.FOREST, Material.DARK_OAK_WOOD, "Fenian Flowers", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), PlayerUtils.SCOREBOARD_RING_UNLOCK),
+		GRACE("grace", InfusionType.GRACE, Location.KEEP, Material.CRACKED_STONE_BRICKS, "Iridium Catalysts", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), PlayerUtils.SCOREBOARD_RING_UNLOCK),
 		GALVANIC("galvanic", InfusionType.GALVANIC, Location.SCIENCE, Material.IRON_BLOCK, "Corrupted Circuits", NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
 		DECAPITATION("decapitation", InfusionType.DECAPITATION, Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
-		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), PlayerUtils.SCOREBOARD_RING_UNLOCK),
 		FERVOR("fervor", InfusionType.FERVOR, Location.HEXFALL, Material.DRAGON_BREATH, "Fragrant Branch of Fen", NamespacedKeyUtils.fromString("epic:r3/items/currency/fragrant_branch_of_fen"), "Ruten"),
 
 		REFUND("refund", null, null, Material.GRINDSTONE, null, null, (String[]) null);

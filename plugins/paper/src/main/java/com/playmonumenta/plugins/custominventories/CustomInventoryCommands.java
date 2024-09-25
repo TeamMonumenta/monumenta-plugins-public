@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.guis.ZenithCharmPowerGUI;
 import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.guis.MusicGui;
+import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -241,7 +242,7 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openclassgui")
 			.withPermission("monumenta.command.openclassgui")
 			.executesPlayer((player, args) -> {
-				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
+				new ClassSelectionGui(player, false).open();
 			})
 			.register();
 		new CommandAPICommand("openclassgui")
@@ -253,7 +254,7 @@ public class CustomInventoryCommands {
 				if (sender instanceof Player playerSender) {
 					viewer = playerSender;
 				}
-				new ClassSelectionCustomInventory(player).openInventory(viewer, plugin);
+				new ClassSelectionGui(viewer, false).open();
 			})
 			.register();
 		new CommandAPICommand("openclassdisplaygui")
@@ -277,7 +278,7 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("playerdetails")
 			.withPermission("monumenta.command.playerdetails")
 			.executesPlayer((player, args) -> {
-				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
+				new ClassSelectionGui(player, false).open();
 			})
 			.register();
 		new CommandAPICommand("playerdetails")

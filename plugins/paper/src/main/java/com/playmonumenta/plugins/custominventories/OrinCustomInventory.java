@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.DungeonUtils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -16,7 +17,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -200,7 +200,7 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.SAND, "Quest101", 13,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_1, new InvLocation(4, 5), "Galengarde", sortedDesc,
-			Material.RED_MUSHROOM_BLOCK, "R3Access", 1,
+			Material.RED_MUSHROOM_BLOCK, PlayerUtils.SCOREBOARD_RING_UNLOCK, 1,
 			"execute as @S run function monumenta:mechanisms/teleporters/goto/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_1, new InvLocation(7, 5), "Dungeon Instances", "Click to view all open dungeon instances.",
 			Material.SPAWNER, null, 0,
@@ -220,7 +220,7 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.SAND, "Quest101", 13,
 			"tp @S -762.5 70.1 1344.5 180 0", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_2, new InvLocation(4, 5), "Galengarde", sortedDesc,
-			Material.RED_MUSHROOM_BLOCK, "R3Access", 1,
+			Material.RED_MUSHROOM_BLOCK, PlayerUtils.SCOREBOARD_RING_UNLOCK, 1,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_2, new InvLocation(7, 5), "Dungeon Instances", "Click to view all open dungeon instances.",
 			Material.SPAWNER, null, 0,
@@ -240,7 +240,7 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.SAND, "Quest101", 13,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_3, new InvLocation(4, 5), "Galengarde", sortedDesc,
-			Material.RED_MUSHROOM_BLOCK, "R3Access", 1,
+			Material.RED_MUSHROOM_BLOCK, PlayerUtils.SCOREBOARD_RING_UNLOCK, 1,
 			"tp @S -303.5 83 -654.5 90 0", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_3, new InvLocation(7, 5), "Dungeon Instances", "Click to view all open dungeon instances.",
 			Material.SPAWNER, null, 0,
@@ -266,7 +266,7 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.SAND, "Quest101", 13,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(4, 5), "Galengarde", sortedDesc,
-			Material.RED_MUSHROOM_BLOCK, "R3Access", 1,
+			Material.RED_MUSHROOM_BLOCK, PlayerUtils.SCOREBOARD_RING_UNLOCK, 1,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(7, 5), "Dungeon Instances", "Click to view all open dungeon instances.",
 			Material.SPAWNER, null, 0,
@@ -286,7 +286,7 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.SAND, "Quest101", 13,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLAYER_PLOTS, new InvLocation(4, 5), "Galengarde", sortedDesc,
-			Material.RED_MUSHROOM_BLOCK, "R3Access", 1,
+			Material.RED_MUSHROOM_BLOCK, PlayerUtils.SCOREBOARD_RING_UNLOCK, 1,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLAYER_PLOTS, new InvLocation(7, 5), "Dungeon Instances", "Click to view all open dungeon instances.",
 			Material.SPAWNER, null, 0,
@@ -305,7 +305,7 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.SAND, "Quest101", 13,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DEFAULT_SHARD, new InvLocation(4, 5), "Galengarde", sortedDesc,
-			Material.RED_MUSHROOM_BLOCK, "R3Access", 1,
+			Material.RED_MUSHROOM_BLOCK, PlayerUtils.SCOREBOARD_RING_UNLOCK, 1,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DEFAULT_SHARD, new InvLocation(7, 5), "Dungeon Instances", "Click to view all open dungeon instances.",
 			Material.SPAWNER, null, 0,

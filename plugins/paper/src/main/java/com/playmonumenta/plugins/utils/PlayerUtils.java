@@ -71,6 +71,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class PlayerUtils {
+	public static final String SCOREBOARD_RING_UNLOCK = "R3Access";
+
 	public static void callAbilityCastEvent(Player player, Ability ability, ClassAbility spell) {
 		AbilityCastEvent event = new AbilityCastEvent(player, ability, spell);
 		Bukkit.getPluginManager().callEvent(event);
@@ -644,7 +646,7 @@ public class PlayerUtils {
 	}
 
 	public static boolean hasUnlockedRing(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) >= 1;
+		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_RING_UNLOCK).orElse(0) >= 1;
 	}
 
 	public static Location getRespawnLocationAndClear(Player player, World world, @Nullable Location originalRespawnLocation) {

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.market.gui;
 
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +28,7 @@ public class TabChooseCurrency implements MarketGuiTab {
 	public void setup() {
 		for (int region = 0; region < CURRENCY_LOOTTABLE.length; region++) {
 			if ((region == 1 && ScoreboardUtils.getScoreboardValue(mGui.mPlayer, "Quest101").orElse(0) < 13)
-			|| (region == 2 && ScoreboardUtils.getScoreboardValue(mGui.mPlayer, "R3Access").orElse(0) < 1)) {
+			|| (region == 2 && !PlayerUtils.hasUnlockedRing(mGui.mPlayer))) {
 				continue;
 			}
 			for (int compression = 0; compression < CURRENCY_LOOTTABLE[region].length; compression++) {

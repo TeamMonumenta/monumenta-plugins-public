@@ -61,9 +61,9 @@ public class AlchemicalArtillery extends Ability {
 			.actionBarColor(TextColor.color(255, 0, 0))
 			.descriptions(
 				("Pressing the Drop Key while holding an Alchemist Bag and not sneaking launches a heavy bomb that " +
-				"explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing %s + %s%% of your " +
-				"potion's damage and applying your selected potion's effects, in an area that is %s%% of your potion's radius. " +
-				"The initial speed of the bomb scales with your projectile speed. This costs you %s potions. %ss cooldown.")
+					"explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing %s + %s%% of your " +
+					"potion's damage and applying your selected potion's effects, in an area that is %s%% of your potion's radius. " +
+					"The initial speed of the bomb scales with your projectile speed. This costs you %s potions. %ss cooldown.")
 					.formatted(
 						ARTILLERY_1_DAMAGE_RAW,
 						StringUtils.multiplierToPercentage(ARTILLERY_1_DAMAGE_MULTIPLIER),
@@ -76,13 +76,14 @@ public class AlchemicalArtillery extends Ability {
 						ARTILLERY_2_DAMAGE_RAW,
 						StringUtils.multiplierToPercentage(ARTILLERY_2_DAMAGE_MULTIPLIER)),
 				("Add an aftershock to the explosion, which happens %ss after it, and deals %s%% of the original explosion damage. " +
-				"If possible, the aftershock also applies the potion effect opposite of the one that you have selected.")
+					"If possible, the aftershock also applies the potion effect opposite of the one that you have selected.")
 					.formatted(
 						StringUtils.ticksToSeconds(AFTERSHOCK_DELAY),
 						StringUtils.multiplierToPercentage(AFTERSHOCK_DAMAGE_MULTIPLIER)
 					)
 			)
 			.simpleDescription("Launch a bomb in the direction you're looking, which applies your selected potion's effects on impact.")
+			.quest216Message("-------o-------b-------")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AlchemicalArtillery::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))

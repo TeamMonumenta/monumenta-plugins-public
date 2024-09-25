@@ -64,30 +64,31 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DAMAGE_BOOST = "Sanguine Harvest Damage Boost Amplifier";
 
 	public static final AbilityInfo<SanguineHarvest> INFO =
-			new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
-					.linkedSpell(ClassAbility.SANGUINE_HARVEST)
-					.scoreboardId("SanguineHarvest")
-					.shorthandName("SH")
-					.actionBarColor(TextColor.color(179, 0, 0))
-					.descriptions(
-							("Enemies you damage with an ability are afflicted with Bleed II for %s seconds. " +
-									"Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
-									"Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
-									"This projectile travels up to %s blocks and upon contact with a block or enemy or reaching max range, it explodes, " +
-									"knocking back all mobs within %s blocks and applying a blood mark to them for %ss. " +
-									"Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
-									.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS, StringUtils.ticksToSeconds(MARK_DURATION), StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
-							("Increase the mark's healing to %s%% of max health. " +
-								"Melee attacks against marked mobs heal the player for %s%% of their max health, deal %s%% more damage, and consume the mark.")
-									.formatted(StringUtils.multiplierToPercentage(HEAL_PERCENT_2), StringUtils.multiplierToPercentage(HEAL_PERCENT_2), StringUtils.multiplierToPercentage(DAMAGE_BOOST)),
-							("Sanguine Harvest creates a %s-block cone of blight on the ground that lasts for %ss. " +
-									"Mobs in the blighted area take %s%% extra damage per debuff they currently have. Blight is not counted as a debuff.")
-									.formatted(RANGE, StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION), StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE)))
-					.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
-					.cooldown(COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", SanguineHarvest::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
-							AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-					.displayItem(Material.NETHER_STAR);
+		new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
+			.linkedSpell(ClassAbility.SANGUINE_HARVEST)
+			.scoreboardId("SanguineHarvest")
+			.shorthandName("SH")
+			.actionBarColor(TextColor.color(179, 0, 0))
+			.descriptions(
+				("Enemies you damage with an ability are afflicted with Bleed II for %s seconds. " +
+					"Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
+					"Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
+					"This projectile travels up to %s blocks and upon contact with a block or enemy or reaching max range, it explodes, " +
+					"knocking back all mobs within %s blocks and applying a blood mark to them for %ss. " +
+					"Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
+					.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS, StringUtils.ticksToSeconds(MARK_DURATION), StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
+				("Increase the mark's healing to %s%% of max health. " +
+					"Melee attacks against marked mobs heal the player for %s%% of their max health, deal %s%% more damage, and consume the mark.")
+					.formatted(StringUtils.multiplierToPercentage(HEAL_PERCENT_2), StringUtils.multiplierToPercentage(HEAL_PERCENT_2), StringUtils.multiplierToPercentage(DAMAGE_BOOST)),
+				("Sanguine Harvest creates a %s-block cone of blight on the ground that lasts for %ss. " +
+					"Mobs in the blighted area take %s%% extra damage per debuff they currently have. Blight is not counted as a debuff.")
+					.formatted(RANGE, StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION), StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE)))
+			.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
+			.quest216Message("-------s-------m-------")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", SanguineHarvest::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(Material.NETHER_STAR);
 
 	private final double mRadius;
 	private final double mBleedLevel;
@@ -172,7 +173,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		}
 
 		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
-				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
+			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
 		Location endLoc;
 		if (result == null) {
@@ -208,7 +209,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
 	private void runMarkerRunnable() {
 		if (!mMarkedLocations.isEmpty() &&
-				isEnhanced()) {
+			isEnhanced()) {
 			new BukkitRunnable() {
 				int mTicks = 0;
 

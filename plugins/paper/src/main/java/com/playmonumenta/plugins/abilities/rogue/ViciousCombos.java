@@ -61,6 +61,7 @@ public class ViciousCombos extends Ability {
 					(int) (ENHANCEMENT_DAMAGE_INCREASE * 100),
 					ENHANCEMENT_COOLDOWN_REDUCTION / 20))
 			.simpleDescription("Killing mobs reduces cooldowns, and killing elite mobs completely refresh them.")
+			.quest216Message("-------n-------u-------")
 			.displayItem(Material.ZOMBIE_HEAD);
 
 	private @Nullable ClassAbility mLastAbility = null;
@@ -116,9 +117,9 @@ public class ViciousCombos extends Ability {
 		// LastAbility does exist
 		// The LastAbility cast time is within charge's lifetime.
 		if (isEnhanced()
-			    && event.getType() == DamageEvent.DamageType.MELEE
-			    && mLastAbility != null
-			    && Bukkit.getServer().getCurrentTick() < mAbilityCastTime + ENHANCEMENT_CHARGE_LIFETIME) {
+			&& event.getType() == DamageEvent.DamageType.MELEE
+			&& mLastAbility != null
+			&& Bukkit.getServer().getCurrentTick() < mAbilityCastTime + ENHANCEMENT_CHARGE_LIFETIME) {
 			double enhancementDamageMulti = ENHANCEMENT_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
 			event.updateDamageWithMultiplier(1 + enhancementDamageMulti);
 			mPlugin.mTimers.updateCooldown(mPlayer, mLastAbility, ENHANCEMENT_COOLDOWN_REDUCTION);

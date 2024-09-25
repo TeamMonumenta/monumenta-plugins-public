@@ -431,7 +431,7 @@ public class AbilityUtils {
 	public static int getEffectiveTotalSkillPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
-			    && ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0) {
+			    && PlayerUtils.hasUnlockedRing(player)) {
 			return MAX_SKILL_POINTS;
 		}
 		return ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
@@ -440,7 +440,7 @@ public class AbilityUtils {
 	public static int getEffectiveTotalSpecPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
-			    && ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0) {
+			    && PlayerUtils.hasUnlockedRing(player)) {
 			return MAX_SPEC_POINTS;
 		}
 		return ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
@@ -448,7 +448,7 @@ public class AbilityUtils {
 
 	public static boolean getEffectiveSpecs(Player player) {
 		// fast track: all specs in R3; and also in plots if having been to R3 at least once
-		return ServerProperties.getAbilityEnhancementsEnabled(player) && (ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0);
+		return ServerProperties.getAbilityEnhancementsEnabled(player) && PlayerUtils.hasUnlockedRing(player);
 	}
 
 	public static void resetClass(Player player) {

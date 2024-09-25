@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -233,7 +234,7 @@ public class KnickKnackSackGui extends Gui {
 
 		// Charm trinket, r3 access
 		ItemStack charm = makeTrinketItemStack("epic:r3/charms/charms_trinket");
-		if (ScoreboardUtils.getScoreboardValue(mPlayer, "R3Access").orElse(0) != 0) {
+		if (PlayerUtils.hasUnlockedRing(mPlayer)) {
 			GUIUtils.splitLoreLine(charm, "Click to open the Charms Menu.", NamedTextColor.GRAY, true);
 			GuiItem tCharm = new GuiItem(charm).onClick((evt) -> runConsoleCommand("charm gui @S"));
 			setItem(charmSlot, tCharm);
@@ -336,7 +337,7 @@ public class KnickKnackSackGui extends Gui {
 
 		// Delves Trinket, requires r3 access
 		ItemStack delve = makeTrinketItemStack("epic:r3/delves/items/delves_trinket");
-		if (ScoreboardUtils.getScoreboardValue(mPlayer, "R3Access").orElse(0) != 0) {
+		if (PlayerUtils.hasUnlockedRing(mPlayer)) {
 			GUIUtils.splitLoreLine(delve, "Click to view Architect's Ring Overworld Delve Modifiers. Shift Right Click to clear modifiers.", NamedTextColor.GRAY, true);
 
 			GuiItem tDelve = new GuiItem(delve).onClick((evt) -> {
