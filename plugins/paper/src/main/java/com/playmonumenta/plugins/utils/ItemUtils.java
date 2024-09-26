@@ -64,6 +64,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
 import org.bukkit.potion.PotionEffect;
@@ -1491,26 +1492,15 @@ public class ItemUtils {
 			return EntityType.UNKNOWN;
 		}
 
-		return NBT.get(item, nbt -> {
-			ReadableNBT entityTag = nbt.getCompound("EntityTag");
-			if (entityTag == null) {
-				return getSpawnEggType(item.getType());
+		ItemMeta meta = item.getItemMeta();
+		if (meta instanceof SpawnEggMeta spawnEggMeta) {
+			EntityType customType = spawnEggMeta.getCustomSpawnedType();
+			if (customType != null) {
+				return customType;
 			}
-			String id = entityTag.getString("id");
-			if (id == null || id.isEmpty()) {
-				return getSpawnEggType(item.getType());
-			}
-			NamespacedKey key = NamespacedKey.fromString(id);
-			if (key == null) {
-				return getSpawnEggType(item.getType());
-			}
-			for (EntityType entityType : EntityType.values()) {
-				if (key.equals(entityType.getKey())) {
-					return entityType;
-				}
-			}
-			return getSpawnEggType(item.getType());
-		});
+		}
+
+		return getSpawnEggType(item.getType());
 	}
 
 	public static ItemType getItemType(ItemStack item) {
