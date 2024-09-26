@@ -142,7 +142,7 @@ public class SpellFloralFlechettes extends Spell {
 											mLocs.add(loc);
 
 											new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(mVec.clone().multiply(mR)).add(0, 0.2, 0), mWidth)
-												.countPerMeter(2)
+												.countPerMeter(1.5)
 												.data(Material.SPORE_BLOSSOM.createBlockData())
 												.spawnAsBoss();
 
@@ -151,7 +151,7 @@ public class SpellFloralFlechettes extends Spell {
 												mLocs.add(backLoc);
 
 												new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(mVec.clone().rotateAroundY(Math.toRadians(180)).multiply(mR)).add(0, 0.2, 0), mWidth)
-													.countPerMeter(2)
+													.countPerMeter(1.5)
 													.data(Material.SPORE_BLOSSOM.createBlockData())
 													.spawnAsBoss();
 											}

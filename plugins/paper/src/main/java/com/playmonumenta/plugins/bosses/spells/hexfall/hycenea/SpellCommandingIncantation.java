@@ -105,9 +105,9 @@ public class SpellCommandingIncantation extends Spell {
 
 								if (activeBinding.playerCount() > 0) {
 									if (correct) {
-										new PPPillar(Particle.REDSTONE, pGround, 5).data(new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.25f)).count(15).spawnAsBoss();
+										new PPPillar(Particle.REDSTONE, pGround.clone().add(0, 3.5, 0), 4).data(new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.25f)).count(15).spawnAsBoss();
 									} else {
-										new PPPillar(Particle.REDSTONE, pGround, 5).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.25f)).count(5).spawnAsBoss();
+										new PPPillar(Particle.REDSTONE, pGround.clone().add(0, 3.5, 0), 4).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.25f)).count(5).spawnAsBoss();
 									}
 								}
 							}
