@@ -343,6 +343,7 @@ public class Plugin extends JavaPlugin {
 		ScanMobsCommand.register();
 		WhatTableCommand.register();
 		StatTrackAdd.register();
+		PlaySoundsCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

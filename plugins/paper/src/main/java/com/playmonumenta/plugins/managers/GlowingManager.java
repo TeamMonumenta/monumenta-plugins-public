@@ -200,7 +200,7 @@ public class GlowingManager {
 					}
 				} else {
 					GlowingReplacer.sendTeamUpdate(entity, player,
-						sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity instanceof Player) : null,
+							sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity) : null,
 						activeInstance != null && activeGlowing ? activeInstance.mTeamColor : null);
 				}
 
@@ -241,7 +241,7 @@ public class GlowingManager {
 						for (Player player : entity.getTrackedPlayers()) {
 							NamedTextColor sentColor = data.mSentPlayerData.get(player.getUniqueId());
 							if (sentColor != null) {
-								GlowingReplacer.sendTeamUpdate(entity, player, GlowingReplacer.getColoredGlowingTeamName(sentColor, entity instanceof Player), null);
+								GlowingReplacer.sendTeamUpdate(entity, player, GlowingReplacer.getColoredGlowingTeamName(sentColor, entity), null);
 							}
 						}
 						iterator.remove();
