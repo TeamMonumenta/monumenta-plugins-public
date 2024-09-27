@@ -26,6 +26,8 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -374,7 +376,9 @@ public enum EffectType {
 				entity.setHealth(0);
 				return;
 			}
-			DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
+			if (!ZoneUtils.hasZoneProperty(entity, ZoneProperty.RESIST_5)) {
+				DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
+			}
 			return;
 		} else if (effectType == CLUCKING) {
 			if (entity instanceof Player player) {
