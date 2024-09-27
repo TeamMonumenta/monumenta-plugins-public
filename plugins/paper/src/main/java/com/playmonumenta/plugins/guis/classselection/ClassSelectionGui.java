@@ -63,7 +63,7 @@ public class ClassSelectionGui extends Gui {
 
 	protected boolean isClassPermLocked(PlayerClass testClass) {
 		return testClass.mPermissionString != null
-			&& mPlayer.hasPermission(testClass.mPermissionString);
+			&& !mPlayer.hasPermission(testClass.mPermissionString);
 	}
 
 	protected int remainingSkillPoints() {

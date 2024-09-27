@@ -72,11 +72,9 @@ public class CustomInventoryCommands {
 				for (TeleporterPage page : TeleporterPage.values()) {
 					if (page.mPage == 10 + (int) args.get("region #")) {
 						new OrinCustomInventory(player, page).openInventory(player, plugin);
-						break;
+						return;
 					}
 				}
-
-				new OrinCustomInventory(player, TeleporterPage.SELF_DETERMINED).openInventory(player, plugin);
 			})
 			.register();
 

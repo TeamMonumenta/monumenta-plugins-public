@@ -128,10 +128,9 @@ public class ClassPage extends Page {
 					}
 					new AbilityTriggersGui(mGui.mPlayer, true).open();
 				});
-
-			// Set gui identifier
-			setGuiIdentifier("gui_class_1");
 		}
+		// Set gui identifier
+		setGuiIdentifier("gui_class_1");
 	}
 
 	private void setClassIcon(
