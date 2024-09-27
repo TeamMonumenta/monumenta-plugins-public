@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import static com.playmonumenta.plugins.listeners.ShulkerShortcutListener.isCarrierOfExplosions;
 
 public class ExplosionManager implements Listener {
-	private static final int ITEM_ENTITY_THRESHOLD = (int) Math.ceil(27.0 / PickupFilterResult.values().length);
+	private static final int ITEM_ENTITY_THRESHOLD = 8;
 
 	private int mLastTick = Integer.MIN_VALUE;
 	private @Nullable BukkitRunnable mCleanupRunnable = null;
