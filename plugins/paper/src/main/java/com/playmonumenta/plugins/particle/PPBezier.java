@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.particle;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import com.playmonumenta.plugins.Plugin;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,10 +35,9 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 		{1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1}
 	};
 	private int mAnimationTicks = 1;
-	private Plugin mPlugin;
 
 	/**
-	 * An n-point Bezier curve, with an upper bound of {@value MAX_CONTROL_POINTS}
+	 * An n-point Bézier curve, with an upper bound of {@value MAX_CONTROL_POINTS}
 	 * @param particle A particle.
 	 * @param controlPoints A list of locations beginning with a starting location (t = 0.0) and ending with an ending location (t = 1.0)
 	 *                      The list can contain one element, such that the starting and ending points are the same, but not zero elements.
@@ -78,11 +77,10 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 		mLocation = startLocation;
 	}
 
-	public PPBezier delay(Plugin plugin, int animationTicks) {
+	public PPBezier delay(int animationTicks) {
 		if (animationTicks < 1) {
 			animationTicks = 1;
 		}
-		mPlugin = plugin;
 		mAnimationTicks = animationTicks;
 		return this;
 	}
@@ -95,7 +93,7 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 		if (mAnimationTicks > 1) {
 			new BukkitRunnable() {
 				int mT = 0;
-				int mCountPerTick = (int) Math.ceil((float) count / mAnimationTicks);
+				final int mCountPerTick = (int) Math.ceil((float) count / mAnimationTicks);
 				int mI = 0;
 
 				@Override
@@ -128,7 +126,7 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(Plugin.getInstance(), 0, 1);
 		} else {
 			for (int i = 0; i <= count; i++) {
 				double t = 1.0 * i / count;

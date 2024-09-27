@@ -2,7 +2,15 @@ package com.playmonumenta.plugins.classes;
 
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
-import com.playmonumenta.plugins.abilities.shaman.*;
+import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
+import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
+import com.playmonumenta.plugins.abilities.shaman.CrystallineCombos;
+import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
+import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
+import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
+import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;

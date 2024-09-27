@@ -7,7 +7,6 @@ import com.playmonumenta.networkchat.DefaultChannels;
 import com.playmonumenta.networkchat.NetworkChatPlugin;
 import com.playmonumenta.networkchat.PlayerState;
 import com.playmonumenta.networkchat.PlayerStateManager;
-import com.playmonumenta.networkchat.RemotePlayerManager;
 import com.playmonumenta.networkchat.channel.Channel;
 import com.playmonumenta.networkchat.channel.ChannelGlobal;
 import com.playmonumenta.networkchat.channel.interfaces.ChannelPermissionNode;

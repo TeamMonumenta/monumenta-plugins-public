@@ -348,10 +348,13 @@ public class MarketManager {
 		if (marketPlayerData == null) {
 			Plugin.getInstance().getLogger().warning("ERROR: FAILED TO GET MARKET DATA OF " + player.getName() + ": NO MARKET INSTANCE. CONTACT A MODERATOR IMMEDIATELY, SOMETHING IS WRONG WITH YOUR PLUGIN DATA");
 			return new MarketPlayerOptions();
-		} else if (marketPlayerData.getPlayerOptions() == null) {
-			marketPlayerData.setPlayerOptions(new MarketPlayerOptions());
 		}
-		return marketPlayerData.getPlayerOptions();
+		MarketPlayerOptions marketPlayerOptions = marketPlayerData.getPlayerOptions();
+		if (marketPlayerOptions == null) {
+			marketPlayerOptions = new MarketPlayerOptions();
+			marketPlayerData.setPlayerOptions(marketPlayerOptions);
+		}
+		return marketPlayerOptions;
 	}
 
 	public static void setPlayerMarketFilters(Player player, List<MarketFilter> playerFilters) {
@@ -451,13 +454,11 @@ public class MarketManager {
 		String shardName = ServerProperties.getShardName().toLowerCase(Locale.ROOT);
 		MarketPlayerOptions options = getMarketPlayerOptions(player);
 
-		if (options != null) {
-			MarketPlayerOptions.NotificationShard shardsForNotif = options.getShardsForNotification();
-			if (shardsForNotif == MarketPlayerOptions.NotificationShard.ALWAYS
-				|| (shardsForNotif == MarketPlayerOptions.NotificationShard.OVERWORLD && (shardName.contains("valley") || shardName.contains("isles") || shardName.contains("ring") || shardName.contains("plots") || shardName.contains("dev1")))
-				|| (shardsForNotif == MarketPlayerOptions.NotificationShard.PLOTS && shardName.contains("plots"))) {
-				ownedListingsID = getListingsOfPlayer(player);
-			}
+		MarketPlayerOptions.NotificationShard shardsForNotif = options.getShardsForNotification();
+		if (shardsForNotif == MarketPlayerOptions.NotificationShard.ALWAYS
+			|| (shardsForNotif == MarketPlayerOptions.NotificationShard.OVERWORLD && (shardName.contains("valley") || shardName.contains("isles") || shardName.contains("ring") || shardName.contains("plots") || shardName.contains("dev1")))
+			|| (shardsForNotif == MarketPlayerOptions.NotificationShard.PLOTS && shardName.contains("plots"))) {
+			ownedListingsID = getListingsOfPlayer(player);
 		}
 
 		if (ownedListingsID != null && !ownedListingsID.isEmpty()) {

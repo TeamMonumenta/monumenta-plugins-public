@@ -34,6 +34,7 @@ public class MarketFilter {
 
 	public MarketFilter() {
 		mComponents = new ArrayList<>();
+		mSorter = Sorter.DEFAULT_SORTER;
 	}
 
 	public MarketFilter(@Nullable String displayName, @Nullable List<FilterComponent> components) {
@@ -58,8 +59,8 @@ public class MarketFilter {
 	}
 
 	boolean mStartWithActiveOnly = false;
-	@Nullable List<FilterComponent> mComponents;
-	@Nullable String mDisplayName;
+	@Nullable List<FilterComponent> mComponents = null;
+	@Nullable String mDisplayName = null;
 
 	Sorter mSorter;
 
@@ -144,7 +145,7 @@ public class MarketFilter {
 			}
 		}
 
-		// build the final list with order whitelist first to blacklist second, with smallest size of values first
+		// build the final list with order whitelist first to blacklist second, with the smallest size of values first
 		List<FilterComponent> out = new ArrayList<>();
 		for (ArrayList<FilterComponent> list : whitelist.values()) {
 			out.addAll(list);

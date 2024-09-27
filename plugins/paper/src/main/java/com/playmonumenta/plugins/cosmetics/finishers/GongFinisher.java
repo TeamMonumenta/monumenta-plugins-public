@@ -7,7 +7,14 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -18,7 +25,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import static org.bukkit.inventory.EquipmentSlot.*;
+import static org.bukkit.inventory.EquipmentSlot.CHEST;
+import static org.bukkit.inventory.EquipmentSlot.FEET;
+import static org.bukkit.inventory.EquipmentSlot.HAND;
+import static org.bukkit.inventory.EquipmentSlot.HEAD;
+import static org.bukkit.inventory.EquipmentSlot.LEGS;
+import static org.bukkit.inventory.EquipmentSlot.OFF_HAND;
 
 public class GongFinisher implements EliteFinisher {
 

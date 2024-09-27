@@ -39,7 +39,7 @@ public class GatesOfHell extends Spell {
 	@Override
 	public void run() {
 		//Opens 1 portal at random
-		if (mPortals.size() > 0) {
+		if (!mPortals.isEmpty()) {
 			openGate(mPortals.remove(FastUtils.RANDOM.nextInt(mPortals.size())));
 		}
 	}

@@ -6,7 +6,14 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.*;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.DamageBlocker;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.GatesOfHell;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.LapseOfReality;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.NothingnessSeeker;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellFlamethrower;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -16,7 +23,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.worlds.common.MMLog;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,7 +91,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 	private final LapseOfReality mMania;
 	private final GatesOfHell mHell;
 
-	private GatesOfHell mCeilingHell;
+	private final GatesOfHell mCeilingHell;
 	private double mScalingCoefficient;
 
 	public FalseSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -111,6 +117,8 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 				switch (tag) {
 					case PORTAL_TAG -> portals.add(e);
 					case PORTAL_CEILING_TAG -> ceilingPortal = e;
+					default -> {
+					}
 				}
 			}
 		}
@@ -118,12 +126,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 		// Theoretically ceilingPortal should never be null after the above block runs because the armor stands are
 		// spawned via mechs, but I'm adding a log here in case it does happen
 		mHell = new GatesOfHell(plugin, boss, portals, 1);
-		try {
-			mCeilingHell = new GatesOfHell(plugin, boss, new ArrayList<>(List.of(ceilingPortal)), 5);
-		} catch (NullPointerException exception) {
-			exception.printStackTrace();
-			MMLog.warning("[False Spirit] mCeilingHell in FalseSpirit.java failed to initialize!");
-		}
+		mCeilingHell = new GatesOfHell(plugin, boss, new ArrayList<>(ceilingPortal == null ? List.of() : List.of(ceilingPortal)), 5);
 
 		int multiEarthshakeDuration = 50;
 		int passiveCooldown = 20 * 8;

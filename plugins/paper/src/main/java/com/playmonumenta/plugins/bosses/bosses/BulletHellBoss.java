@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class BulletHellBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bullet_hell";
+
 	@BossParam(help = "Bullets")
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Amount of damage a bullet will deal")

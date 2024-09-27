@@ -444,6 +444,7 @@ public class BossManager implements Listener {
 		registerStatefulBoss(ExaltedCAxtal.identityTag, ExaltedCAxtal::new);
 		registerStatefulBoss(Sirius.identityTag, Sirius::new);
 	}
+
 	private static void registerStatelessBoss(String identityTag, StatelessBossConstructor constructor) {
 		registerStatelessBoss(identityTag, constructor, constructor::construct);
 	}

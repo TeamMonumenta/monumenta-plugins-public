@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -903,7 +904,7 @@ public class ItemUtils {
 		if (ItemUtils.isNullOrAir(itemStack)) {
 			return Component.empty();
 		}
-		// other method is ambigious between Function/Consumer
+		// other method is ambiguous between Function/Consumer
 		// see: https://github.com/tr7zw/Item-NBT-API/blob/3bb4d7b4493c74911f82ac9226c6be7150629875/item-nbt-api/src/main/java/de/tr7zw/changeme/nbtapi/NBT.java#L54-L74
 		return NBT.get(itemStack, nbt -> {
 			return getRawDisplayName(nbt);
@@ -1403,7 +1404,7 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Gets the entity type of a spawn egg by material, which is the default entity the egg will spawn unless overridden in the NBT tags.
+	 * Gets the entity type of the spawn egg by material, which is the default entity the egg will spawn unless overridden in the NBT tags.
 	 * Thus, use the more accurate {@link #getSpawnEggType(ItemStack) item stack check} instead if possible.
 	 */
 	public static EntityType getSpawnEggType(Material material) {
@@ -1484,7 +1485,7 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Gets the entity type of a spawn egg. THis is more accurate than the {@link #getSpawnEggType(Material) material-only check},
+	 * Gets the entity type of the spawn egg. THis is more accurate than the {@link #getSpawnEggType(Material) material-only check},
 	 * as a spawn egg can spawn mobs of a different type if the NBT tag {@code EntityTag.id} is set.
 	 */
 	public static EntityType getSpawnEggType(ItemStack item) {
@@ -1543,8 +1544,10 @@ public class ItemUtils {
 	public static Component getPlainNameComponentWithHover(ItemStack item) {
 		ItemStack clone = item.clone();
 		if (clone.getItemMeta() instanceof BookMeta book) {
-			book.pages(Collections.emptyList());
-			clone.setItemMeta(book);
+			Book adventureBook = book.pages(Collections.emptyList());
+			if (adventureBook instanceof BookMeta bookMeta) {
+				clone.setItemMeta(bookMeta);
+			}
 		} else if (clone.getItemMeta() instanceof BlockStateMeta blockStateMeta && blockStateMeta.getBlockState() instanceof ShulkerBox shulker) {
 			shulker.getInventory().clear();
 			blockStateMeta.setBlockState(shulker);
@@ -1615,10 +1618,9 @@ public class ItemUtils {
 			if (this == o) {
 				return true;
 			}
-			if (o == null || getClass() != o.getClass()) {
+			if (!(o instanceof ItemIdentifier that)) {
 				return false;
 			}
-			ItemIdentifier that = (ItemIdentifier) o;
 			return mType == that.mType && Objects.equals(mName, that.mName);
 		}
 

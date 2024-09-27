@@ -25,6 +25,7 @@ public class Rejuvenation extends Ability {
 	public static final AbilityInfo<Rejuvenation> INFO =
 		new AbilityInfo<>(Rejuvenation.class, null, Rejuvenation::new)
 			.canUse(player -> AbilityUtils.getClassNum(player) == Cleric.CLASS_ID);
+
 	public Rejuvenation(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mCharmHealthLimit = HEALTH_LIMIT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_THRESHOLD);

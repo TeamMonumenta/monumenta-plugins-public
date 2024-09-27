@@ -104,6 +104,8 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				case "PortalNum3" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
 				case "PortalNum4" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
 				case "PortalNum5" -> key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
+				default -> {
+				}
 			}
 
 			try {
@@ -120,11 +122,11 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				dm.setDamage(248);
 				mTrident.setItemMeta(dm);
 			} catch (Exception exception) {
-				// Thank you Java for not having a default message for NPEs
+				// Thank you, Java for not having a default message for NPEs
 				if (exception.getMessage() != null) {
 					MMLog.warning(exception.getMessage());
 				}
-				exception.printStackTrace();
+				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), exception);
 			}
 		}, 1);
 
@@ -135,6 +137,8 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				switch (tag) {
 					case SUMMON_TAG -> mGates.add(as);
 					case SUMMON_CEILING_TAG -> mCeilingGate = as;
+					default -> {
+					}
 				}
 			}
 		}
@@ -187,7 +191,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					return;
 				}
 
-				//Scales with playercount to summon mobs
+				//Scales with player count to summon mobs
 				//No more than 15 mobs from one portal can be out at a time
 				//Custom spawn rate for delves, 50% faster for normal portals and 25% faster for the ceiling portal
 				if (((!mDelve && mTicks % (100 / mPlayerCount) == 0) || (mDelve && mCeilingGate != null && mTicks % (80 / mPlayerCount) == 0) || (mDelve && mCeilingGate == null && mTicks % (67 / mPlayerCount) == 0))
@@ -344,7 +348,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 		}
 	}
 
-	//Deletes all of the tridents used to close the portals/gates so you can not hoard them
+	// Deletes all the tridents used to close the portals/gates so you can not hoard them
 	private void deleteTridents() {
 		for (Entity e : mBoss.getLocation().getNearbyEntities(100, 100, 100)) {
 			if (e instanceof Item item) {

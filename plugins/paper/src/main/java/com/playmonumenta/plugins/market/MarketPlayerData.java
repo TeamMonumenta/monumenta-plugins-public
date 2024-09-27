@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public class MarketPlayerData {
 	private final HashSet<Long> mOwnedListingIDList;
 	private List<MarketFilter> mPlayerFilters;
-	private MarketPlayerOptions mPlayerOptions;
+	private @Nullable MarketPlayerOptions mPlayerOptions = null;
 
 	public MarketPlayerData() {
 		this.mOwnedListingIDList = new HashSet<>();
@@ -59,7 +60,7 @@ public class MarketPlayerData {
 		));
 	}
 
-	public MarketPlayerOptions getPlayerOptions() {
+	public @Nullable MarketPlayerOptions getPlayerOptions() {
 		return mPlayerOptions;
 	}
 

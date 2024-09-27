@@ -40,6 +40,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
 import static java.awt.Color.HSBtoRGB;
 
 public class Refraction extends DepthsAbility implements AbilityWithDuration {

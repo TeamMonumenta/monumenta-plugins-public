@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -28,15 +27,13 @@ public class SpellSteelboreSpread extends Spell {
 	private final LivingEntity mBoss;
 	private final ImperialConstruct mConstruct;
 	private final ChargeUpManager mChargeUp;
-	private final Location mStartLoc;
 	private final double mDamage;
 
-	public SpellSteelboreSpread(Plugin plugin, LivingEntity boss, ImperialConstruct construct, int radius, Location startLoc, double damage) {
+	public SpellSteelboreSpread(Plugin plugin, LivingEntity boss, ImperialConstruct construct, int radius, double damage) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mConstruct = construct;
 		mRadius = radius;
-		mStartLoc = startLoc;
 		mDamage = damage;
 		mChargeUp = ImperialConstruct.defaultChargeUp(mBoss, CAST_TIME, ABILITY_NAME, ImperialConstruct.detectionRange);
 	}
@@ -49,7 +46,7 @@ public class SpellSteelboreSpread extends Spell {
 			mBoss.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 1, 2);
 		}
 		mChargeUp.setTime(0);
-		BukkitRunnable testrunnable = new BukkitRunnable() {
+		BukkitRunnable testRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
@@ -80,8 +77,8 @@ public class SpellSteelboreSpread extends Spell {
 						for (Player n : nearby) {
 							new BukkitRunnable() {
 								int mT = 0;
-								int ANIM_TIME = 10;
-								int MAX_HEIGHT = 5;
+								final int ANIM_TIME = 10;
+								final int MAX_HEIGHT = 5;
 
 								@Override
 								public void run() {
@@ -137,8 +134,8 @@ public class SpellSteelboreSpread extends Spell {
 				}
 			}
 		};
-		testrunnable.runTaskTimer(mPlugin, 0, 2);
-		mActiveRunnables.add(testrunnable);
+		testRunnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(testRunnable);
 	}
 
 	@Override

@@ -66,6 +66,7 @@ public class LoadoutManagerGui extends Gui {
 	}
 
 	@Override
+	@SuppressWarnings("EnumOrdinal")
 	protected void setup() {
 		LoadoutManager.Loadout selectedLoadout = mSelectedLoadout;
 		if (selectedLoadout == null) {

@@ -579,7 +579,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	private BossBarManager.BossHealthAction getSteelboreAction(Plugin plugin, boolean savage, boolean phase3) {
 		double damage = savage ? 1 : 0.6;
 		int radius = savage ? (phase3 ? 6 : 11) : (phase3 ? 3 : 7);
-		return boss -> new SpellSteelboreSpread(plugin, boss, this, radius, mCurrentLoc, damage).run();
+		return boss -> new SpellSteelboreSpread(plugin, boss, this, radius, damage).run();
 	}
 
 	private Component getMessageComponent(String text) {

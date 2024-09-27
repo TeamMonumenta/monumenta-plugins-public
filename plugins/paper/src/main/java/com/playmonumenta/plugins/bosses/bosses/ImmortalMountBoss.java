@@ -14,7 +14,10 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Snowball;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 

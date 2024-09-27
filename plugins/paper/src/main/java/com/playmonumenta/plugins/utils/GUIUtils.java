@@ -364,6 +364,7 @@ public class GUIUtils {
 		}
 		return item;
 	}
+
 	/**
 	 * Creates a gui identifier item. This is for the rp to apply gui texture. Other than that it works like a filler.
 	 */
@@ -378,6 +379,7 @@ public class GUIUtils {
 		setGuiNbtTag(idItem, "texture", tag, active);
 		return idItem;
 	}
+
 	public static boolean isPlaceholder(final @Nullable ItemStack item) {
 		if (ItemUtils.isNullOrAir(item)) {
 			return false;

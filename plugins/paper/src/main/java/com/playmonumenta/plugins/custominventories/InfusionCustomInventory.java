@@ -123,6 +123,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		mInfusionPanelsMap.put(infusion, items);
 	}
 
+	@SuppressWarnings("EnumOrdinal")
 	private void loadRowNormalInfusionItem(Player player, EquipmentSlot equipmentSlot, int row) {
 		Plugin plugin = Plugin.getInstance();
 		ItemStack item = player.getEquipment().getItem(equipmentSlot);
@@ -151,11 +152,11 @@ public class InfusionCustomInventory extends CustomInventory {
 				}
 			}
 
+			int slot = (row * 9) + 2 + infusionLvl;
 			if (infusionLvl < 4) {
-				int slot = (row * 9) + 2 + infusionLvl;
 				Component lore = Component.text("You need " + InfusionUtils.getExpLvlInfuseCost(plugin, player, item) + " experience levels", NamedTextColor.GRAY);
 
-				int currency = -1;
+				int currency;
 				try {
 					currency = InfusionUtils.calcInfuseCost(item);
 				} catch (WrapperCommandSyntaxException e) {
@@ -185,7 +186,6 @@ public class InfusionCustomInventory extends CustomInventory {
 					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
 				});
 			} else {
-				int slot = (row * 9) + 2 + infusionLvl;
 				mInventory.setItem(slot, mMaxLevelReachedItem);
 			}
 		} else {

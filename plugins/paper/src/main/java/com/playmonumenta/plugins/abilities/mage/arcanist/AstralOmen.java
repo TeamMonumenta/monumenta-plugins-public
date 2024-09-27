@@ -26,7 +26,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
-
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;

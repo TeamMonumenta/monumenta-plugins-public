@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.shaman;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;

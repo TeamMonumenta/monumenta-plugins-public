@@ -39,11 +39,13 @@ public class ParrotManager implements Listener {
 	public static final String SCOREBOARD_PARROT_LEFT = "ParrotLeft";
 	// store info about which parrot is on the right shoulder
 	public static final String SCOREBOARD_PARROT_RIGHT = "ParrotRight";
+
 	public enum PlayerShoulder {
 		LEFT,
 		RIGHT,
 		NONE
 	}
+
 	public enum ParrotVariant {
 		//minecraft default
 		RED("Scarlet Macaw", 1, Parrot.Variant.RED, Material.RED_WOOL),

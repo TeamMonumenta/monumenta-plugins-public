@@ -942,6 +942,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 						forceCastSpell(SpellSeekingEyes.class);
 					}
 				}
+				default -> {
+				}
 			}
 		}, delay);
 	}
@@ -1677,6 +1679,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 				world.playSound(loc, Sound.ENTITY_CREEPER_DEATH, 2, 0.75f);
 				world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, 2, 2f);
 				world.playSound(loc, Sound.ENTITY_GHAST_DEATH, 2, 1.5f);
+			}
+			default -> {
 			}
 		}
 	}

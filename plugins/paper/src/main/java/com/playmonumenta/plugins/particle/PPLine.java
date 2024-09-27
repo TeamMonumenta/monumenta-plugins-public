@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.particle;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -20,7 +20,6 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 	private double mParticlesPerMeter = -1;
 	private double mMinParticlesPerMeter = 1;
 	private double mGroupingDistance = 0.15;
-	private Plugin mPlugin;
 	private int mAnimationTicks = 1;
 
 	private boolean mIncludeStart = true;
@@ -84,12 +83,11 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 		return this;
 	}
 
-	public PPLine delay(Plugin plugin, int animationTicks) {
+	public PPLine delay(int animationTicks) {
 
 		if (animationTicks < 1) {
 			animationTicks = 1;
 		}
-		mPlugin = plugin;
 		mAnimationTicks = animationTicks;
 		return this;
 	}
@@ -196,7 +194,7 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(Plugin.getInstance(), 0, 1);
 		} else {
 			for (int i = 0; i < count; i++) {
 				packagedValues.location(loc);

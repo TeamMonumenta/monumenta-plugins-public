@@ -74,7 +74,7 @@ public class ConfirmationGUICommand {
 		return "";
 	}
 
-	private static String generateSuggestion(String argument) {
+	private static @Nullable String generateSuggestion(String argument) {
 		String joinedOptions = String.join("|", OPTIONS);
 		Pattern pattern = Pattern.compile("((" + joinedOptions + ")" + "(\\s|)(%|)([^%]+)(%|))", Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(argument);

@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -11,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class PlayerInventoryView implements Listener {

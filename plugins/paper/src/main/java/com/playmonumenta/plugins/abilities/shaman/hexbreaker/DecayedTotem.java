@@ -23,7 +23,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

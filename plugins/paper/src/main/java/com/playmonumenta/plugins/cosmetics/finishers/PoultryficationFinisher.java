@@ -438,6 +438,7 @@ public class PoultryficationFinisher implements EliteFinisher {
 			}
 		}
 
+		@SuppressWarnings("EnumOrdinal")
 		public void playNote(Instrument instrument, Note note) {
 			List<Location> locs = new ArrayList<>();
 			if (mChickens.isEmpty()) {

@@ -268,15 +268,15 @@ public class Phase {
 				}
 				String name = reader.readOneOf(TRIGGER_BUILDER_MAP.keySet());
 				if (name == null) {
-					List<Tooltip<String>> suggArgs = new ArrayList<>(TRIGGER_BUILDER_MAP.keySet().size() + 1);
+					List<Tooltip<String>> suggestionArgs = new ArrayList<>(TRIGGER_BUILDER_MAP.keySet().size() + 1);
 					String soFar = reader.readSoFar();
 					for (String valid : TRIGGER_BUILDER_MAP.keySet()) {
-						suggArgs.add(Tooltip.ofString(soFar + valid, "hoverDescription")); //todo add a way to get custom descriptions
+						suggestionArgs.add(Tooltip.ofString(soFar + valid, "hoverDescription")); //todo add a way to get custom descriptions
 					}
 					if (!hasReadNegation) {
-						suggArgs.add(Tooltip.ofString(soFar + "NOT ", "negation"));
+						suggestionArgs.add(Tooltip.ofString(soFar + "NOT ", "negation"));
 					}
-					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
+					return ParseResult.of(suggestionArgs.toArray(Tooltip.arrayOf()));
 				}
 				ParseResult<Trigger> parseResult = Objects.requireNonNull(TRIGGER_BUILDER_MAP.get(name)).buildTrigger(reader);
 				if (parseResult.getResult() == null) {
@@ -290,20 +290,20 @@ public class Phase {
 
 			}
 
-			if (lastThingRead % 2 == 1) {
+			if (trigger != null) {
 				if (reader.advance("->")) {
 					break;
 				}
 
 				TriggerOperation opp = reader.readEnum(TriggerOperation.values());
 				if (opp == null) {
-					List<Tooltip<String>> suggArgs = new ArrayList<>(TriggerOperation.values().length);
+					List<Tooltip<String>> suggestionArgs = new ArrayList<>(TriggerOperation.values().length);
 					String soFar = reader.readSoFar();
 					for (TriggerOperation valid : TriggerOperation.values()) {
-						suggArgs.add(Tooltip.ofString(soFar + valid.name(), "hoverDescription"));
+						suggestionArgs.add(Tooltip.ofString(soFar + valid.name(), "hoverDescription"));
 					}
-					suggArgs.add(Tooltip.ofString(soFar + " ->", "negation"));
-					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
+					suggestionArgs.add(Tooltip.ofString(soFar + " ->", "negation"));
+					return ParseResult.of(suggestionArgs.toArray(Tooltip.arrayOf()));
 				}
 
 				trigger.setOperation(opp);
@@ -315,17 +315,17 @@ public class Phase {
 		do {
 			String name = reader.readOneOf(ACTION_BUILDER_MAP.keySet());
 			if (name == null) {
-				List<Tooltip<String>> suggArgs = new ArrayList<>(ACTION_BUILDER_MAP.keySet().size() + 1);
+				List<Tooltip<String>> suggestionArgs = new ArrayList<>(ACTION_BUILDER_MAP.keySet().size() + 1);
 				String soFar = reader.readSoFar();
 				for (String valid : ACTION_BUILDER_MAP.keySet()) {
-					suggArgs.add(Tooltip.ofString(soFar + valid + " ", "hoverDescription")); //todo add a way to get custom descriptions
+					suggestionArgs.add(Tooltip.ofString(soFar + valid + " ", "hoverDescription")); //todo add a way to get custom descriptions
 				}
-				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
+				return ParseResult.of(suggestionArgs.toArray(Tooltip.arrayOf()));
 			}
 
 			ParseResult<Action> parseResult = Objects.requireNonNull(ACTION_BUILDER_MAP.get(name)).buildAction(reader);
 			if (parseResult.getResult() == null) {
-				return ParseResult.of(parseResult.getTooltip());
+				return ParseResult.of(Objects.requireNonNull(parseResult.getTooltip()));
 			}
 
 			actionsList.add(parseResult.getResult());

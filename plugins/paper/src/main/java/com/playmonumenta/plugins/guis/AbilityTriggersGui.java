@@ -47,7 +47,7 @@ public class AbilityTriggersGui extends Gui {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "EnumOrdinal", "rawtypes", "unchecked" })
 	protected void setup() {
 		ItemStack tempItem;
 		String guiTag;
@@ -395,6 +395,7 @@ public class AbilityTriggersGui extends Gui {
 		setItem(row + 1, column, indicator).onLeftClick(onClick);
 	}
 
+	@SuppressWarnings("EnumOrdinal")
 	private void makeBinaryOptionIcon(int row, int column, Material material, String name, AbilityTrigger.BinaryOption value, Consumer<AbilityTrigger.BinaryOption> setter) {
 		String displayName = value == AbilityTrigger.BinaryOption.TRUE ? "Must be " + name
 				: value == AbilityTrigger.BinaryOption.FALSE ? "Not " + name

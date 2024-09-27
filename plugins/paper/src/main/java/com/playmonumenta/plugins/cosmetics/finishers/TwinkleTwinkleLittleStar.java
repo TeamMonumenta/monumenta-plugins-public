@@ -298,6 +298,7 @@ public class TwinkleTwinkleLittleStar implements EliteFinisher {
 			super.cancel();
 		}
 
+		@SuppressWarnings("EnumOrdinal")
 		public void playNote(Instrument instrument, Note note) {
 			List<Location> locs = new ArrayList<>();
 			if (mLocations.isEmpty()) {

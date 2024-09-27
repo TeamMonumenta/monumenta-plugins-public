@@ -8,7 +8,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.PlayerInventory;
 
 public class PlayerInventoryCustomInventory extends CustomInventory {
 	private static final int BACK_LOC = 0;

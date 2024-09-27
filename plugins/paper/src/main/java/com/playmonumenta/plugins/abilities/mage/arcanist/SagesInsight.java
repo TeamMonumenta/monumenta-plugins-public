@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

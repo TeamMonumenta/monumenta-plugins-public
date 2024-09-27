@@ -30,6 +30,7 @@ public class PotionManager {
 
 		private final int mValue;
 		private final String mName;
+
 		PotionID(int value, String name) {
 			this.mValue = value;
 			this.mName = name;

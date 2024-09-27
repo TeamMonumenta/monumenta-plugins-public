@@ -379,11 +379,11 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("mobs", "DTestDelve");
 	}
 
+	private static boolean IS_SPAWNING = false;
+
 	public static void duplicateLibraryOfSoulsMob(LivingEntity mob) {
 		duplicateLibraryOfSoulsMob(mob, mob.getLocation());
 	}
-
-	private static boolean IS_SPAWNING = false;
 
 	public static void duplicateLibraryOfSoulsMob(LivingEntity mob, Location loc) {
 		// Only the bottom mob's name is in the LoS
