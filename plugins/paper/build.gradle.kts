@@ -19,6 +19,7 @@ dependencies {
 	implementation(project(":adapter_api"))
 	implementation(project(":adapter_unsupported"))
 	implementation(project(":adapter_v1_19_R3", "reobf"))
+	implementation(project(":velocity"))
 
 	implementation("org.openjdk.jmh:jmh-core:1.19")
 	implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
@@ -57,10 +58,7 @@ dependencies {
 
 	// Bungeecord/Velocity deps
 	compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")
-	compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
-	annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
 	compileOnly("com.google.code.gson:gson:2.8.5")
-	// NetworkRelay already included for compile only above
 	compileOnly("com.vexsoftware:nuvotifier-universal:3.0.0:all")
 }
 
@@ -146,6 +144,7 @@ tasks {
 			exclude(project(":adapter_api"))
 			exclude(project(":adapter_unsupported"))
 			exclude(project(":adapter_v1_19_R3"))
+			exclude(project(":velocity"))
 		}
 	}
 }
