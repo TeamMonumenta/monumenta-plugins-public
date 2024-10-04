@@ -402,7 +402,7 @@ public class Plugin extends JavaPlugin {
 		//  Initialize Variables.
 		mTimers = new CooldownTimers(this);
 
-		mProjectileEffectTimers = new ProjectileEffectTimers(this);
+		mProjectileEffectTimers = new ProjectileEffectTimers();
 
 		mPotionManager = new PotionManager();
 		mTrackingManager = new TrackingManager(this);

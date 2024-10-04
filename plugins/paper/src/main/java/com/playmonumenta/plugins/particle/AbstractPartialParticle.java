@@ -45,6 +45,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	public double mMaximumMultiplier = 2;
 
 	public double mDistanceFalloff = 0;
+	private double mDistanceFalloffSquared = 0;
 
 	/*
 	 * Whether to randomise between negative mDelta or 0, and 0 or mDelta,
@@ -223,6 +224,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 */
 	public SelfT distanceFalloff(double distanceFalloff) {
 		mDistanceFalloff = distanceFalloff;
+		mDistanceFalloffSquared = distanceFalloff * distanceFalloff;
 		return getSelf();
 	}
 
@@ -357,12 +359,12 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 * looping internally as needed.
 	 */
 	protected void spawnUsingSettings(ParticleBuilder packagedValues) {
-		if (mDistanceFalloff != 0) {
-			double distance = Objects.requireNonNull(packagedValues.location()).distance(Objects.requireNonNull(packagedValues.receivers()).get(0).getLocation());
-			if (distance > mDistanceFalloff) {
+		if (mDistanceFalloffSquared != 0) {
+			double distance = Objects.requireNonNull(packagedValues.location()).distanceSquared(Objects.requireNonNull(packagedValues.receivers()).get(0).getLocation());
+			if (distance > mDistanceFalloffSquared) {
 				return;
 			}
-			int count = FastUtils.roundRandomly(packagedValues.count() * (1 - distance / mDistanceFalloff));
+			int count = FastUtils.roundRandomly(packagedValues.count() * (1 - distance / mDistanceFalloffSquared));
 			if (count == 0) {
 				return;
 			}
@@ -377,6 +379,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 			variedClone.extra(packagedValues.extra());
 			variedClone.data(packagedValues.data());
 			variedClone.receivers(packagedValues.receivers());
+			variedClone.force(packagedValues.force());
+			variedClone.source(packagedValues.source());
 
 			int loops = packagedValues.count();
 			if (mDirectionalMode) {
@@ -447,8 +451,9 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	}
 
 	private SelfT forEachNearbyPlayer(Consumer<Player> playerAction) {
+		double capDistance = mDistanceFalloffSquared != 0 ? mDistanceFalloffSquared : PARTICLE_SPAWN_DISTANCE_SQUARED;
 		for (Player player : mLocation.getWorld().getPlayers()) {
-			if (player.getLocation().distanceSquared(mLocation) < PARTICLE_SPAWN_DISTANCE_SQUARED
+			if (player.getLocation().distanceSquared(mLocation) < capDistance
 				    && (mPlayerCondition == null || mPlayerCondition.test(player))) {
 				playerAction.accept(player);
 			}

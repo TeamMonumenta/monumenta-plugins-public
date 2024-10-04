@@ -1,37 +1,21 @@
 package com.playmonumenta.plugins.timers;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class ProjectileEffectTimers {
-	private Plugin mPlugin;
-	private HashMap<Entity, Particle> mTrackingEntities;
-	private int mDeadTicks = 0;
-
-	public ProjectileEffectTimers(Plugin plugin) {
-		mPlugin = plugin;
-		mTrackingEntities = new HashMap<Entity, Particle>();
-	}
+	private final Map<Entity, Particle> mTrackingEntities = new HashMap<>();
 
 	public void addEntity(Entity entity, Particle particle) {
-		// 2 tick delay so particles don't get spammed in the player's face
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				// Make sure the entity still exists and has not yet landed
-				if (entity.isValid() && !(entity instanceof AbstractArrow && ((AbstractArrow) entity).isInBlock())) {
-					mTrackingEntities.put(entity, particle);
-				}
-			}
-		}.runTaskLater(mPlugin, 2);
+		mTrackingEntities.put(entity, particle);
 	}
 
 	public void removeEntity(Entity entity) {
@@ -39,41 +23,33 @@ public class ProjectileEffectTimers {
 	}
 
 	public void update() {
-		mDeadTicks++;
-
 		Iterator<Entry<Entity, Particle>> entityIter = mTrackingEntities.entrySet().iterator();
 		while (entityIter.hasNext()) {
 			Entry<Entity, Particle> entityHash = entityIter.next();
 			Entity entity = entityHash.getKey();
 			Particle particle = entityHash.getValue();
 
-			int numParticles = 3;
-
-			//  Because some particles are big
-			if (particle == Particle.CLOUD) {
-				numParticles = 1;
+			if (entity == null || !entity.isValid() || !entity.isTicking()) {
+				entityIter.remove();
+				continue;
 			}
 
+			// If the projectie lifetime is too long, then there is probably a problem and we should ignore it
+			int ticksLived = entity.getTicksLived();
+			if (ticksLived >= 200 || (entity instanceof AbstractArrow arrow && arrow.isInBlock())) {
+				entityIter.remove();
+				continue;
+			}
+
+			Vector velocity = entity.getVelocity().clone();
 			Location entityLoc = entity.getLocation();
-			new PartialParticle(particle, entityLoc, numParticles, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(entity);
-
-			/* Every so often check if this entity is actually still there */
-			if (mDeadTicks > 100) {
-				mDeadTicks = 0;
-				boolean isPresent = false;
-				for (Entity e : entityLoc.getWorld().getNearbyEntities(entityLoc, 4, 4, 4)) {
-					if (e.getUniqueId().equals(entity.getUniqueId())) {
-						isPresent = true;
-					}
-				}
-				if (entity.isDead() || !entity.isValid()) {
-					isPresent = false;
-				}
-
-				if (!isPresent) {
-					entityIter.remove();
-				}
-			}
+			// Launch particles in the direction of the projectile to prevent particles from blocking the view of the player
+			new PartialParticle(particle, entityLoc)
+			.directionalMode(true)
+			.delta(velocity.getX(), velocity.getY(), velocity.getZ())
+			.extra(0.5)
+			.distanceFalloff(48)
+			.spawnAsEntityActive(entity);
 		}
 	}
 }
