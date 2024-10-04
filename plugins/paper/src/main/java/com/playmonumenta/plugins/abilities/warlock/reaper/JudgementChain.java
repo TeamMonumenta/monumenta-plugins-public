@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -31,15 +32,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class JudgementChain extends MultipleChargeAbility {
-	private static final int COOLDOWN = 12 * 20;
+	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 12;
 	private static final int MAX_CHARGES = 2;
 	private static final int RANGE = 20;
-	private static final int CHAIN_DURATION = 8 * 20;
+	private static final int CHAIN_DURATION = Constants.TICKS_PER_SECOND * 8;
 	private static final double SLOWNESS_AMOUNT = 0.4;
 	private static final double WEAKNESS_AMOUNT = 0.4;
-	private static final double DMG_BOOST_1 = 0.1;
-	private static final double DMG_BOOST_2 = 0.2;
-	private static final int DEBUFF_DURATION = 3 * 20;
+	private static final double DMG_BOOST_1 = 0.15;
+	private static final double DMG_BOOST_2 = 0.3;
+	private static final int DEBUFF_DURATION = Constants.TICKS_PER_SECOND * 3;
 	private static final int EXTRA_TARGETS = 2;
 	private static final double EXTRA_TARGET_RADIUS = 3;
 	public static final String EFFECT_NAME = "JudgementChainEffect";

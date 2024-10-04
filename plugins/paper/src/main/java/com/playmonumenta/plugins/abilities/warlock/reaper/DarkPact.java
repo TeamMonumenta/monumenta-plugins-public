@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -30,21 +31,20 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class DarkPact extends Ability {
-
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
 	private static final int PERCENT_HEAL = -1;
 	private static final String AESTHETICS_EFFECT_NAME = "DarkPactAestheticsEffect";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
-	private static final int DURATION = 20 * 7;
-	private static final int DURATION_INCREASE_ON_KILL = 20 * 1;
-	private static final double PERCENT_DAMAGE_DEALT_1 = 0.35;
-	private static final double PERCENT_DAMAGE_DEALT_2 = 0.55;
+	private static final int DURATION = Constants.TICKS_PER_SECOND * 7;
+	private static final int DURATION_INCREASE_ON_KILL = Constants.TICKS_PER_SECOND;
+	private static final double PERCENT_DAMAGE_DEALT_1 = 0.50;
+	private static final double PERCENT_DAMAGE_DEALT_2 = 0.75;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE);
 	private static final int ABSORPTION_ON_KILL = 1;
 	private static final int MAX_ABSORPTION = 6;
-	private static final int COOLDOWN = 20 * 14;
+	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 14;
 	private static final double EXTENDED_ANTIHEAL = -2.0 / 3.0;
-	private static final int CANCEL_WINDOW = 7 * 20;
+	private static final int CANCEL_WINDOW = Constants.TICKS_PER_SECOND * 7;
 
 	public static final String CHARM_COOLDOWN = "Dark Pact Cooldown";
 	public static final String CHARM_DAMAGE = "Dark Pact Melee Damage";
