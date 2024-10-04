@@ -144,7 +144,7 @@ public class ChaosDagger extends DepthsAbility {
 					} else {
 						EntityUtils.applyStun(mPlugin, mStunDuration, mTarget);
 					}
-					GlowingManager.startGlowing(mTarget, NamedTextColor.DARK_PURPLE, DAMAGE_DURATION, GlowingManager.PLAYER_ABILITY_PRIORITY);
+					GlowingManager.startGlowing(mTarget, NamedTextColor.DARK_PURPLE, DAMAGE_DURATION, GlowingManager.PLAYER_ABILITY_PRIORITY, p -> p == mPlayer, "ChaosDagger" + mPlayer.getName());
 
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mHitMob = null, DAMAGE_DURATION);
 
@@ -183,7 +183,7 @@ public class ChaosDagger extends DepthsAbility {
 		if (enemy == mHitMob && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)) {
 			event.setDamage(event.getFlatDamage() * (1 + mDamageMultiplier));
 			mHitMob = null;
-			mPlugin.mEffectManager.clearEffects(enemy, "ChaosDaggerGlowing");
+			GlowingManager.clear(enemy, "ChaosDagger" + mPlayer.getName());
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				if (enemy.isDead() || enemy.getHealth() < 0) {
 					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
