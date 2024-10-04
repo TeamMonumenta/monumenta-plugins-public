@@ -829,7 +829,7 @@ public class DepthsManager {
 				}
 			}
 
-			DepthsAbilityItem item = da.getAbilityItem(rarity, p);
+			DepthsAbilityItem item = da.getAbilityItem(rarity, p, 0, false);
 			if (item != null) {
 				mItems.add(item);
 			}

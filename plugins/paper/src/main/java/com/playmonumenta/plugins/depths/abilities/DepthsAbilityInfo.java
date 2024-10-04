@@ -254,7 +254,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {
-		return getAbilityItem(rarity, player, 0);
+		return getAbilityItem(rarity, player, 0, true);
 	}
 
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity) {

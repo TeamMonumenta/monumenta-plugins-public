@@ -94,7 +94,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 		player.closeInventory();
 	}
 
-	void setLayout(Player player, Inventory inventory, Boolean paid) {
+	void setLayout(Player player, Inventory inventory, boolean paid) {
 		int[] paidLocations = {10, 11, 12, 14, 15, 16};
 		int[] unpaidLocations = {10, 13, 16};
 		int[] chosenArray;
