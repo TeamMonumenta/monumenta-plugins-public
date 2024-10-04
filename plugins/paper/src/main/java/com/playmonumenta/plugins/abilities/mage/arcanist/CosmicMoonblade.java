@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,13 +35,17 @@ public class CosmicMoonblade extends Ability {
 	private static final double ANGLE = 55;
 	public static final double REDUCTION_MULTIPLIER_1 = 0.05;
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
+	public static final double REDUCTION_MULTIPLIER_KILL = 0.1;
 	public static final int CAP_TICKS_1 = (int) (0.5 * Constants.TICKS_PER_SECOND);
 	public static final int CAP_TICKS_2 = 1 * Constants.TICKS_PER_SECOND;
+	public static final int CAP_TICKS_KILL = (int) (0.75 * Constants.TICKS_PER_SECOND);
 
 	public static final String CHARM_DAMAGE = "Cosmic Moonblade Damage";
 	public static final String CHARM_SPELL_COOLDOWN = "Cosmic Moonblade Cooldown Reduction";
+	public static final String CHARM_DEATH_COOLDOWN = "Cosmic Moonblade On Kill Cooldown Reduction";
 	public static final String CHARM_COOLDOWN = "Cosmic Moonblade Cooldown";
 	public static final String CHARM_CAP = "Cosmic Moonblade Cooldown Cap";
+	public static final String CHARM_DEATH_CAP = "Cosmic Moonblade On Kill Cooldown Cap";
 	public static final String CHARM_RANGE = "Cosmic Moonblade Range";
 	public static final String CHARM_SLASH = "Cosmic Moonblade Slashes";
 
@@ -58,10 +63,14 @@ public class CosmicMoonblade extends Ability {
 					(int) (REDUCTION_MULTIPLIER_1 * 100),
 					CAP_TICKS_1 / 20.0,
 					COOLDOWN / 20),
-				String.format("Cooldown reduction is increased to %s%% (Max %ss) per blade and damage is increased to %s.",
+				String.format("Cooldown reduction is increased to %s%% (Max %ss) per blade and damage is increased to %s. " +
+								"Additionally reduce all cooldowns including Cosmic Moonblade by %s%% (Max %ss) if this ability killed a mob once per activation.",
 					(int) (REDUCTION_MULTIPLIER_2 * 100),
 					CAP_TICKS_2 / 20,
-					(int) DAMAGE_2))
+					(int) DAMAGE_2,
+					(int) (REDUCTION_MULTIPLIER_KILL * 100),
+					CAP_TICKS_KILL / 20)
+					)
 			.simpleDescription("Damage mobs in a cone twice and reduce cooldowns if mobs are damaged.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CosmicMoonblade::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
@@ -73,15 +82,20 @@ public class CosmicMoonblade extends Ability {
 	private final int mLevelCap;
 	private final CosmicMoonbladeCS mCosmetic;
 
+	private boolean mTriggered;
+
 	public CosmicMoonblade(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelReduction = (isLevelOne() ? REDUCTION_MULTIPLIER_1 : REDUCTION_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SPELL_COOLDOWN);
 		mLevelCap = CharmManager.getDuration(player, CHARM_CAP, (isLevelOne() ? CAP_TICKS_1 : CAP_TICKS_2));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CosmicMoonbladeCS());
+		mTriggered = false;
 	}
 
 	public boolean cast() {
+		Ability ignoredAbil = this;
+		mTriggered = false;
 		if (isOnCooldown()) {
 			return false;
 		}
@@ -100,7 +114,7 @@ public class CosmicMoonblade extends Ability {
 				Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), range, Math.toRadians(ANGLE));
 				List<LivingEntity> hitMobs = hitbox.getHitMobs();
 				if (!hitMobs.isEmpty()) {
-					updateCooldowns(mLevelReduction);
+					updateCooldowns(mLevelReduction, ignoredAbil, mLevelCap);
 					for (LivingEntity mob : hitMobs) {
 						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
 					}
@@ -120,14 +134,34 @@ public class CosmicMoonblade extends Ability {
 		return true;
 	}
 
-	public void updateCooldowns(double percent) {
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getAbility() == mInfo.getLinkedSpell() &&
+		    event.getFinalDamage(true) > enemy.getHealth() &&
+			event.getDamager() == mPlayer && !mTriggered) {
+			mTriggered = true;
+			// update all abil cd, 1 tick delay to make sure moon blade is also reduced
+			double percent = REDUCTION_MULTIPLIER_KILL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DEATH_COOLDOWN);
+			int levelCap = CharmManager.getDuration(mPlayer, CHARM_DEATH_CAP, CAP_TICKS_KILL);
+			new BukkitRunnable() {
+
+				@Override public void run() {
+					updateCooldowns(percent, null, levelCap);
+				}
+			}.runTaskLater(mPlugin, 1);
+		}
+
+		return false;
+	}
+
+	public void updateCooldowns(double percent, @Nullable Ability ignoredAbil, int cap) {
 		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
 			ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
-			if (abil == this || linkedSpell == null) {
+			if (abil == ignoredAbil || linkedSpell == null) {
 				continue;
 			}
 			int totalCD = abil.getModifiedCooldown();
-			int reducedCD = Math.min((int) (totalCD * percent), mLevelCap);
+			int reducedCD = Math.min((int) (totalCD * percent), cap);
 			mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, reducedCD);
 		}
 	}

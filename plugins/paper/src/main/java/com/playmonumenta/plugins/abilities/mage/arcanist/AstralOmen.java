@@ -41,7 +41,8 @@ public class AstralOmen extends Ability {
 	public static final String BONUS_DAMAGE_SOURCE = "AstralOmenBonusDamage";
 	public static final String DAMAGED_THIS_TICK_METAKEY = "AstralOmenDamagedThisTick";
 
-	public static final int DAMAGE = 7;
+	public static final double DAMAGE_1 = 7;
+	public static final double DAMAGE_2 = 7.5;
 	public static final int RADIUS = 3;
 	public static final double BONUS_MULTIPLIER = 0.15;
 	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
@@ -56,6 +57,7 @@ public class AstralOmen extends Ability {
 	public static final String CHARM_PULL = "Astral Omen Pull Speed";
 
 	private final double mLevelBonusMultiplier;
+	private final double mDamage;
 
 	private static final Map<ClassAbility, Type> mElementClassification;
 
@@ -75,12 +77,13 @@ public class AstralOmen extends Ability {
 						"That implosion's damage ignores iframes and itself cannot apply omens. " +
 						"Omens cannot be applied or sealed by Elemental Arrows.",
 					STACK_THRESHOLD,
-					DAMAGE,
+					DAMAGE_1,
 					RADIUS,
 					StringUtils.ticksToSeconds(STACK_TICKS)
 				),
 				String.format(
-					"The implosion now pulls all enemies inwards. Enemies hit by the implosion now take %s%% more damage from you for %ss.",
+					"The implosion now pulls all enemies inwards and deals %s damage. Enemies hit by the implosion now take %s%% more damage from you for %ss.",
+					DAMAGE_2,
 					StringUtils.multiplierToPercentage(BONUS_MULTIPLIER),
 					StringUtils.ticksToSeconds(BONUS_TICKS)
 				)
@@ -123,6 +126,7 @@ public class AstralOmen extends Ability {
 		super(plugin, player, INFO);
 		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER) : 0);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AstralOmenCS());
+		mDamage = isLevelTwo() ? DAMAGE_2 : DAMAGE_1;
 	}
 
 	@Override
@@ -156,7 +160,7 @@ public class AstralOmen extends Ability {
 
 		int stacksThreshold = STACK_THRESHOLD + (int) CharmManager.getLevel(mPlayer, CHARM_STACK);
 		if (combo >= stacksThreshold) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
-			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage);
 			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
 			for (LivingEntity mob : hitbox.getHitMobs()) {
