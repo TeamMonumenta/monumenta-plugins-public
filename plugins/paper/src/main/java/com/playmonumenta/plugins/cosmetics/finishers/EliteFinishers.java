@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.google.common.collect.ImmutableMap;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Set;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.scoreboard.Team;
 
 public class EliteFinishers {
 
@@ -71,37 +72,40 @@ public class EliteFinishers {
 
 	public static LivingEntity createClonedMob(LivingEntity killedMob, Player p, NamedTextColor color) {
 		LivingEntity mClonedKilledMob = EntityUtils.copyMob(killedMob);
-		if (p.getScoreboardTags().contains(FINISHER_GLOW_TAG)) {
-			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
-			p.showEntity(Plugin.getInstance(), mClonedKilledMob);
+		mClonedKilledMob.setHealth(1);
+		mClonedKilledMob.setInvulnerable(true);
+		ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "finisher", NamedTextColor.WHITE).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+		mClonedKilledMob.setGravity(false);
+		mClonedKilledMob.setAI(false);
+		mClonedKilledMob.setSilent(true);
+		mClonedKilledMob.addScoreboardTag("SkillImmune");
+		boolean hasGlowTag = p.getScoreboardTags().contains(FINISHER_GLOW_TAG);
+		boolean hasShowTag = p.getScoreboardTags().contains(FINISHER_SHOW_TAG);
+
+		if (hasGlowTag && hasShowTag) {
+			// Both tags present: hide everything
+			GlowingManager.clearAll(mClonedKilledMob);
 			mClonedKilledMob.setInvisible(true);
 			EntityEquipment equipment = mClonedKilledMob.getEquipment();
 			if (equipment != null) {
 				equipment.clear();
 			}
-		} else if (p.getScoreboardTags().contains(FINISHER_SHOW_TAG)) {
-			GlowingManager.clearAll(mClonedKilledMob);
-			p.showEntity(Plugin.getInstance(), mClonedKilledMob);
-		} else if (p.getScoreboardTags().contains(FINISHER_GLOW_TAG) && p.getScoreboardTags().contains(FINISHER_SHOW_TAG)) {
-			// both tags hide everything and no tags hide nothing (reversed) because i didn't want to create another tag and wanted
-			// show all by default (no tags)
-			GlowingManager.clearAll(mClonedKilledMob);
-			p.hideEntity(Plugin.getInstance(), mClonedKilledMob);
+		} else if (hasGlowTag) {
+			// Only Glow Tag present: show glowing and hide mob
+			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
+			mClonedKilledMob.setInvisible(true);
 			EntityEquipment equipment = mClonedKilledMob.getEquipment();
 			if (equipment != null) {
 				equipment.clear();
 			}
+		} else if (hasShowTag) {
+			// Only Show Tag present: remove glowing, show mob
+			GlowingManager.clearAll(mClonedKilledMob);
 		} else {
+			// Neither tag present: show everything by default (glowing)
 			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
-			p.showEntity(Plugin.getInstance(), mClonedKilledMob);
 		}
-		mClonedKilledMob.setHealth(1);
-		mClonedKilledMob.setInvulnerable(true);
-		mClonedKilledMob.setGravity(false);
-		mClonedKilledMob.setCollidable(false);
-		mClonedKilledMob.setAI(false);
-		mClonedKilledMob.setSilent(true);
-		mClonedKilledMob.addScoreboardTag("SkillImmune");
+
 		return mClonedKilledMob;
 	}
 
