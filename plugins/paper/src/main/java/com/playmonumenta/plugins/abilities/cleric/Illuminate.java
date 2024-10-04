@@ -42,6 +42,7 @@ public class Illuminate extends Ability {
 	public static final double ILLUMINATE_TRAIL_WIDTH = 3.5;
 	public static final int ILLUMINATE_TRAIL_DURATION_1 = 6 * 20;
 	public static final int ILLUMINATE_TRAIL_DURATION_2 = 8 * 20;
+	public static final int ILLUMINATE_BUFF_DURATION = 4 * 20;
 	public static final double ILLUMINATE_SPEED_BUFF = 0.20;
 	public static final double ILLUMINATE_STRENGTH_BUFF = 0.10;
 	public static final double ILLUMINATE_DAMAGE_1 = 8;
@@ -50,6 +51,7 @@ public class Illuminate extends Ability {
 	public static final float ILLUMINATE_KNOCKBACK = 0.5f;
 	public static final double ILLUMINATE_ENHANCE_RADIUS = 6.0;
 	public static final double ILLUMINATE_ENHANCE_DAMAGE = 1;
+	public static final int ILLUMINATE_ENHANCE_COOLDOWN = 2 * 20;
 
 	public static final String CHARM_COOLDOWN = "Illuminate Cooldown";
 	public static final String CHARM_RANGE = "Illuminate Max Range";
@@ -72,13 +74,14 @@ public class Illuminate extends Ability {
 			.descriptions(
 				String.format("Pressing the drop key will fire a holy projectile that travels for %s blocks, " +
 					"leaving behind a %s-block wide trail that lasts for %ss and grants +%s%% Speed to all players inside it. " +
-					"Buffs linger for 4s upon leaving the area. " +
+					"Buffs linger for %ss upon leaving the area. " +
 					"Upon hitting a mob, block, or reaching its max distance, the projectile explodes, dealing %s magic damage " +
 					"in a %s-block radius to all mobs and knocking them away. Cooldown: %ss.",
 					StringUtils.formatDecimal(ILLUMINATE_MAX_RANGE),
 					StringUtils.formatDecimal(ILLUMINATE_TRAIL_WIDTH),
 					StringUtils.ticksToSeconds(ILLUMINATE_TRAIL_DURATION_1),
 					StringUtils.multiplierToPercentage(ILLUMINATE_SPEED_BUFF),
+					StringUtils.ticksToSeconds(ILLUMINATE_BUFF_DURATION),
 					StringUtils.formatDecimal(ILLUMINATE_DAMAGE_1),
 					StringUtils.formatDecimal(ILLUMINATE_RADIUS),
 					StringUtils.ticksToSeconds(COOLDOWN_1)
@@ -93,9 +96,10 @@ public class Illuminate extends Ability {
 					StringUtils.ticksToSeconds(COOLDOWN_2)
 				),
 				String.format("A sanctified area is placed wherever Illuminate explodes, granting the same effects as the trail within a %s-block radius and lasting for the same duration. " +
-					"Enemies within Illuminate's trail take %s magic damage every 2s.",
+					"Enemies within Illuminate's trail take %s magic damage every %ss.",
 					StringUtils.formatDecimal(ILLUMINATE_ENHANCE_RADIUS),
-					StringUtils.formatDecimal(ILLUMINATE_ENHANCE_DAMAGE)
+					StringUtils.formatDecimal(ILLUMINATE_ENHANCE_DAMAGE),
+					StringUtils.ticksToSeconds(ILLUMINATE_ENHANCE_COOLDOWN)
 				))
 			.simpleDescription("Fire an explosive projectile forwards while leaving behind a trail that buffs allies.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
@@ -207,13 +211,13 @@ public class Illuminate extends Ability {
 			@Override
 			public void run() {
 				for (Player player : mPlayersInZone) {
-					mPlugin.mEffectManager.addEffect(player, "IlluminateSpeedEffect", new PercentSpeed(80, mSpeedBuff, "IlluminateSpeedEffect"));
+					mPlugin.mEffectManager.addEffect(player, "IlluminateSpeedEffect", new PercentSpeed(ILLUMINATE_BUFF_DURATION, mSpeedBuff, "IlluminateSpeedEffect"));
 					if (isLevelTwo()) {
-						mPlugin.mEffectManager.addEffect(player, "IlluminateStrengthEffect", new PercentDamageDealt(80, mStrengthBuff));
+						mPlugin.mEffectManager.addEffect(player, "IlluminateStrengthEffect", new PercentDamageDealt(ILLUMINATE_BUFF_DURATION, mStrengthBuff));
 					}
 				}
 
-				if (isEnhanced() && mTicks % 40 == 0) {
+				if (isEnhanced() && mTicks % ILLUMINATE_ENHANCE_COOLDOWN == 0) {
 					for (LivingEntity mob : mMobsInZone) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mEnhanceDamage, mInfo.getLinkedSpell(), true);
 						mCosmetic.enhanceTickDamageEffect(mPlayer, mob);

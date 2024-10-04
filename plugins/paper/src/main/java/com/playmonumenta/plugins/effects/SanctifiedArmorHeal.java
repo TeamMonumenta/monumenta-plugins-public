@@ -2,10 +2,13 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
+import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -29,10 +32,29 @@ public class SanctifiedArmorHeal extends Effect {
 	}
 
 	@Override
+	public void onHurt(LivingEntity entity, DamageEvent event) {
+		DamageEvent.DamageType type = event.getType();
+		if (DamageEvent.DamageType.getUnscalableDamageType().contains(type)) {
+			return;
+		}
+		if (event.getSource() instanceof Player player) {
+			if (!mPlayerUuids.contains(player.getUniqueId())) {
+				return;
+			}
+			SanctifiedArmor sanctifiedArmor = Plugin.getInstance().mAbilityManager.getPlayerAbility(player, SanctifiedArmor.class);
+			if (sanctifiedArmor != null) {
+				sanctifiedArmor.onMobHurt(entity, type);
+			}
+		}
+	}
+
+	@Override
 	public void onDeath(EntityDeathEvent event) {
-		for (UUID playerUuid : mPlayerUuids) {
+		for (Iterator<UUID> iterator = mPlayerUuids.iterator(); iterator.hasNext(); ) {
+			UUID playerUuid = iterator.next();
 			Player player = Bukkit.getPlayer(playerUuid);
 			if (player == null) { // player logged off, don't do any damage
+				iterator.remove();
 				continue;
 			}
 			SanctifiedArmor sanctifiedArmor = Plugin.getInstance().mAbilityManager.getPlayerAbility(player, SanctifiedArmor.class);

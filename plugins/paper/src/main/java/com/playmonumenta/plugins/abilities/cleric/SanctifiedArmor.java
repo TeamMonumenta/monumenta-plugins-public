@@ -103,6 +103,7 @@ public class SanctifiedArmor extends Ability {
 
 	private @Nullable UUID mLastAffectedMob = null;
 	private double mLastDamage;
+	public DamageType mLastDamageType;
 
 	private final SanctifiedArmorCS mCosmetic;
 
@@ -181,12 +182,19 @@ public class SanctifiedArmor extends Ability {
 		}
 	}
 
+	public void onMobHurt(LivingEntity entity, DamageType type) {
+		if (isEnhanced() && mLastAffectedMob != null && mLastAffectedMob.equals(entity.getUniqueId())) {
+			mLastDamageType = type;
+		}
+	}
+
 	public void onMobKilled(LivingEntity entity) {
 		if (isEnhanced()
 			&& mLastAffectedMob != null
 			&& mLastAffectedMob.equals(entity.getUniqueId())
 			&& entity.getLastDamageCause() != null
-			&& entity.getLastDamageCause().getCause() != EntityDamageEvent.DamageCause.THORNS) {
+			&& entity.getLastDamageCause().getCause() != EntityDamageEvent.DamageCause.THORNS
+			&& mLastDamageType != DamageType.THORNS) {
 			PlayerUtils.healPlayer(mPlugin, mPlayer, mLastDamage / 2.0);
 			mCosmetic.sanctOnHeal(mPlayer, mPlayer.getLocation(), entity);
 		}
@@ -211,6 +219,7 @@ public class SanctifiedArmor extends Ability {
 					mPlugin.mEffectManager.addEffect(entity, ENHANCEMENT_EFFECT_NAME, new SanctifiedArmorHeal(mPlayer.getUniqueId()).displaysTime(false));
 				}
 				mLastAffectedMob = entity.getUniqueId();
+				mLastDamageType = DamageType.THORNS;
 			}
 		}
 	}
