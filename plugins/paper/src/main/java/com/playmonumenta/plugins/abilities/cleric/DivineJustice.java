@@ -134,7 +134,8 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			mLastPassiveDamage = DAMAGE;
 			/* Flat damage of event does not include crit bonus and does not include gear/potion/skill buffs, readd crit bonus for melee crits */
 			mLastPassiveDamage += event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
-				Math.max(((isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
+				(isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1);
+			mLastPassiveDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mLastPassiveDamage);
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDamage, mInfo.getLinkedSpell(), true, false);
 
 			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber);
