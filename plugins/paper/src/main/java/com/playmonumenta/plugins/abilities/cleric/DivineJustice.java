@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -12,6 +13,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -37,26 +39,25 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-
 public class DivineJustice extends Ability implements AbilityWithChargesOrStacks {
-
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
 
 	public static final int DAMAGE = 5;
-	public static final double DAMAGE_MULTIPLIER = 0.2;
+	public static final double DAMAGE_MULTIPLIER_1 = 0.15;
+	public static final double DAMAGE_MULTIPLIER_2 = 0.3;
 	public static final double HEALING_MULTIPLIER_OWN = 0.1;
 	public static final double HEALING_MULTIPLIER_OTHER = 0.05;
 	public static final int RADIUS = 12;
 	public static final double ENHANCEMENT_ASH_CHANCE = 0.33;
-	public static final int ENHANCEMENT_ASH_DURATION = 10 * 20;
+	public static final int ENHANCEMENT_ASH_DURATION = Constants.TICKS_PER_SECOND * 10;
 	public static final double ENHANCEMENT_ASH_BONUS_DAMAGE = 0.04;
 	public static final double ENHANCEMENT_BONUS_DAMAGE_MAX = 0.32;
-	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = 20 * 20;
-	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = 4 * 60 * 20;
+	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = Constants.TICKS_PER_SECOND * 20;
+	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = Constants.TICKS_PER_MINUTE * 4;
 	public static final String ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME = "DivineJusticeBonusDamageEffect";
 
-	public static final String CHARM_DAMAGE = "Divine Justice Damage";
+	public static final String CHARM_DAMAGE = "Divine Justice Percent Damage";
 	public static final String CHARM_SELF = "Divine Justice Self Heal";
 	public static final String CHARM_ALLY = "Divine Justice Ally Heal";
 	public static final String CHARM_HEAL_RADIUS = "Divine Justice Ally Heal Radius";
@@ -70,21 +71,20 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.shorthandName("DJ")
 			.descriptions(
 				String.format(
-					"Your critical melee or projectile attacks passively deal %s magic damage to undead enemies, ignoring iframes.",
+					"Critical melee or projectile attacks deal %s magic damage to undead enemies, ignoring iframes.",
 					DAMAGE
 				),
 				String.format(
-					"Killing an undead enemy now passively heals %s%% of your max health and heals players within %s blocks of you for %s%% of their max health." +
-						" Damage is increased from %s, to %s and %s%% of your critical attack damage.",
+					"The damage is increased to %s plus %s%% of your critical attack damage. Additionally, killing an undead " +
+						"enemy heals you for %s%% of your max health and heals players within %s blocks of you for %s%% of their max health.",
+					DAMAGE,
+					StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER_2),
 					StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OWN),
 					RADIUS,
-					StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OTHER),
-					DAMAGE,
-					DAMAGE,
-					StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER)
+					StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OTHER)
 				),
 				String.format(
-					"Undead killed have a %s%% chance to drop Purified Ash which disappears after %ss." +
+					"Undead killed have a %s%% chance to drop Purified Ash which lingers for %ss." +
 						" Clerics with this ability who pick it up get %s%% increased undead damage for %ss." +
 						" This effect stacks up to %s%% and the duration is refreshed on each pickup." +
 						" Bone Shards can be consumed from the inventory by right-clicking to get the max effect for %s minutes.",
@@ -93,32 +93,28 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 					StringUtils.multiplierToPercentage(ENHANCEMENT_ASH_BONUS_DAMAGE),
 					StringUtils.ticksToSeconds(ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION),
 					StringUtils.multiplierToPercentage(ENHANCEMENT_BONUS_DAMAGE_MAX),
-					ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION / (60 * 20)
+					ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION / Constants.TICKS_PER_MINUTE
 				)
 			)
 			.simpleDescription("Deal extra damage on critical melee or projectile attacks against Undead enemies and heal when killing Undead enemies.")
 			.remove(DivineJustice::remove)
 			.displayItem(Material.IRON_SWORD);
 
-	private final boolean mDoHealingAndMultiplier;
-	private final double mEnhanceDamage;
-	private final int mEnhanceDuration;
-
 	// Passive damage to share with Holy Javelin
 	public double mLastPassiveDamage = 0;
 
 	public final DivineJusticeCS mCosmetic;
 
+	private final double mEnhanceDamage;
+	private final int mEnhanceDuration;
+
 	private int mComboNumber = 0;
 	private @Nullable BukkitRunnable mComboRunnable = null;
-
 	private double mPriorAmount = 0;
-
 	private @Nullable Crusade mCrusade;
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDoHealingAndMultiplier = isLevelTwo();
 		mEnhanceDamage = ENHANCEMENT_ASH_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_DAMAGE);
 		mEnhanceDuration = CharmManager.getDuration(player, CHARM_ENHANCE_DURATION, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS());
@@ -130,21 +126,18 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		if (!Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
 			return false;
 		}
-		if ((event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) ||
-			(event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
-				&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
-			double damage = DAMAGE;
-			if (mDoHealingAndMultiplier) {
-				// Use the whole melee damage here
-				damage += event.getDamage() * DAMAGE_MULTIPLIER;
-			}
-			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+		/* DamageEvents do not reliably store whether an event is a crit or not since Cumbersome modifies the crit boolean */
+		boolean isMeleeCrit = event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer);
+		if (isMeleeCrit || (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile
+			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
+			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
+			mLastPassiveDamage = DAMAGE;
+			/* Flat damage of event does not include crit bonus and does not include gear/potion/skill buffs, readd crit bonus for melee crits */
+			mLastPassiveDamage += event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
+				Math.max(((isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDamage, mInfo.getLinkedSpell(), true, false);
 
-			mLastPassiveDamage = damage;
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
-
-			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
-			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), widerWidthDelta, mComboNumber);
+			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber);
 
 			if (mComboNumber == 0 || mComboRunnable != null) {
 				if (mComboRunnable != null) {
@@ -174,21 +167,15 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
-		if (mDoHealingAndMultiplier && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)) {
-			PlayerUtils.healPlayer(
-				mPlugin,
-				mPlayer,
+		if (isLevelTwo() && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)) {
+			PlayerUtils.healPlayer(mPlugin, mPlayer,
 				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN)
 			);
 			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS), true);
-			for (Player otherPlayer : players) {
-				PlayerUtils.healPlayer(
-					mPlugin,
-					otherPlayer,
-					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, EntityUtils.getMaxHealth(otherPlayer) * HEALING_MULTIPLIER_OTHER),
-					mPlayer
-				);
-			}
+			players.forEach(otherPlayer -> PlayerUtils.healPlayer(mPlugin, otherPlayer,
+				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, EntityUtils.getMaxHealth(otherPlayer) * HEALING_MULTIPLIER_OTHER),
+				mPlayer
+			));
 
 			players.add(mPlayer);
 			mCosmetic.justiceKill(mPlayer, entityDeathEvent.getEntity().getLocation());
@@ -237,10 +224,8 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 					}
 
 					applyEnhancementEffect(player, false);
-
 					mCosmetic.justiceAshPickUp(player, item.getLocation());
 					item.remove();
-
 					this.cancel();
 					break;
 				}
@@ -250,7 +235,6 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 					item.remove();
 				}
 			}
-
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
