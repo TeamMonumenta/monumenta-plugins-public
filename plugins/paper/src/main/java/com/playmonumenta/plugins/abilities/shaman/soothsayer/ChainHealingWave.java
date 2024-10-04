@@ -90,7 +90,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? BOUNCE_RANGE_2 : BOUNCE_RANGE_1);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
-		mHealPercent = CharmManager.getExtraPercent(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
+		mHealPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
 		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, 20 * CDR_ON_KILL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainHealingWaveCS());
 	}
@@ -147,13 +147,13 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		if (!consumeCharge()) {
 			return;
 		}
-		PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mHealPercent * EntityUtils.getMaxHealth(mPlayer)), mPlayer);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, mHealPercent, mPlayer);
 
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
 			if (target instanceof Player) {
 				mCosmetic.chainHeal(mPlayer, target);
-				PlayerUtils.healPlayer(mPlugin, (Player) target, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mHealPercent * EntityUtils.getMaxHealth(target)), mPlayer);
+				PlayerUtils.healPlayer(mPlugin, (Player) target, mHealPercent, mPlayer);
 			}
 			mCosmetic.chainBeam(mHitTargets, i, target, mPlayer);
 		}

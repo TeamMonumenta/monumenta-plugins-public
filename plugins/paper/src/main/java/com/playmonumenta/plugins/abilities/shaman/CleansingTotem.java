@@ -128,7 +128,7 @@ public class CleansingTotem extends TotemAbility {
 			for (Player p : affectedPlayers) {
 				double maxHealth = EntityUtils.getMaxHealth(p);
 				double totalHealing = maxHealth * mHealPercent;
-				double healed = PlayerUtils.healPlayer(mPlugin, p, maxHealth * mHealPercent);
+				double healed = PlayerUtils.healPlayer(mPlugin, p, totalHealing);
 				double remainingHealing = totalHealing - healed;
 				if (remainingHealing > 0 && isEnhanced()) {
 					AbsorptionUtils.addAbsorption(p, remainingHealing, mAbsorbCap, 15 * 20);
