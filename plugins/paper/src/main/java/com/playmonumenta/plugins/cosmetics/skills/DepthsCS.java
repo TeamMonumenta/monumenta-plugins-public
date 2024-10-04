@@ -9,6 +9,7 @@ public interface DepthsCS {
 	String TALISMAN_DAWN = "dawnbringer_talisman";
 	String TALISMAN_SHADOW = "shadowdancer_talisman";
 	String TALISMAN_STEEL = "steelsage_talisman";
+	String EXTRA_GEODES = "extra_geodes";
 
 	String getToken();
 

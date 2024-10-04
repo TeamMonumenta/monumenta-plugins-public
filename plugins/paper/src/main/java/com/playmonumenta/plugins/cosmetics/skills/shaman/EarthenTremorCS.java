@@ -34,7 +34,7 @@ public class EarthenTremorCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.4f, 2.0f);
 	}
 
-	public void earthenTremorEnhancement(Player player, Location shockwaveLoc, double enhancementRadius) {
+	public void earthenTremorEnhancement(Player player, Location shockwaveLoc, double enhancementRadius, int distance, double maxDistance) {
 		DisplayEntityUtils.groundBlockQuake(shockwaveLoc.clone().add(0, 0.2, 0), enhancementRadius,
 			List.of(Material.DIORITE, Material.GRANITE, Material.IRON_ORE),
 			new Display.Brightness(8, 8));

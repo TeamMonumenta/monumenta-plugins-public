@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.cosmetics.skills.shaman.LightningTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -118,8 +117,13 @@ public class LightningTotem extends TotemAbility {
 	}
 
 	@Override
+	public void placeTotem(Location standLocation, Player player, ArmorStand stand) {
+		mCosmetic.lightningTotemSpawn(standLocation, player, stand, mRadius);
+	}
+
+	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		mCosmetic.lightningTotemTick(mPlayer, mRadius, standLocation);
+		mCosmetic.lightningTotemTick(mPlayer, mRadius, standLocation, stand);
 		mStormTasks.removeIf(BukkitTask::isCancelled);
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
@@ -151,7 +155,7 @@ public class LightningTotem extends TotemAbility {
 		if (mTarget != null) {
 			DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC,
 				mInfo.getLinkedSpell(), stats), damageApplied, true, false, false);
-			mCosmetic.lightningTotemStrike(mPlayer, mTarget);
+			mCosmetic.lightningTotemStrike(mPlayer, standLocation, mTarget);
 		}
 		dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), INTERVAL + 20);
 	}
@@ -174,20 +178,10 @@ public class LightningTotem extends TotemAbility {
 
 					@Override
 					public void run() {
-						mCosmetic.lightningTotemEnhancementStorm(mPlayer, mLoc);
-						new PartialParticle(
-							Particle.REDSTONE,
-							mLoc.clone().add(0, 4, 0),
-							15,
-							1.5,
-							0.25,
-							1.5,
-							0,
-							DUST_GRAY_LARGE
-						).spawnAsPlayerActive(mPlayer);
+						mCosmetic.lightningTotemEnhancementStorm(mPlayer, mLoc, mStormRadius);
 
 						if (mTicks % mInterval == 0) {
-							mCosmetic.lightningTotemEnhancementStrike(mPlayer, mLoc);
+							mCosmetic.lightningTotemEnhancementStrike(mPlayer, mLoc, mStormRadius);
 							for (LivingEntity entity : EntityUtils.getNearbyMobsInSphere(mLoc, mStormRadius, mTarget)) {
 								DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(
 										DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), mStats),

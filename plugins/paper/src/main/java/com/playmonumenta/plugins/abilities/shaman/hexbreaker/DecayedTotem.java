@@ -110,11 +110,13 @@ public class DecayedTotem extends TotemAbility {
 	}
 
 	@Override
+	public void placeTotem(Location standLocation, Player player, ArmorStand stand) {
+		applyDecayedDamageBoost();
+		mCosmetic.decayedTotemSpawn(mPlayer, stand);
+	}
+
+	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		if (ticks == 0) {
-			applyDecayedDamageBoost();
-			mCosmetic.decayedTotemSpawn(mPlayer, stand);
-		}
 		mCosmetic.decayedTotemTick(mPlayer, stand);
 		mTargets.removeIf(mob -> !mob.getWorld().equals(standLocation.getWorld()) || standLocation.distance(mob.getLocation()) >= mRadius || mob.isDead());
 		if (mTargets.size() < mTargetCount) {

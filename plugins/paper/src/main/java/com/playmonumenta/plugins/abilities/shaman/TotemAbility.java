@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.TotemicProjectionCS;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -16,9 +18,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -48,6 +47,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	public int mDuration;
 	public int mChargeUpTicks = PULSE_DELAY;
 	public boolean mIsCharging = true;
+	private final TotemicProjectionCS mCosmetic;
 
 	private @Nullable BukkitRunnable mTotemTickingRunnable;
 
@@ -56,6 +56,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		mProjectileName = projectileName;
 		mTotemName = totemName;
 		mDisplayName = displayName;
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TotemicProjectionCS());
 	}
 
 	public boolean cast() {
@@ -68,9 +69,8 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		mIsCharging = mChargeUpTicks > 0;
 
 		World world = mPlayer.getWorld();
-		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.25f);
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mProjectileName, Particle.CLOUD);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mProjectileName, null);
+		mCosmetic.totemCast(mPlayer, proj, mTotemName);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -147,6 +147,8 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 		stand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 
+		placeTotem(bLoc, mPlayer, stand);
+
 		TotemicEmpowerment.addTotem(mPlayer, stand);
 
 		ArmorStand durationStand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "TotemDurationStand");
@@ -215,6 +217,8 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		};
 		mTotemTickingRunnable.runTaskTimer(mPlugin, 0, 1);
 	}
+
+	public abstract void placeTotem(Location loc, Player player, ArmorStand stand);
 
 	@Override
 	public int getInitialAbilityDuration() {

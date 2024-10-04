@@ -10,6 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
 public class WhirlwindTotemCS implements CosmeticSkill {
@@ -24,7 +25,7 @@ public class WhirlwindTotemCS implements CosmeticSkill {
 		return Material.WHITE_STAINED_GLASS;
 	}
 
-	public void whirlwindTotemSpawn(World world, Player player, Location standLocation) {
+	public void whirlwindTotemSpawn(World world, Player player, Location standLocation, ArmorStand stand) {
 		world.playSound(standLocation, Sound.ENTITY_ENDER_EYE_LAUNCH, SoundCategory.PLAYERS, 2.0f, 0.1f);
 		world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 2.0f, 0.7f);
 		world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 2.0f, 1.3f);

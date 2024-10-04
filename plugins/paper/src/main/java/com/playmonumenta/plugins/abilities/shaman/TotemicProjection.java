@@ -113,10 +113,9 @@ public class TotemicProjection extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE,
-			SoundCategory.PLAYERS, 1.0f, 0.25f);
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Totemic Projection Projectile", Particle.CLOUD);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Totemic Projection Projectile", null);
+		List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
+		mCosmetic.projectionCast(mPlayer, proj, totems);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -161,7 +160,6 @@ public class TotemicProjection extends Ability {
 
 		if (stats != null) {
 			Location dropCenter = proj.getLocation();
-			mCosmetic.projectionCollision(mPlayer, dropCenter);
 
 			List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
 			if (totems.size() == 1) {
@@ -195,6 +193,8 @@ public class TotemicProjection extends Ability {
 					currentDeg += degIncrement;
 				}
 			}
+			mCosmetic.projectionCollision(mPlayer, dropCenter, mRadius, totems);
+
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(mPlayer, "ShamanProjectionEnhancement",
 					new PercentDamageDealt(mEnhanceDamageDuration,

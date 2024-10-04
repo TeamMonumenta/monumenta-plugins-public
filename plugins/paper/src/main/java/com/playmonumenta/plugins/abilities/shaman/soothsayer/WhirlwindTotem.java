@@ -102,11 +102,13 @@ public class WhirlwindTotem extends TotemAbility {
 	}
 
 	@Override
+	public void placeTotem(Location standLocation, Player player, ArmorStand stand) {
+		mCosmetic.whirlwindTotemSpawn(player.getWorld(), mPlayer, standLocation, stand);
+		applyWhirlwindDurationBoost();
+	}
+
+	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		if (ticks == 0) {
-			mCosmetic.whirlwindTotemSpawn(world, mPlayer, standLocation);
-			applyWhirlwindDurationBoost();
-		}
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
 		}

@@ -94,10 +94,12 @@ public class CleansingTotem extends TotemAbility {
 	}
 
 	@Override
+	public void placeTotem(Location standLocation, Player player, ArmorStand stand) {
+		mCosmetic.cleansingTotemSpawn(mPlayer.getWorld(), standLocation);
+	}
+
+	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		if (ticks == 0) {
-			mCosmetic.cleansingTotemSpawn(world, standLocation);
-		}
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
 		}

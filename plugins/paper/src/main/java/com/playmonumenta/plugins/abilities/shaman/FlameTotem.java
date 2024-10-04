@@ -68,10 +68,10 @@ public class FlameTotem extends TotemAbility {
 			.shorthandName("FT")
 			.descriptions(
 				String.format("Right click while holding a melee weapon and sneaking to fire a projectile that summons a flame totem. The totem throws explosive fireballs "
-						+ " at a target within range, dealing %s damage in a %s block radius and sets mobs on fire"
+						+ "at a target within range, dealing %s damage in a %s block radius and sets mobs on fire"
 						+ ", without inferno damage, for %s seconds every second. Charge up time: %ss. Duration: %ss. Cooldown: %ss.",
-					AOE_RANGE_1,
 					DAMAGE_1,
+					AOE_RANGE_1,
 					StringUtils.ticksToSeconds(FIRE_DURATION),
 					StringUtils.ticksToSeconds(TotemAbility.PULSE_DELAY),
 					StringUtils.ticksToSeconds(DURATION_1),
@@ -115,6 +115,11 @@ public class FlameTotem extends TotemAbility {
 	}
 
 	@Override
+	public void placeTotem(Location standLocation, Player player, ArmorStand stand) {
+		mCosmetic.flameTotemSpawn(standLocation, player, stand, mRadius);
+	}
+
+	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (isEnhanced()) {
 			mCosmetic.flameTotemTickEnhanced(mPlayer, standLocation, mRadius);
@@ -134,6 +139,7 @@ public class FlameTotem extends TotemAbility {
 			* (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1);
 		Collections.shuffle(affectedMobs);
 		List<LivingEntity> impactedMobs = new ArrayList<>();
+		List<LivingEntity> targetMobs = new ArrayList<>();
 		if (!affectedMobs.isEmpty()) {
 			for (int i = 0; i < mBombCount; i++) {
 				LivingEntity finalTarget = null;
@@ -147,13 +153,9 @@ public class FlameTotem extends TotemAbility {
 					// No target that hasn't been hit yet, so just pick a random one to bomb
 					finalTarget = affectedMobs.get(0);
 				}
+				targetMobs.add(finalTarget);
 				Location targetLocation = finalTarget.getLocation();
-				Location standEyeLocation = standLocation.clone().add(0, 1.5, 0);
-				if (isEnhanced()) {
-					mCosmetic.flameTotemBombEnhanced(mPlayer, standEyeLocation, targetLocation, standLocation, mPlugin, mBombRadius);
-				} else {
-					mCosmetic.flameTotemBomb(mPlayer, standEyeLocation, targetLocation, standLocation, mPlugin, mBombRadius);
-				}
+
 				List<LivingEntity> newImpactedMobs = EntityUtils.getNearbyMobsInSphere(targetLocation, mBombRadius, null);
 				for (LivingEntity mob : newImpactedMobs) {
 					DamageUtils.damage(mPlayer, mob,
@@ -163,6 +165,11 @@ public class FlameTotem extends TotemAbility {
 						stats, mEnhanceInfernoScale);
 					impactedMobs.add(mob);
 				}
+			}
+			if (isEnhanced()) {
+				mCosmetic.flameTotemBombEnhanced(mPlayer, targetMobs, standLocation, mPlugin, mBombRadius);
+			} else {
+				mCosmetic.flameTotemBomb(mPlayer, targetMobs, standLocation, mPlugin, mBombRadius);
 			}
 		}
 	}

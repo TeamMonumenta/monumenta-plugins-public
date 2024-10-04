@@ -76,9 +76,10 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final Material LOCKED = Material.BARRIER;
 	private static final int LINE = 5;
 	private static final int INTRO_LOC = 4;
-	private static final int ENTRY_START = 10;
-	private static final int ENTRY_PER_LINE = 7;
+	private static final int ENTRY_START = 9;
+	private static final int ENTRY_PER_LINE = 8;
 	private static final int ENTRY_PER_PAGE = ENTRY_PER_LINE * (LINE - 2);
+	private static final int[] ENTRY_COLUMNS = {0, 1, 2, 3, 5, 6, 7, 8};
 	private static final int BACK_LOC = (LINE - 1) * 9 + 4;
 	private static final int PREV_PAGE_LOC = (LINE - 1) * 9;
 	private static final int NEXT_PAGE_LOC = (LINE - 1) * 9 + 8;
@@ -162,35 +163,57 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 								return;
 							}
 
-							NamespacedKey talismanLoot = NamespacedKeyUtils.fromString(TALISMAN_LOOTTABLE_FOLDER + DEPTHS_CS.get(entry).getToken());
-							if (talismanLoot == null) {
-								// Shouldn't be here! But leave it as a handler to avoid typo in code.
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
-								player.sendMessage(Component.text("EX[" + skin + "]1: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
-								close();
-								return;
-							}
-							// Check costs
-							ItemStack mGeode = InventoryUtils.getItemFromLootTable(player, GEODE_LOOTTABLE);
-							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
-							ItemStack mTalisman = InventoryUtils.getItemFromLootTable(player, talismanLoot);
-							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
-									!player.getInventory().containsAtLeast(mTalisman, TALISMAN_PER_DEPTH_SKIN) ||
+							boolean isExtraGeodes = DEPTHS_CS.get(entry).getToken().equals(DepthsCS.EXTRA_GEODES);
+							if (isExtraGeodes) {
+								// Check costs
+								ItemStack mGeode = InventoryUtils.getItemFromLootTable(player, GEODE_LOOTTABLE);
+								ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
+								if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
+									!player.getInventory().containsAtLeast(mGeode, GEODE_PER_DEPTH_SKIN + 64)) {
+									player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
+									player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
+									return;
+								}
+								// Remove items
+								mGeode.setAmount(GEODE_PER_DEPTH_SKIN + 64);
+								mPigment.setAmount(PIGMENT_PER_SKIN);
+								if (buyCosmetic(player, skin)) {
+									player.getInventory().removeItem(mGeode);
+									player.getInventory().removeItem(mPigment);
+								}
+							} else {
+								NamespacedKey talismanLoot = NamespacedKeyUtils.fromString(TALISMAN_LOOTTABLE_FOLDER + DEPTHS_CS.get(entry).getToken());
+								int talismanPerDepthSkin = TALISMAN_PER_DEPTH_SKIN;
+								if (talismanLoot == null) {
+									// Shouldn't be here! But leave it as a handler to avoid typo in code.
+									player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
+									player.sendMessage(Component.text("EX[" + skin + "]1: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
+									close();
+									return;
+								}
+								// Check costs
+								ItemStack mGeode = InventoryUtils.getItemFromLootTable(player, GEODE_LOOTTABLE);
+								ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
+								ItemStack mTalisman = InventoryUtils.getItemFromLootTable(player, talismanLoot);
+								if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
+									!player.getInventory().containsAtLeast(mTalisman, talismanPerDepthSkin) ||
 									!player.getInventory().containsAtLeast(mGeode, GEODE_PER_DEPTH_SKIN)) {
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
-								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
-								return;
-							}
-							// Remove items
-							mGeode.setAmount(GEODE_PER_DEPTH_SKIN);
-							mPigment.setAmount(PIGMENT_PER_SKIN);
-							mTalisman.setAmount(TALISMAN_PER_DEPTH_SKIN);
-							if (buyCosmetic(player, skin)) {
-								player.getInventory().removeItem(mGeode);
-								player.getInventory().removeItem(mPigment);
-								player.getInventory().removeItem(mTalisman);
+									player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
+									player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
+									return;
+								}
+								// Remove items
+								mGeode.setAmount(GEODE_PER_DEPTH_SKIN);
+								mPigment.setAmount(PIGMENT_PER_SKIN);
+								mTalisman.setAmount(talismanPerDepthSkin);
+								if (buyCosmetic(player, skin)) {
+									player.getInventory().removeItem(mGeode);
+									player.getInventory().removeItem(mPigment);
+									player.getInventory().removeItem(mTalisman);
+								}
 							}
 							return;
+
 						} else {
 							// Already bought
 							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
@@ -323,7 +346,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
 							ItemStack mCanvas = InventoryUtils.getItemFromLootTable(player, CANVAS_LOOTTABLE);
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
-									!player.getInventory().containsAtLeast(mCanvas, CANVAS_PER_GALLERY_SKIN)) {
+								!player.getInventory().containsAtLeast(mCanvas, CANVAS_PER_GALLERY_SKIN)) {
 								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
@@ -443,21 +466,27 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		// Skin items
 		int numPages = (DEPTH_THEME.size() - 1) / ENTRY_PER_PAGE + 1;
 		mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
-		int currentSlot = ENTRY_START;
 		// Paging
 		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < DEPTHS_CS.size(); ) {
+			int slot = ENTRY_START + ENTRY_COLUMNS[i % ENTRY_PER_LINE] + i / ENTRY_PER_LINE;
 			String skin = DEPTH_THEME.get(i);
-			String tokenName = StringUtils.capitalizeWords(DEPTHS_CS.get(i).getToken().replace('_', ' '));
-			List<String> price = List.of(
+			boolean isExtraGeodes = DEPTHS_CS.get(i).getToken().equals(DepthsCS.EXTRA_GEODES);
+			if (isExtraGeodes) {
+				List<String> price = List.of(
+					PIGMENT_PER_SKIN + " Twisted Pigments and",
+					GEODE_PER_DEPTH_SKIN + 64 + " Voidstained Geodes");
+				ItemStack item = createSkillIcon(skin, DEPTH_COLOR, player, price);
+				mInventory.setItem(slot, item);
+			} else {
+				String talismanName = StringUtils.capitalizeWords(DEPTHS_CS.get(i).getToken().replace('_', ' '));
+				List<String> price = List.of(
 					PIGMENT_PER_SKIN + " Twisted Pigments,",
-					TALISMAN_PER_DEPTH_SKIN + " " + tokenName + " and",
+					TALISMAN_PER_DEPTH_SKIN + " " + talismanName + " and",
 					GEODE_PER_DEPTH_SKIN + " Voidstained Geodes");
-			ItemStack item = createSkillIcon(skin, DEPTH_COLOR, player, price);
-			mInventory.setItem(currentSlot, item);
-			if (slotToEntryNum(++currentSlot) < 0) {
-				// New line
-				currentSlot += (9 - ENTRY_PER_LINE);
+				ItemStack item = createSkillIcon(skin, DEPTH_COLOR, player, price);
+				mInventory.setItem(slot, item);
 			}
+
 			if (++i % ENTRY_PER_PAGE == 0) {
 				// End of current page number
 				break;
@@ -480,19 +509,16 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		// Skin items
 		int numPages = (DELVE_THEME.size() - 1) / ENTRY_PER_PAGE + 1;
 		mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
-		int currentSlot = ENTRY_START;
 		// Paging
 		List<String> price = List.of(
 				PIGMENT_PER_SKIN + " Twisted Pigments and",
 				STRAND_PER_DELVE_SKIN + " Twisted Strands");
 		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < DELVE_THEME.size(); ) {
+			int slot = ENTRY_START + ENTRY_COLUMNS[i % ENTRY_PER_LINE] + i / ENTRY_PER_LINE;
 			String skin = DELVE_THEME.get(i);
 			ItemStack item = createSkillIcon(skin, DELVE_COLOR, player, price);
-			mInventory.setItem(currentSlot, item);
-			if (slotToEntryNum(++currentSlot) < 0) {
-				// New line
-				currentSlot += (9 - ENTRY_PER_LINE);
-			}
+			mInventory.setItem(slot, item);
+
 			if (++i % ENTRY_PER_PAGE == 0) {
 				// End of current page number
 				break;
@@ -516,18 +542,16 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		// Skin items
 		int numPages = (PRESTIGE_THEME.size() - 1) / ENTRY_PER_PAGE + 1;
 		mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
-		int currentSlot = ENTRY_START;
 		// Paging
-		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < PRESTIGE_CS.size(); ) {
+		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < PRESTIGE_THEME.size();) {
+			int iMod = i % ENTRY_PER_PAGE;
+			int slot = ENTRY_START + iMod + (iMod + 4) / 8;
 			String skin = PRESTIGE_THEME.get(i);
 			int priceNum = PRESTIGE_CS.get(i).getPrice();
 			List<String> price = List.of(priceNum + " Challenge Points");
 			ItemStack item = createSkillIcon(skin, PRESTIGE_COLOR, player, price);
-			mInventory.setItem(currentSlot, item);
-			if (slotToEntryNum(++currentSlot) < 0) {
-				// New line
-				currentSlot += (9 - ENTRY_PER_LINE);
-			}
+			mInventory.setItem(slot, item);
+
 			if (++i % ENTRY_PER_PAGE == 0) {
 				// End of current page number
 				break;
@@ -544,25 +568,22 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private void loadGalleryPage(Player player) {
 		// Intro item
 		ItemStack introItem = createPageIcon(Material.WAXED_OXIDIZED_COPPER,
-				Component.text("Gallery of Fear", GALLERY_COLOR), GALLERY_INTRO);
+			Component.text("Gallery of Fear", GALLERY_COLOR), GALLERY_INTRO);
 		mInventory.setItem(INTRO_LOC, introItem);
 
 		// Skin items
 		int numPages = (GALLERY_THEME.size() - 1) / ENTRY_PER_PAGE + 1;
 		mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
-		int currentSlot = ENTRY_START;
 		// Paging
 		List<String> price = List.of(
-				PIGMENT_PER_SKIN + " Twisted Pigments and",
-				CANVAS_PER_GALLERY_SKIN + " Torn Canvases");
+			PIGMENT_PER_SKIN + " Twisted Pigments and",
+			CANVAS_PER_GALLERY_SKIN + " Torn Canvases");
 		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < GALLERY_THEME.size(); ) {
+			int slot = ENTRY_START + ENTRY_COLUMNS[i % ENTRY_PER_LINE] + i / ENTRY_PER_LINE;
 			String skin = GALLERY_THEME.get(i);
 			ItemStack item = createSkillIcon(skin, GALLERY_CS.get(i).getMap().mColor, player, price);
-			mInventory.setItem(currentSlot, item);
-			if (slotToEntryNum(++currentSlot) < 0) {
-				// New line
-				currentSlot += (9 - ENTRY_PER_LINE);
-			}
+			mInventory.setItem(slot, item);
+
 			if (++i % ENTRY_PER_PAGE == 0) {
 				// End of current page number
 				break;
@@ -676,13 +697,14 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	}
 
 	//May fail if changed relative constants
+
 	private int slotToEntryNum(int slot) {
 		int line = slot / 9 + 1;
-		if (line <= 1 || line >= LINE) {
+		if (line <= 1 || line >= LINE || (slot % 9 + 5) % 9 == 0) {
 			return -1;
 		}
-		int temp = slot - 9 * (line - 2);
-		if (temp >= ENTRY_START && temp < ENTRY_START + ENTRY_PER_LINE) {
+		int temp = slot - 9 * (line - 2) - ((slot % 9 + 5) / 9);
+		if (temp >= ENTRY_START && temp <= ENTRY_START + ENTRY_PER_LINE) {
 			return temp - ENTRY_START + ENTRY_PER_LINE * (line - 2) + ENTRY_PER_PAGE * (mPageNumber - 1);
 		}
 		return -1;
@@ -729,9 +751,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				"a witness of your prestige and glory."
 		);
 		GALLERY_INTRO = applyIntroStyle(
-				"The nightmare was never meant for life.",
-				"Banish the dream.",
-				"End this nightmare!"
+			"The nightmare was never meant for life.",
+			"Banish the dream.",
+			"End this nightmare!"
 		);
 
 	}

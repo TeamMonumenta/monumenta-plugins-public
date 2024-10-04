@@ -12,6 +12,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -29,11 +30,15 @@ public class LightningTotemCS implements CosmeticSkill {
 
 	public static final Particle.DustOptions DUST_GRAY_LARGE = new Particle.DustOptions(Color.fromRGB(51, 51, 51), 2);
 
-	public void lightningTotemTick(Player player, double radius, Location standLocation) {
+	public void lightningTotemSpawn(Location standLocation, Player player, ArmorStand stand, double radius) {
+
+	}
+
+	public void lightningTotemTick(Player player, double radius, Location standLocation, ArmorStand stand) {
 		new PPCircle(Particle.CRIT, standLocation.clone().add(0, 0.3, 0), radius).countPerMeter(0.4).spawnAsPlayerActive(player);
 	}
 
-	public void lightningTotemStrike(Player player, LivingEntity target) {
+	public void lightningTotemStrike(Player player, Location standLocation, LivingEntity target) {
 		PPLightning lightning = new PPLightning(Particle.END_ROD, target.getLocation())
 			.count(8).duration(3);
 		player.getWorld().playSound(target.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST,
@@ -42,12 +47,12 @@ public class LightningTotemCS implements CosmeticSkill {
 		lightning.spawnAsPlayerActive(player);
 	}
 
-	public void lightningTotemEnhancementStorm(Player player, Location loc) {
+	public void lightningTotemEnhancementStorm(Player player, Location loc, double stormRadius) {
 		new PartialParticle(
 			Particle.REDSTONE, loc.clone().add(0, 4, 0), 15, 1.5, 0.25, 1.5, 0, DUST_GRAY_LARGE).spawnAsPlayerActive(player);
 	}
 
-	public void lightningTotemEnhancementStrike(Player player, Location loc) {
+	public void lightningTotemEnhancementStrike(Player player, Location loc, double stormRadius) {
 		PPLightning lightning = new PPLightning(Particle.END_ROD, loc).count(8).duration(3).height(4);
 		player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.25f);
 		lightning.init(3, 2.5, 0.3, 0.3);

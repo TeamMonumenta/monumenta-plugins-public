@@ -70,6 +70,11 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.TwistedCompanionCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PrestigiousPinningShotCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.PrestigiousManeuverCS;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.ChromaCascadeCS;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.HauntedScarecrowCS;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.SummoningRiteCS;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.PrestigiousDevastationCS;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.PrestigiousTotemCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AvalanchexCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.BountifulHarvestCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.BurstingRootsCS;
@@ -179,6 +184,13 @@ public class CosmeticSkills {
 		PrestigiousManeuverCS::new,
 		PrestigiousPinningShotCS::new,
 
+		//Shaman
+		ChromaCascadeCS::new,
+		HauntedScarecrowCS::new,
+		SummoningRiteCS::new,
+		PrestigiousTotemCS::new,
+		PrestigiousDevastationCS::new,
+
 		//Warlock
 		AvalanchexCS::new,
 		InfernalFlamesCS::new,
@@ -246,6 +258,7 @@ public class CosmeticSkills {
 			.add(new PrestigiousMoonbladeCS())
 			.add(new PrestigiousRondeCS())
 			.add(new PrestigiousManeuverCS())
+			.add(new PrestigiousTotemCS())
 			.add(new PrestigiousBondsCS())
 			.add(new PrestigiousSlamCS())
 			.add(new PrestigiousRemedyCS())
@@ -253,6 +266,7 @@ public class CosmeticSkills {
 			.add(new PrestigiousStarfallCS())
 			.add(new PrestigiousBlitzCS())
 			.add(new PrestigiousPinningShotCS())
+			.add(new PrestigiousDevastationCS())
 			.add(new PrestigiousShadesCS())
 			.add(new PrestigiousShieldCS())
 			.build();
@@ -307,6 +321,7 @@ public class CosmeticSkills {
 			.add(TwistedLanceCS.NAME)
 			.add(TranscCombosCS.NAME)
 			.add(TwistedCompanionCS.NAME)
+			.add(HauntedScarecrowCS.NAME)
 			.add(InfernalFlamesCS.NAME)
 			.add(ColossalBruteCS.NAME)
 			.build();

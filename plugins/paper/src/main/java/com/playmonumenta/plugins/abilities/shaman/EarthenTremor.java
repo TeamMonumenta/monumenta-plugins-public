@@ -130,7 +130,7 @@ public class EarthenTremor extends Ability {
 				Vector normDir = VectorUtils.rotateYAxis(forward, i).normalize();
 				Location shockwaveLoc = mPlayer.getLocation().add(normDir.clone().multiply(mRadius));
 				for (int j = 0; j < mShockwaveDistance; j++) {
-					mCosmetic.earthenTremorEnhancement(mPlayer, shockwaveLoc, mShockwaveRadius);
+					mCosmetic.earthenTremorEnhancement(mPlayer, shockwaveLoc, mShockwaveRadius, j, mShockwaveDistance);
 					shockwaveLoc.add(normDir);
 					List<LivingEntity> mShockwaveHits = EntityUtils.getNearbyMobsInSphere(shockwaveLoc, mShockwaveRadius, null);
 					mShockwaveHits.removeAll(mHitEntities);
