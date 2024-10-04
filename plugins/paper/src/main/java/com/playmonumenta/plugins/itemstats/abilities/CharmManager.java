@@ -447,6 +447,7 @@ public class CharmManager {
 			HallowedBeam.CHARM_HEAL,
 			HallowedBeam.CHARM_RESISTANCE,
 			HallowedBeam.CHARM_RESISTANCE_DURATION,
+			HallowedBeam.CHARM_HEALING_PERCENT_THRESHOLD,
 			Rejuvenation.CHARM_THRESHOLD,
 			SanctifiedArmor.CHARM_DAMAGE,
 			SanctifiedArmor.CHARM_SLOW,

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * A powerful vector util class that allows you to rotate the design<br>
  * of any particle design (lines, arcs, helixes, etc.) on the<br>
  * specified axis.<br>
- * Order of rotation (IMPORTANT): Z-axis, X-Axis, Y-Axis
+ * Order of rotation (IMPORTANT): Z-axis, X-Axis, Y-axis
  *
  * (Now also does other things.)
  *
@@ -200,6 +200,15 @@ public class VectorUtils {
 
 	public static Vector swapXZAxes(Vector direction) {
 		return new Vector(direction.getZ(), direction.getY(), direction.getX());
+	}
+
+	public static Vector getDirectionTo(Vector to, Vector from) {
+		Vector diff = to.subtract(from);
+		Vector normalized = diff.normalize();
+		if (!Double.isFinite(normalized.getX())) {
+			return new Vector(0, 1, 0);
+		}
+		return normalized;
 	}
 
 }

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
 import org.bukkit.Color;
@@ -61,7 +62,8 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 	}
 
 	@Override
-	public void beamHealEffect(World world, Player player, LivingEntity pe, Vector dir, double range) {
+	public void beamHealEffect(Player player, LivingEntity pe, Vector dir, double range, Location targetLocation) {
+		World world = player.getWorld();
 		Location loc = player.getEyeLocation();
 		// Launch sound
 		world.playSound(loc, Sound.BLOCK_TRIPWIRE_DETACH, SoundCategory.PLAYERS, 0.6f, 0.75f);
@@ -111,7 +113,8 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 	}
 
 	@Override
-	public void beamHarm(World world, Player player, LivingEntity e, Vector dir, double range) {
+	public void beamHarm(Player player, LivingEntity e, Vector dir, double range, Location targetLocation) {
+		World world = player.getWorld();
 		Location loc = player.getEyeLocation();
 		world.playSound(loc, Sound.BLOCK_TRIPWIRE_DETACH, SoundCategory.PLAYERS, 0.6f, 0.75f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.2f, 0.6f);
@@ -142,14 +145,16 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 	}
 
 	@Override
-	public void beamHarmCrusade(Player player, Location eLoc) {
+	public void beamHarmCrusade(Player player, LivingEntity target, Location targetLocation) {
+		Location eLoc = LocationUtils.getHalfHeightLocation(target);
 		new PartialParticle(Particle.SPIT, eLoc, 30, 0, 0, 0, 0.2).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 60, 0, 0, 0, 0.25).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, eLoc, 100, 1.25, 1, 1.25, 0.5, BURN_COLOR).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void beamHarmOther(Player player, Location eLoc) {
+	public void beamHarmOther(Player player, LivingEntity target, Location targetLocation) {
+		Location eLoc = LocationUtils.getHalfHeightLocation(target);
 		new PartialParticle(Particle.SPIT, eLoc, 30, 0, 0, 0, 0.25f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, eLoc, 30, 1, 1, 1, 0.25).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, eLoc, 75, 1.25, 1, 1.25, 0.5, GOLD_COLOR).spawnAsPlayerActive(player);

@@ -265,7 +265,7 @@ public abstract class Hitbox {
 	 */
 	public static ApproximateFreeformHitbox approximateCone(Location start, double radius, double halfAngleRad) {
 		double radiusSquared = radius * radius;
-		double cosAngle = halfAngleRad >= Math.PI ? -1 : Math.cos(halfAngleRad);
+		double cosAngle = halfAngleRad >= Math.PI ? -1 : FastUtils.cos(halfAngleRad);
 		Vector direction = start.getDirection();
 		Vector startVector = start.toVector();
 		return new ApproximateFreeformHitbox(start.getWorld(),

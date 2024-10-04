@@ -84,7 +84,6 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 	}
 
 	public PPLine delay(int animationTicks) {
-
 		if (animationTicks < 1) {
 			animationTicks = 1;
 		}
@@ -174,12 +173,17 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 		}
 
 		if (mAnimationTicks > 1) {
-			int finalCount = count;
-			new BukkitRunnable() {
-				int mT = 0;
-				final int mCountPerTick = (int) Math.ceil((float) finalCount / mAnimationTicks);
-				int mI = 0;
+			final int finalCount = count;
+			final int mCountPerTick = (int) Math.ceil((float) finalCount / mAnimationTicks);
 
+			// run it once first
+			packagedValues.location(loc);
+			spawnUsingSettings(packagedValues);
+			loc.add(step);
+
+			new BukkitRunnable() {
+				int mT = 1;
+				int mI = 1;
 				@Override
 				public void run() {
 					for (int j = 0; j <= mCountPerTick; j++) {
@@ -187,6 +191,10 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 						spawnUsingSettings(packagedValues);
 						loc.add(step);
 						mI++;
+
+						if (mI > finalCount) {
+							break;
+						}
 					}
 
 					mT++;

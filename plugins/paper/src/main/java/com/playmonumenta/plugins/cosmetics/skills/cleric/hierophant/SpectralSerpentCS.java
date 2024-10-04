@@ -46,7 +46,8 @@ public class SpectralSerpentCS extends HallowedBeamCS {
 	}
 
 	@Override
-	public void beamHealEffect(World world, Player player, LivingEntity target, Vector dir, double range) {
+	public void beamHealEffect(Player player, LivingEntity target, Vector dir, double range, Location targetLocation) {
+		World world = player.getWorld();
 		Location serpentLoc = player.getLocation();
 		Location playerLoc = player.getLocation();
 		Location targetLoc = target.getLocation();
@@ -85,7 +86,8 @@ public class SpectralSerpentCS extends HallowedBeamCS {
 	}
 
 	@Override
-	public void beamHarm(World world, Player player, LivingEntity target, Vector dir, double range) {
+	public void beamHarm(Player player, LivingEntity target, Vector dir, double range, Location targetLocation) {
+		World world = player.getWorld();
 		Location serpentLoc = player.getLocation();
 		Location playerLoc = player.getLocation();
 		Location targetLoc = target.getLocation();
@@ -124,12 +126,12 @@ public class SpectralSerpentCS extends HallowedBeamCS {
 	}
 
 	@Override
-	public void beamHarmCrusade(Player player, Location eLoc) {
+	public void beamHarmCrusade(Player player, LivingEntity target, Location targetLocation) {
 
 	}
 
 	@Override
-	public void beamHarmOther(Player player, Location eLoc) {
+	public void beamHarmOther(Player player, LivingEntity target, Location targetLocation) {
 
 	}
 }

@@ -484,12 +484,16 @@ public class EntityUtils {
 	}
 
 	public static Set<LivingEntity> getEntitiesAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+		return getEntitiesAtCursor(player, range, filter, 0.425);
+	}
+
+	public static Set<LivingEntity> getEntitiesAtCursor(Player player, double range, @Nullable Predicate<Entity> filter, double hitboxSize) {
 		Set<LivingEntity> entities = new HashSet<>();
 		LivingEntity e = getEntityAtCursor(player, range, filter);
 		while (e != null) {
 			entities.add(e);
 			Predicate<Entity> noRepeat = entity -> !(entity instanceof LivingEntity && entities.contains(entity));
-			e = getEntityAtCursor(player, range, filter == null ? noRepeat : noRepeat.and(filter));
+			e = getEntityAtCursor(player, range, filter == null ? noRepeat : noRepeat.and(filter), hitboxSize);
 		}
 		return entities;
 	}
