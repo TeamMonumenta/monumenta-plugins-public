@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -92,7 +92,6 @@ public class SkillPage extends Page {
 					}
 					AbilityUtils.resetSpec(mGui.mPlayer);
 					mGui.updateYellowTessCooldown();
-					mGui.mPage = new ClassPage(mGui);
 					mGui.update();
 				});
 		}
@@ -119,65 +118,29 @@ public class SkillPage extends Page {
 			return;
 		}
 
+		boolean isClass = mGui.isClass(mClass, null);
 		boolean hasSpec = mGui.hasSpec();
 		boolean isSpec = mGui.isClass(mClass, spec);
-
-		if (mGui.isClass(mClass, null) && hasSpec && !isSpec) {
-			// Unlocked, but using other spec
-			ItemStack specItem = GUIUtils.createBasicItem(
-				Material.BARRIER,
-				spec.mSpecName,
-				mClass.mClassColor,
-				false,
-				"Click to view this specialization.",
-				NamedTextColor.WHITE
-			);
-			mGui.setItem(BOTTOM, column, specItem)
-				.onClick(event -> {
-					if (event.isShiftClick()) {
-						return;
-					}
-					mGui.mPage = new SpecPage(mGui, mClass, spec);
-					mGui.update();
-				});
-			return;
-		}
+		boolean otherSpec = hasSpec && !isSpec;
 
 		// Unlocked and possibly using this spec
 		String lore;
 		if (isSpec) {
 			lore = "Click to view your specialization skills.";
-		} else if (hasSpec) {
+		} else if (isClass && !hasSpec) {
 			lore = "Click to choose this specialization!";
 		} else {
 			lore = "Click to view this specialization.";
 		}
 		ItemStack specItem = GUIUtils.createBasicItem(
-			spec.mDisplayItem,
+			otherSpec ? Material.BARRIER : spec.mDisplayItem,
 			spec.mSpecName,
 			mClass.mClassColor,
 			false,
 			lore,
 			NamedTextColor.WHITE
 		);
-		ItemMeta newMeta = specItem.getItemMeta();
-		GUIUtils.splitLoreLine(
-			newMeta,
-			"Description: " + spec.mDescription,
-			NamedTextColor.YELLOW,
-			30,
-			false
-		);
-		if (spec.mPassiveName != null) {
-			GUIUtils.splitLoreLine(
-				newMeta,
-				spec.mPassiveName + " (Passive): " + spec.mPassiveDescription,
-				NamedTextColor.GREEN,
-				30,
-				false
-			);
-		}
-		specItem.setItemMeta(newMeta);
+		addDescriptionAndPassive(specItem, spec);
 		mGui.setItem(BOTTOM, column, specItem)
 			.onClick(event -> {
 				if (event.isShiftClick()) {
@@ -199,5 +162,26 @@ public class SkillPage extends Page {
 				mGui.mPage = new SpecPage(mGui, mClass, spec);
 				mGui.update();
 			});
+	}
+
+	protected void addDescriptionAndPassive(ItemStack specItem, PlayerSpec spec) {
+		ItemMeta newMeta = specItem.getItemMeta();
+		GUIUtils.splitLoreLine(
+			newMeta,
+			"Description: " + spec.mDescription,
+			NamedTextColor.YELLOW,
+			30,
+			false
+		);
+		if (spec.mPassiveName != null) {
+			GUIUtils.splitLoreLine(
+				newMeta,
+				spec.mPassiveName + " (Passive): " + spec.mPassiveDescription,
+				NamedTextColor.GREEN,
+				30,
+				false
+			);
+		}
+		specItem.setItemMeta(newMeta);
 	}
 }

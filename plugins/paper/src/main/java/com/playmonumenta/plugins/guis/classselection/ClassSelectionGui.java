@@ -11,8 +11,8 @@ import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -53,7 +53,7 @@ public class ClassSelectionGui extends Gui {
 		if (
 			testClass.mQuestReq != null
 				&& !AbilityUtils.getEffectiveSpecs(mPlayer)
-				&& ScoreboardUtils.getScoreboardValue(mPlayer, testClass.mQuestReq) < testClass.mQuestReqMin
+				&& ScoreboardUtils.getScoreboardValue(mPlayer, testClass.mQuestReq).orElse(0) < testClass.mQuestReqMin
 		) {
 			return true;
 		}
@@ -67,11 +67,11 @@ public class ClassSelectionGui extends Gui {
 	}
 
 	protected int remainingSkillPoints() {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_SKILL);
+		return ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_SKILL).orElse(0);
 	}
 
 	protected boolean hasSpecsUnlocked() {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, UNLOCK_SPECS) >= UNLOCK_SPECS_MIN;
+		return ScoreboardUtils.getScoreboardValue(mPlayer, UNLOCK_SPECS).orElse(0) >= UNLOCK_SPECS_MIN;
 	}
 
 	protected boolean hasEffectiveSpecsUnlocked() {
@@ -79,15 +79,15 @@ public class ClassSelectionGui extends Gui {
 	}
 
 	protected boolean hasSpecUnlocked(PlayerSpec spec) {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, spec.mSpecQuestScoreboard) >= 100;
+		return ScoreboardUtils.getScoreboardValue(mPlayer, spec.mSpecQuestScoreboard).orElse(0) >= 100;
 	}
 
 	protected int remainingSpecPoints() {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_SPEC);
+		return ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_SPEC).orElse(0);
 	}
 
 	protected int remainingEnhanceCount() {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE);
+		return ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0);
 	}
 
 	private void setRemainingCountIcons() {
@@ -174,18 +174,22 @@ public class ClassSelectionGui extends Gui {
 			lore = lore.append(clickHere);
 		}
 		String quest216Message = ability.getQuest216Message();
+		Component quest216Component;
 		if (
 			quest216Message != null
 			&& mPlayer.getScoreboardTags().contains("Q216Distortion4Active")
 		) {
+			quest216Component = Component.text(
+				quest216Message,
+				NamedTextColor.DARK_GRAY,
+				TextDecoration.ITALIC,
+				TextDecoration.OBFUSCATED
+			);
 			lore = lore
 				.append(Component.newline())
-				.append(Component.text(
-					quest216Message,
-					NamedTextColor.DARK_GRAY,
-					TextDecoration.ITALIC,
-					TextDecoration.OBFUSCATED
-				));
+				.append(quest216Component);
+		} else {
+			quest216Component = null;
 		}
 		Material item = ability.getDisplayItem();
 		if (item == null) {
@@ -201,6 +205,9 @@ public class ClassSelectionGui extends Gui {
 		setItem(row, column, abilityIcon).onClick(event -> {
 			if (event.isShiftClick()) {
 				return;
+			}
+			if (quest216Component != null) {
+				mPlayer.sendMessage(quest216Component);
 			}
 			applyAbilityChosen(displayedClass, displayedSpec, ability, 0);
 			update();
@@ -222,7 +229,7 @@ public class ClassSelectionGui extends Gui {
 		if (objective == null) {
 			currentLevel = 0;
 		} else {
-			currentLevel = ScoreboardUtils.getScoreboardValue(mPlayer, objective);
+			currentLevel = ScoreboardUtils.getScoreboardValue(mPlayer, objective).orElse(0);
 			if (currentLevel > 2) {
 				currentLevel -= 2;
 			}
@@ -275,7 +282,7 @@ public class ClassSelectionGui extends Gui {
 		boolean hasEnhancement;
 		Material newMat;
 		String scoreboard = ability.getScoreboard();
-		switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(mPlayer, scoreboard)) {
+		switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(mPlayer, scoreboard).orElse(0)) {
 			case 0 -> {
 				newMat = Material.BARRIER;
 				ItemStack disabledEn = GUIUtils.createBasicItem(newMat, 1,
@@ -340,7 +347,7 @@ public class ClassSelectionGui extends Gui {
 		String remainingPointsObjective
 			= displayedSpec == null ? AbilityUtils.REMAINING_SKILL : AbilityUtils.REMAINING_SPEC;
 
-		int currentLevel = ScoreboardUtils.getScoreboardValue(mPlayer, objective);
+		int currentLevel = ScoreboardUtils.getScoreboardValue(mPlayer, objective).orElse(0);
 		boolean hasEnhancement = currentLevel > 2;
 		int enhancementOffset = hasEnhancement ? 2 : 0;
 		// actualCurrentLevel is 0, 1, or 2 - the actual level of the ability before any changes
@@ -349,20 +356,20 @@ public class ClassSelectionGui extends Gui {
 			// Remove the ability
 			if (hasEnhancement) {
 				// Remove the enhancement
-				int currentEnhancement = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE);
+				int currentEnhancement = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0);
 				ScoreboardUtils.setScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE, currentEnhancement + 1);
 			}
 			ScoreboardUtils.setScoreboardValue(mPlayer, objective, 0);
-			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective);
+			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective).orElse(0);
 			ScoreboardUtils.setScoreboardValue(mPlayer, remainingPointsObjective, currentCount + (actualCurrentLevel - level));
 		} else if (level < actualCurrentLevel) {
 			// Level clicked is lower than level existing - remove levels down to clicked level
 			ScoreboardUtils.setScoreboardValue(mPlayer, objective, enhancementOffset + level);
-			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective);
+			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective).orElse(0);
 			ScoreboardUtils.setScoreboardValue(mPlayer, remainingPointsObjective, currentCount + (actualCurrentLevel - level));
 		} else if (level > actualCurrentLevel) {
 			// Level clicked is higher than level existing - upgrade to clicked level if enough points
-			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective);
+			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective).orElse(0);
 			if (currentCount >= level - actualCurrentLevel) {
 				// can upgrade
 				ScoreboardUtils.setScoreboardValue(mPlayer, remainingPointsObjective, currentCount - (level - actualCurrentLevel));
@@ -396,10 +403,10 @@ public class ClassSelectionGui extends Gui {
 			return;
 		}
 
-		int currentLevel = ScoreboardUtils.getScoreboardValue(mPlayer, objective);
+		int currentLevel = ScoreboardUtils.getScoreboardValue(mPlayer, objective).orElse(0);
 		if (add) {
 			// Clear ability data
-			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE);
+			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0);
 			// We don't want to assign the ability if we don't have points
 			if (currentCount > 0) {
 				ScoreboardUtils.setScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE, currentCount - 1);
@@ -411,7 +418,7 @@ public class ClassSelectionGui extends Gui {
 		} else {
 			// Level clicked is lower than level existing
 			ScoreboardUtils.setScoreboardValue(mPlayer, objective, currentLevel - 2);
-			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE);
+			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0);
 			ScoreboardUtils.setScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE, currentCount + 1);
 		}
 

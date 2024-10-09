@@ -33,6 +33,7 @@ public class GUIUtils {
 	public static final String GUI_TEXTURES_OBJECTIVE = "GUITextures";
 	public static final Material FILLER_MATERIAL = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
 	public static final ItemStack FILLER = createFiller();
+	public static final Pattern RE_ALT_NEWLINES = Pattern.compile("<newline>|<br>");
 
 	private static ItemStack createFiller() {
 		return createFiller(FILLER_MATERIAL);
@@ -132,6 +133,7 @@ public class GUIUtils {
 		if (mini.isEmpty()) {
 			return new ArrayList<>();
 		}
+		mini = RE_ALT_NEWLINES.matcher(mini).replaceAll("\n");
 		if (mini.length() <= maxLength && !mini.contains("\n")) {
 			return List.of(fixLoreFormatting(lore));
 		}

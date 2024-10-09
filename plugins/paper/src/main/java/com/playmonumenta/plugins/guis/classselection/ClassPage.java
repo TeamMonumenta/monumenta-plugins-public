@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.guis.AbilityTriggersGui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -172,35 +172,21 @@ public class ClassPage extends Page {
 			return;
 		}
 
-		if (otherChosen) {
-			mGui.setItem(
-				row,
-				column,
-				GUIUtils.createBasicItem(
-					Material.BARRIER,
-					classToItemize.mClassName,
-					classToItemize.mClassColor,
-					true,
-					"Click to view skills.",
-					NamedTextColor.GRAY
-				)
-			)
-				.onClick(event -> {
-					if (event.isShiftClick()) {
-						return;
-					}
-					mGui.mPage = new SkillPage(mGui, classToItemize);
-					mGui.update();
-				});
-			return;
+		String lore;
+		if (chosen) {
+			lore = "Click to view your skills.";
+		} else if (otherChosen) {
+			lore = "Click to view skills";
+		} else {
+			lore = "Click to choose this class!";
 		}
 
 		ItemStack classItem = GUIUtils.createBasicItem(
-			classToItemize.mDisplayItem,
+			otherChosen ? Material.BARRIER : classToItemize.mDisplayItem,
 			classToItemize.mClassName,
 			classToItemize.mClassColor,
 			true,
-			chosen ? "Click to view your skills." : "Click to choose this class!",
+			lore,
 			NamedTextColor.GRAY
 		);
 
