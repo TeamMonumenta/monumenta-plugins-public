@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
+import com.playmonumenta.plugins.effects.DivineJusticeInvuln;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -71,8 +72,9 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.shorthandName("DJ")
 			.descriptions(
 				String.format(
-					"Critical melee or projectile attacks deal %s magic damage to undead enemies, ignoring iframes.",
-					DAMAGE
+					"Critical melee or projectile attacks deal %s plus %s%% of your critical attack damage as magic damage to undead enemies.",
+					DAMAGE,
+					StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER_1)
 				),
 				String.format(
 					"The damage is increased to %s plus %s%% of your critical attack damage. Additionally, killing an undead " +
@@ -123,44 +125,38 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		/* Prevent DJ from triggering if the enemy is not affected by Crusade */
 		if (!Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
 			return false;
 		}
+
 		/* DamageEvents do not reliably store whether an event is a crit or not since Cumbersome modifies the crit boolean */
-		boolean isMeleeCrit = event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer);
+		final boolean isMeleeCrit = event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer);
 		if (isMeleeCrit || (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile
 			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
 			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
-			mLastPassiveDamage = DAMAGE;
-			/* Flat damage of event does not include crit bonus and does not include gear/potion/skill buffs, readd crit bonus for melee crits */
-			mLastPassiveDamage += event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
-				(isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1);
-			mLastPassiveDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mLastPassiveDamage);
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDamage, mInfo.getLinkedSpell(), true, false);
+			final DivineJusticeInvuln divineJusticeInvuln = mPlugin.mEffectManager.getActiveEffect(enemy, DivineJusticeInvuln.class);
+			if (divineJusticeInvuln == null) {
+				/* Event's flat damage does not include crit bonus and does not include gear/potion/skill buffs, readd crit bonus for melee crits */
+				mLastPassiveDamage = DAMAGE + event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
+					Math.max(((isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
+				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDamage, mInfo.getLinkedSpell(), true, false);
+				mPlugin.mEffectManager.addEffect(enemy, DivineJusticeInvuln.SOURCE, new DivineJusticeInvuln(DivineJusticeInvuln.DURATION, mLastPassiveDamage));
+				onDamageCosmeticEffects(enemy);
+			} else {
+				/* The enemy has been hit by DJ recently. Check to see if the new hit can apply more damage */
+				final double attemptDamage = DAMAGE + event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
+					Math.max(((isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
+				final int duration = divineJusticeInvuln.getDuration();
+				final double magnitude = divineJusticeInvuln.getMagnitude();
 
-			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber);
-
-			if (mComboNumber == 0 || mComboRunnable != null) {
-				if (mComboRunnable != null) {
-					mComboRunnable.cancel();
+				if (attemptDamage > magnitude) {
+					final double extraDamage = attemptDamage - magnitude;
+					mLastPassiveDamage = attemptDamage;
+					DamageUtils.damage(mPlayer, enemy, DamageEvent.DamageType.MAGIC, extraDamage, mInfo.getLinkedSpell(), true, false);
+					mPlugin.mEffectManager.addEffect(enemy, DivineJusticeInvuln.SOURCE, new DivineJusticeInvuln(duration, attemptDamage));
+					onDamageCosmeticEffects(enemy);
 				}
-				mComboRunnable = new BukkitRunnable() {
-					@Override
-					public void run() {
-						mComboNumber = 0;
-						mComboRunnable = null;
-					}
-				};
-				mComboRunnable.runTaskLater(mPlugin, (long) ((1D / EntityUtils.getAttributeOrDefault(mPlayer, Attribute.GENERIC_ATTACK_SPEED, 4)) * 20) + 15);
-			}
-			mComboNumber++;
-
-			if (mComboNumber >= 3) {
-				if (mComboRunnable != null) {
-					mComboRunnable.cancel();
-					mComboRunnable = null;
-				}
-				mComboNumber = 0;
 			}
 		}
 		return false; // keep the ability open for more Multishot crits this tick
@@ -172,7 +168,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			PlayerUtils.healPlayer(mPlugin, mPlayer,
 				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN)
 			);
-			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS), true);
+			final List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS), true);
 			players.forEach(otherPlayer -> PlayerUtils.healPlayer(mPlugin, otherPlayer,
 				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, EntityUtils.getMaxHealth(otherPlayer) * HEALING_MULTIPLIER_OTHER),
 				mPlayer
@@ -184,8 +180,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchOther()), 2);
 		}
 
-		if (isEnhanced()
-			&& Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
+		if (isEnhanced() && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
 			&& FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
 		}
@@ -195,7 +190,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		// Keep track of prior tick's effect magnitude,
 		// if effect duration runs out (becomes null) decrement stacks rather than clear effect entirely.
-		Effect existingEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
+		final Effect existingEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 		if (existingEffect != null && existingEffect.getMagnitude() > 0) {
 			mPriorAmount = existingEffect.getMagnitude();
 		}
@@ -209,8 +204,35 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		}
 	}
 
+	private void onDamageCosmeticEffects(final LivingEntity enemy) {
+		mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber);
+
+		if (mComboNumber == 0 || mComboRunnable != null) {
+			if (mComboRunnable != null) {
+				mComboRunnable.cancel();
+			}
+			mComboRunnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					mComboNumber = 0;
+					mComboRunnable = null;
+				}
+			};
+			mComboRunnable.runTaskLater(mPlugin, (long) ((1D / EntityUtils.getAttributeOrDefault(mPlayer, Attribute.GENERIC_ATTACK_SPEED, 4)) * 20) + 15);
+		}
+		mComboNumber++;
+
+		if (mComboNumber >= 3) {
+			mComboNumber = 0;
+			if (mComboRunnable != null) {
+				mComboRunnable.cancel();
+				mComboRunnable = null;
+			}
+		}
+	}
+
 	private void spawnAsh(Location loc) {
-		Item item = AbilityUtils.spawnAbilityItem(loc.getWorld(), loc, mCosmetic.justiceAsh(), mCosmetic.justiceAshName(), true, 0.3, false, true);
+		final Item item = AbilityUtils.spawnAbilityItem(loc.getWorld(), loc, mCosmetic.justiceAsh(), mCosmetic.justiceAshName(), true, 0.3, false, true);
 		GlowingManager.startGlowing(item, mCosmetic.justiceAshColor(), -1, 0, DivineJustice::canPickUpAsh, null);
 
 		new BukkitRunnable() {
@@ -239,23 +261,23 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	public static boolean canPickUpAsh(Player player) {
-		DivineJustice divineJustice = Plugin.getInstance().mAbilityManager.getPlayerAbility(player, DivineJustice.class);
+	private static boolean canPickUpAsh(Player player) {
+		final DivineJustice divineJustice = Plugin.getInstance().mAbilityManager.getPlayerAbility(player, DivineJustice.class);
 		return divineJustice != null && divineJustice.isEnhanced();
 	}
 
 	public void applyEnhancementEffect(Player player, boolean fromBoneShard) {
 		int existingEffectDuration = 0;
 		double existingEffectAmount = 0;
-		NavigableSet<Effect> existingEffects = mPlugin.mEffectManager.clearEffects(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
+		final NavigableSet<Effect> existingEffects = mPlugin.mEffectManager.clearEffects(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 		if (existingEffects != null) {
 			Effect existingEffect = existingEffects.stream().findFirst().get();
 			existingEffectDuration = existingEffect.getDuration();
 			existingEffectAmount = existingEffect.getMagnitude();
 		}
 
-		int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, mEnhanceDuration + 10);
-		double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + mEnhanceDamage, ENHANCEMENT_BONUS_DAMAGE_MAX);
+		final int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, mEnhanceDuration + 10);
+		final double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + mEnhanceDamage, ENHANCEMENT_BONUS_DAMAGE_MAX);
 
 		addEnhancementEffect(player, duration, bonusDamage);
 	}
@@ -278,7 +300,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	@Override
 	public int getCharges() {
-		Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
+		final Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 		return activeEffect == null ? 0 : (int) Math.round(100 * activeEffect.getMagnitude());
 	}
 
