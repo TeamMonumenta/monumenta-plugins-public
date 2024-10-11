@@ -344,6 +344,7 @@ public class Plugin extends JavaPlugin {
 		WhatTableCommand.register();
 		StatTrackAdd.register();
 		PlaySoundsCommand.register();
+		CloseInventoryCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
