@@ -67,8 +67,17 @@ public class Haunted {
 	}
 
 	public static final double MAX_SPEED = 0.5;
+	public static final double LEVEL_2_SPEED_MULTIPLIER = 0.2;
 	public static final double DAMAGE = 0.4; //percentage
 	public static final double RANGE = 50;
+	private static final double RANGE_SQUARED = RANGE * RANGE;
+	private static final double RANGE_SQUARED_HALF = RANGE_SQUARED / 2;
+	public static final double RANGE_SOUND = 16;
+	private static final double RANGE_SOUND_SQUARED = RANGE_SOUND * RANGE_SOUND;
+	public static final double RANGE_PARANOID = 3;
+	private static final double RANGE_PARANOID_SQUARED = RANGE_PARANOID * RANGE_PARANOID;
+	public static final double RANGE_HIT = 1;
+	private static final double RANGE_HIT_SQUARED = RANGE_HIT * RANGE_HIT;
 	public static final double VERTICAL_SPEED_DEBUFF = 3; // This makes Looming Consequence move slower vertically
 	public static final double PLAYER_VERTICAL_CHANGE_DEBUFF = 2; // This makes the player's vertical movement factor less into Looming Consequence movement
 
@@ -85,10 +94,16 @@ public class Haunted {
 
 			@Override
 			public void run() {
-				if (!p.isOnline() || !armorStand.isValid()) {
+				if (!p.isOnline()) {
 					this.cancel();
 					armorStand.getEquipment().clear();
 					armorStand.setGlowing(false);
+					return;
+				} else if (!armorStand.isValid()) {
+					armorStand.getEquipment().clear();
+					armorStand.setGlowing(false);
+					applyModifiers(p);
+					this.cancel();
 					return;
 				} else if (p.isDead()) {
 					return;
@@ -99,14 +114,18 @@ public class Haunted {
 				}
 
 				Location sLoc = armorStand.getLocation();
-				double distance = armorStand.getLocation().distance(p.getLocation());
+				double distanceSquared = armorStand.getLocation().distanceSquared(p.getLocation());
 
-				if (distance > RANGE) {
+				if (distanceSquared > RANGE_SQUARED) {
 					armorStand.remove();
 					this.cancel();
 					summonBeast(p, p.getLocation().add(p.getLocation().getDirection().multiply(-10)));
 					return;
-				} else if (distance > RANGE / 2) {
+				} else if (level == 2 && distanceSquared < RANGE_PARANOID_SQUARED) {
+					getParanoid(p, armorStand);
+					this.cancel();
+					return;
+				} else if (distanceSquared > RANGE_SQUARED_HALF) {
 					mSpeed = MAX_SPEED * 2;
 				} else {
 					mSpeed = MAX_SPEED;
@@ -116,34 +135,16 @@ public class Haunted {
 					mSpeed *= 0.8;
 				}
 
-				// Check movement based on the level
-				boolean playerIsMoving = mPLoc.distanceSquared(p.getLocation()) > 0.01; // Using distance squared for performance
-				boolean playerHasLineOfSight = p.hasLineOfSight(armorStand.getLocation().add(0, 0.5, 0)) && isInPlayerConeView(p, armorStand.getLocation().add(0, 0.5, 0), 65);
-
-				if (level == 1 && playerIsMoving) {
-					// Level 1: Move if the player is moving
-					Vector direction = LocationUtils.getDirectionTo(p.getLocation(), sLoc);
-					armorStand.teleport(sLoc.add(direction.multiply(mSpeed)));
-				} else if (level == 2 && !playerHasLineOfSight) {
-					// Level 2: Move if the player is not looking at it
-					Vector direction = LocationUtils.getDirectionTo(p.getLocation(), sLoc);
-					armorStand.teleport(sLoc.add(direction.multiply(mSpeed * 0.2)));
-				}
-
-				if (level == 2 && distance < 3) {
-					getParanoid(p, armorStand);
-					this.cancel();
-					return;
-				}
 
 				// Bobbing motion for visual effect
-				sLoc.setDirection(LocationUtils.getDirectionTo(p.getLocation(), sLoc));
+				Vector direction = LocationUtils.getDirectionTo(p.getLocation(), sLoc);
+				sLoc.setDirection(direction);
 				armorStand.setHeadPose(new EulerAngle(Math.toRadians(sLoc.getPitch()), 0, 0));
-				armorStand.teleport(sLoc.clone().add(0, (FastMath.sin(mRadian) * 0.35) / 10, 0));
+				armorStand.teleport(sLoc.add(0, (FastMath.sin(mRadian) * 0.35) / 10, 0));
 				mRadian += Math.PI / 20D;
 
 				// Hit detection
-				if (mHitTimer <= 0 && distance < 1) {
+				if (level == 1 && mHitTimer <= 0 && distanceSquared < RANGE_HIT_SQUARED) {
 					p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, SoundCategory.HOSTILE, 1f, 2f);
 					p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 
@@ -160,21 +161,49 @@ public class Haunted {
 					}
 					mHitTimer = 10;
 				}
-				mHitTimer--;
+				if (mHitTimer > 0) {
+					mHitTimer--;
+				}
 
 				// Visuals
 				new PartialParticle(Particle.SMOKE_LARGE, armorStand.getLocation().add(0, 1, 0), 1, 0.3, 0.4, 0.3, 0).spawnAsEntityActive(armorStand);
 				new PartialParticle(Particle.SOUL, armorStand.getLocation().add(0, 1, 0), 1, 0.3, 0.4, 0.3, 0.025).spawnAsEntityActive(armorStand);
 
 				// Sounds
-				distance = sLoc.distance(p.getLocation());
-				if (distance <= 16 && mRangeCD <= 0) {
+				if (distanceSquared <= RANGE_SOUND_SQUARED && mRangeCD <= 0) {
 					p.playSound(armorStand.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, SoundCategory.HOSTILE, 1.75f, 0f);
 					mRangeCD = 70;
 				}
-				mRangeCD--;
+				if (mRangeCD > 0) {
+					mRangeCD--;
+				}
 
-				// Store the player's previous location for movement checks
+				// Check movement based on the level
+				double pMovedTick = 1;
+				if (level == 1) {
+					// Level 1: Move if the player is moving
+					boolean playerIsMoving = mPLoc.distanceSquared(p.getLocation()) > 0.01; // Using distance squared for performance
+					if (!playerIsMoving) {
+						return;
+					}
+					pMovedTick = mPLoc.clone().subtract(p.getLocation()).toVector() // Delta between last location and current location
+					.divide(playerYDivider).length(); // Decrease movement based on vertical player movement
+					if (pMovedTick < 0.005) {
+						return;
+					} else if (pMovedTick > 1) {
+						pMovedTick = 1;
+					}
+				} else if (level == 2) {
+					// Level 2: Move if the player is not looking at it
+					Location armorStandCenter = armorStand.getLocation().add(0, 1, 0);
+					boolean playerHasLineOfSight = p.hasLineOfSight(armorStandCenter) && isInPlayerConeView(p, armorStandCenter, 65);
+					if (playerHasLineOfSight) {
+						return;
+					}
+					pMovedTick = LEVEL_2_SPEED_MULTIPLIER;
+				}
+
+				armorStand.teleport(sLoc.add(direction.clone().multiply(mSpeed * pMovedTick)));
 				mPLoc = p.getLocation();
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0L, 1L);
@@ -337,22 +366,26 @@ public class Haunted {
 				}
 
 				// end
-				if (mTicks == 330 || player.isDead() || !player.isValid()) {
-					for (Entity entity : mHiddenEntities) {
-						player.showEntity(Plugin.getInstance(), entity);
-					}
+				if (mTicks >= 330 || player.isDead() || !player.isValid()) {
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
 					this.cancel();
 				}
 				mTicks++;
 			}
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			Location sumBeast = player.getLocation().add(player.getLocation().getDirection().multiply(20));
-			sumBeast.setY(player.getLocation().getY() + 1);
-			summonBeast(player, sumBeast);
 
-		}, 400L);
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				for (Entity entity : mHiddenEntities) {
+					player.showEntity(Plugin.getInstance(), entity);
+				}
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					Location sumBeast = player.getLocation().add(player.getLocation().getDirection().multiply(20));
+					sumBeast.setY(player.getLocation().getY() + 1);
+					summonBeast(player, sumBeast);
+				}, 120L);
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	private static void getSpooked(Player p, SkullMeta meta) {
