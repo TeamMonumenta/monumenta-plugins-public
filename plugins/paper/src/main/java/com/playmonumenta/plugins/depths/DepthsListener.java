@@ -754,7 +754,7 @@ public class DepthsListener implements Listener {
 				}
 				if (dp.mZenithAbandonedByParty) {
 					MMLog.finer(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");
-					sendPlayerToLootRoom(player, true);
+					sendPlayerToLootRoom(player, false); // Assumes that treasure score was successfully set.
 					shouldOfflineTeleport = false;
 					player.sendMessage(Component.text("Your party has abandoned you...", NamedTextColor.DARK_AQUA));
 					AuditListener.logDeath(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");

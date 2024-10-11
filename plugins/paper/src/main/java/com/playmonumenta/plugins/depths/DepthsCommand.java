@@ -279,6 +279,7 @@ public class DepthsCommand extends GenericCommand {
 						return;
 					}
 					dp.mZenithAbandonedByParty = true;
+					dp.mFinalTreasureScore = Objects.requireNonNull(DepthsManager.getInstance().getPartyFromId(dp)).mTreasureScore; // Abandoned players no longer acquire treasure score.
 					DepthsUtils.sendFormattedMessage(playerSender, dp.getContent(), "It is done...");
 					playerSender.playSound(playerSender.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					playerSender.removeMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY, Plugin.getInstance());
