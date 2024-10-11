@@ -210,58 +210,72 @@ public class ChanceCubes {
 				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 0.2f, 0.1f);
 				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 0.6f, 0.1f);
 				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.HOSTILE, 0.4f, 0.1f);
-				COLOSSAL_LAND_POOL.spawn(loc);
+				LivingEntity col1 = (LivingEntity) COLOSSAL_LAND_POOL.spawn(loc);
+				if (col1 != null) {
+					col1.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(col1.getHealth());
+					col1.setHealth(Objects.requireNonNull(col1.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue() / 2);
+				}
+
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 					loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 0.2f, 0.1f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 0.6f, 0.1f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.HOSTILE, 0.4f, 0.1f);
-					COLOSSAL_LAND_POOL.spawn(loc);
+					LivingEntity col2 = (LivingEntity) COLOSSAL_LAND_POOL.spawn(loc);
+					if (col2 != null) {
+						col2.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(col2.getHealth());
+						col2.setHealth(Objects.requireNonNull(col2.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue() / 2);
+					}
 				}, 20);
+
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 					loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 0.2f, 0.1f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 0.6f, 0.1f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.HOSTILE, 0.4f, 0.1f);
-					COLOSSAL_LAND_POOL.spawn(loc);
+					LivingEntity col3 = (LivingEntity) COLOSSAL_LAND_POOL.spawn(loc);
+					if (col3 != null) {
+						col3.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(col3.getHealth());
+						col3.setHealth(Objects.requireNonNull(col3.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue() / 2);
+					}
 				}, 40);
 			}
 			case 3 -> {
-					PufferFish pufferfish = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
-					Objects.requireNonNull(pufferfish.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(150.0);
-					pufferfish.setHealth(150.0);
-					PufferFish pufferfish2 = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
-					Objects.requireNonNull(pufferfish2.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(75.0);
-					pufferfish2.setHealth(75.0);
-					PufferFish pufferfish3 = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
-					Objects.requireNonNull(pufferfish3.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(75.0);
-					pufferfish3.setHealth(75.0);
-					PufferFish pufferfish4 = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
-					Objects.requireNonNull(pufferfish4.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(75.0);
-					pufferfish4.setHealth(75.0);
+				PufferFish pufferfish = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
+				Objects.requireNonNull(pufferfish.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(150.0);
+				pufferfish.setHealth(150.0);
+				PufferFish pufferfish2 = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
+				Objects.requireNonNull(pufferfish2.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(75.0);
+				pufferfish2.setHealth(75.0);
+				PufferFish pufferfish3 = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
+				Objects.requireNonNull(pufferfish3.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(75.0);
+				pufferfish3.setHealth(75.0);
+				PufferFish pufferfish4 = (PufferFish) loc.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
+				Objects.requireNonNull(pufferfish4.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(75.0);
+				pufferfish4.setHealth(75.0);
 
-					loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.1f, 0.2f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 0.3f, 0.1f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 1.2f, 0.1f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.HOSTILE, 1.4f, 0.3f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 1.6f, 0.1f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 5f, 0.1f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.1f, 0.2f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 0.3f, 0.1f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 1.2f, 0.1f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.HOSTILE, 1.4f, 0.3f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 1.6f, 0.1f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 5f, 0.1f);
 
-					Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(POOL_NAME_NORMAL);
-					if (mobsPool != null && !mobsPool.isEmpty()) {
-						List<Soul> twistedMobs = new ArrayList<>(mobsPool.keySet());
-						Soul randomTwisted = twistedMobs.get(FastUtils.RANDOM.nextInt(twistedMobs.size()));
-						LivingEntity twistedMob = (LivingEntity) randomTwisted.summon(loc);
-						if (twistedMob != null) {
-							twistedMob.setInvulnerable(true);
-							twistedMob.setGravity(false);
-							pufferfish.addPassenger(twistedMob);
-							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-								twistedMob.setGravity(true);
-								twistedMob.setInvulnerable(false);
-								Objects.requireNonNull(twistedMob.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(twistedMob.getHealth());
-								twistedMob.setHealth(Objects.requireNonNull(twistedMob.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue() / 1.9);
-							}, 20 * 2 / 2);
-						}
+				Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(POOL_NAME_NORMAL);
+				if (mobsPool != null && !mobsPool.isEmpty()) {
+					List<Soul> twistedMobs = new ArrayList<>(mobsPool.keySet());
+					Soul randomTwisted = twistedMobs.get(FastUtils.RANDOM.nextInt(twistedMobs.size()));
+					LivingEntity twistedMob = (LivingEntity) randomTwisted.summon(loc);
+					if (twistedMob != null) {
+						twistedMob.setInvulnerable(true);
+						twistedMob.setGravity(false);
+						pufferfish.addPassenger(twistedMob);
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+							twistedMob.setGravity(true);
+							twistedMob.setInvulnerable(false);
+							Objects.requireNonNull(twistedMob.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(twistedMob.getHealth());
+							twistedMob.setHealth(Objects.requireNonNull(twistedMob.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue() / 1.9);
+						}, 20 * 2 / 2);
 					}
+				}
 			}
 			case 4 -> {
 				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(20);
@@ -434,7 +448,7 @@ public class ChanceCubes {
 							Plugin.getInstance().mEffectManager.addEffect(player, "gambleEffect", new CustomRegeneration(300, 0.3, Plugin.getInstance()));
 						}
 						case 4, 11, 12 -> {
-							player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 600, 2));
+							player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 400, 2));
 						}
 						case 5 -> {
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 400, 0));
@@ -446,13 +460,13 @@ public class ChanceCubes {
 							player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 100, 0));
 						}
 						case 8 -> {
-							player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 600, 2));
+							player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 400, 2));
 						}
 						case 9 -> {
 							player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 600, 2));
 						}
 						case 10 -> {
-							Plugin.getInstance().mEffectManager.addEffect(player, "gambleEffect", new AbilitySilence(200));
+							Plugin.getInstance().mEffectManager.addEffect(player, "gambleEffect", new AbilitySilence(150));
 						}
 						default -> {
 						}

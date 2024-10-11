@@ -102,16 +102,6 @@ public class StasisListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entityDamageEvent(EntityDamageEvent event) {
-		if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-			return;
-		}
-		if (isInStasis(event.getEntity())) {
-			event.setCancelled(true);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		if (isInStasis(event.getEntity()) || isInStasis(event.getCombuster())) {
 			event.setCancelled(true);

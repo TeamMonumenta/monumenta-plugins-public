@@ -119,17 +119,28 @@ public class DelvesUtils {
 		}
 		long week = DateUtils.getWeeklyVersion() + nextWeek;
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(week / nWeekRotation.size()));
-		return nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+		List<DelvesModifier> selectedModifiers = nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+		if (DateUtils.getWeeklyVersion() == 2859) {
+			DelvesModifier hauntedModifier = DelvesModifier.HAUNTED;
+			if (!selectedModifiers.contains(hauntedModifier)) {
+				selectedModifiers = new ArrayList<>(selectedModifiers);
+				selectedModifiers.add(hauntedModifier);
+			}
+			MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 2);
+		} else {
+			MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
+		}
+
+		return selectedModifiers;
 	}
 
 	public static List<DelvesModifier> getExperimentalDelveModifier() {
 		List<DelvesModifier> experimentalMods = DelvesModifier.experimentalDelveModifiers();
-		// week starting friday august 30, 2024
-		if (DateUtils.getWeeklyVersion() == 2853) {
-			return List.of(experimentalMods.get(0));
-		} else {
-			return Collections.emptyList();
-		}
+		return switch ((int) DateUtils.getWeeklyVersion()) {
+			// week starting friday august 30, 2024
+			case 2853 -> List.of(experimentalMods.get(0));
+			default -> Collections.emptyList();
+		};
 	}
 
 	public static @Nullable ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
