@@ -202,4 +202,8 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public void disableRangedAttackGoal(LivingEntity entity) {
 	}
 
+	@Override
+	public void forceSyncEntityPositionData(Entity entity) {
+
+	}
 }

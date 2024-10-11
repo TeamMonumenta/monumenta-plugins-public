@@ -13,11 +13,7 @@ import com.playmonumenta.plugins.bosses.spells.portalboss.SpellUltimateShulkerMa
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.portals.PortalManager;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -192,6 +188,9 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 			}
 		};
 		mHideRunnable.runTaskLater(mPlugin, 20 * 20);
+
+		// Sync the position a tick later
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> NmsUtils.getVersionAdapter().forceSyncEntityPositionData(mBoss), 1);
 	}
 
 	public void hide() {

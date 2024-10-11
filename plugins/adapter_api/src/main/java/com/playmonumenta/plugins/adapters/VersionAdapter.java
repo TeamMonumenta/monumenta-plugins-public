@@ -207,4 +207,9 @@ public interface VersionAdapter {
 
 	void disableRangedAttackGoal(LivingEntity entity);
 
+	/**
+	 * Forcefully broadcast entity teleport events to all client, preventing desync
+	 * @param entity The entity
+	 */
+	void forceSyncEntityPositionData(Entity entity);
 }

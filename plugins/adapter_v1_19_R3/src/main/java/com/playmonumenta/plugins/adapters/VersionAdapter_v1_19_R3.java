@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -13,9 +14,12 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -54,6 +58,65 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class VersionAdapter_v1_19_R3 implements VersionAdapter {
+	private interface TypedField<O, F> {
+		F get(O object);
+
+		void set(O object, F value);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <O, F> TypedField<O, F> getField(Class<O> clazz, String field) {
+		try {
+			Field f = clazz.getDeclaredField(field);
+			f.setAccessible(true);
+			return new TypedField<>() {
+				@Override
+				public F get(O object) {
+					try {
+						return (F) f.get(object);
+					} catch (IllegalAccessException e) {
+						// Should not happen as the field is set to be accessible
+						throw new RuntimeException(e);
+					}
+				}
+
+				@Override
+				public void set(O object, F value) {
+					try {
+						f.set(object, value);
+					} catch (IllegalAccessException e) {
+						// Should not happen as the field is set to be accessible
+						throw new RuntimeException(e);
+					}
+				}
+			};
+		} catch (NoSuchFieldException e) {
+			// Should only happen if Minecraft is updated.
+			// See linkie.
+			throw new RuntimeException(e);
+		}
+	}
+
+	// https://linkie.shedaniel.dev/mappings?namespace=mojang_raw&version=1.19.4&search=targetType&translateMode=none
+	@SuppressWarnings("rawtypes")
+	private static final TypedField<NearestAttackableTargetGoal, Class<?>> NEAREST_ATTACKABLE_TARGET_GOAL_TARGET_TYPE
+		= getField(NearestAttackableTargetGoal.class, "a");
+
+	// https://linkie.shedaniel.dev/mappings?namespace=mojang_raw&version=1.19.4&search=broadcast&translateMode=none&allowClasses=false&allowMethods=false
+	private static final TypedField<ServerEntity, Consumer<Packet<?>>> SERVER_ENTITY_BROADCAST_FIELD
+		= getField(ServerEntity.class, "g");
+
+	// https://linkie.shedaniel.dev/mappings?namespace=mojang_raw&version=1.19.4&search=attackStrengthTicker&translateMode=none
+	private static final TypedField<net.minecraft.world.entity.LivingEntity, Integer> LIVING_ENTITY_ATTACK_STRENGTH_TICKER
+		= getField(net.minecraft.world.entity.LivingEntity.class, "aO");
+
+	// https://linkie.shedaniel.dev/mappings?namespace=mojang_raw&version=1.19.4&search=TARGETING_CONDITIONS&translateMode=none
+	private static final TypedField<WitherBoss, TargetingConditions> WITHER_TARGETING_CONDITIONS
+		= getField(WitherBoss.class, "cd");
+
+	// https://linkie.shedaniel.dev/mappings?namespace=mojang_raw&version=1.19.4&search=playerScores&translateMode=none
+	private static final TypedField<Scoreboard, Map<String, Map<Objective, Score>>> SCOREBOARD_PLAYER_SCORES
+		= getField(Scoreboard.class, "j");
 
 	final Logger mLogger;
 
@@ -141,36 +204,6 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		return entity == null ? null : entity.getBukkitEntity();
 	}
 
-	private static Field getField(Class<?> clazz, String field) {
-		try {
-			Field f = clazz.getDeclaredField(field);
-			f.setAccessible(true);
-			return f;
-		} catch (NoSuchFieldException e) {
-			// Should only happen if Minecraft is updated.
-			// Check the documentation of where this is used for how to find the new name.
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static @Nullable Object getFieldValue(Field field, Object target) {
-		try {
-			return field.get(target);
-		} catch (IllegalAccessException e) {
-			// Should not happen as the field is set to be accessible
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static void setFieldValue(Field field, Object target, @Nullable Object value) {
-		try {
-			field.set(target, value);
-		} catch (IllegalAccessException e) {
-			// Should not happen as the field is set to be accessible
-			throw new RuntimeException(e);
-		}
-	}
-
 	public Vector getActualDirection(Entity entity) {
 		Vector vector = new Vector();
 
@@ -218,16 +251,13 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		}
 	}
 
-	// unobfuscated field name: attackStrengthTicker
-	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "aO");
-
 	@SuppressWarnings("unboxing.of.nullable")
 	public int getAttackCooldown(LivingEntity entity) {
-		return (int) getFieldValue(attackCooldownField, ((CraftLivingEntity) entity).getHandle());
+		return LIVING_ENTITY_ATTACK_STRENGTH_TICKER.get(((CraftLivingEntity) entity).getHandle());
 	}
 
 	public void setAttackCooldown(LivingEntity entity, int newCooldown) {
-		setFieldValue(attackCooldownField, ((CraftLivingEntity) entity).getHandle(), newCooldown);
+		LIVING_ENTITY_ATTACK_STRENGTH_TICKER.set(((CraftLivingEntity) entity).getHandle(), newCooldown);
 	}
 
 	// Update the code in releaseActiveItem() below before updating this, as this may not even be used anymore.
@@ -448,17 +478,14 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		return result;
 	}
 
-	private static final Field targetTypeField = getField(NearestAttackableTargetGoal.class, "a"); // unobfuscated field name: targetType
 
 	private static Class<?> getNearestAttackableTargetGoalTargetType(NearestAttackableTargetGoal<?> goal) {
-		return (Class<?>) getFieldValue(targetTypeField, goal);
+		return NEAREST_ATTACKABLE_TARGET_GOAL_TARGET_TYPE.get(goal);
 	}
-
-	private static final Field WITHER_TARGETING_CONDITIONS = getField(WitherBoss.class, "cd"); // unobfuscated field name: TARGETING_CONDITIONS
 
 	static {
 		// make withers only attack players and not other mobs
-		((TargetingConditions) getFieldValue(WITHER_TARGETING_CONDITIONS, null)).selector(le -> le instanceof Player);
+		WITHER_TARGETING_CONDITIONS.get(null).selector(le -> le instanceof Player);
 	}
 
 	@Override
@@ -585,21 +612,14 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		((CraftEntity) entity).getHandle().moveTo(target.getX(), target.getY(), target.getZ(), yaw, pitch);
 	}
 
-	@SuppressWarnings("unchecked")
 	public JsonObject getScoreHolderScoresAsJson(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
 		Scoreboard nmsScoreboard = ((CraftScoreboard) scoreboard).getHandle();
 
 		JsonObject data = new JsonObject();
-		Map<String, Map<Objective, Score>> playerScores;
+		final var playerScores = SCOREBOARD_PLAYER_SCORES.get(nmsScoreboard);
 
-		try {
-			Field playerScoresField = Scoreboard.class.getDeclaredField("j");
-			playerScoresField.setAccessible(true);
-			playerScores = (Map<String, Map<Objective, Score>>) playerScoresField.get(nmsScoreboard);
-		} catch (NoSuchFieldException | IllegalAccessException ex) {
-			mLogger.severe("Failed to access playerScores scoreboard field: " + ex.getMessage());
-			ex.printStackTrace();
-			return data;
+		if (playerScores == null) {
+			throw new IllegalArgumentException("Scoreboard#playerScores is null");
 		}
 
 		Map<Objective, Score> scores = playerScores.get(scoreHolder);
@@ -625,4 +645,13 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		((CraftMob) entity).getHandle().goalSelector.getAvailableGoals().removeIf(w -> w.getGoal() instanceof RangedAttackGoal);
 	}
 
+	@Override
+	public void forceSyncEntityPositionData(Entity entity) {
+		final var mcEntity = ((CraftEntity) entity).getHandle();
+		final var tracker = mcEntity.tracker;
+
+		if (tracker != null) {
+			SERVER_ENTITY_BROADCAST_FIELD.get(tracker.serverEntity).accept(new ClientboundTeleportEntityPacket(mcEntity));
+		}
+	}
 }
