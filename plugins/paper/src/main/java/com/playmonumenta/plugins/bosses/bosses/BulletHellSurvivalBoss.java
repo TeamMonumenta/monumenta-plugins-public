@@ -111,7 +111,7 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		if (event.getDamage() > mParam.PLAYER_DAMAGE_CAP * EntityUtils.getMaxHealth(mBoss)) {
 			// Strongest attack can only shorten it by 5 seconds
-			event.setDamage(mParam.PLAYER_DAMAGE_CAP * EntityUtils.getMaxHealth(mBoss));
+			event.setDamageCap(mParam.PLAYER_DAMAGE_CAP * EntityUtils.getMaxHealth(mBoss));
 		}
 		Location loc = mBoss.getLocation();
 		if (source instanceof Player p) {

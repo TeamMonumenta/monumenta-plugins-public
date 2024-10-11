@@ -40,9 +40,9 @@ public class DamageCapBoss extends BossAbilityGroup {
 		}
 
 		if (!mPercent) {
-			event.setDamage(Math.min(event.getDamage(), mAmount));
+			event.setDamageCap(mAmount);
 		} else {
-			event.setDamage(Math.min(event.getDamage(), EntityUtils.getMaxHealth(mBoss) * mAmount / 100));
+			event.setDamageCap(EntityUtils.getMaxHealth(mBoss) * mAmount / 100);
 		}
 	}
 }
