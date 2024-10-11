@@ -329,12 +329,12 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		if (ability != null) {
 			rarity = ability.getAbilityScore();
 		}
-		return getNameWithHover(rarity, player);
+		return getNameWithHover(rarity, 0, player);
 	}
 
-	public Component getNameWithHover(int rarity, Player player) {
+	public Component getNameWithHover(int rarity, int prevRarity, Player player) {
 		Component component = getColoredName();
-		DepthsAbilityItem item = getAbilityItem(rarity, player);
+		DepthsAbilityItem item = getAbilityItem(rarity, player, prevRarity);
 		if (item != null) {
 			component = component.hoverEvent(item.mItem.asHoverEvent());
 		}

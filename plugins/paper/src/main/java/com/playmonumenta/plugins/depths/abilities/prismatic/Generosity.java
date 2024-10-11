@@ -76,7 +76,7 @@ public class Generosity extends DepthsAbility {
 					dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.GENEROSITY);
 					dp.mGenerosityGifts.add(removedAbilityInfo.getAbilityItem(generosityLevel, otherPlayer, currentLevel));
 					otherPlayer.playSound(otherPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
-					Component abilityName = DepthsManager.getInstance().colorAbilityWithHover(removedAbility, generosityLevel, otherPlayer);
+					Component abilityName = DepthsManager.getInstance().colorAbilityWithHover(removedAbility, generosityLevel, 0, otherPlayer);
 					dp.sendMessage(removedPlayer.displayName().append(Component.text(" has generously gifted you: ")).append(abilityName).append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(generosityLevel)).append(Component.text(" level! You can accept the gift in the rewards in your trinket.")));
 				}
 			}

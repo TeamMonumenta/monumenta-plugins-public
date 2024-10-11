@@ -512,7 +512,7 @@ public class DepthsManager {
 				Component teamMessage = null;
 				Component playerMessage = null;
 				Component playerName = p.displayName();
-				Component abilityName = colorAbilityWithHover(name, displayLevel, p);
+				Component abilityName = colorAbilityWithHover(name, displayLevel, previousLevel, p);
 				if (tree != null) {
 					if (level == 0) {
 						Component message = Component.text("lost ability: ").append(abilityName).append(Component.text("!"));
@@ -522,7 +522,7 @@ public class DepthsManager {
 						String direction = previousLevel <= level ? "upgraded" : "downgraded";
 						Component message = Component.text(" " + direction + " ability: ").append(abilityName).append(Component.text(" to ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
 						teamMessage = playerName.append(message);
-						playerMessage = Component.text("You ").append(message);
+						playerMessage = Component.text("You").append(message);
 					} else {
 						Component message = Component.text("ability: ").append(abilityName);
 						if (info.getHasLevels()) {
@@ -554,12 +554,12 @@ public class DepthsManager {
 		}
 	}
 
-	public Component colorAbilityWithHover(String name, int rarity, Player p) {
+	public Component colorAbilityWithHover(String name, int rarity, int prevRarity, Player p) {
 		DepthsAbilityInfo<?> info = getAbility(name);
 		if (info == null) {
 			return Component.text(name);
 		}
-		return info.getNameWithHover(rarity, p);
+		return info.getNameWithHover(rarity, prevRarity, p);
 	}
 
 	/**
