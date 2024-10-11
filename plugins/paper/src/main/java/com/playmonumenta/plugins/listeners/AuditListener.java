@@ -90,6 +90,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(minecraft:)?(blockinteractions|bi)"),
 		exactOptionalArguments("(minecraft:)?claimraffle"),
 		exactOptionalArguments("(minecraft:)?(disabledrop|dd)"),
+		exactNoArguments("(minecraft:)?gg"),
 		exactOptionalArguments("(minecraft:)?glowing"),
 		exactNoArguments("(minecraft:)?grave list"),
 		exactOptionalArguments("(minecraft:)?guild"),
