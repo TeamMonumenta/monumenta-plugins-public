@@ -183,12 +183,17 @@ public class VoteContext {
 		int numSites = VoteManager.getSiteTimers().size() - mOffCooldownTimes.size();
 		mLock.readLock().unlock();
 
+		if (numSites == 0) {
+			// Do not send any message when the player does not have any eligible sites to vote on
+			return;
+		}
+
 		Component builder = Component.text()
 			.append(Component.text("You are eligible to ", NamedTextColor.GOLD))
 			.hoverEvent(HoverEvent.showText(getSiteInfo(false)))
 			.clickEvent(ClickEvent.runCommand("/vote"))
 			.append(Component.text("/vote ", NamedTextColor.AQUA))
-			.append(Component.text("on " + numSites + " sites!", NamedTextColor.GOLD))
+			.append(Component.text("on " + numSites + (numSites == 1 ? " site!" : " sites!"), NamedTextColor.GOLD))
 			.build();
 
 		player.sendMessage(builder);
@@ -269,6 +274,7 @@ public class VoteContext {
 	/* A bungee shard got a vote and broadcasted this notification - need to notify the player */
 	protected void voteNotify(String matchingSite, long cooldownMinutes) {
 		long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
+		int numSites = VoteManager.getSiteTimers().size() - mOffCooldownTimes.size();
 		mLock.writeLock().lock();
 		mOffCooldownTimes.put(matchingSite, currentTime + (cooldownMinutes * 60));
 		mLock.writeLock().unlock();
@@ -276,7 +282,12 @@ public class VoteContext {
 		@Nullable Player player = mPlugin.mServer.getPlayer(mUUID).orElse(null);
 		if (player != null) {
 			player.sendMessage(Component.text("Thanks for voting at " + matchingSite + "!", NamedTextColor.GOLD));
-			sendVoteInfoShort(player);
+
+			if (numSites == 0) {
+				player.sendMessage(Component.text("Thanks for supporting Monumenta by voting on all of our listings!", NamedTextColor.GOLD));
+			} else {
+				sendVoteInfoShort(player);
+			}
 		}
 
 		/* Don't save here - the bungee node that got this request will have already saved the updated times */
