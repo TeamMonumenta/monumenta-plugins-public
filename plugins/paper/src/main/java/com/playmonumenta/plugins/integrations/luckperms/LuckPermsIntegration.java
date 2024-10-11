@@ -849,7 +849,7 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	public static String getGuildId(String plainGuildTag) {
-		return GUILD_MK + "." + LuckPermsIntegration.getCleanLpString(plainGuildTag);
+		return GUILD_MK + "." + getCleanLpString(plainGuildTag);
 	}
 
 	public static String getCleanLpString(String lpString) {

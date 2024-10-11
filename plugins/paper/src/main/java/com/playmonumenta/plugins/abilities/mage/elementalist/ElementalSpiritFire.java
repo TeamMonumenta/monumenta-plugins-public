@@ -112,7 +112,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 		Location playerLocation = mPlayer.getLocation();
 
 		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, HITBOX);
-		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritFire.CHARM_DAMAGE2, spellDamage);
+		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE2, spellDamage);
 		BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), size, size, size);
 		double maxDistanceSquared = startLocation.distanceSquared(endLocation);
 		double maxDistance = Math.sqrt(maxDistanceSquared);

@@ -88,7 +88,7 @@ public class PlayerGuildInfo {
 				List<CompletableFuture<PlayerGuildInfo>> subFutures = new ArrayList<>();
 
 				for (Group guild : guilds) {
-					subFutures.add(PlayerGuildInfo.of(user, guild));
+					subFutures.add(of(user, guild));
 				}
 
 				CompletableFuture.allOf(subFutures.toArray(new CompletableFuture[0])).join();

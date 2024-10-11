@@ -457,6 +457,6 @@ public class ServerProperties {
 	}
 
 	public static Region getRegion(Player player) {
-		return ServerProperties.getAbilityEnhancementsEnabled(player) ? Region.RING : ServerProperties.getClassSpecializationsEnabled(player) ? Region.ISLES : Region.VALLEY;
+		return getAbilityEnhancementsEnabled(player) ? Region.RING : getClassSpecializationsEnabled(player) ? Region.ISLES : Region.VALLEY;
 	}
 }

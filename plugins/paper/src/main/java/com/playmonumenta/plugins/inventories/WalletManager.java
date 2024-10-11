@@ -474,7 +474,7 @@ public class WalletManager implements Listener {
 	 * @param notify Whether to send the player a message about it aswell.
 	 */
 	public static void giveCurrencyToPlayer(final Player player, ItemStack item, boolean notify) {
-		if (!WalletManager.isCurrency(item)) {
+		if (!isCurrency(item)) {
 			MMLog.warning("Attempted to give non-currency item " + item + " to player " + player.getName());
 			return;
 		}
@@ -485,12 +485,12 @@ public class WalletManager implements Listener {
 		ItemStack walletItem = playerGetWalletItem(player);
 		if (walletItem != null) {
 			WalletSettings settings = getSettings(walletItem);
-			if (settings != null && WalletManager.canPutIntoWallet(item, settings)) {
+			if (settings != null && canPutIntoWallet(item, settings)) {
 				if (notify) {
 					player.sendMessage(Component.text(item.getAmount() + " item" + (amount == 1 ? "" : "s") + " deposited into your wallet.", NamedTextColor.GOLD)
 						.hoverEvent(HoverEvent.showText(Component.text(amount + " " + ItemUtils.getPlainNameOrDefault(item), NamedTextColor.GRAY))));
 				}
-				WalletManager.getWallet(player).add(player, item); // this method sets the count of the item to 0, so we need to do it after notifying.
+				getWallet(player).add(player, item); // this method sets the count of the item to 0, so we need to do it after notifying.
 				return;
 			}
 		}
@@ -504,7 +504,7 @@ public class WalletManager implements Listener {
 	@Nullable
 	public static ItemStack playerGetWalletItem(final Player player) {
 		for (ItemStack item : player.getInventory().getContents()) {
-			if (WalletManager.isWallet(item)) {
+			if (isWallet(item)) {
 				return item;
 			}
 		}

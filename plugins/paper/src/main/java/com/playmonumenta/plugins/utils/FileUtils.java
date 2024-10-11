@@ -193,7 +193,7 @@ public class FileUtils {
 				Path datapackPath = Paths.get(datapacksRoot.toString(), packName);
 				MMLog.finer("Searching datapack '" + packName + "': " + datapackPath);
 				try {
-					for (Path path : FileUtils.getFilesInDirectory(datapackPath, extension)) {
+					for (Path path : getFilesInDirectory(datapackPath, extension)) {
 						// Get just the path under the datapack (e.g. data/monumenta/loot_tables/whatever)
 						String subpath = datapackPath.relativize(path).toString();
 						// Remove the file extension

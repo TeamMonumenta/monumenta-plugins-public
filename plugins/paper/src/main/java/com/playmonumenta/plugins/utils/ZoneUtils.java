@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.zones.Zone;
 import java.util.List;
 import java.util.Optional;
@@ -191,8 +192,8 @@ public class ZoneUtils {
 	}
 
 	public static boolean hasZoneProperty(Location loc, ZoneProperty property, String namespace) {
-		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
+		Plugin scriptedQuestsPlugin;
+		scriptedQuestsPlugin = (Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 
 		return scriptedQuestsPlugin.mZoneManager.hasProperty(loc, namespace, property.getPropertyName());
 	}
@@ -202,8 +203,8 @@ public class ZoneUtils {
 	}
 
 	public static Optional<Zone> getZone(Location loc, String namespace) {
-		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
+		Plugin scriptedQuestsPlugin;
+		scriptedQuestsPlugin = (Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 
 		if (scriptedQuestsPlugin == null || scriptedQuestsPlugin.mZoneManager == null) {
 			return Optional.empty();

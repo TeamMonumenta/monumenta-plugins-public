@@ -29,7 +29,7 @@ public class SerializationUtils {
 
 	public static @Nullable BossAbilityGroup statefulBossDeserializer(LivingEntity boss, String identityTag,
 	                                                                  BossConstructor constructor) throws Exception {
-		String content = SerializationUtils.retrieveDataFromEntity(boss, identityTag);
+		String content = retrieveDataFromEntity(boss, identityTag);
 
 		if (content == null || content.isEmpty()) {
 			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");

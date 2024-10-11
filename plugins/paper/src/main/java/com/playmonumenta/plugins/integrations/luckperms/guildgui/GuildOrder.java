@@ -108,7 +108,7 @@ public enum GuildOrder {
 		mSortMethod = sortMethod;
 	}
 
-	public static GuildOrder DEFAULT = GuildOrder.TAG;
+	public static GuildOrder DEFAULT = TAG;
 
 	// Must always be unique for different guilds
 	public CompletableFuture<String> sortKey(PlayerGuildInfo guildInfo) {

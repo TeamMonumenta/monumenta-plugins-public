@@ -343,10 +343,10 @@ public class VanityManager implements Listener {
 				// don't allow changing item type of useable items (e.g. food, shields) to prevent not being slowed down while using them or just messing with their use in general
 				return;
 			}
-			boolean invisible = VanityManager.isInvisibleVanityItem(vanityItem);
+			boolean invisible = isInvisibleVanityItem(vanityItem);
 			if (invisible && equipmentSlot != EquipmentSlot.OFF_HAND) { // invisible armor: only add tag for RP and add lore line
 				NBT.modify(itemStack, nbt -> {
-					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(INVISIBLE_NBT_KEY, true);
 				});
 				ItemMeta meta = itemStack.getItemMeta();
 				if (meta != null) {
@@ -437,7 +437,7 @@ public class VanityManager implements Listener {
 
 			if (invisible) {
 				NBT.modify(itemStack, nbt -> {
-					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(INVISIBLE_NBT_KEY, true);
 				});
 			}
 		}

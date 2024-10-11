@@ -430,7 +430,7 @@ public class StringUtils {
 	public static List<String> sortedStrings(Collection<String> unsorted) {
 		TreeMap<String, String> sortedPlayers = new TreeMap<>();
 		for (String string : unsorted) {
-			String sortKey = StringUtils.getNaturalSortKey(string);
+			String sortKey = getNaturalSortKey(string);
 			sortedPlayers.put(sortKey, string);
 		}
 		return new ArrayList<>(sortedPlayers.values());

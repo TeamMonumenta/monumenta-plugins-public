@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths.guis;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
@@ -60,7 +61,7 @@ public class DepthsGUICommands {
 			player.closeInventory();
 			return;
 		}
-		new DepthsRoomChoiceGUI(player).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
+		new DepthsRoomChoiceGUI(player).openInventory(player, Plugin.getInstance());
 	}
 
 	public static void upgrade(Player player, boolean fromSummaryGUI) {
@@ -127,7 +128,7 @@ public class DepthsGUICommands {
 			return;
 		}
 
-		new DepthsWeaponAspectGUI(player).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
+		new DepthsWeaponAspectGUI(player).openInventory(player, Plugin.getInstance());
 	}
 
 	public static void remove(Player player) {
@@ -141,7 +142,7 @@ public class DepthsGUICommands {
 			return;
 		}
 
-		new DepthsRemoveAbilityGUI(player, player.getLocation().getX() < party.mNoPassiveRemoveRoomStartX).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
+		new DepthsRemoveAbilityGUI(player, player.getLocation().getX() < party.mNoPassiveRemoveRoomStartX).openInventory(player, Plugin.getInstance());
 	}
 
 	public static void mutate(Player player) {
@@ -151,6 +152,6 @@ public class DepthsGUICommands {
 			return;
 		}
 
-		new DepthsMutateAbilityGUI(player).openInventory(player, com.playmonumenta.plugins.Plugin.getInstance());
+		new DepthsMutateAbilityGUI(player).openInventory(player, Plugin.getInstance());
 	}
 }

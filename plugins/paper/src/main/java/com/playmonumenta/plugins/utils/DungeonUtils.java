@@ -96,7 +96,7 @@ public class DungeonUtils {
 		}
 
 		public static final ImmutableMap<String, DungeonCommandMapping> BY_SHARD =
-			Arrays.stream(DungeonCommandMapping.values())
+			Arrays.stream(values())
 				.filter(type -> type.getShardName() != null)
 				.collect(ImmutableMap.toImmutableMap(DungeonCommandMapping::getShardName, type -> type));
 

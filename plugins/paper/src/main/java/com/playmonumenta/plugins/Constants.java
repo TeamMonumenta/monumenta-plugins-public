@@ -273,12 +273,12 @@ public class Constants {
 				throw new RuntimeException("Invalid hotbar keybind index " + index);
 			}
 
-			Keybind[] values = Keybind.values();
+			Keybind[] values = values();
 			return values[index + HOTBAR_1.ordinal()];
 		}
 
 		public static @Nullable Keybind of(String keybindId) {
-			for (Keybind keybind : Keybind.values()) {
+			for (Keybind keybind : values()) {
 				if (keybindId.equals(keybind.asKeybind())) {
 					return keybind;
 				}

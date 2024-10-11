@@ -554,7 +554,7 @@ public class DelvesManager implements Listener {
 		int spawnersTotal = getSpawnersTotal(world);
 		if (spawnersTotal == -1 && shiftingcity) {
 			// Mark spawner counting as in progress
-			world.getPersistentDataContainer().set(DelvesManager.SPAWNER_COUNT_DATA_KEY, PersistentDataType.INTEGER, -2);
+			world.getPersistentDataContainer().set(SPAWNER_COUNT_DATA_KEY, PersistentDataType.INTEGER, -2);
 			// Start the counter - it will eventually update the total spawner count
 			SpawnerCountCommand.count(null, world, 8, true);
 		}

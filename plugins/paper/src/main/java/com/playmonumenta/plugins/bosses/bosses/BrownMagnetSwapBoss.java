@@ -117,7 +117,7 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.VILLAGER_HAPPY, mBoss.getLocation().add(0, 1, 0), 10, 0.5, 1).spawnAsEnemy();
 				}
 
-				mTicks -= BossAbilityGroup.PASSIVE_RUN_INTERVAL_DEFAULT;
+				mTicks -= PASSIVE_RUN_INTERVAL_DEFAULT;
 			}, 1, true)
 		);
 

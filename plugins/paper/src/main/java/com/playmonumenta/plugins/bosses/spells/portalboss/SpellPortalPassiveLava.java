@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.portalboss;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.PortalBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentHeal;
@@ -54,9 +55,9 @@ public class SpellPortalPassiveLava extends Spell {
 		for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), PortalBoss.detectionRange, true)) {
 			if (p.getLocation().getY() < mStartLoc.getY() - 4 && p.isInLava()) {
 				BossUtils.bossDamagePercent(mBoss, p, .35, "Iota's Domain");
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalLava", new PercentHeal(6 * 20, -0.50));
+				Plugin.getInstance().mEffectManager.addEffect(p, "PortalLava", new PercentHeal(6 * 20, -0.50));
 				MessagingUtils.sendActionBarMessage(p, "You have 50% reduced healing for 6s", NamedTextColor.RED);
-				PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
+				PotionUtils.applyPotion(Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
 				p.sendMessage(Component.text("You feel the pure, flowing energy infest you, then spit you out.", NamedTextColor.RED));
 				p.teleport(mStartLoc.clone().add(new Vector(0, 5, 0)), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 				p.playSound(p.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.HOSTILE, 1.0f, 0.6f);

@@ -44,7 +44,6 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
@@ -901,7 +900,7 @@ public class ItemUtils {
 	}
 
 	public static Component getRawDisplayName(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return Component.empty();
 		}
 		// other method is ambiguous between Function/Consumer
@@ -936,7 +935,7 @@ public class ItemUtils {
 	}
 
 	public static String getPlainName(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return "";
 		}
 		String plainName = getPlainNameIfExists(itemStack);
@@ -947,7 +946,7 @@ public class ItemUtils {
 	}
 
 	public static String getPlainNameIfExists(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return "";
 		}
 		return NBT.get(itemStack, nbt -> {
@@ -960,7 +959,7 @@ public class ItemUtils {
 	}
 
 	public static String getPlainNameOrDefault(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return "";
 		}
 		String name = getPlainNameIfExists(itemStack);
@@ -971,7 +970,7 @@ public class ItemUtils {
 	}
 
 	public static boolean hasPlainName(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return false;
 		}
 		return NBT.get(itemStack, nbt -> {
@@ -995,7 +994,7 @@ public class ItemUtils {
 	}
 
 	public static void setPlainName(@Nullable ItemStack itemStack, @Nullable String plainName) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return;
 		}
 
@@ -1023,7 +1022,7 @@ public class ItemUtils {
 	}
 
 	public static List<String> getPlainLore(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return new ArrayList<>(0);
 		}
 		List<String> plainLore = getPlainLoreIfExists(itemStack);
@@ -1043,7 +1042,7 @@ public class ItemUtils {
 	}
 
 	public static List<String> getPlainLoreIfExists(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack)) {
+		if (isNullOrAir(itemStack)) {
 			return new ArrayList<>(0);
 		}
 		return NBT.get(itemStack, nbt -> {
@@ -1138,7 +1137,7 @@ public class ItemUtils {
 	}
 
 	public static void setDisplayLore(ItemStack item, List<Component> lore) {
-		if (ItemUtils.isNullOrAir(item)) {
+		if (isNullOrAir(item)) {
 			return;
 		}
 		NBT.modify(item, nbt -> {
@@ -1161,7 +1160,7 @@ public class ItemUtils {
 	}
 
 	public static List<Component> getDisplayLore(ItemStack item) {
-		if (ItemUtils.isNullOrAir(item)) {
+		if (isNullOrAir(item)) {
 			return new ArrayList<>(0);
 		}
 		return NBT.get(item, nbt -> {
@@ -1785,7 +1784,7 @@ public class ItemUtils {
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
 			if (!meta.hasDisplayName()) {
-				if (ItemUtils.isSign(item.getType()) && meta instanceof BlockStateMeta blockStateMeta) {
+				if (isSign(item.getType()) && meta instanceof BlockStateMeta blockStateMeta) {
 					BlockState blockState = blockStateMeta.getBlockState();
 					if (blockState instanceof Sign signItem) {
 						return signItem.lines();

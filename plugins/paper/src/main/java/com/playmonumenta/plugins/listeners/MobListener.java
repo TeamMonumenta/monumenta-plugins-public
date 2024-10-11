@@ -134,7 +134,6 @@ public class MobListener implements Listener {
 			if (!event.getSpawnLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 				event.setCancelled(true);
 			}
-			return;
 		}
 
 		// flying/dropping entities: can spawn anywhere, so no more checks
@@ -336,7 +335,6 @@ public class MobListener implements Listener {
 					} catch (Exception e) {
 							MMLog.warning("[MobListener] Error while replacing EvokerFangs damage with custom EvokerFangDamage. Reason: " + e.getMessage());
 							e.printStackTrace();
-							return;
 					}
 				}
 			}
@@ -368,7 +366,6 @@ public class MobListener implements Listener {
 			}
 
 			event.setCancelled(true);
-			return;
 		}
 	}
 

@@ -964,7 +964,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			}.runTaskTimer(mPlugin, 0, 1);
 
 			//Check if arrow shot came from arena
-			if (proj.getShooter() instanceof Player player && player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
+			if (proj.getShooter() instanceof Player player && player.getLocation().distance(mStartLoc) > fighterRange) {
 				event.setCancelled(true);
 			}
 		}
@@ -1118,7 +1118,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		castStomp = false;
 		mBoss.addScoreboardTag("GolemFreeze");
 		Location loc = mBoss.getLocation();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, FrostGiant.detectionRange)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, detectionRange)) {
 			if (mob.getType() == EntityType.IRON_GOLEM) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, GOLEM_FREEZE_EFFECT_NAME,
 					new PercentSpeed(20 * 20, -1, GOLEM_FREEZE_EFFECT_NAME));
@@ -1132,7 +1132,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 		if (mBoss.getScoreboardTags().contains("GolemFreeze")) {
 			Location loc = mBoss.getLocation();
 			mBoss.removeScoreboardTag("GolemFreeze");
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, FrostGiant.detectionRange)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, detectionRange)) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mob, GOLEM_FREEZE_EFFECT_NAME);
 				mob.removePotionEffect(PotionEffectType.GLOWING);
 			}

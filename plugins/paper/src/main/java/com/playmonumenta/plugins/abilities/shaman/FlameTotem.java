@@ -73,7 +73,7 @@ public class FlameTotem extends TotemAbility {
 					DAMAGE_1,
 					AOE_RANGE_1,
 					StringUtils.ticksToSeconds(FIRE_DURATION),
-					StringUtils.ticksToSeconds(TotemAbility.PULSE_DELAY),
+					StringUtils.ticksToSeconds(PULSE_DELAY),
 					StringUtils.ticksToSeconds(DURATION_1),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),

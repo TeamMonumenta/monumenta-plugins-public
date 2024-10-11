@@ -88,7 +88,7 @@ public class DelveInfusionUtils {
 			if (label == null) {
 				return null;
 			}
-			for (DelveInfusionSelection selection : DelveInfusionSelection.values()) {
+			for (DelveInfusionSelection selection : values()) {
 				if (selection.getLabel().equals(label)) {
 					return selection;
 				}
@@ -168,8 +168,8 @@ public class DelveInfusionUtils {
 
 		public DelveInfusionMaterial getNext() {
 			return switch (this) {
-				case VOIDSTAINED_GEODE -> DelveInfusionMaterial.INDIGO_BLIGHTDUST;
-				case INDIGO_BLIGHTDUST -> DelveInfusionMaterial.VOIDSTAINED_GEODE;
+				case VOIDSTAINED_GEODE -> INDIGO_BLIGHTDUST;
+				case INDIGO_BLIGHTDUST -> VOIDSTAINED_GEODE;
 			};
 		}
 

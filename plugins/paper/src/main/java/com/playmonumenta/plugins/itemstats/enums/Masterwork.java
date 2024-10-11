@@ -57,16 +57,16 @@ public enum Masterwork {
 
 	public static Masterwork getMasterwork(@Nullable String name) {
 		if (name == null) {
-			return Masterwork.NONE;
+			return NONE;
 		}
 
-		for (Masterwork m : Masterwork.values()) {
+		for (Masterwork m : values()) {
 			if (m.getName().equals(name)) {
 				return m;
 			}
 		}
 
-		return Masterwork.NONE;
+		return NONE;
 	}
 
 	// Only use for 0-5

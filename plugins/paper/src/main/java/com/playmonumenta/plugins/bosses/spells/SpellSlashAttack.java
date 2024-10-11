@@ -158,7 +158,6 @@ public class SpellSlashAttack extends Spell {
 				if (mT >= (mEndAngle - mStartAngle - 40) / 40) {
 					this.cancel();
 					mSoundsSlashEnd.play(mBoss.getLocation());
-					return;
 				}
 			}
 		};

@@ -101,14 +101,14 @@ public enum InfusionType {
 	STAT_TRACK_FISH_CAUGHT(new StatTrackFishCaught(), "", true, false, false, true, false, false, false, false),
 	STAT_TRACK_CHEST_BROKEN(new StatTrackChests(), "", true, false, false, true, false, false, false, false);
 
-	public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
+	public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(values())
 		.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
-	public static final Set<InfusionType> STAT_TRACK_OPTIONS = Arrays.stream(InfusionType.values())
+	public static final Set<InfusionType> STAT_TRACK_OPTIONS = Arrays.stream(values())
 		.filter(type -> type.mIsStatTrackOption)
 		.collect(Collectors.toUnmodifiableSet());
 
-	public static final Set<InfusionType> SPAWNABLE_INFUSIONS = Arrays.stream(InfusionType.values())
+	public static final Set<InfusionType> SPAWNABLE_INFUSIONS = Arrays.stream(values())
 		.filter(type -> type.mIsSpawnable)
 		.collect(Collectors.toUnmodifiableSet());
 

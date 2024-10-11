@@ -337,7 +337,6 @@ public class VirtualItemsReplacer extends PacketAdapter {
 						});
 						markVirtual(nbt);
 					});
-					return;
 				}
 			}
 

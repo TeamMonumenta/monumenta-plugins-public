@@ -98,7 +98,7 @@ public class ClientModHandler {
 
 		ClassUpdatePacket.ClientModAbilityInfo[] abilities =
 				INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
-						.filter(ability -> ClientModHandler.shouldHandleAbility(player, ability))
+						.filter(ability -> shouldHandleAbility(player, ability))
 						.map(ability -> {
 							ClassAbility classAbility = ability.getInfo().getLinkedSpell();
 							int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);

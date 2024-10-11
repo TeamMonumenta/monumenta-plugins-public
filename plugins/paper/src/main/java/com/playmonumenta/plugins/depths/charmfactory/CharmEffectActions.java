@@ -28,7 +28,7 @@ public enum CharmEffectActions {
 	}
 
 	public static @Nullable CharmEffectActions getEffect(String actionName) {
-		for (CharmEffectActions ce : CharmEffectActions.values()) {
+		for (CharmEffectActions ce : values()) {
 			if (ce.mAction.equals(actionName)) {
 				return ce;
 			}

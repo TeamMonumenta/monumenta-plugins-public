@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -57,7 +58,7 @@ public class EarthenTremor extends Ability {
 	private final int mShockwaves;
 	private final double mShockwaveDistance;
 	private final double mShockwaveRadius;
-	private final List<LivingEntity> mHitEntities = new java.util.ArrayList<>();
+	private final List<LivingEntity> mHitEntities = new ArrayList<>();
 
 	public static final AbilityInfo<EarthenTremor> INFO =
 		new AbilityInfo<>(EarthenTremor.class, "Earthen Tremor", EarthenTremor::new)

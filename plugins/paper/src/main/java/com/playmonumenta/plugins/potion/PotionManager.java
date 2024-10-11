@@ -45,16 +45,16 @@ public class PotionManager {
 		}
 
 		public static @Nullable PotionID getFromString(String name) {
-			if (name.equals(PotionID.APPLIED_POTION.getName())) {
-				return PotionID.APPLIED_POTION;
-			} else if (name.equals(PotionID.ABILITY_SELF.getName())) {
-				return PotionID.ABILITY_SELF;
-			} else if (name.equals(PotionID.ABILITY_OTHER.getName())) {
-				return PotionID.ABILITY_OTHER;
-			} else if (name.equals(PotionID.SAFE_ZONE.getName())) {
-				return PotionID.SAFE_ZONE;
-			} else if (name.equals(PotionID.ITEM.getName())) {
-				return PotionID.ITEM;
+			if (name.equals(APPLIED_POTION.getName())) {
+				return APPLIED_POTION;
+			} else if (name.equals(ABILITY_SELF.getName())) {
+				return ABILITY_SELF;
+			} else if (name.equals(ABILITY_OTHER.getName())) {
+				return ABILITY_OTHER;
+			} else if (name.equals(SAFE_ZONE.getName())) {
+				return SAFE_ZONE;
+			} else if (name.equals(ITEM.getName())) {
+				return ITEM;
 			} else {
 				return null;
 			}

@@ -405,7 +405,7 @@ public class CosmeticsManager implements Listener {
 				return;
 			}
 
-			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getRandomActiveCosmetic(player, CosmeticType.ELITE_FINISHER);
+			Cosmetic activeCosmetic = getInstance().getRandomActiveCosmetic(player, CosmeticType.ELITE_FINISHER);
 			if (activeCosmetic != null) {
 				EliteFinishers.activateFinisher(player, mob, mob.getLocation(), activeCosmetic.getName());
 			}

@@ -700,7 +700,7 @@ public class LocationUtils {
 	}
 
 	public static double distanceToGround(Location loc, double minHeight, double maxDistance) {
-		Vector toGround = LocationUtils.getVectorTo(loc, fallToGround(loc, minHeight));
+		Vector toGround = getVectorTo(loc, fallToGround(loc, minHeight));
 		if (toGround.getY() > maxDistance || toGround.getY() < 0) {
 			return 0;
 		} else {

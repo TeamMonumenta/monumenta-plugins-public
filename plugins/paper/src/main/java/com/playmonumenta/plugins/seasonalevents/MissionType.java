@@ -45,7 +45,7 @@ public enum MissionType {
 		if (type == null) {
 			return null;
 		}
-		for (MissionType selection : MissionType.values()) {
+		for (MissionType selection : values()) {
 			if (selection.getType().equals(type)) {
 				return selection;
 			}

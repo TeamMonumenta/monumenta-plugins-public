@@ -659,7 +659,7 @@ public class ChromaBlade extends DepthsAbility {
 		}
 
 		DepthsAbilityInfo<?> info = ability.getInfo();
-		if (info == ChromaBlade.INFO || info == Bulwark.INFO || info == DepthsDodging.INFO || info.getDepthsTrigger() == DepthsTrigger.LIFELINE) {
+		if (info == INFO || info == Bulwark.INFO || info == DepthsDodging.INFO || info.getDepthsTrigger() == DepthsTrigger.LIFELINE) {
 			return true;
 		}
 

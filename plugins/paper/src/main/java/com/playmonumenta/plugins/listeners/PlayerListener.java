@@ -646,7 +646,6 @@ public class PlayerListener implements Listener {
 		// Plot Security: If armor stand is in a plot but the player is in adventure, cancel.
 		if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(armorStand)) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 
@@ -861,7 +860,6 @@ public class PlayerListener implements Listener {
 			    && player.getGameMode() != GameMode.CREATIVE
 			    && player.getGameMode() != GameMode.SPECTATOR) {
 				event.setCancelled(true);
-				return;
 			}
 		}
 	}
@@ -1446,7 +1444,6 @@ public class PlayerListener implements Listener {
 							} else if (!player.isSleeping() || !player.isOnline() || player.isDead()) {
 								// Abort, player got out of bed early
 								this.cancel();
-								return;
 							}
 						}
 					}.runTaskTimer(mPlugin, 0, 1);

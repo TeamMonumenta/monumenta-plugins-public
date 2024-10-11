@@ -26,15 +26,6 @@ import net.luckperms.api.node.types.MetaNode;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_GUILD_NAME_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_HOVER_PREFIX_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_ROOT_ID_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_ROOT_PLAIN_TAG_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_ID_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_NAME_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_PLAIN_TAG_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.getGuildPlainTag;
-
 public class RenameGuild {
 	private static final Argument<String> NEW_NAME_ARG = new TextArgument("new name")
 		.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS);
@@ -167,7 +158,7 @@ public class RenameGuild {
 			}
 
 			// Get old tag for later use
-			String oldTag = getGuildPlainTag(oldRoot);
+			String oldTag = LuckPermsIntegration.getGuildPlainTag(oldRoot);
 			if (oldTag == null) {
 				future.complete(Component.text("Guild '" + guildName
 						+ "' does not have a tag\nCannot update guild channel (possibly does not have an existing channel.)",
@@ -243,8 +234,8 @@ public class RenameGuild {
 			NodeMap guildMemberGroupData = guildMemberGroup.data();
 
 			metaKeysToRemove = Set.of(
-				GUILD_ROOT_ID_MK,
-				GUILD_ROOT_PLAIN_TAG_MK
+				LuckPermsIntegration.GUILD_ROOT_ID_MK,
+				LuckPermsIntegration.GUILD_ROOT_PLAIN_TAG_MK
 			);
 			for (Node node : guildRootGroupData.toCollection()) {
 				if (node instanceof MetaNode metaNode) {
@@ -253,13 +244,13 @@ public class RenameGuild {
 					}
 				}
 			}
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_ID_MK, newRootId).build());
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_PLAIN_TAG_MK, newTag).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_ID_MK, newRootId).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_PLAIN_TAG_MK, newTag).build());
 			LuckPermsIntegration.GM.saveGroup(newRoot).join();
 
 			metaKeysToRemove = Set.of(
-				GUILD_MEMBER_ROOT_ID_MK,
-				GUILD_MEMBER_ROOT_PLAIN_TAG_MK
+				LuckPermsIntegration.GUILD_MEMBER_ROOT_ID_MK,
+				LuckPermsIntegration.GUILD_MEMBER_ROOT_PLAIN_TAG_MK
 			);
 			for (Node node : guildMemberGroupData.toCollection()) {
 				if (node instanceof MetaNode metaNode) {
@@ -268,8 +259,8 @@ public class RenameGuild {
 					}
 				}
 			}
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_ROOT_ID_MK, newRootId).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_ROOT_PLAIN_TAG_MK, newTag).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_ROOT_ID_MK, newRootId).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_ROOT_PLAIN_TAG_MK, newTag).build());
 			LuckPermsIntegration.GM.saveGroup(guildMemberGroup).join();
 
 			try {
@@ -331,7 +322,7 @@ public class RenameGuild {
 
 			NodeMap guildRootGroupData = root.data();
 			metaKeysToRemove = Set.of(
-				GUILD_ROOT_NAME_MK
+				LuckPermsIntegration.GUILD_ROOT_NAME_MK
 			);
 			for (Node node : guildRootGroupData.toCollection()) {
 				if (node instanceof MetaNode metaNode) {
@@ -340,7 +331,7 @@ public class RenameGuild {
 					}
 				}
 			}
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_NAME_MK, newName).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_NAME_MK, newName).build());
 			LuckPermsIntegration.GM.saveGroup(root).join();
 
 			Optional<Group> optMemberGroup = GuildAccessLevel.MEMBER.loadGroupFromRoot(guildRootId).join();
@@ -352,8 +343,8 @@ public class RenameGuild {
 			Group guildMemberGroup = optMemberGroup.get();
 			NodeMap guildMemberGroupData = guildMemberGroup.data();
 			metaKeysToRemove = Set.of(
-				GUILD_MEMBER_HOVER_PREFIX_MK,
-				GUILD_MEMBER_GUILD_NAME_MK
+				LuckPermsIntegration.GUILD_MEMBER_HOVER_PREFIX_MK,
+				LuckPermsIntegration.GUILD_MEMBER_GUILD_NAME_MK
 			);
 			for (Node node : guildMemberGroupData.toCollection()) {
 				if (node instanceof MetaNode metaNode) {
@@ -362,8 +353,8 @@ public class RenameGuild {
 					}
 				}
 			}
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_HOVER_PREFIX_MK, newName).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_GUILD_NAME_MK, newName).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_HOVER_PREFIX_MK, newName).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_GUILD_NAME_MK, newName).build());
 			LuckPermsIntegration.GM.saveGroup(guildMemberGroup).join();
 
 			LuckPermsIntegration.pushUpdate();

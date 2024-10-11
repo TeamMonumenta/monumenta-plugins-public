@@ -270,7 +270,7 @@ public class DepthsManager {
 
 				@Override
 				public void run() {
-					DepthsManager.getInstance().save(p.getDataFolder() + File.separator + "depths");
+					getInstance().save(p.getDataFolder() + File.separator + "depths");
 				}
 
 			}.runTaskTimer(p, SAVE_INTERVAL, SAVE_INTERVAL);
@@ -336,7 +336,7 @@ public class DepthsManager {
 
 					@Override
 					public void run() {
-						DepthsManager.getInstance().save(Plugin.getInstance().getDataFolder() + File.separator + "depths");
+						getInstance().save(Plugin.getInstance().getDataFolder() + File.separator + "depths");
 					}
 
 				}.runTaskTimer(mPlugin, SAVE_INTERVAL, SAVE_INTERVAL);
@@ -1622,7 +1622,7 @@ public class DepthsManager {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			Player nearestPlayer = EntityUtils.getNearestPlayer(loc, range);
 			if (nearestPlayer != null) {
-				DepthsManager.getInstance().goToNextFloor(nearestPlayer);
+				getInstance().goToNextFloor(nearestPlayer);
 			}
 		}, 20);
 	}

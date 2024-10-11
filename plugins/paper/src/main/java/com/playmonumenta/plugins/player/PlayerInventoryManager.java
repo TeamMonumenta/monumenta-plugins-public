@@ -67,7 +67,6 @@ public class PlayerInventoryManager {
 			if (invClickEvent.getSlotType() == InventoryType.SlotType.CRAFTING
 				    || invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
 				mNeedsUpdate = true;
-				return;
 			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem())) {
 				for (int i = 0; i <= 8; i++) {
 					// Update hotbar
@@ -119,7 +118,7 @@ public class PlayerInventoryManager {
 				updateItemSlotProperties(plugin, player, droppedSlot);
 			}
 		} else if (!mNeedsUpdate && event instanceof InventoryCloseEvent) {
-			return; //Only ever updates on InventoryCloseEvent if shift clicks have been made
+            //Only ever updates on InventoryCloseEvent if shift clicks have been made
 		} else {
 
 			// Sets mHasShiftClicked to false after updating entire inventory

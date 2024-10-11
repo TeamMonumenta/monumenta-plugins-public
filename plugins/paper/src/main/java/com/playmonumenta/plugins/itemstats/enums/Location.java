@@ -210,12 +210,12 @@ public enum Location {
 	}
 
 	public static Location getLocation(String name) {
-		for (Location location : Location.values()) {
+		for (Location location : values()) {
 			if (location.getName().replace(" ", "").equals(name.replace(" ", ""))) {
 				return location;
 			}
 		}
 
-		return Location.NONE;
+		return NONE;
 	}
 }

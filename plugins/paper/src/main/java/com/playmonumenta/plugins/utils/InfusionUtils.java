@@ -52,7 +52,7 @@ public class InfusionUtils {
 			if (label == null) {
 				return null;
 			}
-			for (InfusionSelection selection : InfusionSelection.values()) {
+			for (InfusionSelection selection : values()) {
 				if (selection.getLabel().equals(label)) {
 					return selection;
 				}

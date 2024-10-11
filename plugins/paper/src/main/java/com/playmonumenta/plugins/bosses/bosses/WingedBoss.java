@@ -160,9 +160,9 @@ public final class WingedBoss extends BossAbilityGroup {
 			if (e instanceof ArmorStand stand) {
 				stand.teleport(mBoss.getLocation().add(0, yOffset, 0));
 				if (!reverse) {
-					stand.setHeadPose(stand.getHeadPose().add(WingedBoss.headMovement, 0, 0));
+					stand.setHeadPose(stand.getHeadPose().add(headMovement, 0, 0));
 				} else {
-					stand.setHeadPose(stand.getHeadPose().add(WingedBoss.headMovement * -1, 0, 0));
+					stand.setHeadPose(stand.getHeadPose().add(headMovement * -1, 0, 0));
 				}
 			}
 		});

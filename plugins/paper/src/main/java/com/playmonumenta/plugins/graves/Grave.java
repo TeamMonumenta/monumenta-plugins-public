@@ -18,10 +18,8 @@ import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.managers.GlowingManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -46,7 +44,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.ArmorStand;
@@ -345,33 +342,6 @@ public final class Grave {
 			};
 			mRunnable.runTaskTimer(Plugin.getInstance(), 20, 20);
 		}
-	}
-
-	private void doPhylacteryParticles() {
-		if (mEntity == null) {
-			return;
-		}
-		Location loc = mEntity.getLocation();
-		new BukkitRunnable() {
-			int mTicks = 0;
-			double mY = 0;
-			double mTheta = 0;
-
-			@Override
-			public void run() {
-				new PartialParticle(Particle.TOTEM, loc.clone().add(FastUtils.cos(mTheta), mY, FastUtils.sin(mTheta)), 1, 0, 0, 0, 0).spawnAsPlayerPassive(mPlayer);
-				new PartialParticle(Particle.TOTEM, loc.clone().add(-FastUtils.cos(mTheta), mY, -FastUtils.sin(mTheta)), 1, 0, 0, 0, 0).spawnAsPlayerPassive(mPlayer);
-
-				mTicks += 2;
-				mY += 0.2;
-				mTheta += Math.PI / 5;
-
-				if (mTicks >= 20) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(Plugin.getInstance(), 0, 2);
 	}
 
 	private void stopTracking() {

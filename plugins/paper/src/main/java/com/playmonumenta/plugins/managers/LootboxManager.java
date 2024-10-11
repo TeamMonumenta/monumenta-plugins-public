@@ -806,7 +806,7 @@ public class LootboxManager implements Listener {
 
 		if (!(event.getWhoClicked() instanceof Player player) || // we want a player
 				inventory == null || // with valid inventory
-				!LootboxManager.isLootbox(itemClicked) // and they clicked a lootbox
+				!isLootbox(itemClicked) // and they clicked a lootbox
 		) {
 			return;
 		}

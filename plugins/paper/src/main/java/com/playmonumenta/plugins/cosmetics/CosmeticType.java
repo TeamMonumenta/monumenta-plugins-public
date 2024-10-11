@@ -55,7 +55,7 @@ public enum CosmeticType {
 		if (type == null) {
 			return null;
 		}
-		for (CosmeticType selection : CosmeticType.values()) {
+		for (CosmeticType selection : values()) {
 			if (selection.getType().equals(type)) {
 				return selection;
 			}

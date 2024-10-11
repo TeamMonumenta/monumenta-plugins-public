@@ -99,7 +99,6 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 				public void run() {
 					if (mT > mDuration) {
 						this.cancel();
-						return;
 					} else {
 						if (mT > 0) {
 							mCosmetic.residualEnhanceEffects(mPlayer, world, loc);

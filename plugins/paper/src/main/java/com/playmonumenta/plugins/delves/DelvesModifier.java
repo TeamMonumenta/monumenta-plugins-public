@@ -124,7 +124,7 @@ public enum DelvesModifier {
 			return null;
 		}
 
-		for (DelvesModifier mod : DelvesModifier.values()) {
+		for (DelvesModifier mod : values()) {
 			if (mod.name().equals(name)) {
 				return mod;
 			}

@@ -32,7 +32,7 @@ public class ProjectileSpeed implements Attribute {
 
 	public static double getProjectileSpeedModifier(Projectile proj) {
 		if (proj.hasMetadata(SPEED_METAKEY)) {
-			return proj.getMetadata(ProjectileSpeed.SPEED_METAKEY).get(0).asDouble();
+			return proj.getMetadata(SPEED_METAKEY).get(0).asDouble();
 		}
 		return 1;
 	}

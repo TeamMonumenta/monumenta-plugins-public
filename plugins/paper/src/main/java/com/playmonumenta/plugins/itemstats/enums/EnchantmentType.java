@@ -184,14 +184,14 @@ public enum EnchantmentType {
 	MAGIC_WAND(new MagicWandEnch(), false, false, false, false),
 	ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false);
 
-	public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = Arrays.stream(EnchantmentType.values())
+	public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = Arrays.stream(values())
 		.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
-	public static final Set<EnchantmentType> SPAWNABLE_ENCHANTMENTS = Arrays.stream(EnchantmentType.values())
+	public static final Set<EnchantmentType> SPAWNABLE_ENCHANTMENTS = Arrays.stream(values())
 		.filter(type -> type.mIsSpawnable)
 		.collect(Collectors.toUnmodifiableSet());
 
-	public static final Set<EnchantmentType> PROJECTILE_ENCHANTMENTS = Arrays.stream(EnchantmentType.values())
+	public static final Set<EnchantmentType> PROJECTILE_ENCHANTMENTS = Arrays.stream(values())
 		.filter(type -> type.getItemStat() instanceof com.playmonumenta.plugins.itemstats.Enchantment ench && ench.getSlots().contains(Slot.PROJECTILE))
 		.collect(Collectors.toUnmodifiableSet());
 

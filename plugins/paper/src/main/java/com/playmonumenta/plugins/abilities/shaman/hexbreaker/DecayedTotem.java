@@ -69,7 +69,7 @@ public class DecayedTotem extends TotemAbility {
 					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
 					FLAME_TOTEM_DAMAGE_BUFF,
 					LIGHTNING_TOTEM_DAMAGE_BUFF,
-					StringUtils.ticksToSeconds(TotemAbility.PULSE_DELAY),
+					StringUtils.ticksToSeconds(PULSE_DELAY),
 					StringUtils.ticksToSeconds(DURATION_1),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),

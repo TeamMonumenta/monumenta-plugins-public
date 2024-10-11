@@ -118,7 +118,7 @@ public class ParticlesList {
 		}
 	}
 
-	public static final ParticlesList EMPTY = ParticlesList.fromString("[]");
+	public static final ParticlesList EMPTY = fromString("[]");
 
 	private final List<CParticle> mParticleList;
 

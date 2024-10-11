@@ -98,14 +98,14 @@ public enum GuildInviteLevel {
 			}
 
 			if (inheritanceNode.getGroupName().startsWith(rootIdWithSeparator)) {
-				GuildInviteLevel foundInviteLevel = GuildInviteLevel.byGroup(inheritanceNode.getGroupName());
-				if (!GuildInviteLevel.NONE.equals(foundInviteLevel)) {
+				GuildInviteLevel foundInviteLevel = byGroup(inheritanceNode.getGroupName());
+				if (!NONE.equals(foundInviteLevel)) {
 					targetData.remove(inheritanceNode);
 				}
 			}
 		}
 
-		if (GuildInviteLevel.NONE.equals(targetLevel)) {
+		if (NONE.equals(targetLevel)) {
 			LuckPermsIntegration.pushUserUpdate(target);
 			future.complete(target);
 			return future;

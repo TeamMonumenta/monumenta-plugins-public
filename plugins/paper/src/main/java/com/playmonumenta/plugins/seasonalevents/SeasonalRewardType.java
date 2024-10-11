@@ -27,7 +27,7 @@ public enum SeasonalRewardType {
 		if (type == null) {
 			return null;
 		}
-		for (SeasonalRewardType selection : SeasonalRewardType.values()) {
+		for (SeasonalRewardType selection : values()) {
 			if (selection.getType().equals(type)) {
 				return selection;
 			}

@@ -90,15 +90,15 @@ public class VectorUtils {
 		if (yaw == 0 && pitch == 0) {
 			return targetDir;
 		} else {
-			double[] targetAngle = VectorUtils.vectorToRotation(targetDir);
+			double[] targetAngle = vectorToRotation(targetDir);
 			// Start with the assumption the target is at due South (yaw 0.0, pitch 0.0, no offset)
 			Vector dir = new Vector(0.0, 0.0, targetDir.length());
 			// Apply pitch/yaw offset to get start pattern
-			dir = VectorUtils.rotateXAxis(dir, pitch);
-			dir = VectorUtils.rotateYAxis(dir, yaw);
+			dir = rotateXAxis(dir, pitch);
+			dir = rotateYAxis(dir, yaw);
 			// Apply target pitch/yaw to rotate that pattern to match the direction
-			dir = VectorUtils.rotateXAxis(dir, targetAngle[1]);
-			dir = VectorUtils.rotateYAxis(dir, targetAngle[0]);
+			dir = rotateXAxis(dir, targetAngle[1]);
+			dir = rotateYAxis(dir, targetAngle[0]);
 			return dir;
 		}
 	}

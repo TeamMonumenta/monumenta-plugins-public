@@ -238,7 +238,6 @@ public class EntityListener implements Listener {
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 			if (playerDamager.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
 				event.setCancelled(true);
-				return;
 			}
 		} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
@@ -251,7 +250,6 @@ public class EntityListener implements Listener {
 			if (damagee instanceof Player) {
 				damager.remove();
 				event.setCancelled(true);
-				return;
 			}
 		}
 	}
@@ -352,7 +350,6 @@ public class EntityListener implements Listener {
 			}
 			if (damagee.getScoreboardTags().contains(INVULNERABLE_ITEM_TAG) && !source.equals(DamageCause.LAVA) && !source.equals(DamageCause.VOID)) {
 				event.setCancelled(true);
-				return;
 			}
 		}
 	}
@@ -380,7 +377,6 @@ public class EntityListener implements Listener {
 			}
 
 			event.setCancelled(true);
-			return;
 		}
 	}
 
@@ -411,7 +407,6 @@ public class EntityListener implements Listener {
 
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
-				return;
 			}
 		} else if (damager instanceof Projectile projectile) {
 			// If hurt by a projectile from a player in adventure mode.
@@ -420,13 +415,11 @@ public class EntityListener implements Listener {
 			if (source instanceof Player player) {
 				if (player.getGameMode() == GameMode.ADVENTURE) {
 					event.setCancelled(true);
-					return;
 				}
 			}
 		} else if (damager instanceof Creeper creeper) {
 			if (creeper.getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
 				event.setCancelled(true);
-				return;
 			}
 		}
 	}
@@ -915,7 +908,6 @@ public class EntityListener implements Listener {
 				if (AbilityUtils.isStealthed(player)) {
 					event.setTarget(null);
 					event.setCancelled(true);
-					return;
 				} else {
 					mAbilities.entityTargetLivingEntityEvent(player, event);
 				}
@@ -996,7 +988,6 @@ public class EntityListener implements Listener {
 			}
 			fallingBlock.remove();
 			event.setCancelled(true);
-			return;
 		}
 
 	}

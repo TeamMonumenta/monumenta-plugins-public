@@ -63,7 +63,7 @@ public class WhirlwindTotem extends TotemAbility {
 					StringUtils.multiplierToPercentage(CDR_PERCENT),
 					StringUtils.ticksToSeconds(CDR_MAX_PER_SECOND),
 					StringUtils.multiplierToPercentage(DURATION_BOOST),
-					StringUtils.ticksToSeconds(TotemAbility.PULSE_DELAY),
+					StringUtils.ticksToSeconds(PULSE_DELAY),
 					StringUtils.ticksToSeconds(DURATION_1),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),

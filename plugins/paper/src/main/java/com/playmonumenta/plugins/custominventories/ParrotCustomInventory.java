@@ -52,7 +52,7 @@ public final class ParrotCustomInventory extends Gui {
 		}
 
 		public static @Nullable ParrotGUIPage valueOfPage(int pagenum) {
-			for (ParrotGUIPage page : ParrotGUIPage.values()) {
+			for (ParrotGUIPage page : values()) {
 				if (page.mNum == pagenum) {
 					return page;
 				}

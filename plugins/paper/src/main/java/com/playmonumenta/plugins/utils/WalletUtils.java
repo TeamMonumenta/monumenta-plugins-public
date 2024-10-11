@@ -84,7 +84,7 @@ public class WalletUtils {
 		if (debt.mWalletDebt > 0) {
 			WalletManager.getWallet(player).remove(player, debt.mItem.asQuantity(debt.mWalletDebt));
 			if (notify) {
-				WalletUtils.notifyRemovalFromWallet(debt, player);
+				notifyRemovalFromWallet(debt, player);
 			}
 		}
 	}

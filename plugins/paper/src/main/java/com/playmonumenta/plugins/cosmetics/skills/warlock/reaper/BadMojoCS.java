@@ -226,8 +226,8 @@ public class BadMojoCS extends DarkPactCS {
 		Location loc2 = loc.clone().add(VectorUtils.rotateYAxis(new Vector(length, 0, 0), angle + 120));
 		Location loc3 = loc.clone().add(VectorUtils.rotateYAxis(new Vector(length, 0, 0), angle + 240));
 
-		new PPLine(Particle.REDSTONE, loc1, loc2).data(BadMojoCS.MAGENTA).countPerMeter(10).spawnAsPlayerActive(player);
-		new PPLine(Particle.REDSTONE, loc2, loc3).data(BadMojoCS.MAGENTA).countPerMeter(10).spawnAsPlayerActive(player);
-		new PPLine(Particle.REDSTONE, loc3, loc1).data(BadMojoCS.MAGENTA).countPerMeter(10).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, loc1, loc2).data(MAGENTA).countPerMeter(10).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, loc2, loc3).data(MAGENTA).countPerMeter(10).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, loc3, loc1).data(MAGENTA).countPerMeter(10).spawnAsPlayerActive(player);
 	}
 }

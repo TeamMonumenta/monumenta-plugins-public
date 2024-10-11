@@ -285,25 +285,25 @@ public class BroadcastedEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void networkRelayMessageEvent(@NotNull NetworkRelayMessageEvent event) {
-		if (event.getChannel().equals(BroadcastedEvents.UPDATE_BROADCAST_CHANNEL)) {
+		if (event.getChannel().equals(UPDATE_BROADCAST_CHANNEL)) {
 			JsonObject data = event.getData();
 			if (!(data.get(BroadcastedEvents.Event.SHARD_PROP_KEY) instanceof JsonPrimitive shardPrimitive && shardPrimitive.isString())) {
-				MMLog.warning(BroadcastedEvents.UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.SHARD_PROP_KEY + "'");
+				MMLog.warning(UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.SHARD_PROP_KEY + "'");
 				return;
 			}
 
 			if (!(data.get(Event.EVENT_PROP_KEY) instanceof JsonPrimitive eventPrimitive && eventPrimitive.isString())) {
-				MMLog.warning(BroadcastedEvents.UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.EVENT_PROP_KEY + "'");
+				MMLog.warning(UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.EVENT_PROP_KEY + "'");
 				return;
 			}
 
 			if (!(data.get(Event.TIME_PROP_KEY) instanceof JsonPrimitive timePrimitive && timePrimitive.isNumber())) {
-				MMLog.warning(BroadcastedEvents.UPDATE_BROADCAST_CHANNEL + " failed to parse required int field '" + BroadcastedEvents.Event.SHARD_PROP_KEY + "'");
+				MMLog.warning(UPDATE_BROADCAST_CHANNEL + " failed to parse required int field '" + BroadcastedEvents.Event.SHARD_PROP_KEY + "'");
 				return;
 			}
 
 			if (!(data.get(Event.STATUS_PROP_KEY) instanceof JsonPrimitive statusPrimitive && statusPrimitive.isString())) {
-				MMLog.warning(BroadcastedEvents.UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.STATUS_PROP_KEY + "'");
+				MMLog.warning(UPDATE_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.STATUS_PROP_KEY + "'");
 				return;
 			}
 
@@ -322,17 +322,17 @@ public class BroadcastedEvents implements Listener {
 
 
 			MMLog.finer("[Boss Event Relay/Update] Caught child event: " + childEvent.mShard + "@" + childEvent.mEventName);
-			BroadcastedEvents.registerChildEvent(childEvent);
+			registerChildEvent(childEvent);
 		} else if (event.getChannel().equals(PROXIED_TASK_BROADCAST_CHANNEL)) {
 			JsonObject data = event.getData();
 
 			if (!(data.get(Event.EVENT_PROP_KEY) instanceof JsonPrimitive eventPrimitive && eventPrimitive.isString())) {
-				MMLog.warning(BroadcastedEvents.PROXIED_TASK_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.EVENT_PROP_KEY + "'");
+				MMLog.warning(PROXIED_TASK_BROADCAST_CHANNEL + " failed to parse required String field '" + BroadcastedEvents.Event.EVENT_PROP_KEY + "'");
 				return;
 			}
 
 			if (!(data.get(Event.TIME_PROP_KEY) instanceof JsonPrimitive timePrimitive && timePrimitive.isNumber())) {
-				MMLog.warning(BroadcastedEvents.PROXIED_TASK_BROADCAST_CHANNEL + " failed to parse required int field '" + BroadcastedEvents.Event.SHARD_PROP_KEY + "'");
+				MMLog.warning(PROXIED_TASK_BROADCAST_CHANNEL + " failed to parse required int field '" + BroadcastedEvents.Event.SHARD_PROP_KEY + "'");
 				return;
 			}
 

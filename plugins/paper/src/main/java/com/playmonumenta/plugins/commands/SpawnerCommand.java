@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
+import com.playmonumenta.plugins.spawners.types.ProtectorSpawner;
+import com.playmonumenta.plugins.spawners.types.RallySpawner;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -24,17 +26,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import static com.playmonumenta.plugins.spawners.types.ProtectorSpawner.setProtector;
-import static com.playmonumenta.plugins.spawners.types.RallySpawner.setRally;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.CAT_ATTRIBUTE;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.CAT_ATTRIBUTE_RADIUS;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.DECAYING_ATTRIBUTE;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.ENSNARED_ATTRIBUTE;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.GUARDED_ATTRIBUTE;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.SEQUENCE_ATTRIBUTE;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.SEQUENCE_ATTRIBUTE_RADIUS;
-import static com.playmonumenta.plugins.utils.SpawnerUtils.setSpawnerType;
 
 public class SpawnerCommand {
 
@@ -64,7 +55,7 @@ public class SpawnerCommand {
 									}
 
 									int guardBlock = args.getUnchecked("guarded");
-									setSpawnerType(item, GUARDED_ATTRIBUTE, guardBlock);
+									SpawnerUtils.setSpawnerType(item, SpawnerUtils.GUARDED_ATTRIBUTE, guardBlock);
 								}),
 							new CommandAPICommand("ensnared")
 								.withArguments(new IntegerArgument("ensnared"))
@@ -78,7 +69,7 @@ public class SpawnerCommand {
 										player.sendMessage("The command needs the radius to be greater than 3.");
 										return;
 									}
-									setSpawnerType(item, ENSNARED_ATTRIBUTE, ensnaredBlock);
+									SpawnerUtils.setSpawnerType(item, SpawnerUtils.ENSNARED_ATTRIBUTE, ensnaredBlock);
 								}),
 							new CommandAPICommand("decaying")
 								.withArguments(new IntegerArgument("decaying"))
@@ -89,7 +80,7 @@ public class SpawnerCommand {
 									}
 
 									int decayingBlock = args.getUnchecked("decaying");
-									setSpawnerType(item, DECAYING_ATTRIBUTE, decayingBlock);
+									SpawnerUtils.setSpawnerType(item, SpawnerUtils.DECAYING_ATTRIBUTE, decayingBlock);
 								}),
 							new CommandAPICommand("protector")
 								.withArguments(new BooleanArgument("protector"))
@@ -100,7 +91,7 @@ public class SpawnerCommand {
 									}
 
 									boolean protector = args.getUnchecked("protector");
-									setProtector(item, protector);
+									ProtectorSpawner.setProtector(item, protector);
 								}),
 							new CommandAPICommand("rally")
 								.withArguments(new IntegerArgument("rally"))
@@ -111,7 +102,7 @@ public class SpawnerCommand {
 									}
 
 									int rallyBlock = args.getUnchecked("rally");
-									setRally(item, rallyBlock);
+									RallySpawner.setRally(item, rallyBlock);
 								}),
 							new CommandAPICommand("cat")
 								.withArguments(new IntegerArgument("cat"))
@@ -125,8 +116,8 @@ public class SpawnerCommand {
 									int catBlock = args.getUnchecked("cat");
 									int catRadius = args.getUnchecked("catRadius");
 
-									setSpawnerType(item, CAT_ATTRIBUTE, catBlock);
-									setSpawnerType(item, CAT_ATTRIBUTE_RADIUS, catRadius);
+									SpawnerUtils.setSpawnerType(item, SpawnerUtils.CAT_ATTRIBUTE, catBlock);
+									SpawnerUtils.setSpawnerType(item, SpawnerUtils.CAT_ATTRIBUTE_RADIUS, catRadius);
 								}),
 							new CommandAPICommand("sequential")
 								.withArguments(new IntegerArgument("sequence"))
@@ -145,8 +136,8 @@ public class SpawnerCommand {
 										return;
 									}
 
-									setSpawnerType(item, SEQUENCE_ATTRIBUTE, sequenceBlock);
-									setSpawnerType(item, SEQUENCE_ATTRIBUTE_RADIUS, sequenceRadius);
+									SpawnerUtils.setSpawnerType(item, SpawnerUtils.SEQUENCE_ATTRIBUTE, sequenceBlock);
+									SpawnerUtils.setSpawnerType(item, SpawnerUtils.SEQUENCE_ATTRIBUTE_RADIUS, sequenceRadius);
 								})
 						),
 						new CommandAPICommand("function")

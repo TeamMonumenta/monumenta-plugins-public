@@ -143,7 +143,6 @@ public class StatTrackItem extends GenericCommand {
 		InfusionType type = StatTrackManager.getTrackingType(is);
 		if (type == null) {
 			player.sendMessage("Could not find stat track infusion type!");
-			return;
 		} else {
 			StatTrackManager.incrementStat(is, player, type, stat);
 			player.sendMessage("Updated the stat on your item to desired value!");

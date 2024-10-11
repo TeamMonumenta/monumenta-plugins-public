@@ -179,7 +179,7 @@ public class ParrotManager implements Listener {
 		ParrotVariant leftParrot = mLeftShoulders.get(player);
 		if (leftParrot != null) {
 			Parrot parrot = new ParrotPet(leftParrot, player).spawnParrot(spawnLocation);
-			parrot.addScoreboardTag(ParrotManager.SHOULDER_PARROT_TAG);
+			parrot.addScoreboardTag(SHOULDER_PARROT_TAG);
 			parrot.setInvisible(true);
 			PlayerUtils.setPlayerShoulderEntity(player, parrot, false);
 		}
@@ -187,7 +187,7 @@ public class ParrotManager implements Listener {
 		ParrotVariant rightParrot = mRightShoulders.get(player);
 		if (rightParrot != null) {
 			Parrot parrot = new ParrotPet(rightParrot, player).spawnParrot(spawnLocation);
-			parrot.addScoreboardTag(ParrotManager.SHOULDER_PARROT_TAG);
+			parrot.addScoreboardTag(SHOULDER_PARROT_TAG);
 			parrot.setInvisible(true);
 			PlayerUtils.setPlayerShoulderEntity(player, parrot, true);
 		}
@@ -346,7 +346,7 @@ public class ParrotManager implements Listener {
 			}
 		}
 		Parrot parrot = new ParrotPet(variant, player).spawnParrot(player.getLocation());
-		parrot.addScoreboardTag(ParrotManager.PLACED_PARROT_TAG);
+		parrot.addScoreboardTag(PLACED_PARROT_TAG);
 		NmsUtils.getVersionAdapter().disablePerching(parrot);
 	}
 

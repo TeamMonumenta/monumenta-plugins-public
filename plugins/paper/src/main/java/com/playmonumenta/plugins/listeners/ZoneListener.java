@@ -76,12 +76,10 @@ public class ZoneListener implements Listener {
 				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.WINTER_SNOWBALLS_ONLY)
 					    && !InventoryUtils.testForItemWithName(snowball.getItem(), "Arena Snowball", true)) {
 					event.setCancelled(true);
-					return;
 				}
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_POTIONS)) {
 					event.setCancelled(true);
-					return;
 				}
 			}
 		}

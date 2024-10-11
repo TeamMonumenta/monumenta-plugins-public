@@ -34,21 +34,21 @@ public class DeathMsg {
 
 		public static DeathMessageState getDeathMessageState(Integer score) {
 			if (score == null) {
-				return DeathMessageState.VISIBLE;
+				return VISIBLE;
 			} else if (score == 1) {
-				return DeathMessageState.HIDDEN;
+				return HIDDEN;
 			} else {
-				return DeathMessageState.VISIBLE;
+				return VISIBLE;
 			}
 		}
 
 		public static @Nullable DeathMessageState getDeathMessageState(@Nullable String cmdLiteral) {
 			if (cmdLiteral == null) {
 				return null;
-			} else if (cmdLiteral.equals(DeathMessageState.HIDDEN.getCmdLiteral())) {
-				return DeathMessageState.HIDDEN;
+			} else if (cmdLiteral.equals(HIDDEN.getCmdLiteral())) {
+				return HIDDEN;
 			} else {
-				return DeathMessageState.VISIBLE;
+				return VISIBLE;
 			}
 		}
 

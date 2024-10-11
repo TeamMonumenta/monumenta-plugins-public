@@ -7,6 +7,7 @@ import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -130,7 +131,7 @@ public class MessagingUtils {
 
 	/* Gets the difference between now and the specified time in a pretty string like 4h30m */
 	public static String getTimeDifferencePretty(long time) {
-		Duration remaining = Duration.ofSeconds(time - java.time.Instant.now().getEpochSecond());
+		Duration remaining = Duration.ofSeconds(time - Instant.now().getEpochSecond());
 
 		return remaining.toString()
 			.substring(2)

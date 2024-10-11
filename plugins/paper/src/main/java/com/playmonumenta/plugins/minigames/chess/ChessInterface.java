@@ -58,7 +58,7 @@ public class ChessInterface {
 		}
 
 		public static @Nullable FacingPosition valueOfLabel(String label) {
-			for (FacingPosition fp : FacingPosition.values()) {
+			for (FacingPosition fp : values()) {
 				if (fp.mLabel.equalsIgnoreCase(label)) {
 					return fp;
 				}

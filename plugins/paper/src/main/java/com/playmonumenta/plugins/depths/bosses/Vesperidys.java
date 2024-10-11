@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -949,7 +950,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void realityDistortion(boolean finalPhase) {
-		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, REALITY_DISTORTION_TICKS, Component.text("Casting", NamedTextColor.GREEN).append(Component.text(" Reality Distortion...", NamedTextColor.DARK_RED, TextDecoration.BOLD)), net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_10, 100);
+		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, REALITY_DISTORTION_TICKS, Component.text("Casting", NamedTextColor.GREEN).append(Component.text(" Reality Distortion...", NamedTextColor.DARK_RED, TextDecoration.BOLD)), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 100);
 		mTeleportSpell.teleportPlatform(0, 0);
 
 		List<Player> hitPlayers = new ArrayList<>();

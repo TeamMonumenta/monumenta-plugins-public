@@ -501,7 +501,7 @@ public class ParticleUtils {
 	}
 
 	/**
-	 * Use {@link com.playmonumenta.plugins.particle.PPCircle} if possible.
+	 * Use {@link PPCircle} if possible.
 	 * Draw a ring with particles
 	 *
 	 * @param center Center location of the ring
@@ -511,7 +511,7 @@ public class ParticleUtils {
 	 * @param pp     Particle action at each unit
 	 */
 	public static void drawRing(Location center, int units, Vector normal, double radius, ParametricParticle pp) {
-		ParticleUtils.drawCurve(center, 1, units, normal.clone().normalize(),
+		drawCurve(center, 1, units, normal.clone().normalize(),
 				t -> 0,
 				t -> FastUtils.sin(Math.PI * 2 * t / units) * radius,
 				t -> FastUtils.cos(Math.PI * 2 * t / units) * radius,
@@ -524,7 +524,7 @@ public class ParticleUtils {
 		Vector normal = new Vector(0, 1, 0);
 		for (int i = 0; i < units; i++) {
 			double theta = i * thetaStep;
-			ParticleUtils.drawCurve(center, 1, units, normal.clone().normalize(),
+			drawCurve(center, 1, units, normal.clone().normalize(),
 					t -> radius * FastUtils.cos(theta) * FastUtils.sin(Math.PI * 2 * t / units),
 					t -> radius * FastUtils.cos(Math.PI * 2 * t / units),
 					t -> radius * FastUtils.sin(theta) * FastUtils.sin(Math.PI * 2 * t / units),
@@ -541,7 +541,7 @@ public class ParticleUtils {
 
 		for (int i = 0; i < units; i++) {
 			double theta = i * thetaStep;
-			ParticleUtils.drawCurve(center, 0, units, rotation[0], rotation[1] + 90,
+			drawCurve(center, 0, units, rotation[0], rotation[1] + 90,
 					t -> radius * FastUtils.cos(theta) * FastUtils.sin(Math.PI * t / units / 2),
 					t -> radius * FastUtils.cos(Math.PI * t / units / 2),
 					t -> radius * FastUtils.sin(theta) * FastUtils.sin(Math.PI * t / units / 2),
@@ -687,7 +687,7 @@ public class ParticleUtils {
 			@Override
 			public void run() {
 				// Border, starting immediately
-				ParticleUtils.drawPerimeter(corners, units, true,
+				drawPerimeter(corners, units, true,
 					(l, t) -> {
 						PartialParticle pp = new PartialParticle(particle, l, 1).extra(0);
 						if (finalPlayer != null) {
@@ -706,7 +706,7 @@ public class ParticleUtils {
 			@Override
 			public void run() {
 				// Pulses, starting after startDelay
-				ParticleUtils.drawPerimeter(corners, units, true,
+				drawPerimeter(corners, units, true,
 					(l, t) -> {
 						Vector direction = center.toVector().subtract(l.toVector()).normalize();
 						double speedMod = center.distance(l) / 2;
@@ -768,7 +768,7 @@ public class ParticleUtils {
 					@Override
 					public void run() {
 						// Outline always visible
-						ParticleUtils.drawPerimeter(corners, units, true,
+						drawPerimeter(corners, units, true,
 							(l, t) -> {
 								PartialParticle pp = new PartialParticle(particle, l, 1).extra(0).data(data);
 								if (finalPlayer != null) {
@@ -779,7 +779,7 @@ public class ParticleUtils {
 							}
 						);
 						// Inner shrinking rectangles
-						ParticleUtils.drawPerimeter(innerCorners, units, true,
+						drawPerimeter(innerCorners, units, true,
 							(l, t) -> {
 								PartialParticle pp = new PartialParticle(particle, l, 1).extra(0).data(data);
 								if (finalPlayer != null) {
@@ -827,7 +827,7 @@ public class ParticleUtils {
 			@Override
 			public void run() {
 				if (!hideMiddleCircle) {
-					ParticleUtils.drawRing(adjustedCenter, units, normal, radius,
+					drawRing(adjustedCenter, units, normal, radius,
 						(l, t) -> {
 							PartialParticle pp = new PartialParticle(particle, l, 1).extra(0);
 							if (finalPlayer != null) {
@@ -838,7 +838,7 @@ public class ParticleUtils {
 						}
 					);
 				}
-				ParticleUtils.drawRing(adjustedCenter, units, normal, radius,
+				drawRing(adjustedCenter, units, normal, radius,
 					(l, t) -> {
 						Vector direction = adjustedCenter.toVector().subtract(l.toVector()).normalize();
 						PartialParticle pp = new PartialParticle(particle, l, 1).extra(baseSpeed).directionalMode(true)
@@ -934,7 +934,7 @@ public class ParticleUtils {
 
 		int actualComplexity = (complexity % 2 == 0) ? complexity + 1 : complexity;
 
-		ParticleUtils.drawPreciseCurve(center, 0, Math.PI * actualComplexity * 2, thetaStep, normal.clone().normalize(),
+		drawPreciseCurve(center, 0, Math.PI * actualComplexity * 2, thetaStep, normal.clone().normalize(),
 			t -> 0,
 			t -> radius * FastUtils.cos(2.0 / (double) actualComplexity * t) * FastUtils.sin(t),
 			t -> radius * FastUtils.cos(2.0 / (double) actualComplexity * t) * FastUtils.cos(t),

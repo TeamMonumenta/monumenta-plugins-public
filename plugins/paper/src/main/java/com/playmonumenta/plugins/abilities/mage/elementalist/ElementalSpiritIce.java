@@ -70,7 +70,7 @@ public class ElementalSpiritIce extends BaseElementalSpirit {
 	protected void activate(LivingEntity target, World world, double spellDamage, ItemStatManager.PlayerItemStats playerItemStats, boolean isElementalArrows) {
 		Location centre = LocationUtils.getHalfHeightLocation(target);
 		double size = CharmManager.getRadius(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE);
-		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritIce.CHARM_DAMAGE2, spellDamage);
+		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE2, spellDamage);
 		mSpiritPulser = new BukkitRunnable() {
 			int mPulses = 1; // The current pulse for this run
 

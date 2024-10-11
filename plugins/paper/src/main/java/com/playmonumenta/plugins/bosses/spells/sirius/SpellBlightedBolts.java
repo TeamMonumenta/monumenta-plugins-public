@@ -166,9 +166,9 @@ public class SpellBlightedBolts extends Spell {
 		world.playSound(hitloc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.HOSTILE, 0.6f, 1.4f);
 		new PPExplosion(Particle.WAX_OFF, hitloc).count(20).spawnAsBoss();
 		DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Starblight Infection");
-		if (com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, SpellBlightedBolts.BLIGHTEDBOLTTAG) == null
+		if (com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, BLIGHTEDBOLTTAG) == null
 			&& com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, "BlightProtection") == null) {
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SpellBlightedBolts.BLIGHTEDBOLTTAG, new SiriusContagion(SpellBlightedBolts.BLIGHTEDBOLTCONTAGIONDURATION, SpellBlightedBolts.BLIGHTEDBOLTTAG));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, BLIGHTEDBOLTTAG, new SiriusContagion(BLIGHTEDBOLTCONTAGIONDURATION, BLIGHTEDBOLTTAG));
 		}
 	}
 }

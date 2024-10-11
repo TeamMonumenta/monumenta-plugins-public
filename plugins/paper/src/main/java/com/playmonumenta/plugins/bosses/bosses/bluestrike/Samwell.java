@@ -739,11 +739,11 @@ public class Samwell extends BossAbilityGroup {
 
 	// Get number of shards obtained.
 	public int getShards() {
-		return ScoreboardUtils.getScoreboardValue(mBoss, Samwell.OBJECTIVE_SHARD_NAME).orElse(0);
+		return ScoreboardUtils.getScoreboardValue(mBoss, OBJECTIVE_SHARD_NAME).orElse(0);
 	}
 
 	public void addShards(int amount) {
-		ScoreboardUtils.setScoreboardValue(mBoss, Samwell.OBJECTIVE_SHARD_NAME, getShards() + amount);
+		ScoreboardUtils.setScoreboardValue(mBoss, OBJECTIVE_SHARD_NAME, getShards() + amount);
 		refreshGatheringBar();
 	}
 
@@ -753,11 +753,11 @@ public class Samwell extends BossAbilityGroup {
 	}
 
 	public int getFails() {
-		return ScoreboardUtils.getScoreboardValue(mBoss, Samwell.OBJECTIVE_FAILS_NAME).orElse(0);
+		return ScoreboardUtils.getScoreboardValue(mBoss, OBJECTIVE_FAILS_NAME).orElse(0);
 	}
 
 	public void addFail() {
-		ScoreboardUtils.setScoreboardValue(mBoss, Samwell.OBJECTIVE_FAILS_NAME, getFails() + 1);
+		ScoreboardUtils.setScoreboardValue(mBoss, OBJECTIVE_FAILS_NAME, getFails() + 1);
 	}
 
 	public boolean isBossItem(ItemStack itemStack) {

@@ -44,7 +44,7 @@ public enum Slot {
 			return null;
 		}
 
-		for (Slot slot : Slot.values()) {
+		for (Slot slot : values()) {
 			if (slot.getName().replace(" ", "").equals(name.replace(" ", ""))) {
 				return slot;
 			}

@@ -221,7 +221,7 @@ public class QuiverListener implements Listener {
 											}
 										}
 									}
-									return; // why is this needed
+                                    // why is this needed
 								});
 								gui.mPlayer.playSound(gui.mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 1, 1);
 								gui.update();

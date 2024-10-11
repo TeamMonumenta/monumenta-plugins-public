@@ -62,7 +62,7 @@ public enum MonumentaContent {
 	FISHING_COMBAT("fishingcombat", ContentType.OTHER, 0);
 
 	public static final Set<Integer> ALL_CONTENT_REGION_INDEXES
-		= Arrays.stream(MonumentaContent.values())
+		= Arrays.stream(values())
 		.map(content -> content.mRegion)
 		.collect(Collectors.toSet());
 
@@ -92,7 +92,7 @@ public enum MonumentaContent {
 		if (label == null) {
 			return null;
 		}
-		for (MonumentaContent selection : MonumentaContent.values()) {
+		for (MonumentaContent selection : values()) {
 			if (selection.getLabel().equals(label)) {
 				return selection;
 			}

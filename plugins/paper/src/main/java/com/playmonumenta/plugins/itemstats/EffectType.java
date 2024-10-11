@@ -299,7 +299,7 @@ public enum EffectType {
 		String text;
 		boolean includeTime = true;
 
-		if (effectType == EffectType.STARVATION) {
+		if (effectType == STARVATION) {
 			text = effectType.mName + " " + StringUtils.toRoman((int) strength);
 			includeTime = false;
 		} else if (effectType.isConstant()) {

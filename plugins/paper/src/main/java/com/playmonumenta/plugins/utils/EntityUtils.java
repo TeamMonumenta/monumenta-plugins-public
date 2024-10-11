@@ -445,7 +445,7 @@ public class EntityUtils {
 	}
 
 	public static @Nullable LivingEntity getHostileEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
-		Predicate<Entity> hostileFilter = e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid();
+		Predicate<Entity> hostileFilter = e -> isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid();
 		if (filter != null) {
 			hostileFilter = hostileFilter.and(filter);
 		}
@@ -778,7 +778,7 @@ public class EntityUtils {
 			if (unluck != null) {
 				double vulnLevel = 1 + unluck.getAmplifier();
 
-				if (EntityUtils.isBoss(target)) {
+				if (isBoss(target)) {
 					vulnLevel = vulnLevel / 2;
 				}
 
@@ -849,7 +849,7 @@ public class EntityUtils {
 			if (ampLvl > ampCap) {
 				ampLvl = (int) Math.max(ampCap, Math.floor(getVulnAmount(plugin, en) * 10));
 			}
-			applyVulnerability(plugin, EntityUtils.getVulnTicks(plugin, en), ampLvl * 0.1, en);
+			applyVulnerability(plugin, getVulnTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -907,7 +907,7 @@ public class EntityUtils {
 			if (ampLvl > ampCap) {
 				ampLvl = Math.max(ampCap, getBleedLevel(plugin, en));
 			}
-			applyBleed(plugin, EntityUtils.getBleedTicks(plugin, en), ampLvl * 0.1, en);
+			applyBleed(plugin, getBleedTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -968,7 +968,7 @@ public class EntityUtils {
 			if (ampLvl > ampCap) {
 				ampLvl = (int) Math.max(ampCap, Math.floor(getSlowAmount(plugin, en) * 10));
 			}
-			applySlow(plugin, EntityUtils.getSlowTicks(plugin, en), ampLvl * 0.1, en);
+			applySlow(plugin, getSlowTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -1067,7 +1067,7 @@ public class EntityUtils {
 			if (ampLvl > ampCap) {
 				ampLvl = (int) Math.max(ampCap, Math.floor(getWeakenAmount(plugin, en) * 10));
 			}
-			applyWeaken(plugin, EntityUtils.getWeakenTicks(plugin, en), ampLvl * 0.1, en);
+			applyWeaken(plugin, getWeakenTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -1649,18 +1649,18 @@ public class EntityUtils {
 	 * Changes the size on a slime (or magma cube) or phantom without changing its current health, max health, damage, or armor
 	 */
 	public static void setSize(LivingEntity entity, int size) {
-		double maxHealthBase = EntityUtils.getAttributeBaseOrDefault(entity, Attribute.GENERIC_MAX_HEALTH, 0);
-		double atkDamage = EntityUtils.getAttributeBaseOrDefault(entity, Attribute.GENERIC_ATTACK_DAMAGE, 0);
-		double armor = EntityUtils.getAttributeBaseOrDefault(entity, Attribute.GENERIC_ARMOR, 0);
+		double maxHealthBase = getAttributeBaseOrDefault(entity, Attribute.GENERIC_MAX_HEALTH, 0);
+		double atkDamage = getAttributeBaseOrDefault(entity, Attribute.GENERIC_ATTACK_DAMAGE, 0);
+		double armor = getAttributeBaseOrDefault(entity, Attribute.GENERIC_ARMOR, 0);
 		double currentHealth = entity.getHealth();
 		if (entity instanceof Slime slime) {
 			slime.setSize(size);
 		} else if (entity instanceof Phantom phantom) {
 			phantom.setSize(size);
 		}
-		EntityUtils.setAttributeBase(entity, Attribute.GENERIC_MAX_HEALTH, maxHealthBase);
-		EntityUtils.setAttributeBase(entity, Attribute.GENERIC_ATTACK_DAMAGE, atkDamage);
-		EntityUtils.setAttributeBase(entity, Attribute.GENERIC_ARMOR, armor);
+		setAttributeBase(entity, Attribute.GENERIC_MAX_HEALTH, maxHealthBase);
+		setAttributeBase(entity, Attribute.GENERIC_ATTACK_DAMAGE, atkDamage);
+		setAttributeBase(entity, Attribute.GENERIC_ARMOR, armor);
 		entity.setHealth(currentHealth);
 	}
 
@@ -1740,7 +1740,7 @@ public class EntityUtils {
 		Bukkit.getPluginManager().callEvent(event);
 		if (!event.isCancelled()) {
 			double oldHealth = mob.getHealth();
-			double newHealth = Math.min(oldHealth + event.getAmount(), EntityUtils.getMaxHealth(mob));
+			double newHealth = Math.min(oldHealth + event.getAmount(), getMaxHealth(mob));
 			mob.setHealth(newHealth);
 
 			return newHealth - oldHealth;

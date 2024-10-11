@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -85,7 +86,7 @@ public class SundialSlash extends Spell {
 			}
 		};
 		mActiveRunnables.add(runnable);
-		runnable.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, PERIOD);
+		runnable.runTaskTimer(Plugin.getInstance(), 0, PERIOD);
 	}
 
 	private List<BoundingBox> cone(Location bossLoc, double yaw, double degree, double mDeg, double r) {

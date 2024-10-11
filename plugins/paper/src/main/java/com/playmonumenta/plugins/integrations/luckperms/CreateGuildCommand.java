@@ -49,20 +49,6 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_GUILD_NAME_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_HOVER_PREFIX_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_ROOT_COLOR_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_ROOT_ID_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_ROOT_PLAIN_TAG_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_MEMBER_ROOT_PLOT_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_COLOR_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_ID_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_NAME_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_PLAIN_TAG_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_PLOT_MK;
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_ROOT_TAG_MK;
-import static com.playmonumenta.plugins.utils.MessagingUtils.ESCAPED_TEXT_COLOR_SUGGESTIONS;
-
 public class CreateGuildCommand {
 	private static final String[] SUGGESTIONS = {"@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13,gamemode=!spectator]"};
 
@@ -77,7 +63,7 @@ public class CreateGuildCommand {
 		arguments.add(new TextArgument("guild name")
 			.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS));
 		arguments.add(new TextArgument("guild color")
-			.replaceSuggestions(ESCAPED_TEXT_COLOR_SUGGESTIONS));
+			.replaceSuggestions(MessagingUtils.ESCAPED_TEXT_COLOR_SUGGESTIONS));
 		arguments.add(new TextArgument("guild tag")
 			.replaceSuggestions(GuildArguments.TAG_SUGGESTIONS));
 		arguments.add(new EntitySelectorArgument.ManyPlayers("founders")
@@ -207,12 +193,12 @@ public class CreateGuildCommand {
 			// Create root node (used for frozen state and accessing guild info; not used for player's guild)
 			Group guildRootGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildRootGroupId).join();
 			NodeMap guildRootGroupData = guildRootGroup.data();
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_ID_MK, guildRootGroupId).build());
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_PLOT_MK, String.valueOf(guildPlot)).build());
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_COLOR_MK, guildColor.asHexString()).build());
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_PLAIN_TAG_MK, guildTag).build());
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_TAG_MK, guildTagPrefix).build());
-			guildRootGroupData.add(MetaNode.builder(GUILD_ROOT_NAME_MK, guildName).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_ID_MK, guildRootGroupId).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_PLOT_MK, String.valueOf(guildPlot)).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_COLOR_MK, guildColor.asHexString()).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_PLAIN_TAG_MK, guildTag).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_TAG_MK, guildTagPrefix).build());
+			guildRootGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_ROOT_NAME_MK, guildName).build());
 			LuckPermsIntegration.GM.saveGroup(guildRootGroup).join();
 			LuckPermsIntegration.setGuildBanner(sender, guildRootGroup, plugin, guildBanner, true);
 
@@ -233,13 +219,13 @@ public class CreateGuildCommand {
 			Group guildMemberGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildMemberGroupId).join();
 			NodeMap guildMemberGroupData = guildMemberGroup.data();
 			guildMemberGroupData.add(InheritanceNode.builder(guildGuestGroup).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_ROOT_ID_MK, guildRootGroupId).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_ROOT_PLOT_MK, String.valueOf(guildPlot)).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_ROOT_COLOR_MK, guildColor.asHexString()).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_ROOT_PLAIN_TAG_MK, guildTag).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_ROOT_ID_MK, guildRootGroupId).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_ROOT_PLOT_MK, String.valueOf(guildPlot)).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_ROOT_COLOR_MK, guildColor.asHexString()).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_ROOT_PLAIN_TAG_MK, guildTag).build());
 			guildMemberGroupData.add(PrefixNode.builder(guildTagPrefix, 1).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_HOVER_PREFIX_MK, guildName).build());
-			guildMemberGroupData.add(MetaNode.builder(GUILD_MEMBER_GUILD_NAME_MK, guildName).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_HOVER_PREFIX_MK, guildName).build());
+			guildMemberGroupData.add(MetaNode.builder(LuckPermsIntegration.GUILD_MEMBER_GUILD_NAME_MK, guildName).build());
 
 			Group guildManagerGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildManagerGroupId).join();
 			NodeMap guildManagerGroupData = guildManagerGroup.data();

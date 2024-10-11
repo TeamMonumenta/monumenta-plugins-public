@@ -18,19 +18,13 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-
-import static org.bukkit.inventory.EquipmentSlot.CHEST;
-import static org.bukkit.inventory.EquipmentSlot.FEET;
-import static org.bukkit.inventory.EquipmentSlot.HAND;
-import static org.bukkit.inventory.EquipmentSlot.HEAD;
-import static org.bukkit.inventory.EquipmentSlot.LEGS;
-import static org.bukkit.inventory.EquipmentSlot.OFF_HAND;
 
 public class GongFinisher implements EliteFinisher {
 
@@ -94,12 +88,7 @@ public class GongFinisher implements EliteFinisher {
 					player.setRotation(eyeLocation.getYaw(), 0);
 					player.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 					player.setBasePlate(false);
-					player.addDisabledSlots(HAND);
-					player.addDisabledSlots(OFF_HAND);
-					player.addDisabledSlots(FEET);
-					player.addDisabledSlots(LEGS);
-					player.addDisabledSlots(CHEST);
-					player.addDisabledSlots(HEAD);
+					player.addDisabledSlots(EquipmentSlot.values());
 					player.setArms(true);
 					ItemStack head = new ItemStack(Material.PLAYER_HEAD);
 					SkullMeta meta = (SkullMeta) head.getItemMeta();

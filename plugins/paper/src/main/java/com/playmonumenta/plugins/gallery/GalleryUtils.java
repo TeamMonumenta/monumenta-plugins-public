@@ -72,7 +72,7 @@ public class GalleryUtils {
 		if (count <= 1) {
 			return;
 		}
-		EntityUtils.scaleMaxHealth(mob, GalleryUtils.getHealthScaleForPlayerCount(count), "GalleryHealthScalePlayers");
+		EntityUtils.scaleMaxHealth(mob, getHealthScaleForPlayerCount(count), "GalleryHealthScalePlayers");
 	}
 
 	public static double getHealthScaleForLevel(int round) {
@@ -89,9 +89,9 @@ public class GalleryUtils {
 		if (round <= STARTING_ROUND_FOR_SCALING) {
 			return 0;
 		} else if (round <= STARTING_ROUND_FOR_SCALING_HARDER) {
-			return (round - GalleryUtils.STARTING_ROUND_FOR_SCALING) * 0.1;
+			return (round - STARTING_ROUND_FOR_SCALING) * 0.1;
 		} else {
-			return (GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER - GalleryUtils.STARTING_ROUND_FOR_SCALING) * 0.1 + (round - GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER) * 0.2;
+			return (STARTING_ROUND_FOR_SCALING_HARDER - STARTING_ROUND_FOR_SCALING) * 0.1 + (round - STARTING_ROUND_FOR_SCALING_HARDER) * 0.2;
 		}
 	}
 

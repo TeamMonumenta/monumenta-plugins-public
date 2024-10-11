@@ -492,7 +492,7 @@ public enum CharmEffects {
 	}
 
 	public static @Nullable CharmEffects getEffect(String effectName) {
-		for (CharmEffects ce : CharmEffects.values()) {
+		for (CharmEffects ce : values()) {
 			if (ce.mEffectName.equals(effectName)) {
 				return ce;
 			}

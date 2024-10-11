@@ -48,31 +48,31 @@ public class DamageEvent extends Event implements Cancellable {
 			// List every cause for completeness
 			switch (cause) {
 				case ENTITY_ATTACK:
-					return DamageType.MELEE;
+					return MELEE;
 				case ENTITY_SWEEP_ATTACK:
-					return DamageType.MELEE_ENCH;
+					return MELEE_ENCH;
 				case PROJECTILE:
-					return DamageType.PROJECTILE;
+					return PROJECTILE;
 				case DRAGON_BREATH:
 				case MAGIC:
-					return DamageType.MAGIC;
+					return MAGIC;
 				case THORNS:
-					return DamageType.THORNS;
+					return THORNS;
 				case BLOCK_EXPLOSION:
 				case ENTITY_EXPLOSION:
-					return DamageType.BLAST;
+					return BLAST;
 				case FIRE:
 				case FIRE_TICK:
 				case HOT_FLOOR:
 				case LAVA:
-					return DamageType.FIRE;
+					return FIRE;
 				case FALL:
 				case FLY_INTO_WALL:
-					return DamageType.FALL;
+					return FALL;
 				case POISON:
-					return DamageType.POISON;
+					return POISON;
 				case WITHER:
-					return DamageType.AILMENT;
+					return AILMENT;
 				case CONTACT:
 				case CRAMMING:
 				case CUSTOM:
@@ -83,12 +83,12 @@ public class DamageEvent extends Event implements Cancellable {
 				case MELTING:
 				case STARVATION:
 				case SUFFOCATION:
-					return DamageType.OTHER;
+					return OTHER;
 				case VOID:
 				case SUICIDE:
-					return DamageType.TRUE;
+					return TRUE;
 				default:
-					return DamageType.OTHER;
+					return OTHER;
 			}
 		}
 
@@ -115,7 +115,7 @@ public class DamageEvent extends Event implements Cancellable {
 		}
 
 		public static EnumSet<DamageType> getEnumSet() {
-			return EnumSet.copyOf(List.of(DamageType.values()));
+			return EnumSet.copyOf(List.of(values()));
 		}
 
 		public static EnumSet<DamageType> getScalableDamageType() {
@@ -125,23 +125,23 @@ public class DamageEvent extends Event implements Cancellable {
 		}
 
 		public static EnumSet<DamageType> getUnscalableDamageType() {
-			return EnumSet.of(DamageType.AILMENT, DamageType.POISON, DamageType.FALL, DamageType.OTHER, DamageType.TRUE);
+			return EnumSet.of(AILMENT, POISON, FALL, OTHER, TRUE);
 		}
 
 		public static EnumSet<DamageType> getAllMeleeTypes() {
-			return EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
+			return EnumSet.of(MELEE, MELEE_ENCH, MELEE_SKILL);
 		}
 
 		public static EnumSet<DamageType> getAllProjectileTypes() {
-			return EnumSet.of(DamageType.PROJECTILE, DamageType.PROJECTILE_SKILL);
+			return EnumSet.of(PROJECTILE, PROJECTILE_SKILL);
 		}
 
 		public static ParseResult<DamageType> fromReader(StringReader reader, String hoverDescription) {
-			DamageType type = reader.readEnum(DamageType.values());
+			DamageType type = reader.readEnum(values());
 			if (type == null) {
-				List<Tooltip<String>> suggArgs = new ArrayList<>(DamageType.values().length);
+				List<Tooltip<String>> suggArgs = new ArrayList<>(values().length);
 				String soFar = reader.readSoFar();
-				for (DamageType valid : DamageType.values()) {
+				for (DamageType valid : values()) {
 					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 				}
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));

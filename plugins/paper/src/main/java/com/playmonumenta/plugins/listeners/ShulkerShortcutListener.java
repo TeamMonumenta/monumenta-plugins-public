@@ -57,8 +57,8 @@ import org.jetbrains.annotations.Nullable;
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to
  * Allow players to access Shulker Boxes without being placed first.
  *
- * @see com.playmonumenta.plugins.inventories.ShulkerInventoryManager
- * @see com.playmonumenta.plugins.inventories.ShulkerInventory
+ * @see ShulkerInventoryManager
+ * @see ShulkerInventory
  */
 public class ShulkerShortcutListener implements Listener {
 	private static final Permission PERMISSION = new Permission("monumenta.feature.shulkershortcut");

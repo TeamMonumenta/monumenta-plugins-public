@@ -68,12 +68,12 @@ public enum Tier {
 	}
 
 	public static Tier getTier(String name) {
-		for (Tier tier : Tier.values()) {
+		for (Tier tier : values()) {
 			if (tier.getName().equals(name)) {
 				return tier;
 			}
 		}
 
-		return Tier.NONE;
+		return NONE;
 	}
 }

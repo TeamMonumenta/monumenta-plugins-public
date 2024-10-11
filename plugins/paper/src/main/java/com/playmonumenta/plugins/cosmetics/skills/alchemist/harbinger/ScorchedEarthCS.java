@@ -76,7 +76,7 @@ public class ScorchedEarthCS implements CosmeticSkill {
 		Location loc = entity.getLocation().clone().add(0, 1, 0);
 		new PartialParticle(Particle.FLAME, loc, 5, 0.25, 0.5, 0.25, 0.05).spawnAsPlayerActive(alchemist);
 		new PartialParticle(Particle.REDSTONE, loc, 15, 0.35, 0.5, 0.35,
-				new Particle.DustOptions(ScorchedEarthCS.SCORCHED_EARTH_COLOR_DARK, 1.0f)).spawnAsPlayerActive(alchemist);
+				new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f)).spawnAsPlayerActive(alchemist);
 		new PartialParticle(Particle.LAVA, loc, 3, 0.25, 0.5, 0.25, 0).spawnAsPlayerActive(alchemist);
 	}
 

@@ -274,7 +274,7 @@ public class AbilityUtils {
 	}
 
 	public static int getClassNum(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
+		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0);
 	}
 
 	public static String getClass(Player player) {
@@ -310,11 +310,11 @@ public class AbilityUtils {
 	}
 
 	public static boolean isClassless(Player player) {
-		return AbilityUtils.getClassNum(player) == 0;
+		return getClassNum(player) == 0;
 	}
 
 	public static int getSpecNum(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
+		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0);
 	}
 
 	public static String getSpec(Player player) {

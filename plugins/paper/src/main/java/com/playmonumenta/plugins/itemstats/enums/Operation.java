@@ -30,7 +30,7 @@ public enum Operation {
 			return null;
 		}
 
-		for (Operation operation : Operation.values()) {
+		for (Operation operation : values()) {
 			if (operation.getName().replace(" ", "").equals(name.replace(" ", ""))) {
 				return operation;
 			}

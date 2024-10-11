@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -55,7 +56,7 @@ public class SpellRagingRoots extends Spell {
 		this.mSpeed = mSpeed;
 		this.mBoltDuration = mBoltDuration;
 		this.mSpawnLoc = spawnLoc;
-		mChargeUp = new ChargeUpManager(boss, castTime, net.kyori.adventure.text.Component.text("Channeling ", NamedTextColor.GOLD).append(net.kyori.adventure.text.Component.text(ABILITY_NAME, NamedTextColor.YELLOW)), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, mRange * 2);
+		mChargeUp = new ChargeUpManager(boss, castTime, Component.text("Channeling ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, mRange * 2);
 	}
 
 	@Override

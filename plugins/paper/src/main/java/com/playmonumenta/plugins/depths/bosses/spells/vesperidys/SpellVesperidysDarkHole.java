@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -202,7 +203,7 @@ public class SpellVesperidysDarkHole extends Spell {
 					core.getEquipment().setHelmet(new ItemStack(Material.SEA_LANTERN));
 					core.addScoreboardTag(DARK_HOLE_CORE_TAG);
 
-					ChargeUpManager darkHoleChargeUp = new ChargeUpManager(mBoss, mDarkHoleTicks, Component.text("Casting", NamedTextColor.GREEN).append(Component.text(" Dark Hole...", NamedTextColor.GRAY, TextDecoration.BOLD)), net.kyori.adventure.bossbar.BossBar.Color.BLUE, net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_10, 100);
+					ChargeUpManager darkHoleChargeUp = new ChargeUpManager(mBoss, mDarkHoleTicks, Component.text("Casting", NamedTextColor.GREEN).append(Component.text(" Dark Hole...", NamedTextColor.GRAY, TextDecoration.BOLD)), BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, 100);
 
 					BukkitRunnable darkHoleChargeRunnable = new BukkitRunnable() {
 						int mTicksDarkHoleCharge = 0;

@@ -61,7 +61,7 @@ public class MarketManager {
 
 	public static void reloadConfig() {
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			MarketManager instance = MarketManager.getInstance();
+			MarketManager instance = getInstance();
 			String json = null;
 			try {
 				json = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/market.json");
@@ -78,7 +78,7 @@ public class MarketManager {
 	}
 
 	public static MarketConfig getConfig() {
-		return MarketManager.getInstance().mConfig;
+		return getInstance().mConfig;
 	}
 
 	public static boolean claimClaimable(Player player, long id) {
@@ -257,7 +257,7 @@ public class MarketManager {
 			error = "You are currently banned from the player market. Contact a moderator if you believe this is wrong, or for an appeal.";
 		} else if (!player.hasPermission("monumenta.marketaccess")) {
 			error = "You do not have market access. Try again later, or contact a moderator if you believe this is not normal.";
-		} else if (!MarketManager.getInstance().mConfig.mIsMarketOpen) {
+		} else if (!getInstance().mConfig.mIsMarketOpen) {
 			error = "Market is currently closed.";
 		}
 
@@ -321,7 +321,7 @@ public class MarketManager {
 		}
 
 		for (Long id : unmetIDs) {
-			MarketManager.getInstance().unlinkListingFromPlayerData(player, id);
+			getInstance().unlinkListingFromPlayerData(player, id);
 		}
 	}
 
@@ -548,7 +548,7 @@ public class MarketManager {
 	public void addNewListing(Player player, ItemStack itemToSell, int itemsPerTrade, int amountOfTrades, int pricePerTrade, ItemStack currencyItemStack, WalletUtils.Debt taxDebt) {
 
 		// check that the item about to be sold is actually sellable
-		List<String> errorMessages = MarketManager.itemIsSellable(player, itemToSell, currencyItemStack);
+		List<String> errorMessages = itemIsSellable(player, itemToSell, currencyItemStack);
 		if (!errorMessages.isEmpty()) {
 			for (String message : errorMessages) {
 				player.sendMessage(Component.text("Something went wrong: " + message + ". listing creation cancelled", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
@@ -581,7 +581,7 @@ public class MarketManager {
 			AuditListener.logMarket("!ERROR! Player " + player.getName() + "needs a " + taxDebt.mTotalRequiredAmount + "*" + ItemUtils.getPlainName(taxDebt.mItem) + "tax refund, because the listing failed to be created in redis");
 			return;
 		}
-		MarketManager.getInstance().linkListingToPlayerData(player, createdListing.getId());
+		getInstance().linkListingToPlayerData(player, createdListing.getId());
 		MarketAudit.logCreate(player, createdListing, taxDebt);
 	}
 
@@ -701,7 +701,7 @@ public class MarketManager {
 		}
 		// at this point, we should have the most decompressed possible currency, with an appropriately scaled amount
 		// apply tax rate
-		famount = Math.ceil(famount * MarketManager.getConfig().mBazaarTaxRate);
+		famount = Math.ceil(famount * getConfig().mBazaarTaxRate);
 
 		// calculate the debt
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currencyItem.asQuantity((int)famount), player, true);
@@ -795,7 +795,7 @@ public class MarketManager {
 		for (MarketListing listing : listings) {
 			if (player.getUniqueId().toString().equals(listing.getOwnerUUID())) {
 				MarketAudit.logManualLinking(player, listing.getId());
-				MarketManager.getInstance().linkListingToPlayerData(player, listing.getId());
+				getInstance().linkListingToPlayerData(player, listing.getId());
 			}
 		}
 

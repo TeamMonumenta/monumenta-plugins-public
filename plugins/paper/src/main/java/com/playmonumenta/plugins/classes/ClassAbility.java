@@ -297,7 +297,7 @@ public enum ClassAbility {
 	}
 
 	public static @Nullable ClassAbility getAbility(String name) {
-		for (ClassAbility ability : ClassAbility.values()) {
+		for (ClassAbility ability : values()) {
 			if (ability.getName().equals(name)) {
 				return ability;
 			}

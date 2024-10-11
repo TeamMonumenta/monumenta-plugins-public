@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.io.File;
+import java.time.Instant;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -404,7 +405,7 @@ public class DepthsUtils {
 		}
 
 		String playerId = dp.mPlayerId.toString();
-		long timestamp = java.time.Instant.now().getEpochSecond();
+		long timestamp = Instant.now().getEpochSecond();
 		String fileName = path + File.separator + playerId + " - " + timestamp + ".json";
 		// Player data inside the json
 		JsonObject json = new JsonObject();

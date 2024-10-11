@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * This class allows Shulker Boxes to be opened directly from inventories,
  * without needing to place them on the ground first.
  *
- * @see com.playmonumenta.plugins.inventories.ShulkerInventory
+ * @see ShulkerInventory
  */
 public class ShulkerInventoryManager {
 	private static final Component ERROR_SHULKER_LOCKED = Component.text("This shulker is locked", NamedTextColor.RED);

@@ -101,7 +101,7 @@ public class CustomContainerItemManager implements Listener {
 				if (playerModified == null) {
 					continue;
 				}
-				long tempAmount = playerModified.getLong(CustomContainerItemManager.AMOUNT_KEY);
+				long tempAmount = playerModified.getLong(AMOUNT_KEY);
 				amount += tempAmount;
 			}
 			addLore.accept(Component.text("Contains ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)

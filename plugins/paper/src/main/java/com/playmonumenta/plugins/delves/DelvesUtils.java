@@ -232,7 +232,7 @@ public class DelvesUtils {
 					Collections.shuffle(mods);
 					DelvesModifier mod = mods.get(0);
 					int oldValue = info.get(mod);
-					if (oldValue == DelvesUtils.getMaxPointAssignable(mod, oldValue + 1)) {
+					if (oldValue == getMaxPointAssignable(mod, oldValue + 1)) {
 						mods.remove(mod);
 						continue;
 					}
@@ -330,7 +330,7 @@ public class DelvesUtils {
 				Collections.shuffle(mods);
 				DelvesModifier mod = mods.get(0);
 				int oldValue = info.get(mod);
-				if (oldValue == DelvesUtils.getMaxPointAssignable(mod, oldValue + 1)) {
+				if (oldValue == getMaxPointAssignable(mod, oldValue + 1)) {
 					mods.remove(mod);
 					continue;
 				}

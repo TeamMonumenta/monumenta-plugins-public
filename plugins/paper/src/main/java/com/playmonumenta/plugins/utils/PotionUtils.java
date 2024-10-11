@@ -156,12 +156,7 @@ public class PotionUtils {
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
-		                  boolean showParticles, boolean showIcon) {
-			this(type, duration, amplifier, ambient, showParticles, showIcon, 0);
-		}
-
-		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
-						  boolean showParticles, boolean showIcon, int heavenlyBoonExtensions) {
+						  boolean showParticles, boolean showIcon) {
 			mType = type;
 			mDuration = duration;
 			mAmplifier = amplifier;
@@ -256,7 +251,7 @@ public class PotionUtils {
 
 		PotionData data = meta.getBasePotionData();
 		if (data != null) {
-			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data, 1);
+			PotionUtils.PotionInfo info = getPotionInfo(data, 1);
 			if (info != null) {
 				PotionEffect effect = new PotionEffect(info.mType, info.mDuration, info.mAmplifier, info.mAmbient,
 						info.mShowParticles);
@@ -395,7 +390,9 @@ public class PotionUtils {
 		//Do not run if null to avoid NullPointerException
 		if (meta == null) {
 			return;
-		} else if (meta.hasCustomEffects()) {
+		}
+
+		if (meta.hasCustomEffects()) {
 			for (PotionEffect effect : meta.getCustomEffects()) {
 				if (effect.getType() != null) {
 					if (effect.getType().equals(PotionEffectType.HARM)) {
@@ -414,7 +411,7 @@ public class PotionUtils {
 				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 			}
 		} else {
-			PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
+			PotionInfo info = getPotionInfo(meta.getBasePotionData(), 1);
 
 			//If instant healing, manually add health, otherwise if instant damage, manually remove health, else add effect
 			//Check then add health

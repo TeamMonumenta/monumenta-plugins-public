@@ -160,11 +160,11 @@ public class DamageUtils {
 			amountFinal = amount * (1 - 0.25 * plugin.mItemStatManager.getEnchantmentLevel((Player) damager, EnchantmentType.WORLDLY_PROTECTION));
 		}
 
-		DamageUtils.nextEventMetadata = metadata;
+		nextEventMetadata = metadata;
 		try {
 			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amountFinal, blockable, metadata.getBossSpellName());
 		} finally {
-			DamageUtils.nextEventMetadata = null;
+			nextEventMetadata = null;
 
 			if (bypassIFrames) {
 				damagee.setNoDamageTicks(originalIFrames);

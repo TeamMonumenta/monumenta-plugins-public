@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
 import io.papermc.paper.adventure.PaperAdventure;
+import io.papermc.paper.util.CollisionUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,9 +32,11 @@ import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
+import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -458,7 +461,7 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 
 	@Override
 	public boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks, Predicate<Material> checkedTypes) {
-		return io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
+		return CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
 			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), null, loadChunks, false, false, true,
 			(state, pos) -> checkedTypes.test(state.getBukkitMaterial()));
 	}
@@ -466,7 +469,7 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 	@Override
 	public Set<Block> getCollidingBlocks(World world, BoundingBox aabb, boolean loadChunks) {
 		List<AABB> collisions = new ArrayList<>();
-		io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
+		CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
 			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), collisions, loadChunks, false, false, false,
 			(state, pos) -> state.getBukkitMaterial() != Material.SCAFFOLDING);
 		Set<Block> result = new HashSet<>();
@@ -571,8 +574,8 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 		// prevent all mobs from attacking iron golems and turtles
 		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 			&& (getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.IronGolem.class
-			|| getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.Turtle.class
-			|| getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.npc.AbstractVillager.class));
+			|| getNearestAttackableTargetGoalTargetType(natg) == Turtle.class
+			|| getNearestAttackableTargetGoalTargetType(natg) == AbstractVillager.class));
 	}
 
 	@Override

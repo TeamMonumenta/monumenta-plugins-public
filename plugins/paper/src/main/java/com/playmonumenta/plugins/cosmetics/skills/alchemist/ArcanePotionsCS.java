@@ -49,7 +49,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		return NAME;
 	}
 
-	private Symbol mLastSymbol = ArcanePotionsCS.PHLOGISTON;
+	private Symbol mLastSymbol = PHLOGISTON;
 
 	@Override
 	public void effectsOnSplash(Player player, Location loc, boolean isGruesome, double radius, boolean isSpecialPot) {

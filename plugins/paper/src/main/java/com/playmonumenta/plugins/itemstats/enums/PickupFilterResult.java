@@ -58,7 +58,7 @@ public enum PickupFilterResult {
 			}
 
 			String tagValue = pickupTag.getString(PICKUP_FILTER_TAG);
-			for (PickupFilterResult result : PickupFilterResult.values()) {
+			for (PickupFilterResult result : values()) {
 				if (result.mId.equals(tagValue)) {
 					return result;
 				}
@@ -72,19 +72,19 @@ public enum PickupFilterResult {
 		// Rules for every other item
 		Tier tier = ItemStatUtils.getTier(item);
 		if (!JunkItemListener.IGNORED_TIERS.contains(tier) || ItemUtils.isQuestItem(item) || InventoryUtils.containsSpecialLore(item)) {
-			return PickupFilterResult.TIERED;
+			return TIERED;
 		}
 
 		boolean hasLore = ItemUtils.hasLore(item);
 		boolean isInteresting = ItemUtils.isInteresting(item);
 		if (hasLore && isInteresting) {
-			return PickupFilterResult.LORE_AND_INTERESTING;
+			return LORE_AND_INTERESTING;
 		} else if (hasLore) {
-			return PickupFilterResult.LORE;
+			return LORE;
 		} else if (isInteresting) {
-			return PickupFilterResult.INTERESTING;
+			return INTERESTING;
 		} else {
-			return PickupFilterResult.COUNT;
+			return COUNT;
 		}
 	}
 

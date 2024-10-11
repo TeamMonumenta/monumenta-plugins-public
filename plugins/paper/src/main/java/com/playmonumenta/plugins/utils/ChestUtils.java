@@ -231,7 +231,7 @@ public class ChestUtils {
 				}
 
 				// Put the remainder of the loot in the original container
-				ChestUtils.generateLootInventory(itemsForOrigContainer, inventory, player, true);
+				generateLootInventory(itemsForOrigContainer, inventory, player, true);
 
 				// warning on build server
 				if (!Plugin.IS_PLAY_SERVER) {

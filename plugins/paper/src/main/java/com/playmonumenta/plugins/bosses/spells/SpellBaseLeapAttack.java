@@ -212,7 +212,6 @@ public class SpellBaseLeapAttack extends Spell {
 						// Still hasn't reached the leap point after half the cooldown elapsed, so cancel leap
 						if (mTime > mCooldown / 2) {
 							this.cancel();
-							return;
 						}
 					}
 				} else {

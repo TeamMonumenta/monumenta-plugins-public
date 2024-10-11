@@ -237,7 +237,7 @@ public enum MarketListingIndex {
 
 		StringBuilder sb = new StringBuilder();
 
-		for (MarketListingIndex index : MarketListingIndex.values()) {
+		for (MarketListingIndex index : values()) {
 			sb.append("For ").append(index.toString()).append(":\n");
 			sb.append(index.dumpIndexContents());
 		}
@@ -265,7 +265,7 @@ public enum MarketListingIndex {
 
 		// init
 		HashMap<MarketListingIndex, HashMap<String, ArrayList<Long>>> indexValuesMap = new HashMap<>();
-		for (MarketListingIndex index : MarketListingIndex.values()) {
+		for (MarketListingIndex index : values()) {
 			indexValuesMap.put(index, new HashMap<>());
 		}
 
@@ -294,7 +294,7 @@ public enum MarketListingIndex {
 				}
 
 				// store index data from listing
-				for (MarketListingIndex index : MarketListingIndex.values()) {
+				for (MarketListingIndex index : values()) {
 
 					// skip if listing does not match index
 					if (!index.mMatchMethod.apply(listing)) {
@@ -316,7 +316,7 @@ public enum MarketListingIndex {
 			// now, every new index values should be in local memory
 			// push it to redis
 
-			for (MarketListingIndex index : MarketListingIndex.values()) {
+			for (MarketListingIndex index : values()) {
 				// delete the old values
 				RedisAPI.getInstance().sync().del(index.mRedisPath);
 
@@ -363,7 +363,7 @@ public enum MarketListingIndex {
 	public static List<MarketListingIndex> getAllPlayerSelectable() {
 		List<MarketListingIndex> out = new ArrayList<>();
 
-		for (MarketListingIndex idx : MarketListingIndex.values()) {
+		for (MarketListingIndex idx : values()) {
 			if (idx.isPlayerSelectable()) {
 				out.add(idx);
 			}

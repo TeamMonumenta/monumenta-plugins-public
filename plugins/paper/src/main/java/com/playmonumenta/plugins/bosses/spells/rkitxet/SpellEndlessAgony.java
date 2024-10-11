@@ -112,7 +112,6 @@ public class SpellEndlessAgony extends Spell {
 					mRKitxet.setAgonyTarget(null);
 					mChargeUp.reset();
 					this.cancel();
-					return;
 				}
 			}
 

@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.plugins.utils.WalletUtils;
+import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.components.QuestActions;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
@@ -71,25 +72,25 @@ public class CustomTradeGui extends Gui {
 	// Options:
 	// Note: mPeb_tradeGUI_main & mPeb_tradeGUI_locked are also scoreboards, but not tested in here.
 	// THEME: 0: classic. 1: sleek.
-	private final int mPebTradeGUITheme = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.THEME).orElse(0);
+	private final int mPebTradeGUITheme = ScoreboardUtils.getScoreboardValue(mPlayer, THEME).orElse(0);
 	// SPACING: 0: auto. 1: force 16. 2: force 28.
-	private final int mPebTradeGUISpacing = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SPACING).orElse(0);
+	private final int mPebTradeGUISpacing = ScoreboardUtils.getScoreboardValue(mPlayer, SPACING).orElse(0);
 	// PREVIEWDISPLAY: 0: display price on preview. 1: dont.
-	private final int mPebTradeGUIPreviewDisplay = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PREVIEWDISPLAY).orElse(0);
+	private final int mPebTradeGUIPreviewDisplay = ScoreboardUtils.getScoreboardValue(mPlayer, PREVIEWDISPLAY).orElse(0);
 	// TRADEORG: 0: split trades by type. 1: dont.
-	private final int mPebTradeGUITradeOrg = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.TRADEORG).orElse(0);
+	private final int mPebTradeGUITradeOrg = ScoreboardUtils.getScoreboardValue(mPlayer, TRADEORG).orElse(0);
 	// CONFIRM: 0: bring up confirm menu. 1: dont.
-	private final int mPebTradeGUIConfirm = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.CONFIRM).orElse(0);
+	private final int mPebTradeGUIConfirm = ScoreboardUtils.getScoreboardValue(mPlayer, CONFIRM).orElse(0);
 	// QUICKBUY: 0: shift click on preview trade to buy 1. 1: disabled.
-	private final int mPebTradeGUIQuickBuy = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.QUICKBUY).orElse(0);
+	private final int mPebTradeGUIQuickBuy = ScoreboardUtils.getScoreboardValue(mPlayer, QUICKBUY).orElse(0);
 	// SUCCESS: 0: return to preview upon successful trade. 1: close gui. 2: do nothing.
-	private final int mPebTradeGUISuccess = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SUCCESS).orElse(2);
+	private final int mPebTradeGUISuccess = ScoreboardUtils.getScoreboardValue(mPlayer, SUCCESS).orElse(2);
 	// PARTICLES: 0: particles on. 1: off.
-	private final int mPebTradeGUIParticles = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PARTICLES).orElse(0);
+	private final int mPebTradeGUIParticles = ScoreboardUtils.getScoreboardValue(mPlayer, PARTICLES).orElse(0);
 	// SOUNDS: 0: sounds on. 1: off.
-	private final int mPebTradeGUISounds = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SOUNDS).orElse(0);
+	private final int mPebTradeGUISounds = ScoreboardUtils.getScoreboardValue(mPlayer, SOUNDS).orElse(0);
 	// WALLET: 0: enabled, prioritize inventory. 1: disabled. 2: enabled, prioritize wallet.
-	private final int mPebTradeGUIWallet = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.WALLET).orElse(0);
+	private final int mPebTradeGUIWallet = ScoreboardUtils.getScoreboardValue(mPlayer, WALLET).orElse(0);
 	//endregion
 
 	//region <FINAL_VARS>
@@ -343,7 +344,7 @@ public class CustomTradeGui extends Gui {
 			}
 		}
 		// Background panes:
-		if (ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.LOCKED).orElse(0) == 1) {
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, LOCKED).orElse(0) == 1) {
 			// Locked Trades:
 			openLockedTradeView();
 		} else if (mSelectedTrade == null) {
@@ -628,7 +629,7 @@ public class CustomTradeGui extends Gui {
 		// Run Quest Actions:
 		QuestActions actions = trade.getActions();
 		if (actions != null) {
-			QuestContext context = new QuestContext(com.playmonumenta.scriptedquests.Plugin.getInstance(), mPlayer, mVillager);
+			QuestContext context = new QuestContext(Plugin.getInstance(), mPlayer, mVillager);
 			for (int i = 0; i < multiplier; i++) {
 				actions.doActions(context);
 			}

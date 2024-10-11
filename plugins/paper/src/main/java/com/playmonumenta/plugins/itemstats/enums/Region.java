@@ -38,7 +38,7 @@ public enum Region {
 	}
 
 	public static Region getRegion(String name) {
-		for (Region region : Region.values()) {
+		for (Region region : values()) {
 			if (region.getName().equals(name)) {
 				return region;
 			}

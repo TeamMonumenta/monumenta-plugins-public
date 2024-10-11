@@ -248,7 +248,7 @@ public class MarketRedisManager {
 		if (filter.startWithActiveOnly()) {
 			out = MarketListingIndex.ACTIVE_LISTINGS.getListingsFromIndex(true);
 		} else {
-			out = MarketRedisManager.getAllListingsIds(true);
+			out = getAllListingsIds(true);
 		}
 
 		Set<MarketListingIndex> usedIndexes = filter.getUsedIndexes();

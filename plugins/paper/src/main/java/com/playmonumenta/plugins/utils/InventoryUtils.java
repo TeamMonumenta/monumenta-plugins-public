@@ -431,7 +431,7 @@ public class InventoryUtils {
 			if (!items.isEmpty()) {
 				ItemStack materials = items.iterator().next();
 				materials.setAmount(amount);
-				InventoryUtils.giveItem(player, materials);
+				giveItem(player, materials);
 				return;
 			}
 		}
@@ -647,13 +647,13 @@ public class InventoryUtils {
 	public static boolean inventoryContainsItemOrMore(Inventory inventory, ItemStack item) {
 		int numItems = item.getAmount();
 		ItemStack oneItem = item.asOne();
-		return (InventoryUtils.numInInventory(inventory, oneItem) >= numItems);
+		return (numInInventory(inventory, oneItem) >= numItems);
 	}
 
 	public static boolean inventoryContainsItemOrMore(ItemStack[] inventory, ItemStack item) {
 		int numItems = item.getAmount();
 		ItemStack oneItem = item.asOne();
-		return (InventoryUtils.numInInventory(inventory, oneItem) >= numItems);
+		return (numInInventory(inventory, oneItem) >= numItems);
 	}
 
 	public static void removeItemFromArray(ItemStack[] inventory, ItemStack item) {

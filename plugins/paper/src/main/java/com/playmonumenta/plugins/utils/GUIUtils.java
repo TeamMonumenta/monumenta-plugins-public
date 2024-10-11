@@ -346,7 +346,7 @@ public class GUIUtils {
 	 * Checks if the player has the required toggle for GUI textures enabled. Enabled when the score is 0.
 	 */
 	public static boolean getGuiTextureObjective(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, GUIUtils.GUI_TEXTURES_OBJECTIVE).orElse(0) == 0;
+		return ScoreboardUtils.getScoreboardValue(player, GUI_TEXTURES_OBJECTIVE).orElse(0) == 0;
 	}
 
 	/**

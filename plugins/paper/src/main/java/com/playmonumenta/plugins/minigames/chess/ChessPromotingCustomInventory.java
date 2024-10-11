@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -121,13 +122,12 @@ public class ChessPromotingCustomInventory extends CustomInventory {
 				event.getWhoClicked().closeInventory();
 				break;
 			default:
-				return;
 
 		}
 	}
 
 	@Override
-	protected void inventoryClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
+	protected void inventoryClose(InventoryCloseEvent event) {
 		if (!mPromoted) {
 			mBoard.changePieceType(mPiece, ChessPieceType.QUEEN);
 		}

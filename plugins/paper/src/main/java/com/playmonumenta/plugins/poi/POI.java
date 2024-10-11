@@ -28,7 +28,7 @@ public enum POI {
 	VIBRANT_HOLLOW("vibrant_hollow", "Vibrant Hollow", "epic:r3/world/poi/vibrant_hollow/endweekly", "#4C8F4D", "wolfswood"),
 	NONE("none", "None", "temp_path", "", "none");
 
-	public static final Map<String, POI> REVERSE_MAPPINGS = Arrays.stream(POI.values())
+	public static final Map<String, POI> REVERSE_MAPPINGS = Arrays.stream(values())
 		.collect(Collectors.toUnmodifiableMap(POI::getName, type -> type));
 
 	final String mName;

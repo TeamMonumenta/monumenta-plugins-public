@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.integrations;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -37,10 +38,10 @@ import org.bukkit.loot.LootTable;
 public class ChestSortIntegration implements Listener {
 	private static boolean checkedForPlugin = false;
 	private static boolean mIsEnabled = false;
-	private final com.playmonumenta.plugins.Plugin mPlugin;
+	private final Plugin mPlugin;
 	private final Set<UUID> mClicked = new HashSet<>();
 
-	public ChestSortIntegration(com.playmonumenta.plugins.Plugin plugin) {
+	public ChestSortIntegration(Plugin plugin) {
 		mPlugin = plugin;
 		plugin.getLogger().info("Enabling ChestSort integration");
 	}
@@ -96,7 +97,7 @@ public class ChestSortIntegration implements Listener {
 				// Check if the last thing the player did was also the same thing.
 				// If so, sort the chest
 				if (mClicked.contains(player.getUniqueId())) {
-					ChestSortIntegration.sortInventory(inventory);
+					sortInventory(inventory);
 					player.updateInventory();
 					mClicked.remove(player.getUniqueId());
 

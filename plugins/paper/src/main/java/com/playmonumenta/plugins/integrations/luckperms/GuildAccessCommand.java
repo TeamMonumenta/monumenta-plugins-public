@@ -149,13 +149,13 @@ public class GuildAccessCommand {
 
 				CompletableFuture<Group> guildFuture = getGuildFromName(plugin, guildRoot);
 				guildFuture.exceptionally(throwable -> {
-					Bukkit.getScheduler().runTask(plugin, () -> GuildAccessCommand.handleError(throwable, player));
+					Bukkit.getScheduler().runTask(plugin, () -> handleError(throwable, player));
 					return null;
 				});
 
 				getUserFromUUID(plugin, targetUUID)
 					.exceptionally((throwable) -> {
-						Bukkit.getScheduler().runTask(plugin, () -> GuildAccessCommand.handleError(throwable, player));
+						Bukkit.getScheduler().runTask(plugin, () -> handleError(throwable, player));
 						return null;
 					})
 					.thenAcceptBoth(guildFuture, (user, group) -> {

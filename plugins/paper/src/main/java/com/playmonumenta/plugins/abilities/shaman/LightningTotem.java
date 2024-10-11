@@ -67,7 +67,7 @@ public class LightningTotem extends TotemAbility {
 					AOE_RANGE,
 					DAMAGE_1,
 					StringUtils.ticksToSeconds(INTERVAL),
-					StringUtils.ticksToSeconds(TotemAbility.PULSE_DELAY),
+					StringUtils.ticksToSeconds(PULSE_DELAY),
 					StringUtils.ticksToSeconds(TOTEM_DURATION),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),

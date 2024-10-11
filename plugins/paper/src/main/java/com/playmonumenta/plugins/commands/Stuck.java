@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -61,7 +62,7 @@ public class Stuck {
 						}
 						mTime--;
 					}
-				}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 1, 20 * 1);
+				}.runTaskTimer(Plugin.getInstance(), 20 * 1, 20 * 1);
 			})
 			.register();
 	}

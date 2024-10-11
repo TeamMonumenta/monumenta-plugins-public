@@ -17,9 +17,7 @@ public class Chronology {
 	}
 
 	public static void applyModifiers(CreatureSpawner spawner, int level) {
-		if (level == 0) {
-			return;
-		} else {
+		if (level != 0) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -27,7 +25,6 @@ public class Chronology {
 					spawner.update(false, false);
 				}
 			}.runTaskLater(Plugin.getInstance(), 5);
-
 		}
 	}
 }

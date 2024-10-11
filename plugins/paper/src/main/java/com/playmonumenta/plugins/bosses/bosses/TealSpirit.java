@@ -328,7 +328,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mSpawnLoc, detectionRange)) {
 			mob.remove();
 		}
-		PlayerUtils.playersInRange(mSpawnLoc, TealSpirit.detectionRange, true).forEach(player -> {
+		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> {
 			player.sendMessage(Component.text("no, this cannot be! time... betrays me? why do the hands of time not turn? i... will... be... forever!", NamedTextColor.DARK_AQUA));
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, RewriteHistory.PERCENT_HEALTH_EFFECT);
 		});

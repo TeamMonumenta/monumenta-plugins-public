@@ -270,14 +270,14 @@ public class SpawnerUtils {
 				}
 
 				Block spawnerBlock = marker.getLocation().getBlock();
-				if (!SpawnerUtils.isSpawner(spawnerBlock)) {
+				if (!isSpawner(spawnerBlock)) {
 					// The spawner was destroyed and the marker somehow is still lingering around.
 					cancel();
 					return;
 				}
 
 				// Spawn the particles
-				int shields = SpawnerUtils.getShields(spawnerBlock);
+				int shields = getShields(spawnerBlock);
 				if (shields > 0) {
 					mHealthyShield.spawnFull();
 				}
@@ -328,7 +328,7 @@ public class SpawnerUtils {
 					new PPCircle(Particle.REDSTONE, spawnerBlock.getLocation().clone().add(0.5, 1.2, 0.5), 0.5).data(mYELLOW).countPerMeter(8).spawnAsEnemy();
 				}
 
-				List<String> breakActionIdentifiers = SpawnerUtils.getBreakActionIdentifiers(spawnerBlock);
+				List<String> breakActionIdentifiers = getBreakActionIdentifiers(spawnerBlock);
 				breakActionIdentifiers.forEach(id -> {
 					SpawnerBreakAction action = SpawnerActionManager.getAction(id);
 					if (action != null) {

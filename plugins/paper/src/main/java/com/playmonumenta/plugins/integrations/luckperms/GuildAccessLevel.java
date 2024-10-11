@@ -100,8 +100,8 @@ public enum GuildAccessLevel {
 			}
 
 			if (inheritanceNode.getGroupName().startsWith(rootIdWithSeparator)) {
-				GuildAccessLevel foundAccessLevel = GuildAccessLevel.byGroup(inheritanceNode.getGroupName());
-				if (!GuildAccessLevel.NONE.equals(foundAccessLevel)) {
+				GuildAccessLevel foundAccessLevel = byGroup(inheritanceNode.getGroupName());
+				if (!NONE.equals(foundAccessLevel)) {
 					targetData.remove(inheritanceNode);
 					for (GuildPermission guildPermission : GuildPermission.values()) {
 						guildPermission.setExplicitPermission(guild, target, null);
@@ -110,7 +110,7 @@ public enum GuildAccessLevel {
 			}
 		}
 
-		if (GuildAccessLevel.NONE.equals(targetLevel)) {
+		if (NONE.equals(targetLevel)) {
 			LuckPermsIntegration.pushUserUpdate(target);
 			future.complete(target);
 			return future;

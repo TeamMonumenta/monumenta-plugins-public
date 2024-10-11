@@ -117,18 +117,20 @@ public class PersistentDataCommand {
 	}
 
 	private static void get(CommandSender sender, World world, NamespacedKey key) {
+		if (!world.getPersistentDataContainer().has(key)) {
+			sender.sendMessage(Component.text("No such data on this world!"));
+			return;
+		}
+
 		for (Constants.SupportedPersistentDataType supportedType : Constants.SupportedPersistentDataType.values()) {
-			try {
+			if (world.getPersistentDataContainer().has(key, supportedType.mPersistentDataType)) {
 				Object value = world.getPersistentDataContainer().get(key, supportedType.mPersistentDataType);
 				if (value != null) {
 					sender.sendMessage(Component.text("Value (" + supportedType.name().toLowerCase(Locale.ROOT) + "): " + value));
 					return;
 				}
-			} catch (IllegalArgumentException e) {
-				// wrong data type, ignore
 			}
 		}
-		sender.sendMessage(Component.text("No such data on this world!"));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

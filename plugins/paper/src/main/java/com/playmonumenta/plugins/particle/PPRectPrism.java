@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,11 +72,6 @@ public class PPRectPrism extends AbstractPartialParticle<PPRectPrism> {
 	/*-------------------------------------------------------------------------------
 	 * Methods
 	 */
-
-	@Override
-	protected int getPartialCount(double multiplier, Player player, ParticleCategory source) {
-		return super.getPartialCount(multiplier, player, source);
-	}
 
 	@Override
 	protected void doSpawn(ParticleBuilder packagedValues) {

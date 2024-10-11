@@ -58,9 +58,9 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 			)
 			.simpleDescription("Throw potions that deal less damage, but slow and apply vulnerability to enemies.")
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", "Toggles between throwing gruesome or brutal potions.",
-				GruesomeAlchemy::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+				GruesomeAlchemy::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("throwOpposite", "throw opposite potion", "Throws a potion of the opposite type, e.g. a gruesome potion if brutal potions are selected.",
-				GruesomeAlchemy::throwOpposite, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+				GruesomeAlchemy::throwOpposite, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false), HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.displayItem(Material.SKELETON_SKULL);
 
 	private final double mSlownessAmount;

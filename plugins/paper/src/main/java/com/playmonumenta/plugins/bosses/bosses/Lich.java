@@ -2017,6 +2017,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	}
 
 	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String text, int range) {
-		return new ChargeUpManager(boss, chargeTime, Component.text(text, NamedTextColor.YELLOW), net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS, range);
+		return new ChargeUpManager(boss, chargeTime, Component.text(text, NamedTextColor.YELLOW), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, range);
 	}
 }

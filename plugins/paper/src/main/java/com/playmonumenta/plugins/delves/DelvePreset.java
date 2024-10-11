@@ -331,7 +331,7 @@ public enum DelvePreset {
 		if (id <= 0) {
 			return null;
 		}
-		for (DelvePreset selection : DelvePreset.values()) {
+		for (DelvePreset selection : values()) {
 			if (selection.getId() == id) {
 				return selection;
 			}
@@ -340,7 +340,7 @@ public enum DelvePreset {
 	}
 
 	public static @Nullable DelvePreset getDelvePreset(String name) {
-		for (DelvePreset selection : DelvePreset.values()) {
+		for (DelvePreset selection : values()) {
 			if (selection.mName.equals(name)) {
 				return selection;
 			}
@@ -353,7 +353,7 @@ public enum DelvePreset {
 		if (level <= 0 || level > 3) {
 			return Collections.emptyList();
 		}
-		List<DelvePreset> allPresets = Arrays.asList(DelvePreset.values());
+		List<DelvePreset> allPresets = Arrays.asList(values());
 		Collections.shuffle(allPresets);
 		for (DelvePreset preset : allPresets) {
 			if (preset.mLevel == level) {

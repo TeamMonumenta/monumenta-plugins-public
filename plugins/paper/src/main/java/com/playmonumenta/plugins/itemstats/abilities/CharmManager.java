@@ -1515,46 +1515,46 @@ public class CharmManager {
 	//Methods called by the abilities
 
 	public static double getRadius(Player player, String charmEffectName, double baseRadius) {
-		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
+		double level = getInstance().getValueOfAttribute(player, charmEffectName + "%");
 		return Math.max(0.1, baseRadius * ((level / 100.0) + 1));
 	}
 
 	// This is still used in two places which do not handle the conversion to getDuration well, so they have been left for now
 	@Deprecated
 	public static int getExtraDuration(Player player, String charmEffectName) {
-		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
+		double level = getInstance().getValueOfAttribute(player, charmEffectName);
 		return (int) (level * 20);
 	}
 
 	public static int getDuration(Player player, String charmEffectName, int baseDuration) {
-		double flatLevel = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
-		double percentLevel = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
+		double flatLevel = getInstance().getValueOfAttribute(player, charmEffectName);
+		double percentLevel = getInstance().getValueOfAttribute(player, charmEffectName + "%");
 
 		return (int) ((baseDuration + flatLevel * 20) * ((percentLevel / 100.0) + 1));
 	}
 
 	public static int getCooldown(Player player, String charmEffectName, int baseCooldown) {
-		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
+		double level = getInstance().getValueOfAttribute(player, charmEffectName + "%");
 		return (int) (baseCooldown * ((level / 100.0) + 1));
 	}
 
 	public static double getLevel(Player player, String charmEffectName) {
-		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
+		return getInstance().getValueOfAttribute(player, charmEffectName);
 	}
 
 	public static double getLevelPercentDecimal(Player player, String charmEffectName) {
-		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%") / 100.0;
+		return getInstance().getValueOfAttribute(player, charmEffectName + "%") / 100.0;
 	}
 
 	public static double getExtraPercent(Player player, String charmEffectName, double base) {
-		double percentage = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
+		double percentage = getInstance().getValueOfAttribute(player, charmEffectName + "%");
 		return base * (1 + (percentage / 100.0));
 	}
 
 	//Calculates the final amount using both flat and percent modifiers, applying flat before percent
 	public static double calculateFlatAndPercentValue(Player player, String charmEffectName, double baseValue) {
-		double flatLevel = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
-		double percentLevel = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
+		double flatLevel = getInstance().getValueOfAttribute(player, charmEffectName);
+		double percentLevel = getInstance().getValueOfAttribute(player, charmEffectName + "%");
 
 		return (baseValue + flatLevel) * ((percentLevel / 100.0) + 1);
 	}

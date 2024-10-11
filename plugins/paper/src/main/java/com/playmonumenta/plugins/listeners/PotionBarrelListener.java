@@ -131,7 +131,6 @@ public class PotionBarrelListener implements Listener {
 					}
 				}
 				default -> {
-					return;
 				}
 			}
 		} else {

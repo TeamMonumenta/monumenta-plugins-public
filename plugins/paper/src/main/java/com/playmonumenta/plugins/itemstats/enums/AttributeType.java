@@ -47,7 +47,7 @@ public enum AttributeType {
 	POTION_RADIUS(new PotionRadius(), true, false),
 	THORNS(new ThornsDamage(), true, true);
 
-	static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(AttributeType.values())
+	static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(values())
 		.collect(Collectors.toUnmodifiableMap(AttributeType::getCodeName, type -> type));
 
 	public static final ImmutableList<AttributeType> MAINHAND_ATTRIBUTE_TYPES = ImmutableList.of(

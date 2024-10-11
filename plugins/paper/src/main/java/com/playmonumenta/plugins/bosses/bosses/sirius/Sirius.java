@@ -477,7 +477,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 				p.playSound(p, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 0.7f, 1.2f);
 				p.playSound(p, Sound.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 0.8f, 1f);
 				p.playSound(p, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.HOSTILE, 0.5f, 1.5f);
-				Effect fail = EffectManager.getInstance().getActiveEffect(p, Sirius.FAIL_PARTICIPATION_TAG);
+				Effect fail = EffectManager.getInstance().getActiveEffect(p, FAIL_PARTICIPATION_TAG);
 				if (fail == null || fail.getMagnitude() < 3) {
 					EffectManager.getInstance().addEffect(p, PassiveStarBlight.STARBLIGHTAG, new StarBlight(PassiveStarBlight.STARBLIGHTDURATION, magnitude + 5, PassiveStarBlight.STARBLIGHTAG));
 				} else {

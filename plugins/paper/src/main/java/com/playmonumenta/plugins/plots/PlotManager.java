@@ -25,6 +25,7 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -294,7 +295,7 @@ public class PlotManager {
 	}
 
 	private static boolean plotAccessIsExpired(long time) {
-		return time >= 0 && java.time.Instant.now().getEpochSecond() > time;
+		return time >= 0 && Instant.now().getEpochSecond() > time;
 	}
 
 	private static void plotAccessInfo(CommandSender sender, PlotInfo info) {
@@ -353,7 +354,7 @@ public class PlotManager {
 				}
 
 				// Add the current time, so we store the time when it expires, not the delta
-				expiration += java.time.Instant.now().getEpochSecond();
+				expiration += Instant.now().getEpochSecond();
 			} catch (Exception ex) {
 				throw CommandAPI.failWithString("Caught exception: " + ex.getMessage());
 			}

@@ -95,7 +95,7 @@ public class GlowingCommand {
 		MISC("miscellaneous entities", 31) {
 			@Override
 			boolean appliesTo(Player player, Entity entity) {
-				return Arrays.stream(Option.values())
+				return Arrays.stream(values())
 					.noneMatch(option -> option != ALL && option != MISC && option.appliesTo(player, entity));
 			}
 		};

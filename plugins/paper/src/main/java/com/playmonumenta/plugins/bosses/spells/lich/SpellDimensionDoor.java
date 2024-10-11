@@ -152,7 +152,7 @@ public class SpellDimensionDoor extends Spell {
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 					mChargeUp.setTitle(Component.text(SPELL_NAME + " Remaining Time", NamedTextColor.YELLOW));
-					mChargeUp.setColor(net.kyori.adventure.bossbar.BossBar.Color.RED);
+					mChargeUp.setColor(BossBar.Color.RED);
 					new BukkitRunnable() {
 						int mT = 0;
 

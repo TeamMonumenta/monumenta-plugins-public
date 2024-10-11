@@ -42,6 +42,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.PointedDripstone;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -293,7 +294,7 @@ public class ChanceCubes {
 						fallingAnvil.setDamagePerBlock(3F);
 					} else {
 						BlockData dripstoneData = Material.POINTED_DRIPSTONE.createBlockData();
-						if (dripstoneData instanceof org.bukkit.block.data.type.PointedDripstone pointedDripstone) {
+						if (dripstoneData instanceof PointedDripstone pointedDripstone) {
 							pointedDripstone.setVerticalDirection(BlockFace.DOWN);
 						}
 						FallingBlock fallingDripstone = player.getWorld().spawnFallingBlock(spawnLocation, dripstoneData);
