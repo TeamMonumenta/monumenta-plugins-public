@@ -196,7 +196,7 @@ public class Haunted {
 				} else if (level == 2) {
 					// Level 2: Move if the player is not looking at it
 					Location armorStandCenter = armorStand.getLocation().add(0, 1, 0);
-					boolean playerHasLineOfSight = p.hasLineOfSight(armorStandCenter) && isInPlayerConeView(p, armorStandCenter, 65);
+					boolean playerHasLineOfSight = (p.getLocation().distanceSquared(armorStandCenter) <= 20 * 20 || p.hasLineOfSight(armorStandCenter)) && isInPlayerConeView(p, armorStandCenter, 65);
 					if (playerHasLineOfSight) {
 						return;
 					}
