@@ -195,7 +195,7 @@ public class DepthsCommand extends GenericCommand {
 			.withArguments(new LiteralArgument("debug"))
 			.withArguments(playerArg)
 			.executesPlayer((sender, args) -> {
-				Player targetPlayer = args.getUnchecked("target player");
+				Player targetPlayer = args.getByArgument(playerArg);
 
 				new DepthsDebugGUI(sender, targetPlayer, plugin).openInventory(sender, plugin);
 			}).register();
