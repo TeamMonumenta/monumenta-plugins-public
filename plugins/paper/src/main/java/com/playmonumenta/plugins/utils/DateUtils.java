@@ -14,7 +14,7 @@ public class DateUtils {
 	// so it should sync up nicely with changes in getDayOfWeek().
 	public static final int HOURS_OFFSET = -17;
 	public static final ZoneId TIMEZONE = ZoneOffset.ofHours(HOURS_OFFSET);
-	// For use on the dev and stage servers in testing time-based content
+	public static final LocalDateTime TRUE_EPOCH = localDateTime(1970, 1, 1);
 
 	public static LocalDateTime trueUtcDateTime() {
 		return LocalDateTime.now(ZoneId.of("UTC"));
@@ -33,9 +33,8 @@ public class DateUtils {
 	}
 
 	public static LocalDateTime localDateTime(long dailyVersion) {
-		LocalDateTime epoch = localDateTime(1970, 1, 1);
-		long dayOffset = dailyVersion - getDaysSinceEpoch(epoch);
-		return epoch.plusDays(dayOffset);
+		long dayOffset = dailyVersion - getDaysSinceEpoch(TRUE_EPOCH);
+		return TRUE_EPOCH.plusDays(dayOffset);
 	}
 
 	public static LocalDateTime localDateTime(int year, int month, int dayOfMonth) {

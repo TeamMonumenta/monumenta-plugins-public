@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import com.playmonumenta.networkchat.channel.Channel;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -60,17 +58,21 @@ public class UpdateGuilds {
 				}
 				String guildId = guildRoot.getName();
 				try {
-					for (GuildPermission guildPermission : GuildPermission.values()) {
-						guildPermission.setExplicitPermission(guildRoot, memberGroup, true);
-					}
+					for (GuildAccessLevel accessLevel : List.of(
+						GuildAccessLevel.FOUNDER,
+						GuildAccessLevel.MANAGER,
+						GuildAccessLevel.MEMBER
+					)) {
+						Group accessGroup = accessLevel.loadGroupFromRoot(guildRoot).join().orElse(null);
+						if (accessGroup == null) {
+							sender.sendMessage(Component.text("- Could not find " + accessLevel.mId + " group for " + guildId));
+							continue;
+						}
 
-					String guildTag = LuckPermsIntegration.getGuildPlainTag(guildRoot);
-					String chatPermission = GuildPermission.CHAT.guildPermissionString(guildRoot);
-					if (guildTag != null && chatPermission != null) {
-						Channel channel = MonumentaNetworkChatIntegration.getChannel(guildTag);
-						if (channel != null) {
-							MonumentaNetworkChatIntegration.setChannelPermission(channel, chatPermission);
-							MonumentaNetworkChatIntegration.saveChannel(channel);
+						for (GuildPermission guildPermission : GuildPermission.values()) {
+							if (accessLevel.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
+								guildPermission.setExplicitPermission(guildRoot, accessGroup, true);
+							}
 						}
 					}
 

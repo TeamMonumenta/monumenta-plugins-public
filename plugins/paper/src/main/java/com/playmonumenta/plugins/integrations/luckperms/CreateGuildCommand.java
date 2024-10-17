@@ -236,7 +236,13 @@ public class CreateGuildCommand {
 			guildFounderGroupData.add(InheritanceNode.builder(guildManagerGroup).build());
 
 			for (GuildPermission guildPermission : GuildPermission.values()) {
-				guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true);
+				guildPermission.setExplicitPermission(guildRootGroup, guildFounderGroup, true);
+				if (GuildAccessLevel.MANAGER.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
+					guildPermission.setExplicitPermission(guildRootGroup, guildManagerGroup, true);
+				}
+				if (GuildAccessLevel.MEMBER.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
+					guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true);
+				}
 			}
 
 			LuckPermsIntegration.GM.saveGroup(guildGuestGroup).join();

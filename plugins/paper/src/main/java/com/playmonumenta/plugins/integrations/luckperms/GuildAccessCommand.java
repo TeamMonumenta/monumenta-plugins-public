@@ -282,7 +282,8 @@ public class GuildAccessCommand {
 				}
 				if (targetAccess != targetCurrentAccess) {
 					boolean promoted = targetAccess.compareTo(targetCurrentAccess) < 0;
-					sender.sendMessage(Component.text(String.format("Successfully %s %s to %s", (promoted ? "promoted" : "demoted"), target.getUsername(), targetAccess.mLabel), NamedTextColor.GOLD));
+					sender.sendMessage(Component.text(String.format("Successfully %s %s to %s (player's guild permissions have been reset)",
+						(promoted ? "promoted" : "demoted"), target.getUsername(), targetAccess.mLabel), NamedTextColor.GOLD));
 				} else {
 					sender.sendMessage(Component.text(String.format("Could not modify rank because %s is already a %s", target.getUsername(), targetAccess.mLabel), NamedTextColor.RED));
 				}

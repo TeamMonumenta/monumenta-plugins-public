@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.redissync.LeaderboardAPI;
@@ -106,7 +107,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 					mLogger.fine("Loaded potion data for player " + player.getName());
 				} catch (Exception ex) {
 					mLogger.severe("Failed to load potion data for player " + player.getName() + ":" + ex.getMessage());
-					ex.printStackTrace();
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 				}
 			}
 
@@ -116,7 +117,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 					mLogger.fine("Loaded effects data for player " + player.getName());
 				} catch (Exception ex) {
 					mLogger.severe("Failed to load effects data for player " + player.getName() + ":" + ex.getMessage());
-					ex.printStackTrace();
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 				}
 			}
 
@@ -137,7 +138,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 					mLogger.fine("Loaded health data (" + StringUtils.to2DP(health) + ") for player " + player.getName());
 				} catch (Exception ex) {
 					mLogger.severe("Failed to load health data for player " + player.getName() + ":" + ex.getMessage());
-					ex.printStackTrace();
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 				}
 			}
 		} else {

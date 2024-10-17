@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
@@ -16,6 +17,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
@@ -33,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -64,6 +67,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
@@ -1583,6 +1587,25 @@ public class ItemUtils {
 			banner.setItemMeta(bannerMeta);
 		}
 		return banner;
+	}
+
+	public static ItemStack createPlayerHead(UUID playerId, @Nullable String playerName) {
+		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+		ItemMeta meta = item.getItemMeta();
+		if (meta instanceof SkullMeta skullMeta) {
+			PlayerProfile playerProfile;
+			if (playerName == null) {
+				playerName = MonumentaRedisSyncAPI.cachedUuidToName(playerId);
+			}
+			if (playerName == null) {
+				playerProfile = Bukkit.createProfile(playerId);
+			} else {
+				playerProfile = Bukkit.createProfile(playerId, playerName);
+			}
+			skullMeta.setPlayerProfile(playerProfile);
+		}
+		item.setItemMeta(meta);
+		return item;
 	}
 
 	public static void setName(ItemStack item, TextComponent name) {

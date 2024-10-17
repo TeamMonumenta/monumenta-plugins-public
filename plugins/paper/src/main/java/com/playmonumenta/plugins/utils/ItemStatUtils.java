@@ -1393,6 +1393,15 @@ public class ItemStatUtils {
 		return item != null && !ItemUtils.isArrow(item) && !ItemUtils.isAlchemistItem(item) && (getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) == 0);
 	}
 
+	// returns if an item list exists (accepts read only and read/write)
+	public static boolean hasItemList(ReadableNBT nbt) {
+		ReadableNBT playerModified = getPlayerModified(nbt);
+		if (playerModified == null) {
+			return false;
+		}
+		return playerModified.getCompoundList(ITEMS_KEY) != null;
+	}
+
 	// get item list (read/write)
 	public static ReadWriteNBTCompoundList getItemList(ReadWriteNBT nbt) {
 		return addPlayerModified(nbt).getCompoundList(ITEMS_KEY);

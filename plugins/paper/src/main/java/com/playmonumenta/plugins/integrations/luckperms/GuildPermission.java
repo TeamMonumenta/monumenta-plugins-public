@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.luckperms.api.model.PermissionHolder;
 import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
@@ -8,16 +10,57 @@ import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.query.QueryOptions;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public enum GuildPermission {
-	CHAT("chat", "Access Chat", "Allows guests to see and speak in a guild's chat channel (/gc)"),
-	VISIT("visit", "Visit Plot", "Allows guests to visit a guild's plot and guild island");
-	// TODO: Add these once we add move guild plots into worlds, which makes these checks easier
-	//ITEMS("items", "Access Items", "Allows guests to interact with items on a guild's plot"),
-	//SURVIVAL("survival", "Survival Mode", "Allows guests to place and break blocks on a guild's plot");
+	GUILD_SHOP(
+		"guild_shop",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Manage Guild Shop",
+		"Allows members to manage a guild shop"
+	),
+	MAIL(
+		"mail",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Access Mail",
+		"Allows members to access mail to/from a guild"
+	),
+	CHAT(
+		"chat",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Access Chat",
+		"Allows players to see and speak in a guild's chat channel (/gc)"
+	),
+	VISIT(
+		"visit",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Visit Plot",
+		"Allows guests to visit a guild's plot and guild island"
+	),
+	/* TODO: Add these once we add move guild plots into worlds, which makes these checks easier
+	ITEMS(
+		"items",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Access Items",
+		"Allows players to interact with items on a guild's plot"
+	),
+	SURVIVAL(
+		"survival",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Survival Mode",
+		"Allows guests to place and break blocks on a guild's plot"
+	),// */
+	;
 
 	public static final String GUILD_PERM_PREFIX = "guild.perm.";
+	public static final Pattern RE_GUILD_PERM_ID = Pattern.compile("^guild\\.perm\\.([^.]+)\\.([^.]+)$");
 
 	public static class GuildPermissionResult {
 		public final @Nullable PermissionHolder mCausingHolder;
@@ -30,11 +73,21 @@ public enum GuildPermission {
 	}
 
 	public final String mSubPerm;
+	public final GuildAccessLevel mDefaultAccessLevel;
+	public final boolean mGuestPerm;
 	public final String mLabel;
 	public final String mDescription;
 
-	GuildPermission(String subPerm, String label, String description) {
+	GuildPermission(
+		String subPerm,
+		GuildAccessLevel defaultAccessLevel,
+		boolean guestPerm,
+		String label,
+		String description
+	) {
 		mSubPerm = subPerm;
+		mDefaultAccessLevel = defaultAccessLevel;
+		mGuestPerm = guestPerm;
 		mLabel = label;
 		mDescription = description;
 	}
@@ -109,6 +162,10 @@ public enum GuildPermission {
 		}
 	}
 
+	public boolean hasAccess(Group guild, Player player) {
+		return hasAccess(guild, LuckPermsIntegration.getUser(player));
+	}
+
 	public boolean hasAccess(Group guild, PermissionHolder permissionHolder) {
 		return checkAccess(guild, permissionHolder).mResult;
 	}
@@ -129,5 +186,37 @@ public enum GuildPermission {
 		}
 
 		return new GuildPermissionResult(null, false);
+	}
+
+	/**
+	 * Gets the guild's root ID of a given GuildPermission node ID string
+	 * @param permissionId The permission ID you wish to check
+	 * @return The guild's root ID of the GuildPermission node, or null if not a GuildPermission node
+	 */
+	public static @Nullable String getGuildRootId(String permissionId) {
+		Matcher matcher = RE_GUILD_PERM_ID.matcher(permissionId);
+		if (!matcher.matches()) {
+			return null;
+		}
+		return LuckPermsIntegration.GUILD_MK + "." + matcher.group(1);
+	}
+
+	/**
+	 * Gets the GuildPermission from a given permission node
+	 * @param permissionId The permission ID you wish to check
+	 * @return The GuildPermission from a given permission ID, or null if not a GuildPermission
+	 */
+	public static @Nullable GuildPermission getGuildPermission(String permissionId) {
+		Matcher matcher = RE_GUILD_PERM_ID.matcher(permissionId);
+		if (!matcher.matches()) {
+			return null;
+		}
+		String guildPermissionId = matcher.group(2);
+		for (GuildPermission guildPermission : values()) {
+			if (guildPermission.mSubPerm.equals(guildPermissionId)) {
+				return guildPermission;
+			}
+		}
+		return null;
 	}
 }

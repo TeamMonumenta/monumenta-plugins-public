@@ -27,8 +27,12 @@ public abstract class View {
 	public void refresh() {
 	}
 
+	protected int entriesPerPage() {
+		return GuildGui.PAGE_HEIGHT;
+	}
+
 	protected void setPageArrows(int totalRows) {
-		int maxPage = Math.floorDiv(Math.max(0, totalRows - 1), GuildGui.PAGE_HEIGHT);
+		int maxPage = Math.floorDiv(Math.max(0, totalRows - 1), entriesPerPage());
 		mPage = Math.max(0, Math.min(mPage, maxPage));
 
 		ItemStack item;

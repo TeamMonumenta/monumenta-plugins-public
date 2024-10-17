@@ -27,3 +27,4 @@ plugins/paper/src/main/java/com/playmonumenta/plugins/integrations/luckperms/* @
 plugins/paper/src/main/java/com/playmonumenta/plugins/integrations/MonumentaNetworkChatIntegration.java @NickNackGus
 plugins/paper/src/main/java/com/playmonumenta/plugins/itemstats/EffectType.java @Nobody314159
 plugins/paper/src/main/java/com/playmonumenta/plugins/market/* @rayman520
+plugins/paper/src/main/java/com/playmonumenta/plugins/mail/* @NickNackGus

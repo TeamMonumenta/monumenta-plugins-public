@@ -94,6 +94,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(minecraft:)?glowing"),
 		exactNoArguments("(minecraft:)?grave list"),
 		exactOptionalArguments("(minecraft:)?guild"),
+		exactOptionalArguments("(minecraft:)?mail"),
 		exactOptionalArguments("(minecraft:)?particles"),
 		exactOptionalArguments("peb"),
 		exactOptionalArguments("(minecraft:)?player"),
@@ -111,6 +112,7 @@ public class AuditListener implements Listener {
 
 	private static final List<Pattern> NEVER_IGNORED_COMMAND_REGEX = Arrays.asList(
 		exactOptionalArguments("(minecraft:)?guild mod"),
+		exactOptionalArguments("(minecraft:)?mail mod"),
 		exactOptionalArguments("(minecraft:)?plot access [^ ]+_other")
 	);
 
@@ -286,6 +288,13 @@ public class AuditListener implements Listener {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);
 			MonumentaNetworkRelayIntegration.sendModAuditLogMessage(createLocationData() + " " + message);
+		}
+	}
+
+	public static void logMail(String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendMailAuditLogMessage(createLocationData() + " " + message);
 		}
 	}
 

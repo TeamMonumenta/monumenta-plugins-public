@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.TABIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissions;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
@@ -54,6 +55,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.*;
+import com.playmonumenta.plugins.mail.MailMan;
 import com.playmonumenta.plugins.managers.DataCollectionManager;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
@@ -93,6 +95,7 @@ import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.timers.ShowMarkerTimer;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
@@ -110,6 +113,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitWorker;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -270,6 +274,7 @@ public class Plugin extends JavaPlugin {
 		JingleBells.register();
 		Launch.register();
 		LoadoutManagerCommand.register();
+		MailMan.registerCommands();
 		MarketCommands.register();
 		MMQuest.register(this);
 		MonumentaDebug.register(this);
@@ -540,12 +545,14 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new TorchListener(), this);
 		manager.registerEvents(new MarketListener(), this);
 		manager.registerEvents(mPzeroManager, this);
+		manager.registerEvents(new GuildPermissions(), this);
 		manager.registerEvents(new Lockdown(), this);
 		manager.registerEvents(new IchorListener(), this);
 		manager.registerEvents(new DiscoveryManager(), this);
 		manager.registerEvents(mGrapplingListener, this);
 		manager.registerEvents(new CelestialGemListener(), this);
 		new SpawnerVisualisation().register();
+		manager.registerEvents(MailMan.getInstance(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);
@@ -753,6 +760,7 @@ public class Plugin extends JavaPlugin {
 			}
 		}
 
+		MailMan.onDisable();
 		TowerManager.unload();
 		mChessManager.unloadAll();
 		mTrackingManager.unloadTrackedEntities();
@@ -760,7 +768,22 @@ public class Plugin extends JavaPlugin {
 			mHttpManager.stop();
 		}
 		mBossManager.unloadAll(true);
+		MonumentaNetworkRelayIntegration.disable();
 		MetadataUtils.removeAllMetadata(this);
+
+		// Log any async threads that haven't finished yet; these need to be handled before this point!
+		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {
+			if (!worker.getOwner().equals(this)) {
+				continue;
+			}
+
+			Thread thread = worker.getThread();
+			StringBuilder builder = new StringBuilder("Unterminated thread stacktrace:");
+			for (StackTraceElement traceElement : thread.getStackTrace()) {
+				builder.append("\n\tat ").append(traceElement);
+			}
+			MMLog.severe(builder.toString());
+		}
 	}
 
 	public @Nullable Player getPlayer(UUID playerID) {

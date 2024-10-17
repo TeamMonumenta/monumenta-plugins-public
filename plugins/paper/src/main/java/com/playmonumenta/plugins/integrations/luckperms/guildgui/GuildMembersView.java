@@ -121,11 +121,13 @@ public class GuildMembersView extends View {
 		super.refresh();
 
 		Bukkit.getScheduler().runTaskAsynchronously(mGui.mMainPlugin, () -> {
+			TreeMap<GuildAccessLevel, List<PlayerGuildInfo>> guildPlayers = new TreeMap<>();
+			TreeMap<GuildInviteLevel, List<PlayerGuildInfo>> guildInvites = new TreeMap<>();
 			if (mGui.mGuildGroup == null) {
+				Bukkit.getScheduler().runTask(mGui.mMainPlugin, mGui::update);
 				return;
 			}
 
-			TreeMap<GuildAccessLevel, List<PlayerGuildInfo>> guildPlayers = new TreeMap<>();
 			for (GuildAccessLevel accessLevel : GUILD_ACCESS_LEVELS) {
 				List<PlayerGuildInfo> sortedPlayers;
 
@@ -151,7 +153,6 @@ public class GuildMembersView extends View {
 				guildPlayers.put(accessLevel, sortedPlayers);
 			}
 
-			TreeMap<GuildInviteLevel, List<PlayerGuildInfo>> guildInvites = new TreeMap<>();
 			for (GuildInviteLevel inviteLevel : GUILD_INVITE_LEVELS) {
 				List<PlayerGuildInfo> sortedInvites;
 

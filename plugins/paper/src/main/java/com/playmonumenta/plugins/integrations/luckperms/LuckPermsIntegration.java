@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissions;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.InviteNotification;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.LPArguments;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
@@ -179,6 +180,7 @@ public class LuckPermsIntegration implements Listener {
 
 		EventBus eventBus = LP.getEventBus();
 		GuildArguments.registerLuckPermsEvents(plugin, eventBus);
+		GuildPermissions.registerLuckPermsEvents(plugin, eventBus);
 		InviteNotification.registerLuckPermsEvents(plugin, eventBus);
 		Lockdown.registerLuckPermsEvents(plugin, eventBus);
 		LPArguments.registerLuckPermsEvents(plugin, eventBus);
@@ -263,6 +265,30 @@ public class LuckPermsIntegration implements Listener {
 			}
 		});
 		return result;
+	}
+
+	public static CompletableFuture<@Nullable Group> getGuildByPlotId(long guildPlot) {
+		CompletableFuture<Group> future = new CompletableFuture<>();
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				MetaNode desiredPlotMetaKey = MetaNode.builder(GUILD_ROOT_PLOT_MK, String.valueOf(guildPlot)).build();
+				Map<String, Collection<MetaNode>> guildPlotNodeMatches
+					= GM.searchAll(NodeMatcher.metaKey(desiredPlotMetaKey)).join();
+				for (Map.Entry<String, Collection<MetaNode>> matchEntry : guildPlotNodeMatches.entrySet()) {
+					if (!matchEntry.getValue().contains(desiredPlotMetaKey)) {
+						continue;
+					}
+					String guildId = matchEntry.getKey();
+					future.complete(loadGroup(guildId).join().orElse(null));
+					return;
+				}
+
+				future.complete(null);
+			} catch (Exception ex) {
+				future.completeExceptionally(ex);
+			}
+		});
+		return future;
 	}
 
 	public static User getUser(Player player) {
@@ -653,7 +679,7 @@ public class LuckPermsIntegration implements Listener {
 		return result;
 	}
 
-	public static @Nullable Long getGuildPlotId(Group group) {
+	public static @Nullable Long getGuildPlotId(@Nullable Group group) {
 		try {
 			Group root = getGuildRoot(group);
 			if (root == null) {
@@ -992,7 +1018,7 @@ public class LuckPermsIntegration implements Listener {
 		return playerHead;
 	}
 
-	public static ItemStack getGuildBanner(Group guild) {
+	public static ItemStack getGuildBanner(@Nullable Group guild) {
 		Group group = getGuildRoot(guild);
 		if (group == null) {
 			ItemStack notAGuild = getErrorQuestionMarkPlayerHead();

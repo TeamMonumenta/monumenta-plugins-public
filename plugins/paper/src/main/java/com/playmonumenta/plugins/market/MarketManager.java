@@ -240,7 +240,7 @@ public class MarketManager {
 		NBT.get(currentItem, nbt -> {
 			ReadableNBTList<ReadWriteNBT> itemsList = ItemStatUtils.getItemList(nbt);
 			if (itemsList != null && !itemsList.isEmpty()) {
-				errors.add("You cannot sell items which contains other items (quiver, lootbox, etc). Empty the item first!");
+				errors.add("You cannot sell items which contain other items (quiver, lootbox, etc). Empty the item first!");
 			}
 		});
 

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.integrations.luckperms.guildgui;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.guis.GuiItem;
+import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission.GuildPermissionResult;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -27,10 +28,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class PermissionView extends View {
-	protected static final int TARGET_Y = 2;
 	protected static final int TARGET_X = 4;
-	protected static final int PERMISSION_ROW = 4;
+	protected static final int FIRST_COLUMN = 1;
+	protected static final int COLUMNS = 7;
 
+	protected final boolean mIsGuest;
 	protected final PermissionHolder mTarget;
 	protected final Supplier<CompletableFuture<ItemStack>> mRefreshTargetIcon;
 	protected final @Nullable Consumer<InventoryClickEvent> mOnTargetClick;
@@ -38,11 +40,13 @@ public class PermissionView extends View {
 	protected ItemStack mTargetIcon;
 
 	public PermissionView(GuildGui gui,
+						  boolean isGuest,
 	                      PermissionHolder target,
 						  ItemStack targetIcon,
 	                      Supplier<CompletableFuture<ItemStack>> refreshTargetIcon,
 	                      @Nullable Consumer<InventoryClickEvent> onTargetClick) {
 		super(gui);
+		mIsGuest = isGuest;
 		mTarget = target;
 		mTargetIcon = targetIcon;
 		mRefreshTargetIcon = refreshTargetIcon;
@@ -58,14 +62,51 @@ public class PermissionView extends View {
 	public void setup() {
 		setBackIcon();
 
+		List<GuildPermission> shownPermissions = new ArrayList<>();
+		for (GuildPermission permission : GuildPermission.values()) {
+			if (mIsGuest && !permission.mGuestPerm) {
+				continue;
+			}
+			shownPermissions.add(permission);
+		}
+
+		// firstRow is for permissions, targetRow is the PermissionHolder
+		int rows = Math.floorDiv(Math.max(0, shownPermissions.size() - 1), COLUMNS) + 1;
+		// Make sure there's enough room for all icons (bottom-align, assuming they fit on one page)
+		int firstRow = 6 - rows;
+		// If the first row is >= the bottom row, shift it up one to visually center it better
+		if (firstRow >= 5) {
+			firstRow--;
+		}
+		// row 0 is the header, to be avoided (leaving 1 row for target subheading)
+		if (firstRow < 2) {
+			firstRow = 2;
+		}
+		// Target row goes above permission rows
+		int targetRow = firstRow - 1;
+		// If there's only one permission row, shift this up by 1 to avoid too many empty rows in a row
+		if (targetRow >= 3) {
+			targetRow--;
+		}
+		// ...and yes, that whole section can be rewritten as we see fit.
+
 		Component targetName = mTargetIcon.getItemMeta().displayName();
-		GuiItem targetIcon = mGui.setItem(TARGET_Y, TARGET_X, mTargetIcon);
+		GuiItem targetIcon = mGui.setItem(targetRow, TARGET_X, mTargetIcon);
 		if (mOnTargetClick != null) {
 			targetIcon.onClick(mOnTargetClick);
 		}
 
-		setPermissionIcon(PERMISSION_ROW, 3, GuildPermission.CHAT, targetName);
-		setPermissionIcon(PERMISSION_ROW, 5, GuildPermission.VISIT, targetName);
+		for (int index = 0; index < shownPermissions.size(); index++) {
+			int column = index % COLUMNS + FIRST_COLUMN;
+			int row = Math.floorDiv(index, COLUMNS) + firstRow;
+			// Don't set icons outside the visible area! If we have this many permissions, we need to rewrite this
+			// as a paginated view; mostly affects which rows are shown, maybe play with the layout some more.
+			if (row > 5) {
+				break;
+			}
+			GuildPermission permission = shownPermissions.get(index);
+			setPermissionIcon(row, column, permission, targetName, mIsGuest);
+		}
 	}
 
 	@Override
@@ -86,7 +127,8 @@ public class PermissionView extends View {
 		int row,
 		int column,
 		GuildPermission guildPermission,
-		@Nullable Component targetName
+		@Nullable Component targetName,
+		boolean isGuest
 	) {
 		if (mGui.mGuildGroup == null) {
 			ItemStack item = LuckPermsIntegration.getErrorQuestionMarkPlayerHead();
@@ -129,7 +171,8 @@ public class PermissionView extends View {
 		lore.add(Component.empty());
 		lore.add(getResultComponent(isPermitted, isExplicitlySet, causingHolder));
 
-		if (mGui.mayManagePermissions(false)) {
+		GuildAccessLevel accessLevel = isGuest ? GuildAccessLevel.GUEST : GuildAccessLevel.MEMBER;
+		if (mGui.mayManagePermissions(accessLevel, false)) {
 			lore.add(Component.empty());
 			lore.add(baseLoreFormatting
 				.append(Component.keybind(Constants.Keybind.HOTBAR_1))
@@ -155,7 +198,7 @@ public class PermissionView extends View {
 				return;
 			}
 
-			if (!mGui.mayManagePermissions(true)) {
+			if (!mGui.mayManagePermissions(accessLevel, true)) {
 				return;
 			}
 

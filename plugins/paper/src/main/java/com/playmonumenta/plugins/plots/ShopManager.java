@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -829,8 +829,8 @@ public class ShopManager implements Listener {
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
-			if (GuildAccessLevel.byGroup(guild).compareTo(GuildAccessLevel.MANAGER) > 0) {
-				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
+			if (!GuildPermission.GUILD_SHOP.hasAccess(guild, player)) {
+				String msg = "You must have permission to manage the shop for the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}

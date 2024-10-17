@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.integrations.luckperms.guildgui;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
@@ -11,8 +10,17 @@ import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.PlayerGuildInfo;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.mail.MailCache;
+import com.playmonumenta.plugins.mail.MailGui;
+import com.playmonumenta.plugins.mail.MailGuiSettings;
+import com.playmonumenta.plugins.mail.MailMan;
+import com.playmonumenta.plugins.mail.Mailbox;
+import com.playmonumenta.plugins.mail.recipient.GuildRecipient;
+import com.playmonumenta.plugins.mail.recipient.Recipient;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -20,6 +28,7 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -51,10 +60,11 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
 
-public class GuildGui extends Gui {
+public class GuildGui extends MailGui {
 	protected static final int HEADER_Y = 0;
 	protected static final int ROW_LABEL_X = 0;
 	protected static final int PAGE_HEIGHT = 5;
+
 	public static Map<String, Consumer<GuildGui>> VIEW_ARGUMENTS = Map.of(
 		"all", gui -> gui.setView(new AllGuildsView(gui, GuildOrder.DEFAULT)),
 		"accessible", gui -> gui.setView(new AccessibleGuildsView(gui, GuildOrder.DEFAULT)),
@@ -68,6 +78,8 @@ public class GuildGui extends Gui {
 	protected User mTargetUser;
 	protected @Nullable String mGuildId;
 	protected @Nullable Group mGuildGroup;
+	protected final MailGuiSettings mMailSettings = new MailGuiSettings();
+	protected MailCache mMailCache;
 	protected View mView;
 
 	public static void register(Plugin plugin) {
@@ -140,6 +152,8 @@ public class GuildGui extends Gui {
 			throw CommandAPI.failWithString("The guild GUI can only be shown to players");
 		}
 
+		boolean openedAsModerator = targetName != null || guildName != null;
+
 		UUID targetUuid;
 		if (targetName == null) {
 			targetUuid = player.getUniqueId();
@@ -160,19 +174,28 @@ public class GuildGui extends Gui {
 			}
 		}
 
-		GuildGui gui = new GuildGui(plugin, player, targetUuid, guildId);
+		GuildGui gui = new GuildGui(plugin, player, targetUuid, guildId, openedAsModerator);
 		if (viewSetter != null) {
 			viewSetter.accept(gui);
 		}
 		gui.open();
 	}
 
-	private GuildGui(Plugin plugin, Player player, UUID targetUuid, @Nullable String guildId) {
-		super(player, 54, Component.text("Guild Manager:", NamedTextColor.GRAY, TextDecoration.BOLD));
+	private GuildGui(Plugin plugin, Player player, UUID targetUuid, @Nullable String guildId, boolean openedAsModerator) {
+		super(
+			player,
+			54,
+			Component.text("Guild Manager:", NamedTextColor.GRAY, TextDecoration.BOLD),
+			openedAsModerator
+		);
 		mMainPlugin = plugin;
 		mTargetUser = LuckPermsIntegration.getUser(mPlayer);
 		mTargetUuid = targetUuid;
 		mGuildId = guildId;
+
+		// Temporary value to be overridden ASAP
+		Recipient tempRecipient = new GuildRecipient(GuildRecipient.DUMMY_ID_NOT_LOADED, null);
+		mMailCache = new MailCache(tempRecipient);
 
 		// Copied from setView to make nullaway warning go away
 		Group guild = LuckPermsIntegration.getGuild(player);
@@ -190,6 +213,15 @@ public class GuildGui extends Gui {
 		}
 	}
 
+	@Override
+	public void open() {
+		if (mPlayer.hasPermission(MAIL_PERM.toString())) {
+			super.open();
+		} else {
+			super.openBypassAccessCheck();
+		}
+	}
+
 	/*
 	 * Sets the view, refreshing the LP info it requires
 	 */
@@ -202,8 +234,25 @@ public class GuildGui extends Gui {
 	/*
 	 * Applies any LuckPerms changes that may have occurred while the GUI is open
 	 */
+	@Override
 	public void refresh() {
 		updateGuildGroup();
+	}
+
+	@Override
+	public void refreshMailbox(Mailbox mailbox) {
+		if (mView instanceof MailView mailView) {
+			mailView.refreshMailboxSlot(mailbox);
+		}
+	}
+
+	@Override
+	public Collection<MailCache> getRecipientCaches() {
+		MailCache mailCache = mMailCache;
+		if (mailCache != null) {
+			return List.of(mailCache);
+		}
+		return List.of();
 	}
 
 	@Override
@@ -217,7 +266,7 @@ public class GuildGui extends Gui {
 	 * - All Guilds
 	 * - Your Accessible Guilds (or for target player in mod GUI)
 	 * - Guild members/guests for selected guild
-	 * - Teleports? (guild plot/island, maybe another submenu?)
+	 * - Guild mailbox
 	 * - Emergency Lock to prevent edits/access until mod intervention
 	 */
 	private void setHeader() {
@@ -369,7 +418,27 @@ public class GuildGui extends Gui {
 				.onClick((InventoryClickEvent event) -> setView(new GuildMembersView(this)));
 		}
 
-		// ...and other icons eventually, focusing on the others for now
+		if (
+			mGuildGroup != null
+				&& mPlayer.hasPermission(MAIL_PERM.toString())
+				&& (
+				mPlayer.hasPermission(MAIL_MOD_PERM.toString())
+					|| GuildPermission.MAIL.hasAccess(mGuildGroup, mPlayer)
+			)
+		) {
+			setItem(HEADER_Y, 4, mMailCache.recipient().mailboxIcon(mMailSettings))
+				.onClick((InventoryClickEvent event) -> {
+					guiSettingsClick(event, mMailSettings);
+					setView(new MailView(this));
+				});
+		} else {
+			setItem(HEADER_Y, 4,
+				GUIUtils.createBasicItem(Material.ENDER_CHEST, mMailCache.recipient().mailboxIconName(mMailSettings)))
+				.onClick((InventoryClickEvent event) -> {
+					mPlayer.sendMessage(Component.text("You do not have access to your guild's mail.", NamedTextColor.RED));
+					mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				});
+		}
 
 		// Emergency Lockdown (with confirm screen)
 		item = new ItemStack(Material.IRON_BARS);
@@ -398,6 +467,7 @@ public class GuildGui extends Gui {
 			mTargetUser = LuckPermsIntegration.loadUser(mTargetUuid).join();
 			mGuildGroup = LuckPermsIntegration.getGuildRoot(LuckPermsIntegration.getGuild(mTargetUser));
 			mGuildId = mGuildGroup == null ? null : mGuildGroup.getName();
+			updateMailCache();
 			Bukkit.getScheduler().runTask(mMainPlugin, () -> {
 				mView.refresh();
 				update();
@@ -412,11 +482,21 @@ public class GuildGui extends Gui {
 			} else {
 				mGuildGroup = LuckPermsIntegration.loadGroup(mGuildId).join().orElse(null);
 			}
+			updateMailCache();
 			Bukkit.getScheduler().runTask(mMainPlugin, () -> {
 				mView.refresh();
 				update();
 			});
 		});
+	}
+
+	private void updateMailCache() {
+		Long guildPlotId = mGuildGroup == null ? GuildRecipient.DUMMY_ID_NO_GUILD : LuckPermsIntegration.getGuildPlotId(mGuildGroup);
+		if (guildPlotId == null) {
+			guildPlotId = GuildRecipient.DUMMY_ID_NO_GUILD_NUMBER;
+		}
+		Recipient recipient = new GuildRecipient(guildPlotId, mGuildGroup);
+		mMailCache = MailMan.recipientMailCache(recipient);
 	}
 
 	protected void setGuildIcon(int row, int column, PlayerGuildInfo guildInfo) {
@@ -653,8 +733,8 @@ public class GuildGui extends Gui {
 		ItemStack item = getAccessHeaderIcon(accessLevel);
 
 		GuiItem guiItem = setItem(row, column, item);
-		if (GuildAccessLevel.GUEST.equals(accessLevel)) {
-			guiItem.onClick(onGuestAccessHeaderClick());
+		if (!GuildAccessLevel.FOUNDER.equals(accessLevel)) {
+			guiItem.onClick(onAccessHeaderClick(accessLevel));
 		}
 	}
 
@@ -737,13 +817,7 @@ public class GuildGui extends Gui {
 		Group guildRoot = LuckPermsIntegration.getGuildRoot(mGuildGroup);
 		Group displayedAccessLevel;
 		if (guildRoot != null) {
-			// GuildPermissions are always granted to Member and up, and are optional for guests
-			if (accessLevel.equals(GuildAccessLevel.GUEST)) {
-				displayedAccessLevel = GuildAccessLevel.GUEST.getLoadedGroupFromRoot(guildRoot);
-			} else {
-				displayedAccessLevel = GuildAccessLevel.MEMBER.getLoadedGroupFromRoot(guildRoot);
-			}
-
+			displayedAccessLevel = accessLevel.getLoadedGroupFromRoot(guildRoot);
 			if (displayedAccessLevel != null) {
 				for (GuildPermission guildPermission : GuildPermission.values()) {
 					if (guildPermission.hasAccess(guildRoot, displayedAccessLevel)) {
@@ -759,7 +833,10 @@ public class GuildGui extends Gui {
 			}
 		}
 
-		if (GuildAccessLevel.GUEST.equals(accessLevel) && mayManagePermissions(false)) {
+		if (
+			!GuildAccessLevel.FOUNDER.equals(accessLevel)
+			&& mayManagePermissions(accessLevel, false)
+		) {
 			lore.add(Component.empty());
 			lore.add(Component.text("", NamedTextColor.GRAY)
 				.decoration(TextDecoration.ITALIC, false)
@@ -777,26 +854,32 @@ public class GuildGui extends Gui {
 		return item;
 	}
 
-	protected Consumer<InventoryClickEvent> onGuestAccessHeaderClick() {
+	protected Consumer<InventoryClickEvent> onAccessHeaderClick(GuildAccessLevel accessLevel) {
 		return (InventoryClickEvent event) -> {
 			if (mGuildGroup == null) {
 				return;
 			}
-			Group guestGroup = GuildAccessLevel.GUEST.loadGroupFromRoot(mGuildGroup).join().orElse(null);
-			if (guestGroup == null) {
+			Group accessLevelGroup = accessLevel.loadGroupFromRoot(mGuildGroup).join().orElse(null);
+			if (accessLevelGroup == null) {
 				return;
 			}
 
-			if (event.getHotbarButton() == 0 && mayManagePermissions(false)) {
-				View view = new PermissionView(this,
-					guestGroup,
-					getAccessHeaderIcon(GuildAccessLevel.GUEST),
+			if (
+				event.getHotbarButton() == 0
+					&& mayManagePermissions(accessLevel, false)
+			) {
+				View view = new PermissionView(
+					this,
+					accessLevel.equals(GuildAccessLevel.GUEST),
+					accessLevelGroup,
+					getAccessHeaderIcon(accessLevel),
 					() -> {
 						CompletableFuture<ItemStack> future = new CompletableFuture<>();
-						future.complete(getAccessHeaderIcon(GuildAccessLevel.GUEST));
+						future.complete(getAccessHeaderIcon(accessLevel));
 						return future;
 					},
-					onGuestAccessHeaderClick());
+					onAccessHeaderClick(accessLevel)
+				);
 				setView(view);
 			}
 		};
@@ -828,7 +911,6 @@ public class GuildGui extends Gui {
 
 		UUID playerUuid = playerGuildInfo.getUniqueId();
 		String playerName = playerGuildInfo.getNonNullName();
-		boolean nameIsUnknown = playerGuildInfo.getPlayerName() == null;
 
 		if (playerUuid == null) {
 			item = new ItemStack(Material.BARRIER);
@@ -836,15 +918,8 @@ public class GuildGui extends Gui {
 			meta.displayName(Component.text("Could not look up UUID for " + playerName, NamedTextColor.RED)
 				.decoration(TextDecoration.ITALIC, false));
 		} else {
-			item = new ItemStack(Material.PLAYER_HEAD);
+			item = ItemUtils.createPlayerHead(playerUuid, playerName);
 			meta = item.getItemMeta();
-			if (meta instanceof SkullMeta skullMeta) {
-				if (nameIsUnknown) {
-					skullMeta.setPlayerProfile(Bukkit.createProfile(playerUuid, playerUuid.toString()));
-				} else {
-					skullMeta.setPlayerProfile(Bukkit.createProfile(playerUuid, playerName));
-				}
-			}
 		}
 		meta.displayName(Component.text(playerName, NamedTextColor.YELLOW)
 			.decoration(TextDecoration.ITALIC, false));
@@ -854,7 +929,8 @@ public class GuildGui extends Gui {
 			lore = new ArrayList<>();
 		}
 
-		if (GuildAccessLevel.GUEST.equals(playerGuildInfo.getAccessLevel())) {
+		GuildAccessLevel accessLevel = playerGuildInfo.getAccessLevel();
+		if (!GuildAccessLevel.FOUNDER.equals(accessLevel)) {
 			for (GuildPermission guildPermission : GuildPermission.values()) {
 				if (playerGuildInfo.getGuildPermissions().contains(guildPermission)) {
 					lore.add(Component.text("- May ", NamedTextColor.GREEN)
@@ -868,7 +944,7 @@ public class GuildGui extends Gui {
 			}
 			lore.add(Component.empty());
 
-			if (mayManagePermissions(false)) {
+			if (mayManagePermissions(accessLevel, false)) {
 				Component baseLoreFormatting = Component.text("", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false);
 
@@ -885,12 +961,15 @@ public class GuildGui extends Gui {
 
 	protected Consumer<InventoryClickEvent> onPlayerIconClick(PlayerGuildInfo playerGuildInfo) {
 		return (InventoryClickEvent event) -> {
+			GuildAccessLevel accessLevel = playerGuildInfo.getAccessLevel();
 			if (
 				event.getHotbarButton() == 0
-					&& mayManagePermissions(false)
-					&& GuildAccessLevel.GUEST.equals(playerGuildInfo.getAccessLevel())
+					&& !GuildAccessLevel.FOUNDER.equals(accessLevel)
+					&& mayManagePermissions(accessLevel, false)
 			) {
-				View view = new PermissionView(this,
+				View view = new PermissionView(
+					this,
+					playerGuildInfo.getAccessLevel().equals(GuildAccessLevel.GUEST),
 					playerGuildInfo.getUser(),
 					getPlayerIconItem(playerGuildInfo),
 					() -> {
@@ -903,23 +982,28 @@ public class GuildGui extends Gui {
 
 						return future;
 					},
-					onPlayerIconClick(playerGuildInfo));
+					onPlayerIconClick(playerGuildInfo)
+				);
 				setView(view);
 			}
 		};
 	}
 
 	protected boolean isManager() {
+		return isAccessLevel(GuildAccessLevel.MANAGER);
+	}
+
+	protected boolean isAccessLevel(GuildAccessLevel accessLevel) {
 		Group guildAccessGroup = LuckPermsIntegration.getGuild(mTargetUser);
 		Group guildRoot = LuckPermsIntegration.getGuildRoot(guildAccessGroup);
 		return guildAccessGroup != null
 			&& guildRoot != null
 			&& guildRoot.equals(LuckPermsIntegration.getGuildRoot(mGuildGroup))
-			&& GuildAccessLevel.byGroup(guildAccessGroup).compareTo(GuildAccessLevel.MANAGER) <= 0;
+			&& GuildAccessLevel.byGroup(guildAccessGroup).compareTo(accessLevel) <= 0;
 	}
 
-	protected boolean mayManagePermissions(boolean showErrorMessages) {
-		if (isManager()) {
+	protected boolean mayManagePermissions(GuildAccessLevel targetLevel, boolean showErrorMessages) {
+		if (isAccessLevel(targetLevel.compareTo(GuildAccessLevel.MANAGER) <= 0 ? GuildAccessLevel.FOUNDER : GuildAccessLevel.MANAGER)) {
 			return true;
 		}
 
