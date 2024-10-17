@@ -4,6 +4,9 @@ import com.playmonumenta.plugins.inventories.Wallet;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -38,6 +41,39 @@ public class WalletUtils {
 			mNumInWallet = numInWallet;
 			mNumInInventory = numInInventory;
 		}
+	}
+
+	/**
+	 * Calculates the amount of debt for the inventory and wallet, of the requirement item and its amount. Also returns whether the
+	 * player has enough currency to complete the trade.
+	 *
+	 * @param requirement       the ItemStack to calculate debt for.
+	 * @param inventoryContents the contents of the player's inventory.
+	 * @param reqAmount The amount of the item required.
+	 * @param wallet            the Wallet of the player.
+	 * @param prioritizeWallet  whether to take from the wallet first (true) or the inventory first (false)
+	 * @return a Debt object with the relevant information.
+	 */
+	public static Debt calculateInventoryAndWalletDebt(ItemStack requirement, int reqAmount, ItemStack[] inventoryContents, @Nullable Wallet wallet, boolean prioritizeWallet) {
+		// Find the requirement amounts in inventory and wallet:
+		int numInInventory = InventoryUtils.numInInventory(inventoryContents, requirement);
+		long numInWallet = (wallet != null && WalletManager.isCurrency(requirement)) ? wallet.count(requirement) : 0;
+		boolean meetsRequirement = ((long) numInInventory + numInWallet >= (long) reqAmount);
+
+		// Find the debt (amount to remove) for inventory and wallet:
+		int inventoryDebt;
+		int walletDebt;
+		if (!prioritizeWallet) {
+			// Prioritize inventory:
+			inventoryDebt = Math.min(numInInventory, reqAmount);
+			walletDebt = (int) Math.min(reqAmount - inventoryDebt, numInWallet);
+		} else {
+			// Prioritize wallet:
+			walletDebt = (int) Math.min(numInWallet, reqAmount);
+			inventoryDebt = Math.min(reqAmount - walletDebt, numInInventory);
+		}
+
+		return new Debt(requirement, reqAmount, inventoryDebt, walletDebt, meetsRequirement, numInWallet, numInInventory);
 	}
 
 	/**
@@ -78,11 +114,30 @@ public class WalletUtils {
 	}
 
 	public static void payDebt(Debt debt, Player player, boolean notify) {
+		final int oneStack = debt.mItem.getMaxStackSize();
 		if (debt.mInventoryDebt > 0) {
-			player.getInventory().removeItem(debt.mItem.asQuantity(debt.mInventoryDebt));
+			if (debt.mInventoryDebt <= oneStack) {
+				player.getInventory().removeItem(debt.mItem.asQuantity(debt.mInventoryDebt));
+			} else {
+				int left = debt.mInventoryDebt;
+				while (left > 0) {
+					int toRemove = Math.min(left, oneStack);
+					player.getInventory().removeItem(debt.mItem.asQuantity(toRemove));
+					left -= toRemove;
+				}
+			}
 		}
 		if (debt.mWalletDebt > 0) {
-			WalletManager.getWallet(player).remove(player, debt.mItem.asQuantity(debt.mWalletDebt));
+			if (debt.mWalletDebt <= oneStack) {
+				WalletManager.getWallet(player).remove(player, debt.mItem.asQuantity(debt.mWalletDebt));
+			} else {
+				int left = debt.mWalletDebt;
+				while (left > 0) {
+					int toRemove = Math.min(left, oneStack);
+					WalletManager.getWallet(player).remove(player, debt.mItem.asQuantity(toRemove));
+					left -= toRemove;
+				}
+			}
 			if (notify) {
 				notifyRemovalFromWallet(debt, player);
 			}
@@ -104,7 +159,31 @@ public class WalletUtils {
 	}
 
 	public static boolean tryToPayFromInventoryAndWallet(Player player, List<ItemStack> costs) {
+		return tryToPayFromInventoryAndWallet(player, costs.stream().collect(Collectors.toMap(Function.identity(), ItemStack::getAmount)), false, true);
+	}
+
+	public static boolean tryToPayFromInventoryAndWallet(Player player, Map<ItemStack, Integer> costs) {
 		return tryToPayFromInventoryAndWallet(player, costs, false, true);
+	}
+
+	private static boolean tryToPayFromInventoryAndWallet(Player player, Map<ItemStack, Integer> costs, boolean prioritizeWallet, boolean notify) {
+		PlayerInventory playerInventory = player.getInventory();
+		Wallet wallet = WalletManager.getWallet(player);
+		List<Debt> debts = new ArrayList<>(costs.size());
+		for (Map.Entry<ItemStack, Integer> cost : costs.entrySet()) {
+			if (ItemUtils.isNullOrAir(cost.getKey())) {
+				continue;
+			}
+			Debt debt = calculateInventoryAndWalletDebt(cost.getKey(), cost.getValue(), playerInventory.getStorageContents(), wallet, prioritizeWallet);
+			if (!debt.mMeetsRequirement) {
+				return false;
+			}
+			debts.add(debt);
+		}
+		for (Debt debt : debts) {
+			payDebt(debt, player, notify);
+		}
+		return true;
 	}
 
 	public static boolean tryToPayFromInventoryAndWallet(Player player, List<ItemStack> costs, boolean prioritizeWallet, boolean notify) {
