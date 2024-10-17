@@ -1353,21 +1353,39 @@ public class ItemStatUtils {
 	}
 
 	public static boolean isCharm(@Nullable ItemStack item) {
-		return getCharmType(item) != null;
+		Tier tier = getTier(item);
+		return isCharm(tier);
+	}
+
+	public static boolean isCharm(Tier tier) {
+		return isNormalCharm(tier) || isZenithCharm(tier);
+	}
+
+	public static boolean isNormalCharm(Tier tier) {
+		return tier == Tier.CHARM || tier == Tier.RARE_CHARM || tier == Tier.EPIC_CHARM || tier == Tier.LEGACY_CHARM;
 	}
 
 	public static boolean isNormalCharm(@Nullable ItemStack item) {
 		Tier tier = getTier(item);
-		return tier == Tier.CHARM || tier == Tier.RARE_CHARM || tier == Tier.EPIC_CHARM || tier == Tier.LEGACY_CHARM;
+		return isNormalCharm(tier);
+	}
+
+	public static boolean isZenithCharm(Tier tier) {
+		return tier == Tier.ZENITH_CHARM;
 	}
 
 	public static boolean isZenithCharm(@Nullable ItemStack item) {
 		Tier tier = getTier(item);
-		return tier == Tier.ZENITH_CHARM;
+		return isZenithCharm(tier);
+	}
+
+	public static boolean isFish(Tier tier) {
+		return tier == Tier.FISH;
 	}
 
 	public static boolean isFish(@Nullable ItemStack item) {
-		return getTier(item) == Tier.FISH;
+		Tier tier = getTier(item);
+		return isFish(tier);
 	}
 
 	// Returns true if the item has mainhand attack damage OR doesn't have mainhand projectile damage (i.e. any ranged weapon that is not also a melee weapon)

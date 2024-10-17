@@ -308,24 +308,24 @@ public class ItemUpdateHelper {
 
 			// TIER/MASTERWORK
 			if (ItemStatUtils.getEnchantmentLevel(enchantments, EnchantmentType.HIDE_INFO) == 0) {
-				String regionString = monumenta.getString(Region.KEY);
-				if (regionString != null && !regionString.isEmpty()) {
-					Region region = Region.getRegion(regionString);
-					Masterwork masterwork = Masterwork.getMasterwork(monumenta.getString(Masterwork.KEY));
-					Tier tier = Tier.getTier(monumenta.getString(Tier.KEY));
-					if (region != null) {
-						// For R3 items, set tier to match masterwork level
-						if (region == Region.RING) {
-							if (masterwork != null && masterwork != Masterwork.ERROR && masterwork != Masterwork.NONE) {
-								switch (Objects.requireNonNull(masterwork)) {
-									case ZERO, I, II, III -> tier = Tier.RARE;
-									case IV, V -> tier = Tier.ARTIFACT;
-									case VI -> tier = Tier.EPIC;
-									case VIIA, VIIB, VIIC -> tier = Tier.LEGENDARY;
-									default -> {
-										// No Tier
-									}
+				Region region = Region.getRegion(monumenta.getString(Region.KEY));
+				Masterwork masterwork = Masterwork.getMasterwork(monumenta.getString(Masterwork.KEY));
+				Tier tier = Tier.getTier(monumenta.getString(Tier.KEY));
+				if (region != null && region != Region.NONE) {
+					// For R3 items, set tier to match masterwork level
+					if (region == Region.RING) {
+						if (masterwork != null && masterwork != Masterwork.ERROR && masterwork != Masterwork.NONE) {
+							final Tier previousTier = tier;
+							switch (Objects.requireNonNull(masterwork)) {
+								case ZERO, I, II, III -> tier = Tier.RARE;
+								case IV, V -> tier = Tier.ARTIFACT;
+								case VI -> tier = Tier.EPIC;
+								case VIIA, VIIB, VIIC -> tier = Tier.LEGENDARY;
+								default -> {
+									// No Tier
 								}
+							}
+							if (previousTier != tier && tier != Tier.NONE) {
 								String modifyTier = tier.getName();
 								NBT.modify(item, wnbt -> {
 									ReadWriteNBT wmonumenta = wnbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY);
@@ -333,35 +333,34 @@ public class ItemUpdateHelper {
 								});
 							}
 						}
-						if (tier != null && tier != Tier.NONE) {
-							lore.add(region.getDisplay().append(tier.getDisplay()));
-						}
 					}
+					if (tier != null && tier != Tier.NONE) {
+						lore.add(region.getDisplay().append(tier.getDisplay()));
+					}
+				}
 
+				// Masterwork, Charm Power and Fish Quality are mutually exclusive
+				if (masterwork != null && masterwork != Masterwork.NONE) {
+					lore.add(Component.text("Masterwork : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(masterwork.getDisplay()));
+				} else if (ItemStatUtils.isCharm(tier)) {
 					CharmManager.CharmType charmType = ItemStatUtils.getCharmType(item);
-					if (charmType != null) {
-						int charmPower = ItemStatUtils.getCharmPower(item);
-						if (charmPower > 0) {
-							String starString = "★".repeat(charmPower);
-							lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)).append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(charmType.getLabel(nbt)));
-						}
+					int charmPower = ItemStatUtils.getCharmPower(item);
+					if (charmType != null && charmPower > 0) {
+						String starString = "★".repeat(charmPower);
+						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)).append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(charmType.getLabel(nbt)));
 					}
+				} else if (ItemStatUtils.isFish(tier)) {
+					int fishQuality = ItemStatUtils.getFishQuality(item);
+					if (fishQuality > 0) {
+						String starString = "★".repeat(fishQuality) + "☆".repeat(5 - fishQuality);
+						TextColor color = fishQuality == 5 ? TextColor.fromHexString("#28FACC") : TextColor.fromHexString("#1DCC9A");
+						lore.add(Component.text("Fish Quality : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, color)).decoration(TextDecoration.ITALIC, false));
+					}
+				}
 
-					if (ItemStatUtils.isFish(item)) {
-						int fishQuality = ItemStatUtils.getFishQuality(item);
-						if (fishQuality > 0) {
-							String starString = "★".repeat(fishQuality) + "☆".repeat(5 - fishQuality);
-							TextColor color = fishQuality == 5 ? TextColor.fromHexString("#28FACC") : TextColor.fromHexString("#1DCC9A");
-							lore.add(Component.text("Fish Quality : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, color)).decoration(TextDecoration.ITALIC, false));
-						}
-					}
-					if (masterwork != null && masterwork != Masterwork.NONE) {
-						lore.add(Component.text("Masterwork : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(masterwork.getDisplay()));
-					}
-					Location location = Location.getLocation(monumenta.getString(Location.KEY));
-					if (location != null) {
-						lore.add(location.getDisplay());
-					}
+				Location location = Location.getLocation(monumenta.getString(Location.KEY));
+				if (location != null) {
+					lore.add(location.getDisplay());
 				}
 			}
 
@@ -374,6 +373,7 @@ public class ItemUpdateHelper {
 					lore.add(lineAdd);
 				}
 			}
+
 			if (ItemStatUtils.isArrowTransformingQuiver(item)) {
 				QuiverListener.ArrowTransformMode transformMode = ItemStatUtils.getArrowTransformMode(item);
 				if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
@@ -670,6 +670,8 @@ public class ItemUpdateHelper {
 			ReadableNBT monumenta = nbt.getCompound("Monumenta");
 			if (nbt.hasTag("CustomPotionEffects") && monumenta != null && monumenta.hasTag(ItemStatUtils.STOCK_KEY)) {
 				errors.add("Has CustomPotionEffects & Monumenta.Stock tags!");
+			} else if (nbt.hasTag("CustomPotionEffects")) {
+				errors.add("Has CustomPotionEffects tag!");
 			}
 
 			List<VanillaEnchantmentType> nbtEnchantments = new ArrayList<>();

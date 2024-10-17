@@ -25,6 +25,5 @@ public class UpdateHeldItem extends GenericCommand {
 			errorFound = "Errors found with held item: " + errorFound;
 			throw CommandAPI.failWithString(errorFound);
 		}
-		player.getEquipment().setItemInMainHand(item, true);
 	}
 }
