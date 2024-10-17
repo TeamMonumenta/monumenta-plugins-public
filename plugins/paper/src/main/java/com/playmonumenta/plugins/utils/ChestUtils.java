@@ -26,7 +26,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
@@ -64,13 +63,12 @@ public class ChestUtils {
 	}
 
 	public static void generateContainerLootWithScaling(Player player, Block block) {
-		BlockState blockState = block.getState();
-		if (blockState instanceof Container) {
-			Inventory inventory = ((Container) blockState).getInventory();
-			if (inventory instanceof DoubleChestInventory) {
-				boolean forceLootShare = lootTableInventoryHasBonusRolls(((DoubleChestInventory) inventory).getLeftSide());
-				generateContainerLootWithScaling(player, ((DoubleChestInventory) inventory).getLeftSide());
-				generateContainerLootWithScaling(player, ((DoubleChestInventory) inventory).getRightSide(), forceLootShare);
+		if (block.getState() instanceof Container container) {
+			Inventory inventory = container.getInventory();
+			if (inventory instanceof DoubleChestInventory doubleChest) {
+				boolean forceLootShare = lootTableInventoryHasBonusRolls(doubleChest.getLeftSide());
+				generateContainerLootWithScaling(player, doubleChest.getLeftSide());
+				generateContainerLootWithScaling(player, doubleChest.getRightSide(), forceLootShare);
 			} else {
 				generateContainerLootWithScaling(player, inventory);
 			}
@@ -82,164 +80,169 @@ public class ChestUtils {
 	}
 
 	private static void generateContainerLootWithScaling(Player player, Inventory inventory, boolean forceLootshare) {
-		if (inventory.getHolder() instanceof Lootable lootable) {
-			LootTable lootTable = lootable.getLootTable();
-			if (lootTable != null) {
-				/* Figure out what the luck level should be and which players contribute to scaling */
-				int luckAmount; // The amount of luck the loot table should be rolled with
-				List<Player> nearbyPlayers = Collections.singletonList(player); // All players that may receive loot slices
+		if (!(inventory.getHolder() instanceof Lootable lootable)) {
+			return;
+		}
 
-				LootTableManager.LootTableEntry lootEntry = LootTableManager.getLootTableEntry(lootTable.getKey());
-				if (lootEntry == null) {
-					// This loot table doesn't exist, likely an error
-					MMLog.severe("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which wasn't loaded by LootTableManager");
-					luckAmount = 0;
-				} else if (ZoneUtils.hasZoneProperty(inventory.getLocation() != null ? inventory.getLocation() : player.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
-					// Loot scaling is disabled (dungeon loot rooms)
-					luckAmount = 0;
-				} else if (!lootEntry.hasBonusRolls()) {
-					// This chest doesn't have bonus rolls, don't apply luck
-					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which did not have scaling enabled");
-					luckAmount = 0;
-				} else {
-					// Loot scaling is enabled
-					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which was scaled & distributed");
+		LootTable lootTable = lootable.getLootTable();
+		if (lootTable == null) {
+			return;
+		}
 
-					// Get all players in range
-					nearbyPlayers = PlayerUtils.playersInLootScalingRange(player, false);
+		/* Figure out what the luck level should be and which players contribute to scaling */
+		int luckAmount; // The amount of luck the loot table should be rolled with
+		List<Player> nearbyPlayers = Collections.singletonList(player); // All players that may receive loot slices
 
-					// This should at minimum be one since there should always be one player (the person who opened the chest)
-					int otherPlayersMultiplier = nearbyPlayers.size();
+		boolean isInLootroom = ZoneUtils.hasZoneProperty(inventory.getLocation() != null ? inventory.getLocation() : player.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM);
+		LootTableManager.LootTableEntry lootEntry = LootTableManager.getLootTableEntry(lootTable.getKey());
+		if (lootEntry == null) {
+			// This loot table doesn't exist, likely an error
+			MMLog.severe("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which wasn't loaded by LootTableManager");
+			luckAmount = 0;
+		} else if (isInLootroom) {
+			// Loot scaling is disabled (dungeon loot rooms)
+			luckAmount = 0;
+		} else if (!lootEntry.hasBonusRolls()) {
+			// This chest doesn't have bonus rolls, don't apply luck
+			MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which did not have scaling enabled");
+			luckAmount = 0;
+		} else {
+			// Loot scaling is enabled
+			MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which was scaled & distributed");
 
-					MMLog.fine("Lootable seed: " + lootable.getSeed());
-					// Loot table seed set and use the seed for number of players
-					if (lootable.getSeed() > 0 && lootable.getSeed() < 50) {
-						otherPlayersMultiplier = (int)lootable.getSeed();
-						MMLog.fine("Chest loot was already generated due to a spawner being broken with seed " + otherPlayersMultiplier);
-					}
+			// Get all players in range
+			nearbyPlayers = PlayerUtils.playersInLootScalingRange(player, false);
 
-					double bonusItems = BONUS_ITEMS[Math.min(BONUS_ITEMS.length - 1, otherPlayersMultiplier)];
-					MMLog.fine("Lootscaling for " + nearbyPlayers.size() + " players: " + bonusItems);
-					luckAmount = (int) bonusItems;
+			// This should at minimum be one since there should always be one player (the person who opened the chest)
+			int otherPlayersMultiplier = nearbyPlayers.size();
 
-					// Account for fractions of extra items with random roll
-					if (FastUtils.RANDOM.nextDouble() < bonusItems - luckAmount) {
-						luckAmount++;
-					}
-				}
-
-				// Actually roll the loot into a collection of items
-				LootContext.Builder builder = new LootContext.Builder(player.getLocation());
-				builder.luck(luckAmount);
-				LootContext context = builder.build();
-				Collection<ItemStack> popLoot = lootTable.populateLoot(FastUtils.RANDOM, context);
-				// Clear the original chest (vanilla behavior, loot table overrides whatever is in the chest, doesn't add to it
-				inventory.clear();
-
-				if (forceLootshare) {
-					nearbyPlayers = PlayerUtils.playersInLootScalingRange(player, false);
-				}
-
-				// Divide the items up into fractional buckets for all the players
-				List<List<ItemStack>> itemBuckets = LootboxManager.distributeLootToBuckets(new ArrayList<>(popLoot), nearbyPlayers.size());
-
-				// The orig container starts with the first bucket of items
-				// Need to make a copy here because the buckets lists are not modifiable
-				List<ItemStack> itemsForOrigContainer = new ArrayList<>();
-
-				Set<String> lootBoxPlayers = new TreeSet<>();
-				Set<String> noSharePlayers = new TreeSet<>();
-				// if lootbox isn't enabled for this shard or
-				// if the opener is the only player, don't bother trying to give them a lootshare
-				if (ServerProperties.getLootBoxEnabled() && !(nearbyPlayers.size() == 1 && nearbyPlayers.contains(player))) {
-					int bucketIdx = 0; // Start at 0
-					for (Player other : nearbyPlayers) {
-						if (other.getUniqueId().equals(player.getUniqueId())) {
-							// Don't give lootshare to self
-							itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
-							bucketIdx++;
-							continue;
-						}
-						// otherwise give lootshare to other players
-						@Nullable List<ItemStack> rejectedItems = LootboxManager.giveShareToPlayer(new ArrayList<>(itemBuckets.get(bucketIdx)), other);
-						// rejectedItems will be null if player has no lootbox
-						// if rejectedItems is empty or has items, that means player has a lootbox
-						if (rejectedItems == null) {
-							// Failed to give this slice to the other player (no lootbox or lootbox is full)
-							// Put all these items in the orig container
-							itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
-							noSharePlayers.add(other.getName());
-						} else {
-							// Put rejected items in original container
-							if (!rejectedItems.isEmpty()) {
-								itemsForOrigContainer.addAll(rejectedItems);
-							}
-							lootBoxPlayers.add(other.getName());
-						}
-						bucketIdx++;
-					}
-				} else {
-					// Add all items to chest if lootboxes are not enabled or there is only one player opening the chest
-					for (List<ItemStack> items : itemBuckets) {
-						itemsForOrigContainer.addAll(items);
-					}
-				}
-
-				if (!lootBoxPlayers.isEmpty()) {
-					// Sound to indicate loot was split
-					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 0.2f, 1.4f);
-
-					StringJoiner otherPlayersJoiner = new StringJoiner(", ");
-					for (String other : lootBoxPlayers) {
-						otherPlayersJoiner.add(other);
-					}
-					StringJoiner noSharePlayerJoiner = new StringJoiner(", ");
-					for (String noShare : noSharePlayers) {
-						noSharePlayerJoiner.add(noShare);
-					}
-					Component lootboxPlayers = Component.text(lootBoxPlayers.size()
-						+ " nearby player" + (lootBoxPlayers.size() == 1 ? "" : "s"),
-						NamedTextColor.GOLD)
-						.hoverEvent(Component.text(otherPlayersJoiner.toString()));
-
-					Component noSharePlayerComponent;
-					if (noSharePlayers.isEmpty()) {
-						noSharePlayerComponent = Component.empty();
-					} else {
-						StringJoiner noShareJoiner = new StringJoiner(", ");
-						for (String other : noSharePlayers) {
-							noShareJoiner.add(other);
-						}
-						noSharePlayerComponent = Component.text(noSharePlayers.size()
-									+ " player" + (noSharePlayers.size() == 1 ? "" : "s") + " got no share",
-								NamedTextColor.RED)
-							.hoverEvent(Component.text(noSharePlayerJoiner.toString()));
-						noSharePlayerComponent = Component.text(", and ", NamedTextColor.GOLD)
-							.append(noSharePlayerComponent);
-					}
-
-					Component lootDistributedMessage = Component.text("Loot distributed to ", NamedTextColor.GOLD)
-						.append(lootboxPlayers)
-						.append(noSharePlayerComponent);
-
-					if (player.getScoreboardTags().contains("ActionBarLootbox")) {
-						player.sendActionBar(lootDistributedMessage);
-					} else {
-						lootDistributedMessage = lootDistributedMessage.hoverEvent(Component.text(otherPlayersJoiner.toString()));
-						player.sendMessage(lootDistributedMessage);
-					}
-				}
-
-				// Put the remainder of the loot in the original container
-				generateLootInventory(itemsForOrigContainer, inventory, player, true);
-
-				// warning on build server
-				if (!Plugin.IS_PLAY_SERVER) {
-					player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 1, 1);
-					player.sendMessage(Component.text("Loot table rolled!", NamedTextColor.RED).decorate(TextDecoration.BOLD)
-						                   .append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
-				}
+			MMLog.fine("Lootable seed: " + lootable.getSeed());
+			// Loot table seed set and use the seed for number of players
+			if (lootable.getSeed() > 0 && lootable.getSeed() < 50) {
+				otherPlayersMultiplier = (int)lootable.getSeed();
+				MMLog.fine("Chest loot was already generated due to a spawner being broken with seed " + otherPlayersMultiplier);
 			}
+
+			double bonusItems = BONUS_ITEMS[Math.min(BONUS_ITEMS.length - 1, otherPlayersMultiplier)];
+			MMLog.fine("Lootscaling for " + nearbyPlayers.size() + " players: " + bonusItems);
+			luckAmount = (int) bonusItems;
+
+			// Account for fractions of extra items with random roll
+			if (FastUtils.RANDOM.nextDouble() < bonusItems - luckAmount) {
+				luckAmount++;
+			}
+		}
+
+		// Actually roll the loot into a collection of items
+		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
+		builder.luck(luckAmount);
+		LootContext context = builder.build();
+		Collection<ItemStack> popLoot = lootTable.populateLoot(FastUtils.RANDOM, context);
+		// Clear the original chest (vanilla behavior, loot table overrides whatever is in the chest, doesn't add to it
+		inventory.clear();
+
+		if (forceLootshare && !isInLootroom) {
+			nearbyPlayers = PlayerUtils.playersInLootScalingRange(player, false);
+		}
+
+		// Divide the items up into fractional buckets for all the players
+		List<List<ItemStack>> itemBuckets = LootboxManager.distributeLootToBuckets(new ArrayList<>(popLoot), nearbyPlayers.size());
+
+		// The orig container starts with the first bucket of items
+		// Need to make a copy here because the buckets lists are not modifiable
+		List<ItemStack> itemsForOrigContainer = new ArrayList<>();
+
+		Set<String> lootBoxPlayers = new TreeSet<>();
+		Set<String> noSharePlayers = new TreeSet<>();
+		// if lootbox isn't enabled for this shard or
+		// if the opener is the only player, don't bother trying to give them a lootshare
+		if (ServerProperties.getLootBoxEnabled() && !(nearbyPlayers.size() == 1 && nearbyPlayers.contains(player))) {
+			int bucketIdx = 0; // Start at 0
+			for (Player other : nearbyPlayers) {
+				if (other.getUniqueId().equals(player.getUniqueId())) {
+					// Don't give lootshare to self
+					itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
+					bucketIdx++;
+					continue;
+				}
+				// otherwise give lootshare to other players
+				@Nullable List<ItemStack> rejectedItems = LootboxManager.giveShareToPlayer(new ArrayList<>(itemBuckets.get(bucketIdx)), other);
+				// rejectedItems will be null if player has no lootbox
+				// if rejectedItems is empty or has items, that means player has a lootbox
+				if (rejectedItems == null) {
+					// Failed to give this slice to the other player (no lootbox or lootbox is full)
+					// Put all these items in the orig container
+					itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
+					noSharePlayers.add(other.getName());
+				} else {
+					// Put rejected items in original container
+					if (!rejectedItems.isEmpty()) {
+						itemsForOrigContainer.addAll(rejectedItems);
+					}
+					lootBoxPlayers.add(other.getName());
+				}
+				bucketIdx++;
+			}
+		} else {
+			// Add all items to chest if lootboxes are not enabled or there is only one player opening the chest
+			for (List<ItemStack> items : itemBuckets) {
+				itemsForOrigContainer.addAll(items);
+			}
+		}
+
+		if (!lootBoxPlayers.isEmpty()) {
+			// Sound to indicate loot was split
+			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 0.2f, 1.4f);
+
+			StringJoiner otherPlayersJoiner = new StringJoiner(", ");
+			for (String other : lootBoxPlayers) {
+				otherPlayersJoiner.add(other);
+			}
+			StringJoiner noSharePlayerJoiner = new StringJoiner(", ");
+			for (String noShare : noSharePlayers) {
+				noSharePlayerJoiner.add(noShare);
+			}
+			Component lootboxPlayers = Component.text(lootBoxPlayers.size()
+				+ " nearby player" + (lootBoxPlayers.size() == 1 ? "" : "s"),
+				NamedTextColor.GOLD)
+				.hoverEvent(Component.text(otherPlayersJoiner.toString()));
+
+			Component noSharePlayerComponent;
+			if (noSharePlayers.isEmpty()) {
+				noSharePlayerComponent = Component.empty();
+			} else {
+				StringJoiner noShareJoiner = new StringJoiner(", ");
+				for (String other : noSharePlayers) {
+					noShareJoiner.add(other);
+				}
+				noSharePlayerComponent = Component.text(noSharePlayers.size()
+							+ " player" + (noSharePlayers.size() == 1 ? "" : "s") + " got no share",
+						NamedTextColor.RED)
+					.hoverEvent(Component.text(noSharePlayerJoiner.toString()));
+				noSharePlayerComponent = Component.text(", and ", NamedTextColor.GOLD)
+					.append(noSharePlayerComponent);
+			}
+
+			Component lootDistributedMessage = Component.text("Loot distributed to ", NamedTextColor.GOLD)
+				.append(lootboxPlayers)
+				.append(noSharePlayerComponent);
+
+			if (player.getScoreboardTags().contains("ActionBarLootbox")) {
+				player.sendActionBar(lootDistributedMessage);
+			} else {
+				lootDistributedMessage = lootDistributedMessage.hoverEvent(Component.text(otherPlayersJoiner.toString()));
+				player.sendMessage(lootDistributedMessage);
+			}
+		}
+
+		// Put the remainder of the loot in the original container
+		generateLootInventory(itemsForOrigContainer, inventory, player, true);
+
+		// warning on build server
+		if (!Plugin.IS_PLAY_SERVER) {
+			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 1, 1);
+			player.sendMessage(Component.text("Loot table rolled!", NamedTextColor.RED).decorate(TextDecoration.BOLD)
+				                   .append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 		}
 	}
 
