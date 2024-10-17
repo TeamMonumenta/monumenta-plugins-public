@@ -91,8 +91,6 @@ public class DepthsParty {
 	public @Nullable Vector mFloorLobbyLoadPoint;
 	//Where to tp the players at the start of the next floor
 	public @Nullable Vector mFloorLobbyLoadPlayerTpPoint;
-	//Used to determine if the party can receive an upgrade reward
-	public boolean mHasAtLeastOneAbility;
 	//Locations of the loot rooms to tp players to (should be 4)
 	public List<Vector> mLootRoomLocations;
 	//Number of loot rooms the party has used
@@ -200,7 +198,6 @@ public class DepthsParty {
 		mRoomNumber = 0;
 		mSpawnersToBreak = 0;
 		mMobsToKill = 0;
-		mHasAtLeastOneAbility = false;
 		mOldRooms = new ArrayList<>();
 		mLootRoomLocations = new ArrayList<>();
 		mDelveModifiers = new HashMap<>();

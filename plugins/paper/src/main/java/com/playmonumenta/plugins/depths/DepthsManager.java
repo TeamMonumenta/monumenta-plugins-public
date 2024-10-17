@@ -476,81 +476,82 @@ public class DepthsManager {
 		if (name == null) {
 			return;
 		}
+		DepthsAbilityInfo<?> info = getAbility(name);
+		if (info == null) {
+			return;
+		}
+
 		DepthsPlayer dp = getDepthsPlayer(p);
-		if (dp != null) {
-			int previousLevel = dp.getLevelInAbility(name);
-			int displayLevel = level == 0 ? previousLevel : level;
-			if (level > 0) {
-				dp.mAbilities.put(name, level);
-			} else {
-				dp.mAbilities.remove(name);
-			}
-			AbilityManager.getManager().updatePlayerAbilities(p, false);
+		if (dp == null) {
+			return;
+		}
 
-			DepthsAbilityInfo<?> info = getAbility(name);
-			if (info == null) {
-				return;
-			}
-			if (previousLevel == 0 && level > 0) {
-				info.onGain(p);
-			}
+		int previousLevel = dp.getLevelInAbility(name);
+		int displayLevel = level == 0 ? previousLevel : level;
+		if (level > 0) {
+			dp.mAbilities.put(name, level);
+		} else {
+			dp.mAbilities.remove(name);
+		}
+		AbilityManager.getManager().updatePlayerAbilities(p, false);
 
-			//Adjust wand aspect active logic
-			DepthsTree tree = info.getDepthsTree();
-			if (dp.mWandAspectCharges > 0 && previousLevel == 0 && Arrays.asList(DepthsTree.OWNABLE_TREES).contains(tree) && info.getDepthsTrigger().isActive()) {
-				dp.mWandAspectCharges--;
-			}
+		//Adjust wand aspect active logic
+		DepthsTree tree = info.getDepthsTree();
+		if (dp.mWandAspectCharges > 0 && previousLevel == 0 && Arrays.asList(DepthsTree.OWNABLE_TREES).contains(tree) && info.getDepthsTrigger().isActive()) {
+			dp.mWandAspectCharges--;
+		}
 
-			DepthsParty party = getPartyFromId(dp);
-			if (party == null) {
-				return;
-			}
-			party.mHasAtLeastOneAbility = true;
-
-			if (announceToTeam || announceToSelf) {
-				//Tell their party that someone has selected an ability and is eligible for upgrade rooms
-				Component teamMessage = null;
-				Component playerMessage = null;
-				Component playerName = p.displayName();
-				Component abilityName = colorAbilityWithHover(name, displayLevel, previousLevel, p);
-				if (tree != null) {
-					if (level == 0) {
-						Component message = Component.text("lost ability: ").append(abilityName).append(Component.text("!"));
-						teamMessage = playerName.append(Component.text(" has ")).append(message);
-						playerMessage = Component.text("You ").append(message);
-					} else if (previousLevel > 0) {
-						String direction = previousLevel <= level ? "upgraded" : "downgraded";
-						Component message = Component.text(" " + direction + " ability: ").append(abilityName).append(Component.text(" to ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
-						teamMessage = playerName.append(message);
-						playerMessage = Component.text("You").append(message);
-					} else {
-						Component message = Component.text("ability: ").append(abilityName);
-						if (info.getHasLevels()) {
-							message = message.append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
-						} else {
-							message = message.append(Component.text("!"));
-						}
-						teamMessage = playerName.append(Component.text(" now has ")).append(message);
-						playerMessage = Component.text("You now have ").append(message);
-					}
+		if (announceToTeam || announceToSelf) {
+			//Tell their party that someone has selected an ability and is eligible for upgrade rooms
+			Component teamMessage = null;
+			Component playerMessage = null;
+			Component playerName = p.displayName();
+			Component abilityName = colorAbilityWithHover(name, displayLevel, previousLevel, p);
+			if (tree != null) {
+				if (level == 0) {
+					Component message = Component.text("lost ability: ").append(abilityName).append(Component.text("!"));
+					teamMessage = playerName.append(Component.text(" has ")).append(message);
+					playerMessage = Component.text("You ").append(message);
+				} else if (previousLevel > 0) {
+					String direction = previousLevel <= level ? "upgraded" : "downgraded";
+					Component message = Component.text(" " + direction + " ability: ").append(abilityName).append(Component.text(" to ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
+					teamMessage = playerName.append(message);
+					playerMessage = Component.text("You").append(message);
 				} else {
-					if (level == 1) {
-						Component message = Component.text("selected ").append(abilityName).append(Component.text(" as their aspect!"));
-						teamMessage = playerName.append(Component.text(" has ")).append(message);
-						playerMessage = Component.text("You have ").append(message);
-					} else if (level == 2) {
-						teamMessage = playerName.append(Component.text(" has had their Mystery Box transform into ").append(abilityName).append(Component.text("!")));
-						playerMessage = Component.text("Your Mystery Box has transformed into ").append(abilityName).append(Component.text("!"));
+					Component message = Component.text("ability: ").append(abilityName);
+					if (info.getHasLevels()) {
+						message = message.append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(level)).append(Component.text(" level!"));
+					} else {
+						message = message.append(Component.text("!"));
 					}
+					teamMessage = playerName.append(Component.text(" now has ")).append(message);
+					playerMessage = Component.text("You now have ").append(message);
 				}
-
-				if (announceToTeam && teamMessage != null) {
-					party.sendMessage(teamMessage, o -> o != dp);
-				}
-				if (announceToSelf && playerMessage != null) {
-					dp.sendMessage(playerMessage);
+			} else {
+				if (level == 1) {
+					Component message = Component.text("selected ").append(abilityName).append(Component.text(" as their aspect!"));
+					teamMessage = playerName.append(Component.text(" has ")).append(message);
+					playerMessage = Component.text("You have ").append(message);
+				} else if (level == 2) {
+					teamMessage = playerName.append(Component.text(" has had their Mystery Box transform into ").append(abilityName).append(Component.text("!")));
+					playerMessage = Component.text("Your Mystery Box has transformed into ").append(abilityName).append(Component.text("!"));
 				}
 			}
+
+			if (announceToTeam && teamMessage != null) {
+				DepthsParty party = getPartyFromId(dp);
+				if (party == null) {
+					return;
+				}
+				party.sendMessage(teamMessage, o -> o != dp);
+			}
+			if (announceToSelf && playerMessage != null) {
+				dp.sendMessage(playerMessage);
+			}
+		}
+
+		if (previousLevel == 0 && level > 0) {
+			info.onGain(p);
 		}
 	}
 
@@ -1146,11 +1147,6 @@ public class DepthsManager {
 		ArrayList<DepthsRoomType> values = new ArrayList<>(Arrays.asList(DepthsRoomType.values()));
 		values.remove(DepthsRoomType.BOSS);
 		values.remove(DepthsRoomType.TWISTED);
-		//if the party has not selected any abilities yet, do not let them get an upgrade reward!
-		if (!party.mHasAtLeastOneAbility) {
-			values.remove(DepthsRoomType.UPGRADE);
-			values.remove(DepthsRoomType.UPGRADE_ELITE);
-		}
 
 		//If the party is in endless mode and on floor 4+, reduce the chance of utility room
 		//50% chance to remove utility room from the pool if so
