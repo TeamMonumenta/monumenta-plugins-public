@@ -43,7 +43,7 @@ public class SpellSummonManageBlue extends Spell {
 			}
 
 			if (mBlue != null && (mBlue.getHealth() / EntityUtils.getAttributeBaseOrDefault(mBlue, Attribute.GENERIC_MAX_HEALTH, HarrakfarGodOfLife.mHealth) <= 0.5 || !mBlue.isValid())) {
-				if (mAdvancementTicks <= 10 && mBlue.isValid()) {
+				if (mAdvancementTicks <= 60 && mBlue.isValid()) {
 					for (Player p : mHyceneaRageOfTheWolf.mPlayersStartingFight) {
 						AdvancementUtils.grantAdvancement(p, "monumenta:dungeons/hexfall/false_god_of_life");
 					}
