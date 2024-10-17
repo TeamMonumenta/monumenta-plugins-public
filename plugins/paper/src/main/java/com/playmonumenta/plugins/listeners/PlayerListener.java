@@ -217,6 +217,14 @@ public class PlayerListener implements Listener {
 			event.joinMessage(null);
 		}
 
+		String shardName = ServerProperties.getShardName();
+		if (shardName.startsWith("valley") || shardName.startsWith("isles") || shardName.startsWith("ring")) {
+			if (player.getScoreboardTags().contains("resetMessage")) {
+				// It's after weekly update on an overworld shard; check for smuggled items/state
+				InventoryUtils.removeSpecialItems(event.getPlayer(), false, true, false);
+			}
+		}
+
 		if (!player.isOp() && player.getGameMode() == GameMode.CREATIVE) {
 			ZoneUtils.setExpectedGameMode(player);
 			MonumentaNetworkRelayIntegration.sendAdminMessage(player.getName() + " logged in in creative mode despite not being opped.");
