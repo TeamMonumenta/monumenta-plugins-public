@@ -33,18 +33,18 @@ public class CurseOfCorruption implements Enchantment {
 
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
-		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) > 1) {
-			if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
-				mCorruptionPlayers.add(player);
-				if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-					plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, PotionEffect.INFINITE_DURATION, 0, true, false));
-				}
-				plugin.mEffectManager.clearEffects(player, SLOWNESS_SOURCE);
-				plugin.mEffectManager.addEffect(player, SLOWNESS_SOURCE,
-					new PercentSpeed(Integer.MAX_VALUE, SLOWNESS_AMOUNT_PER_LEVEL * (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) - 1), SLOWNESS_SOURCE).displaysTime(false));
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, PotionEffect.INFINITE_DURATION, (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) - 1, true, false));
+		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION);
+		boolean plots = ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE);
+		if (level > 1 && !plots) {
+			mCorruptionPlayers.add(player);
+			if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
+				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, PotionEffect.INFINITE_DURATION, 0, true, false));
 			}
-		} else if (mCorruptionPlayers.remove(player)) {
+			plugin.mEffectManager.clearEffects(player, SLOWNESS_SOURCE);
+			plugin.mEffectManager.addEffect(player, SLOWNESS_SOURCE,
+				new PercentSpeed(Integer.MAX_VALUE, SLOWNESS_AMOUNT_PER_LEVEL * (level - 1), SLOWNESS_SOURCE).displaysTime(false));
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, PotionEffect.INFINITE_DURATION, level - 1, true, false));
+		} else if (mCorruptionPlayers.remove(player) || plots) {
 			plugin.mEffectManager.clearEffects(player, SLOWNESS_SOURCE);
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.BLINDNESS);
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.SLOW_DIGGING);
