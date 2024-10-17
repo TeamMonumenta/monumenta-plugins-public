@@ -31,6 +31,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -68,6 +69,7 @@ public class CustomTradeGui extends Gui {
 	public static final String SOUNDS = "peb_tradeGUI_sounds";
 	public static final String WALLET = "peb_tradeGUI_wallet";
 	public static final String PERMISSION = "monumenta.customtradegui";
+	private static final String TRADE_FREE_PERMISSION = "monumenta.freetrading";
 
 	// Options:
 	// Note: mPeb_tradeGUI_main & mPeb_tradeGUI_locked are also scoreboards, but not tested in here.
@@ -147,6 +149,7 @@ public class CustomTradeGui extends Gui {
 		TAB_SELECT, PAGE_FLIP, CONFIRM_TRADE, TRADE_ERROR, TRADE_SUCCESS, TRADE_MULTIPLIER
 	}
 
+
 	private class TradeReq {
 		// This class holds the status of the player's requirements for a specific trade.
 		private List<Component> mLore = new ArrayList<>();
@@ -155,11 +158,17 @@ public class CustomTradeGui extends Gui {
 		private final int mMultiplier;
 		private boolean mHasRequirements = true;
 		private final TradeWindowOpenEvent.Trade mTrade;
+		/**
+		 * Only true when:
+		 * The player in question is in creative mode and has the permission.
+		 */
+		private final boolean mShouldBypassRequirements;
 
 		public TradeReq(Player player, TradeWindowOpenEvent.Trade trade, int multiplier, boolean useCache) {
 			// Store trade:
 			mTrade = trade;
 			mMultiplier = multiplier;
+			mShouldBypassRequirements = player.getGameMode() == GameMode.CREATIVE && player.hasPermission(TRADE_FREE_PERMISSION);
 			// Obtain the requirements for this trade:
 			for (ItemStack requirement : trade.getRecipe().getIngredients()) {
 				// Check for air or null:
@@ -208,7 +217,7 @@ public class CustomTradeGui extends Gui {
 						Component.text(meetsRequirement ? "✓" : "✗", (meetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).append(
 						Component.text(walletDebt > 0 ? " (" + numInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 				// Update total requirement status:
-				mHasRequirements = mHasRequirements && meetsRequirement;
+				mHasRequirements &= meetsRequirement;
 			}
 			// Save the base requirement to our map:
 			boolean tradeAvailable = handleMaxUses(trade, multiplier, mLore);
@@ -216,7 +225,7 @@ public class CustomTradeGui extends Gui {
 				mSavedBaseRequirements.put(mRequirements, new TradeStatusWrapper(mHasRequirements, mLore));
 			}
 			// Check for locked trades:
-			mHasRequirements = mHasRequirements && tradeAvailable;
+			mHasRequirements &= tradeAvailable;
 		}
 
 		public List<Component> lore() {
@@ -247,11 +256,19 @@ public class CustomTradeGui extends Gui {
 			return mHasRequirements;
 		}
 
+		public boolean isCreative() {
+			return mShouldBypassRequirements;
+		}
+
 		public TradeWindowOpenEvent.Trade getTrade() {
 			return mTrade;
 		}
 
 		public void removeRequirements() {
+			if (isCreative()) {
+				mPlayer.sendMessage(Component.text("Since you are in creative mode, this item is free.", NamedTextColor.LIGHT_PURPLE));
+				return;
+			}
 			// Remove requirements from actual inventory and wallet:
 			Inventory inventory = mPlayer.getInventory();
 			Wallet wallet = (mPebTradeGUIWallet == 1) ? null : WalletManager.getWallet(mPlayer);
@@ -549,7 +566,7 @@ public class CustomTradeGui extends Gui {
 		ItemStack backButton = createBackButton(tradeReq.status());
 		setItem(4, 3, backButton).onLeftClick(this::navToGeneralView);
 		// Confirm/Deny Button:
-		if (tradeReq.status()) {
+		if (tradeReq.status() || tradeReq.isCreative()) {
 			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq)).onLeftClick(() -> {
 				buyNow(mSelectedTrade, mSelectedTradeMultiplier);
 			});
@@ -593,7 +610,7 @@ public class CustomTradeGui extends Gui {
 		}
 		// Double check requirements:
 		TradeReq tradeReq = new TradeReq(mPlayer, trade, multiplier, false);
-		if (!tradeReq.status()) {
+		if (!tradeReq.status() && !tradeReq.isCreative()) {
 			mPlayer.sendMessage("You don't have the required materials for this trade - please reopen the menu!");
 			close();
 			return;
@@ -1057,11 +1074,15 @@ public class CustomTradeGui extends Gui {
 		List<Component> confirmLore = new ArrayList<>();
 		confirmLore.add(comp);
 		confirmLore.addAll(tradeReq.lore());
+		boolean creative = tradeReq.mShouldBypassRequirements;
+		if (creative) {
+			confirmLore.add(Component.text("Since you are in creative mode, this item is free.", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false));
+		}
 		// Set item material and name:
 		boolean canAfford = tradeReq.status();
 		String tag = canAfford ? "trade_confirm_confirm" : "trade_confirm_unaffordable";
 		Material material = canAfford ? Material.GREEN_STAINED_GLASS_PANE : Material.BARRIER;
-		Component name = Component.text((canAfford ? "Confirm" : "Missing material(s)"), (canAfford ? NamedTextColor.GREEN : NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true);
+		Component name = Component.text((canAfford ? "Confirm" : creative ? "Confirm (Creative Mode)" : "Missing material(s)"), (canAfford ? NamedTextColor.GREEN : creative ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true);
 		return GUIUtils.setGuiNbtTag(
 			GUIUtils.createBasicItem(material, 1, name, confirmLore, false, null), "texture", tag, mGuiTagsActive);
 	}
@@ -1087,10 +1108,14 @@ public class CustomTradeGui extends Gui {
 			// Construct price tag lore:
 			List<Component> newLore = new ArrayList<>();
 			newLore.add(Component.empty());
-			newLore.add(Component.text("Price: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			newLore.addAll(tradeReq.lore());
-			if (mPebTradeGUIConfirm == 1) {
-				newLore.add(Component.text("Left-click to buy, Right-click for details.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			if (tradeReq.mShouldBypassRequirements) {
+				newLore.add(Component.text("Price: ", NamedTextColor.YELLOW).append(Component.text("FREE (Creative Mode)", NamedTextColor.GREEN)).decoration(TextDecoration.ITALIC, false));
+			} else {
+				newLore.add(Component.text("Price: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+				newLore.addAll(tradeReq.lore());
+				if (mPebTradeGUIConfirm == 1) {
+					newLore.add(Component.text("Left-click to buy, Right-click for details.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+				}
 			}
 			// Add to previous lore (if any):
 			List<Component> prevLore = new ArrayList<>();
