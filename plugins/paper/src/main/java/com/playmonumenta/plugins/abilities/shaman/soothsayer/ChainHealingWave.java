@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.ChainHealingWaveCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -146,13 +147,13 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		if (!consumeCharge()) {
 			return;
 		}
-		PlayerUtils.healPlayer(mPlugin, mPlayer, mHealPercent, mPlayer);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, mHealPercent * EntityUtils.getMaxHealth(mPlayer), mPlayer);
 
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
-			if (target instanceof Player) {
+			if (target instanceof Player targetPlayer) {
 				mCosmetic.chainHeal(mPlayer, target);
-				PlayerUtils.healPlayer(mPlugin, (Player) target, mHealPercent, mPlayer);
+				PlayerUtils.healPlayer(mPlugin, targetPlayer, mHealPercent * EntityUtils.getMaxHealth(targetPlayer), mPlayer);
 			}
 			mCosmetic.chainBeam(mHitTargets, i, target, mPlayer);
 		}
