@@ -175,7 +175,7 @@ public class DelveInfusionUtils {
 
 		public Component getIcon() {
 			return switch (this) {
-				case VOIDSTAINED_GEODE -> Component.text(" ≈", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false);
+				case VOIDSTAINED_GEODE -> Component.text(" ⚓", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false);
 				case INDIGO_BLIGHTDUST -> Component.text(" ✵", TextColor.fromHexString("#FF9CF0")).decoration(TextDecoration.ITALIC, false);
 			};
 		}
