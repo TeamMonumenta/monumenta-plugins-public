@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,13 +69,15 @@ public class Phylactery implements Infusion {
 		infoMap.remove(PotionManager.PotionID.SAFE_ZONE);
 		infoMap.remove(PotionManager.PotionID.ABILITY_SELF);
 
+		boolean keepDurations = ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.NO_BUFF_DURATION_LOSS_ON_DEATH);
+		double mult = keepDurations ? 1 : value * DURATION_KEPT;
 		for (List<PotionUtils.PotionInfo> infoList : infoMap.values()) {
 			for (Iterator<PotionUtils.PotionInfo> iterator = infoList.iterator(); iterator.hasNext(); ) {
 				PotionUtils.PotionInfo info = iterator.next();
 				if (info.mType != null && PotionUtils.hasNegativeEffects(info.mType)) {
 					iterator.remove();
 				} else if (!info.mInfinite) {
-					info.mDuration = (int) (info.mDuration * value * DURATION_KEPT);
+					info.mDuration = (int) (info.mDuration * mult);
 				}
 			}
 		}
