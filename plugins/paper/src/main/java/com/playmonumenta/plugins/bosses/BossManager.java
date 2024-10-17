@@ -184,7 +184,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(FireResistantBoss.identityTag, FireResistantBoss::new);
 		registerStatelessBoss(HungerCloudBoss.identityTag, HungerCloudBoss::new);
 		registerStatelessBoss(BlockBreakBoss.identityTag, BlockBreakBoss::new, new BlockBreakBoss.Parameters());
-		registerStatelessBoss(ArcaneLaserBoss.identityTag, ArcaneLaserBoss::new, new ArcaneLaserBoss.Parameters());
 		registerStatelessBoss(WeaponSwitchBoss.identityTag, WeaponSwitchBoss::new);
 		registerStatelessBoss(ShieldSwitchBoss.identityTag, ShieldSwitchBoss::new, new ShieldSwitchBoss.Parameters());
 		registerStatelessBoss(ChargerBoss.identityTag, ChargerBoss::new, new ChargerBoss.Parameters());
@@ -193,7 +192,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(FireballBoss.identityTag, FireballBoss::new);
 		registerStatelessBoss(TpBehindBoss.identityTag, TpBehindBoss::new, new TpBehindBoss.Parameters());
 		registerStatelessBoss(TpSwapBoss.identityTag, TpSwapBoss::new, new TpSwapBoss.Parameters());
-		registerStatelessBoss(FlameNovaBoss.identityTag, FlameNovaBoss::new, new FlameNovaBoss.Parameters());
 		registerStatelessBoss(PlayerTargetBoss.identityTag, PlayerTargetBoss::new);
 		registerStatelessBoss(DamageReducedBoss.identityTag, DamageReducedBoss::new);
 		registerStatelessBoss(WinterSnowmanEventBoss.identityTag, WinterSnowmanEventBoss::new);
@@ -201,7 +199,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(FestiveTesseractSnowmanBoss.identityTag, FestiveTesseractSnowmanBoss::new);
 		registerStatelessBoss(CrowdControlImmunityBoss.identityTag, CrowdControlImmunityBoss::new);
 		registerStatelessBoss(FloatBoss.identityTag, FloatBoss::new);
-		registerStatelessBoss(FrostNovaBoss.identityTag, FrostNovaBoss::new, new FrostNovaBoss.Parameters());
 		registerStatelessBoss(DebuffHitBoss.identityTag, DebuffHitBoss::new);
 		registerStatelessBoss(TsunamiChargerBoss.identityTag, TsunamiChargerBoss::new);
 		registerStatelessBoss(BombTossBoss.identityTag, BombTossBoss::new);
@@ -237,9 +234,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(AvengerBoss.identityTag, AvengerBoss::new, new AvengerBoss.Parameters());
 		registerStatelessBoss(RageBoss.identityTag, RageBoss::new, new RageBoss.Parameters());
 		registerStatelessBoss(EarthshakeBoss.identityTag, EarthshakeBoss::new, new EarthshakeBoss.Parameters());
-		registerStatelessBoss(MagicArrowBoss.identityTag, MagicArrowBoss::new, new MagicArrowBoss.Parameters());
-		registerStatelessBoss(SeekingProjectileBoss.identityTag, SeekingProjectileBoss::new, new SeekingProjectileBoss.Parameters());
-		registerStatelessBoss(TrackingProjectileBoss.identityTag, TrackingProjectileBoss::new);
 		registerStatelessBoss(WrathBoss.identityTag, WrathBoss::new, new WrathBoss.Parameters());
 		registerStatelessBoss(LeapBoss.identityTag, LeapBoss::new);
 		registerStatelessBoss(BarrierBoss.identityTag, BarrierBoss::new, new BarrierBoss.Parameters());
@@ -248,16 +242,13 @@ public class BossManager implements Listener {
 		registerStatelessBoss(SwingBoss.identityTag, SwingBoss::new, new SwingBoss.Parameters());
 		registerStatelessBoss(MistMob.identityTag, MistMob::new);
 		registerStatelessBoss(FrostGiantIcicle.identityTag, FrostGiantIcicle::new);
-		registerStatelessBoss(SpellSlingerBoss.identityTag, SpellSlingerBoss::new);
 		registerStatelessBoss(VindictiveBoss.identityTag, VindictiveBoss::new);
 		registerStatelessBoss(ShadowTrailBoss.identityTag, ShadowTrailBoss::new);
-		registerStatelessBoss(KineticProjectileBoss.identityTag, KineticProjectileBoss::new);
 		registerStatelessBoss(FlameTrailBoss.identityTag, FlameTrailBoss::new, new FlameTrailBoss.Parameters());
 		registerStatelessBoss(ShadeParticleBoss.identityTag, ShadeParticleBoss::new);
 		registerStatelessBoss(FireBombTossBoss.identityTag, FireBombTossBoss::new, new FireBombTossBoss.Parameters());
 		registerStatelessBoss(CommanderBoss.identityTag, CommanderBoss::new, new CommanderBoss.Parameters());
 		registerStatelessBoss(ShadePossessedBoss.identityTag, ShadePossessedBoss::new);
-		registerStatelessBoss(TwistedDespairBoss.identityTag, TwistedDespairBoss::new);
 		registerStatelessBoss(CoordinatedAttackBoss.identityTag, CoordinatedAttackBoss::new, new CoordinatedAttackBoss.Parameters());
 		registerStatelessBoss(ShiftingBoss.identityTag, ShiftingBoss::new);
 		registerStatelessBoss(BulletHellBoss.identityTag, BulletHellBoss::new, new BulletHellBoss.Parameters());
@@ -271,10 +262,8 @@ public class BossManager implements Listener {
 		registerStatelessBoss(ImmortalMountBoss.identityTag, ImmortalMountBoss::new, new ImmortalMountBoss.Parameters());
 		registerStatelessBoss(FalseSpiritPortal.identityTag, FalseSpiritPortal::new);
 		registerStatelessBoss(TffBookSummonBoss.identityTag, TffBookSummonBoss::new);
-		registerStatelessBoss(ArcaneProjectileBoss.identityTag, ArcaneProjectileBoss::new, new ArcaneProjectileBoss.Parameters());
 		registerStatelessBoss(JumpBoss.identityTag, JumpBoss::new, new JumpBoss.Parameters());
 		registerStatelessBoss(RebornBoss.identityTag, RebornBoss::new, new RebornBoss.Parameters());
-		registerStatelessBoss(NoFireBoss.identityTag, NoFireBoss::new);
 		registerStatelessBoss(DistanceCloserBoss.identityTag, DistanceCloserBoss::new);
 		registerStatelessBoss(AuraEffectBoss.identityTag, AuraEffectBoss::new, new AuraEffectBoss.Parameters());
 		registerStatelessBoss(DummyDecoyBoss.identityTag, DummyDecoyBoss::new);
@@ -734,19 +723,15 @@ public class BossManager implements Listener {
 			}
 		}
 
-		if (boss != null && !event.isCancelled() && event.getCause() != EntityDamageEvent.DamageCause.VOID && event.getFinalDamage(true) >= damagee.getHealth()) {
+		if (boss != null && event.getCause() != EntityDamageEvent.DamageCause.VOID && event.getFinalDamage(true) >= damagee.getHealth()) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {
 				BossBarManager bossBar = ability.getBossBar();
 				if (bossBar != null && bossBar.capsDamage()) {
 					int nextEventHealthPercent = bossBar.getNextHealthThreshold();
 					if (nextEventHealthPercent > 0) {
 						double setHealth = nextEventHealthPercent * EntityUtils.getMaxHealth(damagee) / 100;
-						double newDamage;
-						if (damagee.getHealth() < setHealth) {
-							newDamage = 0;
-						} else {
-							newDamage = damagee.getHealth() - setHealth + 1; // Adding 1 makes sure we actually go below the threshold but don't kill the boss
-						}
+						// Adding 1 makes sure we actually go below the threshold but don't kill the boss
+						double newDamage = damagee.getHealth() < setHealth ? 0 : damagee.getHealth() - setHealth + 1;
 						event.setDamageCap(newDamage); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
 						MMLog.fine("Because of remaining BossHealthAction at " + nextEventHealthPercent + "% health on entity " + MessagingUtils.plainText(damagee.name()) + ", reduced damage to " + newDamage + ".");
 					}

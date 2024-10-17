@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
+/* TODO: Merge this with NovaBoss */
 public class RejuvenationBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rejuvenation";
 

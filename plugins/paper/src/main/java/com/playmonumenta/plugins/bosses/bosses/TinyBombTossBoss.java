@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.plugin.Plugin;
 
+/* TODO: Merge this with BossGrenadeLauncher */
 public class TinyBombTossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tinybombtoss";
 	public static final int detectionRange = 20;

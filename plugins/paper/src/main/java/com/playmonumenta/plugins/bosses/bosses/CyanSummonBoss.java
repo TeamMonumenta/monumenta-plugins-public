@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellCyanSummon;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
+/* TODO: Merge this with SpawnMobsBoss */
 public class CyanSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_cyansummon";
 	public static final int detectionRange = 30;

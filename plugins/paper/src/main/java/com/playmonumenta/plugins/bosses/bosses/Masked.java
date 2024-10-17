@@ -42,6 +42,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+/* TODO: This boss uses a lot of outdated spells and is in dire need of code refactoring */
 public class Masked extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_masked";

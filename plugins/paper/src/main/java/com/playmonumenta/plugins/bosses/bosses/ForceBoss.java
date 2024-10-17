@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
+/* TODO: Merge this with NovaBoss */
 public class ForceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_force";
 

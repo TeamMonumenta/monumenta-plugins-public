@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+/* TODO: Merge this with DeathSummonBoss */
 public class CorruptInfestedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_corruptinfested";
 	public static final int detectionRange = 30;

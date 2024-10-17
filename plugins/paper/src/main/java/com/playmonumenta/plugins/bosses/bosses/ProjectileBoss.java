@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -22,83 +23,84 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 public class ProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_projectile";
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "not written")
+		@BossParam(help = "Damage to apply to a hit entity")
 		public int DAMAGE = 0;
 
-		@BossParam(help = "How long the projectile can travel at most.")
+		@BossParam(help = "Maximum distance the projectile can travel")
 		public int DISTANCE = 64;
 
-		@BossParam(help = "Projectile speed")
+		@BossParam(help = "Projectile speed in blocks per tick")
 		public double SPEED = 0.4;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Radius in blocks that this boss will check before doing anything")
 		public int DETECTION = 24;
 
-		@BossParam(help = "Delay of the first spell, then cooldown is used to determinate when this spell will cast again")
+		@BossParam(help = "Initial delay in ticks for the first cast of this spell")
 		public int DELAY = 20 * 5;
 
-		@BossParam(help = "Time period between the start of the last charge and next start.")
+		@BossParam(help = "Period in ticks between the start of the last charge and next start.")
 		public int COOLDOWN = 20 * 10;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Prevents the projectile from being despawned early in some situations")
 		public boolean LINGERS = true;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Length in blocks of the projectile hitbox")
 		public double HITBOX_LENGTH = 0.5;
 
-		@BossParam(help = "not written", deprecated = true)
+		@BossParam(help = "Deprecated. Use the targets filter instead", deprecated = true)
 		public boolean SINGLE_TARGET = true;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Percent true damage to apply to a hit entity")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
 		@BossParam(help = "Boolean on if the projectile can damage entities or not")
 		public boolean DAMAGE_PLAYER_ONLY = false;
 
-		@BossParam(help = "Track target when launching if true.")
+		@BossParam(help = "Track target during the channel time")
 		public boolean LAUNCH_TRACKING = true;
 
-		@BossParam(help = "Angular velocity (in radian) of projectile when tracking target. Set to 0 for linear projectile.")
+		@BossParam(help = "Angular velocity (in radians) of the projectile while tracking a target")
 		public double TURN_RADIUS = Math.PI / 30;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Collide with entities besides the initial target")
 		public boolean COLLIDES_WITH_OTHERS = false;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Collide with solid blocks")
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
-		@BossParam(help = "Percentage Speed of projectile when moving in liquids")
+		@BossParam(help = "Percent speed reduction to apply to the projectile while traveling in liquids")
 		public double SPEED_LIQUID = 0.5;
 
-		@BossParam(help = "Percentage Speed of projectile when moving in blocks")
+		@BossParam(help = "Percent speed reduction to apply to the projectile while traveling in solid blocks")
 		public double SPEED_BLOCKS = 0.125;
 
-		@BossParam(help = "Delay on each single cast between sound_start and the actual cast of the projectile")
+		@BossParam(help = "Delay in ticks on each cast between sound_start and the actual cast of the projectile")
 		public int SPELL_DELAY = Integer.MAX_VALUE;
 
-		@BossParam(help = "The glowing color")
+		@BossParam(help = "Mob glowing color")
 		public String COLOR = "red";
 
-		@BossParam(help = "Let you choose the targets of this spell")
+		@BossParam(help = "Conditions to choose valid entities of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT;
 		//note: this object is only used to show the default value while using /bosstag add boss_projectile[targets=[...]]
 
-		@BossParam(help = "Effects applied to the player when he got hit")
+		@BossParam(help = "Effects applied to hit entities")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
-		@BossParam(help = "How many times to be cast after one cooldown")
+		@BossParam(help = "Amount of casts of the projectile per cooldown")
 		public int CHARGE = 1;
 
-		@BossParam(help = "Interval between casting with charges")
+		@BossParam(help = "Interval in ticks between charge casts")
 		public int CHARGE_INTERVAL = 40;
 
 		@BossParam(help = "Left offset from mob's eye to projectile start point")
@@ -110,13 +112,13 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "Front offset from mob's eye to projectile start point")
 		public double OFFSET_FRONT = 0;
 
-		@BossParam(help = "How many projectiles mob will launch in a sector plane")
+		@BossParam(help = "Amount of projectiles to be launched in a flat plane")
 		public int SPLIT = 1;
 
-		@BossParam(help = "Interval angles between splitting projectiles in degree")
+		@BossParam(help = "Angle in degrees between split projectiles")
 		public double SPLIT_ANGLE = 30;
 
-		@BossParam(help = "Dupe launch in mirror position. 0=None, 1=L-R, 2=F-B, 3=Both")
+		@BossParam(help = "Mirror launched projectiles. 0=None, 1=L-R, 2=F-B, 3=Both")
 		public int MIRROR = 0;
 
 		@BossParam(help = "Force launch at a yaw degree offset from boss' sight. [-180, 180] is valid.")
@@ -125,11 +127,14 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "Force launch at a fixed pitch degree. [-90, 90] is valid.")
 		public double FIX_PITCH = 100.0;
 
-		@BossParam(help = "overheal y/n")
+		@BossParam(help = "Apply excess healing as absorption to hit entities")
 		public boolean OVERHEAL = false;
 
-		@BossParam(help = "amount healed")
+		@BossParam(help = "Health to heal hit entities")
 		public double HEAL_AMOUNT = 0;
+
+		@BossParam(help = "Scalar value to use when generating an AoE at the location a projectile hits a target or blocks. Only works with players")
+		public double AOE_RADIUS = 0;
 
 		//particle & sound used!
 		@BossParam(help = "Sound played at the start")
@@ -152,15 +157,13 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Sound used when the projectile hit something")
 		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_DEATH,0.5,0.5)]");
-
 	}
 
 	public ProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-
-		int lifetimeTicks = (int) (p.DISTANCE / p.SPEED);
+		final Parameters p = BossParameters.getParameters(mBoss, identityTag, new Parameters());
+		final int lifetimeTicks = (int) (p.DISTANCE / p.SPEED);
 
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
 			//same object
@@ -178,28 +181,27 @@ public class ProjectileBoss extends BossAbilityGroup {
 			p.MIRROR = 0;
 		}
 
-		Spell spell = new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL, p.COOLDOWN, p.SPELL_DELAY,
-			p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH, p.SPLIT, p.SPLIT_ANGLE,
-			p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS, p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
+		final Spell spell = new SpellBaseSeekingProjectile(mPlugin, mBoss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL,
+			p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
+			p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
+			p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
 			//spell targets
-			() -> {
-				return p.TARGETS.getTargetsList(mBoss);
-			},
+			() -> p.TARGETS.getTargetsList(mBoss),
 			// Initiate Aesthetic
 			(World world, Location loc, int ticks) -> {
 				if (p.SPELL_DELAY > 0) {
-					GlowingManager.startGlowing(boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
+					GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 				}
 				p.SOUND_START.play(loc);
 			},
 			// Launch Aesthetic
 			(World world, Location loc, int ticks) -> {
-				p.PARTICLE_LAUNCH.spawn(boss, loc);
+				p.PARTICLE_LAUNCH.spawn(mBoss, loc);
 				p.SOUND_LAUNCH.play(loc);
 			},
 			// Projectile Aesthetic
 			(World world, Location loc, int ticks) -> {
-				p.PARTICLE_PROJECTILE.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
+				p.PARTICLE_PROJECTILE.spawn(mBoss, loc, 0.1, 0.1, 0.1, 0.1);
 				if (ticks % 40 == 0) {
 					p.SOUND_PROJECTILE.play(loc);
 				}
@@ -208,30 +210,41 @@ public class ProjectileBoss extends BossAbilityGroup {
 			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 				if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
 					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
-					p.PARTICLE_HIT.spawn(boss, loc, 0d, 0d, 0d, 0.25d);
+					p.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
 
 					if (target != null) {
-						if (p.DAMAGE > 0) {
-							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc);
-						}
+						onHitActions(p, mBoss, target, prevLoc);
+					}
 
-						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME);
-						}
-
-						if (p.HEAL_AMOUNT > 0) {
-							double healed = EntityUtils.healMob(target, p.HEAL_AMOUNT);
-							if (p.OVERHEAL && healed < p.HEAL_AMOUNT) {
-								double missing = p.HEAL_AMOUNT - healed;
-								AbsorptionUtils.addAbsorption(target, missing, p.HEAL_AMOUNT, -1);
-							}
-						}
-						p.EFFECTS.apply(target, boss);
+					if (p.AOE_RADIUS > 0) {
+						/* TODO: This could be generalized to work with all LivingEntities with some effort. I only
+						 *  made it work with players since I'm strictly importing functionality from KineticProjectileBoss */
+						final List<Player> hitPlayers = new Hitbox.AABBHitbox(world,
+							new BoundingBox().shift(loc).expand(p.AOE_RADIUS)).getHitPlayers(true);
+						hitPlayers.removeIf(player -> player == target);
+						hitPlayers.forEach(player -> onHitActions(p, mBoss, player, prevLoc));
 					}
 				}
 			});
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
+	}
 
+	private void onHitActions(final Parameters p, final LivingEntity launcher, final LivingEntity affected, final @Nullable Location prevLoc) {
+		if (p.DAMAGE > 0) {
+			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc);
+		}
+
+		if (p.DAMAGE_PERCENTAGE > 0.0) {
+			BossUtils.bossDamagePercent(mBoss, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME);
+		}
+
+		if (p.HEAL_AMOUNT > 0) {
+			final double healed = EntityUtils.healMob(affected, p.HEAL_AMOUNT);
+			if (p.OVERHEAL && healed < p.HEAL_AMOUNT) {
+				AbsorptionUtils.addAbsorption(affected, p.HEAL_AMOUNT - healed, p.HEAL_AMOUNT, -1);
+			}
+		}
+		p.EFFECTS.apply(affected, launcher);
 	}
 }

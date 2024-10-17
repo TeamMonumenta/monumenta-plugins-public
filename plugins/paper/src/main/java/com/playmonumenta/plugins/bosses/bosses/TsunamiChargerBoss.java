@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellTsunamiCharge;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
+/* TODO: Merge this into ChargerBoss */
 public class TsunamiChargerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tsunamicharger";
 	public static final int detectionRange = 20;

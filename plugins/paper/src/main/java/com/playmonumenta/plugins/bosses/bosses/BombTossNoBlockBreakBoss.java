@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
+/* TODO: Merge this with BossGrenadeLauncher */
 public class BombTossNoBlockBreakBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bombtossnoblockbreak";
 	public static final int detectionRange = 20;
