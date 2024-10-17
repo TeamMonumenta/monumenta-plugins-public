@@ -276,16 +276,18 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	public int getGraveDuration(DepthsParty party, DepthsPlayer dp, Player player, boolean allowPermadeath) {
+	public static int getGraveDuration(DepthsParty party, DepthsPlayer dp, Player player, boolean allowPermadeath) {
 		int baseGraveDuration = party.getAscension() < DepthsEndlessDifficulty.ASCENSION_REVIVE_TIME ? GRAVE_DURATION : GRAVE_DURATION - ASCENSION_GRAVE_DURATION_DECREASE;
 		int duration = baseGraveDuration - (int) (Math.sqrt(dp.mNumDeaths) * 7 * 20);
+
+		if (AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, CurseOfDeath.class) != null) {
+			duration = baseGraveDuration - (int) (Math.sqrt(dp.mNumDeaths + 2) * 7 * 20);
+		}
 
 		if (allowPermadeath) {
 			return Math.max(1, duration);
 		}
-		if (duration > 61 && AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, CurseOfDeath.class) != null) {
-			return 61;
-		}
+
 		return Math.max(61, duration);
 	}
 
@@ -533,6 +535,12 @@ public class DepthsListener implements Listener {
 			// else send to loot room on death
 			//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
 			dp.mFinalTreasureScore = party.mTreasureScore;
+
+			// if the player chose the bonus tree at the beginning, boost their personal treasure score
+			if (dp.mBonusTreeSelected) {
+				dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
+			}
+
 			dp.setDeathRoom(party.getRoomNumber());
 			dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 			dp.sendMessage("You reached room " + party.mRoomNumber + "!");
@@ -648,6 +656,12 @@ public class DepthsListener implements Listener {
 			if (party != null) {
 				if (setDeathStats) {
 					dp.mFinalTreasureScore = party.mTreasureScore;
+
+					// if the player chose the bonus tree at the beginning, boost their personal treasure score
+					if (dp.mBonusTreeSelected) {
+						dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
+					}
+
 					dp.setDeathRoom(party.getRoomNumber());
 					dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 					dp.sendMessage("You reached room " + party.mRoomNumber + "!");

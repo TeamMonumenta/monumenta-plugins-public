@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 
 public class Opportunity extends DepthsAbility {
 	public static final String ABILITY_NAME = "Opportunity";
-	public static final int[] REROLLS = {1, 2, 3, 4, 5, 7};
+	public static final int[] REROLLS = {1, 1, 2, 3, 4, 6};
 
 	public static final DepthsAbilityInfo<Opportunity> INFO =
 		new DepthsAbilityInfo<>(Opportunity.class, ABILITY_NAME, Opportunity::new, DepthsTree.PRISMATIC, DepthsTrigger.PASSIVE)

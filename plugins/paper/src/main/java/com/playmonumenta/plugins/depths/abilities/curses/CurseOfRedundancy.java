@@ -22,7 +22,7 @@ public class CurseOfRedundancy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Curse of Redundancy";
 	public static final double RECHARGE_REDUCTION = 0.5;
-	public static final int DURATION = 8 * 20;
+	public static final int DURATION = 5 * 20;
 	public static final String RECHARGE_EFFECT = "CurseOfRedundancyRechargeEffect";
 
 	public static final DepthsAbilityInfo<CurseOfRedundancy> INFO =

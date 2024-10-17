@@ -39,7 +39,7 @@ import org.bukkit.util.Vector;
 public class Scrapshot extends DepthsAbility {
 	public static final String ABILITY_NAME = "Scrapshot";
 	private static final int COOLDOWN = 10 * 20;
-	private static final int[] DAMAGE = {30, 37, 45, 52, 60, 75};
+	private static final int[] DAMAGE = {32, 39, 47, 54, 62, 77};
 	private static final double RECOIL_VELOCITY = 1;
 	private static final int RANGE = 8;
 	private static final double SHRAPNEL_DAMAGE_PERCENT = 0.33;

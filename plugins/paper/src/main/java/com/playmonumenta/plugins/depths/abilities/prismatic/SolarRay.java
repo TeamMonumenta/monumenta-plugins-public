@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -22,6 +23,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,7 +144,14 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 					}
 
 					mHitMobs.add(mob.getUniqueId());
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, false, false);
+
+					double damage = mDamage;
+					DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+					if (party != null) {
+						damage *= party.getPrismaticDamageMultiplier();
+					}
+
+					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
 					if (mob.isDead()) {
 						tryIncreaseDamage(mob.getName());
 					}
@@ -247,6 +256,16 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 				"one time per bounce, and up to " + SAME_MOB_MAX_HITS + " times in total. " +
 				"Killing unique mobs with this ability permanently increases its damage by " + DAMAGE_INCREASE + ".")
 			.addCooldown(COOLDOWN)
-			.add((a, p) -> a != null ? Component.text("\nCurrent stacks: " + a.getCharges()) : Component.empty());
+			.add((a, p) -> a != null ? Component.text("\nCurrent stacks: " + a.getCharges()) : Component.empty())
+			.add((a, p) -> {
+				if (p == null) {
+					return Component.empty();
+				}
+				DepthsParty party = DepthsManager.getInstance().getDepthsParty(p);
+				if (party == null) {
+					return Component.empty();
+				}
+				return Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1));
+			});
 	}
 }

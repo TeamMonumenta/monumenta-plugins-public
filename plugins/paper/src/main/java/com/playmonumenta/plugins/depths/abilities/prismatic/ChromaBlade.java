@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -31,6 +33,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +72,7 @@ public class ChromaBlade extends DepthsAbility {
 	public static final Particle.DustOptions PRISMATIC_COLOR = new Particle.DustOptions(Color.fromRGB(245, 200, 245), 1f);
 
 	public static final String ABILITY_NAME = "Chroma Blade";
-	public static final double[] DAMAGE = {14, 16, 18, 20, 22, 26};
+	public static final double[] DAMAGE = {15, 17, 19, 21, 23, 27};
 	public static final int COOLDOWN = 12 * 20;
 
 	public static final DepthsAbilityInfo<ChromaBlade> INFO =
@@ -456,10 +459,16 @@ public class ChromaBlade extends DepthsAbility {
 		slash(isFast, playerItemStats, tree, hitMobs, angle, startingDegrees, endingDegrees, rings, 1);
 	}
 
-	private void slash(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats, @Nullable DepthsTree tree, List<LivingEntity> hitMobs, double angle, double startingDegrees, double endingDegrees, int rings, double damageMutliplier) {
+	private void slash(boolean isFast, ItemStatManager.PlayerItemStats playerItemStats, @Nullable DepthsTree tree, List<LivingEntity> hitMobs, double angle, double startingDegrees, double endingDegrees, int rings, double damageMultiplier) {
 		// Perhaps all heights should be the same?
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+		if (party != null) {
+			 damageMultiplier *= party.getPrismaticDamageMultiplier();
+		}
+		double finalDamageMult = damageMultiplier;
+
 		ParticleUtils.drawHalfArc(getPlayerLocation(0.5), 1.5, angle, startingDegrees, endingDegrees, rings, 0.32, false, isFast ? 50 : 25,
-			(Location l, int ring) -> doSlashParticle(l, ring, hitMobs, isFast, playerItemStats, tree, damageMutliplier)
+			(Location l, int ring) -> doSlashParticle(l, ring, hitMobs, isFast, playerItemStats, tree, finalDamageMult)
 		);
 		playSlashSound(isFast, tree);
 	}
@@ -705,7 +714,17 @@ public class ChromaBlade extends DepthsAbility {
 			.addConditionalTreeOrAbility(DepthsTree.SHADOWDANCER, getShadowdancerDescription(color))
 			.addConditionalTreeOrAbility(DepthsTree.STEELSAGE, getSteelsageDescription(color))
 			.addConditionalTreeOrAbility(DepthsTree.WINDWALKER, getWindwalkerDescription(color))
-			.addConditionalTreeOrAbility(DepthsTree.PRISMATIC, getPrismaticDescription(color));
+			.addConditionalTreeOrAbility(DepthsTree.PRISMATIC, getPrismaticDescription(color))
+			.add((a, p) -> {
+				if (p == null) {
+					return Component.empty();
+				}
+				DepthsParty party = DepthsManager.getInstance().getDepthsParty(p);
+				if (party == null) {
+					return Component.empty();
+				}
+				return Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1));
+			});
 	}
 
 	private static Description<ChromaBlade> getFrostbornDescription(TextColor color) {

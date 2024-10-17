@@ -135,7 +135,7 @@ public class DepthsCommand extends GenericCommand {
 			.executes((sender, args) -> {
 				Player player = args.getByArgument(playerArg);
 
-				DepthsManager.getInstance().chaos(player);
+				DepthsManager.getInstance().chaos(player, false);
 			}).register();
 
 		//WHEEL COMMAND - run in select utility room to trigger a curious effect depending on the result

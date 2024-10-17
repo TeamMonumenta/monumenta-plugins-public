@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.depths.guis.DepthsTreeGUI;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,12 +38,22 @@ public class DepthsPlayer {
 	public Map<String, Integer> mAbilities;
 	//Unique identifier, mapping to an active depths party object
 	public long mPartyNum;
+
+	// On initialization, the player's 3 choices for their starting tree
+	public List<DepthsTree> mTreeSelection;
+	// On initialization, the player's tree that will give them extra treasure (an index of mTreeSelection)
+	public int mTreasureIndex;
+	// Whether the player chose the bonus treasure tree or not
+	public boolean mBonusTreeSelected;
+
 	//The depths ability trees the player is eligible to select from this run
 	public List<DepthsTree> mEligibleTrees;
+
 	//Weapon offering options for the player
 	public transient List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> mWeaponOfferings;
 	//Whether or not they have selected a weapon aspect
 	public boolean mHasWeaponAspect;
+
 	//Whether or not they have used chaos room this floor already
 	public boolean mUsedChaosThisFloor;
 	//Whether or not they have used chaos room this floor already
@@ -54,6 +66,7 @@ public class DepthsPlayer {
 	public boolean mUsedGenerosity;
 	//Remaining active ability only wand aspect uses
 	public int mWandAspectCharges = 0;
+
 	//Individual treasure score. Copied from the party's treasure score when they die.
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later
@@ -79,6 +92,9 @@ public class DepthsPlayer {
 
 	// Whether the player is currently processing Abnormality
 	public int mAbnormalityLevel = 0;
+
+	// The current counter of the player's Curse of Chaos ability
+	public int mCurseofChaosCount = 0;
 
 	// The last time the player logged out. If 0, then they haven't logged out yet.
 	public long mLastLogoutTime = 0;
@@ -110,7 +126,7 @@ public class DepthsPlayer {
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
 		mAbilities = new HashMap<>();
-		mEligibleTrees = initTrees(p);
+		mEligibleTrees = new ArrayList<>();
 
 		//Randomize order of weapon aspects
 		//First 3 elements available by default, others locked behind transaction
@@ -134,86 +150,59 @@ public class DepthsPlayer {
 		ScoreboardUtils.setScoreboardValue(p, "DDDelve1", 0);
 		ScoreboardUtils.setScoreboardValue(p, "DDDelve2", 0);
 
-		sendMessage("Initializing Depths System! Press button again to begin.");
+		initTreeSelection();
+		openTreeSelectionGUI();
+
+		sendMessage("Initializing Depths System! Select your tree and press the button again to begin.");
 	}
 
-	public List<DepthsTree> initTrees(Player player) {
-		int talismanScore = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS ? ScoreboardUtils.getScoreboardValue(player, "DDTalisman").orElse(0) : ScoreboardUtils.getScoreboardValue(player, "CZTalisman").orElse(0);
-		if (0 < talismanScore && talismanScore <= DepthsTree.OWNABLE_TREES.length) {
-			double chance = 1;
-			if ((player.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING))
-				    || ((ScoreboardUtils.getScoreboardValue(player, "CurrentAscension").orElse(0) > 0) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING))) {
-				chance = 0.75;
+	public void initTreeSelection() {
+		// we have to initialize the random tree choice once, so that way you can't repeatedly reroll your choices by retriggering the GUI
+		if (getPlayer() == null) {
+			return;
+		}
+
+		List<DepthsTree> choices = new ArrayList<>();
+		int talismanScore = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS ? ScoreboardUtils.getScoreboardValue(getPlayer(), "DDTalisman").orElse(0) : ScoreboardUtils.getScoreboardValue(getPlayer(), "CZTalisman").orElse(0);
+		if (talismanScore > 0) {
+			DepthsTree talismanTree = DepthsTree.OWNABLE_TREES[talismanScore - 1];
+			choices.add(talismanTree);
+
+			// remove the talisman tree, then pick 2 more trees
+			List<DepthsTree> allTrees = new ArrayList<>(List.of(DepthsTree.OWNABLE_TREES));
+			allTrees.remove(talismanTree);
+			Collections.shuffle(allTrees);
+			for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN - 2; i++) {
+				choices.add(allTrees.get(i));
 			}
+		} else {
+			// no talisman, so just pick 3 random trees to offer
+			List<DepthsTree> allTrees = new ArrayList<>(List.of(DepthsTree.OWNABLE_TREES));
+			Collections.shuffle(allTrees);
+			for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN - 1; i++) {
+				choices.add(allTrees.get(i));
+			}
+		}
+		Collections.shuffle(choices);
+		mTreeSelection = choices;
 
-			double rand = Math.random();
-			if (rand < 4.0/7.0) {
-				//Guarantee the tree, but same chance that they would normally get it
-				return initTreesWithGuarantee(talismanScore);
-			} else if (rand < chance) {
-				//The Talisman granted them the tree when it wouldn't normally
-				sendMessage("Due to your Talisman, you have become a " + DepthsTree.OWNABLE_TREES[talismanScore - 1].getDisplayName() + " when you would not have otherwise!");
-				return initTreesWithGuarantee(talismanScore);
-			} else {
-				//They failed both the usual random chance of the tree and the Talisman chance
-				List<DepthsTree> randomTrees = new ArrayList<>();
-
-				DepthsTree talismanTree = DepthsTree.OWNABLE_TREES[talismanScore - 1];
-
-				List<DepthsTree> allTrees = new ArrayList<>();
-				//Get all possible trees and shuffle them
-				Collections.addAll(allTrees, DepthsTree.OWNABLE_TREES);
-				//This is the 1/4 chance in Endless with the Talisman to NOT get the requested tree
-				allTrees.remove(talismanTree);
-				Collections.shuffle(allTrees);
-
-				for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN; i++) {
-					randomTrees.add(allTrees.get(i));
+		if (talismanScore > 0) {
+			for (int i = 0; i < mTreeSelection.size(); i++) {
+				// must not be our talisman tree
+				if (mTreeSelection.get(i) != DepthsTree.OWNABLE_TREES[talismanScore - 1]) {
+					mTreasureIndex = i;
 				}
-
-				return randomTrees;
 			}
+		} else {
+			mTreasureIndex = FastUtils.randomIntInRange(0, 2);
 		}
-		return initRandomTrees();
 	}
 
-	/**
-	 * Gets random trees from the system that the player can exclusively select from
-	 * @return tree list
-	 */
-	public List<DepthsTree> initRandomTrees() {
-		List<DepthsTree> randomTrees = new ArrayList<>();
-		List<DepthsTree> allTrees = new ArrayList<>();
-		//Get all possible trees and shuffle them
-		Collections.addAll(allTrees, DepthsTree.OWNABLE_TREES);
-		Collections.shuffle(allTrees);
-
-		//Select the first x values as valid tree offerings this run
-		for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN; i++) {
-			randomTrees.add(allTrees.get(i));
+	public void openTreeSelectionGUI() {
+		if (getPlayer() == null) {
+			return;
 		}
-
-		return randomTrees;
-	}
-
-	public List<DepthsTree> initTreesWithGuarantee(int talismanScore) {
-		List<DepthsTree> randomTrees = new ArrayList<>();
-
-		DepthsTree talismanTree = DepthsTree.OWNABLE_TREES[talismanScore - 1];
-		randomTrees.add(talismanTree);
-
-		List<DepthsTree> allTrees = new ArrayList<>();
-		//Get all possible trees and shuffle them
-		Collections.addAll(allTrees, DepthsTree.OWNABLE_TREES);
-		allTrees.remove(talismanTree);
-		Collections.shuffle(allTrees);
-
-		//Select one less tree since we already have one chosen
-		for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN - 1; i++) {
-			randomTrees.add(allTrees.get(i));
-		}
-
-		return randomTrees;
+		new DepthsTreeGUI(getPlayer(), mTreeSelection, mTreasureIndex).open();
 	}
 
 	public void setDeathRoom(int room) {

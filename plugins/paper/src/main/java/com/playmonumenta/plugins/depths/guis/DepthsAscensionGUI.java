@@ -119,18 +119,23 @@ public class DepthsAscensionGUI extends Gui {
 				+ StringUtils.multiplierToPercentage(ZenithLoot.CURRENCY_PER_ASC_LEVEL * details.mLevel)
 				+ "% and dungeon material drops by "
 				+ StringUtils.multiplierToPercentage(ZenithLoot.DUNGEON_PER_ASC_LEVEL * details.mLevel) + "%.",
-				NamedTextColor.GREEN, 30, false);
+				NamedTextColor.GREEN, 40, false);
 			GUIUtils.splitLoreLine(clickableItem, "+ Zenith Charms drop at Level " + details.mLevel + " rates",
-				NamedTextColor.GREEN, 30, false);
+				NamedTextColor.GREEN, 40, false);
+
+			GUIUtils.splitLoreLine(clickableItem, "+ Prismatic abilities deal "
+					+ StringUtils.multiplierToPercentageWithSign(details.mLevel * DepthsParty.ZENITH_PRISMATIC_DAMAGE_INCREASE_PER_ASCENSION) + " more damage.",
+				NamedTextColor.LIGHT_PURPLE, 40, false);
 
 			GUIUtils.splitLoreLine(clickableItem, "- Your party is randomly assigned "
 					+ details.mAscensionDelvePoints + " delve points, split between F1 and F2.",
-				NamedTextColor.RED, 30, false);
+				NamedTextColor.RED, 40, false);
+
 			//Difficulties
 			for (int i = 0; i < details.mLevel; i++) {
 				String detailString = mLevelData.get(i).mAscensionDescription;
 				if (detailString != null) {
-					GUIUtils.splitLoreLine(clickableItem, "- " + detailString, NamedTextColor.RED, 30, false);
+					GUIUtils.splitLoreLine(clickableItem, "- " + detailString, NamedTextColor.RED, 40, false);
 				}
 			}
 
@@ -141,7 +146,7 @@ public class DepthsAscensionGUI extends Gui {
 			ItemStack lockedItem = GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE, 1,
 				"Celestial Zenith - Ascension " + details.mLevel, NamedTextColor.DARK_PURPLE, true, List.of(Component.empty()), true);
 			GUIUtils.splitLoreLine(lockedItem, "Defeat Celestial Zenith on ascension "
-				+ (details.mLevel - 1) + " or greater to unlock this difficulty.", NamedTextColor.RED, 30, true);
+				+ (details.mLevel - 1) + " or greater to unlock this difficulty.", NamedTextColor.RED, 40, true);
 			setItem(details.mSlot, lockedItem);
 		}
 	}

@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 public class Multiplicity extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Multiplicity";
-	public static final double[] CDR = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
+	public static final double[] CDR = {0.3, 0.35, 0.4, 0.45, 0.5, 0.6};
 	public static final double[] DAMAGE = {0.12, 0.15, 0.18, 0.21, 0.24, 0.3};
 	public static final int DURATION = 5 * 20;
 	public static final String DAMAGE_EFFECT = "MultiplicityPercentDamageDealtEffect";

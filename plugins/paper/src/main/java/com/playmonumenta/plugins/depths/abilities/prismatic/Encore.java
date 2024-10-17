@@ -34,7 +34,7 @@ import org.bukkit.util.Vector;
 public class Encore extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Encore";
-	public static final int[] COOLDOWN = {28 * 20, 26 * 20, 24 * 20, 22 * 20, 20 * 20, 16 * 20};
+	public static final int[] COOLDOWN = {26 * 20, 24 * 20, 22 * 20, 20 * 20, 18 * 20, 14 * 20};
 	public static final int DELAY = 5 * 20;
 
 	public static final DepthsAbilityInfo<Encore> INFO =

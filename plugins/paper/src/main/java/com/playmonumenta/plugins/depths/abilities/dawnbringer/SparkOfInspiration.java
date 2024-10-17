@@ -44,7 +44,7 @@ import org.bukkit.util.Vector;
 public class SparkOfInspiration extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Spark of Inspiration";
-	public static final int COOLDOWN = 50 * 20;
+	public static final int COOLDOWN = 40 * 20;
 	private static final int CAST_RANGE = 16;
 	private static final int[] BUFF_DURATION = {100, 110, 120, 130, 140, 160};
 	private static final double[] CD_RECHARGE_BUFF = {0.60, 0.75, 0.90, 1.05, 1.20, 1.50};

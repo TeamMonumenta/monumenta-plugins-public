@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfChaos;
 import com.playmonumenta.plugins.depths.loot.DepthsLoot;
 import com.playmonumenta.plugins.depths.loot.ZenithLoot;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoom;
@@ -62,8 +63,9 @@ public class DepthsParty {
 	public static final String EXPANDED_LEADERBOARD = "DepthsEndless6";
 	public static final String ASCENSION_LEADERBOARD = "ZenithAscension";
 	public static final String SIX_ASCENSION_LEADERBOARD = "ZenithAscension6";
-	public static final double ZENITH_HEALTH_INCREASE_PER_ASCENSION = 0.03;
-	public static final double ZENITH_DAMAGE_INCREASE_PER_ASCENSION = 0.03;
+	public static final double ZENITH_BOSS_HEALTH_INCREASE_PER_ASCENSION = 0.03;
+	public static final double ZENITH_BOSS_DAMAGE_INCREASE_PER_ASCENSION = 0.03;
+	public static final double ZENITH_PRISMATIC_DAMAGE_INCREASE_PER_ASCENSION = 0.04;
 
 
 	// The difference between where the player spawns in a loot room, and where the loot needs to be dropped
@@ -179,21 +181,6 @@ public class DepthsParty {
 			dp.mPartyNum = this.mPartyNum;
 			mInitialPlayers.add(p.getName());
 		}
-
-		//Run this later so it finishes constructing the party first
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				for (DepthsPlayer dp : players) {
-					Player p = Bukkit.getPlayer(dp.mPlayerId);
-					//Get random ability to start
-					int[] chances = {80, 15, 5, 0, 0};
-					DepthsManager.getInstance().getRandomAbility(Objects.requireNonNull(p), dp, chances, null, false);
-				}
-			}
-
-		}.runTaskLater(Plugin.getInstance(), 5);
 
 		mRoomNumber = 0;
 		mSpawnersToBreak = 0;
@@ -430,6 +417,18 @@ public class DepthsParty {
 
 		if (mCurrentRoomType == DepthsRoomType.TWISTED) {
 			mTwistedThisFloor = true;
+		}
+
+		// Curse of Chaos: new room, increment counter and apply effects
+		for (DepthsPlayer dp : mPlayersInParty) {
+			if (dp.getLevelInAbility(CurseOfChaos.ABILITY_NAME) > 0) {
+				dp.mCurseofChaosCount++;
+				if (dp.mCurseofChaosCount > CurseOfChaos.ROOMS && dp.getPlayer() != null) {
+					dp.sendMessage("Chaos surges within you...");
+					DepthsManager.getInstance().chaos(dp.getPlayer(), true);
+					dp.mCurseofChaosCount = 0;
+				}
+			}
 		}
 
 		//Add to room history so party can't get it again
@@ -723,11 +722,15 @@ public class DepthsParty {
 	}
 
 	public double getZenithHealthIncreaseMultiplier() {
-		return 1 + mAscension * ZENITH_HEALTH_INCREASE_PER_ASCENSION;
+		return 1 + mAscension * ZENITH_BOSS_HEALTH_INCREASE_PER_ASCENSION;
 	}
 
 	public double getZenithDamageIncreaseMultiplier() {
-		return 1 + mAscension * ZENITH_DAMAGE_INCREASE_PER_ASCENSION;
+		return 1 + mAscension * ZENITH_BOSS_DAMAGE_INCREASE_PER_ASCENSION;
+	}
+
+	public double getPrismaticDamageMultiplier() {
+		return 1 + mAscension * ZENITH_PRISMATIC_DAMAGE_INCREASE_PER_ASCENSION;
 	}
 
 	public DepthsContent getContent() {

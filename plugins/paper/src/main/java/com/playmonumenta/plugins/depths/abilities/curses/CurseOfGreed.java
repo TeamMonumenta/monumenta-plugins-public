@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 public class CurseOfGreed extends DepthsAbility {
 	public static final String ABILITY_NAME = "Curse of Greed";
 	public static final String MODIFIER_NAME = "CurseOfGreedPercentHealthModifier";
-	public static final double PERCENT_MAX_HEALTH = -0.04;
+	public static final double PERCENT_MAX_HEALTH = -0.05;
 
 	public static final DepthsAbilityInfo<CurseOfGreed> INFO =
 		new DepthsAbilityInfo<>(CurseOfGreed.class, ABILITY_NAME, CurseOfGreed::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)

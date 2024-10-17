@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class DepthsDodging extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dodging";
-	public static final int[] COOLDOWN = {20 * 16, 20 * 14, 20 * 12, 20 * 10, 20 * 8, 20 * 5};
+	public static final int[] COOLDOWN = {17 * 20, 15 * 20, 13 * 20, 11 * 20, 9 * 20, 6 * 20};
 
 	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
 

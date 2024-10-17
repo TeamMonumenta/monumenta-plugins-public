@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 public class Cryobox extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Cryobox";
-	public static final int[] ABSORPTION_HEALTH = {8, 10, 12, 14, 16, 20};
+	public static final int[] ABSORPTION_HEALTH = {10, 12, 14, 16, 18, 22};
 	public static final int COOLDOWN = 90 * 20;
 	private static final double TRIGGER_HEALTH = 0.25;
 	private static final int KNOCKBACK_RADIUS = 4;
@@ -44,7 +44,7 @@ public class Cryobox extends DepthsAbility {
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int DURATION = 12 * 20;
 	private static final int ICE_DURATION = 12 * 20;
-	private static final int FROZEN_DURATION = 2 * 20;
+	private static final int FROZEN_DURATION = 3 * 20;
 	private static final int REPLENISH_DURATION = 4 * 20;
 	private static final int REPLENISH_AMOUNT = 2; // 4 times a second
 

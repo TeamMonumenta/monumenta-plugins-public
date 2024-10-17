@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfAnchoring;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfArachnophobia;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfChaos;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDeath;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDependency;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfEnvy;
@@ -24,6 +26,7 @@ import com.playmonumenta.plugins.depths.abilities.curses.CurseOfImpatience;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfLust;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfObscurity;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfPessimism;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfPride;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfRedundancy;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfRuin;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfSloth;
@@ -691,6 +694,8 @@ public class DepthsManager {
 
 			// Curses
 			CurseOfAnchoring.INFO,
+			CurseOfArachnophobia.INFO,
+			CurseOfChaos.INFO,
 			CurseOfDeath.INFO,
 			CurseOfDependency.INFO,
 			CurseOfEnvy.INFO,
@@ -700,6 +705,7 @@ public class DepthsManager {
 			CurseOfLust.INFO,
 			CurseOfObscurity.INFO,
 			CurseOfPessimism.INFO,
+			CurseOfPride.INFO,
 			CurseOfRedundancy.INFO,
 			CurseOfRuin.INFO,
 			CurseOfSloth.INFO,
@@ -1360,6 +1366,17 @@ public class DepthsManager {
 		}
 
 		if (dp != null && party != null) {
+			// prevent players from opening the starting ability room if not everyone has selected their trees yet
+			if (party.mRoomNumber == 0 && party.mPlayersInParty.stream().anyMatch(player -> player.mEligibleTrees.isEmpty())) {
+				party.sendMessage("Each player must select a tree before proceeding!");
+				for (DepthsPlayer player : party.mPlayersInParty) {
+					if (player.mEligibleTrees.isEmpty()) {
+						player.openTreeSelectionGUI();
+					}
+				}
+				return;
+			}
+
 			// Check that spawner count is zero
 			if (party.mSpawnersToBreak > 0) {
 				dp.sendMessage("There " + (party.mSpawnersToBreak > 1 ? "are" : "is") + " still " + party.mSpawnersToBreak + " spawner" + (party.mSpawnersToBreak > 1 ? "s" : "") + " left to break!");
@@ -1541,15 +1558,16 @@ public class DepthsManager {
 	 * and rolls them two random new abilities at the replaced ability's rarity
 	 *
 	 * @param p Player to roll for
+	 * @param fromCurse if true, don't use up the chaos room for this floor and don't be stopped by it
 	 */
-	public void chaos(Player p) {
+	public void chaos(Player p, boolean fromCurse) {
 
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp == null) {
 			DepthsUtils.sendFormattedMessage(p, DepthsContent.DARKEST_DEPTHS, "Player not in depths system");
 			return;
 		}
-		if (dp.mUsedChaosThisFloor) {
+		if (dp.mUsedChaosThisFloor && !fromCurse) {
 			dp.sendMessage("You have already used the chaos system on this floor!");
 			return;
 		}
@@ -1577,9 +1595,12 @@ public class DepthsManager {
 		boolean isMutated = info != null && !dp.mEligibleTrees.contains(info.getDepthsTree());
 
 		setPlayerLevelInAbility(removedAbility, p, 0, true, true);
-		dp.mUsedChaosThisFloor = true;
 
-		//Give 2 random abilities that aren't the one we just removed
+		if (!fromCurse) {
+			dp.mUsedChaosThisFloor = true;
+		}
+
+		//Give 2 or 3 random abilities that aren't the one we just removed
 		int abilityCount = 2;
 		if (mRandom.nextInt(3) == 0) {
 			abilityCount = 3;
@@ -1660,6 +1681,12 @@ public class DepthsManager {
 					if (player != null) {
 						DepthsUtils.storeRunStatsToFile(playerInParty, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", true); //Save the player's stats
 						playerInParty.mFinalTreasureScore = party.mTreasureScore;
+
+						// if the player chose the bonus tree at the beginning, boost their personal treasure score
+						if (dp.mBonusTreeSelected) {
+							dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
+						}
+
 						playerInParty.sendMessage("Congratulations! Your final treasure score is " + playerInParty.mFinalTreasureScore + "!");
 						party.populateLootRoom(player, true);
 						if (party.getContent() == DepthsContent.DARKEST_DEPTHS) {

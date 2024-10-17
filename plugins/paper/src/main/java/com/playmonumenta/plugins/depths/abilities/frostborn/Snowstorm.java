@@ -44,8 +44,8 @@ public class Snowstorm extends DepthsAbility {
 	public static final String ABILITY_NAME = "Snowstorm";
 	public static final int COOLDOWN = 16 * 20;
 	public static final int DURATION = 8 * 20;
-	public static final int RADIUS = 6;
-	public static final double[] DAMAGE = {2.0, 2.5, 3.0, 3.5, 4.0, 5.0};
+	public static final int RADIUS = 5;
+	public static final double[] DAMAGE = {1.5, 2.0, 2.5, 3.0, 3.5, 4.5};
 	public static final double SLOW_AMOUNT = 0.15;
 	public static final int SLOW_DURATION = 4 * 20;
 	public static final double[] FREEZE_DAMAGE = {10, 12.5, 15, 17.5, 20, 25};
@@ -170,7 +170,7 @@ public class Snowstorm extends DepthsAbility {
 					int successes = 0;
 					int blocksToIce = (int) (12 * Math.pow(mRadius / 6, 2));
 					while (successes < blocksToIce) {
-						Location iceLoc = LocationUtils.fallToGround(LocationUtils.randomLocationInCircle(mLoc, mRadius), mLoc.getY() - mRadius);
+						Location iceLoc = LocationUtils.fallToGround(LocationUtils.randomLocationInCircle(mLoc, mRadius), mLoc.getY() - 6);
 						Block iceBlock = iceLoc.getBlock();
 						if (DepthsUtils.iceExposedBlock(iceBlock, mIceDuration, mPlayer)) {
 							new PartialParticle(Particle.REDSTONE, BlockUtils.getCenteredBlockBaseLocation(iceBlock), 8).delta(0.25, 0, 0.25).data(LIGHT_BLUE).spawnAsPlayerActive(mPlayer);
@@ -187,7 +187,7 @@ public class Snowstorm extends DepthsAbility {
 				mLoc.add(mDir.clone().multiply(0.15));
 
 				mTicks += 1;
-				if (mTicks > 8 * 20) {
+				if (mTicks > mDuration) {
 					this.cancel();
 				}
 			}

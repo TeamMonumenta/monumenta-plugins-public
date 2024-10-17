@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class Bulwark extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Bulwark";
-	public static final int[] COOLDOWN = {18 * 20, 16 * 20, 14 * 20, 12 * 20, 10 * 20, 7 * 20};
+	public static final int[] COOLDOWN = {19 * 20, 17 * 20, 15 * 20, 13 * 20, 11 * 20, 8 * 20};
 
 	public static final String CHARM_COOLDOWN = "Bulwark Cooldown";
 

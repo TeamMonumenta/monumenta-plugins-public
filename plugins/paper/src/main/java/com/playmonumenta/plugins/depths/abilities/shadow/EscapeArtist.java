@@ -54,7 +54,7 @@ public class EscapeArtist extends DepthsAbility {
 	private static final double TRIGGER_HEALTH = 0.3;
 	private static final String RESISTANCE_EFFECT_NAME = "EscapeArtistResistance";
 	private static final double RESISTANCE = 0.5;
-	private static final int[] STEALTH_DURATION = {60, 70, 80, 90, 100, 120};
+	private static final int[] STEALTH_DURATION = {3 * 20, 4 * 20, 5 * 20, 6 * 20, 7 * 20, 10 * 20};
 	private static final int TP_WINDOW = 60;
 	private static final double PROJECTILE_SPEED = 2.25;
 	private static final double MAX_TP_DISTANCE = 14;

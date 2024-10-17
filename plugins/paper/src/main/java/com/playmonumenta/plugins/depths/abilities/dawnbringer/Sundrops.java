@@ -35,7 +35,7 @@ public class Sundrops extends DepthsAbility {
 	private static final int LINGER_TIME = 10 * 20;
 	private static final int DURATION = 8 * 20;
 	private static final double PERCENT_SPEED = .2;
-	private static final double PERCENT_DAMAGE_RECEIVED = 0.2;
+	private static final double PERCENT_DAMAGE_RECEIVED = 0.25;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "SundropsPercentSpeedEffect";
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "SundropsPercentDamageReceivedEffect";
 

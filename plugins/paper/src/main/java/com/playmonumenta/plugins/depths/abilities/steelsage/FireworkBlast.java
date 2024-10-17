@@ -48,7 +48,7 @@ public class FireworkBlast extends DepthsAbility {
 	private static final int[] DAMAGE = {12, 16, 20, 24, 28, 36};
 	private static final int[] DAMAGE_CAP = {24, 32, 40, 48, 56, 72};
 	private static final double DAMAGE_INCREASE_PER_BLOCK = 0.05;
-	private static final double RADIUS = 4;
+	private static final double RADIUS = 5;
 
 	public static final String CHARM_COOLDOWN = "Firework Blast Cooldown";
 

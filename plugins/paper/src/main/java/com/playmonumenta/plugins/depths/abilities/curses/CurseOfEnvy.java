@@ -19,7 +19,7 @@ public class CurseOfEnvy extends DepthsAbility {
 	public static final DepthsAbilityInfo<CurseOfEnvy> INFO =
 		new DepthsAbilityInfo<>(CurseOfEnvy.class, ABILITY_NAME, CurseOfEnvy::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)
 			.displayItem(Material.APPLE)
-			.canBeOfferedPastFloor1(false)
+			.canBeOfferedPastFloor1(true)
 			.gain(CurseOfEnvy::gain)
 			.descriptions(CurseOfEnvy::getDescription);
 

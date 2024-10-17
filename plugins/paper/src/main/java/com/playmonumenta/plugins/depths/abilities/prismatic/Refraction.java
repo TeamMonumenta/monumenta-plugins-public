@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -24,6 +25,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -45,13 +47,14 @@ import static java.awt.Color.HSBtoRGB;
 
 public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	public static final String ABILITY_NAME = "Refraction";
-	public static final double[] DAMAGE = {5, 5.75, 6.5, 7.25, 8, 9.5};
+	public static final double[] DAMAGE = {5.25, 6.0, 6.75, 7.5, 8.25, 9.75};
 	public static final int COOLDOWN_TICKS = 20 * 20;
 	public static final int DISTANCE = 40;
 	public static final int DURATION = (int) (3.5 * 20);
 	public static final int EFFECT_DURATION = 3 * 20;
 	public static final int BUFF_DURATION = 10 * 20;
 
+	private double mDamage;
 	public int mCurrDuration = -1;
 
 	public static final DepthsAbilityInfo<Refraction> INFO =
@@ -64,6 +67,11 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 
 	public Refraction(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = DAMAGE[mRarity - 1];
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+		if (party != null) {
+			mDamage *= party.getPrismaticDamageMultiplier();
+		}
 	}
 
 	public boolean cast() {
@@ -226,7 +234,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 						world.playSound(mob.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 0.8f, 2f);
 						new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.SPELL_INSTANT, mob.getLocation().add(0, 1, 0), 20, 0.1, 0.2, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
-						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], true, false, false);
+						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, false, false);
 						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.FLAMECALLER)) {
 							EntityUtils.applyFire(mPlugin, EFFECT_DURATION, mob, mPlayer, playerItemStats);
 						}
@@ -307,7 +315,17 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 			.addConditionalTree(DepthsTree.EARTHBOUND, getEarthboundDescription(color))
 			.addConditionalTree(DepthsTree.SHADOWDANCER, getShadowdancerDescription(color))
 			.addConditionalTree(DepthsTree.STEELSAGE, getSteelsageDescription(color))
-			.addConditionalTree(DepthsTree.WINDWALKER, getWindwalkerDescription(color));
+			.addConditionalTree(DepthsTree.WINDWALKER, getWindwalkerDescription(color))
+			.add((a, p) -> {
+				if (p == null) {
+					return Component.empty();
+				}
+				DepthsParty party = DepthsManager.getInstance().getDepthsParty(p);
+				if (party == null) {
+					return Component.empty();
+				}
+				return Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1));
+			});
 	}
 
 	private static Description<Refraction> getFrostbornDescription(TextColor color) {

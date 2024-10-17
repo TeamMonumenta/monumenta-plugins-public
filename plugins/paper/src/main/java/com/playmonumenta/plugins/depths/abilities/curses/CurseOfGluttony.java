@@ -45,7 +45,7 @@ public class CurseOfGluttony extends DepthsAbility {
 		int removed = 0;
 		int highestRarity = 6;
 		List<String> abilities = sortedAbilities.get(highestRarity);
-		outer: while (removed < 3) {
+		outer: while (removed < 2) {
 			while (abilities == null || abilities.isEmpty()) {
 				highestRarity--;
 				if (highestRarity <= 0) {
@@ -66,6 +66,6 @@ public class CurseOfGluttony extends DepthsAbility {
 
 	private static Description<CurseOfGluttony> getDescription() {
 		return new DescriptionBuilder<CurseOfGluttony>()
-			.add("Lose your 3 highest rated abilities.");
+			.add("Lose your 2 highest rarity abilities.");
 	}
 }

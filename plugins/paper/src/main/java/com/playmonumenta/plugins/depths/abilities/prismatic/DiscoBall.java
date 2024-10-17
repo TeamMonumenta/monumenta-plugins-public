@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -58,7 +60,7 @@ import org.joml.Vector3f;
 public class DiscoBall extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Disco Ball";
-	public static final double[] DAMAGE = {4, 5, 6, 7, 8, 10};
+	public static final double[] DAMAGE = {3.5, 4.5, 5.5, 6.5, 7.5, 9.5};
 	public static final int COOLDOWN = 18 * 20;
 	public static final double MAX_HEIGHT = 10;
 	public static final int DURATION = 5 * 20;
@@ -78,10 +80,16 @@ public class DiscoBall extends DepthsAbility {
 			.priorityAmount(949); // Needs to trigger before Rapid Fire;
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private double mDamage;
 
 	public DiscoBall(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPlayerItemStatsMap = new WeakHashMap<>();
+		mDamage = DAMAGE[mRarity - 1];
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+		if (party != null) {
+			mDamage *= party.getPrismaticDamageMultiplier();
+		}
 	}
 
 	private void spawnDiscoBall(Projectile proj, Location loc) {
@@ -190,7 +198,7 @@ public class DiscoBall extends DepthsAbility {
 			}
 
 			public void damageLocation(Location loc, boolean quadruple) {
-				double damage = DAMAGE[mRarity - 1] * (quadruple ? 4 : 1);
+				double damage = mDamage * (quadruple ? 4 : 1);
 				Hitbox hitbox = new Hitbox.SphereHitbox(loc, BLAST_RADIUS);
 				for (LivingEntity mob : hitbox.getHitMobs()) {
 					if (!mAlreadyHitMobs.contains(mob)) {
@@ -318,6 +326,16 @@ public class DiscoBall extends DepthsAbility {
 			.add(" magic damage onto 3 targets every 0.5 seconds. The disco ball starts out with a narrow targeting angle and expands over time. If your party has an active trigger ability " +
 				"from all eight trees, the final pulse of the ball will heat up the dance floor with a color show that " +
 				"deals quadruple damage.")
-			.addCooldown(COOLDOWN);
+			.addCooldown(COOLDOWN)
+			.add((a, p) -> {
+				if (p == null) {
+					return Component.empty();
+				}
+				DepthsParty party = DepthsManager.getInstance().getDepthsParty(p);
+				if (party == null) {
+					return Component.empty();
+				}
+				return Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1));
+			});
 	}
 }

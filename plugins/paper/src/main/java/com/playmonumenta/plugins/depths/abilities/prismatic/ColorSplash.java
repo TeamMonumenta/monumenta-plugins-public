@@ -121,6 +121,7 @@ public class ColorSplash extends DepthsAbility {
 	private boolean mWindwalkerActive;
 	private boolean mWindwalkIframes;
 	private boolean mCanCastWindwalk;
+	private int mCurrentTree;
 
 	public static final DepthsAbilityInfo<ColorSplash> INFO =
 		new DepthsAbilityInfo<>(ColorSplash.class, ABILITY_NAME, ColorSplash::new, DepthsTree.PRISMATIC, DepthsTrigger.SWAP)
@@ -138,6 +139,7 @@ public class ColorSplash extends DepthsAbility {
 		mWindwalkerActive = false;
 		mWindwalkIframes = false;
 		mCanCastWindwalk = false;
+		mCurrentTree = 0;
 	}
 
 	public boolean cast() {
@@ -156,8 +158,10 @@ public class ColorSplash extends DepthsAbility {
 		}
 
 		List<DepthsTree> availableTrees = dPlayer.mEligibleTrees;
-		DepthsTree selectedTree = availableTrees.get(FastUtils.randomIntInRange(0, availableTrees.size() - 1));
+		DepthsTree selectedTree = availableTrees.get(mCurrentTree);
 		preActivationAesthetics(selectedTree);
+
+		mCurrentTree = (mCurrentTree + 1) % dPlayer.mEligibleTrees.size();
 
 		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -685,7 +689,7 @@ public class ColorSplash extends DepthsAbility {
 		return new DescriptionBuilder<ColorSplash>(color)
 			.add("Swap hands to cast a unique ability after ")
 			.addDuration(ACTIVATION_DELAY)
-			.add("s. This ability is chosen at random from one of your available trees.")
+			.add("s. This ability cycles through your available trees in the order you have them.")
 			.addCooldown(COOLDOWN)
 			.addConditionalTree(DepthsTree.FROSTBORN, getFrostbornDescription(rarity, color))
 			.addConditionalTree(DepthsTree.FLAMECALLER, getFlamecallerDescription(rarity, color))
