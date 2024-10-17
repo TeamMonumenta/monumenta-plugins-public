@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -46,7 +45,7 @@ public class PPExplosion extends AbstractPartialParticle<PPExplosion> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		mDirectionalMode = true;
 		int count = packagedValues.count();
 		Location loc = packagedValues.location();

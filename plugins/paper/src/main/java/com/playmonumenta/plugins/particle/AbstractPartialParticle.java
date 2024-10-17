@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
-import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,12 +14,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT>> {
 
-	private static final int PARTICLE_SPAWN_DISTANCE_SQUARED = 50 * 50;
+	public static final int PARTICLE_SPAWN_DISTANCE_SQUARED = 50 * 50;
 
-	private static long mSpawnedParticles;
+	protected static long mSpawnedParticles;
 
 	public Particle mParticle;
 	public Location mLocation;
+	public String mId = "";
 	public int mCount = 1;
 	public double mDeltaX = 0;
 	public double mDeltaY = 0;
@@ -159,6 +159,11 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return getSelf();
 	}
 
+	public SelfT id(String id) {
+		this.mId = id;
+		return getSelf();
+	}
+
 	public SelfT count(int count) {
 		mCount = count;
 		return getSelf();
@@ -242,6 +247,11 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_ACTIVE, ParticleCategory.OTHER_ACTIVE);
 	}
 
+	/**
+	 * Spawn particles in the category {@link ParticleCategory#OTHER_ACTIVE} for nearby players
+	 * Please use {@link #spawnAsPlayerActive(Player)} instead
+	 * This is because this function doesn't respect player visibility settings
+	 */
 	public SelfT spawnAsOtherPlayerActive() {
 		return spawnForPlayers(ParticleCategory.OTHER_ACTIVE);
 	}
@@ -250,6 +260,11 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_PASSIVE, ParticleCategory.OTHER_PASSIVE);
 	}
 
+	/**
+	 * Spawn particles in the category {@link ParticleCategory#OTHER_PASSIVE} for nearby players
+	 * Please use {@link #spawnAsPlayerPassive(Player)} instead
+	 * This is because this function doesn't respect player visibility settings
+	 */
 	public SelfT spawnAsOtherPlayerPassive() {
 		return spawnForPlayers(ParticleCategory.OTHER_PASSIVE);
 	}
@@ -262,6 +277,10 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_EMOJI, ParticleCategory.OTHER_EMOJI);
 	}
 
+	public SelfT spawnAsPlayerFull(Player sourcePlayer) {
+		return spawnForPlayers(ParticleCategory.FULL, sourcePlayer);
+	}
+
 	/*
 	 * Spawns particles for each nearby player,
 	 * based on individual particle multiplier settings.
@@ -271,25 +290,17 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 * while the OTHER_ multipliers are used for other players seeing his/her
 	 * particles.
 	 *
-	 * Specify isPassive as false for active particles
-	 * (eg Mana Lance ability, Spark enchant),
-	 * or as true for passive particles (eg Gilded enchant).
 	 */
 	public SelfT spawnAsPlayer(Player sourcePlayer, ParticleCategory ownCategory, ParticleCategory othersCategory) {
-		prepareSpawn();
-		return forEachNearbyPlayer(
-			(Player player) -> {
-				spawnForPlayerInternal(player, player == sourcePlayer ? ownCategory : othersCategory);
-			}
-		);
+		return spawnForPlayers(ownCategory, othersCategory, null, sourcePlayer);
 	}
 
 	/**
 	 * Calls {@link #spawnAsPlayerActive(Player)} for a player entity, and {@link #spawnAsEnemy()} otherwise.
 	 */
 	public void spawnAsEntityActive(Entity entity) {
-		if (entity instanceof Player) {
-			spawnAsPlayerActive((Player) entity);
+		if (entity instanceof Player player) {
+			spawnAsPlayerActive(player);
 		} else if (entity.getScoreboardTags().contains("Boss")) {
 			spawnAsBoss();
 		} else {
@@ -301,8 +312,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 * Calls {@link #spawnAsPlayerBuff(Player)} for a player entity, and {@link #spawnAsEnemyBuff()} otherwise.
 	 */
 	public void spawnAsEntityBuff(Entity entity) {
-		if (entity instanceof Player) {
-			spawnAsPlayerBuff((Player) entity);
+		if (entity instanceof Player player) {
+			spawnAsPlayerBuff(player);
 		} else {
 			// no boss check here - buffs are often applied by players and can interfere with particles from boss abilities
 			spawnAsEnemyBuff();
@@ -329,10 +340,13 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return spawnForPlayers(ParticleCategory.BOSS);
 	}
 
-	/*
+	/**
 	 * Spawns particles for each nearby player,
 	 * with no partial multiplier applied
 	 * (always spawns the full mCount amount).
+	 *
+	 * Please use {@link #spawnAsPlayerFull(Player)} if this is attributed to a player
+	 * so that this works properly with player visibility settings
 	 */
 	public SelfT spawnFull() {
 		return spawnForPlayers(ParticleCategory.FULL);
@@ -348,7 +362,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 * spawnUsingSettings() with different packagedValues,
 	 * as many times as needed.
 	 */
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		spawnUsingSettings(packagedValues);
 	}
 
@@ -358,7 +372,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 * applies them to a clone of the specified packagedValues,
 	 * looping internally as needed.
 	 */
-	protected void spawnUsingSettings(ParticleBuilder packagedValues) {
+	protected void spawnUsingSettings(PartialParticleBuilder packagedValues) {
 		if (mDistanceFalloffSquared != 0) {
 			double distance = Objects.requireNonNull(packagedValues.location()).distanceSquared(Objects.requireNonNull(packagedValues.receivers()).get(0).getLocation());
 			if (distance > mDistanceFalloffSquared) {
@@ -372,9 +386,10 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		}
 		mSpawnedParticles += packagedValues.count();
 		if (!(mDirectionalMode || isDeltaVaried() || isExtraVaried())) {
-			packagedValues.spawn();
+			ParticleManager.addParticleToQueue(packagedValues);
+			// packagedValues.spawn();
 		} else {
-			ParticleBuilder variedClone = new ParticleBuilder(packagedValues.particle());
+			PartialParticleBuilder variedClone = new PartialParticleBuilder(packagedValues.particle());
 			variedClone.location(Objects.requireNonNull(packagedValues.location()));
 			variedClone.extra(packagedValues.extra());
 			variedClone.data(packagedValues.data());
@@ -421,48 +436,74 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 					variedClone.extra(packagedValues.extra() + FastUtils.randomDoubleInRange(-mExtraVariance, mExtraVariance));
 				}
 
-				variedClone.spawn();
+				ParticleManager.addParticleToQueue(packagedValues);
+				// variedClone.spawn();
 			}
 		}
 	}
 
 	public SelfT spawnForPlayers(ParticleCategory source) {
-		prepareSpawn();
-		return forEachNearbyPlayer(
-			(Player player) -> spawnForPlayerInternal(player, source)
-		);
+		return spawnForPlayers(source, (Player) null);
+	}
+
+	public SelfT spawnForPlayers(ParticleCategory source, @Nullable Player sourcePlayer) {
+		return spawnForPlayers(source, null, sourcePlayer);
 	}
 
 	public SelfT spawnForPlayers(ParticleCategory source, Collection<Player> players) {
-		prepareSpawn();
-		players.forEach(player -> {
-			spawnForPlayerInternal(player, source);
-		});
+		return spawnForPlayers(source, players, null);
+	}
+
+	/**
+	 * Spawns particles for each player in the specified collection,
+	 * based on individual particle multiplier settings.
+	 * Specify a sourcePlayer to respect player visiblitity settings.
+	 * Consider using {@link #spawnAsPlayerFull(Player)} if specific players aren't needed.
+	 * @see #spawnAsPlayerFull(Player)
+	 */
+	public SelfT spawnForPlayers(ParticleCategory source, @Nullable Collection<Player> players, @Nullable Player sourcePlayer) {
+		return spawnForPlayers(source, source, players, sourcePlayer);
+	}
+
+	public SelfT spawnForPlayers(ParticleCategory source, ParticleCategory otherSource, @Nullable Collection<Player> players, @Nullable Player sourcePlayer) {
+		final Collection<Player> finalPlayers = players != null && !players.isEmpty() ? players : forEachNearbyPlayer();
+		if (finalPlayers.isEmpty()) {
+			return getSelf();
+		}
+		spawnForPlayersInternal(source, otherSource, finalPlayers, sourcePlayer);
 		return getSelf();
 	}
 
 	public SelfT spawnForPlayer(ParticleCategory source, Player player) {
-		prepareSpawn();
-		spawnForPlayerInternal(player, source);
-		return getSelf();
+		return spawnForPlayers(source, List.of(player));
 	}
 
 	protected void prepareSpawn() {
 	}
 
-	private SelfT forEachNearbyPlayer(Consumer<Player> playerAction) {
+	protected Collection<Player> forEachNearbyPlayer() {
 		double capDistance = mDistanceFalloffSquared != 0 ? mDistanceFalloffSquared : PARTICLE_SPAWN_DISTANCE_SQUARED;
+		List<Player> players = new ArrayList<>();
 		for (Player player : mLocation.getWorld().getPlayers()) {
 			if (player.getLocation().distanceSquared(mLocation) < capDistance
 				    && (mPlayerCondition == null || mPlayerCondition.test(player))) {
-				playerAction.accept(player);
+				players.add(player);
 			}
 		}
-		return getSelf();
+		return players;
 	}
 
-	private void spawnForPlayerInternal(Player player, ParticleCategory source) {
-		double particleMultiplier = Math.min(PlayerData.getParticleMultiplier(player, source), mMaximumMultiplier);
+	private void spawnForPlayersInternal(ParticleCategory source, ParticleCategory otherSource, Collection<Player> players, @Nullable Player sourcePlayer) {
+		ParticleManager.runOffMainThread(() -> {
+			prepareSpawn();
+			players.forEach(player -> {
+				spawnForPlayerInternal(player, player == sourcePlayer ? source : otherSource, sourcePlayer);
+			});
+		});
+	}
+
+	private void spawnForPlayerInternal(Player player, ParticleCategory source, @Nullable Player sourcePlayer) {
+		double particleMultiplier = Math.min(ParticleManager.getParticleMultiplier(player, source), mMaximumMultiplier);
 		if (particleMultiplier <= mSkipBelowMultiplier) {
 			return;
 		}
@@ -471,15 +512,15 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 			return;
 		}
 
-		ParticleBuilder packagedValues = new ParticleBuilder(mParticle);
+		PartialParticleBuilder packagedValues = new PartialParticleBuilder(mParticle);
 		packagedValues.location(mLocation);
 		packagedValues.count(partialCount);
 		packagedValues.offset(mDeltaX, mDeltaY, mDeltaZ);
 		packagedValues.extra(mExtra);
 		packagedValues.data(mData);
 		packagedValues.force(true);
-
 		packagedValues.receivers(player);
+		packagedValues.source(sourcePlayer);
 
 		doSpawn(packagedValues);
 	}

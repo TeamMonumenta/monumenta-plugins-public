@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.ParticleCategory;
-import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.particle.ParticleManager;
 import com.playmonumenta.plugins.protocollib.EntityEquipmentReplacer;
 import com.playmonumenta.plugins.protocollib.RecipeBookGUIOpener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -984,25 +984,26 @@ public class PEBCustomInventory extends CustomInventory {
 		return new PebItem(slot, gui -> category.mDisplayName + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
 			gui -> description + ". Left click to increase, right click to decrease." + (isEmojiCategory(category) ? "" : " Hold shift to increase/decrease in smaller steps."), NamedTextColor.GRAY,
 			material, false).switchToPage(PebPage.PARTIAL_PARTICLES)
-			       .action((gui, event) -> {
-				       int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
-					   if (isEmojiCategory(category)) {
-						   // Only 4 options: 100%, 50%, 25%, 0% (1x, 0.5x, 0.25x, 0x resolution)
-						   value = (int) (value * (event.isLeftClick() ? 2.0 : 0.5));
-						   // Handle 0
-						   if (value == 0 && event.isLeftClick()) {
-							   value = 25;
-						   } else if (value < 25) {
-							   value = 0;
-						   }
-						   value = Math.min(100, value);
-					   } else {
-						   value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
-						   value = Math.max(0, Math.min(value, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
-					   }
-				       ScoreboardUtils.setScoreboardValue(gui.mPlayer, objectiveName, value);
-				       gui.setLayout(gui.mCurrentPage); // refresh GUI
-			       });
+			.action((gui, event) -> {
+				int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
+				if (isEmojiCategory(category)) {
+					// Only 4 options: 100%, 50%, 25%, 0% (1x, 0.5x, 0.25x, 0x resolution)
+					value = (int) (value * (event.isLeftClick() ? 2.0 : 0.5));
+					// Handle 0
+					if (value == 0 && event.isLeftClick()) {
+						value = 25;
+					} else if (value < 25) {
+						value = 0;
+					}
+					value = Math.min(100, value);
+				} else {
+					value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
+					value = Math.max(0, Math.min(value, ParticleManager.MAX_PARTIAL_PARTICLE_VALUE));
+				}
+				ScoreboardUtils.setScoreboardValue(gui.mPlayer, objectiveName, value);
+				ParticleManager.updateParticleSettings(gui.mPlayer);
+				gui.setLayout(gui.mCurrentPage); // refresh GUI
+			});
 	}
 
 	private final Player mPlayer;

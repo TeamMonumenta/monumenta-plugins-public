@@ -73,6 +73,7 @@ import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.nodeplanner.NodePlanner;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
+import com.playmonumenta.plugins.particle.ParticleManager;
 import com.playmonumenta.plugins.player.PlayerSaturationTracker;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.AnimalLimits;
@@ -735,6 +736,8 @@ public class Plugin extends JavaPlugin {
 			DepthsCommand.register(this);
 			DepthsGUICommands.register();
 		}
+
+		ParticleManager.init();
 	}
 
 	//  Logic that is performed upon disabling the plugin.
@@ -743,6 +746,7 @@ public class Plugin extends JavaPlugin {
 	public void onDisable() {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
+		ParticleManager.shutdown();
 
 		TimeWarpManager.unload();
 

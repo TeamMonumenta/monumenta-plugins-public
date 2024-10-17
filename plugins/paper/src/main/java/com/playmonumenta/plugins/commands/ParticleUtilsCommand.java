@@ -303,7 +303,11 @@ public class ParticleUtilsCommand {
 	}
 
 	private static void spawnForViewers(List<Player> allowedViewers, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle) {
-		allowedViewers.forEach(viewer -> particle.spawnForPlayer(ParticleCategory.FULL, viewer));
+		particle.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
+	}
+
+	private static void spawnForViewers(List<Player> allowedViewers, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle, @Nullable Player callee) {
+		particle.spawnForPlayers(ParticleCategory.FULL, allowedViewers, callee);
 	}
 
 	private static void doLine(@Nullable CommandSender callee, Location start, Location end, double countPerMeter, Particle particle,
@@ -315,7 +319,11 @@ public class ParticleUtilsCommand {
 		}
 
 		if (allowedViewers != null) {
-			spawnForViewers(allowedViewers, line);
+			if (callee instanceof Player player) {
+				spawnForViewers(allowedViewers, line, player);
+			} else {
+				spawnForViewers(allowedViewers, line);
+			}
 		} else {
 			spawnAsActive(callee, line);
 		}

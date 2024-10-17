@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -212,4 +213,6 @@ public interface VersionAdapter {
 	 * @param entity The entity
 	 */
 	void forceSyncEntityPositionData(Entity entity);
+
+	<T> int sendParticle(Particle particle, Player reciever, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data, boolean force);
 }

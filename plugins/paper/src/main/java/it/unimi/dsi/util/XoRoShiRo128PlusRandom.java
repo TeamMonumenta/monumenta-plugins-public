@@ -21,6 +21,7 @@ package it.unimi.dsi.util;
  */
 
 import java.util.Random;
+import java.util.SplittableRandom;
 
 /** A fast, high-quality {@linkplain Random pseudorandom number generator} for floating-point generation.
  * It has excellent speed,
@@ -325,7 +326,7 @@ public class XoRoShiRo128PlusRandom extends Random {
 	/* Monumenta NOTE : Just use Java's Random instead to generate the seed */
 	@Override
 	public synchronized void setSeed(final long seed) {
-		final Random r = new Random(seed);
+		final SplittableRandom r = new SplittableRandom(seed); // We use SplittableRandom instead of Random for better performance and better seed generation
 		mS0 = r.nextLong();
 		mS1 = r.nextLong();
 	}

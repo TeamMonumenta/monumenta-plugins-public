@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.protocollib;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.ListenerOptions;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
@@ -8,11 +9,15 @@ import com.comphenix.protocol.injector.GamePhase;
 import com.comphenix.protocol.injector.netty.WirePacket;
 import com.playmonumenta.plugins.Plugin;
 import io.prometheus.client.Counter;
+import java.util.Set;
 
 /**
  * Measures packet metrics using Prometheus
  */
 public class PacketMonitor implements PacketListener {
+	private static final Set<PacketType> excludedPacketTypes = Set.of(
+		PacketType.Play.Server.TAB_COMPLETE
+	);
 
 	private static final Counter outgoingCounter = Counter.build()
 		.name("monumenta_outgoing_packets_by_type")
@@ -54,8 +59,9 @@ public class PacketMonitor implements PacketListener {
 			.types(PacketType.Play.Server.getInstance().values().stream()
 				.filter(type -> type.isSupported()
 					                && !type.isDeprecated()
-					                && !type.equals(PacketType.Play.Server.TAB_COMPLETE))
+					                && !excludedPacketTypes.contains(type))
 				.toList())
+			.options(Set.of(ListenerOptions.ASYNC))
 			.monitor()
 			.build();
 	}

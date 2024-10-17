@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -63,7 +62,7 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 	 */
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		Location centerLocation = packagedValues.location();
 		// Spawning one by one, looping manually by partialCount times.
 		// spawnWithSettings() will handle whether count should be 0 for
@@ -101,6 +100,6 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 				}
 			}
 
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+		}.runTaskTimerAsynchronously(Plugin.getInstance(), 0, 1);
 	}
 }

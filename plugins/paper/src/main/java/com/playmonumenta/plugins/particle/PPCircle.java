@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Objects;
 import java.util.function.DoublePredicate;
@@ -187,7 +186,7 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		int partialCount = packagedValues.count();
 		Location centerLocation = Objects.requireNonNull(packagedValues.location());
 		// Spawning one by one, looping manually by partialCount times.

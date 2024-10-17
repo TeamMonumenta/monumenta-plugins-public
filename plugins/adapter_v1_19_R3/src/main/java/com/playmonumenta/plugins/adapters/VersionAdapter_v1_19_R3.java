@@ -1,12 +1,17 @@
 package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.papermc.paper.adventure.PaperAdventure;
 import io.papermc.paper.util.CollisionUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -16,6 +21,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -46,8 +52,10 @@ import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.Scoreboard;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_19_R3.CraftParticle;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.entity.*;
@@ -657,4 +665,61 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 			SERVER_ENTITY_BROADCAST_FIELD.get(tracker.serverEntity).accept(new ClientboundTeleportEntityPacket(mcEntity));
 		}
 	}
+
+	private static final Map<UUID, Long> mFlushingPlayers = new ConcurrentHashMap<>();
+	// Netty's default watermark is 64kb, but that throttles too much for us
+	private static final long mMaxQueueBytes = 3000 * 1024L; // 5 mb;
+	private static final long mRetryQueueByes = 3000 * 1024L; // 256 kb // TODO: unfortunately this code isn't working well with high bursty cosmetic abilities such as Transcendent Combos
+	private static final long mFlushQueueBytes = 32 * 1024L; // 32 kb;
+	private static final long mTimeoutNanos = TimeUnit.MILLISECONDS.toNanos(1);
+
+	/**
+	 * @return 0 if the packet was sent, 1 if the packet was dropped and should be requeued, -1 if the packet was dropped
+	 */
+	@Override
+	public <T> int sendParticle(Particle particle, Player player, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data, boolean force) {
+		Channel channel = ((CraftPlayer) player).getHandle().connection.connection.channel;
+		if (channel == null || !channel.isActive()) {
+			return -1;
+		}
+		ChannelPipeline pipeline = channel.pipeline();
+		ChannelHandlerContext ctx = pipeline.context("packet_handler");
+		if (ctx == null) {
+			ctx = pipeline.lastContext();
+		}
+		if (ctx == null) {
+			return -1;
+		}
+		final Channel ctxChannel = ctx.channel();
+		if (ctxChannel == null) {
+			return -1;
+		}
+
+		final int flushedQueueSize = ctxChannel.unsafe().outboundBuffer().size();
+		final long unflushedQueueBytes = ctxChannel.unsafe().outboundBuffer().totalPendingWriteBytes();
+		if (flushedQueueSize >= 8192 || unflushedQueueBytes >= mMaxQueueBytes) {
+			// too many packets in the queue, drop this one
+			return -1;
+		}
+		final UUID uuid = player.getUniqueId();
+		final long currentTime = System.nanoTime();
+		final long flushTime = mFlushingPlayers.getOrDefault(player.getUniqueId(), 0L);
+		final boolean timeout = currentTime - flushTime >= mTimeoutNanos;
+		// stop writing once the queue is too big and we are not flushing
+		if (!timeout && unflushedQueueBytes >= mRetryQueueByes) {
+			return 1;
+		}
+		final ClientboundLevelParticlesPacket packet = new ClientboundLevelParticlesPacket(CraftParticle.toNMS(particle, data), force, x, y, z, (float) offsetX, (float) offsetY, (float) offsetZ, (float) extra, count);
+		if (unflushedQueueBytes >= mFlushQueueBytes && timeout) {
+			mFlushingPlayers.put(uuid, currentTime);
+			ctxChannel.writeAndFlush(packet, ctx.voidPromise());
+		} else {
+			if (timeout) {
+				mFlushingPlayers.remove(uuid);
+			}
+			ctxChannel.write(packet, ctx.voidPromise());
+		}
+		return 0;
+	}
+
 }

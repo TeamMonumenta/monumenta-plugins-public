@@ -19,7 +19,7 @@ public class CustomMobAgroMeleeAttack18 extends MeleeAttackGoal {
 	}
 
 	public CustomMobAgroMeleeAttack18(PathfinderMob entity, VersionAdapter.DamageAction action, double attackRange) {
-		this (entity, action, false, attackRange);
+		this(entity, action, false, attackRange);
 	}
 
 	public CustomMobAgroMeleeAttack18(PathfinderMob entity, VersionAdapter.DamageAction action, boolean requireSight) {

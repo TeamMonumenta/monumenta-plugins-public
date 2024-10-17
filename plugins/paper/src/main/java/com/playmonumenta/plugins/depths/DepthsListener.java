@@ -149,7 +149,7 @@ public class DepthsListener implements Listener {
 			for (Map.Entry<Sundrops, Double> weight : weights.entrySet()) {
 				double chance = weight.getValue();
 				if (roll <= chance) {
-					weight.getKey().summonSundrop(loc);
+					weight.getKey().summonSundrop(player, loc);
 					break;
 				} else {
 					roll -= chance;

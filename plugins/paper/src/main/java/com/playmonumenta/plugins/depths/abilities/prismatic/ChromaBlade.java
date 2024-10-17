@@ -519,7 +519,7 @@ public class ChromaBlade extends DepthsAbility {
 			if (tree != null) {
 				switch (tree) {
 					case FLAMECALLER -> EntityUtils.applyFire(mPlugin, 8 * 20, target, mPlayer);
-					case DAWNBRINGER -> dropChroma(LocationUtils.getHalfHeightLocation(target));
+					case DAWNBRINGER -> dropChroma(mPlayer, LocationUtils.getHalfHeightLocation(target));
 					case SHADOWDANCER -> {
 						EntityUtils.applySilence(mPlugin, 20, target);
 						if (target.isValid() && !EntityUtils.isBoss(target) && target.getHealth() < 0.2 * EntityUtils.getMaxHealth(target)) {
@@ -559,7 +559,7 @@ public class ChromaBlade extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.7f, isFast ? 2.0f : 1.5f);
 	}
 
-	private void dropChroma(Location loc) {
+	private void dropChroma(Player sourcePlayer, Location loc) {
 		World world = loc.getWorld();
 		// have the item pop out with some random direction
 		loc.setYaw(FastUtils.randomFloatInRange(0, 360));
@@ -573,7 +573,7 @@ public class ChromaBlade extends DepthsAbility {
 			public void run() {
 				mT++;
 				Location l = chroma.getLocation();
-				new PartialParticle(Particle.FALLING_DUST, l, 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsOtherPlayerActive();
+				new PartialParticle(Particle.FALLING_DUST, l, 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsPlayerPassive(sourcePlayer);
 
 				for (Player p : PlayerUtils.playersInRange(l, 1.25, true)) {
 					AbsorptionUtils.addAbsorption(p, 1, 6, 10 * 20);
@@ -581,8 +581,8 @@ public class ChromaBlade extends DepthsAbility {
 					world.playSound(l, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
 					world.playSound(l, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1, 1.44f);
 					world.playSound(l, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1, 1.2f);
-					new PartialParticle(Particle.BLOCK_CRACK, l, 20, 0.15, 0.15, 0.15, 0.75f, Material.YELLOW_GLAZED_TERRACOTTA.createBlockData()).spawnAsOtherPlayerActive();
-					new PartialParticle(Particle.TOTEM, l, 10, 0, 0, 0, 0.35F).spawnAsOtherPlayerActive();
+					new PartialParticle(Particle.BLOCK_CRACK, l, 20, 0.15, 0.15, 0.15, 0.75f, Material.YELLOW_GLAZED_TERRACOTTA.createBlockData()).spawnAsPlayerActive(p);
+					new PartialParticle(Particle.TOTEM, l, 10, 0, 0, 0, 0.35F).spawnAsPlayerActive(p);
 
 					this.cancel();
 					chroma.remove();

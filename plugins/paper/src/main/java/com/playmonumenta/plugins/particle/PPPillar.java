@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -42,7 +41,7 @@ public class PPPillar extends AbstractPartialParticle<PPPillar> {
 	 */
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		int partialCount = packagedValues.count();
 		Location baseLocation = packagedValues.location();
 		packagedValues.count(1);

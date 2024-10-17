@@ -1,6 +1,6 @@
 plugins {
     id("com.playmonumenta.plugins.java-conventions")
-    id("io.papermc.paperweight.userdev") version "1.3.8"
+    id("io.papermc.paperweight.userdev") version "1.7.3"
 }
 
 dependencies {

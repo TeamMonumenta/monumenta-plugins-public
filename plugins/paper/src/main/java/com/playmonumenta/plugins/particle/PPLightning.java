@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -139,7 +138,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 	 */
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		generateHopsOnce(packagedValues.location());
 
 		int hopParticleCount = Math.max(HOP_MINIMUM_PARTICLES, packagedValues.count());
@@ -174,7 +173,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 				}
 			}
 		};
-		mRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
+		mRunnable.runTaskTimerAsynchronously(Plugin.getInstance(), 0, 1);
 	}
 
 	// Each lightning bolt will have the same hops for all players,

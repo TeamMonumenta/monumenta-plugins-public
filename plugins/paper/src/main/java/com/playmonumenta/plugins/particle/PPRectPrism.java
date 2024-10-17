@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -74,7 +73,7 @@ public class PPRectPrism extends AbstractPartialParticle<PPRectPrism> {
 	 */
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		super.doSpawn(packagedValues);
 
 		double count = packagedValues.count();
@@ -128,7 +127,7 @@ public class PPRectPrism extends AbstractPartialParticle<PPRectPrism> {
 		}
 	}
 
-	private void offsetAndSpawn(ParticleBuilder packagedValues, Location loc, double x, double y, double z) {
+	private void offsetAndSpawn(PartialParticleBuilder packagedValues, Location loc, double x, double y, double z) {
 		if (mStartColor != null && mEndColor != null) {
 			double distance = Math.sqrt(x * x + y * y + z * z) / mSize.length();
 			packagedValues.data(new Particle.DustOptions(ParticleUtils.getTransition(mStartColor, mEndColor, distance), mDustSize));

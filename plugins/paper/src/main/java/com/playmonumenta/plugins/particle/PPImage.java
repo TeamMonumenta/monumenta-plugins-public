@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.colors.BlendMode;
 import com.playmonumenta.plugins.utils.FileUtils;
@@ -121,7 +120,7 @@ public class PPImage extends AbstractPartialParticle<PPImage> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		if (mShouldRegenerateParticles) {
 			populateDustOptions();
 			mShouldRegenerateParticles = false;

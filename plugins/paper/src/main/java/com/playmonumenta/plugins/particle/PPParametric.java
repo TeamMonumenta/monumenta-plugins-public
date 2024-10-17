@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -15,7 +14,7 @@ import org.bukkit.entity.Player;
 public class PPParametric extends AbstractPartialParticle<PPParametric> {
 
 	public interface ParametricFunction {
-		void transform(double parameter, ParticleBuilder packagedValues);
+		void transform(double parameter, PartialParticleBuilder packagedValues);
 	}
 
 	private final ParametricFunction mFunction;
@@ -50,7 +49,7 @@ public class PPParametric extends AbstractPartialParticle<PPParametric> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		int count = packagedValues.count();
 		packagedValues.count(1);
 		for (int i = 0; i <= count; i++) {

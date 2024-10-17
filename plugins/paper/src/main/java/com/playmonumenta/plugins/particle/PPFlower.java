@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -96,7 +95,7 @@ public class PPFlower extends AbstractPartialParticle<PPFlower> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		double partialCount = packagedValues.count();
 		Location centerLoc = packagedValues.location();
 		if (centerLoc == null) {

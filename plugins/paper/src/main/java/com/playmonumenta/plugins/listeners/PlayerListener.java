@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
+import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
@@ -32,6 +33,7 @@ import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
+import com.playmonumenta.plugins.particle.ParticleManager;
 import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.point.Point;
@@ -240,6 +242,8 @@ public class PlayerListener implements Listener {
 
 		DailyReset.handle(player);
 
+		ParticleManager.updateParticleSettings(player);
+
 		// add player to the players team (and create the team if it doesn't exist already)
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -306,6 +310,8 @@ public class PlayerListener implements Listener {
 		if (playersTeam != null) {
 			playersTeam.removeEntry(player.getName());
 		}
+
+		ParticleManager.removeParticleSettings(player);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -1863,5 +1869,10 @@ public class PlayerListener implements Listener {
 		if (event.getEntity() instanceof Player player) {
 			mPlugin.mAbilityManager.effectTypeApplyFromPotionEvent(player, event);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void serverTickEndEvent(ServerTickEndEvent event) {
+		ParticleManager.tick();
 	}
 }

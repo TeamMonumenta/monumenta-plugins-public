@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Plugin;
 import java.util.Arrays;
 import java.util.List;
@@ -86,7 +85,7 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		int count = packagedValues.count();
 		int n = mControlPoints.size() - 1;
 
@@ -126,7 +125,7 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(Plugin.getInstance(), 0, 1);
+			}.runTaskTimerAsynchronously(Plugin.getInstance(), 0, 1);
 		} else {
 			for (int i = 0; i <= count; i++) {
 				double t = 1.0 * i / count;

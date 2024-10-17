@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -22,7 +21,7 @@ public class PPMulti extends AbstractPartialParticle<PPMulti> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		double countPerLocation = 1.0 * packagedValues.count() / mLocations.size();
 		if (countPerLocation >= 1) { // at least one per location: spawn the same amount each time
 			packagedValues.count((int) countPerLocation);

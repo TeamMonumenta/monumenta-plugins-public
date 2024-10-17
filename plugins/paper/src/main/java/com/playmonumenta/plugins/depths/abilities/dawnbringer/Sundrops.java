@@ -59,7 +59,7 @@ public class Sundrops extends DepthsAbility {
 		mSpeed = PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SUNDROPS_SPEED_AMPLIFIER.mEffectName);
 	}
 
-	public void summonSundrop(Location loc) {
+	public void summonSundrop(Player sourcePlayer, Location loc) {
 		World world = loc.getWorld();
 		Item sundrop = AbilityUtils.spawnAbilityItem(world, loc, Material.HONEYCOMB_BLOCK, "Sundrop", true, 0, true, true);
 
@@ -70,7 +70,7 @@ public class Sundrops extends DepthsAbility {
 			public void run() {
 				mT++;
 				Location l = sundrop.getLocation();
-				new PartialParticle(Particle.FALLING_DUST, l, 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsOtherPlayerActive();
+				new PartialParticle(Particle.FALLING_DUST, l, 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsPlayerPassive(sourcePlayer);
 				//Other player
 				for (Player p : new Hitbox.UprightCylinderHitbox(l, 0.7, 0.7).getHitPlayers(true)) {
 					Plugin plugin = Plugin.getInstance();
@@ -81,8 +81,8 @@ public class Sundrops extends DepthsAbility {
 					world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
 					world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
 					world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1, 1f);
-					new PartialParticle(Particle.BLOCK_CRACK, l, 30, 0.15, 0.15, 0.15, 0.75F, Material.HONEYCOMB_BLOCK.createBlockData()).spawnAsOtherPlayerActive();
-					new PartialParticle(Particle.TOTEM, l, 20, 0, 0, 0, 0.35F).spawnAsOtherPlayerActive();
+					new PartialParticle(Particle.BLOCK_CRACK, l, 30, 0.15, 0.15, 0.15, 0.75F, Material.HONEYCOMB_BLOCK.createBlockData()).spawnAsPlayerActive(p);
+					new PartialParticle(Particle.TOTEM, l, 20, 0, 0, 0, 0.35F).spawnAsPlayerActive(p);
 
 					this.cancel();
 					sundrop.remove();
@@ -117,4 +117,3 @@ public class Sundrops extends DepthsAbility {
 	}
 
 }
-

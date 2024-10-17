@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.particle;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Location;
@@ -152,7 +151,7 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 	}
 
 	@Override
-	protected void doSpawn(ParticleBuilder packagedValues) {
+	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		Location loc = mLocation.clone();
 		int count = packagedValues.count();
 		packagedValues.count(1);
@@ -202,7 +201,7 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(Plugin.getInstance(), 0, 1);
+			}.runTaskTimerAsynchronously(Plugin.getInstance(), 0, 1);
 		} else {
 			for (int i = 0; i < count; i++) {
 				packagedValues.location(loc);

@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -204,6 +205,15 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	@Override
 	public void forceSyncEntityPositionData(Entity entity) {
-
 	}
+
+	@Override
+	public <T> int sendParticle(Particle particle, Player reciever, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data, boolean force) {
+		// Turn off checkstyle for specifically fallback spawnParticle call here
+		// CHECKSTYLE:OFF
+		reciever.spawnParticle(particle, x, y, z, count, offsetX, offsetY, offsetZ, extra, data);
+		// CHECKSTYLE:ON
+		return 0;
+	}
+
 }

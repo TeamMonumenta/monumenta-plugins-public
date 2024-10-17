@@ -24,6 +24,7 @@ public class PPPeriodic extends AbstractPartialParticle<PPPeriodic> {
 
 	@Override
 	protected void prepareSpawn() {
+		super.prepareSpawn();
 		mTime++;
 	}
 

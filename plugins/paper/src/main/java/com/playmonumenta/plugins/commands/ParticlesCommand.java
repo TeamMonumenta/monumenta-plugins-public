@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.particle.ParticleCategory;
-import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.particle.ParticleManager;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -38,8 +38,9 @@ public class ParticlesCommand {
 				}
 				int multiplier = args.getUnchecked("multiplier");
 
-				multiplier = Math.max(0, Math.min(multiplier, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
+				multiplier = Math.max(0, Math.min(multiplier, ParticleManager.MAX_PARTIAL_PARTICLE_VALUE));
 				ScoreboardUtils.setScoreboardValue(player, category.mObjectiveName, multiplier);
+				ParticleManager.updateParticleSettings(player);
 				player.sendMessage(Component.text("Your particle multiplier for ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 					                   .append(Component.text(category.mDisplayName, NamedTextColor.WHITE))
 					                   .append(Component.text(" is now ", NamedTextColor.GRAY))
