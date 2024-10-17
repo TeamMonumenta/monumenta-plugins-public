@@ -22,7 +22,7 @@ public class PlayerInventoryCustomInventory extends CustomInventory {
 		mFromPDGUI = fromPDGUI;
 		mRequestingPlayer = requestingPlayer;
 		mTargetPlayer = clickedPlayer;
-		setLayout(clickedPlayer);
+		setLayout();
 	}
 
 	@Override
@@ -35,19 +35,19 @@ public class PlayerInventoryCustomInventory extends CustomInventory {
 		}
 	}
 
-	public void setLayout(Player clickedPlayer) {
+	public void setLayout() {
 		mInventory.clear();
 		//Added for tracking to prevent them from clicking on stuff
 
-		PlayerInventory playInv = clickedPlayer.getInventory();
-		boolean showVanity = Plugin.getInstance().mVanityManager.getData(clickedPlayer).mGuiVanityEnabled;
+		PlayerInventory playInv = mTargetPlayer.getInventory();
+		boolean showVanity = Plugin.getInstance().mVanityManager.getData(mRequestingPlayer).mGuiVanityEnabled;
 
 		//Set the fake inventory's top row to be the armor and offhand of the player
-		mInventory.setItem(9, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.HEAD, showVanity));
-		mInventory.setItem(10, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.CHEST, showVanity));
-		mInventory.setItem(11, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.LEGS, showVanity));
-		mInventory.setItem(12, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.FEET, showVanity));
-		mInventory.setItem(13, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.OFF_HAND, showVanity));
+		mInventory.setItem(9, PlayerItemStatsGUI.getPlayerItemWithVanity(mTargetPlayer, EquipmentSlot.HEAD, showVanity));
+		mInventory.setItem(10, PlayerItemStatsGUI.getPlayerItemWithVanity(mTargetPlayer, EquipmentSlot.CHEST, showVanity));
+		mInventory.setItem(11, PlayerItemStatsGUI.getPlayerItemWithVanity(mTargetPlayer, EquipmentSlot.LEGS, showVanity));
+		mInventory.setItem(12, PlayerItemStatsGUI.getPlayerItemWithVanity(mTargetPlayer, EquipmentSlot.FEET, showVanity));
+		mInventory.setItem(13, PlayerItemStatsGUI.getPlayerItemWithVanity(mTargetPlayer, EquipmentSlot.OFF_HAND, showVanity));
 
 		//Set the fake inventory's bottom row to be the players hotbar
 		mInventory.setItem(18, playInv.getItem(0));
