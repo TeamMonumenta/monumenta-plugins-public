@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.market.filters.ComponentConfig;
 import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.plugins.market.gui.MarketGui;
+import com.playmonumenta.plugins.market.gui.TabBazaarBrowserState;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -366,6 +367,15 @@ public class MarketManager {
 		marketPlayerData.setPlayerFiltersList(playerFilters);
 	}
 
+	public static TabBazaarBrowserState getTabBazaarBrowserState(Player player) {
+		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.get(player);
+		if (marketPlayerData == null) {
+			Plugin.getInstance().getLogger().warning("ERROR: FAILED TO GET MARKET DATA OF " + player.getName() + ": NO MARKET INSTANCE. CONTACT A MODERATOR IMMEDIATELY, SOMETHING IS WRONG WITH YOUR PLUGIN DATA");
+			return new TabBazaarBrowserState(null);
+		}
+		return marketPlayerData.getTabBazaarBrowserState();
+	}
+
 	// calls redis -> use in an async env.
 	public static void collectAllAndRemoveExpiredFromListingList(Player player, List<MarketListing> listingsList) {
 
@@ -404,38 +414,9 @@ public class MarketManager {
 
 		Gson gson = new Gson();
 
-		MarketPlayerData marketPlayerData = mMarketPlayerDataInstances.getOrDefault(event.getPlayer(), new MarketPlayerData());
 		UUID uuid = event.getPlayer().getUniqueId();
 		JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
-		if (data != null) {
-			// OWNERSHIP
-			JsonArray ownershipArray = data.getAsJsonArray("playerListings");
-			for (JsonElement elem : ownershipArray) {
-				marketPlayerData.addListingIDToPlayer(elem.getAsString());
-			}
-
-			// FILTERS
-			JsonArray filtersArray = data.getAsJsonArray("playerFilters");
-			if (filtersArray == null) {
-				marketPlayerData.resetPlayerFiltersList();
-			} else {
-				ArrayList<MarketFilter> filters = new ArrayList<>();
-				for (JsonElement filterObj : filtersArray.asList()) {
-					MarketFilter filter = gson.fromJson(filterObj, MarketFilter.class);
-					filters.add(filter);
-				}
-				marketPlayerData.setPlayerFiltersList(filters);
-			}
-
-			// OPTIONS
-			JsonElement optionsElement = data.get("playerOptions");
-			if (optionsElement == null) {
-				marketPlayerData.setPlayerOptions(new MarketPlayerOptions());
-			} else {
-				marketPlayerData.setPlayerOptions(gson.fromJson(optionsElement, MarketPlayerOptions.class));
-			}
-		}
-
+		MarketPlayerData marketPlayerData = MarketPlayerData.fromJson(data);
 		mMarketPlayerDataInstances.put(event.getPlayer(), marketPlayerData);
 
 		// launch the notification calculation/display, for later
@@ -503,37 +484,16 @@ public class MarketManager {
 			AuditListener.logMarket("ERROR FAILED TO SAVE MARKET DATA OF " + event.getPlayer().getName() + ": NO MARKET INSTANCE");
 			return;
 		}
-		JsonObject data = new JsonObject();
-		Gson gson = new Gson();
-
-		// OWNERSHIP
-		JsonArray ownershipArray = new JsonArray();
-		for (Long id : marketPlayerData.getOwnedListingsIDList()) {
-			if (id != null) {
-				ownershipArray.add(String.valueOf(id));
-			}
-		}
-		data.add("playerListings", ownershipArray);
-
-		// FILTERS
-		JsonArray filtersArray = new JsonArray();
-		for (MarketFilter filter : marketPlayerData.getPlayerFiltersList()) {
-			JsonElement elem = gson.toJsonTree(filter);
-			filtersArray.add(elem);
-		}
-		data.add("playerFilters", filtersArray);
-
-		// OPTIONS
-		JsonElement optionsElement = gson.toJsonTree(marketPlayerData.getPlayerOptions());
-		data.add("playerOptions", optionsElement);
-
-		event.setPluginData(KEY_PLUGIN_DATA, data);
+		event.setPluginData(KEY_PLUGIN_DATA, marketPlayerData.toJson());
 	}
 
 	public void onLogout(Player player) {
 		// delay the data removal by 20 ticks, as we need it for the playersave event, launched after logout event
+		UUID playerId = player.getUniqueId();
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			mMarketPlayerDataInstances.remove(player);
+			if (!Bukkit.getOfflinePlayer(playerId).isOnline()) {
+				mMarketPlayerDataInstances.remove(player);
+			}
 		}, 20L);
 	}
 

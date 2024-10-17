@@ -41,13 +41,11 @@ public class TabBazaarBrowser implements MarketGuiTab {
 	@Nullable List<Long> mListingsOwnedIDList;
 	@Nullable List<MarketListing> mListingsForPageList;
 
-	int mSelectedFilter;
 	List<MarketFilter> mLoadedMarketFilters = new ArrayList<>();
-	@Nullable String mQuicksearchValue;
 
 	List<MarketListingIndex> mLoadedSortbyIndexes = MarketListingIndex.getAllPlayerSortable();
-	int mSelectedSortByIndex;
-	boolean mSortByDesc;
+
+	TabBazaarBrowserState mTabBazaarBrowserState = new TabBazaarBrowserState(null);
 
 	public TabBazaarBrowser(MarketGui marketGUI) {
 		this.mGui = marketGUI;
@@ -81,7 +79,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		lore.add(Component.text("Left click, Right click", NamedTextColor.WHITE).append(Component.text(" or any", NamedTextColor.GRAY)));
 		lore.add(Component.text("of your ", NamedTextColor.GRAY).append(Component.text("Hotbar keys", NamedTextColor.WHITE).append(Component.text(" to", NamedTextColor.GRAY))));
 		lore.add(Component.text("cycle though sortable fields.", NamedTextColor.GRAY));
-		if (mSortByDesc) {
+		if (mTabBazaarBrowserState.mSortByDesc) {
 			lore.add(Component.text("Current order: ", NamedTextColor.GRAY).append(Component.text("▼ Descending ▼", NamedTextColor.WHITE)));
 			lore.add(Component.keybind("key.swapOffhand", NamedTextColor.WHITE).append(Component.text(" to switch to Ascending", NamedTextColor.GRAY)));
 		} else {
@@ -94,7 +92,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		for (int i = 0; i < mLoadedSortbyIndexes.size(); i++) {
 			NamedTextColor color = NamedTextColor.GRAY;
 			String header = " ";
-			if (mSelectedSortByIndex == i) {
+			if (mTabBazaarBrowserState.mSelectedSortByIndex == i) {
 				color = NamedTextColor.GREEN;
 				header = "⌲";
 			}
@@ -109,29 +107,32 @@ public class TabBazaarBrowser implements MarketGuiTab {
 
 	private void clickSortbyAction(InventoryClickEvent clickEvent) {
 		if (clickEvent.getClick().equals(ClickType.SWAP_OFFHAND)) {
-			mSortByDesc = !mSortByDesc;
+			mTabBazaarBrowserState.mSortByDesc = !mTabBazaarBrowserState.mSortByDesc;
 			mLoadingStatus = 0;
 			mGui.update();
 			return;
 		}
 		int hotbarInt = clickEvent.getHotbarButton();
 		if (hotbarInt >= 0 && hotbarInt < mLoadedSortbyIndexes.size()) {
-			mSelectedSortByIndex = hotbarInt;
+			mTabBazaarBrowserState.mSelectedSortByIndex = hotbarInt;
 		} else {
-			mSelectedSortByIndex = mGui.commonMultiplierSelection(clickEvent, mSelectedSortByIndex + 1, mLoadedSortbyIndexes.size()) - 1;
+			mTabBazaarBrowserState.mSelectedSortByIndex = mGui.commonMultiplierSelection(
+				clickEvent,
+				mTabBazaarBrowserState.mSelectedSortByIndex + 1, mLoadedSortbyIndexes.size()
+			) - 1;
 		}
 		mLoadingStatus = 0;
 		mGui.update();
 	}
 
 	private void quickSearchAction() {
-		mQuicksearchValue = null;
+		mTabBazaarBrowserState.mQuicksearchValue = "";
 		mGui.close();
 		SignUtils.newMenu(List.of("", "~~~~~~~~~~~", "Enter an item name", "'*' for any letters"))
 			.reopenIfFail(false)
 			.response((player, lines) -> {
 				if (!StringUtils.isEmpty(lines[0])) {
-					mQuicksearchValue = lines[0];
+					mTabBazaarBrowserState.mQuicksearchValue = lines[0];
 				}
 				mLoadingStatus = 0;
 				mGui.open();
@@ -142,9 +143,9 @@ public class TabBazaarBrowser implements MarketGuiTab {
 
 	private GuiItem buildQuickSearchIcon() {
 		ArrayList<Component> lore = new ArrayList<>();
-		if (mQuicksearchValue != null) {
+		if (!mTabBazaarBrowserState.mQuicksearchValue.isEmpty()) {
 			lore.add(Component.text("Current search:", NamedTextColor.WHITE));
-			lore.add(Component.text(mQuicksearchValue, NamedTextColor.WHITE));
+			lore.add(Component.text(mTabBazaarBrowserState.mQuicksearchValue, NamedTextColor.WHITE));
 			lore.add(Component.empty());
 		}
 		lore.add(Component.text("click this to quickly", NamedTextColor.GRAY));
@@ -173,9 +174,12 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		}
 		int hotbarInt = clickEvent.getHotbarButton();
 		if (hotbarInt >= 0 && hotbarInt < mLoadedMarketFilters.size()) {
-			mSelectedFilter = hotbarInt;
+			mTabBazaarBrowserState.mSelectedFilter = hotbarInt;
 		} else {
-			mSelectedFilter = mGui.commonMultiplierSelection(clickEvent, mSelectedFilter + 1, mLoadedMarketFilters.size()) - 1;
+			mTabBazaarBrowserState.mSelectedFilter = mGui.commonMultiplierSelection(
+				clickEvent,
+				mTabBazaarBrowserState.mSelectedFilter + 1, mLoadedMarketFilters.size()
+			) - 1;
 		}
 		mLoadingStatus = 0;
 		mGui.update();
@@ -194,7 +198,7 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		for (int i = 0; i < mLoadedMarketFilters.size(); i++) {
 			NamedTextColor color = NamedTextColor.GRAY;
 			String header = " ";
-			if (mSelectedFilter == i) {
+			if (mTabBazaarBrowserState.mSelectedFilter == i) {
 				color = NamedTextColor.GREEN;
 				header = "⌲";
 			}
@@ -213,12 +217,12 @@ public class TabBazaarBrowser implements MarketGuiTab {
 			// and refresh the page when list is loaded
 			mLoadingStatus = 1;
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				MarketFilter filter = MarketFilter.mergeOf(mGui.mForcedBlacklistFilter, mLoadedMarketFilters.get(mSelectedFilter));
-				if (mQuicksearchValue != null) {
-					MarketFilter quicksearch = new MarketFilter("Quick Search : " + mQuicksearchValue, List.of(new FilterComponent(MarketListingIndex.NAME, Comparator.WHITELIST, List.of(mQuicksearchValue))));
+				MarketFilter filter = MarketFilter.mergeOf(mGui.mForcedBlacklistFilter, mLoadedMarketFilters.get(mTabBazaarBrowserState.mSelectedFilter));
+				if (!mTabBazaarBrowserState.mQuicksearchValue.isEmpty()) {
+					MarketFilter quicksearch = new MarketFilter("Quick Search : " + mTabBazaarBrowserState.mQuicksearchValue, List.of(new FilterComponent(MarketListingIndex.NAME, Comparator.WHITELIST, List.of(mTabBazaarBrowserState.mQuicksearchValue))));
 					filter = MarketFilter.mergeOf(filter, quicksearch);
 				}
-				filter.setSorter(new Sorter(mLoadedSortbyIndexes.get(mSelectedSortByIndex), mSortByDesc));
+				filter.setSorter(new Sorter(mLoadedSortbyIndexes.get(mTabBazaarBrowserState.mSelectedSortByIndex), mTabBazaarBrowserState.mSortByDesc));
 				filter.startWithActiveOnly(true);
 
 				mListingsIDList = MarketRedisManager.getAllListingsIdsMatchingFilter(filter);
@@ -348,13 +352,9 @@ public class TabBazaarBrowser implements MarketGuiTab {
 		mLoadedMarketFilters.add(MarketFilter.EMPTY_FILTER); // default filter
 		mLoadedMarketFilters.addAll(MarketManager.getPlayerMarketFilters(mPlayer));
 
-		mSelectedFilter = 0;
-
 		mListingsOwnedIDList = MarketManager.getInstance().getListingsOfPlayer(mPlayer);
 
-		mQuicksearchValue = null;
-
-		mSortByDesc = true;
+		mTabBazaarBrowserState = MarketManager.getTabBazaarBrowserState(mPlayer);
 
 		mLoadingStatus = 0;
 		mCurrentPage = 0;
