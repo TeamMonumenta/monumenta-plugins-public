@@ -318,12 +318,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		int regionCap = ServerProperties.getAbilityEnhancementsEnabled(mPlayer) ? R3_CAP : R2_CAP;
 		int damageCap = isLevelOne() ? regionCap : regionCap * CAP_LEVEL_TWO_MULTIPLIER;
 
-		// nuke method: 0 dmg then do true damage that doesn't scale with anything
-		if (event.getAbility() == ClassAbility.PREDATOR_STRIKE && event.getType() != DamageType.TRUE &&
-			    event.getFinalDamage(true) > damageCap) {
+		if (event.getAbility() == ClassAbility.PREDATOR_STRIKE) {
 			event.setDamageCap((double) damageCap);
 		}
-
 		return false;
 	}
 
