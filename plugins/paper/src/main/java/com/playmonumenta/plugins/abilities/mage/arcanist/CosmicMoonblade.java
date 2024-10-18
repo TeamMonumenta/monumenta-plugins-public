@@ -35,7 +35,7 @@ public class CosmicMoonblade extends Ability {
 	private static final double ANGLE = 55;
 	public static final double REDUCTION_MULTIPLIER_1 = 0.05;
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
-	public static final double REDUCTION_MULTIPLIER_KILL = 0.1;
+	public static final double REDUCTION_MULTIPLIER_KILL = 0.075;
 	public static final int CAP_TICKS_1 = (int) (0.5 * Constants.TICKS_PER_SECOND);
 	public static final int CAP_TICKS_2 = 1 * Constants.TICKS_PER_SECOND;
 	public static final int CAP_TICKS_KILL = (int) (0.75 * Constants.TICKS_PER_SECOND);
@@ -69,7 +69,7 @@ public class CosmicMoonblade extends Ability {
 					CAP_TICKS_2 / 20,
 					(int) DAMAGE_2,
 					(int) (REDUCTION_MULTIPLIER_KILL * 100),
-					CAP_TICKS_KILL / 20)
+					CAP_TICKS_KILL / 20.0)
 					)
 			.simpleDescription("Damage mobs in a cone twice and reduce cooldowns if mobs are damaged.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
