@@ -34,6 +34,8 @@ public class DepthsPlayer {
 
 	//Unique identifier for the player
 	public UUID mPlayerId;
+	//Last known name of player
+	public String mPlayerName;
 	//A map containing all abilities the player has and their current rarity
 	public Map<String, Integer> mAbilities;
 	//Unique identifier, mapping to an active depths party object
@@ -96,6 +98,28 @@ public class DepthsPlayer {
 	// The current counter of the player's Curse of Chaos ability
 	public int mCurseofChaosCount = 0;
 
+	// Northern Star stacks
+	public int mNorthernStarStacks = 0;
+
+	// Reward skips
+	public int mRewardSkips = 0;
+
+	// Bonus treasure score from Avaricious Pendant
+	public int mBonusTreasureScore = 0;
+
+	// Comb of Selection current selection rarities
+	public List<Integer> mCombOfSelectionLevels = new ArrayList<>();
+
+	// Callicarpa's Pointed Hat stacks
+	public @Nullable DepthsTree mPointedHatTree = null;
+	public int mPointedHatStacks = 0;
+
+	// Broodmother's Webbing
+	public boolean mBroodmothersWebbing = false;
+
+	// Statue of Regret previous selections
+	public List<String> mRegretSelections = new ArrayList<>();
+
 	// The last time the player logged out. If 0, then they haven't logged out yet.
 	public long mLastLogoutTime = 0;
 
@@ -125,6 +149,7 @@ public class DepthsPlayer {
 
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
+		mPlayerName = p.getName();
 		mAbilities = new HashMap<>();
 		mEligibleTrees = new ArrayList<>();
 

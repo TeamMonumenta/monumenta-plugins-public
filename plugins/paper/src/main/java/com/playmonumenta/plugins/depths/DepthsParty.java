@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfChaos;
+import com.playmonumenta.plugins.depths.abilities.gifts.AvariciousPendant;
+import com.playmonumenta.plugins.depths.abilities.gifts.NorthernStar;
 import com.playmonumenta.plugins.depths.loot.DepthsLoot;
 import com.playmonumenta.plugins.depths.loot.ZenithLoot;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoom;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
@@ -71,6 +74,8 @@ public class DepthsParty {
 	// The difference between where the player spawns in a loot room, and where the loot needs to be dropped
 	// Transient - don't try to save a circular reference to players (will crash data save)
 	public transient List<DepthsPlayer> mPlayersInParty;
+	// The current floor number the party is on
+	public int mFloorNumber;
 	// The current room number the party is on
 	public int mRoomNumber;
 	// The number of spawners remaining in the current room to break for the party to proceed
@@ -133,6 +138,9 @@ public class DepthsParty {
 	//A flag for if the forced cleansing room has already been spawned in A10+. This is to prevent players from just spamming cleanse rooms (they do nothing, but still).
 	public boolean mSpawnedForcedCleansingRoom = false;
 
+	// treasure map rooms to explore
+	public Set<DepthsRoomType> mTreasureMapRooms = EnumSet.of(DepthsRoomType.ABILITY, DepthsRoomType.ABILITY_ELITE, DepthsRoomType.UPGRADE, DepthsRoomType.UPGRADE_ELITE, DepthsRoomType.UTILITY, DepthsRoomType.WILDCARD, DepthsRoomType.BOSS);
+
 	//The BlockDisplay used to mark the most recent chest, no need to store when serializing
 	public transient @Nullable BlockDisplay mRewardDisplay = null;
 
@@ -182,6 +190,7 @@ public class DepthsParty {
 			mInitialPlayers.add(p.getName());
 		}
 
+		mFloorNumber = 1;
 		mRoomNumber = 0;
 		mSpawnersToBreak = 0;
 		mMobsToKill = 0;
@@ -259,6 +268,28 @@ public class DepthsParty {
 			sendMessage(Component.text("This room's ").append(DepthsUtils.rewardComponent(mCurrentRoomType))
 				.append(Component.text(" reward has been found!")));
 
+			if (rewardType == DepthsRewardType.ABILITY_ELITE || rewardType == DepthsRewardType.UPGRADE_ELITE) {
+				mPlayersInParty.forEach((dp) -> {
+					Player p = dp.getPlayer();
+					if (p == null) {
+						return;
+					}
+					// avaricious pendant trigger
+					if (dp.getLevelInAbility(AvariciousPendant.ABILITY_NAME) > 0) {
+						AvariciousPendant.increaseTreasure(dp);
+					}
+
+					// northern star trigger
+					if (dp.getLevelInAbility(NorthernStar.ABILITY_NAME) > 0) {
+						dp.mNorthernStarStacks--;
+						dp.mEarnedRewards.add(rewardType);
+						if (dp.mNorthernStarStacks == 0) {
+							DepthsManager.getInstance().setPlayerLevelInAbility(NorthernStar.ABILITY_NAME, p, 0, false);
+						}
+					}
+				});
+			}
+
 			if (mCurrentRoomType == DepthsRoomType.TREASURE || mCurrentRoomType == DepthsRoomType.TREASURE_ELITE) {
 				mCanGetTreasureReward = true;
 			}
@@ -331,7 +362,11 @@ public class DepthsParty {
 	 *
 	 * @return info about the party as a string to print
 	 */
-	public Component getSummaryComponent() {
+	public Component getSummaryComponent(Player player) {
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (depthsPlayer == null) {
+			return Component.empty();
+		}
 		Component result = Component.empty().color(NamedTextColor.GOLD)
 			.append(Component.text("Depths Party Summary:", NamedTextColor.LIGHT_PURPLE));
 		StringBuilder partyMembers = new StringBuilder("Players in party:");
@@ -379,6 +414,10 @@ public class DepthsParty {
 
 		if (mContent == DepthsContent.CELESTIAL_ZENITH) {
 			result = result
+				.append(Component.newline())
+				.append(Component.text("Personal treasure score: "))
+				.append(Component.text(depthsPlayer.mBonusTreasureScore, NamedTextColor.WHITE))
+
 				.append(Component.newline())
 				.append(Component.text("Ascension level: "))
 				.append(Component.text(mAscension, NamedTextColor.WHITE));
@@ -478,9 +517,7 @@ public class DepthsParty {
 			try {
 				DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(room.mRoomType);
 				if (rewardType != null) {
-					for (DepthsPlayer dp : mPlayersInParty) {
-						dp.mEarnedRewards.add(rewardType);
-					}
+					mPlayersInParty.forEach((dp) -> dp.mEarnedRewards.add(rewardType));
 				}
 			} catch (Exception e) {
 				MMLog.warning("Null depths party member");
@@ -540,10 +577,11 @@ public class DepthsParty {
 	}
 
 	public int getFloor() {
-		if (mRoomNumber <= 0) {
-			return 1;
-		}
-		return ((mRoomNumber - 1) / 10) + 1;
+		return mFloorNumber;
+	}
+
+	public void incrementFloor() {
+		mFloorNumber++;
 	}
 
 	public int getRoomNumber() {
@@ -575,7 +613,7 @@ public class DepthsParty {
 			int treasureScore = dp.mFinalTreasureScore;
 			if (treasureScore == -1) {
 				//Player beat floor 3 - give them the party's current treasure score
-				treasureScore = mTreasureScore;
+				treasureScore = mTreasureScore + dp.mBonusTreasureScore;
 			}
 
 			int roomReached = dp.getDeathRoom();

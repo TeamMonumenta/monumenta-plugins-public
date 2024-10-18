@@ -23,7 +23,7 @@ public class CurseOfGluttony extends DepthsAbility {
 	public static final DepthsAbilityInfo<CurseOfGluttony> INFO =
 		new DepthsAbilityInfo<>(CurseOfGluttony.class, ABILITY_NAME, CurseOfGluttony::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)
 			.displayItem(Material.FERMENTED_SPIDER_EYE)
-			.canBeOfferedFloor1(false)
+			.floors(floor -> floor != 1)
 			.gain(CurseOfGluttony::gain)
 			.descriptions(CurseOfGluttony::getDescription);
 

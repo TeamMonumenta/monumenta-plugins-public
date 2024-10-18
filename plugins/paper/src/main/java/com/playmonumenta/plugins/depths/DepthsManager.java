@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
+import com.comphenix.protocol.wrappers.Pair;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.playmonumenta.plugins.Plugin;
@@ -73,6 +74,29 @@ import com.playmonumenta.plugins.depths.abilities.frostborn.Icebreaker;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.abilities.frostborn.PiercingCold;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Snowstorm;
+import com.playmonumenta.plugins.depths.abilities.gifts.AvariciousPendant;
+import com.playmonumenta.plugins.depths.abilities.gifts.BottomlessBowl;
+import com.playmonumenta.plugins.depths.abilities.gifts.BrokenClock;
+import com.playmonumenta.plugins.depths.abilities.gifts.BroodmothersWebbing;
+import com.playmonumenta.plugins.depths.abilities.gifts.CallicarpasPointedHat;
+import com.playmonumenta.plugins.depths.abilities.gifts.CelestialSurprise;
+import com.playmonumenta.plugins.depths.abilities.gifts.CombOfSelection;
+import com.playmonumenta.plugins.depths.abilities.gifts.CrackedIdol;
+import com.playmonumenta.plugins.depths.abilities.gifts.ForsakenGrimoire;
+import com.playmonumenta.plugins.depths.abilities.gifts.KaleidoscopicLens;
+import com.playmonumenta.plugins.depths.abilities.gifts.MegaHammer;
+import com.playmonumenta.plugins.depths.abilities.gifts.NorthernStar;
+import com.playmonumenta.plugins.depths.abilities.gifts.OrbOfDarkness;
+import com.playmonumenta.plugins.depths.abilities.gifts.PillarOfLight;
+import com.playmonumenta.plugins.depths.abilities.gifts.PoetsQuill;
+import com.playmonumenta.plugins.depths.abilities.gifts.PrismaticCube;
+import com.playmonumenta.plugins.depths.abilities.gifts.PurgingStone;
+import com.playmonumenta.plugins.depths.abilities.gifts.RainbowGeode;
+import com.playmonumenta.plugins.depths.abilities.gifts.StatueOfRegret;
+import com.playmonumenta.plugins.depths.abilities.gifts.TreasureMap;
+import com.playmonumenta.plugins.depths.abilities.gifts.TwistedScroll;
+import com.playmonumenta.plugins.depths.abilities.gifts.VenomOfTheBroodmother;
+import com.playmonumenta.plugins.depths.abilities.gifts.WildCard;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Abnormality;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Charity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.ChromaBlade;
@@ -125,6 +149,11 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.ThundercloudForm;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.WindsweptCombos;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
+import com.playmonumenta.plugins.depths.guis.gifts.BroodmothersWebbingGUI;
+import com.playmonumenta.plugins.depths.guis.gifts.CallicarpasPointedHatGUI;
+import com.playmonumenta.plugins.depths.guis.gifts.ForsakenGrimoireTreeGUI;
+import com.playmonumenta.plugins.depths.guis.gifts.PoetsQuillRemoveGUI;
+import com.playmonumenta.plugins.depths.guis.gifts.StatueOfRegretRemoveGUI;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.rooms.RoomRepository;
@@ -157,6 +186,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -273,7 +303,7 @@ public class DepthsManager {
 
 				@Override
 				public void run() {
-					getInstance().save(p.getDataFolder() + File.separator + "depths");
+					save(p.getDataFolder() + File.separator + "depths");
 				}
 
 			}.runTaskTimer(p, SAVE_INTERVAL, SAVE_INTERVAL);
@@ -339,7 +369,7 @@ public class DepthsManager {
 
 					@Override
 					public void run() {
-						getInstance().save(Plugin.getInstance().getDataFolder() + File.separator + "depths");
+						save(Plugin.getInstance().getDataFolder() + File.separator + "depths");
 					}
 
 				}.runTaskTimer(mPlugin, SAVE_INTERVAL, SAVE_INTERVAL);
@@ -709,7 +739,32 @@ public class DepthsManager {
 			CurseOfRedundancy.INFO,
 			CurseOfRuin.INFO,
 			CurseOfSloth.INFO,
-			CurseOfSobriety.INFO
+			CurseOfSobriety.INFO,
+
+			// Gifts
+			TwistedScroll.INFO,
+			ForsakenGrimoire.INFO,
+			PrismaticCube.INFO,
+			NorthernStar.INFO,
+			BottomlessBowl.INFO,
+			PoetsQuill.INFO,
+			PurgingStone.INFO,
+			WildCard.INFO,
+			AvariciousPendant.INFO,
+			CelestialSurprise.INFO,
+			CombOfSelection.INFO,
+			PillarOfLight.INFO,
+			BrokenClock.INFO,
+			TreasureMap.INFO,
+			MegaHammer.INFO,
+			KaleidoscopicLens.INFO,
+			CallicarpasPointedHat.INFO,
+			VenomOfTheBroodmother.INFO,
+			BroodmothersWebbing.INFO,
+			StatueOfRegret.INFO,
+			RainbowGeode.INFO,
+			CrackedIdol.INFO,
+			OrbOfDarkness.INFO
 		);
 	}
 
@@ -727,7 +782,7 @@ public class DepthsManager {
 		List<DepthsAbilityInfo<?>> filteredList = new ArrayList<>();
 		for (DepthsAbilityInfo<?> da : getAbilities()) {
 			DepthsTree tree = da.getDepthsTree();
-			if (filter.contains(tree) && !(da.getDepthsTrigger() != DepthsTrigger.PASSIVE && noActiveTrees.contains(tree))) {
+			if (tree != null && filter.contains(tree) && !(da.getDepthsTrigger() != DepthsTrigger.PASSIVE && noActiveTrees.contains(tree))) {
 				filteredList.add(da);
 			}
 		}
@@ -737,7 +792,8 @@ public class DepthsManager {
 	public static List<DepthsAbilityInfo<?>> getMutatedAbilities(List<DepthsTree> filter, DepthsTrigger trigger) {
 		List<DepthsAbilityInfo<?>> filteredList = new ArrayList<>();
 		for (DepthsAbilityInfo<?> da : getAbilities()) {
-			if (filter.contains(da.getDepthsTree()) && da.getDepthsTrigger() == trigger) {
+			DepthsTree tree = da.getDepthsTree();
+			if (tree != null && filter.contains(tree) && da.getDepthsTrigger() == trigger) {
 				filteredList.add(da);
 			}
 		}
@@ -764,6 +820,10 @@ public class DepthsManager {
 
 	public static List<DepthsAbilityInfo<?>> getCurseAbilities() {
 		return getAbilitiesOfTree(DepthsTree.CURSE);
+	}
+
+	public static List<DepthsAbilityInfo<?>> getGiftAbilities() {
+		return getAbilitiesOfTree(DepthsTree.GIFT);
 	}
 
 	private void initItems(List<DepthsTree> filter, Player p, DepthsPlayer dp) {
@@ -803,6 +863,11 @@ public class DepthsManager {
 				DepthsParty party = getPartyFromId(dp);
 				if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY) {
 					roll -= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY_AMOUNT;
+				}
+
+				// cracked idol ability rarity trigger
+				if (dp.getLevelInAbility(CrackedIdol.ABILITY_NAME) > 0) {
+					roll += 10;
 				}
 
 				if (isElite) {
@@ -864,7 +929,7 @@ public class DepthsManager {
 		}
 
 		List<DepthsAbilityItem> offeredItems = mAbilityOfferings.get(p.getUniqueId());
-		if (offeredItems == null || offeredItems.size() == 0) {
+		if (offeredItems == null || offeredItems.isEmpty()) {
 			//Filter the item offerings by the player's eligible trees for that run
 			DepthsRewardType reward = dp.mEarnedRewards.peek();
 			if (reward == DepthsRewardType.PRISMATIC) {
@@ -875,6 +940,18 @@ public class DepthsManager {
 				List<DepthsTree> curseFilter = new ArrayList<>();
 				curseFilter.add(DepthsTree.CURSE);
 				initItems(curseFilter, p, dp);
+			} else if (reward == DepthsRewardType.GIFT) {
+				List<DepthsTree> giftFilter = new ArrayList<>();
+				giftFilter.add(DepthsTree.GIFT);
+				initItems(giftFilter, p, dp);
+			} else if (dp.mPointedHatTree != null && dp.mPointedHatStacks > 0) {
+				// callicarpa's pointed hat trigger
+				initItems(List.of(dp.mPointedHatTree), p, dp);
+				dp.mPointedHatStacks--;
+				if (dp.mPointedHatStacks == 0) {
+					setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, 0, false);
+					dp.mPointedHatTree = null;
+				}
 			} else {
 				List<DepthsTree> cappedTrees = new ArrayList<>();
 				if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
@@ -897,6 +974,14 @@ public class DepthsManager {
 		offeredItems = new ArrayList<>();
 		Collections.shuffle(mItems);
 
+		// Guarantee Twisted Scroll by swapping to front.
+		if (dp.mEarnedRewards.peek() == DepthsRewardType.GIFT) {
+			IntStream.range(0, mItems.size())
+				.filter(index -> mItems.get(index).mAbility.equals(TwistedScroll.ABILITY_NAME))
+				.findFirst()
+				.ifPresent(indexOfTS -> Collections.swap(mItems, 0, indexOfTS));
+		}
+
 		// Add the first 3 items the player is eligible for to the thing
 		int options = 3;
 		Prosperity prosperity = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, Prosperity.class);
@@ -904,11 +989,28 @@ public class DepthsManager {
 			options += prosperity.getExtraChoices();
 		}
 
+		int index = 0;
 		for (DepthsAbilityItem item : mItems) {
 			if (offeredItems.size() >= options) {
 				break;
 			}
 			if (allowedAbilities.contains(item.mAbility)) {
+				// comb of selection trigger
+				if (dp.getLevelInAbility(CombOfSelection.ABILITY_NAME) > 0) {
+					if (index < dp.mCombOfSelectionLevels.size()) {
+						// assigning item.mRarity does not change description, easier to make new item
+						int newRarity = dp.mCombOfSelectionLevels.get(index);
+						DepthsAbilityInfo<?> dai = getAbility(item.mAbility);
+						if (dai != null) {
+							index++;
+							offeredItems.add(dai.getAbilityItem(newRarity, p));
+							continue;
+						}
+					} else {
+						dp.mCombOfSelectionLevels.add(item.mRarity);
+					}
+					index++;
+				}
 				offeredItems.add(item);
 			}
 		}
@@ -1127,7 +1229,7 @@ public class DepthsManager {
 		}
 
 		// Check and see if they already have had options generated
-		if (party.mNextRoomChoices != null && party.mNextRoomChoices.size() > 0) {
+		if (party.mNextRoomChoices != null && !party.mNextRoomChoices.isEmpty()) {
 			return party.mNextRoomChoices;
 		}
 
@@ -1241,8 +1343,6 @@ public class DepthsManager {
 			party.sendMessage("Each player must remove an ability before moving on!");
 			List<UUID> offlines = new ArrayList<>(); // just in case there are multiple, we use a list.
 			for (DepthsPlayer pa : party.mPlayersInParty) {
-
-
 				int logoutTime = (int) (System.currentTimeMillis() - pa.mLastLogoutTime);
 				boolean canAbandon = logoutTime > 5 * 60 * 1000;
 				OfflinePlayer op = Bukkit.getOfflinePlayer(pa.mPlayerId);
@@ -1277,10 +1377,37 @@ public class DepthsManager {
 			roomType = DepthsRoomType.BOSS;
 		}
 
+		// treasure map trigger
+		// since treasure map is only offered past floor 1, prevent removing
+		// room types if on floor 1 to prevent instant proc
+		if (party.getFloor() != 1) {
+			party.mTreasureMapRooms.remove(roomType);
+			if (party.mTreasureMapRooms.isEmpty()) {
+				party.mPlayersInParty.forEach((dp) -> {
+					Player p = dp.getPlayer();
+					if (p != null && dp.getLevelInAbility(TreasureMap.ABILITY_NAME) > 0) {
+						dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find a prismatic ability reward!");
+						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
+						TreasureMap.playSounds(p);
+						setPlayerLevelInAbility(TreasureMap.ABILITY_NAME, p, 0, false);
+					}
+				});
+			}
+		}
+
 		boolean wildcard = roomType == DepthsRoomType.WILDCARD;
 		if (wildcard) {
 			incrementTreasure(null, player, 1);
 			roomType = getWildcardRoomType();
+			// wild card trigger
+			party.mPlayersInParty.forEach((dp) -> {
+				if (dp.getLevelInAbility(WildCard.ABILITY_NAME) > 0) {
+					Player p = dp.getPlayer();
+					if (p != null) {
+						increaseRandomAbilityLevel(p, dp, 1);
+					}
+				}
+			});
 		}
 
 		World world = player.getWorld();
@@ -1333,7 +1460,7 @@ public class DepthsManager {
 	public Component getPartySummary(Player p) {
 		DepthsParty party = getDepthsParty(p);
 		if (party != null) {
-			return party.getSummaryComponent();
+			return party.getSummaryComponent(p);
 		} else {
 			return Component.text("You are not currently in a depths party!");
 		}
@@ -1436,7 +1563,7 @@ public class DepthsManager {
 		//First - check if the player has any rewards to open
 		if (!dp.mEarnedRewards.isEmpty()) {
 			DepthsRewardType reward = dp.mEarnedRewards.peek();
-			if (reward == DepthsRewardType.ABILITY || reward == DepthsRewardType.ABILITY_ELITE || reward == DepthsRewardType.PRISMATIC || reward == DepthsRewardType.CURSE) {
+			if (reward == DepthsRewardType.ABILITY || reward == DepthsRewardType.ABILITY_ELITE || reward == DepthsRewardType.PRISMATIC || reward == DepthsRewardType.CURSE || reward == DepthsRewardType.GIFT) {
 				DepthsGUICommands.ability(p, fromSummaryGUI);
 				return true;
 			} else if (reward == DepthsRewardType.UPGRADE || reward == DepthsRewardType.UPGRADE_ELITE || reward == DepthsRewardType.TWISTED) {
@@ -1444,6 +1571,21 @@ public class DepthsManager {
 				return true;
 			} else if (reward == DepthsRewardType.GENEROSITY) {
 				DepthsGUICommands.generosity(p, fromSummaryGUI);
+				return true;
+			} else if (reward == DepthsRewardType.POETS) {
+				new PoetsQuillRemoveGUI(p).open();
+				return true;
+			} else if (reward == DepthsRewardType.GRIMOIRE) {
+				new ForsakenGrimoireTreeGUI(p).open();
+				return true;
+			} else if (reward == DepthsRewardType.POINTED) {
+				new CallicarpasPointedHatGUI(p).open();
+				return true;
+			} else if (reward == DepthsRewardType.WEBBING) {
+				new BroodmothersWebbingGUI(p).open();
+				return true;
+			} else if (reward == DepthsRewardType.STATUE) {
+				new StatueOfRegretRemoveGUI(p).open();
 				return true;
 			}
 		}
@@ -1585,7 +1727,11 @@ public class DepthsManager {
 			String test = abilityList.get(index);
 			//Make sure the player has the ability AND it's not a weapon aspect
 			int testLevel = dp.getLevelInAbility(test);
-			if (testLevel > 0 && !DepthsUtils.isWeaponAspectAbility(test) && !DepthsUtils.isPrismaticAbility(test) && !DepthsUtils.isCurseAbility(test)) {
+			if (testLevel > 0
+				&& !DepthsUtils.isWeaponAspectAbility(test)
+				&& !DepthsUtils.isPrismaticAbility(test)
+				&& !DepthsUtils.isCurseAbility(test)
+				&& !DepthsUtils.isGiftAbility(test)) {
 				removedAbility = test;
 				removedLevel = testLevel;
 			}
@@ -1639,7 +1785,7 @@ public class DepthsManager {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			Player nearestPlayer = EntityUtils.getNearestPlayer(loc, range);
 			if (nearestPlayer != null) {
-				getInstance().goToNextFloor(nearestPlayer);
+				goToNextFloor(nearestPlayer);
 			}
 		}, 20);
 	}
@@ -1664,6 +1810,7 @@ public class DepthsManager {
 		dp.mNumDeaths = Math.max(0, dp.mNumDeaths - 1);
 		MMLog.finer(p.getName() + " went to next floor. mNumDeaths = " + dp.mNumDeaths);
 		int partyFloor = party.getFloor();
+		party.incrementFloor();
 		int treasureScoreIncrease = TREASURE_PER_FLOOR * partyFloor + 2;
 		party.mTreasureScore += treasureScoreIncrease;
 
@@ -1680,13 +1827,12 @@ public class DepthsManager {
 					Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 					if (player != null) {
 						DepthsUtils.storeRunStatsToFile(playerInParty, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", true); //Save the player's stats
-						playerInParty.mFinalTreasureScore = party.mTreasureScore;
+						playerInParty.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
 
 						// if the player chose the bonus tree at the beginning, boost their personal treasure score
 						if (dp.mBonusTreeSelected) {
 							dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
 						}
-
 						playerInParty.sendMessage("Congratulations! Your final treasure score is " + playerInParty.mFinalTreasureScore + "!");
 						party.populateLootRoom(player, true);
 						if (party.getContent() == DepthsContent.DARKEST_DEPTHS) {
@@ -1738,12 +1884,31 @@ public class DepthsManager {
 				}
 			}
 		} else if (party.mContent == DepthsContent.CELESTIAL_ZENITH) {
+			// avaricious pendant trigger
+			party.mPlayersInParty.forEach((depthsPlayer) -> {
+				if (depthsPlayer.getLevelInAbility(AvariciousPendant.ABILITY_NAME) > 0) {
+					AvariciousPendant.increaseTreasure(depthsPlayer);
+				}
+			});
+
 			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_FLOOR) {
 				party.mPlayersInParty.forEach(dp2 -> dp2.mEarnedRewards.add(DepthsRewardType.CURSE));
 				party.sendMessage("You have been laden with an additional curse after clearing the floor!");
 			}
-			//Give twisted reward for beating boss in depths 2
-			party.mPlayersInParty.forEach(dp2 -> dp2.mEarnedRewards.add(DepthsRewardType.TWISTED));
+			//Give celestial gift for beating boss in depths 2
+			party.mPlayersInParty.forEach(dp2 -> {
+				dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
+				// broken clock trigger
+				if (dp2.getLevelInAbility(BrokenClock.ABILITY_NAME) > 0) {
+					Player p2 = dp.getPlayer();
+					if (p2 != null) {
+						dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
+						dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
+						BrokenClock.playSound(p2);
+						setPlayerLevelInAbility(BrokenClock.ABILITY_NAME, p2, 0, false);
+					}
+				}
+			});
 			party.sendMessage("You received a celestial gift for clearing the floor! Check your trinket to see the upgrade.");
 
 			// Give delve points for ascension level
@@ -2173,6 +2338,41 @@ public class DepthsManager {
 		return getPlayerAbilities(dp).stream().anyMatch(info -> info.getDepthsTrigger().isActive());
 	}
 
+	public @Nullable Pair<String, String> getRandomReplaceablePrismatic(Player player) {
+		// maps a trigger to a list of prismatic abilities in case there are more than one prismatic abilities to a trigger
+		Map<DepthsTrigger, List<DepthsAbilityInfo<?>>> prismaticMap = new HashMap<>();
+		getPrismaticAbilities().forEach((a) -> {
+			DepthsTrigger trigger = a.getDepthsTrigger();
+			List<DepthsAbilityInfo<?>> list = prismaticMap.computeIfAbsent(trigger, k -> new ArrayList<>());
+			list.add(a);
+		});
+
+		List<DepthsAbilityInfo<?>> abilities = getPlayerAbilities(player);
+		abilities.removeIf((a) -> !a.getDepthsTrigger().isActive() || a.getDepthsTree() == DepthsTree.PRISMATIC);
+		if (abilities.isEmpty()) {
+			return null;
+		}
+		Collections.shuffle(abilities);
+
+		// go through each ability to find an active a replacement
+		for (DepthsAbilityInfo<?> a : abilities) {
+			DepthsTrigger trigger = a.getDepthsTrigger();
+			List<DepthsAbilityInfo<?>> prismatics = prismaticMap.getOrDefault(trigger, new ArrayList<>());
+			if (!prismatics.isEmpty()) {
+				return new Pair<>(a.getDisplayName(), FastUtils.getRandomElement(prismatics).getDisplayName());
+			}
+		}
+		return null;
+	}
+
+	public void grantRewardType(Player player, @Nullable String arg) {
+		DepthsPlayer dp = getDepthsPlayer(player);
+		if (dp != null && arg != null) {
+			DepthsRewardType type = DepthsRewardType.valueOf(arg);
+			dp.mEarnedRewards.add(type);
+		}
+	}
+
 	public @Nullable DepthsParty getParty(World world) {
 		UUID uuid = world.getUID();
 		for (DepthsParty party : mParties) {
@@ -2181,5 +2381,40 @@ public class DepthsManager {
 			}
 		}
 		return null;
+	}
+
+	public void increaseRandomAbilityLevel(Player player, DepthsPlayer dp, int amount) {
+		List<String> abilities = new ArrayList<>(dp.mAbilities.keySet());
+		Collections.shuffle(abilities);
+		while (!abilities.isEmpty()) {
+			String ability = abilities.remove(0);
+			int level = dp.getLevelInAbility(ability) + amount;
+			if (level <= 1 || level >= 6) {
+				continue;
+			}
+			DepthsAbilityInfo<?> info = getAbility(ability);
+			if (info == null || !info.getHasLevels()) {
+				continue;
+			}
+			setPlayerLevelInAbility(ability, player, level, true, true);
+			return;
+		}
+	}
+
+	public List<DepthsTree> getEligibleTrees(Player player) {
+		DepthsPlayer dp = getDepthsPlayer(player);
+		if (dp == null) {
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(dp.mEligibleTrees);
+	}
+
+	public boolean hasAbilityOfTree(Player player, DepthsTree tree) {
+		for (DepthsAbilityInfo<?> dai : getPlayerAbilities(player)) {
+			if (dai.getDepthsTree() == tree) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -77,12 +77,12 @@ public class Rebirth extends DepthsAbility {
 		List<DepthsAbilityInfo<?>> playerAbilities = DepthsManager.getInstance().getPlayerAbilities(mPlayer);
 		boolean hasSwap = playerAbilities.stream().anyMatch(info -> info.getDepthsTrigger() == DepthsTrigger.SWAP && info != CurseOfAnchoring.INFO);
 
-		ArrayList<DepthsAbilityInfo<?>> eligibleAbilities = new ArrayList<>(
-			DepthsManager.getAbilities().stream().filter(info ->
-				info.getDisplayName() != null &&
-				!info.getDisplayName().equals(ABILITY_NAME) &&
-				!info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT)
-			).toList()
+		List<DepthsAbilityInfo<?>> eligibleAbilities = new ArrayList<>(
+			DepthsManager.getAbilities().stream()
+					.filter(info -> info.getDisplayName() != null
+							&& !info.getDisplayName().equals(ABILITY_NAME)
+							&& !info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT))
+					.toList()
 		);
 
 		playerAbilities.forEach(abilityInfo -> {
@@ -93,14 +93,15 @@ public class Rebirth extends DepthsAbility {
 			// Filter to keep the eligible ones that have the same trigger as the ability being replaced
 			DepthsTrigger trigger = abilityInfo.getDepthsTrigger();
 			ArrayList<DepthsAbilityInfo<?>> eligibleCopy = new ArrayList<>(eligibleAbilities);
-			if (abilityInfo.getDepthsTree() == DepthsTree.CURSE) {
-				eligibleCopy.removeIf(info -> info.getDepthsTree() != DepthsTree.CURSE);
-				if (hasSwap) {
+			DepthsTree tree = abilityInfo.getDepthsTree();
+			if (tree == DepthsTree.CURSE || tree == DepthsTree.GIFT) {
+				eligibleCopy.removeIf(info -> info.getDepthsTree() != tree);
+				if (hasSwap && tree == DepthsTree.CURSE) {
 					eligibleCopy.remove(CurseOfAnchoring.INFO);
 				}
 			} else {
 				eligibleCopy.removeIf(info -> !info.getDepthsTrigger().equals(trigger));
-				eligibleCopy.removeIf(info -> info.getDepthsTree() == DepthsTree.CURSE);
+				eligibleCopy.removeIf(info -> info.getDepthsTree() == tree);
 			}
 			if (eligibleCopy.isEmpty()) {
 				return;

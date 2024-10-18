@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.commands.GenericCommand;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.depths.guis.DepthsDebugGUI;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import de.tr7zw.nbtapi.NBTItem;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -19,6 +20,7 @@ import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.arguments.UUIDArgument;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -37,6 +39,8 @@ public class DepthsCommand extends GenericCommand {
 		EntitySelectorArgument.OnePlayer playerArg = new EntitySelectorArgument.OnePlayer("player");
 		Argument<String> abilityArg = new TextArgument("Ability Name")
 			.replaceSuggestions(ArgumentSuggestions.strings(DepthsManager.getAbilities().stream().map(a -> '"' + a.getDisplayName() + '"').toList()));
+		Argument<String> rewardTypeArg = new TextArgument("type")
+			.replaceSuggestions(ArgumentSuggestions.strings(Arrays.toString(DepthsRoomType.DepthsRewardType.values())));
 		IntegerArgument rarityArg = new IntegerArgument("Rarity", 0, 6);
 		LocationArgument locationArg = new LocationArgument("loc", LocationType.BLOCK_POSITION);
 		IntegerArgument amountArg = new IntegerArgument("amount");
@@ -148,6 +152,18 @@ public class DepthsCommand extends GenericCommand {
 				Player player = args.getByArgument(playerArg);
 
 				DepthsManager.getInstance().wheel(player, args.getByArgument(wheelResultArg));
+			}).register();
+
+		//GRANT COMMAND - grant rarity rewards to a player
+		new CommandAPICommand("depths")
+			.withPermission(perms)
+			.withArguments(new LiteralArgument("grant"))
+			.withArguments(playerArg)
+			.withArguments(rewardTypeArg)
+			.executes((sender, args) -> {
+				Player player = args.getByArgument(playerArg);
+
+				DepthsManager.getInstance().grantRewardType(player, args.getByArgument(rewardTypeArg));
 			}).register();
 
 		//FLOOR COMMAND - debug command to manually send a party to the next floor

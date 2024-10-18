@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths.rooms;
 
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -42,7 +43,10 @@ public enum DepthsRoomType {
 	}
 
 	public enum DepthsRewardType {
-		ABILITY, ABILITY_ELITE, UPGRADE, UPGRADE_ELITE, TWISTED, PRISMATIC, CURSE, GENEROSITY;
+		ABILITY, ABILITY_ELITE, UPGRADE, UPGRADE_ELITE, TWISTED, PRISMATIC, CURSE, GENEROSITY, GIFT,
+		WEBBING, POINTED, GRIMOIRE, POETS, STATUE;
+
+		public static final List<DepthsRewardType> GIFT_REWARDS = List.of(WEBBING, POINTED, GRIMOIRE, POETS, STATUE);
 	}
 }
 

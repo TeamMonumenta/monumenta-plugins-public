@@ -16,7 +16,7 @@ public class CurseOfObscurity extends DepthsAbility {
 	public static final DepthsAbilityInfo<CurseOfObscurity> INFO =
 		new DepthsAbilityInfo<>(CurseOfObscurity.class, ABILITY_NAME, CurseOfObscurity::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)
 			.displayItem(Material.ROTTEN_FLESH)
-			.canBeOfferedPastFloor1(false)
+			.floors(floor -> floor == 1)
 			.descriptions(CurseOfObscurity::getDescription);
 
 	public CurseOfObscurity(Plugin plugin, Player player) {

@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.EternalSavior;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
+import com.playmonumenta.plugins.depths.abilities.gifts.CrackedIdol;
+import com.playmonumenta.plugins.depths.abilities.gifts.PillarOfLight;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Charity;
 import com.playmonumenta.plugins.depths.abilities.prismatic.ColorSplash;
 import com.playmonumenta.plugins.depths.abilities.prismatic.Rebirth;
@@ -37,6 +39,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -58,6 +61,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -99,6 +103,7 @@ public class DepthsListener implements Listener {
 	private static final int DISCONNECT_ANTICHEESE_RADIUS = 6;
 	private static final String DISCONNECT_ANTICHEESE_MOB_TAG = "ZenithDisconnectedNearMobs";
 	private static final String DISCONNECT_ANTICHEESE_BOSS_TAG = "ZenithDisconnectedNearBoss";
+	private static final double REVIVE_RADIUS = Math.sqrt(2);
 
 	public DepthsListener() {
 	}
@@ -172,8 +177,8 @@ public class DepthsListener implements Listener {
 		}
 
 		if (!ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG)
-			    && !ScoreboardUtils.checkTag(entity, EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)
-			    && EntityUtils.isHostileMob(entity)) {
+			&& !ScoreboardUtils.checkTag(entity, EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)
+			&& EntityUtils.isHostileMob(entity)) {
 			dm.playerKilledMob(player);
 		}
 	}
@@ -241,11 +246,11 @@ public class DepthsListener implements Listener {
 			int scalingFactor = (floor - 1) / 3;
 			if (floor > 15) {
 				double multiplier = 1 + (0.1 * (scalingFactor - 4));
-			    event.setDamage(event.getDamage() * multiplier);
+				event.setDamage(event.getDamage() * multiplier);
 			}
 			if (source != null && EntityUtils.isBoss(source) && floor > 3) {
 				double multiplier = 1 + (0.05 * scalingFactor);
-			    event.setDamage(event.getDamage() * multiplier);
+				event.setDamage(event.getDamage() * multiplier);
 			}
 		}
 
@@ -310,6 +315,27 @@ public class DepthsListener implements Listener {
 			});
 			event.setCancelled(true);
 			return;
+		} else if (dp.mBroodmothersWebbing) {
+			// broodmother's webbing trigger
+			dp.mBroodmothersWebbing = false;
+			Plugin plugin = Plugin.getInstance();
+			World world = player.getWorld();
+			Location loc = player.getLocation();
+
+			player.setHealth(EntityUtils.getMaxHealth(player));
+			PotionUtils.clearNegatives(plugin, player);
+			EntityUtils.setWeakenTicks(plugin, player, 0);
+			EntityUtils.setSlowTicks(plugin, player, 0);
+			if (player.getFireTicks() > 1) {
+				player.setFireTicks(1);
+			}
+
+			world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 2.0f, 0.6f);
+			world.playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 2.0f, 0.8f);
+			Bukkit.getScheduler().runTaskLater(plugin, () -> world.playSound(loc, Sound.ENTITY_SPIDER_DEATH, SoundCategory.PLAYERS, 2.0f, 0.6f), 20);
+
+			event.setCancelled(true);
+			return;
 		}
 
 		DepthsParty party = dm.getPartyFromId(dp);
@@ -339,9 +365,22 @@ public class DepthsListener implements Listener {
 			MMLog.finer(player.getName() + " died. mNumDeaths = " + dp.mNumDeaths);
 			int graveDuration = getGraveDuration(party, dp, player, false);
 			dp.mNumDeaths++;
+
 			if (graveDuration > GRAVE_REVIVE_DURATION) {
 				Location waitingRoomLocation = party.mDeathWaitingRoomPoint.toLocation(player.getWorld());
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.teleport(waitingRoomLocation));
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					player.teleport(waitingRoomLocation);
+
+					// cracked idol trigger loss
+					if (dp.getLevelInAbility(CrackedIdol.ABILITY_NAME) > 0) {
+						dm.setPlayerLevelInAbility(CrackedIdol.ABILITY_NAME, player, 0, false);
+						player.playSound(player, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.0f, 0.6f);
+						player.playSound(player, Sound.BLOCK_GLASS_BREAK, 1.0f, 0.7f);
+						player.playSound(player, Sound.BLOCK_GLASS_BREAK, 1.0f, 0.8f);
+						player.playSound(player, Sound.BLOCK_ENDER_CHEST_OPEN, 1.0f, 1.9f);
+						dp.sendMessage("Your Cracked Idol shattered upon arriving here!");
+					}
+				});
 				MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED),
 					Component.text("Please wait to be revived!", NamedTextColor.RED));
 
@@ -405,15 +444,14 @@ public class DepthsListener implements Listener {
 				dp.mReviveTicks = 0;
 				dp.mCurrentlyReviving = false;
 				dp.mGraveRunnable = new BukkitRunnable() {
-					final double mBaseReviveRadiusSquared = 2;
 					@Nullable BossBar mReviveBar;
 
 					@Override
 					public void run() {
 						dp.mGraveTicks++;
 						if (!player.isOnline()
-							    || !player.getWorld().equals(grave.getWorld())
-							    || player.getLocation().toVector().distanceSquared(party.mDeathWaitingRoomPoint) > 20 * 20) {
+							|| !player.getWorld().equals(grave.getWorld())
+							|| player.getLocation().toVector().distanceSquared(party.mDeathWaitingRoomPoint) > 20 * 20) {
 							// Player logged off, somehow switched worlds, or exited the waiting room:
 							cancel();
 							return;
@@ -427,13 +465,6 @@ public class DepthsListener implements Listener {
 						nearbyPlayers.removeIf(player -> {
 							// if a player is within range due to any one of their abilities, ensure they won't be removed
 
-							ColorSplash colorSplash = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ColorSplash.class);
-							if (colorSplash != null && colorSplash.hasIncreasedReviveRadius()) {
-								if (player.getLocation().distanceSquared(grave.getLocation()) <= mBaseReviveRadiusSquared + Math.pow(ColorSplash.DAWNBRINGER_EXTRA_REVIVE_RADIUS, 2)) {
-									return false;
-								}
-							}
-
 							EternalSavior eternalSavior = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EternalSavior.class);
 							if (eternalSavior != null && eternalSavior.isActive()) {
 								if (player.getLocation().distance(grave.getLocation()) <= eternalSavior.getIncreasedReviveRadius()) {
@@ -441,7 +472,19 @@ public class DepthsListener implements Listener {
 								}
 							}
 
-							return player.getLocation().distanceSquared(grave.getLocation()) > mBaseReviveRadiusSquared;
+							double reviveRadius = REVIVE_RADIUS;
+
+							// pillar of light trigger
+							if (DepthsManager.getInstance().getPlayerLevelInAbility(PillarOfLight.ABILITY_NAME, player) > 0) {
+								reviveRadius *= PillarOfLight.REVIVE_RADIUS_MULTIPLIER;
+							}
+
+							ColorSplash colorSplash = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ColorSplash.class);
+							if (colorSplash != null && colorSplash.hasIncreasedReviveRadius()) {
+								reviveRadius += ColorSplash.DAWNBRINGER_EXTRA_REVIVE_RADIUS;
+							}
+
+							return player.getLocation().distanceSquared(grave.getLocation()) > reviveRadius * reviveRadius;
 						});
 
 						if (!nearbyPlayers.isEmpty()) {
@@ -534,13 +577,12 @@ public class DepthsListener implements Listener {
 		} else if (!attemptRebirth(player, dp, player.getLocation())) {
 			// else send to loot room on death
 			//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
-			dp.mFinalTreasureScore = party.mTreasureScore;
+			dp.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
 
 			// if the player chose the bonus tree at the beginning, boost their personal treasure score
 			if (dp.mBonusTreeSelected) {
 				dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
 			}
-
 			dp.setDeathRoom(party.getRoomNumber());
 			dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 			dp.sendMessage("You reached room " + party.mRoomNumber + "!");
@@ -607,8 +649,8 @@ public class DepthsListener implements Listener {
 
 		if (
 			dp != null &&
-			!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
-			event.getReason() == PlayerQuitEvent.QuitReason.DISCONNECTED
+				!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
+				event.getReason() == PlayerQuitEvent.QuitReason.DISCONNECTED
 		) {
 			if (dp.getContent() == DepthsContent.DARKEST_DEPTHS) {
 				return;
@@ -655,13 +697,12 @@ public class DepthsListener implements Listener {
 			DepthsParty party = dm.getPartyFromId(dp);
 			if (party != null) {
 				if (setDeathStats) {
-					dp.mFinalTreasureScore = party.mTreasureScore;
+					dp.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
 
 					// if the player chose the bonus tree at the beginning, boost their personal treasure score
 					if (dp.mBonusTreeSelected) {
 						dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
 					}
-
 					dp.setDeathRoom(party.getRoomNumber());
 					dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 					dp.sendMessage("You reached room " + party.mRoomNumber + "!");

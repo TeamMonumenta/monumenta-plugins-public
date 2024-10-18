@@ -6,6 +6,10 @@ import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfObscurity;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfRuin;
+import com.playmonumenta.plugins.depths.abilities.gifts.BottomlessBowl;
+import com.playmonumenta.plugins.depths.abilities.gifts.CombOfSelection;
+import com.playmonumenta.plugins.depths.abilities.gifts.RainbowGeode;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -16,6 +20,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -31,12 +37,12 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 	);
 
 	protected final boolean mReturnToSummary;
-	protected final boolean mReroll;
+	protected final boolean mRoomReward;
 
-	public AbstractDepthsRewardGUI(Player player, boolean fromSummaryGUI, String title, boolean reroll) {
+	public AbstractDepthsRewardGUI(Player player, boolean fromSummaryGUI, String title, boolean roomReward) {
 		super(player, 27, title);
 		mReturnToSummary = fromSummaryGUI;
-		mReroll = reroll;
+		mRoomReward = roomReward;
 	}
 
 	@Override
@@ -70,14 +76,14 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 
 			int slot = i;
 			setItem(slotsUsed.get(i), new GuiItem(item).onLeftClick(() -> {
+				depthsPlayer.mCombOfSelectionLevels.clear();
 				playerClickedItem(slot, obscure);
 				close();
 
 				if (dai != null) {
 					// Trigger Curse of Ruin - we could disable this on generosity, but I think it's probably fine
-					CurseOfRuin ruin = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, CurseOfRuin.class);
-					if (ruin != null) {
-						ruin.downgrade(depthsPlayer);
+					if (DepthsManager.getInstance().getPlayerLevelInAbility(CurseOfRuin.ABILITY_NAME, mPlayer) > 0) {
+						DepthsManager.getInstance().increaseRandomAbilityLevel(mPlayer, depthsPlayer, -1);
 					}
 				}
 
@@ -89,17 +95,45 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 			}));
 		}
 
-		if (mReroll) {
-			int count = depthsPlayer.mRerolls;
-			if (count > 0) {
-				ItemStack item = GUIUtils.createBasicItem(Material.NAUTILUS_SHELL, count, "Reroll", NamedTextColor.DARK_AQUA, true, Component.text("Click to reroll these options.\n", NamedTextColor.GRAY).append(Component.text("You have " + count + " reroll" + (count > 1 ? "s" : "") + " remaining.")), 30, true);
+		if (mRoomReward) {
+			int rerolls = depthsPlayer.mRerolls;
+			if (rerolls > 0) {
+				ItemStack item = GUIUtils.createBasicItem(Material.NAUTILUS_SHELL, rerolls, "Reroll", NamedTextColor.DARK_AQUA, true, Component.text("Click to reroll these options.\n", NamedTextColor.GRAY).append(Component.text("You have " + rerolls + " reroll" + (rerolls > 1 ? "s" : "") + " remaining.")), 30, true);
 				setItem(2, 4, new GuiItem(item).onLeftClick(() -> {
 					close();
 					depthsPlayer.mRerolls--;
 					UUID uuid = depthsPlayer.mPlayerId;
 					DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
 					DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
+					// comb of selection trigger increase rarities
+					if (depthsPlayer.getLevelInAbility(CombOfSelection.ABILITY_NAME) > 0) {
+						depthsPlayer.mCombOfSelectionLevels.replaceAll(integer -> Math.min(integer + 1, 5));
+					}
 					DepthsManager.getInstance().getRoomReward(mPlayer, null, mReturnToSummary);
+				}));
+			}
+
+			if ((depthsPlayer.getLevelInAbility(BottomlessBowl.ABILITY_NAME) > 0 || depthsPlayer.getLevelInAbility(RainbowGeode.ABILITY_NAME) > 0)
+				&& !depthsPlayer.mEarnedRewards.isEmpty() && depthsPlayer.mEarnedRewards.peek() != DepthsRoomType.DepthsRewardType.CURSE) {
+				ItemStack item = GUIUtils.createBasicItem(Material.BARRIER, 1, "Skip", NamedTextColor.RED, true, Component.text("Click to skip these options.", NamedTextColor.GRAY), 30, true);
+				setItem(2, 8, new GuiItem(item).onLeftClick(() -> {
+					close();
+					UUID uuid = depthsPlayer.mPlayerId;
+					DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
+					DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
+					depthsPlayer.mEarnedRewards.poll();
+					depthsPlayer.mRewardSkips++;
+					if (depthsPlayer.mRewardSkips % 3 == 0 && depthsPlayer.getLevelInAbility(RainbowGeode.ABILITY_NAME) > 0) {
+						depthsPlayer.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.PRISMATIC);
+						mPlayer.playSound(mPlayer, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.6f);
+					}
+					mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1.0f, 2.0f);
+
+					if (!depthsPlayer.mEarnedRewards.isEmpty()) {
+						DepthsManager.getInstance().getRoomReward(mPlayer, null, mReturnToSummary);
+					} else if (mReturnToSummary) {
+						DepthsGUICommands.summary(mPlayer);
+					}
 				}));
 			}
 		}

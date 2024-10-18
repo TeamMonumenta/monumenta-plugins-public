@@ -38,10 +38,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	private final @Nullable DepthsTree mDepthsTree;
 	private boolean mSingleAbilityCharm;
 	private boolean mHasLevels;
-	private boolean mOfferableFloor1;
-	private boolean mOfferablePastFloor1;
-	private Consumer<Player> mGain = player -> {
-	};
+	private Consumer<Player> mGain;
+	private Predicate<Player> mOfferable;
+	private Predicate<Integer> mFloors;
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
 	                         @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
@@ -49,9 +48,11 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		mDepthsTree = depthsTree;
 		mDepthsTrigger = depthsTrigger;
 		mSingleAbilityCharm = true;
-		mHasLevels = depthsTree != DepthsTree.CURSE && depthsTrigger != DepthsTrigger.WEAPON_ASPECT;
-		mOfferableFloor1 = true;
-		mOfferablePastFloor1 = true;
+		mHasLevels = depthsTree != DepthsTree.CURSE && depthsTrigger != DepthsTrigger.WEAPON_ASPECT && depthsTree != DepthsTree.GIFT;
+		mGain = player -> {
+		};
+		mOfferable = player -> true;
+		mFloors = floor -> true;
 		canUse(player -> DepthsManager.getInstance().getPlayerLevelInAbility(displayName, player) > 0);
 	}
 
@@ -164,13 +165,13 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return this;
 	}
 
-	public DepthsAbilityInfo<T> canBeOfferedFloor1(boolean offerableFloor1) {
-		mOfferableFloor1 = offerableFloor1;
+	public DepthsAbilityInfo<T> offerable(Predicate<Player> offerable) {
+		mOfferable = offerable;
 		return this;
 	}
 
-	public DepthsAbilityInfo<T> canBeOfferedPastFloor1(boolean offerablePastFloor1) {
-		mOfferablePastFloor1 = offerablePastFloor1;
+	public DepthsAbilityInfo<T> floors(Predicate<Integer> floors) {
+		mFloors = floors;
 		return this;
 	}
 
@@ -209,7 +210,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		mGain.accept(player);
 	}
 
-	//Whether the player is eligible to have this ability offered
+	// Whether the player is eligible to have this ability offered
 	public boolean canBeOffered(Player player) {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
 		if (dp == null) {
@@ -236,6 +237,11 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			}
 		}
 
+		// check offerable predicate
+		if (!mOfferable.test(player)) {
+			return false;
+		}
+
 		//Skip passive abilities if they have wand aspect charges
 		if (dp.mWandAspectCharges > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC && mDepthsTree != DepthsTree.CURSE) {
 			return false;
@@ -245,12 +251,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		if (party == null) {
 			return false;
 		}
-		boolean floor1 = party.getFloor() <= 1;
-		if ((floor1 && !mOfferableFloor1) || (!floor1 && !mOfferablePastFloor1)) {
-			return false;
-		}
-
-		return true;
+		return mFloors.test(party.getFloor());
 	}
 
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {
@@ -310,6 +311,15 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			e.printStackTrace();
 		}
 		return item;
+	}
+
+	public ItemStack getAbilityDisplayItem(int rarity, Player player) {
+		DepthsAbilityItem item = getAbilityItem(rarity, player);
+		if (item == null) {
+			return GUIUtils.createBasicItem(Material.BARRIER, "You should not be seeing this. Please report this bug.", NamedTextColor.RED);
+		} else {
+			return item.mItem;
+		}
 	}
 
 	public Component getColoredName() {

@@ -163,11 +163,8 @@ public abstract class RoomRepository {
 			return mWeaponAspectRoom;
 		}
 
-		//Get floor number- +1 if they're in the lobby after beating boss
+		// floor will automatically be incremented after boss is defeated
 		int floor = party.getFloor();
-		if (party.mRoomNumber % 10 == 0) {
-			floor++;
-		}
 
 		//Give them a boss room if they are on a boss
 
@@ -270,8 +267,7 @@ public abstract class RoomRepository {
 		Location loc = new Location(world, party.mFloorLobbyLoadPoint.getX(), party.mFloorLobbyLoadPoint.getY(), party.mFloorLobbyLoadPoint.getZ());
 
 		//Separate rooms by floor here
-		int nextFloorNum = party.getFloor() + 1;
-		String path = getLobbyPath(nextFloorNum);
+		String path = getLobbyPath(party.getFloor());
 
 		StructuresAPI.loadAndPasteStructure(path, loc, true, true).whenComplete((unused, ex) -> {
 			if (ex != null) {

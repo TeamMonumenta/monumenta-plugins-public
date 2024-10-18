@@ -229,6 +229,10 @@ public class DepthsUtils {
 		return DepthsManager.getCurseAbilities().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList().contains(s);
 	}
 
+	public static boolean isGiftAbility(String s) {
+		return DepthsManager.getGiftAbilities().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList().contains(s);
+	}
+
 	/**
 	 * Returns the party of nearby players, if applicable
 	 *
