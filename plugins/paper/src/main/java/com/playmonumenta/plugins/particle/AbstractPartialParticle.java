@@ -436,7 +436,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 					variedClone.extra(packagedValues.extra() + FastUtils.randomDoubleInRange(-mExtraVariance, mExtraVariance));
 				}
 
-				ParticleManager.addParticleToQueue(packagedValues);
+				ParticleManager.addParticleToQueue(variedClone);
 				// variedClone.spawn();
 			}
 		}
