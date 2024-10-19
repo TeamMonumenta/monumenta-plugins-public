@@ -19,7 +19,7 @@ public class PoetsQuill extends DepthsAbility {
 	public static final DepthsAbilityInfo<PoetsQuill> INFO =
 		new DepthsAbilityInfo<>(PoetsQuill.class, ABILITY_NAME, PoetsQuill::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.WRITABLE_BOOK)
-			.floors(floor -> floor == 1)
+			.floors(floor -> floor == 2)
 			.gain(PoetsQuill::gain)
 			.descriptions(PoetsQuill::getDescription);
 

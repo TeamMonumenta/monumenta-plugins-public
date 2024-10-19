@@ -24,7 +24,7 @@ public class BottomlessBowl extends DepthsAbility {
 	public static final DepthsAbilityInfo<BottomlessBowl> INFO =
 		new DepthsAbilityInfo<>(BottomlessBowl.class, ABILITY_NAME, BottomlessBowl::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.BOWL)
-			.floors(floor -> floor == 1)
+			.floors(floor -> floor == 2)
 			.descriptions(BottomlessBowl::getDescription);
 
 	private final @Nullable DepthsPlayer mDepthsPlayer;

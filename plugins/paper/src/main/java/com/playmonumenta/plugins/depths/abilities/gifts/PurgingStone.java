@@ -22,7 +22,7 @@ public class PurgingStone extends DepthsAbility {
 	public static final DepthsAbilityInfo<PurgingStone> INFO =
 		new DepthsAbilityInfo<>(PurgingStone.class, ABILITY_NAME, PurgingStone::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.CLAY)
-			.floors(floor -> floor == 2)
+			.floors(floor -> floor == 3)
 			.offerable(p -> DepthsManager.getInstance().hasAbilityOfTree(p, DepthsTree.CURSE))
 			.gain(PurgingStone::gain)
 			.descriptions(PurgingStone::getDescription);

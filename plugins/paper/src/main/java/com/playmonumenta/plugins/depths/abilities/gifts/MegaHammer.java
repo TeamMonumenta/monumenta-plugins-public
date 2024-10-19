@@ -22,7 +22,7 @@ public class MegaHammer extends DepthsAbility {
 	public static final DepthsAbilityInfo<MegaHammer> INFO =
 		new DepthsAbilityInfo<>(MegaHammer.class, ABILITY_NAME, MegaHammer::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.IRON_AXE)
-			.floors(floor -> floor == 2)
+			.floors(floor -> floor == 3)
 			.gain(MegaHammer::gain)
 			.descriptions(MegaHammer::getDescription);
 

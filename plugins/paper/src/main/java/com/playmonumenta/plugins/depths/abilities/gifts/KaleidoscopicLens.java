@@ -21,7 +21,7 @@ public class KaleidoscopicLens extends DepthsAbility {
 	public static final DepthsAbilityInfo<KaleidoscopicLens> INFO =
 		new DepthsAbilityInfo<>(KaleidoscopicLens.class, ABILITY_NAME, KaleidoscopicLens::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.SPYGLASS)
-			.floors(floor -> floor == 2)
+			.floors(floor -> floor == 3)
 			.gain(KaleidoscopicLens::gain)
 			.descriptions(KaleidoscopicLens::getDescription);
 

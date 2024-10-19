@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +22,7 @@ public class CallicarpasPointedHat extends DepthsAbility {
 	public static final DepthsAbilityInfo<CallicarpasPointedHat> INFO =
 		new DepthsAbilityInfo<>(CallicarpasPointedHat.class, ABILITY_NAME, CallicarpasPointedHat::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.DRAGON_EGG)
-			.floors(floor -> floor == 1)
+			.floors(floor -> floor == 2)
 			.gain(CallicarpasPointedHat::gain)
 			.descriptions(CallicarpasPointedHat::getDescription);
 
@@ -47,7 +48,7 @@ public class CallicarpasPointedHat extends DepthsAbility {
 				.append(a.mDepthsPlayer.mPointedHatTree == null
 					? Component.text("None")
 					: a.mDepthsPlayer.mPointedHatTree.getNameComponent()
-					.append(Component.text("\nRemaining rewards: " + a.mDepthsPlayer.mPointedHatStacks)))
+					.append(Component.text("\nRemaining rewards: " + a.mDepthsPlayer.mPointedHatStacks, NamedTextColor.WHITE)))
 				: Component.empty());
 	}
 }

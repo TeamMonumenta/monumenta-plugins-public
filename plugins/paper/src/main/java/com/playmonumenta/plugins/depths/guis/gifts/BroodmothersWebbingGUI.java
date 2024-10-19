@@ -29,7 +29,7 @@ public class BroodmothersWebbingGUI extends AbstractDepthsSelectionGUI<DepthsPla
 		party.sendMessage(ownPlayerName + " has given " + (ownPlayerName.equals(selection.mPlayerName) ? "themselves" : selection.mPlayerName) + " a protective webbing! They will now be protected the next time they die!");
 	}
 
-	private static List<DepthsPlayer> getPlayers(Player player) {
+	public static List<DepthsPlayer> getPlayers(Player player) {
 		DepthsParty party = DepthsManager.getInstance().getDepthsParty(player);
 		if (party == null) {
 			return Collections.emptyList();

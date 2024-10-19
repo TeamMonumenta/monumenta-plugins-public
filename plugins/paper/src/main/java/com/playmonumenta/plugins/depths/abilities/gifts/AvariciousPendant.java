@@ -21,7 +21,7 @@ public class AvariciousPendant extends DepthsAbility {
 	public static final DepthsAbilityInfo<AvariciousPendant> INFO =
 		new DepthsAbilityInfo<>(AvariciousPendant.class, ABILITY_NAME, AvariciousPendant::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.GOLD_NUGGET)
-			.floors(floor -> floor == 1)
+			.floors(floor -> floor == 2)
 			.descriptions(AvariciousPendant::getDescription);
 
 	public AvariciousPendant(Plugin plugin, Player player) {

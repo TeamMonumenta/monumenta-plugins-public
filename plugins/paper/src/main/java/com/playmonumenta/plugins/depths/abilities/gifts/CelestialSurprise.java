@@ -18,7 +18,7 @@ public class CelestialSurprise extends DepthsAbility {
 	public static final DepthsAbilityInfo<CelestialSurprise> INFO =
 		new DepthsAbilityInfo<>(CelestialSurprise.class, ABILITY_NAME, CelestialSurprise::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.CAKE)
-			.floors(floor -> floor == 2)
+			.floors(floor -> floor == 3)
 			.gain(CelestialSurprise::gain)
 			.descriptions(CelestialSurprise::getDescription);
 

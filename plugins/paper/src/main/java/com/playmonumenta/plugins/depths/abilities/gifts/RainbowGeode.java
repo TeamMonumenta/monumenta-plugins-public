@@ -20,7 +20,7 @@ public class RainbowGeode extends DepthsAbility {
 	public static final DepthsAbilityInfo<RainbowGeode> INFO =
 		new DepthsAbilityInfo<>(RainbowGeode.class, ABILITY_NAME, RainbowGeode::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.AMETHYST_SHARD)
-			.floors(floor -> floor == 1)
+			.floors(floor -> floor == 2)
 			.descriptions(RainbowGeode::getDescription);
 
 	private final @Nullable DepthsPlayer mDepthsPlayer;

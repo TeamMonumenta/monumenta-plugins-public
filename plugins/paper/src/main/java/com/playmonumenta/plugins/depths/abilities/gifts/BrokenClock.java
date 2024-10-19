@@ -19,7 +19,7 @@ public class BrokenClock extends DepthsAbility {
 	public static final DepthsAbilityInfo<BrokenClock> INFO =
 		new DepthsAbilityInfo<>(BrokenClock.class, ABILITY_NAME, BrokenClock::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.BLAZE_SPAWN_EGG)
-			.floors(floor -> floor == 1)
+			.floors(floor -> floor == 2)
 			.descriptions(BrokenClock::getDescription);
 
 	public BrokenClock(Plugin plugin, Player player) {

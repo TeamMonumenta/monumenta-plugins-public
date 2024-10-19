@@ -18,7 +18,7 @@ public class VenomOfTheBroodmother extends DepthsAbility {
 	public static final DepthsAbilityInfo<VenomOfTheBroodmother> INFO =
 		new DepthsAbilityInfo<>(VenomOfTheBroodmother.class, ABILITY_NAME, VenomOfTheBroodmother::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.POTION)
-			.floors(floor -> floor == 2)
+			.floors(floor -> floor == 3)
 			.offerable(VenomOfTheBroodmother::offerable)
 			.gain(VenomOfTheBroodmother::gain)
 			.descriptions(VenomOfTheBroodmother::getDescription);
