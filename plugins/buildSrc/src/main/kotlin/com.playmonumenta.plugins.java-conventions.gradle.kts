@@ -7,24 +7,37 @@ plugins {
 
 repositories {
     mavenLocal()
+    mavenCentral()
+    // Monumenta
+    maven("https://maven.playmonumenta.com/releases/")
+    // Minecraft
+    maven("https://libraries.minecraft.net/")
+    // Paper
     maven("https://repo.papermc.io/repository/maven-public/")
+    // ?
     maven("https://repo.maven.apache.org/maven2/")
+    // PremiumVanishAPI
     maven("https://jitpack.io")
+    // Velocity and Adventure
     maven("https://oss.sonatype.org/content/repositories/snapshots")
+    // CoreProtect
     maven("https://maven.playpro.com/")
+    // ChestSort
     maven("https://repo.jeff-media.com/public/")
+    // BKCommonLib
     maven("https://ci.mg-dev.eu/plugin/repository/everything")
-    maven("https://maven.enginehub.org/repo/")
+    // ProtocolLib
+    maven("https://repo.dmulloy2.net/repository/public/")
+    // NMS?
     maven("https://repo.codemc.org/repository/nms")
     // NBT API
     maven("https://repo.codemc.org/repository/maven-public/")
-	mavenCentral()
-	maven("https://libraries.minecraft.net/")
-	maven("https://repo.codemc.org/repository/maven-public/")
-	maven("https://maven.playmonumenta.com/releases/")
-    // Velocity dependencies
-    maven("https://repo.kryptonmc.org/releases")
+    // PlaceholderAPI
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    // Velocity
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    // FAWE: This one is funky and needs to be last (doesn't respond with 404)
+    maven("https://maven.enginehub.org/repo/")
 }
 
 group = "com.playmonumenta.plugins"
