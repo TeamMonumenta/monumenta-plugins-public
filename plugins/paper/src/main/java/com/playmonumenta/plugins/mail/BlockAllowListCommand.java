@@ -82,6 +82,14 @@ public class BlockAllowListCommand {
 		RecipientCmdArgs listOwnerArgs,
 		@Nullable RecipientType recipientTypeFilter
 	) {
+		if (
+			!listOwnerArgs.mTarget.equals(ArgTarget.CALLER)
+			&& !viewer.hasPermission(MailGui.MAIL_MOD_PERM.toString())
+		) {
+			viewer.sendMessage(Component.text("You do not have permission for this command.", NamedTextColor.RED));
+			return;
+		}
+
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			MailCache mailCache;
 			try {

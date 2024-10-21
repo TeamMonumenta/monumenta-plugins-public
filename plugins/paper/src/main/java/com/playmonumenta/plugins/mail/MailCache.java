@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.redissync.RedisAPI;
-import io.lettuce.core.api.sync.RedisCommands;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,13 +45,11 @@ public class MailCache {
 		MMLog.fine(() -> "[Mailbox] Created mail cache for " + recipient.friendlyStr(MailDirection.DEFAULT));
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisCommands<String, String> redis = RedisAPI.getInstance().sync();
-
 			ConcurrentSkipListSet<Recipient> allowList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
 			ConcurrentSkipListSet<Recipient> blockList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
 			ConcurrentSkipListSet<Recipient> allowedAndBlocked = new ConcurrentSkipListSet<>();
 
-			for (String senderKey : redis.smembers(mRecipient.allowListRedisKey())) {
+			for (String senderKey : RedisAPI.getInstance().sync().smembers(mRecipient.allowListRedisKey())) {
 				Recipient testSender = Recipient.of(senderKey).join();
 				if (testSender == null) {
 					continue;
@@ -60,7 +57,7 @@ public class MailCache {
 				allowList.add(testSender);
 			}
 
-			for (String senderKey : redis.smembers(mRecipient.blockListRedisKey())) {
+			for (String senderKey : RedisAPI.getInstance().sync().smembers(mRecipient.blockListRedisKey())) {
 				Recipient testSender = Recipient.of(senderKey).join();
 				if (testSender == null) {
 					continue;
@@ -198,10 +195,9 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisCommands<String, String> redis = RedisAPI.getInstance().sync();
-			redis.srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().sync().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
 			mRecipientBlockList.remove(recipient);
-			redis.sadd(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().sync().sadd(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
 			mRecipientAllowList.add(recipient);
 
 			if (isLocal) {
@@ -223,10 +219,9 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisCommands<String, String> redis = RedisAPI.getInstance().sync();
-			redis.srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().sync().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
 			mRecipientAllowList.remove(recipient);
-			redis.sadd(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().sync().sadd(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
 			mRecipientBlockList.add(recipient);
 
 			if (isLocal) {
@@ -264,8 +259,7 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisCommands<String, String> redis = RedisAPI.getInstance().sync();
-			redis.srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().sync().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
 			mRecipientAllowList.remove(recipient);
 
 			if (isLocal) {
@@ -287,8 +281,7 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisCommands<String, String> redis = RedisAPI.getInstance().sync();
-			redis.srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().sync().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
 			mRecipientBlockList.remove(recipient);
 
 			if (isLocal) {
@@ -452,6 +445,9 @@ public class MailCache {
 			if (mailboxCommand != null) {
 				mRecipient.audience().forEachAudience(audience -> {
 					if (!(audience instanceof Player player)) {
+						return;
+					}
+					if (!player.hasPermission(MailGui.MAIL_PERM.toString())) {
 						return;
 					}
 					if (!MetadataUtils.checkOnceInRecentTicks(
