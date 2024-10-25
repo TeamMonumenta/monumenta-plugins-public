@@ -38,6 +38,8 @@ public class DepthsPlayer {
 	public String mPlayerName;
 	//A map containing all abilities the player has and their current rarity
 	public Map<String, Integer> mAbilities;
+	// A list of removed abilities, for data collection purposes only. Can contain duplicates
+	public List<String> mRemovedAbilities;
 	//Unique identifier, mapping to an active depths party object
 	public long mPartyNum;
 
@@ -151,6 +153,7 @@ public class DepthsPlayer {
 		mPlayerId = p.getUniqueId();
 		mPlayerName = p.getName();
 		mAbilities = new HashMap<>();
+		mRemovedAbilities = new ArrayList<>();
 		mEligibleTrees = new ArrayList<>();
 
 		//Randomize order of weapon aspects

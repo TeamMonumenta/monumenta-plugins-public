@@ -525,6 +525,7 @@ public class DepthsManager {
 			dp.mAbilities.put(name, level);
 		} else {
 			dp.mAbilities.remove(name);
+			dp.mRemovedAbilities.add(name);
 		}
 		AbilityManager.getManager().updatePlayerAbilities(p, false);
 

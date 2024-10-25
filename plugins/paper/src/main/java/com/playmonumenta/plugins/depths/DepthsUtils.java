@@ -417,6 +417,10 @@ public class DepthsUtils {
 		for (String ability : dp.mAbilities.keySet()) {
 			abilityObjectInJson.addProperty(ability, dp.mAbilities.get(ability));
 		}
+		JsonArray removedAbilitiesJsonArray = new JsonArray();
+		for (String ability : dp.mRemovedAbilities) {
+			removedAbilitiesJsonArray.add(ability);
+		}
 		JsonArray initialPlayersJsonArray = new JsonArray();
 		for (String partyPlayer : depthsParty.mInitialPlayers) {
 			initialPlayersJsonArray.add(partyPlayer);
@@ -430,6 +434,7 @@ public class DepthsUtils {
 		json.addProperty("content_type", dp.getContent().name());
 		json.addProperty("victory", victory);
 		json.add("abilities", abilityObjectInJson);
+		json.add("removed_abilities", removedAbilitiesJsonArray);
 		json.add("initial_players", initialPlayersJsonArray);
 
 		if (depthsParty.getContent() == DepthsContent.DARKEST_DEPTHS) {
