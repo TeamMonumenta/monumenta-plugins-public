@@ -78,7 +78,7 @@ public class MarketRedisManager {
 	}
 
 	public static Long getNextListingID() {
-		return RedisAPI.getInstance().sync().incr(getListingCurrentIDRedisPath());
+		return RedisAPI.getInstance().async().incr(getListingCurrentIDRedisPath()).toCompletableFuture().join();
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class MarketRedisManager {
 
 		String json = listing.toJsonString();
 		String id = String.valueOf(listing.getId());
-		RedisAPI.getInstance().sync().hset(pathListingHashMap, id, json);
+		RedisAPI.getInstance().async().hset(pathListingHashMap, id, json).toCompletableFuture().join();
 
 		return true;
 	}
@@ -104,7 +104,7 @@ public class MarketRedisManager {
 	 */
 	public static boolean atomicCompareAndSwapListing(String expectedListing, MarketListing newListing) {
 		if (mAtomicUpdateScriptHash == null) {
-			mAtomicUpdateScriptHash = RedisAPI.getInstance().sync().scriptLoad("""
+			mAtomicUpdateScriptHash = RedisAPI.getInstance().async().scriptLoad("""
 				local map = KEYS[1];
 				local id = ARGV[1];
 				local expectedJson = ARGV[2];
@@ -114,13 +114,13 @@ public class MarketRedisManager {
 				    return true;
 				end;
 				return false;
-				""");
+				""").toCompletableFuture().join();
 		}
 
 		String newJson = newListing.toJsonString();
 		String id = String.valueOf(newListing.getId());
 
-		return RedisAPI.getInstance().sync().evalsha(mAtomicUpdateScriptHash, ScriptOutputType.BOOLEAN, new String[] {pathListingHashMap}, id, expectedListing, newJson);
+		return (Boolean) RedisAPI.getInstance().async().evalsha(mAtomicUpdateScriptHash, ScriptOutputType.BOOLEAN, new String[] {pathListingHashMap}, id, expectedListing, newJson).toCompletableFuture().join();
 
 	}
 
@@ -184,7 +184,7 @@ public class MarketRedisManager {
 	}
 
 	public static String getListingRaw(long id) {
-		return RedisAPI.getInstance().sync().hget(pathListingHashMap, String.valueOf(id));
+		return RedisAPI.getInstance().async().hget(pathListingHashMap, String.valueOf(id)).toCompletableFuture().join();
 	}
 
 	// proxy for getListings(String... ids)
@@ -200,7 +200,7 @@ public class MarketRedisManager {
 
 	public static @Nullable List<MarketListing> getListings(String... ids) {
 		Gson gson = new Gson();
-		List<KeyValue<String, String>> jsons = RedisAPI.getInstance().sync().hmget(pathListingHashMap, ids);
+		List<KeyValue<String, String>> jsons = RedisAPI.getInstance().async().hmget(pathListingHashMap, ids).toCompletableFuture().join();
 		ArrayList<MarketListing> out = new ArrayList<>();
 		if (jsons == null) {
 			return null;
@@ -220,7 +220,7 @@ public class MarketRedisManager {
 
 	public static List<Long> getAllListingsIds(boolean sorted) {
 		List<Long> out = new ArrayList<>();
-		List<String> lst = RedisAPI.getInstance().sync().hkeys(pathListingHashMap);
+		List<String> lst = RedisAPI.getInstance().async().hkeys(pathListingHashMap).toCompletableFuture().join();
 		for (String l : lst) {
 			out.add(Long.parseLong(l));
 		}
@@ -231,7 +231,7 @@ public class MarketRedisManager {
 	}
 
 	public static void deleteListing(MarketListing listing) {
-		RedisAPI.getInstance().sync().hdel(pathListingHashMap, String.valueOf(listing.getId()));
+		RedisAPI.getInstance().async().hdel(pathListingHashMap, String.valueOf(listing.getId())).toCompletableFuture().join();
 
 		// the index updates do not need to be in sync with the trading,
 		// as such, to make the creation/update of listing faster, we do index update later

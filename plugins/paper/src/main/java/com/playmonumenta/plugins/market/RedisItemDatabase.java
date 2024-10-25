@@ -40,13 +40,13 @@ public class RedisItemDatabase {
 		saveToCache(id, item);
 		String mojangson = ItemUtils.serializeItemStack(item);
 		String idStr = String.valueOf(id);
-		RedisAPI.getInstance().sync().hset(mPathIDBItemToID, mojangson, idStr);
-		RedisAPI.getInstance().sync().hset(mPathIDBIDToItem, idStr, mojangson);
+		RedisAPI.getInstance().async().hset(mPathIDBItemToID, mojangson, idStr).toCompletableFuture().join();
+		RedisAPI.getInstance().async().hset(mPathIDBIDToItem, idStr, mojangson).toCompletableFuture().join();
 		return id;
 	}
 
 	private static long getNextItemID() {
-		return RedisAPI.getInstance().sync().incr(mPathIDBCurrentID);
+		return RedisAPI.getInstance().async().incr(mPathIDBCurrentID).toCompletableFuture().join();
 	}
 
 	public static long getIDFromItemStack(ItemStack item) {
@@ -88,7 +88,7 @@ public class RedisItemDatabase {
 	}
 
 	private static @Nullable Long fetchIDFromRedis(ItemStack item) {
-		String idStr = RedisAPI.getInstance().sync().hget(mPathIDBItemToID, ItemUtils.serializeItemStack(item));
+		String idStr = RedisAPI.getInstance().async().hget(mPathIDBItemToID, ItemUtils.serializeItemStack(item)).toCompletableFuture().join();
 		if (idStr == null || idStr.isEmpty()) {
 			return null;
 		}
@@ -98,7 +98,7 @@ public class RedisItemDatabase {
 	}
 
 	private static @Nullable ItemStack fetchItemFromRedis(long id) {
-		String mojangson = RedisAPI.getInstance().sync().hget(mPathIDBIDToItem, String.valueOf(id));
+		String mojangson = RedisAPI.getInstance().async().hget(mPathIDBIDToItem, String.valueOf(id)).toCompletableFuture().join();
 		if (mojangson == null || mojangson.isEmpty()) {
 			return null;
 		}

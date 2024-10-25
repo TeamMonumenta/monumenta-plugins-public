@@ -119,18 +119,18 @@ public enum MarketListingIndex {
 		// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
 		// a simpler, but unique algorithm needs to be used
 		if (this == ACTIVE_LISTINGS) {
-			RedisAPI.getInstance().sync().lrem(mRedisPath, 0, String.valueOf(listing.getId()));
+			RedisAPI.getInstance().async().lrem(mRedisPath, 0, String.valueOf(listing.getId())).toCompletableFuture().join();
 			return;
 		}
 
 		String key = this.mGetKeyMethod.apply(listing);
 
 		// get the current values of the index, at listing key
-		String listingIdList = RedisAPI.getInstance().sync().hget(mRedisPath, key);
+		String listingIdList = RedisAPI.getInstance().async().hget(mRedisPath, key).toCompletableFuture().join();
 		// remove the listing ID to the list
 		listingIdList = listingIdList.replace(String.valueOf(listing.getId()), "").replace(",,", ",");
 		// push the new value
-		RedisAPI.getInstance().sync().hset(mRedisPath, key, listingIdList);
+		RedisAPI.getInstance().async().hset(mRedisPath, key, listingIdList).toCompletableFuture().join();
 	}
 
 	public List<Long> getListingsFromIndex(boolean descOrder) {
@@ -154,7 +154,7 @@ public enum MarketListingIndex {
 			return out;
 		}
 
-		Map<String, String> indexContents = RedisAPI.getInstance().sync().hgetall(mRedisPath);
+		Map<String, String> indexContents = RedisAPI.getInstance().async().hgetall(mRedisPath).toCompletableFuture().join();
 		for (Map.Entry<String, String> entry : indexContents.entrySet()) {
 			List<Long> list = new ArrayList<>();
 			String[] values = entry.getValue().split(",");
@@ -180,13 +180,13 @@ public enum MarketListingIndex {
 			return out;
 		}
 
-		out = RedisAPI.getInstance().sync().hkeys(mRedisPath);
+		out = RedisAPI.getInstance().async().hkeys(mRedisPath).toCompletableFuture().join();
 		out.sort(descOrder ? Comparator.reverseOrder() : Comparator.naturalOrder());
 		return out;
 	}
 
 	private List<Long> getActiveListings(boolean descOrder) {
-		List<String> activeUnfilteredListings = RedisAPI.getInstance().sync().lrange(mRedisPath, 0, -1);
+		List<String> activeUnfilteredListings = RedisAPI.getInstance().async().lrange(mRedisPath, 0, -1).toCompletableFuture().join();
 		List<Long> activeFilteredListings = new ArrayList<>();
 		for (String listingID : activeUnfilteredListings) {
 			activeFilteredListings.add(Long.parseLong(listingID));
@@ -216,12 +216,12 @@ public enum MarketListingIndex {
 		// Special case for ACTIVE_LISTINGS, which is just a simple list, and not a hashmap
 		// a simpler, but unique algorithm needs to be used
 		if (this == ACTIVE_LISTINGS) {
-			RedisAPI.getInstance().sync().lpush(mRedisPath, key);
+			RedisAPI.getInstance().async().lpush(mRedisPath, key).toCompletableFuture().join();
 			return;
 		}
 
 		// get the current values of the index, at listing key
-		String listingIdList = RedisAPI.getInstance().sync().hget(mRedisPath, key);
+		String listingIdList = RedisAPI.getInstance().async().hget(mRedisPath, key).toCompletableFuture().join();
 		// add the new listing ID to the list
 		if (listingIdList != null && !listingIdList.isEmpty()) {
 			listingIdList += "," + listing.getId();
@@ -229,7 +229,7 @@ public enum MarketListingIndex {
 			listingIdList = "" + listing.getId();
 		}
 		// push the new value
-		RedisAPI.getInstance().sync().hset(mRedisPath, key, listingIdList);
+		RedisAPI.getInstance().async().hset(mRedisPath, key, listingIdList).toCompletableFuture().join();
 	}
 
 
@@ -248,12 +248,12 @@ public enum MarketListingIndex {
 	private String dumpIndexContents() {
 		StringBuilder sb = new StringBuilder();
 		if (this == ACTIVE_LISTINGS) {
-			List<String> lst = RedisAPI.getInstance().sync().lrange(mRedisPath, 0, -1);
+			List<String> lst = RedisAPI.getInstance().async().lrange(mRedisPath, 0, -1).toCompletableFuture().join();
 			sb.append(Arrays.toString(lst.toArray())).append("\n");
 			return sb.toString();
 		}
 
-		Map<String, String> indexContents = RedisAPI.getInstance().sync().hgetall(mRedisPath);
+		Map<String, String> indexContents = RedisAPI.getInstance().async().hgetall(mRedisPath).toCompletableFuture().join();
 		for (Map.Entry<String, String> entry : indexContents.entrySet()) {
 			sb.append("  ").append(entry.getKey()).append(":").append(entry.getValue()).append("\n");
 		}
@@ -274,7 +274,7 @@ public enum MarketListingIndex {
 		ScanCursor cursor = ScanCursor.INITIAL;
 		while (!cursor.isFinished()) {
 			// get redis data
-			MapScanCursor<String, String> hscanResult = RedisAPI.getInstance().sync().hscan(MarketRedisManager.getListingsRedisPath(), cursor, new ScanArgs().limit(50));
+			MapScanCursor<String, String> hscanResult = RedisAPI.getInstance().async().hscan(MarketRedisManager.getListingsRedisPath(), cursor, new ScanArgs().limit(50)).toCompletableFuture().join();
 			cursor = ScanCursor.of(hscanResult.getCursor());
 			cursor.setFinished(hscanResult.isFinished());
 
@@ -318,7 +318,7 @@ public enum MarketListingIndex {
 
 			for (MarketListingIndex index : values()) {
 				// delete the old values
-				RedisAPI.getInstance().sync().del(index.mRedisPath);
+				RedisAPI.getInstance().async().del(index.mRedisPath).toCompletableFuture().join();
 
 				// push the new values
 				HashMap<String, ArrayList<Long>> indexValues = indexValuesMap.getOrDefault(index, new HashMap<>());
@@ -332,7 +332,7 @@ public enum MarketListingIndex {
 						for (int i = 0; i < values.size(); i++) {
 							array[i] = String.valueOf(values.get(i));
 						}
-						RedisAPI.getInstance().sync().lpush(index.mRedisPath, array);
+						RedisAPI.getInstance().async().lpush(index.mRedisPath, array).toCompletableFuture().join();
 					}
 					continue;
 				}
@@ -343,7 +343,7 @@ public enum MarketListingIndex {
 						values.sort(Collections.reverseOrder());
 						String valuesStr = ArrayUtils.toString(values).replace(" ", "");
 						valuesStr = valuesStr.substring(1, valuesStr.length() - 1);
-						RedisAPI.getInstance().sync().hset(index.mRedisPath, key, valuesStr);
+						RedisAPI.getInstance().async().hset(index.mRedisPath, key, valuesStr).toCompletableFuture().join();
 					}
 				}
 

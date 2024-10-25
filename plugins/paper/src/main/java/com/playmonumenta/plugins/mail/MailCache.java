@@ -49,7 +49,7 @@ public class MailCache {
 			ConcurrentSkipListSet<Recipient> blockList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
 			ConcurrentSkipListSet<Recipient> allowedAndBlocked = new ConcurrentSkipListSet<>();
 
-			for (String senderKey : RedisAPI.getInstance().sync().smembers(mRecipient.allowListRedisKey())) {
+			for (String senderKey : RedisAPI.getInstance().async().smembers(mRecipient.allowListRedisKey()).toCompletableFuture().join()) {
 				Recipient testSender = Recipient.of(senderKey).join();
 				if (testSender == null) {
 					continue;
@@ -57,7 +57,7 @@ public class MailCache {
 				allowList.add(testSender);
 			}
 
-			for (String senderKey : RedisAPI.getInstance().sync().smembers(mRecipient.blockListRedisKey())) {
+			for (String senderKey : RedisAPI.getInstance().async().smembers(mRecipient.blockListRedisKey()).toCompletableFuture().join()) {
 				Recipient testSender = Recipient.of(senderKey).join();
 				if (testSender == null) {
 					continue;
@@ -195,9 +195,9 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().sync().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().async().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientBlockList.remove(recipient);
-			RedisAPI.getInstance().sync().sadd(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().async().sadd(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientAllowList.add(recipient);
 
 			if (isLocal) {
@@ -219,9 +219,9 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().sync().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().async().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientAllowList.remove(recipient);
-			RedisAPI.getInstance().sync().sadd(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().async().sadd(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientBlockList.add(recipient);
 
 			if (isLocal) {
@@ -259,7 +259,7 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().sync().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().async().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientAllowList.remove(recipient);
 
 			if (isLocal) {
@@ -281,7 +281,7 @@ public class MailCache {
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().sync().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			RedisAPI.getInstance().async().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientBlockList.remove(recipient);
 
 			if (isLocal) {

@@ -79,7 +79,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			ConcurrentSkipListSet<Mailbox> result = new ConcurrentSkipListSet<>();
-			for (Map.Entry<String, String> entry : RedisAPI.getInstance().sync().hgetall(recipient.redisKey(MailDirection.TO)).entrySet()) {
+			for (Map.Entry<String, String> entry : RedisAPI.getInstance().async().hgetall(recipient.redisKey(MailDirection.TO)).toCompletableFuture().join().entrySet()) {
 				MMLog.fine(() -> "[Mailbox] Caching "
 					+ recipient.friendlyStr(MailDirection.TO)
 					+ ": "
@@ -106,7 +106,7 @@ public class Mailbox implements Comparable<Mailbox> {
 				result.add(MailMan.getOrRegister(redisMailbox));
 			}
 
-			for (Map.Entry<String, String> entry : RedisAPI.getInstance().sync().hgetall(recipient.redisKey(MailDirection.FROM)).entrySet()) {
+			for (Map.Entry<String, String> entry : RedisAPI.getInstance().async().hgetall(recipient.redisKey(MailDirection.FROM)).toCompletableFuture().join().entrySet()) {
 				MMLog.fine(() -> "[Mailbox] Caching "
 					+ recipient.friendlyStr(MailDirection.FROM)
 					+ ": "
@@ -220,7 +220,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 			Map<String, String> rawMailboxItems;
 			try {
-				rawMailboxItems = RedisAPI.getInstance().sync().hgetall(itemSlotRedisKey);
+				rawMailboxItems = RedisAPI.getInstance().async().hgetall(itemSlotRedisKey).toCompletableFuture().join();
 				if (rawMailboxItems == null) {
 					throw new Exception("Unable to load mail");
 				}
@@ -278,7 +278,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				String itemSlotJson = RedisAPI.getInstance().sync().hget(itemSlotRedisKey, Long.toString(slot));
+				String itemSlotJson = RedisAPI.getInstance().async().hget(itemSlotRedisKey, Long.toString(slot)).toCompletableFuture().join();
 				JsonObject slotJson;
 				slotJson = itemSlotJson == null ? null : new Gson().fromJson(itemSlotJson, JsonObject.class);
 
@@ -453,7 +453,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 			String oldItemJsonStr;
 			try {
-				oldItemJsonStr = RedisAPI.getInstance().sync().hget(itemSlotRedisKey, slotStr);
+				oldItemJsonStr = RedisAPI.getInstance().async().hget(itemSlotRedisKey, slotStr).toCompletableFuture().join();
 			} catch (Throwable throwable) {
 				try {
 					freeLock(slot, lockId, throwable).join();
@@ -506,7 +506,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 			if (oldItemStack != null) {
 				try {
-					long deletedCount = RedisAPI.getInstance().sync().hdel(itemSlotRedisKey, slotStr);
+					long deletedCount = RedisAPI.getInstance().async().hdel(itemSlotRedisKey, slotStr).toCompletableFuture().join();
 					if (deletedCount != 1) {
 						throw new Exception("Deleted " + deletedCount + " items instead of 1 item");
 					}
@@ -539,7 +539,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 			if (newItemJsonStr != null) {
 				try {
-					if (!RedisAPI.getInstance().sync().hset(itemSlotRedisKey, slotStr, newItemJsonStr)) {
+					if (!RedisAPI.getInstance().async().hset(itemSlotRedisKey, slotStr, newItemJsonStr).toCompletableFuture().join()) {
 						throw new Exception("Failed to set value; an existing value may be present");
 					}
 					deltaItemSlots++;
@@ -655,7 +655,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				long lockExpirationMs = RedisAPI.getInstance().sync().pexpiretime(lockSlotRedisKey);
+				long lockExpirationMs = RedisAPI.getInstance().async().pexpiretime(lockSlotRedisKey).toCompletableFuture().join();
 
 				if (lockExpirationMs == PEXPIRETIME_EXISTS_NO_EXPIRATION) {
 					lockExpirationMs = DateUtils.TRUE_EPOCH.until(DateUtils.trueUtcDateTime(), ChronoUnit.MILLIS)
@@ -718,8 +718,8 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			mLockedSlots.put(slot, DateUtils.trueUtcDateTime().plus(LOCK_TIMEOUT_MS, ChronoUnit.MILLIS));
-			String response = RedisAPI.getInstance().sync()
-				.set(redisKey, lockId, new SetArgs().nx().px(LOCK_TIMEOUT_MS));
+			String response = RedisAPI.getInstance().async()
+				.set(redisKey, lockId, new SetArgs().nx().px(LOCK_TIMEOUT_MS)).toCompletableFuture().join();
 			if ("OK".equals(response)) {
 				MailMan.broadcastMailSlotChange(this, slot);
 				future.complete(lockId);
@@ -743,7 +743,7 @@ public class Mailbox implements Comparable<Mailbox> {
 		String redisKey = lockSlotMapRedisKey(slot);
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			String response = RedisAPI.getInstance().sync().get(redisKey);
+			String response = RedisAPI.getInstance().async().get(redisKey).toCompletableFuture().join();
 			if (response == null) {
 				mLockedSlots.remove(slot);
 				future.completeExceptionally(
@@ -763,7 +763,7 @@ public class Mailbox implements Comparable<Mailbox> {
 				return;
 			}
 
-			long deletedCount = RedisAPI.getInstance().sync().del(redisKey);
+			long deletedCount = RedisAPI.getInstance().async().del(redisKey).toCompletableFuture().join();
 			if (deletedCount != 1L) {
 				mLockedSlots.remove(slot);
 				MailMan.broadcastMailSlotChange(this, slot);
