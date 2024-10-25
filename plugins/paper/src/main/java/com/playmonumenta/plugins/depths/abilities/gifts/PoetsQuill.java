@@ -20,6 +20,13 @@ public class PoetsQuill extends DepthsAbility {
 		new DepthsAbilityInfo<>(PoetsQuill.class, ABILITY_NAME, PoetsQuill::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
 			.displayItem(Material.WRITABLE_BOOK)
 			.floors(floor -> floor == 2)
+			.offerable(p -> {
+				DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(p);
+				if (dp == null) {
+					return false;
+				}
+				return !dp.mEligibleTrees.isEmpty() && dp.mEligibleTrees.size() < 7;
+			})
 			.gain(PoetsQuill::gain)
 			.descriptions(PoetsQuill::getDescription);
 

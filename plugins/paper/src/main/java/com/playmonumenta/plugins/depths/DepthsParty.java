@@ -275,16 +275,16 @@ public class DepthsParty {
 						return;
 					}
 					// avaricious pendant trigger
-					if (dp.getLevelInAbility(AvariciousPendant.ABILITY_NAME) > 0) {
+					if (dp.hasAbility(AvariciousPendant.ABILITY_NAME)) {
 						AvariciousPendant.increaseTreasure(dp);
 					}
 
 					// northern star trigger
-					if (dp.getLevelInAbility(NorthernStar.ABILITY_NAME) > 0) {
+					if (dp.hasAbility(NorthernStar.ABILITY_NAME)) {
 						dp.mNorthernStarStacks--;
 						dp.mEarnedRewards.add(rewardType);
 						if (dp.mNorthernStarStacks == 0) {
-							DepthsManager.getInstance().setPlayerLevelInAbility(NorthernStar.ABILITY_NAME, p, 0, false);
+							DepthsManager.getInstance().setPlayerLevelInAbility(NorthernStar.ABILITY_NAME, p, dp, 0, false, false);
 						}
 					}
 				});
@@ -460,7 +460,7 @@ public class DepthsParty {
 
 		// Curse of Chaos: new room, increment counter and apply effects
 		for (DepthsPlayer dp : mPlayersInParty) {
-			if (dp.getLevelInAbility(CurseOfChaos.ABILITY_NAME) > 0) {
+			if (dp.hasAbility(CurseOfChaos.ABILITY_NAME)) {
 				dp.mCurseofChaosCount++;
 				if (dp.mCurseofChaosCount > CurseOfChaos.ROOMS && dp.getPlayer() != null) {
 					dp.sendMessage("Chaos surges within you...");

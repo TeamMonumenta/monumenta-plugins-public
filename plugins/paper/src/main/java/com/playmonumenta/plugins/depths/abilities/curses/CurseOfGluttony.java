@@ -59,7 +59,7 @@ public class CurseOfGluttony extends DepthsAbility {
 			if (info == null || !info.getHasLevels()) {
 				continue;
 			}
-			DepthsManager.getInstance().setPlayerLevelInAbility(ability, player, 0, true, true);
+			DepthsManager.getInstance().setPlayerLevelInAbility(ability, player, dp, 0, true, true);
 			removed++;
 		}
 	}

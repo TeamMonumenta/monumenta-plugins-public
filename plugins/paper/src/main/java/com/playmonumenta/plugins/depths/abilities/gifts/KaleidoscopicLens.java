@@ -36,7 +36,7 @@ public class KaleidoscopicLens extends DepthsAbility {
 		}
 		dp.mEligibleTrees = Arrays.stream(DepthsTree.OWNABLE_TREES).filter(tree -> !dp.mEligibleTrees.contains(tree)).collect(Collectors.toList());
 		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.PRISMATIC);
-		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<KaleidoscopicLens> getDescription() {

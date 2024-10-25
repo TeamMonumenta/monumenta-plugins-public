@@ -21,8 +21,11 @@ public class ForsakenGrimoireAbilityGUI extends AbstractDepthsSelectionGUI<Depth
 
 	@Override
 	protected void selected(DepthsAbilityInfo<?> selection) {
-		DepthsManager.getInstance().setPlayerLevelInAbility(ForsakenGrimoire.ABILITY_NAME, mPlayer, 0, false);
-		DepthsManager.getInstance().setPlayerLevelInAbility(selection.getDisplayName(), mPlayer, 3);
+		if (mDepthsPlayer == null) {
+			return;
+		}
+		DepthsManager.getInstance().setPlayerLevelInAbility(ForsakenGrimoire.ABILITY_NAME, mPlayer, mDepthsPlayer, 0, false, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(selection.getDisplayName(), mPlayer, mDepthsPlayer, 3, true, false);
 		mPlayer.playSound(mPlayer, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 	}
 

@@ -19,9 +19,12 @@ public class BroodmothersWebbingGUI extends AbstractDepthsSelectionGUI<DepthsPla
 
 	@Override
 	protected void selected(DepthsPlayer selection) {
+		if (mDepthsPlayer == null) {
+			return;
+		}
 		selection.mBroodmothersWebbing = true;
-		DepthsManager.getInstance().setPlayerLevelInAbility(BroodmothersWebbing.ABILITY_NAME, mPlayer, 0, false);
-		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+		DepthsManager.getInstance().setPlayerLevelInAbility(BroodmothersWebbing.ABILITY_NAME, mPlayer, mDepthsPlayer, 0, false, false);
+		DepthsParty party = DepthsManager.getInstance().getPartyFromId(mDepthsPlayer);
 		if (party == null) {
 			return;
 		}

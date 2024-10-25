@@ -35,11 +35,11 @@ public class OrbOfDarkness extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dm.setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		dm.setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 		for (DepthsAbilityInfo<?> dai : DepthsManager.getPrismaticAbilities()) {
 			String name = dai.getDisplayName();
-			if (dp.getLevelInAbility(name) > 0) {
-				dm.setPlayerLevelInAbility(name, player, 0, true, true);
+			if (dp.hasAbility(name)) {
+				dm.setPlayerLevelInAbility(name, player, dp, 0, true, true);
 				dp.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.TWISTED);
 				dp.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.TWISTED);
 			}

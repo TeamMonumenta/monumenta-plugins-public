@@ -23,14 +23,14 @@ public class PoetsQuillReplaceGUI extends AbstractDepthsSelectionGUI<DepthsTree>
 		if (mDepthsPlayer == null) {
 			return;
 		}
-		DepthsManager.getInstance().setPlayerLevelInAbility(PoetsQuill.ABILITY_NAME, mPlayer, 0, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(PoetsQuill.ABILITY_NAME, mPlayer, mDepthsPlayer, 0, false, false);
 		// remove old tree
 		mDepthsPlayer.mEligibleTrees.remove(mOldTree);
 		DepthsManager dm = DepthsManager.getInstance();
 		for (DepthsAbilityInfo<?> dai : DepthsManager.getAbilities()) {
 			String name = dai.getDisplayName();
-			if (mOldTree == dai.getDepthsTree() && mDepthsPlayer.getLevelInAbility(name) > 0) {
-				dm.setPlayerLevelInAbility(name, mPlayer, 0, true, true);
+			if (mOldTree == dai.getDepthsTree() && mDepthsPlayer.hasAbility(name)) {
+				dm.setPlayerLevelInAbility(name, mPlayer, mDepthsPlayer, 0, true, true);
 			}
 		}
 		// add new tree

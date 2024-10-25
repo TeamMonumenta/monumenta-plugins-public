@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -73,15 +74,21 @@ public class Rebirth extends DepthsAbility {
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 2, 1);
 	}
 
-	public void rerollAbilities(DepthsPlayer dp) {
+	public void rerollAbilities(Player player, DepthsPlayer dp) {
 		List<DepthsAbilityInfo<?>> playerAbilities = DepthsManager.getInstance().getPlayerAbilities(mPlayer);
 		boolean hasSwap = playerAbilities.stream().anyMatch(info -> info.getDepthsTrigger() == DepthsTrigger.SWAP && info != CurseOfAnchoring.INFO);
 
+		DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
+		if (party == null) {
+			return;
+		}
 		List<DepthsAbilityInfo<?>> eligibleAbilities = new ArrayList<>(
 			DepthsManager.getAbilities().stream()
 					.filter(info -> info.getDisplayName() != null
 							&& !info.getDisplayName().equals(ABILITY_NAME)
-							&& !info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT))
+							&& !info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT)
+							&& info.checkConditions(player, party)
+					)
 					.toList()
 		);
 
@@ -101,7 +108,10 @@ public class Rebirth extends DepthsAbility {
 				}
 			} else {
 				eligibleCopy.removeIf(info -> !info.getDepthsTrigger().equals(trigger));
-				eligibleCopy.removeIf(info -> info.getDepthsTree() == tree);
+				eligibleCopy.removeIf(info -> {
+					DepthsTree infoTree = info.getDepthsTree();
+					return infoTree == tree || infoTree == DepthsTree.CURSE || infoTree == DepthsTree.GIFT;
+				});
 			}
 			if (eligibleCopy.isEmpty()) {
 				return;
@@ -113,8 +123,8 @@ public class Rebirth extends DepthsAbility {
 			int level = dp.getLevelInAbility(abilityInfo.getDisplayName());
 			int finalLevel = level == 6 ? 6 : Math.min(5, level + UPGRADE_LEVELS);
 			// Remove the old ability, and add the new chosen ability
-			DepthsManager.getInstance().setPlayerLevelInAbility(abilityInfo.getDisplayName(), mPlayer, 0, false);
-			DepthsManager.getInstance().setPlayerLevelInAbility(chosenOne.getDisplayName(), mPlayer, finalLevel, false);
+			DepthsManager.getInstance().setPlayerLevelInAbility(abilityInfo.getDisplayName(), mPlayer, dp, 0, false, false);
+			DepthsManager.getInstance().setPlayerLevelInAbility(chosenOne.getDisplayName(), mPlayer, dp, finalLevel, false, false);
 		});
 
 		int[] chances = {80, 15, 5, 0, 0};

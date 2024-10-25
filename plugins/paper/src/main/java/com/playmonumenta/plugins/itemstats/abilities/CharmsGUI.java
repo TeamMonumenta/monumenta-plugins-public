@@ -27,6 +27,7 @@ public class CharmsGUI extends Gui {
 	private static final int START_OF_CHARMS = 45;
 	private final ItemStack AVAILABLE_CHARM_POWER_SLOT;
 	private final ItemStack UNAVAILABLE_CHARM_POWER_SLOT;
+	private final ItemStack UNAVAILABLE_CHARM_POWER_SLOT_ZENITH;
 	private final ItemStack CHARM_SLOT;
 	private final ItemStack EXIT;
 	private final ItemStack BACK_TO_PDGUI;
@@ -42,6 +43,11 @@ public class CharmsGUI extends Gui {
 			"Unlockable Charm Power",
 			NamedTextColor.RED,
 			"Progress further in the Architect's Ring to unlock more Charm Power.");
+
+		UNAVAILABLE_CHARM_POWER_SLOT_ZENITH = GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE,
+			"Purchasable Charm Power",
+			NamedTextColor.RED,
+			"Purchase more Charm Power in the Celestial Zenith lobby with Indigo Blightdust.");
 
 		CHARM_SLOT = GUIUtils.createBasicItem(Material.YELLOW_STAINED_GLASS_PANE,
 			"Available Charm Slot",
@@ -100,9 +106,11 @@ public class CharmsGUI extends Gui {
 
 	@Override
 	protected void setup() {
+		ItemStack unavailableItem = mCharmType == CharmManager.CharmType.NORMAL ? UNAVAILABLE_CHARM_POWER_SLOT : UNAVAILABLE_CHARM_POWER_SLOT_ZENITH;
+
 		setItem(0, 8, GUIUtils.createGuiIdentifierItem("gui_charms_1", mGuiTextures));
 		GUIUtils.setGuiNbtTag(AVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_1", mGuiTextures);
-		GUIUtils.setGuiNbtTag(UNAVAILABLE_CHARM_POWER_SLOT, "texture", "power_charms_2", mGuiTextures);
+		GUIUtils.setGuiNbtTag(unavailableItem, "texture", "power_charms_2", mGuiTextures);
 		GUIUtils.setGuiNbtTag(CHARM_SLOT, "texture", "slot_charms_1", mGuiTextures);
 		GUIUtils.setGuiNbtTag(EXIT, "texture", "exit_charms_1", mGuiTextures);
 		GUIUtils.setGuiNbtTag(BACK_TO_PDGUI, "texture", "back_charms_1", mGuiTextures);
@@ -134,7 +142,7 @@ public class CharmsGUI extends Gui {
 			if (i < totalBudget) {
 				setItem(y, x, AVAILABLE_CHARM_POWER_SLOT);
 			} else {
-				setItem(y, x, UNAVAILABLE_CHARM_POWER_SLOT);
+				setItem(y, x, unavailableItem);
 			}
 		}
 

@@ -344,7 +344,7 @@ public class DepthsListener implements Listener {
 		}
 
 		// Check if any other teammate is alive or has rebirth
-		boolean teammateAlive = party.mPlayersInParty.stream().anyMatch(depthsPlayer -> depthsPlayer != dp && (depthsPlayer.mGraveRunnable == null || depthsPlayer.getLevelInAbility(Rebirth.ABILITY_NAME) > 0));
+		boolean teammateAlive = party.mPlayersInParty.stream().anyMatch(depthsPlayer -> depthsPlayer != dp && (depthsPlayer.mGraveRunnable == null || depthsPlayer.hasAbility(Rebirth.ABILITY_NAME)));
 		if (teammateAlive && party.mDeathWaitingRoomPoint != null) {
 			event.setCancelled(true);
 
@@ -372,8 +372,8 @@ public class DepthsListener implements Listener {
 					player.teleport(waitingRoomLocation);
 
 					// cracked idol trigger loss
-					if (dp.getLevelInAbility(CrackedIdol.ABILITY_NAME) > 0) {
-						dm.setPlayerLevelInAbility(CrackedIdol.ABILITY_NAME, player, 0, false);
+					if (dp.hasAbility(CrackedIdol.ABILITY_NAME)) {
+						dm.setPlayerLevelInAbility(CrackedIdol.ABILITY_NAME, player, dp, 0, false, false);
 						player.playSound(player, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.0f, 0.6f);
 						player.playSound(player, Sound.BLOCK_GLASS_BREAK, 1.0f, 0.7f);
 						player.playSound(player, Sound.BLOCK_GLASS_BREAK, 1.0f, 0.8f);
@@ -613,7 +613,7 @@ public class DepthsListener implements Listener {
 		Rebirth rebirth = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Rebirth.class);
 		if (rebirth != null) {
 			rebirth.activationEffects();
-			rebirth.rerollAbilities(dp);
+			rebirth.rerollAbilities(player, dp);
 			rebirth.applyResistance();
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				if (!dp.doOfflineTeleport()) {

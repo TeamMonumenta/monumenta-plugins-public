@@ -43,7 +43,7 @@ public class Abnormality extends DepthsAbility {
 		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.CURSE);
 		dp.mRerolls++;
 
-		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	public static Description<Abnormality> getDescription(int rarity, TextColor color) {

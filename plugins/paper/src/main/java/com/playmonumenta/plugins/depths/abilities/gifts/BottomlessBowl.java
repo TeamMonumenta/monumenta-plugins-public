@@ -43,24 +43,20 @@ public class BottomlessBowl extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getDamager() instanceof Player player) {
-			DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
-			if (dp != null) {
-				double damageMultiplier = 1 + (dp.mRewardSkips * 0.05);
-				event.updateDamageWithMultiplier(damageMultiplier);
-			}
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
+		if (dp != null) {
+			double damageMultiplier = 1 + (dp.mRewardSkips * 0.05);
+			event.updateDamageWithMultiplier(damageMultiplier);
 		}
 		return false;
 	}
 
 	@Override
 	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
-		if (event.getEntity() instanceof Player player) {
-			DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
-			if (dp != null) {
-				double healMultiplier = 1 + (dp.mRewardSkips * 0.05);
-				event.setAmount(event.getAmount() * healMultiplier);
-			}
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
+		if (dp != null) {
+			double healMultiplier = 1 + (dp.mRewardSkips * 0.05);
+			event.setAmount(event.getAmount() * healMultiplier);
 		}
 	}
 }

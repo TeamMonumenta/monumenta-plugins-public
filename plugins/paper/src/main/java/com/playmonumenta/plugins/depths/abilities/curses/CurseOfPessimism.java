@@ -74,7 +74,7 @@ public class CurseOfPessimism extends DepthsAbility {
 
 	private static Description<CurseOfPessimism> getDescription() {
 		return new DescriptionBuilder<CurseOfPessimism>()
-			.add("While any other member of party is below ")
+			.add("While any other member of your party is below ")
 			.addPercent(HEALTH_THRESHOLD)
 			.add(" health, you cannot heal above ")
 			.addPercent(HEALTH_THRESHOLD)

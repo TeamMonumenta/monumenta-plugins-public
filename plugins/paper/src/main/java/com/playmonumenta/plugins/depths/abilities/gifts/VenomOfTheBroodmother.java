@@ -38,7 +38,7 @@ public class VenomOfTheBroodmother extends DepthsAbility {
 			return;
 		}
 		dp.mNumDeaths = 0;
-		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<VenomOfTheBroodmother> getDescription() {

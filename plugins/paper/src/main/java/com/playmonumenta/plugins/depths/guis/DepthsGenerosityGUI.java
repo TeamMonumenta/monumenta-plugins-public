@@ -43,7 +43,7 @@ public class DepthsGenerosityGUI extends AbstractDepthsRewardGUI {
 					    .filter(abilityInfo -> !Objects.equals(abilityInfo.getDisplayName(), item.mAbility))
 					    .filter(abilityInfo -> !abilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
 					    .noneMatch(abilityInfo -> abilityInfo.getDepthsTrigger().equals(item.mTrigger))) {
-				DepthsManager.getInstance().setPlayerLevelInAbility(item.mAbility, mPlayer, item.mRarity);
+				DepthsManager.getInstance().setPlayerLevelInAbility(item.mAbility, mPlayer, dp, item.mRarity, true, false);
 			}
 		}
 		dp.mGenerosityGifts.remove(0);

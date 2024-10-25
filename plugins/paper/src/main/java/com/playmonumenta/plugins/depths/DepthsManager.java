@@ -491,31 +491,29 @@ public class DepthsManager {
 	}
 
 	public void setPlayerLevelInAbility(@Nullable String name, Player p, int level) {
-		setPlayerLevelInAbility(name, p, level, true);
-	}
-
-	public void setPlayerLevelInAbility(@Nullable String name, Player p, int level, boolean announceToTeam) {
-		setPlayerLevelInAbility(name, p, level, announceToTeam, false);
+		DepthsPlayer dp = getDepthsPlayer(p);
+		if (dp == null) {
+			return;
+		}
+		setPlayerLevelInAbility(name, p, dp, level, true, false);
 	}
 
 	/**
 	 * Sets the player level in a specific ability
 	 *
-	 * @param name  the name of the ability's ABILITY_NAME attribute. Needs to be exact!
-	 * @param p     the player to give it to
-	 * @param level the rarity level of the ability
+	 * @param name              the name of the ability's ABILITY_NAME attribute. Needs to be exact!
+	 * @param p                 the player to give it to
+	 * @param dp                the player's DepthsPlayer
+	 * @param level             the rarity level of the ability
+	 * @param announceToTeam    if the team should be notified in chat
+	 * @param announceToSelf    if the player should notified in chat
 	 */
-	public void setPlayerLevelInAbility(@Nullable String name, Player p, int level, boolean announceToTeam, boolean announceToSelf) {
+	public void setPlayerLevelInAbility(@Nullable String name, Player p, DepthsPlayer dp, int level, boolean announceToTeam, boolean announceToSelf) {
 		if (name == null) {
 			return;
 		}
 		DepthsAbilityInfo<?> info = getAbility(name);
 		if (info == null) {
-			return;
-		}
-
-		DepthsPlayer dp = getDepthsPlayer(p);
-		if (dp == null) {
 			return;
 		}
 
@@ -867,7 +865,7 @@ public class DepthsManager {
 				}
 
 				// cracked idol ability rarity trigger
-				if (dp.getLevelInAbility(CrackedIdol.ABILITY_NAME) > 0) {
+				if (dp.hasAbility(CrackedIdol.ABILITY_NAME)) {
 					roll += 10;
 				}
 
@@ -950,7 +948,7 @@ public class DepthsManager {
 				initItems(List.of(dp.mPointedHatTree), p, dp);
 				dp.mPointedHatStacks--;
 				if (dp.mPointedHatStacks == 0) {
-					setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, 0, false);
+					setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, dp, 0, false, false);
 					dp.mPointedHatTree = null;
 				}
 			} else {
@@ -997,7 +995,7 @@ public class DepthsManager {
 			}
 			if (allowedAbilities.contains(item.mAbility)) {
 				// comb of selection trigger
-				if (dp.getLevelInAbility(CombOfSelection.ABILITY_NAME) > 0) {
+				if (dp.hasAbility(CombOfSelection.ABILITY_NAME)) {
 					if (index < dp.mCombOfSelectionLevels.size()) {
 						// assigning item.mRarity does not change description, easier to make new item
 						int newRarity = dp.mCombOfSelectionLevels.get(index);
@@ -1035,6 +1033,10 @@ public class DepthsManager {
 	 * @param slot the index to give from their offerings array
 	 */
 	public void playerChoseItem(Player p, int slot, boolean sendMessage) {
+		DepthsPlayer dp = getDepthsPlayer(p);
+		if (dp == null) {
+			return;
+		}
 		List<DepthsAbilityItem> itemChoices = mAbilityOfferings.get(p.getUniqueId());
 		if (itemChoices == null || slot >= itemChoices.size()) {
 			return;
@@ -1043,13 +1045,10 @@ public class DepthsManager {
 		if (choice == null || choice.mAbility == null) {
 			return;
 		}
-		setPlayerLevelInAbility(choice.mAbility, p, choice.mRarity, true, sendMessage);
+		setPlayerLevelInAbility(choice.mAbility, p, dp, choice.mRarity, true, sendMessage);
 		mAbilityOfferings.remove(p.getUniqueId());
-		DepthsPlayer dp = getDepthsPlayer(p);
-		if (dp != null) {
-			dp.mEarnedRewards.poll();
-			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		}
+		dp.mEarnedRewards.poll();
+		p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 	}
 
 	/**
@@ -1059,14 +1058,13 @@ public class DepthsManager {
 	 * @param slot which element in the array they picked
 	 */
 	public void playerChoseWeaponAspect(Player p, int slot) {
-
 		DepthsPlayer dp = getDepthsPlayer(p);
-		if (dp != null) {
-			dp.mHasWeaponAspect = true;
-			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		} else {
+		if (dp == null) {
 			return;
 		}
+
+		dp.mHasWeaponAspect = true;
+		p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
 		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> options = dp.mWeaponOfferings;
 		if (options == null) {
@@ -1087,7 +1085,7 @@ public class DepthsManager {
 			boolean twisted = DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH;
 			getRandomAbility(p, dp, chances, null, twisted);
 		}
-		setPlayerLevelInAbility(displayName, p, 1);
+		setPlayerLevelInAbility(displayName, p, dp, 1, true, false);
 	}
 
 	/**
@@ -1386,11 +1384,11 @@ public class DepthsManager {
 			if (party.mTreasureMapRooms.isEmpty()) {
 				party.mPlayersInParty.forEach((dp) -> {
 					Player p = dp.getPlayer();
-					if (p != null && dp.getLevelInAbility(TreasureMap.ABILITY_NAME) > 0) {
+					if (p != null && dp.hasAbility(TreasureMap.ABILITY_NAME)) {
 						dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find a prismatic ability reward!");
 						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
 						TreasureMap.playSounds(p);
-						setPlayerLevelInAbility(TreasureMap.ABILITY_NAME, p, 0, false);
+						setPlayerLevelInAbility(TreasureMap.ABILITY_NAME, p, dp, 0, false, false);
 					}
 				});
 			}
@@ -1401,14 +1399,14 @@ public class DepthsManager {
 			incrementTreasure(null, player, 1);
 			roomType = getWildcardRoomType();
 			// wild card trigger
-			party.mPlayersInParty.forEach((dp) -> {
-				if (dp.getLevelInAbility(WildCard.ABILITY_NAME) > 0) {
+			for (DepthsPlayer dp : party.mPlayersInParty) {
+				if (dp.hasAbility(WildCard.ABILITY_NAME)) {
 					Player p = dp.getPlayer();
 					if (p != null) {
 						increaseRandomAbilityLevel(p, dp, 1);
 					}
 				}
-			});
+			}
 		}
 
 		World world = player.getWorld();
@@ -1617,6 +1615,10 @@ public class DepthsManager {
 	 */
 	public void playerUpgradedItem(Player p, int slot, boolean sendMessage) {
 		UUID uuid = p.getUniqueId();
+		DepthsPlayer dp = getDepthsPlayer(uuid);
+		if (dp == null) {
+			return;
+		}
 		List<DepthsAbilityItem> itemChoices = mUpgradeOfferings.get(uuid);
 		if (itemChoices == null) {
 			return;
@@ -1625,13 +1627,10 @@ public class DepthsManager {
 			return;
 		}
 		DepthsAbilityItem choice = itemChoices.get(slot);
-		setPlayerLevelInAbility(choice.mAbility, p, choice.mRarity, true, sendMessage);
+		setPlayerLevelInAbility(choice.mAbility, p, dp, choice.mRarity, true, sendMessage);
 		mUpgradeOfferings.remove(uuid);
-		DepthsPlayer dp = getDepthsPlayer(uuid);
-		if (dp != null) {
-			dp.mEarnedRewards.poll();
-			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		}
+		dp.mEarnedRewards.poll();
+		p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 	}
 
 	/**
@@ -1704,10 +1703,8 @@ public class DepthsManager {
 	 * @param fromCurse if true, don't use up the chaos room for this floor and don't be stopped by it
 	 */
 	public void chaos(Player p, boolean fromCurse) {
-
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp == null) {
-			DepthsUtils.sendFormattedMessage(p, DepthsContent.DARKEST_DEPTHS, "Player not in depths system");
 			return;
 		}
 		if (dp.mUsedChaosThisFloor && !fromCurse) {
@@ -1741,7 +1738,7 @@ public class DepthsManager {
 		DepthsAbilityInfo<?> info = getAbility(removedAbility);
 		boolean isMutated = info != null && !dp.mEligibleTrees.contains(info.getDepthsTree());
 
-		setPlayerLevelInAbility(removedAbility, p, 0, true, true);
+		setPlayerLevelInAbility(removedAbility, p, dp, 0, true, true);
 
 		if (!fromCurse) {
 			dp.mUsedChaosThisFloor = true;
@@ -1773,7 +1770,7 @@ public class DepthsManager {
 					} else {
 						newLevel = removedLevel;
 					}
-					setPlayerLevelInAbility(da.getDisplayName(), p, newLevel, true, true);
+					setPlayerLevelInAbility(da.getDisplayName(), p, dp, newLevel, true, true);
 					break;
 				}
 			}
@@ -1869,13 +1866,13 @@ public class DepthsManager {
 				return;
 			} else {
 				for (DepthsPlayer playerInParty : party.mPlayersInParty) {
-					Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
+					Player player = playerInParty.getPlayer();
 					if (player == null || !player.isOnline()) {
 						continue;
 					}
 					//Transform mystery box if applicable
-					if (dp.getLevelInAbility(RandomAspect.ABILITY_NAME) > 0) {
-						transformMysteryBox(player);
+					if (dp.hasAbility(RandomAspect.ABILITY_NAME)) {
+						transformMysteryBox(player, dp);
 					}
 					//Set score
 					ScoreboardUtils.setScoreboardValue(player, "Depths",
@@ -1887,7 +1884,7 @@ public class DepthsManager {
 		} else if (party.mContent == DepthsContent.CELESTIAL_ZENITH) {
 			// avaricious pendant trigger
 			party.mPlayersInParty.forEach((depthsPlayer) -> {
-				if (depthsPlayer.getLevelInAbility(AvariciousPendant.ABILITY_NAME) > 0) {
+				if (depthsPlayer.hasAbility(AvariciousPendant.ABILITY_NAME)) {
 					AvariciousPendant.increaseTreasure(depthsPlayer);
 				}
 			});
@@ -1900,17 +1897,19 @@ public class DepthsManager {
 			party.mPlayersInParty.forEach(dp2 -> {
 				dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
 				// broken clock trigger
-				if (dp2.getLevelInAbility(BrokenClock.ABILITY_NAME) > 0) {
+				if (dp2.hasAbility(BrokenClock.ABILITY_NAME)) {
 					Player p2 = dp.getPlayer();
 					if (p2 != null) {
 						dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
 						dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
 						BrokenClock.playSound(p2);
-						setPlayerLevelInAbility(BrokenClock.ABILITY_NAME, p2, 0, false);
+						setPlayerLevelInAbility(BrokenClock.ABILITY_NAME, p2, dp2, 0, false, false);
 					}
 				}
 			});
-			party.sendMessage("You received a celestial gift for clearing the floor! Check your trinket to see the upgrade.");
+			party.sendMessage(Component.text("You received a ")
+				.append(DepthsTree.GIFT.getNameComponent())
+				.append(Component.text(" for clearing the floor! Check your Trinket to claim the gift.")));
 
 			// Give delve points for ascension level
 			if (partyFloor == 1 && party.getAscension() > 0) {
@@ -1952,13 +1951,14 @@ public class DepthsManager {
 	 * The level 2 denotes that it is being transformed rather than selected (the aspects are not leveled)
 	 *
 	 * @param player the player to transform the ability of
+	 * @param dp the player's DepthsPlayer
 	 */
-	private void transformMysteryBox(Player player) {
-		setPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player, 0, false);
+	private void transformMysteryBox(Player player, DepthsPlayer dp) {
+		setPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player, dp, 0, false, false);
 		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> aspects = new ArrayList<>(getWeaponAspects());
 		aspects.remove(RandomAspect.INFO);
 		DepthsAbilityInfo<?> info = FastUtils.getRandomElement(aspects);
-		setPlayerLevelInAbility(info.getDisplayName(), player, 2, true, true);
+		setPlayerLevelInAbility(info.getDisplayName(), player, dp, 2, true, true);
 	}
 
 	/**
@@ -2058,7 +2058,7 @@ public class DepthsManager {
 					}
 				}
 
-				setPlayerLevelInAbility(da.getDisplayName(), p, rarity, true, sendMessage);
+				setPlayerLevelInAbility(da.getDisplayName(), p, dp, rarity, true, sendMessage);
 				break;
 			}
 		}
@@ -2082,7 +2082,7 @@ public class DepthsManager {
 		}
 		Collections.shuffle(abilities);
 		DepthsAbilityInfo<?> newAbility = abilities.get(0);
-		setPlayerLevelInAbility(Objects.requireNonNull(newAbility.getDisplayName()), p, 1, true, true);
+		setPlayerLevelInAbility(Objects.requireNonNull(newAbility.getDisplayName()), p, dp, 1, true, true);
 	}
 
 	/**
@@ -2168,8 +2168,8 @@ public class DepthsManager {
 				for (DepthsAbilityInfo<?> da : getAbilities()) {
 					String name = da.getDisplayName();
 					DepthsTree tree = da.getDepthsTree();
-					if (tree == chosenTree && dp.getLevelInAbility(name) > 0) {
-						setPlayerLevelInAbility(name, player, 0, true, true);
+					if (tree == chosenTree && dp.hasAbility(name)) {
+						setPlayerLevelInAbility(name, player, dp, 0, true, true);
 						validateOfferings(dp, name);
 						removed = true;
 					}
@@ -2184,7 +2184,7 @@ public class DepthsManager {
 					if (level < 5 && level > 0) {
 						DepthsAbilityInfo<?> info = getAbility(ability);
 						if (info != null && info.getHasLevels()) {
-							setPlayerLevelInAbility(ability, player, Math.min(5, level + 2), false);
+							setPlayerLevelInAbility(ability, player, dp, Math.min(5, level + 2), false, false);
 						}
 					}
 
@@ -2224,7 +2224,7 @@ public class DepthsManager {
 						index++;
 					}
 
-					setPlayerLevelInAbility(abilityToUpgrade, player, 6, true, true);
+					setPlayerLevelInAbility(abilityToUpgrade, player, dp, 6, true, true);
 					validateOfferings(dp, abilityToUpgrade);
 				}
 				break;
@@ -2252,7 +2252,7 @@ public class DepthsManager {
 					if (level > 1 && level < 6) {
 						DepthsAbilityInfo<?> info = getAbility(ability);
 						if (info != null && info.getHasLevels()) {
-							setPlayerLevelInAbility(ability, player, Math.max(1, level - 1), false);
+							setPlayerLevelInAbility(ability, player, dp, Math.max(1, level - 1), false, false);
 						}
 					}
 				});
@@ -2401,7 +2401,7 @@ public class DepthsManager {
 			// do not upgrade to twisted and do not remove the ability
 			int newLevel = Math.min(Math.max(level + amount, 1), 5);
 			if (level != newLevel) {
-				setPlayerLevelInAbility(ability, player, newLevel, true, true);
+				setPlayerLevelInAbility(ability, player, dp, newLevel, true, true);
 				return;
 			}
 		}

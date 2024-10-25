@@ -18,19 +18,19 @@ public class DepthsRemoveAbilityGUI extends AbstractDepthsAbilityUtilityGUI {
 	}
 
 	@Override
-	public void onConfirm(Player player, DepthsPlayer depthsPlayer, DepthsAbilityInfo<?> ability) {
-		if (!depthsPlayer.mUsedAbilityDeletion) {
-			depthsPlayer.mUsedAbilityDeletion = true;
+	public void onConfirm(Player player, DepthsPlayer dp, DepthsAbilityInfo<?> ability) {
+		if (!dp.mUsedAbilityDeletion) {
+			dp.mUsedAbilityDeletion = true;
 			String removedAbility = ability.getDisplayName();
-			DepthsManager.getInstance().setPlayerLevelInAbility(removedAbility, player, 0);
+			DepthsManager.getInstance().setPlayerLevelInAbility(removedAbility, player, dp, 0, true, false);
 			player.closeInventory();
 			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			MessagingUtils.sendActionBarMessage(player, "Ability removed!");
 
-			DepthsManager.getInstance().validateOfferings(depthsPlayer, removedAbility);
+			DepthsManager.getInstance().validateOfferings(dp, removedAbility);
 
 			//Trigger Generosity if applicable
-			Generosity.abilityRemoved(depthsPlayer, removedAbility);
+			Generosity.abilityRemoved(dp, removedAbility);
 		}
 	}
 

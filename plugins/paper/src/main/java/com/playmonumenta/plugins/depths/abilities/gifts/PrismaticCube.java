@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -28,13 +29,17 @@ public class PrismaticCube extends DepthsAbility {
 
 	private static void gain(Player player) {
 		DepthsManager dm = DepthsManager.getInstance();
+		DepthsPlayer dp = dm.getDepthsPlayer(player);
+		if (dp == null) {
+			return;
+		}
 		Pair<String, String> prismaticReplacement = dm.getRandomReplaceablePrismatic(player);
 		if (prismaticReplacement != null) {
-			int oldRarity = dm.getPlayerLevelInAbility(prismaticReplacement.getFirst(), player);
-			dm.setPlayerLevelInAbility(prismaticReplacement.getFirst(), player, 0, true, true);
-			dm.setPlayerLevelInAbility(prismaticReplacement.getSecond(), player, oldRarity, true, true);
+			int oldRarity = dp.getLevelInAbility(prismaticReplacement.getFirst());
+			dm.setPlayerLevelInAbility(prismaticReplacement.getFirst(), player, dp, 0, true, true);
+			dm.setPlayerLevelInAbility(prismaticReplacement.getSecond(), player, dp, oldRarity, true, true);
 		}
-		dm.setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		dm.setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<PrismaticCube> getDescription() {

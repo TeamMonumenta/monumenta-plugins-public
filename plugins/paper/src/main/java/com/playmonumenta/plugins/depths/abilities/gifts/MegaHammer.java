@@ -41,13 +41,13 @@ public class MegaHammer extends DepthsAbility {
 			if (level == 1 || level == 2) {
 				DepthsAbilityInfo<?> info = dm.getAbility(ability);
 				if (info != null && info.getHasLevels()) {
-					dm.setPlayerLevelInAbility(ability, player, 4, false);
+					dm.setPlayerLevelInAbility(ability, player, dp, 4, false, false);
 				}
 			}
 		});
 		party.sendMessage(player.getName() + " used a MEGA HAMMER and upgraded their common and uncommon abilities to epic level!");
 		player.playSound(player, Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.0f, 0.6f);
-		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<MegaHammer> getDescription() {

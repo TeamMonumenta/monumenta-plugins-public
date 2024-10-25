@@ -49,7 +49,7 @@ public abstract class AbstractDepthsSelectionGUI<T> extends Gui {
 			if (DepthsRoomType.DepthsRewardType.GIFT_REWARDS.contains(mDepthsPlayer.mEarnedRewards.peek())) {
 				mDepthsPlayer.mEarnedRewards.poll();
 			}
-			DepthsManager.getInstance().setPlayerLevelInAbility(mGiftAbility, mPlayer, 0, false);
+			DepthsManager.getInstance().setPlayerLevelInAbility(mGiftAbility, mPlayer, mDepthsPlayer, 0, false, false);
 			return;
 		}
 		int n = mSelections.size();

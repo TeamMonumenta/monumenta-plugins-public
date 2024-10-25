@@ -18,20 +18,20 @@ public class DepthsMutateAbilityGUI extends AbstractDepthsAbilityUtilityGUI {
 	}
 
 	@Override
-	public void onConfirm(Player player, DepthsPlayer depthsplayer, DepthsAbilityInfo<?> ability) {
-		if (!depthsplayer.mUsedAbilityMutation) {
-			depthsplayer.mUsedAbilityMutation = true;
+	public void onConfirm(Player player, DepthsPlayer dp, DepthsAbilityInfo<?> ability) {
+		if (!dp.mUsedAbilityMutation) {
+			dp.mUsedAbilityMutation = true;
 			String removedAbility = ability.getDisplayName();
-			DepthsManager.getInstance().setPlayerLevelInAbility(removedAbility, player, 0);
+			DepthsManager.getInstance().setPlayerLevelInAbility(removedAbility, player, dp, 0, true, false);
 			player.closeInventory();
-			DepthsManager.getInstance().getMutatedAbility(player, depthsplayer, ability);
+			DepthsManager.getInstance().getMutatedAbility(player, dp, ability);
 			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			MessagingUtils.sendActionBarMessage(player, "Ability mutated!");
 
-			DepthsManager.getInstance().validateOfferings(depthsplayer, removedAbility);
+			DepthsManager.getInstance().validateOfferings(dp, removedAbility);
 
 			//Trigger Generosity if applicable
-			Generosity.abilityRemoved(depthsplayer, removedAbility);
+			Generosity.abilityRemoved(dp, removedAbility);
 		}
 	}
 

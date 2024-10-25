@@ -106,14 +106,14 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 					DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
 					DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
 					// comb of selection trigger increase rarities
-					if (depthsPlayer.getLevelInAbility(CombOfSelection.ABILITY_NAME) > 0) {
+					if (depthsPlayer.hasAbility(CombOfSelection.ABILITY_NAME)) {
 						depthsPlayer.mCombOfSelectionLevels.replaceAll(integer -> Math.min(integer + 1, 5));
 					}
 					DepthsManager.getInstance().getRoomReward(mPlayer, null, mReturnToSummary);
 				}));
 			}
 
-			if ((depthsPlayer.getLevelInAbility(BottomlessBowl.ABILITY_NAME) > 0 || depthsPlayer.getLevelInAbility(RainbowGeode.ABILITY_NAME) > 0)
+			if ((depthsPlayer.hasAbility(BottomlessBowl.ABILITY_NAME) || depthsPlayer.hasAbility(RainbowGeode.ABILITY_NAME))
 				&& !depthsPlayer.mEarnedRewards.isEmpty() && depthsPlayer.mEarnedRewards.peek() != DepthsRoomType.DepthsRewardType.CURSE) {
 				ItemStack item = GUIUtils.createBasicItem(Material.BARRIER, 1, "Skip", NamedTextColor.RED, true, Component.text("Click to skip these options.", NamedTextColor.GRAY), 30, true);
 				setItem(2, 8, new GuiItem(item).onLeftClick(() -> {
@@ -123,7 +123,7 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 					DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
 					depthsPlayer.mEarnedRewards.poll();
 					depthsPlayer.mRewardSkips++;
-					if (depthsPlayer.mRewardSkips % 3 == 0 && depthsPlayer.getLevelInAbility(RainbowGeode.ABILITY_NAME) > 0) {
+					if (depthsPlayer.mRewardSkips % 3 == 0 && depthsPlayer.hasAbility(RainbowGeode.ABILITY_NAME)) {
 						depthsPlayer.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.PRISMATIC);
 						mPlayer.playSound(mPlayer, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.6f);
 					}

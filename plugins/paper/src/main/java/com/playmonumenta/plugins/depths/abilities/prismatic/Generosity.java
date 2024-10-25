@@ -60,13 +60,14 @@ public class Generosity extends DepthsAbility {
 		boolean foundPlayer = false;
 		if (party != null && removedAbilityInfo != null && removedPlayer != null) {
 			DepthsAbilityInfo<?> finalRemovedAbilityInfo = removedAbilityInfo;
+			boolean hasLevels = finalRemovedAbilityInfo.getHasLevels();
 			for (DepthsPlayer dp : party.mPlayersInParty) {
 				Player otherPlayer = dp.getPlayer();
 				if (otherPlayer == null || dp == depthsPlayer) {
 					continue;
 				}
 				int currentLevel = dp.getLevelInAbility(removedAbility);
-				if (currentLevel < generosityLevel &&
+				if (((hasLevels && currentLevel < generosityLevel) || currentLevel == 0) &&
 					DepthsManager.getInstance().getPlayerAbilities(otherPlayer).stream()
 						.filter(abilityInfo -> abilityInfo != finalRemovedAbilityInfo)
 						.filter(abilityInfo -> !abilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
@@ -77,7 +78,13 @@ public class Generosity extends DepthsAbility {
 					dp.mGenerosityGifts.add(removedAbilityInfo.getAbilityItem(generosityLevel, otherPlayer, currentLevel));
 					otherPlayer.playSound(otherPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					Component abilityName = DepthsManager.getInstance().colorAbilityWithHover(removedAbility, generosityLevel, 0, otherPlayer);
-					dp.sendMessage(removedPlayer.displayName().append(Component.text(" has generously gifted you: ")).append(abilityName).append(Component.text(" at ")).append(DepthsUtils.getRarityComponent(generosityLevel)).append(Component.text(" level! You can accept the gift in the rewards in your trinket.")));
+					Component atLevel;
+					if (hasLevels) {
+						atLevel = Component.text(" at ").append(DepthsUtils.getRarityComponent(generosityLevel)).append(Component.text(" level"));
+					} else {
+						atLevel = Component.text(" ");
+					}
+					dp.sendMessage(removedPlayer.displayName().append(Component.text(" has generously gifted you: ")).append(abilityName).append(atLevel).append(Component.text("! You can accept the gift in the rewards in your trinket.")));
 				}
 			}
 		}

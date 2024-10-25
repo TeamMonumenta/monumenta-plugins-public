@@ -302,6 +302,13 @@ public class DepthsPlayer {
 		return mAbilities.getOrDefault(abilityName, 0);
 	}
 
+	public boolean hasAbility(@Nullable String abilityName) {
+		if (abilityName == null) {
+			return false;
+		}
+		return mAbilities.containsKey(abilityName);
+	}
+
 	public List<String> getSolarRayUniqueMobNames() {
 		return mSolarRayUniqueMobNames;
 	}

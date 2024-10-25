@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.gifts.BottomlessBowl;
+import com.playmonumenta.plugins.depths.abilities.gifts.RainbowGeode;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -83,9 +85,12 @@ public class DepthsGUICommands {
 
 		if (items == null || items.isEmpty()) {
 			MessagingUtils.sendActionBarMessage(player, "No abilities to choose from.");
-			DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
-			if (depthsPlayer != null) {
-				depthsPlayer.mEarnedRewards.poll();
+			DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
+			if (dp != null) {
+				dp.mEarnedRewards.poll();
+				if (dp.hasAbility(BottomlessBowl.ABILITY_NAME) || dp.hasAbility(RainbowGeode.ABILITY_NAME)) {
+					dp.mRewardSkips++;
+				}
 			}
 			return;
 		}
@@ -98,6 +103,9 @@ public class DepthsGUICommands {
 			MessagingUtils.sendActionBarMessage(player, "No Generosity gift available.");
 			if (dp != null) {
 				dp.mEarnedRewards.poll();
+				if (dp.hasAbility(BottomlessBowl.ABILITY_NAME) || dp.hasAbility(RainbowGeode.ABILITY_NAME)) {
+					dp.mRewardSkips++;
+				}
 			}
 			return;
 		}

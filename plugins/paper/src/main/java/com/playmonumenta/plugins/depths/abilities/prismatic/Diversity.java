@@ -57,7 +57,7 @@ public class Diversity extends DepthsAbility {
 				Set<DepthsTree> uniqueTrees = DepthsManager.getInstance().getPlayerAbilities(player).stream()
 					.map(DepthsAbilityInfo::getDepthsTree)
 					.filter(Objects::nonNull) // Weapon Aspects have null tree
-					.filter(depthsTree -> depthsTree != DepthsTree.CURSE)
+					.filter(depthsTree -> depthsTree != DepthsTree.CURSE && depthsTree != DepthsTree.GIFT)
 					.collect(Collectors.toSet());
 
 				mTreeCount = Math.min(uniqueTrees.size(), TREES_REQUIRED);

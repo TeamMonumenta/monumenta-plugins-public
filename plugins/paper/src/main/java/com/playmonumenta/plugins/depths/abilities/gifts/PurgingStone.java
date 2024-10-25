@@ -47,14 +47,14 @@ public class PurgingStone extends DepthsAbility {
 				if (level > 1 && level < 6) {
 					DepthsAbilityInfo<?> info = dm.getAbility(ability);
 					if (info != null && info.getHasLevels()) {
-						dm.setPlayerLevelInAbility(ability, player, Math.max(1, level - 1), false);
+						dm.setPlayerLevelInAbility(ability, player, dp, Math.max(1, level - 1), false, false);
 					}
 				}
 			});
 			party.sendMessage(player.getName() + " downgraded all their abilities by a level!");
-			dm.setPlayerLevelInAbility(FastUtils.getRandomElement(curses), player, 0, true, true);
+			dm.setPlayerLevelInAbility(FastUtils.getRandomElement(curses), player, dp, 0, true, true);
 		}
-		dm.setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		dm.setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<PurgingStone> getDescription() {

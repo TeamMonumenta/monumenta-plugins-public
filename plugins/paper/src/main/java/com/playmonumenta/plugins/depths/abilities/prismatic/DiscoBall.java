@@ -212,21 +212,7 @@ public class DiscoBall extends DepthsAbility {
 				if (depthsParty == null) {
 					return false;
 				}
-
-				Set<DepthsTree> globalDepthsTrees = new HashSet<>();
-				depthsParty.mPlayersInParty.forEach(dPlayer -> {
-					List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer.getPlayer());
-					Set<DepthsTree> activeTrees = abilities.stream()
-						.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
-						.map(DepthsAbilityInfo::getDepthsTree)
-						.filter(Objects::nonNull) // Weapon Aspects have null tree
-						.filter(tree -> tree != DepthsTree.CURSE)
-						.collect(Collectors.toSet());
-					globalDepthsTrees.addAll(activeTrees);
-				});
-				// If there are 8 different trees in the Set, it means at least one active ability in each of them
-				// is owned across the entire party.
-				return globalDepthsTrees.size() >= 8;
+				return countTrees(depthsParty) >= 8;
 			}
 
 			public void doFinalBlast() {
@@ -257,6 +243,21 @@ public class DiscoBall extends DepthsAbility {
 				}.runTaskTimer(Plugin.getInstance(), 0, 2));
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1));
+	}
+
+	private static int countTrees(DepthsParty party) {
+		Set<DepthsTree> globalDepthsTrees = new HashSet<>();
+		party.mPlayersInParty.forEach(dPlayer -> {
+			List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer.getPlayer());
+			Set<DepthsTree> activeTrees = abilities.stream()
+				.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
+				.map(DepthsAbilityInfo::getDepthsTree)
+				.filter(Objects::nonNull) // Weapon Aspects have null tree
+				.filter(tree -> tree != DepthsTree.CURSE)
+				.collect(Collectors.toSet());
+			globalDepthsTrees.addAll(activeTrees);
+		});
+		return globalDepthsTrees.size();
 	}
 
 	@Override
@@ -335,7 +336,8 @@ public class DiscoBall extends DepthsAbility {
 				if (party == null) {
 					return Component.empty();
 				}
-				return Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1));
+				return Component.text("\nCurrent: " + countTrees(party) + "/8 trees")
+					.append(Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1)));
 			});
 	}
 }

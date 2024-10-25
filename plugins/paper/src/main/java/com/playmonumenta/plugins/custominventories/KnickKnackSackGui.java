@@ -570,7 +570,7 @@ public class KnickKnackSackGui extends Gui {
 
 		ItemStack talisman = makeTrinketItemStack(t.mPath);
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, t.mUnlockObjective).orElse(0) >= 1) {
-			GUIUtils.splitLoreLine(talisman, "Click to increase " + t.mTreeName + " tree odds to 75%. (100% in normal or rigged runs)", NamedTextColor.GRAY, true);
+			GUIUtils.splitLoreLine(talisman, "Click to guarantee the " + t.mTreeName + " tree as one of the options at the beginning of the dungeon.", NamedTextColor.GRAY, true);
 			return new GuiItem(talisman)
 				.onClick((evt) -> {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);

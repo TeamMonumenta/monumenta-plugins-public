@@ -218,7 +218,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		}
 
 		// Make sure the player doesn't have this ability already
-		if (dp.getLevelInAbility(getDisplayName()) > 0) {
+		if (dp.hasAbility(getDisplayName())) {
 			return false;
 		}
 
@@ -231,15 +231,10 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		if (mDepthsTrigger != DepthsTrigger.PASSIVE) {
 			for (DepthsAbilityInfo<?> ability : DepthsManager.getAbilities()) {
 				// Iterate over abilities and return false if the player has an ability with the same trigger already
-				if (ability.getDepthsTrigger() == mDepthsTrigger && dp.getLevelInAbility(ability.getDisplayName()) > 0) {
+				if (ability.getDepthsTrigger() == mDepthsTrigger && dp.hasAbility(ability.getDisplayName())) {
 					return false;
 				}
 			}
-		}
-
-		// check offerable predicate
-		if (!mOfferable.test(player)) {
-			return false;
 		}
 
 		//Skip passive abilities if they have wand aspect charges
@@ -251,7 +246,11 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		if (party == null) {
 			return false;
 		}
-		return mFloors.test(party.getFloor());
+		return checkConditions(player, party);
+	}
+
+	public boolean checkConditions(Player player, DepthsParty party) {
+		return mOfferable.test(player) && mFloors.test(party.getFloor());
 	}
 
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {

@@ -35,7 +35,7 @@ public class CelestialSurprise extends DepthsAbility {
 		int[] chances = {100, 0, 0, 0, 0};
 		dm.getRandomAbility(player, dp, chances, DepthsTree.GIFT, false);
 		dm.getRandomAbility(player, dp, chances, DepthsTree.GIFT, false);
-		dm.setPlayerLevelInAbility(ABILITY_NAME, player, 0, false);
+		dm.setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<CelestialSurprise> getDescription() {

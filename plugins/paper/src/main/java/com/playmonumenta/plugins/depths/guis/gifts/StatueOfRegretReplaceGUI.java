@@ -27,21 +27,21 @@ public class StatueOfRegretReplaceGUI extends AbstractDepthsSelectionGUI<DepthsA
 
 	@Override
 	protected void selected(DepthsAbilityInfo<?> selection) {
-		DepthsManager.getInstance().setPlayerLevelInAbility(StatueOfRegret.ABILITY_NAME, mPlayer, 0, false);
-		DepthsManager.getInstance().setPlayerLevelInAbility(mRemovingCurse, mPlayer, 0);
-		DepthsManager.getInstance().setPlayerLevelInAbility(selection.getDisplayName(), mPlayer, 1);
-		mPlayer.playSound(mPlayer, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
-		if (dp != null) {
-			dp.mRegretSelections.clear();
+		if (mDepthsPlayer == null) {
+			return;
 		}
+		DepthsManager.getInstance().setPlayerLevelInAbility(StatueOfRegret.ABILITY_NAME, mPlayer, mDepthsPlayer, 0, false, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(mRemovingCurse, mPlayer, mDepthsPlayer, 0, true, false);
+		DepthsManager.getInstance().setPlayerLevelInAbility(selection.getDisplayName(), mPlayer, mDepthsPlayer, 1, true, false);
+		mPlayer.playSound(mPlayer, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		mDepthsPlayer.mRegretSelections.clear();
 	}
 
 	private static List<DepthsAbilityInfo<?>> getEligibleAbilities(Player player, @Nullable String removingCurse) {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
 		if (dp != null) {
 			List<DepthsAbilityInfo<?>> curses = DepthsManager.getFilteredAbilities(List.of(DepthsTree.CURSE)).stream()
-				.filter(dai -> dai.getDisplayName() != null && !dai.getDisplayName().equals(removingCurse) && dp.getLevelInAbility(dai.getDisplayName()) == 0)
+				.filter(dai -> dai.getDisplayName() != null && !dai.getDisplayName().equals(removingCurse) && !dp.hasAbility(dai.getDisplayName()))
 				.collect(Collectors.toList());
 			if (dp.mRegretSelections.isEmpty()) {
 				Collections.shuffle(curses);
