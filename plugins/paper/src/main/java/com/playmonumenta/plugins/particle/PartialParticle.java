@@ -93,4 +93,9 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 		mMinimumCount = 0;
 	}
 
+	@Override
+	public PartialParticle copy() {
+		return copy(new PartialParticle(mParticle, mLocation, mCount, mDeltaX, mDeltaY, mDeltaZ, mExtra, mData, mDirectionalMode, mExtraVariance));
+	}
+
 }

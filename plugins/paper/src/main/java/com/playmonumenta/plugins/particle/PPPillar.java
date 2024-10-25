@@ -23,6 +23,18 @@ public class PPPillar extends AbstractPartialParticle<PPPillar> {
 		mHeight = height;
 	}
 
+	@Override
+	public PPPillar copy() {
+		return copy(new PPPillar(mParticle, mLocation.clone(), mHeight));
+	}
+
+	@Override
+	public PPPillar copy(PPPillar copy) {
+		super.copy(copy);
+		copy.mHeight = mHeight;
+		return copy;
+	}
+
 	/*-------------------------------------------------------------------------------
 	 * Parameter getters and setters
 	 */

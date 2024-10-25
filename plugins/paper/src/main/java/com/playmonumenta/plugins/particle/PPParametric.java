@@ -27,6 +27,19 @@ public class PPParametric extends AbstractPartialParticle<PPParametric> {
 		mFunction = function;
 	}
 
+	@Override
+	public PPParametric copy() {
+		return copy(new PPParametric(mParticle, mLocation.clone(), mFunction));
+	}
+
+	@Override
+	public PPParametric copy(PPParametric copy) {
+		super.copy(copy);
+		copy.mIncludeStart = mIncludeStart;
+		copy.mIncludeEnd = mIncludeEnd;
+		return copy;
+	}
+
 	public PPParametric includeStart(boolean includeStart) {
 		mIncludeStart = includeStart;
 		return this;

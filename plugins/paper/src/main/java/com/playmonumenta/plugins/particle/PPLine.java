@@ -47,6 +47,26 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 		mLength = length;
 	}
 
+	@Override
+	public PPLine copy() {
+		return copy(new PPLine(mParticle, mLocation.clone(), mDirection.clone(), mLength));
+	}
+
+	@Override
+	public PPLine copy(PPLine copy) {
+		super.copy(copy);
+		copy.mDirection = mDirection.clone();
+		copy.mLength = mLength;
+		copy.mParticlesPerMeter = mParticlesPerMeter;
+		copy.mMinParticlesPerMeter = mMinParticlesPerMeter;
+		copy.mGroupingDistance = mGroupingDistance;
+		copy.mAnimationTicks = mAnimationTicks;
+		copy.mIncludeStart = mIncludeStart;
+		copy.mIncludeEnd = mIncludeEnd;
+		copy.mOffset = mOffset;
+		return copy;
+	}
+
 	public PPLine location(Location start, Location end) {
 		mLocation = start;
 		mDirection = LocationUtils.getDirectionTo(end, start);

@@ -4,13 +4,40 @@ import com.destroystokyo.paper.ParticleBuilder;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 // Custom builder to override the spawn method to use ParticleManager.sendParticle
 public class PartialParticleBuilder extends ParticleBuilder {
+
+	private @Nullable Entity mSourceEntity;
+
 	public PartialParticleBuilder(Particle particle) {
 		super(particle);
+	}
+
+	@Override
+	public ParticleBuilder source(@Nullable Player source) {
+		this.mSourceEntity = source;
+		return this;
+	}
+
+	@Override
+	public @Nullable Player source() {
+		if (mSourceEntity instanceof Player player) {
+			return player;
+		}
+		return null;
+	}
+
+	public @Nullable Entity sourceEntity() {
+		return mSourceEntity;
+	}
+
+	public PartialParticleBuilder sourceEntity(@Nullable Entity source) {
+		this.mSourceEntity = source;
+		return this;
 	}
 
 	/**
@@ -25,7 +52,8 @@ public class PartialParticleBuilder extends ParticleBuilder {
 			throw new IllegalStateException("Please specify location for this particle");
 		}
 		final List<Player> players = this.receivers() != null ? this.receivers() : location.getWorld().getPlayers();
-		@Nullable final Player source = this.source();
+		@Nullable
+		final Entity source = this.sourceEntity();
 		for (Player player : players) {
 			if (player == null || !player.isOnline() || player.getWorld() != location.getWorld()) {
 				this.receivers().remove(player);
@@ -42,7 +70,8 @@ public class PartialParticleBuilder extends ParticleBuilder {
 				continue;
 			}
 			*/
-			ParticleManager.addParticleToQueue(this.particle(), player, location.getX(), location.getY(), location.getZ(), this.count(), this.offsetX(), this.offsetY(), this.offsetZ(), this.extra(), this.data(), this.force());
+			ParticleManager.addParticleToQueue(this.particle(), player, location.getX(), location.getY(), location.getZ(),
+					this.count(), this.offsetX(), this.offsetY(), this.offsetZ(), this.extra(), this.data(), this.force());
 		}
 		return this;
 	}

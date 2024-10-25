@@ -26,6 +26,20 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 		mRadius = radius;
 	}
 
+	@Override
+	public PPSpiral copy() {
+		return copy(new PPSpiral(mParticle, mLocation.clone(), mRadius));
+	}
+
+	@Override
+	public PPSpiral copy(PPSpiral copy) {
+		super.copy(copy);
+		copy.mRadius = mRadius;
+		copy.mDistancePerParticle = mDistancePerParticle;
+		copy.mTicks = mTicks;
+		return copy;
+	}
+
 	/*-------------------------------------------------------------------------------
 	 * Parameter getters and setters
 	 */

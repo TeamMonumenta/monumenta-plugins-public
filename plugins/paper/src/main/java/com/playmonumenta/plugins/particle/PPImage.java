@@ -40,6 +40,28 @@ public class PPImage extends AbstractPartialParticle<PPImage> {
 		mImagePath = imagePath;
 	}
 
+	@Override
+	public PPImage copy() {
+		return copy(new PPImage(mLocation.clone(), mImagePath));
+	}
+
+	@Override
+	public PPImage copy(PPImage copy) {
+		super.copy(copy);
+		copy.mImagePath = mImagePath;
+		copy.mImageParticles.addAll(mImageParticles);
+		copy.mShouldResize = mShouldResize;
+		copy.mWidth = mWidth;
+		copy.mHeight = mHeight;
+		copy.mCentered = mCentered;
+		copy.mAxis1 = mAxis1.clone();
+		copy.mAxis2 = mAxis2.clone();
+		copy.mBlendInfo = mBlendInfo;
+		copy.mResolution = mResolution;
+		copy.mShouldRegenerateParticles = mShouldRegenerateParticles;
+		return copy;
+	}
+
 	public PPImage imagePath(String imagePath) {
 		mImagePath = imagePath;
 		mShouldRegenerateParticles = true;

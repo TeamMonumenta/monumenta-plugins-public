@@ -20,6 +20,20 @@ public class PPExplosion extends AbstractPartialParticle<PPExplosion> {
 		mDirectionalMode = true;
 	}
 
+	@Override
+	public PPExplosion copy() {
+		return copy(new PPExplosion(mParticle, mLocation.clone()));
+	}
+
+	@Override
+	public PPExplosion copy(PPExplosion copy) {
+		super.copy(copy);
+		copy.mFlat = mFlat;
+		copy.mSpeed = mSpeed;
+		copy.mSpeedVar = mSpeedVar;
+		return copy;
+	}
+
 	/**
 	 * Whether this explosion is flat (circular) or spherical
 	 */

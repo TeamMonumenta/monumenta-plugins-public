@@ -12,7 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT>> {
+public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT>> {
 
 	public static final int PARTICLE_SPAWN_DISTANCE_SQUARED = 50 * 50;
 
@@ -65,6 +65,36 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	public AbstractPartialParticle(Particle particle, Location location) {
 		mParticle = particle;
 		mLocation = location.clone();
+	}
+
+	public abstract SelfT copy();
+
+	public SelfT copy(SelfT copy) {
+		copy.mParticle = mParticle;
+		copy.mLocation = mLocation.clone();
+		copy.mId = mId;
+		copy.mCount = mCount;
+		copy.mDeltaX = mDeltaX;
+		copy.mDeltaY = mDeltaY;
+		copy.mDeltaZ = mDeltaZ;
+		copy.mExtra = mExtra;
+		copy.mData = mData;
+		copy.mDirectionalMode = mDirectionalMode;
+		copy.mExtraVariance = mExtraVariance;
+		copy.mMinimumCount = mMinimumCount;
+		copy.mMaximumMultiplier = mMaximumMultiplier;
+		copy.distanceFalloff(mDistanceFalloff);
+		// copy.mDistanceFalloff = mDistanceFalloff;
+		// copy.mDistanceFalloffSquared = mDistanceFalloffSquared;
+		copy.mVaryPositiveX = mVaryPositiveX;
+		copy.mVaryPositiveY = mVaryPositiveY;
+		copy.mVaryPositiveZ = mVaryPositiveZ;
+		copy.mVaryNegativeX = mVaryNegativeX;
+		copy.mVaryNegativeY = mVaryNegativeY;
+		copy.mVaryNegativeZ = mVaryNegativeZ;
+		copy.conditional(mPlayerCondition); // copy.mPlayerCondition = mPlayerCondition;
+		copy.skipBelowMultiplier(mSkipBelowMultiplier); // copy.mSkipBelowMultiplier = mSkipBelowMultiplier;
+		return copy;
 	}
 
 	/*
@@ -219,7 +249,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return getSelf();
 	}
 
-	public SelfT conditional(Predicate<Player> playerCondition) {
+	public SelfT conditional(@Nullable Predicate<Player> playerCondition) {
 		mPlayerCondition = playerCondition;
 		return getSelf();
 	}
@@ -395,7 +425,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 			variedClone.data(packagedValues.data());
 			variedClone.receivers(packagedValues.receivers());
 			variedClone.force(packagedValues.force());
-			variedClone.source(packagedValues.source());
+			variedClone.sourceEntity(packagedValues.sourceEntity());
 
 			int loops = packagedValues.count();
 			if (mDirectionalMode) {
@@ -494,35 +524,41 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	}
 
 	private void spawnForPlayersInternal(ParticleCategory source, ParticleCategory otherSource, Collection<Player> players, @Nullable Player sourcePlayer) {
-		ParticleManager.runOffMainThread(() -> {
-			prepareSpawn();
+		ParticleManager.runOffMainThread((final AbstractPartialParticle<?> self) -> {
+			self.prepareSpawn();
 			players.forEach(player -> {
-				spawnForPlayerInternal(player, player == sourcePlayer ? source : otherSource, sourcePlayer);
+				spawnForPlayerInternal(self, player, player == sourcePlayer ? source : otherSource, sourcePlayer);
 			});
+		}, (Boolean async) -> {
+			if (async) {
+				return this.copy();
+			} else {
+				return getSelf();
+			}
 		});
 	}
 
-	private void spawnForPlayerInternal(Player player, ParticleCategory source, @Nullable Player sourcePlayer) {
-		double particleMultiplier = Math.min(ParticleManager.getParticleMultiplier(player, source), mMaximumMultiplier);
-		if (particleMultiplier <= mSkipBelowMultiplier) {
+	private static void spawnForPlayerInternal(final AbstractPartialParticle<?> self, Player player, ParticleCategory source, @Nullable Entity sourceEntity) {
+		double particleMultiplier = Math.min(ParticleManager.getParticleMultiplier(player, source), self.mMaximumMultiplier);
+		if (particleMultiplier <= self.mSkipBelowMultiplier) {
 			return;
 		}
-		int partialCount = getPartialCount(particleMultiplier, player, source);
+		int partialCount = self.getPartialCount(particleMultiplier, player, source);
 		if (partialCount <= 0) {
 			return;
 		}
 
-		PartialParticleBuilder packagedValues = new PartialParticleBuilder(mParticle);
-		packagedValues.location(mLocation);
+		PartialParticleBuilder packagedValues = new PartialParticleBuilder(self.mParticle);
+		packagedValues.location(self.mLocation);
 		packagedValues.count(partialCount);
-		packagedValues.offset(mDeltaX, mDeltaY, mDeltaZ);
-		packagedValues.extra(mExtra);
-		packagedValues.data(mData);
+		packagedValues.offset(self.mDeltaX, self.mDeltaY, self.mDeltaZ);
+		packagedValues.extra(self.mExtra);
+		packagedValues.data(self.mData);
 		packagedValues.force(true);
 		packagedValues.receivers(player);
-		packagedValues.source(sourcePlayer);
+		packagedValues.sourceEntity(sourceEntity);
 
-		doSpawn(packagedValues);
+		self.doSpawn(packagedValues);
 	}
 
 	protected int getPartialCount(double multiplier, Player player, ParticleCategory source) {

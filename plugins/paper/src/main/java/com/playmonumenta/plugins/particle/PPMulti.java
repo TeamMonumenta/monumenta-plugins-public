@@ -16,6 +16,17 @@ public class PPMulti extends AbstractPartialParticle<PPMulti> {
 		mLocations = locations;
 	}
 
+	@Override
+	public PPMulti copy() {
+		return copy(new PPMulti(mParticle, mLocations));
+	}
+
+	@Override
+	public PPMulti copy(PPMulti copy) {
+		super.copy(copy);
+		return copy;
+	}
+
 	public PPMulti countPerLocation(int count) {
 		return super.count(count * mLocations.size());
 	}

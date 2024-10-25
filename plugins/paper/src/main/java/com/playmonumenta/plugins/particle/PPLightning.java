@@ -51,6 +51,26 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 		super(particle, strikeLocation);
 	}
 
+	@Override
+	public PPLightning copy() {
+		return copy(new PPLightning(mParticle, mLocation.clone()));
+	}
+
+	@Override
+	public PPLightning copy(PPLightning copy) {
+		super.copy(copy);
+		copy.mHeight = mHeight;
+		copy.mMaxWidth = mMaxWidth;
+		copy.mHopXZ = mHopXZ;
+		copy.mHopY = mHopY;
+		copy.mDuration = mDuration;
+		copy.mHopsPerBlock = mHopsPerBlock;
+		copy.mRunnable = mRunnable;
+		copy.mGeneratedHops.addAll(mGeneratedHops);
+		copy.mParticleLocations.putAll(mParticleLocations);
+		return copy;
+	}
+
 	/*-------------------------------------------------------------------------------
 	 * Required init methods
 	 * One of these must be called prior to spawning this particle

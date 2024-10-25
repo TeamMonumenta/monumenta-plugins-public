@@ -30,6 +30,25 @@ public class PPFlower extends AbstractPartialParticle<PPFlower> {
 		mRadius = radius;
 	}
 
+	@Override
+	public PPFlower copy() {
+		return copy(new PPFlower(mParticle, mLocation.clone(), mRadius));
+	}
+
+	@Override
+	public PPFlower copy(PPFlower copy) {
+		super.copy(copy);
+		copy.mRadius = mRadius;
+		copy.mPetals = mPetals;
+		copy.mAngleStep = mAngleStep;
+		copy.mNormal = mNormal.clone();
+		copy.mInnerColor = mInnerColor;
+		copy.mOuterColor = mOuterColor;
+		copy.mSize = mSize;
+		copy.mSharp = mSharp;
+		return copy;
+	}
+
 	/*-------------------------------------------------------------------------------
 	 * Parameter getters and setters
 	 */

@@ -30,6 +30,22 @@ public class PPRectPrism extends AbstractPartialParticle<PPRectPrism> {
 		mSize = endCorner.toVector().subtract(mStartLocation.toVector());
 	}
 
+	@Override
+	public PPRectPrism copy() {
+		return copy(new PPRectPrism(mParticle, mStartLocation.clone(), mStartLocation.clone().add(mSize)));
+	}
+
+	@Override
+	public PPRectPrism copy(PPRectPrism copy) {
+		super.copy(copy);
+		copy.mEdgeMode = mEdgeMode;
+		copy.mParticlesPerMeter = mParticlesPerMeter;
+		copy.mStartColor = mStartColor;
+		copy.mEndColor = mEndColor;
+		copy.mDustSize = mDustSize;
+		return copy;
+	}
+
 	/*-------------------------------------------------------------------------------
 	 * Parameter getters and setters
 	 */

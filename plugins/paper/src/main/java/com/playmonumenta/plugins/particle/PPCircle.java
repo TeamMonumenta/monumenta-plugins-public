@@ -47,6 +47,31 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 		mRadius = radius;
 	}
 
+	@Override
+	public PPCircle copy() {
+		return copy(new PPCircle(mParticle, mLocation.clone(), mRadius));
+	}
+
+	@Override
+	public PPCircle copy(PPCircle copy) {
+		super.copy(copy);
+		copy.mRadius = mRadius;
+		copy.mInnerRadiusFactor = mInnerRadiusFactor;
+		copy.mParticlesPerMeter = mParticlesPerMeter;
+		copy.mMinParticlesPerMeter = mMinParticlesPerMeter;
+		copy.mStartAngleDeg = mStartAngleDeg;
+		copy.mEndAngleDeg = mEndAngleDeg;
+		copy.mOffset = mOffset;
+		copy.mIncludeStart = mIncludeStart;
+		copy.mIncludeEnd = mIncludeEnd;
+		copy.mAxis1 = mAxis1.clone();
+		copy.mAxis2 = mAxis2.clone();
+		copy.mRotateDelta = mRotateDelta;
+		copy.mRandomizeAngle = mRandomizeAngle;
+		copy.mAnglePredicate = mAnglePredicate;
+		return copy;
+	}
+
 	/*-------------------------------------------------------------------------------
 	 * Parameter getters and setters
 	 */

@@ -41,6 +41,21 @@ public class PPBatch extends AbstractPartialParticle<PPBatch> {
 		mFunction = function;
 	}
 
+	@Override
+	public PPBatch copy() {
+		// Copying is unsupported for PPBatch
+		return this;
+	}
+
+	@Override
+	public PPBatch copy(PPBatch batch) {
+		batch.mParticle = mParticle;
+		batch.mLocation = mLocation.clone();
+		batch.mPendingParticles.clear();
+		batch.mPendingParticles.addAll(mPendingParticles);
+		return batch;
+	}
+
 	public PPBatch add(AbstractPartialParticle<?> particle) {
 		mPendingParticles.add(particle);
 		return getSelf();

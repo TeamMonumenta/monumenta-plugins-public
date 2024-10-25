@@ -18,6 +18,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -41,6 +43,16 @@ public final class ParticleManager {
 			return;
 		}
 		mParticleExecutor.execute(new WrappedRunnable(runnable));
+	}
+
+	// Specifically to avoid allocatiing a new object
+	public static <T> void runOffMainThread(Consumer<T> consumer, Function<Boolean, T> getter) {
+		if (mParticleExecutor.isShutdown() || !Bukkit.isPrimaryThread()) {
+			consumer.accept(getter.apply(false));
+			return;
+		}
+		final T object = getter.apply(true);
+		mParticleExecutor.execute(new WrappedRunnable(() -> consumer.accept(object)));
 	}
 
 	public static class WrappedRunnable implements Runnable {

@@ -668,8 +668,9 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 
 	private static final Map<UUID, Long> mFlushingPlayers = new ConcurrentHashMap<>();
 	// Netty's default watermark is 64kb, but that throttles too much for us
-	private static final long mMaxQueueBytes = 3000 * 1024L; // 5 mb;
-	private static final long mRetryQueueByes = 3000 * 1024L; // 256 kb // TODO: unfortunately this code isn't working well with high bursty cosmetic abilities such as Transcendent Combos
+	// TODO: increased hard limit to 25MB which should never be reached, but if it is, we should definitely drop packets
+	private static final long mMaxQueueBytes = 25 * 1000 * 1024L; // 5 mb;
+	private static final long mRetryQueueByes = 25 * 1000 * 1024L; // 256 kb
 	private static final long mFlushQueueBytes = 32 * 1024L; // 32 kb;
 	private static final long mTimeoutNanos = TimeUnit.MILLISECONDS.toNanos(1);
 

@@ -17,6 +17,18 @@ public class PPPeriodic extends AbstractPartialParticle<PPPeriodic> {
 		mMinimumCount = 0;
 	}
 
+	@Override
+	public PPPeriodic copy() {
+		return copy(new PPPeriodic(mParticle, mLocation.clone()));
+	}
+
+	@Override
+	public PPPeriodic copy(PPPeriodic copy) {
+		super.copy(copy);
+		copy.mTime = mTime;
+		return copy;
+	}
+
 	public PPPeriodic manualTimeOverride(int time) {
 		mTime = time;
 		return getSelf();

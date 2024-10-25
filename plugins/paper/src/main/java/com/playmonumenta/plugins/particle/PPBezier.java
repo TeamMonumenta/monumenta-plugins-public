@@ -76,6 +76,18 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 		mLocation = startLocation;
 	}
 
+	@Override
+	public PPBezier copy() {
+		return copy(new PPBezier(mParticle, mControlPoints));
+	}
+
+	@Override
+	public PPBezier copy(PPBezier bezier) {
+		super.copy(bezier);
+		bezier.mAnimationTicks = mAnimationTicks;
+		return bezier;
+	}
+
 	public PPBezier delay(int animationTicks) {
 		if (animationTicks < 1) {
 			animationTicks = 1;
