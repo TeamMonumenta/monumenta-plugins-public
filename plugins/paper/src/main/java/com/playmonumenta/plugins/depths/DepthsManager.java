@@ -2388,16 +2388,21 @@ public class DepthsManager {
 		Collections.shuffle(abilities);
 		while (!abilities.isEmpty()) {
 			String ability = abilities.remove(0);
-			int level = dp.getLevelInAbility(ability) + amount;
-			if (level <= 1 || level >= 6) {
+			int level = dp.getLevelInAbility(ability);
+			// do not affect twisted abilities
+			if (level < 1 || level > 5) {
 				continue;
 			}
 			DepthsAbilityInfo<?> info = getAbility(ability);
 			if (info == null || !info.getHasLevels()) {
 				continue;
 			}
-			setPlayerLevelInAbility(ability, player, level, true, true);
-			return;
+			// do not upgrade to twisted and do not remove the ability
+			int newLevel = Math.min(Math.max(level + amount, 1), 5);
+			if (level != newLevel) {
+				setPlayerLevelInAbility(ability, player, newLevel, true, true);
+				return;
+			}
 		}
 	}
 
