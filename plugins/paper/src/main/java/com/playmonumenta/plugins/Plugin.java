@@ -311,6 +311,7 @@ public class Plugin extends JavaPlugin {
 		RunWithPlaceholdersCommand.register();
 		ScanChests.register();
 		SeasonalEventCommand.register();
+		SendBlockCrackCommand.register();
 		SetActivity.register(this);
 		SetMasterwork.register();
 		SkillDescription.register(this);
