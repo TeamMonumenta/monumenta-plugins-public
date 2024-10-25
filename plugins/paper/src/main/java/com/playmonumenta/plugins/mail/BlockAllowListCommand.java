@@ -39,9 +39,11 @@ public class BlockAllowListCommand {
 			for (RecipientCmdArgs senderArgs : Recipient.argumentVariants(
 				ArgTarget.ARG, "", "")
 			) {
-				CommandAPICommand actionCmdRoot = mod.withSubcommand(new CommandAPICommand(listType.argument()));
+				CommandAPICommand actionCmdRoot = new CommandAPICommand(listType.argument());
 
 				attachListSubcommand(actionCmdRoot, listType, senderArgs);
+
+				mod.withSubcommand(actionCmdRoot);
 			}
 		}
 	}
@@ -83,7 +85,7 @@ public class BlockAllowListCommand {
 		@Nullable RecipientType recipientTypeFilter
 	) {
 		if (
-			!listOwnerArgs.mTarget.equals(ArgTarget.CALLER)
+			listOwnerArgs.mTarget.equals(ArgTarget.ARG)
 			&& !viewer.hasPermission(MailGui.MAIL_MOD_PERM.toString())
 		) {
 			viewer.sendMessage(Component.text("You do not have permission for this command.", NamedTextColor.RED));

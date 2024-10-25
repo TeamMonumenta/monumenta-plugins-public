@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.integrations;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.playmonumenta.networkrelay.RemotePlayerAPI;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
@@ -42,12 +43,12 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public static final ArgumentSuggestions<CommandSender> ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((info)
 		-> {
 		if (!mEnabled) {
-			return new String[0];
+			return Bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new);
 		}
 		if (info.sender().hasPermission("monumenta.listoffline")) {
 			return MonumentaRedisSyncAPI.getAllCachedPlayerNames().toArray(String[]::new);
 		}
-		return Bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new);
+		return RemotePlayerAPI.getVisiblePlayerNames().toArray(String[]::new);
 	});
 
 	private final Plugin mPlugin;

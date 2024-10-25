@@ -180,6 +180,11 @@ public class SendGui extends MailGui {
 	}
 
 	@Override
+	public MailCache getOwnerCache() {
+		return mSenderCache;
+	}
+
+	@Override
 	public Collection<MailCache> getRecipientCaches() {
 		Set<MailCache> result = new HashSet<>();
 		result.add(mSenderCache);

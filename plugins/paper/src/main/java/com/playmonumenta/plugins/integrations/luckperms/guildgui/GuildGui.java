@@ -215,11 +215,7 @@ public class GuildGui extends MailGui {
 
 	@Override
 	public void open() {
-		if (mPlayer.hasPermission(MAIL_PERM.toString())) {
-			super.open();
-		} else {
-			super.openBypassAccessCheck();
-		}
+		super.openBypassAccessCheck();
 	}
 
 	/*
@@ -247,12 +243,13 @@ public class GuildGui extends MailGui {
 	}
 
 	@Override
+	public MailCache getOwnerCache() {
+		return mMailCache;
+	}
+
+	@Override
 	public Collection<MailCache> getRecipientCaches() {
-		MailCache mailCache = mMailCache;
-		if (mailCache != null) {
-			return List.of(mailCache);
-		}
-		return List.of();
+		return List.of(mMailCache);
 	}
 
 	@Override

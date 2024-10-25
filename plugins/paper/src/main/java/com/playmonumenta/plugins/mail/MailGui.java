@@ -208,8 +208,14 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 			throw new NoMailAccessException("You may not access this GUI here; virtual inventories disabled.");
 		}
 
-		if (mailbox != null && !mOpenedAsModerator) {
-			mailbox.noAccessCheck(mPlayer);
+		if (!mOpenedAsModerator) {
+			if (getOwnerCache().recipient().nonMemberCheck(mPlayer)) {
+				throw new NoMailAccessException("You are not a participant of this mailbox");
+			}
+
+			if (mailbox != null) {
+				mailbox.noAccessCheck(mPlayer);
+			}
 		}
 	}
 
@@ -383,6 +389,8 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 	public abstract void refresh();
 
 	public abstract void refreshMailbox(Mailbox mailbox);
+
+	public abstract MailCache getOwnerCache();
 
 	public abstract Collection<MailCache> getRecipientCaches();
 

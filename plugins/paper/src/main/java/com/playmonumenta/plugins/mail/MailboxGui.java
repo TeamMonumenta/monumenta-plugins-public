@@ -216,6 +216,11 @@ public class MailboxGui extends MailGui {
 	}
 
 	@Override
+	public MailCache getOwnerCache() {
+		return mMailCache;
+	}
+
+	@Override
 	public Collection<MailCache> getRecipientCaches() {
 		return List.of(mMailCache);
 	}
