@@ -79,6 +79,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 
 	public Ruten(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
+		mBoss.addScoreboardTag("NoTrickyTransformation");
 		mMonumentaPlugin = plugin;
 		mPhase = 1;
 		mBoss.setRemoveWhenFarAway(false);

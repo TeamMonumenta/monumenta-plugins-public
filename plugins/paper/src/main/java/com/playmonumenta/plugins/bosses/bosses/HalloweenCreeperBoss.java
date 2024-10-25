@@ -38,6 +38,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 		if (!(boss instanceof Creeper creeper)) {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
+		mBoss.addScoreboardTag("NoTrickyTransformation");
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 100, null);
 

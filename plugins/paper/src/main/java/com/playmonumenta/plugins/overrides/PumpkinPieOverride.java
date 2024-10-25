@@ -4,11 +4,15 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
+import com.playmonumenta.plugins.utils.DateUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -26,15 +30,33 @@ public class PumpkinPieOverride extends BaseOverride {
 		if (player == null
 			    || !ServerProperties.getTrickyCreepersEnabled()
 			    || !(clickedEntity instanceof Creeper creeper)
+			    || EntityUtils.isTrainingDummy(clickedEntity)
 			    || !InventoryUtils.testForItemWithName(item, "Creeper's Delight", true)
 			    || "plots".equals(ServerProperties.getShardName())
 			    || "playerplots".equals(ServerProperties.getShardName())
-			    || clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")
+			    || "guildplots".equals(ServerProperties.getShardName())
+			    || (clickedEntity.getScoreboardTags().contains("NoTrickyTransformation") && !clickedEntity.getScoreboardTags().contains("boss_ruten"))
 			    || clickedEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			return true;
 		}
 
 		if (!player.hasPermission("monumenta.command.summontrickycreeper")) {
+			return true;
+		}
+
+        // optionally, remove this block & the and statement for ru'ten above once Creeperween ends (2024 seasonal advancement)
+		if (clickedEntity.getScoreboardTags().contains("boss_ruten")) {
+			if (DateUtils.getYear() != 2024) { // if not 2024, no advancement, but ru'ten doesn't blow up
+				return true;
+			}
+			item.subtract(1);
+			player.sendMessage(Component.text("Ru'Ten takes your candy, but doesn't eat it. Nice try - it doesn't fall for your Tricks.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			if (!AdvancementUtils.checkAdvancement(player, "monumenta:trophies/events/2024/halloween_tricky_ruten")) {
+				AdvancementUtils.grantAdvancement(player, "monumenta:trophies/events/2024/halloween_tricky_ruten");
+				if (!AdvancementUtils.checkAdvancement(player, "monumenta:trophies/events/2024/root")) {
+					AdvancementUtils.grantAdvancement(player, "monumenta:trophies/events/2024/root");
+				}
+			}
 			return true;
 		}
 
