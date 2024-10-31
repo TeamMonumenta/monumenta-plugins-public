@@ -12,9 +12,7 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.executors.CommandArguments;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -212,26 +210,13 @@ public class GuildRecipient implements Recipient {
 	public Audience audience() {
 		Audience audience = Audience.empty();
 
-		// Each guild has multiple access levels; this matches all of them except guest/none
-		Set<Group> matchingGuilds = new HashSet<>();
-		// Speed up the search by knowing what to skip
-		Set<Group> otherGuilds = new HashSet<>();
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			Group guild = LuckPermsIntegration.getGuild(player);
-			if (matchingGuilds.contains(guild)) {
-				audience = Audience.audience(audience, player);
-			}
-			if (otherGuilds.contains(guild)) {
-				continue;
-			}
+		Group guildRoot = getGuildRoot();
+		if (guildRoot == null) {
+			return audience;
+		}
 
-			Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
-			if (guildPlotId == null) {
-				otherGuilds.add(guild);
-				continue;
-			}
-			if (mGuildId == guildPlotId) {
-				matchingGuilds.add(guild);
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (GuildPermission.MAIL.hasAccess(guildRoot, player)) {
 				audience = Audience.audience(audience, player);
 			}
 		}

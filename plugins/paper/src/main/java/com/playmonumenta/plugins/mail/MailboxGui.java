@@ -140,6 +140,12 @@ public class MailboxGui extends MailGui {
 
 	@Override
 	protected void setup() {
+		setTitle(mMailCache
+			.recipient()
+			.mailboxComponent(mSettings.mDirection)
+			.color(NamedTextColor.DARK_GRAY)
+		);
+
 		if (!mPlayer.hasPermission(MAIL_PERM.toString())) {
 			// In case the GUI permission is revoked
 			mPlayer.sendMessage(Component.text("Your access to this GUI has been revoked.", NamedTextColor.RED));
