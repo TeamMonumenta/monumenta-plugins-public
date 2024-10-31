@@ -11,7 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class PillarOfLight extends DepthsAbility {
-	public static final String ABILITY_NAME = "Pillar Of Light";
+	public static final String ABILITY_NAME = "Pillar of Light";
 	public static final int REVIVE_RADIUS_MULTIPLIER = 3;
 
 	public static final DepthsAbilityInfo<PillarOfLight> INFO =
