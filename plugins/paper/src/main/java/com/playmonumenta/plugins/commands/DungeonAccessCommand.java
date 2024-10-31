@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvePreset;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.DungeonUtils;
@@ -48,71 +49,71 @@ public class DungeonAccessCommand extends GenericCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.dungeonaccess");
 
 		String[] dungeons = Arrays.stream(DungeonUtils.DungeonCommandMapping.values())
-			                    .map(m -> m.name().toLowerCase(Locale.ROOT))
-			                    .toArray(String[]::new);
+				.map(m -> m.name().toLowerCase(Locale.ROOT))
+				.toArray(String[]::new);
 
 		new CommandAPICommand("dungeonaccess")
-			.withPermission(perms)
-			.withArguments(
-				new LiteralArgument("new"),
-				new EntitySelectorArgument.OnePlayer("key player"),
-				new EntitySelectorArgument.ManyPlayers("other players"),
-				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
-				new LocationArgument("return location"),
-				new AngleArgument("return yaw"),
-				new FloatArgument("return pitch")
-			)
-			.withOptionalArguments(
-				new IntegerArgument("type"),
-				new BooleanArgument("useDelvePreset")
-			)
-			.executes((sender, args) -> {
-				startNew(args.getUnchecked("key player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"), args.getOrDefaultUnchecked("type", 0), args.getOrDefaultUnchecked("useDelvePreset", false));
-			})
-			.register();
+				.withPermission(perms)
+				.withArguments(
+						new LiteralArgument("new"),
+						new EntitySelectorArgument.OnePlayer("key player"),
+						new EntitySelectorArgument.ManyPlayers("other players"),
+						new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
+						new LocationArgument("return location"),
+						new AngleArgument("return yaw"),
+						new FloatArgument("return pitch")
+				)
+				.withOptionalArguments(
+						new IntegerArgument("type"),
+						new BooleanArgument("useDelvePreset")
+				)
+				.executes((sender, args) -> {
+					startNew(args.getUnchecked("key player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"), args.getOrDefaultUnchecked("type", 0), args.getOrDefaultUnchecked("useDelvePreset", false));
+				})
+				.register();
 
 		new CommandAPICommand("dungeonaccess")
-			.withPermission(perms)
-			.withArguments(
-				new LiteralArgument("invite"),
-				new EntitySelectorArgument.OnePlayer("inviting player"),
-				new EntitySelectorArgument.ManyPlayers("other players"),
-				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
-				new LocationArgument("return location"),
-				new AngleArgument("return yaw"),
-				new FloatArgument("return pitch")
-			)
-			.executes((sender, args) -> {
-				invite(args.getUnchecked("inviting player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
-			})
-			.register();
+				.withPermission(perms)
+				.withArguments(
+						new LiteralArgument("invite"),
+						new EntitySelectorArgument.OnePlayer("inviting player"),
+						new EntitySelectorArgument.ManyPlayers("other players"),
+						new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
+						new LocationArgument("return location"),
+						new AngleArgument("return yaw"),
+						new FloatArgument("return pitch")
+				)
+				.executes((sender, args) -> {
+					invite(args.getUnchecked("inviting player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
+				})
+				.register();
 
 		new CommandAPICommand("dungeonaccess")
-			.withPermission(perms)
-			.withArguments(
-				new LiteralArgument("send"),
-				new EntitySelectorArgument.ManyPlayers("players"),
-				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
-				new LocationArgument("return location"),
-				new AngleArgument("return yaw"),
-				new FloatArgument("return pitch")
-			)
-			.executes((sender, args) -> {
-				send((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
-			})
-			.register();
+				.withPermission(perms)
+				.withArguments(
+						new LiteralArgument("send"),
+						new EntitySelectorArgument.ManyPlayers("players"),
+						new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons)),
+						new LocationArgument("return location"),
+						new AngleArgument("return yaw"),
+						new FloatArgument("return pitch")
+				)
+				.executes((sender, args) -> {
+					send((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
+				})
+				.register();
 
 		new CommandAPICommand("dungeonaccess")
-			.withPermission(perms)
-			.withArguments(
-				new LiteralArgument("abandon"),
-				new EntitySelectorArgument.ManyPlayers("players"),
-				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons))
-			)
-			.executes((sender, args) -> {
-				abandon((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")));
-			})
-			.register();
+				.withPermission(perms)
+				.withArguments(
+						new LiteralArgument("abandon"),
+						new EntitySelectorArgument.ManyPlayers("players"),
+						new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons))
+				)
+				.executes((sender, args) -> {
+					abandon((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")));
+				})
+				.register();
 	}
 
 	public static DungeonUtils.DungeonCommandMapping getMapping(String dungeon) throws WrapperCommandSyntaxException {
@@ -139,7 +140,7 @@ public class DungeonAccessCommand extends GenericCommand {
 		}
 
 		RBoardAPI.add("$Last", mapping.getAccessName(), 1).thenAccept(accessScore
-			-> Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> { // must run on main server thread
+				-> Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> { // must run on main server thread
 			// Neither delvePreset nor shardName are null if useDelvePreset is true, but nullaway won't let me remove this
 			if (useDelvePreset && delvePreset != null && shardName != null) {
 				DelvesManager.savePlayerData(keyPlayer, shardName, delvePreset.mModifiers, delvePreset.mId);
@@ -270,6 +271,11 @@ public class DungeonAccessCommand extends GenericCommand {
 			returnLocation.setPitch(returnPitch);
 			for (Player player : players) {
 				try {
+					//send location update packet to players using the packet channel.
+					if (ClientModHandler.playerHasClientMod(player)) {
+						ClientModHandler.sendLocationPacket(player, mapping.getLocationName());
+					}
+
 					player.teleport(returnLocation);
 					MonumentaWorldManagementAPI.sortWorld(player);
 				} catch (Exception e) {
@@ -302,8 +308,8 @@ public class DungeonAccessCommand extends GenericCommand {
 
 				// Abandon delve bounty if it is for the abandoned dungeon and the dungeon is of the same week as the delve bounty
 				if (mapping.getDelveBountyId() > 0 && mapping.getStartDateName() != null
-					    && ScoreboardUtils.getScoreboardValue(player, mapping.getAccessName()).orElse(0) != 0
-					    && ScoreboardUtils.getScoreboardValue(player, "DelveDungeon").orElse(0) == mapping.getDelveBountyId()) {
+						&& ScoreboardUtils.getScoreboardValue(player, mapping.getAccessName()).orElse(0) != 0
+						&& ScoreboardUtils.getScoreboardValue(player, "DelveDungeon").orElse(0) == mapping.getDelveBountyId()) {
 					int delveBountyStartDate = ScoreboardUtils.getScoreboardValue(player, "DelveStartDate").orElse(0);
 					int startDate = ScoreboardUtils.getScoreboardValue(player, mapping.getStartDateName()).orElse(0);
 

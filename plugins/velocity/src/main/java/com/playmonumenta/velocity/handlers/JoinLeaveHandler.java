@@ -2,6 +2,7 @@ package com.playmonumenta.velocity.handlers;
 
 import com.playmonumenta.velocity.MonumentaVelocity;
 import com.playmonumenta.velocity.integrations.PremiumVanishIntegration;
+import com.playmonumenta.velocity.network.VelocityClientModHandler;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -80,11 +81,16 @@ public class JoinLeaveHandler {
 	public void serverPostConnectEvent(ServerPostConnectEvent event) {
 		Player player = event.getPlayer();
 
-		if (mPlugin.mConfig.mJoinMessagesEnabled && !mOnlinePlayers.contains(player.getUniqueId())) {
+		if (!mOnlinePlayers.contains(player.getUniqueId())) {
+			//first login, send server info to the client.
+			VelocityClientModHandler.sendServerInfoPacket(player);
+
 			/* This player is not already online - send join message */
 			mOnlinePlayers.add(player.getUniqueId());
-			joinLeaveEvent(player, " joined the game",
-			                mVanishEnabled && PremiumVanishIntegration.isInvisible(player));
+			if (mPlugin.mConfig.mJoinMessagesEnabled) {
+				joinLeaveEvent(player, " joined the game",
+					mVanishEnabled && PremiumVanishIntegration.isInvisible(player));
+			}
 		}
 	}
 
@@ -95,11 +101,14 @@ public class JoinLeaveHandler {
 		}
 		Player player = event.getPlayer();
 
-		if (mPlugin.mConfig.mJoinMessagesEnabled && mOnlinePlayers.contains(player.getUniqueId())) {
+		if (mOnlinePlayers.contains(player.getUniqueId())) {
 			/* This player was online - send leave message */
 			mOnlinePlayers.remove(player.getUniqueId());
-			joinLeaveEvent(player, " left the game",
-			                mVanishEnabled && PremiumVanishIntegration.isInvisible(player));
+
+			if (mPlugin.mConfig.mJoinMessagesEnabled) {
+				joinLeaveEvent(player, " left the game",
+					mVanishEnabled && PremiumVanishIntegration.isInvisible(player));
+			}
 		}
 	}
 }

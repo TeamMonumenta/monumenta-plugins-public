@@ -432,7 +432,7 @@ public class ServerProperties {
 	}
 
 	private <T> void getPropertyValueCollection(Plugin plugin, JsonObject object, String propertyName, @Nullable CommandSender sender,
-	                                            Function<String, T> parser, Collection<T> collection) {
+												Function<String, T> parser, Collection<T> collection) {
 		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			collection.clear();

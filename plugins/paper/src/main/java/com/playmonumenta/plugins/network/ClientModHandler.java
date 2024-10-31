@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
@@ -27,6 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -97,28 +100,28 @@ public class ClientModHandler {
 		}
 
 		ClassUpdatePacket.ClientModAbilityInfo[] abilities =
-				INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
-						.filter(ability -> shouldHandleAbility(player, ability))
-						.map(ability -> {
-							ClassAbility classAbility = ability.getInfo().getLinkedSpell();
-							int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
-							int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
-							int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
+			INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
+				.filter(ability -> shouldHandleAbility(player, ability))
+				.map(ability -> {
+					ClassAbility classAbility = ability.getInfo().getLinkedSpell();
+					int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
+					int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
+					int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 
-							ClassUpdatePacket.ClientModAbilityInfo info = new ClassUpdatePacket.ClientModAbilityInfo();
-							info.name = getAbilityName(ability);
-							info.className = getAbilityClassName(ability);
-							info.remainingCooldown = remainingCooldown;
-							info.initialCooldown = ability.getInfo().getModifiedCooldown(player, ability.getAbilityScore());
-							info.remainingCharges = charges;
-							info.maxCharges = maxCharges;
-							info.mode = ability.getMode();
-							info.initialDuration = ability.getInitialDuration();
-							info.remainingDuration = ability.getRemainingDuration();
-							return info;
-						})
-						.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
-						.toArray(ClassUpdatePacket.ClientModAbilityInfo[]::new);
+					ClassUpdatePacket.ClientModAbilityInfo info = new ClassUpdatePacket.ClientModAbilityInfo();
+					info.name = getAbilityName(ability);
+					info.className = getAbilityClassName(ability);
+					info.remainingCooldown = remainingCooldown;
+					info.initialCooldown = ability.getInfo().getModifiedCooldown(player, ability.getAbilityScore());
+					info.remainingCharges = charges;
+					info.maxCharges = maxCharges;
+					info.mode = ability.getMode();
+					info.initialDuration = ability.getInitialDuration();
+					info.remainingDuration = ability.getRemainingDuration();
+					return info;
+				})
+				.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
+				.toArray(ClassUpdatePacket.ClientModAbilityInfo[]::new);
 
 		ClassUpdatePacket packet = new ClassUpdatePacket();
 		packet.abilities = abilities;
@@ -127,19 +130,19 @@ public class ClientModHandler {
 
 	public static void updateEffects(Entity entity) {
 		if (INSTANCE == null
-				|| !(entity instanceof Player player)
-				|| !playerHasClientMod(player)) {
+			|| !(entity instanceof Player player)
+			|| !playerHasClientMod(player)) {
 			return;
 		}
 		EffectInfo[] effectsList = INSTANCE.mPlugin.mEffectManager.getPriorityEffects(player).entrySet().stream()
-				.filter(effect -> effect != null && effect.getValue().doesDisplay() && effect.getValue().getDisplayedName() != null)
-				.map(effect -> {
-					EffectInfo info = new EffectInfo();
-					mapEffectToEffectInfo(effect.getValue(), info, effect.getKey(), false);
-					return info;
-				})
-				.sorted((effect1, effect2) -> effect2.displayPriority - effect1.displayPriority)
-				.toArray(EffectInfo[]::new);
+			.filter(effect -> effect != null && effect.getValue().doesDisplay() && effect.getValue().getDisplayedName() != null)
+			.map(effect -> {
+				EffectInfo info = new EffectInfo();
+				mapEffectToEffectInfo(effect.getValue(), info, effect.getKey(), false);
+				return info;
+			})
+			.sorted((effect1, effect2) -> effect2.displayPriority - effect1.displayPriority)
+			.toArray(EffectInfo[]::new);
 
 		MassEffectUpdatePacket packet = new MassEffectUpdatePacket();
 		packet.effects = effectsList;
@@ -148,11 +151,11 @@ public class ClientModHandler {
 
 	public static void updateEffect(Entity entity, Effect effect, String source, boolean remove) {
 		if (INSTANCE == null
-				|| !(entity instanceof Player player)
-				|| !playerHasClientMod(player)
-				|| effect == null
-				|| !effect.doesDisplay()
-				|| effect.getDisplayedName() == null) {
+			|| !(entity instanceof Player player)
+			|| !playerHasClientMod(player)
+			|| effect == null
+			|| !effect.doesDisplay()
+			|| effect.getDisplayedName() == null) {
 			return;
 		}
 		EffectInfo info = new EffectInfo();
@@ -195,6 +198,29 @@ public class ClientModHandler {
 		INSTANCE.sendPacket(player, packet);
 	}
 
+	public static void sendLocationPacket(Player player, String content) {
+		String shard;
+		try {
+			shard = NetworkRelayAPI.getShardName();
+		} catch (Exception ex) {
+			//If failed use the short version.
+			shard = ServerProperties.getShardName();
+		}
+
+		sendLocationPacket(player, shard, content);
+	}
+
+	/**
+	 * This overload should only be (publicly) used in the case the current shard is sending the player on another shard
+	 * whose name does not bear the one of the content the player is being sent to
+	 */
+	public static void sendLocationPacket(Player player, @NotNull String shard, String content) {
+		LocationUpdatedPacket packet = new LocationUpdatedPacket();
+		packet.shard = shard;
+		packet.content = content;
+		INSTANCE.sendPacket(player, packet);
+	}
+
 	private void sendPacket(Player player, Packet packet) {
 		player.sendPluginMessage(mPlugin, CHANNEL_ID, mGson.toJson(packet).getBytes(StandardCharsets.UTF_8));
 	}
@@ -204,8 +230,8 @@ public class ClientModHandler {
 	 */
 	private static boolean shouldHandleAbility(Player player, Ability ability) {
 		return ability != null
-				&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
-				|| ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
+			&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
+			|| ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
 	}
 
 	private static @Nullable String getAbilityName(Ability ability) {
@@ -232,8 +258,8 @@ public class ClientModHandler {
 		for (PlayerClass playerClass : INSTANCE.mClasses.mClasses) {
 			Predicate<AbilityInfo<?>> sameClass = abi -> abi.getAbilityClass() == ability.getClass();
 			if (playerClass.mAbilities.stream().anyMatch(sameClass)
-					|| playerClass.mSpecOne.mAbilities.stream().anyMatch(sameClass)
-					|| playerClass.mSpecTwo.mAbilities.stream().anyMatch(sameClass)) {
+				|| playerClass.mSpecOne.mAbilities.stream().anyMatch(sameClass)
+				|| playerClass.mSpecTwo.mAbilities.stream().anyMatch(sameClass)) {
 				return playerClass.mClassName;
 			}
 		}
@@ -355,6 +381,28 @@ public class ClientModHandler {
 
 		public boolean positive;
 		public boolean percentage;
+	}
+
+
+	/**
+	 * Should be sent on login, shard change and after a player enters a new content (most likely will be tied to the instance bot)
+	 */
+	@SuppressWarnings("unused")
+	public static class LocationUpdatedPacket implements Packet {
+		String _type = "LocationUpdatedPacket";
+
+		/**
+		 * the Shard the player is on.
+		 */
+		@MonotonicNonNull
+		String shard;
+
+		/**
+		 * the content the player is playing, content can be the same as shard if the shard has the same name.
+		 * on player plots, this will reflect the current instance.
+		 */
+		@Nullable
+		String content;
 	}
 
 }

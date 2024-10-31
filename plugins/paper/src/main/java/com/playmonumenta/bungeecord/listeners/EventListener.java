@@ -1,6 +1,7 @@
 package com.playmonumenta.bungeecord.listeners;
 
 import com.playmonumenta.bungeecord.Main;
+import com.playmonumenta.bungeecord.network.BungeeClientModHandler;
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 import java.util.Set;
 import java.util.UUID;
@@ -40,6 +41,7 @@ public class EventListener implements Listener {
 	}
 
 	private void joinLeaveEvent(ProxiedPlayer player, String operation, boolean isVanished) {
+
 		if (!isVanished) {
 			/* No vanish - send everyone the login message */
 
@@ -90,11 +92,17 @@ public class EventListener implements Listener {
 	public void serverSwitchEvent(ServerSwitchEvent event) {
 		ProxiedPlayer player = event.getPlayer();
 
-		if (mMain.mJoinMessagesEnabled && !mOnlinePlayers.contains(player.getUniqueId())) {
+		if (!mOnlinePlayers.contains(player.getUniqueId())) {
+			//first login, send server info to the client.
+			BungeeClientModHandler.sendServerInfoPacket(player);
+
 			/* This player is not already online - send join message */
 			mOnlinePlayers.add(player.getUniqueId());
-			joinLeaveEvent(player, " joined the game",
-			                mVanishEnabled && BungeeVanishAPI.isInvisible(player));
+
+			if (mMain.mJoinMessagesEnabled) {
+				joinLeaveEvent(player, " joined the game",
+					mVanishEnabled && BungeeVanishAPI.isInvisible(player));
+			}
 		}
 	}
 
@@ -102,11 +110,14 @@ public class EventListener implements Listener {
 	public void playerDisconnectEvent(PlayerDisconnectEvent event) {
 		ProxiedPlayer player = event.getPlayer();
 
-		if (mMain.mJoinMessagesEnabled && mOnlinePlayers.contains(player.getUniqueId())) {
+		if (mOnlinePlayers.contains(player.getUniqueId())) {
 			/* This player was online - send leave message */
 			mOnlinePlayers.remove(player.getUniqueId());
-			joinLeaveEvent(player, " left the game",
-			                mVanishEnabled && BungeeVanishAPI.isInvisible(player));
+
+			if (mMain.mJoinMessagesEnabled) {
+				joinLeaveEvent(player, " left the game",
+					mVanishEnabled && BungeeVanishAPI.isInvisible(player));
+			}
 		}
 	}
 }

@@ -100,6 +100,10 @@ public class DungeonUtils {
 				.filter(type -> type.getShardName() != null)
 				.collect(ImmutableMap.toImmutableMap(DungeonCommandMapping::getShardName, type -> type));
 
+		public String getLocationName() {
+			return mLocation.getName();
+		}
+
 		public String getDisplayName() {
 			return mLocation.getDisplayName();
 		}

@@ -5,6 +5,7 @@ import com.playmonumenta.bungeecord.commands.Proxy;
 import com.playmonumenta.bungeecord.commands.Vote;
 import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
 import com.playmonumenta.bungeecord.listeners.EventListener;
+import com.playmonumenta.bungeecord.network.BungeeClientModHandler;
 import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
 import com.playmonumenta.bungeecord.voting.VoteManager;
 import java.io.File;
@@ -24,6 +25,8 @@ public class Main extends Plugin {
 
 	public @Nullable String mDefaultServer = null;
 	public boolean mJoinMessagesEnabled = true;
+
+	public boolean mAllowPacketPublicizeContent = false;
 
 	@Override
 	public void onEnable() {
@@ -51,6 +54,9 @@ public class Main extends Plugin {
 		}
 
 		manager.registerListener(this, new EventListener(this));
+
+		//does not have listeners currently, but still needs to be initialized.
+		new BungeeClientModHandler(mAllowPacketPublicizeContent, getLogger());
 
 		getProxy().setReconnectHandler(new MonumentaReconnectHandler(mDefaultServer));
 	}
@@ -104,6 +110,8 @@ public class Main extends Plugin {
 					mLogLevel = Level.INFO;
 			}
 			this.getLogger().setLevel(mLogLevel);
+
+			mAllowPacketPublicizeContent = mConfig.getBoolean("allow_packets_publicize_content");
 		} catch (IOException ex) {
 			getLogger().log(Level.WARNING, "Could not load config.yml", ex);
 		}
@@ -131,6 +139,8 @@ public class Main extends Plugin {
 			} else {
 				mConfig.set("log_level", "INFO");
 			}
+
+			mConfig.set("allow_packets_publicize_content", true);
 
 			try {
 				ConfigurationProvider.getProvider(YamlConfiguration.class).save(mConfig, new File(getDataFolder(), "config.yml"));

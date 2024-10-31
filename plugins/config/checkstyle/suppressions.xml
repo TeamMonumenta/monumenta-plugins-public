@@ -5,14 +5,14 @@
 	"https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-	<!-- suppress the @EventHandler ignoreCancelled check for bungee, as that EvenHandler does not have this attribute -->
+	<!-- suppress the @EventHandler ignoreCancelled check for bungee, as that EventHandler does not have this attribute -->
 	<suppress files=".*[\\/]bungeecord[\\/].*"
 			  checks="RegexpSinglelineJava"
 			  message="Event handlers must specify ignoreCancelled"/>
 	<suppress files=".*[\\/]VersionAdapter_.*java"
 			  checks="TypeName"
 			  message=".*Type name.*must match pattern.*"/>
-	<suppress files=".*[\\/]ClientModHandler.java"
+	<suppress files=".*[\\/][A-Za-z]*ClientModHandler.java"
 			  checks="MemberName"
 			  message=".*Member name.*must match pattern.*"/>
 

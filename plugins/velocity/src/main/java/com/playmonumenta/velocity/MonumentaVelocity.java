@@ -8,6 +8,7 @@ import com.playmonumenta.velocity.handlers.MonumentaReconnectHandler;
 import com.playmonumenta.velocity.integrations.LuckPermsIntegration;
 import com.playmonumenta.velocity.integrations.NetworkRelayIntegration;
 import com.playmonumenta.velocity.integrations.PremiumVanishIntegration;
+import com.playmonumenta.velocity.network.VelocityClientModHandler;
 import com.playmonumenta.velocity.voting.VoteManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ListenerCloseEvent;
@@ -103,6 +104,9 @@ public class MonumentaVelocity {
 		}
 
 		mServer.getEventManager().register(this, new JoinLeaveHandler(this));
+
+		new VelocityClientModHandler(this, mConfig.mAllowPacketPublicizeContent);
+		mServer.getChannelRegistrar().register(VelocityClientModHandler.CHANNEL_ID);
 	}
 
 	@Subscribe
@@ -155,6 +159,9 @@ public class MonumentaVelocity {
 
 		@Setting(value = "version_string")
 		public String mVersionString = "Monumenta 1.19.4-1.20.2";
+
+		@Setting(value = "allow_packets_publicize_content")
+		public Boolean mAllowPacketPublicizeContent = false;
 	}
 
 	@ConfigSerializable
