@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.managers.GlowingManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -105,36 +106,98 @@ public class AdvancingShadows extends Ability {
 
 	public boolean cast() {
 		// Enhancement: If mCanRecast is true (which shows that targeted mob died in 1s), allow recast of AS for next 3 seconds.
-		if (isOnCooldown() && !(isEnhanced() && mCanRecast && mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION >= Bukkit.getCurrentTick())) {
+		boolean isEnhancedRecast;
+		if (isEnhanced() && mCanRecast && mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION >= Bukkit.getCurrentTick()) {
+			isEnhancedRecast = true;
+		} else if (!isOnCooldown()) {
+			isEnhancedRecast = false;
+		} else {
 			return false;
 		}
 
 		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mActivationRange);
-
 		if (entity == null) {
 			return false;
 		}
-
-		if (isEnhanced() && (mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION < Bukkit.getCurrentTick())) {
-			// Lose Kill chain if last kill tick was over 80 ticks ago.
-			mEnhancementChain = 0;
-		}
-
-		mCanRecast = false;
-
-		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
-		if (origDistance > mActivationRange) {
+		Location tpDestination = findTeleportLocation(entity, mPlayer, mActivationRange, mCosmetic);
+		if (tpDestination == null) {
 			return false;
 		}
-		Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
-		World world = mPlayer.getWorld();
-		Location loc = mPlayer.getLocation();
+		if (!tpDestination.equals(mPlayer.getLocation())) {
+			PlayerUtils.playerTeleport(mPlayer, tpDestination);
+		}
+
+		if (isEnhancedRecast) {
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt / 2.0, AFFECTED_DAMAGE_TYPES));
+		} else {
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
+			mEnhancementChain = 0;
+			putOnCooldown();
+		}
+
+		if (isLevelTwo()) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
+				ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+				if (mob != entity) {
+					MovementUtils.knockAway(entity, mob, mKnockback, true);
+				}
+			}
+		}
+
+		if (isEnhanced()) {
+			GlowingManager.ActiveGlowingEffect glowingEffect = GlowingManager.startGlowing(entity, NamedTextColor.BLACK, mRecastTimer, GlowingManager.PLAYER_ABILITY_PRIORITY);
+
+			mCanRecast = false;
+			cancelOnDeath(new BukkitRunnable() {
+				int mT = 0;
+
+				@Override
+				public void run() {
+					if (mT > mRecastTimer) {
+						glowingEffect.clear();
+
+						cancel();
+						return;
+					} else if (entity.isDead() || !entity.isValid()) {
+						mCosmetic.tpChain(mPlayer.getWorld(), mPlayer);
+
+						mCanRecast = true;
+						mEnhancementKillTick = Bukkit.getCurrentTick();
+						mEnhancementChain++;
+
+						MessagingUtils.sendActionBarMessage(mPlayer, "Advancing Shadows Chain: " + mEnhancementChain);
+						cancel();
+						return;
+					}
+
+					mT++;
+				}
+			}.runTaskTimer(mPlugin, 0, 1));
+		}
+
+		mCosmetic.tpParticle(mPlayer, entity);
+		mCosmetic.tpSound(mPlayer.getWorld(), mPlayer);
+		return true;
+	}
+
+	public static @Nullable Location findTeleportLocation(LivingEntity entity, Player player, double range, AdvancingShadowsCS cosmetic) {
+		if (entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			return null;
+		}
+
+		double origDistance = player.getLocation().distance(entity.getLocation());
+		if (origDistance > range) {
+			return null;
+		}
+		Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), player.getLocation());
+		World world = player.getWorld();
+		Location loc = player.getLocation();
 
 		int i = 0;
 		while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
 			i++;
 			loc.add(dir.clone().multiply(0.3333));
-			mCosmetic.tpTrail(mPlayer, loc, i);
+			cosmetic.tpTrail(player, loc, i);
 			if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
 				double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
 				loc.subtract(dir.clone().multiply(multiplier));
@@ -152,8 +215,8 @@ public class AdvancingShadows extends Ability {
 
 		// If still solid, something is wrong.
 		if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
-			mCosmetic.tpSoundFail(world, mPlayer);
-			return false;
+			cosmetic.tpSoundFail(world, player);
+			return null;
 		}
 
 		// Prevent the player from teleporting over void
@@ -173,8 +236,8 @@ public class AdvancingShadows extends Ability {
 
 			// Maybe void - not worth it
 			if (!safe) {
-				mCosmetic.tpSoundFail(world, mPlayer);
-				return false;
+				cosmetic.tpSoundFail(world, player);
+				return null;
 			}
 
 			// Don't teleport players below y = 1.1 to avoid clipping into oblivion
@@ -182,67 +245,15 @@ public class AdvancingShadows extends Ability {
 		}
 
 		// Extra safeguard to prevent bizarro teleports
-		if (mPlayer.getLocation().distance(loc) > mActivationRange) {
-			mCosmetic.tpSoundFail(world, mPlayer);
-			return false;
+		if (player.getLocation().distance(loc) > range) {
+			cosmetic.tpSoundFail(world, player);
+			return null;
 		}
 
-		if (loc.distance(entity.getLocation()) <= origDistance && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			PlayerUtils.playerTeleport(mPlayer, loc);
+		if (loc.distance(entity.getLocation()) <= origDistance && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			return loc;
 		}
-
-		if (mEnhancementChain == 0) {
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
-		} else {
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt / 2.0, AFFECTED_DAMAGE_TYPES));
-		}
-		if (isLevelTwo()) {
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-				ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
-				if (mob != entity) {
-					MovementUtils.knockAway(entity, mob, mKnockback, true);
-				}
-			}
-		}
-
-		if (isEnhanced()) {
-			GlowingManager.ActiveGlowingEffect glowingEffect = GlowingManager.startGlowing(entity, NamedTextColor.BLACK, mRecastTimer, GlowingManager.PLAYER_ABILITY_PRIORITY);
-
-			cancelOnDeath(new BukkitRunnable() {
-				int mT = 0;
-
-				@Override
-				public void run() {
-					if (mT > mRecastTimer) {
-						mEnhancementChain = 0;
-						glowingEffect.clear();
-
-						cancel();
-						return;
-					} else if (entity.isDead() || !entity.isValid()) {
-						mCosmetic.tpChain(world, mPlayer);
-
-						mCanRecast = true;
-						mEnhancementKillTick = Bukkit.getCurrentTick();
-						mEnhancementChain++;
-
-						MessagingUtils.sendActionBarMessage(mPlayer, "Advancing Shadows Chain: " + mEnhancementChain);
-						cancel();
-						return;
-					}
-
-					mT++;
-				}
-			}.runTaskTimer(mPlugin, 0, 1));
-		}
-
-		mCosmetic.tpParticle(mPlayer, entity);
-		mCosmetic.tpSound(world, mPlayer);
-
-		if (mEnhancementChain == 0) {
-			putOnCooldown();
-		}
-		return true;
+		return player.getLocation();
 	}
 
 	@Override
