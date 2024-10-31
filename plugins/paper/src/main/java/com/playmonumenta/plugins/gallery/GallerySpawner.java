@@ -70,6 +70,7 @@ public class GallerySpawner {
 			for (Map.Entry<Soul, Integer> mob : mobsPool.entrySet()) {
 				mobSpawned = (LivingEntity) mob.getKey().summon(loc);
 				mobSpawned.setAI(false);
+				mobSpawned.setInvulnerable(true);
 				if (shouldGiveTag) {
 					mobSpawned.addScoreboardTag(GalleryManager.MOB_TAG_FROM_SPAWNER);
 				}
@@ -95,10 +96,10 @@ public class GallerySpawner {
 			public void run() {
 				mLoc.add(mSpawningDirection.getOffset().clone().multiply(-mDistancePerTick));
 				double[] dir = VectorUtils.vectorToRotation(mSpawningDirection.getOffset().clone().multiply(-1));
-				NmsUtils.getVersionAdapter().setEntityLocation(finalMobSpawned, mLoc.toVector(), (float)dir[0], (float)dir[1]);
-
+				NmsUtils.getVersionAdapter().setEntityLocation(finalMobSpawned, mLoc.toVector(), (float) dir[0], (float) dir[1]);
 				if (mTimes >= mMaxTicks) {
 					finalMobSpawned.setAI(true);
+					finalMobSpawned.setInvulnerable(false);
 					try {
 						BossManager.getInstance().createBossInternal(finalMobSpawned, new GenericGalleryMobBoss(GalleryManager.mPlugin, finalMobSpawned));
 					} catch (Exception e) {
@@ -114,7 +115,6 @@ public class GallerySpawner {
 
 		return mobSpawned;
 	}
-
 
 
 	public void save() {
