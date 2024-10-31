@@ -33,6 +33,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class DepthsCommand extends GenericCommand {
 
+	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.depths");
 
@@ -288,9 +289,12 @@ public class DepthsCommand extends GenericCommand {
 				}
 				if (sender instanceof Player playerSender) {
 
-					// This cast is guaranteed to succeed.
-					if (dp.mZenithAbandonedByParty || (!playerSender.hasMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY)
-						|| !((List<UUID>) playerSender.getMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY).get(0).value()).contains(player) && !playerSender.hasPermission(sacrificeBypass))) {
+					if (dp.mZenithAbandonedByParty) {
+						return;
+					}
+					// This cast is guaranteed to succeed. We check to see if the sender is allowed to kick the person.
+					if ((!playerSender.hasMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY)
+						|| !((List<UUID>) playerSender.getMetadata(DepthsManager.ZENITH_ABANDONABLE_PLAYERS_METADATA_KEY).get(0).value()).contains(player)) && !playerSender.hasPermission(sacrificeBypass)) {
 						DepthsUtils.sendFormattedMessage(playerSender, dp.getContent(), "You cannot do this right now.");
 						return;
 					}

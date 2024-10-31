@@ -647,15 +647,17 @@ public class DepthsListener implements Listener {
 			" quit_reason=" + event.getReason().name()
 		);
 
+		if (dp == null) {
+			return;
+		}
+		dp.mLastLogoutTime = System.currentTimeMillis();
 		if (
-			dp != null &&
 				!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
 				event.getReason() == PlayerQuitEvent.QuitReason.DISCONNECTED
 		) {
 			if (dp.getContent() == DepthsContent.DARKEST_DEPTHS) {
 				return;
 			}
-			dp.mLastLogoutTime = System.currentTimeMillis();
 
 			// Check if in active bossfight
 			List<String> applicableBossTags = List.of(Callicarpa.identityTag, Broodmother.identityTag, Vesperidys.identityTag);
