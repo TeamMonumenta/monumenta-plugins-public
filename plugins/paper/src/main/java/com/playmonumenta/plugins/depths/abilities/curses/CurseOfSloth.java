@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 public class CurseOfSloth extends DepthsAbility {
 	public static final String ABILITY_NAME = "Curse of Sloth";
 	public static final String MODIFIER = "CurseOfSlothSpeedModifier";
-	public static final double SLOWNESS = 0.25;
+	public static final double SLOWNESS = 0.15;
 
 	public static final DepthsAbilityInfo<CurseOfSloth> INFO =
 		new DepthsAbilityInfo<>(CurseOfSloth.class, ABILITY_NAME, CurseOfSloth::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)

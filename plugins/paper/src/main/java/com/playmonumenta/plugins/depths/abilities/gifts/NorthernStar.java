@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class NorthernStar extends DepthsAbility {
 	public static final String ABILITY_NAME = "Northern Star";
+	private static final int STACKS = 4;
 
 	public static final DepthsAbilityInfo<NorthernStar> INFO =
 		new DepthsAbilityInfo<>(NorthernStar.class, ABILITY_NAME, NorthernStar::new, DepthsTree.GIFT, DepthsTrigger.PASSIVE)
@@ -35,11 +36,11 @@ public class NorthernStar extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mNorthernStarStacks = 3;
+		dp.mNorthernStarStacks = STACKS;
 	}
 
 	private static Description<NorthernStar> getDescription() {
-		return new DescriptionBuilder<NorthernStar>().add("The next three elite rooms offer an additional reward.")
+		return new DescriptionBuilder<NorthernStar>().add("The next " + STACKS + " elite rooms offer an additional reward.")
 			.add((a, p) -> a != null && a.mDepthsPlayer != null
 				? Component.text("\nRemaining rewards: " + a.mDepthsPlayer.mNorthernStarStacks)
 				: Component.empty());

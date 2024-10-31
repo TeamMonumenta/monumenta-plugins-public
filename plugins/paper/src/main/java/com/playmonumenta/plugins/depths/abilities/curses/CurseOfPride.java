@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CurseOfPride extends DepthsAbility {
 	public static final String ABILITY_NAME = "Curse of Pride";
-	public static final int MAX_TREE_ABILITIES = 3;
+	public static final int MAX_TREE_ABILITIES = 4;
 	public static final double VULN_PER_ABILITY = 0.1;
 
 	public static final DepthsAbilityInfo<CurseOfPride> INFO =

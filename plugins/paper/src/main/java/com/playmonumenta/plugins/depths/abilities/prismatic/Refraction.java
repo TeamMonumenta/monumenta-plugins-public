@@ -57,6 +57,8 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	private double mDamage;
 	public int mCurrDuration = -1;
 
+	private boolean mDeposited = false;
+
 	public static final DepthsAbilityInfo<Refraction> INFO =
 		new DepthsAbilityInfo<>(Refraction.class, ABILITY_NAME, Refraction::new, DepthsTree.PRISMATIC, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.REFRACTION)
@@ -76,9 +78,14 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 
 	public boolean cast() {
 		if (isOnCooldown()) {
-			return false;
+			if (mDeposited) {
+				return false;
+			}
+			mDeposited = true;
+			return true;
 		}
 		putOnCooldown();
+		mDeposited = false;
 
 		DepthsPlayer dPlayer = DepthsManager.getInstance().getDepthsPlayer(mPlayer);
 		if (dPlayer == null) {
@@ -87,9 +94,8 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-		Location loc = mPlayer.getEyeLocation();
-		Location l = loc.clone().add(loc.getDirection());
 		new BukkitRunnable() {
+			Location mLoc = mPlayer.getEyeLocation();
 			double mPitch = 0;
 			double mRadiusDecrement = 0;
 			int mT = 0;
@@ -98,9 +104,14 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 			public void run() {
 				World world = mPlayer.getWorld();
 
+				if (!mDeposited) {
+					mLoc = mPlayer.getEyeLocation();
+				}
+				Location l = mLoc.clone().add(mLoc.getDirection());
+
 				mT += 1;
 				mPitch += 0.05;
-				float initialRotation = loc.getYaw() + 180;
+				float initialRotation = mLoc.getYaw() + 180;
 				double maxRotPerTick = 9;
 				double currentRotPerTick = maxRotPerTick * (30 - mT) / 30;
 				double rotation = maxRotPerTick * 30 / 2 - currentRotPerTick * (30 - mT) / 2;
@@ -141,10 +152,10 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 
 				}
 
-				world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1.5f, 0.5f + (float) mPitch);
+				world.playSound(mLoc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1.5f, 0.5f + (float) mPitch);
 				if (mT >= 30) {
 					this.cancel();
-					pulseLaser(playerItemStats, dPlayer, loc);
+					pulseLaser(playerItemStats, dPlayer, mLoc);
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
@@ -156,18 +167,22 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 		mCurrDuration = 0;
 
 		new BukkitRunnable() {
+			Location mLoc = loc;
 			float mHue = 0.0f;
 			double mAngle = 0.5;
 
 			@Override
 			public void run() {
 				World world = mPlayer.getWorld();
+				if (!mDeposited) {
+					mLoc = mPlayer.getEyeLocation();
+				}
 
 				mCurrDuration++;
 				mAngle += 0.5;
 				mHue = 0.0f;
-				Vector dir = loc.getDirection().normalize();
-				Location endLoc = LocationUtils.rayTraceToBlock(loc, loc.getDirection(), DISTANCE, (hitBlockLoc) -> {
+				Vector dir = mLoc.getDirection().normalize();
+				Location endLoc = LocationUtils.rayTraceToBlock(mLoc, mLoc.getDirection(), DISTANCE, (hitBlockLoc) -> {
 					if (mCurrDuration % 5 == 0) {
 						new PartialParticle(Particle.FIREWORKS_SPARK, hitBlockLoc, 10, 0.1, 0.1, 0.1, 0.3).spawnAsPlayerActive(mPlayer);
 						world.playSound(hitBlockLoc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 1, 1.5f);
@@ -177,13 +192,13 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 				world.playSound(mPlayer.getEyeLocation(), Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 2f);
 				world.playSound(mPlayer.getEyeLocation(), Sound.ENTITY_GUARDIAN_ATTACK, SoundCategory.PLAYERS, 0.5f, 2f);
 
-				Location adjustedLoc = loc.clone();
+				Location adjustedLoc = mLoc.clone();
 				adjustedLoc.setPitch(adjustedLoc.getPitch() + 90);
 				Vector vec = adjustedLoc.getDirection();
 				vec = vec.clone().rotateAroundAxis(dir, (-Math.PI / 24) * mAngle);
 				vec = vec.normalize().multiply(0.75);
 
-				Location currLoc = loc.clone();
+				Location currLoc = mLoc.clone();
 
 				// every other tick, play particles in the gaps to create a fuller beam
 				if (mCurrDuration % 2 == 0) {
@@ -224,7 +239,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 					vec.rotateAroundAxis(dir, Math.PI / 6);
 				}
 
-				Hitbox hitbox = Hitbox.approximateCylinder(loc, endLoc, 1.25, true).accuracy(0.5);
+				Hitbox hitbox = Hitbox.approximateCylinder(mLoc, endLoc, 1.25, true).accuracy(0.5);
 
 				if (mCurrDuration % 5 == 0) {
 					List<LivingEntity> hitMobs = hitbox.getHitMobs();
@@ -303,11 +318,11 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 
 	private static Description<Refraction> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<Refraction>(color)
-			.add("Swap hands to begin charging a stationary, powerful beam in the direction you face. After a 1 second windup, it releases a beam of prismatic energy that deals ")
+			.add("Swap hands to begin charging a powerful beam in the direction you face. After a 1 second windup, it releases a beam of prismatic energy that deals ")
 			.addDepthsDamage(a -> DAMAGE[rarity - 1] * 4, DAMAGE[rarity - 1] * 4, true)
 			.add(" magic damage per second for ")
 			.addDuration(a -> DURATION, DURATION)
-			.add(" seconds. Additionally, the beam will apply status effects to allies and enemies depending on your available trees.")
+			.add(" seconds. Triggering again while active will cause the beam to remain in place for the remainder of the duration. Additionally, the beam will apply status effects to allies and enemies depending on your available trees.")
 			.addCooldown(COOLDOWN_TICKS)
 			.addConditionalTree(DepthsTree.FROSTBORN, getFrostbornDescription(color))
 			.addConditionalTree(DepthsTree.FLAMECALLER, getFlamecallerDescription(color))

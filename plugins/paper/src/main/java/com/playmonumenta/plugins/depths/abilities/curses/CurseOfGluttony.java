@@ -38,12 +38,15 @@ public class CurseOfGluttony extends DepthsAbility {
 		}
 		Map<Integer, List<String>> sortedAbilities = new HashMap<>();
 		dp.mAbilities.forEach((ability, rarity) -> {
+			if (rarity >= 6) {
+				return;
+			}
 			List<String> rarityAbilities = sortedAbilities.computeIfAbsent(rarity, i -> new ArrayList<>());
 			rarityAbilities.add(ability);
 		});
 
 		int removed = 0;
-		int highestRarity = 6;
+		int highestRarity = 5;
 		List<String> abilities = sortedAbilities.get(highestRarity);
 		outer: while (removed < 2) {
 			while (abilities == null || abilities.isEmpty()) {

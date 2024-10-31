@@ -111,6 +111,9 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 
 	public boolean cast(boolean deposit) {
 		if (isOnCooldown()) {
+			if (mDeposited) {
+				return false;
+			}
 			mDeposited = true;
 			return true;
 		}
