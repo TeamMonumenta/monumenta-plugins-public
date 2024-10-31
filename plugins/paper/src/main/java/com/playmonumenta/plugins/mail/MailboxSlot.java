@@ -147,23 +147,30 @@ public class MailboxSlot {
 				&& blockStateMeta.hasBlockState()
 				&& blockStateMeta.getBlockState() instanceof BlockInventoryHolder inventoryHolder
 		) {
-			Inventory inventory = inventoryHolder.getInventory();
-			for (ItemStack content : inventory) {
-				mVanillaContentArray.add(nullableMailboxSlot(player, content));
-			}
+			try {
+				Inventory inventory = inventoryHolder.getInventory();
+				for (ItemStack content : inventory) {
+					mVanillaContentArray.add(nullableMailboxSlot(player, content));
+				}
 
-			if (inventory instanceof BrewerInventory brewerInventory) {
-				optPutSlotMap(player, "fuel", brewerInventory.getFuel());
-				optPutSlotMap(player, "ingredient", brewerInventory.getIngredient());
-			} else if (inventory instanceof FurnaceInventory furnaceInventory) {
-				optPutSlotMap(player, "fuel", furnaceInventory.getFuel());
-				optPutSlotMap(player, "smelting", furnaceInventory.getSmelting());
-				optPutSlotMap(player, "result", furnaceInventory.getResult());
-			} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
-				optPutSlotMap(player, "record", jukeboxInventory.getRecord());
-			}
+				if (inventory instanceof BrewerInventory brewerInventory) {
+					optPutSlotMap(player, "fuel", brewerInventory.getFuel());
+					optPutSlotMap(player, "ingredient", brewerInventory.getIngredient());
+				} else if (inventory instanceof FurnaceInventory furnaceInventory) {
+					optPutSlotMap(player, "fuel", furnaceInventory.getFuel());
+					optPutSlotMap(player, "smelting", furnaceInventory.getSmelting());
+					optPutSlotMap(player, "result", furnaceInventory.getResult());
+				} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
+					optPutSlotMap(player, "record", jukeboxInventory.getRecord());
+				}
 
-			inventory.clear();
+				inventory.clear();
+			} catch (NullPointerException ignored) {
+				// This occurs on certain chests with loot tables, such as Sirius rewards
+				// Checking for chests with loot tables did not fix this for some reason
+				// None of our containers with loot tables contain non-loot table items,
+				// So it is safe to leave those in the RedisItemDatabase
+			}
 		}
 		reduced.setItemMeta(meta);
 
@@ -395,23 +402,30 @@ public class MailboxSlot {
 				&& blockStateMeta.hasBlockState()
 				&& blockStateMeta.getBlockState() instanceof BlockInventoryHolder inventoryHolder
 		) {
-			Inventory inventory = inventoryHolder.getInventory();
-			for (ItemStack content : inventory) {
-				describeNestedItem(content, itemLog);
-			}
+			try {
+				Inventory inventory = inventoryHolder.getInventory();
+				for (ItemStack content : inventory) {
+					describeNestedItem(content, itemLog);
+				}
 
-			if (inventory instanceof BrewerInventory brewerInventory) {
-				describeNestedItem(brewerInventory.getFuel(), itemLog);
-				describeNestedItem(brewerInventory.getIngredient(), itemLog);
-			} else if (inventory instanceof FurnaceInventory furnaceInventory) {
-				describeNestedItem(furnaceInventory.getFuel(), itemLog);
-				describeNestedItem(furnaceInventory.getSmelting(), itemLog);
-				describeNestedItem(furnaceInventory.getResult(), itemLog);
-			} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
-				describeNestedItem(jukeboxInventory.getRecord(), itemLog);
-			}
+				if (inventory instanceof BrewerInventory brewerInventory) {
+					describeNestedItem(brewerInventory.getFuel(), itemLog);
+					describeNestedItem(brewerInventory.getIngredient(), itemLog);
+				} else if (inventory instanceof FurnaceInventory furnaceInventory) {
+					describeNestedItem(furnaceInventory.getFuel(), itemLog);
+					describeNestedItem(furnaceInventory.getSmelting(), itemLog);
+					describeNestedItem(furnaceInventory.getResult(), itemLog);
+				} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
+					describeNestedItem(jukeboxInventory.getRecord(), itemLog);
+				}
 
-			inventory.clear();
+				inventory.clear();
+			} catch (NullPointerException ignored) {
+				// This occurs on certain chests with loot tables, such as Sirius rewards
+				// Checking for chests with loot tables did not fix this for some reason
+				// None of our containers with loot tables contain non-loot table items,
+				// So it is safe to leave those in the RedisItemDatabase
+			}
 		}
 		reduced.setItemMeta(meta);
 
