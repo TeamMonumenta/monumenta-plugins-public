@@ -63,6 +63,10 @@ public class CreipergeuseBoss extends BossAbilityGroup {
 		final Spell spell = new Spell() {
 			@Override
 			public void run() {
+				if (!mBoss.hasAI()) {
+					return;
+				}
+
 				final Mob mMob = (Mob) mBoss;
 				final LivingEntity currentTarget = mMob.getTarget();
 
