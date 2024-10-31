@@ -239,7 +239,14 @@ public class VanityManager implements Listener {
 			monumenta.removeKey(ItemStatUtils.LORE_KEY);
 		}
 		nbtItem.removeKey("AttributeModifiers");
-		return nbtItem.getItem();
+
+		ItemStack newItem = nbtItem.getItem();
+		ItemMeta meta = newItem.getItemMeta();
+		if (meta instanceof Damageable) {
+			((Damageable) meta).setDamage(0);
+			newItem.setItemMeta(meta);
+		}
+		return newItem;
 	}
 
 	public static boolean isInvisibleVanityItem(@Nullable ItemStack itemStack) {
