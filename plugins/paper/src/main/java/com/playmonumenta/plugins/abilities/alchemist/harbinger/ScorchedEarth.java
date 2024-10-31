@@ -29,7 +29,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Nullable;
 
 public class ScorchedEarth extends MultipleChargeAbility implements PotionAbility, AbilityWithDuration {
-
 	private static final String SCORCHED_EARTH_POTION_METAKEY = "ScorchedEarthPotion";
 
 	private static final int SCORCHED_EARTH_1_COOLDOWN = 20 * 30;
@@ -50,31 +49,31 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	public static final String CHARM_FIRE_DURATION = "Scorched Earth Fire Duration";
 
 	public static final AbilityInfo<ScorchedEarth> INFO =
-			new AbilityInfo<>(ScorchedEarth.class, "Scorched Earth", ScorchedEarth::new)
-					.linkedSpell(ClassAbility.SCORCHED_EARTH)
-					.scoreboardId("ScorchedEarth")
-					.shorthandName("SE")
-					.actionBarColor(TextColor.color(230, 134, 0))
-					.descriptions(
-							("Sneak while throwing an Alchemist's Potion to deploy a %s block radius zone that lasts %ss where the potion lands. " +
-									"Mobs in this zone are dealt %s%% of your potion's damage and set on fire for %ss whenever taking damage " +
-									"of types other than ailment or fire. Cooldown: %ss.")
-									.formatted(
-											StringUtils.to2DP(SCORCHED_EARTH_RADIUS),
-											StringUtils.ticksToSeconds(SCORCHED_EARTH_DURATION),
-											StringUtils.multiplierToPercentage(SCORCHED_EARTH_DAMAGE_FRACTION),
-											StringUtils.ticksToSeconds(SCORCHED_EARTH_FIRE_DURATION),
-											StringUtils.ticksToSeconds(SCORCHED_EARTH_1_COOLDOWN)
-									),
-							"Cooldown reduced to %ss, and %s charges of this ability can be stored at once."
-									.formatted(
-											StringUtils.ticksToSeconds(SCORCHED_EARTH_2_COOLDOWN),
-											SCORCHED_EARTH_2_CHARGES
-									)
-					)
-					.simpleDescription("Deploy a circular zone in which enemies take extra damage based on your potion damage.")
-					.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
-					.displayItem(Material.BROWN_DYE);
+		new AbilityInfo<>(ScorchedEarth.class, "Scorched Earth", ScorchedEarth::new)
+			.linkedSpell(ClassAbility.SCORCHED_EARTH)
+			.scoreboardId("ScorchedEarth")
+			.shorthandName("SE")
+			.actionBarColor(TextColor.color(230, 134, 0))
+			.descriptions(
+				("Sneak while throwing an Alchemist's Potion to deploy a %s block radius zone that lasts %ss where the potion lands. " +
+					"Mobs in this zone are dealt %s%% of your potion's damage and set on fire for %ss whenever taking damage " +
+					"of types other than ailment or fire. Cooldown: %ss.")
+					.formatted(
+						StringUtils.to2DP(SCORCHED_EARTH_RADIUS),
+						StringUtils.ticksToSeconds(SCORCHED_EARTH_DURATION),
+						StringUtils.multiplierToPercentage(SCORCHED_EARTH_DAMAGE_FRACTION),
+						StringUtils.ticksToSeconds(SCORCHED_EARTH_FIRE_DURATION),
+						StringUtils.ticksToSeconds(SCORCHED_EARTH_1_COOLDOWN)
+					),
+				"Cooldown reduced to %ss, and %s charges of this ability can be stored at once."
+				.formatted(
+					StringUtils.ticksToSeconds(SCORCHED_EARTH_2_COOLDOWN),
+					SCORCHED_EARTH_2_CHARGES
+				)
+			)
+			.simpleDescription("Deploy a circular zone in which enemies take extra damage based on your potion damage.")
+			.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(Material.BROWN_DYE);
 
 	private final List<Instance> mActiveInstances = new ArrayList<>();
 
@@ -86,7 +85,6 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	private int mLastCastTicks = 0;
 	private final ScorchedEarthCS mCosmetic;
 	private @Nullable AlchemistPotions mAlchemistPotions;
-
 	private int mCurrDuration = -1;
 
 	public ScorchedEarth(Plugin plugin, Player player) {
@@ -98,9 +96,8 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ScorchedEarthCS());
 
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mAlchemistPotions = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		Bukkit.getScheduler().runTask(mPlugin, () ->
+			mAlchemistPotions = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
 	@Override
@@ -110,20 +107,20 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 			return;
 		}
 		manageChargeCooldowns();
-		int currentTick = Bukkit.getCurrentTick();
+
 		for (Iterator<Instance> iterator = mActiveInstances.iterator(); iterator.hasNext(); ) {
-			Instance instance = iterator.next();
-			int timeRemaining = instance.mEndTick - currentTick;
+			final Instance instance = iterator.next();
+			final int timeRemaining = instance.mEndTick() - Bukkit.getCurrentTick();
+
 			if (timeRemaining <= 0) {
 				iterator.remove();
 			} else {
-				instance.mCosmetic.activeEffects(mPlayer, instance.mLocation, mRadius, timeRemaining, mDuration);
-
-				int fireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, SCORCHED_EARTH_FIRE_DURATION);
-				double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage(instance.mStats) * SCORCHED_EARTH_DAMAGE_FRACTION);
-				Hitbox hitbox = new Hitbox.SphereHitbox(instance.mLocation, mRadius);
+				instance.mCosmetic().activeEffects(mPlayer, instance.mLocation(), mRadius, timeRemaining, mDuration);
+				final int fireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, SCORCHED_EARTH_FIRE_DURATION);
+				final double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage(instance.mStats()) * SCORCHED_EARTH_DAMAGE_FRACTION);
+				final Hitbox hitbox = new Hitbox.SphereHitbox(instance.mLocation(), mRadius);
 				for (LivingEntity mob : hitbox.getHitMobs()) {
-					mPlugin.mEffectManager.addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, instance.mStats, fireDuration, mCosmetic));
+					mPlugin.mEffectManager.addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, instance.mStats(), fireDuration, mCosmetic));
 				}
 			}
 		}
@@ -143,7 +140,7 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 		if (!mPlayer.isSneaking()) {
 			return;
 		}
-		int ticks = mPlayer.getTicksLived();
+		final int ticks = mPlayer.getTicksLived();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
 			return;
@@ -160,7 +157,7 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 		if (mAlchemistPotions != null && potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			loc.setDirection(loc.toVector().subtract(mPlayer.getLocation().toVector()));
 			mCosmetic.landEffects(mPlayer, loc, mRadius, mDuration);
-			ScorchedEarthCS activeCosmetic = mCosmetic.copyForActiveInstance();
+			final ScorchedEarthCS activeCosmetic = mCosmetic.copyForActiveInstance();
 			// immediately do periodic effects too (the next ordinary execution may be delayed by up to 5 ticks)
 			activeCosmetic.activeEffects(mPlayer, loc, mRadius, mDuration, mDuration);
 			mActiveInstances.add(new Instance(loc, Bukkit.getCurrentTick() + mDuration, playerItemStats, activeCosmetic));

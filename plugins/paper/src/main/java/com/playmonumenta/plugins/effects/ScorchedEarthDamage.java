@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.EnumSet;
 import java.util.Set;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -31,7 +32,10 @@ public class ScorchedEarthDamage extends Effect {
 	private final int mFireTickDuration;
 	private final ScorchedEarthCS mCosmetic;
 
-	public ScorchedEarthDamage(int duration, double damage, Player player, PlayerItemStats stats, int fireDuration, ScorchedEarthCS cosmetic) {
+	private int mLastDamageTick = 0;
+
+	public ScorchedEarthDamage(final int duration, final double damage, final Player player, final PlayerItemStats stats,
+							   final int fireDuration, final ScorchedEarthCS cosmetic) {
 		super(duration, effectID);
 		mDamage = damage;
 		mAlchemist = player;
@@ -47,23 +51,21 @@ public class ScorchedEarthDamage extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
-		if (event.getSource() == null || event.isCancelled()) {
+		/* Prevent effect from activating on events it shouldn't */
+		if (event.getSource() == null || event.isCancelled() || event.getAbility() == ClassAbility.SCORCHED_EARTH) {
 			return;
 		}
-		// prevent ability from procing from spam clicking
-		if (event.getFlatDamage() <= 1) {
+
+		final DamageType type = event.getType();
+		/* Only allow 1 application every 2 ticks, disregard certain damage types, and prevent effect from procing on low damage attacks */
+		if (Bukkit.getCurrentTick() - mLastDamageTick < 2 || mIgnoredDamageTypes.contains(type) || event.getFlatDamage() <= 1) {
 			return;
 		}
-		if (event.getAbility() == ClassAbility.SCORCHED_EARTH) {
-			return;
-		}
-		DamageType type = event.getType();
-		if (mIgnoredDamageTypes.contains(type)) {
-			return;
-		}
-		if ((type == DamageType.MELEE && event.getDamager() instanceof Player player && player.getCooledAttackStrength(0.5f) > 0.9) ||
-				(type == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) ||
+
+		if ((type == DamageType.MELEE && event.getDamager() instanceof final Player player && player.getCooledAttackStrength(0.5f) > 0.9) ||
+				(type == DamageType.PROJECTILE && event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) ||
 				(type != DamageType.MELEE && type != DamageType.PROJECTILE && event.getDamager() instanceof Player)) {
+			mLastDamageTick = Bukkit.getCurrentTick();
 			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats), mDamage, true, false, false);
 			EntityUtils.applyFire(Plugin.getInstance(), mFireTickDuration, entity, mAlchemist);
 			mCosmetic.damageEffect(entity, mAlchemist);
