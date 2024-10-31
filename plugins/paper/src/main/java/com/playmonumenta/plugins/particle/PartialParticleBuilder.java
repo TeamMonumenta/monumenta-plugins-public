@@ -17,6 +17,19 @@ public class PartialParticleBuilder extends ParticleBuilder {
 		super(particle);
 	}
 
+	public PartialParticleBuilder copy() {
+		PartialParticleBuilder copy = new PartialParticleBuilder(this.particle());
+		copy.count(this.count());
+		copy.extra(this.extra());
+		copy.data(this.data());
+		copy.force(this.force());
+		copy.location(this.location());
+		copy.offset(this.offsetX(), this.offsetY(), this.offsetZ());
+		copy.receivers(this.receivers());
+		copy.sourceEntity(this.sourceEntity());
+		return copy;
+	}
+
 	@Override
 	public ParticleBuilder source(@Nullable Player source) {
 		this.mSourceEntity = source;
@@ -56,12 +69,12 @@ public class PartialParticleBuilder extends ParticleBuilder {
 		final Entity source = this.sourceEntity();
 		for (Player player : players) {
 			if (player == null || !player.isOnline() || player.getWorld() != location.getWorld()) {
-				this.receivers().remove(player);
+				// this.receivers().remove(player);
 				continue;
 			}
 			// mimic canSee logic
 			if (source != null && !player.canSee(source)) {
-				this.receivers().remove(player);
+				// this.receivers().remove(player);
 				continue;
 			}
 			// TODO: add a setting for the player's particle view distance

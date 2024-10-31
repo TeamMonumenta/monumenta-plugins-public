@@ -203,22 +203,29 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 			new BukkitRunnable() {
 				int mT = 1;
 				int mI = 1;
+				int mSafety = 0;
 				@Override
 				public void run() {
-					for (int j = 0; j <= mCountPerTick; j++) {
-						packagedValues.location(loc);
-						spawnUsingSettings(packagedValues);
-						loc.add(step);
-						mI++;
-
-						if (mI > finalCount) {
-							break;
+					try {
+						if (mT >= mAnimationTicks || mI > finalCount || mSafety > 300) {
+							this.cancel();
+							return;
 						}
-					}
+						mSafety++;
+						mT++;
+						for (int j = 0; j <= mCountPerTick; j++) {
+							packagedValues.location(loc);
+							spawnUsingSettings(packagedValues);
+							loc.add(step);
+							mI++;
 
-					mT++;
-					if (mT >= mAnimationTicks || mI > finalCount) {
+							if (mI > finalCount) {
+								break;
+							}
+						}
+					} catch (Exception e) {
 						this.cancel();
+						throw e;
 					}
 				}
 			}.runTaskTimerAsynchronously(Plugin.getInstance(), 0, 1);

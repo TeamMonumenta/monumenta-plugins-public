@@ -403,6 +403,9 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	 * looping internally as needed.
 	 */
 	protected void spawnUsingSettings(PartialParticleBuilder packagedValues) {
+		if (packagedValues.receivers() == null || packagedValues.receivers().isEmpty() || packagedValues.location() == null) {
+			return;
+		}
 		if (mDistanceFalloffSquared != 0) {
 			double distance = Objects.requireNonNull(packagedValues.location()).distanceSquared(Objects.requireNonNull(packagedValues.receivers()).get(0).getLocation());
 			if (distance > mDistanceFalloffSquared) {
@@ -416,16 +419,10 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 		}
 		mSpawnedParticles += packagedValues.count();
 		if (!(mDirectionalMode || isDeltaVaried() || isExtraVaried())) {
-			ParticleManager.addParticleToQueue(packagedValues);
+			ParticleManager.addParticleToQueue(packagedValues.copy());
 			// packagedValues.spawn();
 		} else {
-			PartialParticleBuilder variedClone = new PartialParticleBuilder(packagedValues.particle());
-			variedClone.location(Objects.requireNonNull(packagedValues.location()));
-			variedClone.extra(packagedValues.extra());
-			variedClone.data(packagedValues.data());
-			variedClone.receivers(packagedValues.receivers());
-			variedClone.force(packagedValues.force());
-			variedClone.sourceEntity(packagedValues.sourceEntity());
+			PartialParticleBuilder variedClone = packagedValues.copy();
 
 			int loops = packagedValues.count();
 			if (mDirectionalMode) {

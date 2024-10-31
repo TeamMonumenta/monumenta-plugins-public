@@ -87,33 +87,38 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 		}
 
 		new BukkitRunnable() {
-			double mCurrentRadius = 0;
-			int mCurrentDegree = 0;
-			int mSafety = 0;
-			final int mTotalParticles = (int) Math.floor(mRadius / mDistancePerParticle);
-			final int mParticlesPerTick = mTotalParticles / mTicks;
+		double mCurrentRadius = 0;
+		int mCurrentDegree = 0;
+		int mSafety = 0;
+		final int mTotalParticles = (int) Math.floor(mRadius / mDistancePerParticle);
+		final int mParticlesPerTick = mTotalParticles / mTicks;
 
 			@Override
 			public void run() {
-				Location loc = centerLocation.clone();
-				for (double i = mCurrentRadius; i < mCurrentRadius + (mParticlesPerTick * mDistancePerParticle); i += mDistancePerParticle) {
-					for (int j = 0; j < 3; j++) {
-						double x = FastUtils.cos((mCurrentDegree + (j * 120)) * (Math.PI / 180)) * i;
-						double z = FastUtils.sin((mCurrentDegree++ + (j * 120)) * (Math.PI / 180)) * i;
-						loc.add(x, 0, z);
-						packagedValues.location(loc);
-
-						spawnUsingSettings(packagedValues);
-						loc.subtract(x, 0, z);
+				try {
+					mSafety++;
+					if (mCurrentRadius >= mRadius || mSafety > 300) {
+						this.cancel();
+						return;
 					}
-				}
-				mCurrentRadius += mParticlesPerTick * mDistancePerParticle;
-				mSafety++;
-				if (mCurrentRadius >= mRadius || mSafety > 1000) {
+					Location loc = centerLocation.clone();
+					for (double i = mCurrentRadius; i < mCurrentRadius + (mParticlesPerTick * mDistancePerParticle); i += mDistancePerParticle) {
+						for (int j = 0; j < 3; j++) {
+							double x = FastUtils.cos((mCurrentDegree + (j * 120)) * (Math.PI / 180)) * i;
+							double z = FastUtils.sin((mCurrentDegree++ + (j * 120)) * (Math.PI / 180)) * i;
+							loc.add(x, 0, z);
+							packagedValues.location(loc);
+
+							spawnUsingSettings(packagedValues);
+							loc.subtract(x, 0, z);
+						}
+					}
+					mCurrentRadius += mParticlesPerTick * mDistancePerParticle;
+				} catch (Exception e) {
 					this.cancel();
+					throw e;
 				}
 			}
-
 		}.runTaskTimerAsynchronously(Plugin.getInstance(), 0, 1);
 	}
 }
