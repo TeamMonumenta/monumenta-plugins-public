@@ -6,7 +6,10 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
@@ -127,6 +130,19 @@ public class DataCollectionManager {
 		});
 	}
 
+	private void examineHotbarItem(ItemStack item, JsonObject hotbarObject) {
+		String type = "misc";
+		// Proj should override melee on combined and wands should override melee
+		if (ItemStatUtils.getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0) {
+			type = "ranged";
+		} else if (ItemStatUtils.getAttributeAmount(item, AttributeType.SPELL_DAMAGE, Operation.MULTIPLY, Slot.MAINHAND) > 0) {
+			type = "wand";
+		} else if (ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0) {
+			type = "melee";
+		}
+		hotbarObject.addProperty(MessagingUtils.plainText(ItemUtils.getDisplayName(item)), type);
+	}
+
 	private JsonObject getPlayerGear(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack mainhandItem = inventory.getItemInMainHand();
@@ -137,7 +153,7 @@ public class DataCollectionManager {
 		}
 
 		JsonObject gearNames = new JsonObject();
-		JsonArray hotbarNames = new JsonArray();
+		JsonObject hotbarNames = new JsonObject();
 		JsonObject activeInfusions = new JsonObject();
 
 		examineEquipmentItem(inventory.getItemInOffHand(), "offhand", gearNames, activeInfusions);
@@ -161,7 +177,7 @@ public class DataCollectionManager {
 
 		hotbarToExamine.forEach(item -> {
 			if (item != null && item.getType() != Material.AIR) {
-				hotbarNames.add(MessagingUtils.plainText(ItemUtils.getDisplayName(item)));
+				examineHotbarItem(item, hotbarNames);
 			}
 		});
 
