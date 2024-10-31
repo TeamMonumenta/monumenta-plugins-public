@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -52,21 +53,28 @@ public class MarchingFate extends Spell {
 		mTealSpirit = tealSpirit;
 		mCenter = tealSpirit.mSpawnLoc;
 
-		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(DISTANCE, HEIGHT, 0), LOS));
-		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(-DISTANCE, HEIGHT, 0), LOS));
+		addMarchingFate(DISTANCE, 0, NamedTextColor.DARK_GRAY);
+		addMarchingFate(-DISTANCE, 0, NamedTextColor.AQUA);
 
 		if (isHard) {
-			mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, DISTANCE), LOS));
-			mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, -DISTANCE), LOS));
-		}
-
-		for (Entity e : mMarchers) {
-			mSpawnIndex.put(e, e.getLocation());
+			addMarchingFate(0, DISTANCE, NamedTextColor.WHITE);
+			addMarchingFate(0, -DISTANCE, NamedTextColor.BLACK);
 		}
 
 		tealSpirit.setMarchers(mMarchers);
 
 		mBossBar = new ChargeUpManager(mCenter, mBoss, 10000, Component.text(SPELL_NAME, NamedTextColor.DARK_AQUA), BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS, TealSpirit.detectionRange);
+	}
+
+	private void addMarchingFate(double dx, double dz, NamedTextColor glowColor) {
+		Location location = mCenter.clone().add(dx, HEIGHT, dz);
+		Entity entity = LibraryOfSoulsIntegration.summon(location, LOS);
+		if (entity == null) {
+			return;
+		}
+		GlowingManager.startGlowing(entity, glowColor, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "marching_fates");
+		mMarchers.add(entity);
+		mSpawnIndex.put(entity, location);
 	}
 
 	@Override
@@ -150,9 +158,7 @@ public class MarchingFate extends Spell {
 			if (!mMarchers.isEmpty()) {
 				double minDistance = 25;
 				for (Entity e : mMarchers) {
-					if (e.getLocation().distance(mCenter) < minDistance) {
-						minDistance = e.getLocation().distance(mCenter);
-					}
+					minDistance = Double.min(minDistance, e.getLocation().distance(mCenter));
 				}
 				mBossBar.setTime((int) (10000 * Math.min(minDistance / DISTANCE, 1)));
 				mBossBar.setTitle(obfuscate(obfuscation, NamedTextColor.DARK_AQUA));
