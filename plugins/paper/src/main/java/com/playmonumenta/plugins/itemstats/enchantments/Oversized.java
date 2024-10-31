@@ -35,7 +35,12 @@ public class Oversized implements Enchantment {
 			return;
 		}
 
-		ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
+		onOversizedShoot(player, false);
+	}
+
+	// called by this and ThrowingKnife
+	public static void onOversizedShoot(Player player, boolean fromThrowingKnife) {
+		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 		double throwRate = playerItemStats.getItemStats().get(AttributeType.THROW_RATE);
 		int cooldown;
 		if (throwRate > 0) {
@@ -49,6 +54,8 @@ public class Oversized implements Enchantment {
 			} else {
 				return;
 			}
+			// ThrowRate already calls this, but others don't
+			onAnyShoot(player, cooldown, fromThrowingKnife, !fromThrowingKnife);
 		}
 		for (Material mat : new Material[] {Material.TRIDENT, Material.SNOWBALL}) {
 			if (player.getCooldown(mat) < cooldown) {
@@ -57,10 +64,12 @@ public class Oversized implements Enchantment {
 		}
 	}
 
-	public static void onThrow(Player player, int cooldown) {
+	// Called by this and ThrowRate
+	public static void onAnyShoot(Player player, int cooldown, boolean disableOversized, boolean disableThrowingKnife) {
 		for (int i = 0; i < 9; i++) {
 			ItemStack item = player.getInventory().getItem(i);
-			if (item != null && ItemStatUtils.hasEnchantment(item, EnchantmentType.OVERSIZED)) {
+			if (item != null && ((disableOversized && ItemStatUtils.hasEnchantment(item, EnchantmentType.OVERSIZED))
+					|| (disableThrowingKnife && ItemStatUtils.hasEnchantment(item, EnchantmentType.THROWING_KNIFE)))) {
 				if (player.getCooldown(item.getType()) < cooldown) {
 					player.setCooldown(item.getType(), cooldown);
 				}

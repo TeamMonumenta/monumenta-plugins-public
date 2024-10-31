@@ -121,6 +121,6 @@ public class ThrowRate implements Attribute {
 			}
 		}
 
-		Oversized.onThrow(player, cooldown);
+		Oversized.onAnyShoot(player, cooldown, true, true);
 	}
 }

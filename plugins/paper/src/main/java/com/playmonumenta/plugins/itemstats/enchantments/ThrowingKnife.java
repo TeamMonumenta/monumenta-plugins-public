@@ -93,6 +93,8 @@ public class ThrowingKnife implements Enchantment {
 				ItemUtils.damageItemWithUnbreaking(plugin, player, item, 1, true);
 
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 1.65f);
+
+				Oversized.onOversizedShoot(player, true);
 			}
 		}
 	}
