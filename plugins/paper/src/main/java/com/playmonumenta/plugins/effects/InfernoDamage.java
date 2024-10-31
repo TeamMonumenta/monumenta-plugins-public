@@ -46,8 +46,7 @@ public class InfernoDamage extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz && entity instanceof LivingEntity le) {
-			double damage = Math.pow(mLevel, 0.95);
-			DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.AILMENT, ClassAbility.INFERNO, mPlayerItemStats), damage, true, false, false);
+			DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.AILMENT, ClassAbility.INFERNO, mPlayerItemStats), mLevel, true, false, false);
 			new PartialParticle(Particle.FLAME, le.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05).spawnAsEnemyBuff();
 		}
 	}
