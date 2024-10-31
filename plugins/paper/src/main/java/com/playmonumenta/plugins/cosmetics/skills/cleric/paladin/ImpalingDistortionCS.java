@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.AbstractMap;
 import java.util.List;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -58,8 +59,8 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 	double mBlue2 = PURPLE.getColor().getBlue() / 255.0;
 
 	@Override
-	public void infusionStartEffect(World world, Player player, Location loc) {
-		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air...");
+	public void infusionStartEffect(World world, Player player, Location loc, int stacks) {
+		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air... (" + stacks + ")", TextColor.color(50, 180, 200));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.6f, 0.6f);
 		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc.subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0), 2, 0, 4,
 			List.of(
@@ -70,8 +71,20 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 	}
 
 	@Override
+	public void infusionAddStack(World world, Player player, Location loc, int stacks) {
+		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air... (" + stacks + ")", TextColor.color(50, 180, 200));
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.2f);
+	}
+
+	@Override
+	public void gainMaxCharge(Player player, Location loc) {
+		player.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.8f, 0.8f);
+		new PartialParticle(Particle.SPELL_MOB, loc, 15, mRed1, mGreen1, mBlue1, 1).directionalMode(true).spawnAsPlayerActive(player);
+	}
+
+	@Override
 	public void infusionExpireMsg(Player player) {
-		MessagingUtils.sendActionBarMessage(player, "The pressure subsides as the air stabilizes...");
+		MessagingUtils.sendActionBarMessage(player, "The pressure subsides as the air stabilizes...", TextColor.color(50, 180, 200));
 	}
 
 	@Override
@@ -82,19 +95,19 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 	}
 
 	@Override
-	public void infusionHitEffect(World world, Player player, LivingEntity damagee, double radius) {
+	public void infusionHitEffect(World world, Player player, LivingEntity damagee, double radius, double ratio, float volumeScaling) {
 		Location loc = damagee.getLocation();
-		world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.9f, 1.7f);
-		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.7f, 0.9f);
-		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1.3f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_ALLAY_DEATH, SoundCategory.PLAYERS, 0.9f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.9f * volumeScaling, 1.7f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.7f * volumeScaling, 0.9f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1.3f * volumeScaling, 0.8f);
+		world.playSound(loc, Sound.ENTITY_ALLAY_DEATH, SoundCategory.PLAYERS, 0.9f * volumeScaling, 0.8f);
 		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player);
-		new PPLightning(Particle.REDSTONE, loc).maxWidth(2).hopXZ(2).hopY(0).height(12).duration(3).count(12).data(CYAN).spawnAsPlayerActive(player);
+		new PPLightning(Particle.REDSTONE, loc).maxWidth(2).hopXZ(2).hopY(0).height(6 + 6 * ratio).duration(3).count(12).data(CYAN).spawnAsPlayerActive(player);
 		new BukkitRunnable() {
 			int mTicks = 0;
 			@Override
 			public void run() {
-				for (int i = 0; i < 4; i++) {
+				for (int i = 0; i < Math.max(1, ratio * 4); i++) {
 					Particle.DustOptions colorTransition = new Particle.DustOptions(Color.fromRGB(30 * mTicks, 200 - 20*mTicks, 200), 1.1f);
 					Location loc = damagee.getLocation().add(FastUtils.randomDoubleInRange(-mTicks - 2, mTicks + 2), 0.5 * damagee.getHeight() + FastUtils.randomDoubleInRange(-mTicks + 2, mTicks + 2), FastUtils.randomDoubleInRange(-mTicks - 2, mTicks + 2));
 					Vector dir = LocationUtils.getDirectionTo(damagee.getLocation(), loc);
@@ -102,8 +115,8 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 						(Location lineLoc, double middleProgress, double endProgress, boolean middle) ->
 							new PartialParticle(Particle.REDSTONE, lineLoc, 1, 0.0, 0.0, 0.0, 0.0).data(colorTransition).spawnAsPlayerActive(player));
 				}
-				new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 1.35f, 1.8f, 1.35f, 0.3).spawnAsPlayerActive(player);
-				world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1.75f, 0.8f);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 1.25f, 1.8f, 1.25f).spawnAsPlayerActive(player);
+				world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1.75f * volumeScaling, 0.8f);
 				mTicks++;
 				if (mTicks > 5) {
 					this.cancel();
@@ -137,7 +150,7 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 			new PPLine(Particle.REDSTONE, loc.clone().add(left120.clone().multiply(0.5)), loc4.clone().add(side90.clone().multiply(0.5))).data(PURPLE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPLine(Particle.REDSTONE, loc.clone().add(right120.clone().multiply(0.5)), loc5.clone().subtract(side90.clone().multiply(0.5))).data(PURPLE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 		}
-		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
+		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius).countPerMeter(12).extraRange(0.1, 0.15).innerRadiusFactor(1)
 			.directionalMode(true).delta(2, 1, -8).rotateDelta(true).spawnAsPlayerActive(player);
 	}
 

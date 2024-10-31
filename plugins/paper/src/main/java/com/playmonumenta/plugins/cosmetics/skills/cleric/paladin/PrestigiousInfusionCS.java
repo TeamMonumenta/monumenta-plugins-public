@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -72,8 +73,8 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	}
 
 	@Override
-	public void infusionStartEffect(World world, Player player, Location loc) {
-		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from prestige...");
+	public void infusionStartEffect(World world, Player player, Location loc, int stacks) {
+		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from prestige... (" + stacks + ")", TextColor.color(255, 168, 16));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.2f);
 		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.95f, 1.4f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.25f, 0.75f);
@@ -111,8 +112,21 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	}
 
 	@Override
+	public void infusionAddStack(World world, Player player, Location loc, int stacks) {
+		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from prestige... (" + stacks + ")", TextColor.color(255, 168, 16));
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.5f);
+		new PartialParticle(Particle.SPELL, player.getLocation(), 15, 0.5, 0.125, 0.5, 0.5).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void gainMaxCharge(Player player, Location loc) {
+		player.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.6f, 2.0f);
+		new PartialParticle(Particle.SPELL, loc, 15, 0.5, 0.125, 0.5, 0.5).spawnAsPlayerActive(player);
+	}
+
+	@Override
 	public void infusionExpireMsg(Player player) {
-		MessagingUtils.sendActionBarMessage(player, "The light fades in glory...");
+		MessagingUtils.sendActionBarMessage(player, "The light fades in glory...", TextColor.color(255, 168, 16));
 	}
 
 	@Override
@@ -130,14 +144,14 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	}
 
 	@Override
-	public void infusionHitEffect(World world, Player player, LivingEntity damagee, double radius) {
+	public void infusionHitEffect(World world, Player player, LivingEntity damagee, double radius, double ratio, float volumeScaling) {
 		Location mCenter = damagee.getLocation();
-		world.playSound(mCenter, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1, 0.75f);
-		world.playSound(mCenter, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 3f, 1.5f);
-		world.playSound(mCenter, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.25f, 1.25f);
-		new PartialParticle(Particle.REDSTONE, mCenter, 125, 2.5f, 0.25f, 2.5f, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, mCenter, 75, 2f, 0.15f, 2f, 0, BURN_COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.FLAME, mCenter, 100, 0.1f, 0.025f, 0.1f, 0.25).spawnAsPlayerActive(player);
+		world.playSound(mCenter, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 0.8f * volumeScaling, 0.75f);
+		world.playSound(mCenter, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 3f * volumeScaling, 1.5f);
+		world.playSound(mCenter, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.25f * volumeScaling, 1.25f);
+		new PartialParticle(Particle.REDSTONE, mCenter, (int) (radius * 35), (float) (radius * 0.5), 0.25f, (float) (radius * 0.5), 0, LIGHT_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, mCenter, (int) (radius * 20), (float) (radius * 0.5), 0.15f, (float) (radius * 0.5), 0, BURN_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FLAME, mCenter, (int) (radius * 25), 0.1f, 0.025f, 0.1f, 0.25).spawnAsPlayerActive(player);
 
 		Vector mFront = player.getLocation().getDirection().clone().setY(0).normalize();
 		ParticleUtils.drawCurve(mCenter, 1, 31, mFront,

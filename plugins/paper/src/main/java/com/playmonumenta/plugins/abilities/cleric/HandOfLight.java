@@ -29,9 +29,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-
 public class HandOfLight extends Ability {
-
 	public static final int RANGE = 12;
 	public static final int NEARBY_SPHERE_RANGE = 2;
 	private static final double HEALING_ANGLE = 70; // (half) angle of the healing cone
@@ -63,7 +61,7 @@ public class HandOfLight extends Ability {
 			.scoreboardId("Healing")
 			.shorthandName("HoL")
 			.descriptions(
-				String.format("Right click while holding a weapon or tool to heal all other players in a %s block cone in front of you or within %s blocks of you " +
+				String.format("Right click while sneaking and holding a weapon or tool to heal all other players in a %s block cone in front of you or within %s blocks of you " +
 					"for %s hearts + %s%% of their max health and gives them regen %s for %s seconds. " +
 					"Additionally, damage all mobs in the area with magic damage equal to %s times the number of undead mobs in the range, up to %s damage. " +
 					"If holding a shield, the trigger is changed to sneak + right click. Cooldown: %ss.",
@@ -91,7 +89,7 @@ public class HandOfLight extends Ability {
 				))
 			.simpleDescription("Heal all players in front of the Cleric, and damage all mobs based on the number of Undead in the area.")
 			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
 				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)))
 			.displayItem(Material.PINK_DYE);
 
@@ -189,5 +187,4 @@ public class HandOfLight extends Ability {
 		putOnCooldown((int) cooldown);
 		return true;
 	}
-
 }

@@ -57,7 +57,6 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = Constants.TICKS_PER_SECOND * 20;
 	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = Constants.TICKS_PER_MINUTE * 4;
 	public static final String ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME = "DivineJusticeBonusDamageEffect";
-
 	public static final String CHARM_DAMAGE = "Divine Justice Percent Damage";
 	public static final String CHARM_SELF = "Divine Justice Self Heal";
 	public static final String CHARM_ALLY = "Divine Justice Ally Heal";
@@ -102,10 +101,10 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.remove(DivineJustice::remove)
 			.displayItem(Material.IRON_SWORD);
 
-	// Passive damage to share with Holy Javelin
-	public double mLastPassiveDamage = 0;
-
 	public final DivineJusticeCS mCosmetic;
+
+	// Passive damage to share with Holy Javelin
+	public double mLastPassiveDJDamage = 0;
 
 	private final double mEnhanceDamage;
 	private final int mEnhanceDuration;
@@ -117,10 +116,11 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mEnhanceDamage = ENHANCEMENT_ASH_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_DAMAGE);
-		mEnhanceDuration = CharmManager.getDuration(player, CHARM_ENHANCE_DURATION, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS());
-		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
+		mEnhanceDamage = ENHANCEMENT_ASH_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE);
+		mEnhanceDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DURATION, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new DivineJusticeCS());
+
+		Bukkit.getScheduler().runTask(mPlugin, () -> mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class));
 	}
 
 	@Override
@@ -137,22 +137,19 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
 			final DivineJusticeInvuln divineJusticeInvuln = mPlugin.mEffectManager.getActiveEffect(enemy, DivineJusticeInvuln.class);
 			if (divineJusticeInvuln == null) {
-				/* Event's flat damage does not include crit bonus and does not include gear/potion/skill buffs, readd crit bonus for melee crits */
-				mLastPassiveDamage = DAMAGE + event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
-					Math.max(((isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
-				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDamage, mInfo.getLinkedSpell(), true, false);
-				mPlugin.mEffectManager.addEffect(enemy, DivineJusticeInvuln.SOURCE, new DivineJusticeInvuln(DivineJusticeInvuln.DURATION, mLastPassiveDamage));
+				mLastPassiveDJDamage = DAMAGE + calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit);
+				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDJDamage, mInfo.getLinkedSpell(), true, false);
+				mPlugin.mEffectManager.addEffect(enemy, DivineJusticeInvuln.SOURCE, new DivineJusticeInvuln(DivineJusticeInvuln.DURATION, mLastPassiveDJDamage));
 				onDamageCosmeticEffects(enemy);
 			} else {
 				/* The enemy has been hit by DJ recently. Check to see if the new hit can apply more damage */
-				final double attemptDamage = DAMAGE + event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
-					Math.max(((isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
+				final double attemptDamage = DAMAGE + calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit);
 				final int duration = divineJusticeInvuln.getDuration();
 				final double magnitude = divineJusticeInvuln.getMagnitude();
 
 				if (attemptDamage > magnitude) {
 					final double extraDamage = attemptDamage - magnitude;
-					mLastPassiveDamage = attemptDamage;
+					mLastPassiveDJDamage = attemptDamage;
 					DamageUtils.damage(mPlayer, enemy, DamageEvent.DamageType.MAGIC, extraDamage, mInfo.getLinkedSpell(), true, false);
 					mPlugin.mEffectManager.addEffect(enemy, DivineJusticeInvuln.SOURCE, new DivineJusticeInvuln(duration, attemptDamage));
 					onDamageCosmeticEffects(enemy);
@@ -202,6 +199,19 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			mPriorAmount = 0;
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
+	}
+
+	/**
+	 * A terrible workaround to be able to deal Divine Justice damage with Luminous Infusion. Does not account for
+	 * flat damage so that LI doesn't get unintentional flat magic damage
+	 * @param event Event that caused the damage
+	 * @param isMeleeCrit Whether the conditions for a melee crit are fulfilled
+	 * @return Damage to deal to the evildoer
+	 */
+	public double calculateDamage(final DamageEvent event, final double multiplier, final boolean isMeleeCrit) {
+		/* Event's flat damage does not include crit bonus and does not include gear/potion/skill buffs, readd crit bonus for melee crits */
+		return event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
+			Math.max((multiplier + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
 	}
 
 	private void onDamageCosmeticEffects(final LivingEntity enemy) {
@@ -289,9 +299,9 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	}
 
 	public static void remove(Player p) {
-		Plugin plugin = Plugin.getInstance();
+		final Plugin plugin = Plugin.getInstance();
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			DivineJustice dj = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(p, DivineJustice.class);
+			final DivineJustice dj = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(p, DivineJustice.class);
 			if (dj == null || !dj.isEnhanced()) {
 				plugin.mEffectManager.clearEffects(p, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 			}
