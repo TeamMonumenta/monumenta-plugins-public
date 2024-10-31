@@ -87,7 +87,6 @@ public class Relic implements Enchantment {
 
 				@Override
 				public void run() {
-
 					if (mT <= 1) {
 						mT++;
 						for (int i = 0; i < lineLength; i++) {
@@ -113,6 +112,8 @@ public class Relic implements Enchantment {
 								Ruten.modifyAnimaAtLocation(b.getLocation(), Ruten.AnimaTendency.LIFE);
 							}
 						}
+					} else {
+						this.cancel();
 					}
 				}
 			};
