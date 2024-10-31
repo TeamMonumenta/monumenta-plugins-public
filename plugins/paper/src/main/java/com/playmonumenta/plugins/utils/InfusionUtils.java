@@ -20,7 +20,7 @@ public class InfusionUtils {
 	/**
 	 * When set to true the refund function will return all the XP used for the infusion, when false only the 75%
 	 */
-	public static final boolean FULL_REFUND = false;
+	public static final boolean FULL_REFUND = true;
 	public static final double REFUND_PERCENT = 0.75;
 	public static final String PULSATING_GOLD = "epic:r1/items/currency/pulsating_gold";
 	public static final String PULSATING_EMERALD = "epic:r2/items/currency/pulsating_emerald";

@@ -31,7 +31,7 @@ public class DelveInfusionUtils {
 	public static final int[] XP_COST_PER_LEVEL = {ExperienceUtils.LEVEL_40, ExperienceUtils.LEVEL_50, ExperienceUtils.LEVEL_60, ExperienceUtils.LEVEL_70};
 
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 75% */
-	public static final boolean FULL_REFUND = false;
+	public static final boolean FULL_REFUND = true;
 	public static final double REFUND_PERCENT = 0.75;
 
 	public enum DelveInfusionSelection {
