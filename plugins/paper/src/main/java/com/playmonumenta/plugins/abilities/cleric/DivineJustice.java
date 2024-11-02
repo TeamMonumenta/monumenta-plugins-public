@@ -137,13 +137,13 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
 			final DivineJusticeInvuln divineJusticeInvuln = mPlugin.mEffectManager.getActiveEffect(enemy, DivineJusticeInvuln.class);
 			if (divineJusticeInvuln == null) {
-				mLastPassiveDJDamage = DAMAGE + calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit);
+				mLastPassiveDJDamage = calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit, false);
 				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDJDamage, mInfo.getLinkedSpell(), true, false);
 				mPlugin.mEffectManager.addEffect(enemy, DivineJusticeInvuln.SOURCE, new DivineJusticeInvuln(DivineJusticeInvuln.DURATION, mLastPassiveDJDamage));
 				onDamageCosmeticEffects(enemy);
 			} else {
 				/* The enemy has been hit by DJ recently. Check to see if the new hit can apply more damage */
-				final double attemptDamage = DAMAGE + calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit);
+				final double attemptDamage = calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit, false);
 				final int duration = divineJusticeInvuln.getDuration();
 				final double magnitude = divineJusticeInvuln.getMagnitude();
 
@@ -202,16 +202,20 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	}
 
 	/**
-	 * A terrible workaround to be able to deal Divine Justice damage with Luminous Infusion. Does not account for
-	 * flat damage so that LI doesn't get unintentional flat magic damage
+	 * A terrible workaround to be able to deal Divine Justice damage with Luminous Infusion
 	 * @param event Event that caused the damage
+	 * @param multiplier Damage multiplier to use
 	 * @param isMeleeCrit Whether the conditions for a melee crit are fulfilled
+	 * @param isLuminous Whether Luminous Infusion is calculating this damage
 	 * @return Damage to deal to the evildoer
 	 */
-	public double calculateDamage(final DamageEvent event, final double multiplier, final boolean isMeleeCrit) {
-		/* Event's flat damage does not include crit bonus and does not include gear/potion/skill buffs, readd crit bonus for melee crits */
-		return event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
-			Math.max((multiplier + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)), 0.0);
+	public double calculateDamage(final DamageEvent event, final double multiplier, final boolean isMeleeCrit, final boolean isLuminous) {
+		/* Notes:
+		 * Luminous infusion does not apply DJ's flat damage or charm effects
+		 * Event's flat damage does not include crit bonus and does not include gear/potion/skill buffs, thus readd crit
+		 * bonus for melee crits */
+		return (isLuminous ? 0 : DAMAGE) + event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
+			Math.max((multiplier + (isLuminous ? 0 : CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE))), 0.0);
 	}
 
 	private void onDamageCosmeticEffects(final LivingEntity enemy) {

@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -87,7 +88,7 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 				String.format(
 					"Luminosity stacks up to %s times. With at least one primed stack, the next critical melee attack against " +
 					"an undead enemy triggers Divine Justice for %s%% of your critical attack damage. Undead enemies " +
-					"hit by this ability are set on fire for %ss.",
+					"hit by Luminous explosions are set on fire for %ss.",
 					MAX_CHARGES_2,
 					StringUtils.multiplierToPercentage(DIVINE_JUSTICE_DAMAGE_MULTIPLIER),
 					StringUtils.ticksToSeconds(FIRE_DURATION_2)
@@ -189,17 +190,23 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		final boolean triggersCrusade = Crusade.enemyTriggersAbilities(enemy, mCrusade);
 		final boolean isMeleeCrit = event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer);
+		int chargesToConsume = 0;
+
+		if (mPrimedStacks > 1 && triggersCrusade && event.getAbility() != mInfo.getLinkedSpell() &&
+				MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "LIExplosionCap")) {
+			execute(enemy, mPrimedStacks);
+			chargesToConsume += mPrimedStacks;
+		}
 
 		if (isLevelTwo() && triggersCrusade && mDivineJustice != null && isMeleeCrit && mPrimedStacks > 0) {
-			mLastPassiveMeleeDamage = mDivineJustice.calculateDamage(event, DIVINE_JUSTICE_DAMAGE_MULTIPLIER, true);
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mInfo.getLinkedSpell(), true);
+			chargesToConsume++;
+			mLastPassiveMeleeDamage = mDivineJustice.calculateDamage(event, DIVINE_JUSTICE_DAMAGE_MULTIPLIER, true, true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mDivineJustice.getInfo().getLinkedSpell(), true);
 		}
 
-		if (mPrimedStacks > 1 && triggersCrusade && event.getAbility() != mInfo.getLinkedSpell()) {
-			execute(enemy, mPrimedStacks);
-			mPrimedStacks = 0;
-			ClientModHandler.updateAbility(mPlayer, this);
-		}
+		/* Why are lambdas like this */
+		final int finalChargesToConsume = chargesToConsume;
+		Bukkit.getScheduler().runTask(mPlugin, () -> mPrimedStacks = Math.max(mPrimedStacks - finalChargesToConsume, 0));
 
 		if (isMeleeCrit && !mPreventActiveStackGain) {
 			mHitCount++;
@@ -214,13 +221,14 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 						mCosmetic.gainMaxCharge(mPlayer, mPlayer.getLocation());
 					}
 				}
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 
 		return false;
 	}
 
-	public void execute(LivingEntity damagee, int stacks) {
+	private void execute(final LivingEntity damagee, final int stacks) {
 		mCooldownTicks = 0;
 		mRechargeTicks = 0;
 		ClientModHandler.updateAbility(mPlayer, this);
@@ -231,14 +239,16 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 		final World world = mPlayer.getWorld();
 		mCosmetic.infusionHitEffect(world, mPlayer, damagee, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS * stacks), ratio, volumeScaling);
 
-		final List<LivingEntity> affected = new Hitbox.SphereHitbox(loc, Math.max(0.1, stacks * CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS))).getHitMobs();
+		final List<LivingEntity> affected = new Hitbox.SphereHitbox(loc, stacks * (RADIUS + CharmManager.getLevel(mPlayer, CHARM_RADIUS))).getHitMobs();
 		for (final LivingEntity entity : affected) {
 			mCosmetic.infusionSpreadEffect(world, mPlayer, damagee, entity, volumeScaling);
 
 			final double totalDamage = (DAMAGE_UNDEAD_1 + CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, 0)) * stacks;
 			if (Crusade.enemyTriggersAbilities(entity, mCrusade)) {
-				EntityUtils.applyFire(Plugin.getInstance(), CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION_2), entity, mPlayer);
 				DamageUtils.damage(mPlayer, entity, DamageType.MAGIC, totalDamage, mInfo.getLinkedSpell(), true);
+				if (isLevelTwo()) {
+					EntityUtils.applyFire(Plugin.getInstance(), CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION_2), entity, mPlayer);
+				}
 			} else {
 				DamageUtils.damage(mPlayer, entity, DamageType.MAGIC, 0.5 * totalDamage, mInfo.getLinkedSpell(), true);
 				Crusade.addCrusadeTag(entity, mCrusade);
