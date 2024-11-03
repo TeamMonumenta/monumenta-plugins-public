@@ -192,8 +192,8 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 		final boolean isMeleeCrit = event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer);
 		int chargesToConsume = 0;
 
-		if (mPrimedStacks > 1 && triggersCrusade && event.getAbility() != mInfo.getLinkedSpell() &&
-				MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "LIExplosionCap")) {
+		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "LIExplosionCap") &&
+			mPrimedStacks > 1 && triggersCrusade && event.getAbility() != mInfo.getLinkedSpell()) {
 			execute(enemy, mPrimedStacks);
 			chargesToConsume += mPrimedStacks;
 		}
