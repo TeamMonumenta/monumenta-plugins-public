@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.adapters;
 import com.google.gson.JsonObject;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -26,6 +27,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class VersionAdapter_unsupported implements VersionAdapter {
+	public VersionAdapter_unsupported() {
+
+	}
 
 	public void removeAllMetadata(Plugin plugin) {
 
@@ -41,7 +45,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T duplicateEntity(T entity) {
-		return (T)entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+		return (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 	}
 
 	public @Nullable Entity getEntityById(World world, int entityId) {
@@ -203,7 +207,6 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public void disableRangedAttackGoal(LivingEntity entity) {
 	}
 
-	@Override
 	public void forceSyncEntityPositionData(Entity entity) {
 	}
 
@@ -216,4 +219,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		return 0;
 	}
 
+	public Object replaceWorldNames(Object packet, Consumer<WorldNameReplacementToken> handler) {
+		return packet;
+	}
 }

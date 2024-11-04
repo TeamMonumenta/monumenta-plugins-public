@@ -239,7 +239,7 @@ public class KnickKnackSackGui extends Gui {
 			GuiItem tCharm = new GuiItem(charm).onClick((evt) -> runConsoleCommand("charm gui @S"));
 			setItem(charmSlot, tCharm);
 		} else {
-			charm.setType(Material.BARRIER);
+			charm = charm.withType(Material.BARRIER);
 			GUIUtils.splitLoreLine(charm, "Gain access to the Architect's Ring to unlock!", NamedTextColor.YELLOW, true);
 			setItem(charmSlot, charm);
 		}
@@ -271,7 +271,7 @@ public class KnickKnackSackGui extends Gui {
 				});
 			setItem(depthsSlot, tDepths);
 		} else {
-			depths.setType(Material.BARRIER);
+			depths = depths.withType(Material.BARRIER);
 			GUIUtils.splitLoreLine(depths, "Find the Darkest Depths lobby to unlock!", NamedTextColor.YELLOW, true);
 			setItem(depthsSlot, depths);
 		}
@@ -288,7 +288,7 @@ public class KnickKnackSackGui extends Gui {
 			});
 			setItem(bestiarySlot, tBestiary);
 		} else {
-			bestiary.setType(Material.BARRIER);
+			bestiary = bestiary.withType(Material.BARRIER);
 			GUIUtils.splitLoreLine(bestiary, "Complete the quest \"A Beast of a Book\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(bestiarySlot, bestiary);
 		}
@@ -330,7 +330,7 @@ public class KnickKnackSackGui extends Gui {
 			setItem(recordSlot, tRecord);
 		} else {
 			// Locked item if neither record player nor soulsinger is unlocked
-			record.setType(Material.BARRIER);
+			record = record.withType(Material.BARRIER);
 			GUIUtils.splitLoreLine(record, "Complete the quest \"Halid's Song\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(recordSlot, record);
 		}
@@ -352,7 +352,7 @@ public class KnickKnackSackGui extends Gui {
 			});
 			setItem(delveSlot, tDelve);
 		} else {
-			delve.setType(Material.BARRIER);
+			delve = delve.withType(Material.BARRIER);
 			GUIUtils.splitLoreLine(delve, "Gain access to the Architect's Ring to unlock!", NamedTextColor.YELLOW, true);
 			setItem(delveSlot, delve);
 		}
@@ -401,7 +401,7 @@ public class KnickKnackSackGui extends Gui {
 			setItem(contractSlot, tContract);
 		} else {
 			// Quest is not complete
-			contract.setType(Material.BARRIER);
+			contract = contract.withType(Material.BARRIER);
 			GUIUtils.splitLoreLine(contract, "Complete the quest \"A Study in Crimson: Part One\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(contractSlot, contract);
 		}
@@ -581,7 +581,7 @@ public class KnickKnackSackGui extends Gui {
 					update();
 				});
 		} else {
-			talisman.setType(Material.BARRIER);
+			talisman = talisman.withType(Material.BARRIER);
 			GUIUtils.splitLoreLine(talisman, "Purchase the " + t.mTreeName + " " + (celestialZenith ? "Zenith" : "Depths") + " Talisman to unlock!", NamedTextColor.YELLOW, true);
 			return new GuiItem(talisman);
 		}

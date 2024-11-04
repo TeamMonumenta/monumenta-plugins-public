@@ -14,11 +14,19 @@ plugins {
 	id("net.ltgt.nullaway") version "1.6.0"
 }
 
+repositories {
+	mavenCentral()
+	maven("https://libraries.minecraft.net/")
+	maven("https://repo.codemc.org/repository/maven-public/")
+	maven("https://maven.playmonumenta.com/releases")
+}
+
 dependencies {
 	// NOTE - Make sure if you add another version here you make sure to exclude it from minimization below!
 	implementation(project(":adapter_api"))
 	implementation(project(":adapter_unsupported"))
 	implementation(project(":adapter_v1_19_R3", "reobf"))
+	implementation(project(":adapter_v1_20_R3", "reobf"))
 	implementation(project(":velocity"))
 
 	implementation("org.openjdk.jmh:jmh-core:1.19")
@@ -30,7 +38,7 @@ dependencies {
 	compileOnly("net.kyori:adventure-api:4.11.0")
 	compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
-	compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+	compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 	compileOnly("dev.jorel:commandapi-bukkit-core:9.4.1")
 	compileOnly("me.clip:placeholderapi:2.10.9")
 	compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
@@ -45,7 +53,7 @@ dependencies {
 	compileOnly("com.playmonumenta:structures:10.2")
 	compileOnly("com.playmonumenta:worlds:2.3.1")
 	compileOnly("com.playmonumenta:libraryofsouls:5.3.1")
-	compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.19.4-v2")
+	compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.20.6-v1")
 	compileOnly("com.mojang:brigadier:1.0.18")
 	compileOnly("com.playmonumenta:nbteditor:4.1:all")
 	compileOnly("de.tr7zw:item-nbt-api-plugin:2.12.0-SNAPSHOT")
@@ -73,8 +81,9 @@ bukkit {
 	apiVersion = "1.19"
 	name = "Monumenta"
 	authors = listOf("The Monumenta Team")
-	depend = listOf("CommandAPI", "ScriptedQuests", "NBTAPI")
+	depend = listOf("CommandAPI", "ScriptedQuests",)
 	softDepend = listOf(
+		"NBTAPI",
 		"MonumentaRedisSync",
 		"PlaceholderAPI",
 		"ChestSort",
@@ -144,6 +153,7 @@ tasks {
 			exclude(project(":adapter_api"))
 			exclude(project(":adapter_unsupported"))
 			exclude(project(":adapter_v1_19_R3"))
+			exclude(project(":adapter_v1_20_R3"))
 			exclude(project(":velocity"))
 		}
 	}

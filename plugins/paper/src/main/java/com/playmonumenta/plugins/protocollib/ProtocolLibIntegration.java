@@ -4,17 +4,13 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.MMLog;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
 public class ProtocolLibIntegration {
-
-	private final PlayerTitleManager mPlayerTitleManager;
 
 	private @Nullable PacketMonitor mPacketMonitor;
 
@@ -44,24 +40,12 @@ public class ProtocolLibIntegration {
 		syncManager.addPacketListener(new PingListener(plugin));
 		// syncManager.addPacketListener(new CursedListener(plugin));
 
-		mPlayerTitleManager = new PlayerTitleManager(syncManager);
-
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tick, 2, 2);
-
+		/*
+		TODO: figure out why this broke
 		if (Bukkit.getPluginManager().isPluginEnabled("PrometheusExporter")) {
 			mPacketMonitor = new PacketMonitor(plugin);
 			syncManager.addPacketListener(mPacketMonitor);
-		}
-	}
-
-	// called every 2 ticks
-	private void tick() {
-		try {
-			mPlayerTitleManager.tick();
-		} catch (Exception e) {
-			MMLog.severe("Exception in ProtocolLibIntegration.tick():");
-			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public void enablePacketMonitor(CommandSender sender, boolean enable, boolean fullReporting) {

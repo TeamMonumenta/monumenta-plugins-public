@@ -18,6 +18,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
+import it.unimi.dsi.fastutil.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -225,7 +226,7 @@ public class CharmFactory {
 		Random r = new Random(seed);
 		ItemStack item = new ItemStack(Material.STONE);
 		if (oldItem != null) {
-			item.setType(oldItem.getType());
+			item = item.withType(oldItem.getType());
 
 			NBT.modify(item, nbt -> {
 				// transfer HAS_USED_KEY from old item to new item
@@ -354,7 +355,9 @@ public class CharmFactory {
 			item.setItemMeta(itemMeta);
 			randomCharmName(r, chosenTree, new ItemStack(Material.STONE)); //Still run randomizer for seed purposes
 		} else {
-			String generatedName = randomCharmName(r, chosenTree, item);
+			Pair<String, ItemStack> generated = randomCharmName(r, chosenTree, item);
+			item = generated.right();
+			String generatedName = generated.left();
 			itemMeta.displayName(Component.text(generatedName, DepthsUtils.getRarityTextColor(level)).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.UNDERLINED, false).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(itemMeta);
 			ItemUtils.setPlainName(item, generatedName);
@@ -736,7 +739,7 @@ public class CharmFactory {
 	 * @param charm the charm item to change the base value of
 	 * @return randomized charm name from three sample selections
 	 */
-	public static String randomCharmName(Random r, @Nullable DepthsTree tree, ItemStack charm) {
+	public static Pair<String, ItemStack> randomCharmName(Random r, @Nullable DepthsTree tree, ItemStack charm) {
 		String a;
 		String b;
 		String c;
@@ -760,12 +763,12 @@ public class CharmFactory {
 
 		CharmNounItems ni = nameB.get(r.nextInt(nameB.size()));
 		b = ni.mName;
-		charm.setType(ni.mBaseItem);
+		charm = charm.withType(ni.mBaseItem);
 
 		CharmNounConcepts nc = nameC.get(r.nextInt(nameC.size()));
 		c = nc.mName;
 
-		return a + " " + b + " of " + c;
+		return Pair.of(a + " " + b + " of " + c, charm);
 	}
 
 	public static int getZenithCharmRarity(ItemStack item) {

@@ -696,6 +696,7 @@ public final class EffectManager implements Listener {
 		return effectPairs.stream().map(pair -> pair.mSource).toList();
 	}
 
+	@SuppressWarnings("PMD.EmptyCatchBlock")
 	public Map<String, Effect> getPriorityEffects(Entity entity) {
 		EffectManager.Effects effects = mEntities.get(entity);
 		HashMap<String, Effect> output = new HashMap<>();

@@ -25,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
@@ -123,7 +124,7 @@ public final class SignUtils {
 			if (!(blockState instanceof Sign sign)) {
 				throw new RuntimeException("No sign block at requested location");
 			} else {
-				for (Component lineComponent : sign.lines()) {
+				for (Component lineComponent : sign.getSide(Side.FRONT).lines()) {
 					if (allowColor) {
 						text.add(MessagingUtils.LEGACY_SERIALIZER.serialize(lineComponent));
 					} else {
@@ -147,7 +148,7 @@ public final class SignUtils {
 						} else {
 							lineComponent = MessagingUtils.PLAIN_SERIALIZER.deserialize(updatedLines[lineNum]);
 						}
-						updatedSign.line(lineNum, lineComponent);
+						updatedSign.getSide(Side.FRONT).line(lineNum, lineComponent);
 					}
 					updatedSign.update();
 					CoreProtectIntegration.logPlacement(player, signBlock);

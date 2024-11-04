@@ -390,7 +390,7 @@ public class AbilityTriggersGui extends Gui {
 	private void makeOptionIcons(int row, int column, ItemStack display, Material indicatorMaterial, Runnable onClick) {
 		setItem(row, column, display).onLeftClick(onClick);
 		ItemStack indicator = display.clone();
-		indicator.setType(indicatorMaterial);
+		indicator = indicator.withType(indicatorMaterial);
 		GUIUtils.setGuiNbtTag(indicator, "texture", "trigger_detail_empty", mGuiTextures);
 		setItem(row + 1, column, indicator).onLeftClick(onClick);
 	}

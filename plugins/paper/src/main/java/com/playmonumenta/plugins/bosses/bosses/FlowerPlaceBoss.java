@@ -50,7 +50,7 @@ public class FlowerPlaceBoss extends BossAbilityGroup {
 		Spell spell = new Spell() {
 
 			private static final EnumSet<Material> mIgnoredMats = EnumSet.of(
-				Material.GRASS,
+				Material.SHORT_GRASS,
 				Material.BLUE_ORCHID,
 				Material.COMMAND_BLOCK,
 				Material.CHAIN_COMMAND_BLOCK,

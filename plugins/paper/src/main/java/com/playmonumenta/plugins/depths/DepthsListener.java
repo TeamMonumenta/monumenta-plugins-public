@@ -413,7 +413,7 @@ public class DepthsListener implements Listener {
 							if (ItemUtils.isNullOrAir(item)) {
 								continue;
 							}
-							VanityManager.applyVanity(item, vanityData, slot, false);
+							item = VanityManager.applyVanity(item, vanityData, slot, false);
 							// usb: remove stats from item before adding to armorstand in case of dupe
 							// this should happen after applying vanity
 							ItemUpdateHelper.removeStats(item);

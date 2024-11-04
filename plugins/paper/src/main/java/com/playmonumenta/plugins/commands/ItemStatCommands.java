@@ -53,6 +53,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -767,7 +768,7 @@ public class ItemStatCommands {
 			item.lore(null);
 
 			ItemMeta meta = item.getItemMeta();
-			for (Enchantment ench : Enchantment.values()) {
+			for (Enchantment ench : Registry.ENCHANTMENT) {
 				meta.removeEnchant(ench);
 			}
 			meta.removeItemFlags(ItemFlag.values());

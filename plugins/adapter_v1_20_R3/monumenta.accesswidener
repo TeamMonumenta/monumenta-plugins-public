@@ -1,0 +1,17 @@
+accessWidener v2 mojang+yarn
+# This needs to be copied to monumenta mixins every time.
+accessible field net/minecraft/world/entity/LivingEntity attackStrengthTicker I
+accessible method net/minecraft/world/entity/LivingEntity updatingUsingItem ()V
+accessible field net/minecraft/world/entity/ai/goal/target/NearestAttackableTargetGoal targetType Ljava/lang/Class;
+accessible field net/minecraft/world/entity/boss/wither/WitherBoss TARGETING_CONDITIONS Lnet/minecraft/world/entity/ai/targeting/TargetingConditions;
+accessible class net/minecraft/world/entity/monster/Evoker$EvokerSummonSpellGoal
+accessible class net/minecraft/world/entity/monster/Evoker$EvokerAttackSpellGoal
+accessible class net/minecraft/world/entity/animal/Bee$BeeEnterHiveGoal
+accessible class net/minecraft/world/entity/animal/Bee$BeePollinateGoal
+accessible class net/minecraft/world/entity/animal/Bee$BeeGrowCropGoal
+accessible class net/minecraft/world/entity/animal/Bee$BeeLocateHiveGoal
+accessible field net/minecraft/world/scores/Scoreboard playerScores Ljava/util/Map;
+accessible class net/minecraft/world/scores/PlayerScores
+accessible method net/minecraft/world/scores/PlayerScores listRawScores ()Ljava/util/Map;
+accessible method net/minecraft/world/entity/LivingEntity getJumpPower ()F
+accessible field net/minecraft/server/level/ServerEntity broadcast Ljava/util/function/Consumer;

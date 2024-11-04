@@ -6,7 +6,6 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     // Monumenta
     maven("https://maven.playmonumenta.com/releases/")

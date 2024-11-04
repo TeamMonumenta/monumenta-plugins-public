@@ -2,8 +2,6 @@ package com.playmonumenta.plugins.market;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.inventories.WalletManager;
@@ -411,8 +409,6 @@ public class MarketManager {
 		if (mMarketPlayerDataInstances == null) {
 			mMarketPlayerDataInstances = new HashMap<>();
 		}
-
-		Gson gson = new Gson();
 
 		UUID uuid = event.getPlayer().getUniqueId();
 		JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);

@@ -83,7 +83,6 @@ public class Haunted {
 
 	private static void followPlayer(Player p, ArmorStand armorStand, int level) {
 		Vector playerYDivider = new Vector(1, PLAYER_VERTICAL_CHANGE_DEBUFF, 1);
-		Vector hauntedYDivider = new Vector(1, VERTICAL_SPEED_DEBUFF, 1);
 		new BukkitRunnable() {
 			Location mPLoc = p.getLocation();
 			double mRadian = 0;

@@ -57,6 +57,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.jetbrains.annotations.CheckReturnValue;
 
 public class VirtualItemsReplacer extends PacketAdapter {
 
@@ -94,20 +95,20 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			List<ItemStack> items = handle.getItems();
 			for (int i = 0; i < items.size(); i++) {
 				ItemStack item = items.get(i);
-				processItemWindow(item, i, player, isPlayerInventory);
+				items.set(i, processItemWindow(item, i, player, isPlayerInventory));
 			}
 		} else if (packet.getType().equals(PacketType.Play.Server.OPEN_WINDOW_MERCHANT)) {
 			List<MerchantRecipe> recipeList = packet.getMerchantRecipeLists().read(0);
 			for (int i = 0; i < recipeList.size(); i++) {
 				MerchantRecipe recipe = recipeList.get(i);
 				List<ItemStack> ingredients = recipe.getIngredients();
-				for (ItemStack ingredient : ingredients) {
-					processTradeMenu(ingredient, -1, player, false);
-				}
+				ingredients.replaceAll(itemStack -> processTradeMenu(itemStack, -1, player, false));
 				ItemStack result = recipe.getResult();
-				processTradeMenu(result, -1, player, false);
-				MerchantRecipe recipeCopy = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(),
-					recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice(), recipe.shouldIgnoreDiscounts());
+				MerchantRecipe recipeCopy = new MerchantRecipe(
+					processTradeMenu(result, -1, player, false), recipe.getUses(), recipe.getMaxUses(),
+					recipe.hasExperienceReward(), recipe.getVillagerExperience(), recipe.getPriceMultiplier(),
+					recipe.getDemand(), recipe.getSpecialPrice(), recipe.shouldIgnoreDiscounts()
+				);
 				recipeCopy.setIngredients(ingredients);
 				recipeList.set(i, recipeCopy);
 			}
@@ -115,28 +116,32 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		} else { // PacketType.Play.Server.SET_SLOT
 			PacketPlayOutSetSlotHandle handle = PacketPlayOutSetSlotHandle.createHandle(packet.getHandle());
 			boolean isPlayerInventory = handle.getWindowId() == 0;
-			processSetSlot(handle.getItem(), handle.getSlot(), player, isPlayerInventory);
+			handle.setItem(processSetSlot(handle.getItem(), handle.getSlot(), player, isPlayerInventory));
 		}
 	}
 
 	// these methods is to determine what packet lags the most/gets called more often in spark
 	// this may get reworked in the future
-	private void processSetSlot(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
-		processItem(itemStack, slot, player, isPlayerInventory);
+	@CheckReturnValue
+	private ItemStack processSetSlot(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
+		return processItem(itemStack, slot, player, isPlayerInventory);
 	}
 
-	private void processItemWindow(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
-		processItem(itemStack, slot, player, isPlayerInventory);
+	@CheckReturnValue
+	private ItemStack processItemWindow(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
+		return processItem(itemStack, slot, player, isPlayerInventory);
 	}
 
-	private void processTradeMenu(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
-		processItem(itemStack, slot, player, isPlayerInventory);
+	@CheckReturnValue
+	private ItemStack processTradeMenu(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
+		return processItem(itemStack, slot, player, isPlayerInventory);
 	}
 
 	// the actual processing event
-	private void processItem(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
+	@CheckReturnValue
+	private ItemStack processItem(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
-			return;
+			return itemStack;
 		}
 
 		if (isPlayerInventory) {
@@ -179,26 +184,26 @@ public class VirtualItemsReplacer extends PacketAdapter {
 						});
 						itemStack.setAmount(Math.max(1, Math.min(blockCountInsideFirm, 64)));
 						// ? Add shulker box id here for resourcepack team when they need dyed support
-						itemStack.setType("Firmament".equals(plainName) ? Material.PRISMARINE : Material.BLACKSTONE);
+						itemStack = itemStack.withType("Firmament".equals(plainName) ? Material.PRISMARINE : Material.BLACKSTONE);
 						markVirtual(itemStack);
-						return;
+						return itemStack;
 					}
 				}
 
 				// Virtual cooldown items for Infinity food
 				for (Map.Entry<EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
 					if (mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey())) && ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0) {
-						itemStack.setType(entry.getValue());
+						itemStack = itemStack.withType(entry.getValue());
 						markVirtual(itemStack);
-						return;
+						return itemStack;
 					}
 				}
 
 				// Worldshaper's Loom cooldown item
 				if (mPlugin.mEffectManager.hasEffect(player, WorldshaperOverride.COOLDOWN_SOURCE) && WorldshaperOverride.isWorldshaperItem(itemStack)) {
-					itemStack.setType(WorldshaperOverride.COOLDOWN_ITEM);
+					itemStack = itemStack.withType(WorldshaperOverride.COOLDOWN_ITEM);
 					markVirtual(itemStack);
-					return;
+					return itemStack;
 				}
 			}
 
@@ -222,8 +227,8 @@ public class VirtualItemsReplacer extends PacketAdapter {
 						case 8 -> EquipmentSlot.FEET;
 						default -> EquipmentSlot.OFF_HAND;
 					};
-					VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
-					return;
+					itemStack = VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
+					return itemStack;
 				}
 			}
 
@@ -256,13 +261,13 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					itemStack.setAmount(Math.max(1, (int) Math.min(amount, 64)));
 					markVirtual(itemStack);
 				}
-				return;
+				return itemStack;
 			}
 
 			// Alchemical Utensils
 			if (isHotbarOrOffhandSlot && PlayerUtils.isAlchemist(player) && ItemUtils.isAlchemistItem(itemStack)) {
 				handleAlchemistPotion(player, itemStack);
-				return;
+				return itemStack;
 			}
 
 			// lightning bottles
@@ -270,7 +275,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				LightningBottle lightningBottle = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LightningBottle.class);
 
 				if (lightningBottle == null) {
-					return;
+					return itemStack;
 				}
 
 				int count = lightningBottle.getCharges();
@@ -286,13 +291,14 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				ItemStatUtils.addAttribute(itemStack, AttributeType.POTION_RADIUS, lightningBottle.getRadius(), Operation.ADD, Slot.MAINHAND);
 				ItemUpdateHelper.generateItemStats(itemStack);
 
+				ItemStack finalItemStack = itemStack;
 				NBT.modify(itemStack, nbt -> {
 					nbt.modifyMeta((nbtr, meta) -> {
-						meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
+						meta.displayName(ItemUtils.getDisplayName(finalItemStack).append(Component.text(" (" + count + ")")));
 					});
 					markVirtual(nbt);
 				});
-				return;
+				return itemStack;
 			}
 		}
 
@@ -339,8 +345,9 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					});
 				}
 			}
-
 		}
+
+		return itemStack;
 	}
 
 	public static void handleAlchemistPotion(Player player, ItemStack itemStack) {

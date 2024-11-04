@@ -118,7 +118,7 @@ public class FishingManager implements Listener {
 					ItemStack overrideItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(baitInfo.mBait.mReplacementLootTable.mPath));
 					if (overrideItem != null) {
 						caughtItemStack.setItemMeta(overrideItem.getItemMeta());
-						caughtItemStack.setType(overrideItem.getType());
+						caughtItemStack = caughtItemStack.withType(overrideItem.getType());
 					}
 				}
 

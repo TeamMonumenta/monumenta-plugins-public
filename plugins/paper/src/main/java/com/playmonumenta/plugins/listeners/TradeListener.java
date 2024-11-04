@@ -262,14 +262,14 @@ public class TradeListener implements Listener {
 			if (ItemUtils.isShulkerBox(source.getType())) {
 				isSameType = ItemUtils::isShulkerBox;
 				clearDye = itemStack -> {
-					itemStack.setType(Material.SHULKER_BOX);
+					itemStack = itemStack.withType(Material.SHULKER_BOX);
 					// Adds the default Bukkit block state tags if absent
 					BlockStateMeta bsm = (BlockStateMeta) itemStack.getItemMeta();
 					bsm.setBlockState(bsm.getBlockState());
 					itemStack.setItemMeta(bsm);
 				};
 				copyDye = (from, to) -> {
-					to.setType(from.getType());
+					to = to.withType(from.getType());
 					NBT.modify(to, nbt -> {
 						nbt.removeKey("BlockEntityTag");
 						NBTCompound fromShulker = new NBTItem(from).getCompound("BlockEntityTag");

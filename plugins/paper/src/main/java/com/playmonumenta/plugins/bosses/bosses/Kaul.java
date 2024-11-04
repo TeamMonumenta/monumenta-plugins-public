@@ -948,7 +948,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						if (FastUtils.RANDOM.nextInt(3) == 1) {
 							Block b = block.getLocation().add(0, 1.5, 0).getBlock();
 							if (!b.getType().isSolid()) {
-								b.setType(Material.GRASS);
+								b.setType(Material.SHORT_GRASS);
 							}
 						}
 					}

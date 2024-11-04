@@ -253,7 +253,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 						vanityItem.setItemMeta(meta);
 					}
 				} else {
-					VanityManager.applyVanity(vanityItem, vanityData, slot, false);
+					vanityItem = VanityManager.applyVanity(vanityItem, vanityData, slot, false);
 				}
 				return vanityItem;
 			}

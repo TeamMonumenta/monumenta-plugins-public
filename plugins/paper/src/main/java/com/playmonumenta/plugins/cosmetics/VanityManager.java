@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -329,26 +330,33 @@ public class VanityManager implements Listener {
 	}
 
 	/**
-	 * Applies vanity to the given item. Modifies the passed-in item stack!
+	 * Applies vanity to the given item.
 	 *
-	 * @param itemStack     Real item stack to apply vanity to (will be modified!)
+	 * @param itemStack     Real item stack to apply vanity to. (not mutated)
 	 * @param vanityData    Vanity data for the player
 	 * @param equipmentSlot The item's slot
 	 * @param self          Whether this is for the player's own equipment or not. Affects offhands.
 	 */
-	public static void applyVanity(ItemStack itemStack, VanityData vanityData, EquipmentSlot equipmentSlot, boolean self) {
+	@CheckReturnValue
+	public static ItemStack applyVanity(ItemStack itemStack, VanityData vanityData, EquipmentSlot equipmentSlot, boolean self) {
 		ItemStack vanityItem = vanityData.getEquipped(equipmentSlot);
-		applyVanity(itemStack, vanityItem, equipmentSlot, self);
+		return applyVanity(itemStack, vanityItem, equipmentSlot, self);
 	}
 
-	public static void applyVanity(ItemStack itemStack, @Nullable ItemStack vanityItem, EquipmentSlot equipmentSlot, boolean self) {
+	@CheckReturnValue
+	public static ItemStack applyVanity(ItemStack itemStack, @Nullable ItemStack vanityItem, EquipmentSlot equipmentSlot, boolean self) {
+		return doApplyVanity(itemStack.clone(), vanityItem, equipmentSlot, self);
+	}
+
+	@CheckReturnValue
+	private static ItemStack doApplyVanity(ItemStack itemStack, @Nullable ItemStack vanityItem, EquipmentSlot equipmentSlot, boolean self) {
 		if (vanityItem != null && vanityItem.getType() != Material.AIR) {
 			if (self
 				    && equipmentSlot == EquipmentSlot.OFF_HAND
 				    && (itemStack.getMaxItemUseDuration() > 0 || vanityItem.getMaxItemUseDuration() > 0)
 				    && itemStack.getType() != vanityItem.getType()) {
 				// don't allow changing item type of useable items (e.g. food, shields) to prevent not being slowed down while using them or just messing with their use in general
-				return;
+				return itemStack;
 			}
 			boolean invisible = isInvisibleVanityItem(vanityItem);
 			if (invisible && equipmentSlot != EquipmentSlot.OFF_HAND) { // invisible armor: only add tag for RP and add lore line
@@ -364,11 +372,11 @@ public class VanityManager implements Listener {
 					itemStack.setItemMeta(meta);
 				}
 				VirtualItemsReplacer.markVirtual(itemStack);
-				return;
+				return itemStack;
 			}
 			ItemMeta vanityMeta = vanityItem.getItemMeta();
 			if (vanityMeta == null) {
-				return;
+				return itemStack;
 			}
 			ItemMeta originalMeta = itemStack.getItemMeta();
 
@@ -438,16 +446,19 @@ public class VanityManager implements Listener {
 			}
 			vanityMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // hide vanilla values like banner patterns
 
-			itemStack.setType(vanityItem.getType());
-			itemStack.setItemMeta(vanityMeta);
-			VirtualItemsReplacer.markVirtual(itemStack);
+			final var newItemStack = itemStack.withType(vanityItem.getType());
+			newItemStack.setItemMeta(vanityMeta);
+			VirtualItemsReplacer.markVirtual(newItemStack);
 
 			if (invisible) {
-				NBT.modify(itemStack, nbt -> {
+				NBT.modify(newItemStack, nbt -> {
 					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(INVISIBLE_NBT_KEY, true);
 				});
 			}
-		}
-	}
 
+			return newItemStack;
+		}
+
+		return itemStack;
+	}
 }

@@ -1,14 +1,21 @@
 plugins {
     id("com.playmonumenta.plugins.java-conventions")
-	id("com.playmonumenta.paperweight-aw.userdev") version "1.1.1"
+    id("com.playmonumenta.paperweight-aw.userdev") version "1.1.1"
 }
+
+repositories {
+	maven("https://maven.playmonumenta.com/releases/")
+}
+
+paperweight.awPath.set(file("monumenta.accesswidener"))
 
 dependencies {
     implementation(project(":adapter_api"))
-    paperDevBundle("1.19.4-R0.1-SNAPSHOT")
+    paperDevBundle("1.20.4-R0.1-SNAPSHOT")
+	compileOnly("com.playmonumenta.papermixins:plugin-api:1.0.0")
 }
 
-description = "adapter_v1_19_R3"
+description = "adapter_v1_20_R3"
 version = rootProject.version
 
 tasks {

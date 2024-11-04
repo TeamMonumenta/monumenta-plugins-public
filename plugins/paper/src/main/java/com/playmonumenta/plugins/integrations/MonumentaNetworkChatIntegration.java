@@ -125,6 +125,10 @@ public class MonumentaNetworkChatIntegration {
 
 	private static boolean ENABLED = false;
 
+	public static boolean isEnabled() {
+		return ENABLED;
+	}
+
 	public static void onEnable(Logger logger) {
 		logger.info("Enabling NetworkChat integration");
 		ENABLED = true;
@@ -426,5 +430,12 @@ public class MonumentaNetworkChatIntegration {
 
 		ChatFilter chatFilter = NetworkChatPlugin.globalBadWordFilter();
 		return chatFilter.hasBadWord(sender, text);
+	}
+
+	public static void setPlayerChannelByPlainTag(Player player, String plainTag) {
+		Channel guildChannel = getChannel(plainTag);
+		if (guildChannel != null) {
+			setPlayerDefaultGuildChat(player, guildChannel);
+		}
 	}
 }

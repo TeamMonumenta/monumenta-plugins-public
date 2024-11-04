@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.gson.JsonObject;
-import com.playmonumenta.networkchat.channel.Channel;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
@@ -1522,16 +1521,18 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	public static void updatePlayerGuildChat(Player player) {
+		if (!MonumentaNetworkChatIntegration.isEnabled()) {
+			return;
+		}
+
 		Group guild = getGuild(player);
 		if (isValidGuild(guild)) {
 			String plainTag = getGuildPlainTag(guild);
 			if (plainTag == null) {
 				return;
 			}
-			Channel guildChannel = MonumentaNetworkChatIntegration.getChannel(plainTag);
-			if (guildChannel != null) {
-				MonumentaNetworkChatIntegration.setPlayerDefaultGuildChat(player, guildChannel);
-			}
+
+			MonumentaNetworkChatIntegration.setPlayerChannelByPlainTag(player, plainTag);
 		} else {
 			MonumentaNetworkChatIntegration.unsetPlayerDefaultGuildChat(player);
 		}

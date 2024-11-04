@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -24,7 +26,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public interface VersionAdapter {
-
 	void removeAllMetadata(Plugin plugin);
 
 	void resetPlayerIdleTimer(Player player);
@@ -215,4 +216,27 @@ public interface VersionAdapter {
 	void forceSyncEntityPositionData(Entity entity);
 
 	<T> int sendParticle(Particle particle, Player reciever, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data, boolean force);
+
+	class WorldNameReplacementToken {
+		private final World mWorld;
+		private @Nullable NamespacedKey mKey = null;
+
+		public WorldNameReplacementToken(World world) {
+			this.mWorld = world;
+		}
+
+		public World getWorld() {
+			return mWorld;
+		}
+
+		public void setKey(@Nullable NamespacedKey key) {
+			this.mKey = key;
+		}
+
+		public @Nullable NamespacedKey getKey() {
+			return mKey;
+		}
+	}
+
+	Object replaceWorldNames(Object packet, Consumer<WorldNameReplacementToken> handler);
 }

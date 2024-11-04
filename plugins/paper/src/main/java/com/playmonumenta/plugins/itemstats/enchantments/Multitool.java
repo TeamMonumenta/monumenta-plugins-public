@@ -17,6 +17,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.CheckReturnValue;
 
 /*
  * Multitool - Level one allows you to swap the tool
@@ -83,7 +84,7 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		swap(plugin, player, item);
+		player.getInventory().setItemInMainHand(swap(plugin, player, item));
 
 		if (eventMat == Material.GRASS_BLOCK || ItemUtils.isStrippable(eventMat)) {
 			event.setCancelled(true);
@@ -96,7 +97,7 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		swap(plugin, player, player.getInventory().getItemInMainHand());
+		player.getInventory().setItemInMainHand(swap(plugin, player, player.getInventory().getItemInMainHand()));
 	}
 
 	@Override
@@ -105,26 +106,27 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		swap(plugin, player, player.getInventory().getItemInMainHand());
+		player.getInventory().setItemInMainHand(swap(plugin, player, player.getInventory().getItemInMainHand()));
 	}
 
-	public static void swap(Plugin plugin, Player player, ItemStack item) {
-
+	@CheckReturnValue
+	public static ItemStack swap(Plugin plugin, Player player, ItemStack item) {
 		// You can swap your item slot in the same tick, the event will begin when you right-click the multitool item
 		// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.MULTITOOL);
 		if (level <= 0) {
-			return;
+			return item;
 		}
 
 		// Only allow swapping once every 2 ticks at most to prevent accidental double-swaps
 		if (MetadataUtils.checkOnceInRecentTicks(plugin, player, "MultitoolMutex", 1)) {
 			Material mat = getNextMaterial(item.getType(), level);
-			item.setType(mat);
+			item = item.withType(mat);
 			player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2F);
 			player.updateInventory();
 		}
 
+		return item;
 	}
 
 	public static boolean isValidMultitoolMaterial(Material mat) {

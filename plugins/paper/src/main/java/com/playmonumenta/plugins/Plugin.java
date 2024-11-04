@@ -60,6 +60,7 @@ import com.playmonumenta.plugins.managers.DataCollectionManager;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.managers.PlayerSkinManager;
+import com.playmonumenta.plugins.managers.PlayerTitleManager;
 import com.playmonumenta.plugins.managers.PlaylistManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.market.MarketCommands;
@@ -555,6 +556,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new CelestialGemListener(), this);
 		new SpawnerVisualisation().register();
 		manager.registerEvents(MailMan.getInstance(), this);
+		PlayerTitleManager.start();
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);

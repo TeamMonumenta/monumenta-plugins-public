@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
@@ -36,6 +37,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public final class MasterworkCustomInventory extends CustomInventory {
 
@@ -177,19 +179,22 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			ItemStack upgradeIconA = createCostItem(p, Material.RED_DYE, "Enhance Item (Fortitude)", TextColor.fromHexString("#D02E28"), costA);
 			mInventory.setItem(21, upgradeIconA);
 			mMapFunction.put(21, (player, inventory, slot) -> {
-				attemptUpgrade(p, equipmentSlot, newItemA, costA);
+				@Nullable ItemStack temp = attemptUpgrade(p, equipmentSlot, newItemA, costA);
+				setUpgrade(p, equipmentSlot, temp);
 			});
 
 			ItemStack upgradeIconB = createCostItem(p, Material.LIGHT_BLUE_DYE, "Enhance Item (Potency)", TextColor.fromHexString("#4AC2E5"), costB);
 			mInventory.setItem(22, upgradeIconB);
 			mMapFunction.put(22, (player, inventory, slot) -> {
-				attemptUpgrade(p, equipmentSlot, newItemB, costB);
+				@Nullable ItemStack temp = attemptUpgrade(p, equipmentSlot, newItemB, costB);
+				setUpgrade(p, equipmentSlot, temp);
 			});
 
 			ItemStack upgradeIconC = createCostItem(p, Material.YELLOW_DYE, "Enhance Item (Alacrity)", TextColor.fromHexString("#FFFA75"), costC);
 			mInventory.setItem(23, upgradeIconC);
 			mMapFunction.put(23, (player, inventory, slot) -> {
-				attemptUpgrade(p, equipmentSlot, newItemC, costC);
+				@Nullable ItemStack temp = attemptUpgrade(p, equipmentSlot, newItemC, costC);
+				setUpgrade(p, equipmentSlot, temp);
 			});
 
 			mInventory.setItem(49, mPreviewItem);
@@ -229,7 +234,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			ItemStack upgradeIcon = createCostItem(p, Material.RAW_IRON, "Enhance Item", TextColor.fromHexString("#FFAA00"), cost);
 			mInventory.setItem(22, upgradeIcon);
 			mMapFunction.put(22, (player, inventory, slot) -> {
-				attemptUpgrade(p, equipmentSlot, newItem, cost);
+				@Nullable ItemStack temp = attemptUpgrade(p, equipmentSlot, newItem, cost);
+				setUpgrade(p, equipmentSlot, temp);
 			});
 
 			mInventory.setItem(49, mPreviewItem);
@@ -389,33 +395,47 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		return currentLore;
 	}
 
-	private void attemptUpgrade(Player p, EquipmentSlot equipmentSlot, ItemStack nextItem, MasterworkUtils.MasterworkCostLevel cost) {
-		attemptUpgrade(p, p.getInventory().getItem(equipmentSlot), nextItem, cost);
-	}
-
-	private void attemptUpgrade(Player p, ItemStack item, ItemStack nextItem, MasterworkUtils.MasterworkCostLevel cost) {
-		if (item.getAmount() > 1) {
-			p.sendMessage(Component.text("You cannot upgrade stacked items.", NamedTextColor.RED));
+	private void setUpgrade(Player p, EquipmentSlot equipmentSlot, @Nullable ItemStack item) {
+		if (item == null) {
 			return;
 		}
+		p.getInventory().setItem(equipmentSlot, item);
+	}
+
+	@CheckReturnValue
+	@Nullable
+	private ItemStack attemptUpgrade(Player p, EquipmentSlot equipmentSlot, ItemStack nextItem, MasterworkUtils.MasterworkCostLevel cost) {
+		return attemptUpgrade(p, p.getInventory().getItem(equipmentSlot), nextItem, cost);
+	}
+
+	@CheckReturnValue
+	@Nullable
+	private ItemStack attemptUpgrade(Player p, ItemStack item, ItemStack nextItem, MasterworkUtils.MasterworkCostLevel cost) {
+		if (item.getAmount() > 1) {
+			p.sendMessage(Component.text("You cannot upgrade stacked items.", NamedTextColor.RED));
+			return item;
+		}
+
+		item = item.clone();
 
 		Masterwork next = ItemStatUtils.getMasterwork(nextItem);
 		if (MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item)) >
 			MasterworkUtils.getMasterworkAsInt(next)) {
 			cost.tryPayCost(p, item, true, next);
-			item.setType(nextItem.getType());
+			item = item.withType(nextItem.getType());
 			item.setItemMeta(nextItem.getItemMeta());
 			ItemUpdateHelper.generateItemStats(item);
 			p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.f, 1.f);
-			return;
+			return item;
 		}
 
 		try {
 			if (cost.tryPayCost(p, item, false, next)) {
-				item.setType(nextItem.getType());
+				item = item.withType(nextItem.getType());
 				item.setItemMeta(nextItem.getItemMeta());
 				ItemUpdateHelper.generateItemStats(item);
 				MasterworkUtils.animate(p, ItemStatUtils.getMasterwork(nextItem));
+				return item;
 			} else {
 				p.sendMessage(Component.text("You don't have enough currency for this upgrade.", NamedTextColor.RED));
 			}
@@ -424,6 +444,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			p.sendMessage(Component.text("If you see this message please contact a mod! (Error in upgrade)", NamedTextColor.RED));
 			e.printStackTrace();
 		}
+
+		return null;
 	}
 
 	private void loadMasterworkPage(Player ply) {
@@ -486,7 +508,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
 								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
 									NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(equippedItem))));
-							attemptUpgrade(player, equippedItem, newItem, costA);
+							@Nullable ItemStack temp = attemptUpgrade(player, equippedItem, newItem, costA);
+							setUpgrade(ply, equipmentSlot, temp);
 						});
 						for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
 							fillWithColoredJunk(i, A_FILLER);
@@ -501,7 +524,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
 								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
 									NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(equippedItem))));
-							attemptUpgrade(player, equippedItem, newItem, costB);
+							@Nullable ItemStack temp = attemptUpgrade(player, equippedItem, newItem, costB);
+							setUpgrade(ply, equipmentSlot, temp);
 						});
 						for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
 							fillWithColoredJunk(i, B_FILLER);
@@ -516,7 +540,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
 								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
 									NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(equippedItem))));
-							attemptUpgrade(player, equippedItem, newItem, costC);
+							@Nullable ItemStack temp = attemptUpgrade(player, equippedItem, newItem, costC);
+							setUpgrade(ply, equipmentSlot, temp);
 						});
 						for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
 							fillWithColoredJunk(i, C_FILLER);
@@ -533,7 +558,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							ItemStack newItem = MasterworkUtils.preserveModified(equippedItem,
 								InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
 									NamespacedKeyUtils.fromString(MasterworkUtils.getPrevItemPath(equippedItem))));
-							attemptUpgrade(player, equippedItem, newItem, MasterworkUtils.getMasterworkCost(equippedItem).get(ItemStatUtils.getMasterwork(equippedItem)));
+							@Nullable ItemStack temp = attemptUpgrade(player, equippedItem, newItem, MasterworkUtils.getMasterworkCost(equippedItem).get(ItemStatUtils.getMasterwork(equippedItem)));
+							setUpgrade(ply, equipmentSlot, temp);
 						});
 					}
 				}
