@@ -1888,6 +1888,7 @@ public class PlayerListener implements Listener {
 	public void customEffectApplyEvent(CustomEffectApplyEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			mPlugin.mAbilityManager.customEffectApplyEvent(player, event);
+			mPlugin.mItemStatManager.onCustomEffectApply(mPlugin, player, event);
 		}
 	}
 
