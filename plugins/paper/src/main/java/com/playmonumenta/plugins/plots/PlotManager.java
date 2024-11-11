@@ -236,6 +236,7 @@ public class PlotManager {
 							player.sendMessage(Component.text("Can't reset your plot because your Plot score is zero. This is a bug, please report it.", NamedTextColor.RED));
 						} else {
 							MonumentaNetworkRelayIntegration.sendPlayerAuditLogMessage(player.getName() + " reset their plot (" + score + ")");
+							MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(player.getName() + " reset their plot (" + score + ")");
 							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.OWN_PLOT, 0);
 							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, 0);
 							getPlotInfo(player.getUniqueId()).whenComplete((info, ex) -> {
