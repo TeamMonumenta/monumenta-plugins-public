@@ -318,6 +318,7 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 						refresh();
 					});
 				}
+				MailMan.interactionChange(mPlayer, redisLockKey, false);
 				return;
 			}
 
