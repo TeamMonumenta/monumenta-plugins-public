@@ -266,17 +266,15 @@ public class DepthsManager {
 	// Map of players to their depths information- to persist through logouts
 	public Map<UUID, DepthsPlayer> mPlayers = new HashMap<>();
 	private static @Nullable Plugin mPlugin;
-	// List of all items with random rarities
-	public ArrayList<DepthsAbilityItem> mItems = new ArrayList<>();
 	// List of ability offers for each player
 	public Map<UUID, List<DepthsAbilityItem>> mAbilityOfferings = new HashMap<>();
 	// List of upgrade offers for each player
 	public Map<UUID, List<DepthsAbilityItem>> mUpgradeOfferings = new HashMap<>();
 	public Random mRandom = new Random();
 	// Parties currently active in the system
-	public ArrayList<DepthsParty> mParties = new ArrayList<>();
+	public List<DepthsParty> mParties = new ArrayList<>();
 	// Repository for storing and spawning depths rooms
-	public @Nullable RoomRepository mRoomRepository;
+	public RoomRepository mRoomRepository;
 	// Runnable to manage for dealing damage to players under certain conditions
 	public @Nullable DepthsDamageRunnable mDamageRunnable;
 	// Config path for saving and loading depths data from the file system
@@ -309,6 +307,7 @@ public class DepthsManager {
 			}.runTaskTimer(p, SAVE_INTERVAL, SAVE_INTERVAL);
 			mInstance = this;
 		}
+		mRoomRepository = DepthsUtils.getDepthsContent().getRoomRepository();
 	}
 
 	//Singleton pattern for manager
@@ -825,17 +824,15 @@ public class DepthsManager {
 		return getAbilitiesOfTree(DepthsTree.GIFT);
 	}
 
-	private void initItems(List<DepthsTree> filter, Player p, DepthsPlayer dp) {
-		initItems(filter, false, p, dp, List.of());
+	private List<DepthsAbilityItem> initItems(List<DepthsTree> filter, Player p, DepthsPlayer dp) {
+		return initItems(filter, false, p, dp, List.of());
 	}
 
 	/**
 	 * This method generates ability items for the players with random rarities.
 	 */
-	private void initItems(List<DepthsTree> filter, boolean isElite, Player p, DepthsPlayer dp, List<DepthsTree> noActiveTrees) {
-		// Replace this with a dedicated place later
-		mItems.clear();
-
+	private List<DepthsAbilityItem> initItems(List<DepthsTree> filter, boolean isElite, Player p, DepthsPlayer dp, List<DepthsTree> noActiveTrees) {
+		List<DepthsAbilityItem> items = new ArrayList<>();
 		int forceLevel = filter.contains(DepthsTree.PRISMATIC) ? dp.mAbnormalityLevel : 0;
 
 		for (DepthsAbilityInfo<?> da : getFilteredAbilities(filter, noActiveTrees)) {
@@ -902,7 +899,7 @@ public class DepthsManager {
 
 			DepthsAbilityItem item = da.getAbilityItem(rarity, p, 0, false);
 			if (item != null) {
-				mItems.add(item);
+				items.add(item);
 			}
 		}
 
@@ -911,6 +908,7 @@ public class DepthsManager {
 			dp.mAbnormalityLevel = 0;
 		}
 
+		return items;
 	}
 
 	/**
@@ -928,39 +926,41 @@ public class DepthsManager {
 		}
 
 		List<DepthsAbilityItem> offeredItems = mAbilityOfferings.get(p.getUniqueId());
-		if (offeredItems == null || offeredItems.isEmpty()) {
-			//Filter the item offerings by the player's eligible trees for that run
-			DepthsRewardType reward = dp.mEarnedRewards.peek();
-			if (reward == DepthsRewardType.PRISMATIC) {
-				List<DepthsTree> prismaticFilter = new ArrayList<>();
-				prismaticFilter.add(DepthsTree.PRISMATIC);
-				initItems(prismaticFilter, p, dp);
-			} else if (reward == DepthsRewardType.CURSE) {
-				List<DepthsTree> curseFilter = new ArrayList<>();
-				curseFilter.add(DepthsTree.CURSE);
-				initItems(curseFilter, p, dp);
-			} else if (reward == DepthsRewardType.GIFT) {
-				List<DepthsTree> giftFilter = new ArrayList<>();
-				giftFilter.add(DepthsTree.GIFT);
-				initItems(giftFilter, p, dp);
-			} else if (dp.mPointedHatTree != null && dp.mPointedHatStacks > 0) {
-				// callicarpa's pointed hat trigger
-				initItems(List.of(dp.mPointedHatTree), p, dp);
-				dp.mPointedHatStacks--;
-				if (dp.mPointedHatStacks == 0) {
-					setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, dp, 0, false, false);
-					dp.mPointedHatTree = null;
-				}
-			} else {
-				List<DepthsTree> cappedTrees = new ArrayList<>();
-				if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
-					List<DepthsTree> trees = getActiveAbilityTrees(dp);
-					cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
-				}
-				initItems(dp.mEligibleTrees, reward == DepthsRewardType.ABILITY_ELITE, p, dp, cappedTrees);
+		if (offeredItems != null && !offeredItems.isEmpty()) {
+			return offeredItems;
+		}
+
+		List<DepthsAbilityItem> allItems;
+
+		//Filter the item offerings by the player's eligible trees for that run
+		DepthsRewardType reward = dp.mEarnedRewards.peek();
+		if (reward == DepthsRewardType.PRISMATIC) {
+			List<DepthsTree> prismaticFilter = new ArrayList<>();
+			prismaticFilter.add(DepthsTree.PRISMATIC);
+			allItems = initItems(prismaticFilter, p, dp);
+		} else if (reward == DepthsRewardType.CURSE) {
+			List<DepthsTree> curseFilter = new ArrayList<>();
+			curseFilter.add(DepthsTree.CURSE);
+			allItems = initItems(curseFilter, p, dp);
+		} else if (reward == DepthsRewardType.GIFT) {
+			List<DepthsTree> giftFilter = new ArrayList<>();
+			giftFilter.add(DepthsTree.GIFT);
+			allItems = initItems(giftFilter, p, dp);
+		} else if (dp.mPointedHatTree != null && dp.mPointedHatStacks > 0) {
+			// callicarpa's pointed hat trigger
+			allItems = initItems(List.of(dp.mPointedHatTree), p, dp);
+			dp.mPointedHatStacks--;
+			if (dp.mPointedHatStacks == 0) {
+				setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, dp, 0, false, false);
+				dp.mPointedHatTree = null;
 			}
 		} else {
-			return offeredItems;
+			List<DepthsTree> cappedTrees = new ArrayList<>();
+			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
+				List<DepthsTree> trees = getActiveAbilityTrees(dp);
+				cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
+			}
+			allItems = initItems(dp.mEligibleTrees, reward == DepthsRewardType.ABILITY_ELITE, p, dp, cappedTrees);
 		}
 
 		// Return 3 choices of items
@@ -971,14 +971,14 @@ public class DepthsManager {
 			}
 		}
 		offeredItems = new ArrayList<>();
-		Collections.shuffle(mItems);
+		Collections.shuffle(allItems);
 
 		// Guarantee Twisted Scroll by swapping to front.
 		if (dp.mEarnedRewards.peek() == DepthsRewardType.GIFT) {
-			IntStream.range(0, mItems.size())
-				.filter(index -> mItems.get(index).mAbility.equals(TwistedScroll.ABILITY_NAME))
+			IntStream.range(0, allItems.size())
+				.filter(index -> allItems.get(index).mAbility.equals(TwistedScroll.ABILITY_NAME))
 				.findFirst()
-				.ifPresent(indexOfTS -> Collections.swap(mItems, 0, indexOfTS));
+				.ifPresent(indexOfTS -> Collections.swap(allItems, 0, indexOfTS));
 		}
 
 		// Add the first 3 items the player is eligible for to the thing
@@ -989,7 +989,7 @@ public class DepthsManager {
 		}
 
 		int index = 0;
-		for (DepthsAbilityItem item : mItems) {
+		for (DepthsAbilityItem item : allItems) {
 			if (offeredItems.size() >= options) {
 				break;
 			}
@@ -1066,26 +1066,22 @@ public class DepthsManager {
 		dp.mHasWeaponAspect = true;
 		p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
-		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> options = dp.mWeaponOfferings;
-		if (options == null) {
+		List<String> options = dp.mWeaponOfferings;
+		if (options == null || options.isEmpty()) {
 			return;
 		}
-		DepthsAbilityInfo<? extends WeaponAspectDepthsAbility> choice = options.get(slot);
+		String choice = options.get(slot);
 		if (choice == null) {
 			return;
 		}
-		String displayName = choice.getDisplayName();
-		if (displayName == null) {
-			return;
-		}
 
-		if (choice == RandomAspect.INFO) {
+		if (choice.equals(RandomAspect.ABILITY_NAME)) {
 			//Roll random ability if they selected mystery box
 			int[] chances = {40, 40, 20, 0, 0};
 			boolean twisted = DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH;
 			getRandomAbility(p, dp, chances, null, twisted);
 		}
-		setPlayerLevelInAbility(displayName, p, dp, 1, true, false);
+		setPlayerLevelInAbility(choice, p, dp, 1, true, false);
 	}
 
 	/**
@@ -1220,7 +1216,7 @@ public class DepthsManager {
 	 * @param party the depths party to generate for
 	 * @return available room options for the party's designated player to select from the gui
 	 */
-	public @Nullable EnumSet<DepthsRoomType> generateRoomOptions(DepthsParty party) {
+	private @Nullable EnumSet<DepthsRoomType> generateRoomOptions(DepthsParty party) {
 
 		// Check if they're currently in a bossfight and cancel the call
 		if (!party.mBeatBoss && party.mRoomNumber % 10 == 0 && party.mRoomNumber > 0) {
@@ -1234,12 +1230,10 @@ public class DepthsManager {
 
 		// If party just started, they get the weapon aspect room
 		if (party.mRoomNumber == 0) {
-			party.mNextRoomChoices = EnumSet.of(DepthsRoomType.ABILITY);
 			return EnumSet.of(DepthsRoomType.ABILITY);
 		}
 		// If party is on a boss interval, they get a boss
 		if (party.mRoomNumber % 10 == 9) {
-			party.mNextRoomChoices = EnumSet.of(DepthsRoomType.BOSS);
 			return EnumSet.of(DepthsRoomType.BOSS);
 		}
 		// Roll for how many options the party gets
@@ -1251,14 +1245,14 @@ public class DepthsManager {
 				choices--;
 			}
 		}
-		ArrayList<DepthsRoomType> values = new ArrayList<>(Arrays.asList(DepthsRoomType.values()));
+		List<DepthsRoomType> values = new ArrayList<>(Arrays.asList(DepthsRoomType.values()));
 		values.remove(DepthsRoomType.BOSS);
 		values.remove(DepthsRoomType.TWISTED);
 
 		//If the party is in endless mode and on floor 4+, reduce the chance of utility room
 		//50% chance to remove utility room from the pool if so
 		//Also remove half of utility rooms with ascension 2 of depths 2
-		if ((party.mRoomNumber >= 30 || party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_UTILITY_ROOMS) && mRandom.nextInt(2) > 0) {
+		if (((party.mRoomNumber >= 30 || party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_UTILITY_ROOMS) && mRandom.nextInt(2) > 0) || party.hasAllUtilsThisFloor()) {
 			values.remove(DepthsRoomType.UTILITY);
 		}
 		boolean twisted = false;
@@ -1273,41 +1267,14 @@ public class DepthsManager {
 			values.remove(DepthsRoomType.WILDCARD);
 		}
 
-		//Pull 4 room types at random. They may or may not be the same, so it is skewed towards fewer options atm.
-		DepthsRoomType e1 = values.get(mRandom.nextInt(values.size()));
-		DepthsRoomType e2 = values.get(mRandom.nextInt(values.size()));
-		DepthsRoomType e3 = values.get(mRandom.nextInt(values.size()));
-		DepthsRoomType e4 = values.get(mRandom.nextInt(values.size()));
-
-		if (choices == 4) {
-			if (twisted) {
-				party.mNextRoomChoices = EnumSet.of(e1, e2, e3, DepthsRoomType.TWISTED);
-				return EnumSet.of(e1, e2, e3, DepthsRoomType.TWISTED);
-			}
-			party.mNextRoomChoices = EnumSet.of(e1, e2, e3, e4);
-			return EnumSet.of(e1, e2, e3, e4);
-		} else if (choices == 3) {
-			if (twisted) {
-				party.mNextRoomChoices = EnumSet.of(e1, e2, DepthsRoomType.TWISTED);
-				return EnumSet.of(e1, e2, DepthsRoomType.TWISTED);
-			}
-			party.mNextRoomChoices = EnumSet.of(e1, e2, e3);
-			return EnumSet.of(e1, e2, e3);
-		} else if (choices == 2) {
-			if (twisted) {
-				party.mNextRoomChoices = EnumSet.of(e1, DepthsRoomType.TWISTED);
-				return EnumSet.of(e1, DepthsRoomType.TWISTED);
-			}
-			party.mNextRoomChoices = EnumSet.of(e1, e2);
-			return EnumSet.of(e1, e2);
-		} else {
-			if (twisted) {
-				party.mNextRoomChoices = EnumSet.of(e1, DepthsRoomType.TWISTED);
-				return EnumSet.of(e1, DepthsRoomType.TWISTED);
-			}
-			party.mNextRoomChoices = EnumSet.of(e1);
-			return EnumSet.of(e1);
+		EnumSet<DepthsRoomType> roomChoices = EnumSet.noneOf(DepthsRoomType.class);
+		for (int i = 0; i < choices; i++) {
+			roomChoices.add(FastUtils.getRandomElement(values));
 		}
+		if (twisted) {
+			roomChoices.add(DepthsRoomType.TWISTED);
+		}
+		return roomChoices;
 	}
 
 	/**
@@ -1320,7 +1287,11 @@ public class DepthsManager {
 	public @Nullable EnumSet<DepthsRoomType> generateRoomOptions(Player p) {
 		DepthsParty party = getDepthsParty(p);
 		if (party != null) {
-			return generateRoomOptions(party);
+			EnumSet<DepthsRoomType> roomOptions = generateRoomOptions(party);
+			if (roomOptions != null) {
+				party.mNextRoomChoices = roomOptions;
+			}
+			return roomOptions;
 		} else {
 			return null;
 		}
@@ -1335,7 +1306,7 @@ public class DepthsManager {
 	 */
 	public void playerSelectedRoom(DepthsRoomType roomType, Player player) {
 		DepthsParty party = getDepthsParty(player);
-		if (player == null || party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null || party.mIsLoadingRoom) {
+		if (party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null || party.mLastLoadStartTick + 20 >= Bukkit.getCurrentTick()) {
 			return;
 		}
 		if (party.mSpawnedForcedCleansingRoom && !party.isAscensionPurgeMet()) {
@@ -1385,7 +1356,8 @@ public class DepthsManager {
 				party.mPlayersInParty.forEach((dp) -> {
 					Player p = dp.getPlayer();
 					if (p != null && dp.hasAbility(TreasureMap.ABILITY_NAME)) {
-						dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find a prismatic ability reward!");
+						dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find 2 prismatic ability rewards!");
+						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
 						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
 						TreasureMap.playSounds(p);
 						setPlayerLevelInAbility(TreasureMap.ABILITY_NAME, p, dp, 0, false, false);
@@ -1397,7 +1369,7 @@ public class DepthsManager {
 		boolean wildcard = roomType == DepthsRoomType.WILDCARD;
 		if (wildcard) {
 			incrementTreasure(null, player, 1);
-			roomType = getWildcardRoomType();
+			roomType = getWildcardRoomType(party);
 			// wild card trigger
 			for (DepthsPlayer dp : party.mPlayersInParty) {
 				if (dp.hasAbility(WildCard.ABILITY_NAME)) {
@@ -1416,23 +1388,21 @@ public class DepthsManager {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
 			removeNearbyButton(roomSpawnerLocation, world), 10);
 
-		// Generate the room
-		if (mRoomRepository == null) {
-			mRoomRepository = DepthsUtils.getDepthsContent().getRoomRepository();
-		}
-
 		// Summon the new room and give it to the party
 		Location l = new Location(world, roomSpawnerLocation.getX(), roomSpawnerLocation.getY(), roomSpawnerLocation.getZ());
 		party.setNewRoom(mRoomRepository.summonRoom(l, roomType, party), wildcard);
 	}
 
-	private DepthsRoomType getWildcardRoomType() {
+	private DepthsRoomType getWildcardRoomType(DepthsParty party) {
 		List<DepthsRoomType> roomOptions = new ArrayList<>(Arrays.asList(DepthsRoomType.values()));
 		roomOptions.remove(DepthsRoomType.BOSS);
 		roomOptions.remove(DepthsRoomType.TREASURE);
 		roomOptions.remove(DepthsRoomType.TREASURE_ELITE);
 		roomOptions.remove(DepthsRoomType.TWISTED);
 		roomOptions.remove(DepthsRoomType.WILDCARD);
+		if (party.hasAllUtilsThisFloor()) {
+			roomOptions.remove(DepthsRoomType.UTILITY);
+		}
 
 		return roomOptions.get(mRandom.nextInt(roomOptions.size()));
 	}
@@ -1939,9 +1909,6 @@ public class DepthsManager {
 			}
 		}
 
-		if (mRoomRepository == null) {
-			mRoomRepository = DepthsUtils.getDepthsContent().getRoomRepository();
-		}
 		mRoomRepository.goToNextFloor(party, treasureScoreIncrease);
 		party.mBeatBoss = true;
 	}

@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
-import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -99,21 +98,16 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 		int[] unpaidLocations = {10, 13, 16};
 		int[] chosenArray;
 
-		DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
 		if (depthsPlayer == null) {
 			close();
 			return;
 		}
-		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = depthsPlayer.mWeaponOfferings;
-		List<DepthsAbilityItem> items = new ArrayList<>();
 
-		if (weapons == null || weapons.size() == 0) {
+		List<String> items = depthsPlayer.mWeaponOfferings;
+		if (items == null || items.isEmpty()) {
 			close();
 			return;
-		}
-
-		for (DepthsAbilityInfo<? extends WeaponAspectDepthsAbility> weapon : weapons) {
-			items.add(weapon.getAbilityItem(1, null));
 		}
 
 		Material payButton = paid ? PURCHASED_MAT : BUY_ITEM;
@@ -135,7 +129,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 			ItemMeta meta = paidFor.getItemMeta();
 			meta.displayName(Component.text("Purchase Upgrade", NamedTextColor.YELLOW)
 					.decoration(TextDecoration.ITALIC, false));
-			ArrayList<Component> loreLines = new ArrayList<>();
+			List<Component> loreLines = new ArrayList<>();
 			loreLines.add(Component.text("Choose from all aspects", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false));
 			if (DepthsUtils.getDepthsContent().equals(DepthsContent.DARKEST_DEPTHS)) {
@@ -157,7 +151,16 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 
 		int itemIndex = 0;
 		for (int location : chosenArray) {
-			inventory.setItem(location, items.get(itemIndex).mItem);
+			String name = items.get(itemIndex);
+			DepthsAbilityInfo<?> info = DepthsManager.getInstance().getAbility(name);
+			if (info == null) {
+				continue;
+			}
+			DepthsAbilityItem item = info.getAbilityItem(1, null);
+			if (item == null) {
+				continue;
+			}
+			inventory.setItem(location, item.mItem);
 			itemIndex++;
 		}
 	}

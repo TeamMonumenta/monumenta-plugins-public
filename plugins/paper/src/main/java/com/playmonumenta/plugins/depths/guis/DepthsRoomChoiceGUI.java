@@ -2,37 +2,33 @@ package com.playmonumenta.plugins.depths.guis;
 
 import com.playmonumenta.plugins.depths.DepthsContent;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
+import com.playmonumenta.plugins.depths.DepthsRarity;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
+import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import net.kyori.adventure.text.Component;
+import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class DepthsRoomChoiceGUI extends CustomInventory {
-	private static final Material NO_CHOICE = Material.BLACK_STAINED_GLASS_PANE;
-	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
-	private static final ArrayList<RoomChoice> ROOM_LOCATIONS = new ArrayList<>();
+public class DepthsRoomChoiceGUI extends Gui {
+	private static final ItemStack NO_CHOICE = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
+	private static final List<RoomChoice> ROOM_LOCATIONS = new ArrayList<>();
 
-	public static final int LEVELSIX = 0x703663;
-
-	static class RoomChoice {
-		ItemStack mItem;
-		Integer mLocation;
+	static class RoomChoice extends GuiItem {
+		int mLocation;
 		DepthsRoomType mType;
 
-		RoomChoice(Integer loc, DepthsRoomType t, ItemStack i) {
+		RoomChoice(int loc, DepthsRoomType t, ItemStack i) {
+			super(i);
 			mLocation = loc;
 			mType = t;
-			mItem = i;
 		}
 	}
 
@@ -72,7 +68,7 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 		if (DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS) {
 			ROOM_LOCATIONS.add(new RoomChoice(13, DepthsRoomType.TWISTED,
 				GUIUtils.createBasicItem(Material.BLACK_CONCRETE, 1,
-					Component.text("XXXXXX", TextColor.color(LEVELSIX), TextDecoration.OBFUSCATED),
+					DepthsRarity.TWISTED.getDisplay(),
 					"", NamedTextColor.GRAY, 30, true)));
 		} else if (DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH) {
 			ROOM_LOCATIONS.add(new RoomChoice(13, DepthsRoomType.WILDCARD,
@@ -86,46 +82,33 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 
 	public DepthsRoomChoiceGUI(Player player) {
 		super(player, 27, "Select the Next Room Type");
+	}
 
-		EnumSet<DepthsRoomType> roomChoices = DepthsManager.getInstance().generateRoomOptions(player);
+	@Override
+	public void setup() {
+		EnumSet<DepthsRoomType> roomChoices = DepthsManager.getInstance().generateRoomOptions(mPlayer);
 		if (roomChoices == null) {
 			return;
 		}
 
 		for (RoomChoice item : ROOM_LOCATIONS) {
 			if (roomChoices.contains(item.mType)) {
-				mInventory.setItem(item.mLocation, item.mItem);
+				setItem(item.mLocation, item.onLeftClick(() -> {
+					DepthsManager.getInstance().playerSelectedRoom(item.mType, mPlayer);
+					close();
+
+					DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
+					if (party != null) {
+						for (Player p: party.getPlayers()) {
+							if (getOpenGui(p) instanceof DepthsRoomChoiceGUI gui) {
+								gui.close();
+							}
+						}
+					}
+				}));
 			} else {
-				mInventory.setItem(item.mLocation, new ItemStack(NO_CHOICE));
+				setItem(item.mLocation, new GuiItem(NO_CHOICE));
 			}
 		}
-		fillEmpty();
-	}
-
-	@Override
-	protected void inventoryClick(InventoryClickEvent event) {
-		event.setCancelled(true);
-		GUIUtils.refreshOffhand(event);
-		ItemStack clickedItem = event.getCurrentItem();
-		if (event.getClickedInventory() != mInventory ||
-			    clickedItem == null ||
-			    clickedItem.getType() == FILLER ||
-			    clickedItem.getType() == NO_CHOICE ||
-			    event.isShiftClick()) {
-			return;
-		}
-
-		Player p = (Player) event.getWhoClicked();
-		for (RoomChoice item : ROOM_LOCATIONS) {
-			if (item.mLocation == event.getSlot()) {
-				DepthsManager.getInstance().playerSelectedRoom(item.mType, p);
-			}
-		}
-
-		event.getWhoClicked().closeInventory();
-	}
-
-	public void fillEmpty() {
-		GUIUtils.fillWithFiller(mInventory);
 	}
 }

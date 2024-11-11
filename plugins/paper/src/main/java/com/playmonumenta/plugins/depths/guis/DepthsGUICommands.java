@@ -5,8 +5,6 @@ import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
-import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.gifts.BottomlessBowl;
 import com.playmonumenta.plugins.depths.abilities.gifts.RainbowGeode;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
@@ -63,7 +61,7 @@ public class DepthsGUICommands {
 			player.closeInventory();
 			return;
 		}
-		new DepthsRoomChoiceGUI(player).openInventory(player, Plugin.getInstance());
+		new DepthsRoomChoiceGUI(player).open();
 	}
 
 	public static void upgrade(Player player, boolean fromSummaryGUI) {
@@ -130,8 +128,7 @@ public class DepthsGUICommands {
 			return;
 		}
 
-		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = depthsPlayer.mWeaponOfferings;
-
+		List<String> weapons = depthsPlayer.mWeaponOfferings;
 		if (weapons == null || weapons.isEmpty()) {
 			return;
 		}

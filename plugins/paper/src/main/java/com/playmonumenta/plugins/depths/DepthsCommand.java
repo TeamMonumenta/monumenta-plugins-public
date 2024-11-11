@@ -274,7 +274,7 @@ public class DepthsCommand extends GenericCommand {
 				Player player = args.getByArgument(playerArg);
 				DepthsParty party = DepthsManager.getInstance().getDepthsParty(player);
 				if (party != null) {
-					party.mIsLoadingRoom = false;
+					party.mLastLoadStartTick = 0;
 				}
 			}).register();
 

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.depths.guis.DepthsTreeGUI;
@@ -54,7 +55,7 @@ public class DepthsPlayer {
 	public List<DepthsTree> mEligibleTrees;
 
 	//Weapon offering options for the player
-	public transient List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> mWeaponOfferings;
+	public List<String> mWeaponOfferings;
 	//Whether or not they have selected a weapon aspect
 	public boolean mHasWeaponAspect;
 
@@ -158,8 +159,9 @@ public class DepthsPlayer {
 
 		//Randomize order of weapon aspects
 		//First 3 elements available by default, others locked behind transaction
-		mWeaponOfferings = DepthsManager.getWeaponAspects();
-		Collections.shuffle(mWeaponOfferings);
+		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weaponOfferings = DepthsManager.getWeaponAspects();
+		Collections.shuffle(weaponOfferings);
+		mWeaponOfferings = weaponOfferings.stream().map(AbilityInfo::getDisplayName).toList();
 
 		mUsedChaosThisFloor = false;
 

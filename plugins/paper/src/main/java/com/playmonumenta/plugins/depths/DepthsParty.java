@@ -121,7 +121,7 @@ public class DepthsParty {
 	//Whether the party got a twisted room already this floor
 	public boolean mTwistedThisFloor = false;
 	//Write the 4 players that started the party
-	public transient ArrayList<String> mInitialPlayers = new ArrayList<>();
+	public transient List<String> mInitialPlayers = new ArrayList<>();
 	//The X value of the start side of the current room
 	public int mRoomStartX;
 	//The X value of the start side of the (first) a10+ remove room in this floor (Integer.MAX_VALUE if unset)
@@ -132,8 +132,8 @@ public class DepthsParty {
 	public DepthsContent mContent;
 	public @Nullable Vector mDeathWaitingRoomPoint;
 	public int mAscension;
-	//Whether or not the party is currently loading a room - used to prevent players from spawning 2 rooms on top of each other
-	public boolean mIsLoadingRoom = false;
+	//The last tick where a room started to spawn
+	public transient int mLastLoadStartTick = 0;
 
 	//A flag for if the forced cleansing room has already been spawned in A10+. This is to prevent players from just spamming cleanse rooms (they do nothing, but still).
 	public boolean mSpawnedForcedCleansingRoom = false;
@@ -793,5 +793,9 @@ public class DepthsParty {
 
 	public void playBossSong(String track, int duration, LivingEntity boss) {
 		SongManager.playBossSong(getPlayers(), new SongManager.Song(track, SoundCategory.RECORDS, duration, true, 1.0f, 1.0f, false), true, boss, true, 0, 5);
+	}
+
+	public boolean hasAllUtilsThisFloor() {
+		return mOldRooms.containsAll(DepthsManager.getInstance().mRoomRepository.getFloor(getFloor()).mUtilityRooms);
 	}
 }

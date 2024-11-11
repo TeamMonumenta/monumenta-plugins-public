@@ -5,7 +5,7 @@ import org.bukkit.util.Vector;
 public class DepthsRoom {
 
 	public DepthsRoomType mRoomType;
-	public transient Vector mSize;
+	public Vector mSize;
 	public Vector mEntry;
 	public int mSpawnerCount;
 	public String mLoadPath;
