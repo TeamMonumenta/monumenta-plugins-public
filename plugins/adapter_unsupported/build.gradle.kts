@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     implementation(project(":adapter_api"))
-    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 }
 
 description = "adapter_unsupported"

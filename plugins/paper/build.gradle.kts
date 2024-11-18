@@ -25,7 +25,6 @@ dependencies {
 	// NOTE - Make sure if you add another version here you make sure to exclude it from minimization below!
 	implementation(project(":adapter_api"))
 	implementation(project(":adapter_unsupported"))
-	implementation(project(":adapter_v1_19_R3", "reobf"))
 	implementation(project(":adapter_v1_20_R3", "reobf"))
 	implementation(project(":velocity"))
 
@@ -152,7 +151,6 @@ tasks {
 		minimize {
 			exclude(project(":adapter_api"))
 			exclude(project(":adapter_unsupported"))
-			exclude(project(":adapter_v1_19_R3"))
 			exclude(project(":adapter_v1_20_R3"))
 			exclude(project(":velocity"))
 		}
