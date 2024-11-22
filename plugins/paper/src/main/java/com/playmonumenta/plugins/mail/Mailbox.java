@@ -47,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Mailbox implements Comparable<Mailbox> {
 	// These limits can be adjusted if needed; only MAX_SLOTS requires a GUI update
-	public static final int MAX_SLOTS = 6;
+	public static final int MAX_SLOTS = 7;
 	private static final int MAX_LOG_DESCRIPTION_LENGTH = 900;
 	// This is the worst case time allowed to finish working with Redis data; if exceeded, the lock will expire
 	private static final long LOCK_TIMEOUT_MS = 10_000L;

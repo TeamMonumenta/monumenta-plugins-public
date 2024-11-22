@@ -152,7 +152,7 @@ public class SendGui extends MailGui {
 
 		for (int mailSlot = 0; mailSlot < Mailbox.MAX_SLOTS; mailSlot++) {
 			int row = 2;
-			int column = 2 + mailSlot;
+			int column = 1 + mailSlot;
 
 			setMailboxSlot(row, column, mMailbox, mailSlot);
 		}

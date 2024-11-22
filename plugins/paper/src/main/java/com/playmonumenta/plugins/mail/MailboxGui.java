@@ -180,7 +180,7 @@ public class MailboxGui extends MailGui {
 			setItem(row + 1, 1, mailbox.receiverIcon());
 
 			for (int mailSlot = 0; mailSlot < Mailbox.MAX_SLOTS; mailSlot++) {
-				int column = 3 + mailSlot;
+				int column = 2 + mailSlot;
 
 				setMailboxSlot(row + 1, column, mailbox, mailSlot);
 			}

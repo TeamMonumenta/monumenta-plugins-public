@@ -103,7 +103,7 @@ public class MailView extends View {
 			mGui.setItem(row + 1, 1, mailbox.receiverIcon());
 
 			for (int mailSlot = 0; mailSlot < Mailbox.MAX_SLOTS; mailSlot++) {
-				int col = 3 + mailSlot;
+				int col = 2 + mailSlot;
 
 				mGui.setMailboxSlot(row + 1, col, mailbox, mailSlot);
 			}

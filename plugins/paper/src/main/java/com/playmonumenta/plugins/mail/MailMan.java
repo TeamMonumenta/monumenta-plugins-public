@@ -56,7 +56,7 @@ public class MailMan implements Listener {
 	private static final String MAIL_KEY = "com.playmonumenta.plugins.mail.MailMan";
 
 	// Configurable constants:
-	public static final int INTERACTIONS_PER_TIME_LIMIT = 12;
+	public static final int INTERACTIONS_PER_TIME_LIMIT = 14;
 	public static final int INTERACTION_TIME_LIMIT_MINUTES = 5;
 
 	private static @Nullable MailMan INSTANCE = null;
