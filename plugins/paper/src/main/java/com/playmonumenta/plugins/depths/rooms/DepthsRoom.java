@@ -22,6 +22,11 @@ public class DepthsRoom {
 		mDirection = direction;
 	}
 
+	public String getRoomCode() {
+		String[] splits = mLoadPath.split("/");
+		return splits[splits.length - 1];
+	}
+
 	public enum RoomDirection {
 		UP, DOWN, EVEN;
 	}

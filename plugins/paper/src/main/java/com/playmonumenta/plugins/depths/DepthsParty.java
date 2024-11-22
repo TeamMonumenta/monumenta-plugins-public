@@ -423,6 +423,13 @@ public class DepthsParty {
 				.append(Component.text(mAscension, NamedTextColor.WHITE));
 		}
 
+		if (mCurrentRoom != null) {
+			result = result
+				.append(Component.newline())
+				.append(Component.text("Room code: "))
+				.append(Component.text(mCurrentRoom.getRoomCode(), NamedTextColor.WHITE));
+		}
+
 		return result;
 	}
 

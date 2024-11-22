@@ -397,14 +397,8 @@ public class DepthsUtils {
 	}
 
 	// Stores run stats of the given DepthsPlayer to a json file.
-	public static void storeRunStatsToFile(DepthsPlayer dp, String path, boolean victory) {
-		Player player = dp.getPlayer();
-		if (player == null) {
-			return;
-		}
-
-		DepthsParty depthsParty = DepthsManager.getInstance().getPartyFromId(dp);
-		if (depthsParty == null || depthsParty.mInitialPlayers == null) {
+	public static void storeRunStatsToFile(Player player, DepthsPlayer dp, DepthsParty depthsParty, String path, boolean victory) {
+		if (depthsParty.mInitialPlayers == null) {
 			return;
 		}
 
@@ -442,6 +436,9 @@ public class DepthsUtils {
 		}
 		if (depthsParty.getContent() == DepthsContent.CELESTIAL_ZENITH) {
 			json.addProperty("ascension", depthsParty.getAscension());
+		}
+		if (depthsParty.mCurrentRoom != null) {
+			json.addProperty("current_room", depthsParty.mCurrentRoom.mLoadPath);
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {

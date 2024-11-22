@@ -693,32 +693,33 @@ public class DepthsListener implements Listener {
 	}
 
 	private void sendPlayerToLootRoom(Player player, boolean setDeathStats) {
+		SongManager.stopSong(player, true);
+
 		DepthsManager dm = DepthsManager.getInstance();
 		DepthsPlayer dp = dm.getDepthsPlayer(player);
-		if (dp != null) {
-			DepthsParty party = dm.getPartyFromId(dp);
-			if (party != null) {
-				if (setDeathStats) {
-					dp.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
+		DepthsParty party = dm.getPartyFromId(dp);
+		if (dp == null || party == null) {
+			return;
+		}
 
-					// if the player chose the bonus tree at the beginning, boost their personal treasure score
-					if (dp.mBonusTreeSelected) {
-						dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
-					}
-					dp.setDeathRoom(party.getRoomNumber());
-					dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
-					dp.sendMessage("You reached room " + party.mRoomNumber + "!");
+		if (setDeathStats) {
+			dp.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
 
-					if (!party.mEndlessMode && party.mAscension == 0) {
-						ExperienceUtils.setTotalExperience(player, (int) (0.5 * ExperienceUtils.getTotalExperience(player)));
-					}
-				}
-				boolean victory = party.mEndlessMode && party.mRoomNumber > 30;
-				DepthsUtils.storeRunStatsToFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", victory); //Save the player's stats
-				party.populateLootRoom(player, victory);
+			// if the player chose the bonus tree at the beginning, boost their personal treasure score
+			if (dp.mBonusTreeSelected) {
+				dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
+			}
+			dp.setDeathRoom(party.getRoomNumber());
+			dp.sendMessage("You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
+			dp.sendMessage("You reached room " + party.mRoomNumber + "!");
+
+			if (!party.mEndlessMode && party.mAscension == 0) {
+				ExperienceUtils.setTotalExperience(player, (int) (0.5 * ExperienceUtils.getTotalExperience(player)));
 			}
 		}
-		SongManager.stopSong(player, true);
+		boolean victory = party.mEndlessMode && party.mRoomNumber > 30;
+		DepthsUtils.storeRunStatsToFile(player, dp, party, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", victory); //Save the player's stats
+		party.populateLootRoom(player, victory);
 	}
 
 	//Save player data on logout or shard crash, to be loaded on startup later

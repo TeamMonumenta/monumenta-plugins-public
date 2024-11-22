@@ -1792,45 +1792,46 @@ public class DepthsManager {
 						continue;
 					}
 					playerInParty.setDeathRoom(30);
-					Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
-					if (player != null) {
-						DepthsUtils.storeRunStatsToFile(playerInParty, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", true); //Save the player's stats
-						playerInParty.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
+					Player player = playerInParty.getPlayer();
+					if (player == null) {
+						continue;
+					}
 
-						// if the player chose the bonus tree at the beginning, boost their personal treasure score
-						if (dp.mBonusTreeSelected) {
-							dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
+					DepthsUtils.storeRunStatsToFile(player, playerInParty, party, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", true); //Save the player's stats
+					playerInParty.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
+
+					// if the player chose the bonus tree at the beginning, boost their personal treasure score
+					if (dp.mBonusTreeSelected) {
+						dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
+					}
+					playerInParty.sendMessage("Congratulations! Your final treasure score is " + playerInParty.mFinalTreasureScore + "!");
+					party.populateLootRoom(player, true);
+					if (party.getContent() == DepthsContent.DARKEST_DEPTHS) {
+						int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
+						if (depthsWins == 0) {
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						} else {
+							Bukkit.getServer().sendMessage(Component.empty()
+								.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+								.append(Component.text(" defeated the Darkest Depths!", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 						}
-						playerInParty.sendMessage("Congratulations! Your final treasure score is " + playerInParty.mFinalTreasureScore + "!");
-						party.populateLootRoom(player, true);
-						if (party.getContent() == DepthsContent.DARKEST_DEPTHS) {
-							int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
+						//Set score
+						ScoreboardUtils.setScoreboardValue(player, "Depths", depthsWins + 1);
+						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
+					} else if (party.getContent() == DepthsContent.CELESTIAL_ZENITH) {
+						int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Zenith").orElse(0);
+						if (party.getAscension() == 0) {
 							if (depthsWins == 0) {
-								MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+								MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 							} else {
 								Bukkit.getServer().sendMessage(Component.empty()
 									.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
-									.append(Component.text(" defeated the Darkest Depths!", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+									.append(Component.text(" defeated the Celestial Zenith!", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 							}
-							//Set score
-							ScoreboardUtils.setScoreboardValue(player, "Depths", depthsWins + 1);
-							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
-						} else if (party.getContent() == DepthsContent.CELESTIAL_ZENITH) {
-							int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Zenith").orElse(0);
-							if (party.getAscension() == 0) {
-								if (depthsWins == 0) {
-									MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
-								} else {
-									Bukkit.getServer().sendMessage(Component.empty()
-										.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
-										.append(Component.text(" defeated the Celestial Zenith!", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
-								}
-							}
-							//Set score
-							ScoreboardUtils.setScoreboardValue(player, "Zenith", depthsWins + 1);
-							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Zenith");
 						}
-
+						//Set score
+						ScoreboardUtils.setScoreboardValue(player, "Zenith", depthsWins + 1);
+						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Zenith");
 					}
 				}
 				return;
