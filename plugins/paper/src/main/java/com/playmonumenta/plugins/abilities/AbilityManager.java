@@ -185,6 +185,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -766,6 +767,10 @@ public class AbilityManager {
 
 	public void playerTeleportEvent(Player player, PlayerTeleportEvent event) {
 		conditionalCast(player, (ability) -> ability.playerTeleportEvent(event));
+	}
+
+	public void playerDismountEvent(Player player, EntityDismountEvent event) {
+		conditionalCast(player, ability -> ability.playerDismountEvent(event));
 	}
 
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {

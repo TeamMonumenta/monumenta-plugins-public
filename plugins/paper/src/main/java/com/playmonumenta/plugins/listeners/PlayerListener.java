@@ -111,6 +111,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -1358,6 +1359,13 @@ public class PlayerListener implements Listener {
 					return;
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityDismountEvent(EntityDismountEvent event) {
+		if (event.getEntity() instanceof Player player) {
+			mPlugin.mAbilityManager.playerDismountEvent(player, event);
 		}
 	}
 

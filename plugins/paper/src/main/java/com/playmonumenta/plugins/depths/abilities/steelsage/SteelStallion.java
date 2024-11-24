@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -28,19 +31,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class SteelStallion extends DepthsAbility {
+public class SteelStallion extends DepthsAbility implements AbilityWithDuration {
 	public static final String ABILITY_NAME = "Steel Stallion";
 	public static final int COOLDOWN = 90 * 20;
 	private static final double TRIGGER_HEALTH = 0.25;
-	public static final int[] HEALTH = {60, 70, 80, 90, 100, 120};
+	public static final int[] HEALTH = {50, 60, 70, 80, 90, 110};
 	public static final double[] SPEED = {.2, .24, .28, .32, .36, .44};
 	public static final double[] JUMP_STRENGTH = {.5, .6, .7, .8, .9, 1.3};
 	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20, 18 * 20};
-	public static final int TICK_INTERVAL = 5;
 
 	public static final String CHARM_COOLDOWN = "Steel Stallion Cooldown";
 
@@ -48,6 +51,7 @@ public class SteelStallion extends DepthsAbility {
 		new DepthsAbilityInfo<>(SteelStallion.class, ABILITY_NAME, SteelStallion::new, DepthsTree.STEELSAGE, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.STEEL_STALLION)
 			.cooldown(CHARM_COOLDOWN, COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("dismount", "dismount", SteelStallion::dismount, new AbilityTrigger(AbilityTrigger.Key.DROP)))
 			.displayItem(Material.IRON_HORSE_ARMOR)
 			.descriptions(SteelStallion::getDescription)
 			.priorityAmount(10000);
@@ -56,6 +60,7 @@ public class SteelStallion extends DepthsAbility {
 	private final double mJumpStrength;
 	private final double mSpeed;
 	private final int mDuration;
+	private int mTicksElapsed = -1;
 
 	private @Nullable Horse mHorse;
 
@@ -134,12 +139,12 @@ public class SteelStallion extends DepthsAbility {
 			putOnCooldown();
 		}
 
+		mTicksElapsed = 0;
 		new BukkitRunnable() {
-			int mTicksElapsed = 0;
 			@Override
 			public void run() {
 				boolean isOutOfTime = mTicksElapsed >= mDuration;
-				if (isOutOfTime || mHorse == null || mHorse.getHealth() <= 0 || mHorse.getPassengers().size() == 0) {
+				if (isOutOfTime || mHorse == null || mHorse.getHealth() <= 0 || mHorse.getPassengers().isEmpty()) {
 					if (isOutOfTime && mHorse != null) {
 						Location horseLoc = mHorse.getLocation();
 						World world = horseLoc.getWorld();
@@ -148,15 +153,12 @@ public class SteelStallion extends DepthsAbility {
 						new PartialParticle(Particle.SMOKE_NORMAL, horseLoc, 20).spawnAsPlayerActive(mPlayer);
 					}
 
-					if (mHorse != null) {
-						mHorse.remove();
-						mHorse = null;
-					}
+					reset();
 					this.cancel();
 				}
-				mTicksElapsed += TICK_INTERVAL;
+				mTicksElapsed++;
 			}
-		}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+		}.runTaskTimer(mPlugin, 0, 1);
 
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.HEART, loc, 10, 2, 2, 2).spawnAsPlayerActive(mPlayer);
@@ -166,11 +168,32 @@ public class SteelStallion extends DepthsAbility {
 		sendActionBarMessage("Steel Stallion has been activated!");
 	}
 
+	public boolean dismount() {
+		if (mHorse == null) {
+			return false;
+		}
+		// Easy way to get the runnable to cancel everything
+		mTicksElapsed = mDuration;
+		return true;
+	}
+
 	@Override
 	public void playerQuitEvent(PlayerQuitEvent event) {
+		reset();
+	}
+
+	private void reset() {
 		if (mHorse != null) {
 			mHorse.remove();
 			mHorse = null;
+		}
+		mTicksElapsed = -1;
+	}
+
+	@Override
+	public void playerDismountEvent(EntityDismountEvent event) {
+		if (mHorse != null && mHorse.getHealth() > 0) {
+			event.setCancelled(true);
 		}
 	}
 
@@ -190,9 +213,18 @@ public class SteelStallion extends DepthsAbility {
 			.add(a -> a.mSpeed, SPEED[rarity - 1], false, null, true)
 			.add(" and a jump strength of ")
 			.add(a -> a.mJumpStrength, JUMP_STRENGTH[rarity - 1], false, null, true)
-			.add(".")
+			.add(". Press drop to dismount the horse.")
 			.addCooldown(COOLDOWN);
 	}
 
 
+	@Override
+	public int getInitialAbilityDuration() {
+		return mDuration;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return mTicksElapsed >= 0 ? getInitialAbilityDuration() - mTicksElapsed : 0;
+	}
 }

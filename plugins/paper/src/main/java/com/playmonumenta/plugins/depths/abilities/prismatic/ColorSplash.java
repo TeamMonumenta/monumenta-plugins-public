@@ -55,6 +55,7 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
@@ -115,12 +116,12 @@ public class ColorSplash extends DepthsAbility {
 	public static final String WINDWALKER_SPEED_ATTR_NAME = "ColorSplashWindwalkerSpeedAttr";
 	public static final double[] WINDWALKER_SPEED = {0.2, 0.24, 0.28, 0.32, 0.36, 0.44};
 
-	private boolean mDawnbringerActive;
-	private boolean mShadowdancerActive;
-	private boolean mSteelsageActive;
-	private boolean mWindwalkerActive;
-	private boolean mWindwalkIframes;
-	private boolean mCanCastWindwalk;
+	private boolean mDawnbringerActive = false;
+	private boolean mShadowdancerActive = false;
+	private @Nullable BukkitRunnable mSteelsageRunnable = null;
+	private boolean mWindwalkerActive = false;
+	private boolean mWindwalkIframes = false;
+	private boolean mCanCastWindwalk = false;
 	private int mCurrentTree;
 
 	public static final DepthsAbilityInfo<ColorSplash> INFO =
@@ -133,12 +134,6 @@ public class ColorSplash extends DepthsAbility {
 
 	public ColorSplash(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDawnbringerActive = false;
-		mShadowdancerActive = false;
-		mSteelsageActive = false;
-		mWindwalkerActive = false;
-		mWindwalkIframes = false;
-		mCanCastWindwalk = false;
 		mCurrentTree = 0;
 	}
 
@@ -146,6 +141,9 @@ public class ColorSplash extends DepthsAbility {
 		if (isOnCooldown()) {
 			if (mWindwalkerActive && mCanCastWindwalk) {
 				castWindwalk();
+				return true;
+			} else if (mSteelsageRunnable != null) {
+				mSteelsageRunnable.cancel();
 				return true;
 			}
 			return false;
@@ -522,12 +520,11 @@ public class ColorSplash extends DepthsAbility {
 		// Mount an invincible horse for X seconds. While on the horse, you deal rarity% more projectile damage and are immune to melee damage for the duration.
 		Entity e = LibraryOfSoulsIntegration.summon(mPlayer.getLocation(), "SteelStallion");
 		if (e instanceof Horse horse) {
-			mSteelsageActive = true;
 			horse.addPassenger(mPlayer);
 			horse.setInvulnerable(true);
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_GALLOP, SoundCategory.PLAYERS, 2, 1.25f);
 
-			cancelOnDeath(new BukkitRunnable() {
+			mSteelsageRunnable = new BukkitRunnable() {
 				final Horse mHorse = horse;
 				int mTicks = 0;
 				int mWarningsLeft = 3;
@@ -544,27 +541,27 @@ public class ColorSplash extends DepthsAbility {
 					}
 
 					// If player dismounts the horse, remove it.
-					if (mHorse.getPassengers().size() == 0) {
-						mHorse.remove();
+					if (mHorse.getPassengers().isEmpty()) {
 						cancel();
 						return;
 					}
 
 					mTicks++;
 					if (mTicks >= STEELSAGE_DURATION) {
-						mHorse.remove();
 						cancel();
 					}
 				}
 
 				@Override
 				public synchronized void cancel() {
-					// Override it so that cancelOnDeath also sets the boolean to false.
-					mSteelsageActive = false;
-					mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.PLAYERS, 2, 2);
 					super.cancel();
+					// Override it so that cancelOnDeath also sets the runnable to null
+					mSteelsageRunnable = null;
+					mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.PLAYERS, 2, 2);
+					mHorse.remove();
 				}
-			}.runTaskTimer(Plugin.getInstance(), 0, 1));
+			};
+			cancelOnDeath(mSteelsageRunnable.runTaskTimer(mPlugin, 0, 1));
 		}
 
 	}
@@ -665,7 +662,7 @@ public class ColorSplash extends DepthsAbility {
 			event.updateDamageWithMultiplier(1 + SHADOWDANCER_DAMAGE_MULTIPLIER[mRarity - 1]);
 			AbilityUtils.removeStealth(Plugin.getInstance(), mPlayer, false, null);
 		}
-		if (mSteelsageActive && (event.getType().equals(DamageEvent.DamageType.PROJECTILE) || event.getType().equals(DamageEvent.DamageType.PROJECTILE_SKILL))) {
+		if (mSteelsageRunnable != null && (event.getType().equals(DamageEvent.DamageType.PROJECTILE) || event.getType().equals(DamageEvent.DamageType.PROJECTILE_SKILL))) {
 			event.updateDamageWithMultiplier(1 + STEELSAGE_PROJ_DAMAGE_MULTIPLIER[mRarity - 1]);
 		}
 		return false;
@@ -673,10 +670,17 @@ public class ColorSplash extends DepthsAbility {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (mSteelsageActive && source != null && event.getType().equals(DamageEvent.DamageType.MELEE)) {
+		if (mSteelsageRunnable != null && source != null && event.getType().equals(DamageEvent.DamageType.MELEE)) {
 			event.setCancelled(true);
 		}
 		if (mWindwalkerActive && mWindwalkIframes && !event.getType().equals(DamageEvent.DamageType.TRUE)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@Override
+	public void playerDismountEvent(EntityDismountEvent event) {
+		if (mSteelsageRunnable != null) {
 			event.setCancelled(true);
 		}
 	}
@@ -782,7 +786,7 @@ public class ColorSplash extends DepthsAbility {
 			.addDuration(STEELSAGE_DURATION)
 			.add("s, ride an invincible horse. While on the horse, any melee damage you would take is negated, and you deal ")
 			.addPercent(a -> STEELSAGE_PROJ_DAMAGE_MULTIPLIER[rarity - 1], STEELSAGE_PROJ_DAMAGE_MULTIPLIER[rarity - 1], false, true)
-			.add(" more projectile damage.");
+			.add(" more projectile damage. Swap hands again while active to dismount.");
 	}
 
 	private static Description<ColorSplash> getWindwalkerDescription(int rarity, TextColor color) {

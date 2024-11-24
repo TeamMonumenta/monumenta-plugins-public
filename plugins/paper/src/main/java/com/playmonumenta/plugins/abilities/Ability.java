@@ -34,6 +34,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -313,6 +314,10 @@ public abstract class Ability {
 	}
 
 	public void playerTeleportEvent(PlayerTeleportEvent event) {
+
+	}
+
+	public void playerDismountEvent(EntityDismountEvent event) {
 
 	}
 
