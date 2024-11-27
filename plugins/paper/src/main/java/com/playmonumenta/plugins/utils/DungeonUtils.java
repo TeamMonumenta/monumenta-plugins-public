@@ -133,15 +133,16 @@ public class DungeonUtils {
 		}
 
 		public String getAbandonShardName(Player player) {
-			if (mTypeName != null) {
-				if (this == SKT) {
-					if (ScoreboardUtils.getScoreboardValue(player, mTypeName).orElse(0) <= 0) {
-						return "isles";
-					} else {
-						return "ring";
-					}
+			if (SKT.equals(this)) {
+				if (player.getScoreboardTags().contains("SKTQuest")) {
+					player.removeScoreboardTag("SKTQuest");
+					return "isles";
+				} else {
+					return "ring";
 				}
+			}
 
+			if (mTypeName != null) {
 				if (
 					mExaltedTypeScore != null
 					&& ScoreboardUtils.getScoreboardValue(player, mTypeName).orElse(0) == mExaltedTypeScore
