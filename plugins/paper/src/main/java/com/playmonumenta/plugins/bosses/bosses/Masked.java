@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -31,8 +32,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -195,7 +194,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, PHASE_CHANGE_DIALOG_COMMAND);
 		});
 
-		BossBarManager bossBar = new BossBarManager(mBoss, DETECTION_RANGE, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(mBoss, DETECTION_RANGE, BossBar.Color.WHITE, BossBar.Overlay.NOTCHED_10, events);
 		super.constructBoss(activeSpells1, passiveSpells1, DETECTION_RANGE, bossBar);
 	}
 }

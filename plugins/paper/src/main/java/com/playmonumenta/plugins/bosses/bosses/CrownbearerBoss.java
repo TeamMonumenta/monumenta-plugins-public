@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -23,8 +24,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -107,7 +106,7 @@ public final class CrownbearerBoss extends SerializedLocationBossAbilityGroup {
 					.append(Component.text("My allies, aid me! Let us finish this fight!")));
 		});
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, events);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, bossBar);
 	}

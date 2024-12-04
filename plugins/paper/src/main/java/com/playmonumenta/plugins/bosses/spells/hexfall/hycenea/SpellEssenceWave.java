@@ -98,12 +98,12 @@ public class SpellEssenceWave extends Spell {
 								Location loc1 = coneStartLocs.get(i).clone().add(vecs.get(i).clone().rotateAroundY(Math.toRadians(-mAngle / 2)).multiply(mConeRange));
 								Location loc2 = coneStartLocs.get(i).clone().add(vecs.get(i).clone().rotateAroundY(Math.toRadians(mAngle / 2)).multiply(mConeRange));
 
-								new PPLine(Particle.BLOCK_DUST, coneStartLocs.get(i), loc1)
+								new PPLine(Particle.BLOCK_CRACK, coneStartLocs.get(i), loc1)
 									.countPerMeter(4)
 									.data(data)
 									.spawnAsBoss();
 
-								new PPLine(Particle.BLOCK_DUST, coneStartLocs.get(i), loc2)
+								new PPLine(Particle.BLOCK_CRACK, coneStartLocs.get(i), loc2)
 									.countPerMeter(4)
 									.data(data)
 									.spawnAsBoss();
@@ -114,7 +114,7 @@ public class SpellEssenceWave extends Spell {
 									loc2
 								);
 
-								new PPBezier(Particle.BLOCK_DUST, endpoints)
+								new PPBezier(Particle.BLOCK_CRACK, endpoints)
 									.data(data)
 									.count(10)
 									.spawnAsBoss();
@@ -124,7 +124,7 @@ public class SpellEssenceWave extends Spell {
 									for (double degree = 0; degree < mAngle; degree += 1) {
 										rotate.rotateAroundY(Math.toRadians(1));
 
-										new PPLine(Particle.BLOCK_DUST, coneStartLocs.get(i), rotate.clone().normalize(), mConeRange)
+										new PPLine(Particle.BLOCK_CRACK, coneStartLocs.get(i), rotate.clone().normalize(), mConeRange)
 											.data(data)
 											.countPerMeter(0.25)
 											.spawnAsBoss();

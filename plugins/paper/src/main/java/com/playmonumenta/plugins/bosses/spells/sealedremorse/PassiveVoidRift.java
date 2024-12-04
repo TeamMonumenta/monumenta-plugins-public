@@ -103,7 +103,7 @@ public class PassiveVoidRift extends Spell {
 					}
 
 					for (Location loc : locs) {
-						new PartialParticle(Particle.BLOCK_DUST, loc, 10, 2, 0.1, 2, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.BLOCK_CRACK, loc, 10, 2, 0.1, 2, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
 
 						if (mTicks % 10 == 0) {

@@ -132,9 +132,9 @@ public class PairedUnnaturalForce extends Spell {
 								Location loc = mSpawnLoc.clone().add(cos * x, y, sin * x);
 								new PartialParticle(Particle.SMOKE_NORMAL, loc, 5, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 								if (deg % 4 == 0) {
-									new PartialParticle(Particle.BLOCK_DUST, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.DEEPSLATE_TILES.createBlockData()).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.BLOCK_CRACK, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.DEEPSLATE_TILES.createBlockData()).spawnAsEntityActive(mBoss);
 								} else {
-									new PartialParticle(Particle.BLOCK_DUST, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.POLISHED_DEEPSLATE.createBlockData()).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.BLOCK_CRACK, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.POLISHED_DEEPSLATE.createBlockData()).spawnAsEntityActive(mBoss);
 								}
 								if (deg % 30 == 0) {
 									new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 5, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
@@ -187,9 +187,9 @@ public class PairedUnnaturalForce extends Spell {
 											Location loc = mSpawnLoc.clone().add(cos * x, y, sin * x);
 											new PartialParticle(Particle.SMOKE_NORMAL, loc, 5, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 											if (deg % 4 == 0) {
-												new PartialParticle(Particle.BLOCK_DUST, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.DEEPSLATE_TILES.createBlockData()).spawnAsEntityActive(mBoss);
+												new PartialParticle(Particle.BLOCK_CRACK, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.DEEPSLATE_TILES.createBlockData()).spawnAsEntityActive(mBoss);
 											} else {
-												new PartialParticle(Particle.BLOCK_DUST, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.POLISHED_DEEPSLATE.createBlockData()).spawnAsEntityActive(mBoss);
+												new PartialParticle(Particle.BLOCK_CRACK, loc, 5, 0.15, 0.1, 0.15, 0.75, Material.POLISHED_DEEPSLATE.createBlockData()).spawnAsEntityActive(mBoss);
 											}
 											if (deg % 30 == 0) {
 												new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 5, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);

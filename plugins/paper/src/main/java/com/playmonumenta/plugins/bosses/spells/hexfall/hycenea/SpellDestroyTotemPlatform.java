@@ -62,7 +62,7 @@ public class SpellDestroyTotemPlatform extends Spell {
 					}
 
 					for (int i = 1; i < 9; i++) {
-						new PPCircle(Particle.BLOCK_DUST, mArmorStand.getLocation(), i)
+						new PPCircle(Particle.BLOCK_CRACK, mArmorStand.getLocation(), i)
 							.data(mLifeOrDeath ? Material.MOSS_BLOCK.createBlockData() : Material.DIRT.createBlockData())
 							.count(10)
 							.spawnAsBoss();

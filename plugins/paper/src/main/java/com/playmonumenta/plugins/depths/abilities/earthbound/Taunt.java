@@ -81,11 +81,11 @@ public class Taunt extends DepthsAbility {
 			AbsorptionUtils.addAbsorption(mPlayer, Math.min(mobs.size(), mMaxMobs) * mAbsorptionPerMob, mMaxMobs * mAbsorptionPerMob, mDuration);
 			for (LivingEntity le : mobs) {
 				EntityUtils.applyTaunt(le, mPlayer);
-				new PartialParticle(Particle.BLOCK_DUST, le.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.BLOCK_CRACK, le.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.FIREWORKS_SPARK, le.getLocation(), 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 			}
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 1, 1.2f);
-			new PartialParticle(Particle.BLOCK_DUST, mPlayer.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.BLOCK_CRACK, mPlayer.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 
 			return true;

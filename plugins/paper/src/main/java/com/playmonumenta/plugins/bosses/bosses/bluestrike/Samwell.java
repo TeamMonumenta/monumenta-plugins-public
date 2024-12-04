@@ -53,8 +53,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
@@ -257,7 +255,7 @@ public class Samwell extends BossAbilityGroup {
 			new SpellRealitySlash(plugin, mBoss, this, 4),
 			new SpellSummonLavaTitan(plugin, mBoss, mSpawnLoc, 4)
 		));
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, null, false);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, null, false);
 
 		super.constructBoss(SpellManager.EMPTY, mInactivePassives, detectionRange, bossBar);
 	}

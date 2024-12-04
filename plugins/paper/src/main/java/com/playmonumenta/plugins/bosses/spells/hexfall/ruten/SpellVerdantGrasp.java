@@ -75,7 +75,7 @@ public class SpellVerdantGrasp extends Spell {
 					for (Player p : HexfallUtils.getPlayersInRuten(mSpawnLoc)) {
 						p.playSound(p.getLocation(), Sound.BLOCK_FUNGUS_PLACE, SoundCategory.HOSTILE, 1f, 1f);
 					}
-					new PPCircle(Particle.BLOCK_DUST, mBoss.getLocation(), mRadius * (double) mChargeTicks / mChannelTime)
+					new PPCircle(Particle.BLOCK_CRACK, mBoss.getLocation(), mRadius * (double) mChargeTicks / mChannelTime)
 						.data(Material.CRIMSON_HYPHAE.createBlockData())
 						.count(60)
 						.spawnAsBoss();
@@ -144,11 +144,11 @@ public class SpellVerdantGrasp extends Spell {
 									Vector dir = target.getLocation().subtract(mBossLocOffset.toVector().setY(0)).toVector().multiply(-(PULL_STRENGTH * mT / mCastTime));
 									target.setVelocity(dir);
 
-									new PPLine(Particle.BLOCK_DUST, mBossLocOffset, target.getLocation().add(0, 1, 0))
+									new PPLine(Particle.BLOCK_CRACK, mBossLocOffset, target.getLocation().add(0, 1, 0))
 										.data(Material.WARPED_HYPHAE.createBlockData())
 										.countPerMeter(7)
 										.spawnAsBoss();
-									new PPCircle(Particle.BLOCK_DUST, mBossLocOffset.clone().add(0, -1, 0), mRadius)
+									new PPCircle(Particle.BLOCK_CRACK, mBossLocOffset.clone().add(0, -1, 0), mRadius)
 										.data(Material.CRIMSON_HYPHAE.createBlockData())
 										.count(60)
 										.spawnAsBoss();
@@ -180,7 +180,7 @@ public class SpellVerdantGrasp extends Spell {
 								mChargeUp.remove();
 								this.cancel();
 
-								new PPExplosion(Particle.BLOCK_DUST, mBossLocOffset)
+								new PPExplosion(Particle.BLOCK_CRACK, mBossLocOffset)
 									.data(Material.CRIMSON_HYPHAE.createBlockData())
 									.count(150)
 									.delta(mRadius / 2)

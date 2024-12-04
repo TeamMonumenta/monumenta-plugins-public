@@ -102,7 +102,7 @@ public class SpellSpinDown extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 4, mPitch);
 					mPitch += 0.01f;
 
-					new PartialParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 2, 0), 5, 1, 0.35, 1, 0.25, ICE_TYPE.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation().add(0, 2, 0), 5, 1, 0.35, 1, 0.25, ICE_TYPE.createBlockData()).spawnAsEntityActive(mBoss);
 				}
 
 				//Shoots out ice blocks every third tick after 3 seconds

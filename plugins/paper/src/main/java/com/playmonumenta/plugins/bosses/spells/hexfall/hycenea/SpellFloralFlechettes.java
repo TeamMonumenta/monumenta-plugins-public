@@ -81,13 +81,13 @@ public class SpellFloralFlechettes extends Spell {
 					}
 
 					for (int r = 0; r < mRadius; r++) {
-						new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(mVec.clone().multiply(r)).add(0, 0.2, 0), mWidth)
+						new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(mVec.clone().multiply(r)).add(0, 0.2, 0), mWidth)
 							.countPerMeter(2)
 							.data(Material.SPORE_BLOSSOM.createBlockData())
 							.spawnAsBoss();
 
 						if (mBackwardsLine) {
-							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(mVec.clone().rotateAroundY(Math.toRadians(180)).multiply(r)).add(0, 0.2, 0), mWidth)
+							new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(mVec.clone().rotateAroundY(Math.toRadians(180)).multiply(r)).add(0, 0.2, 0), mWidth)
 								.countPerMeter(2)
 								.data(Material.SPORE_BLOSSOM.createBlockData())
 								.spawnAsBoss();
@@ -141,7 +141,7 @@ public class SpellFloralFlechettes extends Spell {
 											Location loc = mSpawnLoc.clone().add(mVec.clone().multiply(mR));
 											mLocs.add(loc);
 
-											new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(mVec.clone().multiply(mR)).add(0, 0.2, 0), mWidth)
+											new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(mVec.clone().multiply(mR)).add(0, 0.2, 0), mWidth)
 												.countPerMeter(1.5)
 												.data(Material.SPORE_BLOSSOM.createBlockData())
 												.spawnAsBoss();
@@ -150,7 +150,7 @@ public class SpellFloralFlechettes extends Spell {
 												Location backLoc = mSpawnLoc.clone().add(mVec.clone().rotateAroundY(Math.toRadians(180)).multiply(mR));
 												mLocs.add(backLoc);
 
-												new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(mVec.clone().rotateAroundY(Math.toRadians(180)).multiply(mR)).add(0, 0.2, 0), mWidth)
+												new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(mVec.clone().rotateAroundY(Math.toRadians(180)).multiply(mR)).add(0, 0.2, 0), mWidth)
 													.countPerMeter(1.5)
 													.data(Material.SPORE_BLOSSOM.createBlockData())
 													.spawnAsBoss();
@@ -186,14 +186,14 @@ public class SpellFloralFlechettes extends Spell {
 									Vector middle = mVec.clone().multiply(mRadius).multiply(0.5).setY(i);
 									Vector end = mVec.clone().multiply(mRadius).setY(Math.random());
 
-									new PPBezier(Particle.BLOCK_DUST, mSpawnLoc.clone().add(start), mSpawnLoc.clone().add(middle), mSpawnLoc.clone().add(end))
+									new PPBezier(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(start), mSpawnLoc.clone().add(middle), mSpawnLoc.clone().add(end))
 										.count(15)
 										.delay(mInterval)
 										.data(Material.FLOWERING_AZALEA_LEAVES.createBlockData())
 										.spawnAsBoss();
 
 									if (mBackwardsLine) {
-										new PPBezier(Particle.BLOCK_DUST, mSpawnLoc.clone().add(start.rotateAroundY(Math.toRadians(180))), mSpawnLoc.clone().add(middle.rotateAroundY(Math.toRadians(180))), mSpawnLoc.clone().add(end.rotateAroundY(Math.toRadians(180))))
+										new PPBezier(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(start.rotateAroundY(Math.toRadians(180))), mSpawnLoc.clone().add(middle.rotateAroundY(Math.toRadians(180))), mSpawnLoc.clone().add(end.rotateAroundY(Math.toRadians(180))))
 											.count(15)
 											.delay(mInterval)
 											.data(Material.FLOWERING_AZALEA_LEAVES.createBlockData())

@@ -117,8 +117,8 @@ public class SpellRaiseDead extends Spell {
 			summon = "DrownedDraugr";
 		}
 
-		PartialParticle dust1 = new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
-		PartialParticle dust2 = new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
+		PartialParticle dust1 = new PartialParticle(Particle.BLOCK_CRACK, loc, 1, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
+		PartialParticle dust2 = new PartialParticle(Particle.BLOCK_CRACK, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
 		new BukkitRunnable() {
 			int mINC = 0;
 

@@ -131,7 +131,7 @@ public class SpellBreakPlatform extends Spell {
 					if (mT % (mCastTicks / 5) == 0) {
 						for (Vesperidys.Platform platform : platforms) {
 							mBoss.getWorld().playSound(platform.getCenter(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.0f, 0.5f);
-							new PartialParticle(Particle.BLOCK_DUST, platform.getCenter().add(0, 1, 0), 100, 1.6, 0.2, 1.6, Material.DIRT.createBlockData()).spawnAsBoss();
+							new PartialParticle(Particle.BLOCK_CRACK, platform.getCenter().add(0, 1, 0), 100, 1.6, 0.2, 1.6, Material.DIRT.createBlockData()).spawnAsBoss();
 							for (Block block : platform.mBlocks) {
 								if (block.getType() != Material.NETHER_WART_BLOCK && block.getType() != Material.AIR) {
 									if (FastUtils.RANDOM.nextInt(3) == 0 || mT >= (4 * mCastTicks / 5)) {

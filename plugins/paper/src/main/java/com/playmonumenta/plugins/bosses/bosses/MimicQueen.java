@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -27,8 +28,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -96,7 +95,7 @@ public final class MimicQueen extends SerializedLocationBossAbilityGroup {
 			new SpellPurgeNegatives(boss, 20 * 6)
 		);
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, null);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange + 30, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, null);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}

@@ -108,9 +108,9 @@ public class SpellPlatformWave extends Spell {
 								new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 								if (FastUtils.randomIntInRange(0, 5) == 0) {
 									if (FastUtils.randomIntInRange(0, 2) == 0) {
-										new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.BLOCK_CRACK, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).spawnAsEntityActive(mBoss);
 									} else {
-										new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.BLOCK_CRACK, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).spawnAsEntityActive(mBoss);
 									}
 								}
 

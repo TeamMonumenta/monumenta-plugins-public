@@ -79,7 +79,7 @@ public class SpellLinkBeyondLife extends Spell {
 					//Summon the mob using our location
 					Location sLoc = loc.clone().add(x, 0.25, z);
 					loc.getWorld().playSound(sLoc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 0.75f);
-					new PartialParticle(Particle.BLOCK_DUST, sLoc, 16, 0.25, 0.1, 0.25, 0.25, Material.GRAVEL.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, sLoc, 16, 0.25, 0.1, 0.25, 0.25, Material.GRAVEL.createBlockData()).spawnAsEntityActive(mBoss);
 					Random r = new Random();
 					int roll = r.nextInt(3);
 					Entity summonedMob = null;

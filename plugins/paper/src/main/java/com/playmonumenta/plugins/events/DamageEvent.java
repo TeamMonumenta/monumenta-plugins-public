@@ -46,50 +46,27 @@ public class DamageEvent extends Event implements Cancellable {
 
 		public static DamageType getType(DamageCause cause) {
 			// List every cause for completeness
-			switch (cause) {
-				case ENTITY_ATTACK:
-					return MELEE;
-				case ENTITY_SWEEP_ATTACK:
-					return MELEE_ENCH;
-				case PROJECTILE:
-					return PROJECTILE;
-				case DRAGON_BREATH:
-				case MAGIC:
-					return MAGIC;
-				case THORNS:
-					return THORNS;
-				case BLOCK_EXPLOSION:
-				case ENTITY_EXPLOSION:
-					return BLAST;
-				case FIRE:
-				case FIRE_TICK:
-				case HOT_FLOOR:
-				case LAVA:
-					return FIRE;
-				case FALL:
-				case FLY_INTO_WALL:
-					return FALL;
-				case POISON:
-					return POISON;
-				case WITHER:
-					return AILMENT;
-				case CONTACT:
-				case CRAMMING:
-				case CUSTOM:
-				case DROWNING:
-				case DRYOUT:
-				case FALLING_BLOCK:
-				case LIGHTNING:
-				case MELTING:
-				case STARVATION:
-				case SUFFOCATION:
-					return OTHER;
-				case VOID:
-				case SUICIDE:
-					return TRUE;
-				default:
-					return OTHER;
-			}
+			return switch (cause) {
+				case WORLD_BORDER, CONTACT, MELTING, DROWNING, STARVATION, LIGHTNING, FALLING_BLOCK, CUSTOM, DRYOUT,
+					 FREEZE, CRAMMING, SONIC_BOOM, SUFFOCATION -> OTHER;
+				case ENTITY_ATTACK -> MELEE;
+				case ENTITY_SWEEP_ATTACK -> MELEE_ENCH;
+				case PROJECTILE -> PROJECTILE;
+				case DRAGON_BREATH, MAGIC -> MAGIC;
+				case THORNS -> THORNS;
+				case BLOCK_EXPLOSION, ENTITY_EXPLOSION -> BLAST;
+				case FIRE, FIRE_TICK, HOT_FLOOR, LAVA -> FIRE;
+				case FALL, FLY_INTO_WALL -> FALL;
+				case POISON -> POISON;
+				case WITHER -> AILMENT;
+				case VOID, KILL, SUICIDE -> TRUE;
+				// we should log an error on default, this makes porting easier since any new damage types added will
+				// automatically lead to a stacktrace
+				default -> {
+					MMLog.warning("Unknown/new damage type: " + cause);
+					yield OTHER;
+				}
+			};
 		}
 
 		private final boolean mIsEnvironmental;

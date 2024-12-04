@@ -72,7 +72,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				(LivingEntity target) -> {
 					new PartialParticle(Particle.REDSTONE, target.getLocation(), 50, 1, 1.5f, 1, 0)
 						.data(new Particle.DustOptions(Color.RED, 2)).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.BLOCK_DUST, target.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.BLOCK_CRACK, target.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
 					world.playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2.0f, 0.85f);
 					BossUtils.blockableDamage(mBoss, target, DamageType.MELEE, 25);
 					MovementUtils.knockAway(mBoss.getLocation(), target, 0.4f, 0.4f);
@@ -81,7 +81,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				(Location loc) -> new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).minimumCount(1).spawnAsEntityActive(boss),
 				// Ending particles and sound on boss
 				() -> {
-					new PartialParticle(Particle.BLOCK_DUST, boss.getLocation(), 50, 1, 1.5f, 1, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.BLOCK_CRACK, boss.getLocation(), 50, 1, 1.5f, 1, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_MUD_PLACE, SoundCategory.HOSTILE, 3.0f, 0.7f);
 				}
 			),

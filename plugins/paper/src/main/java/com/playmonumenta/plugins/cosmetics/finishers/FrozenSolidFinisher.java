@@ -80,7 +80,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 					// Break the ice with particles and play the sound
 					for (ArmorStand ice : mArmorStands) {
 						ice.remove();
-						new PartialParticle(Particle.BLOCK_DUST, ice.getLocation().add(0, 1.5, 0), 5, Bukkit.createBlockData(Material.ICE)).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation().add(0, 1.5, 0), 5, Bukkit.createBlockData(Material.ICE)).spawnAsPlayerActive(p);
 					}
 					loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 2f, Constants.NotePitches.F11);
 				}

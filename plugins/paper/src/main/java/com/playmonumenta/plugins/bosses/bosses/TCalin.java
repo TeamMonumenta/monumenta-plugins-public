@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -32,8 +33,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -104,7 +103,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 			},
 
 			(Location loc) -> {
-				new PartialParticle(Particle.BLOCK_DUST, loc, 10, 0.35, 0.35, 0.35, 0.25,
+				new PartialParticle(Particle.BLOCK_CRACK, loc, 10, 0.35, 0.35, 0.35, 0.25,
 					Material.OAK_LEAVES.createBlockData()).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.2, 0.2, 0.2, 0.125).spawnAsEntityActive(boss);
 			},
@@ -239,7 +238,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 
 		events.put(50, mBoss -> PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"This cannot be!\",\"color\":\"white\"}]"));
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, events);
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, bossBar);
 	}

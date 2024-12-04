@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -38,8 +39,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -207,7 +206,7 @@ public class HeadlessHorsemanBoss extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellHellzoneGrenade.class);
 		});
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, events);
 
 		super.constructBoss(phase1Spells, passives, detectionRange, bossBar);
 	}

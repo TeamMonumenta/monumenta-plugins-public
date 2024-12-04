@@ -114,7 +114,7 @@ public class SpellEarthenCleave extends Spell {
 							boxes.add(BoundingBox.of(l, 0.65, 15, 0.65));
 
 							if (degree % 4 == 0 && r % 2 == 0) {
-								new PPExplosion(Particle.BLOCK_DUST, l.clone().add(0, 1, 0))
+								new PPExplosion(Particle.BLOCK_CRACK, l.clone().add(0, 1, 0))
 									.speed(1)
 									.count(4)
 									.extraRange(0.10, 0.2)

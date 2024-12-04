@@ -18,13 +18,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Listener;
@@ -63,7 +62,7 @@ public class HarrakfarGodOfLife extends BossAbilityGroup implements Listener {
 			mSpellQueue.addSpellToQueue(new SpellGenerateBlueSpells(this));
 		});
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BarColor.BLUE, BarStyle.SEGMENTED_6, blueEvents, true);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_6, blueEvents, true);
 
 		super.constructBoss(mSpellQueue, getPassiveSpells(), detectionRange * 2, bossBar, 100, 1);
 	}

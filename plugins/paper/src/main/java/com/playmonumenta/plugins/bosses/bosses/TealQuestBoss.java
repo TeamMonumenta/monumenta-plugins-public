@@ -19,6 +19,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,8 +27,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -135,7 +134,7 @@ public class TealQuestBoss extends SerializedLocationBossAbilityGroup {
 			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
 		}), new SpellCrowdControlClear(boss, CLEAR_TIME)));
 
-		BossBarManager barManager = new BossBarManager(mBoss, detectionRange, BarColor.BLUE, BarStyle.SOLID, null);
+		BossBarManager barManager = new BossBarManager(mBoss, detectionRange, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS, null);
 
 		super.constructBoss(manager, passives, detectionRange, barManager);
 	}

@@ -94,11 +94,11 @@ public class SpellRagingRoots extends Spell {
 											new PartialParticle(Particle.TOTEM, loc)
 												.count(1)
 												.spawnAsBoss();
-											new PartialParticle(Particle.BLOCK_DUST, loc)
+											new PartialParticle(Particle.BLOCK_CRACK, loc)
 												.count(1)
 												.data(Material.VERDANT_FROGLIGHT.createBlockData())
 												.spawnAsBoss();
-											new PartialParticle(Particle.BLOCK_DUST, loc)
+											new PartialParticle(Particle.BLOCK_CRACK, loc)
 												.count(1)
 												.data(Material.MOSS_BLOCK.createBlockData())
 												.spawnAsBoss();
@@ -114,11 +114,11 @@ public class SpellRagingRoots extends Spell {
 										new PartialParticle(Particle.TOTEM, loc)
 											.count(1)
 											.spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_DUST, loc)
+										new PartialParticle(Particle.BLOCK_CRACK, loc)
 											.count(1)
 											.data(Material.VERDANT_FROGLIGHT.createBlockData())
 											.spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_DUST, loc)
+										new PartialParticle(Particle.BLOCK_CRACK, loc)
 											.count(1)
 											.data(Material.MOSS_BLOCK.createBlockData())
 											.spawnAsBoss();
@@ -131,11 +131,11 @@ public class SpellRagingRoots extends Spell {
 										new PartialParticle(Particle.TOTEM, loc)
 											.count(1)
 											.spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_DUST, loc)
+										new PartialParticle(Particle.BLOCK_CRACK, loc)
 											.count(1)
 											.data(Material.VERDANT_FROGLIGHT.createBlockData())
 											.spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_DUST, loc)
+										new PartialParticle(Particle.BLOCK_CRACK, loc)
 											.count(1)
 											.data(Material.MOSS_BLOCK.createBlockData())
 											.spawnAsBoss();
@@ -150,19 +150,19 @@ public class SpellRagingRoots extends Spell {
 									player.playSound(loc, Sound.BLOCK_GRASS_STEP, SoundCategory.HOSTILE, 0.75f, 0);
 								}
 
-								new PPExplosion(Particle.BLOCK_DUST, loc)
+								new PPExplosion(Particle.BLOCK_CRACK, loc)
 									.speed(1)
 									.count(7)
 									.extraRange(0.15, 0.2)
 									.data(Material.SLIME_BLOCK.createBlockData())
 									.spawnAsBoss();
-								new PPExplosion(Particle.BLOCK_DUST, loc)
+								new PPExplosion(Particle.BLOCK_CRACK, loc)
 									.speed(1)
 									.count(7)
 									.extraRange(0.15, 0.2)
 									.data(Material.VERDANT_FROGLIGHT.createBlockData())
 									.spawnAsBoss();
-								new PPExplosion(Particle.BLOCK_DUST, loc)
+								new PPExplosion(Particle.BLOCK_CRACK, loc)
 									.speed(1)
 									.count(7)
 									.extraRange(0.15, 0.2)
@@ -191,7 +191,7 @@ public class SpellRagingRoots extends Spell {
 						.distanceFalloff(50)
 						.count(120)
 						.spawnAsBoss();
-					new PPSpiral(Particle.BLOCK_DUST, mBoss.getLocation(), 23)
+					new PPSpiral(Particle.BLOCK_CRACK, mBoss.getLocation(), 23)
 						.distanceFalloff(50)
 						.count(120)
 						.data(Material.OAK_LEAVES.createBlockData())

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -97,6 +99,8 @@ public class AbsorptionUtils {
 			MMLog.warning("Tried giving negative absorption!", new Exception());
 			amount = 0;
 		}
+		final var attribute = entity.getAttribute(Attribute.GENERIC_MAX_ABSORPTION);
+		Objects.requireNonNull(attribute, "entity does not support absorption attribute").setBaseValue(amount);
 		entity.setAbsorptionAmount(amount);
 		addAbsorptionInstance(entity, amount, duration);
 	}

@@ -251,7 +251,7 @@ public class SpellBlockBreak extends Spell {
 		}
 
 		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 0.25f, FastUtils.randomFloatInRange(0.7f, 1.0f));
-		new PartialParticle(Particle.BLOCK_DUST, loc, 15, mXRad / 2.0, mYRad / 4.0, mZRad / 2.0, 0.05, particleMat.createBlockData()).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.BLOCK_CRACK, loc, 15, mXRad / 2.0, mYRad / 4.0, mZRad / 2.0, 0.05, particleMat.createBlockData()).spawnAsEntityActive(mLauncher);
 		MMLog.finest(() -> "[SpellBlockBreak] Launcher " + mLauncher.getName() + " successfully broke blocks. Returning true");
 		return true;
 	}

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -42,8 +43,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hoglin;
@@ -230,7 +229,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		});
 
 		// Boss Bar and Construct
-		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10, events);
 		constructBoss(phase1Spells, passives, detectionRange, bossBar, 100, 1, true);
 	}
 

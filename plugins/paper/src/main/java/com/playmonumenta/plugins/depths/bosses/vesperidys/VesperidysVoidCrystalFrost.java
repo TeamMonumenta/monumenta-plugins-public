@@ -110,7 +110,7 @@ public class VesperidysVoidCrystalFrost extends BossAbilityGroup {
 			// Projectile Aesthetic
 			(World world, Location loc, int ticks) -> {
 				new PartialParticle(Particle.SNOWFLAKE, loc, 4, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
-				new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.1, 0.1, 0.1, 0.05, Material.ICE.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.BLOCK_CRACK, loc, 1, 0.1, 0.1, 0.1, 0.05, Material.ICE.createBlockData()).spawnAsEntityActive(mBoss);
 			},
 			// Hit Action
 			(World world, @Nullable LivingEntity le, Location loc, @Nullable Location prevLoc) -> {

@@ -67,7 +67,7 @@ public class SpellSurgingDeath extends Spell {
 						player.playSound(player, Sound.BLOCK_SOUL_SOIL_BREAK, SoundCategory.HOSTILE, 0.2f, 1f);
 					}
 
-					new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, Ruten.arenaRadius)
+					new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc, Ruten.arenaRadius)
 						.data(Material.SOUL_SOIL.createBlockData())
 						.countPerMeter(3)
 						.spawnAsBoss();
@@ -131,7 +131,7 @@ public class SpellSurgingDeath extends Spell {
 											world.playSound(mSpawnLoc, Sound.BLOCK_SOUL_SOIL_BREAK, SoundCategory.HOSTILE, 0.5f, 1);
 
 											for (double radius = minRad; radius < maxRad; radius += 1) {
-												new PPCircle(Particle.BLOCK_DUST, mBoss.getLocation(), radius)
+												new PPCircle(Particle.BLOCK_CRACK, mBoss.getLocation(), radius)
 													.ringMode(true)
 													.count(20)
 													.data(Material.SOUL_SOIL.createBlockData())

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -33,8 +34,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -70,7 +69,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 
 		Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BarColor.RED, BarStyle.SEGMENTED_6, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BossBar.Color.RED, BossBar.Overlay.NOTCHED_6, events);
 		super.constructBoss(mSpellQueue, getPassiveSpellsByPhase(mPhase), detectionRange * 2, bossBar, 0, 1);
 
 		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).stream().filter(p -> p.getScoreboardTags().contains("HyceneaFighter")).forEach(p -> {

@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ParticlesList {
-	private static final EnumSet<Particle> PARTICLES_WITH_PARAMETERS = EnumSet.of(Particle.REDSTONE, Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_DUST, Particle.FALLING_DUST, Particle.DUST_COLOR_TRANSITION);
+	private static final EnumSet<Particle> PARTICLES_WITH_PARAMETERS = EnumSet.of(Particle.REDSTONE, Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_CRACK, Particle.FALLING_DUST, Particle.DUST_COLOR_TRANSITION);
 
 	public static class CParticle {
 		public Particle mParticle;
@@ -236,7 +236,7 @@ public class ParticlesList {
 
 			/* Valid CParticles:
 			 * (REDSTONE,count=1,dx=0,dy=0,dz=0,velocity=1,#color=none,size=1)
-			 * (BLOCK_CRACK|BLOCK_DUST|FALLING_DUST,count=1,dx=0,dy=0,dz=0,velocity=1,Material=none)
+			 * (BLOCK_CRACK|BLOCK_CRACK|FALLING_DUST,count=1,dx=0,dy=0,dz=0,velocity=1,Material=none)
 			 * (ITEM_CRACK,count=1,dx=0,dy=0,dz=0,velocity=1,ItemStack=none)
 			 * (<any other>,count=1,dx=0,dy=0,dz=0,velocity=1)
 			 */

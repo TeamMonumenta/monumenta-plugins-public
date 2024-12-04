@@ -64,7 +64,7 @@ public class SpellAnimaExpulsion extends Spell {
 						p.playSound(p.getLocation(), Sound.ENTITY_SLIME_SQUISH, SoundCategory.HOSTILE, 0.25f, 1);
 					});
 
-					new PPCircle(Particle.BLOCK_DUST, mBoss.getLocation(), (mTempRadius * (1d - ((double) mChargeUp.getTime() / (double) mCastTime))))
+					new PPCircle(Particle.BLOCK_CRACK, mBoss.getLocation(), (mTempRadius * (1d - ((double) mChargeUp.getTime() / (double) mCastTime))))
 						.ringMode(true)
 						.count(20)
 						.data(Material.JUNGLE_LEAVES.createBlockData())

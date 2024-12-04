@@ -61,7 +61,7 @@ public class SpellRKitxetSummon extends Spell {
 
 			Location loweredLoc = randomSpreadLoc.clone().subtract(0, 1.5, 0); //Starts spawning in the ground
 			loweredLoc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 0.75f);
-			new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.LIME_WOOL.createBlockData()).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.BLOCK_CRACK, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.LIME_WOOL.createBlockData()).spawnAsEntityActive(mBoss);
 			Collections.shuffle(mSummonOptions);
 			Entity summon = LibraryOfSoulsIntegration.summon(loweredLoc, mSummonOptions.get(0));
 			if (summon != null && summon instanceof LivingEntity) {
@@ -87,7 +87,7 @@ public class SpellRKitxetSummon extends Spell {
 							//Break 2 blocks where the mob is so it isn't trapped
 							summonedMob.getLocation().getBlock().breakNaturally();
 							summonedMob.getLocation().add(0, 1, 0).getBlock().breakNaturally();
-							new PartialParticle(Particle.BLOCK_DUST, loc, 6, 0.25, 0.1, 0.25, 0.25, Material.GREEN_CONCRETE_POWDER.createBlockData()).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.BLOCK_CRACK, loc, 6, 0.25, 0.1, 0.25, 0.25, Material.GREEN_CONCRETE_POWDER.createBlockData()).spawnAsEntityActive(mBoss);
 						}
 
 						if (mBoss.isDead() || !mBoss.isValid()) {

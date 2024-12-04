@@ -70,11 +70,11 @@ public class AnvilOverride extends BaseOverride {
 						mTicks++;
 						if (mTicks >= 3) {
 							this.cancel();
-							new PartialParticle(Particle.BLOCK_DUST, mParticleLoc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData()).spawnAsPlayerActive(player);
+							new PartialParticle(Particle.BLOCK_CRACK, mParticleLoc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData()).spawnAsPlayerActive(player);
 							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
 							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
 						} else {
-							new PartialParticle(Particle.BLOCK_DUST, mParticleLoc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData()).spawnAsPlayerActive(player);
+							new PartialParticle(Particle.BLOCK_CRACK, mParticleLoc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData()).spawnAsPlayerActive(player);
 						}
 					}
 

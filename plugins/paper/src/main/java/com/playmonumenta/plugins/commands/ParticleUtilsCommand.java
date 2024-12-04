@@ -267,7 +267,7 @@ public class ParticleUtilsCommand {
 	}
 
 	private static boolean isBlock(Particle particle) {
-		return particle.equals(Particle.BLOCK_CRACK) || particle.equals(Particle.BLOCK_DUST) || particle.equals(Particle.BLOCK_MARKER);
+		return particle.equals(Particle.BLOCK_CRACK) || particle.equals(Particle.BLOCK_MARKER);
 	}
 
 	private static Particle.DustOptions parseDustOptions(String extraData) {

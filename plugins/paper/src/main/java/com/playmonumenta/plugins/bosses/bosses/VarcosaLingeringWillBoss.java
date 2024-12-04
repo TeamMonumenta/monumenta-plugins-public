@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -35,8 +36,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -102,7 +101,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(10, mBoss -> forceCastSpell(SpellGhostlyCannons.class));
-		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange + 20, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, events);
 
 		super.constructBoss(spells, passiveSpells, detectionRange, bossBar);
 	}

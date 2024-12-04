@@ -110,7 +110,7 @@ public class SpellVileBloom extends Spell {
 							if (mT % 10 == 0) {
 								for (LivingEntity entity : vileBloomSpawns) {
 									if (entity.getScoreboardTags().contains(RED_BLOOM_NAME) && progress < 0.5) {
-										new PPCircle(Particle.BLOCK_DUST, entity.getLocation(), mBloomRange)
+										new PPCircle(Particle.BLOCK_CRACK, entity.getLocation(), mBloomRange)
 											.data(Material.ROSE_BUSH.createBlockData())
 											.countPerMeter(1)
 											.spawnAsBoss();
@@ -123,7 +123,7 @@ public class SpellVileBloom extends Spell {
 											.countPerMeter(1)
 											.spawnAsBoss();
 									} else if (entity.getScoreboardTags().contains(BLUE_BLOOM_NAME) && progress < 1.0) {
-										new PPCircle(Particle.BLOCK_DUST, entity.getLocation(), mBloomRange)
+										new PPCircle(Particle.BLOCK_CRACK, entity.getLocation(), mBloomRange)
 											.data(Material.BLUE_ORCHID.createBlockData())
 											.countPerMeter(1)
 											.spawnAsBoss();

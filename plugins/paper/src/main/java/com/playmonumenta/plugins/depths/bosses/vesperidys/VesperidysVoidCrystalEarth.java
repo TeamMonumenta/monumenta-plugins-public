@@ -113,7 +113,7 @@ public class VesperidysVoidCrystalEarth extends BossAbilityGroup {
 									if (FastUtils.randomIntInRange(0, 2) == 0) {
 										// 1/3 chance for particle
 										if (FastUtils.randomIntInRange(0, 2) == 0) {
-											new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+											new PartialParticle(Particle.BLOCK_CRACK, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 										} else {
 											new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
 										}
@@ -139,7 +139,7 @@ public class VesperidysVoidCrystalEarth extends BossAbilityGroup {
 									if (FastUtils.randomIntInRange(0, 100) == 0) {
 										new PartialParticle(Particle.EXPLOSION_NORMAL, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.25, 0.1, 0.25, 0).spawnAsEntityActive(mBoss);
 									} else {
-										new PartialParticle(Particle.BLOCK_DUST, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0, Material.DIRT.createBlockData())
+										new PartialParticle(Particle.BLOCK_CRACK, block.getLocation().add(0.5, 1.2, 0.5), 1, 0.1, 0.1, 0.1, 0, Material.DIRT.createBlockData())
 											.spawnAsEntityActive(mBoss);
 									}
 								}
@@ -284,7 +284,7 @@ public class VesperidysVoidCrystalEarth extends BossAbilityGroup {
 							if (FastUtils.randomIntInRange(0, 2) == 0) {
 								// 1/3 chance for particle
 								if (FastUtils.randomIntInRange(0, 2) == 0) {
-									new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.BLOCK_CRACK, loc, 1, 0.15, 0.1, 0.15, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 								} else {
 									new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
 								}

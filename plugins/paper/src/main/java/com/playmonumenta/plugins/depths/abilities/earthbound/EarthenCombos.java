@@ -67,8 +67,8 @@ public class EarthenCombos extends DepthsCombosAbility {
 		Location entityLoc = enemy.getLocation();
 		playSounds(world, loc);
 		new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_CRACK, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_CRACK, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsPlayerActive(player);
 	}
 
 	public static void playSounds(World world, Location loc) {

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -41,8 +42,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -224,7 +223,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 			sendDialogue(6, true);
 		});
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.WHITE, BossBar.Overlay.NOTCHED_10, events);
 		constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 10);
 
 		new BukkitRunnable() {

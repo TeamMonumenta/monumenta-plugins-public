@@ -62,7 +62,7 @@ public class Entrench extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 1.2f, 0.45f);
 		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.PLAYERS, 1, 0.6f);
 		double mult = radius / RADIUS;
-		new PartialParticle(Particle.BLOCK_DUST, loc, (int) (35 * mult), 1.5 * mult, 1.5 * mult, 1.5 * mult, 1, Material.SOUL_SOIL.createBlockData()).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_CRACK, loc, (int) (35 * mult), 1.5 * mult, 1.5 * mult, 1.5 * mult, 1, Material.SOUL_SOIL.createBlockData()).spawnAsPlayerActive(player);
 	}
 
 	@Override

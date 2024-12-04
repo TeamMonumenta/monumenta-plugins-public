@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -36,8 +37,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -114,7 +113,7 @@ public class SnowSpirit extends SerializedLocationBossAbilityGroup {
 
 		events.put(0, mBoss -> changePhase(SpellManager.EMPTY, Collections.emptyList(), null));
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.WHITE, BossBar.Overlay.NOTCHED_10, events);
 		constructBoss(activeSpells1, passiveSpells, detectionRange, bossBar, 20 * 10);
 
 		new BukkitRunnable() {

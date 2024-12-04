@@ -109,7 +109,7 @@ public class SpellAxtalGroundSurge extends Spell {
 							if (mTicks % 2 == 0) {
 								world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 3, mPitch);
 							}
-							new PartialParticle(Particle.BLOCK_DUST, pLoc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.BLOCK_CRACK, pLoc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 							new PartialParticle(Particle.SMOKE_LARGE, pLoc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 
 							mTicks++;
@@ -166,7 +166,7 @@ public class SpellAxtalGroundSurge extends Spell {
 					}
 
 					world.playSound(bLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.75f, 1);
-					new PartialParticle(Particle.BLOCK_DUST, bLoc, 20, 0.5, 0.5, 0.5, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, bLoc, 20, 0.5, 0.5, 0.5, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.FLAME, bLoc, 15, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.LAVA, bLoc, 2, 0.5, 0.5, 0.5, 0.25).spawnAsEntityActive(mBoss);
 					for (Player player : players) {
@@ -223,7 +223,7 @@ public class SpellAxtalGroundSurge extends Spell {
 									//Have particles with collision show only for the player who's targeted.
 									//This is to prevent lag from the numerous other surges that have these same
 									//Particles
-									new PartialParticle(Particle.BLOCK_DUST, innerBoxLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.BLOCK_CRACK, innerBoxLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.FLAME, innerBoxLoc, 6, 0.2, 0.2, 0.2, 0.075).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.LAVA, innerBoxLoc, 1, 0.2, 0.2, 0.2, 0.25).spawnAsEntityActive(mBoss);
 									for (Player surgePlayer : players) {

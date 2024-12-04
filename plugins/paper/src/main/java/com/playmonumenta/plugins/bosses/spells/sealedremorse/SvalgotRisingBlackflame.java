@@ -53,7 +53,7 @@ public class SvalgotRisingBlackflame extends Spell {
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0f);
 				}
 
-				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.BLOCK_CRACK, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.SPELL_WITCH, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
@@ -66,7 +66,7 @@ public class SvalgotRisingBlackflame extends Spell {
 
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 2);
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1.5f, 1);
-					new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, loc, 250, 3, 0.1, 3, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 100, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {

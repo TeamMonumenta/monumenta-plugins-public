@@ -68,7 +68,7 @@ public class SpellRingOfThorns extends Spell {
 					for (Player target : mPlayers) {
 						Location fixY = target.getLocation().clone();
 						fixY.setY(mSpawnLoc.getY());
-						new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, Math.min(fixY.distance(mSpawnLoc), Ruten.arenaRadius))
+						new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc, Math.min(fixY.distance(mSpawnLoc), Ruten.arenaRadius))
 							.countPerMeter(1)
 							.data(mDripStoneData)
 							.ringMode(true)
@@ -103,12 +103,12 @@ public class SpellRingOfThorns extends Spell {
 						double outerRad = distanceFromCenter + mRadius;
 
 						for (double i = innerRad; i < outerRad; i += 0.25) {
-							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(0, 0.5, 0), i)
+							new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(0, 0.5, 0), i)
 								.data(mJungleLeavesData)
 								.ringMode(true)
 								.count(3)
 								.spawnAsBoss();
-							new PPCircle(Particle.BLOCK_DUST, mSpawnLoc.clone().add(0, 0.5, 0), i)
+							new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(0, 0.5, 0), i)
 								.data(mDripStoneData)
 								.ringMode(true)
 								.count(3)

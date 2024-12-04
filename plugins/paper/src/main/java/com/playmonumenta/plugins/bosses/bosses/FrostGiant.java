@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -60,8 +61,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -646,8 +645,8 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 							}
 
 							if (mTicks % 10 == 0) {
-								new PartialParticle(Particle.BLOCK_DUST, mStartLoc, 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
-								new PartialParticle(Particle.BLOCK_DUST, mStartLoc, 75, 5, 0.35, 5, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.BLOCK_CRACK, mStartLoc, 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.BLOCK_CRACK, mStartLoc, 75, 5, 0.35, 5, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
 								new PartialParticle(Particle.EXPLOSION_NORMAL, mStartLoc, 15, 5, 0.35, 5, 0.15).spawnAsEntityActive(boss);
 								new PartialParticle(Particle.CLOUD, mStartLoc, 20, 5, 0.35, 5, 0.15).spawnAsEntityActive(boss);
 							}
@@ -692,7 +691,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 											player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 										}
 
-										BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
+										BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, events, false);
 										constructBoss(phase1Spells, phase1PassiveSpells, detectionRange, bossBar, 20 * 10);
 
 										mBoss.setGravity(true);
@@ -843,8 +842,8 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 				if (mTicks >= 20 * 4 && mTicks <= 20 * 10 && mTicks % 10 == 0) {
 					world.playSound(mStartLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 2, FastUtils.RANDOM.nextFloat());
 					world.playSound(mStartLoc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 2, mPitch);
-					new PartialParticle(Particle.BLOCK_DUST, startLoc, 100, 2, 0.35, 2, 0.25, Material.BLUE_ICE.createBlockData()).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.BLOCK_DUST, startLoc, 100, 2, 0.35, 2, 0.25, Material.IRON_TRAPDOOR.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, startLoc, 100, 2, 0.35, 2, 0.25, Material.BLUE_ICE.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, startLoc, 100, 2, 0.35, 2, 0.25, Material.IRON_TRAPDOOR.createBlockData()).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.DRAGON_BREATH, startLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.25).spawnAsEntityActive(mBoss);
 				}
 

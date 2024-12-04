@@ -75,8 +75,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creature;
@@ -841,8 +839,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 										}
 
-										BossBarManager bossBar = new BossBarManager(boss, detectionRange,
-											BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
+										BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10, events);
 										constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar);
 										this.cancel();
 									}

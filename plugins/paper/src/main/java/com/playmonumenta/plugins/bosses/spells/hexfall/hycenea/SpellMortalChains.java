@@ -81,8 +81,8 @@ public class SpellMortalChains extends Spell {
 
 				if (mChargeUp.getTime() % 5 == 0) {
 					for (Location loc : totemLoc) {
-						new PPCircle(Particle.BLOCK_DUST, loc, mRadius).data(Material.OAK_WOOD.createBlockData()).count(25).spawnAsBoss();
-						new PPCircle(Particle.BLOCK_DUST, loc, mRadius).data(Material.JUNGLE_LEAVES.createBlockData()).count(25).spawnAsBoss();
+						new PPCircle(Particle.BLOCK_CRACK, loc, mRadius).data(Material.OAK_WOOD.createBlockData()).count(25).spawnAsBoss();
+						new PPCircle(Particle.BLOCK_CRACK, loc, mRadius).data(Material.JUNGLE_LEAVES.createBlockData()).count(25).spawnAsBoss();
 
 						if (HexfallUtils.playersInBossInXZRange(loc, mRadius, true).size() > 0) {
 							new PPPillar(Particle.REDSTONE, loc, 5).data(new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.65f)).count(15).spawnAsBoss();
@@ -116,8 +116,8 @@ public class SpellMortalChains extends Spell {
 							public void run() {
 								mCircleRadius = (mRadius * (1d - ((double) mT / (double) mAnimationTime)));
 								if (mT % 2 == 0) {
-									new PPCircle(Particle.BLOCK_DUST, loc, mCircleRadius).data(Material.OAK_WOOD.createBlockData()).count(35).spawnAsBoss();
-									new PPCircle(Particle.BLOCK_DUST, loc, mCircleRadius).data(Material.JUNGLE_LEAVES.createBlockData()).count(35).spawnAsBoss();
+									new PPCircle(Particle.BLOCK_CRACK, loc, mCircleRadius).data(Material.OAK_WOOD.createBlockData()).count(35).spawnAsBoss();
+									new PPCircle(Particle.BLOCK_CRACK, loc, mCircleRadius).data(Material.JUNGLE_LEAVES.createBlockData()).count(35).spawnAsBoss();
 								}
 								if (mT >= mAnimationTime) {
 									new PPExplosion(Particle.SOUL_FIRE_FLAME, loc)
@@ -156,10 +156,10 @@ public class SpellMortalChains extends Spell {
 								@Override
 								public void run() {
 									if (mT % 2 == 0) {
-										new PPCircle(Particle.BLOCK_DUST, loc, mInnerRad).data(Material.OAK_WOOD.createBlockData()).count(15).spawnAsBoss();
-										new PPCircle(Particle.BLOCK_DUST, loc, mInnerRad).data(Material.JUNGLE_LEAVES.createBlockData()).count(15).spawnAsBoss();
+										new PPCircle(Particle.BLOCK_CRACK, loc, mInnerRad).data(Material.OAK_WOOD.createBlockData()).count(15).spawnAsBoss();
+										new PPCircle(Particle.BLOCK_CRACK, loc, mInnerRad).data(Material.JUNGLE_LEAVES.createBlockData()).count(15).spawnAsBoss();
 										for (double rad = mInnerRad; rad < mOuterRad; rad += 0.5) {
-											new PPCircle(Particle.BLOCK_DUST, loc, rad).data(Material.POPPY.createBlockData()).count(15).spawnAsBoss();
+											new PPCircle(Particle.BLOCK_CRACK, loc, rad).data(Material.POPPY.createBlockData()).count(15).spawnAsBoss();
 										}
 									}
 
@@ -256,7 +256,7 @@ public class SpellMortalChains extends Spell {
 					if (tetherLength > (mTetherBreakThreshold + 3)) {
 						new PPLine(Particle.REDSTONE, loc, p.getEyeLocation().add(0, -1, 0)).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f)).countPerMeter(2).spawnAsBoss();
 					} else if (tetherLength > mTetherBreakThreshold) {
-						new PPLine(Particle.BLOCK_DUST, loc, p.getEyeLocation().add(0, -1, 0)).data(Material.RED_WOOL.createBlockData()).countPerMeter(2).spawnAsBoss();
+						new PPLine(Particle.BLOCK_CRACK, loc, p.getEyeLocation().add(0, -1, 0)).data(Material.RED_WOOL.createBlockData()).countPerMeter(2).spawnAsBoss();
 					} else {
 						new PPLine(Particle.SPELL_WITCH, loc, p.getEyeLocation().add(0, -1, 0)).countPerMeter(2).spawnAsBoss();
 					}
@@ -276,9 +276,9 @@ public class SpellMortalChains extends Spell {
 						@Override
 						public void run() {
 							if (mT % 2 == 0) {
-								new PPCircle(Particle.BLOCK_DUST, p.getLocation(), mInnerRad).data(Material.CHORUS_PLANT.createBlockData()).count(20).spawnAsBoss();
+								new PPCircle(Particle.BLOCK_CRACK, p.getLocation(), mInnerRad).data(Material.CHORUS_PLANT.createBlockData()).count(20).spawnAsBoss();
 								for (double rad = mInnerRad; rad < mOuterRad; rad += 0.5) {
-									new PPCircle(Particle.BLOCK_DUST, p.getLocation(), rad).data(Material.POPPY.createBlockData()).count(20).spawnAsBoss();
+									new PPCircle(Particle.BLOCK_CRACK, p.getLocation(), rad).data(Material.POPPY.createBlockData()).count(20).spawnAsBoss();
 								}
 							}
 							double ratio = ((double) mT) / mAnimationTime;

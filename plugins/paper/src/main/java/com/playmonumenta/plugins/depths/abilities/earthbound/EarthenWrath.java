@@ -123,7 +123,7 @@ public class EarthenWrath extends DepthsAbility {
 					}
 
 					new PartialParticle(Particle.CRIT_MAGIC, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.BLOCK_DUST, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.BLOCK_CRACK, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 					new PPCircle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.5, 0), mTransferRadius)
 						.countPerMeter(3)
 						.data(new Particle.DustOptions(Color.fromRGB(100, 50, 0), 1f))
@@ -153,7 +153,7 @@ public class EarthenWrath extends DepthsAbility {
 						world.playSound(loc, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, SoundCategory.PLAYERS, 0.7f, 0.1f);
 						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 1.0f, 0.1f);
 						double mult = mDamageRadius / DAMAGE_RADIUS;
-						new PartialParticle(Particle.BLOCK_DUST, loc, (int) (250 * mult), 3 * mult, 0.1 * mult, 3 * mult, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.BLOCK_CRACK, loc, (int) (250 * mult), 3 * mult, 0.1 * mult, 3 * mult, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.LAVA, loc, (int) (100 * mult), 3 * mult, 0.1 * mult, 3 * mult, 0.25).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, (int) (75 * mult), 3 * mult, 0.1 * mult, 3 * mult, 0.25).spawnAsPlayerActive(mPlayer);
 					} else {

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -34,8 +35,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -165,7 +164,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
 
-					BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
+					BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10, events);
 					constructBoss(normalSpells, passiveNormalSpells, detectionRange, bossBar, 20 * 10);
 
 					for (Player player : getPlayers()) {

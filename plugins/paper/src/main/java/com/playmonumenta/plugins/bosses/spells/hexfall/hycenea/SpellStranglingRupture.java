@@ -67,7 +67,7 @@ public class SpellStranglingRupture extends Spell {
 							if (mChargeUp.getTime() % 10 == 0) {
 								mBoss.getWorld().playSound(p.getLocation(), Sound.BLOCK_WOOD_BREAK, SoundCategory.HOSTILE, 0.75f, 1f);
 							}
-							new PPCircle(Particle.BLOCK_DUST, p.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(35).spawnAsBoss();
+							new PPCircle(Particle.BLOCK_CRACK, p.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(35).spawnAsBoss();
 						}
 					}
 
@@ -75,7 +75,7 @@ public class SpellStranglingRupture extends Spell {
 						if (mChargeUp.getTime() % 10 == 0) {
 							mBoss.getWorld().playSound(e.getLocation(), Sound.BLOCK_WOOD_BREAK, SoundCategory.HOSTILE, 0.75f, 1f);
 						}
-						new PPCircle(Particle.BLOCK_DUST, e.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(35).spawnAsBoss();
+						new PPCircle(Particle.BLOCK_CRACK, e.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(35).spawnAsBoss();
 					}
 				}
 
@@ -98,8 +98,8 @@ public class SpellStranglingRupture extends Spell {
 							islandTargets.add(platform);
 							armorStand.addScoreboardTag("Hycenea_StranglingRupture_Target");
 						} else {
-							new PPCircle(Particle.BLOCK_DUST, p.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(5).spawnAsBoss();
-							new PPCircle(Particle.BLOCK_DUST, p.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_LEAVES.createBlockData()).count(5).spawnAsBoss();
+							new PPCircle(Particle.BLOCK_CRACK, p.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(5).spawnAsBoss();
+							new PPCircle(Particle.BLOCK_CRACK, p.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_LEAVES.createBlockData()).count(5).spawnAsBoss();
 							for (double rad = 0; rad < mPlatformRadius; rad += 0.5) {
 								new PPCircle(Particle.SMOKE_NORMAL, p.getLocation(), rad).count(5).spawnAsBoss();
 							}
@@ -148,8 +148,8 @@ public class SpellStranglingRupture extends Spell {
 			@Override
 			public void run() {
 				if (mT % 2 == 0) {
-					new PPCircle(Particle.BLOCK_DUST, e.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(10).spawnAsBoss();
-					new PPCircle(Particle.BLOCK_DUST, e.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_LEAVES.createBlockData()).count(10).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, e.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_WOOD.createBlockData()).count(10).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, e.getLocation(), mPlatformRadius - 1).data(Material.DARK_OAK_LEAVES.createBlockData()).count(10).spawnAsBoss();
 					for (double rad = 0; rad < mPlatformRadius; rad += 0.5) {
 						new PPCircle(Particle.SMOKE_NORMAL, e.getLocation(), rad).count(5).spawnAsBoss();
 					}

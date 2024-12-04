@@ -92,7 +92,7 @@ public class BottledSunlight extends DepthsAbility {
 					}
 
 					world.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.85f);
-					new PartialParticle(Particle.BLOCK_DUST, l, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.BLOCK_CRACK, l, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.FIREWORKS_SPARK, l, 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 					bottle.remove();
 

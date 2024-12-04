@@ -94,7 +94,7 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 		world.playSound(location, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.8f, 1.7f);
 		world.playSound(location, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.5f, 2.0f);
 		world.playSound(location, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.6f, 1.0f);
-		new PartialParticle(Particle.BLOCK_DUST, location, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
+		new PartialParticle(Particle.BLOCK_CRACK, location, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, location.clone().add(0, 0.3, 0))
 				.count(20).delta(0.05, 0.1, 0.05)
 				.spawnAsPlayerActive(p);

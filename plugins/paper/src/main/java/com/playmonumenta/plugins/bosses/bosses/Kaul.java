@@ -63,8 +63,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -356,7 +354,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								double radian1 = Math.toRadians(mRotation + (72 * i));
 								mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 								new PartialParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0).spawnAsBoss();
-								new PartialParticle(Particle.BLOCK_DUST, mLoc, 4, 0.25, 0.25, 0.25, 0.25,
+								new PartialParticle(Particle.BLOCK_CRACK, mLoc, 4, 0.25, 0.25, 0.25, 0.25,
 									Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 								mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 							}
@@ -388,7 +386,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 											double radian1 = Math.toRadians(mRotation + (10 * i));
 											loc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 											new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
-											new PartialParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.4, 0.4, 0.25,
+											new PartialParticle(Particle.BLOCK_CRACK, loc, 2, 0.4, 0.4, 0.4, 0.25,
 												Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 											loc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 										}
@@ -466,7 +464,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						double radian1 = Math.toRadians(mRotation + (72 * i));
 						mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 						new PartialParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0).spawnAsBoss();
-						new PartialParticle(Particle.BLOCK_DUST, mLoc, 3, 0.1, 0.1, 0.1, 0.25,
+						new PartialParticle(Particle.BLOCK_CRACK, mLoc, 3, 0.1, 0.1, 0.1, 0.25,
 							Material.DIRT.createBlockData()).spawnAsBoss();
 						mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 					}
@@ -577,7 +575,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 									mLoc.add(mDir.clone().multiply(0.35));
 									if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
 										new PartialParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
+										new PartialParticle(Particle.BLOCK_CRACK, mLoc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
 										new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1).spawnAsBoss();
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)) {
 										new PartialParticle(Particle.REDSTONE, mLoc, 15, 0.4, 0.4, 0.4, RED_COLOR).spawnAsBoss();
@@ -587,7 +585,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										new PartialParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
 										new PartialParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData()).spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData()).spawnAsBoss();
+										new PartialParticle(Particle.BLOCK_CRACK, mLoc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData()).spawnAsBoss();
 										new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1).spawnAsBoss();
 									}
 									if (mLoc.distance(mSpawnLoc.clone().add(0, 5, 0)) < 1.25 || mLoc.distance(mBoss.getLocation().add(0, 1, 0)) < 1.25) {
@@ -627,7 +625,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 													double radian1 = Math.toRadians(mRotation + (10 * i));
 													mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 													new PartialParticle(Particle.FLAME, mLoc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsBoss();
-													new PartialParticle(Particle.BLOCK_DUST, mLoc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
+													new PartialParticle(Particle.BLOCK_CRACK, mLoc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 													mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 												}
 												for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
@@ -699,7 +697,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			// See bossCastAbility() for more info
 			forceCastSpell(volcanicDemise.getClass());
 		});
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange + 30, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, events);
 
 		//Construct the boss with a delay to prevent the passives from going off during the dialogue
 		new BukkitRunnable() {
@@ -735,7 +733,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					double radian1 = Math.toRadians(mRotation + (72 * i));
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 					new PartialParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0).spawnAsBoss();
-					new PartialParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
+					new PartialParticle(Particle.BLOCK_CRACK, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
 						Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 				}
@@ -792,7 +790,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					mRotation += 24;
 					double radian1 = Math.toRadians(mRotation);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-					new PartialParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
+					new PartialParticle(Particle.BLOCK_CRACK, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
 						Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
@@ -979,7 +977,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							mT++;
 							if (mT <= 60) {
 								mBoss.teleport(mBoss.getLocation().subtract(0, 0.05, 0));
-								new PartialParticle(Particle.BLOCK_DUST, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
+								new PartialParticle(Particle.BLOCK_CRACK, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
 									Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 							} else {
 								EntityEquipment equipment = mBoss.getEquipment();

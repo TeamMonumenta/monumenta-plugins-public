@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -51,8 +52,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -131,7 +130,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 
 		events.put(10, mBoss -> new SpellRutenDialogue(Component.text("How could muddling conquer the soul? Do not see a path... To the mud Ru'Ten must... return. Ye come with, it be decreed...", NamedTextColor.WHITE), 0, mSpawnLoc).run());
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BarColor.RED, BarStyle.SEGMENTED_6, events);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BossBar.Color.RED, BossBar.Overlay.NOTCHED_6, events);
 		super.constructBoss(mSpellQueue, passiveSpells, detectionRange * 2, bossBar, 0, 1);
 
 		Creeper ruten = (Creeper) boss;
@@ -500,7 +499,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 			},
 			(LivingEntity boss, Location loc) -> {
 				// Explosion aesthetics
-				new PPExplosion(Particle.BLOCK_DUST, mBoss.getLocation())
+				new PPExplosion(Particle.BLOCK_CRACK, mBoss.getLocation())
 					.speed(1)
 					.count(15)
 					.extraRange(0.15, 0.5)

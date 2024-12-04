@@ -63,8 +63,6 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Light;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -499,7 +497,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellVesperidysDarkHole.class);
 		});
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, events, false);
 		super.constructBoss(SpellManager.EMPTY, mBasePassives, detectionRange, bossBar);
 	}
 

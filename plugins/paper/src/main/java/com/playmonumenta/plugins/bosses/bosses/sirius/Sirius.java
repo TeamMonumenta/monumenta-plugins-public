@@ -61,8 +61,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.AmethystCluster;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
@@ -228,7 +226,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 		//bossbar and constructing
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			BossBarManager bossBar = new BossBarManager(boss, 100, BarColor.PURPLE, BarStyle.SEGMENTED_10, null, false);
+			BossBarManager bossBar = new BossBarManager(boss, 100, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10, null, false);
 			constructBoss(spells, passives, 100, bossBar, 100, 1);
 			mPlayerCount = getPlayers().size();
 			mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
@@ -970,9 +968,9 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					mBoss.setVisibleByDefault(true);
 					Location loc = mBoss.getLocation().subtract(0, 2, 0);
 					new PPCircle(Particle.EXPLOSION_LARGE, loc, 12).count(30).ringMode(false).spawnAsBoss();
-					new PPCircle(Particle.BLOCK_DUST, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.COBBLED_DEEPSLATE)).spawnAsBoss();
-					new PPCircle(Particle.BLOCK_DUST, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.AMETHYST_BLOCK)).spawnAsBoss();
-					new PPCircle(Particle.BLOCK_DUST, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.POLISHED_DEEPSLATE)).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.COBBLED_DEEPSLATE)).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.AMETHYST_BLOCK)).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.POLISHED_DEEPSLATE)).spawnAsBoss();
 					new PPCircle(Particle.FLAME, loc, 12).count(60).ringMode(false).spawnAsBoss();
 					new PPCircle(Particle.LAVA, loc, 12).count(60).ringMode(false).spawnAsBoss();
 					//randomize smoke about
@@ -1013,9 +1011,9 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					this.cancel();
 					Location loc = mBoss.getLocation().subtract(0, 2, 0);
 					new PPCircle(Particle.EXPLOSION_LARGE, loc, 12).count(30).ringMode(false).spawnAsBoss();
-					new PPCircle(Particle.BLOCK_DUST, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.COBBLED_DEEPSLATE)).spawnAsBoss();
-					new PPCircle(Particle.BLOCK_DUST, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.AMETHYST_BLOCK)).spawnAsBoss();
-					new PPCircle(Particle.BLOCK_DUST, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.POLISHED_DEEPSLATE)).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.COBBLED_DEEPSLATE)).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.AMETHYST_BLOCK)).spawnAsBoss();
+					new PPCircle(Particle.BLOCK_CRACK, loc, 12).count(100).ringMode(false).data(Bukkit.createBlockData(Material.POLISHED_DEEPSLATE)).spawnAsBoss();
 					new PPCircle(Particle.FLAME, loc, 12).count(60).ringMode(false).spawnAsBoss();
 					new PPCircle(Particle.LAVA, loc, 12).count(60).ringMode(false).spawnAsBoss();
 				}

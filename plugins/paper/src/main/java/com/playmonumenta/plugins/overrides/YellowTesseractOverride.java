@@ -178,7 +178,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
-		new PartialParticle(Particle.BLOCK_DUST, pLoc, 10, 0.5, 0.5, 0.5, 0, Material.BLACK_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_CRACK, pLoc, 10, 0.5, 0.5, 0.5, 0, Material.BLACK_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has been reset!", NamedTextColor.YELLOW));
 	}

@@ -15,13 +15,12 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -81,7 +80,7 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 			action, tooHighAction);
 		SpellManager activeSpells = new SpellManager(List.of(new SpellPurgeNegatives(mBoss, 100)));
 
-		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, null);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange + 20, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, null);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}

@@ -44,8 +44,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -221,7 +219,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> changePhase(phase3Spells, phase3Passives, null), 180);
 		});
 
-		mBossBar = new BossBarManager(boss, DETECTION_RANGE, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		mBossBar = new BossBarManager(boss, DETECTION_RANGE, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, events);
 		super.constructBoss(phase1Spells, phase1Passives, DETECTION_RANGE, mBossBar);
 
 		// initialize death values

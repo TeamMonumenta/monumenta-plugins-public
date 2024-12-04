@@ -43,7 +43,7 @@ public class IronTinctureCS implements CosmeticSkill {
 
 	public void pickupEffects(World world, Location location, Player p) {
 		world.playSound(location, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.85f);
-		new PartialParticle(Particle.BLOCK_DUST, location, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
+		new PartialParticle(Particle.BLOCK_CRACK, location, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
 		new PartialParticle(Particle.FIREWORKS_SPARK, location, 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(p);
 	}
 

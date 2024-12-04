@@ -84,8 +84,8 @@ public class SpellOrganicShock extends Spell {
 					mChangedBlocks.clear();
 
 					for (double rad = mMinRadius; rad < mRadius; rad += 0.5) {
-						new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, rad).data(Material.OAK_LEAVES.createBlockData()).ringMode(true).count(5).spawnAsBoss();
-						new PPCircle(Particle.BLOCK_DUST, mSpawnLoc, rad).data(Material.OAK_WOOD.createBlockData()).ringMode(true).count(5).spawnAsBoss();
+						new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc, rad).data(Material.OAK_LEAVES.createBlockData()).ringMode(true).count(5).spawnAsBoss();
+						new PPCircle(Particle.BLOCK_CRACK, mSpawnLoc, rad).data(Material.OAK_WOOD.createBlockData()).ringMode(true).count(5).spawnAsBoss();
 					}
 
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_VINE_BREAK, SoundCategory.HOSTILE, 1.5f, 1);

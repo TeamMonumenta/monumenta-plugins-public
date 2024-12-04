@@ -108,7 +108,7 @@ public class IronGrip extends DepthsAbility {
 			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.6f, 1.35f);
 			world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1f, 1.1f);
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.2, 0, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.BLOCK_DUST, loc, 20, 0.2, 0, 0.2, 0.25, Material.IRON_BLOCK.createBlockData()).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.BLOCK_CRACK, loc, 20, 0.2, 0, 0.2, 0.25, Material.IRON_BLOCK.createBlockData()).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SPELL_INSTANT, loc, 20, 0.4, 0.4, 0.4, 0.25).spawnAsPlayerActive(mPlayer);
 
 			mPlugin.mEffectManager.addEffect(player, "IronGripResistance", new PercentDamageReceived(mResistDuration, -mResist));

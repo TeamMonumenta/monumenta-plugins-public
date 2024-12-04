@@ -56,7 +56,7 @@ public class SpellEarthenRupture extends Spell {
 					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 2.0f, 0.9f);
 				}
 
-				new PartialParticle(Particle.BLOCK_DUST, loc, 6, 0.4f, 0.1f, 0.4f, 0.2f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.BLOCK_CRACK, loc, 6, 0.4f, 0.1f, 0.4f, 0.2f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25f, 0.1f, 0.25f, 0.2f).spawnAsEntityActive(mBoss);
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
@@ -65,7 +65,7 @@ public class SpellEarthenRupture extends Spell {
 					this.cancel();
 					mChargeUp.reset();
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2.0f, 0.9f);
-					new PartialParticle(Particle.BLOCK_DUST, loc, 150, 3, 0.1f, 3, 0.25f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, loc, 150, 3, 0.1f, 3, 0.25f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1f, 3, 0.25f).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1f, 3, 0.25f).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {

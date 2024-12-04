@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -19,8 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -69,7 +68,7 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 		// glow with low priority (so that player abilities can override)
 		GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE, -1, 0, null, "magnet");
 
-		BossBarManager bossBar = new BossBarManager(boss, 40, mIsPositive ? BarColor.RED : BarColor.BLUE, BarStyle.SEGMENTED_20, null);
+		BossBarManager bossBar = new BossBarManager(boss, 40, mIsPositive ? BossBar.Color.RED : BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_20, null);
 
 		List<Spell> passives = List.of(
 			new SpellRunAction(() -> {
@@ -105,9 +104,9 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 					}
 
 					if (mIsPositive) {
-						bossBar.setColor(BarColor.RED);
+						bossBar.setColor(BossBar.Color.RED);
 					} else {
-						bossBar.setColor(BarColor.BLUE);
+						bossBar.setColor(BossBar.Color.BLUE);
 					}
 					GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE, -1, 0, null, "magnet");
 
