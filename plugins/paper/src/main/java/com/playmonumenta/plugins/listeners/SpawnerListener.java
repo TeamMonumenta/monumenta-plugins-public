@@ -424,9 +424,9 @@ public class SpawnerListener implements Listener {
 
 		Location blockLoc = BlockUtils.getCenterBlockLocation(block);
 
+		Player thisPlayer = event.getPlayer();
 		if (SpawnerUtils.hasShieldsAttribute(block)) {
 			// This is a shielded spawner - grant the shield spawner advancement, if not had already
-			Player thisPlayer = event.getPlayer();
 			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner")) {
 				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner");
 			}
@@ -434,6 +434,27 @@ public class SpawnerListener implements Listener {
 				doShieldFullBreakAnimation(blockLoc);
 			} else if (!brokeSpawner && SpawnerUtils.getSpawnerType(block, SpawnerUtils.SEQUENCE_ATTRIBUTE) <= 0) {
 				doShieldBreakAnimation(blockLoc, shieldsAfter);
+			}
+		}
+
+		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.GUARDED_ATTRIBUTE) > 0) {
+			// This is a guarded spawner - grant the guarded spawner advancement, if not had already
+			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/guarded_spawner")) {
+				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/guarded_spawner");
+			}
+		}
+
+		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.CAT_ATTRIBUTE) > 0) {
+			// This is a cat spawner - grant the cat spawner advancement, if not had already
+			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/cat_spawner")) {
+				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/cat_spawner");
+			}
+		}
+
+		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.ENSNARED_ATTRIBUTE) > 0) {
+			// This is an ensnared spawner - grant the ensnared spawner advancement, if not had already
+			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/ensnared_spawner")) {
+				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/ensnared_spawner");
 			}
 		}
 	}
