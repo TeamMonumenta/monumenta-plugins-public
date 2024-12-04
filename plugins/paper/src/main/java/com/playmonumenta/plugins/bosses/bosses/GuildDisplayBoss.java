@@ -98,10 +98,11 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 									//I HATE DISPLAY ENTITIES
 									Location loc = mBoss.getLocation().clone().add(p.X_OFFSET, p.Y_OFFSET, p.Z_OFFSET);
 									ItemDisplay banner = mBoss.getWorld().spawn(loc.clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), ItemDisplay.class);
-									AxisAngle4f rotation = new AxisAngle4f((float) -Math.toRadians(90 - p.ROTATION), 0, 1, 0);
-									banner.setTransformation(new Transformation(banner.getTransformation().getTranslation(), rotation, new Vector3f(), new AxisAngle4f()));
-									banner.setInterpolationDuration(-1);
-									banner.setInterpolationDuration(0);
+									AxisAngle4f rotationForward = new AxisAngle4f((float) Math.toRadians(p.ROTATION - 90), 0, 1, 0);
+									AxisAngle4f rotationReverse = new AxisAngle4f((float) Math.toRadians(p.ROTATION + 90), 0, 1, 0);
+									banner.setTransformation(new Transformation(banner.getTransformation().getTranslation(), rotationReverse, new Vector3f(), new AxisAngle4f()));
+									banner.setInterpolationDelay(0);
+									banner.setInterpolationDuration(1);
 									banner.addScoreboardTag(scoreboardTag);
 									banner.addScoreboardTag(REMOVE_ON_UNLOAD);
 									banner.setBrightness(new Display.Brightness(15, 15));
@@ -109,9 +110,9 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 									TextDisplay text = mBoss.getWorld().spawn(loc.clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), 1.5 + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), TextDisplay.class);
 									text.setAlignment(TextDisplay.TextAlignment.CENTER);
 									text.text(LuckPermsIntegration.getGuildFullComponent(mAllGuilds.get(pos)));
-									text.setTransformation(new Transformation(text.getTransformation().getTranslation(), rotation, new Vector3f(), new AxisAngle4f()));
-									text.setInterpolationDuration(-1);
-									text.setInterpolationDuration(0);
+									text.setTransformation(new Transformation(text.getTransformation().getTranslation(), rotationForward, new Vector3f(), new AxisAngle4f()));
+									text.setInterpolationDelay(0);
+									text.setInterpolationDuration(1);
 									text.setBrightness(new Display.Brightness(15, 15));
 									text.addScoreboardTag(scoreboardTag);
 									text.addScoreboardTag(REMOVE_ON_UNLOAD);
