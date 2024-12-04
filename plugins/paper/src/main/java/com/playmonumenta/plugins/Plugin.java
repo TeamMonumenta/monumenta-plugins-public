@@ -231,6 +231,7 @@ public class Plugin extends JavaPlugin {
 		BoatUtilsCommand.register();
 		BossDebug.register();
 		BossFight.register();
+		Bounce.register();
 		ChangeLogLevel.register();
 		ChargeUpBarCommand.register(this);
 		CharmsCommand.register();
