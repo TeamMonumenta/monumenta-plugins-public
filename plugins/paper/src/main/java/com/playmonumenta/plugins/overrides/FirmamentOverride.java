@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
 import com.playmonumenta.plugins.protocollib.FirmamentLagFix;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -76,7 +77,7 @@ public class FirmamentOverride {
 				|| ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
 				|| (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))
 				|| currentItem.getItemMeta().hasLore()) {
-				// Air breaks it, skip over it. Also the banned items break it, skip over those.
+				// Air breaks it, skip over it. Also, the banned items break it, skip over those.
 				continue;
 			}
 
@@ -107,8 +108,8 @@ public class FirmamentOverride {
 						blockData = blockMeta.getBlockData(currentItem.getType());
 					} else {
 						blockData = currentItem.getType().createBlockData();
-						if (blockData instanceof Leaves) {
-							((Leaves) blockData).setPersistent(true);
+						if (blockData instanceof Leaves leaves) {
+							leaves.setPersistent(true);
 						}
 					}
 				}
@@ -116,6 +117,9 @@ public class FirmamentOverride {
 				// Log for overworld replacements
 				BlockPlaceEvent placeEvent = new BlockPlaceEvent(event.getBlock(), event.getBlockReplacedState(), event.getBlockAgainst(), currentItem, event.getPlayer(), event.canBuild(), event.getHand());
 				Bukkit.getPluginManager().callEvent(placeEvent);
+				if (!placeEvent.isCancelled()) {
+					RepairExplosionsListener.getInstance().playerReplacedBlockViaPlugin(player, event.getBlock());
+				}
 				placeEvent.getBlockReplacedState().setBlockData(blockData);
 				if (!event.isCancelled()) {
 					// Place the chosen block instead of the Firmament
@@ -172,14 +176,14 @@ public class FirmamentOverride {
 		if (InventoryUtils.testForItemWithName(item, ITEM_NAME, true)) {
 			for (int i = 0; i < lore.size(); ++i) {
 				String line = lore.get(i);
-				if (line.equals(PLAIN_PRISMARINE_ENABLED) && !foundLine) {
+				if (line.equals(PLAIN_PRISMARINE_ENABLED)) {
 					ItemStatUtils.removeLore(item, i);
 					ItemStatUtils.addLore(item, i, PRISMARINE_DISABLED);
 					player.sendMessage(PRISMARINE_DISABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
 					break;
-				} else if (line.equals(PLAIN_PRISMARINE_DISABLED) && !foundLine) {
+				} else if (line.equals(PLAIN_PRISMARINE_DISABLED)) {
 					ItemStatUtils.removeLore(item, i);
 					ItemStatUtils.addLore(item, i, PRISMARINE_ENABLED);
 					player.sendMessage(PRISMARINE_ENABLED);
@@ -196,14 +200,14 @@ public class FirmamentOverride {
 		} else if (InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME, true)) {
 			for (int i = 0; i < lore.size(); ++i) {
 				String line = lore.get(i);
-				if (line.equals(PLAIN_BLACKSTONE_ENABLED) && !foundLine) {
+				if (line.equals(PLAIN_BLACKSTONE_ENABLED)) {
 					ItemStatUtils.removeLore(item, i);
 					ItemStatUtils.addLore(item, i, BLACKSTONE_DISABLED);
 					player.sendMessage(BLACKSTONE_DISABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
 					break;
-				} else if (line.equals(PLAIN_BLACKSTONE_DISABLED) && !foundLine) {
+				} else if (line.equals(PLAIN_BLACKSTONE_DISABLED)) {
 					ItemStatUtils.removeLore(item, i);
 					ItemStatUtils.addLore(item, i, BLACKSTONE_ENABLED);
 					player.sendMessage(BLACKSTONE_ENABLED);
@@ -224,9 +228,8 @@ public class FirmamentOverride {
 
 	public static boolean isFirmamentItem(ItemStack item) {
 		return item != null &&
-			       item.getType() != null &&
-			       (InventoryUtils.testForItemWithName(item, ITEM_NAME, true) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME, true)) &&
-			       ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
-			       ItemUtils.isShulkerBox(item.getType());
+			(InventoryUtils.testForItemWithName(item, ITEM_NAME, true) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME, true)) &&
+			ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
+			ItemUtils.isShulkerBox(item.getType());
 	}
 }

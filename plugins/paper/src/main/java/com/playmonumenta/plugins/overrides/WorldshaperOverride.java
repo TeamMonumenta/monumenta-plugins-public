@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -107,7 +108,7 @@ public class WorldshaperOverride {
 			// 67.5 to 112.5 is negative X... and so on.
 			float playerYaw = player.getLocation().getYaw();
 
-			// For whatever reason it gives a negative value... yaww.
+			// For whatever reason it gives a negative value... yaw.
 			if (playerYaw < 0) {
 				playerYaw += 360;
 			}
@@ -134,16 +135,13 @@ public class WorldshaperOverride {
 			cooldown = 5 * 20;
 
 			Block block = player.getTargetBlock(null, 3);
-			if (block == null) {
-				return false;
-			}
 
 			Location origin = block.getLocation();
 			origin.setY(player.getLocation().getY() + 1);
 
 			float playerYaw = player.getLocation().getYaw();
 
-			// For whatever reason it gives a negative value... yaww.
+			// For whatever reason it gives a negative value... yaw.
 			if (playerYaw < 0) {
 				playerYaw += 360;
 			}
@@ -220,7 +218,7 @@ public class WorldshaperOverride {
 			// 67.5 to 112.5 is negative X... and so on.
 			float playerYaw = player.getLocation().getYaw();
 
-			// For whatever reason it gives a negative value... yaww.
+			// For whatever reason it gives a negative value... yaw.
 			if (playerYaw < 0) {
 				playerYaw += 360;
 			}
@@ -277,7 +275,9 @@ public class WorldshaperOverride {
 						}
 						wall.setUp(false);
 					}
-					location.getBlock().setBlockData(blockData);
+					Block block = location.getBlock();
+					RepairExplosionsListener.getInstance().playerReplacedBlockViaPlugin(player, block);
+					block.setBlockData(blockData);
 					blocksPlaced++;
 					new PartialParticle(Particle.SMOKE_NORMAL, location, 10, 0.15, 0.15, 0.15).spawnAsPlayerActive(player);
 					world.playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1f, 0.75f);
@@ -319,7 +319,7 @@ public class WorldshaperOverride {
 			if (type.isAir() || ItemUtils.notAllowedTreeReplace.contains(type)
 				|| (!type.isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(type) && !(occludingException != null && occludingException.test(type)))
 				|| currentItem.getItemMeta().hasLore()) {
-				// Air breaks it, skip over it. Also the banned items break it, skip over those.
+				// Air breaks it, skip over it. Also, the banned items break it, skip over those.
 				continue;
 			}
 

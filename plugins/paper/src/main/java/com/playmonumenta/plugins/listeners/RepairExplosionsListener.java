@@ -26,6 +26,7 @@ import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Snowable;
 import org.bukkit.block.data.type.Snow;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -114,6 +115,8 @@ public class RepairExplosionsListener implements Listener {
 		NO_REPAIR_MATS.addAll(BlockUtils.VALUABLES);
 	}
 
+	private static @Nullable RepairExplosionsListener INSTANCE = null;
+
 	/* A hash table that stores the list of blocks to restore for each chunk */
 	private final Map<UUID, LongHashMap<List<BlockState>>> mBlocksToRepair = new HashMap<>();
 
@@ -121,6 +124,15 @@ public class RepairExplosionsListener implements Listener {
 
 	public RepairExplosionsListener(Plugin plugin) {
 		mPlugin = plugin;
+		INSTANCE = this;
+	}
+
+	public static RepairExplosionsListener getInstance() {
+		RepairExplosionsListener instance = INSTANCE;
+		if (instance == null) {
+			throw new RuntimeException("Cannot access this listener until it is initialized!");
+		}
+		return instance;
 	}
 
 	private void commonExplosionHandler(List<Block> blocks) {
@@ -194,7 +206,7 @@ public class RepairExplosionsListener implements Listener {
 		if (chunkBlockList != null) {
 			for (Iterator<BlockState> iterator = chunkBlockList.iterator(); iterator.hasNext(); ) {
 				BlockState state = iterator.next();
-				if (state.getBlock().equals(block)) {
+				if (state.getBlock().getLocation().equals(block.getLocation())) {
 					iterator.remove();
 					return;
 				}
@@ -240,7 +252,10 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
-		if (!isEnabled(event.getBlock().getWorld()) || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+		if (!(
+			isEnabled(event.getBlock().getWorld())
+				&& ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET))
+		) {
 			return;
 		}
 
@@ -255,7 +270,10 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (!isEnabled(event.getBlock().getWorld()) || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+		if (!(
+			isEnabled(event.getBlock().getWorld())
+				&& ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET))
+		) {
 			return;
 		}
 
@@ -266,6 +284,23 @@ public class RepairExplosionsListener implements Listener {
 		}
 
 		commonExplosionHandler(List.of(event.getBlock()));
+	}
+
+	public void playerReplacedBlockViaPlugin(Player player, Block previousBlock) {
+		if (!(
+			isEnabled(previousBlock.getWorld())
+				&& ZoneUtils.hasZoneProperty(previousBlock.getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET))
+		) {
+			return;
+		}
+
+		// creative mode players bypass the repair, and also clear any pending repair at that block
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			forgetBlock(previousBlock);
+			return;
+		}
+
+		commonExplosionHandler(List.of(previousBlock));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

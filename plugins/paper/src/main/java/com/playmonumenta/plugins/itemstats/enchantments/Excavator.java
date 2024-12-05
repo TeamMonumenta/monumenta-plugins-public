@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
@@ -117,6 +118,7 @@ public class Excavator implements Enchantment {
 			Bukkit.getPluginManager().callEvent(event);
 			if (!event.isCancelled()) {
 				CoreProtectIntegration.logRemoval(player, relative);
+				RepairExplosionsListener.getInstance().playerReplacedBlockViaPlugin(player, relative);
 				relative.breakNaturally(mainHand, true);
 				ItemUtils.damageItem(mainHand, 1, true);
 			}

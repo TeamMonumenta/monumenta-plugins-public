@@ -543,15 +543,15 @@ public class WorldListener implements Listener {
 
 	// Return bit flags that must all be equal for affected locations. Return -1 to disallow in any case.
 	private int pistonZonePropertyTest(Location loc) {
-		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
-			return -1;
-		}
 		int testValue = 0;
 		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
 			testValue |= 1;
 		}
 		if (ZoneUtils.isInPlot(loc)) {
 			testValue |= 2;
+		}
+		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+			testValue |= 4;
 		}
 		return testValue;
 	}
