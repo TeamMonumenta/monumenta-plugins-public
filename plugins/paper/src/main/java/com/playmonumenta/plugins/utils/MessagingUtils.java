@@ -15,6 +15,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -277,34 +278,17 @@ public class MessagingUtils {
 	}
 
 	public static Component concatenateComponents(List<Component> components, Component separator) {
-		Component output = Component.empty();
-		for (int i = 0; i < components.size(); i++) {
-			if (i > 0) {
-				output = output.append(separator);
-			}
-			output = output.append(components.get(i));
-		}
-		return output;
+		return Component.join(JoinConfiguration.separator(separator), components);
 	}
 
 	public static Component concatenateComponentsWithAnd(Collection<Component> components) {
-		Component output = Component.empty();
-		int size = components.size();
-		int i = 0;
-		for (Component component : components) {
-			if (size > 2 && i > 0) {
-				output = output.append(Component.text(", "));
-			}
-			if (size > 2 && i + 1 == size) {
-				output = output.append(Component.text("and "));
-			}
-			if (size == 2 && i == 1) {
-				output = output.append(Component.text(" and "));
-			}
-			output = output.append(component);
-			i++;
+		JoinConfiguration joinConfiguration;
+		if (components.size() == 2) {
+			joinConfiguration = JoinConfiguration.separator(Component.text(" and "));
+		} else {
+			joinConfiguration = JoinConfiguration.separators(Component.text(", "), Component.text(", and "));
 		}
-		return output;
+		return Component.join(joinConfiguration, components);
 	}
 
 }

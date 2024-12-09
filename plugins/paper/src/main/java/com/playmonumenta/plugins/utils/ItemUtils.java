@@ -48,6 +48,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.Tag;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.Sign;
@@ -412,29 +413,6 @@ public class ItemUtils {
 		Material.WARPED_HYPHAE
 	);
 
-	public static final Set<Material> SIGNS = EnumSet.of(
-		Material.ACACIA_SIGN,
-		Material.ACACIA_WALL_SIGN,
-		Material.BIRCH_SIGN,
-		Material.BIRCH_WALL_SIGN,
-		Material.CHERRY_SIGN,
-		Material.CHERRY_WALL_SIGN,
-		Material.CRIMSON_SIGN,
-		Material.CRIMSON_WALL_SIGN,
-		Material.DARK_OAK_SIGN,
-		Material.DARK_OAK_WALL_SIGN,
-		Material.JUNGLE_SIGN,
-		Material.JUNGLE_WALL_SIGN,
-		Material.MANGROVE_SIGN,
-		Material.MANGROVE_WALL_SIGN,
-		Material.OAK_SIGN,
-		Material.OAK_WALL_SIGN,
-		Material.SPRUCE_SIGN,
-		Material.SPRUCE_WALL_SIGN,
-		Material.WARPED_SIGN,
-		Material.WARPED_WALL_SIGN
-	);
-
 	public static final Set<Material> CANDLES = EnumSet.of(
 		Material.CANDLE,
 		Material.WHITE_CANDLE,
@@ -727,7 +705,7 @@ public class ItemUtils {
 	}
 
 	public static boolean isSign(@Nullable Material mat) {
-		return mat != null && SIGNS.contains(mat);
+		return mat != null && Tag.ALL_SIGNS.getValues().contains(mat);
 	}
 
 	public static boolean isWool(@Nullable Material mat) {
@@ -1747,7 +1725,7 @@ public class ItemUtils {
 				if (isSign(item.getType()) && meta instanceof BlockStateMeta blockStateMeta) {
 					BlockState blockState = blockStateMeta.getBlockState();
 					if (blockState instanceof Sign signItem) {
-						return signItem.lines();
+						return SignUtils.getLines(signItem);
 					}
 				}
 			}

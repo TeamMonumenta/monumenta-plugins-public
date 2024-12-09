@@ -56,7 +56,7 @@ dependencies {
 	compileOnly("com.mojang:brigadier:1.0.18")
 	compileOnly("com.playmonumenta:nbteditor:4.1:all")
 	compileOnly("de.tr7zw:item-nbt-api-plugin:2.12.0-SNAPSHOT")
-	compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
+	compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
 	compileOnly("io.prometheus:simpleclient:0.11.0")
 	compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.9.0-4")
 	compileOnly("me.neznamy:tab-api:4.0.2")

@@ -83,8 +83,8 @@ public class VanityManager implements Listener {
 			}
 		}
 
-		public @Nullable ItemStack getEquipped(EquipmentSlot slot) {
-			return mEquipped.get(slot);
+		public @Nullable ItemStack getEquipped(@Nullable EquipmentSlot slot) {
+			return slot == null ? null : mEquipped.get(slot);
 		}
 
 		public Map<EquipmentSlot, ItemStack> getEquipped() {

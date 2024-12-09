@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.SignUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -228,13 +229,13 @@ public class AuditListener implements Listener {
 					retStr.append(" \"").append(MessagingUtils.plainText(displayName)).append("\"");
 				}
 
-				if (meta instanceof BlockStateMeta) {
+				if (meta instanceof BlockStateMeta blockStateMeta) {
 					retStr.append(" [");
 
 					boolean elementAdded = false;
 
 					/* Is a container of more things */
-					BlockState state = ((BlockStateMeta)meta).getBlockState();
+					BlockState state = blockStateMeta.getBlockState();
 					if (state instanceof Lootable lootable) {
 						if (lootable.hasLootTable()) {
 							@Nullable LootTable lootTable = lootable.getLootTable();
@@ -243,11 +244,11 @@ public class AuditListener implements Listener {
 							elementAdded = true;
 						}
 					}
-					if (state instanceof CommandBlock) {
-						retStr.append(((CommandBlock) state).getCommand());
+					if (state instanceof CommandBlock commandBlock) {
+						retStr.append(commandBlock.getCommand());
 					}
-					if (state instanceof Container) {
-						for (ItemStack subItem : ((Container)state).getInventory().getContents()) {
+					if (state instanceof Container container) {
+						for (ItemStack subItem : container.getInventory().getContents()) {
 							if (subItem != null) {
 								if (elementAdded) {
 									retStr.append(", ");
@@ -257,8 +258,8 @@ public class AuditListener implements Listener {
 							}
 						}
 					}
-					if (state instanceof Sign) {
-						for (Component comp : ((Sign)state).lines()) {
+					if (state instanceof Sign sign) {
+						for (Component comp : SignUtils.getLines(sign)) {
 							String line = MessagingUtils.plainText(comp);
 							if (!line.isEmpty()) {
 								if (elementAdded) {

@@ -54,6 +54,7 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -558,7 +559,7 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 			if (event.getBlock().getState() instanceof Sign sign) {
 				int lineNum = 0;
-				for (Component oldLine : sign.lines()) {
+				for (Component oldLine : SignUtils.getLines(sign)) {
 					event.line(lineNum, oldLine);
 					lineNum++;
 				}

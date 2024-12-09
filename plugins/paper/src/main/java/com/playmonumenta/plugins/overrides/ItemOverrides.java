@@ -39,64 +39,15 @@ public final class ItemOverrides {
 		Material.ANVIL,
 		Material.CHEST,
 		Material.FLINT_AND_STEEL,
-		Material.ENDER_CHEST,
-
-		Material.WHITE_BANNER,
-		Material.ORANGE_BANNER,
-		Material.MAGENTA_BANNER,
-		Material.LIGHT_BLUE_BANNER,
-		Material.YELLOW_BANNER,
-		Material.LIME_BANNER,
-		Material.PINK_BANNER,
-		Material.GRAY_BANNER,
-		Material.LIGHT_GRAY_BANNER,
-		Material.CYAN_BANNER,
-		Material.PURPLE_BANNER,
-		Material.BLUE_BANNER,
-		Material.BROWN_BANNER,
-		Material.GREEN_BANNER,
-		Material.RED_BANNER,
-		Material.BLACK_BANNER,
-
-		Material.WHITE_WOOL,
-		Material.ORANGE_WOOL,
-		Material.MAGENTA_WOOL,
-		Material.LIGHT_BLUE_WOOL,
-		Material.YELLOW_WOOL,
-		Material.LIME_WOOL,
-		Material.PINK_WOOL,
-		Material.GRAY_WOOL,
-		Material.LIGHT_GRAY_WOOL,
-		Material.CYAN_WOOL,
-		Material.PURPLE_WOOL,
-		Material.BLUE_WOOL,
-		Material.BROWN_WOOL,
-		Material.GREEN_WOOL,
-		Material.RED_WOOL,
-		Material.BLACK_WOOL,
-
-		Material.ACACIA_SIGN,
-		Material.ACACIA_WALL_SIGN,
-		Material.BIRCH_SIGN,
-		Material.BIRCH_WALL_SIGN,
-		Material.CRIMSON_SIGN,
-		Material.CRIMSON_WALL_SIGN,
-		Material.DARK_OAK_SIGN,
-		Material.DARK_OAK_WALL_SIGN,
-		Material.JUNGLE_SIGN,
-		Material.JUNGLE_WALL_SIGN,
-		Material.OAK_SIGN,
-		Material.OAK_WALL_SIGN,
-		Material.SPRUCE_SIGN,
-		Material.SPRUCE_WALL_SIGN,
-		Material.WARPED_SIGN,
-		Material.WARPED_WALL_SIGN,
-		Material.MANGROVE_SIGN,
-		Material.MANGROVE_WALL_SIGN,
-		Material.CHERRY_SIGN,
-		Material.CHERRY_WALL_SIGN
+		Material.ENDER_CHEST
 	);
-	Map<Material, BaseOverride> mItems = new EnumMap<Material, BaseOverride>(Material.class);
+	Map<Material, BaseOverride> mItems = new EnumMap<>(Material.class);
+
+	static {
+		EXCEPTION_LORED_MATERIALS.addAll(Tag.BANNERS.getValues());
+		EXCEPTION_LORED_MATERIALS.addAll(Tag.WOOL.getValues());
+		EXCEPTION_LORED_MATERIALS.addAll(Tag.ALL_SIGNS.getValues());
+	}
 
 	public ItemOverrides() {
 		registerOverrides();
@@ -188,7 +139,7 @@ public final class ItemOverrides {
 		mItems.put(Material.SCULK_SHRIEKER, sculkOverride);
 
 		BaseOverride signOverride = new SignOverride();
-		for (Material sign : Tag.SIGNS.getValues()) {
+		for (Material sign : Tag.ALL_SIGNS.getValues()) {
 			mItems.put(sign, signOverride);
 		}
 
@@ -325,8 +276,7 @@ public final class ItemOverrides {
 
 	public boolean inventoryClickInteraction(Plugin plugin, Player player, InventoryClickEvent event) {
 		ItemStack cursorItem = event.getCursor();
-		if ((event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.LEFT)
-			|| (cursorItem != null && cursorItem.getType() != Material.AIR)) {
+		if ((event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.LEFT) || cursorItem.getType() != Material.AIR) {
 			return true;
 		}
 		ItemStack item = event.getCurrentItem();
@@ -350,9 +300,6 @@ public final class ItemOverrides {
 	// Returns true is event swaphands is to be cancelled, this cancels player abilities too (like Shield Wall).
 	public boolean swapHandsInteraction(Plugin plugin, Player player) {
 		ItemStack item = player.getInventory().getItemInMainHand();
-		if (item == null) {
-			return true;
-		}
 		BaseOverride override = mItems.get(item.getType());
 		return override != null && override.swapHandsInteraction(plugin, player, item);
 	}

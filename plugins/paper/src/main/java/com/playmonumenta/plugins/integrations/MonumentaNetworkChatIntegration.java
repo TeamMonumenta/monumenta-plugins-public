@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -358,7 +359,7 @@ public class MonumentaNetworkChatIntegration {
 			}
 
 			if (blockState instanceof Sign sign) {
-				for (Component line : sign.lines()) {
+				for (Component line : SignUtils.getLines(sign)) {
 					if (hasBadWord(sender, line)) {
 						return true;
 					}

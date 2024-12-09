@@ -18,6 +18,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Removes unnecessary info from equipment items to reduce network load.
@@ -83,7 +84,9 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 
 	}
 
-	private EquipmentSlot itemSlotToEquipmentSlot(EnumWrappers.ItemSlot slot) {
+	private @Nullable EquipmentSlot itemSlotToEquipmentSlot(EnumWrappers.ItemSlot slot) {
+		// There's a weird "body" item slot but no equipment slot.
+		// Might be something that's changed in future versions
 		return switch (slot) {
 			case HEAD -> EquipmentSlot.HEAD;
 			case CHEST -> EquipmentSlot.CHEST;
@@ -91,6 +94,7 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 			case FEET -> EquipmentSlot.FEET;
 			case OFFHAND -> EquipmentSlot.OFF_HAND;
 			case MAINHAND -> EquipmentSlot.HAND;
+			default -> null;
 		};
 	}
 

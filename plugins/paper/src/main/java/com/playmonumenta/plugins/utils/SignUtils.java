@@ -258,4 +258,12 @@ public final class SignUtils {
 			return ChatColor.translateAlternateColorCodes('&', input);
 		}
 	}
+
+	public static List<Component> getLines(Sign sign) {
+		List<Component> list = new ArrayList<>();
+		for (Side side : Side.values()) {
+			list.addAll(sign.getSide(side).lines());
+		}
+		return list;
+	}
 }
