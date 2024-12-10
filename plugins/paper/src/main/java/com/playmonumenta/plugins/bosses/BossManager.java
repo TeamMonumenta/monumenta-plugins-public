@@ -724,7 +724,7 @@ public class BossManager implements Listener {
 			}
 		}
 
-		if (boss != null && event.getCause() != EntityDamageEvent.DamageCause.VOID && event.getFinalDamage(true) >= damagee.getHealth()) {
+		if (boss != null && event.getType() != DamageEvent.DamageType.TRUE && event.getFinalDamage(true) >= damagee.getHealth()) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {
 				BossBarManager bossBar = ability.getBossBar();
 				if (bossBar != null && bossBar.capsDamage()) {
