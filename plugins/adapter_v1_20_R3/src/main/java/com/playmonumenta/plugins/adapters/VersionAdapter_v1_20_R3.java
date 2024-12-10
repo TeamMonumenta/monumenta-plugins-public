@@ -673,7 +673,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		} else {
 			ClientboundRespawnPacket respawnPacket = (ClientboundRespawnPacket) packet;
 			return new ClientboundRespawnPacket(
-				info,
+				newInfo,
 				respawnPacket.dataToKeep()
 			);
 		}
