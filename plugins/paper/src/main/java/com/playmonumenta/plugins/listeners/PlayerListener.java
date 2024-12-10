@@ -1432,7 +1432,7 @@ public class PlayerListener implements Listener {
 					// Adjust for player teleports being off-center
 					Location teleLoc = new Location(world, pt.mX - 0.5, pt.mY, pt.mZ - 0.5, yaw, pitch);
 
-					final Location oldPlayerSpawn = player.getBedSpawnLocation();
+					final Location oldPlayerSpawn = player.getRespawnLocation();
 
 					// Create a deferred task to eject player and teleport them after a short sleep
 					new BukkitRunnable() {
@@ -1445,7 +1445,7 @@ public class PlayerListener implements Listener {
 
 							if (mTicks == 0) {
 								//Set player's spawn point back to whatever it was
-								player.setBedSpawnLocation(oldPlayerSpawn, true);
+								player.setRespawnLocation(oldPlayerSpawn, true);
 							}
 
 

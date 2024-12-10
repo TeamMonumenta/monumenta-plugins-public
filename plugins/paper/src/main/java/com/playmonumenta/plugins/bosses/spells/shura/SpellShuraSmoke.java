@@ -50,7 +50,7 @@ public class SpellShuraSmoke extends Spell {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_CREEPER_PRIMED, SoundCategory.HOSTILE, 1, 2);
 		Location spawnLoc = mBoss.getLocation().add(0, 1.7, 0);
-		FallingBlock block = world.spawnFallingBlock(spawnLoc, Bukkit.createBlockData(Material.COAL_BLOCK));
+		FallingBlock block = world.spawn(spawnLoc, FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(Material.COAL_BLOCK)));
 		block.setDropItem(false);
 		EntityUtils.disableBlockPlacement(block);
 

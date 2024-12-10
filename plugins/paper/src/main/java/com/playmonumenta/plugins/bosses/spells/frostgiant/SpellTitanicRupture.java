@@ -143,7 +143,7 @@ public class SpellTitanicRupture extends Spell {
 								l.set(loc.getX() + x, loc.getY() + y + 20, loc.getZ() + z);
 								Block b = l.getBlock();
 								if (b.getType() == Material.BLUE_ICE || b.getType() == Material.SNOW_BLOCK) {
-									ices.add(mBoss.getWorld().spawnFallingBlock(l, Bukkit.createBlockData(b.getType())));
+									ices.add(mBoss.getWorld().spawn(l, FallingBlock.class, fb -> fb.setBlockData(Bukkit.createBlockData(b.getType()))));
 									b.setType(Material.AIR);
 								}
 							}

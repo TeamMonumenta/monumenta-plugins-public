@@ -46,7 +46,7 @@ public class ArcaneEnhancementsCS extends EsotericEnhancementsCS {
 	private static void playSound(Player player, LivingEntity aberration, float volume, float pitch) {
 		if (player.getWorld() == aberration.getWorld() && player.getLocation().distanceSquared(aberration.getLocation()) > 5 * 5) {
 			// if far from the caster, play normal sound for other players and a closer one for the caster so that they can always hear it
-			for (Player p : aberration.getTrackedPlayers()) {
+			for (Player p : aberration.getTrackedBy()) {
 				if (p != player) {
 					// Normal sound for other players
 					p.playSound(aberration.getLocation(), Sound.ENTITY_ALLAY_DEATH, SoundCategory.PLAYERS, volume, pitch);

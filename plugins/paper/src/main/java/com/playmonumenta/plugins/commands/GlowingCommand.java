@@ -208,7 +208,7 @@ public class GlowingCommand {
 		int viewDistance = Bukkit.getServer().getViewDistance() * 16;
 		player.getWorld().getNearbyEntities(player.getLocation(), viewDistance, viewDistance, viewDistance,
 			e -> (e.isGlowing() || (e instanceof LivingEntity le && le.hasPotionEffect(PotionEffectType.GLOWING)))
-				     && e.getTrackedPlayers().contains(player)).forEach(e -> GlowingReplacer.resendEntityMetadataFlags(e, player));
+				     && e.getTrackedBy().contains(player)).forEach(e -> GlowingReplacer.resendEntityMetadataFlags(e, player));
 
 		player.sendMessage(Component.text("Glowing " + operation + "d"
 			+ " for " + StringUtils.join(options, ", ") + ". Your new options are:", NamedTextColor.GOLD));

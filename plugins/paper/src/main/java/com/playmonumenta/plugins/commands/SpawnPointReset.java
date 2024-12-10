@@ -18,7 +18,7 @@ public class SpawnPointReset {
 				.executes((sender, args) -> {
 					Collection<Player> targets = (Collection<Player>) Objects.requireNonNull(args.get("players"));
 					for (Player target : targets) {
-						target.setBedSpawnLocation(null, true);
+						target.setRespawnLocation(null, true);
 					}
 				})
 				.register();

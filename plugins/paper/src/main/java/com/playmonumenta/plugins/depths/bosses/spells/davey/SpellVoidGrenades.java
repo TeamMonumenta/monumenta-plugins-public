@@ -82,7 +82,7 @@ public class SpellVoidGrenades extends Spell {
 		Location sLoc = mBoss.getLocation();
 		sLoc.setY(sLoc.getY() + 1.7f);
 		try {
-			FallingBlock fallingBlock = sLoc.getWorld().spawnFallingBlock(sLoc, Material.CRYING_OBSIDIAN.createBlockData());
+			FallingBlock fallingBlock = sLoc.getWorld().spawn(sLoc, FallingBlock.class, b -> b.setBlockData(Material.CRYING_OBSIDIAN.createBlockData()));
 			fallingBlock.setDropItem(false);
 			EntityUtils.disableBlockPlacement(fallingBlock);
 

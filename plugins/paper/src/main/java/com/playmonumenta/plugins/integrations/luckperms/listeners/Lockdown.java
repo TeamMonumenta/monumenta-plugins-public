@@ -338,7 +338,7 @@ public class Lockdown implements Listener {
 		boolean requiresMessage = hasNotSeenMessage && player.hasPermission("group." + guild.getName());
 		boolean requiresTp = false;
 		Location playerLocation = player.getLocation();
-		Location spawnLocation = player.getBedSpawnLocation();
+		Location spawnLocation = player.getRespawnLocation();
 
 		Set<UUID> checkedWorldIds = new HashSet<>();
 		checkedWorldIds.add(playerLocation.getWorld().getUID());
@@ -361,7 +361,7 @@ public class Lockdown implements Listener {
 				if (spawnLocation != null
 					&& worldId.equals(spawnLocation.getWorld().getUID())
 					&& guildPlotOrIsland.contains(spawnLocation.toVector())) {
-					player.setBedSpawnLocation(null);
+					player.setRespawnLocation(null);
 				}
 			}
 		}

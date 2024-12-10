@@ -186,7 +186,7 @@ public class SpellGreatswordSlam extends Spell {
 									BoundingBox box = BoundingBox.of(l, 1, 3.65, 1);
 									boxes.add(box);
 
-									FallingBlock fallBlock = world.spawnFallingBlock(l.add(0, 0.4, 0), Bukkit.createBlockData(Material.BLUE_ICE));
+									FallingBlock fallBlock = world.spawn(l.add(0, 0.4, 0), FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(Material.BLUE_ICE)));
 									fallBlock.setDropItem(false);
 									EntityUtils.disableBlockPlacement(fallBlock);
 									fallBlock.setVelocity(new Vector(0, 0.4, 0));

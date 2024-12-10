@@ -117,7 +117,7 @@ public class SpellFinalHeatMech extends Spell {
 
 			for (Vector v : vec) {
 				VectorUtils.rotateYAxis(v, 90 * i);
-				FallingBlock fallingBlock = world.spawnFallingBlock(mBoss.getLocation().add(0, 5, 0), Material.MAGMA_BLOCK.createBlockData());
+				FallingBlock fallingBlock = world.spawn(mBoss.getLocation().add(0, 5, 0), FallingBlock.class, b -> b.setBlockData(Material.MAGMA_BLOCK.createBlockData()));
 				fallingBlock.setDropItem(false);
 				EntityUtils.disableBlockPlacement(fallingBlock);
 				fallingBlock.setVelocity(v);

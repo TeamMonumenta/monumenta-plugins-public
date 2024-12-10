@@ -131,7 +131,7 @@ public class SpellFallingIcicle extends Spell {
 
 		List<FallingBlock> ices = new ArrayList<>(icicle.size());
 		for (Location l : icicle) {
-			ices.add(world.spawnFallingBlock(l, Bukkit.createBlockData(Material.ICE)));
+			ices.add(world.spawn(l, FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(Material.ICE))));
 		}
 		for (FallingBlock ice : ices) {
 			ice.setVelocity(new Vector(0, -2, 0));

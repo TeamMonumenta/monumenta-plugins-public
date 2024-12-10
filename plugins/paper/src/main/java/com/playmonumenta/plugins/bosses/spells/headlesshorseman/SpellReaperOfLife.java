@@ -68,7 +68,7 @@ public class SpellReaperOfLife extends Spell {
 		sLoc.setY(sLoc.getY() + 1.7f);
 
 		try {
-			FallingBlock fallingBlock = sLoc.getWorld().spawnFallingBlock(sLoc, Material.JACK_O_LANTERN.createBlockData());
+			FallingBlock fallingBlock = sLoc.getWorld().spawn(sLoc, FallingBlock.class, b -> b.setBlockData(Material.JACK_O_LANTERN.createBlockData()));
 			fallingBlock.setDropItem(false);
 			EntityUtils.disableBlockPlacement(fallingBlock);
 

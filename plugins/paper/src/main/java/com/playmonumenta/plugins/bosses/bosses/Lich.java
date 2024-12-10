@@ -1503,7 +1503,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		mCounter = 0;
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3.0f, 1.0f);
 		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 150, 0, 0, 0, 0.75).spawnAsBoss();
-		FallingBlock block = world.spawnFallingBlock(mBoss.getLocation().add(0, 3.5, 0), Bukkit.createBlockData(Material.OBSIDIAN));
+		FallingBlock block = world.spawn(mBoss.getLocation().add(0, 3.5, 0), FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(Material.OBSIDIAN)));
 		block.setGravity(false);
 		block.setTicksLived(1);
 		block.setDropItem(false);

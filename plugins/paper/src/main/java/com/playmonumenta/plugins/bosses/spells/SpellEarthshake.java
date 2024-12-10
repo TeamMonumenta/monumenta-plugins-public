@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -164,7 +165,8 @@ public class SpellEarthshake extends Spell {
 					if (mParameters.FLY_BLOCKS) {
 						double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 						double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
-						FallingBlock block = world.spawnFallingBlock(b.getLocation(), b.getBlockData());
+						BlockData data = b.getBlockData();
+						FallingBlock block = world.spawn(b.getLocation(), FallingBlock.class, fb -> fb.setBlockData(data));
 						block.setDropItem(false);
 						block.setVelocity(new Vector(x, 1.0, z));
 					}

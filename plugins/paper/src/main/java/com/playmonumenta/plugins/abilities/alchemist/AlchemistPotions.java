@@ -461,7 +461,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 		// Also send an update to all nearby players if an alchemist's potion is held
 		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
-			for (Player otherPlayer : mPlayer.getTrackedPlayers()) {
+			for (Player otherPlayer : mPlayer.getTrackedBy()) {
 				otherPlayer.sendEquipmentChange(mPlayer, EquipmentSlot.HAND, mPlayer.getInventory().getItemInMainHand());
 			}
 		}

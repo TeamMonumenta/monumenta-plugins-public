@@ -180,7 +180,7 @@ public class GlowingManager {
 	}
 
 	private static void update(Entity entity, GlowingEntityData data) {
-		for (Player player : entity.getTrackedPlayers()) {
+		for (Player player : entity.getTrackedBy()) {
 			GlowingInstance activeInstance = data.getActiveInstance(player);
 			boolean activeGlowing = activeInstance != null && activeInstance.mGlowing;
 			NamedTextColor sentColor = data.mSentPlayerData.get(player.getUniqueId());
@@ -238,7 +238,7 @@ public class GlowingManager {
 						if (data.mOriginalColor != null && entity instanceof Display display) {
 							display.setGlowColorOverride(data.mOriginalColor);
 						}
-						for (Player player : entity.getTrackedPlayers()) {
+						for (Player player : entity.getTrackedBy()) {
 							NamedTextColor sentColor = data.mSentPlayerData.get(player.getUniqueId());
 							if (sentColor != null) {
 								GlowingReplacer.sendTeamUpdate(entity, player, GlowingReplacer.getColoredGlowingTeamName(sentColor, entity), null);

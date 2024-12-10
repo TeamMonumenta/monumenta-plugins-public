@@ -103,7 +103,7 @@ public class RespawnStasis extends Stasis {
 				});
 			} else {
 				if (player.getGameMode() == GameMode.SPECTATOR) {
-					Location respawnLocation = PlayerUtils.getRespawnLocationAndClear(player, player.getWorld(), player.getBedSpawnLocation());
+					Location respawnLocation = PlayerUtils.getRespawnLocationAndClear(player, player.getWorld(), player.getRespawnLocation());
 					player.teleport(respawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
 					ZoneUtils.setExpectedGameMode(player);
 				}

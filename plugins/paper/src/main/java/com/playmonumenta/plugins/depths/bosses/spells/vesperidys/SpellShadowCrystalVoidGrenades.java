@@ -91,7 +91,7 @@ public class SpellShadowCrystalVoidGrenades extends Spell {
 		Location sLoc = mBoss.getLocation();
 		sLoc.setY(sLoc.getY() + 1.7f);
 		try {
-			FallingBlock fallingBlock = sLoc.getWorld().spawnFallingBlock(sLoc, Material.NETHERITE_BLOCK.createBlockData());
+			FallingBlock fallingBlock = sLoc.getWorld().spawn(sLoc, FallingBlock.class, b -> b.setBlockData(Material.NETHERITE_BLOCK.createBlockData()));
 			fallingBlock.setDropItem(false);
 			EntityUtils.disableBlockPlacement(fallingBlock);
 

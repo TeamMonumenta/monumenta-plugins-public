@@ -359,7 +359,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 			bossLocation.add(offset);
 
-			FallingBlock fallingBlock = bossLocation.getWorld().spawnFallingBlock(mBoss.getEyeLocation().add(offset), mGrenadeMaterial.createBlockData());
+			FallingBlock fallingBlock = bossLocation.getWorld().spawn(mBoss.getEyeLocation().add(offset), FallingBlock.class, b -> b.setBlockData(mGrenadeMaterial.createBlockData()));
 			fallingBlock.setDropItem(false);
 			EntityUtils.disableBlockPlacement(fallingBlock);
 

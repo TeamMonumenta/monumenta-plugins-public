@@ -200,7 +200,7 @@ public class SpellMultiEarthshake extends Spell {
 									double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 									double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 
-									FallingBlock block = mWorld.spawnFallingBlock(b.getLocation(), b.getBlockData());
+									FallingBlock block = mWorld.spawn(b.getLocation(), FallingBlock.class, fb -> fb.setBlockData(b.getBlockData()));
 									block.setDropItem(false);
 									block.setVelocity(new Vector(x, 1.0, z));
 									mWorld.getBlockAt(b.getLocation()).setType(Material.AIR);

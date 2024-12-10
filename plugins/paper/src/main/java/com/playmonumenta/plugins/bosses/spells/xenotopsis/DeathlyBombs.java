@@ -119,7 +119,7 @@ public class DeathlyBombs extends Spell {
 
 	// largely taken from SpellBaseGrenadeLauncher
 	private void launchBomb(Location destination) {
-		FallingBlock fallingBlock = mWorld.spawnFallingBlock(mBoss.getEyeLocation().add(0, 1, 0), Material.POLISHED_DIORITE.createBlockData());
+		FallingBlock fallingBlock = mWorld.spawn(mBoss.getEyeLocation().add(0, 1, 0), FallingBlock.class, b -> b.setBlockData(Material.POLISHED_DIORITE.createBlockData()));
 		fallingBlock.setDropItem(false);
 		EntityUtils.disableBlockPlacement(fallingBlock);
 		Location tLoc = fallingBlock.getLocation();

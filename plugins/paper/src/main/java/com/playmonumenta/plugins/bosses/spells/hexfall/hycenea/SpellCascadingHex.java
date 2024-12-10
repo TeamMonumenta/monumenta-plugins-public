@@ -103,7 +103,7 @@ public class SpellCascadingHex extends Spell {
 
 					for (Location loc : locationTypes.keySet()) {
 						Material mat = locationTypes.get(loc) ? Material.MOSS_BLOCK : Material.SOUL_SAND;
-						FallingBlock fallingBlock = mBoss.getWorld().spawnFallingBlock(mBoss.getEyeLocation(), mat.createBlockData());
+						FallingBlock fallingBlock = mBoss.getWorld().spawn(mBoss.getEyeLocation(), FallingBlock.class, b -> b.setBlockData(mat.createBlockData()));
 						fallingBlock.setGravity(false);
 						fallingBlock.setDropItem(false);
 						EntityUtils.disableBlockPlacement(fallingBlock);

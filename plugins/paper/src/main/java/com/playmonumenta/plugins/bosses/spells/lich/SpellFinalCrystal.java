@@ -202,7 +202,7 @@ public class SpellFinalCrystal extends Spell {
 			world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 1f);
 			for (int i = 0; i < 5; i++) {
 				//Velocity randomized of the frosted ice as a falling block
-				FallingBlock block = world.spawnFallingBlock(spawnLoc, Bukkit.createBlockData(Material.CRYING_OBSIDIAN));
+				FallingBlock block = world.spawn(spawnLoc, FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(Material.CRYING_OBSIDIAN)));
 				block.setDropItem(false);
 				EntityUtils.disableBlockPlacement(block);
 				block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-0.55, 0.55), FastUtils.randomDoubleInRange(0.25, 1), FastUtils.randomDoubleInRange(-0.55, 0.55)));

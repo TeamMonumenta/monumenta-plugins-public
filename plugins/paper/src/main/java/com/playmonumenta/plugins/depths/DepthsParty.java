@@ -607,7 +607,7 @@ public class DepthsParty {
 		if (mLootRoomLocations.size() > mLootRoomsUsed && maxLootRooms > mLootRoomsUsed) {
 			Location lootRoomLoc = new Location(p.getWorld(), mLootRoomLocations.get(mLootRoomsUsed).getX(), mLootRoomLocations.get(mLootRoomsUsed).getY(), mLootRoomLocations.get(mLootRoomsUsed).getZ());
 			p.teleport(lootRoomLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
-			p.setBedSpawnLocation(lootRoomLoc, true);
+			p.setRespawnLocation(lootRoomLoc, true);
 			p.addScoreboardTag(Constants.Tags.NO_TRANSPOSING);
 			mLootRoomsUsed++;
 			dp.sendMessage("Sending you to loot room " + mLootRoomsUsed);

@@ -110,7 +110,7 @@ public class SpellSpinDown extends Spell {
 					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 4, 0.5f);
 
 					//Velocity randomized of the frosted ice as a falling block
-					FallingBlock block = world.spawnFallingBlock(loc, Bukkit.createBlockData(ICE_TYPE));
+					FallingBlock block = world.spawn(loc, FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(ICE_TYPE)));
 					block.setDropItem(false);
 					EntityUtils.disableBlockPlacement(block);
 					block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(0.1, 0.75), FastUtils.randomDoubleInRange(-1, 1)));

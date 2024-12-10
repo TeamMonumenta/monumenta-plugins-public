@@ -290,14 +290,14 @@ public class ChanceCubes {
 						TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(spawnLocation, EntityType.PRIMED_TNT);
 						tnt.setFuseTicks(40);
 					} else if (randomChoice == 1) {
-						FallingBlock fallingAnvil = player.getWorld().spawnFallingBlock(spawnLocation, Material.ANVIL.createBlockData());
+						FallingBlock fallingAnvil = player.getWorld().spawn(spawnLocation, FallingBlock.class, b -> b.setBlockData(Material.ANVIL.createBlockData()));
 						fallingAnvil.setDamagePerBlock(3F);
 					} else {
 						BlockData dripstoneData = Material.POINTED_DRIPSTONE.createBlockData();
 						if (dripstoneData instanceof PointedDripstone pointedDripstone) {
 							pointedDripstone.setVerticalDirection(BlockFace.DOWN);
 						}
-						FallingBlock fallingDripstone = player.getWorld().spawnFallingBlock(spawnLocation, dripstoneData);
+						FallingBlock fallingDripstone = player.getWorld().spawn(spawnLocation, FallingBlock.class, b -> b.setBlockData(dripstoneData));
 						fallingDripstone.setDropItem(false);
 						fallingDripstone.setDamagePerBlock(3F);
 					}
