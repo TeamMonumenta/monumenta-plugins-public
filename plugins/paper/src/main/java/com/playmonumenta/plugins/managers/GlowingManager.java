@@ -216,8 +216,6 @@ public class GlowingManager {
 		mTask = new BukkitRunnable() {
 			@Override
 			public void run() {
-				mData.values().removeIf(d -> !d.mEntity.isValid());
-
 				if (mData.isEmpty()) {
 					cancel();
 					mTask = null;
@@ -231,7 +229,7 @@ public class GlowingManager {
 					Entity entity = data.mEntity;
 
 					data.mInstances.removeIf(d -> d.mUntilTick < currentTick);
-					if (data.mInstances.isEmpty()) {
+					if (data.mInstances.isEmpty() || !entity.isValid()) {
 						if (!data.mOriginallyGlowing) {
 							entity.setGlowing(false);
 						}
