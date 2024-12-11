@@ -106,6 +106,12 @@ public final class ItemOverrides {
 		BaseOverride anvilOverride = new AnvilOverride();
 		mItems.put(Material.ANVIL, anvilOverride);
 		mItems.put(Material.CHIPPED_ANVIL, anvilOverride);
+
+		BannerOverride bannerOverride = new BannerOverride();
+		for (Material banner : Tag.BANNERS.getValues()) {
+			mItems.put(banner, bannerOverride);
+		}
+
 		mItems.put(Material.DAMAGED_ANVIL, anvilOverride);
 
 		mItems.put(Material.FISHING_ROD, new FishingRodOverride());
