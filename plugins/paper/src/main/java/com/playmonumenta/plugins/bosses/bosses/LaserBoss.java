@@ -132,7 +132,7 @@ public class LaserBoss extends BossAbilityGroup {
 			(LivingEntity target, Location loc, boolean blocked) -> {
 				p.SOUND_END.play(loc, 0.6f, 1.5f);
 				p.PARTICLE_END.spawn(boss, loc, 0, 0, 0, 0.25);
-				if (!ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESIST_5) || ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
+				if (!ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_SUMMONS)) {
 					Entity spawn = p.SPAWNED_MOB_POOL.spawn(loc);
 					if (spawn != null) {
 						summonPlugins(spawn);

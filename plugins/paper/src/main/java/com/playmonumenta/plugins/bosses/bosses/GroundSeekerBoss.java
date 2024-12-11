@@ -157,7 +157,7 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 								}
 								p.EFFECTS.apply(player, boss);
 
-								if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.RESIST_5) || ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
+								if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS)) {
 									Entity spawn = p.SPAWNED_MOB_POOL.spawn(player.getLocation());
 									if (spawn != null) {
 										summonPlugins(spawn);

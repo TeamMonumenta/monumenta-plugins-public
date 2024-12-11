@@ -144,7 +144,7 @@ public class StarfallBoss extends BossAbilityGroup {
 								p.SOUND_EXPLOSION.play(meteorCenter);
 
 								// don't spawn in safe zones!
-								if (!ZoneUtils.hasZoneProperty(meteorCenter, ZoneUtils.ZoneProperty.RESIST_5) || ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
+								if (!ZoneUtils.hasZoneProperty(meteorCenter, ZoneUtils.ZoneProperty.NO_SUMMONS)) {
 									Entity spawn = p.SPAWNED_MOB_POOL.spawn(meteorCenter);
 									if (spawn != null) {
 										summonPlugins(spawn);

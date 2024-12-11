@@ -64,8 +64,8 @@ public class SpellSpawnMobs extends Spell {
 				}
 			}
 
-			//Can skip some summons but doesn't matter I don't think - this is the edgiest of edge cases
-			if (ZoneUtils.hasZoneProperty(sLoc, ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
+			// Skip summons in zones that don't allow them
+			if (ZoneUtils.hasZoneProperty(sLoc, ZoneUtils.ZoneProperty.NO_SUMMONS)) {
 				continue;
 			}
 			Entity entity = LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
@@ -92,12 +92,12 @@ public class SpellSpawnMobs extends Spell {
 
 		if (mCapMobsByName) {
 			if (mobCount >= mMobCap
-				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ))) {
+				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS))) {
 				return false;
 			}
 		} else {
 			if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap
-				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ))) {
+				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS))) {
 				return false;
 			}
 		}
