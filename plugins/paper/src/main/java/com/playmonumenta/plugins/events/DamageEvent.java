@@ -69,6 +69,10 @@ public class DamageEvent extends Event implements Cancellable {
 			};
 		}
 
+		public static boolean is(DamageCause cause, DamageType type) {
+			return getType(cause) == type;
+		}
+
 		private final boolean mIsEnvironmental;
 		private final boolean mIsDefendable;
 		private final String mDisplay;

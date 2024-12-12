@@ -348,7 +348,7 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-			if (damagee.getScoreboardTags().contains(INVULNERABLE_ITEM_TAG) && !source.equals(DamageCause.LAVA) && !source.equals(DamageCause.VOID)) {
+			if (damagee.getScoreboardTags().contains(INVULNERABLE_ITEM_TAG) && !source.equals(DamageCause.LAVA) && !DamageEvent.DamageType.is(source, DamageEvent.DamageType.TRUE)) {
 				event.setCancelled(true);
 			}
 		}

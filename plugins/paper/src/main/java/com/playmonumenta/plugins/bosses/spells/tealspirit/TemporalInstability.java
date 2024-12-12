@@ -48,7 +48,7 @@ public class TemporalInstability extends Spell {
 	public void onHurt(DamageEvent event) {
 		if (!isVulnerable()) {
 			// Let /kill commands work
-			if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+			if (event.getType() == DamageEvent.DamageType.TRUE) {
 				return;
 			}
 

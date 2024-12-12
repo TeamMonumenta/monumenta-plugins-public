@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -137,7 +138,7 @@ public class ShopManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
-		if (event.getCause() != DamageCause.CUSTOM && event.getCause() != DamageCause.VOID) {
+		if (event.getCause() != DamageCause.CUSTOM && !DamageEvent.DamageType.is(event.getCause(), DamageEvent.DamageType.TRUE)) {
 			cancelIfNpc(event.getEntity(), event);
 		}
 	}

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.GraveCommand;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -209,7 +210,7 @@ public class GraveListener implements Listener {
 			}
 			GraveManager.onDestroyItem(entity);
 			if (entity.isValid()
-				    && event.getCause() != EntityDamageEvent.DamageCause.VOID
+				    && !DamageEvent.DamageType.is(event.getCause(), DamageEvent.DamageType.TRUE)
 				    && ItemStatUtils.getInfusionLevel(entity.getItemStack(), InfusionType.HOPE) > 0) {
 				// If a hoped item isn't put into a grave (because graves are disabled), cancel all non-void damage.
 				event.setCancelled(true);
