@@ -248,7 +248,7 @@ public class DiscoBall extends DepthsAbility {
 	private static int countTrees(DepthsParty party) {
 		Set<DepthsTree> globalDepthsTrees = new HashSet<>();
 		party.mPlayersInParty.forEach(dPlayer -> {
-			List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer.getPlayer());
+			List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer);
 			Set<DepthsTree> activeTrees = abilities.stream()
 				.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
 				.map(DepthsAbilityInfo::getDepthsTree)

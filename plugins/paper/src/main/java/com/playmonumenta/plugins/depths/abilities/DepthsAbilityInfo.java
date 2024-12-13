@@ -254,20 +254,24 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player) {
-		return getAbilityItem(rarity, player, 0, true);
+		return getAbilityItem(rarity, player, 0, 0, true);
 	}
 
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity) {
-		return getAbilityItem(rarity, player, oldRarity, false);
+		return getAbilityItem(rarity, player, oldRarity, 0, false);
 	}
 
 	/**
 	 * Returns the ability item to display in GUIs given the input rarity
 	 *
-	 * @param rarity the rarity to put on the item
-	 * @return the item to display
+	 * @param rarity            the rarity to put on the item
+	 * @param player            the player who has or can get this ability
+	 * @param oldRarity         the rarity the player already has/had in this ability (0 to not include)
+	 * @param preIncreaseRarity the rarity before it was increased by abilities such as Enlightenment (0 to not include)
+	 * @param useAbility        whether to use current ability data in the description
+	 * @return                  the item to display
 	 */
-	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity, boolean useAbility) {
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity, int preIncreaseRarity, boolean useAbility) {
 		if (rarity <= 0) {
 			//This should never happen
 			return null;
@@ -279,32 +283,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			if (mDepthsTree == null) {
 				rarity = 1;
 			}
-			Material mat = getDisplayItem();
-			if (mat == null) {
-				return null;
-			}
-			String name = getDisplayName();
-			if (name == null) {
-				return null;
-			}
-			ItemStack stack = new ItemStack(mat, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			meta.displayName(getColoredName().colorIfAbsent(NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-			if (mDepthsTree != null) {
-				List<Component> lore = new ArrayList<>();
-				if (mHasLevels) {
-					lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity, oldRarity));
-				} else {
-					lore.add(mDepthsTree.getNameComponent());
-				}
-				meta.lore(lore);
-			}
-			Component description = getDescription(mHasLevels ? rarity : 1, player, useAbility);
-			GUIUtils.splitLoreLine(meta, description, 30, false);
-			stack.setItemMeta(meta);
-			ItemUtils.setPlainName(stack, name);
-			item = new DepthsAbilityItem(stack, name, rarity, oldRarity, mDepthsTrigger, mDepthsTree);
+			ItemStack stack = createAbilityItem(rarity, oldRarity, preIncreaseRarity, player, useAbility);
+			String name = getDisplayName() == null ? "" : getDisplayName(); // It's never actually null
+			item = new DepthsAbilityItem(stack, name, rarity, oldRarity, preIncreaseRarity, useAbility, mDepthsTrigger, mDepthsTree);
 		} catch (Exception e) {
 			MMLog.warning("Invalid depths ability item: " + getDisplayName());
 			e.printStackTrace();
@@ -312,13 +293,30 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return item;
 	}
 
-	public ItemStack getAbilityDisplayItem(int rarity, Player player) {
-		DepthsAbilityItem item = getAbilityItem(rarity, player);
-		if (item == null) {
+	public ItemStack createAbilityItem(int rarity, int oldRarity, int preIncreaseRarity, @Nullable Player player, boolean useAbility) {
+		Material mat = getDisplayItem();
+		if (mat == null) {
 			return GUIUtils.createBasicItem(Material.BARRIER, "You should not be seeing this. Please report this bug.", NamedTextColor.RED);
-		} else {
-			return item.mItem;
 		}
+		String name = getDisplayName();
+		ItemStack stack = new ItemStack(mat, 1);
+		ItemMeta meta = stack.getItemMeta();
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.displayName(getColoredName().colorIfAbsent(NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		if (mDepthsTree != null) {
+			List<Component> lore = new ArrayList<>();
+			if (mHasLevels) {
+				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity, oldRarity, preIncreaseRarity));
+			} else {
+				lore.add(mDepthsTree.getNameComponent());
+			}
+			meta.lore(lore);
+		}
+		Component description = getDescription(mHasLevels ? rarity : 1, player, useAbility);
+		GUIUtils.splitLoreLine(meta, description, 30, false);
+		stack.setItemMeta(meta);
+		ItemUtils.setPlainName(stack, name);
+		return stack;
 	}
 
 	public Component getColoredName() {
@@ -333,7 +331,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	public Component getNameWithHover(Player player) {
-		T ability = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, getAbilityClass());
+		T ability = getPlayerAbility(Plugin.getInstance(), player);
 		int rarity = 1;
 		if (ability != null) {
 			rarity = ability.getAbilityScore();
@@ -342,11 +340,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	public Component getNameWithHover(int rarity, int prevRarity, Player player) {
-		Component component = getColoredName();
-		DepthsAbilityItem item = getAbilityItem(rarity, player, prevRarity);
-		if (item != null) {
-			component = component.hoverEvent(item.mItem.asHoverEvent());
-		}
-		return component;
+		ItemStack item = createAbilityItem(rarity, prevRarity, 0, player, false);
+		return getColoredName().hoverEvent(item.asHoverEvent());
 	}
 }

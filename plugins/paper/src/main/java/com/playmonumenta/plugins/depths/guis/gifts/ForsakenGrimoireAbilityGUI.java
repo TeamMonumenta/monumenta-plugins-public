@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 public class ForsakenGrimoireAbilityGUI extends AbstractDepthsSelectionGUI<DepthsAbilityInfo<?>> {
 	public ForsakenGrimoireAbilityGUI(Player player, DepthsTree tree) {
 		super(player, "Grimoire (Select Ability)", ForsakenGrimoire.ABILITY_NAME,
-			getEligibleAbilities(player, tree), dai -> dai.getAbilityDisplayItem(3, player), true);
+			getEligibleAbilities(player, tree), dai -> dai.createAbilityItem(3, 0, 0, player, false), true);
 	}
 
 	@Override

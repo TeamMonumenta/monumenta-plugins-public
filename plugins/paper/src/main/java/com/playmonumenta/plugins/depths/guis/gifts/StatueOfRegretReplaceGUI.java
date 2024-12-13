@@ -21,7 +21,7 @@ public class StatueOfRegretReplaceGUI extends AbstractDepthsSelectionGUI<DepthsA
 
 	public StatueOfRegretReplaceGUI(Player player, @Nullable String removingCurse) {
 		super(player, "Regret (Replace Curse)", StatueOfRegret.ABILITY_NAME,
-			getEligibleAbilities(player, removingCurse), dai -> dai.getAbilityDisplayItem(1, player), true);
+			getEligibleAbilities(player, removingCurse), dai -> dai.createAbilityItem(1, 0, 0, player, false), true);
 		mRemovingCurse = removingCurse;
 	}
 

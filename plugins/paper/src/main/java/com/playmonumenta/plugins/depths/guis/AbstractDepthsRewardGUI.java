@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -70,7 +69,7 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 				item = GUIUtils.createBasicItem(Material.ROTTEN_FLESH, DepthsTree.CURSE.color("UnknownChoice").decorate(TextDecoration.OBFUSCATED));
 				obscure = true;
 			} else {
-				item = dai.mItem;
+				item = dai.getItem(mPlayer);
 				obscure = false;
 			}
 
@@ -102,9 +101,8 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 				setItem(2, 4, new GuiItem(item).onLeftClick(() -> {
 					close();
 					depthsPlayer.mRerolls--;
-					UUID uuid = depthsPlayer.mPlayerId;
-					DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
-					DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
+					depthsPlayer.mAbilityOfferings = null;
+					depthsPlayer.mUpgradeOfferings = null;
 					// comb of selection trigger increase rarities
 					if (depthsPlayer.hasAbility(CombOfSelection.ABILITY_NAME)) {
 						depthsPlayer.mCombOfSelectionLevels.replaceAll(integer -> Math.min(integer + 1, 5));
@@ -118,9 +116,8 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 				ItemStack item = GUIUtils.createBasicItem(Material.BARRIER, 1, "Skip", NamedTextColor.RED, true, Component.text("Click to skip these options.", NamedTextColor.GRAY), 30, true);
 				setItem(2, 8, new GuiItem(item).onLeftClick(() -> {
 					close();
-					UUID uuid = depthsPlayer.mPlayerId;
-					DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
-					DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
+					depthsPlayer.mAbilityOfferings = null;
+					depthsPlayer.mUpgradeOfferings = null;
 					depthsPlayer.mEarnedRewards.poll();
 					depthsPlayer.mRewardSkips++;
 					if (depthsPlayer.mRewardSkips % 3 == 0 && depthsPlayer.hasAbility(RainbowGeode.ABILITY_NAME)) {

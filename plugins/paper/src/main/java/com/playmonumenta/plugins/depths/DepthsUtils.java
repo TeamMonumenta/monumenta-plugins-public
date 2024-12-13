@@ -106,17 +106,21 @@ public class DepthsUtils {
 	//List of locations where ice is spawned by a barrier
 	public static Map<Location, Boolean> iceBarrier = new HashMap<>();
 
-	public static Component getLoreForItem(DepthsTree tree, int rarity, int oldRarity) {
-		Component oldRarityComponent = Component.empty();
+	public static Component getLoreForItem(DepthsTree tree, int rarity, int oldRarity, int preIncreaseRarity) {
+		Component extraComponent = Component.empty();
 		if (oldRarity != 0 && oldRarity != rarity) {
-			oldRarityComponent = Component.empty().append(getRarityComponent(oldRarity)).append(Component.text(" → ", NamedTextColor.DARK_GRAY));
+			extraComponent = Component.empty().append(getRarityComponent(oldRarity)).append(Component.text(" → ", NamedTextColor.DARK_GRAY));
+		} else if (preIncreaseRarity != 0 && preIncreaseRarity != rarity) {
+			extraComponent = Component.empty()
+				.append(getRarityComponent(preIncreaseRarity).decorate(TextDecoration.STRIKETHROUGH))
+				.append(Component.text(" "));
 		}
 
 		return tree.getNameComponent()
-			       .append(Component.text(" : ", NamedTextColor.DARK_GRAY))
-			       .append(oldRarityComponent)
-			       .append(getRarityComponent(rarity))
-			       .decoration(TextDecoration.ITALIC, false);
+			.append(Component.text(" : ", NamedTextColor.DARK_GRAY))
+			.append(extraComponent)
+			.append(getRarityComponent(rarity))
+			.decoration(TextDecoration.ITALIC, false);
 	}
 
 	public static DepthsRarity getRarity(int rarity) {

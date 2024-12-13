@@ -49,15 +49,15 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 
 		GUIUtils.fillWithFiller(mInventory, true);
 
-		setAbilities(targetPlayer);
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(targetPlayer);
+		if (dp == null) {
+			return;
+		}
+		setAbilities(targetPlayer, dp);
 	}
 
-	public boolean setAbilities(Player targetPlayer) {
-		List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(targetPlayer);
-
-		if (items == null || items.size() == 0) {
-			return false;
-		}
+	public void setAbilities(Player targetPlayer, DepthsPlayer dp) {
+		List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(targetPlayer, dp);
 		items.removeIf(item -> item.mTree == DepthsTree.CURSE);
 
 		GUIUtils.fillWithFiller(mInventory, true);
@@ -73,7 +73,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 			} else {
 				for (Map.Entry<Integer, DepthsTrigger> slot : TRIGGER_MAP.entrySet()) {
 					if (slot.getValue() == item.mTrigger) {
-						mInventory.setItem(slot.getKey(), item.mItem);
+						mInventory.setItem(slot.getKey(), item.getItem(targetPlayer));
 						break;
 					}
 				}
@@ -82,7 +82,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 
 		if (mShowPassives) {
 			for (int i = 0; i < passiveItems.size() && i < 18; i++) {
-				mInventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
+				mInventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).getItem(targetPlayer));
 			}
 		}
 
@@ -95,8 +95,6 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 				}
 			}
 		}
-
-		return true;
 	}
 
 	public void setConfirmation(ItemStack item) {
@@ -121,21 +119,21 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
-		DepthsManager instance = DepthsManager.getInstance();
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (depthsPlayer == null) {
+			return;
+		}
 
-		List<DepthsAbilityInfo<?>> abilities = instance.getPlayerAbilities(player);
+		List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(depthsPlayer);
 
 		if (clickedItem.getType() == CONFIRM_MAT) {
 			for (DepthsAbilityInfo<?> ability : abilities) {
 				if (ability.getDisplayName() != null && mAbilityName != null && mAbilityName.contains(ability.getDisplayName())) {
-					DepthsPlayer depthsPlayer = instance.mPlayers.get(player.getUniqueId());
-					if (depthsPlayer != null) {
-						onConfirm(player, depthsPlayer, ability);
-					}
+					onConfirm(player, depthsPlayer, ability);
 				}
 			}
 		} else if (clickedItem.getType() == CANCEL_MAT) {
-			setAbilities(player);
+			setAbilities(player, depthsPlayer);
 		} else {
 			for (DepthsAbilityInfo<?> ability : abilities) {
 				if (ability.getDisplayName() != null

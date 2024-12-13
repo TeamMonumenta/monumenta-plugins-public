@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.particle.PPFlower;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -75,7 +74,7 @@ public class Rebirth extends DepthsAbility {
 	}
 
 	public void rerollAbilities(Player player, DepthsPlayer dp) {
-		List<DepthsAbilityInfo<?>> playerAbilities = DepthsManager.getInstance().getPlayerAbilities(mPlayer);
+		List<DepthsAbilityInfo<?>> playerAbilities = DepthsManager.getInstance().getPlayerAbilities(dp);
 		boolean hasSwap = playerAbilities.stream().anyMatch(info -> info.getDepthsTrigger() == DepthsTrigger.SWAP && info != CurseOfAnchoring.INFO);
 
 		DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
@@ -132,9 +131,8 @@ public class Rebirth extends DepthsAbility {
 			DepthsManager.getInstance().getRandomAbility(mPlayer, dp, chances, null, false, false);
 		}
 
-		UUID uuid = mPlayer.getUniqueId();
-		DepthsManager.getInstance().mUpgradeOfferings.remove(uuid);
-		DepthsManager.getInstance().mAbilityOfferings.remove(uuid);
+		dp.mUpgradeOfferings = null;
+		dp.mAbilityOfferings = null;
 	}
 
 	public void applyResistance() {

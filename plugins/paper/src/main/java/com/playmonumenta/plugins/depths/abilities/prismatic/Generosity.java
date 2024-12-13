@@ -68,7 +68,7 @@ public class Generosity extends DepthsAbility {
 				}
 				int currentLevel = dp.getLevelInAbility(removedAbility);
 				if (((hasLevels && currentLevel < generosityLevel) || currentLevel == 0) &&
-					DepthsManager.getInstance().getPlayerAbilities(otherPlayer).stream()
+					DepthsManager.getInstance().getPlayerAbilities(dp).stream()
 						.filter(abilityInfo -> abilityInfo != finalRemovedAbilityInfo)
 						.filter(abilityInfo -> !abilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
 						.noneMatch(abilityInfo -> abilityInfo.getDepthsTrigger().equals(finalRemovedAbilityInfo.getDepthsTrigger()))

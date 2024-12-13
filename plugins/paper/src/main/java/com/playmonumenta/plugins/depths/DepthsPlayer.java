@@ -76,6 +76,10 @@ public class DepthsPlayer {
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later
 	public Queue<DepthsRewardType> mEarnedRewards;
+	//Opened but unclaimed ability reward options
+	public @Nullable List<DepthsAbilityItem> mAbilityOfferings;
+	//Opened but unclaimed upgrade reward options
+	public @Nullable List<DepthsAbilityItem> mUpgradeOfferings;
 	//The room on which the player died. -1 if the player has not died
 	public int mDeathRoom;
 	// Number of times this player has died as relevant for graves (gets reduced with bosses beaten, so is not an accurate total count)

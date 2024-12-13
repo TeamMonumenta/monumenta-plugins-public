@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class StatueOfRegretRemoveGUI extends AbstractDepthsSelectionGUI<DepthsAbilityInfo<?>> {
 	public StatueOfRegretRemoveGUI(Player player) {
 		super(player, "Regret (Remove Curse)", StatueOfRegret.ABILITY_NAME,
-			getEligibleAbilities(player), dai -> dai.getAbilityDisplayItem(1, player), false);
+			getEligibleAbilities(player), dai -> dai.createAbilityItem(1, 0, 0, player, true), false);
 	}
 
 	@Override

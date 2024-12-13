@@ -111,12 +111,9 @@ public class DepthsGUICommands {
 	}
 
 	public static void summary(Player player) {
-		List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(player);
-
-		if (items == null || items.size() == 0) {
+		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
+		if (dp == null) {
 			MessagingUtils.sendActionBarMessage(player, "No abilities to summarize.");
-			player.closeInventory();
-			return;
 		}
 		new DepthsSummaryGUI(player).open();
 	}

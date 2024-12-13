@@ -22,8 +22,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class DepthsSummaryGUI extends Gui {
-	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(47, 48, 50, 51, 46, 52, 45, 53));
-	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<>(Arrays.asList(2, 3, 5, 6, 1, 7, 0, 8));
+	public static final List<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(48, 50, 47, 51, 46, 52, 45, 53));
+	public static final List<Integer> TREE_LOCATIONS = new ArrayList<>(Arrays.asList(3, 5, 2, 6, 1, 7, 0, 8));
 	private static final int START_OF_PASSIVES = 27;
 	private static final int PASSIVES_PER_PAGE = 18;
 	private static final int REWARD_LOCATION = 49;
@@ -76,11 +76,7 @@ public class DepthsSummaryGUI extends Gui {
 		if (targetPlayer == null) {
 			return;
 		}
-		List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(targetPlayer);
-		if (items == null || items.isEmpty()) {
-			// This shouldn't happen - the abilities are checked before creating the GUI
-			return;
-		}
+		List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(targetPlayer, mTargetPlayer);
 
 		//First- check if the player has any rewards to open
 		ItemStack rewardItem;
@@ -106,7 +102,7 @@ public class DepthsSummaryGUI extends Gui {
 			} else {
 				for (Map.Entry<Integer, DepthsTrigger> slot : TRIGGER_MAP.entrySet()) {
 					if (slot.getValue() == item.mTrigger) {
-						setItem(slot.getKey(), item.mItem);
+						setItem(slot.getKey(), item.getItem(targetPlayer));
 						break;
 					}
 				}
@@ -115,7 +111,7 @@ public class DepthsSummaryGUI extends Gui {
 
 		int startIndex = mPage * PASSIVES_PER_PAGE;
 		for (int i = 0; i < passiveItems.size() - startIndex && i < PASSIVES_PER_PAGE; i++) {
-			setItem(i + START_OF_PASSIVES, passiveItems.get(i + startIndex).mItem);
+			setItem(i + START_OF_PASSIVES, passiveItems.get(i + startIndex).getItem(targetPlayer));
 		}
 
 		if (mPage > 0) {

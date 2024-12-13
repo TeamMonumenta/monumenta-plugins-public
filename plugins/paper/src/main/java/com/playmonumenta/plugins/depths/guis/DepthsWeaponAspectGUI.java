@@ -160,7 +160,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 			if (item == null) {
 				continue;
 			}
-			inventory.setItem(location, item.mItem);
+			inventory.setItem(location, item.getItem(player));
 			itemIndex++;
 		}
 	}

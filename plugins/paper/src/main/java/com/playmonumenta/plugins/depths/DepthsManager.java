@@ -266,10 +266,6 @@ public class DepthsManager {
 	// Map of players to their depths information- to persist through logouts
 	public Map<UUID, DepthsPlayer> mPlayers = new HashMap<>();
 	private static @Nullable Plugin mPlugin;
-	// List of ability offers for each player
-	public Map<UUID, List<DepthsAbilityItem>> mAbilityOfferings = new HashMap<>();
-	// List of upgrade offers for each player
-	public Map<UUID, List<DepthsAbilityItem>> mUpgradeOfferings = new HashMap<>();
 	public Random mRandom = new Random();
 	// Parties currently active in the system
 	public List<DepthsParty> mParties = new ArrayList<>();
@@ -837,14 +833,23 @@ public class DepthsManager {
 
 		for (DepthsAbilityInfo<?> da : getFilteredAbilities(filter, noActiveTrees)) {
 			int rarity;
+			int preIncreaseRarity;
 			if (forceLevel > 0) {
 				rarity = forceLevel;
+				preIncreaseRarity = 0;
 				if (da == Abnormality.INFO) {
 					continue;
 				}
 			} else {
 				// Get a number 1 to 100
 				int roll = mRandom.nextInt(100) + 1;
+
+				DepthsParty party = getPartyFromId(dp);
+				if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY) {
+					roll -= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY_AMOUNT;
+				}
+
+				preIncreaseRarity = getRarity(roll, isElite);
 
 				//Add enlightenment level to roll if applicable
 				Enlightenment enlightenment = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Enlightenment.class);
@@ -856,48 +861,15 @@ public class DepthsManager {
 				if (diversity != null) {
 					roll += (int) (diversity.getRarityIncrease() * 100);
 				}
-				DepthsParty party = getPartyFromId(dp);
-				if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY) {
-					roll -= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY_AMOUNT;
-				}
-
 				// cracked idol ability rarity trigger
 				if (dp.hasAbility(CrackedIdol.ABILITY_NAME)) {
 					roll += 10;
 				}
 
-				if (isElite) {
-					if (roll < 46) {
-						//UNCOMMON RARITY- 45%
-						rarity = 2;
-					} else if (roll < 76) {
-						//RARE RARITY- 30%
-						rarity = 3;
-					} else if (roll < 91) {
-						//EPIC RARITY- 15%
-						rarity = 4;
-					} else {
-						//LEGENDARY RARITY- 10%
-						rarity = 5;
-					}
-				} else {
-					if (roll < 41) {
-						//COMMON RARITY- 40%
-						rarity = 1;
-					} else if (roll < 71) {
-						//UNCOMMON RARITY- 30%
-						rarity = 2;
-					} else if (roll < 91) {
-						//RARE RARITY- 20%
-						rarity = 3;
-					} else {
-						//EPIC RARITY- 10%
-						rarity = 4;
-					}
-				}
+				rarity = getRarity(roll, isElite);
 			}
 
-			DepthsAbilityItem item = da.getAbilityItem(rarity, p, 0, false);
+			DepthsAbilityItem item = da.getAbilityItem(rarity, p, 0, preIncreaseRarity, false);
 			if (item != null) {
 				items.add(item);
 			}
@@ -909,6 +881,38 @@ public class DepthsManager {
 		}
 
 		return items;
+	}
+
+	private int getRarity(int roll, boolean isElite) {
+		if (isElite) {
+			if (roll < 46) {
+				//UNCOMMON RARITY- 45%
+				return 2;
+			} else if (roll < 76) {
+				//RARE RARITY- 30%
+				return 3;
+			} else if (roll < 91) {
+				//EPIC RARITY- 15%
+				return 4;
+			} else {
+				//LEGENDARY RARITY- 10%
+				return 5;
+			}
+		} else {
+			if (roll < 41) {
+				//COMMON RARITY- 40%
+				return 1;
+			} else if (roll < 71) {
+				//UNCOMMON RARITY- 30%
+				return 2;
+			} else if (roll < 91) {
+				//RARE RARITY- 20%
+				return 3;
+			} else {
+				//EPIC RARITY- 10%
+				return 4;
+			}
+		}
 	}
 
 	/**
@@ -925,7 +929,7 @@ public class DepthsManager {
 			return null;
 		}
 
-		List<DepthsAbilityItem> offeredItems = mAbilityOfferings.get(p.getUniqueId());
+		List<DepthsAbilityItem> offeredItems = dp.mAbilityOfferings;
 		if (offeredItems != null && !offeredItems.isEmpty()) {
 			return offeredItems;
 		}
@@ -1021,8 +1025,7 @@ public class DepthsManager {
 			return getAbilityUnlocks(p);
 		}
 
-		mAbilityOfferings.put(p.getUniqueId(), offeredItems);
-
+		dp.mAbilityOfferings = offeredItems;
 		return offeredItems;
 	}
 
@@ -1037,7 +1040,7 @@ public class DepthsManager {
 		if (dp == null) {
 			return;
 		}
-		List<DepthsAbilityItem> itemChoices = mAbilityOfferings.get(p.getUniqueId());
+		List<DepthsAbilityItem> itemChoices = dp.mAbilityOfferings;
 		if (itemChoices == null || slot >= itemChoices.size()) {
 			return;
 		}
@@ -1046,7 +1049,7 @@ public class DepthsManager {
 			return;
 		}
 		setPlayerLevelInAbility(choice.mAbility, p, dp, choice.mRarity, true, sendMessage);
-		mAbilityOfferings.remove(p.getUniqueId());
+		dp.mAbilityOfferings = null;
 		dp.mEarnedRewards.poll();
 		p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 	}
@@ -1109,9 +1112,6 @@ public class DepthsManager {
 
 		// If the player is in the system
 		if (mPlayers.remove(uuid) != null) {
-			mAbilityOfferings.remove(uuid);
-			mUpgradeOfferings.remove(uuid);
-
 			AbilityManager.getManager().updatePlayerAbilities(p, true);
 			//Reset delve player info
 			DelvesUtils.clearDelvePlayerByShard(null, p, ServerProperties.getShardName());
@@ -1126,18 +1126,11 @@ public class DepthsManager {
 	/**
 	 * Returns the ability item previews of all abilities the player currently has
 	 *
-	 * @param p the player to look up
-	 * @return ability items for all their active abilities (rarity > 0)
+	 * @param p  the player to look up
+	 * @param dp the player's DepthsPlayer
+	 * @return   ability items for all their active abilities (rarity > 0)
 	 */
-	public @Nullable List<DepthsAbilityItem> getPlayerAbilitySummary(Player p) {
-
-		DepthsPlayer dp = getDepthsPlayer(p);
-
-		// Check if they're in the system
-		if (dp == null) {
-			return null;
-		}
-
+	public List<DepthsAbilityItem> getPlayerAbilitySummary(Player p, DepthsPlayer dp) {
 		List<DepthsAbilityItem> abilities = new ArrayList<>();
 
 		// For each ability they have a score for, return the item that says what that ability does
@@ -1584,12 +1577,11 @@ public class DepthsManager {
 	 * @param slot the index of which item they selected in their offering array
 	 */
 	public void playerUpgradedItem(Player p, int slot, boolean sendMessage) {
-		UUID uuid = p.getUniqueId();
-		DepthsPlayer dp = getDepthsPlayer(uuid);
+		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp == null) {
 			return;
 		}
-		List<DepthsAbilityItem> itemChoices = mUpgradeOfferings.get(uuid);
+		List<DepthsAbilityItem> itemChoices = dp.mUpgradeOfferings;
 		if (itemChoices == null) {
 			return;
 		}
@@ -1598,7 +1590,7 @@ public class DepthsManager {
 		}
 		DepthsAbilityItem choice = itemChoices.get(slot);
 		setPlayerLevelInAbility(choice.mAbility, p, dp, choice.mRarity, true, sendMessage);
-		mUpgradeOfferings.remove(uuid);
+		dp.mUpgradeOfferings = null;
 		dp.mEarnedRewards.poll();
 		p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 	}
@@ -1610,16 +1602,15 @@ public class DepthsManager {
 	 * @return the items for the available upgrades
 	 */
 	public @Nullable List<DepthsAbilityItem> getAbilityUpgradeOptions(Player p) {
-		UUID uuid = p.getUniqueId();
-		List<DepthsAbilityItem> offeredItems = mUpgradeOfferings.get(uuid);
-		if (offeredItems != null && !offeredItems.isEmpty()) {
-			return offeredItems;
-		}
-
-		DepthsPlayer dp = getDepthsPlayer(uuid);
+		DepthsPlayer dp = getDepthsPlayer(p);
 		DepthsParty party = getPartyFromId(dp);
 		if (dp == null || party == null) {
 			return null;
+		}
+
+		List<DepthsAbilityItem> offeredItems = dp.mUpgradeOfferings;
+		if (offeredItems != null && !offeredItems.isEmpty()) {
+			return offeredItems;
 		}
 		// Return up to 3 random choices of items that are one level above the current level
 		ArrayList<DepthsAbilityInfo<?>> abilities = new ArrayList<>(getAbilities());
@@ -1660,8 +1651,7 @@ public class DepthsManager {
 			}
 		}
 
-		mUpgradeOfferings.put(uuid, offeredItems);
-
+		dp.mUpgradeOfferings = offeredItems;
 		return offeredItems;
 	}
 
@@ -1996,7 +1986,7 @@ public class DepthsManager {
 
 		//Do not give any abilities that have the same trigger as abilities that are currently offered in an ability reward
 		//This is needed because players can open up an ability reward, not choose anything, then take mystery box or chaos and end up with two abilities on a trigger
-		List<DepthsAbilityItem> abilityOffering = mAbilityOfferings.get(p.getUniqueId());
+		List<DepthsAbilityItem> abilityOffering = dp.mAbilityOfferings;
 		if (abilityOffering != null) {
 			List<DepthsTrigger> blockedTriggers = new ArrayList<>();
 			for (DepthsAbilityItem offeredAbility : abilityOffering) {
@@ -2253,7 +2243,7 @@ public class DepthsManager {
 	}
 
 	public void validateOfferings(DepthsPlayer dp, @Nullable String removedAbility) {
-		List<DepthsAbilityItem> upgradeOfferings = mUpgradeOfferings.get(dp.mPlayerId);
+		List<DepthsAbilityItem> upgradeOfferings = dp.mUpgradeOfferings;
 		if (upgradeOfferings != null) {
 			if (removedAbility != null) {
 				upgradeOfferings.removeIf(dai -> dai.mAbility.equals(removedAbility));
@@ -2277,11 +2267,11 @@ public class DepthsManager {
 				}
 			}
 			if (upgradeOfferings.isEmpty()) {
-				mUpgradeOfferings.remove(dp.mPlayerId);
+				dp.mUpgradeOfferings = null;
 			}
 		}
 
-		List<DepthsAbilityItem> abilityOfferings = mAbilityOfferings.get(dp.mPlayerId);
+		List<DepthsAbilityItem> abilityOfferings = dp.mAbilityOfferings;
 		if (abilityOfferings != null) {
 			abilityOfferings.removeIf(dai -> dp.mAbilities.keySet().stream().map(this::getAbility).filter(Objects::nonNull).anyMatch(info -> dai.mAbility.equals(info.getDisplayName()) || (dai.mTrigger != DepthsTrigger.PASSIVE && info.getDepthsTrigger() == dai.mTrigger)));
 			DepthsParty party = getPartyFromId(dp);
@@ -2290,7 +2280,7 @@ public class DepthsManager {
 				abilityOfferings.removeIf(dai -> dai.mTrigger != DepthsTrigger.PASSIVE && trees.stream().filter(t -> t == dai.mTree).count() >= 4);
 			}
 			if (abilityOfferings.isEmpty()) {
-				mAbilityOfferings.remove(dp.mPlayerId);
+				dp.mAbilityOfferings = null;
 			}
 		}
 	}

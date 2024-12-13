@@ -54,7 +54,7 @@ public class Diversity extends DepthsAbility {
 		} else {
 			// Since all abilities are refreshed when we get a new ability, we only have to calculate the value once
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				Set<DepthsTree> uniqueTrees = DepthsManager.getInstance().getPlayerAbilities(player).stream()
+				Set<DepthsTree> uniqueTrees = DepthsManager.getInstance().getPlayerAbilities(depthsPlayer).stream()
 					.map(DepthsAbilityInfo::getDepthsTree)
 					.filter(Objects::nonNull) // Weapon Aspects have null tree
 					.filter(depthsTree -> depthsTree != DepthsTree.CURSE && depthsTree != DepthsTree.GIFT)
