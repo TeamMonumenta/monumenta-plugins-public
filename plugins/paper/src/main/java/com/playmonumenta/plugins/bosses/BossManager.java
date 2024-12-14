@@ -242,7 +242,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(SwingBoss.identityTag, SwingBoss::new, new SwingBoss.Parameters());
 		registerStatelessBoss(MistMob.identityTag, MistMob::new);
 		registerStatelessBoss(FrostGiantIcicle.identityTag, FrostGiantIcicle::new);
-		registerStatelessBoss(VindictiveBoss.identityTag, VindictiveBoss::new);
+		registerStatelessBoss(VindictiveBoss.identityTag, VindictiveBoss::new, new VindictiveBoss.Parameters());
 		registerStatelessBoss(ShadowTrailBoss.identityTag, ShadowTrailBoss::new);
 		registerStatelessBoss(FlameTrailBoss.identityTag, FlameTrailBoss::new, new FlameTrailBoss.Parameters());
 		registerStatelessBoss(ShadeParticleBoss.identityTag, ShadeParticleBoss::new);
