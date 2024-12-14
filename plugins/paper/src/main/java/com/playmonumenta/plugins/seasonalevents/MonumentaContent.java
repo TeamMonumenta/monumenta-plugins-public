@@ -45,6 +45,8 @@ public enum MonumentaContent {
 	RED("red", ContentType.DUNGEON, 3),
 	BLACK("black", ContentType.DUNGEON, 3),
 	SKT("skt", ContentType.DUNGEON, 3),
+	HEXFALL_RUTEN("hexfallruten", ContentType.DUNGEON, 3),
+	HEXFALL_HYCENEA("hexfallhycenea", ContentType.OTHER, 3),
 	RUIN("ruin", ContentType.STRIKE, 3),
 	PORTAL("portal", ContentType.STRIKE, 3),
 	GALLERY("gallery", ContentType.OTHER, 3),
