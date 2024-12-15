@@ -62,7 +62,7 @@ public class CrossbowListener implements Listener {
 			if (crossbow.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
 				    && arrow instanceof Arrow regularArrow
 				    && !regularArrow.hasCustomEffects()
-				    && regularArrow.getBasePotionData().getType() == PotionType.UNCRAFTABLE // plain arrow
+				    && regularArrow.getBasePotionType() == PotionType.UNCRAFTABLE // plain arrow
 				    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 				arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 				if (player.getGameMode() != GameMode.CREATIVE) {

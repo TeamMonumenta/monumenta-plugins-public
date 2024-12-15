@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.potion;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import java.util.Collection;
 import java.util.HashMap;
@@ -82,7 +83,7 @@ public class PlayerPotionInfo {
 		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
 			JsonElement element = potionEntry.getValue().getAsJsonObject(includeAll);
 			if (element != null) {
-				playerPotionInfoObject.add(potionEntry.getKey().getName(), element);
+				playerPotionInfoObject.add(potionEntry.getKey().getKey().getKey(), element);
 			}
 		}
 
@@ -91,7 +92,7 @@ public class PlayerPotionInfo {
 
 	protected void loadFromJsonObject(JsonObject object) throws Exception {
 		for (Entry<String, JsonElement> info : object.entrySet()) {
-			PotionEffectType type = PotionEffectType.getByName(info.getKey());
+			PotionEffectType type = PotionUtils.getTypeByKey(info.getKey());
 			if (type == null) {
 				throw new Exception("Invalid potion type " + info.getKey());
 			}

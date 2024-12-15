@@ -64,7 +64,7 @@ public class ThrowingKnife implements Enchantment {
 				if (item.getType() == Material.TIPPED_ARROW) {
 					PotionMeta meta = (PotionMeta) item.getItemMeta();
 					arrow = world.spawnArrow(eyeLoc, dir, ARROW_VELOCITY, 0, Arrow.class);
-					arrow.setBasePotionData(meta.getBasePotionData());
+					arrow.setBasePotionType(meta.getBasePotionType());
 					if (meta.hasCustomEffects()) {
 						for (PotionEffect effect : meta.getCustomEffects()) {
 							arrow.addCustomEffect(effect, true);

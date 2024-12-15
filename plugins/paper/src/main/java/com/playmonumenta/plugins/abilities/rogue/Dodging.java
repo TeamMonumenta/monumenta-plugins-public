@@ -10,10 +10,12 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,10 +32,8 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -167,10 +167,10 @@ public class Dodging extends Ability {
 			if (isEnhanced()) {
 				if (proj.getShooter() instanceof LivingEntity livingEntity && EntityUtils.isHostileMob(livingEntity)) {
 					// If Source is an enemy, apply potion effects to the enemy
-					PotionUtils.PotionInfo potionInfo = PotionUtils.getPotionInfo(arrow.getBasePotionData(), 8);
+					List<PotionUtils.PotionInfo> infos = PotionUtils.getPotionInfoList(arrow.getBasePotionType(), 8);
 
-					if (potionInfo != null) {
-						PotionUtils.apply(livingEntity, potionInfo);
+					for (PotionUtils.PotionInfo info : infos) {
+						PotionUtils.apply(livingEntity, info);
 					}
 
 					if (arrow.hasCustomEffects()) {
@@ -182,8 +182,7 @@ public class Dodging extends Ability {
 				}
 			}
 
-			arrow.setBasePotionData(new PotionData(PotionType.MUNDANE));
-			arrow.clearCustomEffects();
+			EntityListener.removePotionEffectsFromArrow(arrow);
 		}
 		proj.remove();
 		return true;

@@ -34,7 +34,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -55,6 +54,7 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -625,7 +625,7 @@ public class ColorSplash extends DepthsAbility {
 
 						if (!EntityUtils.isCCImmuneMob(mob)) {
 							mob.setVelocity(mob.getVelocity().setY(0.5));
-							PotionUtils.apply(mob, new PotionUtils.PotionInfo(PotionEffectType.LEVITATION, WINDWALKER_EFFECTS_DURATION, 1, false, false, false));
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, WINDWALKER_EFFECTS_DURATION, 1, false, false, false));
 							EntityUtils.applyStun(mPlugin, 30, mob);
 						}
 					});

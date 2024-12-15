@@ -379,7 +379,7 @@ public class PotionConsumeListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void appliedPotionEvent(EntityPotionEffectEvent event) {
 		PotionEffect newEffect = event.getNewEffect();
-		if (event.getModifiedType().getName().equals("WEAKNESS") && newEffect != null) {
+		if (event.getModifiedType().equals(PotionEffectType.WEAKNESS) && newEffect != null) {
 			if (event.getAction() != EntityPotionEffectEvent.Action.REMOVED && event.getAction() != EntityPotionEffectEvent.Action.CLEARED && event.getEntity() instanceof LivingEntity le) {
 				EntityUtils.applyWeaken(mPlugin, newEffect.getDuration(), (newEffect.getAmplifier() + 1) * 0.1, le, null);
 				le.removePotionEffect(PotionEffectType.WEAKNESS);

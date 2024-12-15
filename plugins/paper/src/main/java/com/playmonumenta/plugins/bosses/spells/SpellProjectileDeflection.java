@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffect;
 public class SpellProjectileDeflection extends Spell {
 	private static final double MAX_DEFLECT_VELOCITY = 3.0;
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 
 	public SpellProjectileDeflection(LivingEntity boss) {
 		mBoss = boss;
@@ -32,12 +32,11 @@ public class SpellProjectileDeflection extends Spell {
 				Projectile deflected = (Projectile) mBoss.getWorld().spawnEntity(proj.getLocation().subtract(proj.getVelocity().normalize()), proj.getType());
 				deflected.setShooter(mBoss);
 				if (deflected instanceof Arrow deflectedArrow && proj instanceof Arrow originalArrow) {
-					((Arrow) deflected).setCritical(((Arrow) proj).isCritical());
-					if (originalArrow.getBasePotionData() != null) {
-						deflectedArrow.setBasePotionData(originalArrow.getBasePotionData());
-						for (PotionEffect effect : originalArrow.getCustomEffects()) {
-							deflectedArrow.addCustomEffect(effect, true);
-						}
+					deflectedArrow.setCritical(originalArrow.isCritical());
+
+					deflectedArrow.setBasePotionType(originalArrow.getBasePotionType());
+					for (PotionEffect effect : originalArrow.getCustomEffects()) {
+						deflectedArrow.addCustomEffect(effect, true);
 					}
 
 				}

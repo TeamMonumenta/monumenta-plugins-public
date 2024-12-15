@@ -141,7 +141,6 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -1128,13 +1127,13 @@ public class PlayerListener implements Listener {
 			if (ItemStatUtils.hasConsumeEffect(item)) {
 				// If it's a custom potion, remove all effects
 				potionMeta.clearCustomEffects();
-				potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+				potionMeta.setBasePotionType(PotionType.AWKWARD);
 			} else {
 				// If it's a vanilla potion, remove positive effects (Ensure legacies stay unusable)
 				PotionUtils.removePositiveEffects(potionMeta);
-				if (PotionUtils.hasPositiveEffects(potionMeta.getBasePotionData().getType().getEffectType())) {
+				if (PotionUtils.hasPositiveEffects(potionMeta.getBasePotionType().getPotionEffects())) {
 					// If base potion is vanilla positive potion, set to AWKWARD, otherwise keep (ensures negative effects remain)
-					potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+					potionMeta.setBasePotionType(PotionType.AWKWARD);
 				}
 			}
 			item.setItemMeta(potionMeta);

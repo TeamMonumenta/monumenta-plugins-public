@@ -66,13 +66,10 @@ public class DamageBlocker extends Spell {
 					deflected.setShooter(mBoss);
 					if (deflected instanceof Arrow arrow && proj instanceof Arrow projec) {
 						arrow.setCritical(projec.isCritical());
-						if (projec.getBasePotionData() != null) {
-							arrow.setBasePotionData(projec.getBasePotionData());
-							for (PotionEffect effect : projec.getCustomEffects()) {
-								arrow.addCustomEffect(effect, true);
-							}
+						arrow.setBasePotionType(projec.getBasePotionType());
+						for (PotionEffect effect : projec.getCustomEffects()) {
+							arrow.addCustomEffect(effect, true);
 						}
-
 					}
 					deflected.setVelocity(LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), deflected.getLocation()).multiply(Math.min(MAX_DEFLECT_VELOCITY, proj.getVelocity().length())));
 					proj.remove();

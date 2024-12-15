@@ -30,6 +30,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -143,10 +144,10 @@ public abstract class BossParameters {
 						if ((valid.getKey().startsWith(remaining) || fullSuggestions) && !usedParams.contains(valid.getKey()) && !valid.getValue().getDeprecated()) {
 							Object def = valid.getValue().getField().get(parameters);
 							final String defStr;
-							if (def instanceof PotionEffectType) {
-								defStr = ((PotionEffectType) def).getName();
-							} else if (def instanceof Sound) {
-								defStr = ((Sound) def).name();
+							if (def instanceof PotionEffectType defPotion) {
+								defStr = defPotion.getKey().getKey();
+							} else if (def instanceof Sound defSound) {
+								defStr = defSound.name();
 							} else if (def instanceof Color color) {
 								if (StringReader.COLOR_NAME_MAP.containsKey(color)) {
 									defStr = StringReader.COLOR_NAME_MAP.get(color);
@@ -233,10 +234,11 @@ public abstract class BossParameters {
 						PotionEffectType val = reader.readPotionEffectType();
 						if (val == null) {
 							// Entry not valid, offer all entries as completions
-							List<Tooltip<String>> suggArgs = new ArrayList<>(PotionEffectType.values().length);
+							List<PotionEffectType> values = Registry.POTION_EFFECT_TYPE.stream().toList();
+							List<Tooltip<String>> suggArgs = new ArrayList<>(values.size());
 							String soFar = reader.readSoFar();
-							for (PotionEffectType valid : PotionEffectType.values()) {
-								suggArgs.add(Tooltip.ofString(soFar + valid.getName(), validType.getDesc()));
+							for (PotionEffectType valid : values) {
+								suggArgs.add(Tooltip.ofString(soFar + valid.getKey().getKey(), validType.getDesc()));
 							}
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}

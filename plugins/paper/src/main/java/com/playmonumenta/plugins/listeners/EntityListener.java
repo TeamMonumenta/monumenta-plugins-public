@@ -90,7 +90,6 @@ import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -614,7 +613,7 @@ public class EntityListener implements Listener {
 		if (source instanceof Player && item.getItemMeta() instanceof PotionMeta potionMeta) {
 			// Will never have negative effects at this point, just do basic clear of positive effects
 			potionMeta.clearCustomEffects();
-			potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+			potionMeta.setBasePotionType(PotionType.AWKWARD);
 			item.setItemMeta(potionMeta);
 			for (LivingEntity entity : affectedEntities) {
 				if (entity instanceof Player player) {
@@ -713,15 +712,15 @@ public class EntityListener implements Listener {
 
 		boolean allowEffectsOnFriendlyMobs = ServerProperties.getShardName().contains("plot");
 
-		PotionData data = cloud.getBasePotionData();
-		PotionInfo info = PotionUtils.getPotionInfo(data, 4);
+		PotionType potionType = cloud.getBasePotionType();
+		List<PotionInfo> infos = PotionUtils.getPotionInfoList(potionType, 4);
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
 
 		// All affected players need to have the effect added to their potion manager.
 		ItemStack potion = MetadataUtils.<ItemStack>getMetadata(cloud, AREA_EFFECT_CLOUD_POTION_METAKEY).orElse(null);
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player player) {
-				if (info != null) {
+				for (PotionInfo info : infos) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 				}
 
@@ -842,15 +841,15 @@ public class EntityListener implements Listener {
 					Vector from = arrow.getLocation().toVector();
 
 					if (to.subtract(from).dot(player.getLocation().getDirection()) < 0) {
-						removePotionDataFromArrow(arrow);
+						removePotionEffectsFromArrow(arrow);
 					}
 				}
 
-				PotionData data = arrow.getBasePotionData();
-				PotionInfo info = PotionUtils.getPotionInfo(data, 8);
+				PotionType potionType = arrow.getBasePotionType();
+				List<PotionInfo> infos = PotionUtils.getPotionInfoList(potionType, 8);
 				List<PotionEffect> effects = arrow.hasCustomEffects() ? arrow.getCustomEffects() : null;
 
-				if (info != null) {
+				for (PotionInfo info : infos) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 				}
 
@@ -882,15 +881,9 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	private void removePotionDataFromArrow(Arrow arrow) {
-		PotionData data = new PotionData(PotionType.AWKWARD);
-		arrow.setBasePotionData(data);
-
-		if (arrow.hasCustomEffects()) {
-			for (PotionEffect effect : new ArrayList<>(arrow.getCustomEffects())) {
-				arrow.removeCustomEffect(effect.getType());
-			}
-		}
+	public static void removePotionEffectsFromArrow(Arrow arrow) {
+		arrow.setBasePotionType(PotionType.AWKWARD);
+		arrow.clearCustomEffects();
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.bukkit.Registry;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -173,7 +174,7 @@ public class EffectsList {
 
 		// This constructor for potion effects
 		public Effect(PotionEffectType effect, int duration, int amplifier) {
-			mName = effect.getName();
+			mName = effect.getKey().getKey();
 			mDurationTicks = duration;
 			mAmplifier = amplifier;
 			mEffect = effect;
@@ -333,7 +334,8 @@ public class EffectsList {
 				}
 				if (customEffect == null) {
 					// Nope, neither matched
-					List<Tooltip<String>> suggArgs = new ArrayList<>(PotionEffectType.values().length + Effect.EFFECT_RUNNER.size() + Effect.CUSTOM_EFFECT_RUNNER.size());
+					List<PotionEffectType> potionEffectTypes = Registry.POTION_EFFECT_TYPE.stream().toList();
+					List<Tooltip<String>> suggArgs = new ArrayList<>(potionEffectTypes.size() + Effect.EFFECT_RUNNER.size() + Effect.CUSTOM_EFFECT_RUNNER.size());
 					String soFar = reader.readSoFar();
 					for (String valid : Effect.EFFECT_RUNNER.keySet()) {
 						suggArgs.add(Tooltip.ofString(soFar + valid, hoverDescription));
@@ -341,8 +343,8 @@ public class EffectsList {
 					for (String valid : Effect.CUSTOM_EFFECT_RUNNER.keySet()) {
 						suggArgs.add(Tooltip.ofString(soFar + valid, hoverDescription));
 					}
-					for (PotionEffectType valid : PotionEffectType.values()) {
-						suggArgs.add(Tooltip.ofString(soFar + valid.getName(), hoverDescription));
+					for (PotionEffectType valid : potionEffectTypes) {
+						suggArgs.add(Tooltip.ofString(soFar + valid.getKey().getKey(), hoverDescription));
 					}
 					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 				}

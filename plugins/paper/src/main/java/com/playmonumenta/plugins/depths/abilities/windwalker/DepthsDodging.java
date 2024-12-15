@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collection;
 import net.kyori.adventure.text.format.TextColor;
@@ -29,9 +30,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
 
 public class DepthsDodging extends DepthsAbility {
@@ -105,8 +104,7 @@ public class DepthsDodging extends DepthsAbility {
 		}
 
 		if (proj instanceof Arrow arrow) {
-			arrow.setBasePotionData(new PotionData(PotionType.MUNDANE));
-			arrow.clearCustomEffects();
+			EntityListener.removePotionEffectsFromArrow(arrow);
 		}
 		proj.remove();
 		return true;

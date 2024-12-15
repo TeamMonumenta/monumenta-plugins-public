@@ -22,15 +22,12 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Volley extends Ability {
@@ -104,19 +101,6 @@ public class Volley extends Ability {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				// Store PotionData from the original arrow only if it is weakness or slowness
-				PotionData tArrowData = null;
-
-				if (projectile instanceof Arrow regularArrow) {
-					if (regularArrow.hasCustomEffects()) {
-						tArrowData = regularArrow.getBasePotionData();
-						if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {
-							// This arrow isn't weakness or slowness - don't store the potion data
-							tArrowData = null;
-						}
-					}
-				}
-
 				List<Projectile> projectiles;
 				if (!isEnhanced()) {
 					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, arrowSpeed, 5, projectile.getClass());
@@ -135,11 +119,6 @@ public class Volley extends Ability {
 
 						arrow.setCritical(projectile instanceof AbstractArrow projectileArrow && projectileArrow.isCritical());
 						arrow.setPierceLevel(piercing);
-
-						// If the base arrow's potion data is still stored, apply it to the new arrows
-						if (tArrowData != null) {
-							((Arrow) proj).setBasePotionData(tArrowData);
-						}
 					} else if (proj instanceof ThrowableProjectile throwable && projectile instanceof ThrowableProjectile oldThrowable) {
 						ItemUtils.setSnowballItem(throwable, oldThrowable.getItem());
 					}

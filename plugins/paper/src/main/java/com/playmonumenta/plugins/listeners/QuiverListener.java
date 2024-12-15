@@ -273,7 +273,7 @@ public class QuiverListener implements Listener {
 
 				if (newArrow instanceof Arrow newPotionArrow
 					    && projectileItem.getItemMeta() instanceof PotionMeta itemMeta) {
-					newPotionArrow.setBasePotionData(itemMeta.getBasePotionData());
+					newPotionArrow.setBasePotionType(itemMeta.getBasePotionType());
 					newPotionArrow.setColor(itemMeta.getColor());
 					for (PotionEffect customEffect : itemMeta.getCustomEffects()) {
 						newPotionArrow.addCustomEffect(customEffect, true);

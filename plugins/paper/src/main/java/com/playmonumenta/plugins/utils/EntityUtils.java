@@ -797,18 +797,6 @@ public class EntityUtils {
 			       .orElse(null);
 	}
 
-	public static void amplifyPotionLevel(LivingEntity en, PotionEffectType effectType, int ampAmount, int ampCap) {
-		PotionEffect effect = en.getPotionEffect(effectType);
-		if (effect != null) {
-			int ampLvl = effect.getAmplifier() + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = Math.max(ampCap, effect.getAmplifier());
-			}
-			PotionUtils.PotionInfo potionInfo = new PotionUtils.PotionInfo(effectType, effect.getDuration(), ampLvl, effect.isAmbient(), effect.hasParticles(), effect.hasIcon());
-			PotionUtils.apply(en, potionInfo);
-		}
-	}
-
 	public static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
 
 	public static void applyVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob) {

@@ -54,7 +54,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
 
@@ -549,8 +548,8 @@ public class ItemUpdateHelper {
 				if (meta instanceof PotionMeta potionMeta) {
 					// TODO: Don't clear custom potion effects until we know what it is supposed to do
 					// potionMeta.clearCustomEffects();
-					if (!PotionUtils.BASE_POTION_ITEM_TYPES.contains(potionMeta.getBasePotionData().getType())) {
-						potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+					if (!PotionUtils.BASE_POTION_ITEM_TYPES.contains(potionMeta.getBasePotionType())) {
+						potionMeta.setBasePotionType(PotionType.AWKWARD);
 					}
 				}
 

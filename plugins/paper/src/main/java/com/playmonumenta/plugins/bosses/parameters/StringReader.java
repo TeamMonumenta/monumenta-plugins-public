@@ -180,10 +180,10 @@ public class StringReader {
 
 	public @Nullable PotionEffectType readPotionEffectType() {
 		skipWhitespace();
-		String remain = remaining().toUpperCase(Locale.ROOT);
+		String remain = remaining().toLowerCase(Locale.ROOT);
 		for (PotionEffectType type : POTION_EFFECT_TYPES_SORTED) {
-			if (remain.startsWith(type.getName())) {
-				advance(type.getName().length());
+			if (remain.startsWith(type.getKey().getKey())) {
+				advance(type.getKey().getKey().length());
 				return type;
 			}
 		}
@@ -286,7 +286,7 @@ public class StringReader {
 		SOUNDS_SORTED.sort((a, b) -> b.name().length() - a.name().length());
 
 		//sorting Potion Effect Type
-		POTION_EFFECT_TYPES_SORTED.sort((a, b) -> b.getName().length() - a.getName().length());
+		POTION_EFFECT_TYPES_SORTED.sort((a, b) -> b.getKey().getKey().length() - a.getKey().getKey().length());
 	}
 
 	public @Nullable Color readColor() {
