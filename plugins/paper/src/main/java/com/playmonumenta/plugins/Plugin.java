@@ -63,6 +63,7 @@ import com.playmonumenta.plugins.managers.PlayerSkinManager;
 import com.playmonumenta.plugins.managers.PlayerTitleManager;
 import com.playmonumenta.plugins.managers.PlaylistManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
+import com.playmonumenta.plugins.managers.UsernameManager;
 import com.playmonumenta.plugins.market.MarketCommands;
 import com.playmonumenta.plugins.market.MarketListener;
 import com.playmonumenta.plugins.market.MarketManager;
@@ -192,6 +193,7 @@ public class Plugin extends JavaPlugin {
 	public PzeroManager mPzeroManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
 	public PlayerListener mPlayerListener;
+	public UsernameManager mUsernameManager;
 	public GrapplingListener mGrapplingListener;
 	public @Nullable AuditListener mAuditListener = null;
 	private @Nullable CustomLogger mLogger = null;
@@ -339,6 +341,7 @@ public class Plugin extends JavaPlugin {
 		UpdateHeldItem.register();
 		UpdatePlainName.register();
 		UpdateStrikeChests.register();
+		UsernameManager.register();
 		ViewActivity.register();
 		VirtualFirmament.register();
 		WalletCommand.register();
@@ -436,6 +439,7 @@ public class Plugin extends JavaPlugin {
 		mPzeroManager = new PzeroManager();
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
 		mPlayerListener = new PlayerListener(this);
+		mUsernameManager = new UsernameManager(this);
 		mGrapplingListener = new GrapplingListener();
 
 		new ClientModHandler(this);
@@ -491,6 +495,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new AnimalLimits(), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(mPlayerListener, this);
+		manager.registerEvents(mUsernameManager, this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);
