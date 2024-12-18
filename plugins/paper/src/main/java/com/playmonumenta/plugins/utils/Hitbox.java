@@ -1,16 +1,21 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.math3.util.MathUtils;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -476,6 +481,38 @@ public abstract class Hitbox {
 			       .filter(filter == null ? e -> true : filter)
 			       .filter(e -> intersects(e.getBoundingBox()))
 			       .collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	public void visualize(double distance, int duration) {
+		BoundingBox box = getBoundingBox();
+		for (double x = box.getMinX(); x <= box.getMaxX(); x += distance) {
+			for (double y = box.getMinY(); y <= box.getMaxY(); y += distance) {
+				for (double z = box.getMinZ(); z <= box.getMaxZ(); z += distance) {
+					Vector vec = new Vector(x, y, z);
+					if (contains(vec)) {
+						Color color = Color.fromRGB(
+							(int) (128 * (0.5 + (x - box.getMinX()) / (box.getMaxX() - box.getMinX()))),
+							(int) (128 * (0.5 + (y - box.getMinY()) / (box.getMaxY() - box.getMinY()))),
+							(int) (128 * (0.5 + (z - box.getMinZ()) / (box.getMaxZ() - box.getMinZ())))
+						);
+						PartialParticle p = new PartialParticle(Particle.REDSTONE, vec.toLocation(getWorld()), 1, new Particle.DustOptions(color, (float) Math.max(0.25, Math.min(4, distance * 1.25))));
+						new BukkitRunnable() {
+							int mTicks = 0;
+
+							@Override
+							public void run() {
+								if (mTicks > duration) {
+									this.cancel();
+									return;
+								}
+								p.spawnFull();
+								mTicks += 5;
+							}
+						}.runTaskTimer(Plugin.getInstance(), 0, 5);
+					}
+				}
+			}
+		}
 	}
 
 }
