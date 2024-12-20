@@ -2066,7 +2066,10 @@ public class DepthsManager {
 		return getDepthsPlayer(player.getUniqueId());
 	}
 
-	public @Nullable DepthsParty getDepthsParty(Player player) {
+	public @Nullable DepthsParty getDepthsParty(@Nullable Player player) {
+		if (player == null) {
+			return null;
+		}
 		DepthsPlayer dp = getDepthsPlayer(player);
 		return getPartyFromId(dp);
 	}

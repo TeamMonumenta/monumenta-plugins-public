@@ -3,10 +3,17 @@ package com.playmonumenta.plugins.depths.abilities.gifts;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.List;
+import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -37,6 +44,15 @@ public class TreasureMap extends DepthsAbility {
 	private static Description<TreasureMap> getDescription() {
 		return new DescriptionBuilder<TreasureMap>().add("Once your team selects one of each room type, gain 2 ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
-			.add(" ability selections.");
+			.add(" ability selections.")
+			.add((a, p) -> {
+				DepthsParty party = DepthsManager.getInstance().getDepthsParty(p);
+				if (party == null) {
+					return Component.empty();
+				}
+				List<Component> roomTypes = party.mTreasureMapRooms.stream().map(DepthsRoomType::getRoomComponent).collect(Collectors.toList());
+				Component c = MessagingUtils.concatenateComponents(roomTypes, Component.text(", "));
+				return Component.text("\n\nRemaining Room Types: ").append(c);
+			});
 	}
 }
