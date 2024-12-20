@@ -263,6 +263,9 @@ public class SpawnerUtils {
 
 			@Override
 			public void run() {
+				if (PlayerUtils.playersInRange(marker.getLocation(), 20, false).isEmpty()) {
+					return;
+				}
 				// If the marker despawned or got removed, cancel the runnable.
 				if (!mMarker.isValid()) {
 					cancel();
