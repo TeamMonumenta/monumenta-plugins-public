@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +28,7 @@ public class ShardHealthUtils {
 		return awaitShardHealth(
 			audience,
 			0.7,
-			ShardHealthUtils.ShardHealth.defaultTargetHealth()
-				.memoryHealth(0.7)
-				.tickHealth(0.7),
+			ShardHealthUtils.ShardHealth.defaultTargetHealth(),
 			10L, // Half a second
 			300L // 15 seconds
 		);
@@ -140,7 +140,7 @@ public class ShardHealthUtils {
 
 	/**
 	 * Returns a combined score of server performance
-	 * @return Combined server performance, 1.0 is impossible good, may go negative if lagging
+	 * @return Combined server performance, 1.0 is impossible good
 	 */
 	public static double serverHealthScore() {
 		return unallocatedMemoryPercent() * averageTickUnusedPercent();
@@ -152,7 +152,7 @@ public class ShardHealthUtils {
 	 */
 	public static double unallocatedMemoryPercent() {
 		Runtime runtime = Runtime.getRuntime();
-		return (double) runtime.totalMemory() / runtime.maxMemory();
+		return Math.max(0.0, (double) runtime.totalMemory() / runtime.maxMemory());
 	}
 
 	/**
@@ -164,14 +164,15 @@ public class ShardHealthUtils {
 	}
 
 	/**
-	 * Returns what percent of a tick is not being used - can be negative during lag!
-	 * @return The average percent of a tick that is not being used on a scale of 0.0 to 1.0 when not lagging
+	 * Returns what percent of a tick is not being used - will be 0 if ticks take too long!
+	 * @return The average percent of a tick that is not being used on a scale of 0.0 to 1.0
 	 */
 	public static double averageTickUnusedPercent() {
-		return 1.0 - averageTickUsagePercent();
+		return Math.max(0.0, 1.0 - averageTickUsagePercent());
 	}
 
 	public static class ShardHealth {
+		private @Nullable Double mHealthScore = null;
 		private double mMemoryHealth;
 		private double mTickHealth;
 
@@ -189,8 +190,8 @@ public class ShardHealthUtils {
 
 		public static ShardHealth defaultTargetHealth() {
 			return new ShardHealth(
-				0.9,
-				0.9
+				0.7,
+				0.7
 			);
 		}
 
@@ -199,6 +200,43 @@ public class ShardHealthUtils {
 				0.0,
 				0.0
 			);
+		}
+
+		public static ShardHealth fromJson(JsonObject object) {
+			ShardHealth result = defaultTargetHealth();
+
+			if (
+				object.get("healthScore") instanceof JsonPrimitive healthScorePrimitive
+					&& healthScorePrimitive.isNumber()
+			) {
+				result.healthScore(healthScorePrimitive.getAsDouble());
+			}
+
+			if (
+				object.get("memoryHealth") instanceof JsonPrimitive memoryHealthPrimitive
+					&& memoryHealthPrimitive.isNumber()
+			) {
+				result.memoryHealth(memoryHealthPrimitive.getAsDouble());
+			}
+
+			if (
+				object.get("tickHealth") instanceof JsonPrimitive tickHealthPrimitive
+					&& tickHealthPrimitive.isNumber()
+			) {
+				result.tickHealth(tickHealthPrimitive.getAsDouble());
+			}
+
+			return result;
+		}
+
+		public JsonObject toJson() {
+			JsonObject result = new JsonObject();
+
+			result.addProperty("healthScore", healthScore());
+			result.addProperty("memoryHealth", memoryHealth());
+			result.addProperty("tickHealth", tickHealth());
+
+			return result;
 		}
 
 		public double memoryHealth() {
@@ -220,7 +258,15 @@ public class ShardHealthUtils {
 		}
 
 		public double healthScore() {
+			if (mHealthScore != null) {
+				return mHealthScore;
+			}
 			return mMemoryHealth * mTickHealth;
+		}
+
+		public ShardHealth healthScore(@Nullable Double healthScore) {
+			mHealthScore = healthScore;
+			return this;
 		}
 	}
 }

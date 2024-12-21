@@ -3,17 +3,20 @@ package com.playmonumenta.plugins.custominventories;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.RemotePlayerAPI;
 import com.playmonumenta.plugins.commands.DungeonAccessCommand;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DungeonUtils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ShardHealthUtils.ShardHealth;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -634,10 +637,20 @@ public class OrinCustomInventory extends CustomInventory {
 			if (shard != 0) {
 				shardName += "-" + shard;
 			}
+
 			int playerCount = RemotePlayerAPI.getVisiblePlayersOnServer(shardName).size();
 			String playerCountString = playerCount + (playerCount == 1 ? " player" : " players") + " online!";
+
+			List<String> shardLore = new ArrayList<>();
+			shardLore.add(playerCountString);
+			if (player.hasPermission("group.dev")) {
+				ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
+				shardLore.add((int) (100 * shardHealth.healthScore()) + "% Shard Health (lags/crashes at 0, only devs see this)");
+			}
+
+
 			if (index <= instanceLocations.length) {
-				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, playerCountString,
+				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, String.join("\n", shardLore),
 					itemType, null, 0,
 					"transferserver " + shardName, "", shard < 1 ? 1 : shard));
 			}
