@@ -76,8 +76,8 @@ public class PlotManager {
 					}))
 				/* This variant requires perms because it lets you get other players */
 				.withSubcommand(new CommandAPICommand("info")
-					.withPermission(CommandPermission.fromString("monumenta.plot.info"))
-					.withArguments(new StringArgument("name"))
+					.withArguments(new StringArgument("name")
+						.withPermission(CommandPermission.fromString("monumenta.plot.info")))
 					.executes((sender, args) -> {
 						String name = args.getUnchecked("name");
 						UUID uuid = resolveUUID(name);
@@ -115,23 +115,23 @@ public class PlotManager {
 						UUID otherPlayerUUID = resolveUUID(args.getUnchecked("other player"));
 						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, args.getUnchecked("duration"));
 					}))
-					/* REMOVE */
-					.withSubcommand(new CommandAPICommand("remove")
-							.withArguments(new StringArgument("name")) // TODO: Suggestions? Annoying to do
-							.executesPlayer((player, args) -> {
-								plotAccessRemove(player, args.getUnchecked("name"));
-							}))
-					/* MODERATOR REMOVE */
-					.withSubcommand(new CommandAPICommand("remove_other")
-							.withPermission("monumenta.command.plot.remove.others")
-							.withArguments(
-									new StringArgument("plot owner"),
-									new StringArgument("other player"))
-							.executes((sender, args) -> {
-								UUID ownerUUID = resolveUUID(args.getUnchecked("plot owner"));
-								UUID otherPlayerUUID = resolveUUID(args.getUnchecked("other player"));
-								plotAccessRemove(sender, ownerUUID, otherPlayerUUID);
-							}))
+				/* REMOVE */
+				.withSubcommand(new CommandAPICommand("remove")
+					.withArguments(new StringArgument("name")) // TODO: Suggestions? Annoying to do
+					.executesPlayer((player, args) -> {
+						plotAccessRemove(player, args.getUnchecked("name"));
+					}))
+				/* MODERATOR REMOVE */
+				.withSubcommand(new CommandAPICommand("remove_other")
+					.withPermission("monumenta.command.plot.remove.others")
+					.withArguments(
+						new StringArgument("plot owner"),
+						new StringArgument("other player"))
+					.executes((sender, args) -> {
+						UUID ownerUUID = resolveUUID(args.getUnchecked("plot owner"));
+						UUID otherPlayerUUID = resolveUUID(args.getUnchecked("other player"));
+						plotAccessRemove(sender, ownerUUID, otherPlayerUUID);
+					}))
 			)
 			/* SEND */
 			.withSubcommand(new CommandAPICommand("send")
@@ -534,10 +534,10 @@ public class PlotManager {
 						meta.displayName(Component.text(rec.mName + "'s Plot", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 						List<Component> lore = new ArrayList<>();
 						lore.add(Component.text("Access expires in:", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
+							.decoration(TextDecoration.ITALIC, false));
 						String timeLeft = (rec.mExpiration == -1) ? "Unlimited" : MessagingUtils.getTimeDifferencePretty(rec.mExpiration);
 						lore.add(Component.text(timeLeft, NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
+							.decoration(TextDecoration.ITALIC, false));
 						meta.lore(lore);
 						meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 						head.setItemMeta(meta);
