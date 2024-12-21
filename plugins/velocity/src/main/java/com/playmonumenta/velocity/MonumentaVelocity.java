@@ -105,7 +105,7 @@ public class MonumentaVelocity {
 
 		mServer.getEventManager().register(this, new JoinLeaveHandler(this));
 
-		new VelocityClientModHandler(this, mConfig.mAllowPacketPublicizeContent);
+		mServer.getEventManager().register(this, new VelocityClientModHandler(this, mConfig.mAllowPacketPublicizeContent));
 		mServer.getChannelRegistrar().register(VelocityClientModHandler.CHANNEL_ID);
 	}
 

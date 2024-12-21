@@ -82,9 +82,6 @@ public class JoinLeaveHandler {
 		Player player = event.getPlayer();
 
 		if (!mOnlinePlayers.contains(player.getUniqueId())) {
-			//first login, send server info to the client.
-			VelocityClientModHandler.sendServerInfoPacket(player);
-
 			/* This player is not already online - send join message */
 			mOnlinePlayers.add(player.getUniqueId());
 			if (mPlugin.mConfig.mJoinMessagesEnabled) {
@@ -104,6 +101,7 @@ public class JoinLeaveHandler {
 		if (mOnlinePlayers.contains(player.getUniqueId())) {
 			/* This player was online - send leave message */
 			mOnlinePlayers.remove(player.getUniqueId());
+			VelocityClientModHandler.onPlayerDisconnected(player);
 
 			if (mPlugin.mConfig.mJoinMessagesEnabled) {
 				joinLeaveEvent(player, " left the game",
