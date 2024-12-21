@@ -301,6 +301,10 @@ public class StringUtils {
 	}
 
 	public static String getDamageTypeString(@Nullable EnumSet<DamageEvent.DamageType> types) {
+		return getDamageTypeString(types, true, null);
+	}
+
+	public static String getDamageTypeString(@Nullable EnumSet<DamageEvent.DamageType> types, boolean includeSpaceAfter, @Nullable String defaultString) {
 		String string = "";
 
 		if (types != null) {
@@ -329,7 +333,11 @@ public class StringUtils {
 
 		// Add a space before
 		if (!string.isEmpty()) {
-			string = " " + string;
+			if (includeSpaceAfter) {
+				string = " " + string;
+			}
+		} else if (defaultString != null) {
+			return defaultString;
 		}
 
 		return string;

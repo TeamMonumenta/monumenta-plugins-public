@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -10,7 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
-import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.effects.DamageImmunity;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPLightning;
@@ -25,6 +26,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.TextColor;
@@ -37,14 +39,13 @@ import org.bukkit.Particle.DustTransition;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class ThundercloudForm extends DepthsAbility {
+public class ThundercloudForm extends DepthsAbility implements AbilityWithDuration {
 
 	public static final String ABILITY_NAME = "Thundercloud Form";
 	public static final int COOLDOWN = 30 * 20;
@@ -56,6 +57,7 @@ public class ThundercloudForm extends DepthsAbility {
 	public static final double[] LIGHTNING_DAMAGE = {60, 70, 80, 90, 100, 120};
 	public static final double[] AOE_DAMAGE = {20, 25, 30, 35, 40, 50};
 	public static final double AOE_RADIUS = 4;
+	private static final String FALL_IMMUNITY_EFFECT = "ThundercloudFormFallImmunity";
 
 	public static final String CHARM_COOLDOWN = "Thundercloud Form Cooldown";
 
@@ -75,10 +77,9 @@ public class ThundercloudForm extends DepthsAbility {
 	private final double mAOEDamage;
 	private final double mAOERadius;
 
-	private boolean mFlightActive;
-	private boolean mFallDamageImmune;
-	private boolean mHasThrownLightning;
-
+	private @Nullable BukkitRunnable mRunnable = null;
+	private boolean mHasThrownLightning = false;
+	private int mCurrDuration = -1;
 
 	public ThundercloudForm(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -89,21 +90,20 @@ public class ThundercloudForm extends DepthsAbility {
 		mLightningDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.THUNDERCLOUD_FORM_DAMAGE.mEffectName, LIGHTNING_DAMAGE[mRarity - 1]);
 		mAOEDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.THUNDERCLOUD_FORM_DAMAGE.mEffectName, AOE_DAMAGE[mRarity - 1]);
 		mAOERadius = CharmManager.getRadius(mPlayer, CharmEffects.THUNDERCLOUD_FORM_RADIUS.mEffectName, AOE_RADIUS);
-
-		mFlightActive = false;
-		mFallDamageImmune = false;
-		mHasThrownLightning = false;
 	}
 
 	public boolean cast() {
 		if (isOnCooldown()) {
-			if (mFlightActive && !mHasThrownLightning) {
+			if (mRunnable != null && !mHasThrownLightning) {
 
 				throwLightning();
 
 				return true;
 			}
 			return false;
+		}
+		if (mRunnable != null) {
+			mRunnable.cancel();
 		}
 
 		putOnCooldown();
@@ -133,12 +133,12 @@ public class ThundercloudForm extends DepthsAbility {
 		mPlayer.setVelocity(mPlayer.getEyeLocation().getDirection().multiply(0.5).add(new Vector(0, 0.9, 0)).normalize().multiply(1.2));
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mPlayer.setFlying(true), 6);
 
-		mFlightActive = true;
-		mFallDamageImmune = true;
 		mHasThrownLightning = false;
 
-		cancelOnDeath(new BukkitRunnable() {
-			int mTicks = 0;
+		mPlugin.mEffectManager.addEffect(mPlayer, FALL_IMMUNITY_EFFECT, new DamageImmunity(mFlightDuration + 4 * 20, EnumSet.of(DamageType.FALL)));
+
+		mCurrDuration = 0;
+		mRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (!mPlayer.isOnline() || mPlayer.isDead()) {
@@ -147,7 +147,7 @@ public class ThundercloudForm extends DepthsAbility {
 				}
 
 				if (!mHasThrownLightning) {
-					if (mTicks % 10 == 0) {
+					if (mCurrDuration % 10 == 0) {
 						world.playSound(mPlayer.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.5f, 0.9f);
 					}
 					new PartialParticle(Particle.ELECTRIC_SPARK, mPlayer.getEyeLocation(), 1).delta(0.5).spawnAsPlayerActive(mPlayer);
@@ -159,28 +159,29 @@ public class ThundercloudForm extends DepthsAbility {
 				}
 				new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 1).delta(0.2, 0.1, 0.2).extraRange(0.05, 0.1).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 2).delta(0.5, 0.2, 0.5).extraRange(0, 0.1).spawnAsPlayerActive(mPlayer);
-				if (mFlightDuration - mTicks < 30 && mTicks % 5 == 0) { // last 1.5s
-					float pitch = 1 + (mTicks - mFlightDuration + 20) / 20f;
+				if (mFlightDuration - mCurrDuration < 30 && mCurrDuration % 5 == 0) { // last 1.5s
+					float pitch = 1 + (mCurrDuration - mFlightDuration + 20) / 20f;
 					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_BULLET_HIT, SoundCategory.PLAYERS, 0.7f, pitch);
 				}
 
-				if (mTicks > mFlightDuration) {
+				if (mCurrDuration > mFlightDuration) {
 					this.cancel();
 				}
-				mTicks++;
+				mCurrDuration++;
 			}
 
 			@Override
 			public synchronized void cancel() {
 				super.cancel();
 
-				mFlightActive = false;
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mFallDamageImmune = false, 80); // 4s of fall damage immunity
+				mRunnable = null;
+				mCurrDuration = -1;
 				mHasThrownLightning = false;
 				mPlayer.setFlying(false);
 				mPlayer.setAllowFlight(false);
 			}
-		}.runTaskTimer(mPlugin, 0, 1));
+		};
+		cancelOnDeath(mRunnable.runTaskTimer(mPlugin, 0, 1));
 
 		return true;
 	}
@@ -267,14 +268,6 @@ public class ThundercloudForm extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		// cancel fall damage while in flight and for 4s after
-		if (event.getType() == DamageType.FALL && mFallDamageImmune) {
-			event.setCancelled(true);
-		}
-	}
-
 	private static Description<ThundercloudForm> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<ThundercloudForm>(color)
 			.add("Swap hands to launch upwards, dealing ")
@@ -304,6 +297,16 @@ public class ThundercloudForm extends DepthsAbility {
 			new PPLine(Particle.DUST_COLOR_TRANSITION, oldLocation, location).data(new DustTransition(Color.YELLOW, Color.YELLOW, 0.75f))
 				.countPerMeter(12).groupingDistance(0).spawnAsPlayerActive(mPlayer);
 		}
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return mFlightDuration;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return mCurrDuration >= 0 ? getInitialAbilityDuration() - mCurrDuration : 0;
 	}
 }
 
