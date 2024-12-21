@@ -37,6 +37,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -158,6 +159,8 @@ public class SpawnerUtils {
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatVuln", new PercentDamageReceived(30, -1.0));
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatSpeed", new PercentSpeed(20, 1, "PercentSpeed"));
 				}
+				PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, block.getLocation().clone().add(0.5, 0.5, 0.5), cat.getLocation().clone().add(0, cat.getHeight() / 2, 0));
+				line.countPerMeter(10).spawnAsEnemy();
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_CAT_HURT, SoundCategory.HOSTILE, 1f, 1f);
 				return false;
 			} else {
@@ -176,6 +179,7 @@ public class SpawnerUtils {
 				// set health to specified
 				Objects.requireNonNull(cat.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(catHealth);
 				cat.setHealth(catHealth);
+				cat.addScoreboardTag("Hostile");
 				spawnerCatMap.put(block.getLocation(), cat.getUniqueId());
 				spawnersWithCat.add(block.getLocation());
 
@@ -939,7 +943,15 @@ public class SpawnerUtils {
 
 				for (Player player : spawnerLocation.getWorld().getPlayers()) {
 					if (player.getLocation().distance(spawnerLocation) > ensnareRadius && player.getLocation().distance(spawnerLocation) < ensnareRadius + 5) {
-						MovementUtils.pullTowardsNormalized(spawnerLocation, player, 0.8f, false);
+						if (player.getGameMode() == GameMode.SPECTATOR) {
+							continue;
+						}
+						Location playerLoc = player.getLocation().clone();
+						playerLoc.setY(spawnerLocation.getY());
+						double horizontalDistance = playerLoc.distance(spawnerLocation);
+						if (horizontalDistance > ensnareRadius && horizontalDistance < ensnareRadius + 5) {
+							MovementUtils.pullTowardsNormalized(spawnerLocation, player, 0.8f, false);
+						}
 					}
 				}
 

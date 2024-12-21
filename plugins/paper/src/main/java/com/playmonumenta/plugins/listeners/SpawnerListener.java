@@ -12,7 +12,13 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.actions.ParticleHaloTask;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.SpawnerUtils;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -252,6 +258,25 @@ public class SpawnerListener implements Listener {
 				if (spawnedEntity instanceof LivingEntity livingEntity) {
 					MMLog.fine(() -> "SpawnerListener: Started tracking mob: " + mob.getUniqueId());
 					mMobInfos.put(livingEntity.getUniqueId(), new MobInfo(livingEntity));
+					MobInfo mobInfo = new MobInfo((LivingEntity) spawnedEntity);
+					spawnerInfo.add(mobInfo);
+					if (SpawnerUtils.getSpawnerType(spawnerBlock, SpawnerUtils.GUARDED_ATTRIBUTE) > 0) {
+						if (!(spawnedEntity instanceof Player)) {
+							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_CHAIN_FALL, SoundCategory.HOSTILE, 0.5f, 1f);
+							ParticleHaloTask haloTask = new ParticleHaloTask((LivingEntity) spawnedEntity, Particle.SCULK_SOUL);
+							haloTask.start();
+							PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, spawnerBlock.getLocation().clone().add(0.5, 0.5, 0.5), spawnedEntity.getLocation().clone().add(0, spawnedEntity.getHeight() / 2, 0));
+							line.countPerMeter(10).spawnAsEnemy();
+						}
+					}
+					if (getProtector(spawnerBlock) && !(spawnedEntity instanceof Player)) {
+						GlowingManager.startGlowing(spawnedEntity, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
+						spawnedEntity.setInvulnerable(true);
+						if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
+							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
+							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
+						}
+					}
 				} else {
 					DelvesManager.setForcedReferenceToSpawner(null);
 				}
@@ -288,7 +313,14 @@ public class SpawnerListener implements Listener {
 				int decaying = SpawnerUtils.getSpawnerType(spawnerBlock, SpawnerUtils.DECAYING_ATTRIBUTE);
 				if (decaying > 0) {
 					decaying--;
+					Particle.DustOptions mBROWN = new Particle.DustOptions(Color.fromRGB(125, 80, 9), 1.0f);
 					SpawnerUtils.setSpawnerType(spawnerBlock, SpawnerUtils.DECAYING_ATTRIBUTE, decaying);
+					spawnerBlock.getLocation().getNearbyPlayers(15).forEach(player ->
+						ParticleUtils.drawSevenSegmentNumber(
+							SpawnerUtils.getSpawnerType(spawnerBlock, SpawnerUtils.DECAYING_ATTRIBUTE), spawnerBlock.getLocation().clone().add(0.5, 2, 0.5),
+							player, 0.65, 0.5, Particle.REDSTONE, mBROWN
+						)
+					);
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_SAND_PLACE, SoundCategory.HOSTILE, 0.85f, 2f);
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_AZALEA_FALL, SoundCategory.HOSTILE, 0.60f, 2f);
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_SAND_PLACE, SoundCategory.HOSTILE, 0.85f, 2f);
