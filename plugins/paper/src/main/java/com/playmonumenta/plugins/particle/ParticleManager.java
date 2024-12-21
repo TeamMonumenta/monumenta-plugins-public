@@ -98,6 +98,7 @@ public final class ParticleManager {
 
 	public static class ParticlePacket {
 		public final WeakReference<Player> mPlayer;
+		public final UUID mPlayerUUID;
 		public final Particle mParticle;
 		public final double mX;
 		public final double mY;
@@ -112,6 +113,7 @@ public final class ParticleManager {
 
 		public ParticlePacket(Particle particle, Player player, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable Object data, boolean force) {
 			mPlayer = new WeakReference<Player>(player);
+			mPlayerUUID = player.getUniqueId();
 			mParticle = particle;
 			mX = x;
 			mY = y;
@@ -123,6 +125,24 @@ public final class ParticleManager {
 			mExtra = extra;
 			mData = data;
 			mForce = force;
+		}
+
+		@Override
+		public String toString() {
+			return "ParticlePacket{" +
+				"mPlayerUUID=" + mPlayerUUID +
+				", mParticle=" + mParticle +
+				", mX=" + mX +
+				", mY=" + mY +
+				", mZ=" + mZ +
+				", mCount=" + mCount +
+				", mOffsetX=" + mOffsetX +
+				", mOffsetY=" + mOffsetY +
+				", mOffsetZ=" + mOffsetZ +
+				", mExtra=" + mExtra +
+				", mData=" + mData +
+				", mForce=" + mForce +
+				'}';
 		}
 	}
 
@@ -214,18 +234,23 @@ public final class ParticleManager {
 			return;
 		}
 		mIsFlushing.set(true);
+		ParticlePacket particle = null;
 		try {
-			ParticlePacket particle;
-			// PartialParticleBuilder particle;
 			while ((particle = mPendingParticles.poll()) != null) {
 				Player player = particle.mPlayer.get();
 				if (player == null) {
 					continue;
 				}
 				sendParticle(particle.mParticle, player, particle.mX, particle.mY, particle.mZ, particle.mCount, particle.mOffsetX, particle.mOffsetY, particle.mOffsetZ, particle.mExtra, particle.mData, particle.mForce);
-				// particle.spawn();
+			}
+		} catch (Exception ex) {
+			if (particle != null) {
+				MMLog.severe("Error flushing particles (potentially malformed particle?): \n" + particle.toString(), ex);
+			} else {
+				MMLog.severe("Error flushing particles: ", ex);
 			}
 		} finally {
+			mPendingParticles.clear();
 			mIsFlushing.set(false);
 			mIsFlushQueued.set(false);
 		}
@@ -242,7 +267,7 @@ public final class ParticleManager {
 	}
 
 	public static <T> boolean sendParticle(Particle particle, Player reciever, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data, boolean force) {
-		NmsUtils.getVersionAdapter().sendParticle(particle, reciever, x, y, z, count, offsetX, offsetY, offsetZ, extra, data, force);
-		return true;
+		int num = NmsUtils.getVersionAdapter().sendParticle(particle, reciever, x, y, z, count, offsetX, offsetY, offsetZ, extra, data, force);
+		return num == 0;
 	}
 }

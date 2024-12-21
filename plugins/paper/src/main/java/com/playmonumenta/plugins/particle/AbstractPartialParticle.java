@@ -418,10 +418,7 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 			packagedValues.count(count);
 		}
 		mSpawnedParticles += packagedValues.count();
-		if (!(mDirectionalMode || isDeltaVaried() || isExtraVaried())) {
-			ParticleManager.addParticleToQueue(packagedValues.copy());
-			// packagedValues.spawn();
-		} else {
+		if (mDirectionalMode || isDeltaVaried() || isExtraVaried()) {
 			PartialParticleBuilder variedClone = packagedValues.copy();
 
 			int loops = packagedValues.count();
@@ -463,9 +460,11 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 					variedClone.extra(packagedValues.extra() + FastUtils.randomDoubleInRange(-mExtraVariance, mExtraVariance));
 				}
 
-				ParticleManager.addParticleToQueue(variedClone);
+				ParticleManager.addParticleToQueue(variedClone.copy());
 				// variedClone.spawn();
 			}
+		} else {
+			ParticleManager.addParticleToQueue(packagedValues.copy());
 		}
 	}
 

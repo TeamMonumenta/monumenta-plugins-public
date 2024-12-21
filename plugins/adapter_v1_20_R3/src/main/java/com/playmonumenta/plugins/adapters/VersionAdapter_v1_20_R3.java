@@ -600,6 +600,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		if (!timeout && unflushedQueueBytes >= mRetryQueueByes) {
 			return 1;
 		}
+		// translate particles from legacy format (why bukkit)
 		final ClientboundLevelParticlesPacket packet = new ClientboundLevelParticlesPacket(CraftParticle.createParticleParam(particle, data), force, x, y, z, (float) offsetX, (float) offsetY, (float) offsetZ, (float) extra, count);
 		if (unflushedQueueBytes >= mFlushQueueBytes && timeout) {
 			mFlushingPlayers.put(uuid, currentTime);
