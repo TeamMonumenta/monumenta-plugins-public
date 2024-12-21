@@ -514,11 +514,11 @@ public class EntityListener implements Listener {
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
 					event.setCancelled(true);
-					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES)) {
+					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.DISABLE_MAGIC_TESS)) {
 						EnderPearlTracker.startTracking(player, newPearl);
 					}
 				} else {
-					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES)) {
+					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.DISABLE_MAGIC_TESS)) {
 						EnderPearlTracker.startTracking(player, origPearl);
 					}
 				}

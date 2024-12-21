@@ -25,6 +25,7 @@ public class ZoneUtils {
 		BONE_MEAL_DISABLED("Bone Meal Disabled"),
 		BROOMSTICK_ENABLED("Broomstick Enabled"),
 		DISABLE_GRAVES("Disable Graves"),
+		DISABLE_MAGIC_TESS("DisableMagicTess"),
 		DISABLE_REDSTONE_INTERACTIONS("Disable Redstone Interactions"),
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
 		ITEM_FRAMES_EDITABLE("Item Frames Editable"),

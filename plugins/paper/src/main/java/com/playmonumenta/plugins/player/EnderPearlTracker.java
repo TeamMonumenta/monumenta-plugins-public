@@ -70,7 +70,9 @@ public class EnderPearlTracker {
 						Location teleportLocation = new Location(loc.getWorld(), playerBox.getCenterX(), playerBox.getMinY(), playerBox.getCenterZ(),
 							mPlayer.getLocation().getYaw(), mPlayer.getLocation().getPitch());
 						if (!ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)
-							    && !ZoneUtils.hasZoneProperty(teleportLocation, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+							    && !ZoneUtils.hasZoneProperty(teleportLocation, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)
+								&& !ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.DISABLE_MAGIC_TESS)
+								&& !ZoneUtils.hasZoneProperty(teleportLocation, ZoneUtils.ZoneProperty.DISABLE_MAGIC_TESS)) {
 							// UNKNOWN cause to prevent the teleport runnable from changing the player's arrival location (and potentially allowing exploits again)
 							mPlayer.teleport(teleportLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						}
