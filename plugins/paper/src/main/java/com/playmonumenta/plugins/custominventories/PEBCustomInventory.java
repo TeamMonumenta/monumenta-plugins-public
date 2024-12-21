@@ -921,7 +921,7 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldStarpoint 2").playerMessage("No music will be played in the wilderness of Star Point."),
 
 			new PebItem(15, "Plots and Playerplots Music",
-				"Enable or disable strike music.", NamedTextColor.LIGHT_PURPLE,
+				"Enable or disable plots/playerplots music.", NamedTextColor.LIGHT_PURPLE,
 				Material.CRAFTING_TABLE, false),
 			new PebItem(24, "Official Theme",
 				"The official Plots theme will be played when on the Plots and Playerplots shards.", NamedTextColor.LIGHT_PURPLE,
@@ -934,7 +934,20 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.BLUE_BED, false).serverCommand("scoreboard players set @S MusicPlots 2").playerMessage("Your custom music file will now be played while on Plots and Playerplots shards."),
 			new PebItem(51, "No Theme",
 				"No music will be played when on the Plots and Playerplots shards", NamedTextColor.LIGHT_PURPLE,
-				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicPlots 3").playerMessage("No music will now be played on Plots and Playerplots shards.")
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicPlots 3").playerMessage("No music will now be played on Plots and Playerplots shards."),
+
+			new PebItem(16, "Lobby Music",
+				"Choose what to play in lobbies", NamedTextColor.LIGHT_PURPLE,
+				Material.REDSTONE_LAMP, false),
+			new PebItem(25, "Monument Theme",
+				"The official Monument theme will play in lobbies", NamedTextColor.LIGHT_PURPLE,
+				Material.LANTERN, false).serverCommand("scoreboard players set @S MusicLobby 0").playerMessage("The official Monument theme will now play in lobbies."),
+			new PebItem(34, "Custom Lobby Music",
+				"The \"customoverworldlobby.ogg\" file in your music pack will play in lobbies.", NamedTextColor.LIGHT_PURPLE,
+				Material.SOUL_LANTERN, false).serverCommand("scoreboard players set @S MusicLobby 1").playerMessage("The custom music file you set will now play in lobbies."),
+			new PebItem(43, "No Theme",
+				"No Lobby Music", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicLobby 2").playerMessage("No music will be played in lobbies.")
 		);
 
 		// Sound Delays
@@ -952,7 +965,6 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(39, "No Delay",
 				"There will be no delay between loops of the official theme. There will be 4 minutes between the start of each play of a custom theme.", NamedTextColor.LIGHT_PURPLE,
 				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldDelay 1").playerMessage("There will be no delay between loops of the official theme."),
-
 			new PebItem(22, "Dungeon Music Delay",
 				"", NamedTextColor.LIGHT_PURPLE,
 				Material.WOODEN_PICKAXE, false),
