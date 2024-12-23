@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeSet;
@@ -36,8 +37,13 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataHolder;
+import org.bukkit.persistence.PersistentDataType;
 
 public class ChestUtils {
+	public static final NamespacedKey NON_LOOT_LIMITED
+		= Objects.requireNonNull(NamespacedKey.fromString("monumenta:non_looting_limited"));
 	private static final double[] BONUS_ITEMS = {
 			0, // Dummy value, this is a player count indexed array
 			0.5,
@@ -361,6 +367,29 @@ public class ChestUtils {
 		ItemUtils.setPlainTag(chest);
 
 		return chest;
+	}
+
+	public static boolean isNonLootLimitedChest(Block block) {
+		if (block.getState() instanceof PersistentDataHolder persistentDataHolder) {
+			return Boolean.TRUE.equals(
+				persistentDataHolder
+					.getPersistentDataContainer()
+					.get(NON_LOOT_LIMITED, PersistentDataType.BOOLEAN)
+			);
+		}
+
+		return false;
+	}
+
+	public static void setNonLootLimitedChest(Block block, boolean value) {
+		if (block instanceof PersistentDataHolder persistentDataHolder) {
+			PersistentDataContainer dataContainer = persistentDataHolder.getPersistentDataContainer();
+			if (value) {
+				dataContainer.set(NON_LOOT_LIMITED, PersistentDataType.BOOLEAN, true);
+			} else {
+				dataContainer.remove(NON_LOOT_LIMITED);
+			}
+		}
 	}
 
 }

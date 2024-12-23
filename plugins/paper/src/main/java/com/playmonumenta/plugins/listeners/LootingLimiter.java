@@ -21,6 +21,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -93,6 +94,27 @@ public class LootingLimiter implements Listener {
 			Math.min(ScoreboardUtils.getScoreboardValue(player, KILLS_SCORE).orElse(0) + score, MAX_BANKED_CHESTS * ServerProperties.getLootingLimiterMobKills()));
 	}
 
+	// Chest place event (ignore loot chests the player places, ie from boss loot)
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockPlaceEvent(BlockPlaceEvent event) {
+		if ((ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0)
+			|| ServerProperties.getLootingLimiterIgnoreBreakingChests()) {
+			return;
+		}
+		Player player = event.getPlayer();
+		if (player.getGameMode().equals(GameMode.CREATIVE)) {
+			return;
+		}
+
+		Block block = event.getBlock();
+		if (!ChestUtils.isChestWithLootTable(block)) {
+			return;
+		}
+
+		ChestUtils.setNonLootLimitedChest(block, true);
+	}
+
 	// chest break checks
 
 	// explode events are handled by ChestOverride, as that code is called before this one would be
@@ -126,6 +148,11 @@ public class LootingLimiter implements Listener {
 			return true;
 		}
 		if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.LOOTING_LIMITER_DISABLED, "looting_limiter_disabled")) {
+			return true;
+		}
+		if (ChestUtils.isNonLootLimitedChest(block)) {
+			// The chest is about to have its loot table rolled; remove this marker
+			ChestUtils.setNonLootLimitedChest(block, false);
 			return true;
 		}
 		if (ChestUtils.isChestWithLootTable(block)) {

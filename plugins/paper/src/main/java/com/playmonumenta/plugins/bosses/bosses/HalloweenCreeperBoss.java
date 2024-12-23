@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -67,6 +68,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESTRICTED)
 								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 								block.setType(Material.CHEST);
+								ChestUtils.setNonLootLimitedChest(block, true);
 								if (block.getState() instanceof Chest chest) {
 									chest.customName(Component.text("Creeperween Chest", NamedTextColor.GOLD, TextDecoration.BOLD));
 									chest.setLootTable(Bukkit.getLootTable(LOOT_TABLE));
