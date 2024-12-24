@@ -45,7 +45,7 @@ public class RegionScalingDamageDealt implements Enchantment {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		event.setDamage(event.getDamage() * DAMAGE_DEALT_MULTIPLIER[Math.max(0, Math.min((int) value, DAMAGE_DEALT_MULTIPLIER.length - 1))]);
+		event.setDamage(event.getFlatDamage() * DAMAGE_DEALT_MULTIPLIER[Math.max(0, Math.min((int) value, DAMAGE_DEALT_MULTIPLIER.length - 1))]);
 	}
 
 	@Override
