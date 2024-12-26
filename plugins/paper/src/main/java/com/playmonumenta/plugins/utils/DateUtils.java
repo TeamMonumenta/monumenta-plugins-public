@@ -189,6 +189,14 @@ public class DateUtils {
 		return getDaysSinceEpoch(localDateTime) - getDaysIntoWeeklyVersion(localDateTime) + 1;
 	}
 
+	public static LocalDateTime getWeeklyVersionLocalStartDate() {
+		return getWeeklyVersionLocalStartDate(localDateTime());
+	}
+
+	public static LocalDateTime getWeeklyVersionLocalStartDate(LocalDateTime localDateTime) {
+		return localDateTime(getWeeklyVersionStartDate(localDateTime));
+	}
+
 	public static long getWeeklyVersionEndDate() {
 		return getWeeklyVersionEndDate(localDateTime());
 	}
@@ -203,6 +211,14 @@ public class DateUtils {
 
 	public static long getNextWeeklyVersionStartDate(LocalDateTime localDateTime) {
 		return getWeeklyVersionStartDate(localDateTime) + 7;
+	}
+
+	public static LocalDateTime getStartOfMonth() {
+		return getStartOfMonth(localDateTime());
+	}
+
+	public static LocalDateTime getStartOfMonth(LocalDateTime localDateTime) {
+		return LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0, 0);
 	}
 
 	public static String untilNewDay() {

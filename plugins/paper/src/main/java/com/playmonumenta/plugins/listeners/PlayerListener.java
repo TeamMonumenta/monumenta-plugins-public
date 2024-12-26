@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.managers.DungeonAccessManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
@@ -240,6 +241,7 @@ public class PlayerListener implements Listener {
 		POIManager.getInstance().playerJoinEvent(event);
 		mPlugin.mAbilityManager.playerJoinEvent(player, event);
 
+		DungeonAccessManager.updateVisitTime(player);
 		DailyReset.handle(player);
 
 		ParticleManager.updateParticleSettings(player);

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.server.reset;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.managers.DungeonAccessManager;
 import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.utils.DateUtils;
@@ -229,6 +230,9 @@ public class DailyReset {
 			return;
 		}
 		boolean isNewWeek = DateUtils.getWeeklyVersion(dailyVersion) != DateUtils.getWeeklyVersion();
+
+		// Dungeon access checks
+		DungeonAccessManager.checkPlayerAccess(player);
 
 		//  If so reset some scoreboards and message the player.
 		String commandStr = DAILY_PLAYER_CHANGES_COMMAND.replace("@S", player.getName());
