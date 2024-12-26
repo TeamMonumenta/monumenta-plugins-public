@@ -157,6 +157,7 @@ public enum EffectType {
 	BLEED("Bleed", "Bleed", false, false, false),
 
 	STASIS("Stasis", "Stasis", true, false, true),
+	SILENCE("Silence", "Silence", false, false, true),
 	PARADOX("Paradox", "Paradox", false, false, true),
 	INFUSED_LIFE("InfusedLife", "Infusion of Life", false, false, true),
 	REINCARNATION("Reincarnation", "Reincarnation", false, false, true),
@@ -411,6 +412,12 @@ public enum EffectType {
 				AbilityUtils.applyStealth(plugin, player, duration);
 			}
 			return;
+		} else if (effectType == SILENCE) {
+			if (entity instanceof Player player) {
+				AbilityUtils.silencePlayer(player, duration);
+			} else {
+				EntityUtils.applySilence(plugin, duration, entity);
+			}
 		}
 
 		String sourceString = source != null ? source : effectType.mType;
