@@ -533,7 +533,7 @@ public class DepthsManager {
 			Component teamMessage = null;
 			Component playerMessage = null;
 			Component playerName = p.displayName();
-			Component abilityName = colorAbilityWithHover(name, displayLevel, previousLevel, p);
+			Component abilityName = info.getNameWithHover(displayLevel, previousLevel, p, true);
 			if (tree != null) {
 				if (level == 0) {
 					Component message = Component.text("lost ability: ").append(abilityName).append(Component.text("!"));
@@ -580,14 +580,6 @@ public class DepthsManager {
 		if (previousLevel == 0 && level > 0) {
 			info.onGain(p);
 		}
-	}
-
-	public Component colorAbilityWithHover(String name, int rarity, int prevRarity, Player p) {
-		DepthsAbilityInfo<?> info = getAbility(name);
-		if (info == null) {
-			return Component.text(name);
-		}
-		return info.getNameWithHover(rarity, prevRarity, p);
 	}
 
 	/**

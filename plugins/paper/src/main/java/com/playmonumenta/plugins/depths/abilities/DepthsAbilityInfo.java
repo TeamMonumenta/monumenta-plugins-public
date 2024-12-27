@@ -330,17 +330,8 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return mDepthsTree.color(name);
 	}
 
-	public Component getNameWithHover(Player player) {
-		T ability = getPlayerAbility(Plugin.getInstance(), player);
-		int rarity = 1;
-		if (ability != null) {
-			rarity = ability.getAbilityScore();
-		}
-		return getNameWithHover(rarity, 0, player);
-	}
-
-	public Component getNameWithHover(int rarity, int prevRarity, Player player) {
-		ItemStack item = createAbilityItem(rarity, prevRarity, 0, player, false);
+	public Component getNameWithHover(int rarity, int prevRarity, Player player, boolean useAbility) {
+		ItemStack item = createAbilityItem(rarity, prevRarity, 0, player, useAbility);
 		return getColoredName().hoverEvent(item.asHoverEvent());
 	}
 }
