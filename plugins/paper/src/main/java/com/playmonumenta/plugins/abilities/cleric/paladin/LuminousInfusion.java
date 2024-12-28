@@ -128,6 +128,13 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 		if (!consumeCharge()) {
 			return false;
 		}
+
+		if (mPrimedStacks == 0) {
+			mCosmetic.infusionStartEffect(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedStacks);
+		} else {
+			mCosmetic.infusionAddStack(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedStacks);
+		}
+
 		mPrimedStacks = Math.min(mPrimedStacks + 1, mMaxCharges);
 
 		if (all) {
@@ -136,8 +143,6 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 				mPrimedStacks = Math.min(mPrimedStacks + 1, mMaxCharges);
 			}
 		}
-
-		mCosmetic.infusionStartEffect(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedStacks);
 
 		if (mCancelRunnable != null) {
 			mCancelRunnable.cancel();
@@ -153,7 +158,9 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 				if (mT >= EXPIRE_TICKS || mPrimedStacks <= 0) {
 					for (int i = mPrimedStacks; i > 0; i--) {
 						incrementCharge();
-						mCosmetic.gainMaxCharge(mPlayer, mPlayer.getLocation());
+						if (mCharges == mMaxCharges) {
+							mCosmetic.gainMaxCharge(mPlayer, mPlayer.getLocation());
+						}
 					}
 					mPrimedStacks = 0;
 					if (mT >= EXPIRE_TICKS) {
@@ -237,7 +244,7 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 		final float volumeScaling = (float) Math.sqrt(ratio);
 		final Location loc = damagee.getLocation();
 		final World world = mPlayer.getWorld();
-		mCosmetic.infusionHitEffect(world, mPlayer, damagee, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS * stacks), ratio, volumeScaling);
+		mCosmetic.infusionHitEffect(world, mPlayer, damagee, stacks * (RADIUS + CharmManager.getLevel(mPlayer, CHARM_RADIUS)), ratio, volumeScaling);
 
 		final List<LivingEntity> affected = new Hitbox.SphereHitbox(loc, stacks * (RADIUS + CharmManager.getLevel(mPlayer, CHARM_RADIUS))).getHitMobs();
 		for (final LivingEntity entity : affected) {

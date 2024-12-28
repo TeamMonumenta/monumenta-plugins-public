@@ -786,7 +786,7 @@ public class ItemUtils {
 		//Colossal is also an extra 50% chance to not lose durability on top of unbreaking
 		//Need to add all enchantments to do with durability here
 		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-		if (player.getGameMode() == GameMode.CREATIVE || meta == null) {
+		if (player.getGameMode() == GameMode.CREATIVE || meta == null || item.getType().getMaxDurability() == 0) {
 			return;
 		}
 
