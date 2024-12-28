@@ -71,7 +71,7 @@ public class UpdateGuilds {
 
 						for (GuildPermission guildPermission : GuildPermission.values()) {
 							if (accessLevel.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
-								guildPermission.setExplicitPermission(guildRoot, accessGroup, true);
+								guildPermission.setExplicitPermission(guildRoot, accessGroup, true).join();
 							}
 						}
 					}

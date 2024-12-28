@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms.guildgui;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
@@ -194,7 +195,8 @@ public class PermissionView extends View {
 
 		item.setItemMeta(meta);
 		mGui.setItem(row, column, item).onClick((InventoryClickEvent event) -> {
-			if (mGui.mGuildGroup == null) {
+			Group guildGroup = mGui.mGuildGroup;
+			if (guildGroup == null) {
 				return;
 			}
 
@@ -202,37 +204,35 @@ public class PermissionView extends View {
 				return;
 			}
 
+			final @Nullable Boolean value;
+			final Sound sound;
 			switch (event.getHotbarButton()) {
 				case 0 -> {
-					guildPermission.setExplicitPermission(mGui.mGuildGroup, mTarget, true);
-					mGui.mPlayer.playSound(mGui.mPlayer,
-						Sound.ENTITY_VILLAGER_YES,
-						SoundCategory.PLAYERS,
-						1.0f,
-						1.0f);
-					mGui.refresh();
+					value = true;
+					sound = Sound.ENTITY_VILLAGER_YES;
 				}
 				case 1 -> {
-					guildPermission.setExplicitPermission(mGui.mGuildGroup, mTarget, null);
-					mGui.mPlayer.playSound(mGui.mPlayer,
-						Sound.ENTITY_VILLAGER_TRADE,
-						SoundCategory.PLAYERS,
-						1.0f,
-						1.0f);
-					mGui.refresh();
+					value = null;
+					sound = Sound.ENTITY_VILLAGER_TRADE;
 				}
 				case 2 -> {
-					guildPermission.setExplicitPermission(mGui.mGuildGroup, mTarget, false);
-					mGui.mPlayer.playSound(mGui.mPlayer,
-						Sound.ENTITY_VILLAGER_NO,
-						SoundCategory.PLAYERS,
-						1.0f,
-						1.0f);
-					mGui.refresh();
+					value = false;
+					sound = Sound.ENTITY_VILLAGER_NO;
 				}
 				default -> {
+					return;
 				}
 			}
+			mGui.mPlayer.playSound(mGui.mPlayer,
+				sound,
+				SoundCategory.PLAYERS,
+				1.0f,
+				1.0f);
+
+			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+				guildPermission.setExplicitPermission(guildGroup, mTarget, value).join();
+				mGui.refresh();
+			});
 		});
 	}
 

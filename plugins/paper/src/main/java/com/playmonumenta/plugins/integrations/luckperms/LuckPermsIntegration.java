@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
@@ -342,6 +341,19 @@ public class LuckPermsIntegration implements Listener {
 	@Contract("null -> false")
 	public static boolean isValidGuild(@Nullable Group guild) {
 		return getGuildRoot(guild) != null;
+	}
+
+	public static CompletableFuture<Set<UUID>> getUsersWithGuildPermissions(String guildPlainTag) {
+		CompletableFuture<Set<UUID>> future = new CompletableFuture<>();
+		String guildPermissionPrefix = GuildPermission.guildPermissionStringPrefix(guildPlainTag);
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				future.complete(UM.searchAll(NodeMatcher.keyStartsWith(guildPermissionPrefix)).join().keySet());
+			} catch (Throwable throwable) {
+				future.completeExceptionally(throwable);
+			}
+		});
+		return future;
 	}
 
 	public static Set<Group> getRelevantGuilds(Player player, boolean includeMembership, boolean includeInvited) {
@@ -1568,14 +1580,16 @@ public class LuckPermsIntegration implements Listener {
 		pluginData.addProperty("isAdmin", isAdmin);
 		pluginData.addProperty("prefix", prefix);
 		pluginData.addProperty("suffix", suffix);
+
 		// skin stuff
-		@Nullable PlayerProfile profile = Bukkit.createProfile(uuid);
-		if (profile != null) {
-			ProfileProperty skin = profile.getProperties().stream().filter(p -> p.getName().equals("textures")).findFirst().orElse(null);
-			if (skin != null) {
-				pluginData.addProperty("signed_texture", skin.getValue() + ";" + skin.getSignature());
-			}
-		}
+		Bukkit.createProfile(uuid)
+			.getProperties()
+			.stream()
+			.filter(p -> p.getName().equals("textures"))
+			.findFirst()
+			.ifPresent(skin ->
+				pluginData.addProperty("signed_texture", skin.getValue() + ";" + skin.getSignature())
+			);
 		return pluginData;
 	}
 }

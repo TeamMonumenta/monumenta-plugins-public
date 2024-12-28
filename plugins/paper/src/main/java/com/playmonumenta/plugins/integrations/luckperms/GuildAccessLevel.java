@@ -93,31 +93,30 @@ public enum GuildAccessLevel {
 		}
 		String rootIdWithSeparator = root.getName() + ".";
 
-		NodeMap targetData = target.data();
-		for (Node node : targetData.toCollection()) {
-			if (!(node instanceof InheritanceNode inheritanceNode)) {
-				continue;
-			}
-
-			if (inheritanceNode.getGroupName().startsWith(rootIdWithSeparator)) {
-				GuildAccessLevel foundAccessLevel = byGroup(inheritanceNode.getGroupName());
-				if (!NONE.equals(foundAccessLevel)) {
-					targetData.remove(inheritanceNode);
-					for (GuildPermission guildPermission : GuildPermission.values()) {
-						guildPermission.setExplicitPermission(guild, target, null);
-					}
-				}
-			}
-		}
-
-		if (NONE.equals(targetLevel)) {
-			LuckPermsIntegration.pushUserUpdate(target);
-			future.complete(target);
-			return future;
-		}
-
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
+				NodeMap targetData = target.data();
+				for (Node node : targetData.toCollection()) {
+					if (!(node instanceof InheritanceNode inheritanceNode)) {
+						continue;
+					}
+
+					if (inheritanceNode.getGroupName().startsWith(rootIdWithSeparator)) {
+						GuildAccessLevel foundAccessLevel = byGroup(inheritanceNode.getGroupName());
+						if (!NONE.equals(foundAccessLevel)) {
+							targetData.remove(inheritanceNode);
+							for (GuildPermission guildPermission : GuildPermission.values()) {
+								guildPermission.setExplicitPermission(guild, target, null).join();
+							}
+						}
+					}
+				}
+
+				if (NONE.equals(targetLevel)) {
+					LuckPermsIntegration.pushUserUpdate(target);
+					future.complete(target);
+				}
+
 				Group targetGroup = targetLevel.loadGroupFromRoot(guild).join().orElse(null);
 				if (targetGroup == null) {
 					throw new Exception("Could not get " + targetLevel.mId + " for guild " + guild.getName());

@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import com.playmonumenta.plugins.Plugin;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.luckperms.api.model.PermissionHolder;
@@ -10,6 +15,7 @@ import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.query.QueryOptions;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,12 +104,17 @@ public enum GuildPermission {
 			// Guild not found
 			return null;
 		}
-		return GUILD_PERM_PREFIX + partialId + "." + mSubPerm;
+		return guildPermissionStringPrefix(partialId) + mSubPerm;
+	}
+
+	public static String guildPermissionStringPrefix(String guildPlainTag) {
+		String partialId = LuckPermsIntegration.getCleanLpString(guildPlainTag);
+		return GUILD_PERM_PREFIX + partialId + ".";
 	}
 
 	public String guildPermissionStringFromPlainTag(String guildPlainTag) {
 		String partialId = LuckPermsIntegration.getCleanLpString(guildPlainTag);
-		return GUILD_PERM_PREFIX + partialId + "." + mSubPerm;
+		return guildPermissionStringPrefix(partialId) + mSubPerm;
 	}
 
 	/**
@@ -132,10 +143,13 @@ public enum GuildPermission {
 	 * @param permissionHolder The user or group whose access is being modified (usually a player or the owning guild)
 	 * @param value Whether the permission is true, false, or falls through to the guild or default of false
 	 */
-	public void setExplicitPermission(Group guild, PermissionHolder permissionHolder, @Nullable Boolean value) {
+	public CompletableFuture<Void> setExplicitPermission(Group guild, PermissionHolder permissionHolder, @Nullable Boolean value) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
 		String guildPerm = guildPermissionString(guild);
 		if (guildPerm == null) {
-			return;
+			future.complete(null);
+			return future;
 		}
 
 		NodeMap data = permissionHolder.data();
@@ -155,11 +169,122 @@ public enum GuildPermission {
 		}
 
 		if (permissionHolder instanceof Group group) {
-			LuckPermsIntegration.GM.saveGroup(group);
+			LuckPermsIntegration.GM.saveGroup(group).join();
 			LuckPermsIntegration.pushUpdate();
 		} else if (permissionHolder instanceof User user) {
 			LuckPermsIntegration.pushUserUpdate(user);
 		}
+
+		if (permissionHolder instanceof Group group) {
+			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+				LuckPermsIntegration.GM.saveGroup(group).join();
+				LuckPermsIntegration.pushUpdate();
+				future.complete(null);
+			});
+		} else if (permissionHolder instanceof User user) {
+			LuckPermsIntegration.pushUserUpdate(user);
+			future.complete(null);
+		}
+
+		return future;
+	}
+
+	public static CompletableFuture<Void> clearExplicitPermissions(PermissionHolder permissionHolder, String oldGuildTag) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
+		String guildPermPrefix = guildPermissionStringPrefix(oldGuildTag);
+
+		NodeMap data = permissionHolder.data();
+		for (Node node : new ArrayList<>(data.toCollection())) {
+			if (!(node instanceof PermissionNode permissionNode)) {
+				continue;
+			}
+
+			String permId = permissionNode.getPermission();
+			if (!permId.startsWith(guildPermPrefix)) {
+				continue;
+			}
+
+			data.remove(permissionNode);
+		}
+
+		if (permissionHolder instanceof Group group) {
+			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+				LuckPermsIntegration.GM.saveGroup(group).join();
+				LuckPermsIntegration.pushUpdate();
+				future.complete(null);
+			});
+		} else if (permissionHolder instanceof User user) {
+			LuckPermsIntegration.pushUserUpdate(user);
+			future.complete(null);
+		}
+
+		return future;
+	}
+
+	public static CompletableFuture<Void> renameExplicitPermissions(Group newGuild, PermissionHolder permissionHolder, String oldGuildTag) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
+		Map<String, String> renameMap = new HashMap<>();
+		Map<String, @Nullable Boolean> permMap = new HashMap<>();
+		for (GuildPermission guildPermission : values()) {
+			String newGuildPerm = guildPermission.guildPermissionString(newGuild);
+			if (newGuildPerm == null) {
+				future.complete(null);
+				return future;
+			}
+
+			String oldGuildPerm = guildPermission.guildPermissionStringFromPlainTag(oldGuildTag);
+
+			renameMap.put(oldGuildPerm, newGuildPerm);
+			permMap.put(oldGuildPerm, null);
+			permMap.put(newGuildPerm, null);
+		}
+
+		NodeMap data = permissionHolder.data();
+		for (Node node : new ArrayList<>(data.toCollection())) {
+			if (!(node instanceof PermissionNode permissionNode)) {
+				continue;
+			}
+
+			String permId = permissionNode.getPermission();
+			if (!permMap.containsKey(permId)) {
+				continue;
+			}
+
+			permMap.put(permId, permissionNode.getValue());
+			data.remove(permissionNode);
+		}
+
+		for (Map.Entry<String, String> renameEntry : renameMap.entrySet()) {
+			String oldPerm = renameEntry.getKey();
+			String newPerm = renameEntry.getValue();
+
+			@Nullable Boolean oldValue = permMap.get(oldPerm);
+			@Nullable Boolean newValue = permMap.get(newPerm);
+
+			if (newValue == null) {
+				newValue = oldValue;
+			}
+
+			if (newValue != null) {
+				PermissionNode permissionNode = PermissionNode.builder().permission(newPerm).value(newValue).build();
+				data.add(permissionNode);
+			}
+		}
+
+		if (permissionHolder instanceof Group group) {
+			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+				LuckPermsIntegration.GM.saveGroup(group).join();
+				LuckPermsIntegration.pushUpdate();
+				future.complete(null);
+			});
+		} else if (permissionHolder instanceof User user) {
+			LuckPermsIntegration.pushUserUpdate(user);
+			future.complete(null);
+		}
+
+		return future;
 	}
 
 	public boolean hasAccess(Group guild, Player player) {

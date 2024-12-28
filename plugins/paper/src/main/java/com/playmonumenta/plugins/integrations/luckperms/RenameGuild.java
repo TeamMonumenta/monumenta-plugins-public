@@ -16,13 +16,16 @@ import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -30,6 +33,8 @@ public class RenameGuild {
 	private static final Argument<String> NEW_NAME_ARG = new TextArgument("new name")
 		.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS);
 	private static final Argument<String> NEW_TAG_ARG = new TextArgument("new tag")
+		.replaceSuggestions(GuildArguments.TAG_SUGGESTIONS);
+	private static final Argument<String> OLD_TAG_ARG = new TextArgument("old tag")
 		.replaceSuggestions(GuildArguments.TAG_SUGGESTIONS);
 
 	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.guild.mod.renameguild");
@@ -99,8 +104,31 @@ public class RenameGuild {
 				runRenameBoth(plugin, sender, guildName, newGuildName, newTag);
 			});
 
+		CommandAPICommand fixGuildPermsSubCommand = new CommandAPICommand("fixGuildPerms")
+			.withArguments(List.of(
+				GuildCommand.GUILD_NAME_ARG,
+				OLD_TAG_ARG
+			))
+			.executes((sender, args) -> {
+				CommandUtils.checkPerm(sender, PERMISSION);
+				// Either you can run the command or it errors out.
+				if (GuildCommand.senderCannotRunCommand(sender, true)) {
+					return;
+				}
+
+				String guildName = args.getByArgument(GuildCommand.GUILD_NAME_ARG);
+				String oldTag = args.getByArgument(OLD_TAG_ARG);
+
+				runFixFailedGuildPermissionMigration(plugin, sender, guildName, oldTag);
+			});
+
 		return rootCommand
-			.withSubcommands(tagSubCommand, nameSubCommand, allSubCommand);
+			.withSubcommands(
+				tagSubCommand,
+				nameSubCommand,
+				allSubCommand,
+				fixGuildPermsSubCommand
+			);
 	}
 
 	public static void runRenameTag(Plugin plugin, CommandSender sender, String guild, String newTag) {
@@ -115,6 +143,58 @@ public class RenameGuild {
 			Component res = renameGuild(plugin, oldName, newName, sender).join();
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> sender.sendMessage(res));
 		});
+	}
+
+	public static void runFixFailedGuildPermissionMigration(Plugin plugin, CommandSender sender, String guildName, String oldTag) {
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			Component res = fixFailedGuildPermissionMigration(plugin, sender, guildName, oldTag).join();
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> sender.sendMessage(res));
+		});
+	}
+
+	public static CompletableFuture<Component> fixFailedGuildPermissionMigration(Plugin plugin, CommandSender sender, String guildName, String oldTag) {
+		CompletableFuture<Component> future = new CompletableFuture<>();
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			String currentId = GuildArguments.getIdFromName(guildName);
+			if (currentId == null) {
+				future.complete(Component.text("Could not identify guild by name: '"
+					+ guildName + "'.", NamedTextColor.RED));
+				return;
+			}
+
+			Group currentRoot = LuckPermsIntegration.GM.loadGroup(currentId).join().orElse(null);
+			if (currentRoot == null) {
+				future.complete(Component.text("Cannot fix old permissions for '"
+					+ guildName + "' as this guild does not exist.", NamedTextColor.RED));
+				return;
+			}
+
+			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
+				if (GuildAccessLevel.NONE.equals(accessLevel)) {
+					continue;
+				}
+
+				Group accessGroup = accessLevel.loadGroupFromRoot(currentRoot).join().orElse(null);
+				if (accessGroup == null) {
+					future.complete(Component.text("Unable to load '"
+						+ accessLevel.mLabel + "' access level for '"
+						+ guildName + "'.", NamedTextColor.RED));
+					return;
+				}
+			}
+
+			for (UUID userId : LuckPermsIntegration.getUsersWithGuildPermissions(oldTag).join()) {
+				User user = LuckPermsIntegration.loadUser(userId).join();
+				if (user.getInheritedGroups(QueryOptions.nonContextual()).contains(currentRoot)) {
+					GuildPermission.renameExplicitPermissions(currentRoot, user, oldTag).join();
+				} else {
+					GuildPermission.clearExplicitPermissions(user, oldTag).join();
+				}
+			}
+			AuditListener.log("<+> Fixed guild: " + guildName + " from its old guild permissions '" + oldTag + "'\nTask Executed by " + sender.getName());
+			future.complete(Component.text("Successfully updated guild permissions with correct guild tag", NamedTextColor.GREEN));
+		});
+		return future;
 	}
 
 	public static void runRenameBoth(Plugin plugin, CommandSender sender, String oldName, String newName, String newTag) {
@@ -288,10 +368,32 @@ public class RenameGuild {
 				return;
 			}
 
+
+			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
+				if (accessLevel.equals(GuildAccessLevel.NONE)) {
+					continue;
+				}
+
+				Group accessGroup = accessLevel.loadGroupFromRoot(newRoot).join().orElse(null);
+				if (accessGroup == null) {
+					future.complete(Component.text("Unable to load access level "
+						+ accessLevel.mLabel + " for renamed guild group "
+						+ newTag + " to update its guild permissions", NamedTextColor.RED));
+					return;
+				}
+
+				GuildPermission.renameExplicitPermissions(newRoot, accessGroup, oldTag).join();
+				for (UUID userId : LuckPermsIntegration.getGroupMembers(accessGroup).join()) {
+					User user = LuckPermsIntegration.loadUser(userId).join();
+					GuildPermission.renameExplicitPermissions(newRoot, user, oldTag).join();
+				}
+			}
+
 			AuditListener.log("<+> Renamed guild: " + guildName + "'s tag to: '" + newTag + "'\nTask Executed by " + sender.getName());
 			future.complete(Component.text("Successfully changed " + guildName + "'s tag to " + newTag,
 				NamedTextColor.GOLD));
 		});
+
 		return future;
 	}
 

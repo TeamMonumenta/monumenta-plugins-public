@@ -236,12 +236,12 @@ public class CreateGuildCommand {
 			guildFounderGroupData.add(InheritanceNode.builder(guildManagerGroup).build());
 
 			for (GuildPermission guildPermission : GuildPermission.values()) {
-				guildPermission.setExplicitPermission(guildRootGroup, guildFounderGroup, true);
+				guildPermission.setExplicitPermission(guildRootGroup, guildFounderGroup, true).join();
 				if (GuildAccessLevel.MANAGER.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
-					guildPermission.setExplicitPermission(guildRootGroup, guildManagerGroup, true);
+					guildPermission.setExplicitPermission(guildRootGroup, guildManagerGroup, true).join();
 				}
 				if (GuildAccessLevel.MEMBER.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
-					guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true);
+					guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true).join();
 				}
 			}
 

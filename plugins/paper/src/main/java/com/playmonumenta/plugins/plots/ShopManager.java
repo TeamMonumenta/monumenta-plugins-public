@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -22,6 +24,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +34,7 @@ import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -42,6 +46,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
 import org.bukkit.block.Lockable;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -376,6 +381,7 @@ public class ShopManager implements Listener {
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	public static void registerCommands() {
 		/* ******************** NEW ******************** */
 		new CommandAPICommand("monumentashop")
@@ -462,6 +468,29 @@ public class ShopManager implements Listener {
 			.withArguments(new StringArgument("player name"))
 			.executesPlayer((sender, args) -> {
 				createBarrelKey(sender, args.getUnchecked("player name"));
+			})
+			.register();
+
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new LiteralArgument("utilities"))
+			.withArguments(new LiteralArgument("transferowner"))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("to player"))
+			.executesPlayer((sender, args) -> {
+				transferPlayerShop(sender, args.getUnchecked("entity"), args.getUnchecked("to player"));
+			})
+			.register();
+
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new LiteralArgument("utilities"))
+			.withArguments(new LiteralArgument("transferguild"))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
+			.withArguments(new TextArgument("to guild")
+				.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS))
+			.executesPlayer((sender, args) -> {
+				transferGuildShop(sender, args.getUnchecked("entity"), args.getUnchecked("to guild"));
 			})
 			.register();
 
@@ -622,6 +651,71 @@ public class ShopManager implements Listener {
 			/* Add a cellar floor */
 			plat.subtract(0, SHOP_DEPTH + 1, 0);
 			plat.getBlock().setType(Material.BEDROCK);
+		});
+	}
+
+	private static void transferPlayerShop(CommandSender sender, Entity shopEntity, Player player) throws WrapperCommandSyntaxException {
+		Shop shop = Shop.fromShopEntity(shopEntity);
+		shopEntity.removeScoreboardTag("shop_ownerUUID=" + shop.mOwnerUUID);
+		shopEntity.addScoreboardTag("shop_ownerUUID=" + player.getUniqueId());
+		shopEntity.removeScoreboardTag("shop_ownerName=" + shop.mOwnerName);
+		shopEntity.addScoreboardTag("shop_ownerName=" + player.getName());
+		if (!shop.isGuildShop()) {
+			shopEntity.customName(Component.text(player.getName() + "'s Shop", NamedTextColor.AQUA));
+		}
+		AuditListener.log(
+			"<+> Transferred ownership of plot at : " + shopEntity.getLocation().toVector().toBlockVector()
+				+ " from its old owner '" + shop.mOwnerName
+				+ "' to '" + player.getName()
+				+ "'\nTask Executed by " + sender.getName()
+		);
+	}
+
+	private static void transferGuildShop(Player sender, Entity shopEntity, String guildName) throws WrapperCommandSyntaxException {
+		Shop shop = Shop.fromShopEntity(shopEntity);
+		if (!shop.isGuildShop()) {
+			throw CommandAPI.failWithString("That's not a guild shop!");
+		}
+
+		String guildId = GuildArguments.getIdFromName(guildName);
+		if (guildId == null) {
+			throw CommandAPI.failWithString("Could not find a guild with the name " + guildName);
+		}
+
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				Group guild = LuckPermsIntegration.loadGroup(guildId).join().orElse(null);
+				if (guild == null) {
+					Bukkit.getScheduler().runTask(Plugin.getInstance(),
+						() -> sender.sendMessage(Component.text("Unable to load the guild " + guildName, NamedTextColor.RED)));
+					return;
+				}
+
+				String guildShopName = LuckPermsIntegration.getUnlockedGuildName(guild);
+				if (guildShopName == null) {
+					Bukkit.getScheduler().runTask(Plugin.getInstance(),
+						() -> sender.sendMessage(Component.text("Could not get the shop name for " + guildName, NamedTextColor.RED)));
+					return;
+				}
+
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					Set<String> tags = shopEntity.getScoreboardTags();
+					tags.remove("shop_ownerGuildName=" + shop.mOwnerGuildName);
+					tags.add("shop_ownerGuildName=" + guildShopName);
+					shopEntity.customName(Component.text(guildShopName + "'s Guild Shop", NamedTextColor.GREEN));
+					AuditListener.log(
+						"<+> Transferred guild of plot at : " + shopEntity.getLocation().toVector().toBlockVector()
+							+ " from '" + shop.mOwnerGuildName
+							+ "' to '" + guildShopName
+							+ "'\nTask Executed by " + sender.getName()
+					);
+				});
+			} catch (Throwable throwable) {
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					sender.sendMessage(Component.text("Transfer cancelled due to an error:", NamedTextColor.RED));
+					MessagingUtils.sendStackTrace(sender, throwable);
+				});
+			}
 		});
 	}
 

@@ -181,10 +181,9 @@ public class MonumentaNetworkChatIntegration {
 		Channel channel = getChannel(oldGuildTag);
 		try {
 			if (channel instanceof ChannelPermissionNode permissionNode) {
-				ChannelManager.renameChannel(oldGuildTag, newGuildTag);
 				permissionNode.setChannelPermission(permission);
-
-				saveChannel(channel);
+				// Has built-in save method; calling twice in a row can cause conflicts, with one valid state "winning"
+				ChannelManager.renameChannel(oldGuildTag, newGuildTag);
 				return channel;
 			} else {
 				audience.sendMessage(Component.text("Cannot change permissions for this channel", NamedTextColor.RED));
