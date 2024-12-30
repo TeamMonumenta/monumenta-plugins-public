@@ -194,16 +194,21 @@ public final class SignUtils {
 
 			player.sendBlockChange(location, signMat.createBlockData());
 
-			PacketContainer openSign = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
 			PacketContainer signData = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
 			PacketPlayOutTileEntityDataHandle signPacket = PacketPlayOutTileEntityDataHandle.createHandle(signData.getHandle());
-
-			openSign.getBlockPositionModifier().write(0, mPosition);
 
 			NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
 			if (signNBT == null) {
 				signNBT = NbtFactory.ofCompound("sign");
 			}
+
+			final var frontTextContainer = signNBT.getCompoundOrDefault("front_text");
+			final var backTextContainer = signNBT.getCompoundOrDefault("back_text");
+
+			frontTextContainer.put("has_glowing_text", (byte) 0);
+			backTextContainer.put("has_glowing_text", (byte) 0);
+			backTextContainer.getListOrDefault("messages");
+			final var frontText = frontTextContainer.getListOrDefault("messages");
 
 			for (int lineNum = 0; lineNum < SIGN_LINES; lineNum++) {
 				String lineLegacy = "";
@@ -215,7 +220,7 @@ public final class SignUtils {
 				}
 				Component lineComponent = Component.text(lineLegacy);
 				JsonElement lineJson = MessagingUtils.toGson(lineComponent);
-				signNBT.put("Text" + (lineNum + 1), lineJson.toString());
+				frontText.add(lineJson.toString());
 			}
 
 			signNBT.put("x", mPosition.getX());
@@ -229,7 +234,7 @@ public final class SignUtils {
 
 			try {
 				ProtocolLibrary.getProtocolManager().sendServerPacket(player, signData);
-				ProtocolLibrary.getProtocolManager().sendServerPacket(player, openSign);
+				NmsUtils.getVersionAdapter().sendOpenSignPacket(player, location.getBlockX(), location.getBlockY(), location.getBlockZ(), true);
 			} catch (Exception exception) {
 				exception.printStackTrace();
 			}

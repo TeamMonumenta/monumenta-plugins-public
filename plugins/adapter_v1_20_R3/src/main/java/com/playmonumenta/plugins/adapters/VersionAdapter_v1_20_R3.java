@@ -8,7 +8,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.papermc.paper.adventure.PaperAdventure;
 import io.papermc.paper.util.CollisionUtil;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -16,17 +23,29 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.network.protocol.game.ClientboundLoginPacket;
+import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
+import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
+import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.PanicGoal;
+import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
@@ -49,12 +68,33 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R3.CraftParticle;
 import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R3.entity.*;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftCreature;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftMob;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftParrot;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.scoreboard.CraftScoreboard;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftVector;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractSkeleton;
+import org.bukkit.entity.CaveSpider;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Drowned;
+import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fox;
+import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Parrot;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Spider;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
@@ -517,7 +557,6 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		((CraftEntity) entity).getHandle().moveTo(target.getX(), target.getY(), target.getZ(), yaw, pitch);
 	}
 
-	@SuppressWarnings("unchecked")
 	public JsonObject getScoreHolderScoresAsJson(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
 		final var nmsScoreboard = ((CraftScoreboard) scoreboard).getHandle();
 
@@ -678,5 +717,10 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 				respawnPacket.dataToKeep()
 			);
 		}
+	}
+
+	@Override
+	public void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b) {
+		((CraftPlayer) player).getHandle().connection.send(new ClientboundOpenSignEditorPacket(new BlockPos(blockX, blockY, blockZ), b));
 	}
 }

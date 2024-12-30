@@ -222,4 +222,9 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public Object replaceWorldNames(Object packet, Consumer<WorldNameReplacementToken> handler) {
 		return packet;
 	}
+
+	@Override
+	public void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b) {
+
+	}
 }

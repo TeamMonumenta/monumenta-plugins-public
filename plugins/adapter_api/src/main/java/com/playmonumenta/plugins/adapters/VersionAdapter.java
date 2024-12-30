@@ -239,4 +239,6 @@ public interface VersionAdapter {
 	}
 
 	Object replaceWorldNames(Object packet, Consumer<WorldNameReplacementToken> handler);
+
+	void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b);
 }
