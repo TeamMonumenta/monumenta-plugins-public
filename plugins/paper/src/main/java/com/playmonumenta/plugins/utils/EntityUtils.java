@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.common.base.Preconditions;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
@@ -80,9 +81,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-
 public class EntityUtils {
-
 	private static final EnumSet<EntityType> UNDEAD_MOBS = EnumSet.of(
 		EntityType.ZOMBIE,
 		EntityType.ZOMBIE_VILLAGER,
@@ -498,7 +497,9 @@ public class EntityUtils {
 		return entities;
 	}
 
-	public static Projectile spawnProjectile(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends Projectile> projectileClass) {
+	public static Projectile spawnProjectile(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, EntityType projectileType) {
+		final var projectileClass = Preconditions.checkNotNull(projectileType.getEntityClass());
+
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 
@@ -517,19 +518,19 @@ public class EntityUtils {
 		World world = player.getWorld();
 
 		// Spawn the arrow at the specified location, direction, and speed
-		Projectile projectile = world.spawn(loc, projectileClass);
+		Projectile projectile = (Projectile) world.spawn(loc, projectileClass);
 		projectile.setVelocity(dir.normalize().multiply(speed));
 		projectile.setShooter(player);
 		return projectile;
 	}
 
 
-	public static List<Projectile> spawnVolley(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends Projectile> projectileClass) {
+	public static List<Projectile> spawnVolley(LivingEntity player, int numProjectiles, float speed, double spacing, EntityType projectileType) {
 		List<Projectile> projectiles = new ArrayList<>();
 
 		for (int i = 0; i < numProjectiles; i++) {
 			double yaw = spacing * (i - (numProjectiles - 1) / 2f);
-			Projectile arrow = spawnProjectile(player, yaw, 0.0, new Vector(0, 0, 0), speed, projectileClass);
+			Projectile arrow = spawnProjectile(player, yaw, 0.0, new Vector(0, 0, 0), speed, projectileType);
 			projectiles.add(arrow);
 		}
 

@@ -37,7 +37,6 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hoglin;
@@ -131,7 +130,7 @@ public class VesperidysVoidCrystalSteel extends BossAbilityGroup {
 								public void run() {
 									w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 3, 1);
 									w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1);
-									List<Projectile> projectiles = EntityUtils.spawnVolley(mBoss, 40, 2, 360.0 / 40, Arrow.class);
+									List<Projectile> projectiles = EntityUtils.spawnVolley(mBoss, 40, 2, 360.0 / 40, EntityType.ARROW);
 									for (Projectile projectile : projectiles) {
 										AbstractArrow proj = (AbstractArrow) projectile;
 

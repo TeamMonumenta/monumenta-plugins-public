@@ -10,7 +10,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.plugin.Plugin;
@@ -46,7 +46,7 @@ public class SpellVolley extends Spell {
 			public void run() {
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 3, 1);
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1);
-				List<Projectile> projectiles = EntityUtils.spawnVolley(mBoss, 10, 2, 5.0, Arrow.class);
+				List<Projectile> projectiles = EntityUtils.spawnVolley(mBoss, 10, 2, 5.0, EntityType.ARROW);
 				for (Projectile projectile : projectiles) {
 					AbstractArrow proj = (AbstractArrow) projectile;
 

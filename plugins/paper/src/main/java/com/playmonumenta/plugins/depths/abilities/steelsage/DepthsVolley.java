@@ -98,7 +98,7 @@ public class DepthsVolley extends DepthsAbility {
 					fireticks = regularArrow.getFireTicks();
 				}
 				int piercing = (projectile instanceof AbstractArrow) ? (int) CharmManager.getLevel(mPlayer, CharmEffects.VOLLEY_PIERCING.mEffectName) : 0;
-				List<Projectile> projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, projSpeed, 5, projectile.getClass());
+				List<Projectile> projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, projSpeed, 5, projectile.getType());
 				for (Projectile proj : projectiles) {
 					mDepthsVolley.add(proj);
 
