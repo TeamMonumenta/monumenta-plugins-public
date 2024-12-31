@@ -1112,10 +1112,10 @@ public class CustomTradeGui extends Gui {
 				newLore.add(Component.text("Price: ", NamedTextColor.YELLOW).append(Component.text("FREE (Creative Mode)", NamedTextColor.GREEN)).decoration(TextDecoration.ITALIC, false));
 			} else {
 				newLore.add(Component.text("Price: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-				newLore.addAll(tradeReq.lore());
-				if (mPebTradeGUIConfirm == 1) {
-					newLore.add(Component.text("Left-click to buy, Right-click for details.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-				}
+			}
+			newLore.addAll(tradeReq.lore());
+			if (mPebTradeGUIConfirm == 1) {
+				newLore.add(Component.text("Left-click to buy, Right-click for details.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 			}
 			// Add to previous lore (if any):
 			List<Component> prevLore = new ArrayList<>();
