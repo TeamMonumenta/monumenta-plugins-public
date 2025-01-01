@@ -144,7 +144,7 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 
 							// check hitboxes
 							Hitbox hitbox = new Hitbox.AABBHitbox(world, BoundingBox.of(mGroundLoc, 0.25, 0.25, 0.25));
-							if (hitbox.getHitPlayers(true).contains(player)) {
+							if (hitbox.getHitEntities((entity) -> !entity.equals(boss)).contains(player)) {
 								p.PARTICLE_HIT.spawn(mBoss, player.getLocation());
 								p.SOUND_HIT.play(player.getLocation());
 
