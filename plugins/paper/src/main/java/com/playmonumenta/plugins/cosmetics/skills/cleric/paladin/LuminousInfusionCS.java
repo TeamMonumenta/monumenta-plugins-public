@@ -37,7 +37,6 @@ public class LuminousInfusionCS implements CosmeticSkill {
 	}
 
 	public void infusionAddStack(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from your hands... (" + stacks + ")");
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.5f, 2.0f);
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 0.5f, 0.8f);
 		new PartialParticle(Particle.SPELL_INSTANT, loc, 10, 0.75f, 0.25f, 0.75f, 1).spawnAsPlayerActive(player);
@@ -46,6 +45,10 @@ public class LuminousInfusionCS implements CosmeticSkill {
 	public void gainMaxCharge(Player player, Location loc) {
 		player.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.7f, 1.8f);
 		new PartialParticle(Particle.SPELL_INSTANT, loc, 15, 0.75f, 0.25f, 0.75f, 1).spawnAsPlayerActive(player);
+	}
+
+	public void infusionStartMsg(Player player, int stacks) {
+		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from your hands... (" + stacks + ")");
 	}
 
 	public void infusionExpireMsg(Player player) {

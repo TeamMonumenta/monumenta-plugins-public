@@ -113,7 +113,6 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 
 	@Override
 	public void infusionAddStack(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from prestige... (" + stacks + ")", TextColor.color(255, 168, 16));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.5f);
 		new PartialParticle(Particle.SPELL, player.getLocation(), 15, 0.5, 0.125, 0.5, 0.5).spawnAsPlayerActive(player);
 	}
@@ -122,6 +121,11 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	public void gainMaxCharge(Player player, Location loc) {
 		player.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.6f, 2.0f);
 		new PartialParticle(Particle.SPELL, loc, 15, 0.5, 0.125, 0.5, 0.5).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void infusionStartMsg(Player player, int stacks) {
+		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from prestige... (" + stacks + ")", TextColor.color(255, 168, 16));
 	}
 
 	@Override

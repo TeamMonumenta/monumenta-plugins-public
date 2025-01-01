@@ -151,6 +151,8 @@ public class BloodbathCS extends IlluminateCS {
 			loc.add(0, 0.2, 0);
 		}
 
+		loc.setDirection(new Vector(1, 0, 0));
+
 		if (ticks == 0) {
 			ItemDisplay display = loc.getWorld().spawn(loc.clone().add(0, 0.25, 0), ItemDisplay.class);
 			display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GROUND);

@@ -72,7 +72,6 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 
 	@Override
 	public void infusionAddStack(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air... (" + stacks + ")", TextColor.color(50, 180, 200));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.2f);
 	}
 
@@ -80,6 +79,11 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 	public void gainMaxCharge(Player player, Location loc) {
 		player.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.8f, 0.8f);
 		new PartialParticle(Particle.SPELL_MOB, loc, 15, mRed1, mGreen1, mBlue1, 1).directionalMode(true).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void infusionStartMsg(Player player, int stacks) {
+		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air... (" + stacks + ")", TextColor.color(50, 180, 200));
 	}
 
 	@Override

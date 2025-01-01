@@ -144,6 +144,8 @@ public class LuminousInfusion extends MultipleChargeAbility implements AbilityWi
 			}
 		}
 
+		mCosmetic.infusionStartMsg(mPlayer, mPrimedStacks);
+
 		if (mCancelRunnable != null) {
 			mCancelRunnable.cancel();
 		}
