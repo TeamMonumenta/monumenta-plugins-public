@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
@@ -16,11 +18,11 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class SpellChangeFloor extends Spell {
+	private static final String SLOWNESS_SRC = "SpellChangeFloorSelfSlow";
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final Location mCenterLoc;
@@ -44,7 +46,7 @@ public final class SpellChangeFloor extends Spell {
 	public void run() {
 		final List<Player> players = PlayerUtils.playersInRange(mCenterLoc, mRange, true);
 		if (!players.isEmpty()) {
-			launch(players.get(FastUtils.RANDOM.nextInt(players.size())));
+			launch(players.get(FastUtils.RANDOM.nextInt(players.size())).getLocation());
 		}
 	}
 
@@ -53,20 +55,23 @@ public final class SpellChangeFloor extends Spell {
 		return Constants.TICKS_PER_SECOND * 8;
 	}
 
-	private void launch(final Player target) {
+	private void launch(final Location targetLoc) {
 		final HashSet<Block> changedBlocks = new HashSet<>();
 
-		target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 4f);
-		mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 5f);
+		mBoss.getWorld().playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 2f);
+		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 2f);
 		new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0).spawnAsEntityActive(mBoss);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, SLOWNESS_SRC,
+			new BaseMovementSpeedModifyEffect(30, -0.6));
 
 		// Get a list of blocks that should be changed
-		for (int dx = -mRadius; dx < mRadius; dx++) {
-			for (int dy = -mRadius; dy < mRadius; dy++) {
-				for (int dz = -mRadius; dz < mRadius; dz++) {
-					final Block block = target.getLocation().add(dx, dy, dz).getBlock();
-					if (FastUtils.RANDOM.nextInt(16) > 6) {
+		final Location blockLoc = targetLoc.clone();
+		for (double dx = targetLoc.getX() - mRadius; dx <= targetLoc.getX() + mRadius; dx++) {
+			for (double dy = targetLoc.getX() - mRadius; dy <= targetLoc.getX() + mRadius; dy++) {
+				for (double dz = targetLoc.getX() - mRadius; dz <= targetLoc.getX() + mRadius; dz++) {
+					final Block block = blockLoc.set(dx, dy, dz).getBlock();
+					/* Special case for obsidian because of Azacor's arena */
+					if (FastUtils.RANDOM.nextInt(16) > 6 && !(BlockUtils.isMechanicalBlock(block.getType()) && block.getType() != Material.OBSIDIAN)) {
 						changedBlocks.add(block);
 					}
 				}
@@ -78,12 +83,12 @@ public final class SpellChangeFloor extends Spell {
 
 			@Override
 			public void run() {
-				mTicks++;
+				mTicks += 5;
 				if (mTicks < mFloorDuration) {
 					// Particles over the changed blocks
 					for (final Block block : changedBlocks) {
 						final Location loc = block.getLocation().add(0.5f, 1f, 0.5f);
-						new PartialParticle(Particle.DRAGON_BREATH, loc, 1, 0.3, 0.3, 0.3, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DRAGON_BREATH, loc, 4, 0.3, 0.3, 0.3, 0).spawnAsEntityActive(mBoss);
 					}
 
 					return;
@@ -95,7 +100,7 @@ public final class SpellChangeFloor extends Spell {
 			}
 		};
 
-		runnable.runTaskTimer(mPlugin, 0, 1);
+		runnable.runTaskTimer(mPlugin, 0, 5);
 		mActiveRunnables.add(runnable);
 	}
 }
