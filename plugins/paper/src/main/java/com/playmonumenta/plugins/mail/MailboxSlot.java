@@ -31,6 +31,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Beehive;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.BrewerInventory;
@@ -145,32 +146,35 @@ public class MailboxSlot {
 		} else if (
 			meta instanceof BlockStateMeta blockStateMeta
 				&& blockStateMeta.hasBlockState()
-				&& blockStateMeta.getBlockState() instanceof BlockInventoryHolder inventoryHolder
 		) {
-			try {
-				Inventory inventory = inventoryHolder.getInventory();
-				for (ItemStack content : inventory) {
-					mVanillaContentArray.add(nullableMailboxSlot(player, content));
-				}
+			BlockState blockState = blockStateMeta.getBlockState();
+			if (blockState instanceof BlockInventoryHolder inventoryHolder) {
+				try {
+					Inventory inventory = inventoryHolder.getInventory();
+					for (ItemStack content : inventory) {
+						mVanillaContentArray.add(nullableMailboxSlot(player, content));
+					}
 
-				if (inventory instanceof BrewerInventory brewerInventory) {
-					optPutSlotMap(player, "fuel", brewerInventory.getFuel());
-					optPutSlotMap(player, "ingredient", brewerInventory.getIngredient());
-				} else if (inventory instanceof FurnaceInventory furnaceInventory) {
-					optPutSlotMap(player, "fuel", furnaceInventory.getFuel());
-					optPutSlotMap(player, "smelting", furnaceInventory.getSmelting());
-					optPutSlotMap(player, "result", furnaceInventory.getResult());
-				} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
-					optPutSlotMap(player, "record", jukeboxInventory.getRecord());
-				}
+					if (inventory instanceof BrewerInventory brewerInventory) {
+						optPutSlotMap(player, "fuel", brewerInventory.getFuel());
+						optPutSlotMap(player, "ingredient", brewerInventory.getIngredient());
+					} else if (inventory instanceof FurnaceInventory furnaceInventory) {
+						optPutSlotMap(player, "fuel", furnaceInventory.getFuel());
+						optPutSlotMap(player, "smelting", furnaceInventory.getSmelting());
+						optPutSlotMap(player, "result", furnaceInventory.getResult());
+					} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
+						optPutSlotMap(player, "record", jukeboxInventory.getRecord());
+					}
 
-				inventory.clear();
-			} catch (NullPointerException ignored) {
-				// This occurs on certain chests with loot tables, such as Sirius rewards
-				// Checking for chests with loot tables did not fix this for some reason
-				// None of our containers with loot tables contain non-loot table items,
-				// So it is safe to leave those in the RedisItemDatabase
+					inventory.clear();
+				} catch (NullPointerException ignored) {
+					// This occurs on certain chests with loot tables, such as Sirius rewards
+					// Checking for chests with loot tables did not fix this for some reason
+					// None of our containers with loot tables contain non-loot table items,
+					// So it is safe to leave those in the RedisItemDatabase
+				}
 			}
+			blockStateMeta.setBlockState(blockState);
 		}
 		reduced.setItemMeta(meta);
 
@@ -318,40 +322,43 @@ public class MailboxSlot {
 			if (
 				meta instanceof BlockStateMeta blockStateMeta
 					&& blockStateMeta.hasBlockState()
-					&& blockStateMeta.getBlockState() instanceof BlockInventoryHolder inventoryHolder
 			) {
-				Inventory inventory = inventoryHolder.getInventory();
+				BlockState blockState = blockStateMeta.getBlockState();
+				if (blockState instanceof BlockInventoryHolder inventoryHolder) {
+					Inventory inventory = inventoryHolder.getInventory();
 
-				for (int i = 0; i < mVanillaContentArray.size(); i++) {
-					MailboxSlot content = mVanillaContentArray.get(i);
-					if (content != null) {
-						inventory.setItem(i, content.getItem());
+					for (int i = 0; i < mVanillaContentArray.size(); i++) {
+						MailboxSlot content = mVanillaContentArray.get(i);
+						if (content != null) {
+							inventory.setItem(i, content.getItem());
+						}
+					}
+
+					ItemStack content;
+					if (inventory instanceof BrewerInventory brewerInventory) {
+						if ((content = contentMapGet("fuel")) != null) {
+							brewerInventory.setFuel(content);
+						}
+						if ((content = contentMapGet("ingredient")) != null) {
+							brewerInventory.setIngredient(content);
+						}
+					} else if (inventory instanceof FurnaceInventory furnaceInventory) {
+						if ((content = contentMapGet("fuel")) != null) {
+							furnaceInventory.setFuel(content);
+						}
+						if ((content = contentMapGet("smelting")) != null) {
+							furnaceInventory.setSmelting(content);
+						}
+						if ((content = contentMapGet("result")) != null) {
+							furnaceInventory.setResult(content);
+						}
+					} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
+						if ((content = contentMapGet("record")) != null) {
+							jukeboxInventory.setRecord(content);
+						}
 					}
 				}
-
-				ItemStack content;
-				if (inventory instanceof BrewerInventory brewerInventory) {
-					if ((content = contentMapGet("fuel")) != null) {
-						brewerInventory.setFuel(content);
-					}
-					if ((content = contentMapGet("ingredient")) != null) {
-						brewerInventory.setIngredient(content);
-					}
-				} else if (inventory instanceof FurnaceInventory furnaceInventory) {
-					if ((content = contentMapGet("fuel")) != null) {
-						furnaceInventory.setFuel(content);
-					}
-					if ((content = contentMapGet("smelting")) != null) {
-						furnaceInventory.setSmelting(content);
-					}
-					if ((content = contentMapGet("result")) != null) {
-						furnaceInventory.setResult(content);
-					}
-				} else if (inventory instanceof JukeboxInventory jukeboxInventory) {
-					if ((content = contentMapGet("record")) != null) {
-						jukeboxInventory.setRecord(content);
-					}
-				}
+				blockStateMeta.setBlockState(blockState);
 			}
 		}
 		result.setItemMeta(meta);
