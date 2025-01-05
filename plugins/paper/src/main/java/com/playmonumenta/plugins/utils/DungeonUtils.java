@@ -363,6 +363,11 @@ public class DungeonUtils {
 		}
 
 		public void checkPlayerAccess(Player player, int date) {
+			Integer durationDays = getDurationDays();
+			if (durationDays == null || durationDays <= 0) {
+				return;
+			}
+
 			String dungeonName = getLocationName();
 
 			Integer accessScore = getAccessScore(player);
