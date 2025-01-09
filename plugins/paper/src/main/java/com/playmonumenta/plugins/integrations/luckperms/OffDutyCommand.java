@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.networkchat.channel.Channel;
+import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -58,6 +59,7 @@ public class OffDutyCommand extends TogglePermCommand {
 	@Override
 	public void setPerm(Player player, boolean setEnabled) { // Enabled = off duty
 		super.setPerm(player, setEnabled);
+		NetworkRelayAPI.refreshPlayer(player.getUniqueId());
 
 		// Update notification sounds for mh
 		Channel modHelp = MonumentaNetworkChatIntegration.getChannel("mh");
