@@ -401,8 +401,8 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 			((CraftWorld) world).getHandle(),
 			null,
 			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()),
-			null,
-			null,
+			new ArrayList<>(),
+			new ArrayList<>(),
 			(loadChunks ? CollisionUtil.COLLISION_FLAG_LOAD_CHUNKS : 0) | CollisionUtil.COLLISION_FLAG_CHECK_ONLY,
 			(state, pos) -> checkedTypes.test(state.getBukkitMaterial())
 		);
@@ -415,7 +415,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 			((CraftWorld) world).getHandle(),
 			null,
 			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()),
-			null,
+			new ArrayList<>(),
 			collisions,
 			loadChunks ? CollisionUtil.COLLISION_FLAG_LOAD_CHUNKS : 0,
 			(state, pos) -> state.getBukkitMaterial() != Material.SCAFFOLDING
