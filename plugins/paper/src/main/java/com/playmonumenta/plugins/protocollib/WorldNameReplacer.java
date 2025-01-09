@@ -26,6 +26,10 @@ public class WorldNameReplacer extends PacketAdapter {
 	// we can't use Minecraft types here, so we have to deal with unchecked casts and raw types
 	public void onPacketSending(PacketEvent event) {
 
+		if (ServerProperties.disableSpoofWorldNames()) {
+			return;
+		}
+
 		if (event.getPlayer() instanceof TemporaryPlayer
 			    || !ScoreboardUtils.checkTag(event.getPlayer(), WorldNameCommand.TAG)
 			    || !event.getPlayer().hasPermission(WorldNameCommand.PERMISSION)) {
