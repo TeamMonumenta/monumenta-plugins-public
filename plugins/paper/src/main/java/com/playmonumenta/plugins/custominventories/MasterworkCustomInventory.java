@@ -430,6 +430,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 
 		try {
+			mRowSelected = 99;
 			if (cost.tryPayCost(p, item, false, next)) {
 				item = item.withType(nextItem.getType());
 				item.setItemMeta(nextItem.getItemMeta());
@@ -439,7 +440,6 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			} else {
 				p.sendMessage(Component.text("You don't have enough currency for this upgrade.", NamedTextColor.RED));
 			}
-			mRowSelected = 99;
 		} catch (Exception e) {
 			p.sendMessage(Component.text("If you see this message please contact a mod! (Error in upgrade)", NamedTextColor.RED));
 			e.printStackTrace();
