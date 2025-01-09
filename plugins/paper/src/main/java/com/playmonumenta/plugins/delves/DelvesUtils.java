@@ -279,6 +279,11 @@ public class DelvesUtils {
 	public static int getPlayerTotalDelvePoint(@Nullable CommandSender sender, Player target, String dungeonName) {
 		Map<String, DelvesManager.DungeonDelveInfo> map = getDelveInfoMap(target);
 
+		// If the delve points being checked is for a delve PoI, get the delve points the player has assigned in the ring shard
+		if (dungeonName.equals("wolfswood") || dungeonName.equals("keep") || dungeonName.equals("starpoint")) {
+			dungeonName = "ring";
+		}
+
 		DelvesManager.DungeonDelveInfo info = map.getOrDefault(dungeonName, new DelvesManager.DungeonDelveInfo());
 
 		if (sender != null && !(sender instanceof ProxiedCommandSender)) {

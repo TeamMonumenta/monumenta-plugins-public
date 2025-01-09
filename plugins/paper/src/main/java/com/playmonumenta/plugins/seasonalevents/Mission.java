@@ -178,15 +178,15 @@ public abstract class Mission {
 			mModifierRank = missionObject.get("modifierrank").getAsInt();
 			if (showWarnings && mModifierRank <= 0) {
 				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
-						+ passName + ": Modifier Rank is <= 0: " + mMP, NamedTextColor.RED)
+						+ passName + ": Modifier Rank is <= 0: " + mModifierRank, NamedTextColor.RED)
 					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
 			}
 		}
 		if (missionObject.get("rotatingamount") != null) {
 			mRotatingModifiersAmount = missionObject.get("rotatingamount").getAsInt();
-			if (showWarnings && mRotatingModifiersAmount <= 0) {
+			if (showWarnings && mRotatingModifiersAmount < 0) {
 				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
-						+ passName + ": Rotating Amount is <= 0: " + mMP, NamedTextColor.RED)
+						+ passName + ": Rotating Amount is < 0: " + mRotatingModifiersAmount, NamedTextColor.RED)
 					.hoverEvent(Component.text(missionObject.toString(), NamedTextColor.RED)));
 			}
 		}
