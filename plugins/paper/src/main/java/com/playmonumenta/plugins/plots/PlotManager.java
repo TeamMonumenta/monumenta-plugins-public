@@ -165,7 +165,7 @@ public class PlotManager {
 								sender.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
 								MessagingUtils.sendStackTrace(sender, ex);
 							} else {
-								new PlotAccessCustomInventory(player, info).openInventory(player, Plugin.getInstance());
+								new PlotAccessGui(player, info, PlotAccessGui.GuiMode.TELEPORT_MODE).open();
 							}
 						});
 					}
