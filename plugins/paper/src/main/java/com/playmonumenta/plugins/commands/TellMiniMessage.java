@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -7,106 +8,48 @@ import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import io.papermc.paper.text.PaperComponents;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.TitlePart;
 import org.bukkit.entity.Player;
 
 public class TellMiniMessage {
+	private static final String PERMISSION = "monumenta.command.tellmini";
+	private static final String NAME = "tellmini";
 
-	public static void register() {
-		new CommandAPICommand("tellmini")
-			.withPermission("monumenta.command.tellmini")
-			.withSubcommands(
-				new CommandAPICommand("title")
-					.withArguments(
-						new EntitySelectorArgument.ManyPlayers("recipients"),
-						new GreedyStringArgument("title")
-					).executes((sender, args) -> {
-						@SuppressWarnings("unchecked")
-						Collection<Player> recipients = (Collection<Player>) args.get("recipients");
-						String title = args.getUnchecked("title");
-
-						Component parsed = MessagingUtils.fromMiniMessage(title);
-						for (Player recipient : recipients) {
-							try {
-								recipient.sendTitlePart(TitlePart.TITLE, PaperComponents.resolveWithContext(parsed, sender, recipient, false));
-							} catch (IOException ex) {
-								ex.printStackTrace();
-							}
-						}
-					}),
-				new CommandAPICommand("subtitle")
-					.withArguments(
-						new EntitySelectorArgument.ManyPlayers("recipients"),
-						new GreedyStringArgument("subtitle")
-					).executes((sender, args) -> {
-						@SuppressWarnings("unchecked")
-						Collection<Player> recipients = (Collection<Player>) args.get("recipients");
-						String subtitle = args.getUnchecked("subtitle");
-
-						Component parsed = MessagingUtils.fromMiniMessage(subtitle);
-						for (Player recipient : recipients) {
-							try {
-								recipient.sendTitlePart(TitlePart.SUBTITLE, PaperComponents.resolveWithContext(parsed, sender, recipient, false));
-							} catch (IOException ex) {
-								ex.printStackTrace();
-							}
-						}
-					}),
-				new CommandAPICommand("actionbar")
-					.withArguments(
-						new EntitySelectorArgument.ManyPlayers("recipients"),
-						new GreedyStringArgument("message")
-					).executes((sender, args) -> {
-						@SuppressWarnings("unchecked")
-						Collection<Player> recipients = (Collection<Player>) args.get("recipients");
-						String message = args.getUnchecked("message");
-
-						Component parsed = MessagingUtils.fromMiniMessage(message);
-						for (Player recipient : recipients) {
-							try {
-								recipient.sendActionBar(PaperComponents.resolveWithContext(parsed, sender, recipient, false));
-							} catch (IOException ex) {
-								ex.printStackTrace();
-							}
-						}
-					}),
-				new CommandAPICommand("msg")
-					.withArguments(
-						new EntitySelectorArgument.ManyPlayers("recipients"),
-						new GreedyStringArgument("message")
-					).executes((sender, args) -> {
-						@SuppressWarnings("unchecked")
-						Collection<Player> recipients = (Collection<Player>) args.get("recipients");
-						String message = args.getUnchecked("message");
-
-						Component parsed = MessagingUtils.fromMiniMessage(message);
-						for (Player recipient : recipients) {
-							try {
-								recipient.sendMessage(PaperComponents.resolveWithContext(parsed, sender, recipient, false));
-							} catch (IOException ex) {
-								ex.printStackTrace();
-							}
-						}
-					})
-				)
-			.withArguments(
-				new EntitySelectorArgument.ManyPlayers("recipients"),
-				new GreedyStringArgument("message")
-			).executes((sender, args) -> {
-				@SuppressWarnings("unchecked")
-				Collection<Player> recipients = (Collection<Player>) args.get("recipients");
-				String message = args.getUnchecked("message");
-
-				Component parsed = MessagingUtils.fromMiniMessage(message);
-				for (Player recipient : recipients) {
-					try {
-						recipient.sendMessage(PaperComponents.resolveWithContext(parsed, sender, recipient, false));
-					} catch (IOException ex) {
-						ex.printStackTrace();
-					}
+	private static CommandAPICommand generateSubcommand(String name, BiConsumer<Player, Component> send) {
+		return new CommandAPICommand(name).withArguments(
+			new EntitySelectorArgument.ManyPlayers("recipients"),
+			new GreedyStringArgument("message").setOptional(true)
+		).executes((sender, args) -> {
+			Collection<Player> recipients = Objects.requireNonNull(args.getUnchecked("recipients"));
+			String title = args.getUnchecked("message");
+			Component parsed = title == null ? Component.empty() : MessagingUtils.fromMiniMessage(title);
+			for (Player recipient : recipients) {
+				try {
+					send.accept(recipient, PaperComponents.resolveWithContext(parsed, sender, recipient, false));
+				} catch (IOException e) {
+					MMLog.warning("tellmini: failed to resolveWithContext:", e);
+					return;
 				}
-			}).register();
+			}
+		});
 	}
 
+	public static void register() {
+		new CommandAPICommand(NAME)
+			.withPermission(PERMISSION)
+			.withSubcommands(
+				generateSubcommand("title", (r, m) -> r.sendTitlePart(TitlePart.TITLE, m)),
+				generateSubcommand("subtitle", (r, m) -> r.sendTitlePart(TitlePart.SUBTITLE, m)),
+				generateSubcommand("actionbar", Audience::sendActionBar),
+				generateSubcommand("msg", Audience::sendMessage)
+			).register();
+
+		generateSubcommand(NAME, Audience::sendMessage)
+			.withPermission(PERMISSION)
+			.register();
+	}
 }
