@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import io.papermc.paper.text.PaperComponents;
+import java.io.IOException;
 import java.util.Collection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.TitlePart;
@@ -26,7 +28,11 @@ public class TellMiniMessage {
 
 						Component parsed = MessagingUtils.fromMiniMessage(title);
 						for (Player recipient : recipients) {
-							recipient.sendTitlePart(TitlePart.TITLE, parsed);
+							try {
+								recipient.sendTitlePart(TitlePart.TITLE, PaperComponents.resolveWithContext(parsed, sender, recipient, false));
+							} catch (IOException ex) {
+								ex.printStackTrace();
+							}
 						}
 					}),
 				new CommandAPICommand("subtitle")
@@ -40,7 +46,11 @@ public class TellMiniMessage {
 
 						Component parsed = MessagingUtils.fromMiniMessage(subtitle);
 						for (Player recipient : recipients) {
-							recipient.sendTitlePart(TitlePart.SUBTITLE, parsed);
+							try {
+								recipient.sendTitlePart(TitlePart.SUBTITLE, PaperComponents.resolveWithContext(parsed, sender, recipient, false));
+							} catch (IOException ex) {
+								ex.printStackTrace();
+							}
 						}
 					}),
 				new CommandAPICommand("actionbar")
@@ -52,9 +62,13 @@ public class TellMiniMessage {
 						Collection<Player> recipients = (Collection<Player>) args.get("recipients");
 						String message = args.getUnchecked("message");
 
-						Component parsedMessage = MessagingUtils.fromMiniMessage(message);
+						Component parsed = MessagingUtils.fromMiniMessage(message);
 						for (Player recipient : recipients) {
-							recipient.sendActionBar(parsedMessage);
+							try {
+								recipient.sendActionBar(PaperComponents.resolveWithContext(parsed, sender, recipient, false));
+							} catch (IOException ex) {
+								ex.printStackTrace();
+							}
 						}
 					}),
 				new CommandAPICommand("msg")
@@ -66,9 +80,13 @@ public class TellMiniMessage {
 						Collection<Player> recipients = (Collection<Player>) args.get("recipients");
 						String message = args.getUnchecked("message");
 
-						Component parsedMessage = MessagingUtils.fromMiniMessage(message);
+						Component parsed = MessagingUtils.fromMiniMessage(message);
 						for (Player recipient : recipients) {
-							recipient.sendMessage(parsedMessage);
+							try {
+								recipient.sendMessage(PaperComponents.resolveWithContext(parsed, sender, recipient, false));
+							} catch (IOException ex) {
+								ex.printStackTrace();
+							}
 						}
 					})
 				)
@@ -80,9 +98,13 @@ public class TellMiniMessage {
 				Collection<Player> recipients = (Collection<Player>) args.get("recipients");
 				String message = args.getUnchecked("message");
 
-				Component parsedMessage = MessagingUtils.fromMiniMessage(message);
+				Component parsed = MessagingUtils.fromMiniMessage(message);
 				for (Player recipient : recipients) {
-					recipient.sendMessage(parsedMessage);
+					try {
+						recipient.sendMessage(PaperComponents.resolveWithContext(parsed, sender, recipient, false));
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
 				}
 			}).register();
 	}
