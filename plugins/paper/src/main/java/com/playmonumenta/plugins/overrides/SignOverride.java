@@ -75,13 +75,13 @@ public class SignOverride extends BaseOverride {
 						Component allSignLines = MessagingUtils.concatenateComponents(chatFilterLines, Component.newline());
 						if (MonumentaNetworkChatIntegration.hasBadWord(player, allSignLines)) {
 							AuditListener.logSevere(player.getName()
-									+ " attempted to place a sign with a bad word: `/s "
-									+ ServerProperties.getShardName()
-									+ "` `/world " + loc.getWorld().getName()
-									+ "` `/tp @s " + loc.getBlockX()
-									+ " " + loc.getBlockY()
-									+ " " + loc.getBlockZ()
-									+ "`"
+								+ " attempted to place a sign with a bad word: `/s "
+								+ ServerProperties.getShardName()
+								+ "` `/world " + loc.getWorld().getName()
+								+ "` `/tp @s " + loc.getBlockX()
+								+ " " + loc.getBlockY()
+								+ " " + loc.getBlockZ()
+								+ "`"
 							);
 							item.setAmount(0);
 							return false;
@@ -105,7 +105,7 @@ public class SignOverride extends BaseOverride {
 										signSideBlock.line(lineNum, signItemLines.get(lineNum));
 									}
 									signSideBlock.setColor(signSideItem.getColor());
-									signSideBlock.setGlowingText(signSideBlock.isGlowingText() && !shopsPossible);
+									signSideBlock.setGlowingText(signSideItem.isGlowingText() && !shopsPossible);
 								}
 								sign.update();
 								loc.getWorld().playSound(loc, Sound.BLOCK_WOOD_PLACE, SoundCategory.BLOCKS, 1.0f, 1.0f);
@@ -133,15 +133,16 @@ public class SignOverride extends BaseOverride {
 		Sign sign = (Sign) block.getState();
 		SignSide facingSide = sign.getSide(sign.getInteractableSideFor(player));
 		boolean usingItem = item != null
+			&& item.hasItemMeta()
+			&& item.getItemMeta().hasLore()
 			&& (
 			ItemUtils.isDye(type)
 				|| (type == Material.GLOW_INK_SAC && !facingSide.isGlowingText())
 				|| (type == Material.INK_SAC && facingSide.isGlowingText())
 				|| (type == Material.HONEYCOMB && !sign.isWaxed())
 				|| (ItemUtils.isAxe(item) && sign.isWaxed())
-		)
-			&& !(item.hasItemMeta() && item.getItemMeta().hasLore());
-		boolean output = ZoneUtils.playerCanMineBlock(player, block) && (ItemUtils.isNullOrAir(item) || usingItem);
+		);
+		boolean output = ZoneUtils.playerCanMineBlock(player, block) && (ItemUtils.isNullOrAir(item) || !usingItem);
 
 		// Compile all the lines of text together and make sure it is not a leaderboard that is being clicked
 		if (item == null || !ItemUtils.isSign(item.getType())) {
@@ -195,7 +196,7 @@ public class SignOverride extends BaseOverride {
 			// If clicking a sign with another sign, copy the contents to the item
 			if (!meta.hasDisplayName()) {
 				if (ItemUtils.isSign(item.getType()) &&
-				    meta instanceof BlockStateMeta blockStateMeta) {
+					meta instanceof BlockStateMeta blockStateMeta) {
 					BlockState blockState = blockStateMeta.getBlockState();
 					if (blockState instanceof Sign signItem) {
 						boolean blockIsHangingSign = sign instanceof HangingSign;
@@ -206,6 +207,7 @@ public class SignOverride extends BaseOverride {
 							// the width limit is smaller on hanging signs
 							// This can be updated if someone wants to check the width of the sign contents, but
 							// that depends on the pixel width of each character, and I don't know the limits
+							player.sendMessage(Component.text("You cannot copy a sign to a hanging sign; there might not be enough room.", NamedTextColor.RED));
 							return output;
 						}
 
