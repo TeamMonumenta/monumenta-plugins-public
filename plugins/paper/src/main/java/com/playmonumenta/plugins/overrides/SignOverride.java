@@ -142,7 +142,7 @@ public class SignOverride extends BaseOverride {
 				|| (type == Material.HONEYCOMB && !sign.isWaxed())
 				|| (ItemUtils.isAxe(item) && sign.isWaxed())
 		);
-		boolean output = ZoneUtils.playerCanMineBlock(player, block) && (ItemUtils.isNullOrAir(item) || !usingItem);
+		boolean output = ItemUtils.isNullOrAir(item) || !usingItem;
 
 		// Compile all the lines of text together and make sure it is not a leaderboard that is being clicked
 		if (item == null || !ItemUtils.isSign(item.getType())) {
