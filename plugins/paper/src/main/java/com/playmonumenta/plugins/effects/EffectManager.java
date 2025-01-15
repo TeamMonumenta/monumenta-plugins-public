@@ -981,6 +981,25 @@ public final class EffectManager implements Listener {
 		}
 	}
 
+	//Called in DamageListener
+	public void damageEventFinal(DamageEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+		LivingEntity damagee = event.getDamagee();
+		Effects effects = mEntities.get(damagee);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					if (event.isCancelled()) {
+						return;
+					}
+					effectGroup.last().onHurtFinal(damagee, event);
+				}
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void expChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();

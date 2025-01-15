@@ -247,6 +247,10 @@ public class DamageListener implements Listener {
 				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, event, damagee);
 			}
 		}
+
+		if (!event.isCancelled()) {
+			mPlugin.mEffectManager.damageEventFinal(event);
+		}
 	}
 
 	public static @Nullable PlayerItemStats getProjectileItemStats(Projectile proj) {

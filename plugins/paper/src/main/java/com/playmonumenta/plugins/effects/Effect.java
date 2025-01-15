@@ -95,6 +95,11 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	}
 
+	// Do not modify the damage using this method
+	public void onHurtFinal(LivingEntity entity, DamageEvent event) {
+
+	}
+
 	public void onExpChange(Player player, PlayerExpChangeEvent event) {
 
 	}
