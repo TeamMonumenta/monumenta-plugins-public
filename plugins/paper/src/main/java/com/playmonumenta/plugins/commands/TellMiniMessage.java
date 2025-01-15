@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import dev.jorel.commandapi.wrappers.NativeProxyCommandSender;
 import io.papermc.paper.text.PaperComponents;
 import java.io.IOException;
 import java.util.Collection;
@@ -24,6 +25,10 @@ public class TellMiniMessage {
 			new EntitySelectorArgument.ManyPlayers("recipients"),
 			new GreedyStringArgument("message").setOptional(true)
 		).executes((sender, args) -> {
+			if (sender instanceof NativeProxyCommandSender nativeProxyCommandSender) {
+				sender = nativeProxyCommandSender.getCaller(); // don't use get callee probably
+			}
+
 			Collection<Player> recipients = Objects.requireNonNull(args.getUnchecked("recipients"));
 			String title = args.getUnchecked("message");
 			Component parsed = title == null ? Component.empty() : MessagingUtils.fromMiniMessage(title);
