@@ -227,6 +227,16 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			}
 		}
 
+		//Player title but with replacement if empty, and no space after
+		if (identifier.startsWith("title_default_")) {
+			Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
+			if (title != null) {
+				return title.getName();
+			} else {
+				return identifier.substring("title_default_".length());
+			}
+		}
+
 		//%monumenta_boss_details_<number>%
 		if (identifier.startsWith("boss_details_")) {
 			int index = Integer.parseInt(identifier.substring("boss_details_".length())) - 1;
