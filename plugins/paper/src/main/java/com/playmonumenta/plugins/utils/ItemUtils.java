@@ -1428,15 +1428,15 @@ public class ItemUtils {
 
 	public static String getGiveCommand(ItemStack item) {
 		if (item == null) {
-			return "/tellraw @s {\"text\":\"Item is null\"}";
+			return "/tellmini msg @s Item is null";
 		}
 
 		if (item.getType() == Material.AIR) {
-			return "/tellraw @s {\"text\":\"Item is air\"}";
+			return "/tellmini msg @s Item is air";
 		}
 
 		if (item.getAmount() <= 0) {
-			return "/tellraw @s {\"text\":\"Item has invalid count\"}";
+			return "/tellmini msg @s Item has invalid count";
 		}
 
 		String itemId = item.getType().getKey().asString();

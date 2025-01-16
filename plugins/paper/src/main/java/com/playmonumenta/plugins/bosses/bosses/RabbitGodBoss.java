@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -193,7 +192,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 						new PartialParticle(Particle.EXPLOSION_NORMAL, spawnLoc, 50, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
 						world.playSound(spawnLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.5f);
 						world.playSound(spawnLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1f);
-						PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK OINK! OINK OINK OINK, OINK OINK OINK OINK!!! OOIIINNNKKK!!!\",\"color\":\"dark_red\"}]");
+						PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange).sendMessage(Component.text("OINK OINK OINK! OINK OINK OINK, OINK OINK OINK OINK!!! OOIIINNNKKK!!!", NamedTextColor.DARK_RED));
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.5f, 1f);
 					}
 					mBoss.teleport(mSpawnLoc.clone().add(0, mY, 0));
@@ -234,7 +233,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 				@Override
 				public void run() {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.5f, 1f);
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mTime].toUpperCase(Locale.getDefault()) + "\",\"color\":\"dark_red\"}]");
+					PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange).sendMessage(Component.text(dio[mTime], NamedTextColor.DARK_RED));
 					mTime++;
 					if (mTime == dio.length) {
 						this.cancel();
@@ -286,13 +285,13 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 										public void run() {
 											if (mTime == 0) {
 												world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, SoundCategory.HOSTILE, 1.5f, 1f);
-												PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!? OINK OINK OINK!?!\",\"color\":\"dark_red\"}]");
+												PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange).sendMessage(Component.text("OINK!? OINK OINK OINK!?!", NamedTextColor.DARK_RED));
 											}
 											mTime++;
 
 											if (mTime >= 20 * 4) {
 												this.cancel();
-												PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Godly Clucking Spirit] \",\"color\":\"gold\"},{\"text\":\"Cluck. Cluck Cluck Cluck Cluck. Cluck CLUCK!!!\",\"color\":\"white\"}]");
+												PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange).sendMessage(Component.text("[Godly Clucking Spirit] ", NamedTextColor.GOLD).append(Component.text("Cluck. Cluck Cluck Cluck Cluck. Cluck CLUCK!!!", NamedTextColor.WHITE)));
 												world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_HURT, SoundCategory.HOSTILE, 1, 1);
 												world.playSound(chicken.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 1, 1.35f);
 												new BukkitRunnable() {
@@ -336,8 +335,8 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 															mBoss.setAI(true);
 															mPhase2 = true;
 															mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-															PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"Your curse of Clucking is suddenly brought out in power, making you feel extremely powerful!\",\"color\":\"aqua\"}]");
-															PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"You have gained OP AS CLUCK powers!! Cluck em' up!\",\"color\":\"aqua\"}]");
+															PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange).sendMessage(Component.text("Your curse of Clucking is suddenly brought out in power, making you feel extremely powerful!", NamedTextColor.AQUA));
+															PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange).sendMessage(Component.text("You have gained OP AS CLUCK powers!! Cluck em' up!", NamedTextColor.AQUA));
 															new BukkitRunnable() {
 																int mTime = 0;
 
@@ -346,7 +345,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 																	mTime++;
 																	if (mTime == 1) {
 																		world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.5f, 1f);
-																		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!! OINK OINK OINK!!! OINK OINK!!!!!!!\",\"color\":\"dark_red\"}]");
+																		PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange).sendMessage(Component.text("OINK!! OINK OINK OINK!!! OINK OINK!!!!!!!", NamedTextColor.DARK_RED));
 																	} else if (mTime == 2) {
 																		changePhase(phase2Spells, passive2Spells, null);
 																		this.cancel();
@@ -424,7 +423,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK! OINK OINK! OINK OINK OINK OINK!?!?!?\",\"color\":\"dark_red\"}]");
+		PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange).sendMessage(Component.text("OINK! OINK OINK! OINK OINK OINK OINK!?!?!?", NamedTextColor.DARK_RED));
 		new BukkitRunnable() {
 			int mTime = 0;
 
@@ -437,7 +436,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1f);
 
 				if (mTime >= 12) {
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OOOOOOIIIIIIINNNNNNNNNNKKKKKKKKK!!!!!!!\",\"color\":\"dark_red\"}]");
+					PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange).sendMessage(Component.text("OOOOOOIIIIIIINNNNNNNNNNKKKKKKKKK!!!!!!!", NamedTextColor.DARK_RED));
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, SoundCategory.HOSTILE, 1.5f, 0.75f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, SoundCategory.HOSTILE, 1.5f, 1f);
 					mBoss.remove();

@@ -646,7 +646,7 @@ public class DepthsParty {
 					}
 					if (roomReached > 30) {
 						if (roomReached > highestRoom) {
-							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <italic><gold>" + p.getName() + "</gold> defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")");
 						} else {
 							Bukkit.getServer().sendMessage(Component.empty()
 								.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
@@ -659,7 +659,7 @@ public class DepthsParty {
 					if (victory && getAscension() > maxAscension) {
 						ScoreboardUtils.setScoreboardValue(p, ASCENSION_LEADERBOARD, getAscension());
 						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getName() + " " + ASCENSION_LEADERBOARD);
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith with a new personal best! (Ascension Level: " + getAscension() + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <italic><gold>" + p.getName() + "</gold> defeated the Celestial Zenith with a new personal best! (Ascension Level: " + getAscension() + ")");
 					} else if (victory && getAscension() > 0) {
 						Bukkit.getServer().sendMessage(Component.empty()
 							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
@@ -678,7 +678,7 @@ public class DepthsParty {
 					}
 					if (roomReached > 30) {
 						if (roomReached > highestRoom) {
-							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best in six player mode! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <italic><gold>" + p.getName() + "</gold> defeated the Darkest Depths with a new personal best in six player mode! (Endless Room Reached: " + roomReached + ")");
 						} else {
 							Bukkit.getServer().sendMessage(Component.empty()
 								.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
@@ -691,7 +691,7 @@ public class DepthsParty {
 					if (victory && getAscension() > maxAscension) {
 						ScoreboardUtils.setScoreboardValue(p, SIX_ASCENSION_LEADERBOARD, getAscension());
 						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getName() + " " + SIX_ASCENSION_LEADERBOARD);
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Celestial Zenith with a new personal best in six player mode! (Ascension Level: " + getAscension() + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <italic><gold>" + p.getName() + "</gold> defeated the Celestial Zenith with a new personal best in six player mode! (Ascension Level: " + getAscension() + ")");
 					} else if (victory) {
 						Bukkit.getServer().sendMessage(Component.empty()
 							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))

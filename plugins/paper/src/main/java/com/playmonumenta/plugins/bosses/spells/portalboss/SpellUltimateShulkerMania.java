@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells.portalboss;
 
-import com.playmonumenta.plugins.bosses.bosses.PortalBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -11,6 +10,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -28,10 +29,10 @@ import org.bukkit.util.Vector;
 
 public class SpellUltimateShulkerMania extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private int mCooldown;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final int mCooldown;
 
 	public static final int ARENA_SIZE = 18;
 	public static final int DAMAGE = 50;
@@ -49,8 +50,9 @@ public class SpellUltimateShulkerMania extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 6.0f, 1.0f);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 50, true);
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), PortalBoss.detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\", \"color\":\"gold\"},{\"text\":\" TARGETS LOCKED. BEGINNING BARRAGE.\",\"color\":\"red\"}]");
-
+		for (Player player : players) {
+			player.sendMessage(Component.text("[Iota]", NamedTextColor.GOLD).append(Component.text(" TARGETS LOCKED. BEGINNING BARRAGE.", NamedTextColor.RED)));
+		}
 
 		//Summon bullet every 10 ticks
 		BukkitRunnable run = new BukkitRunnable() {

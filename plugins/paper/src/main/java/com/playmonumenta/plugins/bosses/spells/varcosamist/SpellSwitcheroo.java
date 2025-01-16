@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -132,7 +134,7 @@ public class SpellSwitcheroo extends Spell {
 	private void animation(Player target) {
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 1.4f, 0.5f);
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mLauncher.getLocation(), 50, "tellraw @s [\"\",{\"text\":\"" + mDio + "\",\"color\":\"red\"}]");
+		PlayerUtils.nearbyPlayersAudience(mLauncher.getLocation(), 50).sendMessage(Component.text(mDio, NamedTextColor.RED));
 
 		new BukkitRunnable() {
 			int mTicks = 0;

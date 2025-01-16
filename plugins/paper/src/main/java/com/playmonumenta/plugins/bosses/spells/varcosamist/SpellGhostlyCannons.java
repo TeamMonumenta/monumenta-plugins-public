@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -24,12 +26,12 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellGhostlyCannons extends Spell {
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private double mRange;
-	private Location mCenter;
-	private boolean mPhaseThree;
-	private String mDio;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final double mRange;
+	private final Location mCenter;
+	private final boolean mPhaseThree;
+	private final String mDio;
 	private static final Particle.DustOptions CANNONS_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
 	public SpellGhostlyCannons(Plugin plugin, LivingEntity boss, double range, Location center, boolean phaseThree, String dio) {
@@ -44,7 +46,7 @@ public class SpellGhostlyCannons extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		PlayerUtils.executeCommandOnNearbyPlayers(mCenter, 50, "tellraw @s [\"\",{\"text\":\"" + mDio + "\",\"color\":\"red\"}]");
+		PlayerUtils.nearbyPlayersAudience(mCenter, 50).sendMessage(Component.text(mDio, NamedTextColor.RED));
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;

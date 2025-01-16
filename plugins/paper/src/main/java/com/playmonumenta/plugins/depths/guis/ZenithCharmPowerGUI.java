@@ -69,7 +69,7 @@ public final class ZenithCharmPowerGUI extends CustomInventory {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_CELEBRATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						EntityUtils.fireworkAnimation(player.getLocation(), List.of(Color.GRAY, Color.WHITE, Color.RED), FireworkEffect.Type.BURST, 5);
 						if (slotInfo.getMiddle() == 15) {
-							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":true,\"italic\":true},{\"text\":\" has purchased the final charm power upgrade for Celestial Zenith! Congratulations!\",\"color\":\"gold\",\"italic\":true,\"bold\":false}]");
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <gold><bold><italic>" + player.getName() + "</bold> has purchased the final charm power upgrade for Celestial Zenith! Congratulations!");
 						}
 						ScoreboardUtils.setScoreboardValue(player, CHARM_SCOREBOARD, slotInfo.getMiddle());
 					} else {

@@ -44,8 +44,6 @@ public class SpellEndlessHederaSummons extends Spell {
 		loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 20, 1);
 		int summonCount = SPAWN_COUNT + PlayerUtils.playersInRange(mBoss.getLocation(), Hedera.detectionRange, true).size();
 
-		//PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), Davey.detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Now ye've done it. She be watchin'. Help me, heathens of \",\"color\":\"blue\"},{\"text\":\"ngbgbggb\",\"obfuscated\":\"true\",\"color\":\"blue\"},{\"text\":\"!\",\"color\":\"blue\"}]");
-
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;
 			int mSummons = 0;

@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -245,7 +247,7 @@ public class SpellMultiEarthshake extends Spell {
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, FalseSpirit.detectionRange, "tellraw @s [\"\",{\"text\":\"The Congress shall tremble!\",\"color\":\"dark_red\"}]");
+		PlayerUtils.nearbyPlayersAudience(mSpawnLoc, FalseSpirit.detectionRange).sendMessage(Component.text("The Congress shall tremble!", NamedTextColor.DARK_RED));
 	}
 
 	@Override

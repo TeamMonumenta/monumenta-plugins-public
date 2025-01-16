@@ -182,8 +182,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
-		events.put(100, mBoss ->
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Thank you for foolishly opening the way into this town, hero.\",\"color\":\"white\"}]"));
+		events.put(100, mBoss -> sendDialogue("Thank you for foolishly opening the way into this town, hero."));
 
 		events.put(50, mBoss -> {
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1f);
@@ -233,10 +232,10 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 30, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Know the true power of the Sons of the Forest!\",\"color\":\"white\"}]");
+			sendDialogue("Know the true power of the Sons of the Forest!");
 		});
 
-		events.put(50, mBoss -> PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"This cannot be!\",\"color\":\"white\"}]"));
+		events.put(50, mBoss -> sendDialogue("This cannot be!"));
 
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, events);
 
@@ -309,5 +308,11 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 			MessagingUtils.sendBoldTitle(player, Component.text("T'Calin", NamedTextColor.GREEN), Component.text("Forest Battlemage", NamedTextColor.DARK_GREEN));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 1.25f);
 		}
+	}
+
+	private void sendDialogue(String msg) {
+		PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+			.sendMessage(Component.text("[T'Calin] ", NamedTextColor.GOLD)
+				.append(Component.text(msg, NamedTextColor.WHITE)));
 	}
 }

@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -49,7 +51,7 @@ public class ForcefulGrip extends SpellBaseSeekingProjectile {
 			// Projectile Aesthetic
 			(World world, Location loc, int ticks) -> {
 				if (ticks == 0) {
-					PlayerUtils.executeCommandOnNearbyPlayers(boss.getLocation(), 50, "tellraw @s [\"\",{\"text\":\"" + dio + "\",\"color\":\"red\"}]");
+					PlayerUtils.nearbyPlayersAudience(boss.getLocation(), 50).sendMessage(Component.text(dio, NamedTextColor.RED));
 				}
 				new PartialParticle(Particle.CRIT, loc, 3, 0, 0, 0, 0.1).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 4, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);

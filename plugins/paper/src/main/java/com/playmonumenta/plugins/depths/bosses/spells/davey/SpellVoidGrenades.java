@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,7 +54,7 @@ public class SpellVoidGrenades extends Spell {
 		if (players.isEmpty()) {
 			return;
 		}
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), Davey.detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\", \"color\":\"gold\"},{\"text\":\" Arr! Who be needin' Varcosa's cannons when She sends me this!\",\"color\":\"blue\"}]");
+		PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), Davey.detectionRange).sendMessage(Component.text("[Davey]", NamedTextColor.GOLD).append(Component.text(" Arr! Who be needin' Varcosa's cannons when She sends me this!", NamedTextColor.BLUE)));
 
 		new BukkitRunnable() {
 			int mTicks = 0;

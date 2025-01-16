@@ -14,6 +14,8 @@ import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import com.playmonumenta.scriptedquests.growables.GrowableProgress;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -68,7 +70,7 @@ public class SpellTitanicRupture extends Spell {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 5, 0.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 5, 1);
-		PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"CRUMBLE UNDER THE WEIGHT OF THE MOUNTAIN.\",\"color\":\"dark_red\"}]");
+		PlayerUtils.nearbyPlayersAudience(mStartLoc, FrostGiant.detectionRange).sendMessage(Component.text("CRUMBLE UNDER THE WEIGHT OF THE MOUNTAIN.", NamedTextColor.DARK_RED));
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;

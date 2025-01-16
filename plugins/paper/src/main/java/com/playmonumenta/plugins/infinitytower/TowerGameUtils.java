@@ -319,7 +319,7 @@ public class TowerGameUtils {
 		}
 
 		if (floor >= 50) {
-			MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [{\"text\":\"" + game.mPlayer.mPlayer.getName() + "\",\"color\":\"gold\",\"bold\":true,\"italic\":false},{\"text\":\" has beaten Plunderer's Blitz (round reached: " + (floor + 1) + ")\",\"color\":\"white\",\"italic\":\"true\",\"bold\":false}]");
+			MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <gold><bold>" + game.mPlayer.mPlayer.getName() + "</bold></gold><italic> has beaten Plunderer's Blitz (round reached: " + (floor + 1) + ")");
 		}
 
 		if (floor > 50) {
@@ -401,7 +401,7 @@ public class TowerGameUtils {
 
 	}
 
-	public static void startMob(LivingEntity mobSpawned, @Nullable TowerMob mob, TowerGame game, boolean playerSummon) throws Exception {
+	public static void startMob(LivingEntity mobSpawned, @Nullable TowerMob mob, TowerGame game, boolean playerSummon) {
 		if (BossManager.getInstance() != null) {
 			BossManager.getInstance().createBossInternal(mobSpawned, new GenericTowerMob(TowerManager.mPlugin, mobSpawned.getName(), (Mob) mobSpawned, game, mob, playerSummon));
 		}

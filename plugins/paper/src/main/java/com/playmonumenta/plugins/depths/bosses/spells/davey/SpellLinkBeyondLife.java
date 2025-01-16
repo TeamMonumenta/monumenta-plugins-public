@@ -10,6 +10,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Random;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -45,7 +48,11 @@ public class SpellLinkBeyondLife extends Spell {
 		loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 20, 1);
 		int summonCount = SPAWN_COUNT + PlayerUtils.playersInRange(mBoss.getLocation(), Davey.detectionRange, true).size();
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), Davey.detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Now ye've done it. She be watchin'. Help me, heathens of \",\"color\":\"blue\"},{\"text\":\"ngbgbggb\",\"obfuscated\":\"true\",\"color\":\"blue\"},{\"text\":\"!\",\"color\":\"blue\"}]");
+		PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), Davey.detectionRange)
+			.sendMessage(Component.text("[Davey]", NamedTextColor.GOLD)
+				.append(Component.text(" Now ye've done it. She be watchin'. Help me, heathens of ", NamedTextColor.BLUE))
+				.append(Component.text("ngbgbggb", NamedTextColor.BLUE, TextDecoration.OBFUSCATED))
+				.append(Component.text("!", NamedTextColor.BLUE)));
 
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;

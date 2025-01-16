@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Random;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -45,7 +47,7 @@ public class SpellPortalSummons extends Spell {
 		loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 20, 1);
 		int summonCount = SPAWN_COUNT + (2 * PlayerUtils.playersInRange(mBoss.getLocation(), PortalBoss.detectionRange, true).size());
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), PortalBoss.detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" FABRICATING... ATTACK INTELLIGENCE INSTALLED. HORDE, PURGE INTRUDERS.\",\"color\":\"red\"}]");
+		PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), PortalBoss.detectionRange).sendMessage(Component.text("[Iota]", NamedTextColor.GOLD).append(Component.text(" FABRICATING... ATTACK INTELLIGENCE INSTALLED. HORDE, PURGE INTRUDERS.", NamedTextColor.RED)));
 
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;

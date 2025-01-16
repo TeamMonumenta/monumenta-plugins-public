@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -70,7 +72,7 @@ public class SpellPassiveGarden extends Spell {
 		//Give a warning if we're 2 seconds before plants spawn
 		if ((mTicks + 40) % PLANT_SPAWN_INTERVAL == 0) {
 			mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 1, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(mLauncher.getLocation(), Hedera.detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Twisting vines, grow and rise! Bring forth ruin, spell demise!\",\"color\":\"dark_green\"}]");
+			PlayerUtils.nearbyPlayersAudience(mLauncher.getLocation(), Hedera.detectionRange).sendMessage(Component.text("[Hedera]", NamedTextColor.GOLD).append(Component.text(" Twisting vines, grow and rise! Bring forth ruin, spell demise!", NamedTextColor.DARK_GREEN)));
 		}
 
 		//Also spawn if 2 seconds into the fight

@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.depths.bosses.Broodmother;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoom.RoomDirection;
 import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import com.playmonumenta.structures.StructuresAPI;
@@ -236,7 +235,9 @@ public abstract class RoomRepository {
 					return;
 				}
 				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ(), 270.0f, 0.0f);
-				PlayerUtils.executeCommandOnNearbyPlayers(l, 20, "stopsound @s record");
+				for (Player player : party.getPlayers()) {
+					player.stopSound(SoundCategory.RECORDS);
+				}
 				//Tp all the players to it
 				for (DepthsPlayer dp : party.mPlayersInParty) {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
@@ -246,7 +247,6 @@ public abstract class RoomRepository {
 						p.teleport(l, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						PotionUtils.applyPotion(Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 					}
-					PlayerUtils.executeCommandOnNearbyPlayers(l, 20, "stopsound @s record");
 				}
 				party.sendMessage("Your party earned " + treasure + " treasure score for clearing floor " + (party.getFloor() - 1) + "! Sending your party to next floor.");
 				//Reset used rooms

@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -58,19 +60,17 @@ public class SpellRisingTides extends Spell {
 			}
 		}
 
-		if (lowCount > highCount) {
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), 50, "tellraw @s [\"\",{\"text\":\"The frigid water rises below...\",\"color\":\"blue\"}]");
-
-			cast(true, players);
-
-		} else {
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), 50, "tellraw @s [\"\",{\"text\":\"The water above boils with heat..\",\"color\":\"red\"}]");
-
-			cast(false, players);
-		}
+		cast(lowCount > highCount, players);
 	}
 
 	public void cast(boolean tide, List<Player> players) {
+		for (Player player : players) {
+			if (tide) {
+				player.sendMessage(Component.text("The frigid water rises below...", NamedTextColor.BLUE));
+			} else {
+				player.sendMessage(Component.text("The water above boils with heat..", NamedTextColor.RED));
+			}
+		}
 
 		World world = mStartLoc.getWorld();
 

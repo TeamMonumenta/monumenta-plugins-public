@@ -85,17 +85,17 @@ public class SpellReaperOfLife extends Spell {
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 3, 1.5f);
 			new PartialParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
-			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
 			List<Player> players = PlayerUtils.playersInRange(mCenter, HeadlessHorsemanBoss.arenaSize, true);
-			if (players.size() != 0) {
-				for (Player player : players) {
-					if (!mWarnedPlayers.contains(player)) {
-						mWarnedPlayers.add(player);
-						player.sendMessage(Component.text("Seems like the Horseman threw a bomb to the center of the arena. Maybe you can disarm it?", NamedTextColor.AQUA));
-					}
+			for (Player player : players) {
+				player.sendMessage(Component.text("[The Horseman] ", NamedTextColor.DARK_RED)
+					.append(Component.text("May your life force fuel ", NamedTextColor.GOLD))
+					.append(Component.text("our ", NamedTextColor.DARK_RED))
+					.append(Component.text("existence.", NamedTextColor.GOLD)));
+				if (!mWarnedPlayers.contains(player)) {
+					mWarnedPlayers.add(player);
+					player.sendMessage(Component.text("Seems like the Horseman threw a bomb to the center of the arena. Maybe you can disarm it?", NamedTextColor.AQUA));
 				}
 			}
-
 
 			new BukkitRunnable() {
 				double mTempPlayerScalingHP = 0;
