@@ -8,8 +8,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -17,7 +17,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -79,28 +78,27 @@ public class SpellUltimateShulkerMania extends Spell {
 					checkCircle = Math.pow(ARENA_SIZE, 2) - (Math.pow(x, 2) + Math.pow(z, 2));
 					attempts++;
 				}
-				if (l == null) {
-					//Try again next time
+
+				if (attempts >= 100) {
 					return;
 				}
-				ShulkerBullet bullet = null;
 
-				for (int i = 0; i < players.size(); i++) {
-					try {
-						bullet = (ShulkerBullet) EntityUtils.getSummonEntityAt(l, EntityType.SHULKER_BULLET, "{Target:[I;1234,1234,1234,1234],Motion:[0.0,0.5,0.0],TYD:-1d}");
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				if (players.isEmpty()) {
+					return;
 				}
+
+				final var player = FastUtils.getRandomElement(players);
+
+				// not null, but pmd is stupid
+				Objects.requireNonNull(l).getWorld().spawn(l, ShulkerBullet.class, shulkerBullet -> {
+					shulkerBullet.setVelocity(new Vector(0.0, 0.5, 0.0));
+					shulkerBullet.setTargetDelta(new Vector(0, -1, 0));
+					shulkerBullet.setTarget(player);
+					shulkerBullet.setShooter(mBoss);
+					shulkerBullet.setVelocity(new Vector(0.0, 1.0, 0.0));
+				});
+
 				world.playSound(mBoss.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.HOSTILE, 6.0f, 1.0f);
-
-				//set target of bullet
-				Collections.shuffle(players);
-				if (bullet != null) {
-					bullet.setTarget(players.get(0));
-					bullet.setShooter(mBoss);
-					bullet.setVelocity(new Vector(0.0, 1.0, 0.0));
-				}
 			}
 
 		};

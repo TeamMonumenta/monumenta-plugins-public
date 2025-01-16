@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.google.common.collect.Lists;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
@@ -30,13 +31,13 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -221,18 +222,30 @@ public final class WingedBoss extends BossAbilityGroup {
 		}
 	}
 
-	private Collection<Entity> createWings(Location loc) {
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,15.0f,-60.0f]},Silent:1b,Tags:[\"winged_wing\",\"left\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[15.0f,0.0f,-90.0f]},Silent:1b,Tags:[\"winged_wing\",\"left\",\"REMOVE_ON_UNLOAD\",\"effect_player\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,-15.0f,-120.0f]},Silent:1b,Tags:[\"winged_wing\",\"left\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,-15.0f,60.0f]},Silent:1b,Tags:[\"winged_wing\",\"right\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[15.0f,0.0f,90.0f]},Silent:1b,Tags:[\"winged_wing\",\"right\",\"REMOVE_ON_UNLOAD\"]}");
-		EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Invisible:1b,Marker:1b,NoBasePlate:1b,NoGravity:1b,Pose:{Head:[20.0f,15.0f,120.0f]},Silent:1b,Tags:[\"winged_wing\",\"right\",\"REMOVE_ON_UNLOAD\"]}");
+	private ArmorStand createWing(Location loc, EulerAngle headPose, String... tags) {
+		return loc.getWorld().spawn(loc, ArmorStand.class, e -> {
+			e.setInvisible(true);
+			e.setMarker(true);
+			e.setBasePlate(false);
+			e.setGravity(false);
+			e.setHeadPose(headPose);
+			e.setSilent(true);
+			e.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+			for (String tag : tags) {
+				e.addScoreboardTag(tag);
+			}
+		});
+	}
 
-		Collection<Entity> wings = loc.getNearbyEntities(0.01, 0.01, 0.01);
-		wings.removeIf((Entity entity) ->
-			!entity.getScoreboardTags().contains("winged_wing"));
-		return wings;
+	private Collection<Entity> createWings(Location loc) {
+		return List.of(
+			createWing(loc, new EulerAngle(20f, 15f, -60f), "left"),
+			createWing(loc, new EulerAngle(20f, 15f, -60f), "left", "effect_player"),
+			createWing(loc, new EulerAngle(20f, 15f, -60f), "left"),
+			createWing(loc, new EulerAngle(20f, 15f, -60f), "right"),
+			createWing(loc, new EulerAngle(20f, 15f, -60f), "right"),
+			createWing(loc, new EulerAngle(20f, 15f, -60f), "right")
+		);
 	}
 
 	public static List<ItemStack[]> banner(int pattern) {

@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -24,8 +23,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
@@ -79,22 +76,17 @@ public class SpellSoulShackle extends Spell {
 					this.cancel();
 					world.playSound(mBoss.getLocation().add(0, 5, 0), Sound.ENTITY_SHULKER_BULLET_HURT, SoundCategory.HOSTILE, 3.0f, 1.0f);
 					Location cornerloc = mBoss.getLocation().add(-1, 5, -1);
-					for (int i = 0; i < players.size(); i++) {
-						Location spawnloc = cornerloc.clone().add(FastUtils.RANDOM.nextInt(2), 0, FastUtils.RANDOM.nextInt(2));
-						EntityUtils.summonEntityAt(spawnloc, EntityType.SHULKER_BULLET, "{Target:[I;1234,1234,1234,1234],Motion:[0.0,0.5,0.0],TYD:-1d}");
+					for (Player player : players) {
+						Location loc = cornerloc.clone().add(FastUtils.RANDOM.nextInt(2), 0, FastUtils.RANDOM.nextInt(2));
+
+						loc.getWorld().spawn(loc, ShulkerBullet.class, shulkerBullet -> {
+							shulkerBullet.setTarget(player);
+							shulkerBullet.setVelocity(new Vector(0, 0.5, 0));
+							shulkerBullet.setShooter(mBoss);
+							shulkerBullet.setTargetDelta(new Vector(0, -1, 0));
+						});
 					}
 
-					//grab all bullets summoned
-					List<Entity> bullets = new ArrayList<>(mBoss.getLocation().add(0, 5, 0).getNearbyEntities(2f, 2f, 2f));
-					bullets.removeIf(e -> !e.getType().equals(EntityType.SHULKER_BULLET));
-
-					//set target of each bullet in list
-					for (int i = 0; i < players.size(); i++) {
-						Player p = players.get(i);
-						ShulkerBullet b = (ShulkerBullet) bullets.get(i);
-						b.setTarget(p);
-						b.setShooter(mBoss);
-					}
 					mChargeUp.reset();
 				}
 			}

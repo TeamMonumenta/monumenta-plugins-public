@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -134,7 +132,10 @@ public class SpellBombToss extends Spell {
 		Location sLoc = mBoss.getEyeLocation();
 		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
 		try {
-			TNTPrimed tnt = (TNTPrimed) EntityUtils.getSummonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + mFuse + "}");
+			final var tnt = sLoc.getWorld().spawn(sLoc, TNTPrimed.class, e -> {
+				e.setFuseTicks(mFuse);
+			});
+
 			mTNTList.add(tnt);
 			// Dummy TNT
 			tnt.setYield(0);

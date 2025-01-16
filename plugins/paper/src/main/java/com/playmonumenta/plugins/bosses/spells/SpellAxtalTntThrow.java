@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -11,8 +10,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
@@ -75,17 +74,15 @@ public class SpellAxtalTntThrow extends Spell {
 				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100, true);
 				if (plist.size() >= 1) {
 					Player target = plist.get(FastUtils.RANDOM.nextInt(plist.size()));
-					Location sLoc = mLauncher.getLocation();
-					try {
-						Entity tnt = EntityUtils.getSummonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
-						Location pLoc = target.getLocation();
-						Location tLoc = tnt.getLocation();
-						Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-						vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
-						tnt.setVelocity(vect);
-					} catch (Exception e) {
-						mPlugin.getLogger().warning("Summoned TNT but could not find TNT entity");
-					}
+					Location sLoc = mLauncher.getLocation().add(0, 1.7, 0);
+					final var tnt = sLoc.getWorld().spawn(sLoc, TNTPrimed.class, tntPrimed -> {
+						tntPrimed.setFuseTicks(50);
+					});
+					Location pLoc = target.getLocation();
+					Location tLoc = tnt.getLocation();
+					Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
+					vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
+					tnt.setVelocity(vect);
 				}
 			}
 		};

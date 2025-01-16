@@ -36,6 +36,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -100,7 +101,9 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 						}
 						target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2));
 					} else {
-						EntityUtils.summonEntityAt(loc, EntityType.PRIMED_TNT, "{Fuse:0}");
+						loc.getWorld().spawn(loc, TNTPrimed.class, e -> {
+							e.setFuseTicks(0);
+						});
 					}
 				}),
 			new SpellKnockAway(plugin, boss, 5, 20, 1.5f)

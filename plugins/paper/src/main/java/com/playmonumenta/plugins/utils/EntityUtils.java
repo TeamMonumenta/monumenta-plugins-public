@@ -1310,29 +1310,6 @@ public class EntityUtils {
 		return entity == null || !entity.isValid() || entity.isDead() || isSilenced(entity) || isStunned(entity) || isFrozen(entity);
 	}
 
-	public static void summonEntityAt(Location loc, EntityType type, String nbt) {
-		try {
-			getSummonEntityAt(loc, type, nbt);
-		} catch (Exception ex) {
-			Plugin.getInstance().getLogger().warning("Attempted to summon entity " + type.toString() + " but no entity appeared");
-		}
-	}
-
-	/*
-	 * TODO: This is really janky - it *probably* returns the correct entity... but it might not
-	 */
-	public static Entity getSummonEntityAt(Location loc, EntityType type, String nbt) throws Exception {
-		String worldName = Bukkit.getWorlds().get(0).equals(loc.getWorld()) ? "overworld" : loc.getWorld().getName();
-		String cmd = "execute in " + worldName + " run summon " + type.getKey().asString() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
-
-		return loc.getNearbyEntities(1f, 1f, 1f)
-			       .stream()
-			       .filter(e -> e.getType().equals(type))
-			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			       .orElseThrow(() -> new Exception("Summoned mob but no mob appeared - " + cmd));
-	}
-
 	/*
 	 * When we retrieve the location of the projectile, we get the location of the projectile the tick before
 	 * it hits; any location data retrieved from later ticks is unreliable. This relies on the fact that the

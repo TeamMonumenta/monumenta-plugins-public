@@ -42,7 +42,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -456,18 +455,11 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 								public void run() {
 									if (mInc == 0) {
 										world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3.0f, 1.0f);
-										try {
-											mSkull = EntityUtils.getSummonEntityAt(
-												startLoc.clone().add(vec.multiply(2 / distance)),
-												EntityType.WITHER_SKULL,
-												"{power:[" + vec.getX() * distance / 9.5 + ","
-													+ vec.getY() * distance / 9.5 + ","
-													+ vec.getZ() * distance / 9.5 + "]}");
-											((WitherSkull) mSkull).setCharged(true);
-										} catch (Exception e) {
-											MMLog.warning("[Hekawt] Failed to spawn a wither skull during the 66% health phase transition animation!");
-											e.printStackTrace();
-										}
+										final var skullPos = startLoc.clone().add(vec.multiply(2 / distance));
+										mSkull = skullPos.getWorld().spawn(skullPos, WitherSkull.class, skull -> {
+											skull.setPower(vec.clone().multiply(distance / 9.5));
+											skull.setCharged(true);
+										});
 									}
 									if (mSkull == null) {
 										cancel();
