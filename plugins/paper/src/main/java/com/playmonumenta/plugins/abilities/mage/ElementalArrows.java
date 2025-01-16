@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -37,6 +38,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.Nullable;
 
 
 public class ElementalArrows extends Ability {
@@ -137,7 +139,8 @@ public class ElementalArrows extends Ability {
 
 	private void applyArrowEffects(DamageEvent event, Projectile proj, LivingEntity enemy, boolean thunder, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
 		double baseDamage = playerItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
-		ItemStack arrowItem = EntityListener.getArrowItem(proj.getUniqueId());
+		@Nullable
+		ItemStack arrowItem = proj instanceof AbstractArrow arrow ? arrow.getItemStack() : null;
 		if (arrowItem != null) {
 			baseDamage *= 1 + ItemStatUtils.getAttributeAmount(arrowItem, AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.PROJECTILE);
 		}

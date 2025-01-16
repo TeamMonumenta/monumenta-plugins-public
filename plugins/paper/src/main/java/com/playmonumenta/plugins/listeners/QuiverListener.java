@@ -280,7 +280,7 @@ public class QuiverListener implements Listener {
 					}
 				}
 
-				EntityListener.setArrowItem(newArrow, projectileItem);
+				arrowSetItemWrapper(newArrow, projectileItem);
 
 				// We need to call a new ProjectileLaunchEvent as we changed the projectile entity (which causes the event to no longer get fired automatically)
 				// Delay to MONITOR to see if we actually shoot the projectile, and also allow the crossbow listener to add fire aspect and similar to the arrow
@@ -290,6 +290,13 @@ public class QuiverListener implements Listener {
 			}
 			player.updateInventory();
 		}
+	}
+
+	// TODO: fix this in 1.20.5 :3
+	@SuppressWarnings("deprecation")
+	public AbstractArrow arrowSetItemWrapper(AbstractArrow item, ItemStack projectileItem) {
+		item.setItem(projectileItem);
+		return item;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -371,11 +378,6 @@ public class QuiverListener implements Listener {
 		handlePickupEvent(event, event.getItem(), event.getPlayer());
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void playerPickupArrowEvent(PlayerPickupArrowEvent event) {
-		handlePickupEvent(event, event.getItem(), event.getPlayer());
-	}
-
 	// If an arrow is picked up, put it into a quiver if space is available
 	private void handlePickupEvent(Cancellable event, Item item, Player player) {
 		if (!item.isValid()) {
@@ -398,6 +400,33 @@ public class QuiverListener implements Listener {
 			item.remove();
 		} else {
 			item.setItemStack(itemStack);
+		}
+	}
+
+	// If an arrow is picked up, put it into a quiver if space is available
+	// Special handling is needed because `getItem` from PlayerPickupArrowEvent doesn't return the correct itemstack
+	// TODO: this entire thing breaks in 1.20.5 but it's the best we got for now - usb
+	@SuppressWarnings("deprecation")
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	public void playerPickupArrowEvent(PlayerPickupArrowEvent event) {
+		Player player = event.getPlayer();
+		AbstractArrow arrow = event.getArrow();
+		ItemStack itemStack = arrow.getItemStack();
+		// PlayerAttemptPickupItemEvent runs 20 times a tick for one item entity if PickupDelay is set to 0/-1
+		if (!ItemUtils.isArrow(itemStack) || !MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), arrow, "QuiverPickupDelay" + player.getUniqueId(), 20)) {
+			return;
+		}
+
+		if (!attemptPickup(player, itemStack)) {
+			return;
+		}
+
+		if (itemStack.getAmount() == 0) {
+			event.setCancelled(true);
+			event.setFlyAtPlayer(true);
+			arrow.remove();
+		} else {
+			arrow.setItem(itemStack);
 		}
 	}
 

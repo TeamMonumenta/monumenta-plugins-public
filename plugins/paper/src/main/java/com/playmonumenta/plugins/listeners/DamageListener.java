@@ -262,8 +262,8 @@ public class DamageListener implements Listener {
 		PlayerItemStats stats = plugin.mItemStatManager.getPlayerItemStatsCopy(player);
 		PlayerItemStats.ItemStatsMap map = stats.getItemStats();
 		UUID uuid = proj.getUniqueId();
-		if (proj instanceof AbstractArrow && !(proj instanceof Trident)) {
-			ItemStack item = EntityListener.getArrowItem(uuid);
+		if (proj instanceof AbstractArrow arrow && !(proj instanceof Trident)) {
+			ItemStack item = arrow.getItemStack();
 			if (item != null && item.getType() != Material.AIR) {
 				NBT.get(item, nbt -> {
 					ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
