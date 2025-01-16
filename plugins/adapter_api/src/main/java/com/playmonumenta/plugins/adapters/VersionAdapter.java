@@ -13,7 +13,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
@@ -28,16 +27,9 @@ import org.jetbrains.annotations.Nullable;
 public interface VersionAdapter {
 	void removeAllMetadata(Plugin plugin);
 
-	void resetPlayerIdleTimer(Player player);
-
 	void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg);
 
 	<T extends Entity> T duplicateEntity(T entity);
-
-	/**
-	 * Gets an entity by its {@link Entity#getEntityId() id} (i.e. not by its {@link Entity#getUniqueId() UUID}).
-	 */
-	@Nullable Entity getEntityById(World world, int entityId);
 
 	/**
 	 * Gets the actual direction of an entity instead of the direction of its head.
@@ -45,12 +37,6 @@ public interface VersionAdapter {
 	 * instead of one slightly in the past as the head is lagging behind the actual direction.
 	 */
 	Vector getActualDirection(Entity entity);
-
-	/**
-	 * Gets the jump velocity of an player. Based on LivingEntity.getJumpPower + getJumpBoostPower in LivingEntity.jumpFromGround
-	 */
-	double getJumpVelocity(LivingEntity entity);
-
 
 	int getAttackCooldown(LivingEntity entity);
 
@@ -68,28 +54,10 @@ public interface VersionAdapter {
 	void cancelStrafe(Mob mob);
 
 	/**
-	 * Spawns an entity that will not be present in the world
-	 *
-	 * @param type  Entity type to spawn - not all types may work!
-	 * @param world Any world (required for the constructor, and used for activation range and possibly some more things)
-	 * @return Newly spawned entity
-	 * @throws IllegalArgumentException if the provided entity type cannot be spawned
-	 */
-	Entity spawnWorldlessEntity(EntityType type, World world);
-
-	/**
 	 * Prevents the given parrot from moving onto a player's shoulders.
 	 * This is not persistent and needs to be re-applied whenever the parrot is loaded again.
 	 */
 	void disablePerching(Parrot parrot);
-
-	/**
-	 * Make entity agro players
-	 *
-	 * @param entity       The entity who should agro players
-	 * @param action       Damage action when this entity hit a player
-	 */
-	void setAggressive(Creature entity, DamageAction action);
 
 	/**
 	 * Make entity agro players but now with range
@@ -126,20 +94,6 @@ public interface VersionAdapter {
 	 * @param attackRange Attack range of the entity (calculated from feet to feet)
 	 */
 	void setAttackRange(Creature entity, double attackRange);
-
-	/**
-	 * Returns the NMS class representing a ResourceKey (for use in packet handlers). A resource key is a pair of identifiers,
-	 * with the first one representing the type of resource, and the second one identifying the resource,
-	 * e.g. the resource key "minecraft:dimension_type / minecraft:overworld" represents the vanilla overworld dimension type.
-	 */
-	Class<?> getResourceKeyClass();
-
-	/**
-	 * Creates a ResourceKey of type "minecraft:dimension_type" with the provided namespace and key as identifier.
-	 */
-	Object createDimensionTypeResourceKey(String namespace, String key);
-
-	@Nullable World getWorldByResourceKey(Object currentWorldKey);
 
 	/**
 	 * Runs a command as the console, without logging output to server logs.

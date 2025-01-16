@@ -11,7 +11,6 @@ import io.papermc.paper.util.CollisionUtil;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -36,7 +35,6 @@ import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
@@ -56,7 +54,6 @@ import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Evoker;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
@@ -84,7 +81,6 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
@@ -114,13 +110,6 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		for (final var world : Bukkit.getWorlds()) {
 			((CraftWorld) world).getBlockMetadata().removeAll(plugin);
 		}
-	}
-
-	@Override
-	public void resetPlayerIdleTimer(Player player) {
-		final var p = (CraftPlayer) player;
-		final var playerHandle = p.getHandle();
-		playerHandle.resetLastActionTime();
 	}
 
 	@Override
@@ -156,12 +145,6 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		((CraftEntity) newEntity).getHandle().load(tag);
 
 		return newEntity;
-	}
-
-	@Override
-	public @Nullable Entity getEntityById(World world, int entityId) {
-		final var entity = ((CraftWorld) world).getHandle().getEntity(entityId);
-		return entity == null ? null : entity.getBukkitEntity();
 	}
 
 	@Override
@@ -224,34 +207,11 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	}
 
 	@Override
-	public Entity spawnWorldlessEntity(EntityType type, World world) {
-		final var entityTypes = net.minecraft.world.entity.EntityType.byString(type.name().toLowerCase(Locale.ROOT));
-
-		if (entityTypes.isEmpty()) {
-			throw new IllegalArgumentException("Invalid entity type " + type.name());
-		}
-
-		final var entity = entityTypes.get().create(((CraftWorld) world).getHandle());
-
-		if (entity == null) {
-			throw new IllegalArgumentException("Unspawnable entity type " + type.name());
-		}
-
-		return entity.getBukkitEntity();
-	}
-
-	@Override
 	public void disablePerching(Parrot parrot) {
 		((CraftParrot) parrot).getHandle()
 			.goalSelector
 			.getAvailableGoals()
 			.removeIf(w -> w.getGoal() instanceof LandOnOwnersShoulderGoal);
-	}
-
-	@Override
-	public void setAggressive(Creature entity, DamageAction action) {
-		// 0 is default. Would be like, a negative number but unfortunately -100^2 is a positive number
-		setAggressive(entity, action, 0);
 	}
 
 	@Override
@@ -345,28 +305,6 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 						.build()
 				);
 			});
-	}
-
-	@Override
-	public Class<?> getResourceKeyClass() {
-		return ResourceKey.class;
-	}
-
-	@Override
-	public Object createDimensionTypeResourceKey(String namespace, String key) {
-		return ResourceKey.create(Registries.DIMENSION_TYPE, new ResourceLocation(namespace, key));
-	}
-
-	@Override
-	// Cannot check resource key type, but this should only ever be called with the proper type anyway
-	@SuppressWarnings("unchecked")
-	public @Nullable World getWorldByResourceKey(Object key) {
-		if (!(key instanceof ResourceKey<?> resourceKey)) {
-			return null;
-		}
-
-		ServerLevel level = MinecraftServer.getServer().getLevel(((ResourceKey<Level>) resourceKey));
-		return level == null ? null : level.getWorld();
 	}
 
 	@Override
@@ -653,12 +591,6 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		return 0;
 	}
 
-
-	@Override
-	public double getJumpVelocity(LivingEntity entity) {
-		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
-		return e.getJumpPower() + e.getJumpBoostPower();
-	}
 
 	@Override
 	public Object replaceWorldNames(Object packet, Consumer<WorldNameReplacementToken> handler) {

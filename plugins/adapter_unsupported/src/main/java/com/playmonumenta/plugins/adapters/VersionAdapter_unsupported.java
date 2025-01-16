@@ -14,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
@@ -35,10 +34,6 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	}
 
-	public void resetPlayerIdleTimer(Player player) {
-
-	}
-
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
 		damagee.damage(amount, damager);
 	}
@@ -48,16 +43,8 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		return (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 	}
 
-	public @Nullable Entity getEntityById(World world, int entityId) {
-		return null;
-	}
-
 	public Vector getActualDirection(Entity entity) {
 		return entity.getLocation().getDirection();
-	}
-
-	public double getJumpVelocity(LivingEntity entity) {
-		return 0.42;
 	}
 
 	public int getAttackCooldown(LivingEntity entity) {
@@ -82,17 +69,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
-	public Entity spawnWorldlessEntity(EntityType type, World world) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void disablePerching(Parrot parrot) {
-
-	}
-
-	@Override
-	public void setAggressive(Creature entity, DamageAction action) {
 
 	}
 
@@ -114,21 +91,6 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public void setAttackRange(Creature entity, double attackRange) {
 
-	}
-
-	@Override
-	public Class<?> getResourceKeyClass() {
-		return null;
-	}
-
-	@Override
-	public Object createDimensionTypeResourceKey(String namespace, String key) {
-		return null;
-	}
-
-	@Override
-	public @Nullable World getWorldByResourceKey(Object currentWorldKey) {
-		return null;
 	}
 
 	@Override

@@ -135,7 +135,7 @@ public final class SpectateBot extends GenericCommand implements Listener {
 							 */
 							if (ctx.mTimeSinceLastSwitch < 100 || FastUtils.RANDOM.nextInt(200) == 0) {
 								/* Make sure the player won't get idle kicked */
-								NmsUtils.getVersionAdapter().resetPlayerIdleTimer(ctx.mSpectator);
+								ctx.mSpectator.resetIdleDuration();
 								continue;
 							}
 
