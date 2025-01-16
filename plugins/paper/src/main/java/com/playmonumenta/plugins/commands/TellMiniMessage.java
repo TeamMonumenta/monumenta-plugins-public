@@ -1,23 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.GreedyStringArgument;
-import dev.jorel.commandapi.wrappers.NativeProxyCommandSender;
-import io.papermc.paper.text.PaperComponents;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.function.BiConsumer;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.TitlePart;
-import org.bukkit.entity.Player;
-
 public class TellMiniMessage {
-	private static final String PERMISSION = "monumenta.command.tellmini";
+	// TODO: tellmini is moved to the mixins repo due to a bug in commandapi
+	/*private static final String PERMISSION = "monumenta.command.tellmini";
 	private static final String NAME = "tellmini";
 
 	private static CommandAPICommand generateSubcommand(String name, BiConsumer<Player, Component> send) {
@@ -26,7 +11,7 @@ public class TellMiniMessage {
 			new GreedyStringArgument("message").setOptional(true)
 		).executes((sender, args) -> {
 			if (sender instanceof NativeProxyCommandSender nativeProxyCommandSender) {
-				sender = nativeProxyCommandSender.getCaller(); // don't use get callee probably
+				sender = nativeProxyCommandSender.getCallee(); // don't use get caller probably
 			}
 
 			Collection<Player> recipients = Objects.requireNonNull(args.getUnchecked("recipients"));
@@ -41,9 +26,9 @@ public class TellMiniMessage {
 				}
 			}
 		});
-	}
+	}*/
 
-	public static void register() {
+	public static void register() {/*
 		new CommandAPICommand(NAME)
 			.withPermission(PERMISSION)
 			.withSubcommands(
@@ -55,6 +40,6 @@ public class TellMiniMessage {
 
 		generateSubcommand(NAME, Audience::sendMessage)
 			.withPermission(PERMISSION)
-			.register();
+			.register();*/
 	}
 }
