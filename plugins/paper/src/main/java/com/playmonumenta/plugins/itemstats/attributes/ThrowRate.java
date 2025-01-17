@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.itemstats.enchantments.Oversized;
+import com.playmonumenta.plugins.itemstats.enchantments.Snowy;
 import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -103,12 +104,19 @@ public class ThrowRate implements Attribute {
 				if (isVolley) {
 					return;
 				}
+				// if event is cancelled (either from TwoHanded or Snowy), do not create projectile
+				if (event.isCancelled()) {
+					return;
+				}
 
 				Snowball snowball = (Snowball) player.getWorld().spawnEntity(proj.getLocation(), EntityType.SNOWBALL);
 				snowball.setShooter(player);
 				snowball.setVelocity(proj.getVelocity());
 				DamageListener.addProjectileItemStats(snowball, player);
 				ItemUtils.setSnowballItem(snowball, oldSnowball.getItem());
+
+				Snowy.transferProjectileMode(oldSnowball, snowball);
+
 				player.playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.5f, 0.5f);
 				AbilityManager.getManager().playerShotProjectileEvent(player, snowball);
 

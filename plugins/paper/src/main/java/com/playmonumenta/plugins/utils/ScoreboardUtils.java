@@ -191,13 +191,9 @@ public class ScoreboardUtils {
 		}
 	}
 
-	public static boolean addScore(Entity entity, String objectiveName, int add) {
-		OptionalInt scoreboardValue = getScoreboardValue(entity, objectiveName);
-		if (scoreboardValue.isEmpty()) {
-			return false;
-		}
-		setScoreboardValue(entity, objectiveName, scoreboardValue.getAsInt() + add);
-		return true;
+	public static void addScore(Entity entity, String objectiveName, int add) {
+		int amount = getScoreboardValue(entity, objectiveName).orElse(0);
+		setScoreboardValue(entity, objectiveName, amount + add);
 	}
 
 	public static Objective createObjective(String name, Component displayName) {

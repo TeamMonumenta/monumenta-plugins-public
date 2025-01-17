@@ -33,6 +33,13 @@ public class TwoHanded implements Enchantment {
 		return EnchantmentType.TWO_HANDED;
 	}
 
+	// throw rate has priority of 1000, and creates a new snowball
+	// want this enchant to cancel the event before throw rate checks for cancelled event
+	@Override
+	public double getPriorityAmount() {
+		return 999;
+	}
+
 	public static boolean checkForOffhand(Plugin plugin, Player player) {
 		PlayerInventory inventory = player.getInventory();
 		if (inventory.getItemInOffHand().getType() != Material.AIR && inventory.getItemInMainHand().getType() != Material.AIR

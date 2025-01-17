@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
 import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
+import com.playmonumenta.plugins.itemstats.enchantments.Snowy;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -295,6 +296,20 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				NBT.modify(itemStack, nbt -> {
 					nbt.modifyMeta((nbtr, meta) -> {
 						meta.displayName(ItemUtils.getDisplayName(finalItemStack).append(Component.text(" (" + count + ")")));
+					});
+					markVirtual(nbt);
+				});
+				return itemStack;
+			}
+
+			if (isHotbarOrOffhandSlot && ItemStatUtils.hasEnchantment(itemStack, EnchantmentType.SNOWY)) {
+				int count = Snowy.getSnowballAmmo(itemStack);
+				itemStack.setAmount(Math.max(1, count));
+
+				Component prevDisplayName = ItemUtils.getDisplayName(itemStack);
+				NBT.modify(itemStack, nbt -> {
+					nbt.modifyMeta((nbtr, meta) -> {
+						meta.displayName(prevDisplayName.append(Component.text(" (" + count + ")")));
 					});
 					markVirtual(nbt);
 				});

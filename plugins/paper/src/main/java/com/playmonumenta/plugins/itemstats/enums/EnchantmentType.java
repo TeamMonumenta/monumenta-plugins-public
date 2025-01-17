@@ -182,7 +182,8 @@ public enum EnchantmentType {
 
 	// Item Tags (these are last)
 	MAGIC_WAND(new MagicWandEnch(), false, false, false, false),
-	ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false);
+	ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false),
+	SNOWY(new Snowy(), false, false, false, false);
 
 	public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = Arrays.stream(values())
 		.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
