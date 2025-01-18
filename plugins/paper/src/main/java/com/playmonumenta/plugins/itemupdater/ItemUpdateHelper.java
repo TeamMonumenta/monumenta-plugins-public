@@ -508,7 +508,7 @@ public class ItemUpdateHelper {
 				lore.add(Component.empty());
 				lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 				for (String serializedLine : charmLore) {
-					Component lineAdd = MessagingUtils.parseComponent(serializedLine);
+					Component lineAdd = MessagingUtils.fromMiniMessage(serializedLine);
 					lore.add(lineAdd);
 				}
 			}
