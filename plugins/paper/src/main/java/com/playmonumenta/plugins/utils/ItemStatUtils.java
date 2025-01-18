@@ -53,14 +53,17 @@ public class ItemStatUtils {
 
 	public static final String MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME = "MMDummy";
 	public static final String MONUMENTA_KEY = "Monumenta";
-	public static final String LORE_KEY = "Lore";
+	public static final String NAME_KEY = "MMName";
+	public static final String LORE_KEY = "MMLore";
+	public static final String LEGACY_LORE_KEY = "Lore";
 	public static final String STOCK_KEY = "Stock";
 	public static final String PLAYER_MODIFIED_KEY = "PlayerModified";
 	public static final String LEVEL_KEY = "Level";
 	public static final String INFUSER_KEY = "Infuser";
 	public static final String INFUSER_NPC_KEY = "InfuserNpc";
 	public static final String ATTRIBUTE_NAME_KEY = "AttributeName";
-	public static final String CHARM_KEY = "CharmText";
+	public static final String CHARM_KEY = "MMCharmText";
+	public static final String LEGACY_CHARM_KEY = "CharmText";
 	public static final String CHARM_POWER_KEY = "CharmPower";
 	public static final String FISH_QUALITY_KEY = "FishQuality";
 	public static final String AMOUNT_KEY = "Amount";
@@ -319,7 +322,7 @@ public class ItemStatUtils {
 		}
 		NBT.modify(item, nbt -> {
 			ReadWriteNBTList<String> lore = nbt.getOrCreateCompound(MONUMENTA_KEY).getStringList(LORE_KEY);
-			String serializedLine = MessagingUtils.toGson(line).toString();
+			String serializedLine = MessagingUtils.toMiniMessage(line);
 			if (index < lore.size()) {
 				lore.add(index, serializedLine);
 			} else {
@@ -363,6 +366,14 @@ public class ItemStatUtils {
 		item.lore(null);
 	}
 
+	public static Component getName(final ReadableNBT nbt) {
+		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return Component.empty();
+		}
+		return MessagingUtils.fromMiniMessage(monumenta.getString(NAME_KEY));
+	}
+
 	public static List<Component> getLore(final ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return getLore(nbt);
@@ -376,7 +387,7 @@ public class ItemStatUtils {
 			return lore;
 		}
 		for (String serializedLine : monumenta.getStringList(LORE_KEY)) {
-			lore.add(MessagingUtils.fromGson(serializedLine));
+			lore.add(MessagingUtils.fromMiniMessage(serializedLine));
 		}
 		return lore;
 	}
@@ -395,7 +406,7 @@ public class ItemStatUtils {
 		}
 		NBT.modify(item, nbt -> {
 			ReadWriteNBTList<String> charmLore = nbt.getOrCreateCompound(MONUMENTA_KEY).getStringList(CHARM_KEY);
-			String serializedLine = MessagingUtils.toGson(line).toString();
+			String serializedLine = MessagingUtils.toMiniMessage(line);
 			if (index < charmLore.size()) {
 				charmLore.add(index, serializedLine);
 			} else {
@@ -431,7 +442,7 @@ public class ItemStatUtils {
 			return lore;
 		}
 		for (String serializedLine : monumenta.getStringList(CHARM_KEY)) {
-			lore.add(MessagingUtils.fromGson(serializedLine));
+			lore.add(MessagingUtils.fromMiniMessage(serializedLine));
 		}
 		return lore;
 	}

@@ -78,10 +78,10 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class ItemUtils {
-	private static final String PLAIN_KEY = "plain";
-	private static final String DISPLAY_KEY = "display";
-	private static final String LORE_KEY = "Lore";
-	private static final String NAME_KEY = "Name";
+	public static final String PLAIN_KEY = "plain";
+	public static final String DISPLAY_KEY = "display";
+	public static final String LORE_KEY = "Lore";
+	public static final String NAME_KEY = "Name";
 	private static final Pattern NON_PLAIN_REGEX = Pattern.compile("[^ -~]");
 
 	private static final String plainNamePath = PLAIN_KEY + "." + DISPLAY_KEY + "." + NAME_KEY;
@@ -1055,6 +1055,16 @@ public class ItemUtils {
 		}
 	}
 
+	public static void setDisplayName(ItemStack itemStack, Component displayName) {
+		NBT.modify(itemStack, nbt -> {
+			setDisplayName(nbt, displayName);
+		});
+	}
+
+	public static void setDisplayName(ReadWriteNBT nbt, Component displayName) {
+		nbt.getOrCreateCompound(DISPLAY_KEY).setString(NAME_KEY, MessagingUtils.serializeComponent(displayName));
+	}
+
 	public static void setDisplayLore(ItemStack item, List<Component> lore) {
 		if (isNullOrAir(item)) {
 			return;
@@ -1088,7 +1098,7 @@ public class ItemUtils {
 	}
 
 	public static List<Component> getDisplayLore(ReadableNBT nbt) {
-		ReadableNBT display = nbt.getCompound("display");
+		ReadableNBT display = nbt.getCompound(DISPLAY_KEY);
 		List<Component> lore = new ArrayList<>();
 		if (display == null) {
 			return lore;

@@ -28,6 +28,7 @@ import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTType;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTList;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.nio.charset.StandardCharsets;
@@ -368,7 +369,7 @@ public class ItemUpdateHelper {
 			if (description != null) {
 				for (String serializedLine : description) {
 					Component lineAdd = Component.text("", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
-					lineAdd = lineAdd.append(MessagingUtils.parseComponent(serializedLine));
+					lineAdd = lineAdd.append(MessagingUtils.fromMiniMessage(serializedLine));
 					lore.add(lineAdd);
 				}
 			}
@@ -525,15 +526,14 @@ public class ItemUpdateHelper {
 				cleanEmptyTags(nbt, path);
 			}
 
+			addDummyAttributeIfNeeded(item);
+
 			// return if no NBT
 			if (nbt.getKeys().isEmpty()) {
 				return;
 			}
 
-
 			// placeholder attributes (for items with default attributes)
-			addDummyAttributeIfNeeded(item);
-
 			nbt.modifyMeta((nbtr, meta) -> {
 
 				// placeholder enchantment
@@ -590,6 +590,9 @@ public class ItemUpdateHelper {
 					meta.removeItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 				}
 			});
+
+			nbt.removeKey(ItemUtils.DISPLAY_KEY);
+			ItemUtils.setDisplayName(nbt, ItemStatUtils.getName(nbt));
 			ItemUtils.setDisplayLore(nbt, lore);
 			ItemUtils.setPlainComponentLore(nbt, lore);
 		});
@@ -823,6 +826,35 @@ public class ItemUpdateHelper {
 				}
 			}
 
+			// regenerate display name and lore
+			Component displayName = ItemUtils.getRawDisplayName(nbt);
+			List<Component> lore = legacyGetLore(nbt);
+			if (Component.IS_NOT_EMPTY.test(displayName)) {
+				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setString(ItemStatUtils.NAME_KEY, MessagingUtils.toMiniMessage(displayName));
+			}
+			if (!lore.isEmpty()) {
+				ReadWriteNBTList<String> loreNBT = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getStringList(ItemStatUtils.LORE_KEY);
+				loreNBT.clear();
+				for (Component line : lore) {
+					loreNBT.add(MessagingUtils.toMiniMessage(line));
+				}
+				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.LEGACY_LORE_KEY);
+			}
+
+			// regenerate charm lore
+			if (monumenta != null && ItemStatUtils.isCharm(item)) {
+				List<Component> charmEffects = legacyGetCharmEffects(nbt);
+				if (!charmEffects.isEmpty()) {
+					// mriaw
+					ReadWriteNBTList<String> charmLoreNBT = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getStringList(ItemStatUtils.CHARM_KEY);
+					charmLoreNBT.clear();
+					for (Component effect : charmEffects) {
+						charmLoreNBT.add(MessagingUtils.toMiniMessage(effect));
+					}
+					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.LEGACY_CHARM_KEY);
+				}
+			}
+
 			// purge vanilla enchantments and attribute modifiers
 			nbt.removeKey("AttributeModifiers");
 			nbt.removeKey("Enchantments");
@@ -848,9 +880,44 @@ public class ItemUpdateHelper {
 				}
 			});
 		});
+		Material mat = item.getType();
+		ItemMeta meta = item.getItemMeta();
+		String plainName = ItemUtils.getPlainNameIfExists(item);
+		if (!plainName.isEmpty() && !meta.hasDisplayName()) {
+			if (mat != Material.WRITABLE_BOOK && mat != Material.WRITTEN_BOOK) {
+				errors.add("Name: '" + plainName + "' (No Display Name)");
+			}
+		} else if (plainName.isEmpty() && meta.hasDisplayName()) {
+			errors.add("Name: '" + meta.displayName() + "' (No Plain Name)");
+			plainName = ItemUtils.toPlainTagText(meta.displayName());
+		}
 		if (!errors.isEmpty()) {
-			return "Name: '" + ItemUtils.toPlainTagText(item.displayName()) + "\'\n" + String.join("\n", errors);
+			return "Name: '" + plainName + "'\n" + String.join("\n", errors);
 		}
 		return null;
+	}
+
+	public static List<Component> legacyGetCharmEffects(final ReadableNBT nbt) {
+		List<Component> lore = new ArrayList<>();
+		ReadableNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
+		if (monumenta == null) {
+			return lore;
+		}
+		for (String serializedLine : monumenta.getStringList(ItemStatUtils.LEGACY_CHARM_KEY)) {
+			lore.add(MessagingUtils.fromGson(serializedLine));
+		}
+		return lore;
+	}
+
+	public static List<Component> legacyGetLore(final ReadableNBT nbt) {
+		List<Component> lore = new ArrayList<>();
+		ReadableNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
+		if (monumenta == null) {
+			return lore;
+		}
+		for (String serializedLine : monumenta.getStringList(ItemStatUtils.LEGACY_LORE_KEY)) {
+			lore.add(MessagingUtils.fromGson(serializedLine));
+		}
+		return lore;
 	}
 }

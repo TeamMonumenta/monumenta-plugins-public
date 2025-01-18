@@ -431,6 +431,7 @@ public class ItemStatCommands {
 
 			itemMeta.displayName(displayName);
 			item.setItemMeta(itemMeta);
+			ItemUtils.setDisplayName(item, displayName);
 			ItemUtils.setPlainName(item);
 		}).register();
 
@@ -447,13 +448,11 @@ public class ItemStatCommands {
 
 			ItemMeta itemMeta = item.getItemMeta();
 			Component displayName = itemMeta.displayName();
-			if (displayName != null) {
-				itemMeta.displayName(Component.text(name, displayName.color()).decorations(displayName.decorations()));
-			} else {
-				itemMeta.displayName(Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-			}
+			Component resultName = displayName != null ? Component.text(name, displayName.color()).decorations(displayName.decorations()) : Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
+			itemMeta.displayName(resultName);
 			item.setItemMeta(itemMeta);
-			ItemUtils.setPlainName(item, name);
+			ItemUtils.setDisplayName(item, resultName);
+			ItemUtils.setPlainName(item);
 		}).register();
 	}
 

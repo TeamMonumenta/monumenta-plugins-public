@@ -11,6 +11,7 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import de.tr7zw.nbtapi.NBT;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,16 @@ public class NBTBanFix extends PacketAdapter {
 		ItemStack realItem = entityItem.getItemStack();
 		if (!ItemUtils.isShulkerBox(realItem.getType())) { // may want to modify other block entities such as chests and such
 			return;
+		}
+		try {
+			packet = packet.deepClone();
+		} catch (RuntimeException e) {
+			// sometimes, cloning just fails for some reason?
+			if (e.getMessage() != null && e.getMessage().startsWith("Unable to clone")) {
+				MMLog.warning("Failed to clone packet of type " + packet.getType());
+				return;
+			}
+			throw e;
 		}
 		ItemStack item = realItem.clone();
 		NBT.modify(item, nbt -> {
