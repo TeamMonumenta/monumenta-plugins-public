@@ -165,6 +165,8 @@ public class ItemStatCommands {
 				comp = MessagingUtils.fromMiniMessage(lore);
 			}
 
+			ItemUpdateHelper.regenerateStats(item);
+
 			ItemStatUtils.addLore(item, index, comp);
 
 			ItemUpdateHelper.generateItemStats(item);
@@ -179,6 +181,8 @@ public class ItemStatCommands {
 				return;
 			}
 			int index = args.getByArgument(indexArg);
+
+			ItemUpdateHelper.regenerateStats(item);
 
 			ItemStatUtils.removeLore(item, index);
 
@@ -196,6 +200,8 @@ public class ItemStatCommands {
 			}
 			int index = args.getByArgument(indexArg);
 			String lore = args.getByArgument(loreArg);
+
+			ItemUpdateHelper.regenerateStats(item);
 
 			ItemStatUtils.removeLore(item, index);
 			ItemStatUtils.addLore(item, index, MessagingUtils.fromMiniMessage(lore));
@@ -231,6 +237,8 @@ public class ItemStatCommands {
 				player.sendMessage(Component.text("Item has no lore!", NamedTextColor.RED));
 				return;
 			}
+
+			ItemUpdateHelper.regenerateStats(item);
 
 			int loreIdx = 0;
 			for (Component c : oldLore) {
@@ -429,10 +437,10 @@ public class ItemStatCommands {
 				displayName = displayName.decoration(TextDecoration.UNDERLINED, underline);
 			}
 
-			itemMeta.displayName(displayName);
-			item.setItemMeta(itemMeta);
-			ItemUtils.setDisplayName(item, displayName);
-			ItemUtils.setPlainName(item);
+			ItemStatUtils.setName(item, displayName);
+
+
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 
 		new CommandAPICommand("editname").withPermission(perms)
@@ -449,11 +457,28 @@ public class ItemStatCommands {
 			ItemMeta itemMeta = item.getItemMeta();
 			Component displayName = itemMeta.displayName();
 			Component resultName = displayName != null ? Component.text(name, displayName.color()).decorations(displayName.decorations()) : Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
-			itemMeta.displayName(resultName);
-			item.setItemMeta(itemMeta);
-			ItemUtils.setDisplayName(item, resultName);
-			ItemUtils.setPlainName(item);
+			ItemStatUtils.setName(item, resultName);
+
+
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
+
+		new CommandAPICommand("editname").withPermission(perms)
+		.withArguments(new LiteralArgument("minimessage"))
+		.withArguments(nameArg)
+		.executesPlayer((player, args) -> {
+		ItemStack item = getHeldItemAndSendErrors(player);
+		if (item == null) {
+			return;
+		}
+
+		String name = args.getByArgument(nameArg);
+
+		Component resultName = MessagingUtils.fromMiniMessage(name);
+		ItemStatUtils.setName(item, resultName);
+
+		ItemUpdateHelper.generateItemStats(item);
+	}).register();
 	}
 
 	public static void registerConsumeCommand() {

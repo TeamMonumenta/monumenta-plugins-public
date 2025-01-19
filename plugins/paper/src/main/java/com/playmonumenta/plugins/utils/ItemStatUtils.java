@@ -366,12 +366,32 @@ public class ItemStatUtils {
 		item.lore(null);
 	}
 
+	public static Component getName(final ItemStack item) {
+		return NBT.get(item, nbt -> {
+			return getName(nbt);
+		});
+	}
+
 	public static Component getName(final ReadableNBT nbt) {
 		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
 			return Component.empty();
 		}
 		return MessagingUtils.fromMiniMessage(monumenta.getString(NAME_KEY));
+	}
+
+	public static void setName(final ItemStack item, final Component name) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBT.modify(item, nbt -> {
+			setName(nbt, name);
+		});
+	}
+
+	public static void setName(final ReadWriteNBT nbt, final Component name) {
+		ReadWriteNBT monumenta = nbt.getOrCreateCompound(MONUMENTA_KEY);
+		monumenta.setString(NAME_KEY, MessagingUtils.toMiniMessage(name));
 	}
 
 	public static List<Component> getLore(final ItemStack item) {
@@ -1167,23 +1187,24 @@ public class ItemStatUtils {
 		if (item == null || item.getType() == Material.AIR) {
 			return Tier.NONE;
 		}
-		return NBT.get(item, nbt -> {
-			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
-			if (monumenta == null) {
-				return ItemUtils.isShulkerBox(item.getType()) ? Tier.SHULKER_BOX : Tier.NONE;
-			}
-
-			String tierString = monumenta.getString(Tier.KEY);
-			if (tierString != null && !tierString.isEmpty()) {
-				return Tier.getTier(tierString);
-			}
-
-			if (ItemUtils.isShulkerBox(item.getType())) {
-				return Tier.SHULKER_BOX;
-			}
-
-			return Tier.NONE;
+		Tier tier = NBT.get(item, nbt -> {
+			return getTier(nbt);
 		});
+		return tier == Tier.NONE && ItemUtils.isShulkerBox(item.getType()) ? Tier.SHULKER_BOX : tier;
+	}
+
+	public static Tier getTier(final ReadableNBT nbt) {
+		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return Tier.NONE;
+		}
+
+		String tierString = monumenta.getString(Tier.KEY);
+		if (tierString != null && !tierString.isEmpty()) {
+			return Tier.getTier(tierString);
+		}
+
+		return Tier.NONE;
 	}
 
 	public static Masterwork getMasterwork(final @Nullable ItemStack item) {
@@ -1364,6 +1385,11 @@ public class ItemStatUtils {
 
 	public static boolean isCharm(@Nullable ItemStack item) {
 		Tier tier = getTier(item);
+		return isCharm(tier);
+	}
+
+	public static boolean isCharm(final ReadableNBT nbt) {
+		Tier tier = getTier(nbt);
 		return isCharm(tier);
 	}
 

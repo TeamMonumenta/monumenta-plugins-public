@@ -185,6 +185,13 @@ public class ItemUpdateHelper {
 			return;
 		}
 
+		// convert legacy lore to MM
+		if (requiresConversionToMM(item)) {
+			NBT.modify(item, nbt -> {
+				convertToMM(nbt);
+			});
+		}
+
 		if (wasDirty && ItemStatUtils.isZenithCharm(item)) {
 			// Update Depths charms once a week (when not clean) to catch balance changes
 			// This calls generateItemStats again once updated. Mark clean to prevent infinite recursion
@@ -584,15 +591,18 @@ public class ItemUpdateHelper {
 					|| name.contains("PATTERN") // banners
 					|| name.contains("BANNER") // banners
 					|| name.contains("SHIELD") // shield
-					|| type == Material.TIPPED_ARROW) { // tipped arrows
+					|| type == Material.TIPPED_ARROW // tipped arrows
+					|| name.contains("SMITHING_TEMPLATE")) { // item trims?
 					meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 				} else {
 					meta.removeItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 				}
 			});
 
-			nbt.removeKey(ItemUtils.DISPLAY_KEY);
-			ItemUtils.setDisplayName(nbt, ItemStatUtils.getName(nbt));
+			Component name = ItemStatUtils.getName(nbt);
+			if (Component.IS_NOT_EMPTY.test(name)) {
+				ItemUtils.setDisplayName(nbt, name);
+			}
 			ItemUtils.setDisplayLore(nbt, lore);
 			ItemUtils.setPlainComponentLore(nbt, lore);
 		});
@@ -826,33 +836,8 @@ public class ItemUpdateHelper {
 				}
 			}
 
-			// regenerate display name and lore
-			Component displayName = ItemUtils.getRawDisplayName(nbt);
-			List<Component> lore = legacyGetLore(nbt);
-			if (Component.IS_NOT_EMPTY.test(displayName)) {
-				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setString(ItemStatUtils.NAME_KEY, MessagingUtils.toMiniMessage(displayName));
-			}
-			if (!lore.isEmpty()) {
-				ReadWriteNBTList<String> loreNBT = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getStringList(ItemStatUtils.LORE_KEY);
-				loreNBT.clear();
-				for (Component line : lore) {
-					loreNBT.add(MessagingUtils.toMiniMessage(line));
-				}
-				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.LEGACY_LORE_KEY);
-			}
-
-			// regenerate charm lore
-			if (monumenta != null && ItemStatUtils.isCharm(item)) {
-				List<Component> charmEffects = legacyGetCharmEffects(nbt);
-				if (!charmEffects.isEmpty()) {
-					// mriaw
-					ReadWriteNBTList<String> charmLoreNBT = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getStringList(ItemStatUtils.CHARM_KEY);
-					charmLoreNBT.clear();
-					for (Component effect : charmEffects) {
-						charmLoreNBT.add(MessagingUtils.toMiniMessage(effect));
-					}
-					nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.LEGACY_CHARM_KEY);
-				}
+			if (requiresConversionToMM(nbt)) {
+				convertToMM(nbt);
 			}
 
 			// purge vanilla enchantments and attribute modifiers
@@ -866,7 +851,7 @@ public class ItemUpdateHelper {
 					meta.addEnchant(type.enchant, type.level, true);
 				}
 				// add placeholder if nbtAttributes is empty
-				if (ItemUtils.hasDefaultAttributes(item) && nbtAttributes.size() == 0) {
+				if (ItemUtils.hasDefaultAttributes(item) && nbtAttributes.isEmpty()) {
 					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
 				} else {
 					for (VanillaAttributeType type : nbtAttributes) {
@@ -895,6 +880,58 @@ public class ItemUpdateHelper {
 			return "Name: '" + plainName + "'\n" + String.join("\n", errors);
 		}
 		return null;
+	}
+
+	public static void regenerateDisplayName(final ReadWriteNBT nbt) {
+		Component displayName = ItemUtils.getRawDisplayName(nbt);
+		if (Component.IS_NOT_EMPTY.test(displayName)) {
+			nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setString(ItemStatUtils.NAME_KEY, MessagingUtils.toMiniMessage(displayName));
+		}
+	}
+
+	public static boolean requiresConversionToMM(ItemStack item) {
+		return NBT.get(item, nbt -> {
+			return requiresConversionToMM(nbt);
+		});
+	}
+
+	public static boolean requiresConversionToMM(final ReadableNBT nbt) {
+		ReadableNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
+		if (monumenta == null) {
+			return false;
+		}
+		return !monumenta.hasTag(ItemStatUtils.NAME_KEY) || monumenta.hasTag(ItemStatUtils.LEGACY_LORE_KEY) || monumenta.hasTag(ItemStatUtils.LEGACY_CHARM_KEY);
+	}
+
+	public static void convertToMM(final ReadWriteNBT nbt) {
+		// regenerate display name and lore
+		Component displayName = ItemUtils.getRawDisplayName(nbt);
+		if (Component.IS_NOT_EMPTY.test(displayName) && !Component.IS_NOT_EMPTY.test(ItemStatUtils.getName(nbt))) {
+			nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setString(ItemStatUtils.NAME_KEY, MessagingUtils.toMiniMessage(displayName));
+		}
+		List<Component> lore = legacyGetLore(nbt);
+		if (!lore.isEmpty()) {
+			ReadWriteNBTList<String> loreNBT = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getStringList(ItemStatUtils.LORE_KEY);
+			loreNBT.clear();
+			for (Component line : lore) {
+				loreNBT.add(MessagingUtils.toMiniMessage(line));
+			}
+			nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.LEGACY_LORE_KEY);
+		}
+
+		// regenerate charm lore
+		if (ItemStatUtils.isCharm(nbt)) {
+			List<Component> charmEffects = legacyGetCharmEffects(nbt);
+			if (!charmEffects.isEmpty()) {
+				// mriaw
+				ReadWriteNBTList<String> charmLoreNBT = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getStringList(ItemStatUtils.CHARM_KEY);
+				charmLoreNBT.clear();
+				for (Component effect : charmEffects) {
+					charmLoreNBT.add(MessagingUtils.toMiniMessage(effect));
+				}
+				nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).removeKey(ItemStatUtils.LEGACY_CHARM_KEY);
+			}
+		}
 	}
 
 	public static List<Component> legacyGetCharmEffects(final ReadableNBT nbt) {
