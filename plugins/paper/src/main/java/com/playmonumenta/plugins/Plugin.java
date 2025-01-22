@@ -290,6 +290,7 @@ public class Plugin extends JavaPlugin {
 			NodePlanner.registerCommands();
 		}
 		POICommands.register();
+		PointToLocCommand.register(this);
 		PartialParticleCommand.register();
 		ParticleUtilsCommand.register();
 		ParticlesCommand.register();
