@@ -97,12 +97,12 @@ public class SpellTotemicDestruction extends Spell {
 				if (mChargeUp.getTime() % 40 == 10) {
 					new PPSpiral(Particle.REDSTONE, mBoss.getLocation(), 3)
 						.data(new Particle.DustOptions(Color.fromRGB(0, 204, 0), 1f))
-						.count(10)
+						.countPerBlockPerCurve(12)
 						.spawnAsBoss();
 				} else if (mChargeUp.getTime() % 40 == 30) {
 					new PPSpiral(Particle.REDSTONE, mBoss.getLocation(), 3)
 						.data(new Particle.DustOptions(Color.fromRGB(153, 76, 37), 1f))
-						.count(10)
+						.countPerBlockPerCurve(12)
 						.spawnAsBoss();
 				}
 

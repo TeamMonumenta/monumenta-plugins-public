@@ -73,7 +73,7 @@ public class SpellCommandingIncantation extends Spell {
 			public void run() {
 				if (mChargeUp.getTime() % 20 == 0) {
 					new PPSpiral(Particle.SPELL_WITCH, mBoss.getLocation(), 2)
-						.count(10)
+						.countPerBlockPerCurve(10)
 						.spawnAsBoss();
 
 					for (Player player : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
@@ -81,7 +81,7 @@ public class SpellCommandingIncantation extends Spell {
 					}
 				} else if (mChargeUp.getTime() % 20 == 10) {
 					new PPSpiral(Particle.CRIT_MAGIC, mBoss.getLocation(), 2)
-						.count(10)
+						.countPerBlockPerCurve(10)
 						.spawnAsBoss();
 				}
 

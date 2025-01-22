@@ -45,7 +45,7 @@ public class CleansingTotemCS implements CosmeticSkill {
 		PPCircle cleansingRing = new PPCircle(Particle.REDSTONE, standLocation, radius)
 			.countPerMeter(1.05).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
 		PPSpiral cleansingSpiral = new PPSpiral(Particle.REDSTONE, standLocation, radius)
-			.distancePerParticle(0.075).ticks(5).count(1).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
+			.curveAngle(270).ticks(5).count(300).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
 		cleansingRing.spawnAsPlayerActive(player);
 		cleansingSpiral.spawnAsPlayerActive(player);
 	}

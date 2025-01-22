@@ -63,12 +63,12 @@ public class ChromaCascadeCS extends EarthenTremorCS implements DepthsCS {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.4f, 0.6f);
 		world.playSound(loc, Sound.BLOCK_CONDUIT_ATTACK_TARGET, SoundCategory.PLAYERS, 1.6f, 1.8f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.6f, 1.5f);
-		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(5).distancePerParticle(0.097).data(RED).delta(0.03).spawnAsPlayerActive(player);
-		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(6).distancePerParticle(0.105).data(ORANGE).delta(0.03).spawnAsPlayerActive(player);
-		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(6).distancePerParticle(0.115).data(YELLOW).delta(0.03).spawnAsPlayerActive(player);
-		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(7).distancePerParticle(0.125).data(GREEN).delta(0.03).spawnAsPlayerActive(player);
-		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(7).distancePerParticle(0.14).data(BLUE).delta(0.03).spawnAsPlayerActive(player);
-		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(7).distancePerParticle(0.155).data(PURPLE).delta(0.03).spawnAsPlayerActive(player);
+		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(5).curveAngle(220).count(180).data(RED).delta(0.03).spawnAsPlayerActive(player);
+		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(6).curveAngle(208).count(180).data(ORANGE).delta(0.03).spawnAsPlayerActive(player);
+		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(6).curveAngle(192).count(180).data(YELLOW).delta(0.03).spawnAsPlayerActive(player);
+		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(7).curveAngle(178).count(180).data(GREEN).delta(0.03).spawnAsPlayerActive(player);
+		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(7).curveAngle(158).count(180).data(BLUE).delta(0.03).spawnAsPlayerActive(player);
+		new PPSpiral(Particle.REDSTONE, loc, radius).ticks(7).curveAngle(140).count(180).data(PURPLE).delta(0.03).spawnAsPlayerActive(player);
 
 		new PartialParticle(Particle.END_ROD, loc, 22).delta(1).extra(0.08).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.WAX_OFF, loc, 22).delta(1).extra(8).spawnAsPlayerActive(player);

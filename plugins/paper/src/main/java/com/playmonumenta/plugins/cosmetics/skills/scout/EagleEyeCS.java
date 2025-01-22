@@ -19,7 +19,6 @@ public class EagleEyeCS implements CosmeticSkill {
 	public ClassAbility getAbility() {
 		return ClassAbility.EAGLE_EYE;
 	}
-
 	@Override
 	public Material getDisplayItem() {
 		return Material.ENDER_EYE;

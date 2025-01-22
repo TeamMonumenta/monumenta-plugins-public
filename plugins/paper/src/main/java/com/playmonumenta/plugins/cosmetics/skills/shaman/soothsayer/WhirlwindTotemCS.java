@@ -32,7 +32,7 @@ public class WhirlwindTotemCS implements CosmeticSkill {
 	}
 
 	public void whirlwindTotemPulse(Player player, Location standLocation, double radius) {
-		PPSpiral windSpiral = new PPSpiral(Particle.SPELL_INSTANT, standLocation, radius).distancePerParticle(.05).ticks(5).count(1).delta(0);
+		PPSpiral windSpiral = new PPSpiral(Particle.SPELL_INSTANT, standLocation, radius).curveAngle(360).count(300).ticks(5).delta(0);
 		windSpiral.spawnAsPlayerActive(player);
 		standLocation.getWorld().playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.3f, 0.5f);
 	}

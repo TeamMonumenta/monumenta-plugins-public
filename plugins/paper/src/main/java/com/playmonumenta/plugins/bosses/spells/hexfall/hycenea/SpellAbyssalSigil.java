@@ -89,7 +89,7 @@ public class SpellAbyssalSigil extends Spell {
 				if (mChargeUp.nextTick()) {
 					for (Location loc : locs) {
 						new PPSpiral(Particle.SOUL_FIRE_FLAME, loc, mRadius)
-							.distancePerParticle(0.1)
+							.curveAngle(270)
 							.spawnAsBoss();
 
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 2);

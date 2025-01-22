@@ -91,7 +91,7 @@ public class SpellCosmicPortals extends Spell {
 				if (mTicks >= DURATION - 2 * 20 && mTicks % 10 == 0) {
 					drawCircle(mPortalLoc, finalMRadius);
 					if (mTicks % 20 == 0) {
-						new PPSpiral(Particle.END_ROD, mPortalLoc, finalMRadius).count(7).spawnAsBoss();
+						new PPSpiral(Particle.END_ROD, mPortalLoc, finalMRadius).countPerBlockPerCurve(12).spawnAsBoss();
 					}
 				}
 
