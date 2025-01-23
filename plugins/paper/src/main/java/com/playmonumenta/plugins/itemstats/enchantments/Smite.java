@@ -40,9 +40,9 @@ public class Smite implements Enchantment {
 		if (EntityUtils.isUndead(enemy)) {
 			double damage = level * DAMAGE_PER_LEVEL;
 			if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-				event.setDamage(event.getFlatDamage() + damage);
+				event.setFlatDamage(event.getFlatDamage() + damage);
 			} else if (event.getType() == DamageType.MELEE) {
-				event.setDamage(event.getFlatDamage() + damage * player.getCooledAttackStrength(0));
+				event.setFlatDamage(event.getFlatDamage() + damage * player.getCooledAttackStrength(0));
 			}
 		}
 	}

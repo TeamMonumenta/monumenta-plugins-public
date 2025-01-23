@@ -28,7 +28,7 @@ public class MagicDamageAdd implements Attribute {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MAGIC) {
-			event.setDamage(event.getFlatDamage() + value);
+			event.setFlatDamage(event.getFlatDamage() + value);
 		}
 	}
 

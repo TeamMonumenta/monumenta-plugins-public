@@ -31,7 +31,7 @@ public class AntiCritScaling implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
-			event.setDamage(event.getDamage() / CRIT_BONUS);
+			event.setFlatDamage(event.getFlatDamage() / CRIT_BONUS);
 		}
 	}
 }

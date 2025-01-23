@@ -131,7 +131,7 @@ public final class Virius extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void onHurt(final DamageEvent event) {
-		event.setDamage(event.getFlatDamage() / mDefenseScaling);
+		event.setFlatDamage(event.getFlatDamage() / mDefenseScaling);
 	}
 
 	@Override

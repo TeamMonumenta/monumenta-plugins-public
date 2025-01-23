@@ -44,7 +44,7 @@ public class UnyieldingBoss extends BossAbilityGroup {
 		double maxHealth = EntityUtils.getMaxHealth(mBoss);
 		double halfMaxHealth = maxHealth / 2.0;
 		if (mBoss.getHealth() - event.getFinalDamage(true) <= halfMaxHealth) {
-			event.setDamage(0.001);
+			event.setFlatDamage(0.001);
 			mBoss.setHealth(halfMaxHealth);
 			PotionUtils.clearNegatives(mBoss);
 			EntityUtils.setWeakenTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);

@@ -35,7 +35,7 @@ public class GrapplingFallDR extends Effect {
 		}
 		playAnim(entity, Math.max(0.5f, event.getDamage() / 5), true);
 
-		event.setDamage(event.getDamage() * (1 + mAmount));
+		event.setFlatDamage(event.getDamage() * (1 + mAmount));
 		setDuration(0);
 	}
 

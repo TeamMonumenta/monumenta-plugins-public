@@ -355,7 +355,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (event.getBossSpellName() != null) {
-			event.setDamage(DepthsParty.getAscensionScaledDamage(event.getDamage(), mParty));
+			event.setFlatDamage(DepthsParty.getAscensionScaledDamage(event.getDamage(), mParty));
 		}
 	}
 

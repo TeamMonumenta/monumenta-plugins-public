@@ -199,7 +199,7 @@ public class EarthenWrath extends DepthsAbility {
 				new PartialParticle(Particle.CLOUD, pLoc, 6, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
 			}
 
-			event.setDamage(0);
+			event.setFlatDamage(0);
 			otherPlayer.setNoDamageTicks(10);
 			return true;
 		}

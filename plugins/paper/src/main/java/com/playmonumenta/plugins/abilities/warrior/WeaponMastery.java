@@ -100,7 +100,7 @@ public class WeaponMastery extends Ability {
 			return;
 		}
 		if (ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
-			event.setDamage(event.getDamage() * (1 - (WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION))));
+			event.setFlatDamage(event.getDamage() * (1 - (WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION))));
 		}
 	}
 }

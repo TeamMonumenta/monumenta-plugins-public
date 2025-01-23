@@ -216,7 +216,7 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 
 		//Prevents bypassing plants if a single high-damage hit is done
 		if (event.getFinalDamage(true) >= mBoss.getHealth() && plantsAlive) {
-			event.setDamage(1);
+			event.setFlatDamage(1);
 			mBoss.setHealth(1);
 		}
 
@@ -225,7 +225,7 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 			// If not being damaged from a source OR If damage is a form of DoT, don't consume plants and don't take damage
 			if (event.getSource() == null ||
 				event.getType() == DamageEvent.DamageType.AILMENT || event.getType() == DamageEvent.DamageType.FIRE) {
-				event.setDamage(1);
+				event.setFlatDamage(1);
 			} else {
 				Collection<Location> plantsCollection = mPlants.keySet();
 				List<Location> plants = new ArrayList<>(plantsCollection);

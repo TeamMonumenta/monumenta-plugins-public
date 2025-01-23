@@ -34,11 +34,11 @@ public class ResistanceBoss extends BossAbilityGroup {
 		if (!event.getType().equals(DamageEvent.DamageType.TRUE)) {
 			if (mParams.DAMAGE_INCREASE_TYPE.equals(Operation.MULTIPLY)) {
 				if (mParams.UNIVERSAL_INCREASE || mParams.DAMAGE_TYPE.equals(event.getType())) {
-					event.setDamage(event.getFlatDamage() * (1 + mParams.DAMAGE_INCREASE));
+					event.setFlatDamage(event.getFlatDamage() * (1 + mParams.DAMAGE_INCREASE));
 				}
 			} else {
 				if (mParams.UNIVERSAL_INCREASE || mParams.DAMAGE_TYPE.equals(event.getType())) {
-					event.setDamage(event.getFlatDamage() + mParams.DAMAGE_INCREASE);
+					event.setFlatDamage(event.getFlatDamage() + mParams.DAMAGE_INCREASE);
 				}
 			}
 		}

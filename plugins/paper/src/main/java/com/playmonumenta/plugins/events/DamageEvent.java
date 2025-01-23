@@ -253,7 +253,7 @@ public class DamageEvent extends Event implements Cancellable {
 		return mOriginalDamage;
 	}
 
-	public void setDamage(double damage) {
+	public void setFlatDamage(double damage) {
 		if (damage < 0) {
 			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage dealt: " + damage, new Exception());
 		}

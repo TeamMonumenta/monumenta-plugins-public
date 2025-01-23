@@ -91,7 +91,7 @@ public class TwoHanded implements Enchantment {
 			return;
 		}
 		if (checkForOffhand(plugin, player)) {
-			event.setDamage(event.getFlatDamage() * (1 - PERCENT_DAMAGE_REDUCTION));
+			event.setFlatDamage(event.getFlatDamage() * (1 - PERCENT_DAMAGE_REDUCTION));
 		}
 	}
 

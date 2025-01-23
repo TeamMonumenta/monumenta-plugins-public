@@ -97,7 +97,7 @@ public class ArmorOfFrost extends Spell {
 				}
 				mWarned.add(player);
 			}
-			event.setDamage(0.0001);
+			event.setFlatDamage(0.0001);
 		}
 	}
 

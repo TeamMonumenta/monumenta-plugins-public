@@ -72,7 +72,7 @@ public class DamageTransferBoss extends BossAbilityGroup {
 		} else {
 			DamageUtils.damage(null, mBoss, event.getType(), event.getDamage(), null, false);
 		}
-		event.setDamage(0);
+		event.setFlatDamage(0);
 	}
 
 	@Override

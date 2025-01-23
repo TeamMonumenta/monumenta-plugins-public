@@ -49,7 +49,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 			Location loc = mBoss.getLocation();
 			loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
 			new PartialParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1).spawnAsEntityActive(mBoss);
-			event.setDamage(1);
+			event.setFlatDamage(1);
 			return;
 		}
 

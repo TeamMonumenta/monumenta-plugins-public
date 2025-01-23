@@ -73,11 +73,11 @@ public class Agility extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH || event.getType() == DamageType.MELEE_SKILL) {
 			if (isLevelTwo()) {
-				event.setDamage(event.getFlatDamage() + AGILITY_BONUS_DAMAGE);
+				event.setFlatDamage(event.getFlatDamage() + AGILITY_BONUS_DAMAGE);
 				event.updateDamageWithMultiplier(1 + SCALING_DAMAGE);
 				mCosmetic.agilityEffectLevelTwo(mPlayer, enemy);
 			} else {
-				event.setDamage(event.getFlatDamage() + AGILITY_BONUS_DAMAGE);
+				event.setFlatDamage(event.getFlatDamage() + AGILITY_BONUS_DAMAGE);
 				mCosmetic.agilityEffectLevelOne(mPlayer, enemy);
 			}
 		}

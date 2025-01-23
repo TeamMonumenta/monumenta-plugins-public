@@ -28,7 +28,7 @@ public class Tenacity implements Infusion {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		event.setDamage(event.getDamage() * getDamageTakenMultiplier(value));
+		event.setFlatDamage(event.getDamage() * getDamageTakenMultiplier(value));
 	}
 
 	public static double getDamageTakenMultiplier(double level) {

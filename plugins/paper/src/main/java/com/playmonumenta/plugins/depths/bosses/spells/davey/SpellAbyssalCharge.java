@@ -69,7 +69,7 @@ public class SpellAbyssalCharge extends Spell {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//Extra damage
 		if (mEmpoweredAttack && damagee instanceof Player) {
-			event.setDamage(event.getDamage() * DAMAGE_MULTIPLIER);
+			event.setFlatDamage(event.getDamage() * DAMAGE_MULTIPLIER);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.HOSTILE, 5, 1.25f);
 			mEmpoweredAttack = false;
 		}

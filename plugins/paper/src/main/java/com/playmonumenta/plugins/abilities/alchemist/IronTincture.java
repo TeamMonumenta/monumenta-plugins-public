@@ -183,7 +183,7 @@ public class IronTincture extends Ability {
 					}
 					if (entity instanceof Player player) {
 						if (AbsorptionUtils.getAbsorption(player) > 0) {
-							event.setDamage(event.getDamage() * (1 - resistance));
+							event.setFlatDamage(event.getDamage() * (1 - resistance));
 						}
 					}
 				}

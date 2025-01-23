@@ -59,7 +59,7 @@ public class Resurrection implements Enchantment {
 		}
 
 		// Act like a normal totem
-		event.setDamage(0.001);
+		event.setFlatDamage(0.001);
 		player.setHealth(1);
 
 		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 40, 0, true, true));

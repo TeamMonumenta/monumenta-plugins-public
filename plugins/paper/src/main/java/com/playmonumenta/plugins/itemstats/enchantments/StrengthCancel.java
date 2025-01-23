@@ -38,9 +38,9 @@ public class StrengthCancel implements Enchantment {
 			double strengthDamage = (potLevel + 1) * DAMAGE_ADD_CANCEL_PER_LEVEL * (0.2F + cooldown * cooldown * 0.8F);
 
 			if (PlayerUtils.isCriticalAttack(player)) {
-				event.setDamage(event.getDamage() - strengthDamage * 1.5);
+				event.setFlatDamage(event.getDamage() - strengthDamage * 1.5);
 			} else {
-				event.setDamage(event.getDamage() - strengthDamage);
+				event.setFlatDamage(event.getDamage() - strengthDamage);
 			}
 		}
 	}

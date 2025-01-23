@@ -41,11 +41,11 @@ public class SecondWind implements Enchantment {
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		double hpAfterHit = currHealth - event.getFinalDamage(true);
 		if (currHealth / maxHealth <= healthThreshold) {
-			event.setDamage(event.getDamage() * Math.pow(1 - DAMAGE_RESIST, level));
+			event.setFlatDamage(event.getDamage() * Math.pow(1 - DAMAGE_RESIST, level));
 		} else if (hpAfterHit / maxHealth <= healthThreshold) {
 			double hpLostBelowHalf = maxHealth * healthThreshold - hpAfterHit;
 			double proportion = hpLostBelowHalf / event.getFinalDamage(false);
-			event.setDamage(event.getDamage() * (1 - proportion) + event.getDamage() * proportion * Math.pow(1 - DAMAGE_RESIST, level));
+			event.setFlatDamage(event.getDamage() * (1 - proportion) + event.getDamage() * proportion * Math.pow(1 - DAMAGE_RESIST, level));
 		}
 	}
 

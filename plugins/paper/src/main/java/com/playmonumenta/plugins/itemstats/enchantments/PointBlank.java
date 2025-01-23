@@ -48,7 +48,7 @@ public class PointBlank implements Enchantment {
 				return;
 			}
 
-			event.setDamage(event.getFlatDamage() + apply(player, target, level));
+			event.setFlatDamage(event.getFlatDamage() + apply(player, target, level));
 		}
 	}
 

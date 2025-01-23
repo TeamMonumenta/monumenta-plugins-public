@@ -28,7 +28,7 @@ public class BoonOfTheFracturedTree extends ZeroArgumentEffect {
 	@Override
 	public void onHurtByEntityWithSource(LivingEntity entity, DamageEvent event, Entity damager, LivingEntity source) {
 		if (!EntityUtils.isInFieldOfView(entity, source)) {
-			event.setDamage(event.getDamage() * RECEIVED_DAMAGE_MULTIPLIER);
+			event.setFlatDamage(event.getDamage() * RECEIVED_DAMAGE_MULTIPLIER);
 		}
 	}
 

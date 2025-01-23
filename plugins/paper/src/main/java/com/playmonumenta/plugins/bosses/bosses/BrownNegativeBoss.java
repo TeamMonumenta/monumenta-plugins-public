@@ -38,14 +38,14 @@ public class BrownNegativeBoss extends BossAbilityGroup {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (damagee instanceof Player player && ScoreboardUtils.checkTag(player, BrownPolarityDisplay.POSITIVE_TAG)) {
-			event.setDamage(event.getDamage() * mPlayerResist);
+			event.setFlatDamage(event.getDamage() * mPlayerResist);
 		}
 	}
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		if (source instanceof Player player && ScoreboardUtils.checkTag(player, BrownPolarityDisplay.POSITIVE_TAG)) {
-			event.setDamage(event.getFlatDamage() * mBossVuln);
+			event.setFlatDamage(event.getFlatDamage() * mBossVuln);
 			playAesthetic();
 		}
 	}

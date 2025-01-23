@@ -72,7 +72,7 @@ public class AvengerBoss extends BossAbilityGroup {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damgaee) {
 		if (mStacks > 0) {
-			event.setDamage(event.getDamage() * (1 + mStacks * mParam.DAMAGE_PERCENT_INCREMENT));
+			event.setFlatDamage(event.getDamage() * (1 + mStacks * mParam.DAMAGE_PERCENT_INCREMENT));
 		}
 	}
 

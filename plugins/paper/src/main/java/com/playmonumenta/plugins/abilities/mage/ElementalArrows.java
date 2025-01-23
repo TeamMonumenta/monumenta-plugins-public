@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -176,7 +175,7 @@ public class ElementalArrows extends Ability {
 		Consumer<LivingEntity> finalEffectAction = effectAction;
 		Bukkit.getScheduler().runTask(mPlugin, () -> finalEffectAction.accept(enemy));
 
-		event.setDamage(0);
+		event.setFlatDamage(0);
 		DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats, NAME), targetDamage, false, true, false);
 
 		double areaDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AREA_DAMAGE, baseDamage * AOE_DAMAGE_MULTIPLIER);

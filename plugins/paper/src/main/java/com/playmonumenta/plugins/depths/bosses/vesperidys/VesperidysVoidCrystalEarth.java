@@ -210,7 +210,7 @@ public class VesperidysVoidCrystalEarth extends BossAbilityGroup {
 				new PartialParticle(Particle.CLOUD, pLoc, 6, 0.05, 0.05, 0.05, 0.05).spawnAsEntityActive(mBoss);
 			}
 
-			event.setDamage(0);
+			event.setFlatDamage(0);
 			le.setNoDamageTicks(10);
 
 			mOpenTicks = 3 * 20;

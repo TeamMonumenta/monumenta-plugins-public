@@ -118,6 +118,6 @@ public class Taunt extends Spell {
 		mBoss.setVelocity(mBoss.getLocation().subtract(player.getLocation()).toVector().setY(0).normalize().multiply(2));
 		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE_SKILL, mDamage);
 		EntityUtils.selfRoot(mBoss, 20);
-		event.setDamage(0);
+		event.setFlatDamage(0);
 	}
 }

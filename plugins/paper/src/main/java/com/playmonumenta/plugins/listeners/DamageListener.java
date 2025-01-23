@@ -216,7 +216,7 @@ public class DamageListener implements Listener {
 			    && event.getType() != DamageEvent.DamageType.TRUE) {
 			double damage = event.getDamage();
 			// Now, set damage to 0.001 (to allow for knockback effects), and customly damage enemy using damage function.
-			event.setDamage(0.001);
+			event.setFlatDamage(0.001);
 			if (EntityUtils.isTrainingDummy(damagee)) {
 				TrainingDummyBoss.mNextTrueDamageReplacement = event.getType();
 			}

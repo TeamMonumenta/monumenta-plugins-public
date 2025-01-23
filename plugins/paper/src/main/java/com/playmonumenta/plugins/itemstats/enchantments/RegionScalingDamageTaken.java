@@ -41,9 +41,9 @@ public class RegionScalingDamageTaken implements Enchantment {
 		if (event.getType() == DamageEvent.DamageType.FALL || event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER[Math.max(0, Math.min((int) value, DAMAGE_TAKEN_MULTIPLIER.length - 1))]);
+		event.setFlatDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER[Math.max(0, Math.min((int) value, DAMAGE_TAKEN_MULTIPLIER.length - 1))]);
 		if (event.getType() == DamageEvent.DamageType.POISON) {
-			event.setDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));
+			event.setFlatDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));
 		}
 	}
 

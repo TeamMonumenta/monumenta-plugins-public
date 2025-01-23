@@ -103,11 +103,11 @@ public class CarapaceBoss extends BossAbilityGroup {
 			double newDamage = damage - remainingCarapaceHealth;
 			if (newDamage > 0) {
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.3f, 0.2f);
-				event.setDamage(newDamage);
+				event.setFlatDamage(newDamage);
 			} else {
 				world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.05f, 2f);
 				world.playSound(loc, Sound.BLOCK_GRASS_PLACE, SoundCategory.HOSTILE, 0.05f, 0.5f);
-				event.setDamage(0);
+				event.setFlatDamage(0);
 			}
 		}
 

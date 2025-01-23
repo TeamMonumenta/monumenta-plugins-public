@@ -412,7 +412,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		if (mPhase2) {
-			event.setDamage(event.getFlatDamage() * 15);
+			event.setFlatDamage(event.getFlatDamage() * 15);
 		}
 	}
 

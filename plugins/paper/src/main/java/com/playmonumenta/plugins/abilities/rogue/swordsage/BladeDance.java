@@ -134,7 +134,7 @@ public class BladeDance extends Ability {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (mIsActive && event.getType().isDefendable()) {
-			event.setDamage(0);
+			event.setFlatDamage(0);
 			event.setCancelled(true);
 		}
 	}

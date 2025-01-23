@@ -48,7 +48,7 @@ public class Sniper implements Enchantment {
 				return;
 			}
 
-			event.setDamage(event.getFlatDamage() + apply(player, enemy, level));
+			event.setFlatDamage(event.getFlatDamage() + apply(player, enemy, level));
 		}
 	}
 

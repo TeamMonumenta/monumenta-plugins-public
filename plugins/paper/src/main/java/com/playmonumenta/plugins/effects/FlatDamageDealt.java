@@ -41,7 +41,7 @@ public class FlatDamageDealt extends Effect {
 			return;
 		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
-			event.setDamage(event.getFlatDamage() + mAmount);
+			event.setFlatDamage(event.getFlatDamage() + mAmount);
 		}
 	}
 

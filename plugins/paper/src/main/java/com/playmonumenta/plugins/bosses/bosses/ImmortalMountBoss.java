@@ -96,7 +96,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 				mMountDamageThisTick = 0;
 			}, 0);
 		}
-		event.setDamage(0);
+		event.setFlatDamage(0);
 	}
 
 	@Override

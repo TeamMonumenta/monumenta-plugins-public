@@ -48,7 +48,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 			if (event.getDamager() instanceof LivingEntity le) {
 				MovementUtils.knockAway(mReaper.getLocation(), le, 0.3f, 0.15f, true);
 			}
-			event.setDamage(0);
+			event.setFlatDamage(0);
 			event.setCancelled(true);
 		} else {
 			// Ignore DoT damage
@@ -57,7 +57,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 			}
 			entity.setLastDamage(event.getDamage());
 			entity.setNoDamageTicks(20);
-			event.setDamage(0);
+			event.setFlatDamage(0);
 			event.setCancelled(true);
 		}
 

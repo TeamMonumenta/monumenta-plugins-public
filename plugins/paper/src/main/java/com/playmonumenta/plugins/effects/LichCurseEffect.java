@@ -26,7 +26,7 @@ public class LichCurseEffect extends Effect {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		event.setDamage(event.getDamage() * DAMAGE_INCREASE);
+		event.setFlatDamage(event.getDamage() * DAMAGE_INCREASE);
 	}
 
 	@Override

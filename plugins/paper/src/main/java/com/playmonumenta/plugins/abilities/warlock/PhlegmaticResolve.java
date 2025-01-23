@@ -226,7 +226,7 @@ public class PhlegmaticResolve extends Ability {
 				}
 			}
 			// Only set damage to 0 so that kb occurs.
-			event.setDamage(0);
+			event.setFlatDamage(0);
 		}
 	}
 }

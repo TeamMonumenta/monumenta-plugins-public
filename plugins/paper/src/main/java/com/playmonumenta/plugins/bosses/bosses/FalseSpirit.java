@@ -305,7 +305,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 	// Reduce damage taken for each player by a percent
 	@Override
 	public void onHurt(DamageEvent event) {
-		event.setDamage(event.getFlatDamage() / mScalingCoefficient);
+		event.setFlatDamage(event.getFlatDamage() / mScalingCoefficient);
 	}
 
 	@Override

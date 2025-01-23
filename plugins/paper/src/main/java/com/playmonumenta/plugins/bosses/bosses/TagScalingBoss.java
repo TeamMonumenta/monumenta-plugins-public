@@ -33,14 +33,14 @@ public class TagScalingBoss extends BossAbilityGroup {
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		if (source instanceof Player && source.getScoreboardTags().contains(mParams.TAG)) {
-			event.setDamage(event.getFlatDamage() * (1d - mParams.DAMAGE_REDUCTION));
+			event.setFlatDamage(event.getFlatDamage() * (1d - mParams.DAMAGE_REDUCTION));
 		}
 	}
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (damagee instanceof Player && damagee.getScoreboardTags().contains(mParams.TAG)) {
-			event.setDamage((event.getFlatDamage() * (1d + mParams.DAMAGE_INCREASE)));
+			event.setFlatDamage((event.getFlatDamage() * (1d + mParams.DAMAGE_INCREASE)));
 		}
 	}
 }

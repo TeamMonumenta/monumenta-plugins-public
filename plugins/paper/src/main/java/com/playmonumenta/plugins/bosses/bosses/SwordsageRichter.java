@@ -210,7 +210,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (mBoss.getHealth() - event.getFinalDamage(true) <= 0) {
 			event.setCancelled(true);
-			event.setDamage(0);
+			event.setFlatDamage(0);
 		}
 	}
 

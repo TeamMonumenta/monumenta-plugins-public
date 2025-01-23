@@ -39,7 +39,7 @@ public class WorldlyProtection implements Enchantment {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		event.setDamage(event.getDamage() * getDamageMultiplier(value, ServerProperties.getRegion(player)));
+		event.setFlatDamage(event.getDamage() * getDamageMultiplier(value, ServerProperties.getRegion(player)));
 	}
 
 	public static double getDamageMultiplier(double level, Region region) {

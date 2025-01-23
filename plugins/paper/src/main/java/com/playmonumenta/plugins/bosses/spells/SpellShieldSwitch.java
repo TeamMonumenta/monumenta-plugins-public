@@ -62,7 +62,7 @@ public class SpellShieldSwitch extends Spell {
 			ItemStack curItem = mLauncher.getEquipment().getItemInMainHand();
 
 			if (curItem != null && curItem.getType().equals(Material.SHIELD)) {
-				event.setDamage(0.01);
+				event.setFlatDamage(0.01);
 				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1.0f, 1.0f);
 				if (source instanceof Player player) {
 					player.playSound(mLauncher.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 0.5f, 1.0f);

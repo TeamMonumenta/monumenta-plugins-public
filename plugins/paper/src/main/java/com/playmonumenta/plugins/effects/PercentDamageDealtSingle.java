@@ -51,7 +51,7 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 			|| (mAffectedDamageTypes.contains(DamageEvent.DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			mHasDoneDamage = true;
 			if (mMultiplicative) {
-				event.setDamage(event.getFlatDamage() * (1 + mAmount));
+				event.setFlatDamage(event.getFlatDamage() * (1 + mAmount));
 			} else {
 				event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
 			}

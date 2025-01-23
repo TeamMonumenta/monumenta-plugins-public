@@ -47,7 +47,7 @@ public class LichShieldBoss extends BossAbilityGroup {
 			proj.remove();
 		}
 		if (event.getDamage() > 32) {
-			event.setDamage(32);
+			event.setFlatDamage(32);
 		}
 		if (mBoss.getHealth() - event.getFinalDamage(true) <= 0) {
 			event.setCancelled(true);

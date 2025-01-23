@@ -32,7 +32,7 @@ public class SKTQuestDamageDealt implements Enchantment {
 			return;
 		}
 		if (player.getScoreboardTags().contains("SKTQuest")) {
-			event.setDamage(event.getDamage() * DAMAGE_DEALT_MULTIPLIER);
+			event.setFlatDamage(event.getDamage() * DAMAGE_DEALT_MULTIPLIER);
 		}
 	}
 }

@@ -123,7 +123,7 @@ public class Riposte extends Ability implements AbilityWithDuration {
 				ClientModHandler.updateAbility(mPlayer, this);
 				mPlayer.setNoDamageTicks(20);
 				mPlayer.setLastDamage(event.getDamage());
-				event.setDamage(0);
+				event.setFlatDamage(0);
 				event.setCancelled(true);
 
 				if (isEnhanced()) {

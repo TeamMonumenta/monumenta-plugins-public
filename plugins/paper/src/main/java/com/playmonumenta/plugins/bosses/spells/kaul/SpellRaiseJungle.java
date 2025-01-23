@@ -195,7 +195,7 @@ public class SpellRaiseJungle extends Spell {
 	@Override
 	public void onHurt(DamageEvent event) {
 		if (!mSummoned.isEmpty()) {
-			event.setDamage(event.getFlatDamage() * 0.4);
+			event.setFlatDamage(event.getFlatDamage() * 0.4);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 1, 0.5f);
 			new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA).spawnAsEntityActive(mBoss);
 		}

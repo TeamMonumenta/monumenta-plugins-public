@@ -927,7 +927,7 @@ public class GalleryGame {
 
 	public void onPlayerHurtEvent(DamageEvent event, Player player, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if ((source == null || !GalleryUtils.ignoreScaling(source)) && !EXCLUDED_DAMAGE_TYPES.contains(event.getType())) {
-			event.setDamage(event.getDamage() * (1 + GalleryUtils.getDamageScaleForLevel(mCurrentRound)));
+			event.setFlatDamage(event.getDamage() * (1 + GalleryUtils.getDamageScaleForLevel(mCurrentRound)));
 		}
 
 		GalleryPlayer gPlayer = mPlayersMap.get(player.getUniqueId());

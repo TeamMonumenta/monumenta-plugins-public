@@ -246,18 +246,18 @@ public class DepthsListener implements Listener {
 			int scalingFactor = (floor - 1) / 3;
 			if (floor > 15) {
 				double multiplier = 1 + (0.1 * (scalingFactor - 4));
-				event.setDamage(event.getDamage() * multiplier);
+				event.setFlatDamage(event.getDamage() * multiplier);
 			}
 			if (source != null && EntityUtils.isBoss(source) && floor > 3) {
 				double multiplier = 1 + (0.05 * scalingFactor);
-				event.setDamage(event.getDamage() * multiplier);
+				event.setFlatDamage(event.getDamage() * multiplier);
 			}
 		}
 
 		ClassAbility ability = event.getAbility();
 		DamageEvent.DamageType type = event.getType();
 		if (ability != null && !ability.isFake() && type != DamageEvent.DamageType.TRUE && type != DamageEvent.DamageType.OTHER && event.getSource() instanceof Player player) {
-			event.setDamage(event.getFlatDamage() * DepthsUtils.getDamageMultiplier());
+			event.setFlatDamage(event.getFlatDamage() * DepthsUtils.getDamageMultiplier());
 
 			ItemStatManager.PlayerItemStats playerItemStats = event.getPlayerItemStats();
 			if (playerItemStats == null) {

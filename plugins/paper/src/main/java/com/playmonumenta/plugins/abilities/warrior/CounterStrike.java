@@ -100,7 +100,7 @@ public class CounterStrike extends Ability {
 		if (source != null) {
 			if (isEnhanced() && mLastHurtTicks.containsKey(source)) {
 				double resistance = (mAbsorptionMobs.contains(source) ? ABSORPTION_RESISTANCE : RESISTANCE) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_REDUCTION);
-				event.setDamage(event.getDamage() * (1 - resistance));
+				event.setFlatDamage(event.getDamage() * (1 - resistance));
 			}
 
 			prime(source);

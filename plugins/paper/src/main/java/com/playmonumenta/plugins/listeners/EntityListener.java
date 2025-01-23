@@ -40,8 +40,6 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -94,7 +92,6 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class EntityListener implements Listener {
 	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
@@ -355,7 +352,7 @@ public class EntityListener implements Listener {
 	public void damageEvent(DamageEvent event) {
 		// Prevent shop shulkers from taking damage, no matter what
 		if (EntityUtils.isShopShulker(event.getDamagee())) {
-			event.setDamage(0);
+			event.setFlatDamage(0);
 		}
 	}
 

@@ -140,7 +140,7 @@ public class Dodging extends Ability {
 
 			mPlayer.setNoDamageTicks(20);
 			mPlayer.setLastDamage(event.getDamage());
-			event.setDamage(0);
+			event.setFlatDamage(0);
 			event.setCancelled(true);
 		}
 	}

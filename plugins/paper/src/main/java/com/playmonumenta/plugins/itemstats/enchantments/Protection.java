@@ -20,7 +20,7 @@ public abstract class Protection implements Enchantment {
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == getType()) {
-			event.setDamage(event.getDamage() * Math.pow(REDUCTION_PER_EPF, value * getEPF()));
+			event.setFlatDamage(event.getDamage() * Math.pow(REDUCTION_PER_EPF, value * getEPF()));
 		}
 	}
 

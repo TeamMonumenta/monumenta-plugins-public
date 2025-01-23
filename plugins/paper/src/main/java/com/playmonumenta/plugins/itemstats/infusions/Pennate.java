@@ -27,7 +27,7 @@ public class Pennate implements Infusion {
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.FALL) {
-			event.setDamage(event.getDamage() * getFallDamageResistance(value));
+			event.setFlatDamage(event.getDamage() * getFallDamageResistance(value));
 		}
 	}
 
