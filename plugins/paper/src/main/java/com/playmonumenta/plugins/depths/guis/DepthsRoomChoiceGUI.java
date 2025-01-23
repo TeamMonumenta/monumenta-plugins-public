@@ -21,14 +21,9 @@ public class DepthsRoomChoiceGUI extends Gui {
 	private static final ItemStack NO_CHOICE = GUIUtils.createFiller(Material.BLACK_STAINED_GLASS_PANE);
 	private static final List<RoomChoice> ROOM_LOCATIONS = new ArrayList<>();
 
-	static class RoomChoice extends GuiItem {
-		int mLocation;
-		DepthsRoomType mType;
-
-		RoomChoice(int loc, DepthsRoomType t, ItemStack i) {
-			super(i);
-			mLocation = loc;
-			mType = t;
+	private record RoomChoice(int mLocation, DepthsRoomType mType, ItemStack mStack) {
+		public GuiItem onLeftClick(Runnable runnable) {
+			return new GuiItem(mStack).onLeftClick(runnable);
 		}
 	}
 
