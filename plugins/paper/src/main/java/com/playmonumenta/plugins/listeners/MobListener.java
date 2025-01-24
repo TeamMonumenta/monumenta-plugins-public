@@ -6,6 +6,7 @@ import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -44,6 +45,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Vex;
@@ -129,8 +131,8 @@ public class MobListener implements Listener {
 		// Some entities like creepers don't follow this rule so that they can be used in drop creeper traps
 		// after some ticks of failed spawns, air becomes a valid spawn point for all land mobs.
 		if (!EntityUtils.isFlyingMob(type)
-			    && !FALLING_MOBS.contains(type)
-			    && currentTick - firstSpawnAttempt <= 5) {
+				&& !FALLING_MOBS.contains(type)
+				&& currentTick - firstSpawnAttempt <= 5) {
 			if (!event.getSpawnLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 				event.setCancelled(true);
 			}
@@ -146,8 +148,8 @@ public class MobListener implements Listener {
 		CreatureSpawnEvent.SpawnReason spawnReason = event.getSpawnReason();
 
 		if (spawnReason == CreatureSpawnEvent.SpawnReason.BUILD_WITHER ||
-			    spawnReason == CreatureSpawnEvent.SpawnReason.CURED ||
-			    spawnReason == CreatureSpawnEvent.SpawnReason.VILLAGE_DEFENSE) {
+				spawnReason == CreatureSpawnEvent.SpawnReason.CURED ||
+				spawnReason == CreatureSpawnEvent.SpawnReason.VILLAGE_DEFENSE) {
 			event.setCancelled(true);
 			return;
 		}
@@ -164,14 +166,14 @@ public class MobListener implements Listener {
 		// We need to allow spawning hostile mobs intentionally, but disable natural spawns.
 		// It's easier to check the intentional ways than the natural ones.
 		if (spawnReason != CreatureSpawnEvent.SpawnReason.CUSTOM &&
-			    spawnReason != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
-			    spawnReason != CreatureSpawnEvent.SpawnReason.DISPENSE_EGG &&
-			    spawnReason != CreatureSpawnEvent.SpawnReason.SPAWNER &&
-			    spawnReason != CreatureSpawnEvent.SpawnReason.DEFAULT &&
-			    spawnReason != CreatureSpawnEvent.SpawnReason.COMMAND &&
-			    spawnReason != CreatureSpawnEvent.SpawnReason.BEEHIVE &&
-			    EntityUtils.isHostileMob(entity, true) &&
-			    ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
+				spawnReason != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
+				spawnReason != CreatureSpawnEvent.SpawnReason.DISPENSE_EGG &&
+				spawnReason != CreatureSpawnEvent.SpawnReason.SPAWNER &&
+				spawnReason != CreatureSpawnEvent.SpawnReason.DEFAULT &&
+				spawnReason != CreatureSpawnEvent.SpawnReason.COMMAND &&
+				spawnReason != CreatureSpawnEvent.SpawnReason.BEEHIVE &&
+				EntityUtils.isHostileMob(entity, true) &&
+				ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -333,8 +335,8 @@ public class MobListener implements Listener {
 							event.setDamage(damage);
 						}
 					} catch (Exception e) {
-							MMLog.warning("[MobListener] Error while replacing EvokerFangs damage with custom EvokerFangDamage. Reason: " + e.getMessage());
-							e.printStackTrace();
+						MMLog.warning("[MobListener] Error while replacing EvokerFangs damage with custom EvokerFangDamage. Reason: " + e.getMessage());
+						e.printStackTrace();
 					}
 				}
 			}
@@ -347,6 +349,22 @@ public class MobListener implements Listener {
 		// Obviously there is no reasonable case where a mob should target itself so disable any time that happens
 		if (event.getTarget() == event.getEntity()) {
 			event.setCancelled(true);
+		}
+
+		// Match Chivalrous mob's targets with the mount
+		if (Chivalrous.isChivalrousName(event.getEntity().getName())
+				&& event.getTarget() instanceof LivingEntity livingTarget) {
+			event.getEntity().getPassengers().forEach(entity -> {
+				if (entity instanceof Mob mob) {
+					mob.setTarget(livingTarget);
+				}
+			});
+		}
+		if (event.getEntity().getScoreboardTags().contains(Chivalrous.CHIVALROUS_PASSENGER_TAG)
+				&& event.getTarget() instanceof LivingEntity livingTarget) {
+			if (event.getEntity().getVehicle() instanceof Mob mob) {
+				mob.setTarget(livingTarget);
+			}
 		}
 	}
 
@@ -396,8 +414,8 @@ public class MobListener implements Listener {
 
 		Player player = livingEntity.getKiller();
 		if (player != null
-			    && EntityUtils.isHostileMob(livingEntity)
-			    && !livingEntity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
+				&& EntityUtils.isHostileMob(livingEntity)
+				&& !livingEntity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			//  Player kills a mob
 			mPlugin.mItemStatManager.onKill(mPlugin, player, event, livingEntity);
 			if (!livingEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
@@ -475,8 +493,8 @@ public class MobListener implements Listener {
 	public void entityDamageEvent(EntityDamageEvent event) {
 		// Make Endermen take no damage from water (unless drowning)
 		if (event.getCause() == EntityDamageEvent.DamageCause.DROWNING
-			    && event.getEntity() instanceof Enderman enderman
-			    && enderman.getRemainingAir() > 0) {
+				&& event.getEntity() instanceof Enderman enderman
+				&& enderman.getRemainingAir() > 0) {
 			event.setCancelled(true);
 		}
 	}

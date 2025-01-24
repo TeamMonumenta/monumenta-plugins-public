@@ -196,7 +196,7 @@ public class WindBomb extends Ability {
 								}
 							}
 						}
-						mCosmetic.onVortexTick(mPlayer, loc);
+						mCosmetic.onVortexTick(mPlayer, loc, pullRadius, mTicks);
 						if (mTicks >= pullDuration) {
 							this.cancel();
 						}

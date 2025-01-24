@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -146,9 +147,9 @@ public class CurseOfTheVeil implements Enchantment {
 		// Check nearby entities
 		Collection<LivingEntity> nearbyEntities = player.getLocation().getNearbyLivingEntities(NEARBY_BOSS_RANGE);
 		for (LivingEntity entity : nearbyEntities) {
-			if (!(entity instanceof Player)
-				&& (entity.getScoreboardTags().contains("Boss")
-				|| entity.getLocation().distanceSquared(player.getLocation()) < NEARBY_NORMAL_RANGE * NEARBY_NORMAL_RANGE)) {
+			if ((!(entity instanceof Player) && entity.getScoreboardTags().contains("Boss"))
+					|| (EntityUtils.isHostileMob(entity)
+					&& entity.getLocation().distanceSquared(player.getLocation()) < NEARBY_NORMAL_RANGE * NEARBY_NORMAL_RANGE)) {
 				return true;
 			}
 		}

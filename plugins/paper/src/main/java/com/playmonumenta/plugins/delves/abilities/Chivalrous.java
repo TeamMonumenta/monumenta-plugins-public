@@ -19,6 +19,7 @@ public class Chivalrous {
 
 	private static final double SPAWN_CHANCE_PER_LEVEL = 0.10;
 	public static final String AVOID_CHIVALROUS = "boss_chivalrousimmune";
+	public static final String CHIVALROUS_PASSENGER_TAG = "ChivalrousPassengerTag";
 
 	// 33% bee - 33% slime - 33% cave spider
 	private static final String[] MOUNTS = {
@@ -90,6 +91,7 @@ public class Chivalrous {
 				mount.addScoreboardTag(EntityListener.BEES_BLOCK_HIVE_ENTER_EVENT);
 				mount.addPassenger(mob);
 
+				mob.addScoreboardTag(CHIVALROUS_PASSENGER_TAG);
 				if (mob instanceof Creeper creeper) {
 					creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);
 				}

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -29,6 +30,9 @@ public class LifeDrain implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
 		if (event.getType() != DamageType.MELEE) {
+			return;
+		}
+		if (!EntityUtils.isHostileMob(target)) {
 			return;
 		}
 		if (PlayerUtils.isFallingAttack(player)) {
