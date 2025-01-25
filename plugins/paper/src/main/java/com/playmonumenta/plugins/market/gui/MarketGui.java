@@ -80,9 +80,9 @@ public class MarketGui extends Gui {
 			offset = 16;
 		}
 
-		if (event.getClick() == ClickType.RIGHT) {
+		if (event.getClick() == ClickType.LEFT) {
 			current += offset;
-		} else if (event.getClick() == ClickType.LEFT) {
+		} else if (event.getClick() == ClickType.RIGHT) {
 			current -= offset;
 
 		}
