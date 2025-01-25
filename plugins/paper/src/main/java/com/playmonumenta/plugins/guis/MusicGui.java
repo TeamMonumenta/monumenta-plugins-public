@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.guis;
 
+import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.depths.bosses.Broodmother;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
@@ -37,7 +39,7 @@ public class MusicGui extends Gui {
 		VANILLA("vanilla", 36, "Minecraft Music Discs"),
 		VALLEY("valley", 36, "Monumenta Soundtrack: King's Valley"),
 		ISLES("isles", 54, "Monumenta Soundtrack: Celsian Isles"),
-		RING("ring", 36, "Monumenta Soundtrack: Architect's Ring"),
+		RING("ring", 54, "Monumenta Soundtrack: Architect's Ring"),
 		DUNGEONS("dungeons", 27, "Monumenta Soundtrack: Dungeons"),
 		PLAYLIST("playlist", 54, "Music Playlist"),
 		LABS("labs", 27, "Monumenta Soundtrack: Alchemy Labs"),
@@ -181,14 +183,19 @@ public class MusicGui extends Gui {
 				addMusicItem(3, 5, Material.MUSIC_DISC_5, "Sermon of the Cosmos", Location.ZENITH, "Vesperidys", "CmdrGod", Vesperidys.MUSIC_TITLE_AMBIENT, Broodmother.MUSIC_DURATION_AMBIENT, checkScore("Zenith"));
 				addMusicItem(3, 6, Material.MUSIC_DISC_5, "Subjugation of the Stars", Location.ZENITH, "Vesperidys", "CmdrGod", Vesperidys.MUSIC_TITLE, Broodmother.MUSIC_DURATION, checkScore("Zenith"));
 				addMusicItem(3, 7, Material.MUSIC_DISC_5, "Supernova Slayer", Location.ZENITH, "Vesperidys", "CmdrGod", Vesperidys.MUSIC_TITLE_2, Broodmother.MUSIC_DURATION_2, checkScore("Zenith"));
+
+				addMusicItem(4, 1, Material.IRON_BLOCK, "Ancient Automation", Location.SILVER, "Silver Construct", "Salamanderlonk", ImperialConstruct.MUSIC_TITLE, ImperialConstruct.MUSIC_DURATION, checkScore("SKT"));
+				addMusicItem(4, 2, Material.MUSIC_DISC_OTHERSIDE, "The Fate of Time", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE, TealSpirit.MUSIC_DURATION, checkScore("SKT"));
+				addMusicItem(4, 3, Material.MUSIC_DISC_OTHERSIDE, "The Hour of Oblivion", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_2, TealSpirit.MUSIC_DURATION_2, checkScore("SKT"));
 			}
 
 			case DUNGEONS -> {
-				addDungeonItem(1, 2, Material.WHITE_WOOL, Location.WHITE, MusicPage.WHITE, "White");
-				addDungeonItem(1, 3, Material.ORANGE_WOOL, Location.ORANGE, MusicPage.ORANGE, "Orange");
-				addDungeonItem(1, 4, Material.MAGENTA_WOOL, Location.MAGENTA, MusicPage.MAGENTA, "Magenta");
-				addDungeonItem(1, 5, Material.LIGHT_BLUE_WOOL, Location.LIGHTBLUE, MusicPage.LIGHTBLUE, "LightBlue");
-				addDungeonItem(1, 6, Material.YELLOW_WOOL, Location.YELLOW, MusicPage.YELLOW, "Yellow");
+				addMusicItem(1, 2, Material.SPAWNER, "Before the Perilous Path", Location.NONE, "Dungeon Lobbies", "Xernial", "epic:music.lobby", 146, checkAdvance("monumenta:quests/r1/sierhaven"));
+				addDungeonItem(1, 3, Material.WHITE_WOOL, Location.WHITE, MusicPage.WHITE, "White");
+				addDungeonItem(1, 4, Material.ORANGE_WOOL, Location.ORANGE, MusicPage.ORANGE, "Orange");
+				addDungeonItem(1, 5, Material.MAGENTA_WOOL, Location.MAGENTA, MusicPage.MAGENTA, "Magenta");
+				addDungeonItem(1, 6, Material.LIGHT_BLUE_WOOL, Location.LIGHTBLUE, MusicPage.LIGHTBLUE, "LightBlue");
+				addDungeonItem(1, 7, Material.YELLOW_WOOL, Location.YELLOW, MusicPage.YELLOW, "Yellow");
 
 				addDungeonItem(2, 2, Material.GLASS_BOTTLE, Location.LABS, MusicPage.LABS, "OldLab");
 				addDungeonItem(2, 3, Material.JUNGLE_LEAVES, Location.WILLOWS, MusicPage.WILLOWS, "R1Bonus");

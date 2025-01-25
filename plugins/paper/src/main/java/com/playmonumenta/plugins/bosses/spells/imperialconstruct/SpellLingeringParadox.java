@@ -44,7 +44,7 @@ public class SpellLingeringParadox extends Spell {
 		Collections.shuffle(players);
 		for (Player player : players) {
 			if (!Plugin.getInstance().mEffectManager.hasEffect(player, TemporalFlux.class)) {
-				mConstruct.sendMessage(Component.text("[Imperial Construct]", NamedTextColor.GOLD).append(Component.text(" TEMPORAL SHIFT PROTOCOL INITIATED - PARADOX REDIRECTED TO TARGET:", NamedTextColor.WHITE)));
+				mConstruct.sendMessage(Component.text("[Silver Construct]", NamedTextColor.GOLD).append(Component.text(" TEMPORAL SHIFT PROTOCOL INITIATED - PARADOX REDIRECTED TO TARGET:", NamedTextColor.WHITE)));
 				Plugin.getInstance().mEffectManager.addEffect(player, TemporalFlux.GENERIC_NAME, new TemporalFlux(20 * 30));
 				return;
 			}

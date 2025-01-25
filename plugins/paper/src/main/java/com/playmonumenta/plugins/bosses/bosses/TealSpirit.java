@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,6 +55,10 @@ import org.jetbrains.annotations.Nullable;
 public class TealSpirit extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_tealspirit";
 	public static final int detectionRange = 70;
+	public static final String MUSIC_TITLE = "epic:music.orasomn1";
+	public static final int MUSIC_DURATION = 145;
+	public static final String MUSIC_TITLE_2 = "epic:music.orasomn2";
+	public static final int MUSIC_DURATION_2 = 181;
 
 	private final int mHealth;
 
@@ -291,6 +296,8 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 	}
 
 	private BossBarManager.BossHealthAction getSummonEchoAction() {
+		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE_2, SoundCategory.RECORDS, MUSIC_DURATION_2, true, 1, 1, true), true, mBoss, true, 0, 5);
 		return mBoss -> {
 			Location loc = mSpawnLoc.clone().add(0, 2, 0);
 			LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");

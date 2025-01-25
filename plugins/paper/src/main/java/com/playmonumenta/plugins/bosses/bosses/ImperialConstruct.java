@@ -64,6 +64,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 	private static final String START_TAG = "Construct_Center";
 	private static final String PHASE_TWO_TAG = "Construct_PhaseTwo";
 	private static final String PHASE_THREE_TAG = "Construct_PhaseThree";
+	public static final String MUSIC_TITLE = "epic:music.construct";
+	public static final int MUSIC_DURATION = 144;
 	private LivingEntity mStart;
 	private final int mHealth;
 	private final BoundingBox mArenaBox;
