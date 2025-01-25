@@ -362,6 +362,8 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
-		event.getPlayer().sendMessage(Component.text("the endless march of time will decay even your bones. you will be forgotten.", NamedTextColor.DARK_AQUA));
+		Player player = event.getPlayer();
+		player.sendMessage(Component.text("the endless march of time will decay even your bones. you will be forgotten.", NamedTextColor.DARK_AQUA));
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, RewriteHistory.PERCENT_HEALTH_EFFECT);
 	}
 }
