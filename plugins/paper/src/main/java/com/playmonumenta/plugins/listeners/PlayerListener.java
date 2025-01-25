@@ -128,6 +128,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.SmithItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -1749,6 +1750,28 @@ public class PlayerListener implements Listener {
 		if (!cancel && ItemUtils.isShulkerBox(resultMat) && event.getWhoClicked() instanceof Player player) {
 			StatTrackManager.getInstance().incrementStatImmediately(result, player, InfusionType.STAT_TRACK_DEATH, 1);
 		}
+	}
+
+	/*
+	 * Prevent using the smithing table on custom items
+	 */
+	@EventHandler(ignoreCancelled = true)
+	public void smithItemEvent(SmithItemEvent event) {
+		ItemStack result = event.getCurrentItem();
+		if (result == null) {
+			return;
+		}
+		boolean cancel = false;
+
+		for (ItemStack item : event.getInventory()) {
+			if (item != null) {
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null && meta.hasLore() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MATERIAL) == 0) {
+					cancel = true;
+				}
+			}
+		}
+		event.setCancelled(cancel);
 	}
 
 	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(
