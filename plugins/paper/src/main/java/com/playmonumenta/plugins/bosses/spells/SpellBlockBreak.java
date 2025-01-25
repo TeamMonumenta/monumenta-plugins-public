@@ -17,8 +17,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Slab;
+import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -37,30 +37,37 @@ public class SpellBlockBreak extends Spell {
 	private final int mZRad;
 	private final int mArenaFloorY;
 	private final boolean mBreakBossArena;
+	private final boolean mFlattenArena;
 	private final boolean mBreakOverheadBlocks;
 	private final boolean mBreakFootLevel;
 	private final boolean mAdaptToBoundingBox;
 	private final boolean mOnlyForcecast;
 
-	public SpellBlockBreak(Entity launcher) {
+	public SpellBlockBreak(final Entity launcher) {
 		this(launcher, 1, 3, 1);
 	}
 
-	public SpellBlockBreak(Entity launcher, int xRad, int yRad, int zRad) {
-		this(launcher, xRad, yRad, zRad, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD, false, true, false);
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad) {
+		this(launcher, xRad, yRad, zRad, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD,
+			false, true, false);
 	}
 
-	public SpellBlockBreak(Entity launcher, boolean adaptToBoundingBox, boolean breakFootLevel) {
-		this(launcher, 1, 3, 1, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD, adaptToBoundingBox, true, breakFootLevel);
+	public SpellBlockBreak(final Entity launcher, final boolean adaptToBoundingBox, final boolean breakFootLevel) {
+		this(launcher, 1, 3, 1, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD,
+			adaptToBoundingBox, true, breakFootLevel);
 	}
 
-	public SpellBlockBreak(Entity launcher, int xRad, int yRad, int zRad, int arenaFloorY, boolean adaptToBoundingBox,
-						   boolean breakBossArena, boolean breakFootLevel) {
-		this(launcher, xRad, yRad, zRad, arenaFloorY, adaptToBoundingBox, breakBossArena, breakFootLevel, true, false, Material.AIR);
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int arenaFloorY,
+						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean breakFootLevel) {
+		this(launcher, xRad, yRad, zRad, arenaFloorY, adaptToBoundingBox, breakBossArena, false,
+			breakFootLevel, true, false, Material.AIR);
 	}
 
-	public SpellBlockBreak(Entity launcher, boolean adaptToBoundingBox, boolean breakFootLevel, boolean onlyForcecast) {
-		this(launcher, 1, 3, 1, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD, adaptToBoundingBox, true, breakFootLevel, true, onlyForcecast, Material.AIR);
+	public SpellBlockBreak(final Entity launcher, final boolean adaptToBoundingBox, final boolean breakFootLevel,
+						   final boolean onlyForcecast) {
+		this(launcher, 1, 3, 1, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD,
+			adaptToBoundingBox, true, false, breakFootLevel, true,
+			onlyForcecast, Material.AIR);
 	}
 
 	/**
@@ -72,14 +79,16 @@ public class SpellBlockBreak extends Spell {
 	 * @param arenaFloorY For bosses with a dedicated arena. Only used if breakBossArena is set to false
 	 * @param adaptToBoundingBox Whether the launcher should check for blocks to break depending on the radii or its bounding box
 	 * @param breakBossArena If the launcher should be able to break the arena floor
+	 * @param flattenArena If the launcher should consistently break blocks above {@code arenaFloorY}
 	 * @param breakFootLevel If the launcher should break blocks at "foot" level. If set to true, the launcher won't attempt to "stair" from low to high elevation
 	 * @param breakOverheadBlocks Only used with Eldrask for now. Defaults to true
 	 * @param onlyForcecast Whether to run this spell manually. Used during the launcher's pathfinding calculations. Defaults to false
 	 * @param noBreak List of block materials the launcher should not break
 	 */
-	public SpellBlockBreak(Entity launcher, int xRad, int yRad, int zRad, int arenaFloorY, boolean adaptToBoundingBox,
-						   boolean breakBossArena, boolean breakFootLevel, boolean breakOverheadBlocks,
-						   boolean onlyForcecast, Material... noBreak) {
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int arenaFloorY,
+						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean flattenArena,
+						   final boolean breakFootLevel, final boolean breakOverheadBlocks, final boolean onlyForcecast,
+						   final Material... noBreak) {
 		mLauncher = launcher;
 		mAdaptToBoundingBox = adaptToBoundingBox;
 		mXRad = xRad;
@@ -87,6 +96,7 @@ public class SpellBlockBreak extends Spell {
 		mZRad = zRad;
 		mArenaFloorY = arenaFloorY;
 		mBreakBossArena = breakBossArena;
+		mFlattenArena = flattenArena;
 		mBreakFootLevel = breakFootLevel;
 		mBreakOverheadBlocks = breakOverheadBlocks;
 		mOnlyForcecast = onlyForcecast;
@@ -103,48 +113,45 @@ public class SpellBlockBreak extends Spell {
 	 * @param initialRequiredScore Threshold score that must be met before block breaking happens. Defaults to 6
 	 * @return True if blocks were broken
 	 */
-	public boolean tryToBreakBlocks(int initialRequiredScore) {
+	public boolean tryToBreakBlocks(final int initialRequiredScore) {
 		return tryToBreakBlocks(mLauncher.getLocation(), initialRequiredScore);
 	}
 
 	/**
-	 * Attempt to break blocks in the launcher's world.
-	 * <br>
+	 * Attempt to break blocks in the launcher's world.<br>
 	 * Warning: Do not move this code outside of this method! Attempting to put this in run() causes race conditions!
 	 * @param loc Location where block breaking should happen. I had to add this param to this dang spell to get it to work with the LaserBoss code
 	 * @param initialRequiredScore Threshold score that must be met before block breaking happens. Defaults to 6
 	 * @return True if blocks were broken
 	 */
-	public boolean tryToBreakBlocks(Location loc, int initialRequiredScore) {
-		/* Calculate radii every time the spell is run because of size changing slimes with block break */
-		final int xRad = (int) (mAdaptToBoundingBox ? Math.round(mLauncher.getBoundingBox().getWidthX()) : mXRad);
-		final int yRad = (int) (mAdaptToBoundingBox ? Math.ceil(mLauncher.getBoundingBox().getHeight()) : mYRad);
-		final int zRad = (int) (mAdaptToBoundingBox ? Math.round(mLauncher.getBoundingBox().getWidthZ()) : mZRad);
-
+	public boolean tryToBreakBlocks(final Location loc, final int initialRequiredScore) {
 		if (!mIsActive || ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 			return false;
 		}
 
-		double testLocX = loc.getX();
+		/* Calculate radii every time the spell is run because of size changing slimes with block break */
+		final int xRad = (int) (mAdaptToBoundingBox ? Math.round(mLauncher.getBoundingBox().getWidthX()) : mXRad);
+		final int yRad = (int) (mAdaptToBoundingBox ? Math.ceil(mLauncher.getBoundingBox().getHeight()) : mYRad);
+		final int zRad = (int) (mAdaptToBoundingBox ? Math.round(mLauncher.getBoundingBox().getWidthZ()) : mZRad);
+		final double testLocX = loc.getX();
 		double testLocY = loc.getY() - 1.0;
-		double testLocZ = loc.getZ();
-		Location testLoc = new Location(loc.getWorld(), 0, 0, 0);
+		final double testLocZ = loc.getZ();
+		final Location testLoc = new Location(loc.getWorld(), 0, 0, 0);
 		Block testBlock;
-		BlockData testBlockData;
 		Material testMat;
 
 		int badScore = 0;
 		int requiredScore = initialRequiredScore;
-		List<Block> breakBlockList = new ArrayList<>();
+		final List<Block> breakBlockList = new ArrayList<>();
 
 		/* Allow for roughly half of the launcher's hitbox perimeter to be surrounded by foot-level blocks before
-		 * attempting to break them */
-		if (mBreakFootLevel) {
+		 * attempting to break them unless the launcher should bulldoze the arena flat (e.g. Eldrask) */
+		if (mBreakFootLevel && !mFlattenArena) {
 			requiredScore = 2 * (xRad + yRad + 2);
 		}
 
 		// If the launcher is a mob with a valid player target with a GEQ 2 block height difference, reduce threshold
-		if (mLauncher instanceof Mob mob && mob.getTarget() instanceof Player target
+		if (mLauncher instanceof final Mob mob && mob.getTarget() instanceof final Player target
 			    && target.getLocation().getY() >= loc.getY() + 2 && PlayerUtils.isOnGround(target)) {
 			requiredScore /= 2;
 		}
@@ -164,21 +171,25 @@ public class SpellBlockBreak extends Spell {
 		}
 
 		/* Get a list of all blocks that impede the launcher's movement */
-		testLocY++;
+		if (!mFlattenArena) {
+			testLocY++;
+		}
 		for (double x = testLocX - xRad; x <= testLocX + xRad; x++) {
 			for (double y = testLocY; y <= testLocY + yRad; y++) {
 				for (double z = testLocZ - zRad; z <= testLocZ + zRad; z++) {
 					testLoc.set(x, y, z);
 					testBlock = testLoc.getBlock();
-					testBlockData = testBlock.getBlockData();
 					testMat = testBlock.getType();
+					/* Mob pathfinding frequently doesn't navigate over or around open trapdoors */
+					final boolean evilTrapdoor = testBlock.getBlockData() instanceof final TrapDoor trapdoor
+						&& trapdoor.isOpen();
 
-					if (BlockUtils.isEnvHazardForMobs(testMat) || BlockUtils.mobCannotPathfindOver(testBlockData)) {
+					if (BlockUtils.isEnvHazardForMobs(testMat) || BlockUtils.mobCannotPathfindOver(testBlock.getBlockData()) || evilTrapdoor) {
 						requiredScore = 0;
 						breakBlockList.add(testBlock);
-						/* If the block is not a mech block and is not in mNoBreak
-						 * and the block has collision with entities
-						 * and (the block is not a Lootable or (is a Lootable without a loot table and the block below it is not bedrock)) */
+					/* If the block is not a mech block and is not in mNoBreak
+					 * and the block has collision with entities
+					 * and (the block is not a Lootable or (is a Lootable without a loot table and the block below it is not bedrock)) */
 					} else if (!BlockUtils.isMechanicalBlock(testMat) && !mNoBreak.contains(testMat)
 						       && blockMaterialHasCollision(testMat)
 						       && (!(testBlock.getState() instanceof Lootable) || (!((Lootable) testBlock.getState()).hasLootTable()
@@ -188,7 +199,7 @@ public class SpellBlockBreak extends Spell {
 						// 3 Bad blocks Top level (3 * 2) = 6 (Break)
 						// 4 Foot Level blocks (4 * 1) + 1 Top level block (1 * 2) = 6 (Break)
 						// 3 Foot Level blocks (2 * 1) + 1 Top level block (1 * 2) = 5 (Don't Break)
-						if (y > testLocY || (mBreakFootLevel && shouldBreakSlab(testBlock))) {
+						if (y > testLocY || (mBreakFootLevel && shouldBreakSlab(testBlock)) || (mFlattenArena && y > mArenaFloorY)) {
 							breakBlockList.add(testBlock);
 							badScore += 2;
 						} else {
@@ -202,7 +213,8 @@ public class SpellBlockBreak extends Spell {
 		/* If the threshold has been met, attempt to break blocks */
 		if (badScore >= requiredScore) {
 			final int finalBadScore = badScore;
-			MMLog.finest(() -> "[SpellBlockBreak] Launcher " + mLauncher.getName() + " has achieved " + finalBadScore + " badScore and is attempting to break blocks");
+			MMLog.finest(() -> "[SpellBlockBreak] Launcher " + mLauncher.getName() + " has achieved " + finalBadScore +
+				" badScore and is attempting to break blocks");
 			return breakBlocks(loc, breakBlockList);
 		}
 		return false;
@@ -223,37 +235,46 @@ public class SpellBlockBreak extends Spell {
 	 * @param blockList List of blocks to break
 	 * @return True if blocks were destroyed
 	 */
-	public boolean breakBlocks(Location loc, List<Block> blockList) {
+	public boolean breakBlocks(final Location loc, final List<Block> blockList) {
 		/* Call an event with these exploding blocks to give plugins a chance to modify it */
-		EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, loc, blockList, 0f);
+		final EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, loc, blockList, 0f);
 		Bukkit.getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled() || blockList.isEmpty()) {
-			MMLog.finest(() -> "[SpellBlockBreak] Launcher " + mLauncher.getName() + "'s EntityExplodeEvent was cancelled or the blockList is empty. Returning false");
+			MMLog.finest(() -> "[SpellBlockBreak] Launcher " + mLauncher.getName() +
+				"'s EntityExplodeEvent was cancelled or the blockList is empty. Returning false");
 			return false;
 		}
 
 		/* Remove any remaining blocks which might have been modified by the event */
-		Material particleMat = blockList.get(0).getType();
-		for (Block block : blockList) {
+		final Material particleMat = blockList.get(0).getType();
+		boolean atLeastOneBlockChanged = false;
+		for (final Block block : blockList) {
 			/* Special case for big boy Eldrask who can crunch the blocks over his head when doing Giant Stomp.
-				  If (don't break overhead blocks) and (difference between current block and arena floor >= 15), skip */
+			 * If (don't break overhead blocks) and (difference between current block and arena floor >= 15), skip */
 			if ((!mBreakOverheadBlocks && block.getLocation().getY() - mArenaFloorY >= mYRad)
-				/* If (don't break boss arena) and (current block's Y coord is less than arena floor's Y, skip */
+				/* If (don't break boss arena) and (current block's Y coord is less than arena floor's Y), skip */
 				|| (!mBreakBossArena && block.getLocation().getY() < mArenaFloorY)) {
 				continue;
 			}
 
 			if (BlockUtils.isValuableBlock(block.getType()) || BlockUtils.isNonEmptyContainer(block)) {
+				atLeastOneBlockChanged = true;
 				block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
 			} else {
+				atLeastOneBlockChanged = true;
 				block.setType(Material.AIR);
 			}
 		}
 
-		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 0.25f, FastUtils.randomFloatInRange(0.7f, 1.0f));
-		new PartialParticle(Particle.BLOCK_CRACK, loc, 15, mXRad / 2.0, mYRad / 4.0, mZRad / 2.0, 0.05, particleMat.createBlockData()).spawnAsEntityActive(mLauncher);
-		MMLog.finest(() -> "[SpellBlockBreak] Launcher " + mLauncher.getName() + " successfully broke blocks. Returning true");
-		return true;
+		if (atLeastOneBlockChanged) {
+			loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 0.25f, FastUtils.randomFloatInRange(0.7f, 1.0f));
+			new PartialParticle(Particle.BLOCK_CRACK, loc, 15, mXRad / 2.0, mYRad / 4.0, mZRad / 2.0,
+				0.05, particleMat.createBlockData()).spawnAsEntityActive(mLauncher);
+			MMLog.finest(() -> "[SpellBlockBreak] Launcher " + mLauncher.getName() + " successfully broke blocks. Returning true");
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -261,7 +282,7 @@ public class SpellBlockBreak extends Spell {
 	 * @param material Material of the block to be tested
 	 * @return True if an entity's hitbox can collide with the block material
 	 */
-	private boolean blockMaterialHasCollision(Material material) {
+	private boolean blockMaterialHasCollision(final Material material) {
 		return (material.isSolid()
 				|| ItemUtils.HEADS.contains(material)
 				|| ItemUtils.CARPETS.contains(material)
@@ -269,8 +290,8 @@ public class SpellBlockBreak extends Spell {
 				|| ItemUtils.FLOWER_POTS.contains(material));
 	}
 
-	private boolean shouldBreakSlab(Block block) {
-		if (block instanceof Slab s) {
+	private boolean shouldBreakSlab(final Block block) {
+		if (block instanceof final Slab s) {
 			// if block is slab, don't break if it's a bottom slab
 			return s.getType() != Slab.Type.BOTTOM;
 		}

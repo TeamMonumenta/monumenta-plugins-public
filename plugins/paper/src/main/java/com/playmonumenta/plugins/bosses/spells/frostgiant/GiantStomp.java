@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -16,80 +18,78 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class GiantStomp extends Spell {
-
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mTimer;
-	private int mCooldown;
-
+public final class GiantStomp extends Spell {
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 128), 1.0f);
 
+	private final Plugin mPlugin;
+	private final FrostGiant mFrostGiant;
+	private final LivingEntity mBoss;
+	private final int mTimer;
+	private int mCooldown;
 
-	//direction is 0 or 180
-
-	public GiantStomp(Plugin plugin, LivingEntity boss) {
+	public GiantStomp(final Plugin plugin, final FrostGiant frostGiant) {
 		mPlugin = plugin;
-		mBoss = boss;
-		mTimer = 5 * 20;
+		mFrostGiant = frostGiant;
+		mBoss = mFrostGiant.mBoss;
+		mTimer = Constants.TICKS_PER_SECOND * 5;
 	}
 
 	@Override
 	public void run() {
-		if (FrostGiant.castStomp) {
-			mCooldown -= 5;
-			if (mCooldown <= 0) {
-				mCooldown = mTimer;
-				World world = mBoss.getWorld();
-
-				Vector dir = mBoss.getLocation().getDirection();
-
-				BukkitRunnable runnable = new BukkitRunnable() {
-					int mTicks = 0;
-
-					@Override
-					public void run() {
-						Location loc = mBoss.getLocation();
-						loc.setDirection(dir);
-
-						int radius = 5;
-						Vector vec;
-
-						world.playSound(loc, Sound.ENTITY_RAVAGER_STEP, SoundCategory.HOSTILE, 3, 0.6f);
-
-						for (double degree = 0; degree < 360; degree += 15) {
-							double radian1 = Math.toRadians(degree);
-							for (int i = 1; i <= radius; i++) {
-								vec = new Vector(FastUtils.cos(radian1) * i, 0, FastUtils.sin(radian1) * i);
-								vec = VectorUtils.rotateYAxis(vec, 5);
-								Location l = loc.clone().add(vec);
-								new PartialParticle(Particle.REDSTONE, l, 5, 0.1, 1, 0.1, 0.1, BLUE_COLOR).spawnAsEntityActive(mBoss);
-							}
-						}
-
-						if (mTicks >= 20) {
-							for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
-								DamageUtils.damage(mBoss, player, DamageType.MELEE, 35, null, false, true, "Giant Stomp");
-								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.1f, true);
-							}
-							this.cancel();
-						}
-						mTicks += 4;
-					}
-				};
-				runnable.runTaskTimer(mPlugin, 0, 4);
-			}
+		if (mFrostGiant.mCastStomp) {
+			mCooldown -= BossAbilityGroup.PASSIVE_RUN_INTERVAL_DEFAULT;
 		}
+
+		if (mCooldown > 0 || mFrostGiant.getArenaParticipants().isEmpty()) {
+			return;
+		}
+
+		mCooldown = mTimer;
+		final World world = mBoss.getWorld();
+		final Vector dir = mBoss.getLocation().getDirection();
+		final int runnablePeriod = 4;
+
+		final BukkitRunnable runnable = new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				mTicks += runnablePeriod;
+
+				final Location loc = mBoss.getLocation();
+				final int radius = 5;
+				loc.setDirection(dir);
+				Vector vec;
+
+				world.playSound(loc, Sound.ENTITY_RAVAGER_STEP, SoundCategory.HOSTILE, 3, 0.6f);
+
+				for (double degree = 0; degree < 360; degree += 15) {
+					for (int i = 1; i <= radius; i++) {
+						vec = new Vector(FastUtils.cosDeg(degree) * i, 0, FastUtils.sinDeg(degree) * i);
+						vec = VectorUtils.rotateYAxis(vec, 5);
+						new PartialParticle(Particle.REDSTONE, loc.clone().add(vec), 5, 0.1, 1, 0.1, 0.1, BLUE_COLOR)
+							.distanceFalloff(FrostGiant.ARENA_RADIUS).spawnAsEntityActive(mBoss);
+					}
+				}
+
+				if (mTicks >= Constants.TICKS_PER_SECOND) {
+					PlayerUtils.playersInRange(loc, radius, true).forEach(player -> {
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, 35, null, false, false, "Giant Stomp");
+						MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.1f, true);
+					});
+					this.cancel();
+				}
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, runnablePeriod);
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return 7 * 20;
+		return Constants.TICKS_PER_SECOND * 7;
 	}
-
 }

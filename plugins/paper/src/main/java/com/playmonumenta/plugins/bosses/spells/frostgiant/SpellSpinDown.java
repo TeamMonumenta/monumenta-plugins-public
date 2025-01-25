@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.destroystokyo.paper.entity.Pathfinder;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -22,190 +21,176 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Mob;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class SpellSpinDown extends Spell {
-	private static final Material ICE_TYPE = Material.FROSTED_ICE;
+public final class SpellSpinDown extends Spell {
+	private static final String SPELL_NAME = FastUtils.RANDOM.nextInt(10000) == 0 ? "Frosted Beyblade" : "Frost Whirlwind";
+	private static final int CHARGE_DURATION = Constants.TICKS_PER_SECOND * 3;
+
 	private final Plugin mPlugin;
+	private final FrostGiant mFrostGiant;
 	private final LivingEntity mBoss;
+	private final World mWorld;
 	private final Location mStartLoc;
 	private final List<Block> mChangedBlocks = new ArrayList<>();
+	private final ChargeUpManager mChargeManager;
+	private final ChargeUpManager mCastManager;
 
 	private boolean mCooldown = false;
 
-	public SpellSpinDown(Plugin plugin, LivingEntity boss, Location loc) {
+	public SpellSpinDown(final Plugin plugin, final FrostGiant frostGiant, final Location loc) {
 		mPlugin = plugin;
-		mBoss = boss;
+		mFrostGiant = frostGiant;
+		mBoss = mFrostGiant.mBoss;
+		mWorld = mBoss.getWorld();
 		mStartLoc = loc;
+		mChargeManager = FrostGiant.defaultChargeUp(mBoss, CHARGE_DURATION, "Charging " + SPELL_NAME + "...");
+		mCastManager = FrostGiant.defaultChargeUp(mBoss, CHARGE_DURATION, "Casting " + SPELL_NAME + "...");
 	}
 
 	@Override
 	public void run() {
-		FrostGiant.freezeGolems(mBoss);
 		mCooldown = true;
-		new BukkitRunnable() {
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, Constants.TICKS_PER_SECOND * 30);
 
-			@Override
-			public void run() {
-				mCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, 20 * 30);
-
-		//Same as teleport method from the Frost Giant class, teleport with particle effect/sounds
-		Location bossLoc = mBoss.getLocation();
-		Location secondLoc = bossLoc.clone().add(0, 1, 0);
-		World world = mStartLoc.getWorld();
-		world.playSound(bossLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		new PartialParticle(Particle.FIREWORKS_SPARK, secondLoc, 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
-		new PartialParticle(Particle.CLOUD, secondLoc, 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
-		mBoss.teleport(mStartLoc.clone().add(0, 1, 0));
-		world.playSound(bossLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		new PartialParticle(Particle.FIREWORKS_SPARK, secondLoc, 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
-		new PartialParticle(Particle.SMOKE_LARGE, secondLoc, 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
-
-		FrostGiant.delayHailstormDamage();
-
-		if (FrostGiant.mInstance != null) {
-			FrostGiant.mInstance.mPreventTargetting = true;
-		}
-
+		mFrostGiant.teleport(mStartLoc.clone().add(0, 1, 0));
+		mFrostGiant.freezeGolems();
+		mFrostGiant.mPreventTargetting = true;
 		mChangedBlocks.clear();
 
-		final float vel = 45f;
-		BukkitRunnable runnable = new BukkitRunnable() {
-			int mTicks = 0;
-			float mPitch = 0;
+		final World world = mBoss.getWorld();
+		final Location loc = mBoss.getLocation();
+		final Mob mMob = (Mob) mBoss;
+		final Pathfinder mPathfinder = mMob.getPathfinder();
+		final BukkitRunnable runnable = new BukkitRunnable() {
+			float mPitch = 0.3f;
 
 			@Override
 			public void run() {
-				World world = mBoss.getWorld();
+				mMob.setTarget(null);
+				mPathfinder.stopPathfinding();
+				final Location speenLoc = mBoss.getLocation();
+				speenLoc.setYaw(speenLoc.getYaw() + 45);
+				mBoss.teleport(speenLoc);
 
-				Creature c = (Creature) mBoss;
-				Pathfinder pathfinder = c.getPathfinder();
-
-				c.setTarget(null);
-				pathfinder.stopPathfinding();
-
-				Location loc = mBoss.getLocation();
-				mBoss.setRotation(loc.getYaw() + vel, loc.getPitch());
-
-				if (mTicks % 2 == 0 && mTicks <= 20 * 3) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 4, mPitch);
+				if (mChargeManager.getTime() % 2 == 0) {
+					world.playSound(loc, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 4, mPitch);
 					mPitch += 0.01f;
-
-					new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation().add(0, 2, 0), 5, 1, 0.35, 1, 0.25, ICE_TYPE.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, loc.clone().add(0, 2, 0), 5, 1,
+						0.35, 1, 0.25, FrostGiant.ICE_TYPE.createBlockData()).spawnAsEntityActive(mBoss);
 				}
 
-				//Shoots out ice blocks every third tick after 3 seconds
-				if (mTicks >= 20 * 3 && mTicks % 3 == 0) {
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 4, 0.5f);
+				if (!mChargeManager.nextTick()) {
+					return;
+				}
 
-					//Velocity randomized of the frosted ice as a falling block
-					FallingBlock block = world.spawn(loc, FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(ICE_TYPE)));
-					block.setDropItem(false);
-					EntityUtils.disableBlockPlacement(block);
-					block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(0.1, 0.75), FastUtils.randomDoubleInRange(-1, 1)));
+				mChargeManager.reset();
+				mCastManager.setTime(CHARGE_DURATION);
 
-					new BukkitRunnable() {
-						int mTicks = 0;
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						mMob.setTarget(null);
+						mPathfinder.stopPathfinding();
+						final Location speenLoc = mBoss.getLocation();
+						speenLoc.setYaw(speenLoc.getYaw() + 45);
+						mBoss.teleport(speenLoc);
 
-						@Override
-						public void run() {
-							//Once the ice touches the ground or after 5 seconds, create a 4*4 square of damaging frosted ice (cracked)
-							if (mTicks >= 20 * 5 || block.isOnGround()) {
-								Location bLoc = block.getLocation();
-								Material groundMat = bLoc.getBlock().getRelative(BlockFace.DOWN).getType();
-								if (groundMat != Material.BEDROCK && groundMat != Material.AIR && groundMat != Material.BARRIER) {
-									for (int r = 0; r <= 2; r++) {
-										for (int x = -r; x < r; x++) {
-											for (int z = -r; z < r; z++) {
-												//Have to clone location because of use in HashMap
-												Block b = bLoc.clone().add(x, -1, z).getBlock();
-
-												if (b.getType() != SpellFrostRift.RIFT_BLOCK_TYPE
-													    && TemporaryBlockChangeManager.INSTANCE.changeBlock(b, ICE_TYPE, 20 * FrostGiant.frostedIceDuration + FastUtils.randomIntInRange(0, 10))) {
-													Ageable age = (Ageable) b.getBlockData();
-													age.setAge(1 + FastUtils.RANDOM.nextInt(3));
-													b.setBlockData(age);
-												}
-											}
-										}
-									}
-								}
-								block.remove();
-
-								this.cancel();
-							}
-
-							mTicks += 2;
+						//Shoots out ice blocks every third tick after 3 seconds
+						if (mCastManager.getTime() % 3 == 0) {
+							createNewIce();
 						}
-					}.runTaskTimer(mPlugin, 0, 2);
-				}
 
-
-				if (mTicks >= 20 * 6) {
-					if (FrostGiant.mInstance != null) {
-						FrostGiant.mInstance.mPreventTargetting = false;
+						if (mCastManager.previousTick()) {
+							mCastManager.reset();
+							mFrostGiant.mPreventTargetting = false;
+							mFrostGiant.unfreezeGolems();
+							this.cancel();
+						}
 					}
-					FrostGiant.unfreezeGolems(mBoss);
-					this.cancel();
-				}
+				}.runTaskTimer(mPlugin, 0, 1);
 
-				mTicks += 1;
+				this.cancel();
 			}
 		};
 
 		runnable.runTaskTimer(mPlugin, 1, 1);
 		mActiveRunnables.add(runnable);
-
-		// Damage players standing on frosted ice for the duration
-		mActiveTasks.add(new BukkitRunnable() {
-			int mTicks = 0;
-
-			@Override
-			public void run() {
-
-				//Stop running after 20 seconds
-				if (mTicks >= 20 * FrostGiant.frostedIceDuration || mBoss.isDead() || !mBoss.isValid()) {
-					this.cancel();
-				}
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
-					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
-						    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == ICE_TYPE || player.getLocation().getBlock().getType() == ICE_TYPE)) {
-						Vector vel = player.getVelocity();
-						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Frosted Ice");
-						player.setVelocity(vel);
-					}
-				}
-				mTicks += 10;
-			}
-		}.runTaskTimer(mPlugin, 0, 10)); //Every 0.5 seconds, check if player is on cone area damage
 	}
 
 	@Override
 	public void cancel() {
 		super.cancel();
 
-		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, ICE_TYPE);
+		mChargeManager.reset();
+		mCastManager.reset();
+		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, FrostGiant.ICE_TYPE);
 		mChangedBlocks.clear();
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return 7 * 20;
+		return Constants.TICKS_PER_SECOND * 7;
 	}
 
 	@Override
 	public boolean canRun() {
 		return !mCooldown;
+	}
+
+	private void createNewIce() {
+		final Location bossLoc = mBoss.getLocation();
+		final FallingBlock block = mWorld.spawn(bossLoc, FallingBlock.class, CreatureSpawnEvent.SpawnReason.CUSTOM,
+			(final FallingBlock ice) -> {
+				ice.setBlockData(Bukkit.createBlockData(Material.ICE));
+				ice.setVelocity(new Vector(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(0.1, 0.75), FastUtils.randomDoubleInRange(-1, 1)));
+				ice.setDropItem(false);
+				EntityUtils.disableBlockPlacement(ice);
+			});
+
+		mWorld.playSound(bossLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 4, 0.5f);
+		new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				//Once the ice touches the ground or after 5 seconds, create a 4*4 square of damaging frosted ice (cracked)
+				if (block.isOnGround() || mTicks >= Constants.TICKS_PER_SECOND * 5) {
+					final Location bLoc = block.getLocation();
+					final Material groundMat = bLoc.getBlock().getRelative(BlockFace.DOWN).getType();
+
+					if (groundMat == Material.BEDROCK || groundMat == Material.AIR || groundMat == Material.BARRIER) {
+						block.remove();
+						this.cancel();
+						return;
+					}
+
+					for (int r = 0; r <= 2; r++) {
+						for (int x = -r; x < r; x++) {
+							for (int z = -r; z < r; z++) {
+								//Have to clone location because of use in HashMap
+								final Block b = bLoc.clone().add(x, -1, z).getBlock();
+
+								if (b.getType() != SpellFrostRift.RIFT_BLOCK_TYPE
+									&& TemporaryBlockChangeManager.INSTANCE.changeBlock(b, FrostGiant.ICE_TYPE, 20 * FrostGiant.frostedIceDuration + FastUtils.randomIntInRange(0, 10))) {
+									final Ageable age = (Ageable) b.getBlockData();
+									age.setAge(1 + FastUtils.RANDOM.nextInt(3));
+									b.setBlockData(age);
+								}
+							}
+						}
+					}
+					block.remove();
+					this.cancel();
+				}
+				mTicks += 2;
+			}
+		}.runTaskTimer(mPlugin, 0, 2);
 	}
 }

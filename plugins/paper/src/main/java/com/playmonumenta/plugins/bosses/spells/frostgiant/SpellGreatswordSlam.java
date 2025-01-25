@@ -1,20 +1,25 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.destroystokyo.paper.entity.Pathfinder;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -26,94 +31,101 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class SpellGreatswordSlam extends Spell {
-
-	private static final Material ICE_TYPE = Material.FROSTED_ICE;
-
-	private final Plugin mPlugin;
-	private final LivingEntity mBoss;
-	private final double mDeg;
-	//Number of sec. the cracked ice lasts
-	private final int mDuration;
+public final class SpellGreatswordSlam extends Spell {
+	private static final String SPELL_NAME = "Greatsword Slam";
+	private static final int CHARGE_DURATION = Constants.TICKS_PER_SECOND * 2;
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
 	private static final Particle.DustOptions GRAY_COLOR = new Particle.DustOptions(Color.fromRGB(156, 156, 156), 1.0f);
 
+	private final Plugin mPlugin;
+	private final FrostGiant mFrostGiant;
+	private final LivingEntity mBoss;
+	private final double mDeg;
+	private final int mIceDuration;
+	private final World mWorld;
 	private final Location mStartLoc;
-
+	private final ChargeUpManager mChargeManager;
 	private final List<Block> mChangedBlocks = new ArrayList<>();
 
-	public SpellGreatswordSlam(Plugin plugin, LivingEntity boss, int dur, double deg, Location startLoc) {
+	public SpellGreatswordSlam(final Plugin plugin, final FrostGiant frostGiant, final int iceDuration, final double deg,
+							   final Location startLoc) {
 		mPlugin = plugin;
-		mBoss = boss;
-		mDuration = dur;
+		mFrostGiant = frostGiant;
+		mBoss = mFrostGiant.mBoss;
+		mIceDuration = iceDuration;
 		mDeg = deg;
+		mWorld = mBoss.getWorld();
 		mStartLoc = startLoc;
+		mChargeManager = new ChargeUpManager(mBoss, CHARGE_DURATION, Component.text("Casting ", NamedTextColor.DARK_AQUA)
+			.append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED)), BossBar.Color.RED, BossBar.Overlay.PROGRESS, FrostGiant.detectionRange);
 	}
 
 	@Override
 	public void run() {
-		FrostGiant.freezeGolems(mBoss);
-		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 10, 1);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 1.5f);
-		for (int deg = 0; deg < 360; deg += 5) {
-			new PartialParticle(Particle.REDSTONE, mBoss.getLocation().clone().add(3 * FastUtils.cos(deg), 0, 3 * FastUtils.sin(deg)), 1, 0.15, 0.15, 0.15, GRAY_COLOR).spawnAsEntityActive(mBoss);
+		if (mFrostGiant.getArenaParticipants().isEmpty()) {
+			return;
 		}
-		Creature c = (Creature) mBoss;
-		Pathfinder pathfinder = c.getPathfinder();
 
+		final Location bossLoc = mBoss.getLocation();
+
+		mFrostGiant.freezeGolems();
+		mWorld.playSound(bossLoc, Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 5, 1);
+		mWorld.playSound(bossLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 1.5f);
+		new PPCircle(Particle.REDSTONE, mBoss.getLocation(), 3).count(1).delta(0.15).data(GRAY_COLOR).spawnAsEntityActive(mBoss);
+
+		final Mob mMob = (Mob) mBoss;
+		final Pathfinder pathfinder = mMob.getPathfinder();
 		pathfinder.stopPathfinding();
-
-		Vector bossDir = mBoss.getLocation().getDirection();
-
-		Location loc = mBoss.getLocation();
-
-		BukkitRunnable runnable1 = new BukkitRunnable() {
-			int mT = 0;
-
+		final Vector bossDir = bossLoc.getDirection();
+		final BukkitRunnable warningRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-
-				mT += 10;
-				if (mT > 20 * 3.5) {
+				if (mChargeManager.nextTick()) {
+					mChargeManager.reset();
 					this.cancel();
+				}
+
+				if (mChargeManager.getTime() <= mChargeManager.getChargeTime()) {
+					mBoss.teleport(mBoss.getLocation().setDirection(bossDir));
+				}
+
+				/* Spawn particles once every half second */
+				if (mChargeManager.getTime() % Constants.HALF_TICKS_PER_SECOND != 0) {
+					return;
 				}
 
 				for (int r = 0; r < 30; r += 2) {
 					for (double degree = 90 - mDeg / 2; degree <= 90 + mDeg / 2; degree += 5) {
-						double radian1 = Math.toRadians(degree);
-						Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+						Vector vec = new Vector(FastUtils.cosDeg(degree) * r, 0, FastUtils.sinDeg(degree) * r);
+						vec = VectorUtils.rotateYAxis(vec, bossLoc.getYaw());
 
-						Location l = loc.clone().add(vec);
-						while (l.getBlock().getType() != Material.AIR && l.getBlockY() <= mStartLoc.getBlockY() + 3) {
+						final Location l = bossLoc.clone().add(vec);
+						while (l.getBlock().getType() != Material.AIR && l.getBlockY() <= FrostGiant.ARENA_FLOOR_Y + 3) {
 							l.add(0, 1, 0);
 						}
 						new PartialParticle(Particle.SPELL_WITCH, l, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.END_ROD, l, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 					}
 				}
-
-				if (mT <= 70) {
-					mBoss.teleport(mBoss.getLocation().setDirection(bossDir));
-				}
 			}
 		};
-		runnable1.runTaskTimer(mPlugin, 0, 10);
-		mActiveRunnables.add(runnable1);
+		warningRunnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(warningRunnable);
 
 		mChangedBlocks.clear();
 
-		BukkitRunnable runnable2 = new BukkitRunnable() {
+		/* TODO: This runnable should probably get a rewrite so it's not a mess of nested code but it is brittle and I don't want to deal with it */
+		final BukkitRunnable jumpRunnable = new BukkitRunnable() {
 			int mT = 0;
 			final List<Player> mHitPlayers = new ArrayList<>();
 
@@ -121,22 +133,21 @@ public class SpellGreatswordSlam extends Spell {
 			public void run() {
 				mT += 2;
 
-				if (mT <= 30 && mT >= 20) {
+				if (mT <= (int) (Constants.TICKS_PER_SECOND * 1.5) && mT >= Constants.TICKS_PER_SECOND) {
 					//Initiates the jump upwards
 					mBoss.setVelocity(new Vector(0, 1.5, 0));
-				} else if (mT >= 30) {
+				} else if (mT >= (int) (Constants.TICKS_PER_SECOND * 1.5)) {
 					if (!mBoss.isOnGround()) {
 						//Initiates the slam down
 						mBoss.setVelocity(new Vector(0, -1.5, 0));
 					} else {
 						//Creates the giant 30 degree cone rift of damage
-						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
-						BukkitRunnable runnable = new BukkitRunnable() {
+						mWorld.playSound(bossLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
+						final BukkitRunnable runnable = new BukkitRunnable() {
 							int mRadius = 0;
 
 							@Override
 							public void run() {
-
 								mBoss.setVelocity(new Vector(0, 0, 0));
 								pathfinder.stopPathfinding();
 
@@ -147,22 +158,20 @@ public class SpellGreatswordSlam extends Spell {
 								//In the current radius, makes a cone of frosted ice and various other particles
 								//If player is in trajectory (in bounding box), damage them and knock back
 								Vector vec;
-								List<BoundingBox> boxes = new ArrayList<>();
+								final List<BoundingBox> boxes = new ArrayList<>();
 								for (double degree = 90 - mDeg / 2; degree <= 90 + mDeg / 2; degree += 5) {
-
-									double radian1 = Math.toRadians(degree);
-									vec = new Vector(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-									vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+									vec = new Vector(FastUtils.cosDeg(degree) * mRadius, 0, FastUtils.sinDeg(degree) * mRadius);
+									vec = VectorUtils.rotateYAxis(vec, bossLoc.getYaw());
 
 									//Also have to clone location because of use in HashMap, can not optimize
-									Location l = loc.clone().add(vec).add(0, -1, 0);
+									final Location l = bossLoc.clone().add(vec).add(0, -1, 0);
 									//Move down one block to not overshoot, sometimes boss can stand on a single block, affects location
 									if (l.getBlock().getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
 										l.add(0, -1, 0);
 									}
 									//Once it leaves the arena, stop iterating
 									if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-										    || l.distance(mStartLoc) > FrostGiant.fighterRange) {
+										    || l.distance(mStartLoc) > FrostGiant.ARENA_RADIUS) {
 										continue;
 									}
 									//If on bedrock or barriers, move up one to not replace that
@@ -172,52 +181,47 @@ public class SpellGreatswordSlam extends Spell {
 
 									//Put less frosted ice than the entire cone
 									if (degree % 10 == 0) {
-										Block block = l.getBlock();
+										final Block block = l.getBlock();
 										if (block.getType() != SpellFrostRift.RIFT_BLOCK_TYPE
-											    && TemporaryBlockChangeManager.INSTANCE.changeBlock(block, ICE_TYPE, 20 * mDuration - mRadius + FastUtils.randomIntInRange(0, 10))) {
+											    && TemporaryBlockChangeManager.INSTANCE.changeBlock(block, FrostGiant.ICE_TYPE,
+											Constants.TICKS_PER_SECOND * mIceDuration - mRadius + FastUtils.randomIntInRange(0, 10))) {
 											mChangedBlocks.add(block);
-											Ageable age = (Ageable) block.getBlockData();
+											final Ageable age = (Ageable) block.getBlockData();
 											age.setAge(1 + FastUtils.RANDOM.nextInt(3));
 											block.setBlockData(age);
 										}
 									}
 
-									//15 -> 3.65 lol
-									BoundingBox box = BoundingBox.of(l, 1, 3.65, 1);
+									final BoundingBox box = BoundingBox.of(l, 1, 3.65, 1);
 									boxes.add(box);
+									final FallingBlock fallBlock = mWorld.spawn(l.add(0, 0.4, 0), FallingBlock.class,
+										CreatureSpawnEvent.SpawnReason.CUSTOM, (final FallingBlock ice) -> {
+											ice.setBlockData(Bukkit.createBlockData(Material.BLUE_ICE));
+											ice.setVelocity(new Vector(0, 0.4, 0));
+											ice.setDropItem(false);
+											ice.setHurtEntities(false);
+											EntityUtils.disableBlockPlacement(ice);
+										});
 
-									FallingBlock fallBlock = world.spawn(l.add(0, 0.4, 0), FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(Material.BLUE_ICE)));
-									fallBlock.setDropItem(false);
-									EntityUtils.disableBlockPlacement(fallBlock);
-									fallBlock.setVelocity(new Vector(0, 0.4, 0));
-									fallBlock.setHurtEntities(false);
-
-									new BukkitRunnable() {
-										@Override
-										public void run() {
-											if (fallBlock.isValid()) {
-												fallBlock.remove();
-											}
+									Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+										if (fallBlock.isValid()) {
+											fallBlock.remove();
 										}
-									}.runTaskLater(mPlugin, 20);
+									}, Constants.TICKS_PER_SECOND);
 
 									new PartialParticle(Particle.CLOUD, l, 2, 0.15, 0.15, 0.15, 0.125).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.CRIT, l, 8, 0.15, 0.15, 0.15, 0.7).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.REDSTONE, l, 8, 0.15, 0.15, 0.15, BLUE_COLOR).spawnAsEntityActive(mBoss);
 									if (degree > 85 && degree < 95 && mRadius % 5 == 0) {
-										world.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
+										mWorld.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0.5f);
 									}
 								}
-								for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
-									if (player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
-										continue;
-									}
-
-									for (BoundingBox box : boxes) {
+								for (final Player player : mFrostGiant.getArenaParticipants()) {
+									for (final BoundingBox box : boxes) {
 										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
-											DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Greatsword Slam");
-											AbilityUtils.silencePlayer(player, 20 * 5);
-											MovementUtils.knockAway(loc, player, 0f, 1.5f, false);
+											DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, SPELL_NAME);
+											AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
+											MovementUtils.knockAway(bossLoc, player, 0f, 1.5f, false);
 											mHitPlayers.add(player);
 											break;
 										}
@@ -229,7 +233,7 @@ public class SpellGreatswordSlam extends Spell {
 						runnable.runTaskTimer(mPlugin, 0, 1);
 						mActiveRunnables.add(runnable);
 
-						FrostGiant.unfreezeGolems(mBoss);
+						mFrostGiant.unfreezeGolems();
 						this.cancel();
 					}
 				} else {
@@ -238,42 +242,20 @@ public class SpellGreatswordSlam extends Spell {
 				}
 			}
 		};
-		runnable2.runTaskTimer(mPlugin, 0, 2);
-		mActiveRunnables.add(runnable2);
-
-		// Damage players standing on frosted ice for the duration
-		mActiveTasks.add(new BukkitRunnable() {
-			int mT = 0;
-
-			@Override
-			public void run() {
-
-				//Stop running after duration seconds
-				if (mT >= 20 * mDuration || mBoss.isDead() || !mBoss.isValid()) {
-					this.cancel();
-				}
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, false)) {
-					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
-						    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == ICE_TYPE || player.getLocation().getBlock().getType() == ICE_TYPE)) {
-						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, false, "Frosted Ice");
-					}
-				}
-				mT += 10;
-			}
-		}.runTaskTimer(mPlugin, 0, 10)); //Every 0.5 seconds, check if player is on cone area damage
+		jumpRunnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(jumpRunnable);
 	}
 
 	@Override
 	public void cancel() {
 		super.cancel();
 
-		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, ICE_TYPE);
+		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, FrostGiant.ICE_TYPE);
 		mChangedBlocks.clear();
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return 7 * 20;
+		return Constants.TICKS_PER_SECOND * 7;
 	}
-
 }

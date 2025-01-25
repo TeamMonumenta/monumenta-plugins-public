@@ -21,7 +21,6 @@ import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Gate;
-import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.BlockInventoryHolder;
@@ -63,7 +62,8 @@ public class BlockUtils {
 		Material.POWERED_RAIL,
 		Material.DETECTOR_RAIL,
 		Material.ACTIVATOR_RAIL,
-		Material.POWDER_SNOW
+		Material.POWDER_SNOW,
+		Material.END_ROD
 	);
 
 	public static final EnumSet<Material> VALUABLES = EnumSet.of(
@@ -205,9 +205,8 @@ public class BlockUtils {
 	 * @param blockData BlockData of a block to test
 	 * @return True if a mob cannot jump or pathfind over the block
 	 */
-	public static boolean mobCannotPathfindOver(BlockData blockData) {
-		return blockData instanceof TrapDoor || blockData instanceof Fence
-			|| blockData instanceof Gate || blockData instanceof Wall;
+	public static boolean mobCannotPathfindOver(final BlockData blockData) {
+		return blockData instanceof Fence || blockData instanceof Gate || blockData instanceof Wall;
 	}
 
 	public static boolean isValuableBlock(Material material) {

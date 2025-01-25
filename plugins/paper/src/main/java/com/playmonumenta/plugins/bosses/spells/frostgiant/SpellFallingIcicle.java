@@ -1,11 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,57 +19,51 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.ThrowableProjectile;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class SpellFallingIcicle extends Spell {
-	private static final int RESPAWN_DURATION = 20 * 3;
+public final class SpellFallingIcicle extends Spell {
+	private static final int RESPAWN_DURATION = Constants.TICKS_PER_SECOND * 3;
+	private static final int HITBOX_RADIUS = 4;
+	private static final int HITBOX_HEIGHT = 20;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
-	private final BoundingBox mBox;
+	private final World mWorld;
+	private final Hitbox mProjectileDetectionBox;
 	private boolean mCurrentlyRespawning = false;
 
-
-	public SpellFallingIcicle(Plugin plugin, LivingEntity boss) {
+	public SpellFallingIcicle(final Plugin plugin, final LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
-		mBox = BoundingBox.of(mBoss.getLocation(), 6.5, 1, 6.5);
-		mBox.expand(0, 15, 0, 0, 25, 0);
+		mWorld = mBoss.getWorld();
+		mProjectileDetectionBox = new Hitbox.UprightCylinderHitbox(mBoss.getLocation(), HITBOX_HEIGHT, HITBOX_RADIUS);
 	}
 
 	@Override
 	public void run() {
-		World world = mBoss.getWorld();
-		Collection<Entity> projectiles = world.getNearbyEntities(mBox, (proj) -> proj instanceof Projectile);
-		for (Entity entity : projectiles) {
-			Projectile proj = (Projectile) entity;
-			if (proj instanceof AbstractArrow) { // check if it is an arrow or a trident
-				// tridents inherit from ThrowableProjectile and AbstractArrow
-				if (((AbstractArrow) proj).getAttachedBlock() != null) {
-					proj.setShooter(mBoss);
-					runIcicleFall(proj);
-				}
-			} else if (proj instanceof ThrowableProjectile) { // otherwise check for any other throwable projectile
-				if (((ThrowableProjectile) proj).getBoundingBox().overlaps(mBox)) {
-					proj.setShooter(mBoss);
-				}
+		mProjectileDetectionBox.getHitEntitiesByClass(Projectile.class).forEach(projectile -> {
+			projectile.setShooter(mBoss);
+
+			/* Check if it is an arrow or a trident since tridents inherit from ThrowableProjectile and AbstractArrow */
+			if (projectile instanceof AbstractArrow && ((AbstractArrow) projectile).getAttachedBlock() != null) {
+				runIcicleFall(projectile);
 			}
-		}
+		});
 	}
 
 	@Override
-	public void bossProjectileHit(ProjectileHitEvent event) {
-		if (mBox.overlaps(event.getEntity().getBoundingBox())) {
+	public void bossProjectileHit(final ProjectileHitEvent event) {
+		if (mProjectileDetectionBox.getBoundingBox().overlaps(event.getEntity().getBoundingBox())) {
 			runIcicleFall(event.getEntity());
 		}
 	}
 
-	private void runIcicleFall(Projectile proj) {
+	private void runIcicleFall(final Projectile proj) {
 		if (mCurrentlyRespawning) {
 			/* No arrow checks while still respawning */
 			return;
@@ -76,8 +71,7 @@ public class SpellFallingIcicle extends Spell {
 		if (proj.isValid()) {
 			proj.remove();
 		}
-		Location loc = mBoss.getLocation();
-		World world = mBoss.getWorld();
+		final Location loc = mBoss.getLocation();
 
 		//Create the bounding box for the whole icicle off of the smallest and largest x, y, z values
 		double minX = loc.getX();
@@ -88,92 +82,76 @@ public class SpellFallingIcicle extends Spell {
 		double maxY = minY;
 		double maxZ = minZ;
 
-		List<Location> icicle = new ArrayList<>();
-		for (int x = -5; x <= 5; x++) {
-			for (int z = -5; z <= 5; z++) {
-				for (int y = 20; y >= -5; y--) {
+		final List<Location> icicleBlockLocs = new ArrayList<>();
+		Location tempLoc;
+		for (int x = -HITBOX_RADIUS; x <= HITBOX_RADIUS; x++) {
+			for (int z = -HITBOX_RADIUS; z <= HITBOX_RADIUS; z++) {
+				for (int y = 0; y <= HITBOX_HEIGHT; y++) {
 					//Can't make location values more optimized - each one needs to be a separate Location object
-					Location l = loc.clone().add(x, y, z);
-					if (l.getBlock().getType() == Material.ICE) {
-
-						if (l.getX() < minX) {
-							minX = l.getX();
-						} else if (l.getX() > maxX) {
-							maxX = l.getX();
+					tempLoc = loc.clone().add(x, y, z);
+					if (tempLoc.getBlock().getType() == Material.ICE) {
+						if (tempLoc.getX() < minX) {
+							minX = tempLoc.getX();
+						} else if (tempLoc.getX() > maxX) {
+							maxX = tempLoc.getX();
 						}
 
-						if (l.getY() < minY) {
-							minY = l.getY();
-						} else if (l.getY() > maxY) {
-							maxY = l.getY();
+						if (tempLoc.getY() < minY) {
+							minY = tempLoc.getY();
+						} else if (tempLoc.getY() > maxY) {
+							maxY = tempLoc.getY();
 						}
 
-						if (l.getZ() < minZ) {
-							minZ = l.getZ();
-						} else if (l.getZ() > maxZ) {
-							maxZ = l.getZ();
+						if (tempLoc.getZ() < minZ) {
+							minZ = tempLoc.getZ();
+						} else if (tempLoc.getZ() > maxZ) {
+							maxZ = tempLoc.getZ();
 						}
 
-						icicle.add(l);
-						l.getBlock().setType(Material.AIR);
+						icicleBlockLocs.add(tempLoc);
+						tempLoc.getBlock().setType(Material.AIR);
 					}
 				}
 			}
 		}
 
-		if (icicle.size() == 0) {
+		if (icicleBlockLocs.isEmpty()) {
 			return;
 		}
+		runIcicleRespawn(icicleBlockLocs);
 
-		BoundingBox icicleBox = BoundingBox.of(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
+		final BoundingBox icicleBox = BoundingBox.of(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
+		final List<FallingBlock> ices = new ArrayList<>(icicleBlockLocs.size());
+		icicleBlockLocs.forEach(blockLoc -> ices.add(mWorld.spawn(blockLoc, FallingBlock.class,
+			CreatureSpawnEvent.SpawnReason.CUSTOM, (final FallingBlock ice) -> {
+				ice.setBlockData(Bukkit.createBlockData(Material.ICE));
+				ice.setVelocity(new Vector(0, -2, 0));
+				ice.setDropItem(false);
+				EntityUtils.disableBlockPlacement(ice);
+			})));
 
-		runIcicleRespawn(icicle);
-
-		List<FallingBlock> ices = new ArrayList<>(icicle.size());
-		for (Location l : icicle) {
-			ices.add(world.spawn(l, FallingBlock.class, b -> b.setBlockData(Bukkit.createBlockData(Material.ICE))));
-		}
-		for (FallingBlock ice : ices) {
-			ice.setVelocity(new Vector(0, -2, 0));
-			ice.setDropItem(false);
-			EntityUtils.disableBlockPlacement(ice);
-		}
-
-		FallingBlock ice = ices.get(0);
+		final FallingBlock icicleTip = ices.get(0);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-			double mPreviousY = ice.getLocation().getY();
+			double mPreviousY = icicleTip.getLocation().getY();
 
 			@Override
 			public void run() {
-
-				double diffY = ice.getLocation().getY() - mPreviousY;
+				final double diffY = icicleTip.getLocation().getY() - mPreviousY;
 				icicleBox.shift(new Vector(0, diffY, 0));
 
-				//Cancel automatically if it takes too long
-				if (mTicks >= 40) {
-					new PartialParticle(Particle.FIREWORKS_SPARK, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
-					for (FallingBlock b : ices) {
-						Location bLoc = b.getLocation();
+				/* If the tip of the icicle collides with the ground or it takes too long to hit the ground */
+				if (icicleTip.isOnGround() || icicleTip.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR
+					|| mTicks >= Constants.TICKS_PER_SECOND * 2) {
+					new PartialParticle(Particle.FIREWORKS_SPARK, icicleTip.getLocation(), 20, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.CRIT, icicleTip.getLocation(), 20, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_CRACK, icicleTip.getLocation(), 20, 0, 0, 0, 0.1,
+						Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
+					for (final FallingBlock b : ices) {
+						final Location bLoc = b.getLocation();
 						bLoc.add(0, -1, 0);
-						if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
-							bLoc.getBlock().setType(Material.CRACKED_STONE_BRICKS);
-						}
-						b.remove();
-					}
-					this.cancel();
-				}
-				if (ice.isOnGround() || ice.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
-					new PartialParticle(Particle.FIREWORKS_SPARK, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
-					for (FallingBlock b : ices) {
-						Location bLoc = b.getLocation();
-						bLoc.add(0, -1, 0);
-						if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
+						if (bLoc.getBlock().getType() == FrostGiant.ICE_TYPE) {
 							bLoc.getBlock().setType(Material.CRACKED_STONE_BRICKS);
 						}
 						b.remove();
@@ -181,57 +159,49 @@ public class SpellFallingIcicle extends Spell {
 					this.cancel();
 				}
 
-				//Method gets Frost Giant instance, checks if hitboxes overlap, performs functions there
+				/* Break the armor of any FrostGiant instance hit by the icicle */
 				if (FrostGiant.testHitByIcicle(icicleBox)) {
-					for (FallingBlock b : ices) {
-						b.remove();
-					}
+					ices.forEach(Entity::remove);
 					this.cancel();
 				}
 
 				mTicks += 2;
-				mPreviousY = ice.getLocation().getY();
+				mPreviousY = icicleTip.getLocation().getY();
 			}
 		}.runTaskTimer(mPlugin, 0, 2);
 	}
-
 
 	@Override
 	public int cooldownTicks() {
 		return 0;
 	}
 
-	private void runIcicleRespawn(List<Location> icicle) {
-		if (icicle.size() > 0) {
-			mCurrentlyRespawning = true;
-
-			BukkitRunnable runnable = new BukkitRunnable() {
-				int mTicks = 0;
-				int mCount = 0;
-
-				@Override
-				public void run() {
-					/* Replace a slice of blocks every tick, so that all blocks are replaced over the duration */
-					for (; mCount < (((icicle.size() - 1) * mTicks) / RESPAWN_DURATION) + 1; mCount++) {
-						icicle.get(mCount).getBlock().setType(Material.ICE);
-					}
-					if (mCount >= icicle.size()) {
-						mCurrentlyRespawning = false;
-
-						/* Remove any arrows that had already been stuck in the ice while it was respawning */
-						for (AbstractArrow proj : mBoss.getWorld().getNearbyEntitiesByType(AbstractArrow.class, mBoss.getLocation(), 25)) {
-							if (proj.getBoundingBox().overlaps(mBox)) {
-								proj.remove();
-							}
-						}
-
-						this.cancel();
-						return;
-					}
-					mTicks++;
-				}
-			};
-			runnable.runTaskTimer(mPlugin, 20 * 2, 1);
+	private void runIcicleRespawn(final List<Location> icicle) {
+		if (icicle.isEmpty()) {
+			return;
 		}
+
+		mCurrentlyRespawning = true;
+
+		final BukkitRunnable runnable = new BukkitRunnable() {
+			int mTicks = 0;
+			int mCount = 0;
+
+			@Override
+			public void run() {
+				/* Replace a slice of blocks every tick, so that all blocks are replaced over the duration and
+				 * remove projectiles stuck in blocks when respawning completes */
+				for (; mCount < (((icicle.size() - 1) * mTicks) / RESPAWN_DURATION) + 1; mCount++) {
+					icicle.get(mCount).getBlock().setType(Material.ICE);
+				}
+				if (mCount >= icicle.size() || mTicks > RESPAWN_DURATION) {
+					mCurrentlyRespawning = false;
+					mProjectileDetectionBox.getHitEntitiesByClass(AbstractArrow.class).forEach(Entity::remove);
+					this.cancel();
+				}
+				mTicks++;
+			}
+		};
+		runnable.runTaskTimer(mPlugin, Constants.TICKS_PER_SECOND * 2, 1);
 	}
 }

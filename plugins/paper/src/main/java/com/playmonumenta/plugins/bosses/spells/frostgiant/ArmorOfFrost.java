@@ -1,16 +1,17 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -28,37 +29,25 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 /*
-Armor of Frost - Once every 60 seconds or phase change
-the boss gains a shield of permafrost
-that prevents the boss from taking damage as long as
-the shield is up. Players can break the shield
-by positioning the boss underneath an icicle above and knocking it down to hit him.
+Armor of Frost - Once every 60 seconds or on phase change the boss gains permafrost armor that prevents the boss
+from taking damage as long as the shield is up. Players can break the shield by positioning the boss underneath an
+icicle above and knocking it down to hit him.
  */
-public class ArmorOfFrost extends Spell {
-	private static final Component[] armorStatusMessage = new Component[] {
-		Component.text("The icicle pierces the armor, shattering it.", NamedTextColor.AQUA),
-		Component.text("The armor cracks from the icicle.", NamedTextColor.AQUA),
-		Component.text("The armor begins to falter from the icicle barrage.", NamedTextColor.AQUA),
-		Component.text("The armor reforms once again.", NamedTextColor.AQUA)
-	};
+public final class ArmorOfFrost extends Spell {
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
-	private final List<Player> mWarned = new ArrayList<>();
-	//Gets frostArmorActive, which determines if the permafrost armor is up
-	private final FrostGiant mBossClass;
+	private final List<UUID> mWarned = new ArrayList<>();
+	private final FrostGiant mFrostGiant;
 	private @Nullable BukkitRunnable mCooldown;
 	private final int mMaxLevel;
-	//Whether or not the immune armor regenerates after 45 seconds
-	//ONLY FALSE IF FINAL 10% PHASE
 	private final boolean mRegen;
 	private int mLevel;
 
-	public ArmorOfFrost(Plugin plugin, LivingEntity boss, FrostGiant giantClass, int max, boolean regen) {
+	public ArmorOfFrost(final Plugin plugin, final FrostGiant frostGiant, final int max, final boolean regen) {
 		mPlugin = plugin;
-		mBoss = boss;
-		mBossClass = giantClass;
+		mFrostGiant = frostGiant;
+		mBoss = mFrostGiant.mBoss;
 		mRegen = regen;
-
 		mMaxLevel = max;
 		mLevel = mMaxLevel;
 
@@ -70,34 +59,28 @@ public class ArmorOfFrost extends Spell {
 				}
 				mWarned.clear();
 			}
-		}.runTaskTimer(mPlugin, 0, 20 * 5);
-	}
-
-	public ArmorOfFrost(Plugin plugin, LivingEntity boss, FrostGiant giantClass, int max) {
-		this(plugin, boss, giantClass, max, true);
+		}.runTaskTimer(mPlugin, 0, Constants.TICKS_PER_SECOND * 20);
 	}
 
 	@Override
 	public void run() {
-		if (mBossClass.mFrostArmorActive) {
+		if (mFrostGiant.mFrostArmorActive && !mFrostGiant.getArenaParticipants().isEmpty()) {
 			runAnimation();
 		}
 	}
 
-	/*
-	 * Boss was damaged, check if permafrost armor is up or not
-	 */
+	/* Boss was damaged, check if permafrost armor is up or not */
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mBossClass.mFrostArmorActive) {
-			if (source instanceof Player player) {
-				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 3, 0);
-				if (!mWarned.contains(player)) {
-					player.sendMessage(Component.text("The armor absorbs the damage you dealt.", NamedTextColor.GOLD));
-				}
-				mWarned.add(player);
-			}
+	public void onHurtByEntityWithSource(final DamageEvent event, final Entity damager, final LivingEntity source) {
+		if (mFrostGiant.mFrostArmorActive) {
 			event.setFlatDamage(0.0001);
+			if (source instanceof final Player player) {
+				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 2.0f, 0.5f);
+				if (!mWarned.contains(player.getUniqueId())) {
+					player.sendMessage(Component.text("The armor absorbs the damage you dealt.", NamedTextColor.AQUA));
+					mWarned.add(player.getUniqueId());
+				}
+			}
 		}
 	}
 
@@ -115,40 +98,37 @@ public class ArmorOfFrost extends Spell {
 
 	//Set armor from icicle hit
 	public void hitByIcicle() {
-		World world = mBoss.getWorld();
+		final World world = mBoss.getWorld();
 		// For Icicle Crash advancement
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently(
-			"function monumenta:frost_giant/fight/icicles_hit_count");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("function monumenta:frost_giant/fight/icicles_hit_count");
 
-		if (mBossClass.mFrostArmorActive) {
+		if (mFrostGiant.mFrostArmorActive) {
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
 			new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.CRIT, mBoss.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
-			mLevel -= 1;
-			if (mLevel <= 0) {
-				new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 4, 0), 50, 0.5, 0.5, 0.5, 0.3).spawnAsEntityActive(mBoss);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 3, 2);
-				world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 3, 2);
-				// Armor 0
-				sendArmorStatusMessage(0);
-				mBossClass.mFrostArmorActive = false;
-				if (mRegen) {
-					runCooldown();
+			mLevel--;
+
+			switch (mLevel) {
+				case 2 -> mFrostGiant.sendDialogue("The armor cracks from the icicle.", NamedTextColor.AQUA, false);
+				case 1 -> mFrostGiant.sendDialogue("The armor begins to falter from the icicle barrage.", NamedTextColor.AQUA, false);
+				default -> {
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 4, 0), 50, 0.5, 0.5, 0.5, 0.3).spawnAsEntityActive(mBoss);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 3, 2);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 3, 2);
+					mFrostGiant.sendDialogue("The icicle pierces the armor, shattering it.", NamedTextColor.AQUA, false);
+					mFrostGiant.mFrostArmorActive = false;
+					if (mRegen) {
+						runCooldown();
+					}
+					mLevel = mMaxLevel;
 				}
-				mLevel = mMaxLevel;
-			} else if (mLevel == 1) {
-				// Armor 2
-				sendArmorStatusMessage(2);
-			} else {
-				// Armor 1
-				sendArmorStatusMessage(1);
 			}
 		} else {
 			//If permafrost shield already down, do normal damage and reset countdown for permafrost armor
 			DamageUtils.damage(null, mBoss, DamageEvent.DamageType.TRUE, 70);
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
-				new BaseMovementSpeedModifyEffect(20 * 3, -0.3));
+				new BaseMovementSpeedModifyEffect(Constants.TICKS_PER_SECOND * 3, -0.3));
 			runCooldown();
 		}
 	}
@@ -165,43 +145,32 @@ public class ArmorOfFrost extends Spell {
 					this.cancel();
 				}
 
-				mBossClass.mFrostArmorActive = true;
-				sendArmorStatusMessage(3);
+				mFrostGiant.mFrostArmorActive = true;
+				mFrostGiant.sendDialogue("The armor reforms once again.", NamedTextColor.AQUA, false);
 				mWarned.clear();
-				FrostGiant.changeArmorPhase(mBoss.getEquipment(), false);
+				mFrostGiant.changeArmorPhase(mBoss.getEquipment(), false);
 			}
 		};
-		mCooldown.runTaskLater(mPlugin, 20 * 45);
-		FrostGiant.changeArmorPhase(mBoss.getEquipment(), true);
+		mCooldown.runTaskLater(mPlugin, Constants.TICKS_PER_SECOND * 45);
+		mFrostGiant.changeArmorPhase(mBoss.getEquipment(), true);
 	}
 
 	private void runAnimation() {
+		final double bossCurrentY = mBoss.getLocation().getY();
+		final Location particleLoc = mBoss.getLocation();
+		final PPCircle armorCircle = new PPCircle(Particle.SOUL_FIRE_FLAME, particleLoc, 3.0).count(12);
 
-		Location loc = mBoss.getLocation();
-		Location tempLoc = loc.clone();
-
-		for (int deg = 0; deg < 360; deg += 10) {
-			if (FastUtils.RANDOM.nextDouble() > 0.4) {
-				//Each level adds one ring up to level 3. At level 3, all three rings
-				if (mLevel >= 1) {
-					tempLoc.set(loc.getX(), loc.getY(), loc.getZ());
-					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 4, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
-				}
-				if (mLevel >= 2) {
-					tempLoc.set(loc.getX(), loc.getY(), loc.getZ());
-					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 2, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
-				}
-				if (mLevel >= 3) {
-					tempLoc.set(loc.getX(), loc.getY(), loc.getZ());
-					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 6, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
-				}
-			}
+		if (mLevel >= 1) {
+			particleLoc.setY(bossCurrentY + 3);
+			armorCircle.location(particleLoc).spawnAsEntityActive(mBoss);
 		}
-	}
-
-	private void sendArmorStatusMessage(int statusIndex) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange, true)) {
-			player.sendMessage(armorStatusMessage[statusIndex]);
+		if (mLevel >= 2) {
+			particleLoc.setY(bossCurrentY + 5);
+			armorCircle.location(particleLoc).spawnAsEntityActive(mBoss);
+		}
+		if (mLevel >= 3) {
+			particleLoc.setY(bossCurrentY + 7);
+			armorCircle.location(particleLoc).spawnAsEntityActive(mBoss);
 		}
 	}
 }
