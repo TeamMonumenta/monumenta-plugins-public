@@ -951,6 +951,12 @@ public class EntityListener implements Listener {
 			return;
 		}
 
+		// When a boat runs into a lilypad in an Adventure Mode zone, do not break the lilypad
+		if (event.getEntity() instanceof Boat && !ZoneUtils.isMineable(event.getBlock().getLocation())) {
+			event.setCancelled(true);
+			return;
+		}
+
 		// Cancel Falling Blocks with SpellGrenade tag
 		if (event.getEntity() instanceof FallingBlock fallingBlock && fallingBlock.getScoreboardTags().contains("DisableBlockPlacement")) {
 			event.setCancelled(true);
