@@ -340,6 +340,7 @@ public class Plugin extends JavaPlugin {
 		UpTimeCommand.register();
 		UpdateChestItems.register();
 		UpdateHeldItem.register();
+		UpdateLocationCommand.register();
 		UpdatePlainName.register();
 		UpdateStrikeChests.register();
 		UsernameManager.register();
