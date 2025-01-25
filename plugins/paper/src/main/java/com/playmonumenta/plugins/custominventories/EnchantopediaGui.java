@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
@@ -41,6 +42,7 @@ public class EnchantopediaGui extends Gui {
 	private int mFilterIndex = -1;
 	private @Nullable ItemStack mFilterItem = null;
 	private String mFilterTerm = "";
+	private boolean mFilterSelected = false;
 
 	public EnchantopediaGui(Player player) {
 		super(player, INV_SIZE, BASE_TITLE);
@@ -81,7 +83,8 @@ public class EnchantopediaGui extends Gui {
 
 	@Override
 	protected void setup() {
-		int backArrowSlot = 0;      // Back arrow
+		int resetFiltersSlot = 0;   // Reset filters button
+		int backArrowSlot = 1;      // Back arrow
 		int itemFilterSlot = 3;     // Item examine
 		int nameSearchSlot = 4;     // Filter by name
 		int categoryFilterSlot = 5; // Filter by category
@@ -110,7 +113,7 @@ public class EnchantopediaGui extends Gui {
 
 		ItemStack finalFilter = mFilterItem; // Theoretically isn't necessary, but reviewdog gets cranky without it
 		if (finalFilter != null) {
-			displayedEnchants = displayedEnchants.stream().filter(adv -> {
+			displayedEnchants = mEnchants.stream().filter(adv -> {
 				if (adv == null) {
 					return false;
 				}
@@ -131,8 +134,10 @@ public class EnchantopediaGui extends Gui {
 			List.of("Click to filter enchantments by name", "Shift-click to reset"), NamedTextColor.GRAY)).onClick((evt) -> {
 			if (evt.isShiftClick()) {
 				mFilterTerm = "";
+				mFilterSelected = false;
 			} else {
 				openSignMenu((filterTerm) -> {
+					mFilterSelected = true;
 					mFilterTerm = filterTerm;
 					open();
 				});
@@ -159,7 +164,7 @@ public class EnchantopediaGui extends Gui {
 		if (category != null) {
 			displayedEnchants = mEnchants.stream().filter(adv -> {
 				if (adv == null) {
-					return true;
+					return false;
 				} else {
 					Advancement match = mCategoryMap.get(adv);
 					if (match == null) {
@@ -171,6 +176,10 @@ public class EnchantopediaGui extends Gui {
 			}).toList();
 		}
 
+		if (!mFilterSelected) {
+			displayedEnchants = mCategories;
+			offset = 18;
+		}
 
 		// Next arrow
 		int rowCount = displayedEnchants.size() / 9 - (INV_SIZE - offset) / 9 + 1;
@@ -183,7 +192,23 @@ public class EnchantopediaGui extends Gui {
 			}));
 		}
 
-		addEnchants(offset, displayedEnchants);
+		if (!mFilterSelected) {
+			addCategories(offset);
+		} else {
+			// Reset filters button
+			setItem(resetFiltersSlot, new GuiItem(GUIUtils.createBasicItem(
+				Material.BARRIER,
+				Component.text("Reset Filters", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
+				List.of("Click here to reset all filters"), NamedTextColor.GRAY)).onClick((evt) -> {
+				mRow = 0;
+				mFilterIndex = -1;
+				mFilterItem = null;
+				mFilterTerm = "";
+				mFilterSelected = false;
+				update();
+			}));
+			addEnchants(offset, displayedEnchants);
+		}
 	}
 
 	private void addItemFilter(int slot) {
@@ -198,6 +223,7 @@ public class EnchantopediaGui extends Gui {
 				)).onClick((evt) -> {
 					mFilterItem = null;
 					mFilterTerm = "";
+					mFilterSelected = true;
 					update();
 				}));
 		} else {
@@ -223,6 +249,7 @@ public class EnchantopediaGui extends Gui {
 				lore,
 				true
 			)).onClick((evt) -> {
+				mFilterSelected = false;
 				mFilterItem = null;
 				mFilterTerm = "";
 				update();
@@ -247,13 +274,15 @@ public class EnchantopediaGui extends Gui {
 			categoryIcon = GUIUtils.createBasicItem(
 				category.getDisplay().icon(),
 				1,
-				Component.text("Category: " + name, c, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+				Component.text("Category: " + name, c).decoration(TextDecoration.ITALIC, false),
 				List.of(Component.text("Left or right click to cycle through filters", NamedTextColor.GRAY), Component.text("Shift-click to reset", NamedTextColor.GRAY)),
 				true);
 		}
 
 		setItem(slot, categoryIcon).onClick(evt -> {
+			mFilterSelected = true;
 			if (evt.isShiftClick()) {
+				mFilterSelected = false;
 				mFilterIndex = -1;
 			} else if (evt.isLeftClick()) {
 				mFilterIndex += 1;
@@ -273,8 +302,74 @@ public class EnchantopediaGui extends Gui {
 		});
 	}
 
-	private void addEnchants(int offset, List<Advancement> displayedEnchants) {
+	private void addCategories(int offsetStart) {
+		int i = 0;
+		int offset = offsetStart;
+		while (i + offset < INV_SIZE) {
+			if (i >= mCategories.size()) {
+				break;
+			}
+			var cat = mCategories.get(i);
+			if (cat == null) {
+				i += 1;
+				offset += 1;
+				continue;
+			}
 
+			if (offset % 9 == 0 || offset % 9 == 8) {
+				offset += 1;
+				continue;
+			}
+
+			var d = cat.getDisplay();
+			if (d == null) {
+				MMLog.warning("Null category display in Enchantopedia GUI");
+				i += 1;
+				continue;
+			}
+
+			String name = MessagingUtils.plainText(cat.displayName()).replace("[", "").replace("]", "");
+
+			TextColor nameColor = NamedTextColor.WHITE;
+			if (MessagingUtils.plainText(cat.displayName()).contains("Curses")) {
+				nameColor = NamedTextColor.RED;
+			}
+
+			int finalIndex = i;
+			var item = new GuiItem(GUIUtils.createBasicItem(
+				d.icon(),
+				1,
+				Component.text(name, nameColor, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+				new ArrayList<>(),
+				true
+			)).onClick(evt -> {
+				mFilterSelected = true;
+				mFilterIndex = finalIndex;
+				update();
+			});
+
+			GUIUtils.splitLoreLine(item.getItem(), d.description().appendNewline().appendNewline().append(Component.text("Click to view enchantments").color(NamedTextColor.WHITE)).color(NamedTextColor.GRAY), 45, true);
+
+			setItem(offset, item);
+			i += 1;
+			offset += 1;
+		}
+
+		var viewAll = new GuiItem(GUIUtils.createBasicItem(
+			Material.ENDER_EYE,
+			Component.text("View All Enchantments")
+				.color(NamedTextColor.WHITE)
+				.decoration(TextDecoration.BOLD, true)
+				.decoration(TextDecoration.ITALIC, false)
+		)).onClick(evt -> {
+			mFilterSelected = true;
+			update();
+		});
+		GUIUtils.splitLoreLine(viewAll.getItem(), Component.text("A scrollable list of all enchantments, separated by category.", NamedTextColor.GRAY).appendNewline().appendNewline().append(Component.text("Click to view enchantments").color(NamedTextColor.WHITE)), 45, true);
+		setItem(offset, viewAll);
+	}
+
+	private void addEnchants(int offset, List<Advancement> displayedEnchants) {
 		int slot = 0;
 		while (slot + offset < INV_SIZE) {
 			if (slot + mRow * 9 >= displayedEnchants.size()) {
@@ -294,6 +389,8 @@ public class EnchantopediaGui extends Gui {
 
 			var d = adv.getDisplay();
 			if (d == null) {
+				MMLog.warning("Null advancement display in Enchantopedia GUI");
+				slot += 1;
 				continue;
 			}
 
@@ -302,7 +399,7 @@ public class EnchantopediaGui extends Gui {
 
 			TextColor nameColor = NamedTextColor.WHITE;
 			Advancement category = mCategoryMap.get(adv);
-			if (category != null && MessagingUtils.plainText(adv.displayName()).contains("Curses")) {
+			if (category != null && MessagingUtils.plainText(category.displayName()).contains("Curses")) {
 				nameColor = NamedTextColor.RED;
 			}
 
@@ -342,6 +439,7 @@ public class EnchantopediaGui extends Gui {
 		if (event.getCurrentItem() == null || getEnchantNames(event.getCurrentItem()).isEmpty()) {
 			return;
 		}
+		mFilterSelected = true;
 		mRow = 0;
 		mFilterIndex = -1;
 		mFilterItem = event.getCurrentItem();

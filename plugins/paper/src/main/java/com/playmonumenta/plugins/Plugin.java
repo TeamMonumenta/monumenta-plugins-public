@@ -561,6 +561,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new DiscoveryManager(), this);
 		manager.registerEvents(mGrapplingListener, this);
 		manager.registerEvents(new CelestialGemListener(), this);
+		manager.registerEvents(new UnlockEnchantmentListener(), this);
 		manager.registerEvents(new WinterListener(), this);
 		new SpawnerVisualisation().register();
 		manager.registerEvents(MailMan.getInstance(), this);

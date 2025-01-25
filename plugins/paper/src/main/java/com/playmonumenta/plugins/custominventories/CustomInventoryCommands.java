@@ -408,14 +408,13 @@ public class CustomInventoryCommands {
 			}).register();
 
 		new CommandAPICommand("openenchantexplanations")
-			.withAliases("enchants")
+			.withAliases("enchantments", "enchants")
 			.withPermission("monumenta.command.openenchantexplanations.self")
 			.executesPlayer((player, args) -> {
 				new EnchantopediaGui(player).open();
 			})
 			.register();
 		new CommandAPICommand("openenchantexplanationsfor")
-			.withAliases("enchants")
 			.withPermission("monumenta.command.openenchantexplanations.others")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
