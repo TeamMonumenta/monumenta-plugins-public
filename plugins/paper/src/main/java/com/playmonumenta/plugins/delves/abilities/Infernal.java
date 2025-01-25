@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,13 +16,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 public class Infernal {
-
-	private static final EnumSet<DamageType> ENVIRONMENTAL_DAMAGE_CAUSES = EnumSet.of(
-			DamageType.AILMENT,
-			DamageType.FALL
-	);
-
-	private static final double ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL = 0.1;
 
 	private static final double BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL = 0.2;
 
@@ -36,8 +28,7 @@ public class Infernal {
 	public static Component[] rankDescription(int level) {
 			return new Component[]{
 				Component.text("For each mob a spawner produces, there is a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to spawn an Ember."),
-				Component.text("Players take +" + Math.round(BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Burning Damage"),
-				Component.text("and +" + Math.round(ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Environmental Damage.")
+				Component.text("Players take +" + Math.round(BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Burning Damage")
 			};
 	}
 
@@ -48,8 +39,6 @@ public class Infernal {
 
 		if (event.getType() == DamageType.FIRE) {
 			event.setFlatDamage(event.getDamage() * (1 + BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level));
-		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getType())) {
-			event.setFlatDamage(event.getDamage() * (1 + ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level));
 		}
 	}
 
