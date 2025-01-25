@@ -89,8 +89,8 @@ public class GravityBomb extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1.0f, 1.8f);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1.0f, 1.8f), 2);
 
-		launchBomb(VectorUtils.rotateYAxis(new Vector(0, 0.045, 0.65), loc.getYaw() + 22.5));
-		launchBomb(VectorUtils.rotateYAxis(new Vector(0, 0.045, 0.65), loc.getYaw() - 22.5));
+		launchBomb(VectorUtils.rotateYAxis(mPlayer.getEyeLocation().getDirection().normalize().multiply(0.87), 25.5));
+		launchBomb(VectorUtils.rotateYAxis(mPlayer.getEyeLocation().getDirection().normalize().multiply(0.87), -25.5));
 
 		return true;
 	}
@@ -109,6 +109,9 @@ public class GravityBomb extends DepthsAbility {
 		}
 		EntityUtils.selfRoot(bomb, 9999 * 20);
 		bomb.setVelocity(direction);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			bomb.setVelocity(new Vector(0, 0, 0));
+		}, 20L);
 
 		EnumSet<DamageType> allButProj = DamageType.getEnumSet();
 		allButProj.remove(DamageType.PROJECTILE);
