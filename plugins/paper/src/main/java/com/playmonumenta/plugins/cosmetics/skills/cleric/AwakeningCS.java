@@ -92,7 +92,7 @@ public class AwakeningCS extends CelestialBlessingCS {
 	}
 
 	@Override
-	public void startEffectCaster(Player caster) {
+	public void startEffectCaster(Player caster, double radius) {
 		Location locCaster = caster.getLocation().subtract(0, LocationUtils.distanceToGround(caster.getLocation(), 0, PlayerUtils.getJumpHeight(caster)), 0);
 		World world = caster.getWorld();
 		world.playSound(locCaster, Sound.ENTITY_WARDEN_ROAR, SoundCategory.PLAYERS, 1.0f, 0.8f);

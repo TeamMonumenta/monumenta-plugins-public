@@ -104,7 +104,8 @@ public class CelestialBlessing extends Ability {
 			return false;
 		}
 
-		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, CELESTIAL_RADIUS), true);
+		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, CELESTIAL_RADIUS);
+		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), radius, true);
 
 		// Don't buff players that have their class disabled
 		affectedPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
@@ -123,7 +124,7 @@ public class CelestialBlessing extends Ability {
 			);
 			mCosmetic.startEffectTargets(p);
 		}
-		mCosmetic.startEffectCaster(mPlayer);
+		mCosmetic.startEffectCaster(mPlayer, radius);
 
 		putOnCooldown();
 		return true;

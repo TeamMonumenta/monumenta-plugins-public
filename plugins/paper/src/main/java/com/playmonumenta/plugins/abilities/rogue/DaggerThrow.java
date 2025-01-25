@@ -89,7 +89,7 @@ public class DaggerThrow extends Ability {
 		Vector dir = startLoc.getDirection();
 		double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DAGGER_THROW_RANGE);
 		World world = mPlayer.getWorld();
-		mCosmetic.daggerCastSound(world, startLoc);
+		mCosmetic.daggerThrowEffect(world, startLoc, mPlayer);
 
 		int daggers = DAGGER_THROW_DAGGERS + (int) CharmManager.getLevel(mPlayer, CHARM_DAGGERS);
 
@@ -105,7 +105,7 @@ public class DaggerThrow extends Ability {
 				if (!MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
 					continue;
 				}
-				mCosmetic.daggerHitEffect(world, startLoc, mob.getLocation(), mPlayer);
+				mCosmetic.daggerHitEffect(world, startLoc, mob, mPlayer);
 				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 				EntityUtils.applyVulnerability(mPlugin, DAGGER_THROW_DURATION, mVulnAmplifier, mob);
 				if (isEnhanced()) {

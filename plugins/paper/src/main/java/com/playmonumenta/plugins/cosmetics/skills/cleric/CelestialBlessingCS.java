@@ -48,7 +48,7 @@ public class CelestialBlessingCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.75f, 1.1f);
 	}
 
-	public void startEffectCaster(Player caster) {
+	public void startEffectCaster(Player caster, double radius) {
 
 	}
 }

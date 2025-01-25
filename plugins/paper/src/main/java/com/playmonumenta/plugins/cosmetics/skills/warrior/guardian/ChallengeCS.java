@@ -40,4 +40,16 @@ public class ChallengeCS implements CosmeticSkill {
 		new PartialParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(player);
 	}
+
+	public void onCastEffect(Player player, World world, Location loc) {
+
+	}
+
+	public void killMob(Player player, World world, Location loc) {
+
+	}
+
+	public void maxMobs(Player player, World world, Location loc) {
+		player.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 0.5f);
+	}
 }

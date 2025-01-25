@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneOdorCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneTinctureCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeEchoesCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.LiferootTonicCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.SunriseBrewCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcanePanaceaCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcaneRemedyCS;
@@ -30,6 +31,7 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.ContortingBoltCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DarkPunishmentCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.ForceFieldCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.PurgingPyreCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.RebirthCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.SoulStrainCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.TouchOfEntropyCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.VitalityExtractionCS;
@@ -44,6 +46,7 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.RipplingBeamCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SanguineAegisCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.TwistedLanceCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.VolcanicBurstCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.VoodooBurstCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.PrestigiousMoonbladeCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.PrestigiousStarfallCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.AstralWeaverCS;
@@ -56,6 +59,7 @@ import com.playmonumenta.plugins.cosmetics.skills.rogue.StarburstCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.StarstruckCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.SupernovaShieldCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.TranscCombosCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.VorpalVinelashCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.WindStepCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.AstralObfuscationCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.GalacticRainCS;
@@ -70,6 +74,8 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.TwistedCompanionCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PrestigiousPinningShotCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.PrestigiousManeuverCS;
+import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.VerdantRazorCS;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.AbyssalEffigyCS;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.ChromaCascadeCS;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.HauntedScarecrowCS;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.SummoningRiteCS;
@@ -82,6 +88,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warlock.DruidicHexCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.FloralFlurryCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.InfernalFlamesCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.NaturesGiftCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.NecromantiaCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.ProwlersRoarCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.ScorchingSigilCS;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.UntamedResilienceCS;
@@ -98,6 +105,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.ColossalBruteCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloryExecutionCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.PrestigiousSlamCS;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.EssenceBurstCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.PrestigiousShieldCS;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -114,6 +122,7 @@ public class CosmeticSkills {
 		RitualRingCS::new,
 		PrestigiousEsotericCS::new,
 		PrestigiousRemedyCS::new,
+		LiferootTonicCS::new,
 		ArcanePotionsCS::new,
 		ArcanePanaceaCS::new,
 		ArcaneTinctureCS::new,
@@ -135,6 +144,7 @@ public class CosmeticSkills {
 		PrestigiousInfusionCS::new,
 		PrestigiousBeamCS::new,
 		AwakeningCS::new,
+		RebirthCS::new,
 		SoulStrainCS::new,
 		VitalityExtractionCS::new,
 		BloodbathCS::new,
@@ -155,6 +165,7 @@ public class CosmeticSkills {
 		SanguineAegisCS::new,
 		PrestigiousMoonbladeCS::new,
 		PrestigiousStarfallCS::new,
+		VoodooBurstCS::new,
 
 		//Rogue
 		WindStepCS::new,
@@ -162,6 +173,7 @@ public class CosmeticSkills {
 		DecapitationCS::new,
 		PrestigiousRondeCS::new,
 		PrestigiousBlitzCS::new,
+		VorpalVinelashCS::new,
 		StarfireSpinCS::new,
 		StarstruckCS::new,
 		StarburstCS::new,
@@ -183,6 +195,7 @@ public class CosmeticSkills {
 		EverseeingEyeCS::new,
 		PrestigiousManeuverCS::new,
 		PrestigiousPinningShotCS::new,
+		VerdantRazorCS::new,
 
 		//Shaman
 		ChromaCascadeCS::new,
@@ -190,6 +203,7 @@ public class CosmeticSkills {
 		SummoningRiteCS::new,
 		PrestigiousTotemCS::new,
 		PrestigiousDevastationCS::new,
+		AbyssalEffigyCS::new,
 
 		//Warlock
 		AvalanchexCS::new,
@@ -197,6 +211,7 @@ public class CosmeticSkills {
 		VampiricDrainCS::new,
 		PrestigiousBondsCS::new,
 		PrestigiousShadesCS::new,
+		NecromantiaCS::new,
 
 		DruidicHexCS::new,
 		ScorchingSigilCS::new,
@@ -218,11 +233,12 @@ public class CosmeticSkills {
 		ColossalBruteCS::new,
 		GloryExecutionCS::new,
 		PrestigiousSlamCS::new,
-		PrestigiousShieldCS::new
+		PrestigiousShieldCS::new,
+		EssenceBurstCS::new
 	);
 
 	private static final ImmutableMap<String, Supplier<CosmeticSkill>> COSMETIC_SKILLS_BY_NAME = COSMETIC_SKILLS.stream()
-		                                                                                             .collect(ImmutableMap.toImmutableMap(skill -> skill.get().getName(), skill -> skill));
+		.collect(ImmutableMap.toImmutableMap(skill -> skill.get().getName(), skill -> skill));
 
 	/* Notes for implementing more Cosmetic Skills
 	 * 0. 基础 If the ability is not skinned, add a default CS class!
@@ -349,5 +365,18 @@ public class CosmeticSkills {
 			builder.add(Objects.requireNonNull(((CosmeticSkill) cs).getName()));
 		}
 		return builder.build();
+	}
+
+	public static ImmutableList<String> getHexfallNames() {
+		return ImmutableList.<String>builder()
+			.add(LiferootTonicCS.NAME)
+			.add(RebirthCS.NAME)
+			.add(VoodooBurstCS.NAME)
+			.add(VorpalVinelashCS.NAME)
+			.add(VerdantRazorCS.NAME)
+			.add(AbyssalEffigyCS.NAME)
+			.add(NecromantiaCS.NAME)
+			.add(EssenceBurstCS.NAME)
+			.build();
 	}
 }

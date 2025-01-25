@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -36,7 +37,7 @@ public class StarShurikenCS extends DaggerThrowCS {
 	}
 
 	@Override
-	public void daggerCastSound(World world, Location loc) {
+	public void daggerThrowEffect(World world, Location loc, Player player) {
 		new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -70,9 +71,9 @@ public class StarShurikenCS extends DaggerThrowCS {
 	}
 
 	@Override
-	public void daggerHitEffect(World world, Location loc, Location bLoc, Player mPlayer) {
-		new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLAME, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
+	public void daggerHitEffect(World world, Location loc, LivingEntity target, Player mPlayer) {
+		new PartialParticle(Particle.SWEEP_ATTACK, target.getLocation(), 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, target.getLocation(), 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1f, 2f);
 		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.8f, 1.6f);
 	}

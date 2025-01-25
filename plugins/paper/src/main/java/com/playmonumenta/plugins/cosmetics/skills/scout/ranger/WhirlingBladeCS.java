@@ -23,7 +23,15 @@ public class WhirlingBladeCS implements CosmeticSkill {
 		return Material.IRON_SWORD;
 	}
 
-	public void tick(Player player, Location bladeLoc, World world, Location loc) {
+	public void onCast(Player player, Location loc, World world) {
+
+	}
+
+	public void hitMob(Player player, Location loc, World world) {
+
+	}
+
+	public void tick(Player player, Location bladeLoc, World world, Location loc, double throwRadius, double bladeRadius, int mIncrementDegrees) {
 		new PartialParticle(Particle.SWEEP_ATTACK, bladeLoc, 3, 0.35, 0, 0.35, 1).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.4f, 0.9f);
 		world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 0.4f, 1.2f);
@@ -31,7 +39,7 @@ public class WhirlingBladeCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.2f, 1.7f);
 	}
 
-	public void end(World world, Location loc) {
+	public void end(World world, Location loc, Player player) {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 0.75f);
 	}
 }

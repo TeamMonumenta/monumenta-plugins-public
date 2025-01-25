@@ -115,6 +115,9 @@ public class Challenge extends Ability {
 			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, mDuration);
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(mDuration, mPercentDamageDealtEffect, AFFECTED_DAMAGE_TYPES));
 
+			World world = mPlayer.getWorld();
+			mCosmetic.onCast(mPlayer, world, loc);
+
 			mobs.stream().filter(mob -> mob instanceof Mob).forEach(mob -> {
 				EntityUtils.applyTaunt(mob, mPlayer);
 				if (mCounterStrike != null) {
@@ -124,11 +127,11 @@ public class Challenge extends Ability {
 			if (isLevelTwo()) {
 				clearAffectedEntities();
 				mAffectedEntities = mobs;
-				mobs.forEach(mob -> mPlugin.mEffectManager.addEffect(mob, AFFECTED_MOB_EFFECT_NAME, new ChallengeMobEffect(60 * 20, this)));
+				mobs.forEach(mob -> {
+					mPlugin.mEffectManager.addEffect(mob, AFFECTED_MOB_EFFECT_NAME, new ChallengeMobEffect(60 * 20, this));
+					mCosmetic.onCastEffect(mPlayer, world, mob.getLocation());
+				});
 			}
-
-			World world = mPlayer.getWorld();
-			mCosmetic.onCast(mPlayer, world, loc);
 
 			putOnCooldown();
 			return true;
@@ -136,8 +139,9 @@ public class Challenge extends Ability {
 		return false;
 	}
 
-	public void incrementKills() {
+	public void incrementKills(LivingEntity mob) {
 		mKillCount++;
+		mCosmetic.killMob(mPlayer, mPlayer.getWorld(), mob.getLocation());
 		if (mKillCount >= KILLED_MOBS_CAP + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_MOBS) || mKillCount >= mAffectedEntities.size()) {
 			double speed = mKillCount * (SPEED_PER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED_PER));
 			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, speed, SPEED_EFFECT_NAME));
@@ -145,7 +149,7 @@ public class Challenge extends Ability {
 			int cdr = mKillCount * CharmManager.getDuration(mPlayer, CHARM_CDR_PER, CDR_PER);
 			EnumSet.of(ClassAbility.CHALLENGE, ClassAbility.BODYGUARD, ClassAbility.SHIELD_WALL).forEach(ca -> mPlugin.mTimers.updateCooldown(mPlayer, ca, cdr));
 
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 0.5f);
+			mCosmetic.maxMobs(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
 
 			clearAffectedEntities();
 		}

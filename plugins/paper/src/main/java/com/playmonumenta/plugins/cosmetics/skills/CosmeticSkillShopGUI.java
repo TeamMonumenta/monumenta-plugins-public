@@ -41,35 +41,39 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final int GEODE_PER_DEPTH_SKIN = 2 * 64;
 	private static final int STRAND_PER_DELVE_SKIN = 64;
 	private static final int CANVAS_PER_GALLERY_SKIN = 2 * 64;
+	private static final int SAPLING_PER_HEXFALL_SKIN = 1;
 	private static final NamespacedKey PIGMENT_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_pigment");
 	private static final String TALISMAN_LOOTTABLE_FOLDER = "epic:r2/depths/utility/";
 	private static final NamespacedKey GEODE_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 	private static final NamespacedKey STRAND_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_strand");
 	private static final NamespacedKey CANVAS_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r3/gallery/items/torn_canvas");
+	private static final NamespacedKey SAPLING_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r3/items/currency/liferoot_sapling");
 	private static final String CHALLENGE_POINTS_SCOREBOARD = "ChallengePoints";
 
 	//Theme constants
+
 	//Depths
 	private static final List<TextComponent> DEPTH_INTRO;
-
 	private static final ImmutableList<String> DEPTH_THEME = CosmeticSkills.getDepthsNames();
 	private static final ImmutableList<DepthsCS> DEPTHS_CS = CosmeticSkills.getDepthsSkins();
+
 	//Delves
 	private static final List<TextComponent> DELVE_INTRO;
-
 	private static final ImmutableList<String> DELVE_THEME = CosmeticSkills.getDelvesNames();
+
 	//Prestige
 	private static final List<TextComponent> PRESTIGE_INTRO;
-
-
 	private static final ImmutableList<String> PRESTIGE_THEME = CosmeticSkills.getPrestigeNames();
 	private static final ImmutableList<PrestigeCS> PRESTIGE_CS = CosmeticSkills.getPrestigeSkins();
+
 	//Sanguine
 	private static final List<TextComponent> GALLERY_INTRO;
-
-
 	private static final ImmutableList<String> GALLERY_THEME = CosmeticSkills.getGalleryNames();
 	private static final ImmutableList<GalleryCS> GALLERY_CS = CosmeticSkills.getGallerySkins();
+
+	//Hexfall
+	private static final List<TextComponent> HEXFALL_INTRO;
+	private static final ImmutableList<String> HEXFALL_THEME = CosmeticSkills.getHexfallNames();
 
 	//GUI constants
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
@@ -87,14 +91,17 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final String R1MONUMENT_SCB = "R1Complete";
 	private static final String DEPTHS_SCB = "Depths";
 	private static final String GALLERY_SCB = "DGLobby";
+	private static final String HEXFALL_SCB = "Hexfall";
 	private static final TextColor DEPTH_COLOR = TextColor.fromHexString("#5D2D87");
 	private static final TextColor DELVE_COLOR = TextColor.fromHexString("#B47028");
 	public static final TextColor PRESTIGE_COLOR = TextColor.fromHexString("#FEDC10");
 	private static final TextColor GALLERY_COLOR = TextColor.fromHexString("#39B14E");
+	private static final TextColor HEXFALL_COLOR = TextColor.fromHexString("#A930DA");
 	private static final int DEPTH_ENTRY_LOC = 20;
 	private static final int DELVE_ENTRY_LOC = 21;
 	private static final int PRESTIGE_ENTRY_LOC = 22;
 	private static final int GALLERY_ENTRY_LOC = 23;
+	private static final int HEXFALL_ENTRY_LOC = 24;
 
 	private final Plugin mPlugin;
 	private CSGUIPage mCurrentPage = CSGUIPage.HOME;
@@ -107,6 +114,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		DELVE,
 		PRESTIGE,
 		SANGUINE,
+		HEXFALL,
 		OTHER
 	}
 
@@ -378,6 +386,56 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 						loadGalleryPage(player);
 					}
 				}
+				case HEXFALL -> {
+					int entry = slotToEntryNum(slot);
+
+					// Clicked on a cosmetic. Check for buying
+					if (entry >= 0 && entry < HEXFALL_THEME.size()) {
+						String skin = HEXFALL_THEME.get(entry);
+						if (!CosmeticsManager.getInstance().playerHasCosmetic(player, CosmeticType.COSMETIC_SKILL, skin)) {
+							// Try to buy
+							if (player.getGameMode() == GameMode.CREATIVE) {
+								buyCosmetic(player, skin);
+								player.sendMessage(Component.text("Because you are in creative mode, this is free!", NamedTextColor.GREEN));
+								return;
+							}
+
+							// Check costs
+							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
+							ItemStack mSapling = InventoryUtils.getItemFromLootTable(player, SAPLING_LOOTTABLE);
+							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
+								!player.getInventory().containsAtLeast(mSapling, SAPLING_PER_HEXFALL_SKIN)) {
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
+								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
+								return;
+							}
+							// Remove items
+							mPigment.setAmount(PIGMENT_PER_SKIN);
+							mSapling.setAmount(SAPLING_PER_HEXFALL_SKIN);
+							if (buyCosmetic(player, skin)) {
+								player.getInventory().removeItem(mPigment);
+								player.getInventory().removeItem(mSapling);
+							}
+							return;
+						} else {
+							// Already bought
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
+							player.sendMessage(Component.text("You already have this cosmetic skill. Go to Cosmetic Manager to equip it!", NamedTextColor.RED));
+							return;
+						}
+					}
+
+					// Changing page
+					if (slot == PREV_PAGE_LOC) {
+						mPageNumber--;
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
+						loadGalleryPage(player);
+					} else if (slot == NEXT_PAGE_LOC) {
+						mPageNumber++;
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
+						loadGalleryPage(player);
+					}
+				}
 				default -> {
 					//Reject: related content not discovered
 					if (item.getType() == LOCKED) {
@@ -397,6 +455,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					} else if (slot == GALLERY_ENTRY_LOC) {
 						mPageNumber = 1;
 						loadPage(CSGUIPage.SANGUINE, player);
+					} else if (slot == HEXFALL_ENTRY_LOC) {
+						mPageNumber = 1;
+						loadPage(CSGUIPage.HEXFALL, player);
 					}
 				}
 			}
@@ -434,6 +495,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			case DELVE -> loadDelvePage(player);
 			case PRESTIGE -> loadPrestigePage(player);
 			case SANGUINE -> loadGalleryPage(player);
+			case HEXFALL -> loadHexfallPage(player);
 			default -> {
 				// Intro item
 				ItemStack introItem = createPageIcon(Material.RED_GLAZED_TERRACOTTA, Component.text("Theme Selection", NamedTextColor.RED), List.of(Component.text("Select a theme to buy", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false), Component.text("cosmetic skills!", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)));
@@ -450,6 +512,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 				// Gallery theme entry
 				setPageIcon(GALLERY_ENTRY_LOC, Material.WAXED_OXIDIZED_COPPER, Component.text("Gallery of Fear", GALLERY_COLOR), Component.text("MzkCaerulaArbor", GALLERY_COLOR).decorate(TextDecoration.OBFUSCATED), GALLERY_INTRO, List.of(Component.text("Reveal the secret b").append(Component.text("eneth the ocean").decorate(TextDecoration.OBFUSCATED)).append(Component.text("s")), Component.text("to unlock this theme!")), GALLERY_SCB, player);
+
+				// Hexfall theme entry
+				setPageIcon(HEXFALL_ENTRY_LOC, Material.MOSSY_STONE_BRICKS, Component.text("Hexfall", HEXFALL_COLOR), Component.text("H", HEXFALL_COLOR).append(Component.text("exfall", HEXFALL_COLOR).decorate(TextDecoration.OBFUSCATED)), HEXFALL_INTRO, List.of(Component.text("Defeat the d").append(Component.text("ryad in t").decorate(TextDecoration.OBFUSCATED)).append(Component.text("he Sa")).append(Component.text("nctum of Sunken Fa").decorate(TextDecoration.OBFUSCATED)).append(Component.text("ith")), Component.text("to unlock this theme!")), HEXFALL_SCB, player);
 
 				// Back item
 				setBackItem("Back to Cosmetic Manager");
@@ -596,6 +661,39 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		// Back item
 		setBackItem("Back to Overview");
 	}
+
+	private void loadHexfallPage(Player player) {
+		// Intro item
+		ItemStack introItem = createPageIcon(Material.MOSSY_STONE_BRICKS,
+			Component.text("Hexfall", HEXFALL_COLOR), HEXFALL_INTRO);
+		mInventory.setItem(INTRO_LOC, introItem);
+
+		// Skin items
+		int numPages = (HEXFALL_THEME.size() - 1) / ENTRY_PER_PAGE + 1;
+		mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
+		// Paging
+		List<String> price = List.of(
+			PIGMENT_PER_SKIN + " Twisted Pigments and",
+			SAPLING_PER_HEXFALL_SKIN + " Liferoot Sapling");
+		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < HEXFALL_THEME.size(); ) {
+			int slot = ENTRY_START + ENTRY_COLUMNS[i % ENTRY_PER_LINE] + i / ENTRY_PER_LINE;
+			String skin = HEXFALL_THEME.get(i);
+			ItemStack item = createSkillIcon(skin, HEXFALL_COLOR, player, price);
+			mInventory.setItem(slot, item);
+
+			if (++i % ENTRY_PER_PAGE == 0) {
+				// End of current page number
+				break;
+			}
+		}
+
+		// Prev and next page buttons
+		setPagingItems(numPages);
+
+		// Back item
+		setBackItem("Back to Overview");
+	}
+
 
 	private void setPagingItems(int numPages) {
 		if (mPageNumber > 1) {
@@ -754,6 +852,10 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			"The nightmare was never meant for life.",
 			"Banish the dream.",
 			"End this nightmare!"
+		);
+		HEXFALL_INTRO = applyIntroStyle(
+			"Hycenea's grasp on the Wolfswood has vanished.",
+			"The residue of her magic now calls for you to control."
 		);
 
 	}
