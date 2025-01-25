@@ -451,7 +451,7 @@ public class CustomTradeGui extends Gui {
 			// NEXT PAGE BUTTON
 			setItem(5, 7,
 				GUIUtils.setGuiNbtTag(GUIUtils.createBasicItem(Material.ARROW, "Next Page (" + (mCurrentPage + 1) + ")", NamedTextColor.YELLOW, false,
-					"", NamedTextColor.GRAY, 0), "texture", "next_page", mGuiTagsActive)
+					"", NamedTextColor.GRAY, 0), "texture", "trade_menu_next_page", mGuiTagsActive)
 				).onLeftClick(() -> {
 				// Page Flip:
 				mCurrentPage++;
@@ -463,7 +463,7 @@ public class CustomTradeGui extends Gui {
 			// PREV PAGE BUTTON
 			setItem(5, 6,
 				GUIUtils.setGuiNbtTag(GUIUtils.createBasicItem(Material.ARROW, "Previous Page (" + (mCurrentPage - 1) + ")", NamedTextColor.YELLOW, false,
-					"", NamedTextColor.GRAY, 0), "texture", "prev_page", mGuiTagsActive)
+					"", NamedTextColor.GRAY, 0), "texture", "trade_menu_prev_page", mGuiTagsActive)
 				).onLeftClick(() -> {
 				// Page Flip:
 				mCurrentPage--;
