@@ -82,6 +82,8 @@ public class DepthsUtils {
 		Material.PISTON,
 		Material.STICKY_PISTON,
 		Material.MOVING_PISTON,
+		Material.BREWING_STAND,
+		Material.ANVIL,
 		Material.SHULKER_BOX,
 		Material.WHITE_SHULKER_BOX,
 		Material.ORANGE_SHULKER_BOX,
