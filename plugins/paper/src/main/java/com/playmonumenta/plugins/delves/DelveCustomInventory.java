@@ -566,7 +566,7 @@ public class DelveCustomInventory extends CustomInventory {
 		} else {
 			lore.add(Component.text("- Challenge Mode not active", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 		}
-		if (depthPoints >= DelvesUtils.MAX_DEPTH_POINTS) {
+		if (depthPoints >= DelvesUtils.MAX_DEPTH_POINTS && !mDungeonName.equals("willows")) {
 			lore.add(Component.text("- All Delves Modifiers advancement granted upon completion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 		} else {
 			lore.add(Component.text("- All Delves Modifiers advancement not granted upon completion", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
