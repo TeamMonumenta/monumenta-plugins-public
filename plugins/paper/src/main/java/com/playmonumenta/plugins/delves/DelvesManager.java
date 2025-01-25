@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.SpawnerCountCommand;
 import com.playmonumenta.plugins.delves.abilities.Astral;
+import com.playmonumenta.plugins.delves.abilities.Berserk;
 import com.playmonumenta.plugins.delves.abilities.ChanceCubes;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
@@ -407,20 +408,22 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
-		if (event.getEntity().getKiller() == null
-			    || !(getRank(event.getEntity().getKiller(), DelvesModifier.HAUNTED) > 0)
-			    || event.getEntity().getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
-			return;
+		if ((getRank(event.getEntity().getKiller(), DelvesModifier.HAUNTED) > 0)) {
+			if (event.getEntity().getKiller() == null || event.getEntity().getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
+				return;
+			}
+			int multiplier = 1;
+			if (EntityUtils.isElite(event.getEntity())) {
+				multiplier = 4;
+			} else if (EntityUtils.isBoss(event.getEntity())) {
+				multiplier = 10;
+			}
+			Haunted.moveBackwards(event.getEntity().getKiller(), multiplier);
+		}
+		if ((getRank(event.getEntity().getKiller(), DelvesModifier.BERSERK) > 0)) {
+			Berserk.applyModifiers(event.getEntity().getKiller(), event.getEntity());
 		}
 
-		int multiplier = 1;
-		if (EntityUtils.isElite(event.getEntity())) {
-			multiplier = 4;
-		} else if (EntityUtils.isBoss(event.getEntity())) {
-			multiplier = 10;
-		}
-
-		Haunted.moveBackwards(event.getEntity().getKiller(), multiplier);
 	}
 
 	@EventHandler(ignoreCancelled = true)
