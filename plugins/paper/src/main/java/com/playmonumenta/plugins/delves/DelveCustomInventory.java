@@ -28,6 +28,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -646,15 +647,20 @@ public class DelveCustomInventory extends CustomInventory {
 				mPage++;
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1.5f);
 			} else if (mConfig.editable()) {
-				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
-				mAlreadyRolledEntropy = 0;
-				List<DelvesModifier> experimentalModifiers = DelvesModifier.experimentalDelveModifiers();
-				for (DelvesModifier mod : getAvailableModifiers()) {
-					if (experimentalModifiers.contains(mod)) {
-						mPointSelected.put(mod, 0);
-					} else {
-						mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
+				if ((event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT)) {
+					playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
+					mAlreadyRolledEntropy = 0;
+					List<DelvesModifier> experimentalModifiers = DelvesModifier.experimentalDelveModifiers();
+					for (DelvesModifier mod : getAvailableModifiers()) {
+						if (experimentalModifiers.contains(mod)) {
+							mPointSelected.put(mod, 0);
+						} else {
+							mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
+						}
 					}
+				} else {
+					playerWhoClicked.sendMessage(Component.text("You must shift-click to enable all delve mods!", NamedTextColor.RED));
+					event.setCancelled(true);
 				}
 			}
 		}
