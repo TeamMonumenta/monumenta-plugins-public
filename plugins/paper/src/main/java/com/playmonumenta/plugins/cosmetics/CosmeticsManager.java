@@ -388,6 +388,7 @@ public class CosmeticsManager implements Listener {
 		Plugin.getInstance().mVanityManager.playerJoinEvent(event);
 
 		GravePoses.handleLogin(p);
+		EliteFinishers.handleLogin(p);
 	}
 
 	// Elite Finisher handler

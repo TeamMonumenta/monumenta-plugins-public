@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.google.common.collect.ImmutableMap;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -38,6 +41,7 @@ public class EliteFinishers {
 			.put(LightningFinisher.NAME, new LightningFinisher())
 			.put(LocustSwarmFinisher.NAME, new LocustSwarmFinisher())
 			.put(MegalovaniaFinisher.NAME, new MegalovaniaFinisher())
+			.put(MoneyRainFinisher.NAME, new MoneyRainFinisher())
 			.put(PaintSplashFinisher.NAME, new PaintSplashFinisher())
 			.put(PoultryficationFinisher.NAME, new PoultryficationFinisher())
 			.put(Promenade.NAME, new Promenade())
@@ -109,6 +113,17 @@ public class EliteFinishers {
 		return mClonedKilledMob;
 	}
 
+	public static boolean canAccess(Player player) {
+		return (ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_2);
+	}
+
+	public static void handleLogin(Player player) {
+		if (canAccess(player)) {
+			CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.ELITE_FINISHER, MoneyRainFinisher.NAME);
+		} else {
+			CosmeticsManager.getInstance().removeCosmetic(player, CosmeticType.ELITE_FINISHER, MoneyRainFinisher.NAME);
+		}
+	}
 
 	public static String[] getNames() {
 		return FINISHERS.keySet().toArray(String[]::new);
