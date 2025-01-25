@@ -431,6 +431,8 @@ public class MobListener implements Listener {
 			return;
 		}
 
+		event.getDrops().removeIf(itemStack -> !ItemUtils.doDropItemAfterSpawnerLimit(itemStack));
+
 		//Give wither to vexes spawned from the evoker that died so they die over time
 		if (livingEntity instanceof Evoker) {
 			List<LivingEntity> vexes = EntityUtils.getNearbyMobs(livingEntity.getLocation(), 30, EnumSet.of(EntityType.VEX));
