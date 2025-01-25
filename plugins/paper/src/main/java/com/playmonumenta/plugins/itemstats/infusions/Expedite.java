@@ -48,11 +48,12 @@ public class Expedite implements Infusion {
 				} else {
 					oldEffect.clearEffect();
 					plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed * (oldStacks + 1), PERCENT_SPEED_EFFECT_NAME));
+					AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 				}
 			} else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed, PERCENT_SPEED_EFFECT_NAME));
+				AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 			}
-			AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 		}
 	}
 
