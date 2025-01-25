@@ -72,6 +72,7 @@ public class SpellRazorVine extends Spell {
 						player.playSound(player, Sound.BLOCK_WART_BLOCK_PLACE, SoundCategory.HOSTILE, 2f, 1f);
 						player.playSound(player, Sound.BLOCK_WART_BLOCK_BREAK, SoundCategory.HOSTILE, 2f, 1.5f);
 						player.playSound(player, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.HOSTILE, 2f, 1f);
+						player.playSound(player, Sound.BLOCK_WEEPING_VINES_STEP, SoundCategory.HOSTILE, 1f, 1f);
 					}
 				}
 

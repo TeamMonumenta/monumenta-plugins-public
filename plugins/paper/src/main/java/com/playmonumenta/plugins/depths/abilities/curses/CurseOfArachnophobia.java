@@ -24,7 +24,7 @@ public class CurseOfArachnophobia extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<CurseOfArachnophobia> INFO =
 		new DepthsAbilityInfo<>(CurseOfArachnophobia.class, ABILITY_NAME, CurseOfArachnophobia::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)
-			.displayItem(Material.RED_CANDLE)
+			.displayItem(Material.SPIDER_EYE)
 			.descriptions(CurseOfArachnophobia::getDescription);
 
 	public CurseOfArachnophobia(Plugin plugin, Player player) {
