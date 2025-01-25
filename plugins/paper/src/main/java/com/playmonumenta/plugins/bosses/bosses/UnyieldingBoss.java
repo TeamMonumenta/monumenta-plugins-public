@@ -1,6 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.effects.DisableAI;
+import com.playmonumenta.plugins.effects.DisableGravity;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.Frozen;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -61,7 +65,12 @@ public class UnyieldingBoss extends BossAbilityGroup {
 				@Override
 				public void run() {
 					// Cancel upon knock away, knockup, silence, stun, frozen (hard cc)
-					if (mBoss.isDead() || !mBoss.hasAI() || mBoss.hasPotionEffect(PotionEffectType.SLOW_FALLING) || mBoss.hasPotionEffect(PotionEffectType.LEVITATION)) {
+					if (!mBoss.isValid()
+						    || mBoss.hasPotionEffect(PotionEffectType.SLOW_FALLING)
+						    || mBoss.hasPotionEffect(PotionEffectType.LEVITATION)
+						    || EffectManager.getInstance().hasEffect(mBoss, Frozen.class)
+						    || EffectManager.getInstance().hasEffect(mBoss, DisableAI.class)
+						    || EffectManager.getInstance().hasEffect(mBoss, DisableGravity.class)) {
 						interrupt();
 						return;
 					}
