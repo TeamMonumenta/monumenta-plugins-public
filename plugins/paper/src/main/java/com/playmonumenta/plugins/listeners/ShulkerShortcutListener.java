@@ -243,7 +243,10 @@ public class ShulkerShortcutListener implements Listener {
 					} else if (click == ClickType.SWAP_OFFHAND && ItemUtils.isNullOrAir(itemHeld)) {
 						// Pressed swap on a shulker with empty cursor: Deposit matching items from the inventory
 						event.setCancelled(true);
-						GUIUtils.refreshOffhand(event);
+						// Refresh only if the shulker item ISN'T in their offhand (to prevent item deletion)
+						if (!itemClicked.isSimilar(player.getInventory().getItemInOffHand())) {
+							GUIUtils.refreshOffhand(event);
+						}
 						depositAllMatching(player, itemClicked);
 					} else if (ShulkerInventoryManager.playerIsShulkerRateLimited(player)) {
 						player.sendMessage(Component.text("Too fast! Please try again", NamedTextColor.RED));

@@ -94,7 +94,7 @@ public class IntoxicatingWarmth implements Enchantment {
 			}.runTaskTimer(plugin, 0, 5);
 
 			// Particles
-			plugin.mEffectManager.addEffect(player, "IntoxicatingWarmthParticles", new Aesthetics(DURATION,
+			plugin.mEffectManager.addEffect(player, "IntoxicatingWarmthParticles", new Aesthetics(duration,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
 						// Tick effect
 						Location loc = player.getLocation().add(0, 1, 0);
