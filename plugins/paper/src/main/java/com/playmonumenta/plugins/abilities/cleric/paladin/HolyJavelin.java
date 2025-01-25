@@ -73,7 +73,7 @@ public class HolyJavelin extends Ability {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HolyJavelin::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).sprinting(true)
 					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
-			.displayItem(Material.TRIDENT)
+			.displayItem(Material.GOLDEN_SWORD)
 			.priorityAmount(1001); // shortly after divine justice and luminous infusion
 
 	private @Nullable Crusade mCrusade;

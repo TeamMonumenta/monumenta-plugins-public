@@ -96,6 +96,7 @@ public class AbilityTriggersGui extends Gui {
 					ItemStack item = GUIUtils.createBasicItem(info.getDisplayItem(), 1,
 						info.getDisplayName() + " - " + trigger.getDisplayName(), NamedTextColor.GOLD, false,
 						lore, true);
+					GUIUtils.setGuiNbtTag(item, "texture", info.getDisplayName(), mGuiTextures);
 
 					setItem(2 + (i / 7), 1 + (i % 7), item)
 						.onLeftClick(() -> {
@@ -165,9 +166,11 @@ public class AbilityTriggersGui extends Gui {
 					.append(Component.text(mSelectedTrigger.getRestriction().getDisplay(), NamedTextColor.WHITE)));
 			}
 			// summary icon
-			setItem(0, 4, GUIUtils.createBasicItem(mSelectedAbility.getDisplayItem(), 1,
+			ItemStack summaryItem = GUIUtils.createBasicItem(mSelectedAbility.getDisplayItem(), 1,
 				mSelectedAbility.getDisplayName() + " - " + mSelectedTrigger.getDisplayName(), NamedTextColor.GOLD, false,
-				summary, true));
+				summary, true);
+			GUIUtils.setGuiNbtTag(summaryItem, "texture", mSelectedAbility.getDisplayName(), mGuiTextures);
+			setItem(0, 4, summaryItem);
 
 			// options
 			tempItem = GUIUtils.createBasicItem(Material.BARRIER, mNewTrigger.isEnabled() ? "Trigger enabled" : "Trigger disabled", mNewTrigger.isEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED, false,
