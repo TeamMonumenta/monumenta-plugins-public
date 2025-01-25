@@ -128,7 +128,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 			new SpellGenerateRutenSpells(this).run();
 		});
 
-		events.put(10, mBoss -> new SpellRutenDialogue(Component.text("How could muddling conquer the soul? Do not see a path... To the mud Ru'Ten must... return. Ye come with, it be decreed...", NamedTextColor.WHITE), 0, mSpawnLoc).run());
+		events.put(10, mBoss -> new SpellRutenDialogue(Component.text("How do you stand against the full force of this Shrine? There are no more witches left to eat... the traitor got away. I must return to the mud - and you must come with me.", NamedTextColor.WHITE), 0, mSpawnLoc).run());
 
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange * 2, BossBar.Color.RED, BossBar.Overlay.NOTCHED_6, events);
 		super.constructBoss(mSpellQueue, passiveSpells, detectionRange * 2, bossBar, 0, 1);
@@ -149,7 +149,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(mHealth);
 
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).stream().filter(p -> p.getScoreboardTags().contains("RutenFighter")).toList()) {
-			MessagingUtils.sendBoldTitle(player, Component.text("Ru'Ten", NamedTextColor.GOLD), Component.text("Arcane Abomination", NamedTextColor.RED));
+			MessagingUtils.sendBoldTitle(player, Component.text("Ru'Ten", NamedTextColor.GOLD), Component.text("Devouring Loci", NamedTextColor.RED));
 		}
 	}
 
@@ -412,7 +412,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				fillerSpellsFinal.add(new SpellVileBloom(mMonumentaPlugin, mBoss, 20 * 2, 20 * 12, 24, 500, 20 * 8, mSpawnLoc));
 				Collections.shuffle(fillerSpellsFinal);
 				List<Spell> phase3Casts = new ArrayList<>();
-				phase3Casts.add(new SpellRutenDialogue(Component.text("More needed, hah. Nalatia soul knew death. Ru'Ten bring death to ye now! Shrine must be sacred. Wolf must return!", NamedTextColor.WHITE), 0, mSpawnLoc));
+				phase3Casts.add(new SpellRutenDialogue(Component.text("You surprise me. More power is needed to destroy you! Lady Nalatia's soul screams power. I will devour her lingering power to rain death upon you.", NamedTextColor.WHITE), 0, mSpawnLoc));
 
 				phase3Casts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 3, 20 * 2, 20 * 3, 20 * 12));
 				phase3Casts.add(fillerSpellsFinal.get(0));
@@ -444,7 +444,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				Collections.shuffle(surgingFiller);
 
 				List<Spell> surgingDeathCasts = new ArrayList<>();
-				surgingDeathCasts.add(new SpellRutenDialogue(Component.text("Death beget ye now, still!", NamedTextColor.WHITE), 0, mSpawnLoc));
+				surgingDeathCasts.add(new SpellRutenDialogue(Component.text("Death be upon you! I must feast on your strength!", NamedTextColor.WHITE), 0, mSpawnLoc));
 				surgingDeathCasts.add(new Spell() {
 					@Override
 					public void run() {
@@ -459,7 +459,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 				surgingDeathCasts.add(new SpellSurgingDeath(mMonumentaPlugin, mBoss, mSpawnLoc, detectionRange, 20 * 3, 4, 20 * 2, 20 * 3, 20 * 3));
 				surgingDeathCasts.add(surgingFiller.get(0));
 				surgingDeathCasts.add(surgingFiller.get(1));
-				surgingDeathCasts.add(new SpellRutenDialogue(Component.text("Ru'Ten need more energy, hmph. Laurey seem essence worthwhile now. Feast!", NamedTextColor.WHITE), 0, mSpawnLoc));
+				surgingDeathCasts.add(new SpellRutenDialogue(Component.text("I feel tired... where has all my power gone? I was saving Lady Laurey's magic for later, but I shall feast now instead. Her strength will become mine and together we shall destroy you.", NamedTextColor.WHITE), 0, mSpawnLoc));
 
 				for (Spell spell : surgingDeathCasts) {
 					mSpellQueue.addSpellToQueue(spell);
