@@ -54,8 +54,8 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 		{
 			ItemStack options = new ItemStack(Material.CRAFTING_TABLE);
 			ItemMeta meta = options.getItemMeta();
-			meta.displayName(Component.text("Settings", NamedTextColor.GOLD, TextDecoration.BOLD));
-			meta.lore(List.of(Component.text("Configure your " + ItemUtils.getPlainName(mExperiencinatorItem), NamedTextColor.GRAY)));
+			meta.displayName(Component.text("Settings", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			meta.lore(List.of(Component.text("Configure your " + ItemUtils.getPlainName(mExperiencinatorItem), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			options.setItemMeta(meta);
 			GUIUtils.setPlaceholder(options);
 			mInventory.setItem(11, options);
@@ -63,8 +63,8 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 		{
 			ItemStack convertAll = new ItemStack(Material.GOLD_INGOT);
 			ItemMeta meta = convertAll.getItemMeta();
-			meta.displayName(Component.text("Convert Now", NamedTextColor.GOLD, TextDecoration.BOLD));
-			meta.lore(List.of(Component.text("Convert all items in your inventory", NamedTextColor.GRAY)));
+			meta.displayName(Component.text("Convert Now", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			meta.lore(List.of(Component.text("Convert all items in your inventory", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			convertAll.setItemMeta(meta);
 			GUIUtils.setPlaceholder(convertAll);
 			mInventory.setItem(13, convertAll);
@@ -72,8 +72,8 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 		{
 			ItemStack selectiveConvert = new ItemStack(Material.GOLD_NUGGET);
 			ItemMeta meta = selectiveConvert.getItemMeta();
-			meta.displayName(Component.text("Selective Conversion", NamedTextColor.GOLD, TextDecoration.BOLD));
-			meta.lore(List.of(Component.text("Convert specific items only", NamedTextColor.GRAY)));
+			meta.displayName(Component.text("Selective Conversion", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			meta.lore(List.of(Component.text("Convert specific items only", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			selectiveConvert.setItemMeta(meta);
 			GUIUtils.setPlaceholder(selectiveConvert);
 			mInventory.setItem(15, selectiveConvert);

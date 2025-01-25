@@ -210,7 +210,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 					lore.add(Component.text("for the " + mExperiencinator.getName() + ",", NamedTextColor.GRAY, TextDecoration.ITALIC));
 					lore.add(Component.text("thus it will not convert items of this type.", NamedTextColor.GRAY, TextDecoration.ITALIC));
 				}
-				ItemStack item = GUIUtils.createBasicItem(conversionResult.getItem().getType(), Math.max(1, amount), Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversion.getName(), NamedTextColor.GOLD)), lore, false);
+				ItemStack item = GUIUtils.createBasicItem(conversionResult.getItem().getType(), Math.max(1, amount), Component.text("Convert to ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).append(Component.text(conversion.getName(), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)), lore, false);
 
 				ItemUtils.setPlainName(item, ItemUtils.getPlainNameIfExists(conversionResult.getItem()));
 

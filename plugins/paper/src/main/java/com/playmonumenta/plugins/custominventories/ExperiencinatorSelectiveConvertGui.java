@@ -82,8 +82,8 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 			// back button
 			ItemStack backButton = new ItemStack(Material.OBSERVER);
 			ItemMeta meta = backButton.getItemMeta();
-			meta.displayName(Component.text("Back", NamedTextColor.GRAY, TextDecoration.BOLD));
-			meta.lore(List.of(Component.text("Return to the main menu", NamedTextColor.GRAY)));
+			meta.displayName(Component.text("Back", NamedTextColor.GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			meta.lore(List.of(Component.text("Return to the main menu", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			backButton.setItemMeta(meta);
 			GUIUtils.setPlaceholder(backButton);
 			mInventory.setItem(0, backButton);
@@ -93,11 +93,11 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 			// instructions
 			ItemStack instructions = new ItemStack(Material.DARK_OAK_SIGN);
 			ItemMeta meta = instructions.getItemMeta();
-			meta.displayName(Component.text("Instructions", NamedTextColor.GOLD, TextDecoration.BOLD));
-			meta.lore(List.of(Component.text("Click on items in your inventory", NamedTextColor.WHITE),
-				Component.text("to convert them using the selection below.", NamedTextColor.WHITE),
-				Component.text("Left click to sell all items of a stack,", NamedTextColor.WHITE),
-				Component.text("Right click to sell a single item only.", NamedTextColor.WHITE)));
+			meta.displayName(Component.text("Instructions", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			meta.lore(List.of(Component.text("Click on items in your inventory", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
+				Component.text("to convert them using the selection below.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
+				Component.text("Left click to sell all items of a stack,", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
+				Component.text("Right click to sell a single item only.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 			instructions.setItemMeta(meta);
 			GUIUtils.setPlaceholder(instructions);
 			mInventory.setItem(4, instructions);
@@ -109,8 +109,8 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 			// default conversion
 			ItemStack instructions = new ItemStack(Material.CRAFTING_TABLE);
 			ItemMeta meta = instructions.getItemMeta();
-			meta.displayName(Component.text("Configured Conversion", NamedTextColor.GOLD));
-			meta.lore(List.of(Component.text("Uses the conversion configured in the settings", NamedTextColor.GRAY)));
+			meta.displayName(Component.text("Configured Conversion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+			meta.lore(List.of(Component.text("Uses the conversion configured in the settings", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			instructions.setItemMeta(meta);
 			GUIUtils.setPlaceholder(instructions);
 			mInventory.setItem(conversionStartIndex, instructions);
@@ -125,9 +125,9 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 			ItemStack item = conversionResults.get(0).getItem();
 			ItemMeta meta = item.getItemMeta();
 			String conversionNames = conversions.get(0).getCombinedName() != null ? conversions.get(0).getCombinedName() : conversions.stream().map(Conversion::getName).collect(Collectors.joining("/"));
-			meta.displayName(Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversionNames, NamedTextColor.GOLD)));
-			meta.lore(List.of(Component.text("Will convert applicable items to", NamedTextColor.GRAY),
-				Component.text(conversionNames, NamedTextColor.GRAY)));
+			meta.displayName(Component.text("Convert to ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).append(Component.text(conversionNames, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+			meta.lore(List.of(Component.text("Will convert applicable items to", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+				Component.text(conversionNames, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			meta.addItemFlags(ItemFlag.values());
 			item.setItemMeta(meta);
 			GUIUtils.setPlaceholder(item);
@@ -141,9 +141,9 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 				                         : "the configured conversion";
 			ItemStack marker = new ItemStack(Material.GOLD_NUGGET);
 			ItemMeta meta = marker.getItemMeta();
-			meta.displayName(Component.text("Selected Conversion", NamedTextColor.GOLD));
-			meta.lore(List.of(Component.text("Will convert applicable items to", NamedTextColor.GRAY),
-				Component.text(conversionNames, NamedTextColor.GRAY)));
+			meta.displayName(Component.text("Selected Conversion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+			meta.lore(List.of(Component.text("Will convert applicable items to", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+				Component.text(conversionNames, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			marker.setItemMeta(meta);
 			GUIUtils.setPlaceholder(marker);
 			mInventory.setItem(conversionStartIndex + 9 + mSelectedConversion + 1, marker);
