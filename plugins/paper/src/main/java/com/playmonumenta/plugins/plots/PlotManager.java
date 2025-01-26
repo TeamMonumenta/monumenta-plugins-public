@@ -76,6 +76,7 @@ public class PlotManager {
 							}
 						});
 					}))
+				/* INFO OTHER */
 				/* This variant requires perms because it lets you get other players */
 				.withSubcommand(new CommandAPICommand("info")
 					.withArguments(new StringArgument("name")
@@ -90,6 +91,38 @@ public class PlotManager {
 								MessagingUtils.sendStackTrace(player, ex);
 							} else {
 								new PlotAccessGui(player, name, uuid, info, PlotAccessGui.MainGuiMode.ACCESS_INFO_MODE, Component.text("Plot Access Information")).open();
+							}
+						});
+					}))
+				/* INFO RAW */
+				.withSubcommand(new CommandAPICommand("info_raw")
+					.executesPlayer((player, args) -> {
+						getPlotInfo(player.getUniqueId()).whenComplete((info, ex) -> {
+							if (ex != null) {
+								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
+								player.sendMessage(Component.text("An error occurred while trying to list plot access. Please report this: " + ex.getMessage(), NamedTextColor.RED));
+								MessagingUtils.sendStackTrace(player, ex);
+							} else {
+								plotAccessInfoRaw(player, info);
+							}
+						});
+					}))
+				/* INFO RAW OTHER */
+				/* This variant requires perms because it lets you get other players */
+				.withSubcommand(new CommandAPICommand("info_raw")
+					.withArguments(new StringArgument("name")
+						.withPermission(CommandPermission.fromString("monumenta.plot.info")))
+					.executesPlayer((player, args) -> {
+						String name = args.getUnchecked("name");
+						UUID uuid = resolveUUID(name);
+						getPlotInfo(uuid).whenComplete((info, ex) -> {
+							if (ex != null) {
+								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + name + " : " + ex.getMessage());
+								player.sendMessage(Component.text("An error occurred while trying to list plot access. Please report this: " + ex.getMessage(), NamedTextColor.RED));
+								MessagingUtils.sendStackTrace(player, ex);
+							} else {
+								player.sendMessage(Component.text("Displaying info for player ", NamedTextColor.GOLD).append(Component.text(name, NamedTextColor.AQUA)));
+								plotAccessInfoRaw(player, info);
 							}
 						});
 					}))
@@ -304,6 +337,44 @@ public class PlotManager {
 
 	private static boolean plotAccessIsExpired(long time) {
 		return time >= 0 && Instant.now().getEpochSecond() > time;
+	}
+
+	private static void plotAccessInfoRaw(CommandSender sender, PlotInfo info) {
+		sender.sendMessage(Component.text("Your plot number is: ", NamedTextColor.GREEN).append(Component.text("#" + info.mOwnedPlotId, NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("Your currently selected plot is: ", NamedTextColor.GREEN).append(Component.text("#" + info.mCurrentPlotId, NamedTextColor.GOLD)));
+		if (info.mOtherAccessToOwnerPlot.isEmpty()) {
+			sender.sendMessage(Component.text("There are no players with access to your plot", NamedTextColor.GREEN));
+		} else {
+			sender.sendMessage(Component.text("These players have access to your plot:", NamedTextColor.GREEN));
+
+			info.mOtherAccessToOwnerPlot.forEach((key, otherAccessToOwnerPlot) -> {
+				String name = MonumentaRedisSyncIntegration.cachedUuidToName(key);
+				if (name != null) {
+					Component msg = Component.text("  " + name, NamedTextColor.AQUA);
+					if (otherAccessToOwnerPlot.mExpiration > 0) {
+						msg = msg.append(Component.text(" Expires: ", NamedTextColor.GREEN)).append(Component.text(MessagingUtils.getTimeDifferencePretty(otherAccessToOwnerPlot.mExpiration), NamedTextColor.AQUA));
+					}
+					sender.sendMessage(msg);
+				}
+			});
+		}
+
+		if (info.mOwnerAccessToOtherPlots.isEmpty()) {
+			sender.sendMessage(Component.text("You don't have access to any other player's plot", NamedTextColor.GREEN));
+		} else {
+			sender.sendMessage(Component.text("You have access to these other plots:", NamedTextColor.GREEN));
+
+			info.mOwnerAccessToOtherPlots.forEach((key, ownerAccessToOtherPlots) -> {
+				String name = MonumentaRedisSyncIntegration.cachedUuidToName(key);
+				if (name != null) {
+					Component msg = Component.text("  " + name, NamedTextColor.AQUA).append(Component.text(" (#" + ownerAccessToOtherPlots.mPlotId + ")", NamedTextColor.GOLD));
+					if (ownerAccessToOtherPlots.mExpiration > 0) {
+						msg = msg.append(Component.text(" Expires: ", NamedTextColor.GREEN)).append(Component.text(MessagingUtils.getTimeDifferencePretty(ownerAccessToOtherPlots.mExpiration), NamedTextColor.AQUA));
+					}
+					sender.sendMessage(msg);
+				}
+			});
+		}
 	}
 
 	private static void plotAccessAdd(CommandSender sender, UUID ownerUUID, UUID otherUUID, @Nullable String duration) throws WrapperCommandSyntaxException {
