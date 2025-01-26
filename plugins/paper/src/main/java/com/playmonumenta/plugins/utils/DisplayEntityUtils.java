@@ -520,8 +520,20 @@ public class DisplayEntityUtils {
 	 * @param duration duration of the interpolation
 	 */
 	public static void rotateToPointAtLoc(Display display, Vector vec, int duration) {
-		rotateToPointAtLoc(display, vec, duration, -Math.PI / 4.0f);
+		rotateToPointAtLoc(display, vec, duration, -3*Math.PI/4.0f);
 	}
+
+
+	public static Transformation rotateToPointAtLoc(Display display, Vector vec, double angleOffset) {
+		Transformation trans = display.getTransformation();
+		return rotateToPointAtLoc(display, vec, angleOffset, trans.getScale());
+	}
+
+	public static Transformation rotateToPointAtLoc(Display display, Vector vec, double angleOffset, Vector3f scale) {
+		Transformation trans = display.getTransformation();
+		return new Transformation(trans.getTranslation(), new AxisAngle4f((float) -Math.atan2(vec.getZ(), vec.getX()), 0, 1, 0), scale, new AxisAngle4f((float) (Math.asin(vec.getY()) + angleOffset), 0, 0, 1));
+	}
+
 
 	/**
 	 * Only works for cubes and will make item displays vertical and point towards it.
@@ -530,12 +542,17 @@ public class DisplayEntityUtils {
 	 * @param vec         vector direction the display should be rotated.
 	 *                    For looking at a loc get the vector between the two locs
 	 * @param duration    duration of the interpolation
-	 * @param angleOffset the angle in radians to rotate it in additions. Cross bows would be +π/4, armor would be 0,
-	 *                    and weapons would be -π/4
+	 * @param angleOffset the angle in radians to rotate it in additions. Cross bows would be -π/4, armor would be -π/2,
+	 *                    and weapons would be -3π/4
 	 */
 	public static void rotateToPointAtLoc(Display display, Vector vec, int duration, double angleOffset) {
+		Transformation trans = display.getTransformation();
+		rotateToPointAtLoc(display, vec, duration, angleOffset, trans.getScale());
+	}
+
+	public static void rotateToPointAtLoc(Display display, Vector vec, int duration, double angleOffset, Vector3f scale) {
 		vec.normalize();
-		display.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f((float) -Math.atan2(vec.getZ(), vec.getX()), 0, 1, 0), new Vector3f(2f), new AxisAngle4f((float) (Math.asin(vec.getY()) + angleOffset), 0, 0, 1)));
+		display.setTransformation(rotateToPointAtLoc(display, vec, angleOffset, scale));
 		display.setInterpolationDuration(duration);
 		display.setInterpolationDelay(-1);
 	}

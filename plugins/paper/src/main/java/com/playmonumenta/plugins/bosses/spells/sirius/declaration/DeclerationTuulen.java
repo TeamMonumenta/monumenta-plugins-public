@@ -213,11 +213,12 @@ public class DeclerationTuulen extends Spell {
 					vec2.normalize();
 					Vector vecToBoss = LocationUtils.getVectorTo(mSirius.mBoss.getLocation(), SILVERKNIGHTLOCATIONS.get(mThrown));
 					Location fallVec = LocationUtils.fallToGround(SILVERKNIGHTLOCATIONS.get(mThrown), 0).subtract(SILVERKNIGHTLOCATIONS.get(mThrown));
-					animation = animation.addKeyframe(new Transformation(new Vector3f(), new AxisAngle4f((float) -FastMath.atan2(vec2.getZ(), vec2.getX()), 0, 1, 0), new Vector3f(2f), new AxisAngle4f((float) (FastMath.asin(vec2.getY()) - FastMath.PI / 4.0f), 0, 0, 1)), 10);
+					Transformation rotation = DisplayEntityUtils.rotateToPointAtLoc(display, vec2, -3*Math.PI/4.0f);
+					animation = animation.addKeyframe(rotation, 10);
 					animation = animation.addDelay(DURATION - mTicks);
 					animation.addKeyframe(new Transformation(new Vector3f((float) vecToBoss.getX(), (float) vecToBoss.getY(), (float) vecToBoss.getZ()), new AxisAngle4f(), new Vector3f(2f), new AxisAngle4f()), 5);
 					animation = animation.removeDisplaysAfterwards();
-					animation.addCancelFrame(new Transformation(new Vector3f((float) fallVec.x(), (float) fallVec.y(), (float) fallVec.z()), new AxisAngle4f((float) (-Math.PI / 2 - Math.PI / 4.0f), 0, 0, 1), new Vector3f(2f), new AxisAngle4f()), 10);
+					animation.addCancelFrame(new Transformation(new Vector3f((float) fallVec.x(), (float) fallVec.y(), (float) fallVec.z()), new AxisAngle4f((float) (-Math.PI - Math.PI / 4.0f), 0, 0, 1), new Vector3f(2f), new AxisAngle4f()), 10);
 					animation.addCancelDelay(20);
 					//Delayed to allow for the size and rotation to be constant
 					DisplayEntityUtils.DisplayAnimation finalAnimation = animation;

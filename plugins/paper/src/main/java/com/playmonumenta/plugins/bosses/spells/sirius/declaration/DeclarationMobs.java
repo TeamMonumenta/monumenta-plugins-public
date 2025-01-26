@@ -29,7 +29,7 @@ public class DeclarationMobs extends Spell {
 			p.playSound(p, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.HOSTILE, 1f, 0.7f);
 			p.playSound(p, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 0.4f, 0.8f);
 		}
-		mSpawner.mobDecleration(DURATION, MOBSPERPLAYER);
+		mSpawner.mobDeclaration(DURATION, MOBSPERPLAYER);
 	}
 
 	@Override

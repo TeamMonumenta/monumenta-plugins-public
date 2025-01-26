@@ -430,7 +430,7 @@ public class Grappling implements Enchantment {
 			});
 			mDisplay = spawnLocation.getWorld().spawn(spawnLocation, ItemDisplay.class, display -> {
 				display.setItemStack(new ItemStack(Material.ARROW));
-				DisplayEntityUtils.rotateToPointAtLoc(display, pointingVector.normalize().setY(-pointingVector.getY()), 0, Math.PI / 4);
+				DisplayEntityUtils.rotateToPointAtLoc(display, pointingVector.normalize().setY(-pointingVector.getY()), 0, -Math.PI / 4);
 				Transformation comicallyLarge = display.getTransformation();
 				display.setTransformation(new Transformation(comicallyLarge.getTranslation(),
 					comicallyLarge.getLeftRotation(),

@@ -392,7 +392,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(PrecisionStrikeDamage.effectID, PrecisionStrikeDamage::deserialize);
 		mEffectDeserializer.put(FlatHealthBoost.effectID, FlatHealthBoost::deserialize);
 		mEffectDeserializer.put(CustomTimerEffect.effectID, CustomTimerEffect::deserialize);
-		mEffectDeserializer.put(SiriusContagion.effectID, SiriusContagion::deserialize);
 		mEffectDeserializer.put(SiriusSetTargetEffect.effectID, SiriusSetTargetEffect::deserialize);
 		mEffectDeserializer.put(TemporalFlux.effectID, TemporalFlux::deserialize);
 		mEffectDeserializer.put(Reincarnation.effectId, Reincarnation::deserialize);

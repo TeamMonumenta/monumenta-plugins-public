@@ -34,7 +34,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 public class DeclarationTp extends Spell {
 	private static final int RADIUS = 7;
@@ -84,7 +84,7 @@ public class DeclarationTp extends Spell {
 						}
 					}.runTaskTimer(mPlugin, 0, 2);
 					mTuulenSword.setItemStack(DisplayEntityUtils.generateRPItem(Material.IRON_SWORD, "Silver Knight's Failure"));
-					DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, LocationUtils.getVectorTo(mMidPoint, mSirius.mTuulenLocation.clone().add(0, 1.25, 0)), 0);
+					DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, LocationUtils.getVectorTo(mMidPoint, mSirius.mTuulenLocation.clone().add(0, 1.25, 0)), 0, -3*Math.PI/4.0f, new Vector3f(2f));
 					mTuulenSword.addScoreboardTag("SiriusDisplay");
 					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("You... come join our power...", NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -93,7 +93,7 @@ public class DeclarationTp extends Spell {
 					World world = mSirius.mBoss.getWorld();
 					world.playSound(mSirius.mTuulenLocation, Sound.ENTITY_WITCH_THROW, SoundCategory.HOSTILE, 1, 0.7f);
 					world.playSound(mSirius.mTuulenLocation, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.HOSTILE, 0.4f, 0.8f);
-
+					//TODO add aurora rotating staff doing a similiar animation to refraction. Then add some more flair to the beam.
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						Transformation trans = mTuulenSword.getTransformation();
 						Vector vec = LocationUtils.getVectorTo(mMidPoint, mTuulenSword.getLocation());
@@ -106,21 +106,15 @@ public class DeclarationTp extends Spell {
 							trans.getRightRotation()));
 					}, 1);
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						Transformation trans = mTuulenSword.getTransformation();
 						Location mMidPointClone = mMidPoint.clone();
 						mMidPointClone.setY(mTuulenSword.getLocation().getY() - 1);
 						Vector vec = LocationUtils.getVectorTo(mMidPointClone, mTuulenSword.getLocation());
 						mTuulenSword.setInterpolationDelay(-1);
 						mTuulenSword.setInterpolationDuration(1);
-						mTuulenSword.setTransformation(new Transformation(
-							trans.getTranslation(),
-							new AxisAngle4f((float) -Math.atan2(vec.getZ(), vec.getX()), 0, 1, 0),
-							trans.getScale(),
-							new AxisAngle4f((float) (Math.asin(vec.getY()) - Math.PI / 4), 0, 0, 1)));
+						mTuulenSword.setTransformation(DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, vec, -3*Math.PI/4.0f));
 						world.playSound(mMidPointClone, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.HOSTILE, 1, 0.7f);
 						world.playSound(mMidPointClone, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 1, 2);
 						world.playSound(mMidPointClone, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 0.9f, 0.8f);
-
 					}, 20);
 				}
 				if (mTicks == 20) {
@@ -178,16 +172,16 @@ public class DeclarationTp extends Spell {
 					List<Player> pList = mSirius.getValidDeclarationPlayersInArena();
 					for (Player p : PlayerUtils.playersInRange(pList, mMidPoint, RADIUS, true, true)) {
 						passers++;
+					}
+					//make sure everyone is tagged with participation if they tried also
+					for (Player p : PlayerUtils.playersInRange(mSirius.getPlayers(), mMidPoint, RADIUS + 3, true, true)) {
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));
 						EffectManager.getInstance().clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 						p.playSound(p, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 0.7f, 1.2f);
 						p.playSound(p, Sound.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 0.8f, 1f);
 						p.playSound(p, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.HOSTILE, 0.7f, 1.2f);
 						p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.HOSTILE, 0.4f, 0.9f);
 						new PPExplosion(Particle.CLOUD, p.getLocation()).delta(0.5).count(10).spawnAsBoss();
-					}
-					//make sure everyone is tagged with participation if they tried also
-					for (Player p : PlayerUtils.playersInRange(pList, mMidPoint, RADIUS + 3, true, true)) {
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));
 					}
 					if (passers >= pList.size() / 2.0 + 0.5) {
 						mSirius.changeHp(true, 1);

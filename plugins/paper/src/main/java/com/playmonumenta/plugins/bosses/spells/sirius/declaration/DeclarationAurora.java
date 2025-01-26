@@ -229,7 +229,7 @@ public class DeclarationAurora extends Spell {
 		mPowerLocation.clear();
 		for (int i = 0; i < Math.min(count, 18); i++) {
 			Location loc = mCenter.clone().add(FastUtils.randomIntInRange(-12, 12), 10 + FastUtils.randomIntInRange(-3, 3), FastUtils.randomIntInRange(-36, 36));
-			if (loc.getBlock().getType().isSolid() && !mPowerLocation.contains(loc)) {
+			if (!loc.getBlock().getType().isAir() || mPowerLocation.contains(loc)) {
 				i--;
 			} else {
 				//avoid generating star energy in walls.

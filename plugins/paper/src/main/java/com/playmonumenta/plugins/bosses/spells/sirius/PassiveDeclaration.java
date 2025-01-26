@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 public class PassiveDeclaration extends Spell {
 	public static final int COOLDOWN = 17 * 20;
 	public boolean mSwapping;
-	public List<Spell> mDeclerations;
+	public List<Spell> mDeclarations;
 	public Sirius mSirius;
 	public boolean mTp;
 	private boolean mOnCooldown;
@@ -37,22 +37,22 @@ public class PassiveDeclaration extends Spell {
 		mFirstRun = true;
 		mTp = false;
 		mTpBlocked = false;
-		mDeclerations = new ArrayList<>();
+		mDeclarations = new ArrayList<>();
 		mPlugin = plugin;
 		//Less common as they are more powerful
-		mDeclerations.add(new DeclarationAurora(plugin, sirius.mSpawnLoc.clone().subtract(25, -2, 0), sirius));
-		mDeclerations.add(new DeclerationTuulen(spawner, sirius, plugin));
+		mDeclarations.add(new DeclarationAurora(plugin, mSirius.mSpawnLoc.clone().subtract(25, -2, 0), sirius));
+		mDeclarations.add(new DeclerationTuulen(spawner, mSirius, plugin));
 		//Common Declarations
-		mDeclerations.add(new DeclarationTp(plugin, sirius));
-		mDeclerations.add(new DeclarationTp(plugin, sirius));
-		mDeclerations.add(new DeclarationBarrage(plugin, sirius));
-		mDeclerations.add(new DeclarationBarrage(plugin, sirius));
-		mDeclerations.add(new DeclarationDamage(plugin, sirius, converter));
-		mDeclerations.add(new DeclarationDamage(plugin, sirius, converter));
-		mDeclerations.add(new DeclarationMobs(spawner, sirius));
-		mDeclerations.add(new DeclarationMobs(spawner, sirius));
-		mDeclerations.add(new DeclarationPoints(mSirius, plugin, converter));
-		mDeclerations.add(new DeclarationPoints(mSirius, plugin, converter));
+		mDeclarations.add(new DeclarationTp(plugin, mSirius));
+		mDeclarations.add(new DeclarationTp(plugin, mSirius));
+		mDeclarations.add(new DeclarationBarrage(plugin, mSirius));
+		mDeclarations.add(new DeclarationBarrage(plugin, mSirius));
+		mDeclarations.add(new DeclarationDamage(plugin, mSirius, converter));
+		mDeclarations.add(new DeclarationDamage(plugin, mSirius, converter));
+		mDeclarations.add(new DeclarationMobs(spawner, mSirius));
+		mDeclarations.add(new DeclarationMobs(spawner, mSirius));
+		mDeclarations.add(new DeclarationPoints(mSirius, plugin, converter));
+		mDeclarations.add(new DeclarationPoints(mSirius, plugin, converter));
 		//mDeclerations.add(new DeclerationTemp(mSirius));
 		mOnCooldown = false;
 		mLastSpell = null;
@@ -86,16 +86,16 @@ public class PassiveDeclaration extends Spell {
 			mSwapping = false;
 			Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN);
 			Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mSwapping = true, COOLDOWN - 4 * 20);
-			Spell declaration = FastUtils.getRandomElement(mDeclerations);
+			Spell declaration = FastUtils.getRandomElement(mDeclarations);
 			if (mLastSpell == null) {
 				//force the first cast to be points to help people understand the mechanic
-				declaration = mDeclerations.get(11);
-				mLastSpell = mDeclerations.get(0);
+				declaration = mDeclarations.get(11);
+				mLastSpell = mDeclarations.get(0);
 			}
 			while (mLastSpell.getClass().equals(declaration.getClass())
 					|| (declaration.getClass().equals(DeclarationDamage.class) && mSirius.mDamagePhase)
 					|| (mTpBlocked && declaration.getClass().equals(DeclarationTp.class))) {
-				declaration = FastUtils.getRandomElement(mDeclerations);
+				declaration = FastUtils.getRandomElement(mDeclarations);
 			}
 			if (declaration.getClass() == DeclarationTp.class) {
 				mTp = true;

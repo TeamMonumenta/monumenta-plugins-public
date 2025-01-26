@@ -164,7 +164,7 @@ public class SpellSummonTheStars extends Spell {
 		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
-	public void mobDecleration(int duration, double summonsPerPlayer) {
+	public void mobDeclaration(int duration, double summonsPerPlayer) {
 		mActiveMobs = new ArrayList<>();
 		List<Player> pList = mSirius.getPlayers();
 		mMobsAlive = (int) (pList.size() * summonsPerPlayer + 1.5);

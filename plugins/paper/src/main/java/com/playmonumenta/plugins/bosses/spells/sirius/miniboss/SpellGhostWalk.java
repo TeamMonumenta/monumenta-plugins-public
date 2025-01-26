@@ -27,6 +27,7 @@ public class SpellGhostWalk extends Spell {
 	private boolean mOnCooldown;
 	private static final int COOLDOWN = 10 * 20;
 	private static final int DURATION = 3 * 20;
+	private static final double MAGIC_VULN = 0.25;
 	private List<Player> mWarned;
 
 	public SpellGhostWalk(Plugin plugin, LivingEntity boss) {
@@ -87,6 +88,7 @@ public class SpellGhostWalk extends Spell {
 	public void onHurt(DamageEvent event) {
 		if (mGhost) {
 			if (event.getType() == DamageEvent.DamageType.MAGIC || (event.getType() == DamageEvent.DamageType.TRUE && event.getDamager() == null)) {
+				event.updateDamageWithMultiplier(1 + MAGIC_VULN);
 				super.onHurt(event);
 			} else {
 				event.setCancelled(true);
