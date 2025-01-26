@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +48,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class FishingCombatManager implements Listener {
 	private static final String COMBAT_LIMIT = "DailyLimitRingFishingCombat";
-	private static final String COMBAT_TOTAL = "FishCombatsCompleted";
+	public static final String COMBAT_TOTAL = "FishCombatsCompleted";
+	public static final String MUSIC_TITLE = "epic:music.fishingcombat";
+	public static final int MUSIC_DURATION = 125;
 	private static final int PORTAL_DURATION = 200;
 	private static final int WAVE_COUNT = 3;
 	private static final int[][] WAVE_MOB_TYPES = new int[][] {
@@ -266,6 +269,7 @@ public class FishingCombatManager implements Listener {
 						continue;
 					}
 					player.teleport(arena.mCoordinates.toLocation(player.getWorld()));
+					SongManager.playSong(player, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, false, 1, 1, true), true);
 					if (!arena.mActive) {
 						arena.mActive = true;
 						initiateCombat(player, arena);

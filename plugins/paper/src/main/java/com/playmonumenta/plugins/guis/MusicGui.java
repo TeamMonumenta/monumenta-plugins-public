@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
+import com.playmonumenta.plugins.fishing.FishingCombatManager;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.managers.PlaylistManager;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
@@ -171,6 +172,7 @@ public class MusicGui extends Gui {
 
 				addMusicItem(1, 5, Material.MUSIC_DISC_BLOCKS, "The Architect's Ring", Location.OVERWORLD3, "The Architect's Ring", "Corpe_", "epic:music.ring", 187, checkScore(PlayerUtils.SCOREBOARD_RING_UNLOCK));
 				addMusicItem(1, 6, Material.MUSIC_DISC_MALL, "Into the Star Verse", Location.STARPOINT, "Star Point", "CmdrGod", "epic:music.starpoint", 215, checkScore(PlayerUtils.SCOREBOARD_RING_UNLOCK));
+				addMusicItem(1, 7, Material.MUSIC_DISC_OTHERSIDE, "Jellyfish Skirmish", Location.FISHING, "Fishing Combat", "Xernial", FishingCombatManager.MUSIC_TITLE, FishingCombatManager.MUSIC_DURATION, checkScore(FishingCombatManager.COMBAT_TOTAL));
 
 				addMusicItem(2, 2, Material.MUSIC_DISC_WAIT, "Reckoning", Location.BLUESTRIKE, "Samwell", "CmdrGod", "epic:music.samwell", 267, checkScore("MasqueradersRuin"));
 				addMusicItem(2, 3, Material.MUSIC_DISC_STRAD, "Misanthropic Circuitry", Location.SCIENCE, "Iota", "Okaye", "epic:music.misanthropic_circuitry", 234, checkScore("Portal"));
@@ -184,13 +186,13 @@ public class MusicGui extends Gui {
 				addMusicItem(3, 6, Material.MUSIC_DISC_5, "Subjugation of the Stars", Location.ZENITH, "Vesperidys", "CmdrGod", Vesperidys.MUSIC_TITLE, Broodmother.MUSIC_DURATION, checkScore("Zenith"));
 				addMusicItem(3, 7, Material.MUSIC_DISC_5, "Supernova Slayer", Location.ZENITH, "Vesperidys", "CmdrGod", Vesperidys.MUSIC_TITLE_2, Broodmother.MUSIC_DURATION_2, checkScore("Zenith"));
 
-				addMusicItem(4, 1, Material.IRON_BLOCK, "Ancient Automation", Location.SILVER, "Silver Construct", "Salamanderlonk", ImperialConstruct.MUSIC_TITLE, ImperialConstruct.MUSIC_DURATION, checkScore("SKT"));
+				addMusicItem(4, 1, Material.MUSIC_DISC_STRAD, "Ancient Automation", Location.SILVER, "Silver Construct", "Salamanderlonk", ImperialConstruct.MUSIC_TITLE, ImperialConstruct.MUSIC_DURATION, checkScore("SKT"));
 				addMusicItem(4, 2, Material.MUSIC_DISC_OTHERSIDE, "The Fate of Time", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE, TealSpirit.MUSIC_DURATION, checkScore("SKT"));
 				addMusicItem(4, 3, Material.MUSIC_DISC_OTHERSIDE, "The Hour of Oblivion", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_2, TealSpirit.MUSIC_DURATION_2, checkScore("SKT"));
 			}
 
 			case DUNGEONS -> {
-				addMusicItem(1, 2, Material.SPAWNER, "Before the Perilous Path", Location.NONE, "Dungeon Lobbies", "Xernial", "epic:music.lobby", 146, checkAdvance("monumenta:quests/r1/sierhaven"));
+				addMusicItem(1, 2, Material.MUSIC_DISC_STAL, "Before the Perilous Path", Location.NONE, "Dungeon Lobbies", "Xernial", "epic:music.lobby", 146, checkAdvance("monumenta:quests/r1/sierhaven"));
 				addDungeonItem(1, 3, Material.WHITE_WOOL, Location.WHITE, MusicPage.WHITE, "White");
 				addDungeonItem(1, 4, Material.ORANGE_WOOL, Location.ORANGE, MusicPage.ORANGE, "Orange");
 				addDungeonItem(1, 5, Material.MAGENTA_WOOL, Location.MAGENTA, MusicPage.MAGENTA, "Magenta");
