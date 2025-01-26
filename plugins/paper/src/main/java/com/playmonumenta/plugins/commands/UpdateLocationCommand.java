@@ -20,27 +20,22 @@ public class UpdateLocationCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.updatelocation");
 
-		List<Argument<?>> startingArguments = new ArrayList<>();
-		startingArguments.add(new LiteralArgument("UpdateLocation"));
-		startingArguments.add(new EntitySelectorArgument.ManyPlayers("Targets"));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new LiteralArgument("UpdateLocation"));
+		arguments.add(new EntitySelectorArgument.ManyPlayers("Targets"));
 
-		List<Argument<?>> arguments = new ArrayList<>(startingArguments);
 		arguments.add(new StringArgument("Shard"));
 		arguments.add(new StringArgument("Content"));
-		for (int i = 0; i <= 1; i++) {
-			new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					Collection<Player> targets = args.getUnchecked("Targets");
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Collection<Player> targets = args.getUnchecked("Targets");
 
-					String content = args.getUnchecked("Content");
-					String shard = args.getUnchecked("Shard");
-					run(targets, shard, content);
-				});
-			arguments.removeIf(argument -> argument.getNodeName().equalsIgnoreCase("Shard"));
-		}
-
+				String content = args.getUnchecked("Content");
+				String shard = args.getUnchecked("Shard");
+				run(targets, shard, content);
+			}).register();
 	}
 
 	public static void run(Collection<Player> targets, @Nullable String shard, String content) {
