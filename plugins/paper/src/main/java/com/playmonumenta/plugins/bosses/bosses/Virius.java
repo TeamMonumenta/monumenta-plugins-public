@@ -16,9 +16,11 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -126,7 +128,12 @@ public final class Virius extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(final @Nullable EntityDeathEvent event) {
-		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> {
+			ScoreboardUtils.toggleTag(player, "ViriusFight");
+			player.sendMessage(Component.text("Virius falls over, defeated after your battle.", NamedTextColor.AQUA));
+			player.sendMessage(Component.text("[Virius] ", NamedTextColor.GOLD)
+				.append(Component.text("Ha... Dying here means he will blame my failure on you... You do not see the damage your meddling has wrought...", NamedTextColor.WHITE)));
+		});
 	}
 
 	@Override
