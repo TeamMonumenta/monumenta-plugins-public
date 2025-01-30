@@ -38,7 +38,7 @@ public class Snowy implements Enchantment {
 		new SnowballMode(0, "NORMAL", "Snowballs", "Essence of Winter",
 			32, 0.75, 0.25, 1.5f, 6f),
 		new SnowballMode(1, "EMPOWERED", "EmpoweredSnowballs", "Cryosphere",
-			8, 3, 0.5, 1f, 2f)
+			16, 3, 0.5, 1f, 2f)
 	};
 	private static final String SNOWBALL_MODE = "SnowballMode";
 	private static final int SWAP_COOLDOWN = 20;

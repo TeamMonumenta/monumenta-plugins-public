@@ -29,9 +29,9 @@ import org.bukkit.util.Vector;
 public class Berserk {
 
 	public static final String DESCRIPTION = "Go berserk by building up a combo.";
-	private static final int MAX_KILL_TIME = 8 * 20;
-	private static final int MIN_KILL_TIME = 4 * 20;
-	private static final double COMBO_MULTI = 0.05;
+	private static final int MAX_KILL_TIME = 7 * 20;
+	private static final int MIN_KILL_TIME = 3 * 20;
+	private static final double COMBO_MULTI = 0.01;
 	private static final Map<Player, Integer> berserkCombo = new HashMap<>();
 	private static final Map<Player, BukkitTask> activeBerserk = new HashMap<>();
 	private static final String sourceName = "berserkEffect";
@@ -109,7 +109,7 @@ public class Berserk {
 	}
 
 	private static Color comboColour(int comboMulti) {
-		int combo2 = comboMulti / 5;
+		int combo2 = comboMulti / 10;
 		// per 5 combo, change colour to wool dungeon colour
 		return switch (combo2) {
 			case 0 -> Color.WHITE;
