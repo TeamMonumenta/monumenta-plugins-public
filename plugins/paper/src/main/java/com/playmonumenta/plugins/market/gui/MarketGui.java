@@ -139,8 +139,8 @@ public class MarketGui extends Gui {
 
 	public GuiItem buildChangePageIcon(int mCurrentPage, int maxPage) {
 		ArrayList<Component> lore = new ArrayList<>();
-		lore.add(Component.text("Right Click to go to the next page.", NamedTextColor.GRAY));
-		lore.add(Component.text("Left Click to go to the previous page.", NamedTextColor.GRAY));
+		lore.add(Component.text("Left Click to go to the next page.", NamedTextColor.GRAY));
+		lore.add(Component.text("Right Click to go to the previous page.", NamedTextColor.GRAY));
 		// made this way to facilitate translations later on
 		String name = "Page %d of %d";
 		String[] nameParts = name.split("%d");

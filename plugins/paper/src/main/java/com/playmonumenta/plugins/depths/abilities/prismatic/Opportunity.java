@@ -37,7 +37,8 @@ public class Opportunity extends DepthsAbility {
 	}
 
 	private static Description<Opportunity> getDescription(int rarity, TextColor textColor) {
-		String s = rarity > 1 ? "s" : "";
+		//Rarity starts counting at 1 while arrays start counting at 0.
+		String s = REROLLS[rarity - 1] > 1 ? "s" : "";
 		return new DescriptionBuilder<Opportunity>(textColor)
 			.add("Gain ")
 			.add(a -> REROLLS[rarity - 1], REROLLS[rarity - 1], false, null, true)

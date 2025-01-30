@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -290,7 +291,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 
 			if (mCurrentState == TabooState.BURST) {
 				// Apparently getRemainingAbilityDuration() doesn't actually work
-				output = output.append(Component.text(((int) Math.ceil(mBurstTimer)) + "s", NamedTextColor.GOLD));
+				output = output.append(Component.text(((int) Math.ceil(mBurstTimer) / Constants.TICKS_PER_SECOND) + "s", NamedTextColor.GOLD));
 			} else if (remainingCooldown > 0) {
 				output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GRAY));
 			} else {

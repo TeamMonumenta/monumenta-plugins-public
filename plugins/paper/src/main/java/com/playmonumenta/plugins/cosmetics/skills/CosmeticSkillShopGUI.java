@@ -613,7 +613,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			int slot = ENTRY_START + iMod + (iMod + 4) / 8;
 			String skin = PRESTIGE_THEME.get(i);
 			int priceNum = PRESTIGE_CS.get(i).getPrice();
-			List<String> price = List.of(priceNum + " Challenge Points");
+			List<String> price = List.of(priceNum + (priceNum == 1 ? " Challenge Point" : " Challenge Points"));
 			ItemStack item = createSkillIcon(skin, PRESTIGE_COLOR, player, price);
 			mInventory.setItem(slot, item);
 
