@@ -309,7 +309,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 					public void run() {
 						Entity target = mTarget.get();
 						LivingEntity boss = mBossRef.get();
-						if (target == null || boss == null || boss.isDead() || !boss.isValid() || !target.isValid()) {
+						if (target == null || !target.isValid() || EntityUtils.shouldCancelSpells(boss)) {
 							cancel();
 							return;
 						}
