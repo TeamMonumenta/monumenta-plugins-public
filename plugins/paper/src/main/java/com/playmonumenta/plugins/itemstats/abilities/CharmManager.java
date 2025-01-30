@@ -327,7 +327,6 @@ public class CharmManager {
 			Spellshock.CHARM_SLOW,
 			Spellshock.CHARM_SPELL,
 			Spellshock.CHARM_MELEE,
-			Spellshock.CHARM_ENHANCE_KNOCKBACK,
 			Spellshock.CHARM_ENHANCE_DAMAGE,
 			Spellshock.CHARM_ENHANCE_SLOW,
 			Spellshock.CHARM_ENHANCE_WEAK,
