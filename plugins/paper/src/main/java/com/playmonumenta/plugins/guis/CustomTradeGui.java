@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.inventories.Wallet;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -267,6 +268,8 @@ public class CustomTradeGui extends Gui {
 		public void removeRequirements() {
 			if (isCreative()) {
 				mPlayer.sendMessage(Component.text("Since you are in creative mode, this item is free.", NamedTextColor.LIGHT_PURPLE));
+				AuditListener.log(mPlayer.getName() + " used creative mode to purchase "
+					+ ItemUtils.getPlainNameIfExists(mTrade.getRecipe().getResult()) + " for free from a trader.");
 				return;
 			}
 			// Remove requirements from actual inventory and wallet:
