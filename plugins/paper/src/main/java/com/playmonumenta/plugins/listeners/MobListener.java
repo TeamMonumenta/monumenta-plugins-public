@@ -184,6 +184,7 @@ public class MobListener implements Listener {
 			entity.setCanPickupItems(false);
 
 			// Overwrite drop chances for mob armor and held items
+			// TODO: this is broken API in 1.20.4 for certain mobs like Foxes
 			EntityEquipment equipment = entity.getEquipment();
 			if (equipment != null) {
 				equipment.setHelmetDropChance(ItemUtils.getItemDropChance(equipment.getHelmet()));
@@ -431,7 +432,8 @@ public class MobListener implements Listener {
 			return;
 		}
 
-		event.getDrops().removeIf(itemStack -> !ItemUtils.doDropItemAfterSpawnerLimit(itemStack));
+		// TODO: workaround for item drop chance equipment not working in 1.20.4
+		event.getDrops().removeIf(itemStack -> !ItemUtils.shouldDropEquipment(itemStack));
 
 		//Give wither to vexes spawned from the evoker that died so they die over time
 		if (livingEntity instanceof Evoker) {

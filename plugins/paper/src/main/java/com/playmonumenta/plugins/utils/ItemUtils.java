@@ -627,6 +627,10 @@ public class ItemUtils {
 		return getItemDropChance(item) > 0;
 	}
 
+	public static boolean shouldDropEquipment(@Nullable ItemStack item) {
+		return item != null && !item.lore().isEmpty() && !InventoryUtils.testForItemWithLore(item, "$$");
+	}
+
 	public static @Nullable String getBookTitle(@Nullable ItemStack book) {
 		if (book == null) {
 			return null;
