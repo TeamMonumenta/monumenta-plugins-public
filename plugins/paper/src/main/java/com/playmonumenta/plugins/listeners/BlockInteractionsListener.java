@@ -6,11 +6,13 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -100,6 +102,22 @@ public final class BlockInteractionsListener implements Listener {
 		Entity entity = event.getRightClicked();
 		Player player = event.getPlayer();
 		if (checkEntityAction(entity, player.getInventory().getItem(event.getHand()), player) && INTERACTABLE_ENTITIES.contains(entity.getType())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void playerOpenSignEvent(PlayerOpenSignEvent event) {
+		Player player = event.getPlayer();
+
+		Location blockLoc = event.getSign().getLocation();
+		Material realSignType = blockLoc.getBlock().getType();
+		if (!Tag.ALL_SIGNS.getValues().contains(realSignType)) {
+			// Likely a sign GUI, like the wallet; these don't actually place a sign in the world, but fake it per-player
+			return;
+		}
+
+		if (commonChecks(player)) {
 			event.setCancelled(true);
 		}
 	}
