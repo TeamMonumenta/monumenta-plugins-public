@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.integrations;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.networkrelay.GatherHeartbeatDataEvent;
 import com.playmonumenta.networkrelay.GatherRemotePlayerDataEvent;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.RemotePlayerAPI;
+import com.playmonumenta.networkrelay.RemotePlayerAbstraction;
+import com.playmonumenta.networkrelay.RemotePlayerData;
 import com.playmonumenta.networkrelay.RemotePlayerLoadedEvent;
+import com.playmonumenta.networkrelay.RemotePlayerProxy;
 import com.playmonumenta.networkrelay.RemotePlayerUnloadedEvent;
 import com.playmonumenta.networkrelay.RemotePlayerUpdatedEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -15,6 +19,9 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ShardHealthUtils.ShardHealth;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -232,6 +239,63 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	// Updates RemotePlayer information for other shards
 	public static void refreshPlayer(Player player) {
 		RemotePlayerAPI.refreshPlayer(player.getUniqueId());
+	}
+
+	public static Set<String> getVisiblePlayerNames() {
+		return RemotePlayerAPI.getVisiblePlayerNames();
+	}
+
+	public static @Nullable RemotePlayerData getRemotePlayer(String playerName) {
+		return RemotePlayerAPI.getRemotePlayer(playerName);
+	}
+
+	public static @Nullable RemotePlayerData getRemotePlayer(UUID playerId) {
+		return RemotePlayerAPI.getRemotePlayer(playerId);
+	}
+
+	public static @Nullable String remotePlayerShard(RemotePlayerData remotePlayerData) {
+		if (remotePlayerData.get("proxy") instanceof RemotePlayerProxy remotePlayerProxy) {
+			return remotePlayerProxy.targetShard();
+		}
+		return null;
+	}
+
+	public static @Nullable String remotePlayerGuild(RemotePlayerData remotePlayerData) {
+		RemotePlayerAbstraction minecraftData = remotePlayerData.get("minecraft");
+		if (minecraftData == null) {
+			return null;
+		}
+		JsonObject monumentaData = minecraftData.getPluginData("monumenta");
+		if (monumentaData == null) {
+			return null;
+		}
+		if (monumentaData.get("guild") instanceof JsonPrimitive guildPrimitive && guildPrimitive.isString()) {
+			return guildPrimitive.getAsString();
+		}
+		return null;
+	}
+
+	public static Set<String> guildMembersOnShard(String selfGuild, String shard) {
+		Set<String> result = new TreeSet<>();
+
+		for (String otherPlayer : getVisiblePlayerNames()) {
+			RemotePlayerData otherRemoteData = getRemotePlayer(otherPlayer);
+			if (otherRemoteData == null) {
+				continue;
+			}
+
+			if (!shard.equals(remotePlayerShard(otherRemoteData))) {
+				continue;
+			}
+
+			if (!selfGuild.equals(remotePlayerGuild(otherRemoteData))) {
+				continue;
+			}
+
+			result.add(otherPlayer);
+		}
+
+		return result;
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
