@@ -905,6 +905,10 @@ public class ItemUtils {
 		});
 	}
 
+	public static void setPlainComponentName(ReadWriteNBT nbt, Component name) {
+		setPlainName(nbt, toPlainTagText(name));
+	}
+
 	public static void setPlainName(ItemStack itemStack) {
 		String itemName = null;
 		if (itemStack.hasItemMeta()) {
@@ -922,26 +926,30 @@ public class ItemUtils {
 		}
 
 		NBT.modify(itemStack, nbt -> {
-			if (plainName != null) {
-				// addComponent effectively runs:
-				// if (key exists) { return tag(key) } else { return new tag(key) }
-				nbt.getOrCreateCompound(PLAIN_KEY).getOrCreateCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
-			} else {
-				ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
-				if (plain != null) {
-					ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
-					if (display != null) {
-						display.removeKey(NAME_KEY);
-						if (display.getKeys().isEmpty()) {
-							plain.removeKey(DISPLAY_KEY);
-							if (plain.getKeys().isEmpty()) {
-								nbt.removeKey(PLAIN_KEY);
-							}
+			setPlainName(nbt, plainName);
+		});
+	}
+
+	public static void setPlainName(ReadWriteNBT nbt, @Nullable String plainName) {
+		if (plainName != null) {
+			// addComponent effectively runs:
+			// if (key exists) { return tag(key) } else { return new tag(key) }
+			nbt.getOrCreateCompound(PLAIN_KEY).getOrCreateCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
+		} else {
+			ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
+			if (plain != null) {
+				ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
+				if (display != null) {
+					display.removeKey(NAME_KEY);
+					if (display.getKeys().isEmpty()) {
+						plain.removeKey(DISPLAY_KEY);
+						if (plain.getKeys().isEmpty()) {
+							nbt.removeKey(PLAIN_KEY);
 						}
 					}
 				}
 			}
-		});
+		}
 	}
 
 	public static List<String> getPlainLore(@Nullable ItemStack itemStack) {

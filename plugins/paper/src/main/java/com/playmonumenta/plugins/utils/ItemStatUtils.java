@@ -381,7 +381,7 @@ public class ItemStatUtils {
 	}
 
 	public static void setName(final ItemStack item, final Component name) {
-		if (item.getType() == Material.AIR) {
+		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
 		NBT.modify(item, nbt -> {

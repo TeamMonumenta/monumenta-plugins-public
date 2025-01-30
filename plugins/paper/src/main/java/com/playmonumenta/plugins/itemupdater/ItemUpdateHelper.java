@@ -599,11 +599,17 @@ public class ItemUpdateHelper {
 				}
 			});
 
+			// set MMName to current display name
 			Component name = ItemStatUtils.getName(nbt);
+			if (Component.IS_NOT_EMPTY.test(item.displayName()) && !Component.EQUALS.test(name, item.displayName())) {
+				regenerateDisplayName(nbt);
+			}
+			name = ItemStatUtils.getName(nbt);
 			if (Component.IS_NOT_EMPTY.test(name)) {
 				ItemUtils.setDisplayName(nbt, name);
 			}
 			ItemUtils.setDisplayLore(nbt, lore);
+			ItemUtils.setPlainComponentName(nbt, name);
 			ItemUtils.setPlainComponentLore(nbt, lore);
 		});
 	}
@@ -885,7 +891,7 @@ public class ItemUpdateHelper {
 	public static void regenerateDisplayName(final ReadWriteNBT nbt) {
 		Component displayName = ItemUtils.getRawDisplayName(nbt);
 		if (Component.IS_NOT_EMPTY.test(displayName)) {
-			nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setString(ItemStatUtils.NAME_KEY, MessagingUtils.toMiniMessage(displayName));
+			ItemStatUtils.setName(nbt, displayName);
 		}
 	}
 
@@ -907,7 +913,7 @@ public class ItemUpdateHelper {
 		// regenerate display name and lore
 		Component displayName = ItemUtils.getRawDisplayName(nbt);
 		if (Component.IS_NOT_EMPTY.test(displayName) && !Component.IS_NOT_EMPTY.test(ItemStatUtils.getName(nbt))) {
-			nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setString(ItemStatUtils.NAME_KEY, MessagingUtils.toMiniMessage(displayName));
+			ItemStatUtils.setName(nbt, displayName);
 		}
 		List<Component> lore = legacyGetLore(nbt);
 		if (!lore.isEmpty()) {

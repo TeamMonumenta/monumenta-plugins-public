@@ -436,9 +436,7 @@ public class ItemStatCommands {
 			if (underline != null) {
 				displayName = displayName.decoration(TextDecoration.UNDERLINED, underline);
 			}
-
-			ItemStatUtils.setName(item, displayName);
-
+			ItemUtils.setDisplayName(item, displayName);
 
 			ItemUpdateHelper.generateItemStats(item);
 		}).register();
@@ -457,8 +455,7 @@ public class ItemStatCommands {
 			ItemMeta itemMeta = item.getItemMeta();
 			Component displayName = itemMeta.displayName();
 			Component resultName = displayName != null ? Component.text(name, displayName.color()).decorations(displayName.decorations()) : Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
-			ItemStatUtils.setName(item, resultName);
-
+			ItemUtils.setDisplayName(item, resultName);
 
 			ItemUpdateHelper.generateItemStats(item);
 		}).register();
@@ -475,7 +472,7 @@ public class ItemStatCommands {
 		String name = args.getByArgument(nameArg);
 
 		Component resultName = MessagingUtils.fromMiniMessage(name);
-		ItemStatUtils.setName(item, resultName);
+		ItemUtils.setDisplayName(item, resultName);
 
 		ItemUpdateHelper.generateItemStats(item);
 	}).register();
