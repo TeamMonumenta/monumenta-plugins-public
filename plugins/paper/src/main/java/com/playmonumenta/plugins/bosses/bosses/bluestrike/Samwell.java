@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.bluestrike;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossManager;
@@ -74,8 +75,8 @@ public class Samwell extends BossAbilityGroup {
 	public static final String DAGGER_EFFECT_SOURCE = "SamwellBlackbloodDagger";
 	public static final String OBJECTIVE_SHARD_NAME = "temp";
 	public static final String OBJECTIVE_FAILS_NAME = "TempA";
-	private static final int CRAFT_DURATION = 25 * 20; // Ticks taken to craft dagger (25 secs)
-	private static final int DAGGER_DURATION = 30 * 20; // Time limit to hit with dagger (30 secs)
+	private static final int CRAFT_DURATION = Constants.TICKS_PER_SECOND * 25;
+	private static final int DAGGER_DURATION = Constants.TICKS_PER_SECOND * 30;
 	private static final int HEALTH = 8000;
 
 	private static final int detectionRange = 100;
@@ -121,19 +122,22 @@ public class Samwell extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mSpawnLoc = startLoc;
 		mEndLoc = endLoc;
-		HashMap<Double, LoSPool> weights = new HashMap<>();
+		final HashMap<Double, LoSPool> weights = new HashMap<>();
 		weights.put(0.15, LoSPool.fromString("~BlueMaskedElite"));
 		weights.put(0.85, LoSPool.fromString("~BlueMaskedNormal"));
 
-		Location bhairaviLoc = mSpawnLoc.clone().add(15, 1, 0);
-		Location izzyLoc = mSpawnLoc.clone().add(-8, 1, 12);
-		Location levynLoc = mSpawnLoc.clone().add(-8, 1, -12);
+		final Location bhairaviLoc = mSpawnLoc.clone().add(15, 1, 0);
+		final Location izzyLoc = mSpawnLoc.clone().add(-8, 1, 12);
+		final Location levynLoc = mSpawnLoc.clone().add(-8, 1, -12);
 		mDaggerLoc = mSpawnLoc.clone().add(0, 8, 0);
 
-		mDagger = InventoryUtils.getItemFromLootTableOrThrow(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_dagger"));
-		mShards = InventoryUtils.getItemFromLootTableOrThrow(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_shard"));
+		mDagger = InventoryUtils.getItemFromLootTableOrThrow(mSpawnLoc,
+			NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_dagger"));
+		mShards = InventoryUtils.getItemFromLootTableOrThrow(mSpawnLoc,
+			NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_shard"));
 
-		mCraftingBar = BossBar.bossBar(Component.text("Crafting...", NamedTextColor.YELLOW, TextDecoration.BOLD), 0, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_6);
+		mCraftingBar = BossBar.bossBar(Component.text("Crafting...", NamedTextColor.YELLOW, TextDecoration.BOLD),
+			0, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_6);
 		mGatheringBar = BossBar.bossBar(Component.empty(), 0, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_6);
 		// Title of mGatheringBar is properly set in init()
 
@@ -159,22 +163,23 @@ public class Samwell extends BossAbilityGroup {
 
 		mBasePassives = Arrays.asList(
 			new SpellBlockBreak(mBoss),
-			new SpellConditionalTeleport(boss, startLoc, b -> {
+			new SpellConditionalTeleport(mBoss, startLoc, b -> {
 				// Boss isn't stuck in lava or bedrock
 				boolean condition1 = b.getLocation().getBlock().getType() == Material.BEDROCK ||
 					b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
 					b.getLocation().getBlock().getType() == Material.LAVA;
 
 				// Boss isn't too far off arena.
-				boolean condition2 = (boss.getLocation().distance(startLoc) > 30) || Math.abs(boss.getLocation().getY() - startLoc.getY()) > 5;
+				boolean condition2 = (boss.getLocation().distance(startLoc) > 30)
+					|| Math.abs(boss.getLocation().getY() - startLoc.getY()) > 5;
 
 				return condition1 || condition2;
 			}),
-			new SpellDominion(plugin, boss, mSpawnLoc, true),
-			new SpellTargetVisiblePlayer((Mob) boss, detectionRange, 60, 160),
+			new SpellDominion(plugin, mBoss, mSpawnLoc, true),
+			new SpellTargetVisiblePlayer((Mob) mBoss, detectionRange, 60, 160),
 			new SpellRunAction(() -> {
-				if (boss.hasPotionEffect(PotionEffectType.GLOWING)) {
-					boss.removePotionEffect(PotionEffectType.GLOWING);
+				if (mBoss.hasPotionEffect(PotionEffectType.GLOWING)) {
+					mBoss.removePotionEffect(PotionEffectType.GLOWING);
 				}
 			})
 		);
@@ -191,7 +196,7 @@ public class Samwell extends BossAbilityGroup {
 			new SpellSamwellRegeneration(mBoss, this, 2.0 / 4.0),
 			new SpellSummonBlueStrike(mPlugin, mBoss, mSpawnLoc, weights, 12 * 4, 9, 20)
 		));
-		mPhase4Passives = new ArrayList<>(Arrays.asList(
+		mPhase4Passives = new ArrayList<>(List.of(
 			new SpellSummonBlueStrike(mPlugin, mBoss, mSpawnLoc, weights, 12 * 4, 9, 20)
 		));
 		mCraft1Passives = new ArrayList<>(Arrays.asList(
@@ -209,13 +214,13 @@ public class Samwell extends BossAbilityGroup {
 			new SpellSummonBlueStrike(mPlugin, mBoss, mSpawnLoc, weights, 15 * 4, 9, 20),
 			new SpellSummonBlueStrikeTargets(mBoss, mSpawnLoc, 8 * 4, 1, 1, 4)
 		));
-		mDagger1Passives = new ArrayList<>(Arrays.asList(
+		mDagger1Passives = new ArrayList<>(List.of(
 			new SpellSamwellRegeneration(mBoss, this, 1)
 		));
-		mDagger2Passives = new ArrayList<>(Arrays.asList(
+		mDagger2Passives = new ArrayList<>(List.of(
 			new SpellSamwellRegeneration(mBoss, this, 3.0 / 4.0)
 		));
-		mDagger3Passives = new ArrayList<>(Arrays.asList(
+		mDagger3Passives = new ArrayList<>(List.of(
 			new SpellSamwellRegeneration(mBoss, this, 2.0 / 4.0)
 		));
 
@@ -231,32 +236,33 @@ public class Samwell extends BossAbilityGroup {
 		mDagger3Passives.addAll(mBasePassives);
 
 		mPhase1Actives = new SpellManager(Arrays.asList(
-			new SpellDeathSweep(plugin, mBoss, 1),
+			new SpellDeathSweep(mPlugin, mBoss, 1),
 			new SpellSamwellSmokeBomb(plugin, mBoss, 1),
 			new SpellRealitySlash(plugin, mBoss, this, 1)
 		));
 		mPhase2Actives = new SpellManager(Arrays.asList(
-			new SpellDeathSweep(plugin, mBoss, 2),
+			new SpellDeathSweep(mPlugin, mBoss, 2),
 			new SpellSamwellSmokeBomb(plugin, mBoss, 2),
 			new SpellRealitySlash(plugin, mBoss, this, 2),
 			new SpellCrystalBarrage(plugin, mBoss, this, 2)
 		));
 		mPhase3Actives = new SpellManager(Arrays.asList(
-			new SpellDeathSweep(plugin, mBoss, 3),
+			new SpellDeathSweep(mPlugin, mBoss, 3),
 			new SpellSamwellSmokeBomb(plugin, mBoss, 3),
 			new SpellCrystalBarrage(plugin, mBoss, this, 3),
 			new SpellRealitySlash(plugin, mBoss, this, 3),
 			new SpellSummonLavaTitan(plugin, mBoss, mSpawnLoc, 3)
 		));
 		mPhase4Actives = new SpellManager(Arrays.asList(
-			new SpellDeathSweep(plugin, mBoss, 4),
+			new SpellDeathSweep(mPlugin, mBoss, 4),
 			new SpellSamwellSmokeBomb(plugin, mBoss, 4),
 			new SpellCrystalBarrage(plugin, mBoss, this, 4),
 			new SpellRealitySlash(plugin, mBoss, this, 4),
 			new SpellSummonLavaTitan(plugin, mBoss, mSpawnLoc, 4)
 		));
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10, null, false);
 
+		final BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.BLUE,
+			BossBar.Overlay.NOTCHED_10, null, false);
 		super.constructBoss(SpellManager.EMPTY, mInactivePassives, detectionRange, bossBar);
 	}
 
@@ -267,30 +273,33 @@ public class Samwell extends BossAbilityGroup {
 		// Going to be using Scoreboards for this, easier to track between functions (I hope)
 		resetScoreboard();
 
-		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		mPlayerCount = getPlayers().size();
 		EntityUtils.setMaxHealthAndHealth(mBoss, HEALTH);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
 
-		GlowingManager.startGlowing(mBoss, NamedTextColor.BLUE, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "samwell");
+		GlowingManager.startGlowing(mBoss, NamedTextColor.BLUE, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1,
+			null, "samwell");
 
 		mShardsReq = (int) (3 + Math.floor(getPlayers().size() / 2.0));
 		refreshGatheringBar();
 
 		sendMessage("Well, I wasn't sure if you guys would make it this far. How do you like my new place?");
 
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			sendMessage("It'll be the last thing you see... I've got the Blue Wool on my side!");
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+			sendMessage("It'll be the last thing you see... I've got the Blue Wool on my side!"), (int) (Constants.TICKS_PER_SECOND * 3.5));
 
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mBoss.setAI(true);
-				changePhaseNormal();
-				getPlayers().forEach(p -> {
-					com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Samwell", NamedTextColor.DARK_RED), Component.text("Usurper Of Life", NamedTextColor.RED));
-					p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
-				});
-				mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5, 0.7f);
-			}, 10);
-		}, 70);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			mBoss.setAI(true);
+			changePhaseNormal();
+			getPlayers().forEach(p -> {
+				com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p,
+					Component.text("Samwell", NamedTextColor.DARK_RED),
+					Component.text("Usurper Of Life", NamedTextColor.RED));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Constants.TICKS_PER_SECOND * 2,
+					2, true, false, false));
+			});
+			mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5, 0.7f);
+		}, Constants.TICKS_PER_SECOND * 4);
 	}
 
 	@Override
@@ -304,27 +313,27 @@ public class Samwell extends BossAbilityGroup {
 	}
 
 	@Override
-	public void nearbyPlayerDeath(PlayerDeathEvent event) {
-		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+	public void nearbyPlayerDeath(final PlayerDeathEvent event) {
+		mPlayerCount--;
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		player.hideBossBar(mGatheringBar);
 		player.hideBossBar(mCraftingBar);
 	}
 
 	@Override
-	public void onHurtByEntity(DamageEvent event, Entity damager) {
+	public void onHurtByEntity(final DamageEvent event, final Entity damager) {
 		if (mPhase < 4) {
-			if (damager instanceof Player player && event.getType() == DamageEvent.DamageType.MELEE && Plugin.getInstance().mEffectManager.hasEffect(player, DAGGER_EFFECT_SOURCE)) {
+			if (damager instanceof Player player && event.getType() == DamageEvent.DamageType.MELEE
+				&& Plugin.getInstance().mEffectManager.hasEffect(player, DAGGER_EFFECT_SOURCE)) {
 				switch (mPhase) {
 					case 1 -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (3.0 / 4.0));
 						sendMessage("Ugh, what! How did you do that? It... burns!");
 						mPhase = 2;
 						changePhaseNormal();
-						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-							forceCastSpell(SpellCrystalBarrage.class);
-						}, 40);
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> forceCastSpell(SpellCrystalBarrage.class),
+							Constants.TICKS_PER_SECOND * 2);
 					}
 					case 2 -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (2.0 / 4.0));
@@ -335,9 +344,11 @@ public class Samwell extends BossAbilityGroup {
 					}
 					default -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (1.0 / 4.0));
-						sendMessage("I'm done with you! That dagger is too much. I don't get why Blue can't heal from it? Is it another wool?!");
+						sendMessage("I'm done with you! That dagger is too much. I don't get why Blue can't " +
+							"heal from it? Is it another wool?!");
 						mPhase = 4;
-						GlowingManager.startGlowing(mBoss, NamedTextColor.BLACK, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "samwell");
+						GlowingManager.startGlowing(mBoss, NamedTextColor.BLACK, -1,
+							GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "samwell");
 						changePhaseNormal();
 					}
 				}
@@ -475,7 +486,8 @@ public class Samwell extends BossAbilityGroup {
 
 				Player player = EntityUtils.getNearestPlayer(daggerEntity.getLocation(), 1);
 				if (player != null) {
-					Plugin.getInstance().mEffectManager.addEffect(player, DAGGER_EFFECT_SOURCE, new SamwellBlackbloodDagger(30 * 20));
+					Plugin.getInstance().mEffectManager.addEffect(player, DAGGER_EFFECT_SOURCE,
+						new SamwellBlackbloodDagger(Constants.TICKS_PER_SECOND * 30));
 					daggerEntity.remove();
 					this.cancel();
 				}
@@ -496,7 +508,8 @@ public class Samwell extends BossAbilityGroup {
 				}
 
 				if (mTimer > DAGGER_DURATION) {
-					getPlayers().forEach(p -> p.sendMessage(Component.text("As the dagger loses its magic, it vaporizes into thin air...", NamedTextColor.AQUA, TextDecoration.ITALIC)));
+					getPlayers().forEach(p -> p.sendMessage(Component.text("As the dagger loses its magic, " +
+						"it vaporizes into thin air...", NamedTextColor.AQUA, TextDecoration.ITALIC)));
 					clearDagger();
 					changePhaseNormal();
 					this.cancel();
@@ -572,10 +585,11 @@ public class Samwell extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				if (mT % 20 == 0) {
+				if (mT % Constants.TICKS_PER_SECOND == 0) {
 					world.playSound(mSpawnLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 10, 1);
 				}
-				new PartialParticle(Particle.EXPLOSION_LARGE, mSpawnLoc.clone().add(0, 5, 0), 1, 10, 10, 10).minimumCount(1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.EXPLOSION_LARGE, mSpawnLoc.clone().add(0, 5, 0)).count(1).delta(10)
+					.minimumCount(1).spawnAsEntityActive(mBoss);
 
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
@@ -590,7 +604,7 @@ public class Samwell extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				sendMessage(Component.text(dio[mT], NamedTextColor.RED).decoration(TextDecoration.ITALIC, mT >= 3));
+				sendMessage(Component.text(dio[mT], NamedTextColor.RED).decoration(TextDecoration.ITALIC, mT == 3));
 				mT++;
 				if (mT == dio.length) {
 					this.cancel();
@@ -599,15 +613,17 @@ public class Samwell extends BossAbilityGroup {
 
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						for (Player player : getPlayers()) {
-							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text("Samwell, Usurper Of Life", NamedTextColor.DARK_RED));
-							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
+							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player,
+								Component.text("VICTORY", NamedTextColor.GREEN),
+								Component.text("Samwell, Usurper Of Life", NamedTextColor.DARK_RED));
+							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 5, 0.8f);
 						}
 						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 						mBoss.remove();
-					}, 20 * 4);
+					}, Constants.TICKS_PER_SECOND * 4);
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 20 * 3);
+		}.runTaskTimer(mPlugin, 0, Constants.TICKS_PER_SECOND * 3);
 	}
 
 	// Called whenever it is the end of a Dagger's construction Phase
@@ -747,7 +763,10 @@ public class Samwell extends BossAbilityGroup {
 
 	private void refreshGatheringBar() {
 		mGatheringBar.progress((float) getShards() / mShardsReq);
-		mGatheringBar.name(Component.text("Shards Obtained: ", NamedTextColor.YELLOW).append(Component.text(getShards(), NamedTextColor.GREEN)).append(Component.text(" / ", NamedTextColor.YELLOW)).append(Component.text(mShardsReq, NamedTextColor.RED)));
+		mGatheringBar.name(Component.text("Shards Obtained: ", NamedTextColor.YELLOW)
+			.append(Component.text(getShards(), NamedTextColor.GREEN))
+			.append(Component.text(" / ", NamedTextColor.YELLOW))
+			.append(Component.text(mShardsReq, NamedTextColor.RED)));
 	}
 
 	public int getFails() {

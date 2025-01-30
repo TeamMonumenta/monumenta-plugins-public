@@ -10,10 +10,10 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,9 +64,8 @@ public abstract class BossAbilityGroup {
 		mPassiveSpells = Collections.emptyList();
 	}
 
-	public void changePhase(SpellManager activeSpells,
-							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
-
+	public void changePhase(SpellManager activeSpells, List<Spell> passiveSpells,
+							@Nullable Consumer<LivingEntity> phaseAction) {
 		if (phaseAction != null) {
 			phaseAction.accept(mBoss);
 		}
@@ -74,7 +73,8 @@ public abstract class BossAbilityGroup {
 		mActiveSpells.cancelAll();
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
-		MMLog.fine("Changed phase for " + mIdentityTag + ". Boss's health is currently at " + 100 * mBoss.getHealth() / EntityUtils.getMaxHealth(mBoss) + "%. " + mActiveSpells.toString());
+		MMLog.fine("Changed phase for " + mIdentityTag + ". Boss's health is currently at " +
+			100 * mBoss.getHealth() / EntityUtils.getMaxHealth(mBoss) + "%. " + mActiveSpells.toString());
 	}
 
 	public void changePassivePhase(List<Spell> passiveSpells) {
@@ -85,30 +85,36 @@ public abstract class BossAbilityGroup {
 		constructBoss(activeSpell, detectionRange, null);
 	}
 
-	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange, @Nullable BossBarManager bossBar) {
+	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
+							  @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpell, detectionRange, bossBar, 100);
 	}
 
-	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
+							  @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(List.of(activeSpell), Collections.emptyList(), detectionRange, bossBar, spellDelay);
 	}
 
-	public void constructBoss(BossAbilityGroup this, List<Spell> activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+	public void constructBoss(BossAbilityGroup this, List<Spell> activeSpells, List<Spell> passiveSpells,
+							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(new SpellManager(activeSpells), passiveSpells, detectionRange, bossBar, spellDelay);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+							  @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+							  @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+							  @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, passiveIntervalTicks, false);
 	}
 
@@ -142,7 +148,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't run abilities if players aren't present */
-				if (detectionRange > 0 && BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
+				if (detectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).isEmpty()) {
 					return;
 				}
 
@@ -183,7 +189,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't progress if players aren't present */
-				if (detectionRange > 0 && BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
+				if (detectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).isEmpty()) {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;
@@ -213,7 +219,8 @@ public abstract class BossAbilityGroup {
 	}
 
 	private void handleMissingBoss() {
-		MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. It has been removed and untracked via the fallback system.");
+		MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") +
+			" but still registered as an active boss. It has been removed and untracked via the fallback system.");
 		BossManager.getInstance().unload(mBoss, true);
 		// usb: this is triggering when it shouldn't, don't remove bosses if they might be persistant
 		// mBoss.remove();
@@ -234,7 +241,8 @@ public abstract class BossAbilityGroup {
 			SpellCastEvent event = new SpellCastEvent(mBoss, this, sp);
 			Bukkit.getPluginManager().callEvent(event);
 		} else {
-			MMLog.severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but boss does not have this spell!");
+			MMLog.severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() +
+				"' but boss does not have this spell!");
 		}
 	}
 
