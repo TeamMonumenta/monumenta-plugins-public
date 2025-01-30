@@ -1572,7 +1572,7 @@ public class LuckPermsIntegration implements Listener {
 
 		@Nullable String metaGuild = metaData.getMetaValue("guild:member:root:plain_tag");
 		boolean isMod = permissionData.checkPermission("monumenta.mod").asBoolean();
-		boolean isAdmin = permissionData.checkPermission("group.devlead").asBoolean();
+		boolean isAdmin = permissionData.checkPermission("group.devlead").asBoolean() || permissionData.checkPermission("group.modlead").asBoolean();
 		@Nullable String prefix = metaData.getPrefix();
 		@Nullable String suffix = metaData.getSuffix();
 		pluginData.addProperty("guild", metaGuild);
