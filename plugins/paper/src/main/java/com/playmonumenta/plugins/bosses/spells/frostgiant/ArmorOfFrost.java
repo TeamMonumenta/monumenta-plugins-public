@@ -120,6 +120,8 @@ public final class ArmorOfFrost extends Spell {
 					mFrostGiant.mFrostArmorActive = false;
 					if (mRegen) {
 						runCooldown();
+					} else { /* Special case for the final chill phase where the armor does not regen */
+						mFrostGiant.changeArmorPhase(mBoss.getEquipment(), true);
 					}
 					mLevel = mMaxLevel;
 				}

@@ -74,7 +74,8 @@ public final class SpellTitanicRupture extends Spell {
 		if (mFrostGiant.getArenaParticipants().isEmpty()) {
 			return;
 		}
-		mFrostGiant.getArenaParticipants().forEach(player -> mFrostGiant.sendDialogue("CRUMBLE UNDER THE WEIGHT OF THE MOUNTAIN.", NamedTextColor.DARK_RED, true));
+
+		mFrostGiant.sendDialogue("CRUMBLE UNDER THE WEIGHT OF THE MOUNTAIN.", NamedTextColor.DARK_RED, true);
 		mFrostGiant.freezeGolems();
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 5, 0.5f);
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 5, 1);
