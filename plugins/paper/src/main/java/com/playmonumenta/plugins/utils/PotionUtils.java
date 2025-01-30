@@ -21,7 +21,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Registry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -468,7 +467,8 @@ public class PotionUtils {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static @Nullable PotionEffectType getTypeByKey(String key) {
-		return Registry.POTION_EFFECT_TYPE.get(NamespacedKeyUtils.fromString(key));
+		return PotionEffectType.getByName(key);
 	}
 }
