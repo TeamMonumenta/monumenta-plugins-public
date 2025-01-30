@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.List;
@@ -43,7 +44,7 @@ public class PlayerInventoryView implements Listener {
 					NamedTextColor.RED));
 				return;
 			}
-			if (clickedPlayer != null) {
+			if (clickedPlayer != null && PremiumVanishIntegration.canSee(requestingPlayer, clickedPlayer)) {
 				new PlayerDisplayCustomInventory(requestingPlayer, clickedPlayer).openInventory(requestingPlayer, Plugin.getInstance());
 			}
 		}
