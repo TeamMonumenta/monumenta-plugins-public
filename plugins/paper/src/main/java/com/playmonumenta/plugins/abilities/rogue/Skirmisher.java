@@ -82,15 +82,6 @@ public class Skirmisher extends Ability {
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 
-			if (event.getAbility() != mInfo.getLinkedSpell() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
-				if (EntityUtils.getNearbyMobs(loc, mFriendlyRadius, enemy).size() >= MOB_COUNT_CUTOFF
-					|| (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
-					event.addUnmodifiableDamage(mIsolatedFlatDamage);
-					event.updateDamageWithMultiplier(1 + mIsolatedPercentDamage);
-					mCosmetic.aesthetics(mPlayer, loc, world, enemy);
-				}
-			}
-
 			// If Enhanced and triggers on a melee strike,
 			if (isEnhanced() && event.getType() == DamageType.MELEE) {
 				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(loc, mSplashRadius, enemy);
@@ -108,6 +99,14 @@ public class Skirmisher extends Ability {
 				}
 			}
 
+			if (event.getAbility() != mInfo.getLinkedSpell() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
+				if (EntityUtils.getNearbyMobs(loc, mFriendlyRadius, enemy).size() >= MOB_COUNT_CUTOFF
+					    || (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
+					event.addUnmodifiableDamage(mIsolatedFlatDamage);
+					event.updateDamageWithMultiplier(1 + mIsolatedPercentDamage);
+					mCosmetic.aesthetics(mPlayer, loc, world, enemy);
+				}
+			}
 		}
 		return false; // only changes event damage
 	}

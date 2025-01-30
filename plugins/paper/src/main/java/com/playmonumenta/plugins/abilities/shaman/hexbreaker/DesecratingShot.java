@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DesecratingShotCS;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -14,7 +15,9 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.NavigableSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -88,6 +91,17 @@ public class DesecratingShot extends Ability {
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, event.getDamage() * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
 				EntityUtils.applyWeaken(mPlugin, mDuration, mWeaknessPercent, mob);
 				mCosmetic.desecratingShotEffect(mPlayer, mob, mPlugin);
+			}
+		}
+		if (event.getAbility() == ClassAbility.DESECRATING_SHOT) {
+			//Check if totemic projection u is active as otherwise ordering doesn't work.
+			NavigableSet<PercentDamageDealt> effects = mPlugin.mEffectManager.getEffects(mPlayer, PercentDamageDealt.class);
+			for (PercentDamageDealt effect : effects) {
+				EnumSet<DamageType> types = effect.getAffectedDamageTypes();
+				if (types == null || types.contains(DamageType.PROJECTILE)) {
+					double magnitude = 1 + effect.getMagnitude();
+					event.updateDamageWithMultiplier(magnitude);
+				}
 			}
 		}
 		return false;

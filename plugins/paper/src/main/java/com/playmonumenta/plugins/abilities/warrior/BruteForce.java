@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -14,6 +16,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -77,6 +80,18 @@ public class BruteForce extends Ability {
 
 			event.addUnmodifiableDamage(mFlatDamage);
 			event.updateDamageWithMultiplier(1 + mMultiplier);
+
+			// TODO this might be unnecessary or bugged but it's not the main issue right now
+			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
+				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
+					if (priorityEffects instanceof PercentDamageDealt damageEffect) {
+						EnumSet<DamageType> types = damageEffect.getAffectedDamageTypes();
+						if (types == null || types.contains(DamageType.MELEE)) {
+							damageBonus = damageBonus * (1 + damageEffect.getMagnitude() * (damageEffect.isBuff() ? 1 : -1));
+						}
+					}
+				}
+			}
 
 			Location playerLoc = mPlayer.getLocation();
 			wave(enemy, playerLoc, damageBonus, false);

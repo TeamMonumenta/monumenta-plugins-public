@@ -171,9 +171,6 @@ public class DamageListener implements Listener {
 
 		event.updateDamageWithMultiplier(EntityUtils.vulnerabilityMult(damagee));
 
-		mPlugin.mEffectManager.damageEvent(event);
-		GalleryManager.onEntityDamageEvent(event);
-
 		// Player getting damaged
 		if (damagee instanceof Player player) {
 			mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
@@ -208,6 +205,10 @@ public class DamageListener implements Listener {
 					ActivityManager.getManager().addDamageDealt(player, Math.min(event.getDamage(), damagee.getHealth()));
 				}
 			}
+		}
+		if (!event.isLifelineCancel()) {
+			mPlugin.mEffectManager.damageEvent(event);
+			GalleryManager.onEntityDamageEvent(event);
 		}
 
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
@@ -246,10 +247,6 @@ public class DamageListener implements Listener {
 			} else {
 				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, event, damagee);
 			}
-		}
-
-		if (!event.isCancelled()) {
-			mPlugin.mEffectManager.damageEventFinal(event);
 		}
 	}
 
