@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.TablistCommand;
 import com.playmonumenta.plugins.protocollib.PingListener;
+import com.playmonumenta.plugins.schedule.ExecutorWrapper;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
@@ -221,6 +223,7 @@ public class TABIntegration implements Listener {
 	}
 
 	private static final Map<UUID, MonumentaPlayer> mPlayers = new ConcurrentHashMap<>();
+	private static final ExecutorWrapper mExecutor = new ExecutorWrapper("TABIntegration");
 
 	public TABIntegration() {
 		INSTANCE = this;
@@ -228,8 +231,7 @@ public class TABIntegration implements Listener {
 		mTab = TabAPI.getInstance();
 		Objects.requireNonNull(mTab.getEventBus()).register(PlayerLoadEvent.class, this::playerLoadEvent);
 		// Refresh for latency
-		Bukkit.getScheduler().runTaskTimerAsynchronously(Plugin.getInstance(),
-			() -> onRefreshRequest(true), 0, 600);
+		mExecutor.scheduleRepeatingTask(() -> onRefreshRequest(true), 0L, 30L, TimeUnit.SECONDS);
 	}
 
 	public static TABIntegration getInstance() {
@@ -240,7 +242,7 @@ public class TABIntegration implements Listener {
 	}
 
 	public void playerLoadEvent(PlayerLoadEvent event) {
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> refreshOnlinePlayer(event.getPlayer().getUniqueId(), true));
+		mExecutor.schedule(() -> refreshOnlinePlayer(event.getPlayer().getUniqueId(), true));
 	}
 
 	public static void loadRemotePlayer(RemotePlayerAbstraction player) {
@@ -252,7 +254,7 @@ public class TABIntegration implements Listener {
 			return oldValue;
 		});
 		if (monuPlayer.mShardPlayer != null && monuPlayer.mProxyPlayer != null) {
-			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(true));
+			getInstance().onRefreshRequest(false);
 		}
 	}
 
@@ -270,7 +272,7 @@ public class TABIntegration implements Listener {
 			}
 			if (oldValue.mShardPlayer == null && oldValue.mProxyPlayer == null) {
 				oldValue = null;
-				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
+				getInstance().onRefreshRequest(false);
 			}
 			return oldValue;
 		});
@@ -325,32 +327,13 @@ public class TABIntegration implements Listener {
 
 	private long mNextRefreshLatencyTime = 0L;
 	private long mNextRefreshTime = 0L;
-	private @Nullable BukkitTask mRefreshTimer = null;
+	private static boolean mNeedsRefresh = false;
+	private static boolean mRefreshLatency = false;
+	private static boolean mScheduled = false;
 
-	// this should be run async
 	private void onRefreshRequest(boolean latency) {
-		long now = System.currentTimeMillis();
-		if (now >= mNextRefreshTime) {
-			if (latency && now >= mNextRefreshLatencyTime) {
-				mNextRefreshLatencyTime = now + 15000;
-			} else {
-				latency = false;
-			}
-			mNextRefreshTime = now + 1000;
-			if (mRefreshTimer != null) {
-				mRefreshTimer.cancel();
-			}
-			mRefreshTimer = null;
-			final boolean finalLatency = latency;
-			refresh(finalLatency);
-		} else {
-			if (mRefreshTimer != null) {
-				return;
-			}
-			final boolean finalLatency = latency;
-
-			mRefreshTimer = Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), () -> onRefreshRequest(finalLatency), 20L);
-		}
+		mNeedsRefresh = true;
+		mRefreshLatency = mRefreshLatency || latency;
 	}
 
 	// this should be run async
@@ -373,6 +356,33 @@ public class TABIntegration implements Listener {
 			mLastRefresh = System.currentTimeMillis();
 			mIsRefreshing = false;
 		}
+	}
+
+	private void attemptRefresh() {
+		final long now = System.currentTimeMillis();
+		MMLog.info("Attempting refresh: " + mNeedsRefresh + " " + mScheduled + " " + now + " " + mNextRefreshTime + " " + mRefreshLatency + " " + mNextRefreshLatencyTime);
+		if (mNeedsRefresh && !mScheduled && now >= mNextRefreshTime && (!mRefreshLatency || now >= mNextRefreshLatencyTime)) {
+			final boolean refreshLatency = mRefreshLatency;
+			mRefreshLatency = false;
+			mNeedsRefresh = false;
+			mScheduled = true;
+			mExecutor.schedule(() -> {
+				refresh(refreshLatency);
+				mScheduled = false;
+			});
+			if (refreshLatency) {
+				mNextRefreshLatencyTime = System.currentTimeMillis() + 5000L;
+			}
+			mNextRefreshTime = System.currentTimeMillis() + 1000L;
+		}
+	}
+
+
+	public static void tick() {
+		if (INSTANCE == null) {
+			return;
+		}
+		getInstance().attemptRefresh();
 	}
 
 
@@ -610,7 +620,7 @@ public class TABIntegration implements Listener {
 				} catch (Exception eex) {
 					MMLog.warning("Failed to send global ping message: ", eex);
 				}
-				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
+				getInstance().onRefreshRequest(false);
 			});
 		});
 	}
@@ -630,7 +640,7 @@ public class TABIntegration implements Listener {
 						MMLog.warning("Failed to process global ping message: ", ex);
 					}
 				}
-				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
+				getInstance().onRefreshRequest(false);
 			}
 		}
 	}

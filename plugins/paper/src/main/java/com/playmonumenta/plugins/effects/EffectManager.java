@@ -28,6 +28,7 @@ import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.bukkit.Bukkit;
@@ -407,7 +408,7 @@ public final class EffectManager implements Listener {
 
 	private static final int PERIOD = 5;
 
-	private final HashMap<Entity, Effects> mEntities = new HashMap<>();
+	private final Map<Entity, Effects> mEntities = new WeakHashMap<Entity, Effects>();
 	private final BukkitRunnable mTimer;
 	private static @Nullable EffectManager INSTANCE = null;
 	private static final String PLAYER_EFFECT_DEATH_KEY = "player_effect_death_key";
@@ -430,8 +431,9 @@ public final class EffectManager implements Listener {
 				boolean oneHertz = mTicks % 20 == 0;
 
 				// Periodic trigger for Effects in case they need stuff like particles
+				Map<Entity, Effects> clone = new WeakHashMap<>(mEntities);
 				try {
-					for (Map.Entry<Entity, Effects> entry : ((HashMap<Entity, Effects>) mEntities.clone()).entrySet()) {
+					for (Map.Entry<Entity, Effects> entry : clone.entrySet()) {
 						for (Map<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
 							// Have to make a copy of the effects to prevent concurrent modification exceptions in case ticking changes the effects :(
 							for (NavigableSet<Effect> effectGroup : new ArrayList<>(priorityEffects.values())) {

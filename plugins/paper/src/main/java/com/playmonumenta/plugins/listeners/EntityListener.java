@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -439,6 +440,12 @@ public class EntityListener implements Listener {
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void entityAddToWorldEvent(EntityRemoveFromWorldEvent event) {
+		Entity entity = event.getEntity();
+		mPlugin.mTrackingManager.removeEntity(entity);
 	}
 
 	// Player shoots an arrow.
