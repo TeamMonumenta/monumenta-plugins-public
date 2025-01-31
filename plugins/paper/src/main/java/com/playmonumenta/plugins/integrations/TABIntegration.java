@@ -360,7 +360,6 @@ public class TABIntegration implements Listener {
 
 	private void attemptRefresh() {
 		final long now = System.currentTimeMillis();
-		MMLog.info("Attempting refresh: " + mNeedsRefresh + " " + mScheduled + " " + now + " " + mNextRefreshTime + " " + mRefreshLatency + " " + mNextRefreshLatencyTime);
 		if (mNeedsRefresh && !mScheduled && now >= mNextRefreshTime && (!mRefreshLatency || now >= mNextRefreshLatencyTime)) {
 			final boolean refreshLatency = mRefreshLatency;
 			mRefreshLatency = false;
