@@ -628,7 +628,7 @@ public class ItemUtils {
 	}
 
 	public static boolean shouldDropEquipment(@Nullable ItemStack item) {
-		return item != null && !item.lore().isEmpty() && !InventoryUtils.testForItemWithLore(item, "$$");
+		return item != null && item.hasItemMeta() && item.getItemMeta().hasLore() && !InventoryUtils.testForItemWithLore(item, "$$");
 	}
 
 	public static @Nullable String getBookTitle(@Nullable ItemStack book) {
