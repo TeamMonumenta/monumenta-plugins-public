@@ -708,6 +708,11 @@ public class LoadoutManager implements Listener {
 	}
 
 	public void openOwnGui(Player player) {
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.MECHANICAL_ARMORY_DISABLED)) {
+			player.sendMessage(Component.text("The magic of this area prevents you from using this item.", NamedTextColor.RED));
+			return;
+		}
+
 		if (!player.hasPermission(LOADOUT_MANAGER_PERMISSION)) {
 			player.sendMessage(Component.text(
 				LOADOUT_MANAGER_NAME + " is currently disabled.",
@@ -743,6 +748,11 @@ public class LoadoutManager implements Listener {
 	}
 
 	public void quickSwap(Player player, Keybind keybind) {
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.MECHANICAL_ARMORY_DISABLED)) {
+			player.sendMessage(Component.text("The magic of this area prevents you from using this item.", NamedTextColor.RED));
+			return;
+		}
+
 		if (!player.hasPermission(LOADOUT_MANAGER_PERMISSION)) {
 			player.sendMessage(Component.text(
 				LOADOUT_MANAGER_NAME + " is currently disabled.",

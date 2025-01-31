@@ -34,6 +34,7 @@ public class ZoneUtils {
 		LOOTROOM("Lootroom"),
 		MASK_JUMP_BOOST("Mask Jump Boost"),
 		MASK_SPEED("Mask Speed"),
+		MECHANICAL_ARMORY_DISABLED("MechanicalArmoryDisabled"),
 		MONUMENT("Monument"),
 		NO_BERRY_BUSH_CLICKS("No Berry Bush Clicks"),
 		NO_BUFF_DURATION_LOSS_ON_DEATH("No Buff Duration Loss On Death"),
