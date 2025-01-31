@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -84,7 +85,7 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		player.getInventory().setItemInMainHand(swap(plugin, player, item));
+		player.getInventory().setItemInMainHand(swapChecked(plugin, player, item));
 
 		if (eventMat == Material.GRASS_BLOCK || ItemUtils.isStrippable(eventMat)) {
 			event.setCancelled(true);
@@ -97,7 +98,7 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		player.getInventory().setItemInMainHand(swap(plugin, player, player.getInventory().getItemInMainHand()));
+		player.getInventory().setItemInMainHand(swapChecked(plugin, player, player.getInventory().getItemInMainHand()));
 	}
 
 	@Override
@@ -106,11 +107,11 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		player.getInventory().setItemInMainHand(swap(plugin, player, player.getInventory().getItemInMainHand()));
+		player.getInventory().setItemInMainHand(swapChecked(plugin, player, player.getInventory().getItemInMainHand()));
 	}
 
 	@CheckReturnValue
-	public static ItemStack swap(Plugin plugin, Player player, ItemStack item) {
+	public static ItemStack swapChecked(Plugin plugin, Player player, ItemStack item) {
 		// You can swap your item slot in the same tick, the event will begin when you right-click the multitool item
 		// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.MULTITOOL);
@@ -118,9 +119,14 @@ public class Multitool implements Enchantment {
 			return item;
 		}
 
+		return swap(plugin, player, item);
+	}
+
+	@CheckReturnValue
+	public static ItemStack swap(Plugin plugin, Player player, ItemStack item) {
 		// Only allow swapping once every 2 ticks at most to prevent accidental double-swaps
 		if (MetadataUtils.checkOnceInRecentTicks(plugin, player, "MultitoolMutex", 1)) {
-			Material mat = getNextMaterial(item.getType(), level);
+			Material mat = getNextMaterial(item.getType(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MULTITOOL));
 			item = item.withType(mat);
 			player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2F);
 			player.updateInventory();

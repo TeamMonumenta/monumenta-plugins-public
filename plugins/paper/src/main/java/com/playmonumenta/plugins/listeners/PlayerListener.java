@@ -830,7 +830,8 @@ public class PlayerListener implements Listener {
 			&& event.getClickedInventory() == player.getInventory()
 			&& ItemUtils.isNullOrAir(event.getCursor())
 			&& ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)) {
-			Multitool.swap(mPlugin, (Player) event.getWhoClicked(), item);
+			event.setCurrentItem(Multitool.swap(mPlugin, (Player) event.getWhoClicked(), item));
+			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		}
 
