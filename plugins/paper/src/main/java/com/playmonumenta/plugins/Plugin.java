@@ -45,6 +45,7 @@ import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissio
 import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
+import com.playmonumenta.plugins.inventories.CharmBagManager;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
@@ -347,6 +348,7 @@ public class Plugin extends JavaPlugin {
 		ViewActivity.register();
 		VirtualFirmament.register();
 		WalletCommand.register();
+		CharmBagCommand.register();
 		WeaponDash.register();
 		WorldNameCommand.register();
 		BlockDisplayCommand.register();
@@ -549,6 +551,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new InventoryUpdateListener(), this);
 		WalletManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
 		manager.registerEvents(new WalletManager(), this);
+		CharmBagManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
+		manager.registerEvents(new CharmBagManager(), this);
 		manager.registerEvents(new CustomContainerItemManager(), this);
 		manager.registerEvents(StatTrackManager.getInstance(), this);
 		manager.registerEvents(new PotionBarrelListener(), this);
