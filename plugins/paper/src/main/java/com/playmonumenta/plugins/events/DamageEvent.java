@@ -430,6 +430,13 @@ public class DamageEvent extends Event implements Cancellable {
 		return mEvent.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0;
 	}
 
+	/**
+	 * Returns true if the damage cause is {@link DamageCause#VOID} or {@link DamageCause#KILL}, false if not
+	 */
+	public boolean isUnblockable() {
+		return getCause() == DamageCause.VOID || getCause() == DamageCause.KILL;
+	}
+
 	// Mandatory Event Methods
 	private static final HandlerList HANDLERS = new HandlerList();
 

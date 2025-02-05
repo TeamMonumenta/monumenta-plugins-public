@@ -92,7 +92,7 @@ public class StasisListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void damageEvent(DamageEvent event) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
+		if (event.isUnblockable()) {
 			return;
 		}
 		if (isInStasis(event.getDamager()) || isInStasis(event.getDamagee())) {
