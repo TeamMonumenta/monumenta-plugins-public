@@ -69,7 +69,6 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-
 public class PlayerUtils {
 	public static final String SCOREBOARD_RING_UNLOCK = "R3Access";
 
@@ -761,5 +760,4 @@ public class PlayerUtils {
 	public static boolean isDead(Player player) {
 		return player.isDead() || Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class);
 	}
-
 }

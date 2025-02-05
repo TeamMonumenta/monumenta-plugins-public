@@ -306,10 +306,11 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this);
 		RefreshClass.register(this);
 		RegisterTorch.register();
-		RepairItemCommand.register();
-		ReportCommand.register();
+		RemotePunchCommand.register();
 		RemoveTags.register();
 		RenameItemCommand.register();
+		RepairItemCommand.register();
+		ReportCommand.register();
 		ResetClass.register();
 		RestartEmptyCommand.register(this);
 		RocketJump.register();

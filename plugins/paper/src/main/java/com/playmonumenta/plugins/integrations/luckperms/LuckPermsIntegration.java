@@ -293,10 +293,30 @@ public class LuckPermsIntegration implements Listener {
 		return UM.getUser(player.getUniqueId());
 	}
 
+	/**
+	 * Sets a permission to either true or false for a player
+	 *
+	 * @param player The player that you want to set a permission for
+	 * @param permission The string of your permission to set
+	 * @param value The boolean that your permission is set to
+	 */
 	public static void setPermission(Player player, String permission, boolean value) {
 		UM.modifyUser(player.getUniqueId(), user -> {
 			// Add the permission
 			user.data().add(Node.builder(permission).value(value).build());
+		});
+	}
+
+	/**
+	 * Removes a permission from a player
+	 *
+	 * @param player The player that you want to remove a permission from
+	 * @param permission The string of your permission to remove
+	 */
+	public static void unsetPermission(Player player, String permission) {
+		UM.modifyUser(player.getUniqueId(), user -> {
+			// Remove the permission
+			user.data().remove(Node.builder(permission).build());
 		});
 	}
 

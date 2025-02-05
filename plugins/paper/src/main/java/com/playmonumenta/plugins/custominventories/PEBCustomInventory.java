@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.punches.PlayerPunches;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -24,6 +27,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import net.kyori.adventure.text.Component;
@@ -31,6 +35,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -245,7 +250,7 @@ public class PEBCustomInventory extends CustomInventory {
 				"Click to choose your preferences for the \"glowing\" effect.", NamedTextColor.LIGHT_PURPLE,
 				Material.SPECTRAL_ARROW, false).switchToPage(PebPage.GLOWING),
 			new PebItem(22, "Music Options",
-				"Click to choose your preferences across a wide variety of music", NamedTextColor.LIGHT_PURPLE,
+				"Click to choose your preferences across a wide variety of music.", NamedTextColor.LIGHT_PURPLE,
 				Material.JUKEBOX, false).switchToPage(PebPage.SOUND_CONTROLS),
 			new PebItem(23, "Passive ability sounds",
 				"Click to toggle whether some sounds from long-lasting ability effects and enchantments are played.", NamedTextColor.LIGHT_PURPLE,
@@ -263,16 +268,16 @@ public class PEBCustomInventory extends CustomInventory {
 				event.getWhoClicked().sendMessage(Component.text("Ability Hotbar is now " + (enabled ? "enabled" : "disabled"), NamedTextColor.GOLD, TextDecoration.BOLD));
 			}),
 			new PebItem(30, "Toggle Darksight",
-				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
+				"Click to toggle whether Darksight provides Night Vision.", NamedTextColor.LIGHT_PURPLE,
 				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
 			new PebItem(31, "Toggle Radiant",
 				"Click to toggle whether Radiant provides Night Vision.", NamedTextColor.LIGHT_PURPLE,
 				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
 			new PebItem(32, "Rocket Jump",
-				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
+				"Click to enable or disable Rocket Jump.", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
 			new PebItem(33, "Cloned Finisher Elites Visibility",
-				"Click to toggle whether cloned elites in finishers glow and are visible.", NamedTextColor.LIGHT_PURPLE,
+				"Click to toggle whether cloned elites in Elite Finishers glow and are visible.", NamedTextColor.LIGHT_PURPLE,
 				Material.ZOMBIE_HEAD, false).switchToPage(PebPage.FINISHER_VISIBILTY),
 			new PebItem(4 * 9 + 3, "Toggle Spectating After Death",
 				"Click to toggle whether you spectate the area in which you die for 3 seconds after dying.", NamedTextColor.LIGHT_PURPLE,
@@ -285,7 +290,32 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.TRIDENT, false).action((pebCustomInventory, event) -> {
 				boolean onlyDuringRiptide = ScoreboardUtils.toggleTag((Player) event.getWhoClicked(), Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING);
 				event.getWhoClicked().sendMessage(Component.text("Depth Strider is now " + (onlyDuringRiptide ? "only disabled while riptiding." : "constantly disabled while holding a Riptide trident."), NamedTextColor.GOLD, TextDecoration.BOLD));
-			})
+			}),
+			new PebItem(4 * 9 + 5, "Opt Out of Player Punches", "Click to toggle whether you are opted out of being able to punch other players and having the ability to be launched.", NamedTextColor.LIGHT_PURPLE,
+				Material.FEATHER, false).action((peb, event) -> {
+					UUID playerUuid = peb.mPlayer.getUniqueId();
+					CosmeticsManager cosmeticsManager = CosmeticsManager.getInstance();
+					long currentTime = System.currentTimeMillis();
+
+					if (isOnPlayerPunchToggleCooldown(peb.mPlayer, playerUuid, cosmeticsManager, currentTime)) {
+						return;
+					}
+
+					if (peb.mPlayer.hasPermission("monumenta.cosmetics.punchoptout")) {
+						LuckPermsIntegration.unsetPermission(peb.mPlayer, "monumenta.cosmetics.punchoptout");
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PlayerPunches.handleLogin(peb.mPlayer), 20);
+						peb.mPlayer.sendMessage(Component.text("You have opted back in to Player Punches!", NamedTextColor.GOLD));
+					} else if (PlayerPunches.canAccess(peb.mPlayer)) {
+						LuckPermsIntegration.setPermission(peb.mPlayer, "monumenta.cosmetics.punchoptout", true);
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PlayerPunches.handleLogin(peb.mPlayer), 20);
+						peb.mPlayer.sendMessage(Component.text("You have opted out of Player Punches!", NamedTextColor.GOLD));
+					} else {
+						peb.mPlayer.sendMessage(Component.text("You do not have access to Player Punches to begin with!", NamedTextColor.GOLD));
+						return;
+					}
+
+					cosmeticsManager.mOptOutPunchCooldowns.put(playerUuid, currentTime);
+				})
 		);
 
 		definePage(PebPage.TECHNICAL_OPTIONS,
@@ -746,19 +776,19 @@ public class PEBCustomInventory extends CustomInventory {
 				"", NamedTextColor.LIGHT_PURPLE,
 				Material.OBSERVER, false).switchToPage(PebPage.GAMEPLAY_OPTIONS),
 			new PebItem(4, "Elite Finisher Visibility Settings",
-				"Choose how cloned mobs in your elite finishers are visible.", NamedTextColor.LIGHT_PURPLE,
+				"Choose how cloned mobs in your Elite Finishers are visible.", NamedTextColor.LIGHT_PURPLE,
 				Material.ZOMBIE_HEAD, false),
 			new PebItem(19, "Show and Glow",
-				"Cloned Elites from your elite finisher are visible and glow.", NamedTextColor.LIGHT_PURPLE,
+				"Cloned elites from your Elite Finisher are visible and glow.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLOW_INK_SAC, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_show_glow"),
 			new PebItem(21, "Hide and Glow",
-				"Cloned Elites from your elite finisher are hidden but still glow.", NamedTextColor.LIGHT_PURPLE,
+				"Cloned elites from your Elite Finisher are hidden but still glow.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLOWSTONE_DUST, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_glow"),
 			new PebItem(23, "Show and Don't Glow",
-				"Cloned Elites from your elite finisher are visible and do not glow.", NamedTextColor.LIGHT_PURPLE,
+				"Cloned elites from your Elite Finisher are visible and do not glow.", NamedTextColor.LIGHT_PURPLE,
 				Material.SKELETON_SKULL, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_show"),
 			new PebItem(25, "Hide and Don't Glow",
-				"Cloned Elites from your elite finisher are hidden and do not glow.", NamedTextColor.LIGHT_PURPLE,
+				"Cloned elites from your Elite Finisher are hidden and do not glow.", NamedTextColor.LIGHT_PURPLE,
 				Material.BARRIER, false).serverCommand("execute as @S run function monumenta:mechanisms/finisher_hide")
 		);
 
@@ -989,6 +1019,18 @@ public class PEBCustomInventory extends CustomInventory {
 
 	private static boolean isEmojiCategory(ParticleCategory category) {
 		return category == ParticleCategory.OWN_EMOJI || category == ParticleCategory.OTHER_EMOJI;
+	}
+
+	private static boolean isOnPlayerPunchToggleCooldown(Player player, UUID playerUuid, CosmeticsManager cosmeticsManager, long currentTime) {
+		long lastToggle = cosmeticsManager.mOptOutPunchCooldowns.getOrDefault(playerUuid, 0L);
+
+		if (currentTime - lastToggle < CosmeticsManager.OPT_OUT_PUNCH_COOLDOWN) {
+			long remainingTime = (CosmeticsManager.OPT_OUT_PUNCH_COOLDOWN - (currentTime - lastToggle)) / 1000;
+			player.sendMessage(Component.text("You must wait " + remainingTime + " more second" + (remainingTime == 1 ? "" : "s") + " before toggling this option!", NamedTextColor.RED));
+			return true;
+		}
+
+		return false;
 	}
 
 	private static PebItem makePartialParticlePebItem(int slot, String description, Material material, ParticleCategory category) {

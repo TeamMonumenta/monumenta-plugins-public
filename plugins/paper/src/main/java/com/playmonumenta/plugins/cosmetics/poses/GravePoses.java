@@ -63,7 +63,7 @@ public class GravePoses {
 	}
 
 	public static String[] getNames() {
-		return POSES.keySet().stream().map(CommandUtils::quoteIfNeeded).toArray(String[]::new);
+		return POSES.keySet().toArray(String[]::new);
 	}
 
 	public static Set<String> getNameSet() {
