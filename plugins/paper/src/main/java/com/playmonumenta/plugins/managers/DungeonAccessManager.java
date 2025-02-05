@@ -53,6 +53,11 @@ public class DungeonAccessManager {
 		for (DungeonCommandMapping dungeonMapping : DungeonCommandMapping.values()) {
 			dungeonMapping.checkPlayerAccess(player);
 		}
+
+		DungeonCommandMapping delveMapping = DungeonCommandMapping.getByDelveBounty(player);
+		if (delveMapping != null) {
+			delveMapping.delveBountyAbandonCheck(player);
+		}
 	}
 
 }

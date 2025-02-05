@@ -358,6 +358,23 @@ public class DungeonUtils {
 			return BY_SHARD.get(name);
 		}
 
+		public static @Nullable DungeonCommandMapping getByDelveBounty(Player player) {
+			int delveDungeonScore = ScoreboardUtils.getScoreboardValue(player, "DelveDungeon").orElse(0);
+			if (delveDungeonScore <= 0) {
+				return null;
+			}
+
+			for (DungeonCommandMapping dungeonMapping : values()) {
+				if (delveDungeonScore != dungeonMapping.getDelveBountyId()) {
+					continue;
+				}
+
+				return dungeonMapping;
+			}
+
+			return null;
+		}
+
 		public void checkPlayerAccess(Player player) {
 			checkPlayerAccess(player, (int) DateUtils.getDaysSinceEpoch());
 		}
@@ -569,5 +586,45 @@ public class DungeonUtils {
 			}
 		}
 
+		public void delveBountyAbandonCheck(Player player) {
+			long currentWeek = DateUtils.getWeeklyVersion();
+
+			int delveBountyStartDate = ScoreboardUtils.getScoreboardValue(player, "DelveStartDate").orElse(0);
+			long delveBountyWeek = DateUtils.getWeeklyVersion(delveBountyStartDate);
+			if (currentWeek == delveBountyWeek) {
+				// Still a chance to start the delve dungeon!
+				return;
+			}
+
+			String startDateObjective = getStartDateName();
+			String shardName = getShardName();
+			if (startDateObjective == null || shardName == null) {
+				MMLog.warning("Null start date or shard name for delve bounty dungeon " + this + "!");
+				return;
+			}
+
+			int startDate = ScoreboardUtils.getScoreboardValue(player, startDateObjective).orElse(0);
+			long dungeonWeek = DateUtils.getWeeklyVersion(startDate);
+
+			if (startDate == 0 || delveBountyStartDate != dungeonWeek) {
+				// No instance for that week
+				abandonDelve(player);
+				return;
+			}
+
+			DelvesManager.DungeonDelveInfo delveInfo = DelvesUtils.getDelveInfo(player, shardName);
+			int totalPoints = DelvesUtils.getTotalPoints(delveInfo.getMap());
+			if (totalPoints == 0) {
+				// Not a delve dungeon
+				abandonDelve(player);
+			}
+		}
+
+		public static void abandonDelve(Player player) {
+			ScoreboardUtils.setScoreboardValue(player, "DelveDungeon", 0);
+			ScoreboardUtils.setScoreboardValue(player, "DelveStartDate", 0);
+			player.sendMessage(Component.text(
+				"Your delve bounty expired - talk to Knight-Errant Reynart for another!", NamedTextColor.AQUA));
+		}
 	}
 }
