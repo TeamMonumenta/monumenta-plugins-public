@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.inventories.CharmBag;
 import com.playmonumenta.plugins.inventories.CharmBagManager;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -73,7 +74,21 @@ public class CharmBagGui extends Gui {
 		boolean showAmounts = mPlayer.getScoreboardTags().contains(CustomContainerItemManager.SHOW_AMOUNTS_TAG);
 		int pos = 0;
 		int itemsPerPage = 5 * 8; // top row and left column reserved
-		for (String charmClass : CharmBagManager.classListString) {
+
+		String playerClass = AbilityUtils.getClass(mPlayer);
+		List<String> classOrder = new ArrayList<>();
+		if (!playerClass.equals("No Class")) { // player has a class, put their class first
+			classOrder.add(playerClass);
+			for (String thisClass : CharmBagManager.classListString) {
+				if (!thisClass.equals(playerClass)) {
+					classOrder.add(thisClass);
+				}
+			}
+		} else { // No class; use default order
+			classOrder = CharmBagManager.classListString;
+		}
+
+		for (String charmClass : classOrder) {
 			List<CharmBag.CharmBagItem> classItems = items.get(charmClass);
 			if (classItems == null) {
 				continue;

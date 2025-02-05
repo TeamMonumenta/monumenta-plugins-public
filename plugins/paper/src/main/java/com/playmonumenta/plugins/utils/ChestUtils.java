@@ -276,8 +276,8 @@ public class ChestUtils {
 			int slot = freeSlots.remove(0);
 			inventory.setItem(slot, lootItem);
 			if (!skrScrolls) {
-				if ((InventoryUtils.testForItemWithName(lootItem, "Remnant Scroll -=- Combat", false) && lootItem.getType().equals(Material.WARD_ARMOR_TRIM_SMITHING_TEMPLATE))
-					|| (InventoryUtils.testForItemWithName(lootItem, "Remnant Scroll -=- Puzzle", false) && lootItem.getType().equals(Material.VEX_ARMOR_TRIM_SMITHING_TEMPLATE))) {
+				if ((InventoryUtils.testForItemWithName(lootItem, "Remnant Scroll", false) &&
+					lootItem.getType().name().contains("SMITHING_TEMPLATE"))) {
 					skrScrolls = true; // SKR Scroll found, alert the player later!
 				}
 			}
