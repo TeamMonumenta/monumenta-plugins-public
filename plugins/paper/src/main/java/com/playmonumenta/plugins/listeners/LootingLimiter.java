@@ -133,7 +133,7 @@ public class LootingLimiter implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useInteractedBlock() == Event.Result.DENY
-			    || event.getAction() != Action.RIGHT_CLICK_BLOCK
+			    || !(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK)
 			    || (ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0)) {
 			return;
 		}
