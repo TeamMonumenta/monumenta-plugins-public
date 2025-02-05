@@ -24,6 +24,8 @@ public class ZoneUtils {
 		BLOCKBREAK_DISABLED("Blockbreak Disabled"),
 		BONE_MEAL_DISABLED("Bone Meal Disabled"),
 		BROOMSTICK_ENABLED("Broomstick Enabled"),
+		CAN_DEPOSIT_INTO_POTS("Can Deposit Into Pots"),
+		CAN_SHOOT_POTS("Can Shoot Pots"),
 		DISABLE_GRAVES("Disable Graves"),
 		DISABLE_MAGIC_TESS("DisableMagicTess"),
 		DISABLE_REDSTONE_INTERACTIONS("Disable Redstone Interactions"),

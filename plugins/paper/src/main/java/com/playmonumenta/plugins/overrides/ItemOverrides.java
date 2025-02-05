@@ -97,6 +97,8 @@ public final class ItemOverrides {
 		mItems.put(Material.CHEST, chestOverride);
 		mItems.put(Material.TRAPPED_CHEST, chestOverride);
 
+		mItems.put(Material.DECORATED_POT, new DecoratedPotOverride());
+
 		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
 		mItems.put(Material.LIME_STAINED_GLASS, new LimeTesseractOverride());
 		mItems.put(Material.ICE, new FestiveTesseractOverride());

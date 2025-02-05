@@ -832,6 +832,15 @@ public class EntityListener implements Listener {
 		Projectile proj = event.getEntity();
 		ProjectileSource source = proj.getShooter();
 
+		if (event.getHitBlock() != null) {
+			Block block = event.getHitBlock();
+
+			if (block.getType() == Material.DECORATED_POT && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) && !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.CAN_SHOOT_POTS)) {
+				// Prevent decorated pots from being broken in adventure mode zones UNLESS the DecoratedPotsShoot zone exists
+				event.setCancelled(true);
+			}
+		}
+
 		if (entity instanceof Player player) {
 			mAbilities.playerHitByProjectileEvent(player, event);
 
