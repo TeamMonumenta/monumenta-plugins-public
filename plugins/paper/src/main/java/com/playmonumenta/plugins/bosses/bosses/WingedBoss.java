@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 public final class WingedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_winged";
 	// In-game, Minecraft shows Pose values as degrees, but internally it's radians
-	public static final double headMovement = 0.8 * Math.PI / 180;
+	public static final double headMovement = Math.toRadians(0.8);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Only move towards players and idly oscillate if there is a player within this radius")
@@ -239,12 +239,12 @@ public final class WingedBoss extends BossAbilityGroup {
 
 	private Collection<Entity> createWings(Location loc) {
 		return List.of(
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "left"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "left", "effect_player"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "left"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "right"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "right"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "right")
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(15f), Math.toRadians(-60f)), "left"),
+			createWing(loc, new EulerAngle(Math.toRadians(15f), Math.toRadians(0f), Math.toRadians(-90f)), "left", "effect_player"),
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(-15f), Math.toRadians(-120f)), "left"),
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(-15f), Math.toRadians(60f)), "right"),
+			createWing(loc, new EulerAngle(Math.toRadians(15f), Math.toRadians(0f), Math.toRadians(90f)), "right"),
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(15f), Math.toRadians(120f)), "right")
 		);
 	}
 
