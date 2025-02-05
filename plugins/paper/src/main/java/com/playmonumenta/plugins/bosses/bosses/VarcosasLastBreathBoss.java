@@ -125,23 +125,23 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 
 	@Override
 	public void init() {
-		mBoss.teleport(mCenter.clone().add(0, 1, 0));
-		int hpDelta = 2000;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
+		final List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+		final int baseHealth = 2000;
+		final double finalHp = baseHealth * BossUtils.healthScalingCoef(players.size(), 0.5, 0.5);
 
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, finalHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(finalHp);
 
+		mBoss.teleport(mCenter.clone().add(0, 1, 0));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(0, 0, 11.5));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(0, 0, -11.5));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(11.5, 0, 0));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(-11.5, 0, 0));
 
-		for (Player player : getPlayers()) {
-			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa's", NamedTextColor.RED), Component.text("Last Breath", NamedTextColor.DARK_RED));
+		for (Player player : players) {
+			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa's", NamedTextColor.RED),
+				Component.text("Last Breath", NamedTextColor.DARK_RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
@@ -151,7 +151,7 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		List<Player> players = getPlayers();
+		final List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 
 		if (players.isEmpty()) {
 			return;
@@ -171,10 +171,6 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 				}
 			}
 		}.runTaskLater(mPlugin, 20);
-	}
-
-	private List<Player> getPlayers() {
-		return PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 	}
 
 	private void summonArmorStandIfNoneAreThere(Location loc) {

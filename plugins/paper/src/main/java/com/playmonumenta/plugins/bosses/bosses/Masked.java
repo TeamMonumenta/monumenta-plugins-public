@@ -115,7 +115,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, DETECTION_RANGE);
+		final int playerCount = PlayerUtils.playersInRange(mSpawnLoc, DETECTION_RANGE, true).size();
 		int health = (int) ((1 - Math.pow(0.5, playerCount)) * MAXIMUM_BASE_HEALTH);
 
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, health);

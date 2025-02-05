@@ -48,6 +48,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_will";
 	public static final int detectionRange = 50;
@@ -139,17 +141,15 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 
 	@Override
 	public void init() {
-		mBoss.teleport(mSpawnLoc);
-		int hpDelta = 2000;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
+		final List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+		final int hpDelta = 2000;
+		final double finalHp = hpDelta * BossUtils.healthScalingCoef(players.size(), 0.5, 0.5);
 
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, finalHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(finalHp);
 
-		for (Player player : getPlayers()) {
+		for (Player player : players) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Lingering Will", NamedTextColor.DARK_RED), null);
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
@@ -174,7 +174,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 20, 20 * 2);
+		}.runTaskTimer(mPlugin, TICKS_PER_SECOND, TICKS_PER_SECOND * 2);
 	}
 
 	private void summonArmorStandIfNoneAreThere(Location loc) {

@@ -161,8 +161,8 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		double hp = EntityUtils.getMaxHealth(mBoss) * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
+		final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		final double hp = EntityUtils.getMaxHealth(mBoss) * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
 		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
 	}
 

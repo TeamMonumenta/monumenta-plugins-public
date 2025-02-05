@@ -159,7 +159,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	public Lich(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
-		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
+		mPlayerCount = playersInRange(mSpawnLoc, detectionRange, true).size();
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
 		mStart = boss;
@@ -878,7 +878,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			return;
 		}
 		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, curseSource);
-		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
+		mPlayerCount = playersInRange(mSpawnLoc, detectionRange, true).size();
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		World world = player.getWorld();
 		new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,
@@ -1979,15 +1979,8 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	}
 
 	public static List<Player> playersInRange(Location bossLoc, double range, boolean includeStealthed) {
-		List<Player> players = PlayerUtils.playersInRange(bossLoc, range, includeStealthed);
-		List<Player> toRemove = new ArrayList<>();
-		for (Player p : players) {
-			if (p.getLocation().getY() > mStart.getLocation().getY() + mCeiling) {
-				toRemove.add(p);
-			}
-		}
-		players.removeAll(toRemove);
-		return players;
+		return PlayerUtils.playersInRange(bossLoc, range, includeStealthed).stream()
+			.filter(p -> p.getLocation().getY() > mStart.getLocation().getY() + mCeiling).toList();
 	}
 
 	@Override

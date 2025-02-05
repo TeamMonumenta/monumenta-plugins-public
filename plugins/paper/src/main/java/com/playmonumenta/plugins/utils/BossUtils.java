@@ -231,20 +231,6 @@ public class BossUtils {
 		return true;
 	}
 
-	public static int getPlayersInRangeForHealthScaling(Entity entity, double radius) {
-		return getPlayersInRangeForHealthScaling(entity.getLocation(), radius);
-	}
-
-	public static int getPlayersInRangeForHealthScaling(Location loc, double radius) {
-		return PlayerUtils.playersInRange(loc, radius, true).size();
-	}
-
-	public static int getPlayersInRangeForHealthScaling(Location loc, double radius, double ceiling) {
-		return (int) PlayerUtils.playersInRange(loc, radius, true).stream()
-			.filter(p -> p.getLocation().getY() - loc.getY() <= ceiling)
-			.count();
-	}
-
 	/**
 	 * Adds modifiers to the existing map from the string
 	 *
