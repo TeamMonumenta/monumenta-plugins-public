@@ -218,7 +218,7 @@ public class FireworkBlast extends DepthsAbility {
 			.add("Right click while sneaking to shoot a firework that deals ")
 			.addDepthsDamage(a -> a.mBaseDamage, DAMAGE[rarity - 1], true)
 			.add(" projectile damage to enemies within ")
-			.add(RADIUS)
+			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks of its explosion. The damage is increased by ")
 			.addPercent(a -> a.mDamagePerBlock, DAMAGE_INCREASE_PER_BLOCK)
 			.add(" for every block the firework travels past 6 blocks, up to ")

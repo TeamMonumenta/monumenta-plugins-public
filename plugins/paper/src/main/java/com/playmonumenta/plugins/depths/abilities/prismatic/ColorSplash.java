@@ -54,7 +54,6 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -674,13 +673,6 @@ public class ColorSplash extends DepthsAbility {
 			event.setCancelled(true);
 		}
 		if (mWindwalkerActive && mWindwalkIframes && !event.getType().equals(DamageEvent.DamageType.TRUE)) {
-			event.setCancelled(true);
-		}
-	}
-
-	@Override
-	public void playerDismountEvent(EntityDismountEvent event) {
-		if (mSteelsageRunnable != null) {
 			event.setCancelled(true);
 		}
 	}

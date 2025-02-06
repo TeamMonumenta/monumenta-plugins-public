@@ -192,9 +192,7 @@ public class SteelStallion extends DepthsAbility implements AbilityWithDuration 
 
 	@Override
 	public void playerDismountEvent(EntityDismountEvent event) {
-		if (mHorse != null && mHorse.getHealth() > 0) {
-			event.setCancelled(true);
-		}
+		dismount();
 	}
 
 	public static boolean isSteelStallion(Entity entity) {
