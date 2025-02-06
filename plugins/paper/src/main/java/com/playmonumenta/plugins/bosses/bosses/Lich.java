@@ -159,9 +159,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	public Lich(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
-		mPlayerCount = playersInRange(mSpawnLoc, detectionRange, true).size();
-		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
-
 		mStart = boss;
 		for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
 			if (e.getScoreboardTags().contains(START_TAG) && e instanceof LivingEntity) {
@@ -169,6 +166,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				break;
 			}
 		}
+
+		mPlayerCount = playersInRange(mSpawnLoc, detectionRange, true).size();
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
 		// load all the crystal spawn locations
 		mCrystalLoc.add(mStart.getLocation().clone().add(mL, mY, mS));
