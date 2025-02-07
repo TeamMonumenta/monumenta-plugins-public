@@ -1979,8 +1979,9 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	}
 
 	public static List<Player> playersInRange(Location bossLoc, double range, boolean includeStealthed) {
-		return PlayerUtils.playersInRange(bossLoc, range, includeStealthed).stream()
-			.filter(p -> p.getLocation().getY() > mStart.getLocation().getY() + mCeiling).toList();
+		List<Player> players = PlayerUtils.playersInRange(bossLoc, range, includeStealthed).stream()
+			.filter(p -> p.getLocation().getY() <= mStart.getLocation().getY() + mCeiling).toList();
+		return new ArrayList<>(players);
 	}
 
 	@Override
