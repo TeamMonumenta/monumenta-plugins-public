@@ -606,7 +606,7 @@ public class DungeonUtils {
 			int startDate = ScoreboardUtils.getScoreboardValue(player, startDateObjective).orElse(0);
 			long dungeonWeek = DateUtils.getWeeklyVersion(startDate);
 
-			if (startDate == 0 || delveBountyStartDate != dungeonWeek) {
+			if (startDate == 0 || delveBountyWeek != dungeonWeek) {
 				// No instance for that week
 				abandonDelve(player);
 				return;
