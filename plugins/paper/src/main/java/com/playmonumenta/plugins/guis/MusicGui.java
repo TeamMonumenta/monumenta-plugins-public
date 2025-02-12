@@ -51,6 +51,7 @@ public class MusicGui extends Gui {
 		YELLOW("yellow", 27, "Monumenta Soundtrack: Vernal Nightmare"),
 		WILLOWS("willows", 27, "Monumenta Soundtrack: Black Willows"),
 		REVERIE("reverie", 27, "Monumenta Soundtrack: Malevolent Reverie"),
+		GRAY("gray", 27, "Monumenta Soundtrack: Valley of the Forgotten Pharaohs"),
 		BLUE("blue", 27, "Monumenta Soundtrack: Coven's Gambit"),
 		BROWN("brown", 27, "Monumenta Soundtrack: Cradle of the Broken God"),
 		PLOTS("plots", 27, "Monumenta Soundtrack: Miscellaneous");
@@ -187,7 +188,7 @@ public class MusicGui extends Gui {
 				addMusicItem(3, 7, Material.MUSIC_DISC_5, "Supernova Slayer", Location.ZENITH, "Vesperidys", "CmdrGod", Vesperidys.MUSIC_TITLE_2, Broodmother.MUSIC_DURATION_2, checkScore("Zenith"));
 
 				addMusicItem(4, 1, Material.MUSIC_DISC_STRAD, "Ancient Automation", Location.SILVER, "Silver Construct", "Salamanderlonk", ImperialConstruct.MUSIC_TITLE, ImperialConstruct.MUSIC_DURATION, checkScore("SKT"));
-				addMusicItem(4, 2, Material.MUSIC_DISC_OTHERSIDE, "The Fate of Time", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE, TealSpirit.MUSIC_DURATION, checkScore("SKT"));
+				addMusicItem(4, 2, Material.MUSIC_DISC_OTHERSIDE, "The Fate of Time", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_1, TealSpirit.MUSIC_DURATION_1, checkScore("SKT"));
 				addMusicItem(4, 3, Material.MUSIC_DISC_OTHERSIDE, "The Hour of Oblivion", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_2, TealSpirit.MUSIC_DURATION_2, checkScore("SKT"));
 			}
 
@@ -202,8 +203,9 @@ public class MusicGui extends Gui {
 				addDungeonItem(2, 2, Material.GLASS_BOTTLE, Location.LABS, MusicPage.LABS, "OldLab");
 				addDungeonItem(2, 3, Material.JUNGLE_LEAVES, Location.WILLOWS, MusicPage.WILLOWS, "R1Bonus");
 				addDungeonItem(2, 4, Material.FIRE_CORAL, Location.REVERIE, MusicPage.REVERIE, "Corrupted");
-				addDungeonItem(2, 5, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
-				addDungeonItem(2, 6, Material.BROWN_WOOL, Location.BROWN, MusicPage.BROWN, "Brown");
+				addDungeonItem(2, 5, Material.GRAY_WOOL, Location.GRAY, MusicPage.GRAY, "Gray");
+				addDungeonItem(2, 6, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
+				addDungeonItem(2, 7, Material.BROWN_WOOL, Location.BROWN, MusicPage.BROWN, "Brown");
 			}
 
 			case PLAYLIST -> {
@@ -285,6 +287,13 @@ public class MusicGui extends Gui {
 			case REVERIE -> {
 				addMusicItem(1, 3, Material.MUSIC_DISC_CHIRP, "He is Awake 1", Location.REVERIE, "Okaye", "epic:music.reverie1", 103);
 				addMusicItem(1, 5, Material.MUSIC_DISC_CHIRP, "He is Awake 2", Location.REVERIE, "Okaye", "epic:music.reverie2", 97);
+			}
+
+			case GRAY -> {
+				addMusicItem(1, 2, Material.MUSIC_DISC_STAL, "Desolate Valley 1", Location.GRAY, "Salamanderlonk", "epic:music.gray1", 90);
+				addMusicItem(1, 3, Material.MUSIC_DISC_STAL, "Desolate Valley 2", Location.GRAY, "Salamanderlonk", "epic:music.gray2", 69);
+				addMusicItem(1, 5, Material.MUSIC_DISC_STAL, "Lost Kingdom", Location.GRAY, "Salamanderlonk", "epic:music.gray3", 69);
+				addMusicItem(1, 6, Material.MUSIC_DISC_STAL, "Dark Secrets", Location.GRAY, "Salamanderlonk", "epic:music.grayend", 78);
 			}
 
 			case BLUE -> {
