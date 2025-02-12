@@ -1,5 +1,6 @@
-package com.playmonumenta.plugins.abilities.scout.ranger;
+package com.playmonumenta.plugins.abilities.scout;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -7,7 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
-import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.QuickdrawCS;
+import com.playmonumenta.plugins.cosmetics.skills.scout.QuickdrawCS;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -31,14 +33,14 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class Quickdraw extends Ability {
-
-	private static final int QUICKDRAW_1_COOLDOWN = 20 * 6;
-	private static final int QUICKDRAW_2_COOLDOWN = 20 * 3;
+	private static final int DAMAGE_1 = 13;
+	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 6;
+	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 3;
+	private static final int PIERCE_LVL = 1;
 
 	public static final String CHARM_DAMAGE = "Quickdraw Damage";
 	public static final String CHARM_COOLDOWN = "Quickdraw Cooldown";
@@ -50,29 +52,38 @@ public class Quickdraw extends Ability {
 			.scoreboardId("Quickdraw")
 			.shorthandName("Qd")
 			.descriptions(
-				String.format("Left-clicking with a projectile weapon instantly fires that projectile, fully charged. " +
-					"This skill can only apply Recoil once before touching the ground. Cooldown: %ds.", QUICKDRAW_1_COOLDOWN / 20),
-				String.format("Arrows shot with this skill are given +1 piercing. Cooldown: %ds.", QUICKDRAW_2_COOLDOWN / 20))
-			.simpleDescription("Instantly fire the held projectile weapon.")
-			.cooldown(QUICKDRAW_1_COOLDOWN, QUICKDRAW_2_COOLDOWN, CHARM_COOLDOWN)
+				String.format("Left-clicking with a projectile weapon fires a %d damage projectile that inherits " +
+					"the enchantments of that weapon except those that modify base weapon damage. This skill can " +
+					"only apply Recoil once before touching the ground. Cooldown: %ss.",
+					DAMAGE_1,
+					StringUtils.ticksToSeconds(COOLDOWN_1)),
+				String.format("Cooldown: %ss.",
+					StringUtils.ticksToSeconds(COOLDOWN_2)),
+				String.format("Arrows shot with this skill are given +%s Piercing.",
+					PIERCE_LVL))
+			.simpleDescription("Instantly fire a held projectile weapon.")
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Quickdraw::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.BLAZE_POWDER);
 
 	public @Nullable Projectile mProjectile;
+
+	private final double mDamage;
 	private final QuickdrawCS mCosmetic;
 
-	public Quickdraw(Plugin plugin, Player player) {
+	public Quickdraw(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new QuickdrawCS());
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new QuickdrawCS());
 	}
 
 	public boolean cast() {
 		if (isOnCooldown()) {
 			return false;
 		}
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
+		final ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		final ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if ((ItemStatUtils.hasEnchantment(inMainHand, EnchantmentType.TWO_HANDED)
 			&& !(ItemUtils.isNullOrAir(inOffHand) || ItemStatUtils.hasEnchantment(inOffHand, EnchantmentType.WEIGHTLESS)))
 			|| ItemUtils.isShootableItem(inOffHand)) {
@@ -80,7 +91,7 @@ public class Quickdraw extends Ability {
 		}
 		mCosmetic.quickdrawCast(mPlayer);
 
-		boolean launched = shootProjectile(inMainHand, 0);
+		final boolean launched = shootProjectile(inMainHand, 0);
 		if (launched) {
 			putOnCooldown();
 
@@ -94,22 +105,22 @@ public class Quickdraw extends Ability {
 		return false;
 	}
 
-	private boolean shootProjectile(ItemStack inMainHand, int deviation) {
-		Vector direction = mPlayer.getLocation().getDirection();
+	private boolean shootProjectile(final ItemStack inMainHand, final int deviation) {
+		final Vector direction = mPlayer.getLocation().getDirection();
 		if (deviation != 0) {
-			Location l = mPlayer.getLocation();
+			final Location l = mPlayer.getLocation();
 			l.setPitch(l.getPitch() - 90);
 			direction.rotateAroundNonUnitAxis(l.getDirection(), deviation * 10.0 * Math.PI / 180);
 		}
 
-		World world = mPlayer.getWorld();
-		Location eyeLoc = mPlayer.getEyeLocation();
-		Projectile proj;
+		final World world = mPlayer.getWorld();
+		final Location eyeLoc = mPlayer.getEyeLocation();
+		final Projectile proj;
 		switch (inMainHand.getType()) {
 			case BOW, CROSSBOW -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);
 			case TRIDENT -> proj = world.spawnArrow(eyeLoc, direction, 2.5f, 0, Trident.class);
 			case SNOWBALL -> {
-				Snowball snowball = world.spawn(eyeLoc, Snowball.class);
+				final Snowball snowball = world.spawn(eyeLoc, Snowball.class);
 				ItemUtils.setSnowballItem(snowball, inMainHand);
 				proj = snowball;
 				proj.setVelocity(direction.normalize().multiply(3.0f));
@@ -118,6 +129,7 @@ public class Quickdraw extends Ability {
 				if (ItemStatUtils.hasEnchantment(inMainHand, EnchantmentType.THROWING_KNIFE)) {
 					proj = world.spawnArrow(eyeLoc, direction, 3f, 0, Arrow.class);
 				} else {
+					// And you may ask yourself,
 					// How did we get here?
 					return false;
 				}
@@ -137,42 +149,47 @@ public class Quickdraw extends Ability {
 			}
 			EntityUtils.applyRecoilDisable(mPlugin, 9999, 1, mPlayer);
 			proj.addScoreboardTag("SourceQuickDraw");
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mPlayer.updateInventory();
-				}
-			}.runTaskLater(mPlugin, 1);
+			Bukkit.getScheduler().runTaskLater(mPlugin, mPlayer::updateInventory, 1);
 		}
 
 		proj.setShooter(mPlayer);
-		if (proj instanceof AbstractArrow arrow) {
-			arrow.setPierceLevel(Math.max(0, Math.min((isLevelTwo() ? 1 : 0) + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING), 127)));
+		if (proj instanceof final AbstractArrow arrow) {
+			arrow.setPierceLevel(Math.max(0, Math.min((isEnhanced() ? PIERCE_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0), 127)));
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 		}
 
-		ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(proj);
+		final ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(proj);
 		Bukkit.getPluginManager().callEvent(eventLaunch);
 
 		if (!eventLaunch.isCancelled()) {
 			mCosmetic.quickdrawProjectileEffect(mPlugin, proj);
 		}
 
-		ItemStatManager.PlayerItemStats stats = DamageListener.getProjectileItemStats(proj);
+		final ItemStatManager.PlayerItemStats stats = DamageListener.getProjectileItemStats(proj);
 		if (stats != null) {
-			ItemStatManager.PlayerItemStats.ItemStatsMap map = stats.getItemStats();
+			final ItemStatManager.PlayerItemStats.ItemStatsMap map = stats.getItemStats();
 			if (map != null) {
-				ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
-				double damage = map.get(projDamageAdd);
-				map.set(projDamageAdd, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage));
+				final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+				final ItemStat sniper = Objects.requireNonNull(EnchantmentType.SNIPER.getItemStat());
+				final ItemStat pointBlank = Objects.requireNonNull(EnchantmentType.POINT_BLANK.getItemStat());
+				// I know this doesn't make sense but trust me on this because Tridents were applying spec enchants
+				final ItemStat smite = Objects.requireNonNull(EnchantmentType.SMITE.getItemStat());
+				final ItemStat slayer = Objects.requireNonNull(EnchantmentType.SLAYER.getItemStat());
+				final ItemStat duelist = Objects.requireNonNull(EnchantmentType.DUELIST.getItemStat());
+				map.set(projDamageAdd, mDamage);
+				map.set(sniper, 0);
+				map.set(pointBlank, 0);
+				map.set(smite, 0);
+				map.set(slayer, 0);
+				map.set(duelist, 0);
 			}
 		}
 
 		return !eventLaunch.isCancelled() || proj instanceof Trident;
 	}
 
-	public boolean isQuickDraw(Projectile projectile) {
+	public boolean isQuickDraw(final Projectile projectile) {
 		return projectile == mProjectile;
 	}
 }

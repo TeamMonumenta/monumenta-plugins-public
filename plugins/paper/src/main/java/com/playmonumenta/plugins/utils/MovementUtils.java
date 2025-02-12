@@ -86,20 +86,7 @@ public class MovementUtils {
 	}
 
 	public static void pullTowards(Entity towardsEntity, LivingEntity target, float speed) {
-		if (EntityUtils.isBoss(target)) {
-			return;
-		}
-		BossManager.getInstance().entityKnockedAway(target, speed);
-		Vector dir = target.getLocation().subtract(towardsEntity.getLocation().toVector()).toVector().multiply(-speed);
-		if (dir.getY() < 0) {
-			dir.setY(0.5f);
-		}
-		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
-		if (mult > 0) {
-			dir.multiply(mult);
-
-			target.setVelocity(dir);
-		}
+		pullTowards(towardsEntity.getLocation(), target, speed);
 	}
 
 	public static void pullTowards(Location location, LivingEntity target, float speed) {

@@ -92,7 +92,7 @@ public enum ClassAbility {
 	SWIFT_CUTS("Swift Cuts"), //placeholder for cosmetic
 	SWIFTNESS("Swiftness"),
 	SHARPSHOOTER("Sharpshooter"),
-	AGILITY("Agility"),
+	QUICKDRAW("Quickdraw"),
 
 	// Hunter
 	PREDATOR_STRIKE("Predator Strike"),
@@ -101,7 +101,7 @@ public enum ClassAbility {
 
 	// Ranger
 	TACTICAL_MANEUVER("Tactical Maneuver"),
-	QUICKDRAW("Quickdraw"),
+	RENDING_RAZOR("Rending Razor"),
 	WHIRLING_BLADE("Whirling Blade"),
 
 	// [Warlock]

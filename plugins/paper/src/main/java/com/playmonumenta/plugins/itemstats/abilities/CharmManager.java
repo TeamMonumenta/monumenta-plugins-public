@@ -66,9 +66,9 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
-import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
@@ -77,7 +77,7 @@ import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
-import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.ranger.RendingRazor;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
@@ -837,7 +837,6 @@ public class CharmManager {
 			Culling.CHARM_RESISTANCE,
 
 			//Scout
-			Agility.CHARM_HASTE,
 			EagleEye.CHARM_COOLDOWN,
 			EagleEye.CHARM_DURATION,
 			EagleEye.CHARM_RADIUS,
@@ -863,14 +862,18 @@ public class CharmManager {
 			SwiftCuts.CHARM_DURATION,
 			SwiftCuts.CHARM_ENHANCE,
 			Swiftness.CHARM_SPEED,
+			Swiftness.CHARM_ATTACK_SPEED,
 			Swiftness.CHARM_JUMP_BOOST,
-			Swiftness.CHARM_DODGE,
+			Swiftness.CHARM_ENHANCE_CDR,
 			Volley.CHARM_COOLDOWN,
 			Volley.CHARM_ARROWS,
 			Volley.CHARM_DAMAGE,
 			Volley.CHARM_PIERCING,
 			Volley.CHARM_BLEED_AMPLIFIER,
 			Volley.CHARM_BLEED_DURATION,
+			Quickdraw.CHARM_COOLDOWN,
+			Quickdraw.CHARM_PIERCING,
+			Quickdraw.CHARM_DAMAGE,
 			WindBomb.CHARM_COOLDOWN,
 			WindBomb.CHARM_DAMAGE,
 			WindBomb.CHARM_DAMAGE_MODIFIER,
@@ -892,9 +895,14 @@ public class CharmManager {
 			SplitArrow.CHARM_DAMAGE,
 			SplitArrow.CHARM_RANGE,
 			SplitArrow.CHARM_BOUNCES,
-			Quickdraw.CHARM_COOLDOWN,
-			Quickdraw.CHARM_PIERCING,
-			Quickdraw.CHARM_DAMAGE,
+			RendingRazor.CHARM_EMBED_DAMAGE,
+			RendingRazor.CHARM_REND_DAMAGE,
+			RendingRazor.CHARM_COOLDOWN,
+			RendingRazor.CHARM_SPEED,
+			RendingRazor.CHARM_SLOWNESS,
+			RendingRazor.CHARM_SLOWNESS_DURATION,
+			RendingRazor.CHARM_RAZOR_RANGE,
+			RendingRazor.CHARM_RAZOR_SIZE,
 			TacticalManeuver.CHARM_CHARGES,
 			TacticalManeuver.CHARM_COOLDOWN,
 			TacticalManeuver.CHARM_DAMAGE,
@@ -1099,6 +1107,7 @@ public class CharmManager {
 			Quickdraw.CHARM_COOLDOWN,
 			TacticalManeuver.CHARM_COOLDOWN,
 			WhirlingBlade.CHARM_COOLDOWN,
+			RendingRazor.CHARM_COOLDOWN,
 			CleansingTotem.CHARM_COOLDOWN,
 			CleansingTotem.CHARM_PULSE_DELAY,
 			ChainLightning.CHARM_COOLDOWN,

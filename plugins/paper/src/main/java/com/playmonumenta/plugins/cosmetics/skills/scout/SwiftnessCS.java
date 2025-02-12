@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class SwiftnessCS implements CosmeticSkill {
@@ -23,18 +22,16 @@ public class SwiftnessCS implements CosmeticSkill {
 		return Material.RABBIT_FOOT;
 	}
 
-	public void swiftnessEnhancement(Player player) {
-		Location loc = player.getLocation();
-		World world = player.getWorld();
-		new PartialParticle(Particle.CLOUD, loc, 40, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(player);
-		world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.25f, 2f);
+	public void swiftnessEnhancement(final Player player, final Location blockLoc) {
+		new PartialParticle(Particle.CLOUD, blockLoc, 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerPassive(player);
+		player.playSound(blockLoc, Sound.ITEM_BUNDLE_REMOVE_ONE, SoundCategory.PLAYERS, 0.8f, 1.0f);
 	}
 
-	public void toggleJumpBoostOff(Player player) {
+	public void toggleJumpBoostOff(final Player player) {
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 	}
 
-	public void toggleJumpBoostOn(Player player) {
+	public void toggleJumpBoostOn(final Player player) {
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 	}
 }

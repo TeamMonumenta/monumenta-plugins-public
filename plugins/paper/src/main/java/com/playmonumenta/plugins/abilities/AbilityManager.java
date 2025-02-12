@@ -73,9 +73,9 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
-import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
@@ -85,7 +85,7 @@ import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
-import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.ranger.RendingRazor;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
@@ -277,7 +277,6 @@ public class AbilityManager {
 			EscapeDeath.INFO,
 
 			//********** SCOUT **********//
-			Agility.INFO,
 			HuntingCompanion.INFO,
 			Volley.INFO,
 			Swiftness.INFO,
@@ -286,6 +285,7 @@ public class AbilityManager {
 			SwiftCuts.INFO,
 			Sharpshooter.INFO,
 			WindBomb.INFO,
+			Quickdraw.INFO,
 
 			//********** WARRIOR **********//
 			CounterStrike.INFO,
@@ -369,9 +369,9 @@ public class AbilityManager {
 
 			//********** SCOUT **********//
 			// RANGER
+			RendingRazor.INFO,
 			TacticalManeuver.INFO,
 			WhirlingBlade.INFO,
-			Quickdraw.INFO,
 
 			// HUNTER
 			PinningShot.INFO,
@@ -396,7 +396,6 @@ public class AbilityManager {
 			// HJ runs afterwards and can use that value in the same event,
 			// sharing it to its Javelin AoE
 			HolyJavelin.INFO,
-
 			ChoirBells.INFO,
 
 			// HIEROPHANT

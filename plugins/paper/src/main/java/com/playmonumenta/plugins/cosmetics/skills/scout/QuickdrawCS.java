@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.cosmetics.skills.scout.ranger;
+package com.playmonumenta.plugins.cosmetics.skills.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
