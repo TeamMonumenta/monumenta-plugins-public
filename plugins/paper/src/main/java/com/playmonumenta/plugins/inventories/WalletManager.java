@@ -109,6 +109,12 @@ public class WalletManager implements Listener {
 				"epic:r1/transmog/rare_frag",
 				"epic:r1/items/currency/pulsating_dust",
 				"epic:r1/items/currency/pulsating_dust_frag",
+				// r1 events
+				"epic:event/winter2021/blue_ornament",
+				"epic:event/winter2021/green_ornament",
+				"epic:event/winter2021/red_ornament",
+				"epic:event/winter2021/yellow_ornament",
+				"epic:event/winter2021/purple_ornament",
 
 				// r2
 				"epic:r2/items/currency/pulsating_emerald_block",
