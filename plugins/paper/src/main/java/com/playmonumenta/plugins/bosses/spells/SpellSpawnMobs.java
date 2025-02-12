@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -82,26 +84,24 @@ public class SpellSpawnMobs extends Spell {
 
 	@Override
 	public boolean canRun() {
-		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange);
-		int mobCount = 0;
-		for (LivingEntity mob : nearbyMobs) {
-			if (mob.getName().equals(mMobCapName)) {
-				mobCount++;
-			}
-		}
-
 		if (mCapMobsByName) {
-			if (mobCount >= mMobCap
-				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS))) {
-				return false;
+			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange);
+
+			int mobCount = 0;
+			String plainMobCapName = MessagingUtils.plainFromLegacy(mMobCapName);
+			for (LivingEntity mob : nearbyMobs) {
+				Component customName = mob.customName();
+				if (customName != null && MessagingUtils.plainText(customName).equals(plainMobCapName)) {
+					mobCount++;
+				}
 			}
+
+			return mobCount < mMobCap
+				&& !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS);
 		} else {
-			if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap
-				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS))) {
-				return false;
-			}
+			return EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() <= mMobCap
+				&& !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS);
 		}
-		return true;
 	}
 
 	@Override
