@@ -267,9 +267,16 @@ public class SpawnerUtils {
 
 			@Override
 			public void run() {
+				// if no one within 20 blocks, don't play effects
 				if (PlayerUtils.playersInRange(marker.getLocation(), 20, false).isEmpty()) {
 					return;
 				}
+
+				if (marker.getLocation().getWorld().getPlayers().isEmpty()) {
+					cancel();
+					return;
+				}
+
 				// If the marker despawned or got removed, cancel the runnable.
 				if (!mMarker.isValid()) {
 					cancel();
