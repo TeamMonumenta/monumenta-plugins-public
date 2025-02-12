@@ -29,17 +29,17 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-public class EnergizingElixir extends Ability implements AbilityWithChargesOrStacks {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
-	private static final int COOLDOWN = 2 * 20;
-	private static final int DURATION = 6 * 20;
+public class EnergizingElixir extends Ability implements AbilityWithChargesOrStacks {
+	private static final int COOLDOWN = TICKS_PER_SECOND * 2;
+	private static final int DURATION = TICKS_PER_SECOND * 6;
 	private static final double SPEED_AMPLIFIER_1 = 0.1;
 	private static final double SPEED_AMPLIFIER_2 = 0.2;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "EnergizingElixirPercentSpeedEffect";
 	private static final int JUMP_LEVEL = 1;
 	private static final double DAMAGE_AMPLIFIER_2 = 0.1;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "EnergizingElixirPercentDamageEffect";
-
 	private static final double AUTO_RECAST_COST_INCREASE = 0.2;
 
 	private static final String ENHANCED_STACKS_NAME = EnergizingElixirStacks.GENERIC_NAME;
@@ -63,61 +63,59 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			.scoreboardId("EnergizingElixir")
 			.shorthandName("EE")
 			.descriptions(
-				("Left click while holding an Alchemist's Bag to consume a potion to apply %s%% Speed and Jump Boost %s " +
-				"to yourself for %ss. Cooldown: %ss.")
-					.formatted(
-						StringUtils.multiplierToPercentage(SPEED_AMPLIFIER_1),
-						JUMP_LEVEL + 1,
-						StringUtils.ticksToSeconds(DURATION),
-						StringUtils.ticksToSeconds(COOLDOWN)
-					),
-				"Speed is increased to %s%%; additionally, gain a %s%% damage buff from all sources for the same duration."
-					.formatted(
-						StringUtils.multiplierToPercentage(SPEED_AMPLIFIER_2),
-						StringUtils.multiplierToPercentage(DAMAGE_AMPLIFIER_2)
-					),
-				("Recasting this ability while the buff is still active refreshes the duration and increases " +
-				"the damage bonus and speed by %s%%, up to %s stacks. Stacks decay every %ss.")
-					.formatted(
-						StringUtils.multiplierToPercentage(ENHANCED_BONUS),
-						ENHANCED_MAX_STACK,
-						StringUtils.ticksToSeconds(DURATION)
-					)
-			)
+				String.format("Left click while holding an Alchemist's Bag to consume a potion and gain %s Speed " +
+					"and Jump Boost %s for %ss. Cooldown: %ss.",
+					StringUtils.multiplierToPercentageWithSign(SPEED_AMPLIFIER_1),
+					JUMP_LEVEL + 1,
+					StringUtils.ticksToSeconds(DURATION),
+					StringUtils.ticksToSeconds(COOLDOWN)),
+				String.format("The Speed is increased to %s and gain %s Damage for %ss.",
+					StringUtils.multiplierToPercentage(SPEED_AMPLIFIER_2),
+					StringUtils.multiplierToPercentage(DAMAGE_AMPLIFIER_2),
+					StringUtils.ticksToSeconds(DURATION)),
+				String.format("Recasting this ability while the buff is active refreshes the duration and increases " +
+					"the Damage and Speed by %s, up to %s stacks. Stacks decay every %ss.",
+					StringUtils.multiplierToPercentageWithSign(ENHANCED_BONUS),
+					ENHANCED_MAX_STACK,
+					StringUtils.ticksToSeconds(DURATION)))
 			.simpleDescription("Consume potions to give yourself mobility and damage buffs.")
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast",
 				EnergizingElixir::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("toggleRecast", "toggle automatic recast",
-				"Automatically keeps the buff up at a cost to potion recharge rate " + StringUtils.multiplierToPercentage(AUTO_RECAST_COST_INCREASE) + "% higher than what optimal manual casts would use.",
+				"Automatically keeps the buffs active at a " + StringUtils.multiplierToPercentageWithSign(AUTO_RECAST_COST_INCREASE) + " higher cost to potion recharge rate compared to optimal manual casting.",
 				EnergizingElixir::toggleRecast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN).enabled(false), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("toggleJumpBoost", "toggle jump boost",
 				EnergizingElixir::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP).enabled(false), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.displayItem(Material.RABBIT_FOOT);
 
 	private final double mSpeedAmp;
+	private final double mDamageAmp;
 	private final int mDuration;
-	private @Nullable AlchemistPotions mAlchemistPotions;
-	private int mStacks;
+	private final double mEnhanceEffectBonus;
 	private final int mMaxStacks;
 	private final int mPrice;
 	private final int mJumpBoostAmplifier;
 	private final EnergizingElixirCS mCosmetic;
 
-	public EnergizingElixir(Plugin plugin, Player player) {
+	private @Nullable AlchemistPotions mAlchemistPotions;
+	private int mStacks;
+
+	public EnergizingElixir(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mSpeedAmp = (isLevelOne() ? SPEED_AMPLIFIER_1 : SPEED_AMPLIFIER_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mDamageAmp = DAMAGE_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
+		mEnhanceEffectBonus = ENHANCED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS);
 		mStacks = 0;
 		mMaxStacks = isEnhanced() ? ENHANCED_MAX_STACK + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS) : 0;
 		mPrice = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_PRICE);
 		mJumpBoostAmplifier = JUMP_LEVEL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EnergizingElixirCS());
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new EnergizingElixirCS());
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		Bukkit.getScheduler().runTask(mPlugin, () ->
+			mAlchemistPotions = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, AlchemistPotions.class));
 	}
 
 	public boolean cast() {
@@ -141,8 +139,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		return true;
 	}
 
-	private void activate(boolean manualCast, boolean showParticles) {
-
+	private void activate(final boolean manualCast, final boolean showParticles) {
 		if (isEnhanced()) {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
 				mStacks = Math.min(mMaxStacks, mStacks + 1);
@@ -178,14 +175,19 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (mStacks > 1) {
 			duration += 10; // to prevent gaps
 		}
-		double bonus = mStacks * (ENHANCED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS));
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedAmp + bonus, PERCENT_SPEED_EFFECT_NAME));
+		final double effectAmpBonus = mStacks * mEnhanceEffectBonus;
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
+			new PercentSpeed(duration, mSpeedAmp + effectAmpBonus, PERCENT_SPEED_EFFECT_NAME));
+
 		if (!mPlayer.getScoreboardTags().contains(DISABLE_JUMP_BOOST_TAG)) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, duration, mJumpBoostAmplifier,
-				true, false, !mPlayer.getScoreboardTags().contains(TOGGLE_TAG)));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+				new PotionEffect(PotionEffectType.JUMP, duration, mJumpBoostAmplifier, true, false,
+					!mPlayer.getScoreboardTags().contains(TOGGLE_TAG)));
 		}
+
 		if (isLevelTwo()) {
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(duration, DAMAGE_AMPLIFIER_2 + bonus + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_EFFECT_NAME,
+				new PercentDamageDealt(duration, mDamageAmp + effectAmpBonus));
 		}
 	}
 
@@ -197,7 +199,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		} else {
 			// jump boost enabled: apply jump boost if elixir is currently active
 			mPlayer.sendActionBar(Component.text("Energizing Elixir's Jump Boost has been enabled"));
-			Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME);
+			final Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME);
 			if (activeEffect != null) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, activeEffect.getDuration(), mJumpBoostAmplifier,
 					true, false, !mPlayer.getScoreboardTags().contains(TOGGLE_TAG)));
@@ -207,12 +209,12 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 	}
 
 	@Override
-	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(final boolean twoHertz, final boolean oneSecond, final int ticks) {
 		boolean toggled = mPlayer.getScoreboardTags().contains(TOGGLE_TAG);
 		if (toggled && mAlchemistPotions != null) {
 			// Toggled potion cost is implemented by periodically increasing potion recharge time,
 			// as a constant modifier of the recharge rate results in different costs depending on the current value of that rate.
-			double potionTimer = (1 + AUTO_RECAST_COST_INCREASE) * 5 * 20 * mPrice / mDuration;
+			final double potionTimer = (1 + AUTO_RECAST_COST_INCREASE) * 5 * TICKS_PER_SECOND * mPrice / mDuration;
 			mAlchemistPotions.modifyCurrentPotionTimer(-potionTimer);
 		}
 		if (toggled && Arrays.stream(mPlayer.getInventory().getContents()).limit(9).noneMatch(ItemUtils::isAlchemistItem)) {
@@ -234,7 +236,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			applyEffects();
 			ClientModHandler.updateAbility(mPlayer, this);
 		} else if (toggled) {
-			Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME);
+			final Effect activeEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME);
 			if (activeEffect == null || activeEffect.getDuration() <= 5) {
 				activate(false, activeEffect == null);
 				ClientModHandler.updateAbility(mPlayer, this);
@@ -256,5 +258,4 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 	public @Nullable String getMode() {
 		return mPlayer.getScoreboardTags().contains(TOGGLE_TAG) ? "active" : null;
 	}
-
 }
