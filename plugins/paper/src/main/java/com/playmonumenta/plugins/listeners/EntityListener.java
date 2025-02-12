@@ -443,7 +443,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void entityAddToWorldEvent(EntityRemoveFromWorldEvent event) {
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.removeEntity(entity);
 	}

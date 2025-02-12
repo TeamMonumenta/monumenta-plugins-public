@@ -26,7 +26,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
@@ -38,7 +41,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -301,7 +303,11 @@ public class TABIntegration implements Listener {
 			if (bukkitPlayer == null) {
 				return;
 			}
-			refreshPing(bukkitPlayer).join();
+			try {
+				refreshPing(bukkitPlayer).get(1L, TimeUnit.SECONDS);
+			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
+				// don't care
+			}
 		}
 		TabPlayer viewer = mTab.getPlayer(uuid);
 		if (viewer == null || !viewer.isLoaded()) {
@@ -325,15 +331,16 @@ public class TABIntegration implements Listener {
 		Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout(viewer.getUniqueId()));
 	}
 
-	private long mNextRefreshLatencyTime = 0L;
 	private long mNextRefreshTime = 0L;
-	private static boolean mNeedsRefresh = false;
-	private static boolean mRefreshLatency = false;
-	private static boolean mScheduled = false;
+	private static final AtomicBoolean mNeedsRefresh = new AtomicBoolean(false);
+	private static final AtomicBoolean mRefreshLatency = new AtomicBoolean(false);
+	private static final AtomicBoolean mScheduled = new AtomicBoolean(false);
 
 	private void onRefreshRequest(boolean latency) {
-		mNeedsRefresh = true;
-		mRefreshLatency = mRefreshLatency || latency;
+		mNeedsRefresh.set(true);
+		if (latency) {
+			mRefreshLatency.set(true);
+		}
 	}
 
 	// this should be run async
@@ -360,18 +367,15 @@ public class TABIntegration implements Listener {
 
 	private void attemptRefresh() {
 		final long now = System.currentTimeMillis();
-		if (mNeedsRefresh && !mScheduled && now >= mNextRefreshTime && (!mRefreshLatency || now >= mNextRefreshLatencyTime)) {
-			final boolean refreshLatency = mRefreshLatency;
-			mRefreshLatency = false;
-			mNeedsRefresh = false;
-			mScheduled = true;
+		if (mNeedsRefresh.get() && !mScheduled.get() && now >= mNextRefreshTime) {
+			final boolean refreshLatency = mRefreshLatency.get();
+			mRefreshLatency.set(false);
+			mNeedsRefresh.set(false);
+			mScheduled.set(true);
 			mExecutor.schedule(() -> {
 				refresh(refreshLatency);
-				mScheduled = false;
+				mScheduled.set(false);
 			});
-			if (refreshLatency) {
-				mNextRefreshLatencyTime = System.currentTimeMillis() + 5000L;
-			}
 			mNextRefreshTime = System.currentTimeMillis() + 1000L;
 		}
 	}
