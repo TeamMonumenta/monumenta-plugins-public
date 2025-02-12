@@ -109,7 +109,8 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			mStacksMap.put(ability, false);
 			if (mStacks >= mMaxStacks) {
 				if (mSpeed > 0) {
-					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed", new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME));
+					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed",
+						new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME).deleteOnAbilityUpdate(true));
 				}
 				mCosmetic.insightTrigger(mPlugin, mPlayer);
 

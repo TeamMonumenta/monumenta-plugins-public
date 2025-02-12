@@ -128,7 +128,9 @@ public class EscapeDeath extends Ability {
 
 				if (isLevelTwo()) {
 					AbsorptionUtils.addAbsorption(mPlayer, absorptionHealth, absorptionHealth, BUFF_DURATION);
-					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
+					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
+						new PercentSpeed(BUFF_DURATION, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME)
+							.deleteOnAbilityUpdate(true));
 					if (!mPlayer.getScoreboardTags().contains(DISABLE_JUMP_BOOST_TAG)) {
 						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP), true, true));
@@ -138,7 +140,9 @@ public class EscapeDeath extends Ability {
 				if (isEnhanced()) {
 					// This check ensures that no "dupe" regeneration runnables occurs.
 					// If escape death somehow "double procs", simply reset the ticks variable.
-					mPlugin.mEffectManager.addEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN, new CustomRegeneration(ENHANCEMENT_DURATION, ENHANCEMENT_HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer), mPlugin));
+					mPlugin.mEffectManager.addEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN,
+						new CustomRegeneration(ENHANCEMENT_DURATION, ENHANCEMENT_HEAL_PERCENT *
+							EntityUtils.getMaxHealth(mPlayer), mPlugin).deleteOnAbilityUpdate(true));
 				}
 
 				Location loc = mPlayer.getLocation();

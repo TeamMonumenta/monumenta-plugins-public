@@ -45,7 +45,8 @@ public class Execution implements Infusion {
 		BlockData fallingDustData = Material.ANVIL.createBlockData();
 		new PartialParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
 			(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData).spawnAsPlayerActive(player);
-		plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new GearDamageIncrease(DURATION, percentDamage, AFFECTED_DAMAGE_TYPES));
+		plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new GearDamageIncrease(DURATION, percentDamage)
+			.damageTypes(AFFECTED_DAMAGE_TYPES));
 	}
 
 	public static double getDamageDealtMultiplier(double level) {

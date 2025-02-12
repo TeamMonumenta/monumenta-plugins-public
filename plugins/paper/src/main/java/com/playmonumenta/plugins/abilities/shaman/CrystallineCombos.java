@@ -143,7 +143,8 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		mCrystalStacks = 0;
 		updateNotify();
 		mPlugin.mEffectManager.addEffect(mPlayer, "CrystalCombosSpeed", new PercentSpeed(mSpeedDuration,
-			Math.min(mMaxSpeed, savedStacks * mSpeedPerStack), "CrystalCombosSpeed"));
+			Math.min(mMaxSpeed, savedStacks * mSpeedPerStack), "CrystalCombosSpeed")
+			.deleteOnAbilityUpdate(true));
 		return true;
 	}
 

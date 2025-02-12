@@ -21,8 +21,6 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -238,27 +236,6 @@ public class AbilityUtils {
 				player.sendActionBar(Component.text("You have reduced healing for " + duration / 20 + "s", NamedTextColor.DARK_RED));
 			}
 		}
-	}
-
-	// the unluck potion effect does not increase nor decrease luck attribute
-	public static void increaseDamageReceivedPlayer(Player player, int duration, double damageBoost, String cause) {
-		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageReceived(duration, damageBoost));
-		if (damageBoost > 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration, -1));
-		} else if (damageBoost < 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, -1));
-		}
-	}
-
-	// the weakness potion effect does not increase nor decrease melee damage
-	public static void increaseDamageDealtPlayer(Player player, int duration, double damageBoost, String cause) {
-		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageDealt(duration, damageBoost));
-		if (damageBoost < 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, -1));
-		} else if (damageBoost > 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, duration, -1));
-		}
-
 	}
 
 	public static boolean refundPotion(Player player, ThrownPotion potion) {

@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class BlueDamageIncreaseBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bluedamageincrease";
 	public static final int detectionRange = 36;
@@ -40,7 +42,9 @@ public class BlueDamageIncreaseBoss extends BossAbilityGroup {
 						currentIncrease.clearEffect();
 					}
 
-					mMonumentaPlugin.mEffectManager.addEffect(player, BluePercentDamageDealt.GENERIC_NAME, new BluePercentDamageDealt(60 * 20, amount, null, 0, (entity, enemy) -> enemy.getScoreboardTags().contains("boss_harrakfar")));
+					mMonumentaPlugin.mEffectManager.addEffect(player, BluePercentDamageDealt.effectID,
+						new BluePercentDamageDealt(TICKS_PER_SECOND * 60, amount, null, BluePercentDamageDealt.effectID)
+							.predicate((entity, enemy) -> enemy.getScoreboardTags().contains("boss_harrakfar")));
 
 					new PPExplosion(Particle.SOUL_FIRE_FLAME, player.getLocation())
 						.count(5)

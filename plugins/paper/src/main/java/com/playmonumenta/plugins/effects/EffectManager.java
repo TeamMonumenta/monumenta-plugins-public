@@ -428,17 +428,17 @@ public final class EffectManager implements Listener {
 
 	private static final int PERIOD = 5;
 
-	private final Map<UUID, Effects> mEntities = new WeakHashMap<UUID, Effects>();
+	private final Map<UUID, Effects> mEntities = new WeakHashMap<>();
 	private final BukkitRunnable mTimer;
 	private static @Nullable EffectManager INSTANCE = null;
 	private static final String PLAYER_EFFECT_DEATH_KEY = "player_effect_death_key";
 
-	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {
 		INSTANCE = this;
 		/*
-		 * This timer also ticks down for offline players. Keeping it like this for now since most custom effects we
-		 * want to apply are short (no more than 30 seconds, e.g. class abilities) and already function this way.
+		 * This timer runs every PERIOD ticks on all Entities that are alive in mEntities. If the Entity is a player,
+		 * that player must also be logged in for the timer to run on them. Offline players are removed and their
+		 * effects do not tick down until they log in again
 		 */
 		mTimer = new BukkitRunnable() {
 			int mTicks = 0;
@@ -949,10 +949,9 @@ public final class EffectManager implements Listener {
 					Effect effect = pair.mEffect;
 					String source = pair.mSource;
 
-					if (source.startsWith("DeathPersistent")) {
-						// Don't alter duration for these effects.
-						continue;
-					} else if (effect.isBuff() && !source.startsWith("PatronShrine")) {
+					// DeathPersistent effects are not modified
+
+					if (effect.isBuff() && !source.startsWith("PatronShrine")) {
 						// Effect is Buff, set duration based on Phylactery value.
 						effect.setDuration((int) (effect.getDuration() * phylactery * Phylactery.DURATION_KEPT));
 						effect.entityLoseEffect(player);
@@ -1044,9 +1043,6 @@ public final class EffectManager implements Listener {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 					effectGroup.last().onConsumeArrow(event.getPlayer(), event);
-					if (event.isCancelled()) {
-						return;
-					}
 				}
 			}
 		}
@@ -1158,7 +1154,7 @@ public final class EffectManager implements Listener {
 	@EventHandler (priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
-		Effects effects = mEntities.get(player);
+		Effects effects = mEntities.get(player.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {

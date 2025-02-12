@@ -19,12 +19,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class Stamina implements Enchantment {
 
 	private static final String STAMINA_EFFECT = "StaminaDamage";
 	private static final double DAMAGE_BONUS = 0.025;
 	private static final double DAMAGE_CAP = 0.1;
-	private static final int DURATION = 5 * 20;
+	private static final int DURATION = TICKS_PER_SECOND * 5;
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(241, 190, 84), 0.75f);
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 		DamageEvent.DamageType.MELEE,
@@ -74,30 +76,15 @@ public class Stamina implements Enchantment {
 		}
 
 		double damage = Math.min(currStamina + (DAMAGE_BONUS * level), DAMAGE_CAP * level);
-		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new GearDamageIncrease(DURATION, damage, AFFECTED_DAMAGE_TYPES));
+		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new GearDamageIncrease(DURATION, damage)
+			.damageTypes(AFFECTED_DAMAGE_TYPES));
 
-		player.getWorld().playSound(
-			player.getLocation(),
-			Sound.BLOCK_LANTERN_BREAK,
-			SoundCategory.PLAYERS,
-			0.5f,
-			0.7f
-		);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LANTERN_BREAK, SoundCategory.PLAYERS, 0.5f, 0.7f);
 
-		double widthDelta = PartialParticle.getWidthDelta(player);
-		double doubleWidthDelta = widthDelta * 2;
-		double heightDelta = PartialParticle.getHeightDelta(player);
-
-		new PartialParticle(
-			Particle.REDSTONE,
-			LocationUtils.getHeightLocation(player, 0.8),
-			8,
-			doubleWidthDelta,
-			heightDelta / 2,
-			doubleWidthDelta,
-			1,
-			COLOR
-		).spawnAsEnemy();
+		final double widthDelta = PartialParticle.getWidthDelta(player);
+		final double doubleWidthDelta = widthDelta * 2;
+		final double heightDelta = PartialParticle.getHeightDelta(player);
+		new PartialParticle(Particle.REDSTONE, LocationUtils.getHeightLocation(player, 0.8), 8,
+			doubleWidthDelta, heightDelta / 2, doubleWidthDelta).extra(1).data(COLOR).spawnAsPlayerPassive(player);
 	}
-
 }

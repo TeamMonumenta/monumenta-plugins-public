@@ -5,7 +5,33 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SequentialSpellManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.*;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellAbyssalSigil;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellAllowTotemThrow;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellBlueTransition;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellCascadingHex;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellCommandingIncantation;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellDestroyCenterPlatform;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellEarthenCleave;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellFloralFlechettes;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellGenerateHyceneaSpells;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellGrowableAtMarker;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellHyceneaAnticheat;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellHyceneaDialogue;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellHyceneaLeyline;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellHyceneaRecover;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellHyceneaSummonTotemPlatforms;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellMortalChains;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellMysticMaelstrom;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellOrganicShock;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellPassiveStranglingKillzones;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellPassiveTotemicShields;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellReunion;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellSetHyceneaPhase;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellStranglingRupture;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellSummonManageBlue;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellTotemicDestruction;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellVoodooBindings;
+import com.playmonumenta.plugins.bosses.spells.hexfall.hycenea.SpellVoodooExecution;
 import com.playmonumenta.plugins.effects.NegateDamage;
 import com.playmonumenta.plugins.effects.hexfall.BluePercentDamageDealt;
 import com.playmonumenta.plugins.effects.hexfall.DeathImmunity;
@@ -73,7 +99,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 		super.constructBoss(mSpellQueue, getPassiveSpellsByPhase(mPhase), detectionRange * 2, bossBar, 0, 1);
 
 		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).stream().filter(p -> p.getScoreboardTags().contains("HyceneaFighter")).forEach(p -> {
-				plugin.mEffectManager.clearEffects(p, BluePercentDamageDealt.GENERIC_NAME);
+				plugin.mEffectManager.clearEffects(p, BluePercentDamageDealt.effectID);
 				plugin.mEffectManager.addEffect(p, Reincarnation.GENERIC_NAME, new Reincarnation(20 * 6000, 1));
 				mPlayersStartingFight.add(p);
 			}
@@ -561,7 +587,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 					@Override
 					public void run() {
 						for (Player player : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
-							mMonumentaPlugin.mEffectManager.clearEffects(player, BluePercentDamageDealt.GENERIC_NAME);
+							mMonumentaPlugin.mEffectManager.clearEffects(player, BluePercentDamageDealt.effectID);
 						}
 					}
 

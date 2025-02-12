@@ -33,6 +33,8 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_MINUTE;
+
 public class Challenge extends Ability {
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "ChallengePercentDamageDealtEffect";
 	private static final String SPEED_EFFECT_NAME = "ChallengePercentSpeedEffect";
@@ -102,6 +104,9 @@ public class Challenge extends Ability {
 	private final double mPercentDamageDealtEffect;
 	private final double mAbsorptionPerMob;
 	private final double mMaxAbsorption;
+	private final int mKilledMobsCap;
+	private final double mSpeedPerMob;
+	private final int mCDRPerMob;
 	private final int mDuration;
 	private @Nullable CounterStrike mCounterStrike;
 
@@ -121,6 +126,9 @@ public class Challenge extends Ability {
 			isLevelOne() ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2);
 		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX,
 			isLevelOne() ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2);
+		mKilledMobsCap = KILLED_MOBS_CAP + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_MOBS);
+		mSpeedPerMob = SPEED_PER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED_PER);
+		mCDRPerMob = CharmManager.getDuration(mPlayer, CHARM_CDR_PER, CDR_PER);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new ChallengeCS());
 		Bukkit.getScheduler().runTask(mPlugin, () ->
@@ -141,8 +149,8 @@ public class Challenge extends Ability {
 
 		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, mDuration);
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
-			new PercentDamageDealt(mDuration, Math.min(mobs.size() * mPercentDamageDealtPerMob, mPercentDamageDealtEffect),
-				AFFECTED_DAMAGE_TYPES));
+			new PercentDamageDealt(mDuration, Math.min(mobs.size() * mPercentDamageDealtPerMob, mPercentDamageDealtEffect))
+				.damageTypes(AFFECTED_DAMAGE_TYPES).deleteOnAbilityUpdate(true));
 
 		mobs.stream().filter(mob -> mob instanceof Mob).forEach(mob -> {
 			EntityUtils.applyTaunt(mob, mPlayer);
@@ -155,7 +163,7 @@ public class Challenge extends Ability {
 			mAffectedEntities = mobs;
 			mobs.forEach(mob -> {
 				mPlugin.mEffectManager.addEffect(mob, AFFECTED_MOB_EFFECT_NAME,
-					new ChallengeMobEffect(Constants.TICKS_PER_MINUTE, this));
+					new ChallengeMobEffect(TICKS_PER_MINUTE, this));
 				mCosmetic.onCastEffect(mPlayer, mPlayer.getWorld(), mob.getLocation());
 			});
 		}
@@ -169,16 +177,16 @@ public class Challenge extends Ability {
 		mKillCount++;
 		mCosmetic.killMob(mPlayer, mPlayer.getWorld(), mob.getLocation());
 
-		if (mKillCount > KILLED_MOBS_CAP + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_MOBS) || mKillCount > mAffectedEntities.size()) {
+		if (mKillCount >= mKilledMobsCap || mKillCount > mAffectedEntities.size()) {
 			mCosmetic.maxMobs(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
 			clearAffectedEntities();
 			return;
 		}
 
-		final double speed = mKillCount * (SPEED_PER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED_PER));
-		mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, speed, SPEED_EFFECT_NAME));
+		mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME,
+			new PercentSpeed(mDuration, mKillCount * mSpeedPerMob, SPEED_EFFECT_NAME).deleteOnAbilityUpdate(true));
 		EnumSet.of(ClassAbility.CHALLENGE, ClassAbility.BODYGUARD, ClassAbility.SHIELD_WALL)
-			.forEach(ca -> mPlugin.mTimers.updateCooldown(mPlayer, ca, CharmManager.getDuration(mPlayer, CHARM_CDR_PER, CDR_PER)));
+			.forEach(ca -> mPlugin.mTimers.updateCooldown(mPlayer, ca, mCDRPerMob));
 
 		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.7f, (float) Math.pow(2, ((mKillCount - 12) / 12.0)));
 	}

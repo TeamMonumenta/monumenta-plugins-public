@@ -16,6 +16,7 @@ import static com.playmonumenta.plugins.abilities.cleric.CelestialBlessing.PARTI
 import static com.playmonumenta.plugins.abilities.cleric.CelestialBlessing.SPEED_EFFECT_NAME;
 
 public class CelestialBlessingDamageBuff extends PercentDamageDealt {
+	public static final String effectID = "CelestialBlessingDamageBuff";
 
 	private final CelestialBlessingCS mCosmetic;
 	private final boolean mEnhanced;
@@ -25,8 +26,9 @@ public class CelestialBlessingDamageBuff extends PercentDamageDealt {
 	private boolean mCast;
 	private boolean mExtended;
 
-	public CelestialBlessingDamageBuff(int duration, double amount, boolean enhanced, CelestialBlessingCS cosmetic, Player player, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
-		super(duration, amount, affectedDamageTypes);
+	public CelestialBlessingDamageBuff(int duration, double amount, boolean enhanced, CelestialBlessingCS cosmetic,
+									   Player player, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
+		super(duration, amount, affectedDamageTypes, effectID);
 		mEnhanced = enhanced;
 		mMelee = false;
 		mRanged = false;
@@ -77,6 +79,4 @@ public class CelestialBlessingDamageBuff extends PercentDamageDealt {
 			mCosmetic.enhanceExtension(mPlayer);
 		}
 	}
-
-
 }

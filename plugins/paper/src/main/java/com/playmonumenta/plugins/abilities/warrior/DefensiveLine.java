@@ -25,7 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class DefensiveLine extends Ability {
-
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "DefensiveLinePercentDamageReceivedEffect";
 	private static final String NEGATE_DAMAGE_EFFECT_NAME = "DefensiveLineNegateDamageEffect";
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = -0.20;
@@ -58,7 +57,6 @@ public class DefensiveLine extends Ability {
 			.displayItem(Material.CHAIN);
 
 	private final double mPercentDamageReceived;
-
 	private final DefensiveLineCS mCosmetic;
 
 	public DefensiveLine(Plugin plugin, Player player) {
@@ -86,9 +84,14 @@ public class DefensiveLine extends Ability {
 		for (Player player : players) {
 			Location loc = player.getLocation();
 
-			mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(duration, mPercentDamageReceived));
+			mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME,
+				new PercentDamageReceived(duration, mPercentDamageReceived).deleteOnAbilityUpdate(true));
 			if (isEnhanced()) {
-				mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME, new NegateDamage(duration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)), EnumSet.of(DamageEvent.DamageType.MELEE), new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.25f)));
+				mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME,
+					new NegateDamage(duration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)),
+						EnumSet.of(DamageEvent.DamageType.MELEE),
+						new PartialParticle(Particle.FIREWORKS_SPARK, loc).count(5).delta(0).extra(0.25))
+						.deleteOnAbilityUpdate(true));
 			}
 
 			for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(player), CharmManager.getRadius(mPlayer, CHARM_RANGE, KNOCK_AWAY_RADIUS)).getHitMobs()) {
@@ -96,5 +99,4 @@ public class DefensiveLine extends Ability {
 			}
 		}
 	}
-
 }

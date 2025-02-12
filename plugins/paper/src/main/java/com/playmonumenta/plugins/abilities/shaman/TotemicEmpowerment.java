@@ -21,6 +21,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class TotemicEmpowerment extends Ability {
 
 	public static final double SPEED = 0.05;
@@ -82,9 +84,12 @@ public class TotemicEmpowerment extends Ability {
 		}
 	}
 
-	private void applyEffects(Player player, double speed, double resist) {
-		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveSpeed", new PercentSpeed(40, speed, "ShamanPassiveSpeed"));
-		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveResistance", new PercentDamageReceived(40, -resist));
+	private void applyEffects(final Player player, final double speed, final double resist) {
+		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveSpeed",
+			new PercentSpeed(TICKS_PER_SECOND * 2, speed, "ShamanPassiveSpeed")
+				.deleteOnAbilityUpdate(true));
+		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveResistance",
+			new PercentDamageReceived(TICKS_PER_SECOND * 2, -resist).deleteOnAbilityUpdate(true));
 	}
 
 	public static void addTotem(Player player, LivingEntity stand) {

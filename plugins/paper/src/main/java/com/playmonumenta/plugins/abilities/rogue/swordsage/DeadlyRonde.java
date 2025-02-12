@@ -98,7 +98,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				public void run() {
 					mTicks++;
 					mCosmetic.rondeTickEffect(mPlayer, getCharges(), mTicks);
-					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(6, speed, "DeadlyRondeMod"));
+					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde",
+						new PercentSpeed(6, speed, "DeadlyRondeMod").deleteOnAbilityUpdate(true));
 					if (mActiveRunnable == null) {
 						this.cancel();
 					}

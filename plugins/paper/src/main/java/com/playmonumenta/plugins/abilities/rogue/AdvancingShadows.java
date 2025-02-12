@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -54,7 +53,6 @@ public class AdvancingShadows extends Ability {
 	public static final String CHARM_ENHANCE_TIMER = "Advancing Shadows Recast Timer";
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeTypes();
 
 	public static final AbilityInfo<AdvancingShadows> INFO =
 		new AbilityInfo<>(AdvancingShadows.class, "Advancing Shadows", AdvancingShadows::new)
@@ -192,9 +190,13 @@ public class AdvancingShadows extends Ability {
 		}
 
 		if (mEnhancementChain == 0) {
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
+				new PercentDamageDealt(DURATION, mPercentDamageDealt).damageTypes(DamageEvent.DamageType.getAllMeleeTypes())
+					.deleteOnAbilityUpdate(true));
 		} else {
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt / 2.0, AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
+				new PercentDamageDealt(DURATION, mPercentDamageDealt / 2.0)
+					.damageTypes(DamageEvent.DamageType.getAllMeleeTypes()).deleteOnAbilityUpdate(true));
 		}
 		if (isLevelTwo()) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),

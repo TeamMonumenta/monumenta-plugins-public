@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -31,16 +30,18 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class Illuminate extends Ability {
-	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 14;
-	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 12;
+	private static final int COOLDOWN_1 = TICKS_PER_SECOND * 14;
+	private static final int COOLDOWN_2 = TICKS_PER_SECOND * 12;
 	private static final int ILLUMINATE_MAX_RANGE = 24;
 	private static final double ILLUMINATE_VELOCITY = 1.4;
 	private static final double ILLUMINATE_HITBOX_RADIUS = 0.8;
 	private static final double ILLUMINATE_TRAIL_WIDTH = 3.5;
-	private static final int ILLUMINATE_TRAIL_DURATION_1 = Constants.TICKS_PER_SECOND * 6;
-	private static final int ILLUMINATE_TRAIL_DURATION_2 = Constants.TICKS_PER_SECOND * 8;
-	private static final int ILLUMINATE_BUFF_DURATION = Constants.TICKS_PER_SECOND * 4;
+	private static final int ILLUMINATE_TRAIL_DURATION_1 = TICKS_PER_SECOND * 6;
+	private static final int ILLUMINATE_TRAIL_DURATION_2 = TICKS_PER_SECOND * 8;
+	private static final int ILLUMINATE_BUFF_DURATION = TICKS_PER_SECOND * 4;
 	private static final double ILLUMINATE_SPEED_BUFF = 0.20;
 	private static final double ILLUMINATE_STRENGTH_BUFF = 0.10;
 	private static final double ILLUMINATE_DAMAGE_1 = 8;
@@ -49,7 +50,7 @@ public class Illuminate extends Ability {
 	private static final float ILLUMINATE_KNOCKBACK = 0.5f;
 	private static final double ILLUMINATE_ENHANCE_RADIUS = 6.0;
 	private static final double ILLUMINATE_ENHANCE_DAMAGE = 1;
-	private static final int ILLUMINATE_ENHANCE_COOLDOWN = Constants.TICKS_PER_SECOND;
+	private static final int ILLUMINATE_ENHANCE_COOLDOWN = TICKS_PER_SECOND;
 
 	public static final String CHARM_COOLDOWN = "Illuminate Cooldown";
 	public static final String CHARM_RANGE = "Illuminate Max Range";
@@ -121,8 +122,11 @@ public class Illuminate extends Ability {
 	private final double mEnhanceRadius;
 	private final double mEnhanceDamage;
 
-	// used for enhance cosmetic
-	private @Nullable Location mEnhanceZone;
+	private @Nullable BukkitRunnable mCastRunnable;
+	private @Nullable BukkitRunnable mEffectsRunnable;
+	private @Nullable BukkitRunnable mLayTrailRunnable;
+	private @Nullable BukkitRunnable mSanctifiedZoneRunnable;
+	private @Nullable Location mEnhanceZone; // used for enhance cosmetic
 
 	public Illuminate(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
@@ -148,8 +152,11 @@ public class Illuminate extends Ability {
 		mEnhanceRadius = CharmManager.getRadius(mPlayer, CHARM_ENHANCE_RADIUS, ILLUMINATE_ENHANCE_RADIUS);
 		mEnhanceDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ILLUMINATE_ENHANCE_DAMAGE);
 
-		// for cosmetic
-		mEnhanceZone = null;
+		mCastRunnable = null;
+		mEffectsRunnable = null;
+		mLayTrailRunnable = null;
+		mSanctifiedZoneRunnable = null;
+		mEnhanceZone = null; // for cosmetic
 	}
 
 	public boolean cast() {
@@ -170,7 +177,7 @@ public class Illuminate extends Ability {
 		mPlayersInZone.clear();
 		mMobsInZone.clear();
 
-		cancelOnDeath(new BukkitRunnable() {
+		mCastRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (!mPlayer.getWorld().equals(mLoc.getWorld())) {
@@ -203,16 +210,21 @@ public class Illuminate extends Ability {
 
 				mCosmetic.projectileEffects(mPlayer, mLoc);
 			}
-		}.runTaskTimer(mPlugin, 0, 1));
+		};
+		cancelOnDeath(mCastRunnable.runTaskTimer(mPlugin, 0, 1));
 
-		cancelOnDeath(new BukkitRunnable() {
+		mEffectsRunnable = new BukkitRunnable() {
 			int mTicks = 0;
 			@Override
 			public void run() {
 				for (final Player player : mPlayersInZone) {
-					mPlugin.mEffectManager.addEffect(player, "IlluminateSpeedEffect", new PercentSpeed(ILLUMINATE_BUFF_DURATION, mSpeedBuff, "IlluminateSpeedEffect"));
+					mPlugin.mEffectManager.addEffect(player, "IlluminateSpeedEffect",
+						new PercentSpeed(ILLUMINATE_BUFF_DURATION, mSpeedBuff, "IlluminateSpeedEffect")
+							.deleteOnAbilityUpdate(true));
+
 					if (isLevelTwo()) {
-						mPlugin.mEffectManager.addEffect(player, "IlluminateStrengthEffect", new PercentDamageDealt(ILLUMINATE_BUFF_DURATION, mStrengthBuff));
+						mPlugin.mEffectManager.addEffect(player, "IlluminateStrengthEffect",
+							new PercentDamageDealt(ILLUMINATE_BUFF_DURATION, mStrengthBuff).deleteOnAbilityUpdate(true));
 					}
 				}
 
@@ -231,13 +243,14 @@ public class Illuminate extends Ability {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1));
+		};
+		cancelOnDeath(mEffectsRunnable.runTaskTimer(mPlugin, 0, 1));
 
 		return true;
 	}
 
 	private void layTrail(final Location loc, final double radius, final int maxDuration, final Vector direction) {
-		cancelOnDeath(new BukkitRunnable() {
+		mLayTrailRunnable = new BukkitRunnable() {
 			int mTrailTicks = 0;
 
 			final Location mTrailLoc = loc.clone().subtract(0, 1, 0);
@@ -253,7 +266,8 @@ public class Illuminate extends Ability {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1));
+		};
+		cancelOnDeath(mLayTrailRunnable.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	private void doExplosion(final Location loc, final double damage, final double radius, final float knockback) {
@@ -266,14 +280,13 @@ public class Illuminate extends Ability {
 
 	private void placeSanctifiedZone(final Location loc, final double radius, final double maxDuration) {
 		mEnhanceZone = loc;
-		cancelOnDeath(new BukkitRunnable() {
+		mSanctifiedZoneRunnable = new BukkitRunnable() {
 			int mZoneTicks = 0;
 			final Location mZoneLoc = loc.clone().subtract(0, 1, 0);
 			@Override
 			public void run() {
 				mPlayersInZone.addAll(PlayerUtils.playersInRange(mZoneLoc, radius, true));
 				mMobsInZone.addAll(EntityUtils.getNearbyMobs(mZoneLoc, radius));
-
 				mCosmetic.sanctifiedZoneEffects(mPlayer, mZoneLoc, radius, mZoneTicks, maxDuration);
 
 				mZoneTicks++;
@@ -282,6 +295,26 @@ public class Illuminate extends Ability {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1));
+		};
+		cancelOnDeath(mSanctifiedZoneRunnable.runTaskTimer(mPlugin, 0, 1));
+	}
+
+	@Override
+	public void invalidate() {
+		if (mCastRunnable != null && !mCastRunnable.isCancelled()) {
+			mCastRunnable.cancel();
+		}
+
+		if (mEffectsRunnable != null && !mEffectsRunnable.isCancelled()) {
+			mEffectsRunnable.cancel();
+		}
+
+		if (mLayTrailRunnable != null && !mLayTrailRunnable.isCancelled()) {
+			mLayTrailRunnable.cancel();
+		}
+
+		if (mSanctifiedZoneRunnable != null && !mSanctifiedZoneRunnable.isCancelled()) {
+			mSanctifiedZoneRunnable.cancel();
+		}
 	}
 }

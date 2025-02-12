@@ -57,7 +57,8 @@ public class CrystallineBlessing extends ZeroArgumentEffect {
 	@Override
 	public void onHurtByEntity(LivingEntity entity, DamageEvent event, Entity enemy) {
 		if (event.getType() == DamageType.MAGIC || event.getType() == DamageType.PROJECTILE) {
-			Plugin.getInstance().mEffectManager.addEffect(entity, ATTR_NAME, new PercentDamageDealt(DUR, DAMAGE_PERCENT, AFFECTED_DAMAGE_TYPES));
+			Plugin.getInstance().mEffectManager.addEffect(entity, ATTR_NAME,
+				new PercentDamageDealt(DUR, DAMAGE_PERCENT).damageTypes(AFFECTED_DAMAGE_TYPES));
 			Plugin.getInstance().mEffectManager.addEffect(entity, "CrystalParticles", new Aesthetics(DUR,
 							(e, fourHertz, twoHertz, oneHertz) -> {
 								// Tick effect

@@ -119,9 +119,11 @@ public class WhirlwindTotem extends TotemAbility {
 		List<Player> affectedPlayers = PlayerUtils.playersInRange(standLocation, mRadius, true);
 
 		for (Player p : affectedPlayers) {
-			mPlugin.mEffectManager.addEffect(p, "WhirlwindTotemCDR", new ShamanCooldownDecreasePerSecond(50, mCDRPerSecond, mCDRMax, mPlugin));
+			mPlugin.mEffectManager.addEffect(p, "WhirlwindTotemCDR",
+				new ShamanCooldownDecreasePerSecond(50, mCDRPerSecond, mCDRMax, mPlugin).deleteOnAbilityUpdate(true));
 			if (isLevelTwo()) {
-				mPlugin.mEffectManager.addEffect(p, WHIRLWIND_SPEED_EFFECT_NAME, new PercentSpeed(50, mSpeed, WHIRLWIND_SPEED_EFFECT_NAME));
+				mPlugin.mEffectManager.addEffect(p, WHIRLWIND_SPEED_EFFECT_NAME,
+					new PercentSpeed(50, mSpeed, WHIRLWIND_SPEED_EFFECT_NAME).deleteOnAbilityUpdate(true));
 			}
 			if (bonusAction) {
 				for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(p).getAbilities()) {

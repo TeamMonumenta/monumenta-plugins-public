@@ -216,7 +216,9 @@ public class SanctifiedArmor extends Ability {
 				if (existingEffect.isPresent()) {
 					existingEffect.get().addPlayer(mPlayer);
 				} else {
-					mPlugin.mEffectManager.addEffect(entity, ENHANCEMENT_EFFECT_NAME, new SanctifiedArmorHeal(mPlayer.getUniqueId()).displaysTime(false));
+					mPlugin.mEffectManager.addEffect(entity, ENHANCEMENT_EFFECT_NAME,
+						new SanctifiedArmorHeal(mPlayer.getUniqueId()).displaysTime(false)
+							.deleteOnAbilityUpdate(true));
 				}
 				mLastAffectedMob = entity.getUniqueId();
 				mLastDamageType = DamageType.THORNS;

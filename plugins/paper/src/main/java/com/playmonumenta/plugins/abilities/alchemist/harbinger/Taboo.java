@@ -229,7 +229,9 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		}
 
 		if (oneSecond && mCurrentState != TabooState.INACTIVE) {
-			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
+			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME,
+				new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10, KNOCKBACK_RESIST_EFFECT_NAME)
+					.displaysTime(false).deleteOnAbilityUpdate(true));
 			applySicknessEffects();
 		}
 	}
@@ -256,8 +258,10 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	private void applySicknessEffects() {
 		double healing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING_PENALTY, PERCENT_HEALING_PENALTY);
 		double absorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PENALTY, PERCENT_ABSORPTION_PENALTY);
-		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_HEALING_SICKNESS, new PercentHeal(20, -healing).displaysTime(false));
-		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_ABSORPTION_SICKNESS, new PercentAbsorption(20, -absorption).displaysTime(false));
+		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_HEALING_SICKNESS,
+			new PercentHeal(20, -healing).displaysTime(false).deleteOnAbilityUpdate(true));
+		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_ABSORPTION_SICKNESS,
+			new PercentAbsorption(20, -absorption).displaysTime(false).deleteOnAbilityUpdate(true));
 	}
 
 	private void clearSicknessEffects() {

@@ -121,7 +121,8 @@ public class SoulRend extends Ability {
 					int currPactDuration = darkPactEffects.last().getDuration();
 					mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 					healPlayer(mPlayer, mHeal, enemy, mDarkPactHeal);
-					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(currPactDuration, -1));
+					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME,
+						new PercentHeal(currPactDuration, -1).deleteOnAbilityUpdate(true));
 
 				} else if (isEnhanced()) {
 					// All healing converted to absorption
@@ -134,7 +135,8 @@ public class SoulRend extends Ability {
 
 			if (isLevelTwo()) {
 				mPlugin.mEffectManager.addEffect(enemy, "SoulRendLifeSteal." + mPlayer.getUniqueId(),
-					new SoulRendLifeSteal(mPlayer, mMarkDuration, mMarks, mHealPercent, mHealCap, mRemainingHeal, this, mCosmetic));
+					new SoulRendLifeSteal(mPlayer, mMarkDuration, mMarks, mHealPercent, mHealCap, mRemainingHeal, this, mCosmetic)
+						.deleteOnAbilityUpdate(true));
 
 				healOthers(mHeal, enemy);
 			}

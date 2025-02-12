@@ -143,7 +143,8 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (isEnhanced()) {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
 				mStacks = Math.min(mMaxStacks, mStacks + 1);
-				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(mDuration, mStacks));
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME,
+					new EnergizingElixirStacks(mDuration, mStacks).deleteOnAbilityUpdate(true));
 			}
 		}
 
@@ -175,9 +176,11 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (mStacks > 1) {
 			duration += 10; // to prevent gaps
 		}
+
 		final double effectAmpBonus = mStacks * mEnhanceEffectBonus;
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
-			new PercentSpeed(duration, mSpeedAmp + effectAmpBonus, PERCENT_SPEED_EFFECT_NAME));
+			new PercentSpeed(duration, mSpeedAmp + effectAmpBonus, PERCENT_SPEED_EFFECT_NAME)
+				.deleteOnAbilityUpdate(true));
 
 		if (!mPlayer.getScoreboardTags().contains(DISABLE_JUMP_BOOST_TAG)) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
@@ -187,7 +190,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 
 		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_EFFECT_NAME,
-				new PercentDamageDealt(duration, mDamageAmp + effectAmpBonus));
+				new PercentDamageDealt(duration, mDamageAmp + effectAmpBonus).deleteOnAbilityUpdate(true));
 		}
 	}
 
@@ -231,7 +234,8 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 				mCosmetic.stackDecayEffect(mPlayer, mStacks);
 			}
 			if (mStacks > 0) {
-				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(mDuration, mStacks));
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME,
+					new EnergizingElixirStacks(mDuration, mStacks).deleteOnAbilityUpdate(true));
 			}
 			applyEffects();
 			ClientModHandler.updateAbility(mPlayer, this);

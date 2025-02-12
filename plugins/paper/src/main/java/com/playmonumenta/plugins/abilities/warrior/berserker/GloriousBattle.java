@@ -43,6 +43,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 
 public class GloriousBattle extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DAMAGE_1 = 20;
@@ -110,8 +112,8 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.displayItem(Material.IRON_SWORD);
 
 	private int mStacks;
-	private List<LivingEntity> mCharged;
-	private int mChargeMobCap;
+	private final List<LivingEntity> mCharged;
+	private final int mChargeMobCap;
 	private final int mStackLimit;
 	private final int mSpellDelay = 10;
 	private final double mDamage;
@@ -155,7 +157,9 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			}
 		}
 		mPlayer.setVelocity(dir);
-		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(200, 1, KBR_EFFECT).displaysTime(false));
+		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT,
+			new PercentKnockbackResist(TICKS_PER_SECOND * 10, 1, KBR_EFFECT)
+				.displaysTime(false).deleteOnAbilityUpdate(true));
 		ClientModHandler.updateAbility(mPlayer, this);
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
@@ -203,7 +207,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 				// piercing change
 				BoundingBox mBox = BoundingBox.of(mPlayer.getLocation().add(0, 1, 0), 2, 2, 2);
-				mobs.removeIf(e -> mCharged.contains(e));
+				mobs.removeIf(mCharged::contains);
 				mobs.sort(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(mPlayer.getLocation())));
 				for (LivingEntity le : mobs) {
 					if (le.getBoundingBox().overlaps(mBox) && mCharged.size() <= mChargeMobCap) {

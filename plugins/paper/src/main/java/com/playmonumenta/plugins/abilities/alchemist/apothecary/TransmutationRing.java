@@ -151,9 +151,13 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 				List<Player> players = PlayerUtils.playersInRange(mCenter, mRadius, true);
 				for (Player player : players) {
 					if (player == mPlayer) {
-						mPlugin.mEffectManager.addEffect(mPlayer, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost / 2.0).displaysTime(false));
+						mPlugin.mEffectManager.addEffect(mPlayer, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME,
+							new PercentDamageDealt(20, damageBoost / 2.0).deleteOnAbilityUpdate(true)
+								.displaysTime(false));
 					} else {
-						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost).displaysTime(false));
+						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME,
+							new PercentDamageDealt(20, damageBoost).deleteOnAbilityUpdate(true)
+								.displaysTime(false));
 					}
 				}
 

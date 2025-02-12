@@ -30,11 +30,6 @@ public class IchorEarthEffect extends Effect {
 			DamageType.PROJECTILE_SKILL,
 			DamageType.MAGIC
 	);
-	private static final EnumSet<DamageType> MELEE_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.MELEE_ENCH,
-			DamageType.MELEE_SKILL
-	);
 
 	private boolean mWasHit = false;
 	private final double mEffectMultiplier;
@@ -71,7 +66,9 @@ public class IchorEarthEffect extends Effect {
 	@Override
 	public void entityLoseEffect(Entity entity) {
 		if (!mWasHit) {
-			EffectManager.getInstance().addEffect(entity, SOURCE_DAMAGE, new PercentDamageDealt(mBuffDuration, mDamage * mEffectMultiplier, mPrismatic ? ALL_DAMAGE_TYPES : MELEE_DAMAGE_TYPES));
+			EffectManager.getInstance().addEffect(entity, SOURCE_DAMAGE,
+				new PercentDamageDealt(mBuffDuration, mDamage * mEffectMultiplier)
+					.damageTypes(mPrismatic ? ALL_DAMAGE_TYPES : DamageEvent.DamageType.getAllMeleeTypes()));
 
 			Player player = (Player) entity;
 			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 0.3f, 1.5f);

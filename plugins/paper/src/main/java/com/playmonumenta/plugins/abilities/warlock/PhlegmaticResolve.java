@@ -166,26 +166,30 @@ public class PhlegmaticResolve extends Ability {
 		cooldowns = Math.min(cooldowns, mAbilityCap);
 
 		mCosmetic.periodicTrigger(mPlayer, mPlayer, cooldowns);
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns).displaysTime(false));
-		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
+			new PercentDamageReceived(20, mPercentDamageResist * cooldowns)
+				.displaysTime(false).deleteOnAbilityUpdate(true));
+		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME,
+			new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME)
+				.displaysTime(false).deleteOnAbilityUpdate(true));
+
 		if (isLevelTwo()) {
 			for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true)) {
 				mCosmetic.periodicTrigger(mPlayer, p, cooldowns);
-				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * mAllyModifier).displaysTime(false));
-				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * mAllyModifier, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
+				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
+					new PercentDamageReceived(20, mPercentDamageResist * cooldowns * mAllyModifier)
+						.displaysTime(false).deleteOnAbilityUpdate(true));
+				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME,
+					new PercentKnockbackResist(20, mKBR * cooldowns * mAllyModifier, KNOCKBACK_RESIST_EFFECT_NAME)
+						.displaysTime(false).deleteOnAbilityUpdate(true));
 			}
 		}
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (isEnhanced() &&
-			    event.getType() != DamageEvent.DamageType.AILMENT &&
-			    event.getType() != DamageEvent.DamageType.POISON &&
-			    event.getType() != DamageEvent.DamageType.OTHER &&
-			    event.getType() != DamageEvent.DamageType.TRUE &&
-			    event.getType() != DamageEvent.DamageType.FALL &&
-			    event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
+		if (isEnhanced() && !DamageEvent.DamageType.getUnscalableDamageType().contains(event.getType())
+				&& event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
 			    !event.isBlocked()) {
 
 			// Need to apply Voodoo Bonds + Resistance effects here since the damage event will be cancelled before

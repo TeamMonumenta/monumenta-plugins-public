@@ -135,6 +135,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		if (isMeleeCrit || (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile
 			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
 			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
+			// TODO: Remove DivineJusticeInvuln and use OnHitTimerEffect
 			final DivineJusticeInvuln divineJusticeInvuln = mPlugin.mEffectManager.getActiveEffect(enemy, DivineJusticeInvuln.class);
 			if (divineJusticeInvuln == null) {
 				mLastPassiveDJDamage = calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit, false);
@@ -298,7 +299,8 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	private void addEnhancementEffect(Player player, int duration, double bonusDamage) {
 		mPlugin.mEffectManager.addEffect(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
-			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
+			new PercentDamageDealt(duration, bonusDamage).priority(2)
+				.predicate((attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)).deleteOnAbilityUpdate(true));
 		ClientModHandler.updateAbility(player, this);
 	}
 

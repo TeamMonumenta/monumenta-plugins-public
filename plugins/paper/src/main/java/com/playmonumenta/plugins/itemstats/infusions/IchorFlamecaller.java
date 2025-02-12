@@ -80,7 +80,9 @@ public class IchorFlamecaller implements Infusion {
 		if (fireCount > 0) {
 			int cappedFireCount = FastMath.min(fireCount, MOB_CAP);
 			double buffMultiplier = cappedFireCount * multiplier;
-			plugin.mEffectManager.addEffect(player, EFFECT, new PercentDamageDealt(adjustedDuration, MAGIC_DAMAGE_PER * buffMultiplier, isPrismatic ? AFFECTED_PRISMATIC_DAMAGE_TYPES : EnumSet.of(DamageEvent.DamageType.MAGIC)));
+			plugin.mEffectManager.addEffect(player, EFFECT,
+				new PercentDamageDealt(adjustedDuration, MAGIC_DAMAGE_PER * buffMultiplier)
+					.damageTypes(isPrismatic ? AFFECTED_PRISMATIC_DAMAGE_TYPES : EnumSet.of(DamageEvent.DamageType.MAGIC)));
 
 			player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.9f + 0.05f * cappedFireCount);
 			player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.65f + 0.04f * cappedFireCount);

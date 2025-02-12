@@ -1,7 +1,38 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.*;
+import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
+import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
+import com.playmonumenta.plugins.effects.AbsorptionSickness;
+import com.playmonumenta.plugins.effects.ArrowSaving;
+import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.BonusSoulThreads;
+import com.playmonumenta.plugins.effects.BoonOfKnightlyPrayer;
+import com.playmonumenta.plugins.effects.BoonOfTheFracturedTree;
+import com.playmonumenta.plugins.effects.BoonOfThePit;
+import com.playmonumenta.plugins.effects.CrystallineBlessing;
+import com.playmonumenta.plugins.effects.DeepGodsEndowment;
+import com.playmonumenta.plugins.effects.DurabilitySaving;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.FishQualityIncrease;
+import com.playmonumenta.plugins.effects.GiftOfTheStars;
+import com.playmonumenta.plugins.effects.HealingSickness;
+import com.playmonumenta.plugins.effects.NegateDamage;
+import com.playmonumenta.plugins.effects.PercentAttackSpeed;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentExperience;
+import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.effects.PercentHealthBoost;
+import com.playmonumenta.plugins.effects.PercentKnockbackResist;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.PoisonImmunity;
+import com.playmonumenta.plugins.effects.SilverPrayer;
+import com.playmonumenta.plugins.effects.SkySeekersGrace;
+import com.playmonumenta.plugins.effects.StarCommunion;
+import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.effects.TemporalFlux;
+import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.effects.hexfall.CreepingDeath;
 import com.playmonumenta.plugins.effects.hexfall.DeathImmunity;
 import com.playmonumenta.plugins.effects.hexfall.DeathVulnerability;
@@ -460,15 +491,15 @@ public enum EffectType {
 			case FIRE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FIRE));
 			case FALL_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FALL));
 
-			case DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getScalableDamageType());
-			case MELEE_DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getAllMeleeTypes());
-			case PROJECTILE_DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getAllProjectileTypes());
-			case MAGIC_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
+			case DAMAGE -> new PercentDamageDealt(duration, strength).damageTypes(DamageEvent.DamageType.getScalableDamageType());
+			case MELEE_DAMAGE -> new PercentDamageDealt(duration, strength).damageTypes(DamageEvent.DamageType.getAllMeleeTypes());
+			case PROJECTILE_DAMAGE -> new PercentDamageDealt(duration, strength).damageTypes(DamageEvent.DamageType.getAllProjectileTypes());
+			case MAGIC_DAMAGE -> new PercentDamageDealt(duration, strength).damageTypes(EnumSet.of(DamageEvent.DamageType.MAGIC));
 
 			case WEAKNESS -> new PercentDamageDealt(duration, -strength);
-			case MELEE_WEAKNESS -> new PercentDamageDealt(duration, -strength, DamageEvent.DamageType.getAllMeleeTypes());
-			case PROJECTILE_WEAKNESS -> new PercentDamageDealt(duration, -strength, DamageEvent.DamageType.getAllProjectileTypes());
-			case MAGIC_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
+			case MELEE_WEAKNESS -> new PercentDamageDealt(duration, -strength).damageTypes(DamageEvent.DamageType.getAllMeleeTypes());
+			case PROJECTILE_WEAKNESS -> new PercentDamageDealt(duration, -strength).damageTypes(DamageEvent.DamageType.getAllProjectileTypes());
+			case MAGIC_WEAKNESS -> new PercentDamageDealt(duration, -strength).damageTypes(EnumSet.of(DamageEvent.DamageType.MAGIC));
 
 			case HEAL -> new PercentHeal(duration, strength);
 			case ANTI_HEAL -> new PercentHeal(duration, -strength);

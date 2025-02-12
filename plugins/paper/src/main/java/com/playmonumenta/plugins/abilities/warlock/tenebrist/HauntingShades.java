@@ -162,8 +162,11 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 						double strength = EFFECT_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 						for (Player p : affectedPlayers) {
 							double maxHealth = EntityUtils.getMaxHealth(p);
-							mPlugin.mEffectManager.addEffect(p, HEAL_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * healPercent, mPlayer, mPlugin));
-							mPlugin.mEffectManager.addEffect(p, STR_NAME, new PercentDamageDealt(EFFECT_DURATION, strength));
+							mPlugin.mEffectManager.addEffect(p, HEAL_NAME,
+								new CustomRegeneration(EFFECT_DURATION, maxHealth * healPercent, mPlayer, mPlugin)
+									.deleteOnAbilityUpdate(true));
+							mPlugin.mEffectManager.addEffect(p, STR_NAME,
+								new PercentDamageDealt(EFFECT_DURATION, strength).deleteOnAbilityUpdate(true));
 						}
 					}
 

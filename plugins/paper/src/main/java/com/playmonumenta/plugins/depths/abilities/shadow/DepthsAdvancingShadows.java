@@ -141,7 +141,8 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 			playerLoc = mPlayer.getLocation();
 
-			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new PercentDamageDealt(mDamageDuration, mDamage, DamageEvent.DamageType.getAllMeleeTypes()));
+			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME,
+				new PercentDamageDealt(mDamageDuration, mDamage).damageTypes(DamageEvent.DamageType.getAllMeleeTypes()));
 
 			new PartialParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);

@@ -84,13 +84,15 @@ public class Dodging extends Ability {
 			.cooldown(DODGING_COOLDOWN_1, DODGING_COOLDOWN_2, CHARM_COOLDOWN)
 			.displayItem(Material.SHIELD);
 
+	private final double mSpeedPotency;
 	private final DodgingCS mCosmetic;
 	private int mTriggerTick = 0;
 
-	public Dodging(Plugin plugin, Player player) {
+	public Dodging(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		// NOTE: This skill will get events even when it is on cooldown!
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DodgingCS());
+		mSpeedPotency = PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new DodgingCS());
 	}
 
 	@Override
@@ -248,7 +250,7 @@ public class Dodging extends Ability {
 		World world = mPlayer.getWorld();
 		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
-				new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
+				new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, mSpeedPotency, ATTR_NAME).deleteOnAbilityUpdate(true));
 
 			mCosmetic.dodgeEffectLv2(mPlayer, world, loc);
 		}

@@ -469,6 +469,13 @@ public class AbilityManager {
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
 
+		// Clear effects on the player that should be removed when switching classes/abilities
+		mPlugin.mEffectManager.getAllEffects(player).forEach(effect -> {
+			if (effect.shouldDeleteOnAbilityUpdate()) {
+				effect.clearEffect();
+			}
+		});
+
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
 

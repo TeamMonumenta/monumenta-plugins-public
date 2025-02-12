@@ -157,7 +157,8 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 		double healing = WARDING_REMEDY_HEAL_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALING);
 		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_RANGE), true)) {
 			if (AbsorptionUtils.getAbsorption(p) > 0) {
-				mPlugin.mEffectManager.addEffect(p, "WardingRemedyBonusHealing", new PercentHeal(20, healing).displaysTime(false));
+				mPlugin.mEffectManager.addEffect(p, "WardingRemedyBonusHealing", new PercentHeal(20, healing)
+					.displaysTime(false).deleteOnAbilityUpdate(true));
 				mCosmetic.remedyHealBuffEffect(mPlayer, p);
 			}
 		}

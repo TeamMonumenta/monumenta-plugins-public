@@ -197,7 +197,9 @@ public class PrismaticShield extends Ability {
 				}
 				mHealedFromBlizzard = true;
 			}
-			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(mEnhancementDuration, DAMAGE_BUFF_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)));
+			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME,
+				new PercentDamageDealt(mEnhancementDuration, DAMAGE_BUFF_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE))
+					.deleteOnAbilityUpdate(true));
 			PlayerUtils.healPlayer(mPlugin, mPlayer, (HEAL_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_HEALING)) * EntityUtils.getMaxHealth(mPlayer));
 			mCosmetic.prismaOnHeal(mPlayer);
 		}

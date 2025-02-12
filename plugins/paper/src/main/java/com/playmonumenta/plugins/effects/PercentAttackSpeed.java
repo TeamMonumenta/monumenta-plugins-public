@@ -18,7 +18,7 @@ public class PercentAttackSpeed extends Effect {
 	private final double mAmount;
 	private final String mModifierName;
 
-	public PercentAttackSpeed(int duration, double amount, String modifierName) {
+	public PercentAttackSpeed(final int duration, final double amount, final String modifierName) {
 		super(duration, effectID);
 		mAmount = amount;
 		mModifierName = modifierName;
@@ -30,14 +30,14 @@ public class PercentAttackSpeed extends Effect {
 	}
 
 	@Override
-	public void entityGainEffect(Entity entity) {
+	public void entityGainEffect(final Entity entity) {
 		if (entity instanceof Attributable attributable) {
 			EntityUtils.replaceAttribute(attributable, Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 
 	@Override
-	public void entityLoseEffect(Entity entity) {
+	public void entityLoseEffect(final Entity entity) {
 		if (entity instanceof Attributable attributable) {
 			EntityUtils.removeAttribute(attributable, Attribute.GENERIC_ATTACK_SPEED, mModifierName);
 		}

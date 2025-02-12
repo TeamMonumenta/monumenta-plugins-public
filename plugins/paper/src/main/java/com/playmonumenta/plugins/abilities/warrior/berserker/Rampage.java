@@ -114,7 +114,9 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 				mCosmetic.onHitMob(mPlayer, mob);
 			}
 
-			mPlugin.mEffectManager.addEffect(mPlayer, CUSTOM_REGENERATION_EFFECT_NAME, new CustomRegeneration(mStacks * 10, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlugin));
+			mPlugin.mEffectManager.addEffect(mPlayer, CUSTOM_REGENERATION_EFFECT_NAME,
+				new CustomRegeneration(mStacks * 10, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING,
+					HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlugin).deleteOnAbilityUpdate(true));
 			addDamageReductionEffect(false);
 
 			Location loc = mPlayer.getLocation();
@@ -182,7 +184,8 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			// Clear old effects so the .displaysTime(false) isn't carried over
 			mPlugin.mEffectManager.clearEffects(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME);
 		}
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(duration, resistance).displaysTime(!passive));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
+			new PercentDamageReceived(duration, resistance).displaysTime(!passive).deleteOnAbilityUpdate(true));
 	}
 
 	@Override

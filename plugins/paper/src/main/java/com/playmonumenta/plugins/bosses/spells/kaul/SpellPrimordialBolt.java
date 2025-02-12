@@ -98,7 +98,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
 						new PercentSpeed(DIRECT_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
-						new PercentDamageDealt(DIRECT_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY, DamageType.getScalableDamageType()));
+						new PercentDamageDealt(DIRECT_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY).damageTypes(DamageType.getScalableDamageType()));
 				} else {
 					for (Player p : PlayerUtils.playersInRange(loc, 2.5, true)) {
 						if (p.getLocation().getY() <= 60) {
@@ -107,7 +107,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
 								new PercentSpeed(AOE_HIT_DEBUFF_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
 							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
-								new PercentDamageDealt(AOE_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY, DamageType.getScalableDamageType()));
+								new PercentDamageDealt(AOE_HIT_DEBUFF_DURATION, WEAKNESS_POTENCY).damageTypes(DamageType.getScalableDamageType()));
 						}
 					}
 				}

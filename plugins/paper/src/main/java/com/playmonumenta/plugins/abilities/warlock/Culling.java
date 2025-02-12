@@ -12,12 +12,13 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class Culling extends Ability {
-
-	private static final int PASSIVE_DURATION = 6 * 20;
+	private static final int PASSIVE_DURATION = TICKS_PER_SECOND * 6;
 	private static final String WARLOCK_PASSIVE_EFFECT_NAME = "CullingPercentDamageResistEffect";
 	private static final double WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT = -0.1;
+
 	public static final String CHARM_RESISTANCE = "Culling Resistance Amplifier";
 	public static final String CHARM_DURATION = "Culling Duration";
 
@@ -25,17 +26,20 @@ public class Culling extends Ability {
 		new AbilityInfo<>(Culling.class, null, Culling::new)
 			.canUse(player -> AbilityUtils.getClassNum(player) == Warlock.CLASS_ID);
 
-	public Culling(Plugin plugin, Player player) {
+	private final double mResistancePotency;
+	private final int mResistanceDuration;
+
+	public Culling(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
+		mResistancePotency = WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
+		mResistanceDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, PASSIVE_DURATION);
 	}
 
 	@Override
-	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (EntityUtils.isHostileMob(event.getEntity())
-			    && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
-			double resistance = WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
-			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, PASSIVE_DURATION);
-			mPlugin.mEffectManager.addEffect(mPlayer, WARLOCK_PASSIVE_EFFECT_NAME, new PercentDamageReceived(duration, resistance));
+	public void entityDeathEvent(final EntityDeathEvent event, final boolean shouldGenDrops) {
+		if (EntityUtils.isHostileMob(event.getEntity()) && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+			mPlugin.mEffectManager.addEffect(mPlayer, WARLOCK_PASSIVE_EFFECT_NAME,
+				new PercentDamageReceived(mResistanceDuration, mResistancePotency).deleteOnAbilityUpdate(true));
 		}
 	}
 }

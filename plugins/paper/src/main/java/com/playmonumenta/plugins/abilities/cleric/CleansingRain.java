@@ -21,18 +21,21 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class CleansingRain extends Ability implements AbilityWithDuration {
-
-	private static final int CLEANSING_DURATION = 15 * 20;
+	private static final int CLEANSING_DURATION = TICKS_PER_SECOND * 15;
 	private static final double PERCENT_DAMAGE_RESIST = -0.2;
-	private static final int CLEANSING_EFFECT_DURATION = 3 * 20;
+	private static final int CLEANSING_EFFECT_DURATION = TICKS_PER_SECOND * 3;
 	private static final int CLEANSING_APPLY_PERIOD = 1;
 	private static final int CLEANSING_RADIUS = 4;
 	private static final int CLEANSING_RADIUS_ENHANCED = 6;
-	private static final int CLEANSING_1_COOLDOWN = 45 * 20;
-	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
+	private static final int CLEANSING_1_COOLDOWN = TICKS_PER_SECOND * 45;
+	private static final int CLEANSING_2_COOLDOWN = TICKS_PER_SECOND * 30;
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "CleansingPercentDamageResistEffect";
+
 	public static final String CHARM_REDUCTION = "Cleansing Rain Damage Reduction";
 	public static final String CHARM_DURATION = "Cleansing Rain Duration";
 	public static final String CHARM_RANGE = "Cleansing Rain Range";
@@ -53,19 +56,27 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 					.formatted(CLEANSING_RADIUS_ENHANCED))
 			.simpleDescription("Summon a rain cloud that cleanses debuffs and grants resistance to players below it.")
 			.cooldown(CLEANSING_1_COOLDOWN, CLEANSING_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CleansingRain::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP).keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON)))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CleansingRain::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP)
+					.keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON)))
 			.displayItem(Material.NETHER_STAR);
 
+	private final int mRainDuration;
 	private final double mRadius;
+	private final double mResistancePotency;
 	private final CleansingRainCS mCosmetic;
 
-	public CleansingRain(Plugin plugin, Player player) {
+	private @Nullable BukkitRunnable mRainRunnable;
+	private int mCurrDuration = -1;
+
+	public CleansingRain(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
+		mRainDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, CLEANSING_DURATION);
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS);
+		mResistancePotency = PERCENT_DAMAGE_RESIST - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
+		mRainRunnable = null;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CleansingRainCS());
 	}
-
-	private int mCurrDuration = -1;
 
 	public boolean cast() {
 		if (isOnCooldown()) {
@@ -75,10 +86,9 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 		mCosmetic.rainCast(mPlayer, mRadius);
 		putOnCooldown();
 
-		// Run cleansing rain here until it finishes
 		mCurrDuration = 0;
 		ClientModHandler.updateAbility(mPlayer, this);
-		cancelOnDeath(new BukkitRunnable() {
+		mRainRunnable = new BukkitRunnable() {
 			int mTicks = 0;
 			final List<Player> mCleansedPlayers = new ArrayList<>();
 
@@ -90,12 +100,12 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 					return;
 				}
 
-				double ratio = mRadius / CLEANSING_RADIUS;
-				double smallRatio = ratio / 3;
+				final double ratio = mRadius / CLEANSING_RADIUS;
+				final double smallRatio = ratio / 3;
 				mCosmetic.rainCloud(mPlayer, ratio, mRadius);
 
-				List<Player> rainPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true);
-				for (Player player : rainPlayers) {
+				final List<Player> rainPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true);
+				for (final Player player : rainPlayers) {
 					if (isEnhanced() && !mCleansedPlayers.contains(player)) {
 						mCleansedPlayers.add(player);
 						continue;
@@ -109,12 +119,14 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 					}
 
 					if (isLevelTwo()) {
-						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(CLEANSING_EFFECT_DURATION, PERCENT_DAMAGE_RESIST - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION)));
+						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
+							new PercentDamageReceived(CLEANSING_EFFECT_DURATION, mResistancePotency)
+								.deleteOnAbilityUpdate(true));
 					}
 				}
 				//Loop through already affected players for enhanced cleansing rain
 				if (isEnhanced()) {
-					for (Player player : mCleansedPlayers) {
+					for (final Player player : mCleansedPlayers) {
 						if (!rainPlayers.contains(player) && player != mPlayer) {
 							mCosmetic.rainEnhancement(player, smallRatio, mRadius);
 						}
@@ -128,7 +140,9 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 						}
 
 						if (isLevelTwo()) {
-							mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(CLEANSING_EFFECT_DURATION, PERCENT_DAMAGE_RESIST - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION)));
+							mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
+								new PercentDamageReceived(CLEANSING_EFFECT_DURATION, mResistancePotency)
+									.deleteOnAbilityUpdate(true));
 						}
 					}
 				}
@@ -139,7 +153,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 					mCurrDuration++;
 				}
 
-				if (mTicks > CharmManager.getDuration(mPlayer, CHARM_DURATION, CLEANSING_DURATION)) {
+				if (mTicks > getInitialAbilityDuration()) {
 					this.cancel();
 				}
 			}
@@ -150,19 +164,26 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 				mCurrDuration = -1;
 				ClientModHandler.updateAbility(mPlayer, CleansingRain.this);
 			}
-		}.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD));
+		};
+		cancelOnDeath(mRainRunnable.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD));
 
 		return true;
 	}
 
 	@Override
+	public void invalidate() {
+		if (mRainRunnable != null && !mRainRunnable.isCancelled()) {
+			mRainRunnable.cancel();
+		}
+	}
+
+	@Override
 	public int getInitialAbilityDuration() {
-		return CharmManager.getDuration(mPlayer, CHARM_DURATION, CLEANSING_DURATION);
+		return mRainDuration;
 	}
 
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
-
 }

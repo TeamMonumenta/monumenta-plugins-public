@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -30,21 +29,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class DarkPact extends Ability {
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
 	private static final int PERCENT_HEAL = -1;
 	private static final String AESTHETICS_EFFECT_NAME = "DarkPactAestheticsEffect";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
-	private static final int DURATION = Constants.TICKS_PER_SECOND * 7;
-	private static final int DURATION_INCREASE_ON_KILL = Constants.TICKS_PER_SECOND;
+	private static final int DURATION = TICKS_PER_SECOND * 7;
+	private static final int DURATION_INCREASE_ON_KILL = TICKS_PER_SECOND;
 	private static final double PERCENT_DAMAGE_DEALT_1 = 0.50;
 	private static final double PERCENT_DAMAGE_DEALT_2 = 0.75;
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE);
 	private static final int ABSORPTION_ON_KILL = 1;
 	private static final int MAX_ABSORPTION = 6;
-	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 14;
+	private static final int COOLDOWN = TICKS_PER_SECOND * 14;
 	private static final double EXTENDED_ANTIHEAL = -2.0 / 3.0;
-	private static final int CANCEL_WINDOW = Constants.TICKS_PER_SECOND * 7;
+	private static final int CANCEL_WINDOW = TICKS_PER_SECOND * 7;
 
 	public static final String CHARM_COOLDOWN = "Dark Pact Cooldown";
 	public static final String CHARM_DAMAGE = "Dark Pact Melee Damage";
@@ -114,11 +114,15 @@ public class DarkPact extends Ability {
 		mStartingTick = Bukkit.getServer().getCurrentTick();
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
+			new PercentDamageDealt(duration, mPercentDamageDealt)
+				.predicate((entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand()))
+				.damageTypes(EnumSet.of(DamageType.MELEE)).deleteOnAbilityUpdate(true));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL)
+			.deleteOnAbilityUpdate(true));
 		mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(duration,
 			(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.tick(mPlayer, fourHertz, twoHertz, oneHertz),
-			(entity) -> mCosmetic.loseEffect(mPlayer)));
+			(entity) -> mCosmetic.loseEffect(mPlayer)).deleteOnAbilityUpdate(true));
 
 		putOnCooldown();
 		return true;
@@ -152,7 +156,8 @@ public class DarkPact extends Ability {
 			for (Effect effect : antiHealEffects) {
 				totalDuration = Math.max(effect.getDuration() + duration, totalDuration);
 			}
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(totalDuration, EXTENDED_ANTIHEAL));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME,
+				new PercentHeal(totalDuration, EXTENDED_ANTIHEAL).deleteOnAbilityUpdate(true));
 		}
 	}
 

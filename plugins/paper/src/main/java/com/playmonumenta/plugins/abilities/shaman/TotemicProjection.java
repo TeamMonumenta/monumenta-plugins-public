@@ -194,9 +194,9 @@ public class TotemicProjection extends Ability {
 
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(mPlayer, "ShamanProjectionEnhancement",
-					new PercentDamageDealt(mEnhanceDamageDuration,
-						mEnhanceDamagePercent * totems.size(),
-						EnumSet.of(DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.MELEE)));
+					new PercentDamageDealt(mEnhanceDamageDuration, mEnhanceDamagePercent * totems.size())
+						.damageTypes(EnumSet.of(DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.MELEE))
+						.deleteOnAbilityUpdate(true));
 			}
 
 			if (isLevelTwo()) {

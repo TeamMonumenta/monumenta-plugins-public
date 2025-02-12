@@ -110,8 +110,10 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 				//send stack update to client
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
-			double damageBoost = mStacks * mDamageAmplifier;
-			Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME, new PercentDamageDealt(mDuration, damageBoost, AFFECTED_DAMAGE_TYPES)));
+
+			Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME,
+				new PercentDamageDealt(mDuration, mStacks * mDamageAmplifier)
+					.damageTypes(DamageEvent.DamageType.getAllMeleeTypes()).deleteOnAbilityUpdate(true)));
 		}
 		return false; // only changes event damage
 	}
@@ -124,7 +126,9 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 				mStacks--;
 				if (mStacks > 0) {
 					double damageBoost = mStacks * mDamageAmplifier;
-					mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME, new PercentDamageDealt(mDuration, damageBoost, AFFECTED_DAMAGE_TYPES));
+					mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME,
+						new PercentDamageDealt(mDuration, damageBoost).damageTypes(AFFECTED_DAMAGE_TYPES)
+							.deleteOnAbilityUpdate(true));
 				}
 				ClientModHandler.updateAbility(mPlayer, this);
 			}

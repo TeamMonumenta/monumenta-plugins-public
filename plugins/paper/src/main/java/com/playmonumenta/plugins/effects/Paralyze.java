@@ -24,7 +24,7 @@ public class Paralyze extends ZeroArgumentEffect {
 	private static final Particle.DustOptions COLOR_FAINT_YELLOW
 		= new Particle.DustOptions(Color.fromRGB(255, 241, 110), 1f);
 
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 
 	public Paralyze(int duration, Plugin plugin) {
 		super(duration, effectID);

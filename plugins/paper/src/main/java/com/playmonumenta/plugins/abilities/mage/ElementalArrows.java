@@ -165,7 +165,8 @@ public class ElementalArrows extends Ability {
 				if (existingStatic != null && existingStatic.isTriggered()) {
 					final double weaknessMultiplier = -1 * (Spellshock.ENHANCE_WEAK_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, Spellshock.CHARM_ENHANCE_WEAK));
 					mPlugin.mEffectManager.addEffect(enemy, Spellshock.ENHANCE_WEAK_SRC,
-						new PercentDamageDealt(Spellshock.ENHANCEMENT_EFFECT_DURATION, weaknessMultiplier, Spellshock.ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES));
+						new PercentDamageDealt(Spellshock.ENHANCEMENT_EFFECT_DURATION, weaknessMultiplier)
+							.damageTypes(Spellshock.ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES));
 				}
 			}
 		}

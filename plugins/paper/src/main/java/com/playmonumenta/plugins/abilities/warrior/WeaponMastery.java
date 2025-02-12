@@ -18,9 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-
 public class WeaponMastery extends Ability {
-
 	private static final double AXE_1_DAMAGE_FLAT = 2;
 	private static final double AXE_2_DAMAGE_FLAT = 4;
 	private static final double SWORD_2_DAMAGE_FLAT = 1;
@@ -54,6 +52,7 @@ public class WeaponMastery extends Ability {
 	private final double mDamageBonusSwordFlat;
 	private final double mDamageBonusAxe;
 	private final double mDamageBonusSword;
+	private final double mSpeedPotency;
 	private final WeaponMasteryCS mCosmetic;
 
 	public WeaponMastery(Plugin plugin, Player player) {
@@ -63,6 +62,7 @@ public class WeaponMastery extends Ability {
 		double enhancementDamage = (isEnhanced() ? ENHANCED_DAMAGE : 0);
 		mDamageBonusAxe = (isLevelOne() ? AXE_1_DAMAGE : AXE_2_DAMAGE) + enhancementDamage;
 		mDamageBonusSword = (isLevelOne() ? 0 : SWORD_2_DAMAGE) + enhancementDamage;
+		mSpeedPotency = AXE_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WeaponMasteryCS());
 	}
 
@@ -90,7 +90,9 @@ public class WeaponMastery extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (isEnhanced() && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
-			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT, new PercentSpeed(6, AXE_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), SPEED_EFFECT).displaysTime(false));
+			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT,
+				new PercentSpeed(6, mSpeedPotency, SPEED_EFFECT).displaysTime(false)
+					.deleteOnAbilityUpdate(true));
 		}
 	}
 

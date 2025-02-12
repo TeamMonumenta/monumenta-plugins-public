@@ -50,7 +50,7 @@ public class ScorchedEarthDamage extends Effect {
 	}
 
 	@Override
-	public void onHurt(LivingEntity entity, DamageEvent event) {
+	public void onHurt(final LivingEntity entity, final DamageEvent event) {
 		/* Prevent effect from activating on events it shouldn't */
 		if (event.getSource() == null || event.isCancelled() || event.getAbility() == ClassAbility.SCORCHED_EARTH) {
 			return;
@@ -62,11 +62,12 @@ public class ScorchedEarthDamage extends Effect {
 			return;
 		}
 
-		if ((type == DamageType.MELEE && event.getDamager() instanceof final Player player && player.getCooledAttackStrength(0.5f) > 0.9) ||
-				(type == DamageType.PROJECTILE && event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) ||
-				(type != DamageType.MELEE && type != DamageType.PROJECTILE && event.getDamager() instanceof Player)) {
+		if ((type == DamageType.MELEE && event.getDamager() instanceof final Player player && player.getCooledAttackStrength(0.5f) > 0.9)
+				|| (type == DamageType.PROJECTILE && event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, false))
+				|| (type != DamageType.MELEE && type != DamageType.PROJECTILE && event.getDamager() instanceof Player)) {
 			mLastDamageTick = Bukkit.getCurrentTick();
-			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats), mDamage, true, false, false);
+			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats),
+				mDamage, true, false, false);
 			EntityUtils.applyFire(Plugin.getInstance(), mFireTickDuration, entity, mAlchemist);
 			mCosmetic.damageEffect(entity, mAlchemist);
 		}

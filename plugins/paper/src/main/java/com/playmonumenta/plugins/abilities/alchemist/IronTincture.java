@@ -175,7 +175,8 @@ public class IronTincture extends Ability {
 			hitbox.getHitMobs().forEach(mob -> EntityUtils.applyStun(mPlugin, IRON_TINCTURE_ENHANCEMENT_STUN_DURATION, mob));
 
 			double resistance = IRON_TINCTURE_ENHANCEMENT_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
-			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(duration, -resistance) {
+			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect",
+				new PercentDamageReceived(duration, -resistance) {
 				@Override
 				public void onHurt(LivingEntity entity, DamageEvent event) {
 					if (event.getType() == DamageEvent.DamageType.TRUE) {
@@ -187,7 +188,7 @@ public class IronTincture extends Ability {
 						}
 					}
 				}
-			});
+			}.deleteOnAbilityUpdate(true));
 		}
 
 		mCosmetic.pickupEffectsForPlayer(player, tinctureLocation);

@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class ThuribleProcession extends Ability implements AbilityWithChargesOrStacks {
-
 	private static final int EFFECTS_DURATION = 20 * 8;
 	private static final int PASSIVE_DURATION = 50; //50 ticks; 20 * 2.5
 	private static final int THURIBLE_RADIUS = 30;
@@ -83,13 +82,25 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			.cooldown(THURIBLE_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.GLOWSTONE_DUST);
 
+	private final double mAttackSpeedPotency;
+	private final double mSpeedPotency;
+	private final double mDamagePotency;
+	private final double mHealingPotency;
+	private final ThuribleProcessionCS mCosmetic;
 	private int mSeconds = 0;
 	private int mBuffs = 0;
-	private final ThuribleProcessionCS mCosmetic;
 
 	public ThuribleProcession(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ThuribleProcessionCS());
+
+		final double effectPotency = isLevelTwo() ? EFFECT_PERCENT_2 : EFFECT_PERCENT_1;
+		mAttackSpeedPotency = effectPotency + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK);
+		mSpeedPotency = effectPotency + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mDamagePotency = effectPotency + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mHealingPotency = (isLevelTwo() ? THURIBLE_HEALING_PERCENT_2 : THURIBLE_HEALING_PERCENT_1)
+			+ CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new ThuribleProcessionCS());
 	}
 
 	@Override
@@ -159,12 +170,14 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	}
 
 	private Effect[] getEffectArray(int duration) {
-		double effectPercent = isLevelOne() ? EFFECT_PERCENT_1 : EFFECT_PERCENT_2;
-		double healingPercent = isLevelOne() ? THURIBLE_HEALING_PERCENT_1 : THURIBLE_HEALING_PERCENT_2;
-		return new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + effectPercent, PERCENT_ATTACK_SPEED_EFFECT_NAME),
-		                     new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + effectPercent, PERCENT_SPEED_EFFECT_NAME),
-		                     new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + effectPercent, AFFECTED_DAMAGE_TYPES),
-		                     new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + healingPercent)};
+		return new Effect[] {new PercentAttackSpeed(duration, mAttackSpeedPotency, PERCENT_ATTACK_SPEED_EFFECT_NAME)
+								.deleteOnAbilityUpdate(true),
+		                     new PercentSpeed(duration, mSpeedPotency, PERCENT_SPEED_EFFECT_NAME)
+								.deleteOnAbilityUpdate(true),
+		                     new PercentDamageDealt(duration, mDamagePotency).damageTypes(AFFECTED_DAMAGE_TYPES)
+								 .deleteOnAbilityUpdate(true),
+		                     new ThuribleBonusHealing(duration, mHealingPotency)
+								 .deleteOnAbilityUpdate(true)};
 	}
 
 	@Override

@@ -522,7 +522,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 		if (isLevelTwo() && mainTarget) {
 			double resistance = HALLOWED_DAMAGE_REDUCTION_PERCENT - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
 			int duration = CharmManager.getDuration(mPlayer, CHARM_RESISTANCE_DURATION, HALLOWED_DAMAGE_REDUCTION_DURATION);
-			mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(duration, resistance));
+			mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
+				new PercentDamageReceived(duration, resistance).deleteOnAbilityUpdate(true));
 		}
 	}
 

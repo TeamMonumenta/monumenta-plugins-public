@@ -86,7 +86,9 @@ public class EnchantedPrayer extends Ability {
 		for (Player p : PlayerUtils.playersInRange(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, ENCHANTED_PRAYER_RANGE), true)) {
 			mCosmetic.applyToPlayer(p, mPlayer);
 			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",
-					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_TYPES, CharmManager.getRadius(mPlayer, CHARM_EFFECT_RANGE, ENCHANTED_PRAYER_EFFECT_SIZE), mPlayer, mCrusade, mCosmetic));
+					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_TYPES,
+						CharmManager.getRadius(mPlayer, CHARM_EFFECT_RANGE, ENCHANTED_PRAYER_EFFECT_SIZE), mPlayer, mCrusade, mCosmetic)
+						.deleteOnAbilityUpdate(true));
 		}
 		return true;
 	}

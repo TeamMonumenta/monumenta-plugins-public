@@ -295,7 +295,8 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 	}
 
 	private void disable(Player player) {
-		mPlugin.mEffectManager.addEffect(player, DISABLE_SOURCE, new UnstableAmalgamDisable(9999));
+		mPlugin.mEffectManager.addEffect(player, DISABLE_SOURCE, new UnstableAmalgamDisable(9999)
+			.deleteOnAbilityUpdate(true));
 	}
 
 	private void unstableMobs(List<LivingEntity> mobs, int duration) {

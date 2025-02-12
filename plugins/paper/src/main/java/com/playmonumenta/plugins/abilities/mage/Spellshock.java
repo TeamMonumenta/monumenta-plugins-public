@@ -178,7 +178,8 @@ public class Spellshock extends Ability {
 			} else if (eventAbility == ClassAbility.THUNDER_STEP) {
 				/* This will also happen for Thunder Elemental Arrows, but it is handled in ElementalArrows.java */
 				mPlugin.mEffectManager.addEffect(enemy, ENHANCE_WEAK_SRC,
-					new PercentDamageDealt(ENHANCEMENT_EFFECT_DURATION, mEnhanceWeakPotency, ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES));
+					new PercentDamageDealt(ENHANCEMENT_EFFECT_DURATION, mEnhanceWeakPotency)
+						.damageTypes(ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES));
 			} else if (ARCANE_ABILITIES.contains(eventAbility)) {
 				/* Does not check for Arcane Strike (U) since this can only happen once per tick, does not check for
 				 * Astral Omen to prevent triggering every spell */
@@ -192,11 +193,13 @@ public class Spellshock extends Ability {
 						} else {
 							oldEffect.clearEffect();
 							mPlugin.mEffectManager.addEffect(mPlayer, ENHANCE_SPEED_SRC,
-								new PercentSpeed(ENHANCEMENT_EFFECT_DURATION, mEnhanceSpeedPotency * (oldStacks + 1), ENHANCE_SPEED_SRC));
+								new PercentSpeed(ENHANCEMENT_EFFECT_DURATION, mEnhanceSpeedPotency * (oldStacks + 1), ENHANCE_SPEED_SRC)
+									.deleteOnAbilityUpdate(true));
 						}
 					} else {
 						mPlugin.mEffectManager.addEffect(mPlayer, ENHANCE_SPEED_SRC,
-							new PercentSpeed(ENHANCEMENT_EFFECT_DURATION, mEnhanceSpeedPotency, ENHANCE_SPEED_SRC));
+							new PercentSpeed(ENHANCEMENT_EFFECT_DURATION, mEnhanceSpeedPotency, ENHANCE_SPEED_SRC)
+								.deleteOnAbilityUpdate(true));
 					}
 				}
 			}
@@ -226,7 +229,7 @@ public class Spellshock extends Ability {
 
 				if (isLevelTwo()) {
 					mPlugin.mEffectManager.addEffect(mPlayer, SPEED_SRC,
-						new PercentSpeed(SPEED_DURATION, mSpeedPotency, SPEED_SRC));
+						new PercentSpeed(SPEED_DURATION, mSpeedPotency, SPEED_SRC).deleteOnAbilityUpdate(true));
 				}
 
 				// spellshock triggering other spellshocks propagates the damage at 100%

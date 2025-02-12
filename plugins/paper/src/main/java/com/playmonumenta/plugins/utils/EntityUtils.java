@@ -64,7 +64,45 @@ import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Ageable;
+import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Bee;
+import org.bukkit.entity.Blaze;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Enemy;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Flying;
+import org.bukkit.entity.Ghast;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Phantom;
+import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.PolarBear;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.PufferFish;
+import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.Shulker;
+import org.bukkit.entity.SkeletonHorse;
+import org.bukkit.entity.Slime;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Trident;
+import org.bukkit.entity.Vex;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.entity.Wolf;
+import org.bukkit.entity.ZombieHorse;
+import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -417,10 +455,6 @@ public class EntityUtils {
 		}
 
 		return false;
-	}
-
-	public static @Nullable Player getPlayerAtCursor(Player player, double range) {
-		return getPlayerAtCursor(player, range, null);
 	}
 
 	public static @Nullable Player getPlayerAtCursor(Player player, double range, double hitboxSize) {
@@ -812,46 +846,6 @@ public class EntityUtils {
 		return false;
 	}
 
-	public static double getVulnAmount(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
-		if (vulns != null) {
-			Effect vuln = vulns.last();
-			return vuln.getMagnitude();
-		} else {
-			return 0;
-		}
-	}
-
-	public static int getVulnTicks(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
-		if (vulns != null) {
-			Effect vuln = vulns.last();
-			return vuln.getDuration();
-		} else {
-			return 0;
-		}
-	}
-
-	public static void amplifyVuln(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isVulnerable(plugin, en)) {
-			int ampLvl = (int) Math.floor(getVulnAmount(plugin, en) * 10) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = (int) Math.max(ampCap, Math.floor(getVulnAmount(plugin, en) * 10));
-			}
-			applyVulnerability(plugin, getVulnTicks(plugin, en), ampLvl * 0.1, en);
-		}
-	}
-
-	private static final String BLIGHT_EFFECT_NAME = "SanguineHarvestBlightEffect";
-
-	public static boolean isBlighted(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> blight = plugin.mEffectManager.getEffects(mob, BLIGHT_EFFECT_NAME);
-		if (blight != null) {
-			return true;
-		}
-		return false;
-	}
-
 	public static final String BLEED_EFFECT_NAME = "BleedEffect";
 
 	public static void applyBleed(Plugin plugin, int ticks, double amount, LivingEntity mob) {
@@ -862,41 +856,11 @@ public class EntityUtils {
 		return plugin.mEffectManager.hasEffect(mob, BLEED_EFFECT_NAME);
 	}
 
-	public static int getBleedLevel(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
-		if (bleeds != null) {
-			Effect bleed = bleeds.last();
-			return (int) bleed.getMagnitude();
-		} else {
-			return 0;
-		}
-	}
-
-	public static int getBleedTicks(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
-		if (bleeds != null) {
-			Effect bleed = bleeds.last();
-			return bleed.getDuration();
-		} else {
-			return 0;
-		}
-	}
-
 	public static void setBleedTicks(Plugin plugin, LivingEntity mob, int ticks) {
 		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
 		if (bleeds != null) {
 			Effect bleed = bleeds.last();
 			bleed.setDuration(ticks);
-		}
-	}
-
-	public static void amplifyBleed(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isBleeding(plugin, en)) {
-			int ampLvl = getBleedLevel(plugin, en) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = Math.max(ampCap, getBleedLevel(plugin, en));
-			}
-			applyBleed(plugin, getBleedTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -916,16 +880,6 @@ public class EntityUtils {
 
 	public static boolean isSlowed(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, SLOW_EFFECT_NAME);
-	}
-
-	public static double getSlowAmount(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
-		if (slows != null) {
-			Effect slow = slows.last();
-			return slow.getMagnitude();
-		} else {
-			return 0;
-		}
 	}
 
 	public static int getSlowTicks(Plugin plugin, LivingEntity mob) {
@@ -948,16 +902,6 @@ public class EntityUtils {
 		if (slows != null) {
 			Effect slow = slows.last();
 			slow.setDuration(ticks);
-		}
-	}
-
-	public static void amplifySlow(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isSlowed(plugin, en)) {
-			int ampLvl = (int) Math.floor(getSlowAmount(plugin, en) * 10) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = (int) Math.max(ampCap, Math.floor(getSlowAmount(plugin, en) * 10));
-			}
-			applySlow(plugin, getSlowTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -991,7 +935,7 @@ public class EntityUtils {
 	}
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet<DamageType> affectedDamageTypes, String effectString) {
-		plugin.mEffectManager.addEffect(mob, effectString, new PercentDamageDealt(ticks, -amount, affectedDamageTypes));
+		plugin.mEffectManager.addEffect(mob, effectString, new PercentDamageDealt(ticks, -amount).damageTypes(affectedDamageTypes));
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_AESTHETICS_NAME, new Aesthetics(ticks,
 			(entity, fourHertz, twoHertz, oneHertz) -> {
 				if (fourHertz) {
@@ -1011,16 +955,6 @@ public class EntityUtils {
 
 	public static boolean isWeakened(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, WEAKEN_EFFECT_NAME);
-	}
-
-	public static double getWeakenAmount(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
-		if (weaks != null) {
-			Effect weak = weaks.last();
-			return weak.getMagnitude();
-		} else {
-			return 0;
-		}
 	}
 
 	public static int getWeakenTicks(Plugin plugin, LivingEntity mob) {
@@ -1047,16 +981,6 @@ public class EntityUtils {
 		if (weaksAesthetics != null) {
 			Effect weak = weaksAesthetics.last();
 			weak.setDuration(ticks);
-		}
-	}
-
-	public static void amplifyWeaken(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isWeakened(plugin, en)) {
-			int ampLvl = (int) Math.floor(getWeakenAmount(plugin, en) * 10) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = (int) Math.max(ampCap, Math.floor(getWeakenAmount(plugin, en) * 10));
-			}
-			applyWeaken(plugin, getWeakenTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 

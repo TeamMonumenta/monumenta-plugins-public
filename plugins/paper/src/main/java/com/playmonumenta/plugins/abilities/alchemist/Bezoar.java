@@ -108,9 +108,8 @@ public class Bezoar extends Ability {
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS());
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		Bukkit.getScheduler().runTask(plugin, () ->
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
 	public void dropBezoar(EntityDeathEvent event) {
@@ -185,11 +184,15 @@ public class Bezoar extends Ability {
 		// If the effects are from a philosopher stone, it should give them with triple the duration.
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		int healDuration = CharmManager.getDuration(mPlayer, CHARM_HEAL_DURATION, HEAL_DURATION);
-		mPlugin.mEffectManager.addEffect(player, "BezoarHealing", new CustomRegeneration(healDuration, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, maxHealth * HEAL_PERCENT), mPlayer, mPlugin));
+		mPlugin.mEffectManager.addEffect(player, "BezoarHealing",
+			new CustomRegeneration(healDuration, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING,
+				maxHealth * HEAL_PERCENT), mPlayer, mPlugin).deleteOnAbilityUpdate(true));
 
 		if (isLevelTwo()) {
 			int damageDuration = CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, DAMAGE_DURATION);
-			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(damageDuration, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
+			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect",
+				new PercentDamageDealt(damageDuration, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE))
+					.deleteOnAbilityUpdate(true));
 		}
 
 		if (isPhilosopherStone) {

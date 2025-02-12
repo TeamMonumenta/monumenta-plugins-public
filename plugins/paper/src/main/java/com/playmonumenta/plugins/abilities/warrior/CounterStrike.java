@@ -157,7 +157,8 @@ public class CounterStrike extends Ability {
 		int currentTick = Bukkit.getCurrentTick();
 		int duration = mAbsorptionMobs.stream().map(mLastHurtTicks::get).filter(Objects::nonNull).mapToInt(t -> t + mDuration - currentTick).max().orElse(0);
 		if (duration > 0) {
-			mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(duration, mKBR, KBR_EFFECT));
+			mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT,
+				new PercentKnockbackResist(duration, mKBR, KBR_EFFECT).deleteOnAbilityUpdate(true));
 		}
 	}
 

@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.bluestrike;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -24,15 +24,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class SpellDeathSweep extends Spell {
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
-	private PartialParticle mPRed;
-	private PartialParticle mPHit;
-	private PartialParticle mPHitCone1;
-	private PartialParticle mPHitCone2;
+	private final PartialParticle mPRed;
+	private final PartialParticle mPHit;
+	private final PartialParticle mPHitCone1;
+	private final PartialParticle mPHitCone2;
 	private final int mDelay;
 	private final int mPhase;
 	private boolean mCooldown;
@@ -176,10 +178,10 @@ public class SpellDeathSweep extends Spell {
 		return !mCooldown;
 	}
 
-	public void hit(Player player) {
-		String cause = "Death Sweep";
-		AbilityUtils.increaseDamageReceivedPlayer(player, 20 * 8, 0.2, cause);
-		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE, 65, cause, mBoss.getLocation());
+	private void hit(final Player player) {
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "LichDeathSweepVulnerability",
+			new PercentDamageReceived(TICKS_PER_SECOND * 8, 0.2));
+		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE, 65, "Death Sweep", mBoss.getLocation());
 		MovementUtils.knockAway(mBoss, player, 1f, 0.5f);
 	}
 }

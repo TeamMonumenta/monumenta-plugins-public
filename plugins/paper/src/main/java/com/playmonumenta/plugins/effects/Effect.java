@@ -24,23 +24,28 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.jetbrains.annotations.Nullable;
 
-/* NOTE:
- *
- * Effects should not themselves modify other effects when any of the below methods are called
- * If you need to do this, you should use Bukkit.getScheduler().runTask(...) to update the effects after the current operation finishes processing
+/**
+ * Abstract representation of a custom effect.<br>
+ * Effects should not themselves modify other effects when any of the class methods are called. If you need to do this,
+ * you should use Bukkit.getScheduler().runTask(...) to update the effects after the current operation finishes processing
  */
 public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
-
 	protected int mDuration;
 	public final String mEffectID;
+	private boolean mDeleteOnAbilityUpdate; // Used by the AbilityManager when updating a player's abilities
 	private boolean mDisplay = true;
 	private boolean mDisplayTime = true;
 	private boolean mDeleteOnLogout = false;
 	boolean mUsed = false;
 
-	public Effect(int duration, String effectID) {
+	public Effect(final int duration, final String effectID) {
+		this(duration, effectID, false);
+	}
+
+	public Effect(final int duration, final String effectID, final boolean deleteOnAbilityUpdate) {
 		mDuration = duration;
 		mEffectID = effectID;
+		mDeleteOnAbilityUpdate = deleteOnAbilityUpdate;
 	}
 
 	public EffectPriority getPriority() {
@@ -49,6 +54,21 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	public int getDuration() {
 		return mDuration;
+	}
+
+	/**
+	 * Builder method to set mDeleteOnAbilityUpdate when creating a new Effect. This should only be used with classes
+	 * that extend Ability since children of DepthsAbility are frequently updated during normal gameplay (e.g. ability upgrade)
+	 * @param deleteOnAbilityUpdate Whether this effect instance should be cleared when the affected player changes class
+	 * @return Modified instance of the Effect
+	 */
+	public Effect deleteOnAbilityUpdate(final boolean deleteOnAbilityUpdate) {
+		mDeleteOnAbilityUpdate = deleteOnAbilityUpdate;
+		return this;
+	}
+
+	public boolean shouldDeleteOnAbilityUpdate() {
+		return mDeleteOnAbilityUpdate;
 	}
 
 	public void setDuration(int duration) {

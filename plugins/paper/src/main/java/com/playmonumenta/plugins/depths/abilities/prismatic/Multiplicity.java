@@ -88,7 +88,8 @@ public class Multiplicity extends DepthsAbility {
 					mPlugin.mTimers.updateCooldown(mPlayer, spell, (int) (CDR[mRarity - 1] * a.getInfo().getModifiedCooldown(mPlayer, a.getAbilityScore())));
 				}
 			});
-			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_EFFECT, new PercentDamageDealt(DURATION, DAMAGE[mRarity - 1], DamageEvent.DamageType.getAllMeleeTypes()));
+			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_EFFECT,
+				new PercentDamageDealt(DURATION, DAMAGE[mRarity - 1]).damageTypes(DamageEvent.DamageType.getAllMeleeTypes()));
 			mLastAbilities.clear();
 
 			// Activation Effects

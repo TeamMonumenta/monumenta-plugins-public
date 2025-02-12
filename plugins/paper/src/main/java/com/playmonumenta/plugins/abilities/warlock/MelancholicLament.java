@@ -160,10 +160,12 @@ public class MelancholicLament extends Ability {
 						.limit(ENHANCE_MAX_MOBS)
 						.count();
 					for (Player player : enhanceHitbox.getHitPlayers(true)) {
-						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, (ENHANCE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)) * numTargeting, AFFECTED_DAMAGE_TYPES));
+						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME,
+							new PercentDamageDealt(ENHANCE_EFFECT_DURATION, (ENHANCE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)) * numTargeting)
+								.damageTypes(AFFECTED_DAMAGE_TYPES).deleteOnAbilityUpdate(true));
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
 							(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.enhancementTick(player, mPlayer, fourHertz, twoHertz, oneHertz),
-							(entity) -> { })
+							(entity) -> { }).deleteOnAbilityUpdate(true)
 						);
 					}
 

@@ -46,24 +46,29 @@ public class Frenzy extends Ability {
 			.displayItem(Material.FEATHER);
 
 	private final double mPercentAttackSpeedEffect;
+	private final double mSpeedPotency;
 	private final int mDuration;
+	private final double mEnhanceDamageMult;
 	private final FrenzyCS mCosmetic;
 
 	public Frenzy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentAttackSpeedEffect = (isLevelOne() ? PERCENT_ATTACK_SPEED_EFFECT_1 : PERCENT_ATTACK_SPEED_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED);
+		mSpeedPotency = PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new FrenzyCS());
+		mEnhanceDamageMult = DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new FrenzyCS());
 	}
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATTACK_SPEED_EFFECT_NAME,
-			new PercentAttackSpeed(mDuration, mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_NAME));
+			new PercentAttackSpeed(mDuration, mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_NAME)
+				.deleteOnAbilityUpdate(true));
 
 		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
-				new PercentSpeed(mDuration, PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
+				new PercentSpeed(mDuration, mSpeedPotency, PERCENT_SPEED_EFFECT_NAME).deleteOnAbilityUpdate(true));
 			mCosmetic.frenzyLevelTwo(mPlayer);
 		} else {
 			mCosmetic.frenzyLevelOne(mPlayer);
@@ -71,7 +76,8 @@ public class Frenzy extends Ability {
 
 		if (isEnhanced()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_SINGLE_EFFECT_NAME,
-				new PercentDamageDealtSingle(mDuration, DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE), EnumSet.of(DamageEvent.DamageType.MELEE)));
+				new PercentDamageDealtSingle(mDuration, mEnhanceDamageMult)
+					.damageTypes(EnumSet.of(DamageEvent.DamageType.MELEE)).deleteOnAbilityUpdate(true));
 			mCosmetic.frenzyEnhancement(mPlayer);
 		}
 	}

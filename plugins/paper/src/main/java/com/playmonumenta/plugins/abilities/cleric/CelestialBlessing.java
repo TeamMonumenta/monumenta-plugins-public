@@ -100,12 +100,15 @@ public class CelestialBlessing extends Ability {
 
 		for (final Player p : affectedPlayers) {
 			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME,
-				new CelestialBlessingDamageBuff(mDuration, mExtraDamage, isEnhanced(), mCosmetic, p, null));
-			mPlugin.mEffectManager.addEffect(p, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, mSpeedPotency, ATTR_NAME));
+				new CelestialBlessingDamageBuff(mDuration, mExtraDamage, isEnhanced(), mCosmetic, p, null)
+					.deleteOnAbilityUpdate(true));
+			mPlugin.mEffectManager.addEffect(p, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, mSpeedPotency, ATTR_NAME)
+				.deleteOnAbilityUpdate(true));
 			mPlugin.mEffectManager.addEffect(p, PARTICLE_EFFECT_NAME, new Aesthetics(mDuration,
 				(entity, fourHertz, twoHertz, oneHertz) ->
 					mCosmetic.tickEffect(mPlayer, p, fourHertz, twoHertz, oneHertz),
 				(entity) -> mCosmetic.loseEffect(mPlayer, p))
+					.deleteOnAbilityUpdate(true)
 			);
 			mCosmetic.startEffectTargets(p);
 		}
