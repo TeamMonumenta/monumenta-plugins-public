@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -1149,6 +1150,19 @@ public final class EffectManager implements Listener {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 					effectGroup.last().onPotionEffectModify(entity, event);
+				}
+			}
+		}
+	}
+
+	@EventHandler (priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void abilityCastEvent(AbilityCastEvent event) {
+		Player player = event.getCaster();
+		Effects effects = mEntities.get(player);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onAbilityCast(event, player);
 				}
 			}
 		}

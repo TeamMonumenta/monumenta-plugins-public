@@ -15,20 +15,20 @@ public class HeavenlyBoonTracker extends Effect {
 
 	private final UUID mPlayerId; // store UUIDs instead of players to prevent memory leaks
 
-	public HeavenlyBoonTracker(int duration, UUID playerUuid) {
+	public HeavenlyBoonTracker(final int duration, final UUID playerUuid) {
 		super(duration, effectID);
 		mPlayerId = playerUuid;
 	}
 
 	@Override
-	public void onDeath(EntityDeathEvent event) {
-		Player player = Bukkit.getPlayer(mPlayerId);
+	public void onDeath(final EntityDeathEvent event) {
+		final Player player = Bukkit.getPlayer(mPlayerId);
 		// Player logged off OR Player used
 		if (player == null) {
 			return;
 		}
 
-		HeavenlyBoon heavenlyBoon = Plugin.getInstance().mAbilityManager.getPlayerAbility(player, HeavenlyBoon.class);
+		final HeavenlyBoon heavenlyBoon = Plugin.getInstance().mAbilityManager.getPlayerAbility(player, HeavenlyBoon.class);
 		if (heavenlyBoon != null) {
 			heavenlyBoon.triggerOnKill(event.getEntity());
 		}

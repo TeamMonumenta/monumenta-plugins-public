@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.cosmetics.skills.cleric;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -46,6 +48,16 @@ public class CelestialBlessingCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.5f, 1.75f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.75f, 1.25f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.75f, 1.1f);
+	}
+
+	public void enhanceExtension(Player player) {
+		player.sendActionBar(Component.text("Blessing Extended!").color(NamedTextColor.GOLD));
+		Location loc = player.getLocation();
+		World world = player.getWorld();
+		world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.5f, 2f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.75f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.75f, 1.35f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.75f, 0.9f);
 	}
 
 	public void startEffectCaster(Player caster, double radius) {
