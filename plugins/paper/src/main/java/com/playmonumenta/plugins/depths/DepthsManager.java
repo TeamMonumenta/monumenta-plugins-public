@@ -1746,19 +1746,16 @@ public class DepthsManager {
 	 * @param p player - get their party and send them to next floor
 	 */
 	public void goToNextFloor(Player p) {
-		DepthsPlayer dp = getDepthsPlayer(p);
-		DepthsParty party = getPartyFromId(dp);
-		if (dp == null || party == null) {
+		DepthsParty party = getPartyFromId(getDepthsPlayer(p));
+		if (party == null) {
 			DepthsUtils.sendFormattedMessage(p, DepthsContent.DARKEST_DEPTHS, "Player not in depths system!");
 			return;
 		}
 		party.mSpawnedForcedCleansingRoom = false; // reset this.
-		if (dp.mGraveRunnable != null) {
-			dp.mDead = false;
-			dp.mGraveRunnable.cancel();
-		}
-		dp.mNumDeaths = Math.max(0, dp.mNumDeaths - 1);
-		MMLog.finer(p.getName() + " went to next floor. mNumDeaths = " + dp.mNumDeaths);
+		party.mPlayersInParty.forEach(dp -> {
+			dp.mNumDeaths = Math.max(0, dp.mNumDeaths - 1);
+		});
+		MMLog.finer(p.getName() + " went to next floor.");
 		int partyFloor = party.getFloor();
 		party.incrementFloor();
 		int treasureScoreIncrease = TREASURE_PER_FLOOR * partyFloor + 2;
@@ -1780,11 +1777,11 @@ public class DepthsManager {
 					}
 
 					DepthsUtils.storeRunStatsToFile(player, playerInParty, party, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats", true); //Save the player's stats
-					playerInParty.mFinalTreasureScore = party.mTreasureScore + dp.mBonusTreasureScore;
+					playerInParty.mFinalTreasureScore = party.mTreasureScore + playerInParty.mBonusTreasureScore;
 
 					// if the player chose the bonus tree at the beginning, boost their personal treasure score
-					if (dp.mBonusTreeSelected) {
-						dp.mFinalTreasureScore += (int) Math.min(dp.mFinalTreasureScore * 0.15, 10);
+					if (playerInParty.mBonusTreeSelected) {
+						playerInParty.mFinalTreasureScore += (int) Math.min(playerInParty.mFinalTreasureScore * 0.15, 10);
 					}
 					playerInParty.sendMessage("Congratulations! Your final treasure score is " + playerInParty.mFinalTreasureScore + "!");
 					party.populateLootRoom(player, true);
@@ -1824,8 +1821,8 @@ public class DepthsManager {
 						continue;
 					}
 					//Transform mystery box if applicable
-					if (dp.hasAbility(RandomAspect.ABILITY_NAME)) {
-						transformMysteryBox(player, dp);
+					if (playerInParty.hasAbility(RandomAspect.ABILITY_NAME)) {
+						transformMysteryBox(player, playerInParty);
 					}
 					//Set score
 					ScoreboardUtils.setScoreboardValue(player, "Depths",
@@ -1836,27 +1833,27 @@ public class DepthsManager {
 			}
 		} else if (party.mContent == DepthsContent.CELESTIAL_ZENITH) {
 			// avaricious pendant trigger
-			party.mPlayersInParty.forEach((depthsPlayer) -> {
-				if (depthsPlayer.hasAbility(AvariciousPendant.ABILITY_NAME)) {
-					AvariciousPendant.increaseTreasure(depthsPlayer);
+			party.mPlayersInParty.forEach((dp) -> {
+				if (dp.hasAbility(AvariciousPendant.ABILITY_NAME)) {
+					AvariciousPendant.increaseTreasure(dp);
 				}
 			});
 
 			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_FLOOR) {
-				party.mPlayersInParty.forEach(dp2 -> dp2.mEarnedRewards.add(DepthsRewardType.CURSE));
+				party.mPlayersInParty.forEach(dp -> dp.mEarnedRewards.add(DepthsRewardType.CURSE));
 				party.sendMessage("You have been laden with an additional curse after clearing the floor!");
 			}
 			//Give celestial gift for beating boss in depths 2
-			party.mPlayersInParty.forEach(dp2 -> {
-				dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
+			party.mPlayersInParty.forEach(dp -> {
+				dp.mEarnedRewards.add(DepthsRewardType.GIFT);
 				// broken clock trigger
-				if (dp2.hasAbility(BrokenClock.ABILITY_NAME)) {
-					Player p2 = dp.getPlayer();
-					if (p2 != null) {
-						dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
-						dp2.mEarnedRewards.add(DepthsRewardType.GIFT);
-						BrokenClock.playSound(p2);
-						setPlayerLevelInAbility(BrokenClock.ABILITY_NAME, p2, dp2, 0, false, false);
+				if (dp.hasAbility(BrokenClock.ABILITY_NAME)) {
+					Player player = dp.getPlayer();
+					if (player != null) {
+						dp.mEarnedRewards.add(DepthsRewardType.GIFT);
+						dp.mEarnedRewards.add(DepthsRewardType.GIFT);
+						BrokenClock.playSound(player);
+						setPlayerLevelInAbility(BrokenClock.ABILITY_NAME, player, dp, 0, false, false);
 					}
 				}
 			});
