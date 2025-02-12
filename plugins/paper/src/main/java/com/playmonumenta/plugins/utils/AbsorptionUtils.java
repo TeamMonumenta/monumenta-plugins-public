@@ -126,6 +126,10 @@ public class AbsorptionUtils {
 	public static void clearAbsorption(LivingEntity entity) {
 		ABSORPTION_INFO_MAPPINGS.remove(entity);
 		entity.setAbsorptionAmount(0);
+		// Hack to remove potion absorption effect from player
+		if (entity instanceof Player player) {
+			Plugin.getInstance().mPotionManager.clearPotionEffectType(player, PotionEffectType.ABSORPTION);
+		}
 	}
 
 	private static void initializeTracker() {
