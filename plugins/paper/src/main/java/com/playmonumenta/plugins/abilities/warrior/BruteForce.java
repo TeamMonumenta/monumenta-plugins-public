@@ -16,8 +16,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
-import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,8 +27,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class BruteForce extends Ability {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
+public class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
 	private static final int BRUTE_FORCE_DAMAGE = 2;
 	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
@@ -49,108 +50,122 @@ public class BruteForce extends Ability {
 			.scoreboardId("BruteForce")
 			.shorthandName("BF")
 			.descriptions(
-				"Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radius around it, " +
-					"and knocks all non-boss enemies away from you.",
-				"Damage is increased to 10% of the attack's damage plus 2.",
-				"Half a second after triggering this ability, it triggers another wave centered on the same mob, with 75% of the damage and all of the knockback.")
-			.simpleDescription("Critical hits deal extra damage and knock back nearby mobs.")
+				String.format("Performing a critical melee attack deals %s damage and applies knockback to the " +
+					"hit enemy and all enemies within a %s block radius. Bosses do not take knockback.",
+					BRUTE_FORCE_DAMAGE,
+					BRUTE_FORCE_RADIUS),
+				String.format("The damage is increased to %s plus %s of the critical attack's damage.",
+					BRUTE_FORCE_DAMAGE,
+					StringUtils.multiplierToPercentageWithSign(BRUTE_FORCE_2_MODIFIER)),
+				String.format("Triggering this ability causes a subsequent wave after %ss centered on the " +
+					"hit enemy that deals %s of the damage and applies knockback.",
+					StringUtils.ticksToSeconds(ENHANCEMENT_DELAY),
+					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_DAMAGE_RATIO)))
+			.simpleDescription("Critical melee attacks deal extra damage and knock back nearby mobs.")
 			.displayItem(Material.STONE_AXE);
 
 	private final double mFlatDamage;
 	private final double mMultiplier;
+	private final double mWaveRadius;
+	private final float mForceScalar;
+	private final double mEnhanceDamageMult;
+	private final int mEnhanceWaves;
+	private final int mEnhanceWaveDelay;
 
 	private final BruteForceCS mCosmetic;
 
 	private int mComboNumber = 0;
 	private @Nullable BukkitRunnable mComboRunnable = null;
 
-	public BruteForce(Plugin plugin, Player player) {
+	public BruteForce(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mFlatDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, BRUTE_FORCE_DAMAGE);
-		mMultiplier = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER);
-
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BruteForceCS());
+		mFlatDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, BRUTE_FORCE_DAMAGE);
+		mMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelTwo() ? BRUTE_FORCE_2_MODIFIER : 0);
+		mWaveRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS);
+		mForceScalar = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BRUTE_FORCE_KNOCKBACK_SPEED);
+		mEnhanceDamageMult = ENHANCEMENT_DAMAGE_RATIO + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WAVE_DAMAGE_RATIO);
+		mEnhanceWaves = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_WAVES);
+		mEnhanceWaveDelay = CharmManager.getDuration(mPlayer, CHARM_WAVE_DELAY, ENHANCEMENT_DELAY);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new BruteForceCS());
 	}
 
 	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
-			// Need to get this value before changing the damage
-			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
+	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
+		if (!(event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer))) {
+			return false;
+		}
 
-			event.addUnmodifiableDamage(mFlatDamage);
-			event.updateDamageWithMultiplier(1 + mMultiplier);
+		// Accounts for base weapon damage, the crit mult, gear attribute damage, and charms (in the constructor)
+		double baseAoEDamage = event.getDamage() * mMultiplier + mFlatDamage;
+		double damageMult = 1;
 
-			// TODO this might be unnecessary or bugged but it's not the main issue right now
-			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
-				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
-					if (priorityEffects instanceof PercentDamageDealt damageEffect) {
-						EnumSet<DamageType> types = damageEffect.getAffectedDamageTypes();
-						if (types == null || types.contains(DamageType.MELEE)) {
-							damageBonus = damageBonus * (1 + damageEffect.getMagnitude() * (damageEffect.isBuff() ? 1 : -1));
+		/*
+		 * TODO: This is a hacky workaround to get damage buffs to work with the waves while preventing each wave from
+		 *  receiving damage buffs again because it is a new DamageEvent with DamageType Melee Skill. Waves use DamageType
+		 *   OTHER instead. This causes issues with Rampage's damage tracking and the First Strike enchantment. Note
+		 *    that debuffs are still multiplicative
+		 */
+		if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
+			for (final Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
+				if (priorityEffects instanceof final PercentDamageDealt damageEffect) {
+					final EnumSet<DamageType> types = damageEffect.getAffectedDamageTypes();
+					if (types == null || types.contains(DamageType.MELEE)) {
+						if (damageEffect.isBuff()) {
+							damageMult += damageEffect.getMagnitude();
+						} else {
+							damageMult *= (1 - damageEffect.getMagnitude());
 						}
 					}
 				}
 			}
+		}
 
-			Location playerLoc = mPlayer.getLocation();
-			wave(enemy, playerLoc, damageBonus, false);
-			if (isEnhanced()) {
-				double damageRatio = ENHANCEMENT_DAMAGE_RATIO + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WAVE_DAMAGE_RATIO);
-				int waves = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_WAVES);
-				long delay = CharmManager.getDuration(mPlayer, CHARM_WAVE_DELAY, ENHANCEMENT_DELAY);
-				for (int i = 1; i <= waves; i++) {
-					double damage = damageBonus * Math.pow(damageRatio, i);
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						wave(enemy, playerLoc, damage, true);
-					}, delay * i);
-				}
+		baseAoEDamage *= damageMult;
+		final int waveCount = 1 + (isEnhanced() ? mEnhanceWaves : 0);
+		for (int i = 0; i < waveCount; i++) {
+			final double damage = baseAoEDamage * Math.pow(mEnhanceDamageMult, i); // Reduces damage if waveCount > 1
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> wave(enemy, mPlayer.getLocation(), damage),
+				(long) mEnhanceWaveDelay * i);
+		}
+
+		if (mComboNumber == 0 || mComboRunnable != null) {
+			if (mComboRunnable != null) {
+				mComboRunnable.cancel();
 			}
-
-			if (mComboNumber == 0 || mComboRunnable != null) {
-				if (mComboRunnable != null) {
-					mComboRunnable.cancel();
-				}
-				mComboRunnable = new BukkitRunnable() {
-					@Override
-					public void run() {
-						mComboNumber = 0;
-						mComboRunnable = null;
-					}
-				};
-				cancelOnDeath(mComboRunnable.runTaskLater(mPlugin, (long) ((1D / EntityUtils.getAttributeOrDefault(mPlayer, Attribute.GENERIC_ATTACK_SPEED, 4)) * 20) + 15));
-			}
-			mComboNumber++;
-
-			if (mComboNumber >= 3) {
-				if (mComboRunnable != null) {
-					mComboRunnable.cancel();
+			mComboRunnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					mComboNumber = 0;
 					mComboRunnable = null;
 				}
-				mComboNumber = 0;
-			}
-			return true;
+			};
+			cancelOnDeath(mComboRunnable.runTaskLater(mPlugin,
+				(long) ((1D / EntityUtils.getAttributeOrDefault(mPlayer, Attribute.GENERIC_ATTACK_SPEED, 4)) * TICKS_PER_SECOND) + 15));
 		}
-		return false;
+		mComboNumber++;
+
+		if (mComboNumber >= 3) {
+			if (mComboRunnable != null) {
+				mComboRunnable.cancel();
+				mComboRunnable = null;
+			}
+			mComboNumber = 0;
+		}
+
+		return true;
 	}
 
-	private void wave(LivingEntity target, Location playerLoc, double damageBonus, boolean damageTarget) {
-		Location loc = target.getLocation().add(0, 0.75, 0);
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS);
-		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
-
-		mCosmetic.bruteOnDamage(mPlayer, loc.getWorld(), loc, radius, mComboNumber);
-
-		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BRUTE_FORCE_KNOCKBACK_SPEED);
-
-		for (LivingEntity mob : mobs) {
-			if (damageTarget || mob != target) {
-				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mob == target ? ClassAbility.BRUTE_FORCE : ClassAbility.BRUTE_FORCE_AOE, true);
-			}
+	private void wave(final LivingEntity target, final Location playerLoc, final double damage) {
+		final Location loc = target.getLocation().add(0, 0.75, 0);
+		for (final LivingEntity mob : new Hitbox.SphereHitbox(loc, mWaveRadius).getHitMobs()) {
+			DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damage,
+				mob == target ? ClassAbility.BRUTE_FORCE : ClassAbility.BRUTE_FORCE_AOE, true);
 
 			if (!EntityUtils.isBoss(mob)) {
-				MovementUtils.knockAway(playerLoc, mob, knockback, knockback / 2, true);
+				MovementUtils.knockAway(playerLoc, mob, mForceScalar, mForceScalar / 2.0f, true);
 			}
 		}
+
+		mCosmetic.bruteOnDamage(mPlayer, loc.getWorld(), loc, mWaveRadius, mComboNumber);
 	}
 }

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior.guardian;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -14,6 +15,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
@@ -25,13 +27,13 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class Bodyguard extends Ability {
-	private static final int COOLDOWN = 30 * 20;
+	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 30;
 	private static final int RANGE = 25;
 	private static final int RADIUS = 4;
 	private static final int ABSORPTION_HEALTH_1 = 8;
 	private static final int ABSORPTION_HEALTH_2 = 12;
-	private static final int BUFF_DURATION = 20 * 10;
-	private static final int STUN_DURATION = 20 * 3;
+	private static final int BUFF_DURATION = Constants.TICKS_PER_SECOND * 10;
+	private static final int STUN_DURATION = Constants.TICKS_PER_SECOND * 3;
 	private static final float KNOCKBACK = 0.45f;
 
 	public static final String CHARM_COOLDOWN = "Bodyguard Cooldown";
@@ -48,10 +50,18 @@ public class Bodyguard extends Ability {
 			.scoreboardId("Bodyguard")
 			.shorthandName("Bg")
 			.descriptions(
-				"Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). " +
-					"Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 8 absorption health for 10 seconds. " +
-					"Left-click twice while looking down to cast on yourself. Cooldown: 30s.",
-				"Absorption increased to 12 health. Additionally, affected mobs are stunned for 3 seconds.")
+				String.format("Left-click the air twice while looking directly at another player within %s blocks to " +
+					"charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within " +
+					"%s blocks. Both you and the other player gain %s absorption health for %ss. Left-click " +
+					"twice while looking down to cast on yourself. Cooldown: %ss.",
+					RANGE,
+					RADIUS,
+					ABSORPTION_HEALTH_1,
+					StringUtils.ticksToSeconds(BUFF_DURATION),
+					StringUtils.ticksToSeconds(COOLDOWN)),
+				String.format("The absorption health is increased to %s. Additionally, affected mobs are stunned for %ss.",
+					ABSORPTION_HEALTH_2,
+					StringUtils.ticksToSeconds(STUN_DURATION)))
 			.simpleDescription("Teleport to another player, giving them and yourself absorption and stunning nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("castSelf", "cast on self or others", bg -> bg.cast(true),
@@ -63,32 +73,41 @@ public class Bodyguard extends Ability {
 			.displayItem(Material.IRON_CHESTPLATE);
 
 	private final double mAbsorptionHealth;
+	private final int mAbsorptionDuration;
+	private final double mRange;
+	private final float mKnockback;
+	private final double mKnockbackRadius;
+	private final int mStunDuration;
 
 	private final BodyguardCS mCosmetic;
 
-	public Bodyguard(Plugin plugin, Player player) {
+	public Bodyguard(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodyguardCS());
+		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, BUFF_DURATION);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
+		mKnockbackRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new BodyguardCS());
 	}
 
-	public boolean cast(boolean allowSelfCast) {
+	public boolean cast(final boolean allowSelfCast) {
 		if (isOnCooldown()) {
 			return false;
 		}
 
-		World world = mPlayer.getWorld();
-		Location userLoc = mPlayer.getLocation();
+		final World world = mPlayer.getWorld();
+		final Location userLoc = mPlayer.getLocation();
 
-		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, range, 0.5);
+		final Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, mRange, 0.5);
 		if (targetPlayer != null) {
 			mCosmetic.onBodyguardOther(mPlayer, targetPlayer, world);
 
-			Vector dir = userLoc.getDirection();
-			Location otherLoc = targetPlayer.getLocation().setDirection(mPlayer.getEyeLocation().getDirection());
+			final Vector dir = userLoc.getDirection();
+			final Location otherLoc = targetPlayer.getLocation().setDirection(mPlayer.getEyeLocation().getDirection());
 			Location targetLoc = otherLoc.clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-			BoundingBox box = mPlayer.getBoundingBox().shift(targetLoc.clone().subtract(mPlayer.getLocation()));
+			final BoundingBox box = mPlayer.getBoundingBox().shift(targetLoc.clone().subtract(mPlayer.getLocation()));
 			if (LocationUtils.collidesWithBlocks(box, mPlayer.getWorld())) {
 				targetLoc = otherLoc;
 			}
@@ -105,23 +124,19 @@ public class Bodyguard extends Ability {
 		}
 
 		putOnCooldown();
-
+		giveAbsorption(mPlayer);
 		mCosmetic.onBodyguard(mPlayer, world, userLoc);
 
-		giveAbsorption(mPlayer);
-
-		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
-		int duration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS))) {
-			MovementUtils.knockAway(mPlayer, mob, knockback, true);
+		for (final LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mKnockbackRadius)) {
+			MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 			if (isLevelTwo()) {
-				EntityUtils.applyStun(mPlugin, duration, mob);
+				EntityUtils.applyStun(mPlugin, mStunDuration, mob);
 			}
 		}
 		return true;
 	}
 
-	private void giveAbsorption(Player player) {
-		AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, BUFF_DURATION));
+	private void giveAbsorption(final Player player) {
+		AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, mAbsorptionDuration);
 	}
 }
