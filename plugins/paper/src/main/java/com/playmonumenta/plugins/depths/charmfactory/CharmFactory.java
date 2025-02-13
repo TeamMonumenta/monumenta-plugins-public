@@ -214,6 +214,7 @@ public class CharmFactory {
 		boolean isTreeLocked = false;
 		int budget = 0;
 		boolean hasNegative = false;
+		boolean isPreloaded = false;
 
 		//Initialize the random generator- in the case this is reloading a generated charm, use the UUID seed in the nbt data
 
@@ -363,26 +364,19 @@ public class CharmFactory {
 			ItemUtils.setPlainName(item, generatedName);
 		}
 
-		// now apply additional effects depending on remaining budget
-		while (budget > 0) {
-			MMLog.fine("budget is " + budget);
-
-			boolean success = false;
-			List<CharmEffectActions> potentialActions = Arrays.asList(CharmEffectActions.values());
-			Collections.shuffle(potentialActions, r);
-
-			// frozen: if loading an existing charm
-			if (actionOrder != null && actionOrder.size() >= activeEffects.size()) {
-				String actionName = actionOrder.get(activeEffects.size() - 1);
+		// load existing effects into the charm first
+		if (actionOrder != null) {
+			isPreloaded = true;
+			for (String actionName : actionOrder) {
 				CharmEffectActions action = CharmEffectActions.getEffect(actionName);
+
 				if (action != null) {
-					DepthsTree lockedTree = isTreeLocked ? chosenTree : null;
-					CharmEffects effect = applyRandomCharmEffect(chosenAbility, lockedTree, action.mRarity, item, r, activeEffects, action.mIsNegative, false, effectOrder, rollsOrder, charmTextLines);
+					CharmEffects effect = applyRandomCharmEffect(chosenAbility, isTreeLocked ? chosenTree : null, action.mRarity, item, r, activeEffects, action.mIsNegative, false, effectOrder, rollsOrder, charmTextLines);
+
 					if (effect == null) {
-						MMLog.fine("action failed- " + action.mAction);
+						MMLog.fine("load failed - " + action.mAction);
 					} else {
 						budget += action.mBudget;
-						success = true;
 						NBT.modify(item, nbt -> {
 							ItemStatUtils.addPlayerModified(nbt).setString(CHARM_ACTIONS_KEY + (activeEffects.size() - 1), action.mAction);
 						});
@@ -395,15 +389,17 @@ public class CharmFactory {
 					}
 				}
 			}
+		}
 
-			// only for Celestial Gem upgraded charms: if we've run out of pre-loaded effects
-			// skip adding new ones and just go straight to budget upgrading
-			if (isUpgrade && effectOrder != null && activeEffects.size() >= effectOrder.size()) {
-				break;
-			}
+		// skip the process of adding new effects if this is just a Celestial Gem upgrade
+		if (!isUpgrade) {
+			// after existing effects have been loaded, add additional effects depending on remaining budget
+			while (budget > 0) {
+				MMLog.fine("budget is " + budget);
 
-			// frozen: if creating a new charm
-			if (!success) {
+				boolean success = false;
+				List<CharmEffectActions> potentialActions = Arrays.asList(CharmEffectActions.values());
+				Collections.shuffle(potentialActions, r);
 
 				// old charms with 10+ effects can keep them. if we're adding new effects or making a new charm, don't go above 10
 				if (activeEffects.size() >= 10) {
@@ -419,8 +415,10 @@ public class CharmFactory {
 
 						continue;
 					}
-					// Skip action if it's negative and we aren't doing an ability only charm
-					if ((action.mIsNegative && chosenAbility == null) || (action.mIsNegative && hasNegative)) {
+					// Skip negative if we're doing a tree or wildcard charm (only single-ability charms can have negatives)
+					// Skip negative if the charm already has a negative (1 max)
+					// Skip negative if we're preloading a charm (never add new negative effects onto existing charms)
+					if ((action.mIsNegative && chosenAbility == null) || (action.mIsNegative && hasNegative) || isPreloaded) {
 						MMLog.fine("action skipped 2- " + action.mAction);
 
 						continue;
@@ -438,7 +436,6 @@ public class CharmFactory {
 					CharmEffects effect = applyRandomCharmEffect(chosenAbility, lockedTree, action.mRarity, item, r, activeEffects, action.mIsNegative, false, effectOrder, rollsOrder, charmTextLines);
 					if (effect == null) {
 						MMLog.fine("action failed- " + action.mAction);
-						continue;
 					} else {
 						budget += action.mBudget;
 						success = true;
@@ -455,11 +452,11 @@ public class CharmFactory {
 						break;
 					}
 				}
-			}
 
-			//End loop if we couldn't give a new effect
-			if (!success) {
-				break;
+				//End loop if we couldn't give a new effect
+				if (!success) {
+					break;
+				}
 			}
 		}
 
