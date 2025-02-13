@@ -38,11 +38,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -73,7 +69,7 @@ public class EscapeArtist extends DepthsAbility {
 			.descriptions(EscapeArtist::getDescription)
 			.priorityAmount(10000);
 
-	private final Map<Snowball, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
+	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 	private final int mStealthDuration;
 	private final double mMaxTPDistance;
 	private final double mProjectileSpeed;
@@ -157,7 +153,7 @@ public class EscapeArtist extends DepthsAbility {
 
 		new PartialParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "Escape Artist Projectile", Particle.SMOKE_NORMAL);
+		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "Escape Artist Projectile", Particle.SMOKE_NORMAL, LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		mPlayerItemStatsMap.put(proj, playerItemStats);
 
@@ -207,7 +203,7 @@ public class EscapeArtist extends DepthsAbility {
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (proj instanceof Snowball && proj.getTicksLived() <= 100) {
+		if ((proj instanceof Snowball || proj instanceof Trident) && proj.getTicksLived() <= 100) {
 			ItemStatManager.PlayerItemStats stats = mPlayerItemStatsMap.remove(proj);
 			if (!mPlayer.getWorld().equals(proj.getWorld())) {
 				return;

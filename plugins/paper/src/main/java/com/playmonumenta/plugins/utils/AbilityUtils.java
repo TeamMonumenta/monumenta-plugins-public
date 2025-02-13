@@ -46,14 +46,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
-import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -633,9 +626,18 @@ public class AbilityUtils {
 		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
 	}
 
-	public static Snowball spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
+	public static ThrowableProjectile spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
+		return spawnAbilitySnowball(plugin, player, world, velocity, name, particle, false);
+	}
+
+	public static ThrowableProjectile spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle, boolean inWater) {
 		Location loc = player.getEyeLocation();
-		Snowball proj = world.spawn(loc, Snowball.class);
+		ThrowableProjectile proj;
+		if (inWater) {
+			proj = world.spawn(loc, Trident.class);
+		} else {
+			proj = world.spawn(loc, Snowball.class);
+		}
 		proj.setVelocity(loc.getDirection().normalize().multiply(velocity));
 		proj.setShooter(player);
 		if (particle != null) {

@@ -14,14 +14,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -129,7 +120,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 		}
 		World world = mPlayer.getWorld();
 		double speed = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, speed, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle());
+		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, speed, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle(), LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		putOnCooldown();
 		return true;

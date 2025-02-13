@@ -13,10 +13,8 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -24,10 +22,7 @@ import java.util.WeakHashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -81,7 +76,7 @@ public class TotemicProjection extends Ability {
 				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.ENDER_PEARL);
 
-	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
+	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	private final double mSlownessPercent;
 	private final int mSlownessDuration;
 	private final double mEnhanceDamagePercent;
@@ -110,7 +105,7 @@ public class TotemicProjection extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Totemic Projection Projectile", null);
+		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Totemic Projection Projectile", null, LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
 		mCosmetic.projectionCast(mPlayer, proj, totems);
 
@@ -150,7 +145,7 @@ public class TotemicProjection extends Ability {
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (!(proj instanceof Snowball) || event.isCancelled()) {
+		if (!(proj instanceof Snowball || proj instanceof Trident) || event.isCancelled()) {
 			return;
 		}
 		ItemStatManager.PlayerItemStats stats = mProjectiles.remove(proj);
@@ -206,6 +201,7 @@ public class TotemicProjection extends Ability {
 					EntityUtils.applySlow(mPlugin, mSlownessDuration, mSlownessPercent, mob);
 				}
 			}
+			proj.remove();
 		}
 	}
 }

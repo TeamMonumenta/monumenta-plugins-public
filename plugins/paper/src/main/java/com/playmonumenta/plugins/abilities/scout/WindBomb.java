@@ -33,7 +33,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -105,7 +105,7 @@ public class WindBomb extends Ability {
 				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.TNT);
 
-	private final List<Triple<Snowball, Double, ItemStatManager.PlayerItemStats>> mProjectiles = new ArrayList<>();
+	private final List<Triple<ThrowableProjectile, Double, ItemStatManager.PlayerItemStats>> mProjectiles = new ArrayList<>();
 	private final double mDamageFraction;
 	private final double mRadius;
 	private final int mEffectDuration;
@@ -138,7 +138,7 @@ public class WindBomb extends Ability {
 		}
 
 		mCosmetic.onThrow(mPlayer.getWorld(), mPlayer.getLocation());
-		final Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, mPlayer.getWorld(), VELOCITY, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle());
+		final ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, mPlayer.getWorld(), VELOCITY, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle(), LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		double damage = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(),
 			AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) * mDamageFraction;
 		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
@@ -154,8 +154,8 @@ public class WindBomb extends Ability {
 
 	@Override
 	public void projectileHitEvent(final ProjectileHitEvent event, final Projectile proj) {
-		Triple<Snowball, Double, ItemStatManager.PlayerItemStats> triple = null;
-		for (final Triple<Snowball, Double, ItemStatManager.PlayerItemStats> testTriple : mProjectiles) {
+		Triple<ThrowableProjectile, Double, ItemStatManager.PlayerItemStats> triple = null;
+		for (final Triple<ThrowableProjectile, Double, ItemStatManager.PlayerItemStats> testTriple : mProjectiles) {
 			if (testTriple.getLeft() == proj) {
 				triple = testTriple;
 				break;
