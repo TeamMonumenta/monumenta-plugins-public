@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -18,13 +19,15 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class ByMyBlade extends Ability {
-	private static final double ATTACK_SPEED_1 = 0.2;
-	private static final double ATTACK_SPEED_2 = 0.4;
+	private static final int HASTE_POTENCY = 1;
+	private static final double ATTACK_SPEED_2 = 0.2;
 	private static final String ATTACK_SPEED_SRC = "ByMyBladeAttackSpeed";
 	private static final int ATTACK_SPEED_DURATION = TICKS_PER_SECOND * 4;
 	private static final int DAMAGE_1 = 12;
@@ -48,14 +51,15 @@ public final class ByMyBlade extends Ability {
 			.shorthandName("BmB")
 			.descriptions(
 				String.format("While holding two swords, performing a critical melee attack deals %s Melee damage to " +
-					"the hit enemy and grants %s Attack Speed for %ss. Cooldown: %ss.",
+					"the hit enemy and grants Haste %s for %ss. Cooldown: %ss.",
 					DAMAGE_1,
-					StringUtils.multiplierToPercentageWithSign(ATTACK_SPEED_1),
+					HASTE_POTENCY + 1,
 					StringUtils.ticksToSeconds(ATTACK_SPEED_DURATION),
 					StringUtils.ticksToSeconds(COOLDOWN)),
-				String.format("The damage is increased to %s and the Attack Speed is increased to %s.",
+				String.format("The damage is increased to %s and additionally gain %s Attack Speed for %s.",
 					DAMAGE_2,
-					StringUtils.multiplierToPercentageWithSign(ATTACK_SPEED_2)),
+					StringUtils.multiplierToPercentageWithSign(ATTACK_SPEED_2),
+					StringUtils.ticksToSeconds(ATTACK_SPEED_DURATION)),
 				String.format("By My Blade does %s extra damage. Killing an enemy with this ability heals you for " +
 					"%s of your max health which is increased to %s if the target was an elite or boss.",
 					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_DAMAGE_MULT),
@@ -76,7 +80,7 @@ public final class ByMyBlade extends Ability {
 		super(plugin, player, INFO);
 		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
 			(isLevelTwo() ? DAMAGE_2 : DAMAGE_1) * (isEnhanced() ? 1 + ENHANCEMENT_DAMAGE_MULT : 1));
-		mAttackSpeedAmplifier = (isLevelTwo() ? ATTACK_SPEED_2 : ATTACK_SPEED_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED_AMPLIFIER);
+		mAttackSpeedAmplifier = ATTACK_SPEED_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED_AMPLIFIER);
 		mAttackSpeedDuration = CharmManager.getDuration(mPlayer, CHARM_ATTACK_SPEED_DURATION, ATTACK_SPEED_DURATION);
 		mEnhancementHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALTH, ENHANCEMENT_HEAL_PERCENT);
 		mEnhancementHealElite = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ELITE_HEALTH, ENHANCEMENT_HEAL_PERCENT_ELITE);
@@ -88,8 +92,15 @@ public final class ByMyBlade extends Ability {
 		if (event.getType() == DamageType.MELEE && !isOnCooldown() && PlayerUtils.isFallingAttack(mPlayer)
 			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mDamageBonus, mInfo.getLinkedSpell(), true);
-			mPlugin.mEffectManager.addEffect(mPlayer, ATTACK_SPEED_SRC, new PercentAttackSpeed(mAttackSpeedDuration,
-				mAttackSpeedAmplifier, ATTACK_SPEED_SRC));
+			// TODO: Remove Haste when we get to 1.20.5, buff Attack Speed to compensate
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionManager.PotionID.ABILITY_SELF,
+				new PotionEffect(PotionEffectType.FAST_DIGGING, ATTACK_SPEED_DURATION, HASTE_POTENCY, true));
+
+			if (isLevelTwo()) {
+				mPlugin.mEffectManager.addEffect(mPlayer, ATTACK_SPEED_SRC, new PercentAttackSpeed(mAttackSpeedDuration,
+					mAttackSpeedAmplifier, ATTACK_SPEED_SRC));
+			}
+
 			putOnCooldown();
 
 			if (isEnhanced()) {
