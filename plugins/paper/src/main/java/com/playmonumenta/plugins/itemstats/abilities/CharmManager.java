@@ -779,6 +779,7 @@ public class CharmManager {
 			SanguineHarvest.CHARM_DAMAGE_BOOST,
 			SoulRend.CHARM_COOLDOWN,
 			SoulRend.CHARM_HEAL,
+			SoulRend.CHARM_PACT_HEAL,
 			SoulRend.CHARM_MARK_DURATION,
 			SoulRend.CHARM_MARK_COUNT,
 			SoulRend.CHARM_ALLY,

@@ -43,6 +43,7 @@ public class SoulRend extends Ability {
 
 	public static final String CHARM_COOLDOWN = "Soul Rend Cooldown";
 	public static final String CHARM_HEAL = "Soul Rend Healing";
+	public static final String CHARM_PACT_HEAL = "Soul Rend Pact Healing";
 	public static final String CHARM_MARK_DURATION = "Soul Rend Mark Duration";
 	public static final String CHARM_MARK_COUNT = "Soul Rend Mark Count";
 	public static final String CHARM_ALLY = "Soul Rend Ally Heal";
@@ -97,7 +98,7 @@ public class SoulRend extends Ability {
 		mAbsorptionDuration = ABSORPTION_DURATION;
 		mAllyHealMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, 1);
 
-		mDarkPactHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? DARK_PACT_HEAL_1 : DARK_PACT_HEAL_2);
+		mDarkPactHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_PACT_HEAL, isLevelOne() ? DARK_PACT_HEAL_1 : DARK_PACT_HEAL_2);
 		Bukkit.getScheduler().runTask(plugin, () -> mDarkPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class));
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SoulRendCS());
