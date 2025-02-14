@@ -1147,6 +1147,7 @@ public class BossManager implements Listener {
 
 		Set<String> tags = entity.getScoreboardTags();
 		if (!tags.isEmpty()) {
+			Boss boss = null;
 			/*
 			 * Note - it is important to make a copy here to avoid concurrent modification exception
 			 * which happens while iterating and the boss constructor changes the tags on the mob
@@ -1154,13 +1155,24 @@ public class BossManager implements Listener {
 			for (String tag : new ArrayList<>(tags)) {
 				BossDeserializer deserializer = mBossDeserializers.get(tag);
 				if (deserializer != null) {
+					BossAbilityGroup ability;
 					try {
-						BossAbilityGroup ability = deserializer.deserialize(mPlugin, entity);
-						if (ability != null) {
-							createBossInternal(entity, ability);
+						ability = deserializer.deserialize(mPlugin, entity);
+						if (ability == null) {
+							continue;
 						}
 					} catch (Exception ex) {
 						mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
+						continue;
+					}
+
+					checkEnablePerformanceEvents(ability);
+
+					if (boss == null) {
+						boss = new Boss(mPlugin, ability);
+						mBosses.put(entity.getUniqueId(), boss);
+					} else {
+						boss.add(ability);
 					}
 				}
 			}
