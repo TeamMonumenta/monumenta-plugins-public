@@ -203,6 +203,7 @@ public class RebirthCS extends CelestialBlessingCS {
 						.spawnAsPlayerActive(mPlayer);
 					if (mT > 5 && mL.distance(targetEntity.getLocation()) < 0.35) {
 						new PartialParticle(Particle.SHRIEK, mL, 1)
+							.data(0)
 							.spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
